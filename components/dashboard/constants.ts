@@ -45,6 +45,9 @@ export const SECTIONS = {
   SEARCH: 'search',
   PAID_DISBURSEMENTS: 'paid-disbursements',
   PAY_DISBURSEMENTS: 'pay-disbursements',
+  APPROVE_PAYMENT_REQUESTS: 'approve-payment-requests',
+  PAYMENT_REQUESTS: 'payment-requests',
+  HOST_PAYMENT_REQUESTS: 'host-payment-requests',
 };
 
 export const ROOT_SECTIONS = {
@@ -336,5 +339,17 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.SUBMITTED_GRANTS]: {
     defaultMessage: 'Issued Grant Requests',
     id: 'qKKz2G',
+  },
+  [ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS]: {
+    defaultMessage: 'Approve Payment Requests',
+    id: 'ApprovePaymentRequests',
+  },
+  [ALL_SECTIONS.PAYMENT_REQUESTS]: {
+    defaultMessage: 'Payment Requests',
+    id: 'PaymentRequests',
+  },
+  [ALL_SECTIONS.HOST_PAYMENT_REQUESTS]: {
+    defaultMessage: 'All Payment Requests',
+    id: 'HostPaymentRequests',
   },
 });

@@ -187,7 +187,11 @@ function buildSortFilterComponent(fieldSchema: z.ZodEnum<any>, i18nCustomLabels?
                     id="SortFilter.SortByField"
                     values={{
                       sortField: i18nSortFieldLabel(intl, value.field, i18nCustomLabels),
-                      SortField: parts => <span className="text-foreground">{parts}</span>,
+                      SortField: parts => (
+                        <span key="sortField" className="text-foreground">
+                          {parts}
+                        </span>
+                      ),
                     }}
                   />
                 </span>

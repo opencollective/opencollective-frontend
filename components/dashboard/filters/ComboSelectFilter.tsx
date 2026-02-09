@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { isUndefined, uniqBy } from 'lodash';
+import { isNil, uniqBy } from 'lodash';
 import { CheckIcon, PlusIcon } from 'lucide-react';
 import type { IntlShape, MessageDescriptor } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -134,7 +134,7 @@ function ComboSelectFilter({
   const intl = useIntl();
   const [input, setInput] = React.useState('');
 
-  const selected = Array.isArray(value) ? value : !isUndefined(value) ? [value] : [];
+  const selected = Array.isArray(value) ? value : isNil(value) ? [] : [value];
 
   useDebouncedSearch(searchFunc, input, { delay: 500, noDelayEmpty: true });
 

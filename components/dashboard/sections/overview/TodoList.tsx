@@ -1,16 +1,21 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { ArrowRight, Building, Coins, MailOpen, Receipt } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { ArrowRight, Award, Building, HandCoins, MailOpen, Receipt } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { hasAccountMoneyManagement } from '../../../../lib/collective';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { gql } from '@/lib/graphql/helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import Link from '../../../Link';
+import { ALL_SECTIONS } from '../../constants';
 import { DashboardContext } from '../../DashboardContext';
 
 const hostTodoQuery = gql`
@@ -70,6 +75,7 @@ const hostTodoQuery = gql`
 
 export const HostTodoList = () => {
   const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
 
   const { data, loading } = useQuery(hostTodoQuery, {
@@ -84,7 +90,12 @@ export const HostTodoList = () => {
         {
           id: 'expenses',
           title: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
-          href: getDashboardRoute(account, 'host-expenses'),
+          href: getDashboardRoute(
+            account,
+            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+              ? ALL_SECTIONS.PAY_DISBURSEMENTS
+              : ALL_SECTIONS.HOST_EXPENSES,
+          ),
           icon: Receipt,
           iconBgColor: 'bg-green-50',
           iconColor: 'text-green-700',
@@ -119,7 +130,13 @@ export const HostTodoList = () => {
                 },
                 { count: data?.missingReceiptExpenses.totalCount },
               ),
-              queryParams: '?chargeHasReceipts=false&status=ALL',
+              href: getDashboardRoute(
+                account,
+                LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+                  ? ALL_SECTIONS.PAID_DISBURSEMENTS
+                  : ALL_SECTIONS.HOST_EXPENSES,
+              ),
+              queryParams: `?chargeHasReceipts=false${LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) ? '' : '&status=ALL'}`,
             },
 
             {
@@ -155,7 +172,7 @@ export const HostTodoList = () => {
           id: 'contributions',
           title: intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' }),
           href: getDashboardRoute(account, 'incoming-contributions'),
-          icon: Coins,
+          icon: HandCoins,
           iconBgColor: 'bg-amber-50',
           iconColor: 'text-amber-700',
           subItems: [
@@ -215,7 +232,7 @@ export const HostTodoList = () => {
         }))
         .filter(item => item.subItems.length > 0),
 
-    [data, account, intl],
+    [data, account, intl, LoggedInUser],
   );
 
   return (
@@ -257,7 +274,7 @@ export const HostTodoList = () => {
                   </div>
                   <div className="pointer-events-auto flex flex-wrap items-center gap-2">
                     {item.subItems.map(subItem => (
-                      <Link key={subItem.id} href={`${item.href}${subItem.queryParams ?? ''}`}>
+                      <Link key={subItem.id} href={`${subItem.href ?? item.href}${subItem.queryParams ?? ''}`}>
                         <Badge
                           type="outline"
                           className={
@@ -281,23 +298,140 @@ export const HostTodoList = () => {
   );
 };
 
+// Query for self-hosted organization specific todos (READY_TO_PAY, etc.)
+const moneyManagingOrgTodoQuery = gql`
+  query MoneyManagingOrgTodo($slug: String!) {
+    toPayExpenses: expenses(account: { slug: $slug }, status: [READY_TO_PAY], includeChildrenExpenses: true) {
+      totalCount
+    }
+  }
+`;
+
+type AccountTodoItem = {
+  id: string;
+  show: boolean;
+  Icon: LucideIcon;
+  message: React.ReactNode;
+};
+
+// For Hosted Collectives and Orgs with money management (but without hosting)
 export const AccountTodoList = () => {
   const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
 
-  const pendingExpenseCount = account?.pendingExpenses.totalCount;
-  const pendingGrantCount = account?.pendingGrants.totalCount;
-  const pausedIncomingContributionsCount = account?.pausedResumableIncomingContributions.totalCount;
-  const pausedOutgoingContributions = account?.pausedOutgoingContributions.totalCount;
+  const isOrgWithMoneyManagment = account?.type === 'ORGANIZATION' && hasAccountMoneyManagement(account);
+
+  // Additional query for orgs with money management
+  const { data } = useQuery(moneyManagingOrgTodoQuery, {
+    variables: { slug: account?.slug },
+    skip: !isOrgWithMoneyManagment,
+  });
+
+  const pendingExpenseCount = account?.pendingExpenses?.totalCount || 0;
+  const pendingGrantCount = account?.pendingGrants?.totalCount || 0;
+  const pausedIncomingContributionsCount = account?.pausedResumableIncomingContributions?.totalCount || 0;
+  const pausedOutgoingContributions = account?.pausedOutgoingContributions?.totalCount || 0;
   const canStartResumeContributionsProcess = account?.canStartResumeContributionsProcess;
   const canActOnPausedIncomingContributions =
     pausedIncomingContributionsCount > 0 && canStartResumeContributionsProcess;
 
-  if (
-    !pendingExpenseCount &&
-    !pendingGrantCount &&
-    !pausedOutgoingContributions &&
-    !canActOnPausedIncomingContributions
-  ) {
+  // Expenses to pay, for orgs with money management
+  const toPayExpenseCount = data?.toPayExpenses?.totalCount || 0;
+
+  const expensesHref = getDashboardRoute(
+    account,
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+      ? ALL_SECTIONS.PAYMENT_REQUESTS
+      : ALL_SECTIONS.EXPENSES,
+  );
+
+  const createLink = (href: string) => (chunks: React.ReactNode) => (
+    <Link className="font-medium text-primary hover:underline" href={href}>
+      {chunks}
+    </Link>
+  );
+
+  const todoItems: AccountTodoItem[] = [
+    {
+      id: 'pending-expenses',
+      show: pendingExpenseCount > 0,
+      Icon: Receipt,
+      message: (
+        <FormattedMessage
+          defaultMessage="{pendingExpenseCount, plural, one {<Link>{pendingExpenseCount} expense</Link> has} other {<Link>{pendingExpenseCount} expenses</Link> have}} not been reviewed"
+          id="PcyeDN"
+          values={{
+            Link: createLink(`${expensesHref}?status=PENDING`),
+            pendingExpenseCount,
+          }}
+        />
+      ),
+    },
+    {
+      id: 'to-pay-expenses',
+      show: isOrgWithMoneyManagment && toPayExpenseCount > 0,
+      Icon: Receipt,
+      message: (
+        <FormattedMessage
+          defaultMessage="{toPayExpenseCount, plural, one {<Link>{toPayExpenseCount} expense</Link> is} other {<Link>{toPayExpenseCount} expenses</Link> are}} ready to pay"
+          id="SelfHostedTodo.ExpensesToPay"
+          values={{
+            Link: createLink(`${expensesHref}?status=READY_TO_PAY`),
+            toPayExpenseCount,
+          }}
+        />
+      ),
+    },
+    {
+      id: 'pending-grants',
+      show: pendingGrantCount > 0,
+      Icon: Award,
+      message: (
+        <FormattedMessage
+          defaultMessage="{pendingGrantCount, plural, one {<Link>{pendingGrantCount} grant</Link> has} other {<Link>{pendingGrantCount} grants</Link> have}} not been reviewed"
+          id="jLe6JL"
+          values={{
+            Link: createLink(getDashboardRoute(account, 'grants?status=PENDING')),
+            pendingGrantCount,
+          }}
+        />
+      ),
+    },
+    {
+      id: 'paused-incoming-contributions',
+      show: canActOnPausedIncomingContributions,
+      Icon: HandCoins,
+      message: (
+        <FormattedMessage
+          defaultMessage="{pausedIncomingContributionsCount, plural, one {A recurring contribution to your account is paused} other {# recurring contributions to your account are paused}} and <Link>can be resumed</Link>."
+          id="AccountTodo.PausedIncoming"
+          values={{
+            Link: createLink(getDashboardRoute(account, 'incoming-contributions?status=PAUSED')),
+            pausedIncomingContributionsCount,
+          }}
+        />
+      ),
+    },
+    {
+      id: 'paused-outgoing-contributions',
+      show: pausedOutgoingContributions > 0,
+      Icon: HandCoins,
+      message: (
+        <FormattedMessage
+          defaultMessage="{pausedOutgoingContributions, plural, one {One of your recurring contributions is paused} other {# of your recurring contributions are paused}} and <Link>can be resumed</Link>."
+          id="4HaZeO"
+          values={{
+            Link: createLink(getDashboardRoute(account, 'outgoing-contributions?status=PAUSED')),
+            pausedOutgoingContributions,
+          }}
+        />
+      ),
+    },
+  ];
+
+  const visibleTodos = todoItems.filter(item => item.show);
+
+  if (visibleTodos.length === 0) {
     return null;
   }
 
@@ -307,105 +441,14 @@ export const AccountTodoList = () => {
         <FormattedMessage defaultMessage="To do" id="vwqEeH" />
       </div>
       <div className="divide-y rounded-xl border bg-slate-50">
-        {pendingExpenseCount > 0 && (
-          <div className="p-3 text-sm">
+        {visibleTodos.map(item => (
+          <div key={item.id} className="p-3 text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Receipt size={16} />
-              <span>
-                <FormattedMessage
-                  defaultMessage="{pendingExpenseCount, plural, one {<Link>{pendingExpenseCount} expense</Link> has} other {<Link>{pendingExpenseCount} expenses</Link> have}} not been reviewed"
-                  id="PcyeDN"
-                  values={{
-                    Link: chunks => (
-                      <Link
-                        className="font-medium text-primary hover:underline"
-                        href={getDashboardRoute(account, 'expenses?status=PENDING')}
-                      >
-                        {chunks}
-                      </Link>
-                    ),
-                    pendingExpenseCount: pendingExpenseCount,
-                  }}
-                />
-              </span>
+              <item.Icon size={16} />
+              <span>{item.message}</span>
             </div>
           </div>
-        )}
-
-        {pendingGrantCount > 0 && (
-          <div className="p-3 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Receipt size={16} />
-              <span>
-                <FormattedMessage
-                  defaultMessage="{pendingGrantCount, plural, one {<Link>{pendingGrantCount} grant</Link> has} other {<Link>{pendingGrantCount} grants</Link> have}} not been reviewed"
-                  id="jLe6JL"
-                  values={{
-                    Link: chunks => (
-                      <Link
-                        className="font-medium text-primary hover:underline"
-                        href={getDashboardRoute(account, 'grants?status=PENDING')}
-                      >
-                        {chunks}
-                      </Link>
-                    ),
-                    pendingGrantCount: pendingGrantCount,
-                  }}
-                />
-              </span>
-            </div>
-          </div>
-        )}
-
-        {canActOnPausedIncomingContributions && (
-          <div className="p-3 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Coins size={16} />
-              <span>
-                <FormattedMessage
-                  defaultMessage="{pausedIncomingContributionsCount, plural, one {A recurring contribution to your Collective is paused} other {# recurring contributions to your Collective are paused}} and <Link>can be resumed</Link>."
-                  id="qck/cA"
-                  values={{
-                    Link: chunks => (
-                      <Link
-                        className="font-medium text-primary hover:underline"
-                        href={getDashboardRoute(account, 'incoming-contributions?status=PAUSED')}
-                      >
-                        {chunks}
-                      </Link>
-                    ),
-                    pausedIncomingContributionsCount: pausedIncomingContributionsCount,
-                  }}
-                />
-              </span>
-            </div>
-          </div>
-        )}
-
-        {pausedOutgoingContributions > 0 && (
-          <div className="p-3 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Coins size={16} />
-              <span>
-                <FormattedMessage
-                  defaultMessage="{pausedOutgoingContributions, plural, one {One of your recurring contributions is paused} other {# of your recurring contributions are paused}} and <Link>can be resumed</Link>."
-                  id="4HaZeO"
-                  values={{
-                    Link: chunks => (
-                      <Link
-                        className="font-medium text-primary hover:underline"
-                        href={getDashboardRoute(account, 'outgoing-contributions?status=PAUSED')}
-                      >
-                        {chunks}
-                      </Link>
-                    ),
-                    pausedOutgoingContributions: pausedOutgoingContributions,
-                  }}
-                />
-              </span>
-            </div>
-          </div>
-        )}
+        ))}
       </div>
     </div>
   );

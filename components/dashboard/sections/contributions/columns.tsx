@@ -20,6 +20,7 @@ import OrderStatusTag from '@/components/orders/OrderStatusTag';
 import { PaymentMethodTypeLabel } from '@/components/PaymentMethodTypeWithIcon';
 import { ColumnHeader } from '@/components/table/ColumnHeader';
 import { actionsColumn } from '@/components/table/DataTable';
+import { Badge } from '@/components/ui/Badge';
 
 const columnHelper = createColumnHelper<ManagedOrderFieldsFragment>();
 
@@ -241,7 +242,18 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
     cell: ({ row, table }) => {
       const { intl } = table.options.meta;
       const pm = row.original.paymentMethod;
-      if (row.original.pendingContributionData?.paymentMethod) {
+      if (row.original.manualPaymentProvider) {
+        return (
+          <div>
+            <Badge size="xs" type="neutral" className="mr-1">
+              <FormattedMessage defaultMessage="Manual" id="PaymentMethod.Manual" />
+            </Badge>
+            <span className="align-middle">{row.original.manualPaymentProvider.name}</span>
+          </div>
+        );
+      } else if (row.original.pendingContributionData?.paymentMethod) {
+        // We don't store this information anymore, but it used to be populated in the API. Do not migrate unless you've
+        // verified that all instances have been migrated to something else.
         return i18nPaymentMethodProviderType(intl, row.original.pendingContributionData?.paymentMethod);
       }
 

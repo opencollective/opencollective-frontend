@@ -59,7 +59,7 @@ export enum NFFEStatus {
 
 export const TaxFormNameFields = z.object({
   firstName: z.string().min(1).max(50),
-  middleName: z.string().max(50).or(z.literal('')).optional(),
+  middleName: z.string().max(50).or(z.literal('')).optional().nullable(),
   lastName: z.string().min(1).max(50),
 });
 
@@ -68,11 +68,11 @@ export const TaxFormNameFields = z.object({
 export const TaxFormLocationFields = z.object({
   country: z.string(),
   structured: z.object({
-    address1: z.string().optional(),
-    address2: z.string().optional(),
-    city: z.string().optional(),
-    zone: z.string().optional(),
-    postalCode: z.string().optional(),
+    address1: z.string().optional().nullable(),
+    address2: z.string().optional().nullable(),
+    city: z.string().optional().nullable(),
+    zone: z.string().optional().nullable(),
+    postalCode: z.string().optional().nullable(),
   }),
 });
 

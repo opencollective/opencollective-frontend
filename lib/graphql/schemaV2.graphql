@@ -2179,6 +2179,7 @@ type Order {
   """
   totalContributed: Amount!
   paymentMethod: PaymentMethod
+  manualPaymentProvider: ManualPaymentProvider
   paymentProcessorUrl: String
 
   """
@@ -4087,7 +4088,22 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
   """
   supportedPaymentMethods: [PaymentMethodLegacyType]
-  bankAccount: PayoutMethod
+
+  """
+  Manual payment providers configured for this host
+  """
+  manualPaymentProviders(
+    """
+    Filter by provider type
+    """
+    type: ManualPaymentProviderType
+
+    """
+    Whether to include archived providers
+    """
+    includeArchived: Boolean! = false
+  ): [ManualPaymentProvider!]!
+  bankAccount: PayoutMethod @deprecated(reason: "2026-01-23: Deprecated in favour of custom payment providers")
 
   """
   Paypal preapproval info. Returns null if PayPal account is not connected.
@@ -4325,6 +4341,16 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
   ): VendorCollection!
 
   """
@@ -5687,6 +5713,10 @@ enum ActivityType {
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
+  MANUAL_PAYMENT_PROVIDER_CREATED
+  MANUAL_PAYMENT_PROVIDER_UPDATED
+  MANUAL_PAYMENT_PROVIDER_DELETED
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -7905,6 +7935,69 @@ type HostExpensesReportNode {
 }
 
 """
+A manual payment provider configured by a host for contributors to use
+"""
+type ManualPaymentProvider {
+  """
+  Unique identifier for this provider
+  """
+  id: String!
+
+  """
+  The type of manual payment provider
+  """
+  type: ManualPaymentProviderType!
+
+  """
+  Display name for this payment provider
+  """
+  name: NonEmptyString!
+
+  """
+  Payment instructions to show contributors (HTML)
+  """
+  instructions: String
+
+  """
+  Icon name for this payment provider
+  """
+  icon: String
+
+  """
+  Bank account details for BANK_TRANSFER type providers
+  """
+  accountDetails: JSON
+
+  """
+  Whether this provider has been archived
+  """
+  isArchived: Boolean!
+
+  """
+  When this provider was created
+  """
+  createdAt: DateTime!
+
+  """
+  When this provider was last updated
+  """
+  updatedAt: DateTime!
+}
+
+"""
+The type of manual payment provider
+"""
+enum ManualPaymentProviderType {
+  BANK_TRANSFER
+  OTHER
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
+"""
 Stripe connected account properties
 """
 type StripeConnectedAccount {
@@ -8158,11 +8251,6 @@ type TransactionsImport {
   ): TransactionsImportRowCollection!
   stats: TransactionsImportStats!
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 """
 Type of the import
@@ -16996,6 +17084,17 @@ type Query {
     """
     searchTerm: String
     relation: [CommunityRelationType!]
+    orderBy: OrderByInput
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
     limit: Int! = 100
     offset: Int! = 0
   ): AccountCollection!
@@ -19401,6 +19500,10 @@ enum ActivityAndClassesType {
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
+  MANUAL_PAYMENT_PROVIDER_CREATED
+  MANUAL_PAYMENT_PROVIDER_UPDATED
+  MANUAL_PAYMENT_PROVIDER_DELETED
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -23162,6 +23265,66 @@ type Mutation {
   ): Boolean!
 
   """
+  Create a new manual payment provider for a host. Scope: "host".
+  """
+  createManualPaymentProvider(
+    """
+    The host to create the manual payment provider for
+    """
+    host: AccountReferenceInput!
+
+    """
+    The manual payment provider data
+    """
+    manualPaymentProvider: ManualPaymentProviderCreateInput!
+  ): ManualPaymentProvider!
+
+  """
+  Update an existing manual payment provider. Scope: "host".
+  """
+  updateManualPaymentProvider(
+    """
+    Reference to the manual payment provider to update
+    """
+    manualPaymentProvider: ManualPaymentProviderReferenceInput!
+
+    """
+    The updated fields
+    """
+    input: ManualPaymentProviderUpdateInput!
+  ): ManualPaymentProvider!
+
+  """
+  Delete a manual payment provider. If orders reference this provider, it will be archived instead. Scope: "host".
+  """
+  deleteManualPaymentProvider(
+    """
+    Reference to the manual payment provider to delete
+    """
+    manualPaymentProvider: ManualPaymentProviderReferenceInput!
+  ): ManualPaymentProvider!
+
+  """
+  Reorder manual payment providers for a host. Scope: "host".
+  """
+  reorderManualPaymentProviders(
+    """
+    The host to reorder manual payment providers for
+    """
+    host: AccountReferenceInput!
+
+    """
+    The type of providers to reorder
+    """
+    type: ManualPaymentProviderType!
+
+    """
+    Ordered list of provider IDs
+    """
+    providers: [ManualPaymentProviderReferenceInput!]!
+  ): [ManualPaymentProvider!]!
+
+  """
   Follows a given Collective. Scope: "account"
   """
   followAccount(
@@ -25685,6 +25848,62 @@ input MemberInvitationReferenceInput {
   legacyId: Int
 }
 
+input ManualPaymentProviderCreateInput {
+  """
+  The type of manual payment provider
+  """
+  type: ManualPaymentProviderType!
+
+  """
+  Display name for this payment provider
+  """
+  name: NonEmptyString!
+
+  """
+  Payment instructions to show contributors (HTML allowed)
+  """
+  instructions: String!
+
+  """
+  Icon name for this payment provider
+  """
+  icon: String
+
+  """
+  Bank account details for BANK_TRANSFER type providers
+  """
+  accountDetails: JSON
+}
+
+input ManualPaymentProviderReferenceInput {
+  """
+  The unique identifier of the manual payment provider
+  """
+  id: String!
+}
+
+input ManualPaymentProviderUpdateInput {
+  """
+  Display name for this payment provider
+  """
+  name: NonEmptyString
+
+  """
+  Payment instructions to show contributors (HTML allowed)
+  """
+  instructions: String
+
+  """
+  Icon name for this payment provider
+  """
+  icon: String
+
+  """
+  Bank account details for BANK_TRANSFER type providers
+  """
+  accountDetails: JSON
+}
+
 type FollowAccountResult {
   individual: Individual!
   member: Member!
@@ -25924,6 +26143,11 @@ input PaymentMethodInput {
   The Payment Intent ID used in this checkout
   """
   paymentIntentId: String
+
+  """
+  The Manual Payment Provider ID used in this checkout
+  """
+  manualPaymentProvider: ManualPaymentProviderReferenceInput
 }
 
 input CreditCardCreateInput {
@@ -26365,12 +26589,12 @@ input GoCardlessLinkInput {
   institutionId: String!
 
   """
-  Maximum number of days of transaction data to retrieve (default: 90)
+  Maximum number of days of transaction data to retrieve (default to the maximum allowed by the institution)
   """
   maxHistoricalDays: Int
 
   """
-  Number of days from acceptance that the access can be used (default: 90)
+  Number of days from acceptance that the access can be used (default to the maximum allowed by the institution)
   """
   accessValidForDays: Int
 
@@ -26658,10 +26882,12 @@ enum UploadedFileKind {
   EXPENSE_ATTACHED_FILE
   EXPENSE_ITEM
   TRANSACTIONS_IMPORT
+  TRANSACTIONS_CSV_EXPORT
   ACCOUNT_LONG_DESCRIPTION
   UPDATE
   COMMENT
   TIER_LONG_DESCRIPTION
+  CUSTOM_PAYMENT_METHOD_TEMPLATE
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
   EXPENSE_INVOICE

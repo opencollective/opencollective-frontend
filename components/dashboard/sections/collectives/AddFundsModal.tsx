@@ -3,8 +3,8 @@ import { useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
-import { compact, get, groupBy, isEmpty, map } from 'lodash';
-import { ArrowLeft, Lock, Unlock } from 'lucide-react';
+import { get, isEmpty } from 'lodash';
+import { ArrowLeft, Lock, PlusCircle, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -15,22 +15,29 @@ import { requireFields } from '../../../../lib/form-utils';
 import { API_V1_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import type { Account, Amount, Order, Tier, TransactionReferenceInput } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
-import type { TierReferenceInput } from '@/lib/graphql/types/v2/graphql';
+import { i18nGraphqlException } from '@/lib/errors';
+import type { TierReferenceInput, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
+import { I18nBold } from '@/components/I18nFormatters';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Switch } from '@/components/ui/Switch';
+import { toast } from '@/components/ui/useToast';
+import { vendorFieldFragment } from '@/components/vendors/queries';
 
+import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
+import Avatar from '../../../Avatar';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../../../collective-page/graphql/queries';
 import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../../../collective-page/sections/Budget';
-import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePicker';
+import CollectivePicker, { CUSTOM_OPTIONS_POSITION, DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Container from '../../../Container';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import { Box, Flex } from '../../../Grid';
+import { Flex } from '../../../Grid';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import MessageBox from '../../../MessageBox';
@@ -41,7 +48,7 @@ import StyledInputAmount from '../../../StyledInputAmount';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledInputPercentage from '../../../StyledInputPercentage';
 import StyledLink from '../../../StyledLink';
-import StyledModal, { CollectiveModalHeader, ModalBody, ModalHeader } from '../../../StyledModal';
+import StyledModal, { ModalBody, ModalHeader } from '../../../StyledModal';
 import StyledSelect from '../../../StyledSelect';
 import StyledTextarea from '../../../StyledTextarea';
 import StyledTooltip from '../../../StyledTooltip';
@@ -277,6 +284,7 @@ const addFundsAccountQuery = gql`
       slug
       currency
       settings
+      ...AccountHoverCardFields
       ... on Organization {
         tiers {
           nodes {
@@ -296,6 +304,17 @@ const addFundsAccountQuery = gql`
           imageUrl
           type
           settings
+          ...AccountHoverCardFields
+
+          childrenAccounts {
+            nodes {
+              id
+              slug
+              name
+              imageUrl
+              type
+            }
+          }
         }
       }
       childrenAccounts {
@@ -328,6 +347,7 @@ const addFundsAccountQuery = gql`
   }
   ${addFundsTierFieldsFragment}
   ${addFundsAccountQueryHostFieldsFragment}
+  ${accountHoverCardFields}
 `;
 
 type FundDetails = {
@@ -358,6 +378,8 @@ type AddFundsFormValues = {
   transactionsImportRow?: TransactionReferenceInput | null;
   invoiceTemplate?: { value: string };
   accountingCategory?: { id: string };
+  hasHostFee?: boolean;
+  hasPaymentProcessorFee?: boolean;
 };
 
 const getInitialValues = (values): AddFundsFormValues => ({
@@ -370,11 +392,19 @@ const getInitialValues = (values): AddFundsFormValues => ({
   fromAccount: null,
   tier: null,
   tax: null,
+  hasHostFee: !!values.hostFeePercent,
+  hasPaymentProcessorFee: !!values.paymentProcessorFee,
   ...values,
 });
 
 const validate = (intl, values) => {
-  const errors = requireFields(values, ['amount', 'fromAccount', 'description', 'processedAt']);
+  const errors = requireFields(values, [
+    'amount',
+    'fromAccount',
+    'description',
+    'processedAt',
+    'add-funds-confirm-checkbox',
+  ]);
   const taxErrors = validateTaxInput(intl, values.tax, { requireTaxIdNumber: false });
   if (!isEmpty(taxErrors)) {
     errors['tax'] = taxErrors;
@@ -469,6 +499,47 @@ const AddFundsModalContentWithCollective = ({
   const applicableTax = getApplicableTaxType(account, host);
   const isEdit = Boolean(editOrderId);
 
+  const [createVendor, { loading: isCreatingVendor }] = useMutation(gql`
+    mutation CreateAddFundsVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
+      createVendor(host: $host, vendor: $vendor) {
+        id
+        ...VendorFields
+      }
+    }
+    ${vendorFieldFragment}
+  `);
+
+  const onCreateVendorClick = React.useCallback(
+    async (
+      searchText: string,
+      { onSuccess, onError }: { onSuccess: (vendor: VendorFieldsFragment) => void; onError: (error: Error) => void },
+    ) => {
+      try {
+        const result = await createVendor({
+          variables: {
+            vendor: {
+              name: searchText,
+            },
+            host: { id: host.id },
+          },
+        });
+
+        toast({
+          variant: 'success',
+          message: intl.formatMessage({ defaultMessage: 'Vendor created', id: 'Ra9inC' }),
+        });
+        onSuccess(result.data.createVendor);
+      } catch (error) {
+        toast({
+          variant: 'error',
+          message: i18nGraphqlException(intl, error),
+        });
+        onError(error);
+      }
+    },
+    [createVendor, host?.id, intl],
+  );
+
   const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
     isEdit ? editAddedFundsMutation : addFundsMutation,
     {
@@ -496,22 +567,9 @@ const AddFundsModalContentWithCollective = ({
   const hostFeePercent = account?.addedFundsHostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const receiptTemplates = host?.settings?.invoice?.templates;
-  const recommendedVendors = host?.vendors?.nodes || [];
-  const defaultSources = [...recommendedVendors, host];
-  const defaultSourcesOptions = map(groupBy(defaultSources, 'type'), (accounts, type) => {
-    return {
-      label: formatCollectiveType(intl, type, accounts.length),
-      options: accounts.map(account => ({
-        value: account,
-        label: <DefaultCollectiveLabel value={account} />,
-      })),
-    };
-  });
 
-  const receivingCollectiveOptions = React.useMemo(
-    () => compact([account, account?.parent, ...(account?.childrenAccounts?.nodes || [])]),
-    [account],
-  );
+  const toCollective = account?.parent ? account.parent : account;
+  const accountOptions = toCollective?.childrenAccounts?.nodes || [];
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -628,140 +686,188 @@ const AddFundsModalContentWithCollective = ({
                   </Button>
                 </div>
               )}
-              <Field
-                name="description"
-                htmlFor="addFunds-description"
-                label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-                mt={3}
-              >
-                {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
-              </Field>
-              <div className="w-full grow overflow-y-auto pb-4">
-                <Field
-                  name="fromAccount"
-                  htmlFor="addFunds-fromAccount"
-                  label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
-                  mt={3}
-                >
-                  {({ form, field }) => (
-                    <CollectivePickerAsync
-                      inputId={field.id}
-                      data-cy="add-funds-source"
-                      types={['USER', 'ORGANIZATION', 'VENDOR']}
-                      error={field.error}
-                      onBlur={() => form.setFieldTouched(field.name, true)}
-                      customOptions={defaultSourcesOptions}
-                      onChange={({ value }) => form.setFieldValue(field.name, value)}
-                      collective={values.fromAccount}
-                      menuPortalTarget={null}
-                      includeVendorsForHostId={host?.legacyId || undefined}
-                      creatable={['USER', 'VENDOR']}
-                      HostCollectiveId={host?.legacyId}
-                    />
-                  )}
-                </Field>
-                <Field
-                  name="account"
-                  htmlFor="addFunds-account"
-                  label={<FormattedMessage defaultMessage="Recipient" id="8Rkoyb" />}
-                  mt={3}
-                >
-                  {({ form, field }) => (
-                    <CollectivePicker
-                      inputId={field.id}
-                      data-cy="add-funds-recipient"
-                      error={field.error}
-                      onBlur={() => form.setFieldTouched(field.name, true)}
-                      onChange={({ value }) => form.setFieldValue(field.name, value)}
-                      collective={values.account}
-                      collectives={receivingCollectiveOptions}
-                      menuPortalTarget={null}
-                      disabled={receivingCollectiveOptions.length === 1}
-                    />
-                  )}
-                </Field>
-                <Field
-                  name="tier"
-                  htmlFor="addFunds-tier"
-                  label={<FormattedMessage defaultMessage="Tier" id="b07w+D" />}
-                  mt={3}
-                  required={false}
-                >
-                  {({ form, field }) => (
-                    <StyledSelect
-                      inputId={field.id}
-                      data-cy="add-funds-tier"
-                      error={field.error}
-                      onBlur={() => form.setFieldTouched(field.name, true)}
-                      onChange={({ value }) => form.setFieldValue(field.name, value)}
-                      isLoading={loading}
-                      options={tiersOptions}
-                      isSearchable={tiersOptions.length > 10}
-                      value={tiersOptions.find(option =>
-                        !values.tier ? option.value === null : option.value?.id === values.tier.id,
-                      )}
-                    />
-                  )}
-                </Field>
-                <Field
-                  name="processedAt"
-                  htmlFor="addFunds-processedAt"
-                  inputType="date"
-                  label={
-                    <span>
-                      <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />
-                      {` `}
-                      <StyledTooltip
-                        content={() => (
-                          <FormattedMessage
-                            defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
-                            id="s3O6iq"
-                          />
-                        )}
-                      >
-                        <InfoCircle size={16} />
-                      </StyledTooltip>
-                    </span>
-                  }
-                  mt={3}
-                >
-                  {({ field }) => <StyledInput data-cy="add-funds-processedAt" {...field} />}
-                </Field>
-                {account?.host?.orderAccountingCategories?.nodes?.length > 0 && (
+
+              <div className="w-full grow space-y-8 overflow-y-auto pb-4">
+                <AddFundsFormSection title={<FormattedMessage defaultMessage="To" id="To" />}>
                   <Field
-                    name="accountingCategory"
-                    htmlFor="addFunds-accountingCategory"
-                    required={false}
+                    name="collective"
+                    htmlFor="addFunds-collective"
+                    label={<FormattedMessage defaultMessage="Collective" id="Collective" />}
+                    mt={3}
+                  >
+                    {() => (
+                      <AccountHoverCard
+                        account={toCollective}
+                        trigger={
+                          <div className="flex items-center gap-2">
+                            <Avatar collective={toCollective} radius={20} />
+                            <span>{toCollective.name}</span>
+                          </div>
+                        }
+                      />
+                    )}
+                  </Field>
+                  {accountOptions.length > 0 && (
+                    <Field
+                      name="account"
+                      htmlFor="addFunds-account"
+                      label={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
+                      mt={3}
+                    >
+                      {({ form, field }) => (
+                        <CollectivePicker
+                          inputId={field.id}
+                          data-cy="add-funds-recipient"
+                          error={field.error}
+                          onBlur={() => form.setFieldTouched(field.name, true)}
+                          onChange={({ value }) => form.setFieldValue(field.name, value)}
+                          collective={values.account}
+                          collectives={[toCollective, ...accountOptions]}
+                          menuPortalTarget={null}
+                          customOptionsPosition={CUSTOM_OPTIONS_POSITION.TOP}
+                          formatOptionLabel={(option, context) => {
+                            if (option.value.slug === toCollective.slug) {
+                              return DefaultCollectiveLabel(
+                                {
+                                  value: {
+                                    ...option.value,
+                                    name: intl.formatMessage({
+                                      defaultMessage: 'Main account',
+                                      id: 'AccountType.MainAccount',
+                                    }),
+                                  },
+                                },
+                                context,
+                              );
+                            }
+                            return DefaultCollectiveLabel({ value: option.value }, context);
+                          }}
+                        />
+                      )}
+                    </Field>
+                  )}
+                  {tiersOptions.length > 1 && (
+                    <Field
+                      name="tier"
+                      htmlFor="addFunds-tier"
+                      label={<FormattedMessage defaultMessage="Tier" id="b07w+D" />}
+                      mt={3}
+                      required={false}
+                    >
+                      {({ form, field }) => (
+                        <StyledSelect
+                          inputId={field.id}
+                          data-cy="add-funds-tier"
+                          error={field.error}
+                          onBlur={() => form.setFieldTouched(field.name, true)}
+                          onChange={({ value }) => form.setFieldValue(field.name, value)}
+                          isLoading={loading}
+                          options={tiersOptions}
+                          isSearchable={tiersOptions.length > 10}
+                          value={tiersOptions.find(option =>
+                            !values.tier ? option.value === null : option.value?.id === values.tier.id,
+                          )}
+                        />
+                      )}
+                    </Field>
+                  )}
+                </AddFundsFormSection>
+
+                <AddFundsFormSection title={<FormattedMessage defaultMessage="From" id="dM+p3/" />}>
+                  <Field
+                    name="fromAccount"
+                    htmlFor="addFunds-fromAccount"
                     label={
-                      <FormattedMessage id="AddFundsModal.accountingCategory" defaultMessage="Accounting category" />
+                      host?.isTrustedHost ? (
+                        <FormattedMessage defaultMessage="Source" id="AddFundsModal.source" />
+                      ) : (
+                        <FormattedMessage defaultMessage="Vendor" id="dU1t5Z" />
+                      )
                     }
                     mt={3}
                   >
                     {({ form, field }) => (
-                      <AccountingCategorySelect
-                        id={field.id}
-                        kind="CONTRIBUTION"
-                        onChange={value => form.setFieldValue(field.name, value)}
-                        host={host}
-                        account={account}
-                        selectedCategory={field.value}
-                        allowNone={true}
-                        showCode={true}
-                      />
+                      <div>
+                        <CollectivePickerAsync
+                          loading={isCreatingVendor}
+                          inputId={field.id}
+                          data-cy="add-funds-source"
+                          types={host?.isTrustedHost ? ['VENDOR', 'ORGANIZATION'] : ['VENDOR']}
+                          error={field.error}
+                          onBlur={() => form.setFieldTouched(field.name, true)}
+                          onChange={({ value }) => {
+                            form.setFieldValue(field.name, value);
+                          }}
+                          collective={values.fromAccount}
+                          menuPortalTarget={null}
+                          includeVendorsForHostId={host?.legacyId || undefined}
+                          creatable={['VENDOR']}
+                          HostCollectiveId={host?.legacyId}
+                          renderNewCollectiveOption={({ searchText, onCreatedCollective }) => {
+                            if (searchText.length > 0) {
+                              return (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  loading={isCreatingVendor}
+                                  className="flex w-full items-center justify-between gap-2 text-sm text-gray-500"
+                                  onClick={() =>
+                                    onCreateVendorClick(searchText, {
+                                      onSuccess: vendor => {
+                                        onCreatedCollective(vendor);
+                                      },
+                                      onError: () => {},
+                                    })
+                                  }
+                                >
+                                  <span>
+                                    <FormattedMessage
+                                      defaultMessage="Create vendor: <b>{vendorName}</b>"
+                                      id="buY7Uz"
+                                      values={{ vendorName: searchText, b: I18nBold }}
+                                    />
+                                  </span>
+                                  <PlusCircle size={16} />
+                                </Button>
+                              );
+                            }
+
+                            return (
+                              <div>
+                                <FormattedMessage defaultMessage="Begin typing to create a vendor" id="Jx28lM" />
+                              </div>
+                            );
+                          }}
+                          formatOptionLabel={(option, context) => {
+                            if (context.context === 'value') {
+                              return (
+                                <div className="flex items-center justify-between gap-2">
+                                  {DefaultCollectiveLabel(option, context)}
+                                  <Button
+                                    type="button"
+                                    variant="link"
+                                    size="sm"
+                                    className="p-0"
+                                    onMouseDown={e => {
+                                      e.stopPropagation();
+                                      e.preventDefault();
+                                      form.setFieldValue('fromAccount', null);
+                                    }}
+                                  >
+                                    <FormattedMessage defaultMessage="Remove" id="Remove" />
+                                  </Button>
+                                </div>
+                              );
+                            }
+
+                            return DefaultCollectiveLabel(option, context);
+                          }}
+                        />
+                      </div>
                     )}
                   </Field>
-                )}
-                <Field
-                  name="memo"
-                  htmlFor="addFunds-memo"
-                  isPrivate
-                  label={<FormattedMessage defaultMessage="Memo" id="D5NqQO" />}
-                  required={false}
-                  mt={3}
-                >
-                  {({ field }) => <StyledTextarea data-cy="add-funds-memo" {...field} />}
-                </Field>
-                <Flex mt={3} flexWrap="wrap" alignItems="flex-start">
+                </AddFundsFormSection>
+                <AddFundsFormSection title={<FormattedMessage defaultMessage="Amounts and fees" id="bg5yQv" />}>
                   <Field
                     name="amount"
                     htmlFor="addFunds-amount"
@@ -832,64 +938,110 @@ const AddFundsModalContentWithCollective = ({
                   </Field>
 
                   {canAddHostFee && (
-                    <Field
-                      name="hostFeePercent"
-                      htmlFor="addFunds-hostFeePercent"
-                      label={
-                        <span>
-                          <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
-                          {` `}
-                          <StyledTooltip
-                            content={() => (
-                              <FormattedMessage
-                                id="AddFundsModal.hostFee.tooltip"
-                                defaultMessage="The default host fee percentage is set up in your host settings. The host fee is charged by the fiscal host to the collectives for the financial services provided."
-                              />
-                            )}
-                          >
-                            <InfoCircle size={16} />
-                          </StyledTooltip>
-                        </span>
-                      }
-                      ml={3}
-                    >
-                      {({ form, field }) => (
-                        <StyledInputPercentage
-                          id={field.id}
-                          placeholder={defaultHostFeePercent}
-                          value={field.value}
-                          error={field.error}
-                          onChange={value => form.setFieldValue(field.name, value)}
-                          onBlur={() => form.setFieldTouched(field.name, true)}
+                    <div className="rounded-md border border-gray-200 bg-white p-4">
+                      <div className="flex items-center justify-between">
+                        <label htmlFor="hasHostFee">
+                          <div className="flex items-center gap-2 text-base font-bold">
+                            <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
+                            <StyledTooltip
+                              content={() => (
+                                <FormattedMessage
+                                  id="AddFundsModal.hostFee.tooltip"
+                                  defaultMessage="The default host fee percentage is set up in your host settings. The host fee is charged by the fiscal host to the collectives for the financial services provided."
+                                />
+                              )}
+                            >
+                              <InfoCircle size={16} />
+                            </StyledTooltip>
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            <FormattedMessage defaultMessage="Collect host fees" id="o9dDdX" />
+                          </div>
+                        </label>
+                        <Switch
+                          id="hasHostFee"
+                          name="hostHostFee"
+                          checked={formik.values.hasHostFee}
+                          onCheckedChange={checked => {
+                            formik.setFieldValue('hasHostFee', checked);
+                            if (!checked) {
+                              formik.setFieldValue('hostFeePercent', 0);
+                            } else {
+                              formik.setFieldValue('hostFeePercent', defaultHostFeePercent);
+                            }
+                          }}
                         />
+                      </div>
+
+                      {formik.values.hasHostFee && (
+                        <Field
+                          name="hostFeePercent"
+                          htmlFor="addFunds-hostFeePercent"
+                          className="mt-4 flex justify-end"
+                        >
+                          {({ form, field }) => (
+                            <StyledInputPercentage
+                              id={field.id}
+                              placeholder={defaultHostFeePercent}
+                              value={field.value}
+                              error={field.error}
+                              onChange={value => form.setFieldValue(field.name, value)}
+                              onBlur={() => form.setFieldTouched(field.name, true)}
+                            />
+                          )}
+                        </Field>
                       )}
-                    </Field>
+                    </div>
                   )}
-                </Flex>
-                <Box mt={3}>
-                  <Field
-                    name="paymentProcessorFee"
-                    htmlFor="addFunds-paymentProcessorFee"
-                    flex="1 1"
-                    required={false}
-                    label={<FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" />}
-                  >
-                    {({ form, field }) => (
-                      <StyledInputAmount
-                        id={field.id}
-                        data-cy="add-funds-paymentProcessorFee"
-                        currency={currency}
-                        error={field.error}
-                        value={field.value}
-                        maxWidth="100%"
-                        onChange={value => form.setFieldValue(field.name, value)}
-                        onBlur={() => form.setFieldTouched(field.name, true)}
+
+                  <div className="rounded-md border border-gray-200 bg-white p-4">
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="hasPaymentProcessorFee">
+                        <div className="flex items-center gap-2 text-base font-bold">
+                          <FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" />
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          <FormattedMessage defaultMessage="Deduct fee amount" id="ue3ZR1" />
+                        </div>
+                      </label>
+                      <Switch
+                        id="hasPaymentProcessorFee"
+                        name="hasPaymentProcessorFee"
+                        checked={formik.values.hasPaymentProcessorFee}
+                        onCheckedChange={checked => {
+                          formik.setFieldValue('hasPaymentProcessorFee', checked);
+                          if (!checked) {
+                            formik.setFieldValue('paymentProcessorFee', 0);
+                          }
+                        }}
                       />
+                    </div>
+
+                    {formik.values.hasPaymentProcessorFee && (
+                      <Field
+                        name="paymentProcessorFee"
+                        htmlFor="addFunds-paymentProcessorFee"
+                        flex="1 1"
+                        className="mt-4 flex justify-end"
+                        required={false}
+                      >
+                        {({ form, field }) => (
+                          <StyledInputAmount
+                            id={field.id}
+                            data-cy="add-funds-paymentProcessorFee"
+                            currency={currency}
+                            error={field.error}
+                            value={field.value}
+                            maxWidth="100%"
+                            onChange={value => form.setFieldValue(field.name, value)}
+                            onBlur={() => form.setFieldTouched(field.name, true)}
+                          />
+                        )}
+                      </Field>
                     )}
-                  </Field>
-                </Box>
-                {applicableTax && (
-                  <Box mt={3}>
+                  </div>
+
+                  {applicableTax && (
                     <TaxesFormikFields
                       taxType={applicableTax}
                       formik={formik}
@@ -904,104 +1056,217 @@ const AddFundsModalContentWithCollective = ({
                         )
                       }
                     />
-                  </Box>
-                )}
-                {receiptTemplateTitles.length > 1 && (
-                  <Container width="100%">
-                    <Field
-                      name="invoiceTemplate"
-                      htmlFor="addFunds-invoiceTemplate"
-                      label={<FormattedMessage defaultMessage="Choose receipt" id="cyMx/0" />}
-                      mt={3}
-                    >
-                      {({ form, field }) => (
-                        <StyledSelect
-                          id={field.id}
-                          options={receiptTemplateTitles}
-                          defaultValue={receiptTemplateTitles[0]}
-                          onChange={value => form.setFieldValue(field.name, value)}
-                        />
-                      )}
-                    </Field>
-                  </Container>
-                )}
-                <P fontSize="14px" lineHeight="17px" fontWeight="500" mt={4}>
-                  <FormattedMessage id="Details" defaultMessage="Details" />
-                </P>
-                <StyledHr my={2} borderColor="black.300" />
-                <AmountDetailsLine
-                  value={values.amount || 0}
-                  currency={currency}
-                  label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
-                />
-                {Boolean(values.tax?.rate) && (
-                  <React.Fragment>
+                  )}
+                  <p className="text-md leading-4 font-bold">
+                    <FormattedMessage defaultMessage="Summary" id="Summary" />
+                  </p>
+                  <div className="rounded-lg border border-gray-200 bg-white p-4">
                     <AmountDetailsLine
-                      value={-taxAmount}
+                      value={values.amount || 0}
                       currency={currency}
-                      label={`${i18nTaxType(intl, values.tax.type, 'long')} (${Math.round(values.tax.rate * 100)}%)`}
+                      label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
                     />
-                    <StyledHr my={1} borderColor="black.200" />
+                    {Boolean(values.tax?.rate) && (
+                      <React.Fragment>
+                        <AmountDetailsLine
+                          value={-taxAmount}
+                          currency={currency}
+                          label={`${i18nTaxType(intl, values.tax.type, 'long')} (${Math.round(values.tax.rate * 100)}%)`}
+                        />
+                        <StyledHr my={1} borderColor="black.200" />
+                        <AmountDetailsLine
+                          value={(values.amount || 0) - taxAmount}
+                          currency={currency}
+                          label={
+                            <FormattedMessage
+                              defaultMessage="Gross amount without {taxName}"
+                              id="dcUpWf"
+                              values={{ taxName: i18nTaxType(intl, values.tax.type, 'short') }}
+                            />
+                          }
+                        />
+                        {canAddHostFee && <StyledHr my={1} borderColor="black.200" />}
+                      </React.Fragment>
+                    )}
+                    {canAddHostFee && (
+                      <AmountDetailsLine
+                        value={!hostFee ? 0 : -hostFee}
+                        currency={currency}
+                        label={
+                          <FormattedMessage
+                            id="AddFundsModal.hostFees"
+                            defaultMessage="Host fee charged to collective ({hostFees})"
+                            values={{ hostFees: `${hostFeePercent || 0}%` }}
+                          />
+                        }
+                      />
+                    )}
+                    {Boolean(paymentProcessorFee) && (
+                      <AmountDetailsLine
+                        value={-paymentProcessorFee}
+                        currency={currency}
+                        label={<FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" />}
+                      />
+                    )}
+                    <StyledHr my={2} borderColor="black.300" />
                     <AmountDetailsLine
-                      value={(values.amount || 0) - taxAmount}
+                      value={values.amount - hostFee - taxAmount - (values.paymentProcessorFee || 0)}
                       currency={currency}
                       label={
                         <FormattedMessage
-                          defaultMessage="Gross amount without {taxName}"
-                          id="dcUpWf"
-                          values={{ taxName: i18nTaxType(intl, values.tax.type, 'short') }}
+                          id="AddFundsModal.netAmount"
+                          defaultMessage="Net amount received by collective"
                         />
                       }
+                      isLargeAmount
                     />
-                    {canAddHostFee && <StyledHr my={1} borderColor="black.200" />}
-                  </React.Fragment>
-                )}
-                {canAddHostFee && (
-                  <AmountDetailsLine
-                    value={!hostFee ? 0 : -hostFee}
-                    currency={currency}
+                  </div>
+                </AddFundsFormSection>
+
+                <AddFundsFormSection title={<FormattedMessage defaultMessage="Accounting" id="home.accounting" />}>
+                  <Field
+                    name="processedAt"
+                    htmlFor="addFunds-processedAt"
+                    inputType="date"
                     label={
-                      <FormattedMessage
-                        id="AddFundsModal.hostFees"
-                        defaultMessage="Host fee charged to collective ({hostFees})"
-                        values={{ hostFees: `${hostFeePercent || 0}%` }}
-                      />
+                      <span>
+                        <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />
+                        {` `}
+                        <StyledTooltip
+                          content={() => (
+                            <FormattedMessage
+                              defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                              id="s3O6iq"
+                            />
+                          )}
+                        >
+                          <InfoCircle size={16} />
+                        </StyledTooltip>
+                      </span>
                     }
-                  />
-                )}
-                {Boolean(paymentProcessorFee) && (
-                  <AmountDetailsLine
-                    value={-paymentProcessorFee}
-                    currency={currency}
-                    label={<FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" />}
-                  />
-                )}
-                <StyledHr my={2} borderColor="black.300" />
-                <AmountDetailsLine
-                  value={values.amount - hostFee - taxAmount - (values.paymentProcessorFee || 0)}
-                  currency={currency}
-                  label={
-                    <FormattedMessage id="AddFundsModal.netAmount" defaultMessage="Net amount received by collective" />
-                  }
-                  isLargeAmount
-                />
+                    mt={3}
+                  >
+                    {({ field }) => <StyledInput data-cy="add-funds-processedAt" {...field} />}
+                  </Field>
+                  {account?.host?.orderAccountingCategories?.nodes?.length > 0 && (
+                    <Field
+                      name="accountingCategory"
+                      htmlFor="addFunds-accountingCategory"
+                      required={false}
+                      label={
+                        <FormattedMessage id="AddFundsModal.accountingCategory" defaultMessage="Accounting category" />
+                      }
+                      mt={3}
+                    >
+                      {({ form, field }) => (
+                        <AccountingCategorySelect
+                          id={field.id}
+                          kind="CONTRIBUTION"
+                          onChange={value => form.setFieldValue(field.name, value)}
+                          host={host}
+                          account={account}
+                          selectedCategory={field.value}
+                          allowNone={true}
+                          showCode={true}
+                          buttonClassName="max-w-[auto]"
+                        />
+                      )}
+                    </Field>
+                  )}
+                  <Field
+                    name="description"
+                    htmlFor="addFunds-description"
+                    label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
+                    mt={3}
+                  >
+                    {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
+                  </Field>
+                  <Field
+                    name="memo"
+                    htmlFor="addFunds-memo"
+                    isPrivate
+                    label={<FormattedMessage defaultMessage="Memo" id="D5NqQO" />}
+                    required={false}
+                    mt={3}
+                  >
+                    {({ field }) => <StyledTextarea data-cy="add-funds-memo" {...field} />}
+                  </Field>
+                  {receiptTemplateTitles.length > 1 && (
+                    <Container width="100%">
+                      <Field
+                        name="invoiceTemplate"
+                        htmlFor="addFunds-invoiceTemplate"
+                        label={<FormattedMessage defaultMessage="Choose receipt" id="cyMx/0" />}
+                        mt={3}
+                      >
+                        {({ form, field }) => (
+                          <StyledSelect
+                            id={field.id}
+                            options={receiptTemplateTitles}
+                            defaultValue={receiptTemplateTitles[0]}
+                            onChange={value => form.setFieldValue(field.name, value)}
+                          />
+                        )}
+                      </Field>
+                    </Container>
+                  )}
+                </AddFundsFormSection>
+
                 <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
                   {isEdit ? (
-                    <FormattedMessage
-                      id="AddFundsModal.editDisclaimer"
-                      defaultMessage="By clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones."
-                    />
+                    <Field
+                      type="checkbox"
+                      id="add-funds-confirm-checkbox"
+                      name="add-funds-confirm-checkbox"
+                      required
+                      data-cy="add-funds-confirm-checkbox"
+                    >
+                      {({ field }) => (
+                        <div className="flex items-start gap-2">
+                          <Checkbox
+                            id={field.id}
+                            checked={field.value}
+                            onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
+                          />
+                          <label htmlFor={field.id} className="flex cursor-pointer items-start gap-2 select-none">
+                            <FormattedMessage
+                              id="AddFundsModal.editDisclaimer"
+                              defaultMessage="By clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones."
+                            />
+                          </label>
+                        </div>
+                      )}
+                    </Field>
                   ) : (
-                    <FormattedMessage
-                      id="AddFundsModal.disclaimer"
-                      defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
-                      values={{ amount: formatCurrency(values.amount, currency, { locale: intl.locale }) }}
-                    />
+                    <Field
+                      type="checkbox"
+                      id="add-funds-confirm-checkbox"
+                      name="add-funds-confirm-checkbox"
+                      required
+                      data-cy="add-funds-confirm-checkbox"
+                    >
+                      {({ field }) => (
+                        <div className="flex items-start gap-2">
+                          <Checkbox
+                            id={field.id}
+                            checked={field.value}
+                            onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
+                          />
+                          <label htmlFor={field.id} className="flex cursor-pointer items-start gap-2 select-none">
+                            <FormattedMessage
+                              defaultMessage="I confirm that by clicking 'Add Funds', I am responsible for managing {amount} on behalf of this collective"
+                              id="Evxi/Q"
+                              values={{ amount: formatCurrency(values.amount, currency, { locale: intl.locale }) }}
+                            />
+                          </label>
+                        </div>
+                      )}
+                    </Field>
                   )}
                 </P>
                 {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
               </div>
-              <div className="flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
+              <div className="border-t-dark-400 flex justify-between gap-4 border-t border-solid pt-4">
                 <Button onClick={handleClose} type="button" variant="outline">
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </Button>
@@ -1154,7 +1419,7 @@ const AddFundsModalContentWithCollective = ({
                     <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                   </Button>
                 )}
-                <Button type="submit" data-cy="add-platform-tip-btn" loading={loading}>
+                <Button type="button" onClick={handleClose} data-cy="add-platform-tip-btn" loading={loading}>
                   <FormattedMessage id="Finish" defaultMessage="Finish" />
                 </Button>
               </div>
@@ -1209,18 +1474,9 @@ const AddFundsModal = ({
       $showSuccessModal={fundDetails.showSuccessModal}
     >
       {selectedCollective && !props.editOrderId ? (
-        <CollectiveModalHeader
-          className="mb-4"
-          onClose={handleClose}
-          collective={selectedCollective}
-          customText={
-            <FormattedMessage
-              id="AddFundsModal.Header"
-              defaultMessage="Add Funds to {collectiveName}"
-              values={{ collectiveName: selectedCollective.name }}
-            />
-          }
-        />
+        <ModalHeader className="mb-4" onClose={handleClose}>
+          <FormattedMessage defaultMessage="Add Funds" id="menu.addFunds" />
+        </ModalHeader>
       ) : (
         <ModalHeader onClose={handleClose} mb={3}>
           {props.editOrderId ? (
@@ -1289,7 +1545,7 @@ const AddFundsModal = ({
               }}
             />
           )}
-          <div className="mt-8 flex justify-center gap-4">
+          <div className="mt-8 flex justify-between gap-4">
             <Button onClick={handleClose} variant="outline" type="button">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>
@@ -1304,3 +1560,19 @@ const AddFundsModal = ({
 };
 
 export default AddFundsModal;
+
+type AddFundsFormSectionProps = React.PropsWithChildren & {
+  title: string | React.ReactNode;
+};
+
+function AddFundsFormSection({ title, children }: AddFundsFormSectionProps) {
+  return (
+    <div className="rounded-lg">
+      <div className="mb-3 flex items-center gap-3">
+        <p className="leading-[17px] font-bold whitespace-nowrap text-[#0F1729]">{title}</p>
+        <div className="h-px flex-1 bg-gray-200" />
+      </div>
+      <div className="space-y-4">{children}</div>
+    </div>
+  );
+}

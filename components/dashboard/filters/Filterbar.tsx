@@ -1,5 +1,6 @@
 import React from 'react';
 import { partition } from 'lodash';
+import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 
 import type { FilterComponentConfigs, resetFilters, SetFilter, Views } from '../../../lib/filters/filter-types';
@@ -37,7 +38,27 @@ function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
   return { displayedFilters, remainingFilters };
 }
 
-const renderFilter = ({ filters, values, key, activeViewId, views, lockViewFilters, intl, meta, setFilter }) => {
+function renderFilter<FV extends Record<string, any>, FM>({
+  filters,
+  values,
+  key,
+  activeViewId,
+  views,
+  lockViewFilters,
+  intl,
+  meta,
+  setFilter,
+}: {
+  filters: FilterComponentConfigs<FV, FM>;
+  values: FV;
+  key: keyof FV & string;
+  activeViewId?: string;
+  views?: Views<FV>;
+  lockViewFilters?: boolean;
+  intl: IntlShape;
+  meta?: FM;
+  setFilter: SetFilter<FV>;
+}) {
   const filter = filters[key];
   const view = views?.find(v => v.id === activeViewId);
   const filterPartOfView = Boolean(view?.filter[key]);
@@ -73,7 +94,7 @@ const renderFilter = ({ filters, values, key, activeViewId, views, lockViewFilte
       />
     );
   }
-};
+}
 
 export function Filterbar<FV extends Record<string, any>, FM>({
   values,
@@ -134,7 +155,11 @@ export function Filterbar<FV extends Record<string, any>, FM>({
 
   return (
     <div className={cn('flex flex-col gap-4', className)}>
-      {views ? <Tabs tabs={views} selectedId={activeViewId} onChange={onTabChange} /> : !hideSeparator && <Separator />}
+      {views?.length > 1 ? (
+        <Tabs tabs={views} selectedId={activeViewId} onChange={onTabChange} />
+      ) : (
+        !hideSeparator && <Separator />
+      )}
       {Boolean(filtersOnTop.length) && (
         <div className={cn('repeat(auto-fit, minmax(200px, 1fr)) grid gap-2 [&_input]:w-full', primaryFilterClassName)}>
           {filtersOnTop.map(key => {

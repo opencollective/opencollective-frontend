@@ -1,9 +1,11 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
+import type { QueryResult } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { themeGet } from '@styled-system/theme-get';
+import type { PaymentIntentResult } from '@stripe/stripe-js';
 import { get, uniqBy } from 'lodash';
+import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -11,10 +13,8 @@ import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
-import { formatCurrency } from '../../lib/currency-utils';
 import { gql } from '../../lib/graphql/helpers';
 import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
-import { formatManualInstructions } from '../../lib/payment-method-utils';
 import { iconForSocialLinkType } from '../../lib/social-links';
 import { getStripe } from '../../lib/stripe';
 import {
@@ -26,11 +26,11 @@ import {
   threadsShareURL,
   tweetURL,
 } from '../../lib/url-helpers';
-import { getWebsiteUrl } from '../../lib/utils';
+import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
+import type { NewContributionFlowOrderSuccessQuery } from '@/lib/graphql/types/v2/graphql';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
-import Container from '../../components/Container';
-import { Box, Flex } from '../../components/Grid';
-import I18nFormatters, { getI18nLink, I18nBold } from '../../components/I18nFormatters';
+import { getI18nLink, I18nBold } from '../../components/I18nFormatters';
 import Image from '../../components/Image';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
@@ -38,10 +38,13 @@ import StyledLink from '../../components/StyledLink';
 import { withUser } from '../../components/UserProvider';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
-import { formatAccountDetails } from '../edit-collective/utils';
+import Avatar from '../Avatar';
 import Link from '../Link';
+import { CustomPaymentMethodInstructions } from '../manual-payment-provider/CustomPaymentMethodInstructions';
+import { getManualPaymentProviderIconComponent } from '../manual-payment-provider/ManualPaymentProviderIcon';
 import { Survey, SURVEY_KEY } from '../Survey';
-import { H3, P } from '../Text';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
 
 import { orderSuccessFragment } from './graphql/fragments';
@@ -50,29 +53,10 @@ import ContributorCardWithTier from './ContributorCardWithTier';
 import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
 
 // Styled components
-const ContainerWithImage = styled(Container)`
-  @media screen and (max-width: 64em) {
-    background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png');
-    background-position: top;
-    background-repeat: no-repeat;
-    background-size: 100% auto;
-  }
-
-  @media screen and (min-width: 64em) {
-    background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
-    background-position: left;
-    background-repeat: no-repeat;
-    background-size: auto 100%;
-    background-size: cover;
-  }
-`;
-
 const ShareLink = styled(StyledLink).attrs({
   buttonStyle: 'standard',
   buttonSize: 'small',
   minWidth: 130,
-  mx: 2,
-  mb: 2,
   target: '_blank',
 })`
   display: flex;
@@ -81,18 +65,6 @@ const ShareLink = styled(StyledLink).attrs({
   svg {
     margin-right: 8px;
   }
-`;
-
-const BankTransferInfoContainer = styled(Container)`
-  border: 1px solid ${themeGet('colors.black.400')};
-  border-radius: 12px;
-  background-color: white;
-`;
-
-const SuccessIllustration = styled(Container)`
-  max-width: 100%;
-  margin: 0 auto;
-  margin-bottom: 16px;
 `;
 
 const successMsgs = defineMessages({
@@ -184,24 +156,23 @@ const getMainTag = collective => {
   }
 };
 
-class ContributionFlowSuccess extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    intl: PropTypes.object,
-    router: PropTypes.object,
-    isEmbed: PropTypes.bool,
-    data: PropTypes.object,
-  };
-
+class ContributionFlowSuccess extends React.Component<
+  {
+    data: QueryResult<NewContributionFlowOrderSuccessQuery>['data'] & { loading: boolean };
+    collective: { slug: string };
+    router: NextRouter;
+    LoggedInUser: LoggedInUser;
+    intl: IntlShape;
+    isEmbed: boolean;
+  },
+  {
+    paymentIntentResult: PaymentIntentResult;
+    loaded: boolean;
+    surveyShown: boolean;
+  }
+> {
   async componentDidMount() {
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
-    if (this.props.LoggedInUser) {
-      toast({
-        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
-        duration: 20000,
-      });
-    }
 
     const isStripeRedirect = this.props.router.query.payment_intent_client_secret;
 
@@ -225,7 +196,17 @@ class ContributionFlowSuccess extends React.Component {
       router: { query: queryParams },
       data: { order },
       intl,
+      LoggedInUser,
     } = this.props;
+
+    // Show survey for logged-in users on non-pending orders (only once)
+    if (LoggedInUser && order && order.status !== ORDER_STATUS.PENDING && !this.state?.surveyShown) {
+      this.setState({ surveyShown: true });
+      toast({
+        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
+        duration: 20000,
+      });
+    }
 
     const paymentIntentResult = this.state?.paymentIntentResult;
     if (order && paymentIntentResult) {
@@ -246,12 +227,15 @@ class ContributionFlowSuccess extends React.Component {
         const url = new URL(path, window.location.origin);
         url.searchParams.set('error', stripeErrorMessage);
         url.searchParams.set('interval', getIntervalFromGQLV2Frequency(order.frequency));
-        url.searchParams.set('amount', order.amount.value);
+        url.searchParams.set('amount', order.amount.value.toString());
         url.searchParams.set('contributeAs', order.fromAccount.slug);
 
-        if (queryParams.redirect) {
+        if (queryParams.redirect && !Array.isArray(queryParams.redirect)) {
           url.searchParams.set('redirect', queryParams.redirect);
-          url.searchParams.set('shouldRedirectParent', queryParams.shouldRedirectParent);
+          url.searchParams.set(
+            'shouldRedirectParent',
+            parseToBoolean(queryParams.shouldRedirectParent) ? 'true' : 'false',
+          );
         }
 
         this.props.router.push(url.toString());
@@ -262,17 +246,23 @@ class ContributionFlowSuccess extends React.Component {
     if (order && queryParams.redirect) {
       if (isValidExternalRedirect(queryParams.redirect)) {
         followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
-          shouldRedirectParent: queryParams.shouldRedirectParent,
+          shouldRedirectParent: parseToBoolean(queryParams.shouldRedirectParent),
         });
       }
     }
   }
 
+  getEmailFromQueryParams = () => {
+    const { router } = this.props;
+    const emailInput = router.query.email;
+    return (Array.isArray(emailInput) ? emailInput[0] : emailInput) ?? null;
+  };
+
   renderCallsToAction = () => {
-    const { LoggedInUser, data, isEmbed, router } = this.props;
+    const { LoggedInUser, data, isEmbed } = this.props;
     const callsToAction = [];
     const isGuest = get(data, 'order.fromAccount.isGuest');
-    const email = get(router, 'query.email') ? decodeURIComponent(router.query.email) : null;
+    const email = this.getEmailFromQueryParams();
 
     if (!isEmbed) {
       if (!LoggedInUser) {
@@ -288,11 +278,11 @@ class ContributionFlowSuccess extends React.Component {
     }
 
     return (
-      <Flex flexDirection="column" justifyContent="center" p={2}>
+      <div className="flex flex-col justify-center p-2">
         {callsToAction.length >= 2 && (
-          <SuccessIllustration>
+          <div className="mx-auto mb-4 max-w-full">
             <Image alt="" width={216} height={152} src="/static/images/success-illustration.jpg" />
-          </SuccessIllustration>
+          </div>
         )}
         {callsToAction.map((type, idx) => (
           <SuccessCTA
@@ -303,80 +293,9 @@ class ContributionFlowSuccess extends React.Component {
             isPrimary={idx === 0}
           />
         ))}
-      </Flex>
+      </div>
     );
   };
-
-  renderBankTransferInformation = () => {
-    const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
-    const bankAccount = get(this.props.data, 'order.toAccount.host.bankAccount.data', null);
-
-    const amount = get(this.props.data, 'order.amount.valueInCents', 0);
-    const platformTipAmount = get(this.props.data, 'order.platformTipAmount.valueInCents', 0);
-    const totalAmount = amount + platformTipAmount;
-    const currency = get(this.props.data, 'order.amount.currency');
-    const formattedAmount = formatCurrency(totalAmount, currency, {
-      locale: this.props.intl.locale,
-      currencyDisplay: 'code',
-    });
-
-    const formattedValues = {
-      account: bankAccount ? formatAccountDetails(bankAccount) : '',
-      reference: get(this.props.data, 'order.legacyId', null),
-      amount: formattedAmount,
-      collective: get(this.props.data, 'order.toAccount.name', null),
-      // Deprecated but still needed for compatibility
-      OrderId: get(this.props.data, 'order.legacyId', null),
-    };
-
-    return (
-      <Flex flexDirection="column" justifyContent="center" width={[1, 3 / 4]} px={[4, 0]} py={[2, 0]}>
-        <MessageBox type="warning" fontSize="12px" mb={2}>
-          <FormattedMessage
-            id="collective.user.orderProcessing.manual"
-            defaultMessage="<strong>Your contribution is pending.</strong> Please follow the payment instructions in the confirmation email to complete your transaction."
-            values={I18nFormatters}
-          />
-        </MessageBox>
-        {instructions && (
-          <BankTransferInfoContainer my={3} p={4}>
-            <H3>
-              <FormattedMessage id="NewContributionFlow.PaymentInstructions" defaultMessage="Payment instructions" />
-            </H3>
-            <Flex mt={2}>
-              <Flex style={{ whiteSpace: 'pre-wrap' }}>{formatManualInstructions(instructions, formattedValues)}</Flex>
-            </Flex>
-          </BankTransferInfoContainer>
-        )}
-        <Flex px={3} mt={2}>
-          <P fontSize="16px" color="black.700">
-            <FormattedMessage
-              id="NewContributionFlow.InTheMeantime"
-              defaultMessage="In the meantime, you can see what {collective} is up to <CollectiveLink>on their Collective page</CollectiveLink>."
-              values={{
-                collective: this.props.data.order.toAccount.name,
-                CollectiveLink: getI18nLink({
-                  as: Link,
-                  href: `/${this.props.data.order.toAccount.slug}`,
-                }),
-              }}
-            />
-          </P>
-        </Flex>
-      </Flex>
-    );
-  };
-
-  renderInfoByPaymentMethod() {
-    const { data } = this.props;
-    const { order } = data;
-    const isPendingBankTransfer = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
-    if (isPendingBankTransfer) {
-      return this.renderBankTransferInformation();
-    } else {
-      return this.renderCallsToAction();
-    }
-  }
 
   getShareSuccessMessage = () => {
     const toAccount = this.props.data?.order?.toAccount;
@@ -389,88 +308,152 @@ class ContributionFlowSuccess extends React.Component {
     });
   };
 
+  renderPendingView() {
+    const { data } = this.props;
+    const { order } = data;
+    const manualPaymentProvider = order.manualPaymentProvider;
+    const amount = order.amount.valueInCents;
+    const platformTipAmount = order.platformTipAmount.valueInCents;
+    const totalAmount = amount + platformTipAmount;
+    const currency = order.amount.currency;
+    const IconComponent = manualPaymentProvider && getManualPaymentProviderIconComponent(manualPaymentProvider);
+
+    return (
+      <div
+        className="relative isolate flex min-h-[calc(100vh-64px)] w-full flex-col items-center justify-center"
+        data-cy="order-success"
+      >
+        <div className="absolute inset-0 -z-10 bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png')] bg-cover bg-no-repeat lg:bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png')] lg:bg-cover lg:bg-[position:0%_0%] xl:bg-[position:0%_-60vw] xl:bg-repeat" />
+        <div className="flex w-full max-w-xl flex-col items-center px-4 py-6 lg:py-12">
+          <div className="mb-5 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+            <div className="flex flex-col items-center border-b border-gray-100 bg-gray-50 px-6 py-6">
+              <Avatar className="mb-3" collective={order.toAccount} radius={64} />
+              <h1 className="mb-1 text-center text-xl font-bold text-gray-900 sm:text-2xl">
+                <FormattedMessage defaultMessage="Contribution request received" id="pd8V15" />
+              </h1>
+              <p className="mb-4 text-center text-sm text-gray-600">
+                <FormattedMessage
+                  defaultMessage="Please follow the instructions below to complete your payment. These instructions have also been sent to your email. We’ll notify you once your contribution has been received, processed, and credited to {collective}."
+                  id="n5a/81"
+                  values={{ collective: <strong>{order.toAccount.name}</strong> }}
+                />
+              </p>
+            </div>
+
+            {/* Payment instructions */}
+            {manualPaymentProvider && (
+              <div className="px-2 py-8 sm:px-4 lg:px-6">
+                <div className="mb-5 flex w-full flex-col items-center gap-1 px-1 lg:flex-row lg:justify-between">
+                  <h2 className="flex items-center text-lg font-semibold text-gray-900">
+                    <FormattedMessage
+                      id="NewContributionFlow.PaymentInstructions"
+                      defaultMessage="Payment instructions"
+                    />
+                  </h2>
+                  <Badge>
+                    <IconComponent className="mr-1 h-4 w-4" /> <span>{manualPaymentProvider.name}</span>
+                  </Badge>
+                </div>
+                <div className="rounded border-l-4 border-blue-400 bg-gray-50 px-5 py-5 text-sm shadow lg:text-base">
+                  <CustomPaymentMethodInstructions
+                    instructions={manualPaymentProvider.instructions}
+                    values={{
+                      amount: { valueInCents: totalAmount, currency },
+                      collectiveSlug: get(data, 'order.toAccount.name', ''),
+                      OrderId: get(data, 'order.legacyId', 0),
+                      accountDetails: manualPaymentProvider.accountDetails,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <Link href={getCollectivePageRoute(order.toAccount)}>
+              <Button variant="secondary">
+                <FormattedMessage
+                  id="NewContributionFlow.Pending.VisitCollective"
+                  defaultMessage="Visit {collective}'s page"
+                  values={{ collective: order.toAccount.name }}
+                />
+                <span>&rarr;</span>
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const { LoggedInUser, collective, data, isEmbed } = this.props;
     const { order } = data;
     const shareURL = `${getWebsiteUrl()}/${collective.slug}`;
     const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
+    const isPendingManualContribution = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
 
     const loading = data.loading || !this.state?.loaded;
 
     if (!data.loading && !order) {
       return (
-        <Flex justifyContent="center" py={[5, 6]}>
+        <div className="flex justify-center py-5 sm:py-6">
           <MessageBox type="warning" withIcon>
             <FormattedMessage id="Order.NotFound" defaultMessage="This contribution doesn't exist" />
           </MessageBox>
-        </Flex>
+        </div>
       );
+    }
+
+    // Show dedicated pending layout for bank transfer contributions
+    if (!loading && isPendingManualContribution) {
+      return this.renderPendingView();
     }
 
     return (
       <React.Fragment>
         {!isEmbed && isProcessing && (
-          <Flex
-            height="120px"
-            justifyContent="center"
-            alignItems="center"
-            backgroundColor="#FFFFC2"
-            color="#0C2D66"
-            flexDirection="column"
-          >
-            <P fontWeight="700" fontSize="14px" lineHeight="20px">
+          <div className="flex h-[120px] flex-col items-center justify-center bg-[#FFFFC2] text-[#0C2D66]">
+            <p className="text-sm leading-5 font-bold">
               <FormattedMessage defaultMessage="Your Contribution is processing!" id="RTyy4V" />
-            </P>
-            <Box mt={1} maxWidth="672px">
-              <P fontWeight="400" fontSize="14px" lineHeight="20px" textAlign="center">
+            </p>
+            <div className="mt-1 max-w-[672px]">
+              <p className="text-center text-sm leading-5 font-normal">
                 <FormattedMessage
                   defaultMessage="Your contribution will remain in processing state until it is completed from the payment processor's end. You will receive an email when it goes through successfully. No further action is required from your end."
                   id="R1RQBD"
                 />
-              </P>
-            </Box>
+              </p>
+            </div>
             <StyledLink
               href={`${getCollectivePageRoute(order.fromAccount)}/transactions`}
-              fontWeight="700"
-              fontSize="14px"
-              lineHeight="20px"
-              textDecoration="underline"
-              color="#0C2D66"
-              mt={1}
+              className="mt-1 text-sm leading-5 font-bold text-[#0C2D66] underline"
             >
               <FormattedMessage defaultMessage="View Contribution!" id="zG2d9i" />
             </StyledLink>
-          </Flex>
+          </div>
         )}
-        <Flex
-          width={1}
-          minHeight="calc(100vh - 69px)"
-          flexDirection={['column', null, null, 'row']}
-          justifyContent={[null, null, 'center']}
-          css={{ height: '100%' }}
+        <div
+          className="flex h-full min-h-[calc(100vh-64px)] w-full flex-col md:justify-center lg:flex-row"
           data-cy="order-success"
         >
           {loading ? (
-            <Container display="flex" alignItems="center" justifyContent="center">
+            <div className="flex items-center justify-center">
               <Loading />
-            </Container>
+            </div>
           ) : (
             <Fragment>
-              <ContainerWithImage
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                width={['100%', null, null, '50%']}
-                mb={[4, null, null, 0]}
-                flexShrink={0}
+              <div
+                className="relative flex w-full shrink-0 items-center justify-center max-lg:mb-4 lg:w-1/2"
                 data-cy={`contribution-id-${order.legacyId}`}
               >
-                <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
+                <div className="absolute inset-0 bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png')] bg-[length:100%_auto] bg-top bg-no-repeat lg:bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png')] lg:bg-cover lg:bg-left lg:bg-no-repeat" />
+                <div className="relative z-10 my-4 flex w-full flex-col items-center justify-center">
                   <h3 className="mb-4 text-3xl font-bold">
                     <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
                   </h3>
-                  <Box mb={3}>
-                    <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
+                  <div className="mb-3">
+                    <p className="text-center text-xl font-medium text-gray-700">
                       <FormattedMessage
                         id="NewContributionFlow.Success.NowSupporting"
                         defaultMessage="You are now supporting <link>{collective}</link>."
@@ -481,8 +464,8 @@ class ContributionFlowSuccess extends React.Component {
                             : getI18nLink({ href: getCollectivePageRoute(order.toAccount), as: Link }),
                         }}
                       />
-                    </P>
-                  </Box>
+                    </p>
+                  </div>
                   {isEmbed ? (
                     <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                   ) : (
@@ -491,24 +474,24 @@ class ContributionFlowSuccess extends React.Component {
                     </StyledLink>
                   )}
                   {!isEmbed && (
-                    <Box my={4}>
+                    <div className="my-4">
                       <Link href={{ pathname: '/search', query: { show: getMainTag(order.toAccount) } }}>
-                        <P color="black.800" fontWeight={500} textAlign="center">
+                        <p className="text-center font-medium text-gray-800">
                           <FormattedMessage
                             id="NewContributionFlow.Success.DiscoverMore"
                             defaultMessage="Discover more Collectives like {collective}"
                             values={{ collective: order.toAccount.name }}
                           />
                           &nbsp;&rarr;
-                        </P>
+                        </p>
                       </Link>
-                    </Box>
+                    </div>
                   )}
-                  <Flex justifyContent="center" my={3} maxWidth="500px" flexWrap="wrap">
+                  <div className="my-3 flex max-w-[500px] flex-wrap justify-center">
                     {getSocialLinksForAccount(order.toAccount, shareURL, this.getShareSuccessMessage()).map(
                       shareLink => (
-                        <ShareLink key={shareLink.url} href={shareLink.url}>
-                          <shareLink.Icon size="1em" />
+                        <ShareLink key={shareLink.url} href={shareLink.url} className="mx-2 mb-2">
+                          <shareLink.Icon size={16} />
                           <FormattedMessage
                             defaultMessage="Share on {serviceName}"
                             id="45jyHl"
@@ -517,28 +500,20 @@ class ContributionFlowSuccess extends React.Component {
                         </ShareLink>
                       ),
                     )}
-                  </Flex>
+                  </div>
                   {LoggedInUser && (
-                    <Box px={1}>
+                    <div className="px-1">
                       <PublicMessageForm order={order} publicMessage={get(order, 'membership.publicMessage')} />
-                    </Box>
+                    </div>
                   )}
-                </Flex>
-              </ContainerWithImage>
-              <Container
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-                width={1}
-                px={3}
-                boxShadow={['0 -35px 5px 0px #fff', '-15px 0 15px -15px #fff']}
-              >
-                {this.renderInfoByPaymentMethod()}
-              </Container>
+                </div>
+              </div>
+              <div className="z-10 flex w-full flex-col items-center justify-center px-3 shadow-[0_-35px_5px_0px_#fff] sm:shadow-[-15px_0_15px_-15px_#fff]">
+                {this.renderCallsToAction()}
+              </div>
             </Fragment>
           )}
-        </Flex>
+        </div>
       </React.Fragment>
     );
   }
@@ -555,10 +530,12 @@ const orderSuccessQuery = gql`
   ${orderSuccessFragment}
 `;
 
-const addOrderSuccessQuery = graphql(orderSuccessQuery, {
+const addOrderSuccessQuery = graphql<{
+  router: NextRouter;
+}>(orderSuccessQuery, {
   options: props => ({
     variables: { order: { id: props.router.query.OrderId } },
   }),
 });
 
-export default injectIntl(withUser(withRouter(addOrderSuccessQuery(ContributionFlowSuccess))));
+export default withRouter(addOrderSuccessQuery(injectIntl(withUser(ContributionFlowSuccess))));

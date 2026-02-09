@@ -23,8 +23,14 @@ import {
   HOST_OMITTED_FIELDS,
   PLATFORM_PRESETS,
 } from '../../lib/export-csv/transactions-csv';
-import type { HostReportsQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../lib/graphql/types/v2/schema';
+import type {
+  ExpenseReferenceInput,
+  HostReportsQueryVariables,
+  OrderReferenceInput,
+  TransactionsPageQueryVariables,
+  TransactionsTableQueryVariables,
+} from '../../lib/graphql/types/v2/graphql';
+import type { Account, AccountReferenceInput } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -41,6 +47,19 @@ import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
 
+type MakeUrlParams = {
+  account?: Pick<Account, 'slug'>;
+  isHostReport?: boolean;
+  queryFilter: {
+    variables: Partial<TransactionsTableQueryVariables>;
+  };
+  flattenTaxesAndPaymentProcessorFees?: boolean;
+  useFieldNames?: boolean;
+  fields?: string[];
+};
+
+const safeJoinString = (value: string[] | string) => (Array.isArray(value) ? value.join(',') : value);
+
 const makeUrl = ({
   account,
   isHostReport,
@@ -48,20 +67,17 @@ const makeUrl = ({
   flattenTaxesAndPaymentProcessorFees,
   useFieldNames,
   fields,
-}) => {
+}: MakeUrlParams) => {
   const url = isHostReport
     ? new URL(`${process.env.REST_URL}/v2/${account?.slug}/hostTransactions.csv`)
     : new URL(`${process.env.REST_URL}/v2/${account?.slug}/transactions.csv`);
 
   if (isHostReport) {
-    if (queryFilter.values.account) {
-      url.searchParams.set('account', queryFilter.values.account);
+    if (queryFilter.variables.account) {
+      url.searchParams.set('account', (queryFilter.variables.account as AccountReferenceInput).slug);
     }
-    if (queryFilter.values.excludeAccount) {
-      url.searchParams.set('excludeAccount', queryFilter.values.excludeAccount);
-    }
-    if (queryFilter.values.excludeHost) {
-      url.searchParams.set('includeHost', '0');
+    if (queryFilter.variables.excludeAccount) {
+      url.searchParams.set('excludeAccount', (queryFilter.variables.excludeAccount as AccountReferenceInput).slug);
     }
   }
 
@@ -69,79 +85,79 @@ const makeUrl = ({
   url.searchParams.set('includeIncognitoTransactions', '1');
   url.searchParams.set('includeChildrenTransactions', '1');
 
-  if (queryFilter.values.expenseType) {
-    url.searchParams.set('expenseType', queryFilter.values.expenseType.join(','));
+  if (queryFilter.variables.expenseType) {
+    url.searchParams.set('expenseType', safeJoinString(queryFilter.variables.expenseType));
   }
 
-  if (queryFilter.values.kind) {
-    url.searchParams.set('kind', queryFilter.values.kind.join(','));
+  if (queryFilter.variables.kind) {
+    url.searchParams.set('kind', safeJoinString(queryFilter.variables.kind));
   }
 
-  if (queryFilter.values.amount) {
-    const toAmountStr = ({ gte, lte }) => (lte ? `${gte}-${lte}` : `${gte}+`);
-    url.searchParams.set('amount', toAmountStr(queryFilter.values.amount));
-  }
-
-  if (queryFilter.values.paymentMethodService) {
-    url.searchParams.set('paymentMethodService', queryFilter.values.paymentMethodService.join(','));
-  }
-
-  if (queryFilter.values.paymentMethodType) {
-    url.searchParams.set('paymentMethodType', queryFilter.values.paymentMethodType.join(','));
-  }
-
-  if (queryFilter.values.type) {
-    url.searchParams.set('type', queryFilter.values.type);
-  }
-
-  if (queryFilter.values.searchTerm) {
-    url.searchParams.set('searchTerm', queryFilter.values.searchTerm);
-  }
-
-  if (queryFilter.values.date) {
-    if (queryFilter.variables.dateFrom) {
-      url.searchParams.set('dateFrom', queryFilter.variables.dateFrom);
+  if (queryFilter.variables.amount) {
+    if (queryFilter.variables.amount.gte) {
+      url.searchParams.set('minAmount', String(queryFilter.variables.amount.gte.valueInCents));
     }
-    if (queryFilter.variables.dateTo) {
-      url.searchParams.set('dateTo', queryFilter.variables.dateTo);
+    if (queryFilter.variables.amount.lte) {
+      url.searchParams.set('maxAmount', String(queryFilter.variables.amount.lte.valueInCents));
     }
   }
 
-  if (queryFilter.values.clearedAt) {
-    if (queryFilter.variables.clearedFrom) {
-      url.searchParams.set('clearedFrom', queryFilter.variables.clearedFrom);
-    }
-    if (queryFilter.variables.clearedTo) {
-      url.searchParams.set('clearedTo', queryFilter.variables.clearedTo);
-    }
+  if (queryFilter.variables.paymentMethodService) {
+    url.searchParams.set('paymentMethodService', safeJoinString(queryFilter.variables.paymentMethodService));
   }
 
-  if (!isNil(queryFilter.values.isRefund)) {
-    url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
+  if (queryFilter.variables.paymentMethodType) {
+    url.searchParams.set('paymentMethodType', safeJoinString(queryFilter.variables.paymentMethodType));
   }
 
-  if (!isNil(queryFilter.values.hasDebt)) {
-    url.searchParams.set('hasDebt', queryFilter.values.hasDebt ? '1' : '0');
+  if (queryFilter.variables.type) {
+    url.searchParams.set('type', queryFilter.variables.type);
   }
 
-  if (queryFilter.values.orderId) {
-    url.searchParams.set('orderId', queryFilter.values.orderId);
+  if (queryFilter.variables.searchTerm) {
+    url.searchParams.set('searchTerm', queryFilter.variables.searchTerm);
   }
 
-  if (queryFilter.values.expenseId) {
-    url.searchParams.set('expenseId', queryFilter.values.expenseId);
+  if (queryFilter.variables.dateFrom) {
+    url.searchParams.set('dateFrom', queryFilter.variables.dateFrom);
+  }
+  if (queryFilter.variables.dateTo) {
+    url.searchParams.set('dateTo', queryFilter.variables.dateTo);
   }
 
-  if (queryFilter.values.merchantId) {
-    url.searchParams.set('merchantId', queryFilter.values.merchantId);
+  if (queryFilter.variables.clearedFrom) {
+    url.searchParams.set('clearedFrom', queryFilter.variables.clearedFrom);
+  }
+  if (queryFilter.variables.clearedTo) {
+    url.searchParams.set('clearedTo', queryFilter.variables.clearedTo);
   }
 
-  if (queryFilter.values.accountingCategory) {
-    url.searchParams.set('accountingCategory', queryFilter.values.accountingCategory.join(','));
+  if (!isNil(queryFilter.variables.isRefund)) {
+    url.searchParams.set('isRefund', queryFilter.variables.isRefund ? '1' : '0');
   }
 
-  if (queryFilter.values.group) {
-    url.searchParams.set('group', queryFilter.values.group.join(','));
+  if (!isNil(queryFilter.variables.hasDebt)) {
+    url.searchParams.set('hasDebt', queryFilter.variables.hasDebt ? '1' : '0');
+  }
+
+  if (queryFilter.variables.order) {
+    url.searchParams.set('orderId', String((queryFilter.variables.order as OrderReferenceInput).legacyId));
+  }
+
+  if (queryFilter.variables.expense) {
+    url.searchParams.set('expenseId', String((queryFilter.variables.expense as ExpenseReferenceInput).legacyId));
+  }
+
+  if (queryFilter.variables.merchantId) {
+    url.searchParams.set('merchantId', queryFilter.variables.merchantId as string);
+  }
+
+  if (queryFilter.variables.accountingCategory) {
+    url.searchParams.set('accountingCategory', safeJoinString(queryFilter.variables.accountingCategory));
+  }
+
+  if (queryFilter.variables.group) {
+    url.searchParams.set('group', safeJoinString(queryFilter.variables.group));
   }
 
   if (flattenTaxesAndPaymentProcessorFees) {

@@ -9,6 +9,7 @@ import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { hasAccountMoneyManagement } from '@/lib/collective';
 
 import DismissibleMessage from '../../../DismissibleMessage';
 import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
@@ -35,10 +36,11 @@ import AccountTable from './AccountTable';
 import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
+import { PlatformBillingCollapsibleCard } from './PlatformBillingOverviewCard';
 import { editAccountSettingMutation, overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { AccountTodoList } from './TodoList';
-import { WelcomeCollective } from './Welcome';
+import { WelcomeCollective, WelcomeOrganization } from './Welcome';
 
 export const schema = z.object({
   period: periodCompareFilter.schema,
@@ -47,7 +49,7 @@ export const schema = z.object({
   subpath: z.coerce.string().nullable().default(null), // default null makes sure to always trigger the `toVariables` function
 });
 
-export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
+export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
   const { account } = React.useContext(DashboardContext);
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showFeedbackModal, setShowFeedbackModal] = React.useState(false);
@@ -112,10 +114,10 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
           default:
             return {
               includeReceived: true,
-              includeBalance: account.isActive, // only showing Balance if account is active
+              includeBalance: true,
               includeSpent: true,
-              includeBalanceTimeseries: account.isActive, // only showing Balance if account is active
-              includeContributionsCount: true,
+              includeBalanceTimeseries: true,
+              includeContributionsCount: account.isActive,
               includeReceivedTimeseries: true,
             };
         }
@@ -157,7 +159,6 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       showCurrencyCode: true,
       isSnapshot: true,
       showTimeSeries: true,
-      hide: !account.isActive,
     },
     {
       id: 'received',
@@ -281,7 +282,14 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
         }
       />
       <ConvertedAccountMessage account={account} />
-      <WelcomeCollective account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
+      {account.type === 'ORGANIZATION' ? (
+        <React.Fragment>
+          {hasAccountMoneyManagement(account) && account.platformSubscription && <PlatformBillingCollapsibleCard />}
+          <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
+        </React.Fragment>
+      ) : (
+        <WelcomeCollective account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
+      )}
       <div className="space-y-3">
         <Filterbar hideSeparator {...queryFilter} />
         <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">

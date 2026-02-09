@@ -1,5 +1,5 @@
-import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -7,22 +7,72 @@ import type {
   PlatformBillingOverviewCardQuery,
   PlatformBillingOverviewCardQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import Link from '@/components/Link';
 import MessageBox from '@/components/MessageBox';
 import { Button } from '@/components/ui/Button';
+import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 import { Skeleton } from '@/components/ui/Skeleton';
 
+import { DashboardContext } from '../../DashboardContext';
 import { platformSubscriptionFragment } from '../platform-subscription/fragments';
 import { PlatformSubscriptionDetails } from '../platform-subscription/PlatformSubscriptionCard';
+
+import { editAccountSettingMutation } from './queries';
+
+export function PlatformBillingCollapsibleCard() {
+  const { account } = useContext(DashboardContext);
+  const [showSubscriptionCard, setShowSubscriptionCard] = useState(undefined);
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
+
+  useEffect(() => {
+    if (!LoggedInUser || !account) {
+      return;
+    }
+
+    if (showSubscriptionCard === undefined) {
+      const showSubscriptionCardKey = `id${account.legacyId}`;
+      const showSubscriptionCardSetting =
+        LoggedInUser.collective.settings?.showInitialOverviewSubscriptionCard?.[showSubscriptionCardKey];
+
+      setShowSubscriptionCard(showSubscriptionCardSetting !== false ? true : false);
+    }
+  }, [LoggedInUser, account, showSubscriptionCard]);
+
+  const handleSubscriptionCardToggle = useCallback(
+    async (open: boolean) => {
+      setShowSubscriptionCard(open);
+
+      await editAccountSetting({
+        variables: {
+          account: { legacyId: LoggedInUser.collective.id },
+          key: `showInitialOverviewSubscriptionCard.id${account.legacyId}`,
+          value: open,
+        },
+      }).catch(() => {});
+      await refetchLoggedInUser();
+    },
+    [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
+  );
+
+  return (
+    <Collapsible open={showSubscriptionCard}>
+      <CollapsibleContent>
+        <PlatformBillingOverviewCard accountSlug={account.slug} onDismiss={() => handleSubscriptionCardToggle(false)} />
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
 
 type PlatformBillingOverviewCardProps = {
   accountSlug: string;
   onDismiss?: () => void;
 };
 
-export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardProps) {
+function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardProps) {
   const query = useQuery<PlatformBillingOverviewCardQuery, PlatformBillingOverviewCardQueryVariables>(
     gql`
       query PlatformBillingOverviewCard($slug: String!) {

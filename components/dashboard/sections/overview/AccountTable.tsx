@@ -22,7 +22,7 @@ import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import { DashboardContext } from '../../DashboardContext';
 
-import type { schema } from './CollectiveOverview';
+import type { schema } from './DefaultOverview';
 import type { MetricProps } from './Metric';
 import { ChangeBadge, getPercentageDifference } from './Metric';
 import { metricsPerAccountQuery } from './queries';
