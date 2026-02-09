@@ -121,6 +121,32 @@
 }
 }
 
+@keyframes sticky-column-shadow {
+  0%,
+  98% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.sticky-actions-column::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: 20px;
+  opacity: 0;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.06));
+  pointer-events: none;
+  animation-name: sticky-column-shadow;
+  animation-duration: auto;
+  animation-timeline: scroll(inline);
+  animation-timing-function: linear;
+}
+
 :root {
   --color-red-50: oklch(0.971 0.013 17.38);
   --color-red-100: oklch(0.936 0.032 17.717);

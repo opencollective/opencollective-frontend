@@ -271,17 +271,20 @@ type CellContext<TData, TValue> = TanCellContext<TData, TValue> & {
 export const actionsColumn = {
   accessorKey: 'actions',
   header: ({ table }) => (
-    <div className="-mr-2 flex justify-end">
+    <div className="flex justify-end">
       <ColumnToggleDropdown table={table} />
     </div>
   ),
-  meta: { className: 'w-14' },
+  meta: {
+    className:
+      'w-12 max-w-12 sticky !pr-2 right-0 z-10 bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted has-data-[state=open]:bg-muted sticky-actions-column',
+  },
   enableHiding: false,
   cell: (ctx: unknown) => {
     const { table, row, actionsMenuTriggerRef } = ctx as CellContext<any, any>;
     return (
       // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-      <div onClick={e => e.stopPropagation()} className="-mr-2 flex items-center justify-end">
+      <div onClick={e => e.stopPropagation()} className="flex items-center justify-end">
         <RowActionsMenu table={table} row={row} actionsMenuTriggerRef={actionsMenuTriggerRef} />
       </div>
     );
