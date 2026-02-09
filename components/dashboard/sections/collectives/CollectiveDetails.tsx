@@ -610,7 +610,11 @@ const CollectiveDetails = ({
                 title={<FormattedMessage id="startsAt" defaultMessage="Event Starts At" />}
                 value={
                   <div className="flex items-center gap-2">
-                    <FormattedDate value={collective.startsAt} day="numeric" month="long" year="numeric" />
+                    {collective.startsAt ? (
+                      <FormattedDate value={collective.startsAt} day="numeric" month="long" year="numeric" />
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                     {collective.endsAt && collective.endsAt !== collective.startsAt && (
                       <React.Fragment>
                         <span>&rarr;</span>
