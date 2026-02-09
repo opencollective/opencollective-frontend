@@ -135,9 +135,9 @@ function getAccount(
 ): Cypress.Chainable<{ name: string; payoutMethods: { id: string; type: string }[] }> {
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
     return graphqlQueryV2(token, {
-      operationName: 'GetAccount',
+      operationName: 'Account',
       query: gql`
-        query GetAccount($accountSlug: String!) {
+        query Account($accountSlug: String!) {
           account(slug: $accountSlug) {
             id
             legacyId

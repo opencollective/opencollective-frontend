@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 import { expensesListFieldsFragment } from '@/components/expenses/graphql/fragments';
 
-export const platformSubscriptionFeatures = gql`
+export const platformSubscriptionFeaturesFragment = gql`
   fragment PlatformSubscriptionFeatures on PlatformSubscriptionFeatures {
     TRANSFERWISE
     PAYPAL_PAYOUTS
@@ -24,7 +24,7 @@ export const platformSubscriptionFeatures = gql`
   }
 `;
 
-export const platformSubscriptionFragment = gql`
+export const platformSubscriptionFieldsFragment = gql`
   fragment PlatformSubscriptionFields on PlatformSubscription {
     startDate
     endDate
@@ -54,10 +54,10 @@ export const platformSubscriptionFragment = gql`
     }
   }
 
-  ${platformSubscriptionFeatures}
+  ${platformSubscriptionFeaturesFragment}
 `;
 
-export const platformBillingFragment = gql`
+export const platformBillingFieldsFragment = gql`
   fragment PlatformBillingFields on PlatformBilling {
     billingPeriod {
       year
@@ -114,9 +114,9 @@ export const platformBillingFragment = gql`
     }
     dueDate
     expenses {
-      ...ExpensesListFieldsFragment
+      ...ExpensesListFields
     }
   }
-  ${platformSubscriptionFragment}
+  ${platformSubscriptionFieldsFragment}
   ${expensesListFieldsFragment}
 `;

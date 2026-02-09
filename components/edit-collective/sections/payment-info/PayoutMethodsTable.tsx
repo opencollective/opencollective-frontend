@@ -12,7 +12,7 @@ import { PayoutMethodRadioGroupItem } from '@/components/submit-expense/form/Pay
 import { useToast } from '../../../ui/useToast';
 
 import { MethodCard, moreActionsThunk } from './common';
-import { PayoutMethodFragment } from './gql';
+import { payoutMethodFieldsFragment } from './gql';
 
 export default function PayoutMethodsTable({ account, loading, onUpdate, ...props }) {
   const { toast } = useToast();
@@ -25,7 +25,7 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
         ...PayoutMethodFields
       }
     }
-    ${PayoutMethodFragment}
+    ${payoutMethodFieldsFragment}
   `);
   const [restorePayoutMethod] = useMutation(gql`
     mutation PaymentInfoRestorePayoutMethod($payoutMethod: PayoutMethodReferenceInput!) {
@@ -34,7 +34,7 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
         ...PayoutMethodFields
       }
     }
-    ${PayoutMethodFragment}
+    ${payoutMethodFieldsFragment}
   `);
 
   const actions = React.useMemo(

@@ -19,10 +19,10 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
-import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
+import { transactionsImportRowFieldsFragment, transactionsImportStatsFragment } from './lib/graphql';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import { getI18nLink } from '@/components/I18nFormatters';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import StackedAvatars from '@/components/StackedAvatars';
@@ -143,9 +143,9 @@ const offPlatformTransactionsQuery = gql`
       }
     }
   }
-  ${TransactionsImportRowFieldsFragment}
-  ${AccountingCategorySelectFieldsFragment}
-  ${TransactionsImportStatsFragment}
+  ${transactionsImportRowFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
+  ${transactionsImportStatsFragment}
 `;
 
 const DEFAULT_PAGE_SIZE = 20;

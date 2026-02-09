@@ -9,7 +9,7 @@ import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/schema';
 import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import { Drawer, DrawerActions, DrawerHeader } from '../Drawer';
@@ -60,10 +60,10 @@ const virtualCardRequestQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
-const RejectVirtualCardRequestMutation = gql`
+const rejectVirtualCardRequestMutation = gql`
   mutation RejectVirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
     rejectVirtualCardRequest(virtualCardRequest: $virtualCardRequest) {
       id
@@ -78,7 +78,7 @@ function VirtualCardRequestDrawerActions({ virtualCardRequest }: { virtualCardRe
 
   const [isVirtualCardModalOpen, setIsVirtualCardModalOpen] = React.useState(false);
 
-  const [rejectRequestMutation, rejectRequestMutationResult] = useMutation(RejectVirtualCardRequestMutation, {
+  const [rejectRequestMutation, rejectRequestMutationResult] = useMutation(rejectVirtualCardRequestMutation, {
     variables: {
       virtualCardRequest: {
         id: virtualCardRequest.id,

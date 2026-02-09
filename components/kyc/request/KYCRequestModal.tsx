@@ -17,7 +17,7 @@ import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import type { BaseModalProps } from '../../ModalContext';
 import { Dialog, DialogContent } from '../../ui/Dialog';
-import { kycVerificationFields } from '../graphql';
+import { kycVerificationFieldsFragment } from '../graphql';
 
 import { ManualKYCRequest } from './manual/ManualKYCRequest';
 import { KYCRequestIntroduction } from './KYCRequestIntroduction';
@@ -58,7 +58,7 @@ export function KYCRequestModal(props: KYCRequestModalProps) {
           }
         }
       }
-      ${kycVerificationFields}
+      ${kycVerificationFieldsFragment}
     `,
     {
       variables: {

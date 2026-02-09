@@ -26,9 +26,9 @@ import { Checkbox } from '@/components/ui/Checkbox';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Switch } from '@/components/ui/Switch';
 import { toast } from '@/components/ui/useToast';
-import { vendorFieldFragment } from '@/components/vendors/queries';
+import { vendorFieldsFragment } from '@/components/vendors/queries';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
 import Avatar from '../../../Avatar';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../../../collective-page/graphql/queries';
@@ -347,7 +347,7 @@ const addFundsAccountQuery = gql`
   }
   ${addFundsTierFieldsFragment}
   ${addFundsAccountQueryHostFieldsFragment}
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 type FundDetails = {
@@ -506,7 +506,7 @@ const AddFundsModalContentWithCollective = ({
         ...VendorFields
       }
     }
-    ${vendorFieldFragment}
+    ${vendorFieldsFragment}
   `);
 
   const onCreateVendorClick = React.useCallback(

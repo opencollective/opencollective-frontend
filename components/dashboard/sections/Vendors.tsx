@@ -26,7 +26,7 @@ import { actionsColumn, DataTable } from '../../table/DataTable';
 import { Button } from '../../ui/Button';
 import { VendorContactTag } from '../../vendors/common';
 import type { VendorFieldsFragment } from '../../vendors/queries';
-import { setVendorArchiveMutation, vendorFieldFragment } from '../../vendors/queries';
+import { setVendorArchiveMutation, vendorFieldsFragment } from '../../vendors/queries';
 import VendorForm from '../../vendors/VendorForm';
 import { DashboardContext } from '../DashboardContext';
 import DashboardHeader from '../DashboardHeader';
@@ -173,7 +173,7 @@ const dashboardVendorsQuery = gql`
       }
     }
   }
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 const getColumns = ({ isVendor }) => {

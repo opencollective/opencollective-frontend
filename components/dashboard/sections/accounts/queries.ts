@@ -1,8 +1,8 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 
-const dashboardAccountsQueryFields = gql`
+const dashboardAccountsQueryFieldsFragment = gql`
   fragment DashboardAccountsQueryFields on Account {
     id
     legacyId
@@ -110,7 +110,7 @@ export const accountsQuery = gql`
     }
   }
 
-  ${dashboardAccountsQueryFields}
+  ${dashboardAccountsQueryFieldsFragment}
 `;
 
 export const accountDetailQuery = gql`
@@ -206,6 +206,6 @@ export const accountDetailQuery = gql`
     }
   }
 
-  ${accountHoverCardFields}
-  ${dashboardAccountsQueryFields}
+  ${accountHoverCardFieldsFragment}
+  ${dashboardAccountsQueryFieldsFragment}
 `;

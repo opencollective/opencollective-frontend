@@ -40,7 +40,7 @@ import { Switch } from '../ui/Switch';
 import { useToast } from '../ui/useToast';
 
 import type { VendorFieldsFragment } from './queries';
-import { vendorFieldFragment } from './queries';
+import { vendorFieldsFragment } from './queries';
 
 const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
 
@@ -51,7 +51,7 @@ const createVendorMutation = gql`
       ...VendorFields
     }
   }
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 const editVendorMutation = gql`
@@ -61,7 +61,7 @@ const editVendorMutation = gql`
       ...VendorFields
     }
   }
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 const EDITABLE_FIELDS = [

@@ -17,7 +17,7 @@ import type { DashboardSectionProps } from '../../types';
 
 import HostApplicationDrawer from './HostApplicationDrawer';
 import HostApplicationsTable from './HostApplicationsTable';
-import { HostApplicationFields } from './queries';
+import { hostApplicationFieldsFragment } from './queries';
 
 const schema = z.object({
   limit,
@@ -54,7 +54,7 @@ export default function HostApplicationRequests({
         }
       }
 
-      ${HostApplicationFields}
+      ${hostApplicationFieldsFragment}
     `,
     {
       variables: { accountSlug, ...queryFilter.variables },

@@ -108,7 +108,7 @@ const getSchema = (intl: IntlShape) =>
       },
     );
 
-const CREATE_EVENT_MUTATION = gql`
+const createEventMutation = gql`
   mutation CreateEvent($event: EventCreateInput!, $account: AccountReferenceInput!) {
     createEvent(event: $event, account: $account) {
       id
@@ -136,7 +136,7 @@ export default function CreateEventForm({
 }) {
   const { toast } = useToast();
   const intl = useIntl();
-  const [createEventMutation, { loading: mutationLoading }] = useMutation(CREATE_EVENT_MUTATION);
+  const [createEvent, { loading: mutationLoading }] = useMutation(createEventMutation);
   const eventSchema = React.useMemo(() => getSchema(intl), [intl]);
   const timezoneOptions = React.useMemo(
     () =>
@@ -162,7 +162,7 @@ export default function CreateEventForm({
   const handleSubmit = async (values: EventFormValues) => {
     try {
       // Convert form values to API format
-      const result = await createEventMutation({
+      const result = await createEvent({
         variables: {
           account: { id: parent.id },
           event: {

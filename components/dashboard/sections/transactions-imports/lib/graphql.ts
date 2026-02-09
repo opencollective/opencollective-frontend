@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-export const TransactionsImportStatsFragment = gql`
+export const transactionsImportStatsFragment = gql`
   fragment TransactionsImportStats on TransactionsImportStats {
     total
     ignored
@@ -13,7 +13,7 @@ export const TransactionsImportStatsFragment = gql`
   }
 `;
 
-export const TransactionsImportAssignmentFieldsFragment = gql`
+export const transactionsImportAssignmentFieldsFragment = gql`
   fragment TransactionsImportAssignmentFields on TransactionsImportAssignment {
     importedAccountId
     accounts {
@@ -29,7 +29,7 @@ export const TransactionsImportAssignmentFieldsFragment = gql`
   }
 `;
 
-export const TransactionImportListFieldsFragment = gql`
+export const transactionImportListFieldsFragment = gql`
   fragment TransactionImportListFields on TransactionsImport {
     id
     source
@@ -61,11 +61,11 @@ export const TransactionImportListFieldsFragment = gql`
       id
     }
   }
-  ${TransactionsImportStatsFragment}
-  ${TransactionsImportAssignmentFieldsFragment}
+  ${transactionsImportStatsFragment}
+  ${transactionsImportAssignmentFieldsFragment}
 `;
 
-export const TransactionsImportRowFieldsFragment = gql`
+export const transactionsImportRowFieldsFragment = gql`
   fragment TransactionsImportRowFields on TransactionsImportRow {
     id
     sourceId
@@ -114,7 +114,7 @@ export const TransactionsImportRowFieldsFragment = gql`
   }
 `;
 
-export const updateTransactionsImportRows = gql`
+export const updateTransactionsImportRowsMutation = gql`
   mutation UpdateTransactionsImportRow(
     $rows: [TransactionsImportRowUpdateInput!]!
     $action: TransactionsImportRowAction!
@@ -132,6 +132,6 @@ export const updateTransactionsImportRows = gql`
       }
     }
   }
-  ${TransactionsImportRowFieldsFragment}
-  ${TransactionsImportStatsFragment}
+  ${transactionsImportRowFieldsFragment}
+  ${transactionsImportStatsFragment}
 `;

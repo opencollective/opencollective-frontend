@@ -1,8 +1,8 @@
 import { gql } from '../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
 
-export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
+export const agreementViewFieldsFragment = gql`
   fragment AgreementViewFields on Agreement {
     id
     title
@@ -35,5 +35,5 @@ export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
       type
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;

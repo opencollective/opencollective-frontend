@@ -12,7 +12,7 @@ import StyledTooltip from '../../../StyledTooltip';
 import { Switch } from '../../../ui/Switch';
 import { useToast } from '../../../ui/useToast';
 
-import { accountActivitySubscriptionsFragment } from './fragments';
+import { accountActivitySubscriptionsFieldsFragment } from './fragments';
 
 const refetchEmailNotificationQuery = gql`
   query NotificationsSettingsRefetch($id: String!) {
@@ -21,7 +21,7 @@ const refetchEmailNotificationQuery = gql`
       ...AccountActivitySubscriptionsFields
     }
   }
-  ${accountActivitySubscriptionsFragment}
+  ${accountActivitySubscriptionsFieldsFragment}
 `;
 
 const setEmailNotificationMutation = gql`

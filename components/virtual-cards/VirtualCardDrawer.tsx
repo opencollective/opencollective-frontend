@@ -8,7 +8,7 @@ import type { VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/
 import { VirtualCardStatus } from '../../lib/graphql/types/v2/schema';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import { Drawer, DrawerActions, DrawerHeader } from '../Drawer';
@@ -75,7 +75,7 @@ const virtualCardQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {

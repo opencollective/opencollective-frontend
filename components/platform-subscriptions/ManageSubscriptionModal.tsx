@@ -21,8 +21,8 @@ import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/Dialog';
 
 import {
-  platformSubscriptionFeatures,
-  platformSubscriptionFragment,
+  platformSubscriptionFeaturesFragment,
+  platformSubscriptionFieldsFragment,
 } from '../dashboard/sections/platform-subscription/fragments';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import MessageBox from '../MessageBox';
@@ -86,7 +86,7 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
         }
       }
     }
-    ${platformSubscriptionFeatures}
+    ${platformSubscriptionFeaturesFragment}
   `);
 
   const [updatePlanMutation] = useMutation<
@@ -103,7 +103,7 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
           }
         }
       }
-      ${platformSubscriptionFragment}
+      ${platformSubscriptionFieldsFragment}
     `,
     {
       variables: {

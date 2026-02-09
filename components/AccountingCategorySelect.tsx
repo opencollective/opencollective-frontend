@@ -18,7 +18,7 @@ import { Button } from './ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 
-export const AccountingCategorySelectFieldsFragment = gql`
+export const accountingCategorySelectFieldsFragment = gql`
   fragment AccountingCategorySelectFields on AccountingCategory {
     id
     kind

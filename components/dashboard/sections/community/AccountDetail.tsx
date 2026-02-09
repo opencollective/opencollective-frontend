@@ -28,7 +28,7 @@ import { DataTable } from '@/components/table/DataTable';
 import Tabs from '@/components/Tabs';
 import { InfoList, InfoListItem } from '@/components/ui/InfoList';
 import { VendorContactTag } from '@/components/vendors/common';
-import { setVendorArchiveMutation, vendorFieldFragment } from '@/components/vendors/queries';
+import { setVendorArchiveMutation, vendorFieldsFragment } from '@/components/vendors/queries';
 import VendorForm from '@/components/vendors/VendorForm';
 
 import Avatar from '../../../Avatar';
@@ -63,7 +63,7 @@ const convertOrganizationMutation = gql`
       ...VendorFields
     }
   }
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 enum AccountDetailView {
