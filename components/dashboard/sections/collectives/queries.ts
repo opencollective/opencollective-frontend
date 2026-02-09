@@ -356,6 +356,8 @@ export const hostedCollectivesQuery = gql`
     $balance: AmountRangeInput
     $consolidatedBalance: AmountRangeInput
     $currencies: [String]
+    $startsAtFrom: DateTime
+    $startsAtTo: DateTime
   ) {
     host(slug: $hostSlug) {
       id
@@ -385,6 +387,8 @@ export const hostedCollectivesQuery = gql`
         balance: $balance
         consolidatedBalance: $consolidatedBalance
         currencies: $currencies
+        startsAtFrom: $startsAtFrom
+        startsAtTo: $startsAtTo
       ) {
         offset
         limit

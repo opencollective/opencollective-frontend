@@ -78,6 +78,13 @@ const makeUrl = ({ account, queryFilter, fields }) => {
     url.searchParams.set('isUnhosted', queryFilter.variables.isUnhosted ? '1' : '0');
   }
 
+  if (queryFilter.variables.startsAtFrom) {
+    url.searchParams.set('startsAtFrom', queryFilter.variables.startsAtFrom);
+  }
+  if (queryFilter.variables.startsAtTo) {
+    url.searchParams.set('startsAtTo', queryFilter.variables.startsAtTo);
+  }
+
   if (!isEmpty(fields)) {
     const selectedFields = fields.join(',').replace('debitAndCreditAmounts', 'debitAmount,creditAmount');
     url.searchParams.set('fields', selectedFields);
