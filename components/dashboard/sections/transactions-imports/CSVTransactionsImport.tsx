@@ -52,7 +52,7 @@ import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledLink from '../../../StyledLink';
-import { actionsColumn, DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable, selectColumn } from '../../../table/DataTable';
 import {
   MultiPagesRowSelectionInitialState,
   multiPagesRowSelectionReducer,
@@ -557,7 +557,7 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                     )}
                     columns={[
                       {
-                        id: 'select',
+                        ...selectColumn,
                         header: ({ table }) =>
                           importRows.some(row => !row.expense && !row.order) ? (
                             <Checkbox

@@ -18,6 +18,7 @@ import type { GetActions } from '../../lib/actions/types';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { cn } from '../../lib/utils';
 
+import { Checkbox } from '../ui/Checkbox';
 import { Skeleton } from '../ui/Skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
 
@@ -90,11 +91,37 @@ export function DataTable<TData, TValue>({
   setRowSelection: setRowSelectionFromProps,
   enableMultiRowSelection,
   meta, // TODO: Possibly remove this prop once the getActions pattern is implemented fully
+  className,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const intl = useIntl();
+  const hasActionsColumn = columns.some(col => 'accessorKey' in col && col.accessorKey === 'actions');
+  const hasSelectColumn = columns.some(col => 'id' in col && col.id === 'select');
+  const hasScrollShadows = hasActionsColumn || hasSelectColumn;
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [sorting, setSorting] = React.useState<SortingState>(initialSort ?? []);
   const [rowSelection, setRowSelection] = React.useState({});
+
+  // Track horizontal overflow to toggle scroll shadow pseudo-elements via CSS custom property.
+  // This complements the scroll-driven animations which handle opacity based on scroll position,
+  // but don't properly deactivate when overflow disappears on resize.
+  React.useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el || !hasScrollShadows) {
+      return;
+    }
+    const update = () => {
+      el.style.setProperty('--scroll-shadow-display', el.scrollWidth > el.clientWidth ? 'block' : 'none');
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    const table = el.querySelector('table');
+    if (table) {
+      observer.observe(table);
+    }
+    return () => observer.disconnect();
+  }, [hasScrollShadows]);
 
   const hasDefaultColumnVisibility = isEqual(
     omitBy(columnVisibility, v => v),
@@ -129,7 +156,12 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <Table {...tableProps} ref={tableRef}>
+    <Table
+      className={cn(className, hasActionsColumn && !hasSelectColumn && 'scroll-shadow-left')}
+      containerRef={scrollContainerRef}
+      {...tableProps}
+      ref={tableRef}
+    >
       {!hideHeader && (
         <TableHeader className="relative">
           {table.getHeaderGroups().map(headerGroup => (
@@ -268,6 +300,34 @@ type CellContext<TData, TValue> = TanCellContext<TData, TValue> & {
   actionsMenuTriggerRef?: React.MutableRefObject<any>;
 };
 
+const stickyColumnBg =
+  'bg-background group-hover/row:[&:is(td)]:bg-muted group-data-[state=selected]/row:bg-muted has-data-[state=open]:bg-muted';
+export const selectColumn = {
+  id: 'select',
+  header: ({ table }) => (
+    <Checkbox
+      aria-label="Select all"
+      className="translate-y-[2px] border-neutral-500"
+      checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate') || false}
+      onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+    />
+  ),
+  cell: ({ row }) => (
+    <Checkbox
+      checked={row.getIsSelected()}
+      disabled={!row.getCanSelect()}
+      aria-label="Select row"
+      className="translate-y-[2px] border-neutral-500"
+      onCheckedChange={value => row.toggleSelected(!!value)}
+    />
+  ),
+  meta: {
+    className: `w-10 sticky left-0 z-10 ${stickyColumnBg} sticky-select-column`,
+  },
+  enableSorting: false,
+  enableHiding: false,
+};
+
 export const actionsColumn = {
   accessorKey: 'actions',
   header: ({ table }) => (
@@ -276,8 +336,7 @@ export const actionsColumn = {
     </div>
   ),
   meta: {
-    className:
-      'w-12 max-w-12 sticky !pr-2 right-0 z-10 bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted has-data-[state=open]:bg-muted sticky-actions-column',
+    className: `w-12 max-w-12 sticky !pr-2 right-0 z-10 ${stickyColumnBg} sticky-actions-column`,
   },
   enableHiding: false,
   cell: (ctx: unknown) => {

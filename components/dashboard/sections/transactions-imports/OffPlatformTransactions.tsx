@@ -35,7 +35,7 @@ import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledLink from '../../../StyledLink';
-import { actionsColumn, DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable, selectColumn } from '../../../table/DataTable';
 import {
   MultiPagesRowSelectionInitialState,
   multiPagesRowSelectionReducer,
@@ -525,7 +525,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                 }}
                 columns={[
                   {
-                    id: 'select',
+                    ...selectColumn,
                     header: ({ table }) =>
                       importRows.some(row => !row.expense && !row.order) ? (
                         <Checkbox
@@ -688,11 +688,11 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                   {
                     id: 'Actions',
                     ...actionsColumn,
-                    header: () => {
-                      return (
-                        <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
-                      );
-                    },
+                    // header: () => {
+                    //   return (
+                    //     <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
+                    //   );
+                    // },
                   },
                 ]}
               />

@@ -5,13 +5,19 @@ import { cn } from '../../lib/utils';
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement> & { mobileTableView?: boolean; fullWidth?: boolean; innerClassName?: string }
->(({ className, innerClassName, mobileTableView, fullWidth, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableElement> & {
+    mobileTableView?: boolean;
+    fullWidth?: boolean;
+    innerClassName?: string;
+    containerRef?: React.Ref<HTMLDivElement>;
+  }
+>(({ className, innerClassName, mobileTableView, fullWidth, containerRef, ...props }, ref) => (
   <div
+    ref={containerRef}
     className={cn(
       'table-auto overflow-auto',
-      mobileTableView || fullWidth ? '-mx-4 border-t border-b' : 'w-full rounded-xl border',
-      fullWidth ? 'sm:-mx-6' : mobileTableView ? 'sm:mx-0 sm:w-full sm:rounded-xl sm:border' : '',
+      mobileTableView || fullWidth ? '-mx-3 border-t border-b' : 'w-full rounded-xl border',
+      fullWidth ? 'sm:-mx-6' : mobileTableView ? 'md:sw-full md:mx-0 md:rounded-xl md:border' : '',
       className,
     )}
   >
