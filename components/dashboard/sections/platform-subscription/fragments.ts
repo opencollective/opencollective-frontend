@@ -24,7 +24,7 @@ export const platformSubscriptionFeaturesFragment = gql`
   }
 `;
 
-export const platformSubscriptionFragment = gql`
+export const platformSubscriptionFieldsFragment = gql`
   fragment PlatformSubscriptionFields on PlatformSubscription {
     startDate
     endDate
@@ -57,7 +57,7 @@ export const platformSubscriptionFragment = gql`
   ${platformSubscriptionFeaturesFragment}
 `;
 
-export const platformBillingFragment = gql`
+export const platformBillingFieldsFragment = gql`
   fragment PlatformBillingFields on PlatformBilling {
     billingPeriod {
       year
@@ -117,6 +117,6 @@ export const platformBillingFragment = gql`
       ...ExpensesListFields
     }
   }
-  ${platformSubscriptionFragment}
+  ${platformSubscriptionFieldsFragment}
   ${expensesListFieldsFragment}
 `;

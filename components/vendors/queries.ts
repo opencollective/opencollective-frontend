@@ -4,7 +4,7 @@ import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
 
 export type { VendorFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 
-export const vendorFieldFragment = gql`
+export const vendorFieldsFragment = gql`
   fragment VendorFields on Vendor {
     id
     slug
@@ -79,5 +79,5 @@ export const setVendorArchiveMutation = gql`
       ...VendorFields
     }
   }
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;

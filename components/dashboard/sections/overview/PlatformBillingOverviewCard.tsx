@@ -17,7 +17,7 @@ import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { DashboardContext } from '../../DashboardContext';
-import { platformSubscriptionFragment } from '../platform-subscription/fragments';
+import { platformSubscriptionFieldsFragment } from '../platform-subscription/fragments';
 import { PlatformSubscriptionDetails } from '../platform-subscription/PlatformSubscriptionCard';
 
 import { editAccountSettingMutation } from './queries';
@@ -90,7 +90,7 @@ function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardProps) {
           }
         }
       }
-      ${platformSubscriptionFragment}
+      ${platformSubscriptionFieldsFragment}
     `,
     {
       variables: {

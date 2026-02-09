@@ -43,7 +43,7 @@ import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMess
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
-import { vendorFieldFragment } from '../../../vendors/queries';
+import { vendorFieldsFragment } from '../../../vendors/queries';
 
 const EDITABLE_FIELDS = [
   'amount',
@@ -123,7 +123,7 @@ const createPendingContributionModalQuery = gql`
     }
   }
 
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 const createPendingContributionModalCollectiveQuery = gql`

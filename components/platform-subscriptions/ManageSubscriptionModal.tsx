@@ -22,7 +22,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/
 
 import {
   platformSubscriptionFeaturesFragment,
-  platformSubscriptionFragment,
+  platformSubscriptionFieldsFragment,
 } from '../dashboard/sections/platform-subscription/fragments';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import MessageBox from '../MessageBox';
@@ -103,7 +103,7 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
           }
         }
       }
-      ${platformSubscriptionFragment}
+      ${platformSubscriptionFieldsFragment}
     `,
     {
       variables: {

@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
-import { platformBillingFragment, platformSubscriptionFragment } from './fragments';
+import { platformBillingFieldsFragment, platformSubscriptionFieldsFragment } from './fragments';
 
 type BillingProjectionProps = {
   accountSlug: string;
@@ -40,8 +40,8 @@ export function BillingProjection(props: BillingProjectionProps) {
           }
         }
       }
-      ${platformSubscriptionFragment}
-      ${platformBillingFragment}
+      ${platformSubscriptionFieldsFragment}
+      ${platformBillingFieldsFragment}
     `,
     {
       variables: {

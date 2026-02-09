@@ -22,7 +22,7 @@ export const updatePaymentMethodFragment = gql`
   }
 `;
 
-export const managedOrderFragment = gql`
+export const managedOrderFieldsFragment = gql`
   fragment ManagedOrderFields on Order {
     id
     legacyId
@@ -193,5 +193,5 @@ export const manageContributionsQuery = gql`
     }
   }
   ${accountNavbarFieldsFragment}
-  ${managedOrderFragment}
+  ${managedOrderFieldsFragment}
 `;

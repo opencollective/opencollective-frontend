@@ -25,7 +25,7 @@ import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 import { useToast } from '../ui/useToast';
 
-import { managedOrderFragment, updatePaymentMethodFragment } from './graphql/queries';
+import { managedOrderFieldsFragment, updatePaymentMethodFragment } from './graphql/queries';
 import AddPaymentMethod from './AddPaymentMethod';
 
 const PaymentMethodBox = styled(Flex)`
@@ -56,7 +56,7 @@ const paymentMethodsQuery = gql`
       ...ManagedOrderFields
     }
   }
-  ${managedOrderFragment}
+  ${managedOrderFieldsFragment}
   ${updatePaymentMethodFragment}
 `;
 
@@ -70,7 +70,7 @@ const updatePaymentMethodMutation = gql`
       ...ManagedOrderFields
     }
   }
-  ${managedOrderFragment}
+  ${managedOrderFieldsFragment}
 `;
 
 const paymentMethodResponseFragment = gql`

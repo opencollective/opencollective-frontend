@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import { kycStatusFieldsFragment, kycVerificationFieldsFragment } from '@/components/kyc/graphql';
-import { vendorFieldFragment } from '@/components/vendors/queries';
+import { vendorFieldsFragment } from '@/components/vendors/queries';
 
 import { legalDocumentFieldsFragment } from '../legal-documents/HostDashboardTaxForms';
 
@@ -345,7 +345,7 @@ export const communityAccountDetailQuery = gql`
   ${kycVerificationFieldsFragment}
   ${legalDocumentFieldsFragment}
   ${communityAccountDetailActivityFieldsFragment}
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 export const communityAccountActivitiesQuery = gql`
