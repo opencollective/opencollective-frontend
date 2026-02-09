@@ -104,7 +104,7 @@
     "node-fetch": "^2.7.0",
     "nprogress": "0.2.0",
     "polished": "4.3.1",
-    "qrcode.react": "3.2.0",
+    "qrcode.react": "4.2.0",
     "react": "19.2.3",
     "react-animate-height": "3.2.3",
     "react-apexcharts": "1.7.0",
