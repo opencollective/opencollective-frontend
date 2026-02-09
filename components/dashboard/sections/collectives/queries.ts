@@ -261,6 +261,10 @@ const hostedCollectiveFields = gql`
     ... on AccountWithContributions {
       totalFinancialContributors
     }
+    ... on Event {
+      startsAt
+      endsAt
+    }
     childrenAccounts {
       nodes {
         id
