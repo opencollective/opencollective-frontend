@@ -28,6 +28,7 @@ import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
+import { expensePayeeFilter } from '../../filters/ExpensePayeeFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
@@ -60,6 +61,7 @@ export const schema = z.object({
   virtualCard: isMulti(z.string()).optional(),
   accountingCategory: accountingCategoryFilter.schema,
   payoutMethodId: z.string().optional(),
+  payee: expensePayeeFilter.schema,
 });
 
 export type FilterValues = z.infer<typeof schema>;
@@ -84,6 +86,7 @@ export const toVariables: FiltersToVariables<
   tag: value => ({ tags: value.includes('untagged') ? null : value }),
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
   payoutMethodId: id => ({ payoutMethod: { id } }),
+  payee: expensePayeeFilter.toVariables,
   type: (value, key, meta) => {
     // Note: Using the `types` GraphQL query variable to allow multi-selection
     return isEmpty(value)
@@ -179,6 +182,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value, intl }) => intl.formatMessage(LastCommentByFilterLabels[value]),
   },
+  payee: expensePayeeFilter.filter,
   virtualCard: {
     labelMsg: defineMessage({ id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' }),
     valueRenderer: ({ value }) => <VirtualCardRenderer id={value} />,

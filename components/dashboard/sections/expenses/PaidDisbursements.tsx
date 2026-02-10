@@ -49,6 +49,7 @@ import {
   toVariables as commonToVariables,
 } from './filters';
 import { paidDisbursementsMetadataQuery, paidDisbursementsQuery } from './queries';
+import { expensePayeeFilter } from '../../filters/ExpensePayeeFilter';
 
 enum PaidDisbursementsTab {
   ALL = 'ALL',
@@ -92,6 +93,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, 'status'),
   date: { ...commonFilters.date, labelMsg: defineMessage({ defaultMessage: 'Date submitted', id: 'jKIFOK' }) },
   account: { ...hostedAccountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Paid from', id: 'jhYP1/' }) },
+  payee: { ...expensePayeeFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Paid to', id: 'Expense.PaidTo' }) },
   tag: expenseTagFilter.filter,
   sort: sortFilter.filter,
 };
