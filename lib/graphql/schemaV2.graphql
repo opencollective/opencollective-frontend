@@ -4422,6 +4422,16 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter by specific Account currencies
     """
     currencies: [String]
+
+    """
+    Filter for accounts (Events) that started at a specific date range
+    """
+    startsAtFrom: DateTime
+
+    """
+    Filter for accounts (Events) that started at a specific date range
+    """
+    startsAtTo: DateTime
   ): HostedAccountCollection!
 
   """
@@ -5708,6 +5718,10 @@ enum ActivityType {
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
+  MANUAL_PAYMENT_PROVIDER_CREATED
+  MANUAL_PAYMENT_PROVIDER_UPDATED
+  MANUAL_PAYMENT_PROVIDER_DELETED
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -19491,6 +19505,10 @@ enum ActivityAndClassesType {
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
+  MANUAL_PAYMENT_PROVIDER_CREATED
+  MANUAL_PAYMENT_PROVIDER_UPDATED
+  MANUAL_PAYMENT_PROVIDER_DELETED
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -26576,12 +26594,12 @@ input GoCardlessLinkInput {
   institutionId: String!
 
   """
-  Maximum number of days of transaction data to retrieve (default: 90)
+  Maximum number of days of transaction data to retrieve (default to the maximum allowed by the institution)
   """
   maxHistoricalDays: Int
 
   """
-  Number of days from acceptance that the access can be used (default: 90)
+  Number of days from acceptance that the access can be used (default to the maximum allowed by the institution)
   """
   accessValidForDays: Int
 

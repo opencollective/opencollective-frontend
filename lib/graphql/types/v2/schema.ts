@@ -1148,6 +1148,10 @@ export enum ActivityAndClassesType {
   KYC_REQUESTED = 'KYC_REQUESTED',
   KYC_REVOKED = 'KYC_REVOKED',
   KYC_VERIFIED = 'KYC_VERIFIED',
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED = 'MANUAL_PAYMENT_PROVIDER_ARCHIVED',
+  MANUAL_PAYMENT_PROVIDER_CREATED = 'MANUAL_PAYMENT_PROVIDER_CREATED',
+  MANUAL_PAYMENT_PROVIDER_DELETED = 'MANUAL_PAYMENT_PROVIDER_DELETED',
+  MANUAL_PAYMENT_PROVIDER_UPDATED = 'MANUAL_PAYMENT_PROVIDER_UPDATED',
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
@@ -1346,6 +1350,10 @@ export enum ActivityType {
   KYC_REQUESTED = 'KYC_REQUESTED',
   KYC_REVOKED = 'KYC_REVOKED',
   KYC_VERIFIED = 'KYC_VERIFIED',
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED = 'MANUAL_PAYMENT_PROVIDER_ARCHIVED',
+  MANUAL_PAYMENT_PROVIDER_CREATED = 'MANUAL_PAYMENT_PROVIDER_CREATED',
+  MANUAL_PAYMENT_PROVIDER_DELETED = 'MANUAL_PAYMENT_PROVIDER_DELETED',
+  MANUAL_PAYMENT_PROVIDER_UPDATED = 'MANUAL_PAYMENT_PROVIDER_UPDATED',
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
@@ -6149,13 +6157,13 @@ export type GoCardlessLink = {
 
 /** Input for creating a GoCardless link */
 export type GoCardlessLinkInput = {
-  /** Number of days from acceptance that the access can be used (default: 90) */
+  /** Number of days from acceptance that the access can be used (default to the maximum allowed by the institution) */
   accessValidForDays?: InputMaybe<Scalars['Int']['input']>;
   /** Option to enable account selection view for the end user (default: true) */
   accountSelection?: InputMaybe<Scalars['Boolean']['input']>;
   /** The institution ID for this requisition */
   institutionId: Scalars['String']['input'];
-  /** Maximum number of days of transaction data to retrieve (default: 90) */
+  /** Maximum number of days of transaction data to retrieve (default to the maximum allowed by the institution) */
   maxHistoricalDays?: InputMaybe<Scalars['Int']['input']>;
   /** A two-letter country code (ISO 639-1) (default: "en") */
   userLanguage?: InputMaybe<Scalars['Locale']['input']>;
@@ -6623,6 +6631,8 @@ export type HostHostedAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: InputMaybe<OrderByInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  startsAtFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  startsAtTo?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
