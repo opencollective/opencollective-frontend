@@ -8618,8 +8618,6 @@ export type Mutation = {
   requestVirtualCard?: Maybe<Scalars['Boolean']['output']>;
   /** To re-send the invitation to complete a draft expense. Scope: "expenses". */
   resendDraftExpenseInvite: Expense;
-  /** Restore the given payout method. Scope: "expenses". */
-  restorePayoutMethod: PayoutMethod;
   /** Resume paused Virtual Card. Scope: "virtualCards". */
   resumeVirtualCard: VirtualCard;
   /** Revoke the KYC Verification */
@@ -9619,12 +9617,6 @@ export type MutationRequestVirtualCardArgs = {
 /** This is the root mutation */
 export type MutationResendDraftExpenseInviteArgs = {
   expense: ExpenseReferenceInput;
-};
-
-
-/** This is the root mutation */
-export type MutationRestorePayoutMethodArgs = {
-  payoutMethod: PayoutMethodReferenceInput;
 };
 
 
@@ -11059,6 +11051,8 @@ export type PayoutMethod = {
   canBeDeleted?: Maybe<Scalars['Boolean']['output']>;
   /** Whether this payout method can be edited */
   canBeEdited?: Maybe<Scalars['Boolean']['output']>;
+  /** The date and time this payout method was created */
+  createdAt: Scalars['DateTime']['output'];
   /** The actual data for this payout method. Content depends on the type. */
   data?: Maybe<Scalars['JSON']['output']>;
   /** Unique identifier for this payout method */
@@ -11069,6 +11063,8 @@ export type PayoutMethod = {
   name?: Maybe<Scalars['String']['output']>;
   /** The type of this payout method (usually the payment provider) */
   type?: Maybe<PayoutMethodType>;
+  /** The date and time this payout method was updated */
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type PayoutMethodInput = {

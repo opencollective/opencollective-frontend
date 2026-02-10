@@ -8,7 +8,7 @@ import { PayoutMethodType } from '../lib/graphql/types/v2/schema';
 
 import Image from './Image';
 
-export function PayoutMethodIcon(props: { payoutMethod: Omit<PayoutMethod, 'id'>; size?: number }) {
+export function PayoutMethodIcon(props: { payoutMethod: Pick<PayoutMethod, 'type'>; size?: number }) {
   const size = props.size || 16;
   switch (props.payoutMethod.type) {
     case PayoutMethodType.ACCOUNT_BALANCE:

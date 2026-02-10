@@ -34,12 +34,17 @@ function flattenDetailsObject(details: any) {
 }
 
 type PayoutMethodDetailsProps = {
-  payoutMethod: Omit<PayoutMethod, 'id'> & { id?: string };
+  payoutMethod: Pick<PayoutMethod, 'type' | 'data'>;
   privateMessage?: React.ReactNode;
 };
 
 function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
   const items: (DataListItemProps & { id: string })[] = [];
+
+  // Early return if there's not data to show (e.g. for archived payout methods)
+  if (!props.payoutMethod.data) {
+    return null;
+  }
 
   switch (props.payoutMethod.type) {
     case PayoutMethodType.PAYPAL:

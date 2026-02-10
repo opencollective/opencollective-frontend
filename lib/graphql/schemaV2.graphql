@@ -6152,6 +6152,16 @@ type PayoutMethod {
   Whether this payout method can be archived
   """
   canBeArchived: Boolean
+
+  """
+  The date and time this payout method was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date and time this payout method was updated
+  """
+  updatedAt: DateTime!
 }
 
 """
@@ -24086,16 +24096,6 @@ type Mutation {
   Remove the given payout method. Scope: "expenses".
   """
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
-
-  """
-  Restore the given payout method. Scope: "expenses".
-  """
-  restorePayoutMethod(
-    """
-    Payout Method reference
-    """
-    payoutMethod: PayoutMethodReferenceInput!
-  ): PayoutMethod!
   editPayoutMethod(
     """
     Payout Method reference

@@ -9,6 +9,8 @@ export const PayoutMethodFragment = gql`
     data
     canBeEdited
     canBeDeleted
+    createdAt
+    updatedAt
   }
 `;
 

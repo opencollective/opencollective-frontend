@@ -15,7 +15,7 @@ type PayoutMethodLabelProps = {
   className?: string;
   showIcon?: boolean;
   iconSize?: number;
-  payoutMethod?: Omit<PayoutMethod, 'id'>;
+  payoutMethod?: Pick<PayoutMethod, 'type' | 'name' | 'data'>;
 };
 
 export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
@@ -23,7 +23,6 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
   if (!props.payoutMethod) {
     return null;
   }
-
   const pm = props.payoutMethod;
   const customLabel = pm.name;
   let defaultLabel: React.ReactNode;
