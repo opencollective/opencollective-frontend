@@ -23733,16 +23733,6 @@ type Mutation {
   Remove the given payout method. Scope: "expenses".
   """
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
-
-  """
-  Restore the given payout method. Scope: "expenses".
-  """
-  restorePayoutMethod(
-    """
-    Payout Method reference
-    """
-    payoutMethod: PayoutMethodReferenceInput!
-  ): PayoutMethod!
   editPayoutMethod(
     """
     Payout Method reference
