@@ -1,24 +1,33 @@
 import * as React from 'react';
+import { motion } from 'framer-motion';
 import { MoreHorizontal } from 'lucide-react';
 
+import { useScrollShadow } from '../../lib/hooks/useScrollShadow';
 import { cn } from '../../lib/utils';
 
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement> & { mobileTableView?: boolean; fullWidth?: boolean; innerClassName?: string }
->(({ className, innerClassName, mobileTableView, fullWidth, ...props }, ref) => (
-  <div
-    className={cn(
-      'table-auto overflow-auto',
-      mobileTableView || fullWidth ? '-mx-3 border-t border-b' : 'w-full rounded-xl border',
-      fullWidth ? 'sm:-mx-6' : mobileTableView ? 'md:mx-0 md:w-full md:rounded-xl md:border' : '',
-      'inset-scroll-shadow',
-      className,
-    )}
-  >
-    <table ref={ref} className={cn('w-full caption-bottom text-sm', innerClassName)} {...props} />
-  </div>
-));
+>(({ className, innerClassName, mobileTableView, fullWidth, ...props }, ref) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const scrollShadowStyle = useScrollShadow(containerRef);
+
+  return (
+    <motion.div
+      ref={containerRef}
+      style={scrollShadowStyle}
+      className={cn(
+        'table-auto overflow-auto',
+        mobileTableView || fullWidth ? '-mx-3 border-t border-b' : 'w-full rounded-xl border',
+        fullWidth ? 'sm:-mx-6' : mobileTableView ? 'md:mx-0 md:w-full md:rounded-xl md:border' : '',
+        '[box-shadow:rgba(0,0,0,var(--scroll-shadow-left,0))_12px_0px_12px_-10px_inset,rgba(0,0,0,var(--scroll-shadow-right,0))_-12px_0px_12px_-10px_inset]',
+        className,
+      )}
+    >
+      <table ref={ref} className={cn('w-full caption-bottom text-sm', innerClassName)} {...props} />
+    </motion.div>
+  );
+});
 Table.displayName = 'Table';
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
