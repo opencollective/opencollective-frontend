@@ -4427,6 +4427,16 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter by specific Account currencies
     """
     currencies: [String]
+
+    """
+    Filter for accounts (Events) that started at a specific date range
+    """
+    startsAtFrom: DateTime
+
+    """
+    Filter for accounts (Events) that started at a specific date range
+    """
+    startsAtTo: DateTime
   ): HostedAccountCollection!
 
   """

@@ -6641,6 +6641,8 @@ export type HostHostedAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: InputMaybe<OrderByInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  startsAtFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  startsAtTo?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
