@@ -114,96 +114,47 @@
       transform: translateX(25%);
     }
   }
-@keyframes caret-blink {
-  50% {
-    opacity: 0.0;
+  @keyframes caret-blink {
+    50% {
+      opacity: 0.0;
+    }
   }
 }
+
+/* Scroll-driven inset box-shadows on the table container (Stripe-style) */
+@keyframes scroll-shadow-both-inset {
+  0% {
+    box-shadow: rgba(0, 0, 0, 0) 12px 0px 12px -10px inset, rgba(0, 0, 0, 0.06) -12px 0px 12px -10px inset;
+  }
+  2%,
+  98% {
+    box-shadow: rgba(0, 0, 0, 0.06) 12px 0px 12px -10px inset, rgba(0, 0, 0, 0.06) -12px 0px 12px -10px inset;
+  }
+  100% {
+    box-shadow: rgba(0, 0, 0, 0.06) 12px 0px 12px -10px inset, rgba(0, 0, 0, 0) -12px 0px 12px -10px inset;
+  }
 }
 
-@keyframes scroll-shadow-in {
+/* Shadow to the left of the sticky actions column — animated drop-shadow filter */
+@keyframes scroll-shadow-drop-left {
+  0%,
+  98% {
+    filter: drop-shadow(-2px 0px 6px rgba(0, 0, 0, 0.06));
+  }
+  100% {
+    filter: drop-shadow(-2px 0px 6px rgba(0, 0, 0, 0));
+  }
+}
+
+/* Shadow to the right of the sticky select column — animated drop-shadow filter */
+@keyframes scroll-shadow-drop-right {
   0% {
-    opacity: 0;
+    filter: drop-shadow(2px 0px 6px rgba(0, 0, 0, 0));
   }
   2%,
   100% {
-    opacity: 1;
+    filter: drop-shadow(2px 0px 6px rgba(0, 0, 0, 0.06));
   }
-}
-
-@keyframes scroll-shadow-out {
-  0%,
-  98% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-/* Left scroll shadow on the table container — uses grid to overlay the sticky shadow on the table */
-.scroll-shadow-left {
-  display: grid;
-}
-
-.scroll-shadow-left > * {
-  grid-row: 1;
-  grid-column: 1;
-}
-
-.scroll-shadow-left::after {
-  content: '';
-  display: var(--scroll-shadow-display, none);
-  grid-row: 1;
-  grid-column: 1;
-  position: sticky;
-  left: 0;
-  width: 20px;
-  justify-self: start;
-  z-index: 20;
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.06), transparent);
-  animation-name: scroll-shadow-in;
-  animation-duration: auto;
-  animation-timeline: scroll(inline);
-  animation-timing-function: linear;
-}
-
-/* Right scroll shadow on the sticky actions column */
-.sticky-actions-column::before {
-  content: '';
-  display: var(--scroll-shadow-display, none);
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 100%;
-  width: 20px;
-  opacity: 0;
-  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.06));
-  pointer-events: none;
-  animation-name: scroll-shadow-out;
-  animation-duration: auto;
-  animation-timeline: scroll(inline);
-  animation-timing-function: linear;
-}
-
-/* Left scroll shadow on the sticky select column */
-.sticky-select-column::after {
-  content: '';
-  display: var(--scroll-shadow-display, none);
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 100%;
-  width: 20px;
-  opacity: 0;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.06), transparent);
-  pointer-events: none;
-  animation-name: scroll-shadow-in;
-  animation-duration: auto;
-  animation-timeline: scroll(inline);
-  animation-timing-function: linear;
 }
 
 :root {

@@ -504,6 +504,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                     setFocus({ rowId: row.original.id });
                   }
                 }}
+                mobileTableView
                 emptyMessage={() => {
                   if (host.transactionsImports.totalCount === 0) {
                     return (

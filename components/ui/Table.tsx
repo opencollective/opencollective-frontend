@@ -18,6 +18,7 @@ const Table = React.forwardRef<
       'table-auto overflow-auto',
       mobileTableView || fullWidth ? '-mx-3 border-t border-b' : 'w-full rounded-xl border',
       fullWidth ? 'sm:-mx-6' : mobileTableView ? 'md:sw-full md:mx-0 md:rounded-xl md:border' : '',
+      '[animation-duration:auto] [animation-name:scroll-shadow-both-inset] [animation-timeline:scroll(self_inline)] [animation-timing-function:linear]', // horizontal scroll shadow
       className,
     )}
   >
@@ -69,7 +70,7 @@ const TableHead = React.forwardRef<
     <th
       ref={ref}
       className={cn(
-        'h-12 px-2 text-left align-middle font-medium tracking-tight text-muted-foreground first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0',
+        'h-12 px-2 text-left align-middle font-medium tracking-tight text-muted-foreground first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-2',
         fullWidth && 'sm:first:pl-6 sm:last:pr-6',
         className,
       )}
@@ -86,7 +87,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      'relative px-2 py-2 align-middle first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0',
+      'relative px-2 py-2 align-middle first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-2',
       withIndicator && 'first:border-l-2 first:border-transparent first:data-[state=indicated]:border-primary',
       fullWidth && 'sm:first:pl-6 sm:last:pr-6',
       compact ? 'h-[49px] min-h-[49px]' : 'h-[56px] min-h-[56px]',

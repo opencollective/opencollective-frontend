@@ -24,6 +24,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 import { ColumnToggleDropdown } from './ColumnToggleDropdown';
 import { RowActionsMenu } from './RowActionsMenu';
+import { cva } from 'class-variance-authority';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -95,33 +96,9 @@ export function DataTable<TData, TValue>({
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const intl = useIntl();
-  const hasActionsColumn = columns.some(col => 'accessorKey' in col && col.accessorKey === 'actions');
-  const hasSelectColumn = columns.some(col => 'id' in col && col.id === 'select');
-  const hasScrollShadows = hasActionsColumn || hasSelectColumn;
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [sorting, setSorting] = React.useState<SortingState>(initialSort ?? []);
   const [rowSelection, setRowSelection] = React.useState({});
-
-  // Track horizontal overflow to toggle scroll shadow pseudo-elements via CSS custom property.
-  // This complements the scroll-driven animations which handle opacity based on scroll position,
-  // but don't properly deactivate when overflow disappears on resize.
-  React.useEffect(() => {
-    const el = scrollContainerRef.current;
-    if (!el || !hasScrollShadows) {
-      return;
-    }
-    const update = () => {
-      el.style.setProperty('--scroll-shadow-display', el.scrollWidth > el.clientWidth ? 'block' : 'none');
-    };
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(el);
-    const table = el.querySelector('table');
-    if (table) {
-      observer.observe(table);
-    }
-    return () => observer.disconnect();
-  }, [hasScrollShadows]);
 
   const hasDefaultColumnVisibility = isEqual(
     omitBy(columnVisibility, v => v),
@@ -156,94 +133,91 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <Table
-      className={cn(className, hasActionsColumn && !hasSelectColumn && 'scroll-shadow-left')}
-      containerRef={scrollContainerRef}
-      {...tableProps}
-      ref={tableRef}
-    >
-      {!hideHeader && (
-        <TableHeader className="relative">
-          {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id} highlightOnHover={false}>
-              {headerGroup.headers.map(header => {
-                const { className, align } = header.column.columnDef.meta || {};
-                return (
-                  <TableHead
-                    key={header.id}
-                    className={clsx(align === 'right' && 'text-right', className)}
-                    fullWidth={tableProps.fullWidth}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-      )}
-
-      <TableBody>
-        {loading ? (
-          [...new Array(nbPlaceholders)].map((_, rowIdx) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <TableRow key={rowIdx}>
-              {table.getVisibleFlatColumns().map(column => {
-                const { className, align } = column.columnDef.meta || {};
-                const showSkeleton = column.id !== 'actions' && column.columnDef.header;
-
-                return (
-                  <TableCell
-                    key={column.id}
-                    fullWidth={tableProps.fullWidth}
-                    compact={compact}
-                    className={clsx(align === 'right' && 'text-right', className)}
-                  >
-                    {showSkeleton && (
-                      <div className="inline-block w-1/2">
-                        <Skeleton className="h-4 rounded-lg" />
-                      </div>
-                    )}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          ))
-        ) : table.getRowModel().rows?.length ? (
-          table
-            .getRowModel()
-            .rows.map(row => (
-              <DataTableRow
-                key={row.id}
-                row={row}
-                onClickRow={onClickRow}
-                getRowDataCy={getRowDataCy}
-                rowHasIndicator={rowHasIndicator}
-                tableProps={tableProps}
-                compact={compact}
-                onHoverRow={onHoverRow}
-                getRowClassName={getRowClassName}
-              />
-            ))
-        ) : (
-          <TableRow highlightOnHover={false}>
-            <TableCell colSpan={columns.length} compact={compact}>
-              <div className="p-4 text-center text-slate-500">
-                {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" id="UG5qoS" />}
-              </div>
-            </TableCell>
-          </TableRow>
+    <React.Fragment>
+      <Table className={cn(className)} containerRef={scrollContainerRef} {...tableProps} ref={tableRef}>
+        {!hideHeader && (
+          <TableHeader className="relative">
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id} highlightOnHover={false}>
+                {headerGroup.headers.map(header => {
+                  const { className, align } = header.column.columnDef.meta || {};
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={clsx(align === 'right' && 'text-right', className)}
+                      fullWidth={tableProps.fullWidth}
+                    >
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
         )}
-      </TableBody>
 
-      {footer && (
-        <tfoot>
-          <tr>
-            <th colSpan={table.getCenterLeafColumns().length}>{footer}</th>
-          </tr>
-        </tfoot>
-      )}
-    </Table>
+        <TableBody>
+          {loading ? (
+            [...new Array(nbPlaceholders)].map((_, rowIdx) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <TableRow key={rowIdx}>
+                {table.getVisibleFlatColumns().map(column => {
+                  const { className, align } = column.columnDef.meta || {};
+                  const showSkeleton = column.id !== 'actions' && column.columnDef.header;
+
+                  return (
+                    <TableCell
+                      key={column.id}
+                      fullWidth={tableProps.fullWidth}
+                      compact={compact}
+                      className={clsx(align === 'right' && 'text-right', className)}
+                    >
+                      {showSkeleton && (
+                        <div className="inline-block w-1/2">
+                          <Skeleton className="h-4 rounded-lg" />
+                        </div>
+                      )}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            ))
+          ) : table.getRowModel().rows?.length ? (
+            table
+              .getRowModel()
+              .rows.map(row => (
+                <DataTableRow
+                  key={row.id}
+                  row={row}
+                  onClickRow={onClickRow}
+                  getRowDataCy={getRowDataCy}
+                  rowHasIndicator={rowHasIndicator}
+                  tableProps={tableProps}
+                  compact={compact}
+                  onHoverRow={onHoverRow}
+                  getRowClassName={getRowClassName}
+                />
+              ))
+          ) : (
+            <TableRow highlightOnHover={false}>
+              <TableCell colSpan={columns.length} compact={compact}>
+                <div className="p-4 text-center text-slate-500">
+                  {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" id="UG5qoS" />}
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+
+        {footer && (
+          <tfoot>
+            <tr>
+              <th colSpan={table.getCenterLeafColumns().length}>{footer}</th>
+            </tr>
+          </tfoot>
+        )}
+      </Table>
+    </React.Fragment>
   );
 }
 
@@ -300,43 +274,48 @@ type CellContext<TData, TValue> = TanCellContext<TData, TValue> & {
   actionsMenuTriggerRef?: React.MutableRefObject<any>;
 };
 
-const stickyColumnBg =
-  'bg-background group-hover/row:[&:is(td)]:bg-muted group-data-[state=selected]/row:bg-muted has-data-[state=open]:bg-muted';
+const stickyColumnVariants = cva(
+  [
+    'bg-background group-data-[state=selected]/row:bg-muted has-data-[state=open]:bg-muted group-hover/row:[&:is(td)]:bg-muted',
+    'ease-linear [animation-duration:auto] [animation-timeline:scroll(inline)]',
+    'sticky',
+  ],
+  {
+    variants: {
+      variant: {
+        select:
+          'left-0 z-1 w-10 max-w-10 [animation-name:scroll-shadow-drop-right] [clip-path:inset(0px_-20px_0px_0px)]',
+        actions:
+          'right-0 w-12 max-w-12 !pr-2 [animation-name:scroll-shadow-drop-left] [clip-path:inset(0px_0px_0px_-20px)]',
+      },
+    },
+  },
+);
+// Sticky select column
 export const selectColumn = {
   id: 'select',
-  header: ({ table }) => (
-    <Checkbox
-      aria-label="Select all"
-      className="translate-y-[2px] border-neutral-500"
-      checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate') || false}
-      onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-    />
-  ),
-  cell: ({ row }) => (
-    <Checkbox
-      checked={row.getIsSelected()}
-      disabled={!row.getCanSelect()}
-      aria-label="Select row"
-      className="translate-y-[2px] border-neutral-500"
-      onCheckedChange={value => row.toggleSelected(!!value)}
-    />
-  ),
   meta: {
-    className: `w-10 sticky left-0 z-10 ${stickyColumnBg} sticky-select-column`,
+    className: stickyColumnVariants({ variant: 'select' }),
   },
-  enableSorting: false,
   enableHiding: false,
 };
 
+// Sticky actions column
 export const actionsColumn = {
-  accessorKey: 'actions',
-  header: ({ table }) => (
-    <div className="flex justify-end">
-      <ColumnToggleDropdown table={table} />
-    </div>
-  ),
+  id: 'actions',
+  header: ({ table }) => {
+    const { defaultColumnVisibility } = table.options.meta;
+    if (defaultColumnVisibility) {
+      return (
+        <div className="flex justify-end">
+          <ColumnToggleDropdown table={table} />
+        </div>
+      );
+    }
+    return null;
+  },
   meta: {
-    className: `w-12 max-w-12 sticky !pr-2 right-0 z-10 ${stickyColumnBg} sticky-actions-column`,
+    className: stickyColumnVariants({ variant: 'actions' }),
   },
   enableHiding: false,
   cell: (ctx: unknown) => {
