@@ -473,6 +473,11 @@ interface Account {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -588,6 +593,11 @@ interface Account {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -3245,6 +3255,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -3360,6 +3375,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -5432,6 +5452,13 @@ input OrderReferenceInput {
   legacyId: Int
 }
 
+input ManualPaymentProviderReferenceInput {
+  """
+  The unique identifier of the manual payment provider
+  """
+  id: String!
+}
+
 input VirtualCardReferenceInput {
   id: String
 }
@@ -6178,6 +6205,11 @@ type PaymentMethod {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -9548,6 +9580,11 @@ type Bot implements Account {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -9663,6 +9700,11 @@ type Bot implements Account {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -10568,6 +10610,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -10683,6 +10730,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -12148,6 +12200,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -12263,6 +12320,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -13442,6 +13504,11 @@ type Individual implements Account {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -13557,6 +13624,11 @@ type Individual implements Account {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -14752,6 +14824,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -14867,6 +14944,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -15912,6 +15994,11 @@ type Vendor implements Account & AccountWithContributions {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -16027,6 +16114,11 @@ type Vendor implements Account & AccountWithContributions {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -17518,6 +17610,11 @@ type Query {
     paymentMethodType: [PaymentMethodType]
 
     """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -17871,6 +17968,11 @@ type Query {
     Only return transactions for this order.
     """
     order: OrderReferenceInput
+
+    """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
@@ -19935,6 +20037,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -20050,6 +20157,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -21102,6 +21214,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -21217,6 +21334,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -25878,13 +26000,6 @@ input ManualPaymentProviderCreateInput {
   Bank account details for BANK_TRANSFER type providers
   """
   accountDetails: JSON
-}
-
-input ManualPaymentProviderReferenceInput {
-  """
-  The unique identifier of the manual payment provider
-  """
-  id: String!
 }
 
 input ManualPaymentProviderUpdateInput {

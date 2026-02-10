@@ -110,6 +110,11 @@ const makeUrl = ({
     url.searchParams.set('paymentMethodType', safeJoinString(queryFilter.variables.paymentMethodType));
   }
 
+  const manualPaymentProvider = queryFilter.variables.manualPaymentProvider;
+  if (Array.isArray(manualPaymentProvider) && manualPaymentProvider.length > 0) {
+    url.searchParams.set('manualPaymentProvider', manualPaymentProvider.map(p => p.id).join(','));
+  }
+
   if (queryFilter.variables.type) {
     url.searchParams.set('type', queryFilter.variables.type);
   }

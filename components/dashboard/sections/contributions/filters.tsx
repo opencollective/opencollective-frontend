@@ -66,6 +66,7 @@ export type FilterMeta = {
   hostSlug?: string;
   includeUncategorized?: boolean;
   accountingCategoryKinds?: readonly AccountingCategoryKind[];
+  manualPaymentProviders?: Array<{ id: string; name: string }>;
 };
 
 type GraphQLQueryVariables = DashboardOrdersQueryVariables;

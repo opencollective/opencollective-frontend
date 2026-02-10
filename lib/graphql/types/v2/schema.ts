@@ -370,6 +370,7 @@ export type AccountOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -448,6 +449,7 @@ export type AccountTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -1908,6 +1910,7 @@ export type BotOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -1986,6 +1989,7 @@ export type BotTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -2502,6 +2506,7 @@ export type CollectiveOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -2606,6 +2611,7 @@ export type CollectiveTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -4633,6 +4639,7 @@ export type EventOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -4731,6 +4738,7 @@ export type EventTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -5942,6 +5950,7 @@ export type FundOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -6040,6 +6049,7 @@ export type FundTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -6793,6 +6803,7 @@ export type HostOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -6906,6 +6917,7 @@ export type HostTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -7718,6 +7730,7 @@ export type IndividualOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -7803,6 +7816,7 @@ export type IndividualTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -10507,6 +10521,7 @@ export type OrganizationOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -10604,6 +10619,7 @@ export type OrganizationTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -10760,6 +10776,7 @@ export type PaymentMethodOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -11871,6 +11888,7 @@ export type ProjectOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -11969,6 +11987,7 @@ export type ProjectTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -12359,6 +12378,7 @@ export type QueryOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -12493,6 +12513,7 @@ export type QueryTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -14294,6 +14315,7 @@ export type VendorOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -14385,6 +14407,7 @@ export type VendorTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
