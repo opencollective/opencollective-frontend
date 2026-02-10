@@ -401,6 +401,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
             queryFilter={queryFilter}
             loading={loading}
             getActions={getExpenseActions}
+            mobileTableView
           />
           <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
           <ExpenseDrawer openExpenseLegacyId={Number(openExpenseId)} handleClose={drawerProps.onClose} />
