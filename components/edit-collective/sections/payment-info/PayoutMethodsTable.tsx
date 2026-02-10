@@ -27,17 +27,8 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
     }
     ${PayoutMethodFragment}
   `);
-  const [restorePayoutMethod] = useMutation(gql`
-    mutation PaymentInfoRestorePayoutMethod($payoutMethod: PayoutMethodReferenceInput!) {
-      restorePayoutMethod(payoutMethod: $payoutMethod) {
-        id
-        ...PayoutMethodFields
-      }
-    }
-    ${PayoutMethodFragment}
-  `);
 
-  const actions = React.useMemo(
+  React.useMemo(
     () => ({
       archive: async (payoutMethodId: string) => {
         try {
@@ -50,19 +41,8 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
           toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
         }
       },
-      restore: async (id: string) => {
-        try {
-          await restorePayoutMethod({ variables: { payoutMethod: { id } } });
-          toast({
-            variant: 'success',
-            message: intl.formatMessage({ defaultMessage: 'Payment method Restored', id: '9/9dt8' }),
-          });
-        } catch (error) {
-          toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
-        }
-      },
     }),
-    [account],
+    [removePayoutMethod, intl, toast],
   );
 
   const [archived, active] = React.useMemo(() => {
@@ -117,8 +97,8 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
             </h1>
             <p className="text-sm leading-none text-muted-foreground">
               <FormattedMessage
-                defaultMessage="Account details that were previously used and can no longer be deleted."
-                id="bqX7g3"
+                defaultMessage="Previously used payout methods. Details are no longer visible to your account and cannot be restored."
+                id="PayoutMethodsTable.archivedDescription"
               />
             </p>
           </div>
@@ -132,7 +112,6 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
               onPaymentMethodDeleted={onUpdate}
               onPaymentMethodEdited={onUpdate}
               refresh={onUpdate}
-              onRestore={() => actions.restore(payoutMethod.id)}
               moreActions={generateMoreActions(payoutMethod)}
               isChecked
               isEditable

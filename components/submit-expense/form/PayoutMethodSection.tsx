@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Formik, useFormikContext } from 'formik';
 import { get, isEmpty, omit, pick, truncate } from 'lodash';
-import { Pencil, Trash2, Undo2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -21,6 +21,7 @@ import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
 import { objectKeys } from '@/lib/utils';
 
 import { ComboSelect } from '@/components/ComboSelect';
+import DateTime from '@/components/DateTime';
 import { FormField } from '@/components/FormField';
 import { useModal } from '@/components/ModalContext';
 import { Badge } from '@/components/ui/Badge';
@@ -561,7 +562,6 @@ type PayoutMethodRadioGroupItemProps = {
   onPaymentMethodDeleted: (deletedPayoutMethodId) => void;
   onPaymentMethodEdited: (newPayoutMethodId: string) => void;
   setNameMismatchReason?: (reason: string) => void;
-  onRestore?: (payoutMethodId) => void;
   refresh?: () => void;
   Component?: React.ComponentType<{
     value?: string;
@@ -660,8 +660,8 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
               id: 'weGvmF',
             })
           : intl.formatMessage({
-              defaultMessage: 'Archive Payout Method?',
-              id: 'dX2XCG',
+              defaultMessage: 'Permanently archive payout method?',
+              id: 'ArchivePayoutMethod.title',
             }),
         description: props.payoutMethod?.canBeDeleted
           ? intl.formatMessage({
@@ -670,8 +670,8 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
             })
           : intl.formatMessage({
               defaultMessage:
-                "This payout method was already used in another expense and can no longer be deleted for security reasons. However, you can archive it to prevent its re-use. Note that this operation is reversible, and you'll be able to restore this payout method if you change your mind.",
-              id: 'x0+ddp',
+                'This is permanent. Your account will no longer have access to these details and you will not be able to restore this payout method. The host may still retain the information for legal reasons.',
+              id: 'ArchivePayoutMethod.permanent',
             }),
         children: <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />,
         onConfirm: async () => {
@@ -699,21 +699,18 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
         },
         confirmLabel: props.payoutMethod?.canBeDeleted
           ? intl.formatMessage({ defaultMessage: 'Delete Payout Method', id: 'Rs7g0Y' })
-          : intl.formatMessage({ defaultMessage: 'Archive Payout Method', id: 'L0TUHP' }),
+          : intl.formatMessage({ defaultMessage: 'Permanently archive', id: 'ArchivePayoutMethod.confirm' }),
         variant: 'destructive',
       });
     },
     [intl, deletePayoutMethod, props, showConfirmationModal, toast],
   );
 
-  const onEditClick = React.useCallback(
-    e => {
-      e.stopPropagation();
-      e.preventDefault();
-      setIsEditingPayoutMethod(true);
-    },
-    [isEditingPayoutMethod, props.payoutMethod],
-  );
+  const onEditClick = React.useCallback(e => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsEditingPayoutMethod(true);
+  }, []);
 
   const { onPaymentMethodEdited } = props;
   const onSaveClick = React.useCallback(
@@ -831,6 +828,31 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                       : privateInfoYouAndHost
                   }
                 />
+                {props.archived &&
+                  (() => {
+                    const pm = props.payoutMethod as { createdAt?: string; updatedAt?: string };
+                    const createdAt = pm?.createdAt;
+                    const updatedAt = pm?.updatedAt;
+                    if (!createdAt && !updatedAt) {
+                      return null;
+                    }
+                    return (
+                      <div className="flex flex-col gap-1 rounded-xl bg-muted p-3 text-sm text-muted-foreground">
+                        {createdAt && (
+                          <span>
+                            <FormattedMessage defaultMessage="Connected on" id="jOD/TD" />{' '}
+                            <DateTime value={createdAt} dateStyle="medium" />
+                          </span>
+                        )}
+                        {updatedAt && (
+                          <span>
+                            <FormattedMessage defaultMessage="Last update" id="transactions.import.lastUpdate" />{' '}
+                            <DateTime value={updatedAt} dateStyle="medium" />
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })()}
                 {isMissingCurrency && !props.disableWarningMessages && (
                   <div className="mt-2">
                     <MessageBox type="warning">
@@ -974,17 +996,6 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                   title={intl.formatMessage({ defaultMessage: 'Remove payout method', id: 'RemovePayoutMethod' })}
                 >
                   <Trash2 size={16} />
-                </Button>
-              )}
-              {props.archived && (
-                <Button
-                  disabled={props.isSubmitting}
-                  onClick={props.onRestore}
-                  size="icon-xs"
-                  variant="ghost"
-                  title={intl.formatMessage({ defaultMessage: 'Restore payout method', id: 'RestorePayoutMethod' })}
-                >
-                  <Undo2 size={16} />
                 </Button>
               )}
               {props.moreActions}

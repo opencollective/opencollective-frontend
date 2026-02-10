@@ -23,7 +23,6 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
   if (!props.payoutMethod) {
     return null;
   }
-
   const pm = props.payoutMethod;
   const customLabel = pm.name;
   let defaultLabel: React.ReactNode;

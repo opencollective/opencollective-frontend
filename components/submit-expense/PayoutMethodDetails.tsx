@@ -83,6 +83,10 @@ function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
       break;
     case PayoutMethodType.BANK_ACCOUNT:
       {
+        if (!props.payoutMethod.data) {
+          return null;
+        }
+
         if (props.payoutMethod.data.type) {
           items.push({
             id: 'type',
