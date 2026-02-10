@@ -28,6 +28,7 @@ import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
+import { expensePayeeFilter, ExpensePayeeFilterMeta } from '../../filters/ExpensePayeeFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
@@ -60,13 +61,14 @@ export const schema = z.object({
   virtualCard: isMulti(z.string()).optional(),
   accountingCategory: accountingCategoryFilter.schema,
   payoutMethodId: z.string().optional(),
+  fromAccounts: expensePayeeFilter.schema,
 });
 
 export type FilterValues = z.infer<typeof schema>;
 
 export const ExpenseAccountingCategoryKinds = [AccountingCategoryKind.EXPENSE] as const;
 
-export type FilterMeta = {
+export type FilterMeta = ExpensePayeeFilterMeta & {
   currency?: Currency;
   hideExpensesMetaStatuses?: boolean;
   accountingCategoryKinds?: readonly AccountingCategoryKind[];
@@ -101,6 +103,7 @@ export const toVariables: FiltersToVariables<
           }
         : { status: value };
   },
+  fromAccounts: expensePayeeFilter.toVariables,
 };
 
 // The filters config is used to populate the Filters component.
@@ -179,6 +182,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value, intl }) => intl.formatMessage(LastCommentByFilterLabels[value]),
   },
+  fromAccounts: expensePayeeFilter.filter,
   virtualCard: {
     labelMsg: defineMessage({ id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' }),
     valueRenderer: ({ value }) => <VirtualCardRenderer id={value} />,

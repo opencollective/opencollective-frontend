@@ -5011,8 +5011,18 @@ export type ExpenseCollection = Collection & {
   limit?: Maybe<Scalars['Int']['output']>;
   nodes?: Maybe<Array<Maybe<Expense>>>;
   offset?: Maybe<Scalars['Int']['output']>;
+  /** The accounts that are payees of the expenses in this collection (scoped to the main query arguments), regardless of pagination. Returns a paginated and searchable collection. */
+  payees: AccountCollection;
   totalAmount?: Maybe<ExpenseCollectionTotalAmount>;
   totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+/** A collection of "Expenses" */
+export type ExpenseCollectionPayeesArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ExpenseCollectionTotalAmount = {
