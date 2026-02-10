@@ -2,13 +2,14 @@ import React, { Fragment, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { omit, pick } from 'lodash';
+import { omit, pick, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getCurrentLocalDateStr } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import type { TaxInput } from '../../lib/graphql/types/v2/schema';
 import { i18nTaxType } from '../../lib/i18n/taxes';
+import { formatCurrency } from '@/lib/currency-utils';
 import type { ConfirmContributionFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
@@ -143,11 +144,10 @@ export const ConfirmContributionForm = ({
 }) => {
   const defaultHostFeePercent = order.hostFeePercent ?? order.toAccount['bankTransfersHostFeePercent'] ?? 0;
   const defaultTaxPercent = order.tax?.rate * 100 || 0;
-  const defaultPlatformTip = order.platformTipAmount?.valueInCents || 0;
-  const amountInitiated = order.amount.valueInCents + defaultPlatformTip;
+  const initialPlatformTip = order.platformTipAmount?.valueInCents || 0;
+  const amountInitiated = order.amount.valueInCents + initialPlatformTip;
   const currency = order.amount.currency;
   const [amountReceived, setAmountReceived] = useState(initialValues['amountReceived'] ?? amountInitiated);
-  const [platformTip, setPlatformTip] = useState(defaultPlatformTip);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
   const [taxPercent, setTaxPercent] = useState(defaultTaxPercent);
@@ -155,7 +155,9 @@ export const ConfirmContributionForm = ({
   const intl = useIntl();
   const { toast } = useToast();
   const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation);
-  const contributionAmount = amountReceived - platformTip;
+  const platformTipPercent = order.amount.valueInCents ? round(initialPlatformTip / order.amount.valueInCents, 4) : 0;
+  const effectivePlatformTip = round(amountReceived * platformTipPercent, 2);
+  const contributionAmount = amountReceived - effectivePlatformTip;
   const grossContributionAmount = Math.round(contributionAmount / (1 + taxPercent / 100));
   const taxAmount = taxPercent ? Math.round(contributionAmount - grossContributionAmount) : null;
   const hostFee = Math.round((contributionAmount - taxAmount) * hostFeePercent) / 100;
@@ -182,7 +184,7 @@ export const ConfirmContributionForm = ({
                 id: order.id,
                 amount: { valueInCents: grossContributionAmount, currency },
                 paymentProcessorFee: { valueInCents: paymentProcessorFee || 0, currency },
-                platformTip: { valueInCents: platformTip || 0, currency },
+                platformTip: { valueInCents: effectivePlatformTip, currency },
                 hostFeePercent: hostFeePercent || 0,
                 processedAt: processedAt ? new Date(processedAt) : new Date(),
                 transactionsImportRow: initialValues['transactionsImportRow']
@@ -266,25 +268,47 @@ export const ConfirmContributionForm = ({
             />
           </Flex>
         </Container>
-        <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
-        <Container>
-          <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
-            <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-platformTip">
-              <FormattedMessage defaultMessage="Platform tip amount" id="Ng5BqM" />
-            </Label>
-            <StyledInputAmount
-              id="confirmContribution-platformTip"
-              name="platformTip"
-              data-cy="platform-tip"
-              width="142px"
-              currency={currency}
-              onChange={value => setPlatformTip(value)}
-              value={platformTip}
-              min={platformTip ? 0 : undefined}
-              max={amountReceived ? amountReceived : undefined}
-            />
-          </Flex>
-        </Container>
+        {initialPlatformTip > 0 && (
+          <React.Fragment>
+            <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
+            <Container data-cy="platform-tip">
+              <Flex
+                justifyContent="space-between"
+                alignItems={['left', 'center']}
+                flexDirection={['column', 'row']}
+                gap={8}
+              >
+                <Label
+                  fontSize="14px"
+                  lineHeight="20px"
+                  fontWeight="400"
+                  htmlFor="confirmContribution-platformTip"
+                  style={{ whiteSpace: 'nowrap' }}
+                >
+                  <FormattedMessage defaultMessage="Platform tip amount" id="Ng5BqM" />
+                </Label>
+                <Box textAlign={['left', 'right']} minWidth={0}>
+                  <Box fontSize="14px" lineHeight="24px" fontWeight="700">
+                    <FormattedMoneyAmount amount={effectivePlatformTip} currency={currency} precision={2} />
+                  </Box>
+                  {initialPlatformTip !== effectivePlatformTip && (
+                    <P fontSize="12px" color="black.600" mt={1} mb={0}>
+                      <FormattedMessage
+                        defaultMessage="Platform tip is calculated proportionally based on the contributor's original choice ({initialTipAmount} tip on {baseAmount} = {percent}%)"
+                        id="zhBj2s"
+                        values={{
+                          percent: round(platformTipPercent * 100, 2),
+                          baseAmount: formatCurrency(order.amount.valueInCents, currency, { locale: intl.locale }),
+                          initialTipAmount: formatCurrency(initialPlatformTip, currency, { locale: intl.locale }),
+                        }}
+                      />
+                    </P>
+                  )}
+                </Box>
+              </Flex>
+            </Container>
+          </React.Fragment>
+        )}
         {Boolean(order.taxAmount || applicableTax) && (
           <Fragment>
             <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
@@ -379,7 +403,7 @@ export const ConfirmContributionForm = ({
             </Box>
           </Flex>
         </Container>
-        {Boolean(platformTip) && (
+        {Boolean(effectivePlatformTip) && (
           <Container mt={2}>
             <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
               <Span fontSize="14px" lineHeight="20px" fontWeight="500">
@@ -398,7 +422,7 @@ export const ConfirmContributionForm = ({
                 />
               </Span>
               <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
-                <FormattedMoneyAmount amount={platformTip} currency={currency} precision={2} />
+                <FormattedMoneyAmount amount={effectivePlatformTip} currency={currency} precision={2} />
               </Box>
             </Flex>
           </Container>
