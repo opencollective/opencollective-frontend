@@ -52,7 +52,7 @@ import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledLink from '../../../StyledLink';
-import { actionsColumn, DataTable, selectColumn } from '../../../table/DataTable';
+import { actionsColumn, DataTable, stickyColumnVariants } from '../../../table/DataTable';
 import {
   MultiPagesRowSelectionInitialState,
   multiPagesRowSelectionReducer,
@@ -557,7 +557,10 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                     )}
                     columns={[
                       {
-                        ...selectColumn,
+                        id: 'select',
+                        meta: {
+                          className: stickyColumnVariants({ variant: 'select' }),
+                        },
                         header: ({ table }) =>
                           importRows.some(row => !row.expense && !row.order) ? (
                             <Checkbox
@@ -675,13 +678,7 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                           );
                         },
                       },
-                      {
-                        id: 'actions',
-                        ...actionsColumn,
-                        header: () => (
-                          <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
-                        ),
-                      },
+                      actionsColumn,
                     ]}
                   />
                   <div className="mt-8">

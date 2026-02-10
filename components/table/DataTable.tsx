@@ -10,6 +10,7 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table';
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { cva } from 'class-variance-authority';
 import clsx from 'clsx';
 import { isEqual, omitBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -18,13 +19,11 @@ import type { GetActions } from '../../lib/actions/types';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { cn } from '../../lib/utils';
 
-import { Checkbox } from '../ui/Checkbox';
 import { Skeleton } from '../ui/Skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
 
 import { ColumnToggleDropdown } from './ColumnToggleDropdown';
 import { RowActionsMenu } from './RowActionsMenu';
-import { cva } from 'class-variance-authority';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -92,11 +91,9 @@ export function DataTable<TData, TValue>({
   setRowSelection: setRowSelectionFromProps,
   enableMultiRowSelection,
   meta, // TODO: Possibly remove this prop once the getActions pattern is implemented fully
-  className,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const intl = useIntl();
-  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [sorting, setSorting] = React.useState<SortingState>(initialSort ?? []);
   const [rowSelection, setRowSelection] = React.useState({});
 
@@ -133,91 +130,89 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <React.Fragment>
-      <Table className={cn(className)} containerRef={scrollContainerRef} {...tableProps} ref={tableRef}>
-        {!hideHeader && (
-          <TableHeader className="relative">
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id} highlightOnHover={false}>
-                {headerGroup.headers.map(header => {
-                  const { className, align } = header.column.columnDef.meta || {};
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className={clsx(align === 'right' && 'text-right', className)}
-                      fullWidth={tableProps.fullWidth}
-                    >
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-        )}
-
-        <TableBody>
-          {loading ? (
-            [...new Array(nbPlaceholders)].map((_, rowIdx) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <TableRow key={rowIdx}>
-                {table.getVisibleFlatColumns().map(column => {
-                  const { className, align } = column.columnDef.meta || {};
-                  const showSkeleton = column.id !== 'actions' && column.columnDef.header;
-
-                  return (
-                    <TableCell
-                      key={column.id}
-                      fullWidth={tableProps.fullWidth}
-                      compact={compact}
-                      className={clsx(align === 'right' && 'text-right', className)}
-                    >
-                      {showSkeleton && (
-                        <div className="inline-block w-1/2">
-                          <Skeleton className="h-4 rounded-lg" />
-                        </div>
-                      )}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))
-          ) : table.getRowModel().rows?.length ? (
-            table
-              .getRowModel()
-              .rows.map(row => (
-                <DataTableRow
-                  key={row.id}
-                  row={row}
-                  onClickRow={onClickRow}
-                  getRowDataCy={getRowDataCy}
-                  rowHasIndicator={rowHasIndicator}
-                  tableProps={tableProps}
-                  compact={compact}
-                  onHoverRow={onHoverRow}
-                  getRowClassName={getRowClassName}
-                />
-              ))
-          ) : (
-            <TableRow highlightOnHover={false}>
-              <TableCell colSpan={columns.length} compact={compact}>
-                <div className="p-4 text-center text-slate-500">
-                  {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" id="UG5qoS" />}
-                </div>
-              </TableCell>
+    <Table {...tableProps} ref={tableRef}>
+      {!hideHeader && (
+        <TableHeader className="relative">
+          {table.getHeaderGroups().map(headerGroup => (
+            <TableRow key={headerGroup.id} highlightOnHover={false}>
+              {headerGroup.headers.map(header => {
+                const { className, align } = header.column.columnDef.meta || {};
+                return (
+                  <TableHead
+                    key={header.id}
+                    className={clsx(align === 'right' && 'text-right', className)}
+                    fullWidth={tableProps.fullWidth}
+                  >
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                );
+              })}
             </TableRow>
-          )}
-        </TableBody>
+          ))}
+        </TableHeader>
+      )}
 
-        {footer && (
-          <tfoot>
-            <tr>
-              <th colSpan={table.getCenterLeafColumns().length}>{footer}</th>
-            </tr>
-          </tfoot>
+      <TableBody>
+        {loading ? (
+          [...new Array(nbPlaceholders)].map((_, rowIdx) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <TableRow key={rowIdx}>
+              {table.getVisibleFlatColumns().map(column => {
+                const { className, align } = column.columnDef.meta || {};
+                const showSkeleton = column.id !== 'actions' && column.columnDef.header;
+
+                return (
+                  <TableCell
+                    key={column.id}
+                    fullWidth={tableProps.fullWidth}
+                    compact={compact}
+                    className={clsx(align === 'right' && 'text-right', className)}
+                  >
+                    {showSkeleton && (
+                      <div className="inline-block w-1/2">
+                        <Skeleton className="h-4 rounded-lg" />
+                      </div>
+                    )}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          ))
+        ) : table.getRowModel().rows?.length ? (
+          table
+            .getRowModel()
+            .rows.map(row => (
+              <DataTableRow
+                key={row.id}
+                row={row}
+                onClickRow={onClickRow}
+                getRowDataCy={getRowDataCy}
+                rowHasIndicator={rowHasIndicator}
+                tableProps={tableProps}
+                compact={compact}
+                onHoverRow={onHoverRow}
+                getRowClassName={getRowClassName}
+              />
+            ))
+        ) : (
+          <TableRow highlightOnHover={false}>
+            <TableCell colSpan={columns.length} compact={compact}>
+              <div className="p-4 text-center text-slate-500">
+                {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" id="UG5qoS" />}
+              </div>
+            </TableCell>
+          </TableRow>
         )}
-      </Table>
-    </React.Fragment>
+      </TableBody>
+
+      {footer && (
+        <tfoot>
+          <tr>
+            <th colSpan={table.getCenterLeafColumns().length}>{footer}</th>
+          </tr>
+        </tfoot>
+      )}
+    </Table>
   );
 }
 
@@ -274,31 +269,17 @@ type CellContext<TData, TValue> = TanCellContext<TData, TValue> & {
   actionsMenuTriggerRef?: React.MutableRefObject<any>;
 };
 
-const stickyColumnVariants = cva(
-  [
-    'bg-background group-data-[state=selected]/row:bg-muted has-data-[state=open]:bg-muted group-hover/row:[&:is(td)]:bg-muted',
-    'ease-linear [animation-duration:auto] [animation-timeline:scroll(inline)]',
-    'sticky',
-  ],
+export const stickyColumnVariants = cva(
+  'sticky bg-background group-data-[state=selected]/row:bg-muted has-data-[state=open]:bg-muted group-hover/row:[&:is(td)]:bg-muted',
   {
     variants: {
       variant: {
-        select:
-          'left-0 z-1 w-10 max-w-10 [animation-name:scroll-shadow-drop-right] [clip-path:inset(0px_-20px_0px_0px)]',
-        actions:
-          'right-0 w-12 max-w-12 !pr-2 [animation-name:scroll-shadow-drop-left] [clip-path:inset(0px_0px_0px_-20px)]',
+        select: 'sticky-col-scroll-shadow-right left-0 z-1 w-10 max-w-10',
+        actions: 'sticky-col-scroll-shadow-left right-0 w-12 max-w-12 !pr-2',
       },
     },
   },
 );
-// Sticky select column
-export const selectColumn = {
-  id: 'select',
-  meta: {
-    className: stickyColumnVariants({ variant: 'select' }),
-  },
-  enableHiding: false,
-};
 
 // Sticky actions column
 export const actionsColumn = {

@@ -352,7 +352,7 @@ const DashboardPage = () => {
                 selectedSection !== 'user-security' ? (
                   <TwoFactorAuthRequiredMessage className="lg:mt-16" />
                 ) : (
-                  <div className="max-w-(--breakpoint-2xl) min-w-0 flex-1">
+                  <div className="max-w-(--breakpoint-xl) min-w-0 flex-1 2xl:max-w-(--breakpoint-2xl)">
                     <DashboardSection
                       section={selectedSection}
                       isLoading={isLoading}

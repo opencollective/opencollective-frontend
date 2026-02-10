@@ -35,7 +35,7 @@ import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledLink from '../../../StyledLink';
-import { actionsColumn, DataTable, selectColumn } from '../../../table/DataTable';
+import { actionsColumn, DataTable, stickyColumnVariants } from '../../../table/DataTable';
 import {
   MultiPagesRowSelectionInitialState,
   multiPagesRowSelectionReducer,
@@ -504,7 +504,6 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                     setFocus({ rowId: row.original.id });
                   }
                 }}
-                mobileTableView
                 emptyMessage={() => {
                   if (host.transactionsImports.totalCount === 0) {
                     return (
@@ -526,7 +525,10 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                 }}
                 columns={[
                   {
-                    ...selectColumn,
+                    id: 'select',
+                    meta: {
+                      className: stickyColumnVariants({ variant: 'select' }),
+                    },
                     header: ({ table }) =>
                       importRows.some(row => !row.expense && !row.order) ? (
                         <Checkbox
@@ -686,15 +688,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                       );
                     },
                   },
-                  {
-                    id: 'Actions',
-                    ...actionsColumn,
-                    // header: () => {
-                    //   return (
-                    //     <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
-                    //   );
-                    // },
-                  },
+                  actionsColumn,
                 ]}
               />
               <div className="mt-8">

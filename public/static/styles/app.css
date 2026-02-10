@@ -119,41 +119,35 @@
       opacity: 0.0;
     }
   }
-}
-
-/* Scroll-driven inset box-shadows on the table container (Stripe-style) */
-@keyframes scroll-shadow-both-inset {
-  0% {
-    box-shadow: rgba(0, 0, 0, 0) 12px 0px 12px -10px inset, rgba(0, 0, 0, 0.06) -12px 0px 12px -10px inset;
+  @keyframes inset-scroll-shadow {
+    0% {
+      box-shadow: rgba(0, 0, 0, 0) 12px 0px 12px -10px inset, rgba(0, 0, 0, 0.06) -12px 0px 12px -10px inset;
+    }
+    2%,
+    98% {
+      box-shadow: rgba(0, 0, 0, 0.06) 12px 0px 12px -10px inset, rgba(0, 0, 0, 0.06) -12px 0px 12px -10px inset;
+    }
+    100% {
+      box-shadow: rgba(0, 0, 0, 0.06) 12px 0px 12px -10px inset, rgba(0, 0, 0, 0) -12px 0px 12px -10px inset;
+    }
   }
-  2%,
-  98% {
-    box-shadow: rgba(0, 0, 0, 0.06) 12px 0px 12px -10px inset, rgba(0, 0, 0, 0.06) -12px 0px 12px -10px inset;
+  @keyframes sticky-col-scroll-shadow-left {
+    0%,
+    98% {
+      filter: drop-shadow(-2px 0px 6px rgba(0, 0, 0, 0.06));
+    }
+    100% {
+      filter: drop-shadow(-2px 0px 6px rgba(0, 0, 0, 0));
+    }
   }
-  100% {
-    box-shadow: rgba(0, 0, 0, 0.06) 12px 0px 12px -10px inset, rgba(0, 0, 0, 0) -12px 0px 12px -10px inset;
-  }
-}
-
-/* Shadow to the left of the sticky actions column — animated drop-shadow filter */
-@keyframes scroll-shadow-drop-left {
-  0%,
-  98% {
-    filter: drop-shadow(-2px 0px 6px rgba(0, 0, 0, 0.06));
-  }
-  100% {
-    filter: drop-shadow(-2px 0px 6px rgba(0, 0, 0, 0));
-  }
-}
-
-/* Shadow to the right of the sticky select column — animated drop-shadow filter */
-@keyframes scroll-shadow-drop-right {
-  0% {
-    filter: drop-shadow(2px 0px 6px rgba(0, 0, 0, 0));
-  }
-  2%,
-  100% {
-    filter: drop-shadow(2px 0px 6px rgba(0, 0, 0, 0.06));
+  @keyframes sticky-col-scroll-shadow-right {
+    0% {
+      filter: drop-shadow(2px 0px 6px rgba(0, 0, 0, 0));
+    }
+    2%,
+    100% {
+      filter: drop-shadow(2px 0px 6px rgba(0, 0, 0, 0.06));
+    }
   }
 }
 
@@ -410,6 +404,25 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+@layer components {
+  .sticky-col-scroll-shadow-left {
+    animation: scroll-shadow-drop-left linear;
+    animation-timeline: scroll(inline);
+    clip-path: inset(0px 0px 0px -20px);
+  }
+
+  .sticky-col-scroll-shadow-right {
+    animation: scroll-shadow-drop-right linear;
+    animation-timeline: scroll(inline);
+    clip-path: inset(0px -20px 0px 0px);
+  }
+}
+
+@utility inset-scroll-shadow {
+  animation: inset-scroll-shadow linear;
+  animation-timeline: scroll(self inline);
 }
 
 @utility container {
