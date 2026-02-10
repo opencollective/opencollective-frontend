@@ -386,6 +386,11 @@
     max-width: 1536px;
   }
 }
+@utility row-indicator {
+  &::before {
+    @apply absolute inset-y-[-1px] left-0 w-0.5 bg-primary content-[''];
+  }
+}
 
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,

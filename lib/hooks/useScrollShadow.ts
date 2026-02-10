@@ -1,18 +1,10 @@
+import { type RefObject, useEffect, useState } from 'react';
 import type { MotionValue } from 'framer-motion';
 import { useScroll, useTransform } from 'framer-motion';
-import { useEffect, useState, type RefObject } from 'react';
 
 /**
- * Produces smooth scroll shadow opacity values for a horizontally scrollable container,
- * using framer-motion's `useScroll` and `useTransform`. Returns a style object with CSS
- * custom properties that can be spread onto a `motion.div`.
- *
- * The CSS custom properties are:
- * - `--scroll-shadow-left`: opacity (0–0.06) for the left-edge shadow (content scrolled past on the left)
- * - `--scroll-shadow-right`: opacity (0–0.06) for the right-edge shadow (content extending past the right)
- *
- * These are consumed by `.inset-scroll-shadow`, `.sticky-col-scroll-shadow-left`,
- * and `.sticky-col-scroll-shadow-right` in the CSS.
+ * Returns `--scroll-shadow-left` and `--scroll-shadow-right` CSS custom properties
+ * (opacity 0–0.06) for a horizontally scrollable `motion.div`.
  */
 export function useScrollShadow(ref: RefObject<HTMLElement | null>): Record<string, MotionValue<number> | number> {
   const { scrollXProgress } = useScroll({ container: ref });
@@ -31,6 +23,11 @@ export function useScrollShadow(ref: RefObject<HTMLElement | null>): Record<stri
     check();
     const observer = new ResizeObserver(check);
     observer.observe(el);
+    // Also observe the first child so that content-driven width changes
+    // (e.g. column visibility toggling) update the overflow state.
+    if (el.firstElementChild) {
+      observer.observe(el.firstElementChild);
+    }
     return () => observer.disconnect();
   }, [ref]);
 

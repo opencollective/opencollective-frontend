@@ -91,7 +91,7 @@ const TableCell = React.forwardRef<
     ref={ref}
     className={cn(
       'relative px-2 py-2 align-middle first:pl-4 last:pr-4',
-      withIndicator && 'first:border-l-2 first:border-transparent first:data-[state=indicated]:border-primary',
+      withIndicator && 'data-[state=indicated]:first:row-indicator',
       fullWidth && 'sm:first:pl-6 sm:last:pr-6',
       compact ? 'h-[49px] min-h-[49px]' : 'h-[56px] min-h-[56px]',
       className,
