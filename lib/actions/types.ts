@@ -2,8 +2,9 @@ import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 
 export type Action = {
-  label: React.ReactNode;
-  onClick: () => void;
+  label: string;
+  onClick?: (e: React.MouseEvent) => void;
+  href?: string;
   Icon?: LucideIcon;
   isLoading?: boolean;
   disabled?: boolean;

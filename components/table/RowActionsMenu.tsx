@@ -5,8 +5,10 @@ import { FormattedMessage } from 'react-intl';
 
 import type { Action } from '@/lib/actions/types';
 
+import Link from '../Link';
 import Spinner from '../Spinner';
 import { Button } from '../ui/Button';
+import { ButtonGroup } from '../ui/ButtonGroup';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,17 +18,31 @@ import {
 } from '../ui/DropdownMenu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
+function DropdownActionItemContent({ action }: { action: Action }) {
+  return (
+    <React.Fragment>
+      {action.Icon && <action.Icon className="shrink-0 text-muted-foreground" size={16} />}
+      {action.label}
+      {action.isLoading && <Spinner className="ml-auto size-4 text-muted-foreground" />}
+    </React.Fragment>
+  );
+}
+
 export function DropdownActionItem({ action }: { action: Action }) {
-  const item = (
+  const item = action.href ? (
+    <DropdownMenuItem asChild className="gap-2.5" disabled={action.disabled} data-cy={action['data-cy']}>
+      <Link href={action.href} onClick={action.onClick}>
+        <DropdownActionItemContent action={action} />
+      </Link>
+    </DropdownMenuItem>
+  ) : (
     <DropdownMenuItem
       onClick={action.onClick}
       className="gap-2.5"
       disabled={action.disabled}
       data-cy={action['data-cy']}
     >
-      {action.Icon && <action.Icon className="shrink-0 text-muted-foreground" size={16} />}
-      {action.label}
-      {action.isLoading && <Spinner className="ml-auto size-4 text-muted-foreground" />}
+      <DropdownActionItemContent action={action} />
     </DropdownMenuItem>
   );
 
@@ -62,17 +78,59 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild ref={actionsMenuTriggerRef}>
-        <Button
-          size="icon-xs"
-          variant="outline"
-          className="border-transparent text-muted-foreground group-hover/row:border-border hover:bg-white hover:text-foreground hover:shadow-xs data-[state=open]:border-border data-[state=open]:text-foreground"
-          data-cy="actions-menu-trigger"
-          disabled={hasNoActions}
-        >
-          <MoreHorizontal size={18} />
-        </Button>
-      </DropdownMenuTrigger>
+      <ButtonGroup className="group/actions">
+        {primary
+          .filter(a => a.Icon && !a.disabled) // only actions with Icons can be rendered as quick-actions
+          .slice(0, 2) // only show the first 2 primary actions
+          .map(action => {
+            const icon = <action.Icon size={16} />;
+            const quickActionClassName =
+              'invisible flex border-transparent text-muted-foreground group-hover/row:visible group-hover/row:border-border group-has-data-[state=open]/actions:visible group-has-data-[state=open]/actions:border-border hover:bg-white hover:text-foreground hover:shadow-xs';
+
+            return (
+              <Tooltip key={action.key} disableHoverableContent>
+                <TooltipTrigger asChild>
+                  {action.href ? (
+                    <Button
+                      asChild
+                      size="icon-xs"
+                      variant="outline"
+                      disabled={action.disabled}
+                      className={quickActionClassName}
+                    >
+                      <Link href={action.href} onClick={action.onClick}>
+                        {icon}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button
+                      size="icon-xs"
+                      variant="outline"
+                      disabled={action.disabled}
+                      className={quickActionClassName}
+                      onClick={action.onClick}
+                    >
+                      {icon}
+                    </Button>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>{action.label}</TooltipContent>
+              </Tooltip>
+            );
+          })}
+
+        <DropdownMenuTrigger asChild ref={actionsMenuTriggerRef}>
+          <Button
+            size="icon-xs"
+            variant="outline"
+            className="border-transparent text-muted-foreground group-hover/row:border-border hover:bg-white hover:text-foreground hover:shadow-xs data-[state=open]:border-border data-[state=open]:text-foreground"
+            data-cy="actions-menu-trigger"
+            disabled={hasNoActions}
+          >
+            <MoreHorizontal size={18} />
+          </Button>
+        </DropdownMenuTrigger>
+      </ButtonGroup>
 
       <DropdownMenuContent align="end">
         {openDrawer && (
