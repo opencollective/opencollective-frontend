@@ -156,6 +156,11 @@ enum OAuthScope {
   Perform critical administrative operations.
   """
   root
+
+  """
+  Manage export requests.
+  """
+  exportRequests
 }
 
 """
@@ -19748,7 +19753,7 @@ type ExportRequest {
   """
   Unique identifier for this export request
   """
-  id: String!
+  id: NonEmptyString!
 
   """
   Legacy numeric ID of this export request
@@ -19758,7 +19763,7 @@ type ExportRequest {
   """
   The name of the export request
   """
-  name: String!
+  name: NonEmptyString!
 
   """
   The type of export request
@@ -19863,7 +19868,7 @@ type ExportRequestCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
-  nodes: [ExportRequest!]
+  nodes: [ExportRequest!]!
 }
 
 """
@@ -23320,7 +23325,7 @@ type Mutation {
     """
     The new name for the export request
     """
-    name: String
+    name: NonEmptyString
   ): ExportRequest!
 
   """
@@ -26106,7 +26111,7 @@ input ExportRequestCreateInput {
   """
   A name for this export request
   """
-  name: String!
+  name: NonEmptyString!
 
   """
   The type of export to create

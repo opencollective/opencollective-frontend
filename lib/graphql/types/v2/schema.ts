@@ -5543,11 +5543,11 @@ export type ExportRequest = {
   /** The exported file (if completed) */
   file?: Maybe<FileInfo>;
   /** Unique identifier for this export request */
-  id: Scalars['String']['output'];
+  id: Scalars['NonEmptyString']['output'];
   /** Legacy numeric ID of this export request */
   legacyId: Scalars['Int']['output'];
   /** The name of the export request */
-  name: Scalars['String']['output'];
+  name: Scalars['NonEmptyString']['output'];
   /** The parameters of the export request */
   parameters?: Maybe<Scalars['JSON']['output']>;
   /** The progress of the export request (0-100) */
@@ -5564,7 +5564,7 @@ export type ExportRequest = {
 export type ExportRequestCollection = Collection & {
   __typename?: 'ExportRequestCollection';
   limit?: Maybe<Scalars['Int']['output']>;
-  nodes?: Maybe<Array<ExportRequest>>;
+  nodes: Array<ExportRequest>;
   offset?: Maybe<Scalars['Int']['output']>;
   totalCount?: Maybe<Scalars['Int']['output']>;
 };
@@ -5574,7 +5574,7 @@ export type ExportRequestCreateInput = {
   /** The account to create the export request for */
   account: AccountReferenceInput;
   /** A name for this export request */
-  name: Scalars['String']['input'];
+  name: Scalars['NonEmptyString']['input'];
   /** Optional parameters for the export request */
   parameters?: InputMaybe<Scalars['JSON']['input']>;
   /** The type of export to create */
@@ -9246,7 +9246,7 @@ export type MutationEditExpenseArgs = {
 /** This is the root mutation */
 export type MutationEditExportRequestArgs = {
   exportRequest: ExportRequestReferenceInput;
-  name?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['NonEmptyString']['input']>;
 };
 
 
@@ -9882,6 +9882,8 @@ export enum OAuthScope {
   email = 'email',
   /** Create and manage expenses, payout methods. */
   expenses = 'expenses',
+  /** Manage export requests. */
+  exportRequests = 'exportRequests',
   /** Administrate fiscal hosts. */
   host = 'host',
   /** Access your incognito account. */
