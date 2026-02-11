@@ -94,13 +94,7 @@ const columns: ColumnDef<Agreement>[] = [
       );
     },
   },
-  {
-    ...actionsColumn,
-    meta: { className: 'w-24 text-right' },
-    header: () => {
-      return <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />;
-    },
-  },
+  actionsColumn,
 ];
 
 type AgreementsTableProps = {

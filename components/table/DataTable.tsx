@@ -10,6 +10,7 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table';
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { cva } from 'class-variance-authority';
 import clsx from 'clsx';
 import { isEqual, omitBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -268,20 +269,43 @@ type CellContext<TData, TValue> = TanCellContext<TData, TValue> & {
   actionsMenuTriggerRef?: React.MutableRefObject<any>;
 };
 
+export const stickyColumnVariants = cva(
+  'sticky bg-background group-data-[state=selected]/row:bg-muted has-data-[state=open]:bg-muted group-hover/row:[&:is(td)]:bg-muted',
+  {
+    variants: {
+      variant: {
+        select:
+          'left-0 z-1 w-10 max-w-10 min-w-10 [filter:drop-shadow(2px_0px_6px_rgba(0,0,0,var(--scroll-shadow-left,0)))] [clip-path:inset(0px_-20px_0px_0px)]',
+        actions:
+          'right-0 w-12 max-w-12 min-w-12 !pr-2 [filter:drop-shadow(-2px_0px_6px_rgba(0,0,0,var(--scroll-shadow-right,0)))] [clip-path:inset(0px_0px_0px_-20px)]',
+      },
+    },
+  },
+);
+
+// Sticky actions column
 export const actionsColumn = {
-  accessorKey: 'actions',
-  header: ({ table }) => (
-    <div className="-mr-2 flex justify-end">
-      <ColumnToggleDropdown table={table} />
-    </div>
-  ),
-  meta: { className: 'w-14' },
+  id: 'actions',
+  header: ({ table }) => {
+    const { defaultColumnVisibility } = table.options.meta;
+    if (defaultColumnVisibility) {
+      return (
+        <div className="flex justify-end">
+          <ColumnToggleDropdown table={table} />
+        </div>
+      );
+    }
+    return null;
+  },
+  meta: {
+    className: stickyColumnVariants({ variant: 'actions' }),
+  },
   enableHiding: false,
   cell: (ctx: unknown) => {
     const { table, row, actionsMenuTriggerRef } = ctx as CellContext<any, any>;
     return (
       // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-      <div onClick={e => e.stopPropagation()} className="-mr-2 flex items-center justify-end">
+      <div onClick={e => e.stopPropagation()} className="flex items-center justify-end">
         <RowActionsMenu table={table} row={row} actionsMenuTriggerRef={actionsMenuTriggerRef} />
       </div>
     );
