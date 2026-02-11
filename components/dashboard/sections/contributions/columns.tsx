@@ -238,6 +238,8 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
         // We don't store this information anymore, but it used to be populated in the API. Do not migrate unless you've
         // verified that all instances have been migrated to something else.
         return i18nPaymentMethodProviderType(intl, row.original.pendingContributionData?.paymentMethod);
+      } else if (!row.original.totalAmount && !pm) {
+        return '-';
       }
 
       return (
