@@ -50,7 +50,6 @@ const schema = isMulti(z.string()).optional();
 
 const resultNodeToOption = (account: Partial<AccountHoverCardFieldsFragment>) => ({
   label: <AccountRenderer account={account as AccountHoverCardFieldsFragment & { slug: string }} inOptionsList />,
-  keywords: [account.name],
   value: account.slug,
 });
 

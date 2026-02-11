@@ -453,6 +453,7 @@ export const paidDisbursementsQuery = gql`
     $sort: ChronologicalOrderInput
     $account: AccountReferenceInput
     $accountingCategory: [String]
+    $fromAccounts: [AccountReferenceInput]
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -470,6 +471,7 @@ export const paidDisbursementsQuery = gql`
       searchTerm: $searchTerm
       orderBy: $sort
       accountingCategory: $accountingCategory
+      fromAccounts: $fromAccounts
     ) {
       totalCount
       offset
