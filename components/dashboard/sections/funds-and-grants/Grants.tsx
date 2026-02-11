@@ -21,9 +21,9 @@ import { Button } from '@/components/ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import { accountFilter } from '../../filters/AccountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
+import { expenseTypeFilter } from '../../filters/ExpenseTypeFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { AccountRenderer } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
@@ -39,12 +39,10 @@ import { accountExpensesMetadataQuery, accountExpensesQuery } from '../expenses/
 import type { GrantsTableMeta } from './common';
 import { grantColumns } from './common';
 
-const schema = commonSchema
-  .extend({
-    account: z.string().nullable().default(null),
-    fromAccount: accountFilter.schema,
-  })
-  .omit({ type: true });
+const schema = commonSchema.extend({
+  account: z.string().nullable().default(null),
+  type: expenseTypeFilter.schema.default(ExpenseType.GRANT),
+});
 
 const schemaWithoutHost = schema.omit({ accountingCategory: true });
 
@@ -68,7 +66,6 @@ const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, 
       return { account: { slug } };
     }
   },
-  fromAccount: accountFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
@@ -91,7 +88,10 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },
-  fromAccount: { ...accountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Beneficiary', id: 'VfJsl4' }) },
+  fromAccounts: {
+    ...commonFilters.fromAccounts,
+    labelMsg: defineMessage({ defaultMessage: 'Beneficiary', id: 'VfJsl4' }),
+  },
 };
 
 const filtersWithoutHost = omit(filters, ['accountingCategory', 'type']);

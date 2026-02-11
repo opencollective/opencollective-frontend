@@ -9,9 +9,11 @@ import { gql } from '@/lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, HostContext } from '@/lib/graphql/types/v2/graphql';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
-import type { FilterValues as ExpenseFilterValues } from '../sections/expenses/filters';
+import { type FilterValues as ExpenseFilterValues } from '../sections/expenses/filters';
 
 import ComboSelectFilter from './ComboSelectFilter';
+import { expenseStatusFilter } from './ExpenseStatusFilter';
+import { expenseTypeFilter } from './ExpenseTypeFilter';
 import { AccountRenderer } from './HostedAccountFilter';
 
 const expensePayeeFilterSearchQuery = gql`
@@ -22,6 +24,7 @@ const expensePayeeFilterSearchQuery = gql`
     $status: [ExpenseStatusFilter]
     $hostContext: HostContext
     $includeChildrenExpenses: Boolean
+    $types: [ExpenseType]
   ) {
     expenses(
       host: $host
@@ -29,6 +32,7 @@ const expensePayeeFilterSearchQuery = gql`
       status: $status
       hostContext: $hostContext
       includeChildrenExpenses: $includeChildrenExpenses
+      types: $types
     ) {
       payees(searchTerm: $searchTerm, limit: 20) {
         nodes {
@@ -56,6 +60,7 @@ const resultNodeToOption = (account: Partial<AccountHoverCardFieldsFragment>) =>
 type RequiredFilterValueTypes = {
   hostContext?: HostContext;
   status?: ExpenseFilterValues['status'];
+  type?: ExpenseFilterValues['type'];
 };
 
 function ExpensePayeeFilter({
@@ -86,24 +91,18 @@ function ExpensePayeeFilter({
           ...accountScope,
           searchTerm: searchTerm || undefined,
           hostContext: values.hostContext,
-          status: values.status,
+          ...expenseStatusFilter.toVariables(values.status, 'status', meta),
+          ...expenseTypeFilter.toVariables(values.type, 'types', meta),
         },
       });
     },
-    [accountScope, search, values.hostContext, values.status],
+    [accountScope, meta, search, values.hostContext, values.status, values.type],
   );
 
   // Load initial options on mount
   React.useEffect(() => {
-    search({
-      variables: {
-        ...accountScope,
-        searchTerm: undefined,
-        hostContext: values.hostContext,
-        status: values.status,
-      },
-    });
-  }, [accountScope, search, values.hostContext, values.status]);
+    searchFunc('');
+  }, [searchFunc]);
 
   React.useEffect(() => {
     if (!loading && data?.expenses?.payees?.nodes) {

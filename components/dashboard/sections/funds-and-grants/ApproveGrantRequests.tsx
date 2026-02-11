@@ -18,7 +18,9 @@ import { DataTable } from '@/components/table/DataTable';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
+import { expenseStatusFilter } from '../../filters/ExpenseStatusFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
+import { expenseTypeFilter } from '../../filters/ExpenseTypeFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { AccountRenderer } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
@@ -34,11 +36,11 @@ import { accountExpensesMetadataQuery, accountExpensesQuery } from '../expenses/
 import type { GrantsTableMeta } from './common';
 import { grantColumns } from './common';
 
-const schema = commonSchema
-  .extend({
-    account: z.string().nullable().default(null),
-  })
-  .omit({ type: true, status: true });
+const schema = commonSchema.extend({
+  account: z.string().nullable().default(null),
+  type: expenseTypeFilter.schema.default(ExpenseType.GRANT),
+  status: expenseStatusFilter.schema.default(ExpenseStatusFilter.PENDING),
+});
 
 const schemaWithoutHost = schema.omit({ accountingCategory: true });
 
@@ -82,6 +84,10 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },
+  fromAccounts: {
+    ...commonFilters.fromAccounts,
+    labelMsg: defineMessage({ defaultMessage: 'Beneficiary', id: 'VfJsl4' }),
+  },
 };
 
 const filtersWithoutHost = omit(filters, ['accountingCategory', 'type', 'status']);
@@ -121,8 +127,6 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
       hasAmountInCreatedByAccountCurrency: false,
       fetchGrantHistory: true,
       ...queryFilter.variables,
-      type: ExpenseType.GRANT,
-      status: [ExpenseStatusFilter.PENDING],
     },
   });
 
