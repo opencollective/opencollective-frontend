@@ -1758,6 +1758,7 @@
   "ExportRequest.Deleted": "Export deleted",
   "ExportRequest.Error": "Failed to create export request. Please try again.",
   "ExportRequest.ViewExports": "View Exports",
+  "exportRequests": "Manage export requests.",
   "Exports": "Exports",
   "Exports.Description": "Export your data for analysis and record-keeping. Large exports are processed in the background and you'll be notified when they're ready to download.",
   "ExportSample": "Exportar amostra",
