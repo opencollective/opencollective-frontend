@@ -30,7 +30,6 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
@@ -69,7 +68,6 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
   account: hostedAccountFilter.filter,
-  tag: expenseTagFilter.filter,
 };
 
 /**
