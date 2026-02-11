@@ -77,7 +77,7 @@ class EditCollectiveForm extends React.Component {
       case ALL_SECTIONS.COLLECTIVE_PAGE:
         return <EditCollectivePage collective={collective} />;
 
-      case ALL_SECTIONS.EXPORT:
+      case ALL_SECTIONS.WIDGETS:
         return <Export collective={collective} />;
 
       case ALL_SECTIONS.HOST:
