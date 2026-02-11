@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { AlertCircle, CheckCircle2, Clock, Download, FileText, Loader2, Trash2 } from 'lucide-react';
+import { Download, FileText, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -28,6 +28,7 @@ import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
+import { ExportStatusLabels, ExportTypeLabels, getStatusClassName, getStatusIcon } from './constants';
 import { ExportRequestDetailsDialog } from './ExportRequestDetailsDialog';
 
 type ExportRequestNode = NonNullable<ExportRequestsQuery['exportRequests']>['nodes'][number];
@@ -88,51 +89,6 @@ const removeExportRequestMutation = gql`
     }
   }
 `;
-
-const ExportTypeLabels = {
-  [ExportRequestType.TRANSACTIONS]: defineMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
-  [ExportRequestType.HOSTED_COLLECTIVES]: defineMessage({
-    defaultMessage: 'Hosted Collectives',
-    id: 'HostedCollectives',
-  }),
-};
-
-const ExportStatusLabels = {
-  [ExportRequestStatus.ENQUEUED]: defineMessage({ defaultMessage: 'Queued', id: 'ExportStatus.Enqueued' }),
-  [ExportRequestStatus.PROCESSING]: defineMessage({ defaultMessage: 'Processing', id: 'processing' }),
-  [ExportRequestStatus.COMPLETED]: defineMessage({ defaultMessage: 'Completed', id: 'ExportStatus.Completed' }),
-  [ExportRequestStatus.FAILED]: defineMessage({ defaultMessage: 'Failed', id: 'ExportStatus.Failed' }),
-};
-
-const getStatusIcon = (status: ExportRequestStatus) => {
-  switch (status) {
-    case ExportRequestStatus.ENQUEUED:
-      return Clock;
-    case ExportRequestStatus.PROCESSING:
-      return Loader2;
-    case ExportRequestStatus.COMPLETED:
-      return CheckCircle2;
-    case ExportRequestStatus.FAILED:
-      return AlertCircle;
-    default:
-      return FileText;
-  }
-};
-
-const getStatusClassName = (status: ExportRequestStatus): string => {
-  switch (status) {
-    case ExportRequestStatus.ENQUEUED:
-      return 'bg-slate-100 text-slate-800';
-    case ExportRequestStatus.PROCESSING:
-      return 'bg-blue-100 text-blue-800';
-    case ExportRequestStatus.COMPLETED:
-      return 'bg-green-100 text-green-800';
-    case ExportRequestStatus.FAILED:
-      return 'bg-red-100 text-red-800';
-    default:
-      return 'bg-slate-100 text-slate-800';
-  }
-};
 
 const getColumns = ({ intl }) => {
   return [
