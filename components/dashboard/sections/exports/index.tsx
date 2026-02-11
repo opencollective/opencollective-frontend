@@ -8,6 +8,8 @@ import { z } from 'zod';
 import { i18nGraphqlException } from '@/lib/errors';
 import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
+import type { ExportRequestsQuery, ExportRequestsQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import { ExportRequestStatus, ExportRequestType } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '../../../Avatar';
@@ -26,6 +28,8 @@ import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
 import { ExportRequestDetailsDialog } from './ExportRequestDetailsDialog';
+
+type ExportRequestNode = NonNullable<ExportRequestsQuery['exportRequests']>['nodes'][number];
 
 const exportRequestFieldsFragment = gql`
   fragment ExportRequestFields on ExportRequest {
@@ -83,61 +87,6 @@ const removeExportRequestMutation = gql`
     }
   }
 `;
-
-type ExportRequestNode = {
-  id: string;
-  legacyId: number;
-  name: string;
-  type: ExportRequestType;
-  status: ExportRequestStatus;
-  progress?: number;
-  error?: string;
-  parameters?: Record<string, unknown>;
-  createdAt: string;
-  updatedAt: string;
-  expiresAt?: string;
-  createdBy?: {
-    id: string;
-    name: string;
-    slug: string;
-    imageUrl: string;
-  };
-  file?: {
-    id: string;
-    url: string;
-    name: string;
-    size: number;
-  };
-};
-
-type ExportRequestsQuery = {
-  exportRequests: {
-    offset: number;
-    limit: number;
-    totalCount: number;
-    nodes: Array<ExportRequestNode>;
-  };
-};
-
-type ExportRequestsQueryVariables = {
-  account: { slug: string };
-  type?: ExportRequestType;
-  status?: ExportRequestStatus;
-  limit: number;
-  offset: number;
-};
-
-enum ExportRequestType {
-  TRANSACTIONS = 'TRANSACTIONS',
-  HOSTED_COLLECTIVES = 'HOSTED_COLLECTIVES',
-}
-
-enum ExportRequestStatus {
-  ENQUEUED = 'ENQUEUED',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-}
 
 const ExportTypeLabels = {
   [ExportRequestType.TRANSACTIONS]: defineMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),

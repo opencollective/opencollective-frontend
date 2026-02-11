@@ -7,10 +7,19 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import type { CSVField } from '../../../../lib/export-csv/transactions-csv';
 import { FieldLabels } from '../../../../lib/export-csv/transactions-csv';
-import type { AccountReferenceInput, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
+import {
+  type AccountReferenceInput,
+  ExportRequestStatus,
+  ExportRequestType,
+  type PaymentMethodType,
+} from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
-import type { TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type {
+  ExportRequestDetailsQuery,
+  ExportRequestDetailsQueryVariables,
+  TransactionsTableQueryVariables,
+} from '@/lib/graphql/types/v2/graphql';
 
 import { PaymentMethodLabel } from '@/components/PaymentMethodLabel';
 
@@ -59,52 +68,6 @@ const exportRequestQuery = gql`
   }
   ${exportRequestFieldsFragment}
 `;
-
-enum ExportRequestType {
-  TRANSACTIONS = 'TRANSACTIONS',
-  HOSTED_COLLECTIVES = 'HOSTED_COLLECTIVES',
-}
-
-enum ExportRequestStatus {
-  ENQUEUED = 'ENQUEUED',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-}
-
-type ExportRequestNode = {
-  id: string;
-  legacyId: number;
-  name: string;
-  type: ExportRequestType;
-  status: ExportRequestStatus;
-  progress?: number;
-  error?: string;
-  parameters?: Record<string, unknown>;
-  createdAt: string;
-  updatedAt: string;
-  expiresAt?: string;
-  createdBy?: {
-    id: string;
-    name: string;
-    slug: string;
-    imageUrl: string;
-  };
-  file?: {
-    id: string;
-    url: string;
-    name: string;
-    size: number;
-  };
-};
-
-type ExportRequestQueryResult = {
-  exportRequest: ExportRequestNode | null;
-};
-
-type ExportRequestQueryVariables = {
-  exportRequest: { id: string };
-};
 
 const ExportTypeLabels = {
   [ExportRequestType.TRANSACTIONS]: defineMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
@@ -407,11 +370,14 @@ type ExportRequestDetailsDialogProps = {
 export const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportRequestDetailsDialogProps) => {
   const intl = useIntl();
 
-  const { data, loading, error } = useQuery<ExportRequestQueryResult, ExportRequestQueryVariables>(exportRequestQuery, {
-    variables: { exportRequest: { id: exportRequestId } },
-    skip: !exportRequestId,
-    fetchPolicy: 'cache-and-network',
-  });
+  const { data, loading, error } = useQuery<ExportRequestDetailsQuery, ExportRequestDetailsQueryVariables>(
+    exportRequestQuery,
+    {
+      variables: { exportRequest: { id: exportRequestId } },
+      skip: !exportRequestId,
+      fetchPolicy: 'cache-and-network',
+    },
+  );
 
   const exportRequest = data?.exportRequest;
 
