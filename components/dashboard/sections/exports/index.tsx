@@ -6,6 +6,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '@/lib/errors';
+import { formatFileSize } from '@/lib/file-utils';
 import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
 import type { ExportRequestsQuery, ExportRequestsQueryVariables } from '@/lib/graphql/types/v2/graphql';
@@ -133,18 +134,6 @@ const getStatusClassName = (status: ExportRequestStatus): string => {
   }
 };
 
-const formatBytes = (bytes: number): string => {
-  if (bytes === null || bytes === undefined) {
-    return '—';
-  } else if (bytes === 0) {
-    return '0 B';
-  }
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-};
-
 const getColumns = ({ intl }) => {
   return [
     {
@@ -202,7 +191,7 @@ const getColumns = ({ intl }) => {
       cell: ({ row }) => {
         const exportRequest = row.original;
         if (exportRequest.file?.size) {
-          return <span className="text-sm">{formatBytes(exportRequest.file.size)}</span>;
+          return <span className="text-sm">{formatFileSize(exportRequest.file.size)}</span>;
         }
         return <span className="text-muted-foreground">—</span>;
       },

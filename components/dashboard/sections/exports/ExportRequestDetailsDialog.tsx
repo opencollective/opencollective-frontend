@@ -15,6 +15,7 @@ import {
 } from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
+import { formatFileSize } from '@/lib/file-utils';
 import type {
   ExportRequestDetailsQuery,
   ExportRequestDetailsQueryVariables,
@@ -112,18 +113,6 @@ const getStatusClassName = (status: ExportRequestStatus): string => {
     default:
       return 'bg-slate-100 text-slate-800';
   }
-};
-
-const formatBytes = (bytes: number): string => {
-  if (bytes === null || bytes === undefined) {
-    return '—';
-  } else if (bytes === 0) {
-    return '0 B';
-  }
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
 
 type TransactionExportParameters = {
@@ -448,7 +437,7 @@ export const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportR
                   />
                   <DataListItem
                     label={<FormattedMessage defaultMessage="File Size" id="FileSize" />}
-                    value={formatBytes(exportRequest.file.size)}
+                    value={formatFileSize(exportRequest.file.size)}
                   />
                 </React.Fragment>
               )}
