@@ -29,7 +29,7 @@ import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
 import { ExportStatusLabels, ExportTypeLabels, getStatusClassName, getStatusIcon } from './constants';
-import { ExportRequestDetailsDialog } from './ExportRequestDetailsDialog';
+import { ExportRequestDetailsDrawer } from './ExportRequestDetailsDrawer';
 
 type ExportRequestNode = NonNullable<ExportRequestsQuery['exportRequests']>['nodes'][number];
 
@@ -396,7 +396,14 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
         </div>
       )}
 
-      <ExportRequestDetailsDialog exportRequestId={selectedExportRequestId} onClose={() => pushSubpath('')} />
+      <ExportRequestDetailsDrawer
+        exportRequestId={selectedExportRequestId}
+        onClose={() => pushSubpath('')}
+        onDelete={exportRequest => {
+          handleRemove(exportRequest);
+          pushSubpath('');
+        }}
+      />
     </div>
   );
 };

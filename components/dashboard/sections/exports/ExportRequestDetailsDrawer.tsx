@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { Download, FileText, Loader2 } from 'lucide-react';
+import { Copy, Download, FileText, Loader2, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -15,22 +15,26 @@ import {
 } from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
+import type { Action } from '@/lib/actions/types';
 import { formatFileSize } from '@/lib/file-utils';
 import type {
   ExportRequestDetailsQuery,
   ExportRequestDetailsQueryVariables,
   TransactionsTableQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
+import useClipboard from '@/lib/hooks/useClipboard';
 
 import { PaymentMethodLabel } from '@/components/PaymentMethodLabel';
+import { Separator } from '@/components/ui/Separator';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
+import DrawerHeader from '../../../DrawerHeader';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Badge } from '../../../ui/Badge';
 import { Checkbox } from '../../../ui/Checkbox';
 import { DataList, DataListItem } from '../../../ui/DataList';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../ui/Dialog';
+import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
 import { ExportStatusLabels, ExportTypeLabels, getStatusClassName, getStatusIcon } from './constants';
 
@@ -308,13 +312,15 @@ const formatExportParameters = (
   }
 };
 
-type ExportRequestDetailsDialogProps = {
+type ExportRequestDetailsDrawerProps = {
   exportRequestId: string | null;
   onClose: () => void;
+  onDelete: (exportRequest: NonNullable<ExportRequestDetailsQuery['exportRequest']>) => void;
 };
 
-export const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportRequestDetailsDialogProps) => {
+export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete }: ExportRequestDetailsDrawerProps) => {
   const intl = useIntl();
+  const { copy, isCopied } = useClipboard();
 
   const { data, loading, error } = useQuery<ExportRequestDetailsQuery, ExportRequestDetailsQueryVariables>(
     exportRequestQuery,
@@ -327,6 +333,46 @@ export const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportR
 
   const exportRequest = data?.exportRequest;
 
+  const actions = React.useMemo(() => {
+    if (!exportRequest) {
+      return undefined;
+    }
+
+    const primary: Action[] = [];
+    const secondary: Action[] = [];
+
+    if (exportRequest.status === ExportRequestStatus.COMPLETED && exportRequest.file) {
+      primary.push({
+        key: 'download',
+        label: intl.formatMessage({ defaultMessage: 'Download', id: 'Download' }),
+        Icon: Download,
+        onClick: () => {
+          window.open(exportRequest.file.url, '_blank');
+        },
+      });
+
+      secondary.push({
+        key: 'copy-url',
+        label: isCopied
+          ? intl.formatMessage({ defaultMessage: 'Copied!', id: 'Clipboard.Copied' })
+          : intl.formatMessage({ defaultMessage: 'Copy download URL', id: 'CopyDownloadURL' }),
+        Icon: Copy,
+        onClick: () => {
+          copy(exportRequest.file.url);
+        },
+      });
+    }
+
+    secondary.push({
+      key: 'delete',
+      label: intl.formatMessage({ defaultMessage: 'Delete', id: 'actions.delete' }),
+      Icon: Trash2,
+      onClick: () => onDelete(exportRequest),
+    });
+
+    return { primary, secondary };
+  }, [exportRequest, intl, onDelete, copy, isCopied]);
+
   if (!exportRequestId) {
     return null;
   }
@@ -335,33 +381,31 @@ export const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportR
   const statusClassName = exportRequest ? getStatusClassName(exportRequest.status) : '';
 
   return (
-    <Dialog open={!!exportRequestId} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
-            <FormattedMessage defaultMessage="Export Details" id="ExportDetails" />
-          </DialogTitle>
-        </DialogHeader>
+    <Sheet open={!!exportRequestId} onOpenChange={open => !open && onClose()}>
+      <SheetContent data-cy="export-request-drawer">
+        {exportRequest && (
+          <DrawerHeader
+            actions={actions}
+            entityName={<FormattedMessage defaultMessage="Export" id="editCollective.menu.export" />}
+            entityIdentifier={`#${exportRequest.legacyId}`}
+            entityLabel={
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">{exportRequest.name}</span>
+              </div>
+            }
+          />
+        )}
 
-        {loading && !exportRequest ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : error ? (
-          <MessageBoxGraphqlError error={error} />
-        ) : exportRequest ? (
-          <React.Fragment>
+        <SheetBody>
+          {loading && !exportRequest ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : error ? (
+            <MessageBoxGraphqlError error={error} />
+          ) : exportRequest ? (
             <DataList className="gap-4">
-              <DataListItem
-                label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
-                value={
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{exportRequest.name}</span>
-                  </div>
-                }
-              />
-
               <DataListItem
                 label={<FormattedMessage defaultMessage="Type" id="expense.type" />}
                 value={intl.formatMessage(ExportTypeLabels[exportRequest.type])}
@@ -429,32 +473,21 @@ export const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportR
               )}
 
               {exportRequest.parameters && Object.keys(exportRequest.parameters).length > 0 && (
-                <DataListItem
-                  className="sm:flex-col"
-                  label={<FormattedMessage defaultMessage="Parameters" id="export.json.parameters.title" />}
-                  labelClassName="basis-0"
-                  itemClassName="w-full max-w-full "
-                  value={formatExportParameters(exportRequest.type, exportRequest.parameters, intl)}
-                />
+                <React.Fragment>
+                  <Separator className="mt-2" />
+                  <DataListItem
+                    className="sm:flex-col"
+                    label={<FormattedMessage defaultMessage="Parameters" id="export.json.parameters.title" />}
+                    labelClassName="basis-0"
+                    itemClassName="w-full max-w-full"
+                    value={formatExportParameters(exportRequest.type, exportRequest.parameters, intl)}
+                  />
+                </React.Fragment>
               )}
             </DataList>
-
-            {exportRequest.status === ExportRequestStatus.COMPLETED && exportRequest.file && (
-              <div className="mt-4 flex justify-end">
-                <a
-                  href={exportRequest.file.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                >
-                  <Download className="h-4 w-4" />
-                  <FormattedMessage defaultMessage="Download" id="Download" />
-                </a>
-              </div>
-            )}
-          </React.Fragment>
-        ) : null}
-      </DialogContent>
-    </Dialog>
+          ) : null}
+        </SheetBody>
+      </SheetContent>
+    </Sheet>
   );
 };
