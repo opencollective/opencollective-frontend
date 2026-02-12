@@ -54,7 +54,7 @@ export const SearchCommand = ({ open, setOpen }) => {
   const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const { account } = React.useContext(DashboardContext);
+  const { account, isRootDashboard } = React.useContext(DashboardContext);
   const defaultContext = useMemo((): { slug: string; type: 'account' | 'host' } | undefined => {
     return workspace?.isHost
       ? { slug: workspace.slug, type: 'host' }
@@ -223,7 +223,7 @@ export const SearchCommand = ({ open, setOpen }) => {
   const isInitialLoading = isLoading && !hasData && hasSearchTerm;
 
   const flattenedMenuItems: DashboardPage[] = React.useMemo(() => {
-    const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
+    const menuItems = account ? getMenuItems({ intl, account, LoggedInUser, isRootDashboard }) : [];
     return menuItems
       .flatMap(menuItem =>
         'subMenu' in menuItem

@@ -33,9 +33,8 @@ describe('Recurring contributions', () => {
   });
 
   it('Has contributions in the right categories', () => {
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/outgoing-contributions` }).then(() => {
       cy.get('[data-cy^="datatable-row"]').should('have.length', 1);
-
       // Filter by Yearly frequency
       cy.getByDataCy('add-filter').click();
       cy.contains('Frequency').click();
@@ -67,22 +66,20 @@ describe('Recurring contributions', () => {
       },
     },
     () => {
-      cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(
-        () => {
-          cy.getByDataCy('actions-menu-trigger').first().click();
-          cy.contains('Update payment method').click();
-          cy.get('input[type=radio][value="stripe-payment-element"]').check();
-          cy.wait(500);
-          cy.fillStripePaymentElementInput();
-          cy.getByDataCy('recurring-contribution-submit-pm-button').click();
-          cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
-        },
-      );
+      cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/outgoing-contributions` }).then(() => {
+        cy.getByDataCy('actions-menu-trigger').first().click();
+        cy.contains('Update payment method').click();
+        cy.get('input[type=radio][value="stripe-payment-element"]').check();
+        cy.wait(500);
+        cy.fillStripePaymentElementInput();
+        cy.getByDataCy('recurring-contribution-submit-pm-button').click();
+        cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
+      });
     },
   );
 
   it('Can change the tier and amount of the order', () => {
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
       cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Backer').within(() => {
@@ -95,7 +92,7 @@ describe('Recurring contributions', () => {
   });
 
   it('Can select a fixed recurring contribution tier', () => {
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
       cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Recurring Fixed Donation Tier').within(() => {
@@ -108,7 +105,7 @@ describe('Recurring contributions', () => {
   });
 
   it('Can change the amount in a flexible contribution tier', () => {
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
       cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
@@ -125,7 +122,7 @@ describe('Recurring contributions', () => {
   });
 
   it('Can contribute a custom contribution amount', () => {
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
       cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
@@ -145,7 +142,7 @@ describe('Recurring contributions', () => {
   });
 
   it('Cannot contribute a contribution amount less than the minimum allowable amount', () => {
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
       cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
@@ -165,7 +162,7 @@ describe('Recurring contributions', () => {
 
   it('Can cancel an active contribution with reasons displayed in modal, "other" displays text area', () => {
     cy.mailpitDeleteAllEmails();
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
       cy.getByDataCy('recurring-contribution-menu-cancel-option').click();
       cy.getByDataCy('cancel-order-modal').should('exist');

@@ -132,7 +132,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const [isCreateCategoryModalOpen, setIsCreateCategoryModalOpen] = React.useState(false);
   const [deleteCategoryConfirmation, setDeleteCategoryConfirmation] = React.useState(null);
 
-  const hasHosting = account.hasHosting;
+  const hasHosting = 'hasHosting' in account && account.hasHosting;
 
   const queryFilter = useQueryFilter({
     schema: React.useMemo(

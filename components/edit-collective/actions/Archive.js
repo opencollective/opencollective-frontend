@@ -5,8 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import { getErrorFromGraphqlException } from '@/lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
+import { loggedInUserQuery } from '@/lib/graphql/queries';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
-import { adminPanelQuery } from '../../dashboard/queries';
 import MessageBox from '../../MessageBox';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
@@ -32,6 +33,7 @@ const unarchiveCollectiveMutation = gqlV1 /* GraphQL */ `
 `;
 
 const ArchiveCollective = ({ collective }) => {
+  const { updateLoggedInUserFromCache } = useLoggedInUser();
   const [archiveStatus, setArchiveStatus] = useState({
     processing: false,
     isArchived: collective.isArchived,
@@ -43,7 +45,8 @@ const ArchiveCollective = ({ collective }) => {
   const [modal, setModal] = useState({ type: defaultAction, show: false });
 
   const adminPanelMutationParams = {
-    refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug } }],
+    refetchQueries: [{ query: loggedInUserQuery }],
+    awaitRefetchQueries: true,
   };
   const [archiveCollective] = useMutation(archiveCollectiveMutation, {
     ...adminPanelMutationParams,
@@ -59,6 +62,7 @@ const ArchiveCollective = ({ collective }) => {
     try {
       setArchiveStatus({ ...archiveStatus, processing: true });
       await archiveCollective({ variables: { id } });
+      updateLoggedInUserFromCache();
       setArchiveStatus({
         ...archiveStatus,
         processing: false,
@@ -75,6 +79,7 @@ const ArchiveCollective = ({ collective }) => {
     try {
       setArchiveStatus({ ...archiveStatus, processing: true });
       await unarchiveCollective({ variables: { id } });
+      updateLoggedInUserFromCache();
       setArchiveStatus({
         ...archiveStatus,
         processing: false,

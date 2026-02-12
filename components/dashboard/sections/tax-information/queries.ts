@@ -22,6 +22,7 @@ export const accountTaxInformationQuery = gql`
         isExpired
       }
       location {
+        id
         address
         country
         structured
