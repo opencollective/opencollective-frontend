@@ -8608,8 +8608,6 @@ export type Mutation = {
   requestVirtualCard?: Maybe<Scalars['Boolean']['output']>;
   /** To re-send the invitation to complete a draft expense. Scope: "expenses". */
   resendDraftExpenseInvite: Expense;
-  /** Restore the given payout method. Scope: "expenses". */
-  restorePayoutMethod: PayoutMethod;
   /** Resume paused Virtual Card. Scope: "virtualCards". */
   resumeVirtualCard: VirtualCard;
   /** Revoke the KYC Verification */
@@ -9609,12 +9607,6 @@ export type MutationRequestVirtualCardArgs = {
 /** This is the root mutation */
 export type MutationResendDraftExpenseInviteArgs = {
   expense: ExpenseReferenceInput;
-};
-
-
-/** This is the root mutation */
-export type MutationRestorePayoutMethodArgs = {
-  payoutMethod: PayoutMethodReferenceInput;
 };
 
 
