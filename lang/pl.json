@@ -1752,6 +1752,7 @@
   "ExportHostedCollectivesCSVModal.Title": "Export Hosted Collectives",
   "ExportImages.AllFinancial": "Odznaka wszystkich wspierających finansowych",
   "ExportImages.Title": "Możesz wyeksportować obrazy pokazujące wkład finansowy dla każdego poziomu.",
+  "ExportName": "Export name",
   "ExportRequest.Created": "Your export is being generated. You can check its progress in the Exports section.",
   "ExportRequest.Delete.Description": "Are you sure you want to delete this export? This action cannot be undone.",
   "ExportRequest.Delete.Title": "Delete Export",

@@ -1752,6 +1752,7 @@
   "ExportHostedCollectivesCSVModal.Title": "Exportar Colectivos con Anfitrión Fiscal",
   "ExportImages.AllFinancial": "Insignia \"Todos Colaboradores Financieros\"",
   "ExportImages.Title": "Puedes exportar imágenes que muestren los colaboradores financieros de cada Categoría.",
+  "ExportName": "Export name",
   "ExportRequest.Created": "Your export is being generated. You can check its progress in the Exports section.",
   "ExportRequest.Delete.Description": "Are you sure you want to delete this export? This action cannot be undone.",
   "ExportRequest.Delete.Title": "Delete Export",

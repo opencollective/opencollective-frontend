@@ -1752,6 +1752,7 @@
   "ExportHostedCollectivesCSVModal.Title": "Export Hosted Collectives",
   "ExportImages.AllFinancial": "全部财政贡献者预算",
   "ExportImages.Title": "您可以导出显示每个等级财务贡献者的图片。",
+  "ExportName": "Export name",
   "ExportRequest.Created": "Your export is being generated. You can check its progress in the Exports section.",
   "ExportRequest.Delete.Description": "Are you sure you want to delete this export? This action cannot be undone.",
   "ExportRequest.Delete.Title": "Delete Export",
