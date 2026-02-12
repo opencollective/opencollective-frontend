@@ -1,6 +1,6 @@
 import React from 'react';
 import { cx } from 'class-variance-authority';
-import { flatten, groupBy, uniqBy } from 'lodash';
+import { flatten, groupBy } from 'lodash';
 import { ChevronDown, ChevronsUpDown, ChevronUp, Plus, UserCog } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import type { ReactElement } from 'react';
@@ -8,8 +8,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 import type LoggedInUser from '@/lib/LoggedInUser';
+import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import { cn } from '@/lib/utils';
 
 import Avatar from '../Avatar';
@@ -51,34 +51,38 @@ const EMPTY_GROUP_STATE = {
   },
 };
 
-const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
-  const isAdministratedAccount = m =>
-    ['ADMIN', 'ACCOUNTANT', 'COMMUNITY_MANAGER'].includes(m.role) && !m.collective.isIncognito;
-  let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.collective) || [];
+const getGroupedWorkspaces = memoizeOne((workspaces: WorkspaceAccount[]): Record<string, WorkspaceAccount[]> => {
+  if (!workspaces) {
+    return {};
+  }
 
-  // Filter out accounts if the user is also an admin of the parent of that account (since we already show the parent)
-  const childAccountIds = flatten(administratedAccounts.map(a => a.children)).map((a: { id: number }) => a.id);
-  administratedAccounts = administratedAccounts
-    .filter(a => !childAccountIds.includes(a.id))
-    .filter(a => a.type !== 'VENDOR');
-  administratedAccounts = uniqBy([...administratedAccounts], a => a.id).filter(Boolean);
+  // Filter out accounts whose id appears as a child of another workspace (parent is already shown)
+  const childAccountIds = new Set(
+    flatten(workspaces.map(a => a.childrenAccounts?.nodes || [])).map((a: { id: string }) => a.id),
+  );
+  const accounts = workspaces.filter(a => !childAccountIds.has(a.id)).filter(a => a.type !== 'VENDOR');
 
-  // Filter out Archived accounts and group it separately
-  const archivedAccounts = administratedAccounts.filter(a => a.isArchived);
-  const activeAccounts = administratedAccounts.filter(a => !a.isArchived);
+  // Filter out Archived accounts and group separately
+  const archivedAccounts = accounts.filter(a => a.isArchived);
+  const activeAccounts = accounts.filter(a => !a.isArchived);
 
-  const groupedAccounts = {
+  // Group by type, excluding individual (USER/INDIVIDUAL) accounts which are shown separately
+  const grouped = groupBy(
+    activeAccounts.filter(a => a.type !== 'INDIVIDUAL'),
+    a => a.type,
+  );
+  const groupedAccounts: Record<string, WorkspaceAccount[]> = {
     [CollectiveType.COLLECTIVE]: [],
     [CollectiveType.ORGANIZATION]: [],
-    ...groupBy(activeAccounts, a => a.type),
+    ...grouped,
   };
   if (archivedAccounts?.length > 0) {
-    groupedAccounts['ARCHIVED'] = archivedAccounts;
+    groupedAccounts['ARCHIVED'] = archivedAccounts.filter(a => a.type !== 'INDIVIDUAL');
   }
   return groupedAccounts;
 });
 
-const generateOptionDescription = (collective: GraphQLV1Collective, LoggedInUser: LoggedInUser) => {
+const generateOptionDescription = (collective: { slug: string; type?: string }, LoggedInUser: LoggedInUser) => {
   if (LoggedInUser && !LoggedInUser.isAdminOfCollective(collective)) {
     if (LoggedInUser.isAccountantOnly(collective)) {
       return <FormattedMessage id="Member.Role.ACCOUNTANT" defaultMessage="Accountant" />;
@@ -139,7 +143,8 @@ const MenuEntry = ({
   activeSlug: string;
   handleClose: () => void;
 }) => {
-  const hasActiveChild = !!account.children?.some(child => child.slug === activeSlug);
+  const children = account.childrenAccounts?.nodes || [];
+  const hasActiveChild = !!children.some(child => child.slug === activeSlug);
   const [expanded, setExpanded] = React.useState(hasActiveChild);
   const isActive = activeSlug === account.slug || (hasActiveChild && !expanded);
 
@@ -170,7 +175,7 @@ const MenuEntry = ({
         >
           <Option collective={account} className="flex-1" />
         </Link>
-        {account.children?.length > 0 && (
+        {children.length > 0 && (
           <CollapsibleTrigger asChild>
             <Button
               data-expand-button
@@ -184,10 +189,10 @@ const MenuEntry = ({
           </CollapsibleTrigger>
         )}
       </DropdownMenuItem>
-      {account.children?.length > 0 && (
+      {children.length > 0 && (
         <CollapsibleContent className="m-0 p-0">
-          {account.children
-            ?.slice() // Create a copy to that we can sort the otherwise immutable array
+          {children
+            .slice() // Create a copy to that we can sort the otherwise immutable array
             .sort((a, b) => a.name.localeCompare(b.name))
             .map(child => {
               const isChildActive = activeSlug === child.slug;
@@ -208,14 +213,12 @@ const MenuEntry = ({
 const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
-
   const [open, setOpen] = React.useState(false);
-  const loggedInUserCollective = LoggedInUser?.collective;
-
-  const groupedAccounts = getGroupedAdministratedAccounts(LoggedInUser);
-  const rootAccounts = flatten(Object.values(groupedAccounts));
-  const allAdministratedAccounts = [...rootAccounts, ...flatten(rootAccounts.map(a => a.children))];
-  const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
+  const personalWorkspace = LoggedInUser?.workspaces?.find(
+    w => w.type === 'INDIVIDUAL' || w.slug === LoggedInUser.slug,
+  );
+  const groupedAccounts = getGroupedWorkspaces(LoggedInUser?.workspaces);
+  const activeAccount = LoggedInUser?.getWorkspace(activeSlug) || personalWorkspace;
   const handleClose = () => setOpen(false);
   const { isMobile, state } = useSidebar();
 
@@ -245,20 +248,22 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
               e.preventDefault();
             }}
           >
-            <DropdownMenuItem
-              asChild
-              className={cn(activeSlug === loggedInUserCollective?.slug && 'bg-slate-100')}
-              onSelect={handleClose}
-            >
-              <Link
-                href={`/dashboard/${loggedInUserCollective?.slug}`}
-                title={loggedInUserCollective?.name}
-                className="min-w-0 flex-1"
-                shallow
+            {personalWorkspace && (
+              <DropdownMenuItem
+                asChild
+                className={cn(activeSlug === personalWorkspace.slug && 'bg-slate-100')}
+                onSelect={handleClose}
               >
-                <Option collective={loggedInUserCollective} />
-              </Link>
-            </DropdownMenuItem>
+                <Link
+                  href={`/dashboard/${personalWorkspace.slug}`}
+                  title={personalWorkspace.name}
+                  className="min-w-0 flex-1"
+                  shallow
+                >
+                  <Option collective={personalWorkspace} />
+                </Link>
+              </DropdownMenuItem>
+            )}
             {LoggedInUser?.isRoot && (
               <DropdownMenuItem asChild className={cn(activeSlug === ROOT_PROFILE_KEY && 'bg-slate-100')}>
                 <Link

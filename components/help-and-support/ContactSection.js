@@ -82,7 +82,7 @@ const ContactForm = () => {
           'relatedCollectives',
           LoggedInUser.memberOf.map(member => {
             if (member.role === 'ADMIN') {
-              return getCollectivePageCanonicalURL(member.collective);
+              return getCollectivePageCanonicalURL(member.account);
             }
           }),
         );
@@ -101,13 +101,13 @@ const ContactForm = () => {
 
   useEffect(() => {
     if (LoggedInUser) {
-      setFieldValue('name', LoggedInUser.collective.name);
+      setFieldValue('name', LoggedInUser.name);
       setFieldValue('email', LoggedInUser.email);
       setFieldValue(
         'relatedCollectives',
         LoggedInUser.memberOf
           .filter(member => member.role === 'ADMIN')
-          .map(member => getCollectivePageCanonicalURL(member.collective)),
+          .map(member => getCollectivePageCanonicalURL(member.account)),
       );
     }
   }, [LoggedInUser]);

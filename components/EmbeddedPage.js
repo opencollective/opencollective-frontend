@@ -4,8 +4,6 @@ import { color } from 'styled-system';
 
 import Header from '../components/Header';
 
-import { withUser } from './UserProvider';
-
 const GlobalStyles = createGlobalStyle`
   body {
     overflow-y: auto;
@@ -27,7 +25,14 @@ const Main = styled.main`
  * and that the footer/topbar will not be displayed, while preserving the normal DOM structure
  * and meta.
  */
-const EmbeddedPage = ({ children, description, title, canonicalURL, collective, backgroundColor }) => {
+const EmbeddedPage = ({
+  children,
+  description = undefined,
+  title = undefined,
+  canonicalURL = undefined,
+  collective = undefined,
+  backgroundColor = undefined,
+}) => {
   return (
     <Fragment>
       <GlobalStyles />
@@ -44,4 +49,4 @@ const EmbeddedPage = ({ children, description, title, canonicalURL, collective, 
   );
 };
 
-export default withUser(EmbeddedPage);
+export default EmbeddedPage;

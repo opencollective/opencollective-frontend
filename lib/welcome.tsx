@@ -140,7 +140,7 @@ const ALL_STEPS = {
       />
     ),
     action: (
-      <RedirectButton url={getDashboardRoute(LoggedInUser?.collective, 'user-security')} router={router}>
+      <RedirectButton url={getDashboardRoute(LoggedInUser, 'user-security')} router={router}>
         <FormattedMessage defaultMessage="Set up 2FA" id="SetupGuide.2FA.Action" />,
       </RedirectButton>
     ),

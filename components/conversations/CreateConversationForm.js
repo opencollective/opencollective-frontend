@@ -93,7 +93,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
   // Load values from localstorage
   useEffect(() => {
     if (!loading && LoggedInUser && !values.title && !values.html && !values.tags.length) {
-      const id = `conversation-${collectiveSlug}-${LoggedInUser.id}`;
+      const id = `conversation-${collectiveSlug}-${LoggedInUser.legacyId}`;
       formPersister.setFormId(id);
     }
 

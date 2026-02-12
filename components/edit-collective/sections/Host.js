@@ -108,8 +108,8 @@ class Host extends React.Component {
   getAdministratedHosts = memoizeOne(LoggedInUser => {
     return (
       LoggedInUser?.memberOf
-        ?.filter(membership => membership.role === 'ADMIN' && membership.collective.hasHosting)
-        .map(membership => membership.collective)
+        ?.filter(membership => membership.role === 'ADMIN' && membership.account.hasHosting)
+        .map(membership => membership.account)
         .filter(Boolean) || []
     );
   });

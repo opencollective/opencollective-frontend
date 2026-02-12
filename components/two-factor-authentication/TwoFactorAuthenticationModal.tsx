@@ -171,7 +171,7 @@ export default function TwoFactorAuthenticationModal() {
                 id="j8E0VG"
                 values={{
                   link: getI18nLink({
-                    href: getDashboardRoute(LoggedInUser.collective, 'user-security#two-factor-auth'),
+                    href: getDashboardRoute(LoggedInUser, 'user-security#two-factor-auth'),
                     as: Link,
                   }),
                 }}

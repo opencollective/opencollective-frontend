@@ -264,7 +264,7 @@ const ApplicationForm = ({
                   setValues({
                     ...values,
                     user: {
-                      name: LoggedInUser.collective.name,
+                      name: LoggedInUser.name,
                       email: LoggedInUser.email,
                     },
                     ...(collectiveWithSlug && {
@@ -645,8 +645,8 @@ const ApplicationForm = ({
                         <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
                           {LoggedInUser ? (
                             <OnboardingProfileCard
-                              key={LoggedInUser.collective.id}
-                              collective={LoggedInUser.collective}
+                              key={LoggedInUser.legacyId}
+                              collective={LoggedInUser.toV1Collective()}
                             />
                           ) : (
                             values.user?.name && <OnboardingProfileCard key="0" collective={values.user} />

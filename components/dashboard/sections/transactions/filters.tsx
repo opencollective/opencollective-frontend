@@ -5,11 +5,7 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { boolean, integer, isMulti, limit, offset } from '../../../../lib/filters/schemas';
-import type {
-  Currency,
-  PaymentMethodType,
-  TransactionsTableQueryVariables,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency, TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nHasDebt } from '../../../../lib/i18n/has-debt';
@@ -22,6 +18,7 @@ import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { dateToVariables } from '../../filters/DateFilter/schema';
+import type { PaymentMethodFilterMeta } from '../../filters/PaymentMethodFilter';
 import { paymentMethodFilter } from '../../filters/PaymentMethodFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
@@ -69,11 +66,9 @@ export const schema = z.object({
 
 type FilterValues = z.infer<typeof schema>;
 
-export type FilterMeta = {
+export type FilterMeta = PaymentMethodFilterMeta & {
   currency?: Currency;
-  paymentMethodTypes?: PaymentMethodType[];
   kinds?: TransactionKind[];
-  manualPaymentProviders?: Array<{ id: string; name: string }>;
 };
 
 // Only needed when values and key of filters are different
