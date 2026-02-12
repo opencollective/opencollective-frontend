@@ -5,9 +5,8 @@ import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash';
 import { Eraser } from 'lucide-react';
-import { useRouter } from 'next/router';
 import type { MouseEventHandler } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
 import { setRestAuthorizationCookie } from '../../lib/auth';
@@ -33,15 +32,19 @@ import type {
   TransactionsPageQueryVariables,
   TransactionsTableQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
+import { ExportRequestType } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { cn, parseToBoolean } from '../../lib/utils';
+import useExportRequest from '@/lib/hooks/useExportRequest';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { InfoTooltipIcon } from '../InfoTooltipIcon';
+import Link from '../Link';
+import Spinner from '../Spinner';
 import Tabs from '../Tabs';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
@@ -50,7 +53,6 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
-import { ToastAction } from '../ui/Toast';
 import { useToast } from '../ui/useToast';
 
 type MakeUrlParams = {
@@ -236,22 +238,75 @@ const DownloadLink = ({ url, disabled, children }: { url: string; disabled?: boo
     </a>
   );
 
+const GenerateExportButton = ({ params, account }) => {
+  const { toast } = useToast();
+  const { create, isCreating, data, isLoading, isGenerating } = useExportRequest({
+    onSuccess: () => {
+      toast({
+        variant: 'success',
+        message: 'Your export request is ready!',
+      });
+    },
+  });
+  const { name, ...parameters } = params;
+
+  const handleRequest = React.useCallback(async () => {
+    const variables = {
+      exportRequest: {
+        account: { slug: account?.slug },
+        name,
+        type: ExportRequestType.TRANSACTIONS,
+        parameters,
+      },
+    };
+
+    try {
+      await create({
+        variables,
+      });
+      toast({
+        variant: 'success',
+        message:
+          'Your export is being generated. You can check its progress in the Exports section or wait here until it finishes.',
+      });
+    } catch {
+      toast({
+        variant: 'error',
+        message: 'Failed to create export request. Please try again.',
+      });
+    }
+  }, [account, create, name, parameters, toast]);
+
+  return data?.exportRequest?.status === 'COMPLETED' ? (
+    <Button variant="success" asChild>
+      <Link href={data.exportRequest.file.url} target="_blank">
+        <FormattedMessage id="DownloadExport" defaultMessage="Download Export" />
+      </Link>
+    </Button>
+  ) : (
+    <Button
+      loading={isCreating || isLoading}
+      onClick={handleRequest}
+      disabled={isGenerating}
+      className="whitespace-nowrap"
+    >
+      {isGenerating ? (
+        <React.Fragment>
+          <Spinner size="xs" className="mr-2" />
+          <FormattedMessage id="GeneratingExport" defaultMessage="Generating Export..." />
+        </React.Fragment>
+      ) : (
+        <FormattedMessage id="GenerateExport" defaultMessage="Generate Export" />
+      )}
+    </Button>
+  );
+};
+
 const editAccountSettingsMutation = gql`
   mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
       settings
-    }
-  }
-`;
-
-const createExportRequestMutation = gql`
-  mutation CreateExportRequest($exportRequest: ExportRequestCreateInput!) {
-    createExportRequest(exportRequest: $exportRequest) {
-      id
-      name
-      type
-      status
     }
   }
 `;
@@ -275,9 +330,6 @@ const ExportTransactionsCSVModal = ({
   isHostReport,
   canCreatePreset = true,
 }: ExportTransactionsCSVModalProps) => {
-  const intl = useIntl();
-  const { toast } = useToast();
-  const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const hasAsyncExportsFeature = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
@@ -308,68 +360,6 @@ const ExportTransactionsCSVModal = ({
 
   const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] =
     useMutation(editAccountSettingsMutation);
-
-  const [createExportRequest] = useMutation(createExportRequestMutation);
-
-  const handleGenerateExport = React.useCallback(
-    async ({
-      fields,
-      flattenTaxesAndPaymentProcessorFees,
-      isHostReport,
-      queryFilterVariables,
-      useFieldNames,
-      fetchAll,
-    }: {
-      fields: string[];
-      flattenTaxesAndPaymentProcessorFees: boolean;
-      isHostReport: boolean;
-      queryFilterVariables: Partial<TransactionsTableQueryVariables>;
-      useFieldNames: boolean;
-      fetchAll: boolean;
-    }) => {
-      try {
-        await createExportRequest({
-          variables: {
-            exportRequest: {
-              account: { slug: account?.slug },
-              name: exportName,
-              type: 'TRANSACTIONS',
-              parameters: {
-                variables: omit(queryFilterVariables, ['limit', 'offset']),
-                fields,
-                useFieldNames,
-                isHostReport,
-                flattenTaxesAndPaymentProcessorFees,
-                fetchAll,
-              },
-            },
-          },
-        });
-        toast({
-          variant: 'success',
-          message: intl.formatMessage({
-            defaultMessage: 'Your export is being generated. You can check its progress in the Exports section.',
-            id: 'ExportRequest.Created',
-          }),
-          action: (
-            <ToastAction altText="View Exports" onClick={() => router.push(`/dashboard/${account?.slug}/exports`)}>
-              <FormattedMessage defaultMessage="View Exports" id="ExportRequest.ViewExports" />
-            </ToastAction>
-          ),
-        });
-        setOpen?.(false);
-      } catch {
-        toast({
-          variant: 'error',
-          message: intl.formatMessage({
-            defaultMessage: 'Failed to create export request. Please try again.',
-            id: 'ExportRequest.Error',
-          }),
-        });
-      }
-    },
-    [account?.slug, createExportRequest, intl, setOpen, toast, exportName, router],
-  );
 
   const customFields = React.useMemo(
     () =>
@@ -872,22 +862,18 @@ const ExportTransactionsCSVModal = ({
                 </DownloadLink>
               </Button>
               {hasAsyncExportsFeature ? (
-                <Button
-                  disabled={disabled}
-                  onClick={() =>
-                    handleGenerateExport({
-                      fields,
-                      flattenTaxesAndPaymentProcessorFees,
-                      isHostReport,
-                      queryFilterVariables: queryFilter.variables,
-                      useFieldNames,
-                      fetchAll: true,
-                    })
-                  }
-                  className="whitespace-nowrap"
-                >
-                  <FormattedMessage id="GenerateExport" defaultMessage="Generate Export" />
-                </Button>
+                <GenerateExportButton
+                  account={account}
+                  params={{
+                    name: exportName,
+                    variables: omit(queryFilter.variables, ['limit', 'offset']),
+                    fields,
+                    useFieldNames,
+                    isHostReport,
+                    flattenTaxesAndPaymentProcessorFees,
+                    fetchAll: true,
+                  }}
+                />
               ) : (
                 <Button disabled={disabled} className="whitespace-nowrap">
                   <DownloadLink url={`${downloadUrl}&fetchAll=1`} disabled={disabled}>
