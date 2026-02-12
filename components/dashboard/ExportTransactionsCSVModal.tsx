@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { use } from 'chai';
 import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash';
 import { Eraser } from 'lucide-react';
 import type { MouseEventHandler } from 'react';
@@ -240,14 +241,14 @@ const DownloadLink = ({ url, disabled, children }: { url: string; disabled?: boo
 
 const GenerateExportButton = ({ params, account }) => {
   const { toast } = useToast();
-  const { create, isCreating, data, isLoading, isGenerating } = useExportRequest({
-    onSuccess: () => {
-      toast({
-        variant: 'success',
-        message: 'Your export request is ready!',
-      });
-    },
-  });
+  const onSuccess = useCallback(() => {
+    toast({
+      variant: 'success',
+      message: 'Your export request is ready!',
+    });
+  }, [toast]);
+
+  const { create, isCreating, data, isLoading, isGenerating } = useExportRequest({ onSuccess });
   const { name, ...parameters } = params;
 
   const handleRequest = React.useCallback(async () => {
@@ -277,7 +278,7 @@ const GenerateExportButton = ({ params, account }) => {
     }
   }, [account, create, name, parameters, toast]);
 
-  return data?.exportRequest?.status === 'COMPLETED' ? (
+  return data?.exportRequest?.status === 'COMPLETED' && data?.exportRequest?.file?.url ? (
     <Button variant="success" asChild>
       <Link href={data.exportRequest.file.url} target="_blank">
         <FormattedMessage id="DownloadExport" defaultMessage="Download Export" />
