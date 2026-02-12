@@ -259,7 +259,7 @@ type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsQueryVariables>;
-  account?: Pick<Account, 'slug' | 'settings'>;
+  account?: Pick<Account, 'slug' | 'settings' | 'name'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
   canCreatePreset?: boolean;
@@ -282,6 +282,7 @@ const ExportTransactionsCSVModal = ({
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
+  const [exportName, setExportName] = React.useState(`${account?.name || account?.slug}'s transactions export`);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
   const [useFieldNames, setUseFieldNames] = React.useState(false);
@@ -325,7 +326,6 @@ const ExportTransactionsCSVModal = ({
       useFieldNames: boolean;
       fetchAll: boolean;
     }) => {
-      const exportName = `${LoggedInUser.collective.name}'s export: ${new Date().toLocaleString()}`;
       try {
         await createExportRequest({
           variables: {
@@ -367,7 +367,7 @@ const ExportTransactionsCSVModal = ({
         });
       }
     },
-    [account?.slug, createExportRequest, intl, setOpen, toast],
+    [account?.slug, createExportRequest, intl, setOpen, toast, exportName, router],
   );
 
   const customFields = React.useMemo(
@@ -761,6 +761,14 @@ const ExportTransactionsCSVModal = ({
                 )}
               </div>
             </div>
+            {hasAsyncExportsFeature && (
+              <div className="flex flex-col gap-2">
+                <h1 className="font-bold">
+                  <FormattedMessage defaultMessage="Export name" id="ExportName" />
+                </h1>
+                <Input value={exportName} onChange={e => setExportName(e.target.value)} name="exportName" />
+              </div>
+            )}
             <div className="flex flex-col gap-2">
               <h1 className="font-bold">
                 <FormattedMessage defaultMessage="Export options" id="b7Sq18" />
