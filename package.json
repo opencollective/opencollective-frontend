@@ -43,7 +43,7 @@
     "@radix-ui/react-tooltip": "1.2.8",
     "@sentry/browser": "^7.84.0",
     "@sentry/nextjs": "^7.120.4",
-    "@simplewebauthn/browser": "11.0.0",
+    "@simplewebauthn/browser": "13.2.2",
     "lib-address": "0.7.0",
     "@stripe/react-stripe-js": "3.9.2",
     "@stripe/stripe-js": "2.4.0",
