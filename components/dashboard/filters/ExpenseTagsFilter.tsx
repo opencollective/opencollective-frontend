@@ -9,7 +9,7 @@ import { gql } from '../../../lib/graphql/helpers';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
-const UNTAGGED_VALUE = 'untagged';
+export const UNTAGGED_VALUE = '__UNTAGGED';
 
 const untaggedLabel = defineMessage({ defaultMessage: 'Untagged', id: 'Tags.Untagged' });
 
