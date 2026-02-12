@@ -46,7 +46,7 @@ function useExportRequest({
   pollInterval?: number;
   onSuccess?: (exportRequest: UseExportRequestQuery['exportRequest']) => void;
 } = {}) {
-  const [create, { data: created, loading: isCreating, called }] = useMutation<
+  const [create, { data: created, loading: isCreating, called, error: createError }] = useMutation<
     UseExportRequestCreateMutation,
     UseExportRequestCreateMutationVariables
   >(createExportRequestMutation);
@@ -66,15 +66,20 @@ function useExportRequest({
   });
 
   React.useEffect(() => {
-    if (called && created && data?.exportRequest?.status !== 'COMPLETED') {
+    if (called && created && !createError && data?.exportRequest?.status !== 'COMPLETED') {
       setIsGenerating(true);
       startPolling(pollInterval);
-    } else if (data?.exportRequest?.status === 'COMPLETED') {
+    } else if (called && createError) {
       setIsGenerating(false);
       stopPolling();
-      onSuccess?.(data.exportRequest);
+    } else if (data && data.exportRequest) {
+      setIsGenerating(false);
+      stopPolling();
+      if (data.exportRequest?.status === 'COMPLETED') {
+        onSuccess?.(data.exportRequest);
+      }
     }
-  }, [called, created, pollInterval, startPolling, stopPolling, data, onSuccess]);
+  }, [called, created, createError, pollInterval, startPolling, stopPolling, data, onSuccess]);
 
   return { create, isCreating, data, isLoading, refetch, isGenerating };
 }
