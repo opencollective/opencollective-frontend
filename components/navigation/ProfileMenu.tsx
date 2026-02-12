@@ -1,6 +1,5 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { get } from 'lodash';
 import type { LucideIcon } from 'lucide-react';
 import {
   BookOpen,
@@ -252,7 +251,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
             className="rounded-full ring-black ring-offset-1 focus:ring-2 focus:outline-hidden"
             data-cy="user-menu-trigger"
           >
-            <Avatar collective={get(LoggedInUser, 'collective')} radius={32} />
+            <Avatar collective={LoggedInUser} radius={32} />
           </button>
         </PopoverTrigger>
         {!isMobile && (

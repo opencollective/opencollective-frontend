@@ -38,6 +38,95 @@ export const addCollectiveNavbarData = component => {
   return graphql(collectiveNavbarQuery)(component);
 };
 
+const loggedInUserWorkspaceFieldsFragment = gql /* GraphQL */ `
+  fragment LoggedInUserWorkspaceFields on Account {
+    id
+    legacyId
+    slug
+    type
+    name
+    imageUrl
+    currency
+    isHost
+    isIncognito
+    isArchived
+    settings
+    categories
+    policies {
+      id
+      REQUIRE_2FA_FOR_ADMINS
+    }
+    features {
+      id
+      VIRTUAL_CARDS
+      USE_PAYMENT_METHODS
+      EMIT_GIFT_CARDS
+      OFF_PLATFORM_TRANSACTIONS
+      TAX_FORMS
+      AGREEMENTS
+      KYC
+    }
+    supportedExpenseTypes
+    ... on AccountWithParent {
+      parent {
+        id
+        legacyId
+        slug
+        policies {
+          id
+          REQUIRE_2FA_FOR_ADMINS
+        }
+      }
+    }
+    ... on AccountWithHost {
+      isApproved
+      host {
+        id
+        slug
+        requiredLegalDocuments
+        settings
+      }
+    }
+    ... on AccountWithPlatformSubscription {
+      platformSubscription {
+        plan {
+          title
+        }
+      }
+    }
+    ... on Organization {
+      hasHosting
+      hasMoneyManagement
+    }
+    ... on Event {
+      endsAt
+    }
+    childrenAccounts {
+      nodes {
+        id
+        legacyId
+        slug
+        type
+        name
+        isActive
+        isArchived
+        imageUrl
+        ... on AccountWithHost {
+          host {
+            id
+          }
+        }
+      }
+    }
+    location {
+      id
+      address
+      country
+      structured
+    }
+  }
+`;
+
 /**
  * GraphQL v2 query to fetch the currently logged-in user (Individual account).
  * This replaces the v1 `loggedInUserQuery` that used the deprecated `LoggedInUser` root field.
@@ -77,25 +166,12 @@ export const loggedInUserQuery = gql /* GraphQL */ `
             legacyId
             slug
             type
-            isIncognito
             name
-            currency
             isHost
-            imageUrl
-            categories
-            isArchived
-            policies {
-              id
-              REQUIRE_2FA_FOR_ADMINS
-            }
             ... on AccountWithParent {
               parent {
                 id
-                legacyId
-                policies {
-                  id
-                  REQUIRE_2FA_FOR_ADMINS
-                }
+                slug
               }
             }
             ... on AccountWithHost {
@@ -106,38 +182,15 @@ export const loggedInUserQuery = gql /* GraphQL */ `
             ... on Organization {
               hasHosting
             }
-            ... on Event {
-              endsAt
-            }
-            settings
-            location {
-              id
-              address
-              country
-              structured
-            }
-            childrenAccounts {
-              nodes {
-                id
-                legacyId
-                slug
-                type
-                name
-                isActive
-                isArchived
-                imageUrl
-                ... on AccountWithHost {
-                  host {
-                    id
-                  }
-                }
-              }
-            }
           }
         }
       }
+      workspaces {
+        ...LoggedInUserWorkspaceFields
+      }
     }
   }
+  ${loggedInUserWorkspaceFieldsFragment}
 `;
 
 /**

@@ -40,13 +40,18 @@ import { DashboardContext } from './DashboardContext';
 import { getMenuItems } from './menu-items';
 
 export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
-  const { workspace } = useWorkspace();
-  const { account, selectedSection, subpath } = React.useContext(DashboardContext);
-  const activeSlug = workspace?.slug;
+  const { workspace: savedWorkspace } = useWorkspace();
+  const { account, workspace, selectedSection, subpath } = React.useContext(DashboardContext);
+  const activeSlug = savedWorkspace?.slug;
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const { setOpenMobile, isMobile } = useSidebar();
-  const menuItems = React.useMemo(() => getMenuItems({ intl, account, LoggedInUser }), [account, intl, LoggedInUser]);
+  // Use workspace data (available immediately) for menu items, with full account as enrichment
+  const effectiveAccount = account || workspace;
+  const menuItems = React.useMemo(
+    () => getMenuItems({ intl, account: effectiveAccount, LoggedInUser }),
+    [effectiveAccount, intl, LoggedInUser],
+  );
 
   const isSectionActive = (section: string) => {
     const sectionAndSubpath = subpath?.length > 0 ? `${selectedSection}/${subpath[0]}` : selectedSection;
@@ -95,7 +100,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                           <SidebarMenuItem key={item.section}>
                             <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
                               <Link
-                                href={getDashboardRoute(account, item.section)}
+                                href={getDashboardRoute(effectiveAccount, item.section)}
                                 data-cy={`menu-item-${item.section}`}
                                 shallow
                                 onClick={closeMobileMenu}
@@ -114,14 +119,14 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
-            {account?.type !== 'ROOT' && (
+            {effectiveAccount?.type !== 'ROOT' && effectiveAccount && (
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
                   tooltip={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
                 >
                   <SidebarLink
-                    href={getCollectivePageRoute(account)}
+                    href={getCollectivePageRoute(effectiveAccount)}
                     Icon={Globe2}
                     label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
                     data-cy="public-profile-link"
@@ -192,7 +197,8 @@ const SidebarLink = React.forwardRef<
 });
 
 function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
-  const { account } = React.useContext(DashboardContext);
+  const { account, workspace } = React.useContext(DashboardContext);
+  const effectiveAccount = account || workspace;
   const { isMobile, state } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
@@ -235,7 +241,7 @@ function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
                     asChild
                     className={cx(isSectionActive(subItem.section) && 'font-medium text-sidebar-accent-foreground')}
                   >
-                    <Link href={getDashboardRoute(account, subItem.section)} shallow onClick={onNavigate}>
+                    <Link href={getDashboardRoute(effectiveAccount, subItem.section)} shallow onClick={onNavigate}>
                       {subItem.label}
                     </Link>
                   </DropdownMenuItem>
@@ -252,7 +258,7 @@ function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
               <SidebarMenuSubItem key={subItem.section}>
                 <SidebarMenuSubButton asChild isActive={isSectionActive(subItem.section)}>
                   <Link
-                    href={getDashboardRoute(account, subItem.section)}
+                    href={getDashboardRoute(effectiveAccount, subItem.section)}
                     shallow
                     data-cy={`menu-item-${subItem.section}`}
                     onClick={onNavigate}

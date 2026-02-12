@@ -1,11 +1,12 @@
 import React from 'react';
-import { groupBy, isEmpty, uniqBy } from 'lodash';
+import { groupBy, isEmpty } from 'lodash';
 import { LayoutDashboard, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import type LoggedInUser from '../../lib/LoggedInUser';
+import type { WorkspaceAccount } from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
 import Avatar from '../Avatar';
 import Collapse from '../Collapse';
@@ -67,17 +68,17 @@ const CollectiveListItem = styled.div`
   }
 `;
 
-interface MembershipLineProps {
+interface WorkspaceLineProps {
   user?: LoggedInUser;
   closeDrawer?(...args: unknown[]): unknown;
-  membership?: LoggedInUser['memberOf'][number];
+  workspace: WorkspaceAccount;
 }
 
-const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) => {
+const WorkspaceLine = ({ user, workspace, closeDrawer }: WorkspaceLineProps) => {
   return (
     <CollectiveListItem className="group h-9">
-      <MenuLink href={`/${membership.account.slug}`} onClick={closeDrawer}>
-        <Avatar collective={membership.account} radius={16} />
+      <MenuLink href={`/${workspace.slug}`} onClick={closeDrawer}>
+        <Avatar collective={workspace} radius={16} />
         <P
           fontSize="inherit"
           fontWeight="inherit"
@@ -86,17 +87,17 @@ const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) 
           letterSpacing={0}
           truncateOverflow
         >
-          {membership.account.name}
+          {workspace.name}
         </P>
       </MenuLink>
 
-      {Boolean(user?.canSeeAdminPanel(membership.account)) && (
+      {Boolean(user?.canSeeAdminPanel(workspace)) && (
         <div className="absolute top-1 right-1 bottom-1">
           <Tooltip>
             <TooltipTrigger>
               <Link
                 className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all group-hover:opacity-100 hover:border-white hover:bg-slate-900 hover:text-white"
-                href={getDashboardRoute(membership.account)}
+                href={getDashboardRoute(workspace)}
                 onClick={closeDrawer}
               >
                 <LayoutDashboard size="14px" strokeWidth={1.5} />
@@ -112,46 +113,41 @@ const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) 
   );
 };
 
-const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
-  if (!memberships?.length) {
+const sortWorkspaces = (workspaces: WorkspaceAccount[]) => {
+  if (!workspaces?.length) {
     return [];
-  } else {
-    return memberships.sort((a, b) => {
-      return a.account.slug.localeCompare(b.account.slug);
-    });
   }
+  return [...workspaces].sort((a, b) => a.slug.localeCompare(b.slug));
 };
 
-const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
-  const archivedMemberships = memberships.filter(m => Boolean(m.account.isArchived));
-  return uniqBy(archivedMemberships, m => m.account.id);
-};
-
-const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
-  const filteredMemberships = memberships.filter(m => {
-    if (!['ADMIN', 'ACCOUNTANT', 'HOST', 'COMMUNITY_MANAGER'].includes(m.role) || m.account.isArchived) {
+/** Filter workspaces to active, non-event/project accounts (workspaces resolver already filters by role) */
+const filterActiveWorkspaces = (workspaces: WorkspaceAccount[]) => {
+  return workspaces.filter(w => {
+    if (w.isArchived) {
       return false;
-    } else if (['EVENT', 'PROJECT'].includes(m.account.type)) {
-      return false;
-    } else {
-      return Boolean(m.account);
     }
+    if (['EVENT', 'PROJECT', 'USER', 'INDIVIDUAL'].includes(w.type)) {
+      return false;
+    }
+    return true;
   });
-
-  return uniqBy(filteredMemberships, m => m.account.id);
 };
 
-interface MembershipsListProps {
+const filterArchivedWorkspaces = (workspaces: WorkspaceAccount[]) => {
+  return workspaces.filter(w => w.isArchived && !['EVENT', 'PROJECT', 'USER', 'INDIVIDUAL'].includes(w.type));
+};
+
+interface WorkspacesListProps {
   user?: LoggedInUser;
-  memberships?: LoggedInUser['memberOf'];
+  workspaces?: WorkspaceAccount[];
   closeDrawer?(...args: unknown[]): unknown;
 }
 
-const MembershipsList = ({ user, memberships, closeDrawer }: MembershipsListProps) => {
+const WorkspacesList = ({ user, workspaces, closeDrawer }: WorkspacesListProps) => {
   return (
     <Box as="ul" p={0} my={2}>
-      {sortMemberships(memberships).map(member => (
-        <MembershipLine key={member.id} membership={member} user={user} closeDrawer={closeDrawer} />
+      {sortWorkspaces(workspaces).map(ws => (
+        <WorkspaceLine key={ws.id} workspace={ws} user={user} closeDrawer={closeDrawer} />
       ))}
     </Box>
   );
@@ -237,12 +233,15 @@ type ProfileMenuMembershipsProps = {
 
 const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsProps) => {
   const intl = useIntl();
-  const memberships = filterMemberships(user.memberOf);
-  const archivedMemberships = filterArchivedMemberships(user.memberOf);
-  const groupedMemberships = groupBy(memberships, m => m.account.type);
-  groupedMemberships.ARCHIVED = archivedMemberships;
+  const workspaces = user.workspaces || [];
+  const activeWorkspaces = filterActiveWorkspaces(workspaces);
+  const archivedWorkspaces = filterArchivedWorkspaces(workspaces);
+  const groupedWorkspaces: Record<string, WorkspaceAccount[]> = {
+    ...groupBy(activeWorkspaces, w => w.type),
+    ARCHIVED: archivedWorkspaces,
+  };
   const shouldDisplaySection = section => {
-    return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
+    return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedWorkspaces[section]);
   };
 
   return (
@@ -250,8 +249,8 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
       {Object.keys(MENU_SECTIONS)
         .filter(shouldDisplaySection)
         .map((accountType, i) => {
-          const memberships = groupedMemberships[accountType];
-          const sectionIsEmpty = isEmpty(memberships);
+          const sectionWorkspaces = groupedWorkspaces[accountType];
+          const sectionIsEmpty = isEmpty(sectionWorkspaces);
           const sectionData = MENU_SECTIONS[accountType];
           return (
             <React.Fragment key={accountType}>
@@ -298,10 +297,10 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
                       />
                     }
                   >
-                    <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
+                    <WorkspacesList workspaces={sectionWorkspaces} user={user} closeDrawer={closeDrawer} />
                   </Collapse>
                 ) : (
-                  <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
+                  <WorkspacesList workspaces={sectionWorkspaces} user={user} closeDrawer={closeDrawer} />
                 )}
               </AccountList>
             </React.Fragment>

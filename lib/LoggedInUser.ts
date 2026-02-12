@@ -24,6 +24,34 @@ export type CollectiveParam = {
   policies?: Record<string, unknown>;
 };
 
+/** A workspace account returned by the individual.workspaces resolver, enriched with dashboard-relevant fields */
+export type WorkspaceAccount = {
+  id: string;
+  legacyId: number;
+  slug: string;
+  type: string;
+  name: string;
+  imageUrl: string;
+  currency?: string;
+  isHost?: boolean;
+  isIncognito?: boolean;
+  isArchived?: boolean;
+  settings?: Record<string, any>;
+  categories?: string[];
+  policies?: Record<string, any>;
+  features?: Record<string, string>;
+  supportedExpenseTypes?: string[];
+  parent?: { id: string; legacyId?: number; slug?: string; policies?: Record<string, any> };
+  host?: { id: string; slug?: string; requiredLegalDocuments?: string[]; settings?: Record<string, any> };
+  isApproved?: boolean;
+  platformSubscription?: { plan?: { title?: string } };
+  hasHosting?: boolean;
+  hasMoneyManagement?: boolean;
+  endsAt?: string;
+  childrenAccounts?: { nodes: Array<Record<string, any>> };
+  location?: { id?: string; address?: string; country?: string; structured?: any };
+};
+
 /**
  * Represent the current logged in user. Includes methods to check permissions.
  * Accepts the v2 `loggedInAccount` (Individual) response directly.
@@ -51,7 +79,8 @@ class LoggedInUser {
   public categories: string[];
   public location: { id?: string; address?: string; country?: string; structured?: any };
 
-  // memberOf with v2 shape (account instead of collective, flat array extracted from nodes)
+  // Slim memberOf with v2 shape -- only fields needed for role map + remaining non-dashboard consumers.
+  // Dashboard-related fields (features, policies, childrenAccounts, etc.) come from workspaces instead.
   public memberOf: Array<{
     id: string;
     role: ReverseCompatibleMemberRole;
@@ -61,22 +90,15 @@ class LoggedInUser {
       slug: string;
       type: string;
       name: string;
-      imageUrl: string;
-      isIncognito?: boolean;
       isHost?: boolean;
-      isArchived?: boolean;
       hasHosting?: boolean;
-      currency?: string;
-      settings?: Record<string, any>;
-      categories?: string[];
-      policies?: Record<string, any>;
-      parent?: { id: string; legacyId?: number; policies?: Record<string, any> };
+      parent?: { id: string; slug?: string };
       host?: { id: string };
-      endsAt?: string;
-      childrenAccounts?: { nodes: Array<Record<string, any>> };
-      location?: { id?: string; address?: string; country?: string; structured?: any };
     };
   }>;
+
+  // Workspace accounts from individual.workspaces resolver (pre-filtered to admin/accountant/community_manager roles, includes self)
+  public workspaces: WorkspaceAccount[];
 
   constructor(data) {
     // The v2 response has memberOf as { nodes: [...] }. Flatten it before assigning.
@@ -95,6 +117,19 @@ class LoggedInUser {
         return roles;
       }, {});
     }
+  }
+
+  /**
+   * Look up a workspace account by slug. Returns the enriched workspace data
+   * available immediately from loggedInUserQuery, without needing adminPanelQuery.
+   */
+  getWorkspace(slug: string): WorkspaceAccount | null {
+    // "childrenAccounts are paginated (limit 100 by default)"
+    const allWorkspaces = (this.workspaces ?? []).flatMap(w => [
+      w,
+      ...((w.childrenAccounts?.nodes ?? []) as WorkspaceAccount[]),
+    ]);
+    return allWorkspaces.find(ws => ws.slug === slug) ?? null;
   }
 
   /**
@@ -254,13 +289,17 @@ class LoggedInUser {
   /**
    * List all the hosts this user belongs to and is admin of
    */
-  hostsUserIsAdminOf() {
+  hostsUserIsAdminOf(): WorkspaceAccount[] {
+    if (this.workspaces) {
+      return this.workspaces.filter(w => w.isHost && this.hasRole(MemberRole.ADMIN, w));
+    }
+    // Fallback to memberOf if workspaces not available
     const accounts = this.memberOf
       .filter(m => m.account?.isHost)
       .filter(m => this.hasRole(MemberRole.ADMIN, m.account))
       .map(m => m.account);
 
-    return uniqBy(accounts, 'id');
+    return uniqBy(accounts, 'id') as WorkspaceAccount[];
   }
 
   isHostAdmin(collective: CollectiveParam) {

@@ -247,25 +247,38 @@ const DashboardPage = () => {
   const router = useRouter();
   const { slug, section, subpath } = parseQuery(router.query);
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
-  const { workspace, setWorkspace } = useWorkspace();
+  const { workspace: savedWorkspace, setWorkspace } = useWorkspace();
   const isRootUser = LoggedInUser?.isRoot;
-  const defaultSlug = workspace.slug || LoggedInUser?.slug;
+  const defaultSlug = savedWorkspace.slug || LoggedInUser?.slug;
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
-  const { data, loading, error } = useQuery(adminPanelQuery, {
+  // Workspace data from LoggedInUser -- available immediately, no extra query needed
+  const workspaceAccount = LoggedInUser?.getWorkspace(activeSlug) ?? null;
+
+  // adminPanelQuery still fires for badge counts, notifications, and enrichment data
+  const {
+    data,
+    loading: accountLoading,
+    error,
+  } = useQuery(adminPanelQuery, {
     variables: { slug: activeSlug },
     skip: !activeSlug || !LoggedInUser || isRootProfile,
   });
-  const account = isRootProfile && isRootUser ? ROOT_PROFILE_ACCOUNT : data?.account;
+  const fullAccount = isRootProfile && isRootUser ? ROOT_PROFILE_ACCOUNT : data?.account;
+
+  // Use full account when available, fall back to workspace data (available immediately from LoggedInUser).
+  // This means `account` in context is never null after LoggedInUser loads, so section components
+  // render immediately. Missing fields (badge counts, etc.) are simply undefined until adminPanelQuery completes.
+  const account = fullAccount || workspaceAccount;
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
     if (activeSlug) {
       if (LoggedInUser) {
-        const membership = LoggedInUser.memberOf.find(val => val.account.slug === activeSlug);
-        setWorkspace({ slug: activeSlug, isHost: membership?.account.isHost });
+        const ws = LoggedInUser.getWorkspace(activeSlug);
+        setWorkspace({ slug: activeSlug, isHost: ws?.isHost });
       }
     }
     // If there is no slug set (that means /dashboard)
@@ -291,14 +304,16 @@ const DashboardPage = () => {
     }
   }, [account]);
 
-  const notification = getNotification(intl, account);
+  const notification = getNotification(intl, fullAccount);
   const [expandedSection, setExpandedSection] = React.useState(null);
-  const isLoading = loading || loadingLoggedInUser;
+
+  // Only wait for LoggedInUser to load, not for adminPanelQuery
+  const isLoading = loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const accountIdentifier = account && (account.name || `@${account.slug}`);
 
-  if (!loading && !account && error) {
+  if (!accountLoading && !fullAccount && error) {
     return <ErrorPage error={error} />;
   }
 
@@ -310,6 +325,8 @@ const DashboardPage = () => {
         expandedSection,
         setExpandedSection,
         account,
+        accountLoading,
+        workspace: workspaceAccount,
         activeSlug,
         defaultSlug,
         setDefaultSlug: slug => setWorkspace({ slug }),
