@@ -118,6 +118,7 @@ function ComboSelectFilter({
   creatable,
   searchFunc,
   valueRenderer,
+  onInputChange,
 }: {
   value: SelectValue;
   isMulti?: boolean;
@@ -130,6 +131,7 @@ function ComboSelectFilter({
   creatable?: boolean;
   searchFunc?: (term?: string) => void;
   valueRenderer?: ({ value }: { value: SelectValue }) => React.ReactNode;
+  onInputChange?: (value: string) => void;
 }) {
   const intl = useIntl();
   const [input, setInput] = React.useState('');
@@ -159,7 +161,10 @@ function ComboSelectFilter({
         autoFocus
         loading={loading}
         value={input}
-        onValueChange={setInput}
+        onValueChange={v => {
+          setInput(v);
+          onInputChange?.(v);
+        }}
         data-cy="combo-select-input"
         {...(!hasFilterOrSearch && {
           customIcon: PlusIcon,

@@ -24,7 +24,6 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { expenseTypeFilter } from '../../filters/ExpenseTypeFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
@@ -75,7 +74,6 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, ['type', 'chargeHasReceipts']),
   account: hostedAccountFilter.filter,
-  tag: expenseTagFilter.filter,
   fromAccounts: {
     ...commonFilters.fromAccounts,
     labelMsg: defineMessage({ defaultMessage: 'Beneficiary', id: 'VfJsl4' }),
@@ -119,13 +117,6 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
           nodes {
             id
             ...AccountHoverCardFields
-          }
-        }
-
-        expenseTags: expenseTagStats(host: { slug: $hostSlug }) {
-          nodes {
-            id
-            tag
           }
         }
       }

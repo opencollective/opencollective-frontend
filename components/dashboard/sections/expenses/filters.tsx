@@ -75,7 +75,7 @@ export const toVariables: FiltersToVariables<
   date: dateFilter.toVariables,
   amount: amountFilter.toVariables,
   payout: value => ({ payoutMethodType: value }),
-  tag: value => ({ tags: value.includes('untagged') ? null : value }),
+  tag: expenseTagFilter.toVariables,
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
   payoutMethodId: id => ({ payoutMethod: { id } }),
   type: expenseTypeFilter.toVariables,
@@ -105,6 +105,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     ),
     valueRenderer: ({ value, intl }) => i18nPayoutMethodType(intl, value),
   },
+  tag: expenseTagFilter.filter,
   chargeHasReceipts: {
     labelMsg: defineMessage({ id: 'expenses.chargeHasReceiptsFilter', defaultMessage: 'Virtual Card Charge Receipts' }),
     Component: ({ valueRenderer, intl, ...props }) => (

@@ -19,7 +19,6 @@ import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseStatusFilter } from '../../filters/ExpenseStatusFilter';
-import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { expenseTypeFilter } from '../../filters/ExpenseTypeFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { AccountRenderer } from '../../filters/HostedAccountFilter';
@@ -68,7 +67,6 @@ const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, 
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, ['type', 'status', 'chargeHasReceipts']),
-  tag: expenseTagFilter.filter,
   account: {
     labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: ({ meta, ...props }) => {

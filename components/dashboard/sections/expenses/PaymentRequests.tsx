@@ -26,7 +26,6 @@ import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
-import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { AccountRenderer } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
@@ -73,7 +72,6 @@ const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, 
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
-  tag: expenseTagFilter.filter,
   account: {
     labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: ({ meta, ...props }) => {

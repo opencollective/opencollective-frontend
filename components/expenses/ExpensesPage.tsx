@@ -11,7 +11,6 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { accountNavbarFieldsFragment } from '@/components/collective-navbar/fragments';
-import { expenseTagFilter } from '@/components/dashboard/filters/ExpenseTagsFilter';
 import { Pagination } from '@/components/dashboard/filters/Pagination';
 import type { FilterMeta as CommonFilterMeta } from '@/components/dashboard/sections/expenses/filters';
 import {
@@ -180,7 +179,6 @@ export const schema = commonSchema.extend({ direction: expenseDirectionFilter.sc
 type FilterValues = z.infer<typeof schema>;
 
 type FilterMeta = CommonFilterMeta & {
-  expenseTags?: string[];
   includeUncategorized?: boolean;
   accountSlug: string;
 };
@@ -194,7 +192,6 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   direction: expenseDirectionFilter.filter,
   ...omit(commonFilters, ['searchTerm', 'status']),
   status: { ...commonFilters.status, static: false } as typeof commonFilters.status,
-  tag: expenseTagFilter.filter,
 };
 
 type ExpensesProps = {

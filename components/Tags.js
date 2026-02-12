@@ -6,7 +6,7 @@ import { styled } from 'styled-components';
 import { i18nGraphqlException } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
 
-import { expenseTagsQuery } from './dashboard/filters/ExpenseTagsFilter';
+import { expenseTagsQuery, UNTAGGED_VALUE } from './dashboard/filters/ExpenseTagsFilter';
 import { useToast } from './ui/useToast';
 import EditTags, { AutocompleteEditTags } from './EditTags';
 import { Flex } from './Grid';
@@ -100,7 +100,7 @@ const Tags = ({
             {tagList.slice(0, limit).map(tag => renderTag({ tag }))}
             {showUntagged &&
               renderTag({
-                tag: 'untagged',
+                tag: UNTAGGED_VALUE,
                 label: intl.formatMessage(defineMessage({ defaultMessage: 'Untagged', id: '8/OT+O' })),
               })}
 
