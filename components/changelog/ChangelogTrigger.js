@@ -5,17 +5,17 @@ import { cloneDeep } from 'lodash';
 import { Megaphone } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V1_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { changelogTriggerLoggedInUserQuery } from '../../lib/graphql/v1/queries';
+import { gql } from '../../lib/graphql/helpers';
+import { changelogTriggerLoggedInUserQuery } from '../../lib/graphql/queries';
 
 import { WebsiteName } from '../I18nFormatters';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
-  const { data } = useQuery(changelogTriggerLoggedInUserQuery, { fetchPolicy: 'cache-only', context: API_V1_CONTEXT });
-  const LoggedInUser = data?.LoggedInUser;
-  const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
+  const { data } = useQuery(changelogTriggerLoggedInUserQuery, { fetchPolicy: 'cache-only' });
+  const loggedInAccount = data?.loggedInAccount;
+  const hasSeenNewUpdates = loggedInAccount?.hasSeenLatestChangelogEntry;
 
   const handleShowNewUpdates = () => {
     setShowNewsAndUpdates(true);
@@ -23,13 +23,13 @@ const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
       variables: { changelogViewDate: new Date() },
       update: store => {
         const data = cloneDeep(store.readQuery({ query: changelogTriggerLoggedInUserQuery }));
-        data.LoggedInUser.hasSeenLatestChangelogEntry = true;
+        data.loggedInAccount.hasSeenLatestChangelogEntry = true;
         store.writeQuery({ query: changelogTriggerLoggedInUserQuery, data });
       },
     });
   };
 
-  if (!LoggedInUser) {
+  if (!loggedInAccount) {
     return null;
   }
 

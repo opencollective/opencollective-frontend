@@ -112,7 +112,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
   const { data } = useQuery(memberInvitationsCountQuery, {
-    variables: { memberAccount: { slug: LoggedInUser?.collective?.slug } },
+    variables: { memberAccount: { slug: LoggedInUser?.slug } },
     skip: !LoggedInUser,
 
     // We ignore errors here because the logout action can trigger refetch before LoggedInUser is set to null and we don't really care if this query fails
@@ -140,21 +140,21 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
         <div className="flex flex-col sm:w-[228px]">
           <div className="flex flex-col gap-1 py-2">
             <div className="flex items-center gap-2 px-2 py-1">
-              <Avatar collective={LoggedInUser.collective} radius={32} />
+              <Avatar collective={LoggedInUser} radius={32} />
               <div className="truncate">
-                <div className="truncate text-sm font-medium">{LoggedInUser.collective.name}</div>
+                <div className="truncate text-sm font-medium">{LoggedInUser.name}</div>
                 <div className="truncate text-xs text-muted-foreground">{LoggedInUser.email}</div>
               </div>
             </div>
             <Separator className="my-1" />
             <MenuItem
               Icon={User}
-              href={`/${LoggedInUser.collective.slug}`}
+              href={`/${LoggedInUser.slug}`}
               label={intl.formatMessage({ id: 'menu.profile', defaultMessage: 'Profile' })}
             />
             <MenuItem
               Icon={LayoutDashboard}
-              href={`/dashboard/${LoggedInUser.collective.slug}`}
+              href={`/dashboard/${LoggedInUser.slug}`}
               label={intl.formatMessage({
                 id: 'Dashboard',
                 defaultMessage: 'Dashboard',
@@ -192,7 +192,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
             )}
             <MenuItem
               Icon={Settings}
-              href={`/dashboard/${LoggedInUser.collective.slug}/info`}
+              href={`/dashboard/${LoggedInUser.slug}/info`}
               label={intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' })}
             />
             <Separator className="my-1" />

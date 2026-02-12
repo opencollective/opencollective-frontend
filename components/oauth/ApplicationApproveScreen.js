@@ -252,7 +252,7 @@ export const ApplicationApproveScreen = ({
                 />
               </P>
               <Flex alignItems="center">
-                <Avatar collective={LoggedInUser.collective} size={32} />
+                <Avatar collective={LoggedInUser} size={32} />
                 <P fontSize="16px" color="black.700" ml={3}>
                   <FormattedMessage
                     defaultMessage="Verify your identity on {service}"
@@ -262,8 +262,8 @@ export const ApplicationApproveScreen = ({
                   <br />
                   <p className="mt-1 text-sm">
                     <strong>
-                      {LoggedInUser.collective.name || LoggedInUser.collective.legalName} (@
-                      {LoggedInUser.collective.slug})
+                      {LoggedInUser.name || LoggedInUser.legalName} (@
+                      {LoggedInUser.slug})
                     </strong>
                     {'. '}
                     <FormattedMessage

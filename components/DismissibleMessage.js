@@ -74,7 +74,7 @@ const DismissibleMessage = ({
     fetchPolicy: 'network-only',
   });
 
-  const loggedInAccount = data?.loggedInAccount || LoggedInUser?.collective;
+  const loggedInAccount = data?.loggedInAccount || LoggedInUser;
   // Hide it if SSR or still loading user
   if (typeof window === 'undefined' || loading || loadingLoggedInUser) {
     return null;

@@ -198,7 +198,7 @@ class CreateExpensePage extends React.Component {
   buildFormPersister() {
     const { LoggedInUser, data } = this.props;
     if (data.account && LoggedInUser) {
-      return new FormPersister(`expense-${data.account.id}=${LoggedInUser.id}`);
+      return new FormPersister(`expense-${data.account.id}=${LoggedInUser.legacyId}`);
     }
   }
 

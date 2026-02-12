@@ -108,7 +108,7 @@ class UpdatePaymentPage extends React.Component {
         const paymentMethod = stripeTokenToPaymentMethod(token);
         const res = await this.props.replaceCreditCard({
           variables: {
-            collectiveId: this.props.LoggedInUser.collective.id,
+            collectiveId: this.props.LoggedInUser.legacyId,
             ...paymentMethod,
             id: parseInt(this.props.paymentMethodId),
           },
@@ -195,7 +195,7 @@ class UpdatePaymentPage extends React.Component {
 
     const orders = data.PaymentMethod?.orders || [];
     const hasForm = Boolean(showCreditCardForm && data.PaymentMethod && orders.length);
-    const contributingAccount = orders[0]?.fromCollective || LoggedInUser.collective;
+    const contributingAccount = orders[0]?.fromCollective || LoggedInUser.toV1Collective();
     return (
       <div className="UpdatedPaymentMethodPage">
         <Page>

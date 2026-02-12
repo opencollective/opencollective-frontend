@@ -8,8 +8,7 @@ import { injectIntl } from 'react-intl';
 
 import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
-import { API_V1_CONTEXT } from '../lib/graphql/helpers';
-import { loggedInUserQuery } from '../lib/graphql/v1/queries';
+import { loggedInUserQuery } from '../lib/graphql/queries';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
@@ -88,7 +87,7 @@ class UserProvider extends React.Component {
       await this.props.client.reFetchObservableQueries();
     } else {
       // Send any request to API to clear rootRedirectDashboard cookie
-      await this.props.client.query({ query: loggedInUserQuery, context: API_V1_CONTEXT, fetchPolicy: 'network-only' });
+      await this.props.client.query({ query: loggedInUserQuery, fetchPolicy: 'network-only' });
     }
 
     if (redirect) {
@@ -154,7 +153,7 @@ class UserProvider extends React.Component {
             if (result.type === 'recovery_code') {
               this.props.router.replace({
                 pathname: '/dashboard/[slug]/user-security',
-                query: { slug: LoggedInUser.collective.slug },
+                query: { slug: LoggedInUser.slug },
               });
             } else {
               this.setState({

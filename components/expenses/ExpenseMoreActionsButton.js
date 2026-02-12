@@ -94,7 +94,7 @@ export const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
   return (
     [ExpenseType.INVOICE, ExpenseType.RECEIPT].includes(expense.type) &&
     expense.status !== ExpenseStatus.DRAFT &&
-    (LoggedInUser.CollectiveId === expense.createdByAccount?.legacyId ||
+    (LoggedInUser.legacyId === expense.createdByAccount?.legacyId ||
       LoggedInUser.isAdminOfCollective(expense.account) ||
       LoggedInUser.isAdminOfCollective(expense.payee) ||
       LoggedInUser.isAdminOfCollective(expense.host))
@@ -196,7 +196,7 @@ const ExpenseMoreActionsButton = ({
                 buttonStyle="dangerSecondary"
                 data-cy="spam-button"
                 onClick={async () => {
-                  const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.CollectiveId;
+                  const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.legacyId;
 
                   if (isSubmitter) {
                     toast({
