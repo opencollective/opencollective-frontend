@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { ArrowRight, Check, ChevronDown, ChevronUp, ListCheck, LockKeyhole, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -322,16 +322,8 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
 
     fetchPolicy: 'cache-and-network',
   });
-  const { LoggedInUser } = useLoggedInUser();
   // Undefined here means the initial state, after that we can set to null or a specific category ID
   const [expandedCategory, setExpandedCategory] = useState<null | string>(null);
-
-  useEffect(() => {
-    if (LoggedInUser && open === undefined && data?.account) {
-      const showGuide = LoggedInUser?.shouldDisplaySetupGuide(data.account);
-      setOpen(showGuide !== false ? true : false);
-    }
-  }, [data?.account, open, setOpen, LoggedInUser]);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -391,16 +383,8 @@ export const WelcomeCollective = ({ account: _account, setOpen, open }) => {
 
     fetchPolicy: 'cache-and-network',
   });
-  const { LoggedInUser } = useLoggedInUser();
   // Undefined here means the initial state, after that we can set to null or a specific category ID
   const [expandedCategory, setExpandedCategory] = useState<null | string>(null);
-
-  useEffect(() => {
-    if (LoggedInUser && open === undefined && data?.account) {
-      const showGuide = LoggedInUser?.shouldDisplaySetupGuide(data.account);
-      setOpen(showGuide !== false ? true : false);
-    }
-  }, [data?.account, open, setOpen, LoggedInUser]);
 
   if (_account?.parent) {
     return null;
