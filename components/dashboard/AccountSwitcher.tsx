@@ -68,7 +68,7 @@ const getGroupedWorkspaces = memoizeOne((workspaces: WorkspaceAccount[]): Record
 
   // Group by type, excluding individual (USER/INDIVIDUAL) accounts which are shown separately
   const grouped = groupBy(
-    activeAccounts.filter(a => a.type !== 'USER' && a.type !== 'INDIVIDUAL'),
+    activeAccounts.filter(a => a.type !== 'INDIVIDUAL'),
     a => a.type,
   );
   const groupedAccounts: Record<string, WorkspaceAccount[]> = {
@@ -77,7 +77,7 @@ const getGroupedWorkspaces = memoizeOne((workspaces: WorkspaceAccount[]): Record
     ...grouped,
   };
   if (archivedAccounts?.length > 0) {
-    groupedAccounts['ARCHIVED'] = archivedAccounts.filter(a => a.type !== 'USER' && a.type !== 'INDIVIDUAL');
+    groupedAccounts['ARCHIVED'] = archivedAccounts.filter(a => a.type !== 'INDIVIDUAL');
   }
   return groupedAccounts;
 });
@@ -213,10 +213,10 @@ const MenuEntry = ({
 const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
-
+  console.log({ LoggedInUser });
   const [open, setOpen] = React.useState(false);
   const personalWorkspace = LoggedInUser?.workspaces?.find(
-    w => w.type === 'INDIVIDUAL' || w.type === 'USER' || w.slug === LoggedInUser.slug,
+    w => w.type === 'INDIVIDUAL' || w.slug === LoggedInUser.slug,
   );
   const groupedAccounts = getGroupedWorkspaces(LoggedInUser?.workspaces);
   const activeAccount = LoggedInUser?.getWorkspace(activeSlug) || personalWorkspace;

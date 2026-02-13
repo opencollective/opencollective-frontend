@@ -1,13 +1,15 @@
 import React, { Fragment } from 'react';
-import { PropTypes } from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
+import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
+import type { WrappedComponentProps } from 'react-intl';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
 import { signin } from '../lib/api';
+import type { WhitelabelProvider } from '../lib/constants/whitelabel-providers';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
@@ -21,6 +23,7 @@ import Loading from './Loading';
 import SignIn from './SignIn';
 import StyledHr from './StyledHr';
 import { Span } from './Text';
+import type { UserContextValue } from './UserProvider';
 import { withUser } from './UserProvider';
 
 const SignInFooterLink = styled(Link)`
@@ -39,60 +42,74 @@ export const SignInOverlayBackground = styled(Container)`
   box-shadow: 0px 9px 14px 1px #dedede;
 `;
 
+type SignInOrJoinFreeForm = 'signin' | 'create-account';
+
+/** Props that callers pass to SignInOrJoinFree */
+export type SignInOrJoinFreeProps = {
+  redirect?: string;
+  defaultEmail?: string;
+  email?: string | null;
+  form?: SignInOrJoinFreeForm;
+  defaultForm?: SignInOrJoinFreeForm;
+  routes?: { signin: string; join: string };
+  signInLabel?: React.ReactNode;
+  hideFooter?: boolean;
+  isOAuth?: boolean;
+  showSubHeading?: boolean;
+  showOCLogo?: boolean;
+  autoFocus?: boolean;
+  noSignInTitle?: boolean;
+  whitelabelProvider?: WhitelabelProvider;
+  disableSignup?: boolean;
+  oAuthApplication?: {
+    name?: string;
+    account?: { imageUrl?: string };
+  };
+};
+
+/** Props injected by graphql(signupMutation, { name: 'createUser' }) */
+type SignupMutationProps = {
+  createUser: (args: {
+    variables: {
+      user: Record<string, unknown>;
+      organization?: Record<string, unknown> | null;
+      redirect?: string;
+      websiteUrl?: string;
+      captcha?: unknown;
+    };
+  }) => Promise<unknown>;
+};
+
+/** Full internal props: own props + all HOC-injected props */
+type InternalProps = SignInOrJoinFreeProps &
+  Pick<UserContextValue, 'login'> &
+  WrappedComponentProps & { router: NextRouter } & SignupMutationProps;
+
+type SignInOrJoinFreeState = {
+  form: SignInOrJoinFreeForm;
+  error: string | null;
+  submitting: boolean;
+  unknownEmailError: boolean;
+  email: string;
+  emailAlreadyExists: boolean;
+  isOAuth?: boolean;
+  oAuthAppName?: string;
+  oAuthAppImage?: string;
+  password?: string;
+  passwordRequired?: boolean;
+  name?: string;
+  newsletterOptIn?: boolean;
+  tosOptIn?: boolean;
+};
+
+type SigninError = Error & { json?: { errorCode?: string; message?: string }; message?: string };
+
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
  * also has the API methods binded, so you can use it directly.
  */
-class SignInOrJoinFree extends React.Component {
-  static propTypes = {
-    /** Redirect URL */
-    redirect: PropTypes.string,
-    /** To pre-fill the "email" field */
-    defaultEmail: PropTypes.string,
-    /** Provide this to automatically sign in the given email */
-    email: PropTypes.string,
-    /** createUserQuery binding */
-    createUser: PropTypes.func,
-    /** Whether user can signup from there */
-    disableSignup: PropTypes.bool,
-    /** Use this prop to use this as a controlled component */
-    form: PropTypes.oneOf(['signin', 'create-account']),
-    /** Set the initial view for the component */
-    defaultForm: PropTypes.oneOf(['signin', 'create-account']),
-    /** If provided, component will use links instead of buttons to make the switch */
-    routes: PropTypes.shape({
-      signin: PropTypes.string,
-      join: PropTypes.string,
-    }),
-    /** Label for signIn, defaults to "Continue with your email" */
-    signInLabel: PropTypes.node,
-    intl: PropTypes.object,
-    router: PropTypes.object,
-    hideFooter: PropTypes.bool,
-    isOAuth: PropTypes.bool,
-    showSubHeading: PropTypes.bool,
-    showOCLogo: PropTypes.bool,
-    oAuthApplication: PropTypes.shape({
-      name: PropTypes.string,
-      account: PropTypes.shape({
-        imageUrl: PropTypes.string,
-      }),
-    }),
-    /* From UserProvider / withUser */
-    login: PropTypes.func,
-    /** whether the input needs to be auto-focused */
-    autoFocus: PropTypes.bool,
-    /** whether to update the page title when the sign in form is active */
-    noSignInTitle: PropTypes.bool,
-    whitelabelProvider: PropTypes.shape({
-      name: PropTypes.string,
-      squareLogo: PropTypes.shape({
-        url: PropTypes.string,
-      }),
-    }),
-  };
-
-  constructor(props) {
+class SignInOrJoinFree extends React.Component<InternalProps, SignInOrJoinFreeState> {
+  constructor(props: InternalProps) {
     super(props);
     this.state = {
       form: this.props.defaultForm || 'signin',
@@ -107,15 +124,16 @@ class SignInOrJoinFree extends React.Component {
     };
   }
 
-  componentDidMount() {
-    // Auto signin if an email is provided
+  override componentDidMount() {
     if (this.props.email && isEmail(this.props.email)) {
       this.signIn(this.props.email);
     }
   }
 
-  switchForm = (form, oAuthDetails = {}) => {
-    // Update local state
+  switchForm = (
+    form: SignInOrJoinFreeForm,
+    oAuthDetails: { isOAuth?: boolean; oAuthAppName?: string; oAuthAppImage?: string } = {},
+  ) => {
     this.setState({
       form,
       isOAuth: oAuthDetails.isOAuth,
@@ -124,7 +142,7 @@ class SignInOrJoinFree extends React.Component {
     });
   };
 
-  getRedirectURL() {
+  getRedirectURL(): string {
     let currentPath = window.location.pathname;
     if (window.location.search) {
       currentPath = currentPath + window.location.search;
@@ -136,12 +154,17 @@ class SignInOrJoinFree extends React.Component {
     return encodeURIComponent(redirectUrl || currentPath || '/');
   }
 
-  signIn = async (email, password = null, { sendLink = false, resetPassword = false } = {}) => {
+  signIn = async (
+    email: string,
+    password: string | null = null,
+    options: { sendLink?: boolean; resetPassword?: boolean } = {},
+  ) => {
     if (this.state.submitting) {
       return false;
     }
 
     this.setState({ submitting: true, error: null });
+    const { sendLink = false, resetPassword = false } = options;
 
     try {
       const redirect = this.getRedirectURL();
@@ -154,9 +177,7 @@ class SignInOrJoinFree extends React.Component {
         createProfile: false,
       });
 
-      // test*@opencollective.com.
       if (response.redirect) {
-        // Use browser redirection to guarantee page, login, and router state are all updated.
         window.location.href = response.redirect;
       } else if (response.token) {
         const user = await this.props.login(response.token);
@@ -178,11 +199,12 @@ class SignInOrJoinFree extends React.Component {
       }
       window.scrollTo(0, 0);
     } catch (e) {
-      if (e.json?.errorCode === 'EMAIL_DOES_NOT_EXIST') {
+      const err = e as SigninError;
+      if (err.json?.errorCode === 'EMAIL_DOES_NOT_EXIST') {
         this.setState({ unknownEmailError: true, submitting: false });
-      } else if (e.json?.errorCode === 'PASSWORD_REQUIRED') {
+      } else if (err.json?.errorCode === 'PASSWORD_REQUIRED') {
         this.setState({ passwordRequired: true, submitting: false });
-      } else if (e.json?.errorCode === 'EMAIL_AWAITING_VERIFICATION') {
+      } else if (err.json?.errorCode === 'EMAIL_AWAITING_VERIFICATION') {
         toast({
           variant: 'error',
           message: (
@@ -195,25 +217,26 @@ class SignInOrJoinFree extends React.Component {
         setTimeout(() => {
           this.props.router.push({ pathname: '/signup', query: { email } });
         }, 1000);
-      } else if (e.message?.includes('Two-factor authentication is enabled')) {
+      } else if (err.message?.includes('Two-factor authentication is enabled')) {
         this.setState({ submitting: false });
       } else {
         toast({
           variant: 'error',
-          message: e.json?.message || e.message || 'Server error',
+          message: err.json?.message || err.message || 'Server error',
         });
         this.setState({ submitting: false });
       }
     }
   };
 
-  createProfile = async data => {
+  createProfile = async (data: Record<string, unknown>) => {
     if (this.state.submitting) {
       return false;
     }
     const user = pick(data, ['email', 'name', 'legalName', 'newsletterOptIn']);
     const organizationData = pick(data, ['orgName', 'orgLegalName', 'githubHandle', 'twitterHandle', 'website']);
-    const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
+    const organization =
+      Object.keys(organizationData).length > 0 ? (organizationData as Record<string, unknown>) : null;
     if (organization) {
       organization.name = organization.orgName;
       organization.legalName = organization.orgLegalName;
@@ -226,34 +249,37 @@ class SignInOrJoinFree extends React.Component {
     try {
       await this.props.createUser({
         variables: {
-          user,
+          user: user as Record<string, unknown>,
           organization,
           redirect: this.getRedirectURL(),
           websiteUrl: getWebsiteUrl(),
           captcha: data.captcha,
         },
       });
-      await this.props.router.push({ pathname: '/signin/sent', query: { email: user.email } });
+      await this.props.router.push({
+        pathname: '/signin/sent',
+        query: { email: String(user.email) },
+      });
       window.scrollTo(0, 0);
     } catch (error) {
-      const emailAlreadyExists = get(error, 'graphQLErrors.0.extensions.code') === 'EMAIL_ALREADY_EXISTS';
+      const emailAlreadyExists =
+        get(error as Record<string, unknown>, 'graphQLErrors.0.extensions.code') === 'EMAIL_ALREADY_EXISTS';
       if (!emailAlreadyExists) {
         toast({
           variant: 'error',
-          message: i18nGraphqlException(this.props.intl, error),
+          message: i18nGraphqlException(this.props.intl, error as Error),
         });
       }
       this.setState({ submitting: false, emailAlreadyExists });
     }
   };
 
-  render() {
+  override render() {
     const { submitting, error, unknownEmailError, passwordRequired, email, password } = this.state;
     const displayedForm = this.props.form || this.state.form;
-    const routes = this.props.routes || {};
+    const routes: { signin?: string; join?: string } = this.props.routes || {};
     const whitelabelProvider = this.props.whitelabelProvider;
 
-    // No need to show the form if an email is provided
     const hasError = Boolean(unknownEmailError || error);
     if (this.props.email && !hasError) {
       return <Loading />;
@@ -277,7 +303,7 @@ class SignInOrJoinFree extends React.Component {
                     oAuthAppImage: this.props.oAuthApplication?.account?.imageUrl,
                   }))
               }
-              onSubmit={options => this.signIn(email, password, options)}
+              onSubmit={options => this.signIn(email, password ?? null, options)}
               loading={submitting}
               unknownEmail={unknownEmailError}
               passwordRequired={passwordRequired}
@@ -304,7 +330,9 @@ class SignInOrJoinFree extends React.Component {
                     onEmailChange={email =>
                       this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })
                     }
-                    onFieldChange={(name, value) => this.setState({ [name]: value })}
+                    onFieldChange={(name, value) =>
+                      this.setState(prev => ({ ...prev, [name]: value }) as SignInOrJoinFreeState)
+                    }
                     onSubmit={this.createProfile}
                     onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                     submitting={submitting}
@@ -374,6 +402,15 @@ const signupMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const addSignupMutation = graphql(signupMutation, { name: 'createUser', options: { context: API_V1_CONTEXT } });
+const addSignupMutation = graphql(signupMutation, {
+  name: 'createUser',
+  options: { context: API_V1_CONTEXT },
+});
 
-export default withUser(injectIntl(addSignupMutation(withRouter(SignInOrJoinFree))));
+// HOC chain: assertions needed because withRouter/graphql/injectIntl/withUser typings don't preserve our props
+const SignInOrJoinFreeWrapped = withUser(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  injectIntl(addSignupMutation(withRouter(SignInOrJoinFree as any)) as any) as any,
+) as React.ComponentType<SignInOrJoinFreeProps>;
+
+export default SignInOrJoinFreeWrapped;

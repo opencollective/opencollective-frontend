@@ -4,9 +4,8 @@ import { get } from 'lodash';
 
 import { DISMISSABLE_HELP_MESSAGE_KEY } from '../lib/constants/dismissable-help-message';
 import { gql } from '../lib/graphql/helpers';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getFromLocalStorage, setLocalStorage } from '../lib/local-storage';
-
-import { withUser } from './UserProvider';
 
 const accountSettingsQuery = gql`
   query AccountSettings {
@@ -26,18 +25,18 @@ const dismissMessageMutation = gql`
   }
 `;
 
-const getSettingsKeys = (messageId, accountId) => {
+const getSettingsKeys = (messageId: string, accountId?: number | string) => {
   return {
     globalKey: `${DISMISSABLE_HELP_MESSAGE_KEY}.${messageId}`,
     scopedKey: !accountId ? undefined : `${DISMISSABLE_HELP_MESSAGE_KEY}.${messageId}.account_${accountId}`,
   };
 };
 
-const getIsDismissedLocally = ({ globalKey, scopedKey }) => {
-  return getFromLocalStorage(globalKey) || getFromLocalStorage(scopedKey);
+const getIsDismissedLocally = ({ globalKey, scopedKey }: { globalKey: string; scopedKey?: string }) => {
+  return getFromLocalStorage(globalKey) || (scopedKey && getFromLocalStorage(scopedKey));
 };
 
-const getIsDismissedInSettings = (settings, globalKey, scopedKey) => {
+const getIsDismissedInSettings = (settings: Record<string, unknown>, globalKey: string, scopedKey?: string) => {
   const globalSetting = get(settings, globalKey);
 
   if (!globalSetting) {
@@ -50,6 +49,15 @@ const getIsDismissedInSettings = (settings, globalKey, scopedKey) => {
   return get(settings, scopedKey, false);
 };
 
+type DismissibleMessageProps = {
+  children: (args: { dismiss: () => void }) => React.ReactNode;
+  messageId: string;
+  /** If set, the key for this message will be scoped to this specific account, meaning the message will only be dismissed for this account */
+  accountId?: number | string;
+  dismissedComponent?: React.ReactNode;
+  displayForLoggedOutUser?: boolean;
+};
+
 /**
  * A message that can be dismissed by the user. Saves a flag into user settings to make
  * sure it won't be displayed again in the future.
@@ -60,14 +68,14 @@ const DismissibleMessage = ({
   children,
   dismissedComponent,
   displayForLoggedOutUser,
-  loadingLoggedInUser,
-  LoggedInUser,
   messageId,
-  /** If set, the key for this message will be scoped to this specific account, meaning the message will only be dismissed for this account */
   accountId,
-}) => {
+}: DismissibleMessageProps) => {
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const settingsKeys = getSettingsKeys(messageId, accountId);
-  const [isDismissedLocally, setDismissedLocally] = React.useState(() => getIsDismissedLocally(settingsKeys));
+  const [isDismissedLocally, setDismissedLocally] = React.useState<boolean>(() =>
+    Boolean(getIsDismissedLocally(settingsKeys)),
+  );
   const [dismissMessage] = useMutation(dismissMessageMutation);
   const { data, loading } = useQuery(accountSettingsQuery, {
     skip: !LoggedInUser,
@@ -102,4 +110,4 @@ const DismissibleMessage = ({
   });
 };
 
-export default withUser(DismissibleMessage);
+export default DismissibleMessage;

@@ -54,11 +54,7 @@ const shouldDisplayConvertedAccountMessage = (activity: AccountConversionsQuery[
   return false;
 };
 
-export function ConvertedAccountMessage({
-  account,
-}: {
-  account: { slug: string; legacyId: number; host: Pick<Host, 'id'> };
-}) {
+export function ConvertedAccountMessage({ account }: { account: { slug: string; legacyId: number } }) {
   const { data: conversionData } = useQuery<AccountConversionsQuery, AccountConversionsQueryVariables>(
     accountConversionsQuery,
     {

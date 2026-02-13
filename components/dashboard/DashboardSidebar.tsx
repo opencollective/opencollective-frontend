@@ -41,18 +41,19 @@ import { getMenuItems } from './menu-items';
 
 export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
   const { workspace: savedWorkspace } = useWorkspace();
-  const { account, workspace, selectedSection, subpath } = React.useContext(DashboardContext);
+  const { account, selectedSection, subpath, isRootDashboard } = React.useContext(DashboardContext);
   const activeSlug = savedWorkspace?.slug;
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const { setOpenMobile, isMobile } = useSidebar();
   // Use workspace data (available immediately) for menu items, with full account as enrichment
-  const effectiveAccount = account || workspace;
   const menuItems = React.useMemo(
-    () => getMenuItems({ intl, account: effectiveAccount, LoggedInUser }),
-    [effectiveAccount, intl, LoggedInUser],
+    () => getMenuItems({ intl, account, LoggedInUser, isRootDashboard }),
+    [account, intl, LoggedInUser, isRootDashboard],
   );
+  const effectiveAccount = isRootDashboard ? { slug: 'root-actions', type: 'ROOT' } : account;
 
+  console.log({ menuItems, isRootDashboard });
   const isSectionActive = (section: string) => {
     const sectionAndSubpath = subpath?.length > 0 ? `${selectedSection}/${subpath[0]}` : selectedSection;
 
@@ -197,8 +198,9 @@ const SidebarLink = React.forwardRef<
 });
 
 function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
-  const { account, workspace } = React.useContext(DashboardContext);
-  const effectiveAccount = account || workspace;
+  const { account, isRootDashboard } = React.useContext(DashboardContext);
+  const effectiveAccount = isRootDashboard ? { slug: 'root-actions', type: 'ROOT' } : account;
+
   const { isMobile, state } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));

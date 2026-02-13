@@ -16,6 +16,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
@@ -89,9 +90,10 @@ const hostTransactionsMetaDataQuery = gql`
   ${AccountingCategorySelectFieldsFragment}
 `;
 
-const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSectionProps) => {
+const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const intl = useIntl();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
+  const { account } = React.useContext(DashboardContext);
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
     variables: { slug: hostSlug },
 

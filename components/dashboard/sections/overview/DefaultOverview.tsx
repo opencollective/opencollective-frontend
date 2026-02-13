@@ -9,6 +9,7 @@ import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { hasAccountMoneyManagement } from '@/lib/collective';
+import { isChildAccount, isOrganization } from '@/lib/LoggedInUser';
 
 import DismissibleMessage from '../../../DismissibleMessage';
 import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
@@ -99,7 +100,7 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
               includeBalance: true,
               includeSpent: true,
               includeBalanceTimeseries: true,
-              includeContributionsCount: account.isActive,
+              includeContributionsCount: workspace.isActive,
               includeReceivedTimeseries: true,
             };
         }
@@ -119,7 +120,7 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
     variables: {
       slug: accountSlug,
       ...queryFilter.variables,
-      ...(account.parent && { includeChildren: false }),
+      ...('parent' in account && account.parent && { includeChildren: false }),
     },
     fetchPolicy: 'cache-and-network',
   });
@@ -264,7 +265,7 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
         }
       />
       <ConvertedAccountMessage account={account} />
-      {account.type === 'ORGANIZATION' ? (
+      {isOrganization(account) ? (
         <React.Fragment>
           {hasAccountMoneyManagement(account) && account.platformSubscription && <PlatformBillingCollapsibleCard />}
           <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
@@ -300,7 +301,7 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
             <Timeline accountSlug={router.query?.as ?? accountSlug} />
           </div>
         </div>
-        {!account.parent && account.isActive && (
+        {!isChildAccount(account) && account.isActive && (
           <div className="-order-1 space-y-6 lg:order-none">
             <Accounts accountSlug={router.query?.as ?? accountSlug} />
           </div>

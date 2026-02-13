@@ -38,6 +38,7 @@ import ErrorPage from '@/components/ErrorPage';
 import Header from '@/components/Header';
 import I18nFormatters from '@/components/I18nFormatters';
 import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
+import { WorkspaceAccount } from '@/lib/LoggedInUser';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -151,7 +152,7 @@ const getNotification = (intl, account) => {
  */
 const getProfileUrl = (
   loggedInUser: LoggedInUser,
-  contextAccount: DashboardQuery['account'],
+  contextAccount: WorkspaceAccount,
   account: { id: string; slug: string; type: string },
 ) => {
   if (!contextAccount) {
@@ -174,15 +175,17 @@ const getProfileUrl = (
   return null;
 };
 
-function getBlocker(LoggedInUser, account, section) {
+function getBlocker(LoggedInUser, account, section, isRootDashboard) {
+  if (isRootDashboard) {
+    return null;
+  }
+
   if (!LoggedInUser) {
     return <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />;
   } else if (!account) {
     return <FormattedMessage defaultMessage="This account doesn't exist" id="3ABdi3" />;
   } else if (account.isIncognito) {
     return <FormattedMessage defaultMessage="You cannot edit this collective" id="ZonfjV" />;
-  } else if (account.type === 'ROOT' && LoggedInUser.isRoot) {
-    return;
   }
 
   // Check permissions
@@ -251,26 +254,22 @@ const DashboardPage = () => {
   const isRootUser = LoggedInUser?.isRoot;
   const defaultSlug = savedWorkspace.slug || LoggedInUser?.slug;
   const activeSlug = slug || defaultSlug;
-  const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
+  const isRootDashboard = activeSlug === ROOT_PROFILE_KEY && LoggedInUser?.isRoot;
 
   // Workspace data from LoggedInUser -- available immediately, no extra query needed
   const workspaceAccount = LoggedInUser?.getWorkspace(activeSlug) ?? null;
 
   // adminPanelQuery still fires for badge counts, notifications, and enrichment data
-  const {
-    data,
-    loading: accountLoading,
-    error,
-  } = useQuery(adminPanelQuery, {
-    variables: { slug: activeSlug },
-    skip: !activeSlug || !LoggedInUser || isRootProfile,
-  });
-  const fullAccount = isRootProfile && isRootUser ? ROOT_PROFILE_ACCOUNT : data?.account;
+  // const {
+  //   data,
+  //   loading: accountLoading,
+  //   error,
+  // } = useQuery(adminPanelQuery, {
+  //   variables: { slug: activeSlug },
+  //   skip: !activeSlug || !LoggedInUser || isRootProfile,
+  // });
+  const account = workspaceAccount;
 
-  // Use full account when available, fall back to workspace data (available immediately from LoggedInUser).
-  // This means `account` in context is never null after LoggedInUser loads, so section components
-  // render immediately. Missing fields (badge counts, etc.) are simply undefined until adminPanelQuery completes.
-  const account = fullAccount || workspaceAccount;
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
 
   // Keep track of last visited workspace account and sections
@@ -299,23 +298,24 @@ const DashboardPage = () => {
 
   // Clear last visited workspace account if not admin
   React.useEffect(() => {
-    if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootProfile && isRootUser)) {
+    if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootDashboard && isRootUser)) {
       setWorkspace({ slug: undefined });
     }
   }, [account]);
 
-  const notification = getNotification(intl, fullAccount);
+  const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
 
   // Only wait for LoggedInUser to load, not for adminPanelQuery
   const isLoading = loadingLoggedInUser;
-  const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
+  const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection, isRootDashboard);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const accountIdentifier = account && (account.name || `@${account.slug}`);
 
-  if (!accountLoading && !fullAccount && error) {
-    return <ErrorPage error={error} />;
-  }
+  console.log({ isRootDashboard });
+  // if (!accountLoading && !account && error) {
+  //   return <ErrorPage error={error} />;
+  // }
 
   return (
     <DashboardContext.Provider
@@ -325,12 +325,12 @@ const DashboardPage = () => {
         expandedSection,
         setExpandedSection,
         account,
-        accountLoading,
         workspace: workspaceAccount,
         activeSlug,
         defaultSlug,
         setDefaultSlug: slug => setWorkspace({ slug }),
         getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
+        isRootDashboard,
       }}
     >
       <Header
@@ -370,12 +370,7 @@ const DashboardPage = () => {
                   <TwoFactorAuthRequiredMessage className="lg:mt-16" />
                 ) : (
                   <div className="max-w-(--breakpoint-xl) min-w-0 flex-1 2xl:max-w-(--breakpoint-2xl)">
-                    <DashboardSection
-                      section={selectedSection}
-                      isLoading={isLoading}
-                      account={account}
-                      subpath={subpath}
-                    />
+                    <DashboardSection section={selectedSection} isLoading={isLoading} subpath={subpath} />
                   </div>
                 )}
               </div>

@@ -86,6 +86,7 @@ import {
 import { DashboardContext } from './DashboardContext';
 import DashboardErrorBoundary from './DashboardErrorBoundary';
 import DashboardHeader from './DashboardHeader';
+import { WorkspaceAccount } from '@/lib/LoggedInUser';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
@@ -166,13 +167,11 @@ interface DashboardSectionProps {
   isLoading?: boolean;
   section?: string;
   subpath?: string[];
-  /** The account. Can be null if isLoading is true */
-  account?: DashboardQuery['account'];
 }
 
-const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSectionProps) => {
+const DashboardSection = ({ isLoading, section, subpath }: DashboardSectionProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  const { activeSlug } = useContext(DashboardContext);
+  const { activeSlug, account } = useContext(DashboardContext);
 
   const { formatMessage } = useIntl();
 
@@ -187,7 +186,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   }
 
   // Use activeSlug for accountSlug (available immediately), account may still be loading
-  const accountSlug = account?.slug || activeSlug;
+  const accountSlug = activeSlug;
 
   const RootComponent = ROOT_COMPONENTS[section];
   if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
@@ -205,7 +204,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
     return (
       <div className="h-full w-full">
         <DashboardErrorBoundary>
-          <DashboardComponent accountSlug={accountSlug} account={account} subpath={subpath} isDashboard />
+          <DashboardComponent accountSlug={accountSlug} subpath={subpath} isDashboard />
         </DashboardErrorBoundary>
       </div>
     );

@@ -6,11 +6,19 @@ import { Megaphone } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';
-import { changelogTriggerLoggedInUserQuery } from '../../lib/graphql/queries';
 
 import { WebsiteName } from '../I18nFormatters';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+
+const changelogTriggerLoggedInUserQuery = gql /* GraphQL */ `
+  query ChangelogTriggerLoggedInUser {
+    loggedInAccount {
+      id
+      hasSeenLatestChangelogEntry
+    }
+  }
+`;
 
 const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
   const { data } = useQuery(changelogTriggerLoggedInUserQuery, { fetchPolicy: 'cache-only' });

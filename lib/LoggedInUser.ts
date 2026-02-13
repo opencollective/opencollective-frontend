@@ -7,9 +7,11 @@ import {
   type Account,
   type AccountWithParent,
   type CommentFieldsFragment,
+  LoggedInUserWorkspaceFieldsFragment
   MemberRole,
   type Update,
 } from './graphql/types/v2/graphql';
+
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
 
@@ -25,32 +27,26 @@ export type CollectiveParam = {
 };
 
 /** A workspace account returned by the individual.workspaces resolver, enriched with dashboard-relevant fields */
-export type WorkspaceAccount = {
-  id: string;
-  legacyId: number;
-  slug: string;
-  type: string;
-  name: string;
-  imageUrl: string;
-  currency?: string;
-  isHost?: boolean;
-  isIncognito?: boolean;
-  isArchived?: boolean;
-  settings?: Record<string, any>;
-  categories?: string[];
-  policies?: Record<string, any>;
-  features?: Record<string, string>;
-  supportedExpenseTypes?: string[];
-  parent?: { id: string; legacyId?: number; slug?: string; policies?: Record<string, any> };
-  host?: { id: string; slug?: string; requiredLegalDocuments?: string[]; settings?: Record<string, any> };
-  isApproved?: boolean;
-  platformSubscription?: { plan?: { title?: string } };
-  hasHosting?: boolean;
-  hasMoneyManagement?: boolean;
-  endsAt?: string;
-  childrenAccounts?: { nodes: Array<Record<string, any>> };
-  location?: { id?: string; address?: string; country?: string; structured?: any };
-};
+export type WorkspaceAccount = LoggedInUserWorkspaceFieldsFragment;
+
+/** Narrows any account union to its Organization/Host members */
+export function isOrganization<T extends { type: AccountType }>(
+  account: T,
+): account is Extract<T, { __typename?: 'Organization' | 'Host' }> {
+  return account.type === 'ORGANIZATION';
+}
+
+/** Narrows any account union to its child account members (Event, Project — implement AccountWithParent) */
+export function isChildAccount<T extends { type: AccountType }>(
+  account: T,
+): account is Extract<T, { __typename?: 'Event' | 'Project' }> {
+  return account.type === 'EVENT' || account.type === 'PROJECT';
+}
+
+/** Convenience type aliases for narrowed workspace accounts */
+export type OrganizationWorkspaceAccount = Extract<WorkspaceAccount, { __typename?: 'Organization' | 'Host' }>;
+export type CollectiveWorkspaceAccount = Extract<WorkspaceAccount, { __typename?: 'Collective' }>;
+export type ChildWorkspaceAccount = Extract<WorkspaceAccount, { __typename?: 'Event' | 'Project' }>;
 
 /**
  * Represent the current logged in user. Includes methods to check permissions.
@@ -97,26 +93,33 @@ class LoggedInUser {
     };
   }>;
 
-  // Workspace accounts from individual.workspaces resolver (pre-filtered to admin/accountant/community_manager roles, includes self)
+  // Workspace accounts: derived from memberOf (when query uses memberOf with role filter) or from individual.workspaces resolver
   public workspaces: WorkspaceAccount[];
 
   constructor(data) {
-    // The v2 response has memberOf as { nodes: [...] }. Flatten it before assigning.
+    // Flatten memberOf (all roles, minimal fields) for role map and hasMemberOf
     if (data?.memberOf?.nodes) {
       data = { ...data, memberOf: data.memberOf.nodes };
     }
     Object.assign(this, data);
-    if (this.memberOf) {
-      // Build a map of roles like { [accountSlug]: [ADMIN, BACKER...] }
-      this.roles = this.memberOf.reduce((roles, member) => {
-        if (member.account) {
-          roles[member.account.slug] = roles[member.account.slug] || [];
-          roles[member.account.slug].push(member.role);
+    // Build roles from memberOf (any role)
+    this.roles = (this.memberOf ?? []).reduce(
+      (roles, member) => {
+        const account = member.account;
+        if (account?.slug) {
+          roles[account.slug] = roles[account.slug] || [];
+          roles[account.slug].push(member.role);
         }
-
         return roles;
-      }, {});
-    }
+      },
+      {} as Record<string, ReverseCompatibleMemberRole[]>,
+    );
+    // workspaces: memberOf(...) with role filter — flatten nodes to account list,
+    // including the logged-in user's own account (loggedInAccount also has ...LoggedInUserWorkspaceFields)
+    const workspaceNodes = data?.workspaces?.nodes ?? data?.workspaces ?? [];
+    const workspaceList = Array.isArray(workspaceNodes) ? workspaceNodes : [];
+    const workspaceAccounts = workspaceList.map(m => m.account).filter(Boolean);
+    this.workspaces = uniqBy([data, ...workspaceAccounts], 'slug') as WorkspaceAccount[];
   }
 
   /**
@@ -161,6 +164,11 @@ class LoggedInUser {
     } else if (Array.isArray(roles)) {
       return this.roles[collective.slug].some(role => roles.includes(role));
     }
+  }
+
+  /** True if the user has any role (e.g. BACKER, FOLLOWER) for the collective — used for expense submission when public submission is disabled. */
+  hasMemberOf(collective: { slug?: string } | null): boolean {
+    return Boolean(collective?.slug && this.roles[collective.slug]?.length > 0);
   }
 
   /**

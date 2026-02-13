@@ -18,6 +18,7 @@ import { Button } from '../../../ui/Button';
 import type { AccountFromTaxInformationQuery } from './queries';
 import { accountTaxInformationQuery } from './queries';
 import { TaxInformationFormDialog } from './TaxInformationFormDialog';
+import { DashboardContext } from '../../DashboardContext';
 
 /**
  * UI for the pending state of the tax form submission, with a button to fill the form.
@@ -121,7 +122,8 @@ const TaxFormSuccessView = () => {
 /**
  * A page for users to fill their info for W9/W8 tax forms.
  */
-export const TaxInformationSettingsSection = ({ account }) => {
+export const TaxInformationSettingsSection = () => {
+  const { account } = React.useContext(DashboardContext);
   const queryParams = { variables: { id: account.id } };
   const { data, error, loading, refetch } = useQuery<AccountTaxInformationQuery, AccountTaxInformationQueryVariables>(
     accountTaxInformationQuery,

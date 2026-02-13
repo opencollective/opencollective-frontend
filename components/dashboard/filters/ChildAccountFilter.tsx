@@ -7,6 +7,7 @@ import type { Account } from '../../../lib/graphql/types/v2/graphql';
 
 import ComboSelectFilter from './ComboSelectFilter';
 import { AccountRenderer } from './HostedAccountFilter';
+import { WorkspaceSubFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 const schema = z.string().nullable().default(null);
 
@@ -14,7 +15,10 @@ function ChildAccountFilter({
   meta,
   intl,
   ...props
-}: FilterComponentProps<z.infer<typeof schema>, { accountSlug: string; childrenAccounts?: Account[] }>) {
+}: FilterComponentProps<
+  z.infer<typeof schema>,
+  { accountSlug: string; childrenAccounts?: WorkspaceSubFieldsFragment[] }
+>) {
   const groupedOptions = React.useMemo(
     () => [
       {

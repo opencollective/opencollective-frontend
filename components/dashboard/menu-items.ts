@@ -26,6 +26,7 @@ import {
   UserX,
   Wallet,
 } from 'lucide-react';
+import type { IntlShape } from 'react-intl';
 
 import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
 import { hasAccountMoneyManagement, isIndividualAccount, isOrganizationAccount } from '../../lib/collective';
@@ -33,7 +34,9 @@ import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import { LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
+import type { WorkspaceAccount } from '@/lib/LoggedInUser';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 
@@ -106,7 +109,7 @@ const ROOT_MENU = [
 type MenuItem = PageMenuItem | GroupMenuItem;
 
 function shouldIncludeMenuItemWithLegacyFallback(
-  account: DashboardQuery['account'],
+  account: WorkspaceAccount,
   featureKey: (typeof FEATURES)[keyof typeof FEATURES],
   fallback: boolean,
 ) {
@@ -115,13 +118,22 @@ function shouldIncludeMenuItemWithLegacyFallback(
     : fallback;
 }
 
-export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+export const getMenuItems = ({
+  intl,
+  account,
+  LoggedInUser,
+  isRootDashboard,
+}: {
+  intl: IntlShape;
+  account: WorkspaceAccount;
+  LoggedInUser: LoggedInUser;
+  isRootDashboard: boolean;
+}): MenuItem[] => {
+  if (isRootDashboard) {
+    return ROOT_MENU;
+  }
   if (!account) {
     return null;
-  }
-  const isRootProfile = account.type === 'ROOT' && LoggedInUser?.isRoot;
-  if (isRootProfile) {
-    return ROOT_MENU;
   }
 
   const isIndividual = isIndividualAccount(account);
@@ -129,17 +141,18 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
   const hasMoneyManagement = hasAccountMoneyManagement(account);
-  const hasHosting = account.hasHosting;
+  const hasHosting = 'hasHosting' in account && account.hasHosting;
   const isSimpleIndividual = isIndividual && !hasHosting;
   const isSimpleOrganization = isOrganization && !hasMoneyManagement;
   const isHostedType = isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]);
 
   const hasPlatformBillingEnabled = Boolean(
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) || account.platformSubscription,
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) ||
+    ('platformSubscription' in account && account.platformSubscription),
   );
 
-  const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
-  const hasReceivedGrantRequests = account.receivedGrantRequests?.totalCount > 0;
+  const hasIssuedGrantRequests = true; // account.issuedGrantRequests?.totalCount > 0;
+  const hasReceivedGrantRequests = true; // account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
     hasReceivedGrantRequests ||
     (!isIndividual && !hasMoneyManagement && Boolean(account.supportedExpenseTypes?.includes?.(ExpenseType.GRANT)));
@@ -369,7 +382,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: shouldIncludeMenuItemWithLegacyFallback(
         account,
         FEATURES.TAX_FORMS,
-        hasMoneyManagement && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+        hasMoneyManagement &&
+          Boolean('host' in account && account.host?.requiredLegalDocuments?.includes(LegalDocumentType.US_TAX_FORM)),
       ),
     },
     {
@@ -489,7 +503,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       if:
         isHostedType &&
-        hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
+        hasFeature('host' in account && account.host, FEATURES.VIRTUAL_CARDS) &&
+        'isApproved' in account &&
         account.isApproved &&
         !isCommunityManagerOnly,
       section: ALL_SECTIONS.VIRTUAL_CARDS,
