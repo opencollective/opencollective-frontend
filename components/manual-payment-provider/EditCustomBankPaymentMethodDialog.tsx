@@ -166,9 +166,22 @@ export const EditCustomBankPaymentMethodDialog = ({
               </div>
 
               <div className="mt-6 border-t pt-6">
-                <Label className="mb-1 block text-sm font-bold">
-                  <FormattedMessage defaultMessage="Bank Account Details" id="yyMC04" />
-                </Label>
+                <div className="mb-1 flex items-center justify-between">
+                  <Label className="block text-sm font-bold">
+                    <FormattedMessage defaultMessage="Bank Account Details" id="yyMC04" />
+                  </Label>
+                  {Object.keys(values.accountDetails).length > 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      onClick={() => setFieldValue('accountDetails', {})}
+                      className="mb-2 h-auto py-1 text-xs"
+                    >
+                      <FormattedMessage defaultMessage="Reset" id="Reset" />
+                    </Button>
+                  )}
+                </div>
                 <p className="mb-4 text-xs text-gray-600">
                   <FormattedMessage
                     defaultMessage="Optional. Providing these details enables validation and allows you to use the <AccountVariable></AccountVariable> template variable in your instructions - a pre-formatted text with all the necessary bank details."
