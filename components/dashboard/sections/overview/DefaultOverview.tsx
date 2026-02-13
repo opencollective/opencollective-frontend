@@ -1,12 +1,11 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { FlaskConical, Settings, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { hasAccountMoneyManagement } from '@/lib/collective';
@@ -37,9 +36,10 @@ import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
 import { PlatformBillingCollapsibleCard } from './PlatformBillingOverviewCard';
-import { editAccountSettingMutation, overviewMetricsQuery } from './queries';
+import { overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { AccountTodoList } from './TodoList';
+import { useSetupGuide } from './useSetupGuide';
 import { WelcomeCollective, WelcomeOrganization } from './Welcome';
 
 export const schema = z.object({
@@ -51,27 +51,9 @@ export const schema = z.object({
 
 export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
   const { account } = React.useContext(DashboardContext);
-  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showFeedbackModal, setShowFeedbackModal] = React.useState(false);
-  const [showSetupGuide, setShowSetupGuide] = React.useState(undefined);
-  const [editAccountSetting] = useMutation(editAccountSettingMutation);
+  const [showSetupGuide, handleSetupGuideToggle] = useSetupGuide();
   const router = useRouter();
-
-  const handleSetupGuideToggle = React.useCallback(
-    async (open: boolean) => {
-      setShowSetupGuide(open);
-
-      await editAccountSetting({
-        variables: {
-          account: { legacyId: LoggedInUser.collective.id },
-          key: `showSetupGuide.id${account.legacyId}`,
-          value: open,
-        },
-      }).catch(() => {});
-      await refetchLoggedInUser();
-    },
-    [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
-  );
 
   const queryFilter = useQueryFilter({
     schema,
