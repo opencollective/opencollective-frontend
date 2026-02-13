@@ -239,6 +239,7 @@ const conversationsPageQuery = gql`
       ... on Collective {
         isApproved
       }
+      supportedExpenseTypes
       features {
         id
         ...NavbarFieldsV1
