@@ -18,6 +18,8 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ## Development
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=76222279)
+
 ### Prerequisite
 
 1. Make sure you have Node.js version 20.x and NPM version >=9.0.0.
