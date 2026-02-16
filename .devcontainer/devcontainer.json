@@ -4,7 +4,7 @@
   "features": {},
   "customizations": {
     "vscode": {
-      "extensions": ["prettier.prettier-vscode", "dbaeumer.vscode-eslint", "bradlc.vscode-tailwindcss"]
+      "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint", "bradlc.vscode-tailwindcss"]
     }
   },
   "forwardPorts": [3000],
