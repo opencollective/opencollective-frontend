@@ -1,0 +1,20 @@
+{
+  "name": "Open Collective Frontend",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": ["prettier.prettier-vscode", "dbaeumer.vscode-eslint", "bradlc.vscode-tailwindcss"]
+    }
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "npm install",
+  "postStartCommand": "npm run dev",
+  "remoteUser": "node"
+}
