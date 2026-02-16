@@ -117,6 +117,16 @@ export const adminPanelQuery = gql`
           legacyId
           requiredLegalDocuments
           hostFeePercent
+          manualPaymentProviders {
+            id
+            name
+          }
+        }
+      }
+      ... on Host {
+        manualPaymentProviders {
+          id
+          name
         }
       }
       ... on AccountWithParent {
@@ -146,6 +156,10 @@ export const adminPanelQuery = gql`
           slug
           name
           settings
+          manualPaymentProviders {
+            id
+            name
+          }
           policies {
             id
             EXPENSE_AUTHOR_CANNOT_APPROVE {

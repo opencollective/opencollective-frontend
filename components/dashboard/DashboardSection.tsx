@@ -44,6 +44,7 @@ import PayDisbursements from './sections/expenses/PayDisbursements';
 import PaymentRequests from './sections/expenses/PaymentRequests';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
+import Exports from './sections/exports';
 import { ApproveGrantRequests } from './sections/funds-and-grants/ApproveGrantRequests';
 import { Grants } from './sections/funds-and-grants/Grants';
 import { HostedFunds } from './sections/funds-and-grants/HostedFunds';
@@ -129,6 +130,10 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.SEARCH]: Search,
 };
 
+const LEGACY_SETTINGS_COMPONENTS = {
+  [LEGACY_SETTINGS_SECTIONS.EXPORTS]: Exports,
+};
+
 const SETTINGS_COMPONENTS = {
   [SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
   [SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
@@ -202,15 +207,13 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
     );
   }
 
-  if (values(LEGACY_SECTIONS).includes(section)) {
+  // Legacy settings component (new sections without AccountSettings)
+  const LegacySettingsComponent = LEGACY_SETTINGS_COMPONENTS[section];
+  if (LegacySettingsComponent) {
     return (
       <div className="w-full">
-        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
-          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
-        )}
-
         <DashboardErrorBoundary>
-          <AccountSettings account={account} section={section} />
+          <LegacySettingsComponent accountSlug={account.slug} subpath={subpath} />
         </DashboardErrorBoundary>
       </div>
     );
@@ -223,6 +226,20 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
       <div className="mx-auto w-full max-w-(--breakpoint-md)">
         <DashboardErrorBoundary>
           <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+        </DashboardErrorBoundary>
+      </div>
+    );
+  }
+
+  if (values(LEGACY_SECTIONS).includes(section)) {
+    return (
+      <div className="w-full">
+        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
+          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
+        )}
+
+        <DashboardErrorBoundary>
+          <AccountSettings account={account} section={section} />
         </DashboardErrorBoundary>
       </div>
     );

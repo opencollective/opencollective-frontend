@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FetchResult } from '@apollo/client';
-import { FormikProvider, useFormikContext } from 'formik';
+import { Field, FormikProvider, useFormikContext } from 'formik';
 import { isEmpty, pick } from 'lodash';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/router';
@@ -32,6 +32,8 @@ import {
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
+import { Input } from '../ui/Input';
+import { Label } from '../ui/Label';
 import { useToast } from '../ui/useToast';
 
 import { GrantProviderSection } from './sections/GrantProviderSection';
@@ -334,7 +336,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
           {
             name: Step.DESCRIPTION,
             title: <FormattedMessage defaultMessage="Description" id="Fields.description" />,
-            formValues: ['expenseItems'],
+            formValues: ['title', 'expenseItems'],
           },
         ],
       },
@@ -449,6 +451,7 @@ type FormContainerProps = {
 
 function FormContainer(props: FormContainerProps) {
   const form = useFormikContext() as ExpenseForm;
+  const intl = useIntl();
 
   const { onVisibleSectionChange } = props;
   const onInViewChange = React.useCallback(
@@ -533,6 +536,28 @@ function FormContainer(props: FormContainerProps) {
             title={<FormattedMessage defaultMessage="Application Content" id="hBBIor" />}
             subtitle={<FormattedMessage defaultMessage="Add the details and information required" id="U7azjR" />}
           >
+            <div className="mb-4">
+              <Label htmlFor="grant-title" className="text-base font-medium">
+                <FormattedMessage defaultMessage="Grant title" id="Grant.Title" />
+              </Label>
+              <Field name="title">
+                {({ field }) => (
+                  <Input
+                    {...field}
+                    id="grant-title"
+                    className="mt-2"
+                    maxLength={255}
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'e.g., Research, software development, etc.',
+                      id: 'ExpenseForm.GrantSubjectPlaceholder',
+                    })}
+                    value={field.value ?? ''}
+                    onChange={e => field.onChange(e)}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              </Field>
+            </div>
             <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(form)} />
 
             <div className="my-4 border-t border-gray-200" />

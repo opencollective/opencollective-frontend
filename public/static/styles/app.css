@@ -114,11 +114,11 @@
       transform: translateX(25%);
     }
   }
-@keyframes caret-blink {
-  50% {
-    opacity: 0.0;
+  @keyframes caret-blink {
+    50% {
+      opacity: 0.0;
+    }
   }
-}
 }
 
 :root {
@@ -384,6 +384,11 @@
   }
   @media (width >= 1536px) {
     max-width: 1536px;
+  }
+}
+@utility row-indicator {
+  &::before {
+    @apply absolute inset-y-[-1px] left-0 w-0.5 bg-primary content-[''];
   }
 }
 

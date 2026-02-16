@@ -71,7 +71,7 @@ export const msg = defineMessages({
   },
   grantSubjectPlaceholder: {
     id: `ExpenseForm.GrantSubjectPlaceholder`,
-    defaultMessage: 'e.g., research, software development, etc...',
+    defaultMessage: 'e.g., Research, software development, etc.',
   },
   addNewReceipt: {
     id: 'ExpenseForm.AddReceipt',

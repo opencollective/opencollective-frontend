@@ -11,6 +11,7 @@ export const accountExpensesQuery = gql`
   query AccountExpenses(
     $account: AccountReferenceInput
     $fromAccount: AccountReferenceInput
+    $fromAccounts: [AccountReferenceInput]
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
@@ -36,6 +37,7 @@ export const accountExpensesQuery = gql`
     expenses(
       account: $account
       fromAccount: $fromAccount
+      fromAccounts: $fromAccounts
       limit: $limit
       offset: $offset
       type: $type
@@ -169,6 +171,7 @@ export const hostDashboardExpensesQuery = gql`
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
     $fromAccount: AccountReferenceInput
+    $fromAccounts: [AccountReferenceInput]
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
     $fetchGrantHistory: Boolean!
@@ -178,6 +181,7 @@ export const hostDashboardExpensesQuery = gql`
       hostContext: $hostContext
       account: $account
       fromAccount: $fromAccount
+      fromAccounts: $fromAccounts
       limit: $limit
       offset: $offset
       type: $type
@@ -449,6 +453,7 @@ export const paidDisbursementsQuery = gql`
     $sort: ChronologicalOrderInput
     $account: AccountReferenceInput
     $accountingCategory: [String]
+    $fromAccounts: [AccountReferenceInput]
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -466,6 +471,7 @@ export const paidDisbursementsQuery = gql`
       searchTerm: $searchTerm
       orderBy: $sort
       accountingCategory: $accountingCategory
+      fromAccounts: $fromAccounts
     ) {
       totalCount
       offset

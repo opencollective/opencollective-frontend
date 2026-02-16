@@ -31,7 +31,6 @@ import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
@@ -92,7 +91,10 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, 'status'),
   date: { ...commonFilters.date, labelMsg: defineMessage({ defaultMessage: 'Date submitted', id: 'jKIFOK' }) },
   account: { ...hostedAccountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Paid from', id: 'jhYP1/' }) },
-  tag: expenseTagFilter.filter,
+  fromAccounts: {
+    ...commonFilters.fromAccounts,
+    labelMsg: defineMessage({ defaultMessage: 'Paid to', id: 'Expense.PaidTo' }),
+  },
   sort: sortFilter.filter,
 };
 

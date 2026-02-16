@@ -73,6 +73,10 @@ const hostTransactionsMetaDataQuery = gql`
       slug
       currency
       settings
+      manualPaymentProviders {
+        id
+        name
+      }
       accountingCategories {
         nodes {
           ...AccountingCategorySelectFields
@@ -109,7 +113,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSecti
       id: 'fiscal_host',
     },
   ];
-  const queryFilter = useQueryFilter({
+  const queryFilter = useQueryFilter<typeof schema, TransactionsTableQueryVariables, FilterMeta>({
     schema,
     toVariables,
     filters,
@@ -118,6 +122,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSecti
       kinds: metaData?.transactions?.kinds,
       hostSlug: hostSlug,
       paymentMethodTypes: metaData?.transactions?.paymentMethodTypes,
+      manualPaymentProviders: metaData?.host?.manualPaymentProviders,
     },
     views,
   });
@@ -142,7 +147,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSecti
               open={displayExportCSVModal}
               setOpen={setDisplayExportCSVModal}
               queryFilter={queryFilter}
-              account={metaData?.host}
+              account={metaData?.host ?? account}
               isHostReport
               trigger={
                 <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>

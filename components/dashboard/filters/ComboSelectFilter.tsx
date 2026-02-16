@@ -22,6 +22,7 @@ import {
 
 function SelectItem({
   isSelected,
+  isMulti,
   value,
   label,
   onSelect,
@@ -29,6 +30,7 @@ function SelectItem({
   keywords,
 }: {
   isSelected: boolean;
+  isMulti: boolean;
   value: string;
   label?: React.ReactNode | string;
   onSelect: (value: string) => void;
@@ -61,14 +63,25 @@ function SelectItem({
       keywords={keywords}
       data-cy={'combo-select-option'}
     >
-      <div
-        className={clsx(
-          'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
-          isSelected ? 'bg-primary text-primary-foreground' : 'opacity-50 [&_svg]:invisible',
-        )}
-      >
-        <CheckIcon className={'h-4 w-4'} />
-      </div>
+      {isMulti ? (
+        <div
+          className={clsx(
+            'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+            isSelected ? 'bg-primary text-primary-foreground' : 'opacity-50 [&_svg]:invisible',
+          )}
+        >
+          <CheckIcon className={'h-4 w-4'} />
+        </div>
+      ) : (
+        <div
+          className={clsx(
+            'mr-2 flex h-4 w-4 items-center justify-center rounded-full border border-primary',
+            isSelected ? 'border-primary' : 'opacity-50',
+          )}
+        >
+          {isSelected && <div className="h-2 w-2 rounded-full bg-primary" />}
+        </div>
+      )}
 
       <div className="truncate" title={typeof label === 'string' ? label : undefined}>
         {label ?? String(value)}
@@ -118,6 +131,7 @@ function ComboSelectFilter({
   creatable,
   searchFunc,
   valueRenderer,
+  onInputChange,
 }: {
   value: SelectValue;
   isMulti?: boolean;
@@ -130,6 +144,7 @@ function ComboSelectFilter({
   creatable?: boolean;
   searchFunc?: (term?: string) => void;
   valueRenderer?: ({ value }: { value: SelectValue }) => React.ReactNode;
+  onInputChange?: (value: string) => void;
 }) {
   const intl = useIntl();
   const [input, setInput] = React.useState('');
@@ -159,7 +174,10 @@ function ComboSelectFilter({
         autoFocus
         loading={loading}
         value={input}
-        onValueChange={setInput}
+        onValueChange={v => {
+          setInput(v);
+          onInputChange?.(v);
+        }}
         data-cy="combo-select-input"
         {...(!hasFilterOrSearch && {
           customIcon: PlusIcon,
@@ -202,6 +220,7 @@ function ComboSelectFilter({
                   <SelectItem
                     key={option.value}
                     isSelected={isSelected}
+                    isMulti={isMulti}
                     value={option.value}
                     label={option.label}
                     keywords={option.keywords}
