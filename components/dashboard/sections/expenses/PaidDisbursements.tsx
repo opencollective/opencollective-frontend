@@ -266,7 +266,7 @@ const getExpenseColumns = intl => [
             <FormattedMoneyAmount amount={Math.abs(amount.valueInCents)} currency={amount.currency} />
           </span>
           <span className="text-xs text-muted-foreground">
-            {i18nPayoutMethodType(intl, expense.payoutMethod?.type, { aliasBankAccountToTransferWise: true })}
+            {i18nPayoutMethodType(intl, expense.payoutMethod?.type)}
           </span>
         </div>
       );

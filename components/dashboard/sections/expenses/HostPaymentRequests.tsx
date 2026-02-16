@@ -235,11 +235,7 @@ function getExpenseColumns(
               <FormattedMoneyAmount amount={Math.abs(expense.amount)} currency={expense.currency} />
             </span>
             <span className="text-xs text-muted-foreground">
-              {intl
-                ? i18nPayoutMethodType(intl, expense.payoutMethod?.type, {
-                    aliasBankAccountToTransferWise: true,
-                  })
-                : expense.payoutMethod?.type}
+              {i18nPayoutMethodType(intl, expense.payoutMethod?.type)}
             </span>
           </div>
         );
