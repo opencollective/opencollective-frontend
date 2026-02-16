@@ -407,6 +407,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.EXPENSE_REPORTS,
           label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
         },
+        {
+          section: ALL_SECTIONS.CONTRIBUTIONS_REPORTS,
+          label: intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' }),
+        },
       ],
     },
     {

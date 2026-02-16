@@ -6347,6 +6347,8 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   /** Applications for this host */
   hostApplications: HostApplicationCollection;
   /** EXPERIMENTAL (this may change or be removed) */
+  hostContributionsReport?: Maybe<HostExpensesReports>;
+  /** EXPERIMENTAL (this may change or be removed) */
   hostExpensesReport?: Maybe<HostExpensesReports>;
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
   /** @deprecated 2025-06-24: Low performance query, see if `hostStats` is sufficient */
@@ -6669,6 +6671,14 @@ export type HostHostApplicationsArgs = {
   orderBy?: ChronologicalOrderInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<HostApplicationStatus>;
+};
+
+
+/** This represents an Host account */
+export type HostHostContributionsReportArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  timeUnit?: InputMaybe<TimeUnit>;
 };
 
 

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { DashboardContext } from '../../DashboardContext';
 import type { DashboardSectionProps } from '../../types';
+import { HostContributionsReports } from '../contributions/reports/HostContributionsReports';
 import { HostExpensesReport } from '../expenses/reports/HostExpensesReport';
 
 import AccountTransactionReports from './AccountTransactionReports';
@@ -16,6 +17,8 @@ const Reports = ({ accountSlug, subpath }: DashboardSectionProps) => {
 
   if (reportType === 'expenses' && hasHosting) {
     return <HostExpensesReport accountSlug={accountSlug} subpath={subpath.slice(1)} />;
+  } else if (reportType === 'contributions' && hasHosting) {
+    return <HostContributionsReports accountSlug={accountSlug} subpath={subpath.slice(1)} />;
   } else {
     if (hasHosting) {
       return <HostTransactionsReports accountSlug={accountSlug} subpath={subpath.slice(1)} />;

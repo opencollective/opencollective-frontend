@@ -159,7 +159,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
-  const queryFilter = useQueryFilter<typeof schema | typeof schemaWithoutHost, { type: ExpenseType }>({
+  const queryFilter = useQueryFilter<typeof schema | typeof schemaWithoutHost, ExpensesPageQueryVariables>({
     schema: hostSlug ? schema : schemaWithoutHost,
     toVariables,
     meta: filterMeta,

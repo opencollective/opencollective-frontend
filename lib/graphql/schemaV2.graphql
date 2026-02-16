@@ -4105,6 +4105,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   hostExpensesReport(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostExpensesReports
 
   """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  hostContributionsReport(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostExpensesReports
+
+  """
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
   """
   supportedPaymentMethods: [PaymentMethodLegacyType]
