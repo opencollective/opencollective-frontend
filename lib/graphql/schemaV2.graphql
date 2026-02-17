@@ -4371,6 +4371,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Only return accounts that expended within this amount range
     """
     totalExpended: AmountRangeInput
+
+    """
+    Order of the results
+    """
+    orderBy: OrderByInput
   ): VendorCollection!
 
   """
@@ -5202,6 +5207,7 @@ enum OrderByFieldType {
   BALANCE
   MEMBER_COUNT
   TOTAL_CONTRIBUTED
+  TOTAL_EXPENDED
   NAME
 
   """

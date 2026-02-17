@@ -7067,6 +7067,7 @@ export type HostVendorsArgs = {
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: InputMaybe<OrderByInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   totalContributed?: InputMaybe<AmountRangeInput>;
   totalExpended?: InputMaybe<AmountRangeInput>;
@@ -10044,6 +10045,7 @@ export enum OrderByFieldType {
   /** Order by start date */
   STARTS_AT = 'STARTS_AT',
   TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED',
+  TOTAL_EXPENDED = 'TOTAL_EXPENDED',
   /** Order by the date the collective was unhosted */
   UNHOSTED_AT = 'UNHOSTED_AT'
 }
