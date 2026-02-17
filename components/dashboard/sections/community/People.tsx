@@ -31,6 +31,7 @@ import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
+import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
@@ -240,9 +241,18 @@ enum ContributorsTab {
 
 const PAGE_SIZE = 20;
 
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  defaultValue: {
+    field: 'NAME',
+    direction: 'ASC',
+  },
+});
+
 const schema = z.object({
   limit: integer.default(PAGE_SIZE),
   offset: integer.default(0),
+  orderBy: sortFilter.schema,
   relation: relationTypeFilter.schema,
   searchTerm: searchFilter.schema,
   account: z.string().optional(),
@@ -253,8 +263,10 @@ const toVariables = {
   account: hostedAccountFilter.toVariables,
   totalContributed: totalContributedFilter.toVariables,
   totalExpended: totalExpendedFilter.toVariables,
+  orderBy: sortFilter.toVariables,
 };
 const filters = {
+  orderBy: sortFilter.filter,
   relation: relationTypeFilter.filter,
   searchTerm: searchFilter.filter,
   account: hostedAccountFilter.filter,
