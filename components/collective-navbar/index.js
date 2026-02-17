@@ -18,7 +18,6 @@ import { display } from 'styled-system';
 import { expenseSubmissionAllowed, getContributeRoute, isIndividualAccount } from '../../lib/collective';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import { isSupportedExpenseType } from '../../lib/expenses';
 import { gql } from '../../lib/graphql/helpers';
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
@@ -319,7 +318,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, i
       isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE' && isIndividualAccount(collective),
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
-      isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
+      isFeatureAvailable(collective, 'RECEIVE_GRANTS') && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isAllowedAddFunds,
   };
 };

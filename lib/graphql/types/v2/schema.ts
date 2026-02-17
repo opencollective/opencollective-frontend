@@ -2738,6 +2738,7 @@ export type CollectiveFeatures = {
   PROJECTS?: Maybe<CollectiveFeatureStatus>;
   RECEIVE_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   RECEIVE_FINANCIAL_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
+  RECEIVE_GRANTS?: Maybe<CollectiveFeatureStatus>;
   RECEIVE_HOST_APPLICATIONS?: Maybe<CollectiveFeatureStatus>;
   RECURRING_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
   REQUEST_VIRTUAL_CARDS?: Maybe<CollectiveFeatureStatus>;
@@ -7466,6 +7467,8 @@ export type Individual = Account & {
   duplicatedFromAccount?: Maybe<Account>;
   /** Email for the account. For authenticated user: scope: "email". */
   email?: Maybe<Scalars['String']['output']>;
+  /** Email address waiting for validation. Only visible to the user themselves. */
+  emailWaitingForValidation?: Maybe<Scalars['EmailAddress']['output']>;
   /** Returns the emails of the account. Individuals only have one, but organizations can have multiple emails. */
   emails?: Maybe<Array<Scalars['EmailAddress']['output']>>;
   /** @deprecated 2024-11-04: Please use policies.EXPENSE_POLICIES */
@@ -7505,6 +7508,10 @@ export type Individual = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Returns true if user account is limited (user can't use any feature) */
+  isLimited: Scalars['Boolean']['output'];
+  /** Returns true if user is a root user. Only visible to the user themselves. */
+  isRoot: Scalars['Boolean']['output'];
   /** Whether this account is suspended */
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
@@ -11400,6 +11407,7 @@ export type PlatformSubscriptionFeatures = {
   PAYPAL_PAYOUTS: Scalars['Boolean']['output'];
   RECEIVE_EXPENSES: Scalars['Boolean']['output'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['output'];
+  RECEIVE_GRANTS: Scalars['Boolean']['output'];
   RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['output'];
   TAX_FORMS: Scalars['Boolean']['output'];
   TRANSFERWISE: Scalars['Boolean']['output'];
@@ -11420,6 +11428,7 @@ export type PlatformSubscriptionFeaturesFeatures = {
   PAYPAL_PAYOUTS: Scalars['Boolean']['input'];
   RECEIVE_EXPENSES: Scalars['Boolean']['input'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['input'];
+  RECEIVE_GRANTS: Scalars['Boolean']['input'];
   RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['input'];
   TAX_FORMS: Scalars['Boolean']['input'];
   TRANSFERWISE: Scalars['Boolean']['input'];
