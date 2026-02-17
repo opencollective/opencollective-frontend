@@ -50,6 +50,7 @@ import { ExpensesTab } from './AccountDetailExpensesTab';
 import { AccountTaxFormStatus } from './AccountTaxFormStatus';
 import {
   associatedTableColumns,
+  getCollectiveTypeIcon,
   getMembersTableColumns,
   RichActivityDate,
   useAssociatedCollectiveActions,
@@ -207,6 +208,10 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 <Avatar collective={account} size={36} />
                 {account.name || account.slug}
                 {legalName && <span className="font-semibold text-muted-foreground">{`(${legalName})`}</span>}
+                <div className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-blue-400 ring-1 ring-blue-300 ring-inset">
+                  {getCollectiveTypeIcon(account?.type || props.expectedAccountType, { size: 12 })}
+                  {formatCollectiveType(intl, account?.type || props.expectedAccountType)}
+                </div>
               </React.Fragment>
             )}
           </div>
@@ -262,20 +267,21 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           <Skeleton className="h-4 w-32" />
         ) : (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <div className="flex gap-1 align-middle">
-              <div className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset">
-                {formatCollectiveType(intl, account?.type || props.expectedAccountType)}
-              </div>
-              {relations.map(role => (
-                <div
-                  key={role}
-                  className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
-                >
-                  {formatCommunityRelation(intl, role)}
+            {relations.length > 0 && (
+              <React.Fragment>
+                <div className="flex gap-1 align-middle">
+                  {relations.map(role => (
+                    <div
+                      key={role}
+                      className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
+                    >
+                      {formatCommunityRelation(intl, role)}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <Dot size={14} />
+                <Dot size={14} />
+              </React.Fragment>
+            )}
             <div className="flex items-center gap-1">
               <BookKey size={14} />
               <CopyID
