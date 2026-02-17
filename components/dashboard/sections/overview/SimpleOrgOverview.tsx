@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import React from 'react';
+import { useQuery } from '@apollo/client';
 import { Settings } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -8,7 +8,6 @@ import { z } from 'zod';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import dayjs from '@/lib/dayjs';
 import { type HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nPeriodFilterType } from '@/lib/i18n/period-compare-filter';
 
 import { columns } from '@/components/dashboard/sections/transactions/TransactionsTable';
@@ -38,8 +37,9 @@ import {
 import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
-import { editAccountSettingMutation, orgOverviewMetricsQuery } from './queries';
+import { orgOverviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
+import { useSetupGuide } from './useSetupGuide';
 import { WelcomeOrganization } from './Welcome';
 
 const schema = z.object({
@@ -51,26 +51,7 @@ export function SimpleOrgOverview({ accountSlug }: DashboardSectionProps) {
   const router = useRouter();
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
-  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
-
-  const [showSetupGuide, setShowSetupGuide] = useState(undefined);
-  const [editAccountSetting] = useMutation(editAccountSettingMutation);
-
-  const handleSetupGuideToggle = useCallback(
-    async (open: boolean) => {
-      setShowSetupGuide(open);
-
-      await editAccountSetting({
-        variables: {
-          account: { legacyId: LoggedInUser.collective.id },
-          key: `showSetupGuide.id${account.legacyId}`,
-          value: open,
-        },
-      }).catch(() => {});
-      await refetchLoggedInUser();
-    },
-    [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
-  );
+  const [showSetupGuide, handleSetupGuideToggle] = useSetupGuide();
 
   const queryFilter = useQueryFilter<typeof schema, HostOverviewMetricsQueryVariables>({
     schema,
