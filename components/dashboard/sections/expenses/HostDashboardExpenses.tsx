@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -25,7 +25,6 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
-import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import DashboardHeader from '../../DashboardHeader';
@@ -95,7 +94,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
   const query = router.query;
-  const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const pageRoute = `/dashboard/${hostSlug}/host-expenses`;
 
   // Konami Code
@@ -212,13 +210,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   });
 
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
-  React.useEffect(() => {
-    if (query.paypalApprovalError && !paypalPreApprovalError) {
-      setPaypalPreApprovalError(query.paypalApprovalError);
-      router.replace(pageRoute, omit(query, 'paypalApprovalError'), { shallow: true });
-    }
-  }, [query.paypalApprovalError]);
-
   const { data, error, loading } = expenses;
 
   const getQueryParams = newParams => {
@@ -228,28 +219,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />} />
-      {paypalPreApprovalError && (
-        <MessageBox type="warning" mb={3} withIcon>
-          {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
-            <FormattedMessage
-              id="paypal.preApproval.emailWarning"
-              defaultMessage="Warning: the associated PayPal email was changed from {oldEmail} to {newEmail}. If this was not intentional, click {refillBalance} and use the correct account."
-              values={{
-                oldEmail: <strong>{query.oldPaypalEmail}</strong>,
-                newEmail: <strong>{query.newPaypalEmail}</strong>,
-                refillBalance: (
-                  <q>
-                    <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
-                  </q>
-                ),
-              }}
-            />
-          ) : (
-            paypalPreApprovalError
-          )}
-        </MessageBox>
-      )}
-
       {!metaData?.host ? (
         <LoadingPlaceholder height={150} />
       ) : errorMetaData ? (

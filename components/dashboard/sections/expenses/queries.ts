@@ -242,16 +242,6 @@ export const hostInfoCardFields = gql`
       address
       country
     }
-    paypalPreApproval {
-      id
-      name
-      expiryDate
-      createdAt
-      balance {
-        currency
-        valueInCents
-      }
-    }
     transferwise {
       id
       balances {
