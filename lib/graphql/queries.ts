@@ -120,7 +120,7 @@ export const loggedInUserQuery = gql`
         country
         structured
       }
-      ...LoggedInUserWorkspaceFields
+      ...WorkspaceSubFields
       workspaces: memberOf(role: [ADMIN, ACCOUNTANT, COMMUNITY_MANAGER], limit: 1000) {
         nodes {
           id
@@ -173,6 +173,7 @@ export const loggedInUserQuery = gql`
       # }
     }
   }
+  ${workspaceSubFieldsFragment}
   ${loggedInUserWorkspaceFieldsFragment}
 `;
 
