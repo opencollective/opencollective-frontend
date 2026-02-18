@@ -184,7 +184,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostExpectedFundsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: 'hasHosting' in account && account.hasHosting ? queryFilter.values.hostContext : undefined,
     },
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     skip: isUpgradeRequired,
@@ -223,7 +223,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />
-            {account.hasHosting && (
+            {'hasHosting' in account && account.hasHosting && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}

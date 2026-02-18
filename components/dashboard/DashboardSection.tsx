@@ -3,7 +3,6 @@ import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
 import { KYCRequests } from '../kyc/dashboard/KYCRequests';
@@ -86,7 +85,6 @@ import {
 import { DashboardContext } from './DashboardContext';
 import DashboardErrorBoundary from './DashboardErrorBoundary';
 import DashboardHeader from './DashboardHeader';
-import { WorkspaceAccount } from '@/lib/LoggedInUser';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,

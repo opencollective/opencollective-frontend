@@ -29,47 +29,7 @@ export const adminPanelQuery = gql`
       duplicatedAccounts {
         totalCount
       }
-      pendingExpenses: expenses(
-        status: PENDING
-        direction: RECEIVED
-        includeChildrenExpenses: true
-        limit: 0
-        types: [INVOICE, RECEIPT, FUNDING_REQUEST, UNCLASSIFIED, CHARGE, SETTLEMENT]
-      ) {
-        totalCount
-      }
-      pendingGrants: expenses(
-        status: PENDING
-        direction: RECEIVED
-        includeChildrenExpenses: true
-        limit: 0
-        type: GRANT
-      ) {
-        totalCount
-      }
-      receivedGrantRequests: expenses(direction: RECEIVED, limit: 0, type: GRANT) {
-        totalCount
-      }
-      issuedGrantRequests: expenses(direction: SUBMITTED, limit: 0, type: GRANT) {
-        totalCount
-      }
-      pausedResumableIncomingContributions: orders(
-        filter: INCOMING
-        status: [PAUSED]
-        includeIncognito: true
-        includeHostedAccounts: false
-        includeChildrenAccounts: true
-        pausedBy: [COLLECTIVE, HOST, PLATFORM]
-      ) {
-        totalCount
-      }
-      pausedOutgoingContributions: orders(filter: OUTGOING, status: PAUSED, includeIncognito: true) {
-        totalCount
-      }
-      ... on AccountWithContributions {
-        canStartResumeContributionsProcess
-        hasResumeContributionsProcessStarted
-      }
+
       ... on AccountWithPlatformSubscription {
         platformSubscription {
           plan {

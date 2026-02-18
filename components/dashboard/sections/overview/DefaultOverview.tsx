@@ -100,7 +100,7 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
               includeBalance: true,
               includeSpent: true,
               includeBalanceTimeseries: true,
-              includeContributionsCount: workspace.isActive,
+              includeContributionsCount: account.isActive,
               includeReceivedTimeseries: true,
             };
         }

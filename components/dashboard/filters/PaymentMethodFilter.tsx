@@ -150,7 +150,7 @@ const manualPaymentProvidersQuery = gql`
   }
 `;
 
-export function useManualPaymentProviders(accountSlug: string) {
+function useManualPaymentProviders(accountSlug: string) {
   const { data, loading } = useQuery(manualPaymentProvidersQuery, { variables: { accountSlug } });
   const manualPaymentProviders =
     data?.account.manualPaymentProviders ?? data?.account.host?.manualPaymentProviders ?? undefined;

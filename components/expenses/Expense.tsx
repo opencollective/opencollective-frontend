@@ -797,8 +797,7 @@ function Expense(props: ExpenseProps) {
                     <CommentForm
                       replyingToComment={replyingToComment}
                       id="new-comment-on-expense"
-                      ExpenseId={expense && expense.id}
-                      disabled={!expense}
+                      ExpenseId={expense.id}
                       onSuccess={onCommentAdded}
                       canUsePrivateNote={expense.permissions.canUsePrivateNote}
                       defaultType={expense.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}

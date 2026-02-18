@@ -168,7 +168,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
                   router.push(
                     getDashboardRoute(
                       account,
-                      `${account.hasHosting ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}${account.hasHosting ? '&sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL' : ''}`,
+                      `${'hasHosting' in account && account.hasHosting ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}${'hasHosting' in account && account.hasHosting ? '&sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL' : ''}`,
                     ),
                   )
                 }
@@ -245,7 +245,7 @@ function BeneficiaryCell({ grant }) {
 
   const previousGrantsLink = getDashboardRoute(
     dashboardAccount,
-    `${dashboardAccount.hasHosting ? 'hosted-grants' : 'grants'}?sort[field]=CREATED_AT&sort[direction]=DESC&fromAccount=${beneficiary.slug}${dashboardAccount.hasHosting ? `&status=ALL` : ''}`,
+    `${'hasHosting' in dashboardAccount && dashboardAccount.hasHosting ? 'hosted-grants' : 'grants'}?sort[field]=CREATED_AT&sort[direction]=DESC&fromAccount=${beneficiary.slug}${'hasHosting' in dashboardAccount && dashboardAccount.hasHosting ? `&status=ALL` : ''}`,
   );
 
   return (

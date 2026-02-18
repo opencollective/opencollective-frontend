@@ -17,6 +17,8 @@ const workspaceSubFieldsFragment = gql`
     isActive
     settings
     categories
+    createdAt
+    canHaveChangelogUpdates
     policies {
       id
       REQUIRE_2FA_FOR_ADMINS
@@ -174,7 +176,7 @@ export const loggedInUserQuery = gql`
   ${loggedInUserWorkspaceFieldsFragment}
 `;
 
-export const collectiveNavbarFieldsFragment = gql`
+const collectiveNavbarFieldsFragment = gql`
   fragment NavbarFieldsV1 on CollectiveFeatures {
     id
     ABOUT

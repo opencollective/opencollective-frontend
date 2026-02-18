@@ -36,6 +36,7 @@ import {
 import { useWorkspace } from '../WorkspaceProvider';
 
 import AccountSwitcher from './AccountSwitcher';
+import { ROOT_PROFILE_ACCOUNT } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { getMenuItems } from './menu-items';
 
@@ -51,9 +52,8 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
     () => getMenuItems({ intl, account, LoggedInUser, isRootDashboard }),
     [account, intl, LoggedInUser, isRootDashboard],
   );
-  const effectiveAccount = isRootDashboard ? { slug: 'root-actions', type: 'ROOT' } : account;
+  const effectiveAccount = isRootDashboard ? ROOT_PROFILE_ACCOUNT : account;
 
-  console.log({ menuItems, isRootDashboard });
   const isSectionActive = (section: string) => {
     const sectionAndSubpath = subpath?.length > 0 ? `${selectedSection}/${subpath[0]}` : selectedSection;
 

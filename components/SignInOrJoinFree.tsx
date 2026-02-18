@@ -44,8 +44,7 @@ export const SignInOverlayBackground = styled(Container)`
 
 type SignInOrJoinFreeForm = 'signin' | 'create-account';
 
-/** Props that callers pass to SignInOrJoinFree */
-export type SignInOrJoinFreeProps = {
+type SignInOrJoinFreeProps = {
   redirect?: string;
   defaultEmail?: string;
   email?: string | null;

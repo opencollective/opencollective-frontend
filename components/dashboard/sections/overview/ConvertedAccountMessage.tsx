@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
 import dayjs from '../../../../lib/dayjs';
-import type { AccountConversionsQuery, AccountConversionsQueryVariables, Host } from '@/lib/graphql/types/v2/graphql';
+import type { AccountConversionsQuery, AccountConversionsQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import { getI18nLink } from '@/components/I18nFormatters';
 import Link from '@/components/Link';

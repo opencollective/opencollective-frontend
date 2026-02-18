@@ -12,16 +12,16 @@ import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
+import type LoggedInUser from '../lib/LoggedInUser';
 import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { loggedInUserQuery } from '@/lib/graphql/queries';
 
 import { toast } from './ui/useToast';
-import LoggedInUser from '../lib/LoggedInUser';
 
-export type TwoFactorAuthPromptResult = { code: string; type: string };
+type TwoFactorAuthPromptResult = { code: string; type: string };
 
-export type TwoFactorAuthPrompt = {
+type TwoFactorAuthPrompt = {
   open: (options?: {
     supportedMethods?: string[];
     authenticationOptions?: Record<string, unknown>;
@@ -29,7 +29,7 @@ export type TwoFactorAuthPrompt = {
   }) => Promise<TwoFactorAuthPromptResult | undefined>;
 };
 
-export type GetLoggedInUserOptions = {
+type GetLoggedInUserOptions = {
   token?: string | null;
   twoFactorAuthenticatorCode?: string;
   twoFactorAuthenticationType?: string;

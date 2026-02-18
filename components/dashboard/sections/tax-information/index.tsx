@@ -14,11 +14,11 @@ import Loading from '../../../Loading';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
+import { DashboardContext } from '../../DashboardContext';
 
 import type { AccountFromTaxInformationQuery } from './queries';
 import { accountTaxInformationQuery } from './queries';
 import { TaxInformationFormDialog } from './TaxInformationFormDialog';
-import { DashboardContext } from '../../DashboardContext';
 
 /**
  * UI for the pending state of the tax form submission, with a button to fill the form.

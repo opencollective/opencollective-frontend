@@ -8,6 +8,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import type { WorkspaceAccount } from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
+
 import Avatar from '../Avatar';
 import Collapse from '../Collapse';
 import Container from '../Container';

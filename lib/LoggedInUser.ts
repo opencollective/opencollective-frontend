@@ -8,7 +8,6 @@ import {
   type AccountWithParent,
   type CommentFieldsFragment,
   LoggedInUserWorkspaceFieldsFragment
-  MemberRole,
   type Update,
 } from './graphql/types/v2/graphql';
 
@@ -16,7 +15,7 @@ import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
 
 /** Common type for collective/account parameters that works with both v1 and v2 data */
-export type CollectiveParam = {
+type CollectiveParam = {
   slug: string;
   type?: string;
   id?: string | number;
@@ -42,11 +41,6 @@ export function isChildAccount<T extends { type: AccountType }>(
 ): account is Extract<T, { __typename?: 'Event' | 'Project' }> {
   return account.type === 'EVENT' || account.type === 'PROJECT';
 }
-
-/** Convenience type aliases for narrowed workspace accounts */
-export type OrganizationWorkspaceAccount = Extract<WorkspaceAccount, { __typename?: 'Organization' | 'Host' }>;
-export type CollectiveWorkspaceAccount = Extract<WorkspaceAccount, { __typename?: 'Collective' }>;
-export type ChildWorkspaceAccount = Extract<WorkspaceAccount, { __typename?: 'Event' | 'Project' }>;
 
 /**
  * Represent the current logged in user. Includes methods to check permissions.

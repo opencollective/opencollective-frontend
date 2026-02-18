@@ -17,7 +17,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';
-import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
@@ -30,6 +29,7 @@ import SignupLogin from '../SignupLogin';
 import { Badge } from '../ui/Badge';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Separator } from '../ui/Separator';
+import type { UserContextValue } from '../UserProvider';
 
 import { DrawerMenu } from './DrawerMenu';
 import { ProfileMenuIconsMap } from './Icons';
@@ -100,7 +100,7 @@ const MenuItem = ({
   );
 };
 
-const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserContextProps['logout']>[0] }) => {
+const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserContextValue['logout']>[0] }) => {
   const whitelabel = useWhitelabelProvider();
   const router = useRouter();
   const intl = useIntl();

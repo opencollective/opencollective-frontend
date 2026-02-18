@@ -1,5 +1,4 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
 import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -9,14 +8,13 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
   ALL_SECTIONS,
-  ROOT_PROFILE_ACCOUNT,
   ROOT_PROFILE_KEY,
   ROOT_SECTIONS,
   SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS,
@@ -24,7 +22,6 @@ import {
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
-import { adminPanelQuery } from '../components/dashboard/queries';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
@@ -34,11 +31,9 @@ import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequire
 import { useWorkspace } from '../components/WorkspaceProvider';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
-import ErrorPage from '@/components/ErrorPage';
 import Header from '@/components/Header';
 import I18nFormatters from '@/components/I18nFormatters';
 import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
-import { WorkspaceAccount } from '@/lib/LoggedInUser';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -309,7 +304,6 @@ const DashboardPage = () => {
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const accountIdentifier = account && (account.name || `@${account.slug}`);
 
-  console.log({ isRootDashboard });
   // if (!accountLoading && !account && error) {
   //   return <ErrorPage error={error} />;
   // }
