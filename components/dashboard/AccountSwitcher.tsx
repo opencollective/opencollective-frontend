@@ -213,7 +213,6 @@ const MenuEntry = ({
 const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
-  console.log({ LoggedInUser });
   const [open, setOpen] = React.useState(false);
   const personalWorkspace = LoggedInUser?.workspaces?.find(
     w => w.type === 'INDIVIDUAL' || w.slug === LoggedInUser.slug,

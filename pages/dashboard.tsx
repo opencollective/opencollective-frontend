@@ -59,11 +59,11 @@ const messages = defineMessages({
   },
 });
 
-const getDefaultSectionForAccount = (account, loggedInUser) => {
-  if (!account) {
-    return null;
-  } else if (account.type === 'ROOT') {
+const getDefaultSectionForAccount = (account, loggedInUser, isRootDashboard) => {
+  if (isRootDashboard) {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
+  } else if (!account) {
+    return null;
   } else if (loggedInUser?.isAccountantOnly(account) && account.hasHosting) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else if (loggedInUser?.isAccountantOnly(account)) {
@@ -256,9 +256,6 @@ const DashboardPage = () => {
   const activeSlug = slug || defaultSlug;
   const isRootDashboard = activeSlug === ROOT_PROFILE_KEY && LoggedInUser?.isRoot;
 
-  // Workspace data from LoggedInUser -- available immediately, no extra query needed
-  const workspaceAccount = LoggedInUser?.getWorkspace(activeSlug) ?? null;
-
   // adminPanelQuery still fires for badge counts, notifications, and enrichment data
   // const {
   //   data,
@@ -268,9 +265,9 @@ const DashboardPage = () => {
   //   variables: { slug: activeSlug },
   //   skip: !activeSlug || !LoggedInUser || isRootProfile,
   // });
-  const account = workspaceAccount;
+  const account = LoggedInUser?.getWorkspace(activeSlug) ?? null;
 
-  const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
+  const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser, isRootDashboard);
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
@@ -325,7 +322,6 @@ const DashboardPage = () => {
         expandedSection,
         setExpandedSection,
         account,
-        workspace: workspaceAccount,
         activeSlug,
         defaultSlug,
         setDefaultSlug: slug => setWorkspace({ slug }),

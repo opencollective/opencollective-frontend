@@ -22,6 +22,7 @@ import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { dateToVariables } from '../../filters/DateFilter/schema';
+import type { PaymentMethodFilterMeta } from '../../filters/PaymentMethodFilter';
 import { paymentMethodFilter } from '../../filters/PaymentMethodFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
@@ -69,11 +70,9 @@ export const schema = z.object({
 
 type FilterValues = z.infer<typeof schema>;
 
-export type FilterMeta = {
+export type FilterMeta = PaymentMethodFilterMeta & {
   currency?: Currency;
-  paymentMethodTypes?: PaymentMethodType[];
   kinds?: TransactionKind[];
-  manualPaymentProviders?: Array<{ id: string; name: string }>;
 };
 
 // Only needed when values and key of filters are different

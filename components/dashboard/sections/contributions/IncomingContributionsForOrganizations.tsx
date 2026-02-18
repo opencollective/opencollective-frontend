@@ -119,7 +119,6 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
-    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({

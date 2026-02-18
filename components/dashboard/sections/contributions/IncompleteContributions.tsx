@@ -72,7 +72,6 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
-    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const views = [
