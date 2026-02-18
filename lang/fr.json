@@ -1772,6 +1772,7 @@
   "ExportSample": "Exporter un échantillon",
   "ExportStatus.Completed": "Completed",
   "ExportStatus.Enqueued": "Queued",
+  "ExportStatus.Expired": "Expired",
   "ExportStatus.Failed": "Failed",
   "ExportTransactionsCSVModal.DeletePresetConfirmation.Body": "Êtes-vous sûr de vouloir supprimer le préréglage {presetName} ?",
   "ExportTransactionsCSVModal.ExportAll": "Exporter toutes les transactions",
