@@ -34,6 +34,7 @@ import { makeAmountFilter } from '../filters/AmountFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
+import { buildSortFilter } from '../filters/SortFilter';
 import type { DashboardSectionProps } from '../types';
 import { makePushSubpath } from '../utils';
 
@@ -81,6 +82,7 @@ const dashboardVendorsQuery = gql`
       offset: $offset
       totalContributed: $totalContributed
       totalExpended: $totalExpended
+      orderBy: $orderBy
     ) @include(if: $onlyVendors) {
       totalCount
       offset
@@ -117,6 +119,7 @@ const dashboardVendorsQuery = gql`
     $totalContributed: AmountRangeInput
     $totalExpended: AmountRangeInput
     $onlyVendors: Boolean!
+    $orderBy: OrderByInput
   ) {
     account(slug: $slug) {
       id
@@ -142,6 +145,7 @@ const dashboardVendorsQuery = gql`
       totalExpended: $totalExpended
       limit: $limit
       offset: $offset
+      orderBy: $orderBy
     ) @skip(if: $onlyVendors) {
       totalCount
       offset
@@ -175,6 +179,14 @@ const dashboardVendorsQuery = gql`
   }
   ${vendorFieldFragment}
 `;
+
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  defaultValue: {
+    field: 'NAME',
+    direction: 'ASC',
+  },
+});
 
 const getColumns = ({ isVendor }) => {
   return [
@@ -314,6 +326,7 @@ const schema = z.object({
   limit: limit.default(PAGE_SIZE),
   offset,
   searchTerm: searchFilter.schema,
+  orderBy: sortFilter.schema,
   isArchived: boolean.optional().default(false),
   onlyVendors: boolean.optional().default(false),
   totalContributed: totalContributed.schema,
@@ -323,6 +336,7 @@ const schema = z.object({
 type FilterValues = z.infer<typeof schema>;
 
 const filters: FilterComponentConfigs<FilterValues> = {
+  orderBy: sortFilter.filter,
   searchTerm: searchFilter.filter,
   totalContributed: totalContributed.filter,
   totalExpended: totalExpended.filter,
@@ -339,6 +353,7 @@ const filters: FilterComponentConfigs<FilterValues> = {
 const toVariables = {
   totalContributed: totalContributed.toVariables,
   totalExpended: totalExpended.toVariables,
+  orderBy: sortFilter.toVariables,
 };
 
 const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
