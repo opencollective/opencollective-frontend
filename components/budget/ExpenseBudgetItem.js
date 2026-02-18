@@ -221,6 +221,7 @@ const ExpenseBudgetItem = ({
                               textDecoration="none"
                               color="black.900"
                               fontSize={fontSize}
+                              overflowWrap="anywhere"
                               data-cy="expense-title"
                             >
                               {value}
