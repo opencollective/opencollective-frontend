@@ -1076,6 +1076,7 @@ export enum ActivityAndClassesType {
   COLLECTIVE = 'COLLECTIVE',
   COLLECTIVE_APPLY = 'COLLECTIVE_APPLY',
   COLLECTIVE_APPROVED = 'COLLECTIVE_APPROVED',
+  COLLECTIVE_BALANCE_TRANSFERRED = 'COLLECTIVE_BALANCE_TRANSFERRED',
   COLLECTIVE_COMMENT_CREATED = 'COLLECTIVE_COMMENT_CREATED',
   COLLECTIVE_CONTACT = 'COLLECTIVE_CONTACT',
   COLLECTIVE_CONVERSATION_CREATED = 'COLLECTIVE_CONVERSATION_CREATED',
@@ -1283,6 +1284,7 @@ export enum ActivityType {
   BACKYOURSTACK_DISPATCH_CONFIRMED = 'BACKYOURSTACK_DISPATCH_CONFIRMED',
   COLLECTIVE_APPLY = 'COLLECTIVE_APPLY',
   COLLECTIVE_APPROVED = 'COLLECTIVE_APPROVED',
+  COLLECTIVE_BALANCE_TRANSFERRED = 'COLLECTIVE_BALANCE_TRANSFERRED',
   COLLECTIVE_COMMENT_CREATED = 'COLLECTIVE_COMMENT_CREATED',
   COLLECTIVE_CONTACT = 'COLLECTIVE_CONTACT',
   COLLECTIVE_CONVERSATION_CREATED = 'COLLECTIVE_CONVERSATION_CREATED',
@@ -7077,6 +7079,7 @@ export type HostVendorsArgs = {
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: InputMaybe<OrderByInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   totalContributed?: InputMaybe<AmountRangeInput>;
   totalExpended?: InputMaybe<AmountRangeInput>;
@@ -7466,6 +7469,8 @@ export type Individual = Account & {
   duplicatedFromAccount?: Maybe<Account>;
   /** Email for the account. For authenticated user: scope: "email". */
   email?: Maybe<Scalars['String']['output']>;
+  /** Email address waiting for validation. Only visible to the user themselves. */
+  emailWaitingForValidation?: Maybe<Scalars['EmailAddress']['output']>;
   /** Returns the emails of the account. Individuals only have one, but organizations can have multiple emails. */
   emails?: Maybe<Array<Scalars['EmailAddress']['output']>>;
   /** @deprecated 2024-11-04: Please use policies.EXPENSE_POLICIES */
@@ -7505,6 +7510,10 @@ export type Individual = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Returns true if user account is limited (user can't use any feature) */
+  isLimited: Scalars['Boolean']['output'];
+  /** Returns true if user is a root user. Only visible to the user themselves. */
+  isRoot: Scalars['Boolean']['output'];
   /** Whether this account is suspended */
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
@@ -8618,6 +8627,11 @@ export type Mutation = {
   requestVirtualCard?: Maybe<Scalars['Boolean']['output']>;
   /** To re-send the invitation to complete a draft expense. Scope: "expenses". */
   resendDraftExpenseInvite: Expense;
+  /**
+   * Restore the given payout method. Scope: "expenses".
+   * @deprecated 2025-02-10: Payout methods cannot be restored.
+   */
+  restorePayoutMethod: PayoutMethod;
   /** Resume paused Virtual Card. Scope: "virtualCards". */
   resumeVirtualCard: VirtualCard;
   /** Revoke the KYC Verification */
@@ -8626,6 +8640,8 @@ export type Mutation = {
   revokeOAuthAuthorization: OAuthAuthorization;
   /** [Root only] Anonymizes an account */
   rootAnonymizeAccount: Account;
+  /** [Root only] Transfers balance from one account to another, creating BALANCE_TRANSFER transactions */
+  rootTransferBalance: Order;
   /** Send a message to an account. Scope: "account" */
   sendMessage?: Maybe<SendMessageResult>;
   /** Send In-App Survey response */
@@ -9621,6 +9637,12 @@ export type MutationResendDraftExpenseInviteArgs = {
 
 
 /** This is the root mutation */
+export type MutationRestorePayoutMethodArgs = {
+  payoutMethod: PayoutMethodReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationResumeVirtualCardArgs = {
   virtualCard: VirtualCardReferenceInput;
 };
@@ -9641,6 +9663,15 @@ export type MutationRevokeOAuthAuthorizationArgs = {
 /** This is the root mutation */
 export type MutationRootAnonymizeAccountArgs = {
   account: AccountReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationRootTransferBalanceArgs = {
+  amount?: InputMaybe<AmountInput>;
+  fromAccount: AccountReferenceInput;
+  message?: InputMaybe<Scalars['String']['input']>;
+  toAccount: AccountReferenceInput;
 };
 
 
@@ -10046,6 +10077,7 @@ export enum OrderByFieldType {
   /** Order by start date */
   STARTS_AT = 'STARTS_AT',
   TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED',
+  TOTAL_EXPENDED = 'TOTAL_EXPENDED',
   /** Order by the date the collective was unhosted */
   UNHOSTED_AT = 'UNHOSTED_AT'
 }
@@ -10873,6 +10905,8 @@ export type PaymentMethod = {
   /** For gift cards, this field will return to the source payment method */
   sourcePaymentMethod?: Maybe<PaymentMethod>;
   type?: Maybe<PaymentMethodType>;
+  /** The date and time this payout method was updated */
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 
