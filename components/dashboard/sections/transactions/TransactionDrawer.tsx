@@ -153,6 +153,12 @@ const transactionQuery = gql`
         toAccount {
           id
           slug
+          ... on AccountWithHost {
+            host {
+              id
+              slug
+            }
+          }
         }
         fromAccount {
           id
@@ -250,6 +256,17 @@ const getExpenseUrl = (dashboardAccount, expense, LoggedInUser) => {
   return `/${expense.account.slug}/expenses/${expense.legacyId}`;
 };
 
+const getContributionUrl = (dashboardAccount, order) => {
+  if (dashboardAccount?.isHost && order.toAccount.host?.id === dashboardAccount.id) {
+    return getDashboardRoute(order.toAccount.host, `orders?orderId=${order.legacyId}`);
+  } else if (dashboardAccount?.id === order.toAccount.id) {
+    return getDashboardRoute(order.toAccount, `incoming-contributions?orderId=${order.legacyId}`);
+  } else if (dashboardAccount?.id === order.fromAccount.id) {
+    return getDashboardRoute(order.fromAccount, `outgoing-contributions?orderId=${order.legacyId}`);
+  }
+  return `/${order.toAccount.slug}/contributions/${order.legacyId}`;
+};
+
 function TransactionDetails({ transactionId, getActions }: TransactionDetailsProps) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -264,10 +281,13 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   const actions = getActions(transaction, dropdownTriggerRef, refetch);
   const accountingCategory = transaction?.expense?.accountingCategory || transaction?.order?.accountingCategory;
 
-  let expenseUrl;
+  let expenseUrl, contributionUrl;
 
   if (transaction?.expense) {
     expenseUrl = getExpenseUrl(account, transaction.expense, LoggedInUser);
+  }
+  if (transaction?.order) {
+    contributionUrl = getContributionUrl(account, transaction.order);
   }
   return (
     <React.Fragment>
@@ -635,10 +655,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                       value={
                         <HoverCard>
                           <HoverCardTrigger asChild>
-                            <Link
-                              href={`/${transaction?.order.toAccount.slug}/contributions/${transaction?.order.legacyId}`}
-                              className="underline hover:text-primary"
-                            >
+                            <Link href={contributionUrl} className="underline hover:text-primary">
                               {transaction?.order.description}
                             </Link>
                           </HoverCardTrigger>
