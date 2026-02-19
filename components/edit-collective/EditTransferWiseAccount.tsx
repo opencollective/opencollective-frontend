@@ -7,7 +7,7 @@ import { connectAccount } from '@/lib/api';
 import { i18nGraphqlException } from '@/lib/errors';
 import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import type { EditTransferWiseAccountQuery } from '@/lib/graphql/types/v2/graphql';
-import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/schema';
+import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/graphql';
 import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 

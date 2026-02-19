@@ -4,7 +4,7 @@ import type { TaxFormType } from '../components/dashboard/sections/tax-informati
 
 import { CollectiveType } from './constants/collectives';
 import { TransactionTypes } from './constants/transactions';
-import type { Comment, Conversation, Expense, HostApplication, Order, Update } from './graphql/types/v2/schema';
+import type { Comment, Conversation, Expense, HostApplication, Order, Update } from './graphql/types/v2/graphql';
 import type LoggedInUser from './LoggedInUser';
 import { getWebsiteUrl } from './utils';
 import { getWindowLocation } from './window';

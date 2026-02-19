@@ -1,5 +1,5 @@
 import type { CollectiveType } from '../constants/collectives';
-import type { Policies } from '../graphql/types/v2/schema';
+import type { Policies } from '../graphql/types/v2/graphql';
 
 export type GraphQLV1Collective = {
   id: number;

@@ -1,7 +1,7 @@
 import type { IntlShape } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
-import { KycProvider, KycVerificationStatus } from '@/lib/graphql/types/v2/schema';
+import { KycProvider, KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
 
 const KYC_STATUS_MESSAGES = defineMessages({
   [KycVerificationStatus.EXPIRED]: {

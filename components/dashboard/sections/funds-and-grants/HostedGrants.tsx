@@ -10,8 +10,8 @@ import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { AccountingCategoryKind, Expense } from '../../../../lib/graphql/types/v2/schema';
-import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
+import type { AccountingCategoryKind, Expense } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 

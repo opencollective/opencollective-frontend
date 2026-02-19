@@ -7,7 +7,7 @@ import type {
   KycVerificationCollectionFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
 import { KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
-import type { KycProvider } from '@/lib/graphql/types/v2/schema';
+import type { KycProvider } from '@/lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '@/components/AccountHoverCard';
 import Avatar from '@/components/Avatar';

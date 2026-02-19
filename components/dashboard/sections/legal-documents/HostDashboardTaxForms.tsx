@@ -7,7 +7,7 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { gql } from '../../../../lib/graphql/helpers';
 import type { HostTaxFormsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/schema';
+import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';

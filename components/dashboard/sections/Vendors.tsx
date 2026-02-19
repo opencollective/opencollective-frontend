@@ -10,7 +10,7 @@ import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
 import { boolean, limit, offset } from '@/lib/filters/schemas';
 import { gql } from '@/lib/graphql/helpers';
 import type { DashboardVendorsQuery, DashboardVendorsQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import { AccountType } from '@/lib/graphql/types/v2/schema';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 

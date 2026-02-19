@@ -10,7 +10,7 @@ import type {
   KycRequestModalQuery,
   KycRequestModalQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import type { Account } from '@/lib/graphql/types/v2/schema';
+import type { Account } from '@/lib/graphql/types/v2/graphql';
 
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';

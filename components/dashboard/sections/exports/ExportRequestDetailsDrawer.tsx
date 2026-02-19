@@ -12,7 +12,7 @@ import {
   ExportRequestStatus,
   ExportRequestType,
   type PaymentMethodType,
-} from '../../../../lib/graphql/types/v2/schema';
+} from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import type { Action } from '@/lib/actions/types';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { PlatformSubscriptionFeatures } from '@/lib/graphql/types/v2/schema';
+import type { PlatformSubscriptionFeatures } from '@/lib/graphql/types/v2/graphql';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 

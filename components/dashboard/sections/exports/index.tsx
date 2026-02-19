@@ -10,7 +10,7 @@ import { formatFileSize } from '@/lib/file-utils';
 import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
 import type { ExportRequestsQuery, ExportRequestsQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import { ExportRequestStatus, ExportRequestType } from '@/lib/graphql/types/v2/schema';
+import { ExportRequestStatus, ExportRequestType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '../../../Avatar';

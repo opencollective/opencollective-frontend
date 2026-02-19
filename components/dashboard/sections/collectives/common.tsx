@@ -21,7 +21,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
 import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
-import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
+import type { AccountWithHost } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { CollectiveType } from '@/lib/constants/collectives';

@@ -10,7 +10,7 @@ import type {
   EditCollectiveBankTransferHostQuery,
   EditCollectiveBankTransferHostQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import type { Account, ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import type { Account, ManualPaymentProvider } from '@/lib/graphql/types/v2/graphql';
 
 import { useToast } from '@/components/ui/useToast';
 

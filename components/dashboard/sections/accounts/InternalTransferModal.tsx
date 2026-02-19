@@ -8,8 +8,8 @@ import { z } from 'zod';
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
 import type { AccountsDashboardQuery, DashboardAccountsQueryFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import type { Account } from '@/lib/graphql/types/v2/schema';
-import { Currency } from '@/lib/graphql/types/v2/schema';
+import type { Account } from '@/lib/graphql/types/v2/graphql';
+import { Currency } from '@/lib/graphql/types/v2/graphql';
 import { fromCollectiveSearchQuery } from '@/lib/graphql/v1/queries';
 
 import CollectivePickerAsync from '@/components/CollectivePickerAsync';

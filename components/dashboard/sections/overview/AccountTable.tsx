@@ -7,7 +7,7 @@ import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpZA } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import type { AccountMetricsFragment, OverviewMetricsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Currency } from '../../../../lib/graphql/types/v2/schema';
+import type { Currency } from '../../../../lib/graphql/types/v2/graphql';
 import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 

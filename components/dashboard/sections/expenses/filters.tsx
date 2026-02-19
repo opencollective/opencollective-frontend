@@ -8,8 +8,8 @@ import type {
   AccountExpensesQueryVariables,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Currency } from '../../../../lib/graphql/types/v2/schema';
-import { AccountingCategoryKind, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/schema';
+import type { Currency } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryKind, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { i18nChargeHasReceipts } from '../../../../lib/i18n/receipts-filter';

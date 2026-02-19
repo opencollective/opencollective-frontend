@@ -11,7 +11,7 @@ import { isIndividualAccount } from '../lib/collective';
 import { gql } from '../lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
-import { type Amount, KycVerificationStatus } from '@/lib/graphql/types/v2/schema';
+import { type Amount, KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { DashboardContext } from './dashboard/DashboardContext';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';

@@ -29,7 +29,7 @@ import {
   getSupportedCurrencies,
   validateExpenseTaxes,
 } from './lib/utils';
-import { UploadedFileKind } from '@/lib/graphql/types/v2/schema';
+import { UploadedFileKind } from '@/lib/graphql/types/v2/graphql';
 import { OFICO_MEMBER_ORGANIZATIONS } from '@/lib/preview-features';
 
 import AccountingCategorySelect, { isSupportedExpenseCategory } from '../AccountingCategorySelect';

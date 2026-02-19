@@ -4,7 +4,7 @@ import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
 import { type CommentFieldsFragment } from './graphql/types/v2/graphql';
-import { type Account, type AccountWithParent, MemberRole, type Update } from './graphql/types/v2/schema';
+import { type Account, type AccountWithParent, MemberRole, type Update } from './graphql/types/v2/graphql';
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
 

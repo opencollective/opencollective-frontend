@@ -9,7 +9,7 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../lib/fi
 import { integer } from '../../../lib/filters/schemas';
 import { gql } from '../../../lib/graphql/helpers';
 import type { HostAgreementsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
-import type { Agreement } from '../../../lib/graphql/types/v2/schema';
+import type { Agreement } from '../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';

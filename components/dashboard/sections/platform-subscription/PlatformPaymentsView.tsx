@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { type ExpensesListFieldsFragmentFragment, ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
-import { ExpenseType } from '@/lib/graphql/types/v2/schema';
+import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
 import DateTime from '@/components/DateTime';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';

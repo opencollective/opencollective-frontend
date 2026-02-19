@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { AccountType, ExpenseType } from '../../../lib/graphql/types/v2/schema';
+import { AccountType, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 

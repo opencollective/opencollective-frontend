@@ -8,7 +8,7 @@ import type {
   ManagePaymentMethodsQuery,
   ManagePaymentMethodsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
+import type { Account } from '../../../../lib/graphql/types/v2/graphql';
 
 import { Button } from '@/components/ui/Button';
 import { Separator } from '@/components/ui/Separator';

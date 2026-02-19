@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';
 import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
-import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/schema';
+import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 
 import StyledCard from '../StyledCard';
 import { H3 } from '../Text';

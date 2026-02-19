@@ -31,14 +31,14 @@ import type {
   InviteExpenseFromDashboardMutationVariables,
   LocationInput,
 } from '../../lib/graphql/types/v2/graphql';
-import type { Amount, CurrencyExchangeRateInput, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
+import type { Amount, CurrencyExchangeRateInput, RecurringExpenseInterval } from '../../lib/graphql/types/v2/graphql';
 import {
   Currency,
   ExpenseLockableFields,
   ExpenseStatus,
   ExpenseType,
   PayoutMethodType,
-} from '../../lib/graphql/types/v2/schema';
+} from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getArrayValuesMemoizer, isValidEmail } from '../../lib/utils';

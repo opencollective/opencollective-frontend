@@ -6,8 +6,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
-import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
-import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2/schema';
+import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/graphql';
+import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2/graphql';
 import type { UpdateTransactionsImportRowMutation } from '@/lib/graphql/types/v2/graphql';
 
 import { useModal } from '../../../../ModalContext';

@@ -10,7 +10,7 @@ import {
   type HostExpensesReportQuery,
   type HostExpensesReportQueryVariables,
 } from '../../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatus } from '../../../../../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '../../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';

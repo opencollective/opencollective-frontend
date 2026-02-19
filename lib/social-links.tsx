@@ -17,7 +17,7 @@ import { Youtube } from '@styled-icons/feather/Youtube';
 import { Pixelfed } from '@styled-icons/remix-line/Pixelfed';
 import { FolderGit2 } from 'lucide-react';
 
-import { SocialLinkType } from './graphql/types/v2/schema';
+import { SocialLinkType } from './graphql/types/v2/graphql';
 
 const SocialLinkIcon: Record<SocialLinkType, typeof Discord | React.FunctionComponent<{ size: number }>> = {
   [SocialLinkType.BLUESKY]: (props: { size: number }) => (

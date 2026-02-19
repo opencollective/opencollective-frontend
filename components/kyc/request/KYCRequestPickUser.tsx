@@ -3,7 +3,7 @@ import { ArrowLeft, Search } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { Account } from '@/lib/graphql/types/v2/schema';
+import type { Account } from '@/lib/graphql/types/v2/graphql';
 
 import CollectivePickerAsync from '@/components/CollectivePickerAsync';
 import { Button } from '@/components/ui/Button';

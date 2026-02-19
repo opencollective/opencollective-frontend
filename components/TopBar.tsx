@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getEnvVar } from '@/lib/env-utils';
-import { MemberRole } from '@/lib/graphql/types/v2/schema';
+import { MemberRole } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';

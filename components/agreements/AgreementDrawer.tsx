@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
-import type { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/schema';
+import type { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
 
 import DrawerHeader from '../DrawerHeader';
 import FilesViewerModal from '../FilesViewerModal';

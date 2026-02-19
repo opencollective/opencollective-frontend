@@ -5,7 +5,7 @@ import { Info, Receipt, Shapes } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import type { BillingProjectionQuery, BillingProjectionQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import type { PlatformSubscription, PlatformUtilization } from '@/lib/graphql/types/v2/schema';
+import type { PlatformSubscription, PlatformUtilization } from '@/lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import { I18nBold } from '@/components/I18nFormatters';

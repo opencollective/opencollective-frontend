@@ -7,8 +7,8 @@ import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../..
 import { isMulti, limit, offset } from '../../../lib/filters/schemas';
 import { gql } from '../../../lib/graphql/helpers';
 import type { HostVirtualCardRequestsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
-import type { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/schema';
-import { VirtualCardRequestStatus } from '../../../lib/graphql/types/v2/schema';
+import type { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/graphql';
+import { VirtualCardRequestStatus } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { i18nVirtualCardRequestStatus } from '../../../lib/i18n/virtual-card-request';
 import { sortSelectOptions } from '../../../lib/utils';

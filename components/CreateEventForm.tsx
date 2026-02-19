@@ -12,7 +12,7 @@ import { RICH_ERROR_MESSAGES } from '../lib/form-utils';
 import { i18nGraphqlException } from '@/lib/errors';
 import { gql } from '@/lib/graphql/helpers';
 import type { CreateEventMutation } from '@/lib/graphql/types/v2/graphql';
-import type { Account } from '@/lib/graphql/types/v2/schema';
+import type { Account } from '@/lib/graphql/types/v2/graphql';
 
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';

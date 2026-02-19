@@ -9,8 +9,8 @@ import type {
   OffPlatformTransactionsInstitutionsQuery,
   OffPlatformTransactionsInstitutionsQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import type { OffPlatformTransactionsInstitution } from '@/lib/graphql/types/v2/schema';
-import { OffPlatformTransactionsProvider } from '@/lib/graphql/types/v2/schema';
+import type { OffPlatformTransactionsInstitution } from '@/lib/graphql/types/v2/graphql';
+import { OffPlatformTransactionsProvider } from '@/lib/graphql/types/v2/graphql';
 import { useRedirectToGoCardlessConnect } from '@/lib/hooks/useRedirectToGoCardlessConnect';
 import { i18nCountryName } from '@/lib/i18n';
 import { cn } from '@/lib/utils';

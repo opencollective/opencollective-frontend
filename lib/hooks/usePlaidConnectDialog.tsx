@@ -15,7 +15,7 @@ import type {
   RefreshPlaidAccountMutation,
   RefreshPlaidAccountMutationVariables,
 } from '../graphql/types/v2/graphql';
-import type { Host } from '../graphql/types/v2/schema';
+import type { Host } from '../graphql/types/v2/graphql';
 import { LOCAL_STORAGE_KEYS, setLocalStorage } from '../local-storage';
 
 const generatePlaidLinkTokenMutation = gql`

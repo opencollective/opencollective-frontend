@@ -15,7 +15,7 @@ import {
   ExpenseType,
   type PaymentMethod,
   PaymentMethodService,
-} from '@/lib/graphql/types/v2/schema';
+} from '@/lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '@/lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '@/lib/payment-method-utils';
 import { confirmPayment } from '@/lib/stripe/confirm-payment';

@@ -9,7 +9,7 @@ jest.mock('../../../PaymentMethodLabel', () => ({
 }));
 
 import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
-import { PaymentMethodService, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
+import { PaymentMethodService, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 
 import { AmountFilterType } from '../../filters/AmountFilter/schema';
 import { DateFilterType } from '../../filters/DateFilter/schema';

@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getCurrentLocalDateStr } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import type { TaxInput } from '../../lib/graphql/types/v2/schema';
+import type { TaxInput } from '../../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import type { ConfirmContributionFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 

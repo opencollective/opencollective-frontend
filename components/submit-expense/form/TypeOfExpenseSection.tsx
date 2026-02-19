@@ -5,7 +5,7 @@ import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
+import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 import { ExpenseLockableFields } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';

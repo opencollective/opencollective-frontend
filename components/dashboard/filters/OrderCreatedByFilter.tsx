@@ -7,7 +7,7 @@ import type { FilterComponentProps, FilterConfig } from '@/lib/filters/filter-ty
 import { isMulti } from '@/lib/filters/schemas';
 import { gql } from '@/lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, HostContext } from '@/lib/graphql/types/v2/graphql';
-import type { ExpectedFundsFilter } from '@/lib/graphql/types/v2/schema';
+import type { ExpectedFundsFilter } from '@/lib/graphql/types/v2/graphql';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
 import type { FilterValues as OrderFilterValues } from '../sections/contributions/filters';

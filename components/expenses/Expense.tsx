@@ -24,7 +24,7 @@ import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
 import { isFeatureEnabled } from '@/lib/allowed-features';
-import type { AccountWithHost, Expense as ExpenseType } from '@/lib/graphql/types/v2/schema';
+import type { AccountWithHost, Expense as ExpenseType } from '@/lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
 

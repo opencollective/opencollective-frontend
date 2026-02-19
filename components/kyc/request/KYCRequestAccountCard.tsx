@@ -9,7 +9,7 @@ import type {
   KycRequestAccountCardQuery,
   KycRequestAccountCardQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import type { AccountReferenceInput } from '@/lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard, accountHoverCardFields } from '@/components/AccountHoverCard';
 import Avatar from '@/components/Avatar';

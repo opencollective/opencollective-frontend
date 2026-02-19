@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-import { Currency } from '@/lib/graphql/types/v2/schema';
+import { Currency } from '@/lib/graphql/types/v2/graphql';
 import { withRequiredProviders } from '../../test/providers';
 
 import { CustomPaymentMethodInstructions } from './CustomPaymentMethodInstructions';

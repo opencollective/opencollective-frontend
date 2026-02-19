@@ -28,8 +28,8 @@ import {
   type TransactionsImportQuery,
   type TransactionsImportQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Amount } from '../../../../lib/graphql/types/v2/schema';
-import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Amount } from '../../../../lib/graphql/types/v2/graphql';
+import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';
