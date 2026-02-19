@@ -595,7 +595,18 @@ type ExpenseFormOptions = {
   supportedExpenseTypes?: ExpenseType[];
   allowInvite?: boolean;
   payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
-  payoutMethods?: ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'];
+  payoutMethods?: Array<
+    | ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]
+    | Partial<{
+        id: '__newAccountBalancePayoutMethod';
+        type: PayoutMethodType.ACCOUNT_BALANCE;
+        data: Pick<ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]['data'], 'currency'>;
+        isSaved: true;
+        canBeDeleted: undefined;
+        updatedAt: undefined;
+        createdAt: undefined;
+      }>
+  >;
   payoutMethod?:
     | ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]
     | ExpenseFormValues['newPayoutMethod'];

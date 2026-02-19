@@ -152,7 +152,6 @@ export function PayoutMethodDetailsContainer(props: {
   }, []);
 
   const payoutMethodDetailItems = getPayoutMethodDetailItems(props) || [];
-  console.log('payoutMethodDetailItems', payoutMethodDetailItems);
   const isExpandable = props.maxItems && payoutMethodDetailItems?.length > props.maxItems;
 
   const shownItems = isExpandable ? payoutMethodDetailItems.slice(0, 3) : payoutMethodDetailItems;

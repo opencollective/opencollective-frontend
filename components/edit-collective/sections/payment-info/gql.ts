@@ -1,6 +1,6 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-export const PayoutMethodFragment = gql`
+const PayoutMethodFragment = gql`
   fragment PayoutMethodFields on PayoutMethod {
     id
     type
