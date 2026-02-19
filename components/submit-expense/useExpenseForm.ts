@@ -32,6 +32,7 @@ import type {
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
   LocationInput,
+  MakeOptional,
   RecurringExpenseInterval,
 } from '../../lib/graphql/types/v2/graphql';
 import {
@@ -400,6 +401,8 @@ const formSchemaQuery = gql`
     isSaved
     canBeEdited
     canBeDeleted
+    createdAt
+    updatedAt
   }
 
   fragment ExpenseFormSchemaHostFields on Host {
@@ -595,7 +598,9 @@ type ExpenseFormOptions = {
   supportedExpenseTypes?: ExpenseType[];
   allowInvite?: boolean;
   payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
-  payoutMethods?: ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'];
+  payoutMethods?: Array<
+    MakeOptional<ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number], 'createdAt' | 'updatedAt'>
+  >;
   payoutMethod?:
     | ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]
     | ExpenseFormValues['newPayoutMethod'];

@@ -5697,6 +5697,7 @@ enum ActivityType {
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
   COLLECTIVE_UNHOSTED
+  COLLECTIVE_BALANCE_TRANSFERRED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
   ORGANIZATION_CONVERTED_TO_COLLECTIVE
@@ -6158,6 +6159,16 @@ type PayoutMethod {
   Whether this payout method can be archived
   """
   canBeArchived: Boolean
+
+  """
+  The date and time this payout method was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date and time this payout method was updated
+  """
+  updatedAt: DateTime!
 }
 
 """
@@ -6166,6 +6177,12 @@ PaymentMethod model
 type PaymentMethod {
   id: String
   legacyId: Int
+  createdAt: DateTime
+
+  """
+  The date and time this payout method was updated
+  """
+  updatedAt: DateTime!
   name: String
   service: PaymentMethodService
   type: PaymentMethodType
@@ -6188,7 +6205,6 @@ type PaymentMethod {
   data: JSON
   limitedToHosts: [Host]
   expiryDate: DateTime
-  createdAt: DateTime
 
   """
   For monthly gift cards, this field will return the monthly limit
@@ -14242,6 +14258,21 @@ type Individual implements Account {
   """
   email: String
   isGuest: Boolean!
+
+  """
+  Email address waiting for validation. Only visible to the user themselves.
+  """
+  emailWaitingForValidation: EmailAddress
+
+  """
+  Returns true if user account is limited (user can't use any feature)
+  """
+  isLimited: Boolean!
+
+  """
+  Returns true if user is a root user. Only visible to the user themselves.
+  """
+  isRoot: Boolean!
   requiresProfileCompletion: Boolean
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
@@ -19598,6 +19629,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
   COLLECTIVE_UNHOSTED
+  COLLECTIVE_BALANCE_TRANSFERRED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
   ORGANIZATION_CONVERTED_TO_COLLECTIVE
@@ -24101,7 +24133,7 @@ type Mutation {
     Payout Method reference
     """
     payoutMethod: PayoutMethodReferenceInput!
-  ): PayoutMethod!
+  ): PayoutMethod! @deprecated(reason: "2025-02-10: Payout methods cannot be restored.")
   editPayoutMethod(
     """
     Payout Method reference
@@ -24348,6 +24380,31 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): Account!
+
+  """
+  [Root only] Transfers balance from one account to another, creating BALANCE_TRANSFER transactions
+  """
+  rootTransferBalance(
+    """
+    Source account (balance goes down)
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Destination account (balance goes up)
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    Amount to transfer. Defaults to full balance of source account.
+    """
+    amount: AmountInput
+
+    """
+    Optional reason for audit trail
+    """
+    message: String
+  ): Order!
 
   """
   Refunds a transaction. Scope: "transactions".
