@@ -36,15 +36,14 @@ function flattenDetailsObject(details: any) {
 type PayoutMethodDetailsProps = {
   payoutMethod: Pick<PayoutMethod, 'type' | 'data'>;
   privateMessage?: React.ReactNode;
-  customItems?: Array<DataListItemProps & { id: string }>;
 };
 
 function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
-  const items: (DataListItemProps & { id: string })[] = props.customItems || [];
+  const items: (DataListItemProps & { id: string })[] = [];
 
   // Early return if there's not data to show (e.g. for archived payout methods)
   if (!props.payoutMethod.data) {
-    return props.customItems || null;
+    return null;
   }
 
   switch (props.payoutMethod.type) {
@@ -144,7 +143,6 @@ export function PayoutMethodDetailsContainer(props: {
   maxItems?: number;
   className?: string;
   privateMessage?: React.ReactNode;
-  customItems?: Array<DataListItemProps & { id: string }>;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const toggleContainer = React.useCallback(() => {

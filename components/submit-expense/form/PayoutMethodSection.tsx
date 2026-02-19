@@ -816,6 +816,17 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                   </Button>
                 </div>
               </React.Fragment>
+            ) : props.archived ? (
+              <div className="relative rounded-xl bg-muted p-4 text-sm text-muted-foreground">
+                <div>
+                  <FormattedMessage defaultMessage="Connected on" id="jOD/TD" />{' '}
+                  <DateTime value={props.payoutMethod.createdAt} dateStyle="medium" />
+                </div>
+                <div>
+                  <FormattedMessage defaultMessage="Last update" id="transactions.import.lastUpdate" />{' '}
+                  <DateTime value={props.payoutMethod.updatedAt} dateStyle="medium" />
+                </div>
+              </div>
             ) : (
               <div className="flex flex-col gap-4">
                 <PayoutMethodDetailsContainer
@@ -826,21 +837,6 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                     props.account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
                       ? privateInfoYouCollectiveAndHost
                       : privateInfoYouAndHost
-                  }
-                  customItems={
-                    props.archived &&
-                    [
-                      props.payoutMethod?.createdAt && {
-                        id: 'createdAt',
-                        label: <FormattedMessage defaultMessage="Connected on" id="jOD/TD" />,
-                        value: <DateTime value={props.payoutMethod?.createdAt} dateStyle="medium" />,
-                      },
-                      props.payoutMethod?.updatedAt && {
-                        id: 'updatedAt',
-                        label: <FormattedMessage defaultMessage="Last update" id="transactions.import.lastUpdate" />,
-                        value: <DateTime value={props.payoutMethod?.updatedAt} dateStyle="medium" />,
-                      },
-                    ].filter(Boolean)
                   }
                 />
                 {isMissingCurrency && !props.disableWarningMessages && (

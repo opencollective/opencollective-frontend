@@ -32,6 +32,7 @@ import type {
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
   LocationInput,
+  MakeOptional,
   RecurringExpenseInterval,
 } from '../../lib/graphql/types/v2/graphql';
 import {
@@ -598,16 +599,7 @@ type ExpenseFormOptions = {
   allowInvite?: boolean;
   payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
   payoutMethods?: Array<
-    | ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]
-    | Partial<{
-        id: '__newAccountBalancePayoutMethod';
-        type: PayoutMethodType.ACCOUNT_BALANCE;
-        data: Pick<ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]['data'], 'currency'>;
-        isSaved: true;
-        canBeDeleted: undefined;
-        updatedAt: undefined;
-        createdAt: undefined;
-      }>
+    MakeOptional<ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number], 'createdAt' | 'updatedAt'>
   >;
   payoutMethod?:
     | ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]
