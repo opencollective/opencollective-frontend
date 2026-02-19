@@ -6,9 +6,8 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Expense } from '../../../../lib/graphql/types/v2/schema';
-import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Expense, ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';

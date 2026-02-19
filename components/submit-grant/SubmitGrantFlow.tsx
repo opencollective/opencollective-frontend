@@ -13,7 +13,7 @@ import type {
   CreateExpenseFromDashboardMutation,
   EditExpenseFromDashboardMutation,
 } from '@/lib/graphql/types/v2/graphql';
-import { ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/schema';
+import { ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { objectKeys } from '@/lib/utils';
 

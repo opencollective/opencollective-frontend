@@ -2,7 +2,7 @@ import { Edit, Trash2 } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
-import type { Agreement } from '../../lib/graphql/types/v2/schema';
+import type { Agreement } from '../../lib/graphql/types/v2/graphql';
 
 export function useAgreementActions(
   onEdit: (agreement: Agreement) => void,

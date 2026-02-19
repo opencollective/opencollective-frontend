@@ -8,8 +8,8 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
-import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/schema';
-import { TwoFactorMethod } from '../../lib/graphql/types/v2/schema';
+import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';

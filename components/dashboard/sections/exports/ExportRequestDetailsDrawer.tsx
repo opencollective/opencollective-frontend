@@ -7,21 +7,18 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { CSVField } from '../../../../lib/export-csv/transactions-csv';
 import { FieldLabels } from '../../../../lib/export-csv/transactions-csv';
-import {
-  type AccountReferenceInput,
-  ExportRequestStatus,
-  ExportRequestType,
-  type PaymentMethodType,
-} from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import type { Action } from '@/lib/actions/types';
 import { formatFileSize } from '@/lib/file-utils';
 import type {
+  AccountReferenceInput,
   ExportRequestDetailsQuery,
   ExportRequestDetailsQueryVariables,
+  PaymentMethodType,
   TransactionsTableQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
+import { ExportRequestStatus, ExportRequestType } from '@/lib/graphql/types/v2/graphql';
 import useClipboard from '@/lib/hooks/useClipboard';
 
 import { PaymentMethodLabel } from '@/components/PaymentMethodLabel';

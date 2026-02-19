@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
-import { type Account, type ManualPaymentProvider, ManualPaymentProviderType } from '@/lib/graphql/types/v2/schema';
+import { type Account, type ManualPaymentProvider, ManualPaymentProviderType } from '@/lib/graphql/types/v2/graphql';
 
 import { useModal } from '@/components/ModalContext';
 

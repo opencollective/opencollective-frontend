@@ -10,7 +10,7 @@ import { DEFAULT_ASSIGNMENT_ACCOUNT_ID } from './lib/types';
 import { getAccountReferenceInput } from '@/lib/collective';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 import { i18nGraphqlException } from '@/lib/errors';
-import type { Account, TransactionsImport } from '@/lib/graphql/types/v2/schema';
+import type { Account, TransactionsImport } from '@/lib/graphql/types/v2/graphql';
 import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
 
 import CollectivePickerAsync from '@/components/CollectivePickerAsync';

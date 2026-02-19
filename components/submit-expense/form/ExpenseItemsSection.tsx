@@ -12,8 +12,12 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import dayjs from '../../../lib/dayjs';
-import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
-import { CurrencyExchangeRateSourceType, ExpenseLockableFields } from '../../../lib/graphql/types/v2/schema';
+import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/graphql';
+import {
+  AccountType,
+  CurrencyExchangeRateSourceType,
+  ExpenseLockableFields,
+} from '../../../lib/graphql/types/v2/graphql';
 import { getIntlDisplayNames } from '../../../lib/i18n';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
@@ -24,7 +28,6 @@ import {
   isTaxRateValid,
 } from '../../expenses/lib/utils';
 import { DISABLE_ANIMATIONS } from '@/lib/animations';
-import { AccountType } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
 import { FormField } from '@/components/FormField';

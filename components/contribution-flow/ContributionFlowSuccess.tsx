@@ -14,7 +14,7 @@ import { track } from '../../lib/analytics/plausible';
 import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { gql } from '../../lib/graphql/helpers';
-import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
+import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { iconForSocialLinkType } from '../../lib/social-links';
 import { getStripe } from '../../lib/stripe';
 import {

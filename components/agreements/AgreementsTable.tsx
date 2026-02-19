@@ -3,7 +3,7 @@ import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
-import type { Agreement } from '../../lib/graphql/types/v2/schema';
+import type { Agreement } from '../../lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';

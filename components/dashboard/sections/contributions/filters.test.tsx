@@ -8,8 +8,12 @@ jest.mock('../../../PaymentMethodLabel', () => ({
   PaymentMethodServiceLabel: () => null,
 }));
 
-import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
-import { PaymentMethodService, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
+import {
+  ContributionFrequency,
+  OrderStatus,
+  PaymentMethodService,
+  PaymentMethodType,
+} from '../../../../lib/graphql/types/v2/graphql';
 
 import { AmountFilterType } from '../../filters/AmountFilter/schema';
 import { DateFilterType } from '../../filters/DateFilter/schema';

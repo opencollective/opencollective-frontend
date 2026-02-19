@@ -1,5 +1,5 @@
-import type { ContributionFrequency } from '../graphql/types/v2/schema';
-import { TierFrequency } from '../graphql/types/v2/schema';
+import type { ContributionFrequency } from '../graphql/types/v2/graphql';
+import { TierFrequency } from '../graphql/types/v2/graphql';
 
 const INTERVALS = {
   oneTime: 'oneTime',

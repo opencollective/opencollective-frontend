@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import type { Account, AccountingCategory, Expense, Host } from '../../lib/graphql/types/v2/schema';
+import type { Account, AccountingCategory, Expense, Host } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 
 import AccountingCategorySelect from '../AccountingCategorySelect';

@@ -7,8 +7,8 @@ import { sortBy } from 'lodash';
 import { GripVertical, X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/schema';
-import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
+import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/graphql';
+import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { SocialLinkLabel } from '../../lib/social-links';
 import { isValidUrl } from '../../lib/utils';
 

@@ -4,7 +4,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { Currency } from '@/lib/graphql/types/v2/schema';
+import { Currency } from '@/lib/graphql/types/v2/graphql';
 import { withRequiredProviders } from '../../test/providers';
 
 import { CustomPaymentMethodTemplateEditor } from './CustomPaymentMethodTemplateEditor';

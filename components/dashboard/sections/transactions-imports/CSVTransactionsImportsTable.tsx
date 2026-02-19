@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '../../../../lib/filters/schemas';
-import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
+import type { TransactionsImport } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsImportType } from '../../../../lib/i18n/transactions-import';
 import { capitalize } from '../../../../lib/utils';

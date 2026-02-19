@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { HandCoins, Landmark } from 'lucide-react';
 
-import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/graphql';
 
 import { CUSTOM_PAYMEMENT_ICON_MAP } from './constants';
 

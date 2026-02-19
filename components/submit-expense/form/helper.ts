@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ExpenseType } from '@/lib/graphql/types/v2/schema';
+import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
 import type { ExpenseForm } from '../useExpenseForm';
 

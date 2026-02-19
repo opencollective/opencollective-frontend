@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import type { Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
-import { OrderStatus } from '../../../../lib/graphql/types/v2/schema';
+import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { isMulti } from '@/lib/filters/schemas';
 import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';

@@ -15,7 +15,7 @@ import { Update as UpdateIcon } from '@styled-icons/material/Update';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { renderDetailsString } from '../../lib/transactions';
-import { ExpenseStatus, type Transaction } from '@/lib/graphql/types/v2/schema';
+import { ExpenseStatus, type Transaction } from '@/lib/graphql/types/v2/graphql';
 
 /**
  * Defines activities display metadata.

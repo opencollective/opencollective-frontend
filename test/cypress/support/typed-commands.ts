@@ -4,7 +4,7 @@
 import type { Message, MessageSummary } from 'cypress-mailpit/src/types';
 
 import { fakeTag as gql } from '../../../lib/graphql/helpers';
-import type { AmountInput } from '@/lib/graphql/types/v2/schema';
+import type { AmountInput } from '@/lib/graphql/types/v2/graphql';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
 

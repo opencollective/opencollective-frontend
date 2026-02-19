@@ -7,18 +7,21 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import type { Account, Host, TransactionsImport, TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
-import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { updateTransactionsImportRows } from './lib/graphql';
-import { getMatchInfo } from './lib/match';
-import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import type {
+  Account,
   FindExpenseMatchForOffPlatformCreditQuery,
   FindExpenseMatchForOffPlatformCreditQueryVariables,
   FindOrderMatchForOffPlatformCreditQuery,
   FindOrderMatchForOffPlatformCreditQueryVariables,
+  Host,
+  TransactionsImport,
+  TransactionsImportRow,
   TransactionsImportStats,
-} from '@/lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/graphql';
+import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { updateTransactionsImportRows } from './lib/graphql';
+import { getMatchInfo } from './lib/match';
+import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { ExpenseStatusFilter, OrderStatus, TransactionsImportRowAction } from '@/lib/graphql/types/v2/graphql';
 
 import {

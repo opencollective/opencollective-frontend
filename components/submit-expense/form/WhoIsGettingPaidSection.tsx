@@ -7,8 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { AccountType, ExpenseType } from '../../../lib/graphql/types/v2/schema';
-import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { FormField } from '@/components/FormField';

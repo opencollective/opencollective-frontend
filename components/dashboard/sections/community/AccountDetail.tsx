@@ -8,9 +8,12 @@ import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { i18nGraphqlException } from '@/lib/errors';
 import { gql } from '@/lib/graphql/helpers';
-import type { CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
-import { AccountType, CommunityRelationType, KycProvider, LegalDocumentType } from '@/lib/graphql/types/v2/schema';
+import type {
+  AccountReferenceInput,
+  CommunityAccountDetailQuery,
+  VendorFieldsFragment,
+} from '@/lib/graphql/types/v2/graphql';
+import { AccountType, CommunityRelationType, KycProvider, LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';

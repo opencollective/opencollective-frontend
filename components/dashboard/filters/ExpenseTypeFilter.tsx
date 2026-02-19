@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { isMulti, isNullable } from '../../../lib/filters/schemas';
-import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
+import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../lib/i18n/expense';
 import { sortSelectOptions } from '../../../lib/utils';
 

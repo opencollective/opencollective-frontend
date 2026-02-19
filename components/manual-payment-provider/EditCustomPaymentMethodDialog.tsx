@@ -2,8 +2,8 @@ import React from 'react';
 import { Formik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
-import { Currency } from '@/lib/graphql/types/v2/schema';
+import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/graphql';
+import { Currency } from '@/lib/graphql/types/v2/graphql';
 
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/Dialog';

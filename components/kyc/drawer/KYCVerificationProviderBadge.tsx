@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { KycProvider } from '@/lib/graphql/types/v2/schema';
+import type { KycProvider } from '@/lib/graphql/types/v2/graphql';
 
 import { Badge } from '@/components/ui/Badge';
 

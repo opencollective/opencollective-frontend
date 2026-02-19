@@ -7,11 +7,11 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import type {
+  AccountingCategory,
   AdminAccountingCategoriesQuery,
   AdminAccountingCategoriesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema';
-import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';

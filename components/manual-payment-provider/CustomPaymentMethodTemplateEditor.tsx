@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { Amount } from '@/lib/graphql/types/v2/schema';
+import type { Amount } from '@/lib/graphql/types/v2/graphql';
 
 import RichTextEditor from '../RichTextEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';

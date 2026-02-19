@@ -3,7 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { CheckCircle2, Shield } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import type { AccountReferenceInput } from '@/lib/graphql/types/v2/graphql';
 
 import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
 import { Button } from '@/components/ui/Button';
