@@ -3,7 +3,7 @@ import { useFormikContext } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '@/lib/collective';
-import { ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
+import { ExpenseLockableFields } from '@/lib/graphql/types/v2/graphql';
 
 import { FormField } from '../../FormField';
 import { Input, InputGroup } from '../../ui/Input';

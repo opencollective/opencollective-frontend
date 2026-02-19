@@ -14,7 +14,7 @@ import {
   PaymentMethodType,
   TransactionKind,
   TransactionType,
-} from '../../../../lib/graphql/types/v2/schema';
+} from '../../../../lib/graphql/types/v2/graphql';
 
 import { AmountFilterType } from '../../filters/AmountFilter/schema';
 import { DateFilterType } from '../../filters/DateFilter/schema';

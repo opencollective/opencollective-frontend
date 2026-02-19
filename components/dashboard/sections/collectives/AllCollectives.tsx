@@ -12,7 +12,7 @@ import type {
   HostedCollectiveFieldsFragment,
   HostedCollectivesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
+import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 

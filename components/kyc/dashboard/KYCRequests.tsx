@@ -6,7 +6,7 @@ import { z } from 'zod';
 import type { FilterComponentConfigs } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
 import type { KycRequestsDashboardQuery } from '@/lib/graphql/types/v2/graphql';
-import { KycVerificationStatus } from '@/lib/graphql/types/v2/schema';
+import { KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';

@@ -14,7 +14,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
-import { ExpenseStatus } from '@/lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { ALL_SECTIONS } from '../dashboard/constants';

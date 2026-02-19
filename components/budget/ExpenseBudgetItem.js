@@ -8,7 +8,7 @@ import { space } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { getFilesFromExpense } from '../../lib/expenses';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { toPx } from '../../lib/theme/helpers';
@@ -221,6 +221,7 @@ const ExpenseBudgetItem = ({
                               textDecoration="none"
                               color="black.900"
                               fontSize={fontSize}
+                              overflowWrap="anywhere"
                               data-cy="expense-title"
                             >
                               {value}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 import { getDashboardRoute } from '../../lib/url-helpers';
 

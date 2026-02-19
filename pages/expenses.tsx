@@ -10,7 +10,7 @@ import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '.
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { generateNotFoundError } from '../lib/errors';
-import { ExpenseStatus } from '../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import type { ExpensesPageQuery } from '@/lib/graphql/types/v2/graphql';

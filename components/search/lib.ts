@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { Comment, HostApplication, Order, Update } from '@/lib/graphql/types/v2/schema';
+import type { Comment, HostApplication, Order, Update } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import {

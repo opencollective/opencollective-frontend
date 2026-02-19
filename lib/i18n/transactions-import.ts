@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import { TransactionsImportType } from '../graphql/types/v2/schema';
+import { TransactionsImportType } from '../graphql/types/v2/graphql';
 
 const TransactionsImportTypeI18n = defineMessages({
   [TransactionsImportType.MANUAL]: {

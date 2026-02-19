@@ -6,7 +6,7 @@ import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { DateTimeField } from '../../../../lib/graphql/types/v2/schema';
+import { DateTimeField } from '../../../../lib/graphql/types/v2/graphql';
 import { useDrawer } from '../../../../lib/hooks/useDrawer';
 import useLocalStorage from '../../../../lib/hooks/useLocalStorage';
 import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';

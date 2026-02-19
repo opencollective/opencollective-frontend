@@ -1,5 +1,5 @@
 import type { CommunityRelationType } from '../graphql/types/v2/graphql';
-import { MemberRole } from '../graphql/types/v2/schema';
+import { MemberRole } from '../graphql/types/v2/graphql';
 
 import formatMemberRole from './member-role';
 

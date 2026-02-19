@@ -5,7 +5,7 @@ import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 
 import { formatCurrency } from '@/lib/currency-utils';
-import type { Amount } from '@/lib/graphql/types/v2/schema';
+import type { Amount } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
 import type { TEMPLATE_VARIABLES } from './constants';

@@ -1,7 +1,7 @@
 import type { IntlShape } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
-import { LegalDocumentRequestStatus } from '../graphql/types/v2/schema';
+import { LegalDocumentRequestStatus } from '../graphql/types/v2/graphql';
 
 const LEGAL_DOCUMENT_STATUSES = defineMessages({
   [LegalDocumentRequestStatus.ERROR]: {

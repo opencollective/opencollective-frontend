@@ -1,7 +1,7 @@
 import { AlertCircle, CheckCircle2, Clock, FileText, Loader2 } from 'lucide-react';
 import { defineMessage } from 'react-intl';
 
-import { ExportRequestStatus, ExportRequestType } from '@/lib/graphql/types/v2/schema';
+import { ExportRequestStatus, ExportRequestType } from '@/lib/graphql/types/v2/graphql';
 
 export const ExportTypeLabels = {
   [ExportRequestType.TRANSACTIONS]: defineMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),

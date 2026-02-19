@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { ExpenseMetaStatuses } from '../../../lib/expense';
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { isMulti } from '../../../lib/filters/schemas';
-import { ExpenseStatusFilter as ExpenseStatusFilterEnum } from '../../../lib/graphql/types/v2/schema';
+import { ExpenseStatusFilter as ExpenseStatusFilterEnum } from '../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../../lib/i18n/expense';
 import { sortSelectOptions } from '../../../lib/utils';
 

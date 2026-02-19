@@ -2,7 +2,7 @@ import React from 'react';
 import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
+import { ExpenseLockableFields } from '@/lib/graphql/types/v2/graphql';
 
 import { FormField } from '@/components/FormField';
 import { Skeleton } from '@/components/ui/Skeleton';

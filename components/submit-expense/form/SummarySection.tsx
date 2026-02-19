@@ -7,12 +7,11 @@ import { AtSign, Building, Contact, Globe, Lock, Mail } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
+import { ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import { RecurringExpenseIntervals } from '../../../lib/i18n/expense';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } from '../../expenses/lib/utils';
 import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { I18nBold } from '@/components/I18nFormatters';
 import { Separator } from '@/components/ui/Separator';

@@ -7,10 +7,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
 import type {
+  Account,
   EditCollectiveBankTransferHostQuery,
   EditCollectiveBankTransferHostQueryVariables,
+  ManualPaymentProvider,
 } from '@/lib/graphql/types/v2/graphql';
-import type { Account, ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
 
 import { useToast } from '@/components/ui/useToast';
 

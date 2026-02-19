@@ -13,12 +13,13 @@ import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import {
   type Currency,
   type CurrencyExchangeRateInput,
+  type Expense,
+  ExpenseLockableFields,
   ExpenseType,
   PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 import { getAccountReferenceInput } from '@/lib/collective';
-import { type Expense, ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
 
 import CollectivePicker from '../CollectivePicker';
 import { accountsQuery } from '../dashboard/sections/accounts/queries';

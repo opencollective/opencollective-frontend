@@ -8,9 +8,12 @@ import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { i18nGraphqlException } from '@/lib/errors';
 import { gql } from '@/lib/graphql/helpers';
-import type { CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
-import { AccountType, CommunityRelationType, KycProvider, LegalDocumentType } from '@/lib/graphql/types/v2/schema';
+import type {
+  AccountReferenceInput,
+  CommunityAccountDetailQuery,
+  VendorFieldsFragment,
+} from '@/lib/graphql/types/v2/graphql';
+import { AccountType, CommunityRelationType, KycProvider, LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
@@ -26,6 +29,7 @@ import StackedAvatars from '@/components/StackedAvatars';
 import StyledModal from '@/components/StyledModal';
 import { DataTable } from '@/components/table/DataTable';
 import Tabs from '@/components/Tabs';
+import { Badge } from '@/components/ui/Badge';
 import { InfoList, InfoListItem } from '@/components/ui/InfoList';
 import { VendorContactTag } from '@/components/vendors/common';
 import { setVendorArchiveMutation, vendorFieldFragment } from '@/components/vendors/queries';
@@ -50,6 +54,7 @@ import { ExpensesTab } from './AccountDetailExpensesTab';
 import { AccountTaxFormStatus } from './AccountTaxFormStatus';
 import {
   associatedTableColumns,
+  getCollectiveTypeIcon,
   getMembersTableColumns,
   RichActivityDate,
   useAssociatedCollectiveActions,
@@ -196,7 +201,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
       </button>
       <DashboardHeader
         title={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {isLoading ? (
               <React.Fragment>
                 <Skeleton className="aspect-square size-9" />
@@ -204,9 +209,13 @@ export function ContributorDetails(props: ContributionDrawerProps) {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <Avatar collective={account} size={36} />
+                <Avatar collective={account} size={48} />
                 {account.name || account.slug}
                 {legalName && <span className="font-semibold text-muted-foreground">{`(${legalName})`}</span>}
+                <Badge className="gap-1 rounded-full">
+                  {getCollectiveTypeIcon(account?.type || props.expectedAccountType, { size: 12 })}
+                  {formatCollectiveType(intl, account?.type || props.expectedAccountType)}
+                </Badge>
               </React.Fragment>
             )}
           </div>
@@ -262,20 +271,18 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           <Skeleton className="h-4 w-32" />
         ) : (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <div className="flex gap-1 align-middle">
-              <div className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset">
-                {formatCollectiveType(intl, account?.type || props.expectedAccountType)}
-              </div>
-              {relations.map(role => (
-                <div
-                  key={role}
-                  className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
-                >
-                  {formatCommunityRelation(intl, role)}
+            {relations.length > 0 && (
+              <React.Fragment>
+                <div className="flex gap-1 align-middle">
+                  {relations.map(role => (
+                    <Badge key={role} size="sm" type="outline">
+                      {formatCommunityRelation(intl, role)}
+                    </Badge>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <Dot size={14} />
+                <Dot size={14} />
+              </React.Fragment>
+            )}
             <div className="flex items-center gap-1">
               <BookKey size={14} />
               <CopyID
