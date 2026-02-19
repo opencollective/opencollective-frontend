@@ -285,6 +285,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
             fromAccount: false,
             createdAt: false,
             lastChargedAt: false,
+            accountingCategory: true,
           }}
         />
       )}
