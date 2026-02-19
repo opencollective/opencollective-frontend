@@ -5,8 +5,7 @@ import dayjs from 'dayjs';
 import { Info, Link as Link2, Pencil } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
-import { ExpenseStatus } from '@/lib/graphql/types/v2/schema';
+import { ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/graphql';
 import formatAccountType from '@/lib/i18n/account-type';
 
 import { CopyID } from '@/components/CopyId';

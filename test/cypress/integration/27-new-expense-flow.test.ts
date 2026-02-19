@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow-callback */
 import * as cheerio from 'cheerio';
 
-import { Currency } from '../../../lib/graphql/types/v2/schema';
+import { Currency } from '../../../lib/graphql/types/v2/graphql';
 
 import { randomSlug } from '../support/faker';
 

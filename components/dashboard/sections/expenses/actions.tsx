@@ -27,7 +27,7 @@ import type {
   ExpensesListAdminFieldsFragmentFragment,
   ExpensesListFieldsFragmentFragment,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatus } from '../../../../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';

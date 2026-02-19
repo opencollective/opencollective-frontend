@@ -4,11 +4,10 @@ import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, LegalDocumentFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
-import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 

@@ -2,8 +2,8 @@ import React from 'react';
 import { startCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/schema';
-import { ConnectedAccountService } from '@/lib/graphql/types/v2/schema';
+import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/graphql';
+import { ConnectedAccountService } from '@/lib/graphql/types/v2/graphql';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import Link from '@/components/Link';

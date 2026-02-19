@@ -5,7 +5,7 @@ import { clsx } from 'clsx';
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../../../../lib/graphql/helpers';
-import type { Amount, ExpenseCollection, Host } from '../../../../lib/graphql/types/v2/schema';
+import type { Amount, ExpenseCollection, Host } from '../../../../lib/graphql/types/v2/graphql';
 import { getDashboardUrl } from '../../../../lib/stripe/dashboard';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';

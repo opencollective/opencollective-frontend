@@ -24,7 +24,7 @@ import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/erro
 import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
 import { gql } from '../../lib/graphql/helpers';
-import { AccountType } from '../../lib/graphql/types/v2/schema';
+import { AccountType } from '../../lib/graphql/types/v2/graphql';
 import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';

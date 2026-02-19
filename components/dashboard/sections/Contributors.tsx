@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { fetchCSVFileFromRESTService } from '../../../lib/api';
 import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
-import { MemberRole } from '../../../lib/graphql/types/v2/schema';
+import { MemberRole } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { capitalize, sortSelectOptions } from '../../../lib/utils';
 

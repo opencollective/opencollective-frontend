@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import type { FilterConfig } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
-import { AccountType, CommunityRelationType, type Contributor } from '@/lib/graphql/types/v2/schema';
+import { AccountType, CommunityRelationType, type Contributor } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';

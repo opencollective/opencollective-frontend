@@ -9,7 +9,7 @@ import type {
   EditCollectiveBankTransferHostQuery,
   ManualPaymentProvider,
 } from '@/lib/graphql/types/v2/graphql';
-import { ManualPaymentProviderType } from '@/lib/graphql/types/v2/schema';
+import { ManualPaymentProviderType } from '@/lib/graphql/types/v2/graphql';
 
 import { InputGroup } from '@/components/ui/Input';
 

@@ -14,7 +14,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { formatErrorMessage } from '../../lib/errors';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
-import { ExpenseLockableFields, ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseLockableFields, ExpenseStatus, UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { require2FAForAdmins } from '../../lib/policies';
@@ -29,7 +29,6 @@ import {
   getSupportedCurrencies,
   validateExpenseTaxes,
 } from './lib/utils';
-import { UploadedFileKind } from '@/lib/graphql/types/v2/schema';
 import { OFICO_MEMBER_ORGANIZATIONS } from '@/lib/preview-features';
 
 import AccountingCategorySelect, { isSupportedExpenseCategory } from '../AccountingCategorySelect';

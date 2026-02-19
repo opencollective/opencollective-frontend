@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
+import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
 
 import type { BaseModalProps } from '../../../ModalContext';
 import { Button } from '../../../ui/Button';

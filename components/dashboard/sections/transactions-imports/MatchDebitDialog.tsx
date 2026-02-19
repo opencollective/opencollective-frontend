@@ -7,16 +7,19 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import type { Account, Host, TransactionsImport, TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
+import type {
+  Account,
+  FindContributionsMatchForOffPlatformDebitQueryVariables,
+  FindExpenseMatchForOffPlatformDebitQueryVariables,
+  Host,
+  TransactionsImport,
+  TransactionsImportRow,
+} from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { updateTransactionsImportRows } from './lib/graphql';
 import { getMatchInfo } from './lib/match';
 import { ExpenseMetaStatuses } from '@/lib/expense';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
-import type {
-  FindContributionsMatchForOffPlatformDebitQueryVariables,
-  FindExpenseMatchForOffPlatformDebitQueryVariables,
-} from '@/lib/graphql/types/v2/graphql';
 import {
   ExpenseStatus,
   ExpenseStatusFilter,

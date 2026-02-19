@@ -4,10 +4,10 @@ import { useIntl } from 'react-intl';
 
 import type {
   AccountHoverCardFieldsFragment,
+  KycProvider,
   KycVerificationCollectionFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
 import { KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
-import type { KycProvider } from '@/lib/graphql/types/v2/schema';
 
 import { AccountHoverCard } from '@/components/AccountHoverCard';
 import Avatar from '@/components/Avatar';

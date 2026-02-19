@@ -5,7 +5,7 @@ import { ArrowLeft, Shield } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import z from 'zod';
 
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import type { AccountReferenceInput } from '@/lib/graphql/types/v2/graphql';
 
 import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
 import { FormField } from '@/components/FormField';

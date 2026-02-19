@@ -16,7 +16,7 @@ import CommentType from '../../lib/constants/commentTypes';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
-import type { Account } from '../../lib/graphql/types/v2/graphql';
+import type { Account, AccountWithHost, Expense as ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useKeyboardKey, { E, ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -24,7 +24,6 @@ import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
 import { isFeatureEnabled } from '@/lib/allowed-features';
-import type { AccountWithHost, Expense as ExpenseType } from '@/lib/graphql/types/v2/schema';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
 
