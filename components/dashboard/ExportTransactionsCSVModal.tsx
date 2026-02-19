@@ -243,7 +243,7 @@ const GenerateExportButton = ({ params, account }) => {
   const onSuccess = useCallback(() => {
     toast({
       variant: 'success',
-      message: 'Your export request is ready!',
+      message: <FormattedMessage id="ExportRequest.Ready" defaultMessage="Your export request is ready!" />,
     });
   }, [toast]);
 
@@ -266,13 +266,22 @@ const GenerateExportButton = ({ params, account }) => {
       });
       toast({
         variant: 'success',
-        message:
-          'Your export is being generated. You can check its progress in the Exports section or wait here until it finishes.',
+        message: (
+          <FormattedMessage
+            id="ExportRequest.Generating"
+            defaultMessage="Your export is being generated. You can check its progress in the Exports section or wait here until it finishes."
+          />
+        ),
       });
     } catch {
       toast({
         variant: 'error',
-        message: 'Failed to create export request. Please try again.',
+        message: (
+          <FormattedMessage
+            id="ExportRequest.Failed"
+            defaultMessage="Failed to create export request. Please try again."
+          />
+        ),
       });
     }
   }, [account, create, name, parameters, toast]);
@@ -335,7 +344,9 @@ const ExportTransactionsCSVModal = ({
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
-  const [exportName, setExportName] = React.useState(`${account?.name || account?.slug}'s transactions export`);
+  const [exportName, setExportName] = React.useState(
+    `${account?.name || account?.slug || LoggedInUser?.collective?.name || 'Your'}'s transactions export`,
+  );
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
   const [useFieldNames, setUseFieldNames] = React.useState(false);

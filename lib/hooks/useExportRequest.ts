@@ -1,11 +1,12 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 
-import type {
-  UseExportRequestCreateMutation,
-  UseExportRequestCreateMutationVariables,
-  UseExportRequestQuery,
-  UseExportRequestQueryVariables,
+import {
+  ExportRequestStatus,
+  type UseExportRequestCreateMutation,
+  type UseExportRequestCreateMutationVariables,
+  type UseExportRequestQuery,
+  type UseExportRequestQueryVariables,
 } from '../graphql/types/v2/graphql';
 
 const createExportRequestMutation = gql`
@@ -66,17 +67,21 @@ function useExportRequest({
   });
 
   React.useEffect(() => {
-    if (called && created && !createError && data?.exportRequest?.status !== 'COMPLETED') {
+    if (called && created && !createError && !data) {
       setIsGenerating(true);
       startPolling(pollInterval);
     } else if (called && createError) {
       setIsGenerating(false);
       stopPolling();
-    } else if (data && data.exportRequest) {
-      setIsGenerating(false);
-      stopPolling();
-      if (data.exportRequest?.status === 'COMPLETED') {
-        onSuccess?.(data.exportRequest);
+    } else if (data?.exportRequest) {
+      if ([ExportRequestStatus.ENQUEUED, ExportRequestStatus.PROCESSING].includes(data.exportRequest.status)) {
+        return;
+      } else {
+        setIsGenerating(false);
+        stopPolling();
+        if (data.exportRequest?.status === 'COMPLETED') {
+          onSuccess?.(data.exportRequest);
+        }
       }
     }
   }, [called, created, createError, pollInterval, startPolling, stopPolling, data, onSuccess]);
