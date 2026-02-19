@@ -278,7 +278,7 @@ const useExpenseCategoryPredictionService = (
 
   // Trigger new fetch predictions, and hide the current ones if we don't get a response within 1s (to avoid flickering)
   React.useEffect(() => {
-    if (hasValidParams) {
+    if (hasValidParams && host?.slug) {
       const hidePredictionsTimeout = setTimeout(() => setShowPreviousPredictions(false), 1000);
       throttledFetchPredictions({ hostSlug: host.slug, accountSlug: account.slug, ...inputData }).then(() => {
         clearTimeout(hidePredictionsTimeout);
@@ -287,7 +287,7 @@ const useExpenseCategoryPredictionService = (
         }
       });
     }
-  }, [host.slug, account?.slug, hasValidParams, ...Object.values(inputData)]);
+  }, [host?.slug, account?.slug, hasValidParams, ...Object.values(inputData)]);
 
   // Map returned categories with known ones to build `predictions`
   const predictions = React.useMemo(() => {

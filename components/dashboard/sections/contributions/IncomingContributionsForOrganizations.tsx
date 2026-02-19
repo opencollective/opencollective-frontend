@@ -16,7 +16,7 @@ import { HostContextFilter, hostContextFilter } from '../../filters/HostContextF
 import { hostedAccountsFilter } from '../../filters/HostedAccountFilter';
 import type { DashboardSectionProps } from '../../types';
 
-import ContributionsTable from './ContributionsTable';
+import ContributionsTable, { defaultVisibility } from './ContributionsTable';
 import type { FilterMeta } from './filters';
 import { ContributionAccountingCategoryKinds, filters, schema as baseSchema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
@@ -206,6 +206,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
         nbPlaceholders={nbPlaceholders}
         error={error}
         refetch={handleRefetch}
+        columnVisibility={{ ...defaultVisibility, accountingCategory: true }}
       />
     </div>
   );
