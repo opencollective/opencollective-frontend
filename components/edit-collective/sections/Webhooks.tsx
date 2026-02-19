@@ -149,7 +149,8 @@ class Webhooks extends React.Component<Props, State> {
     const removeSet = new Set([WebhookEvents.COLLECTIVE_TRANSACTION_CREATED]); // Deprecating this event, see https://github.com/opencollective/opencollective/issues/7162
 
     // Features
-    const canReceiveExpenses = isFeatureEnabled(collective, FEATURES.RECEIVE_EXPENSES);
+    const canReceiveExpenses =
+      isFeatureEnabled(collective, FEATURES.RECEIVE_EXPENSES) || isFeatureEnabled(collective, FEATURES.RECEIVE_GRANTS);
     const canReceiveContributions = isFeatureEnabled(collective, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS);
     const canUseVirtualCards = isFeatureEnabled(collective, FEATURES.VIRTUAL_CARDS);
     const canUseUpdates = isFeatureEnabled(collective, FEATURES.UPDATES);
@@ -421,6 +422,7 @@ const editCollectiveWebhooksQuery = gqlV1 /* GraphQL */ `
       isHost
       features {
         RECEIVE_EXPENSES
+        RECEIVE_GRANTS
         VIRTUAL_CARDS
         RECEIVE_FINANCIAL_CONTRIBUTIONS
         UPDATES
