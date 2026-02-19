@@ -5,8 +5,8 @@ import { MockedProvider } from '@apollo/client/testing';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
-import { ManualPaymentProviderType } from '@/lib/graphql/types/v2/schema';
+import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/graphql';
+import { ManualPaymentProviderType } from '@/lib/graphql/types/v2/graphql';
 import { withRequiredProviders } from '../../test/providers';
 
 import {

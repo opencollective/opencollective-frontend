@@ -7,7 +7,7 @@ import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
-import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/schema';
+import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
 import type LoggedInUser from '@/lib/LoggedInUser';
 

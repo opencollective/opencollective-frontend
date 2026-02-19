@@ -6,7 +6,7 @@ import type z from 'zod';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import type { AccountReferenceInput } from '@/lib/graphql/types/v2/graphql';
 
 import { Button } from '@/components/ui/Button';
 import { DataList, DataListItem } from '@/components/ui/DataList';

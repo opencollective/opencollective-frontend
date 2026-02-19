@@ -16,6 +16,7 @@ export const peopleHostDashboardQuery = gql`
     $account: AccountReferenceInput
     $totalContributed: AmountRangeInput
     $totalExpended: AmountRangeInput
+    $orderBy: OrderByInput
   ) {
     community(
       host: { slug: $slug }
@@ -27,6 +28,7 @@ export const peopleHostDashboardQuery = gql`
       totalExpended: $totalExpended
       offset: $offset
       limit: $limit
+      orderBy: $orderBy
     ) {
       totalCount
       limit

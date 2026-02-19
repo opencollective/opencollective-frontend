@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { hasAccountMoneyManagement } from '@/lib/collective';
-import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/schema';
+import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/graphql';
 
 import { getI18nLink } from '@/components/I18nFormatters';
 import Stripe from '@/components/icons/Stripe';

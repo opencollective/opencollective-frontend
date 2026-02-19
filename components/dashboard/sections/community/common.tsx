@@ -1,23 +1,27 @@
 import React, { useCallback } from 'react';
 import { capitalize, compact } from 'lodash';
+import type { LucideProps } from 'lucide-react';
 import {
   Archive,
   ArrowRightLeft,
   BookKey,
+  Building2,
   EarthIcon,
   EyeIcon,
   HandCoins,
   HelpCircle,
   Pencil,
   Receipt,
+  Store,
+  User,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import type { Contributor } from '@/lib/graphql/types/v2/schema';
+import type { CommunityAccountDetailQuery, Contributor, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
@@ -41,6 +45,21 @@ type UsePersonActionsOptions = {
   hasKYCFeature: boolean;
   editVendor?: (vendor: VendorFieldsFragment) => void;
   archiveVendor?: (vendor: VendorFieldsFragment) => void;
+};
+
+export const getCollectiveTypeIcon = (
+  type: AccountType | (typeof CollectiveType)[keyof typeof CollectiveType],
+  props?: LucideProps,
+): React.ReactNode => {
+  switch (type) {
+    case AccountType.ORGANIZATION:
+      return <Building2 {...props} />;
+    case AccountType.VENDOR:
+      return <Store {...props} />;
+    case CollectiveType.USER:
+    case AccountType.INDIVIDUAL:
+      return <User {...props} />;
+  }
 };
 
 export function usePersonActions(opts: UsePersonActionsOptions) {

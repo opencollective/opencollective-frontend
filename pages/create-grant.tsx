@@ -8,7 +8,7 @@ import { APOLLO_STATE_PROP_NAME, initClient } from '@/lib/apollo-client';
 import { getCollectivePageMetadata, isHiddenAccount } from '@/lib/collective';
 import { generateNotFoundError } from '@/lib/errors';
 import type { CreateGrantPageQuery } from '@/lib/graphql/types/v2/graphql';
-import { ExpenseType } from '@/lib/graphql/types/v2/schema';
+import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '@/lib/url-helpers';

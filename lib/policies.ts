@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
-import type { Account, Policies } from './graphql/types/v2/schema';
+import type { Account, Policies } from './graphql/types/v2/graphql';
 
 type PoliciesUnion = Exclude<keyof Policies, '__typename' | 'id'>;
 

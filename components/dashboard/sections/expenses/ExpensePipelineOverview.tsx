@@ -8,9 +8,9 @@ import { FormattedMessage } from 'react-intl';
 import { connectAccount } from '../../../../lib/api';
 import { createError, ERROR } from '../../../../lib/errors';
 import { gql } from '../../../../lib/graphql/helpers';
-import type { Amount, ExpenseCollection, Host } from '../../../../lib/graphql/types/v2/schema';
-import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
+import type { Amount, ExpenseCollection, Host } from '../../../../lib/graphql/types/v2/graphql';
 import { getDashboardUrl } from '../../../../lib/stripe/dashboard';
+import { useAsyncCall } from '@/lib/hooks/useAsyncCall';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import CcStripe from '../../../icons/Stripe';

@@ -3,8 +3,8 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import type { Expense } from '../../lib/graphql/types/v2/schema';
-import { ExpenseStatus, ExpenseType, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/schema';
+import type { Expense } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus, ExpenseType, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import type { BaseModalProps } from '../ModalContext';

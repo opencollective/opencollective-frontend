@@ -9,7 +9,7 @@ import { margin } from 'styled-system';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
-import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/schema';
+import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getAvailableLimitString } from '../../lib/i18n/virtual-card-spending-limit';
 import { getDashboardObjectIdURL } from '../../lib/stripe/dashboard';

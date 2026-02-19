@@ -13,13 +13,20 @@ import { formatCurrency } from '../../../../lib/currency-utils';
 import { getCurrentLocalDateStr } from '../../../../lib/date-utils';
 import { requireFields } from '../../../../lib/form-utils';
 import { API_V1_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type { Account, Amount, Order, Tier, TransactionReferenceInput } from '../../../../lib/graphql/types/v2/schema';
+import type {
+  Account,
+  Amount,
+  Order,
+  Tier,
+  TierReferenceInput,
+  TransactionReferenceInput,
+  VendorFieldsFragment,
+} from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 import { i18nGraphqlException } from '@/lib/errors';
-import type { TierReferenceInput, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import { I18nBold } from '@/components/I18nFormatters';
 import { Checkbox } from '@/components/ui/Checkbox';

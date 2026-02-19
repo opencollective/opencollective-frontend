@@ -15,7 +15,7 @@ import {
   type SavePayoutMethodMutation,
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
-import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
+import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
 import { objectKeys } from '@/lib/utils';

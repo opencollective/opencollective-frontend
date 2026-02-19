@@ -5,10 +5,9 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import type { Currency, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryKind, ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { sortSelectOptions } from '../../../../lib/utils';
-import { AccountingCategoryKind } from '@/lib/graphql/types/v2/schema';
 
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Expense } from '../../lib/graphql/types/v2/schema';
+import type { Expense } from '../../lib/graphql/types/v2/graphql';
 
 import { Button } from '../ui/Button';
 

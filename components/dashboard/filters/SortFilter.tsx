@@ -14,7 +14,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import { DateTimeField, OrderByFieldType, OrderDirection } from '../../../lib/graphql/types/v2/schema';
+import { DateTimeField, OrderByFieldType, OrderDirection } from '../../../lib/graphql/types/v2/graphql';
 
 import { parseChronologicalOrderInput } from '@/components/dashboard/filters/OrderFilter';
 
@@ -40,6 +40,8 @@ const i18nFieldLabels = defineMessages({
   [OrderByFieldType.UNHOSTED_AT]: { defaultMessage: 'Unhosted since', id: 'UnhostedSince' },
   [DateTimeField.PAID_AT]: { defaultMessage: 'Date Paid', id: '/SrpzP' },
   [OrderByFieldType.STARTS_AT]: { defaultMessage: 'Event Starts Date', id: 'EventStartsDate' },
+  [OrderByFieldType.TOTAL_CONTRIBUTED]: { defaultMessage: 'Total Contributed', id: 'TotalContributed' },
+  [OrderByFieldType.TOTAL_EXPENDED]: { defaultMessage: 'Total Expended', id: 'TotalExpended' },
 });
 
 const i18nDefaultDirectionLabels = defineMessages({
@@ -95,6 +97,7 @@ const FieldIconTypes = {
   [OrderByFieldType.NAME]: 'ALPHABETIC',
   [OrderByFieldType.RANK]: 'NUMERICAL',
   [OrderByFieldType.TOTAL_CONTRIBUTED]: 'NUMERICAL',
+  [OrderByFieldType.TOTAL_EXPENDED]: 'NUMERICAL',
   [OrderByFieldType.MONEY_MANAGED]: 'NUMERICAL',
   [OrderByFieldType.LAST_TRANSACTION_CREATED_AT]: 'NUMERICAL',
   [OrderByFieldType.STARTS_AT]: 'NUMERICAL',

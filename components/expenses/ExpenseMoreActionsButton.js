@@ -20,7 +20,7 @@ import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/schema';
+import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useKeyboardKey, { H, I } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';

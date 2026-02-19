@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { KycProvider, KycProviderData } from '@/lib/graphql/types/v2/schema';
+import type { KycProvider, KycProviderData } from '@/lib/graphql/types/v2/graphql';
 
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '@/components/ui/DataList';
 
