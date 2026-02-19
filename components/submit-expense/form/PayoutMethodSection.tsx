@@ -827,32 +827,22 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                       ? privateInfoYouCollectiveAndHost
                       : privateInfoYouAndHost
                   }
+                  customItems={
+                    props.archived &&
+                    [
+                      props.payoutMethod?.createdAt && {
+                        id: 'createdAt',
+                        label: <FormattedMessage defaultMessage="Connected on" id="jOD/TD" />,
+                        value: <DateTime value={props.payoutMethod?.createdAt} dateStyle="medium" />,
+                      },
+                      props.payoutMethod?.updatedAt && {
+                        id: 'updatedAt',
+                        label: <FormattedMessage defaultMessage="Last update" id="transactions.import.lastUpdate" />,
+                        value: <DateTime value={props.payoutMethod?.updatedAt} dateStyle="medium" />,
+                      },
+                    ].filter(Boolean)
+                  }
                 />
-                {props.archived &&
-                  (() => {
-                    const pm = props.payoutMethod as { createdAt?: string; updatedAt?: string };
-                    const createdAt = pm?.createdAt;
-                    const updatedAt = pm?.updatedAt;
-                    if (!createdAt && !updatedAt) {
-                      return null;
-                    }
-                    return (
-                      <div className="flex flex-col gap-1 rounded-xl bg-muted p-3 text-sm text-muted-foreground">
-                        {createdAt && (
-                          <span>
-                            <FormattedMessage defaultMessage="Connected on" id="jOD/TD" />{' '}
-                            <DateTime value={createdAt} dateStyle="medium" />
-                          </span>
-                        )}
-                        {updatedAt && (
-                          <span>
-                            <FormattedMessage defaultMessage="Last update" id="transactions.import.lastUpdate" />{' '}
-                            <DateTime value={updatedAt} dateStyle="medium" />
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })()}
                 {isMissingCurrency && !props.disableWarningMessages && (
                   <div className="mt-2">
                     <MessageBox type="warning">

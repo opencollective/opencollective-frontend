@@ -1,50 +1,14 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
 import { orderBy } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
-import { i18nGraphqlException } from '../../../../lib/errors';
-import { gql } from '../../../../lib/graphql/helpers';
 import { PayoutMethodType } from '@/lib/constants/payout-method';
 
 import { PayoutMethodRadioGroupItem } from '@/components/submit-expense/form/PayoutMethodSection';
 
-import { useToast } from '../../../ui/useToast';
-
 import { MethodCard, moreActionsThunk } from './common';
-import { PayoutMethodFragment } from './gql';
 
 export default function PayoutMethodsTable({ account, loading, onUpdate, ...props }) {
-  const { toast } = useToast();
-  const intl = useIntl();
-
-  const [removePayoutMethod] = useMutation(gql`
-    mutation PaymentInfoRemovePayoutMethod($payoutMethodId: String!) {
-      removePayoutMethod(payoutMethodId: $payoutMethodId) {
-        id
-        ...PayoutMethodFields
-      }
-    }
-    ${PayoutMethodFragment}
-  `);
-
-  React.useMemo(
-    () => ({
-      archive: async (payoutMethodId: string) => {
-        try {
-          await removePayoutMethod({ variables: { payoutMethodId } });
-          toast({
-            variant: 'success',
-            message: intl.formatMessage({ defaultMessage: 'Payment method Archived', id: 'v6++yS' }),
-          });
-        } catch (error) {
-          toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
-        }
-      },
-    }),
-    [removePayoutMethod, intl, toast],
-  );
-
   const [archived, active] = React.useMemo(() => {
     const { archived, active } = orderBy(props.payoutMethods, ['isSaved'], ['desc'])
       .filter(pm => pm.type !== PayoutMethodType.ACCOUNT_BALANCE)

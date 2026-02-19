@@ -36,14 +36,15 @@ function flattenDetailsObject(details: any) {
 type PayoutMethodDetailsProps = {
   payoutMethod: Pick<PayoutMethod, 'type' | 'data'>;
   privateMessage?: React.ReactNode;
+  customItems?: Array<DataListItemProps & { id: string }>;
 };
 
 function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
-  const items: (DataListItemProps & { id: string })[] = [];
+  const items: (DataListItemProps & { id: string })[] = props.customItems || [];
 
   // Early return if there's not data to show (e.g. for archived payout methods)
   if (!props.payoutMethod.data) {
-    return null;
+    return props.customItems || null;
   }
 
   switch (props.payoutMethod.type) {
@@ -143,6 +144,7 @@ export function PayoutMethodDetailsContainer(props: {
   maxItems?: number;
   className?: string;
   privateMessage?: React.ReactNode;
+  customItems?: Array<DataListItemProps & { id: string }>;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const toggleContainer = React.useCallback(() => {
@@ -150,6 +152,7 @@ export function PayoutMethodDetailsContainer(props: {
   }, []);
 
   const payoutMethodDetailItems = getPayoutMethodDetailItems(props) || [];
+  console.log('payoutMethodDetailItems', payoutMethodDetailItems);
   const isExpandable = props.maxItems && payoutMethodDetailItems?.length > props.maxItems;
 
   const shownItems = isExpandable ? payoutMethodDetailItems.slice(0, 3) : payoutMethodDetailItems;
