@@ -4897,6 +4897,7 @@ type PlatformSubscriptionFeatures {
   UPDATES: Boolean!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
+  RECEIVE_GRANTS: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
 }
@@ -6177,6 +6178,16 @@ PaymentMethod model
 type PaymentMethod {
   id: String
   legacyId: Int
+
+  """
+  The date and time this payout method was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date and time this payout method was updated
+  """
+  updatedAt: DateTime!
   name: String
   service: PaymentMethodService
   type: PaymentMethodType
@@ -6199,7 +6210,6 @@ type PaymentMethod {
   data: JSON
   limitedToHosts: [Host]
   expiryDate: DateTime
-  createdAt: DateTime
 
   """
   For monthly gift cards, this field will return the monthly limit
@@ -7143,6 +7153,7 @@ type CollectiveFeatures {
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
+  RECEIVE_GRANTS: CollectiveFeatureStatus
   MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
@@ -27635,6 +27646,7 @@ input PlatformSubscriptionFeaturesFeatures {
   UPDATES: Boolean!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
+  RECEIVE_GRANTS: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
 }
