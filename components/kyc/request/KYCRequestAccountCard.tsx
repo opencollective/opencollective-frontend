@@ -6,10 +6,10 @@ import { FormattedMessage } from 'react-intl';
 import { gql } from '@/lib/graphql/helpers';
 import type {
   AccountHoverCardFieldsFragment,
+  AccountReferenceInput,
   KycRequestAccountCardQuery,
   KycRequestAccountCardQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard, accountHoverCardFields } from '@/components/AccountHoverCard';
 import Avatar from '@/components/Avatar';

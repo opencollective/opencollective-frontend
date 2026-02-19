@@ -4,8 +4,12 @@ import { shuffle, take } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';
-import type { Account } from '../../lib/graphql/types/v2/graphql';
-import type { CountryIso, FindAFiscalHostQuery, FindAFiscalHostQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type {
+  Account,
+  CountryIso,
+  FindAFiscalHostQuery,
+  FindAFiscalHostQueryVariables,
+} from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';

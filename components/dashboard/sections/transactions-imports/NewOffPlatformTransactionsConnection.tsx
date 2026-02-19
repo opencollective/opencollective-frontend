@@ -6,10 +6,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getEnvVar } from '@/lib/env-utils';
 import type {
+  OffPlatformTransactionsInstitution,
   OffPlatformTransactionsInstitutionsQuery,
   OffPlatformTransactionsInstitutionsQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import type { OffPlatformTransactionsInstitution } from '@/lib/graphql/types/v2/graphql';
 import { OffPlatformTransactionsProvider } from '@/lib/graphql/types/v2/graphql';
 import { useRedirectToGoCardlessConnect } from '@/lib/hooks/useRedirectToGoCardlessConnect';
 import { i18nCountryName } from '@/lib/i18n';

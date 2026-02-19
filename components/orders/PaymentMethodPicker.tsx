@@ -12,8 +12,14 @@ import { clsx } from 'clsx';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';
-import type { PaymentMethodPickerQuery } from '../../lib/graphql/types/v2/graphql';
-import type { Account, Host, Order, PaymentMethod, PaymentMethodType } from '../../lib/graphql/types/v2/graphql';
+import type {
+  Account,
+  Host,
+  Order,
+  PaymentMethod,
+  PaymentMethodPickerQuery,
+  PaymentMethodType,
+} from '../../lib/graphql/types/v2/graphql';
 import { PaymentMethodLegacyType, PaymentMethodService } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getPaymentMethodName } from '../../lib/payment_method_label';

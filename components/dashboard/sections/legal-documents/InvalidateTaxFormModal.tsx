@@ -3,8 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import type { Account, Host } from '../../../../lib/graphql/types/v2/graphql';
-import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import type { Account, Host, LegalDocumentFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 
 import LinkCollective from '../../../LinkCollective';
 import type { BaseModalProps } from '../../../ModalContext';

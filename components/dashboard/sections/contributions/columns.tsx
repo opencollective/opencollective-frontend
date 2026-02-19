@@ -4,8 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
 import dayjs from '@/lib/dayjs';
-import type { ManagedOrderFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import { type Account, AccountType } from '@/lib/graphql/types/v2/graphql';
+import { type Account, AccountType, type ManagedOrderFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { i18nFrequency } from '@/lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '@/lib/i18n/payment-method-provider-type';

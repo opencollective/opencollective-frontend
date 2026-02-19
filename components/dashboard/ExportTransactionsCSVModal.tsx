@@ -25,13 +25,14 @@ import {
   PLATFORM_PRESETS,
 } from '../../lib/export-csv/transactions-csv';
 import type {
+  Account,
+  AccountReferenceInput,
   ExpenseReferenceInput,
   HostReportsQueryVariables,
   OrderReferenceInput,
   TransactionsPageQueryVariables,
   TransactionsTableQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
-import type { Account, AccountReferenceInput } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';

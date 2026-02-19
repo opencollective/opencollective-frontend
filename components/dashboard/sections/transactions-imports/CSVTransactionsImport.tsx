@@ -24,11 +24,12 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import {
-  type TransactionsImportQuery,
-  type TransactionsImportQueryVariables,
+import type {
+  Account,
+  Amount,
+  TransactionsImportQuery,
+  TransactionsImportQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Amount } from '../../../../lib/graphql/types/v2/graphql';
 import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';

@@ -8,14 +8,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type {
   AccountStripePaymentMethodsQuery,
   AccountStripePaymentMethodsQueryVariables,
+  Expense,
+  ExpenseReferenceInput,
+  PaymentMethod,
 } from '@/lib/graphql/types/v2/graphql';
-import {
-  type Expense,
-  type ExpenseReferenceInput,
-  ExpenseType,
-  type PaymentMethod,
-  PaymentMethodService,
-} from '@/lib/graphql/types/v2/graphql';
+import { ExpenseType, PaymentMethodService } from '@/lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '@/lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '@/lib/payment-method-utils';
 import { confirmPayment } from '@/lib/stripe/confirm-payment';

@@ -6,8 +6,7 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Expense } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, Expense, ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { CollectiveType } from '@/lib/constants/collectives';

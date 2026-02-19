@@ -9,7 +9,7 @@ import { styled } from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { i18nGraphqlException } from '../../lib/errors';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { cn, parseToBoolean } from '../../lib/utils';
@@ -18,7 +18,6 @@ import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
 import { isFeatureEnabled } from '@/lib/allowed-features';
-import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';

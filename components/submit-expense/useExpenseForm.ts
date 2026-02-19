@@ -17,8 +17,10 @@ import { z } from 'zod';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import { getPayoutProfiles, standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import type {
+  Amount,
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
+  CurrencyExchangeRateInput,
   EditExpenseFromDashboardMutation,
   EditExpenseFromDashboardMutationVariables,
   ExpenseFormExchangeRatesQuery,
@@ -30,8 +32,8 @@ import type {
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
   LocationInput,
+  RecurringExpenseInterval,
 } from '../../lib/graphql/types/v2/graphql';
-import type { Amount, CurrencyExchangeRateInput, RecurringExpenseInterval } from '../../lib/graphql/types/v2/graphql';
 import {
   Currency,
   ExpenseLockableFields,

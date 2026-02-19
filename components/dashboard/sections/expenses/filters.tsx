@@ -6,9 +6,9 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { boolean, isMulti, limit, offset } from '../../../../lib/filters/schemas';
 import type {
   AccountExpensesQueryVariables,
+  Currency,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Currency } from '../../../../lib/graphql/types/v2/graphql';
 import { AccountingCategoryKind, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';

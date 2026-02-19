@@ -6,9 +6,9 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import {
   type Account,
+  type ExpensesPageQueryVariables,
   ExpenseStatusFilter,
   ExpenseType,
   PayoutMethodType,

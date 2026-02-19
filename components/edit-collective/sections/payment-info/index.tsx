@@ -5,10 +5,10 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import type {
+  Account,
   ManagePaymentMethodsQuery,
   ManagePaymentMethodsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../../../lib/graphql/types/v2/graphql';
 
 import { Button } from '@/components/ui/Button';
 import { Separator } from '@/components/ui/Separator';

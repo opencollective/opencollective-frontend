@@ -3,9 +3,8 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import type { Account, Host } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, Host, LegalDocumentFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { getMessageForRejectedDropzoneFiles } from '../../../../lib/hooks/useImageUploader';
-import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import Dropzone, { DROPZONE_ACCEPT_PDF } from '../../../Dropzone';
 import type { BaseModalProps } from '../../../ModalContext';
