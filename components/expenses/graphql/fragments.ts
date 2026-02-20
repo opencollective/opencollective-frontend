@@ -523,6 +523,10 @@ export const expensePageExpenseFieldsFragment = gql`
       canEdit
       canEditTags
       canEditAccountingCategory
+      editAccountingCategory {
+        allowed
+        reason
+      }
       canEditType
       canEditTitle
       canEditItems
@@ -766,6 +770,10 @@ export const expensesListFieldsFragment = gql`
       canSeeInvoiceInfo
       canEditTags
       canEditAccountingCategory
+      editAccountingCategory {
+        allowed
+        reason
+      }
       canUnschedulePayment
       canHold
       canRelease

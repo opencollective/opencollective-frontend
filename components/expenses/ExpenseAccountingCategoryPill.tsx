@@ -10,6 +10,7 @@ import { cn } from '../../lib/utils';
 import AccountingCategorySelect from '../AccountingCategorySelect';
 import Spinner from '../Spinner';
 import { Button } from '../ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 import { useToast } from '../ui/useToast';
 
 import { editExpenseCategoryMutation } from './graphql/mutations';
@@ -19,6 +20,8 @@ type ExpenseAccountingCategoryPillProps = {
   canEdit: boolean;
   account: Account;
   host: Host;
+  /** Extended permission with reason, for showing tooltips when edit is disabled */
+  editPermission?: { allowed: boolean; reason?: string | null };
   /** Whether to allow the user to select "I don't know" */
   allowNone?: boolean;
   /** Whether to show the category code in the select */
@@ -84,11 +87,34 @@ export const ExpenseAccountingCategoryPill = ({
   host,
   account,
   canEdit,
+  editPermission,
   allowNone,
   showCodeInSelect = false,
 }: ExpenseAccountingCategoryPillProps) => {
   if (!canEdit || !host) {
-    return <div className={cn(BADGE_CLASS, 'truncate')}>{getCategoryLabel(expense.accountingCategory)}</div>;
+    const badge = <div className={cn(BADGE_CLASS, 'truncate')}>{getCategoryLabel(expense.accountingCategory)}</div>;
+    if (editPermission?.reason === 'EXPENSE_BELONGS_TO_DIFFERENT_HOST') {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className={cn(BADGE_CLASS, 'cursor-help truncate')}>
+              {getCategoryLabel(expense.accountingCategory)}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-lg">
+            <FormattedMessage
+              id="expense.accountingCategory.differentHostTooltip"
+              defaultMessage="This expense was processed by a different host ({hostName}), you don't have permission to recategorize it."
+              values={{
+                hostName: host?.name || host?.slug,
+              }}
+            />
+          </TooltipContent>
+        </Tooltip>
+      );
+    } else {
+      return badge;
+    }
   } else {
     return (
       <ExpenseAdminAccountingCategoryPill

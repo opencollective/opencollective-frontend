@@ -1548,6 +1548,7 @@
   "expectedFunds": "Fundos esperados",
   "Expense": "Despesa",
   "expense.accountingCategory": "Categoria",
+  "expense.accountingCategory.differentHostTooltip": "This expense was processed by a different host ({hostName}), you don't have permission to recategorize it.",
   "Expense.Activity.Approved": "Despesa aprovada",
   "Expense.Activity.Created": "Despesa criada",
   "Expense.Activity.Error": "Erro de despesa",

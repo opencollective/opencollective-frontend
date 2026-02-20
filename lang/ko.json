@@ -1548,6 +1548,7 @@
   "expectedFunds": "Expected funds",
   "Expense": "Expense",
   "expense.accountingCategory": "카테고리",
+  "expense.accountingCategory.differentHostTooltip": "This expense was processed by a different host ({hostName}), you don't have permission to recategorize it.",
   "Expense.Activity.Approved": "지출 승인됨",
   "Expense.Activity.Created": "Expense created",
   "Expense.Activity.Error": "Expense error",

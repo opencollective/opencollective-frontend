@@ -1548,6 +1548,7 @@
   "expectedFunds": "Expected funds",
   "Expense": "支出",
   "expense.accountingCategory": "类别",
+  "expense.accountingCategory.differentHostTooltip": "This expense was processed by a different host ({hostName}), you don't have permission to recategorize it.",
   "Expense.Activity.Approved": "支出被批准",
   "Expense.Activity.Created": "支出已创建",
   "Expense.Activity.Error": "开支错误",

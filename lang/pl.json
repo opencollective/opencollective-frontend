@@ -1548,6 +1548,7 @@
   "expectedFunds": "Oczekiwane fundusze",
   "Expense": "Wydatek",
   "expense.accountingCategory": "Kategoria",
+  "expense.accountingCategory.differentHostTooltip": "This expense was processed by a different host ({hostName}), you don't have permission to recategorize it.",
   "Expense.Activity.Approved": "Wydatki zatwierdzone",
   "Expense.Activity.Created": "Dodane wydatki",
   "Expense.Activity.Error": "Błąd w wydatkach",
