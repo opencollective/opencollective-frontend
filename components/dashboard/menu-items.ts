@@ -154,8 +154,7 @@ export const getMenuItems = ({
   const hasIssuedGrantRequests = true; // account.issuedGrantRequests?.totalCount > 0;
   const hasReceivedGrantRequests = true; // account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
-    hasReceivedGrantRequests ||
-    (!isIndividual && !hasMoneyManagement && Boolean(account.supportedExpenseTypes?.includes?.(ExpenseType.GRANT)));
+    hasReceivedGrantRequests || (!isIndividual && !hasMoneyManagement && hasFeature(account, FEATURES.RECEIVE_GRANTS));
 
   const items: MenuItem[] = [
     {

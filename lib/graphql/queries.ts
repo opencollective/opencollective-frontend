@@ -19,10 +19,11 @@ const workspaceSubFieldsFragment = gql`
     categories
     createdAt
     canHaveChangelogUpdates # used by update Form view
-    # policies { # not used
-    #   id
-    #   REQUIRE_2FA_FOR_ADMINS
-    # }
+    policies {
+      # used by dashboard page
+      id
+      REQUIRE_2FA_FOR_ADMINS
+    }
     features {
       # split on various types?
       id
@@ -41,10 +42,10 @@ const workspaceSubFieldsFragment = gql`
         id
         legacyId
         slug
-        # policies {
-        #   id
-        #   REQUIRE_2FA_FOR_ADMINS # how is this used?
-        # }
+        policies {
+          id
+          REQUIRE_2FA_FOR_ADMINS
+        }
       }
     }
     ... on AccountWithHost {
@@ -100,6 +101,7 @@ const workspaceSubFieldsFragment = gql`
       hasMoneyManagement
       host {
         id
+        slug
         requiredLegalDocuments
         #settings
       }

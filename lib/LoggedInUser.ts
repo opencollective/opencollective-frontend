@@ -3,11 +3,12 @@ import { uniqBy } from 'lodash';
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
-import type {
-  AccountType,
-  CommentFieldsFragment,
-  LoggedInUserWorkspaceFieldsFragment,
-  Update,
+import {
+  type AccountType,
+  type CommentFieldsFragment,
+  type LoggedInUserWorkspaceFieldsFragment,
+  MemberRole,
+  type Update,
 } from './graphql/types/v2/graphql';
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';

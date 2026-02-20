@@ -7,8 +7,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import type { Mutation, MutationConfirmEmailArgs } from '../lib/graphql/types/v2/graphql';
-import type { UserContextProps } from '../lib/hooks/useLoggedInUser';
 
 import Container from '../components/Container';
 import { Box } from '../components/Grid';
