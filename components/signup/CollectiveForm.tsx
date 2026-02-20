@@ -43,7 +43,7 @@ const createCollectiveSchema = z.object({
     .object({
       name: z.string().min(5).max(255),
       slug: z.string().min(5).max(255),
-      description: z.string().max(255),
+      description: z.preprocess(val => (val === '' ? null : val), z.string().max(255).nullish()),
       tags: z.array(z.string()).optional().nullable(),
       location: z
         .object({
