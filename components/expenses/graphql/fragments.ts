@@ -602,7 +602,7 @@ export const expensePageExpenseFieldsFragment = gql`
           valueInCents
           currency
         }
-        taxAmount {
+        taxAmount(fetchTax: true) {
           valueInCents
           currency
         }
