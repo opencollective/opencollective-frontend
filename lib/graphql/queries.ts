@@ -18,41 +18,74 @@ const workspaceSubFieldsFragment = gql`
     settings
     categories
     createdAt
-    canHaveChangelogUpdates
-    policies {
-      id
-      REQUIRE_2FA_FOR_ADMINS
-    }
+    canHaveChangelogUpdates # used by update Form view
+    # policies { # not used
+    #   id
+    #   REQUIRE_2FA_FOR_ADMINS
+    # }
     features {
+      # split on various types?
       id
-      VIRTUAL_CARDS
+      # VIRTUAL_CARDS split into Org & AccountWithHost
       USE_PAYMENT_METHODS
       EMIT_GIFT_CARDS
-      OFF_PLATFORM_TRANSACTIONS
-      TAX_FORMS
-      AGREEMENTS
-      KYC
+      # OFF_PLATFORM_TRANSACTIONS
+      #TAX_FORMS
+      #AGREEMENTS
+      #KYC
     }
-    supportedExpenseTypes
+
+    # supportedExpenseTypes # moved to ... on Collective
     ... on AccountWithParent {
       parent {
         id
         legacyId
         slug
-        policies {
-          id
-          REQUIRE_2FA_FOR_ADMINS
-        }
+        # policies {
+        #   id
+        #   REQUIRE_2FA_FOR_ADMINS # how is this used?
+        # }
       }
     }
     ... on AccountWithHost {
+      # used by getNotification in pages/dashboard, maybe scope this to Collective?
+      # missing hostApplication?
+
+      ... on Collective {
+        features {
+          id
+          VIRTUAL_CARDS
+        }
+      }
+      ... on Event {
+        features {
+          id
+          VIRTUAL_CARDS
+        }
+      }
+      ... on Project {
+        features {
+          id
+          VIRTUAL_CARDS
+        }
+      }
+      ... on Fund {
+        features {
+          id
+          VIRTUAL_CARDS
+        }
+      }
+
       isApproved
       host {
         id
         slug
-        requiredLegalDocuments
-        settings
+        # requiredLegalDocuments
+        # settings
       }
+    }
+    ... on Collective {
+      supportedExpenseTypes # used by menu-items, should probably be on Event and Collective also, maybe under AccountWithHost
     }
     ... on AccountWithPlatformSubscription {
       platformSubscription {
@@ -62,18 +95,34 @@ const workspaceSubFieldsFragment = gql`
       }
     }
     ... on Organization {
+      ### for menu and section routing
       hasHosting
       hasMoneyManagement
+      host {
+        id
+        requiredLegalDocuments
+        #settings
+      }
+      features {
+        id
+        VIRTUAL_CARDS
+        OFF_PLATFORM_TRANSACTIONS
+        TAX_FORMS
+        AGREEMENTS
+        KYC
+      }
     }
     ... on Event {
+      # how is this used?
       endsAt
     }
-    location {
-      id
-      address
-      country
-      structured
-    }
+    # not used?
+    # location {
+    #   id
+    #   address
+    #   country
+    #   structured
+    # }
   }
 `;
 

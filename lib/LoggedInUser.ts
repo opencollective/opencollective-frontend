@@ -3,14 +3,12 @@ import { uniqBy } from 'lodash';
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
-import {
-  type Account,
-  type AccountWithParent,
-  type CommentFieldsFragment,
-  LoggedInUserWorkspaceFieldsFragment
-  type Update,
+import type {
+  AccountType,
+  CommentFieldsFragment,
+  LoggedInUserWorkspaceFieldsFragment,
+  Update,
 } from './graphql/types/v2/graphql';
-
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
 
@@ -31,7 +29,7 @@ export type WorkspaceAccount = LoggedInUserWorkspaceFieldsFragment;
 /** Narrows any account union to its Organization/Host members */
 export function isOrganization<T extends { type: AccountType }>(
   account: T,
-): account is Extract<T, { __typename?: 'Organization' | 'Host' }> {
+): account is Extract<T, { __typename?: 'Organization' }> {
   return account.type === 'ORGANIZATION';
 }
 

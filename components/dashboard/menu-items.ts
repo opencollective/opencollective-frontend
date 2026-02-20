@@ -37,7 +37,7 @@ import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
 import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import type LoggedInUser from '@/lib/LoggedInUser';
-
+import { isOrganization as isOrgWorkspace } from '@/lib/LoggedInUser';
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
@@ -383,7 +383,9 @@ export const getMenuItems = ({
         account,
         FEATURES.TAX_FORMS,
         hasMoneyManagement &&
-          Boolean('host' in account && account.host?.requiredLegalDocuments?.includes(LegalDocumentType.US_TAX_FORM)),
+          Boolean(
+            isOrgWorkspace(account) && account.host?.requiredLegalDocuments?.includes(LegalDocumentType.US_TAX_FORM),
+          ),
       ),
     },
     {

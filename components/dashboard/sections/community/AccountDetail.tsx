@@ -60,6 +60,7 @@ import {
   useAssociatedCollectiveActions,
 } from './common';
 import { communityAccountDetailQuery } from './queries';
+import { isOrganization } from '@/lib/LoggedInUser';
 
 const convertOrganizationMutation = gql`
   mutation ConvertOrganizationToVendor($organization: AccountReferenceInput!, $host: AccountReferenceInput!) {
@@ -576,8 +577,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           <VendorForm
             host={dashboardAccount}
             supportsTaxForm={
-              'host' in dashboardAccount &&
-              'requiredLegalDocuments' in dashboardAccount.host &&
+              isOrganization(dashboardAccount) &&
               dashboardAccount.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)
             }
             vendor={editVendor}

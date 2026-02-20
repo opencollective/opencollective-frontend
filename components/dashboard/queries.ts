@@ -83,12 +83,13 @@ export const adminPanelQuery = gql`
           }
         }
       }
-      ... on Host {
-        manualPaymentProviders {
-          id
-          name
-        }
-      }
+      # probably can be removed, assumption: an account is never a host in this query, it's an Organization
+      # ... on Host {
+      #   manualPaymentProviders {
+      #     id
+      #     name
+      #   }
+      # }
       ... on AccountWithParent {
         parent {
           id
