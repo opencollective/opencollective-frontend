@@ -58,15 +58,17 @@ export const StyledHeroBackground = styled.div`
 
     mask: url(${HeroBackgroundMask}) no-repeat;
     mask-size: cover;
-    mask-position-x: 100%;
-    mask-position-y: -150px;
 
     -webkit-mask-position-x: 0;
     -webkit-mask-position-y: -120px;
+    mask-position-x: 0;
+    mask-position-y: -120px;
 
     @media (max-width: 900px) {
       mask-position-x: 20%;
-      -webkit-mask-position-y: -100px;
+      mask-position-y: -250px;
+      -webkit-mask-position-x: 20%;
+      -webkit-mask-position-y: -250px;
     }
   }
 `;
