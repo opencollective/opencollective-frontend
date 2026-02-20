@@ -34,6 +34,7 @@ const workspaceSubFieldsFragment = gql`
       #TAX_FORMS
       #AGREEMENTS
       #KYC
+      RECEIVE_GRANTS
     }
 
     # supportedExpenseTypes # moved to ... on Collective
@@ -85,9 +86,7 @@ const workspaceSubFieldsFragment = gql`
         # settings
       }
     }
-    ... on Collective {
-      supportedExpenseTypes # used by menu-items, should probably be on Event and Collective also, maybe under AccountWithHost
-    }
+
     ... on AccountWithPlatformSubscription {
       platformSubscription {
         plan {
@@ -224,7 +223,6 @@ export const loggedInUserQuery = gql`
       # }
     }
   }
-  ${workspaceSubFieldsFragment}
   ${loggedInUserWorkspaceFieldsFragment}
 `;
 
