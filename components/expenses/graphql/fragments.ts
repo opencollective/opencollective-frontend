@@ -132,13 +132,6 @@ export const expenseHostFields = gql`
       CHART_OF_ACCOUNTS
       TRANSFERWISE
     }
-    paypalPreApproval {
-      id
-      balance {
-        currency
-        valueInCents
-      }
-    }
     location {
       id
       address

@@ -4131,11 +4131,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   bankAccount: PayoutMethod @deprecated(reason: "2026-01-23: Deprecated in favour of custom payment providers")
 
   """
-  Paypal preapproval info. Returns null if PayPal account is not connected.
-  """
-  paypalPreApproval: PaymentMethod
-
-  """
   If the host supports PayPal, this will contain the client ID to use in the frontend
   """
   paypalClientId: String
