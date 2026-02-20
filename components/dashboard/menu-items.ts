@@ -32,12 +32,12 @@ import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../.
 import { hasAccountMoneyManagement, isIndividualAccount, isOrganizationAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { LegalDocumentType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
 import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { isOrganization as isOrgWorkspace } from '@/lib/LoggedInUser';
+
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;

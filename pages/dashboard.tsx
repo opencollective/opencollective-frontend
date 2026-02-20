@@ -244,23 +244,24 @@ const DashboardPage = () => {
   const intl = useIntl();
   const router = useRouter();
   const { slug, section, subpath } = parseQuery(router.query);
-  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, loadingLoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const { workspace: savedWorkspace, setWorkspace } = useWorkspace();
   const isRootUser = LoggedInUser?.isRoot;
   const defaultSlug = savedWorkspace.slug || LoggedInUser?.slug;
   const activeSlug = slug || defaultSlug;
   const isRootDashboard = activeSlug === ROOT_PROFILE_KEY && LoggedInUser?.isRoot;
 
-  // adminPanelQuery still fires for badge counts, notifications, and enrichment data
-  // const {
-  //   data,
-  //   loading: accountLoading,
-  //   error,
-  // } = useQuery(adminPanelQuery, {
-  //   variables: { slug: activeSlug },
-  //   skip: !activeSlug || !LoggedInUser || isRootProfile,
-  // });
   const account = LoggedInUser?.getWorkspace(activeSlug) ?? null;
+
+  // When a workspace account isn't found (e.g. navigating to a newly created event/project),
+  // refetch once to pick up the new account in the workspace data.
+  const lastRefetchedSlug = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (activeSlug && LoggedInUser && !account && !isRootDashboard && lastRefetchedSlug.current !== activeSlug) {
+      lastRefetchedSlug.current = activeSlug;
+      refetchLoggedInUser();
+    }
+  }, [activeSlug, LoggedInUser, account, isRootDashboard, refetchLoggedInUser]);
 
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser, isRootDashboard);
 

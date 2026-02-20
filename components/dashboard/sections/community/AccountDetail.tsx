@@ -18,6 +18,7 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
+import { isOrganization } from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
@@ -60,7 +61,6 @@ import {
   useAssociatedCollectiveActions,
 } from './common';
 import { communityAccountDetailQuery } from './queries';
-import { isOrganization } from '@/lib/LoggedInUser';
 
 const convertOrganizationMutation = gql`
   mutation ConvertOrganizationToVendor($organization: AccountReferenceInput!, $host: AccountReferenceInput!) {
