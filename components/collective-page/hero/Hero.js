@@ -188,6 +188,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               textAlign="left"
               data-cy="collective-title"
               wordBreak="normal"
+              textAlign={['center', 'left']}
             >
               {collective.name || collective.slug}
               <AccountTrustBadge account={collective} size={24} className="ml-3 inline-block" />
