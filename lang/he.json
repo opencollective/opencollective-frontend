@@ -1548,6 +1548,7 @@
   "expectedFunds": "Expected funds",
   "Expense": "Expense",
   "expense.accountingCategory": "Category",
+  "expense.accountingCategory.differentHostTooltip": "This expense was processed by a different host ({hostName}), you don't have permission to recategorize it.",
   "Expense.Activity.Approved": "ההוצאה אושרה",
   "Expense.Activity.Created": "הוצאה נרשמה",
   "Expense.Activity.Error": "שגיאת הוצאה",

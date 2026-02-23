@@ -247,6 +247,7 @@ const ExpenseBudgetItem = ({
                       isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') &&
                       get(expense, 'permissions.canEditAccountingCategory', false)
                     }
+                    editPermission={get(expense, 'permissions.editAccountingCategory')}
                     allowNone
                     showCodeInSelect={isLoggedInUserExpenseHostAdmin}
                   />

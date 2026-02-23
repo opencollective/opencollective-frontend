@@ -1548,6 +1548,7 @@
   "expectedFunds": "Expected funds",
   "Expense": "Expense",
   "expense.accountingCategory": "Kategori",
+  "expense.accountingCategory.differentHostTooltip": "This expense was processed by a different host ({hostName}), you don't have permission to recategorize it.",
   "Expense.Activity.Approved": "Utgift godkänd",
   "Expense.Activity.Created": "Utgift skapad",
   "Expense.Activity.Error": "Fel vid utgift",

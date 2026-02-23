@@ -1548,6 +1548,7 @@
   "expectedFunds": "Expected funds",
   "Expense": "Ausgabe",
   "expense.accountingCategory": "Kategorie",
+  "expense.accountingCategory.differentHostTooltip": "This expense was processed by a different host ({hostName}), you don't have permission to recategorize it.",
   "Expense.Activity.Approved": "Ausgabe bestätigt",
   "Expense.Activity.Created": "Ausgabe erstellt",
   "Expense.Activity.Error": "Ausgabe fehlerhaft",

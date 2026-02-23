@@ -1548,6 +1548,7 @@
   "expectedFunds": "Expected funds",
   "Expense": "Витрата",
   "expense.accountingCategory": "Category",
+  "expense.accountingCategory.differentHostTooltip": "This expense was processed by a different host ({hostName}), you don't have permission to recategorize it.",
   "Expense.Activity.Approved": "Витрати затверджено",
   "Expense.Activity.Created": "Витрату створено",
   "Expense.Activity.Error": "Помилка витрат",

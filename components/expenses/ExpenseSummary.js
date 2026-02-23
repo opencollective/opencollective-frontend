@@ -253,7 +253,7 @@ const ExpenseSummary = ({
       )}
 
       <div className="flex items-baseline gap-2">
-        {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, host) && (
+        {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, collective?.host || host) && (
           <React.Fragment>
             <ExpenseAccountingCategoryPill
               host={host}
@@ -262,6 +262,7 @@ const ExpenseSummary = ({
               canEdit={
                 isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') && Boolean(expense.permissions?.canEditAccountingCategory)
               }
+              editPermission={expense.permissions?.editAccountingCategory}
               allowNone={!isLoggedInUserExpenseHostAdmin}
               showCodeInSelect={isLoggedInUserExpenseHostAdmin}
             />

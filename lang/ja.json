@@ -1548,6 +1548,7 @@
   "expectedFunds": "Expected funds",
   "Expense": "経費",
   "expense.accountingCategory": "Category",
+  "expense.accountingCategory.differentHostTooltip": "This expense was processed by a different host ({hostName}), you don't have permission to recategorize it.",
   "Expense.Activity.Approved": "経費を承認しました",
   "Expense.Activity.Created": "経費を申請しました",
   "Expense.Activity.Error": "Expense error",
