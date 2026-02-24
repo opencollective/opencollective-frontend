@@ -109,6 +109,7 @@ function useExportRequest({
       startPolling(pollInterval);
     } else if (called && createError) {
       setIsGenerating(false);
+      setHasFailed(true);
       stopPolling();
     } else if (data?.exportRequest) {
       const { status } = data.exportRequest;
