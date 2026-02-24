@@ -78,7 +78,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
     cy.wrap(userSlug).as('userSlug');
     cy.signup({
       user: { name: userSlug, email: `oc-test-${userSlug}@opencollective.com` },
-      redirect: `/dashboard/${userSlug}/submitted-expenses?newExpenseFlowEnabled=true`,
+      redirect: `/dashboard/${userSlug}/submitted-expenses`,
     });
 
     cy.get<string>('@userSlug').then(userSlug =>
@@ -354,7 +354,6 @@ function getExpenseInviteEmailLink(to: string) {
       const expenseLink = $html(`a:contains("OK, let's go!")`);
       const href = expenseLink.attr('href');
       const parsedUrl = new URL(href);
-      parsedUrl.searchParams.set('newExpenseFlowEnabled', 'true');
       return `${parsedUrl.pathname}${parsedUrl.search.toString()}`;
     });
 }
@@ -619,7 +618,7 @@ function commonEditScenario(expenseType: 'invoice' | 'reimbursement') {
       const userSlug = randomSlug();
       cy.signup({
         user: { name: userSlug, email: `oc-test-${userSlug}@opencollective.com` },
-        redirect: `/dashboard/${userSlug}/submitted-expenses?newExpenseFlowEnabled=true`,
+        redirect: `/dashboard/${userSlug}/submitted-expenses`,
       });
 
       cy.location('pathname').should('eq', `/dashboard/${userSlug}/submitted-expenses`, {
@@ -641,7 +640,7 @@ function commonEditScenario(expenseType: 'invoice' | 'reimbursement') {
         },
       }).then(createdExpense => {
         expense = createdExpense;
-        cy.visit(`/apex/expenses/${expense.legacyId}?newExpenseFlowEnabled=true`);
+        cy.visit(`/apex/expenses/${expense.legacyId}`);
       });
     });
 

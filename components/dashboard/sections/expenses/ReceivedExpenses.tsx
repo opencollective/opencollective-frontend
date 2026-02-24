@@ -13,9 +13,7 @@ import {
   ExpenseType,
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
@@ -98,7 +96,6 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
-  const { LoggedInUser } = useLoggedInUser();
 
   const {
     data: metadata,
@@ -142,9 +139,6 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     },
   });
 
-  const hasNewSubmitExpenseFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
-
   const pageRoute = `/dashboard/${accountSlug}/expenses`;
 
   return (
@@ -154,11 +148,9 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
           title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
           description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
           actions={
-            hasNewSubmitExpenseFlow ? (
-              <Button onClick={() => setIsExpenseFlowOpen(true)} size="sm" className="gap-1">
-                <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
-              </Button>
-            ) : null
+            <Button onClick={() => setIsExpenseFlowOpen(true)} size="sm" className="gap-1">
+              <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
+            </Button>
           }
         />
         {isSelfHosted && (

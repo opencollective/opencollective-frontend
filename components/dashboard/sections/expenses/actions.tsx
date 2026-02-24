@@ -31,10 +31,10 @@ import { ExpenseStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { getCollectivePageCanonicalURL, getDashboardRoute } from '../../../../lib/url-helpers';
 import { collectiveAdminsMustConfirmAccountingCategory } from '@/components/expenses/lib/accounting-categories';
 import type LoggedInUser from '@/lib/LoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { shouldShowDuplicateExpenseButton } from '@/components/expenses/ExpenseMoreActionsButton';
 import { getDisabledMessage } from '@/components/expenses/PayExpenseButton';
@@ -427,11 +427,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
       }
     };
 
-    // Check if the new expense flow is enabled (via preview feature or query param)
-    const hasNewSubmitExpenseFlow =
-      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) ||
-      router.query.newExpenseFlowEnabled;
-    const canDuplicateExpense = hasNewSubmitExpenseFlow && shouldShowDuplicateExpenseButton(LoggedInUser, expense);
+    const canDuplicateExpense = shouldShowDuplicateExpenseButton(LoggedInUser, expense);
 
     return {
       primary: compact([

@@ -24,7 +24,6 @@ import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
 import { isFeatureEnabled } from '@/lib/allowed-features';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -158,17 +157,9 @@ function Expense(props: ExpenseProps) {
     enableKeyboardShortcuts,
     onClose,
   } = props;
-  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const { loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
-
-  const isNewExpenseSubmissionFlow =
-    (([expenseTypes.INVOICE, expenseTypes.RECEIPT] as string[]).includes(data?.expense?.type) &&
-      ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
-        router.query.newExpenseFlowEnabled)) ||
-    (([expenseTypes.GRANT] as string[]).includes(data?.expense?.type) &&
-      ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
-        router.query.newGrantFlowEnabled));
 
   const [isSubmissionFlowOpen, setIsSubmissionFlowOpen] = React.useState(false);
 
@@ -189,12 +180,7 @@ function Expense(props: ExpenseProps) {
 
   const [state, setState] = useState({
     error: error || null,
-    status:
-      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
-        ? isNewExpenseSubmissionFlow
-          ? PAGE_STATUS.VIEW
-          : PAGE_STATUS.EDIT
-        : PAGE_STATUS.VIEW,
+    status: PAGE_STATUS.VIEW,
     editedExpense: null,
     isSubmitting: false,
     isPollingEnabled: true,
@@ -214,17 +200,6 @@ function Expense(props: ExpenseProps) {
   const drawerActionsContainer = useDrawerActionsContainer();
 
   useEffect(() => {
-    const shouldEditDraft = isNewExpenseSubmissionFlow
-      ? false
-      : data?.expense?.status === ExpenseStatus.DRAFT && draftKey;
-    if (shouldEditDraft) {
-      setState(state => ({
-        ...state,
-        status: PAGE_STATUS.EDIT,
-        editedExpense: data?.expense,
-      }));
-    }
-
     handlePolling();
     document.addEventListener('mousemove', handlePolling);
 
@@ -264,16 +239,11 @@ function Expense(props: ExpenseProps) {
 
   // Update status when data or draftKey changes
   useEffect(() => {
-    const status =
-      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
-        ? isNewExpenseSubmissionFlow
-          ? PAGE_STATUS.VIEW
-          : PAGE_STATUS.EDIT
-        : PAGE_STATUS.VIEW;
+    const status = PAGE_STATUS.VIEW;
     if (status !== state.status) {
       setState(state => ({ ...state, status }));
     }
-  }, [props.data, draftKey, isNewExpenseSubmissionFlow]);
+  }, [props.data, draftKey]);
 
   // Scroll to expense's top when changing status
   const prevState = usePrevious(state);
@@ -613,19 +583,15 @@ function Expense(props: ExpenseProps) {
       )}
       {status !== PAGE_STATUS.EDIT && (
         <Box mb={3}>
-          {isNewExpenseSubmissionFlow &&
-            (expense?.permissions?.canDeclineExpenseInvite ||
-              (expense?.status === ExpenseStatus.DRAFT &&
-                !isRecurring &&
-                draftKey &&
-                expense?.draft?.recipientNote)) && (
-              <ExpenseInviteWelcome
-                onContinueSubmissionClick={onContinueSubmissionClick}
-                className="mb-6"
-                expense={expense}
-                draftKey={draftKey}
-              />
-            )}
+          {(expense?.permissions?.canDeclineExpenseInvite ||
+            (expense?.status === ExpenseStatus.DRAFT && !isRecurring && draftKey && expense?.draft?.recipientNote)) && (
+            <ExpenseInviteWelcome
+              onContinueSubmissionClick={onContinueSubmissionClick}
+              className="mb-6"
+              expense={expense}
+              draftKey={draftKey}
+            />
+          )}
           <ExpenseSummary
             expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
             host={host}

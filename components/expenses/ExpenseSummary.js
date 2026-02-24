@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
 import { Download, MessageSquare } from 'lucide-react';
-import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -11,8 +10,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { i18nGraphqlException } from '../../lib/errors';
 import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { cn, parseToBoolean } from '../../lib/utils';
+import { cn } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
@@ -109,7 +107,6 @@ const ExpenseSummary = ({
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const router = useRouter();
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
@@ -123,12 +120,11 @@ const ExpenseSummary = ({
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
-  const { LoggedInUser } = useLoggedInUser();
+  const LoggedInUser = useLoggedInUser().LoggedInUser;
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
-  const { canEditTitle, canEditType, canEditItems, canUsePrivateNote, canAttachReceipts } =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) ? expense?.permissions || {} : {};
+  const { canEditTitle, canEditType, canEditItems, canUsePrivateNote, canAttachReceipts } = expense?.permissions || {};
   const invoiceFile = React.useMemo(
     () => expense?.invoiceFile || expense?.draft?.invoiceFile,
     [expense?.invoiceFile, expense?.draft?.invoiceFile],
@@ -137,10 +133,6 @@ const ExpenseSummary = ({
     () => (expense?.attachedFiles?.length ? expense.attachedFiles : (expense?.draft?.attachedFiles ?? [])),
     [expense?.attachedFiles, expense?.draft?.attachedFiles],
   );
-  const hasNewEditFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
-    !parseToBoolean(router.query.forceLegacyFlow);
-
   const processButtons = (
     <Flex
       display="flex"
@@ -151,7 +143,7 @@ const ExpenseSummary = ({
       gridGap={[2, 3]}
     >
       <ExpenseMoreActionsButton
-        onEdit={hasNewEditFlow ? undefined : onEdit}
+        onEdit={undefined}
         onCloneModalOpenChange={onCloneModalOpenChange}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
