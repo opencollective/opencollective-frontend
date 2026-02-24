@@ -25402,22 +25402,22 @@ input ContributionAccountingCategoryRuleInput {
   """
   The accounting category to apply the rule to
   """
-  accountingCategory: AccountingCategoryReferenceInput
+  accountingCategory: AccountingCategoryReferenceInput!
 
   """
   The name of the rule
   """
-  name: String
+  name: String!
 
   """
   Whether the rule is enabled
   """
-  enabled: Boolean
+  enabled: Boolean!
 
   """
   The predicates of the rule
   """
-  predicates: [ContributionAccountingCategoryRulePredicateInput]
+  predicates: [ContributionAccountingCategoryRulePredicateInput!]!
 }
 
 """
@@ -25437,12 +25437,12 @@ input ContributionAccountingCategoryRulePredicateInput {
   """
   The subject of the predicate
   """
-  subject: ContributionAccountingCategoryRuleSubject
+  subject: ContributionAccountingCategoryRuleSubject!
 
   """
   The operator of the predicate
   """
-  operator: ContributionAccountingCategoryRuleOperator
+  operator: ContributionAccountingCategoryRuleOperator!
 
   """
   The value of the predicate
