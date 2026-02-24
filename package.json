@@ -208,7 +208,7 @@
     "@codecov/webpack-plugin": "^1.9.1",
     "@eslint/compat": "^2.0.0",
     "@formatjs/cli": "^6.2.12",
-    "@graphql-codegen/cli": "6.1.1",
+    "@graphql-codegen/cli": "6.1.2",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
     "@next/bundle-analyzer": "15.5.9",
     "@tailwindcss/typography": "^0.5.13",
