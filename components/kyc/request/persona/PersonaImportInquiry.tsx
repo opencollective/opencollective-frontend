@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { FormikContext } from 'formik';
+import { FormikProvider } from 'formik';
 import { ArrowLeft, Download } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -87,7 +87,7 @@ export function PersonaImportInquiry(props: PersonaImportInquiryProps) {
   });
 
   return (
-    <FormikContext value={form}>
+    <FormikProvider value={form}>
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
           <Download className="h-5 w-5 text-purple-600" />
@@ -128,6 +128,6 @@ export function PersonaImportInquiry(props: PersonaImportInquiryProps) {
           </Button>
         </DialogFooter>
       </form>
-    </FormikContext>
+    </FormikProvider>
   );
 }
