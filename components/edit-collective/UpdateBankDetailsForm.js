@@ -86,7 +86,7 @@ class UpdateBankDetailsForm extends React.Component {
 
   renderInstructions() {
     const amountInCents = 3000;
-    const currency = this.props.bankAccount?.currency || Currency.USD;
+    const currency = this.props.bankAccount?.data?.currency || Currency.USD;
     const formattedAmount = formatCurrency(amountInCents, currency, {
       currencyDisplay: 'code',
     });
