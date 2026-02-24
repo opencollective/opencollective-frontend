@@ -4053,6 +4053,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
   totalHostedAccounts: Int
   isOpenToApplications: Boolean
+
+  """
+  Returns whether the account has money management activated.
+  """
+  hasMoneyManagement: Boolean!
   termsUrl: URL
   plan: HostPlan!
 
@@ -19868,6 +19873,11 @@ type ExportRequest {
   The error message if the export request failed
   """
   error: String
+
+  """
+  Whether a failed export request will be retried automatically
+  """
+  willRetry: Boolean!
 
   """
   The time the export request was created

@@ -5,9 +5,8 @@ import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash';
 import { Eraser } from 'lucide-react';
-import { useRouter } from 'next/router';
 import type { MouseEventHandler } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
 import { setRestAuthorizationCookie } from '../../lib/auth';
@@ -19,6 +18,7 @@ import {
   FieldLabels,
   FieldOptionsLabels,
   FIELDS,
+  getDefaultExportName,
   GROUP_FIELDS,
   GROUPS,
   HOST_OMITTED_FIELDS,
@@ -33,15 +33,20 @@ import type {
   TransactionsPageQueryVariables,
   TransactionsTableQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
+import { AccountType, ExportRequestType } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { cn, parseToBoolean } from '../../lib/utils';
+import { hasAccountMoneyManagement } from '@/lib/collective';
+import useExportRequest from '@/lib/hooks/useExportRequest';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { InfoTooltipIcon } from '../InfoTooltipIcon';
+import Link from '../Link';
+import Spinner from '../Spinner';
 import Tabs from '../Tabs';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
@@ -50,8 +55,11 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
-import { ToastAction } from '../ui/Toast';
-import { useToast } from '../ui/useToast';
+
+enum ModalStep {
+  CONFIGURE = 'configure',
+  GENERATING = 'generating',
+}
 
 type MakeUrlParams = {
   account?: Pick<Account, 'slug'>;
@@ -245,22 +253,11 @@ const editAccountSettingsMutation = gql`
   }
 `;
 
-const createExportRequestMutation = gql`
-  mutation CreateExportRequest($exportRequest: ExportRequestCreateInput!) {
-    createExportRequest(exportRequest: $exportRequest) {
-      id
-      name
-      type
-      status
-    }
-  }
-`;
-
 type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsQueryVariables>;
-  account?: Pick<Account, 'slug' | 'settings' | 'name'>;
+  account?: Pick<Account, 'slug' | 'settings' | 'name' | 'type'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
   canCreatePreset?: boolean;
@@ -275,15 +272,22 @@ const ExportTransactionsCSVModal = ({
   isHostReport,
   canCreatePreset = true,
 }: ExportTransactionsCSVModalProps) => {
-  const intl = useIntl();
-  const { toast } = useToast();
-  const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
-  const hasAsyncExportsFeature = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS);
+  const hasAsyncExportsFeature =
+    account?.type === AccountType.ORGANIZATION &&
+    hasAccountMoneyManagement(account) &&
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
-  const [exportName, setExportName] = React.useState(`${account?.name || account?.slug}'s transactions export`);
+  const [exportName, setExportName] = React.useState(
+    getDefaultExportName({
+      accountFromFilter: queryFilter.values?.account,
+      accountName: account?.name,
+      accountSlug: account?.slug,
+      loggedInUserCollectiveName: LoggedInUser?.collective?.name,
+    }),
+  );
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
   const [useFieldNames, setUseFieldNames] = React.useState(false);
@@ -291,6 +295,70 @@ const ExportTransactionsCSVModal = ({
   const [presetName, setPresetName] = React.useState('');
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
   const [isDeletingPreset, setIsDeletingPreset] = React.useState(false);
+  const [step, setStep] = React.useState<ModalStep>(ModalStep.CONFIGURE);
+
+  React.useEffect(() => {
+    if (open) {
+      setExportName(
+        getDefaultExportName({
+          accountFromFilter: queryFilter.values?.account,
+          accountName: account?.name,
+          accountSlug: account?.slug,
+          loggedInUserCollectiveName: LoggedInUser?.collective?.name,
+        }),
+      );
+    }
+  }, [open, queryFilter.values?.account, account, LoggedInUser]);
+
+  const {
+    create: createExportRequest,
+    isCreating: isCreatingExport,
+    data: exportRequestData,
+    isLoading: isLoadingExport,
+    hasFailed: hasExportFailed,
+  } = useExportRequest();
+
+  const exportRequestStatus = exportRequestData?.exportRequest?.status;
+  const exportRequestFileUrl = exportRequestData?.exportRequest?.file?.url;
+  // Type assertion needed until GraphQL types are regenerated
+  const exportRequestError = (exportRequestData?.exportRequest as { error?: string } | undefined)?.error;
+  const isExportCompleted = exportRequestStatus === 'COMPLETED' && exportRequestFileUrl;
+
+  const handleGenerateExport = React.useCallback(async () => {
+    const exportParams = {
+      variables: omit(queryFilter.variables, ['limit', 'offset']),
+      fields,
+      useFieldNames,
+      isHostReport,
+      flattenTaxesAndPaymentProcessorFees,
+      fetchAll: true,
+    };
+
+    const variables = {
+      exportRequest: {
+        account: { slug: account?.slug },
+        name: exportName,
+        type: ExportRequestType.TRANSACTIONS,
+        parameters: exportParams,
+      },
+    };
+
+    await createExportRequest({ variables });
+    setStep(ModalStep.GENERATING);
+  }, [
+    account?.slug,
+    exportName,
+    queryFilter.variables,
+    fields,
+    useFieldNames,
+    isHostReport,
+    flattenTaxesAndPaymentProcessorFees,
+    createExportRequest,
+  ]);
+
+  const handleBackToConfiguration = React.useCallback(() => {
+    setStep(ModalStep.CONFIGURE);
+  }, []);
 
   const totalAvailableFields = React.useMemo(
     () => FIELDS.filter(({ id: fieldId }) => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))).length,
@@ -308,68 +376,6 @@ const ExportTransactionsCSVModal = ({
 
   const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] =
     useMutation(editAccountSettingsMutation);
-
-  const [createExportRequest] = useMutation(createExportRequestMutation);
-
-  const handleGenerateExport = React.useCallback(
-    async ({
-      fields,
-      flattenTaxesAndPaymentProcessorFees,
-      isHostReport,
-      queryFilterVariables,
-      useFieldNames,
-      fetchAll,
-    }: {
-      fields: string[];
-      flattenTaxesAndPaymentProcessorFees: boolean;
-      isHostReport: boolean;
-      queryFilterVariables: Partial<TransactionsTableQueryVariables>;
-      useFieldNames: boolean;
-      fetchAll: boolean;
-    }) => {
-      try {
-        await createExportRequest({
-          variables: {
-            exportRequest: {
-              account: { slug: account?.slug },
-              name: exportName,
-              type: 'TRANSACTIONS',
-              parameters: {
-                variables: omit(queryFilterVariables, ['limit', 'offset']),
-                fields,
-                useFieldNames,
-                isHostReport,
-                flattenTaxesAndPaymentProcessorFees,
-                fetchAll,
-              },
-            },
-          },
-        });
-        toast({
-          variant: 'success',
-          message: intl.formatMessage({
-            defaultMessage: 'Your export is being generated. You can check its progress in the Exports section.',
-            id: 'ExportRequest.Created',
-          }),
-          action: (
-            <ToastAction altText="View Exports" onClick={() => router.push(`/dashboard/${account?.slug}/exports`)}>
-              <FormattedMessage defaultMessage="View Exports" id="ExportRequest.ViewExports" />
-            </ToastAction>
-          ),
-        });
-        setOpen?.(false);
-      } catch {
-        toast({
-          variant: 'error',
-          message: intl.formatMessage({
-            defaultMessage: 'Failed to create export request. Please try again.',
-            id: 'ExportRequest.Error',
-          }),
-        });
-      }
-    },
-    [account?.slug, createExportRequest, intl, setOpen, toast, exportName, router],
-  );
 
   const customFields = React.useMemo(
     () =>
@@ -432,6 +438,7 @@ const ExportTransactionsCSVModal = ({
 
   React.useEffect(() => {
     const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
+    const isCustomPreset = !PLATFORM_PRESETS[preset] && preset in customFields;
     if (selectedSet && selectedSet.fields) {
       setFields(selectedSet.fields);
       setIsEditingPreset(false);
@@ -452,11 +459,33 @@ const ExportTransactionsCSVModal = ({
       } else {
         setUseFieldNames(false);
       }
+
+      // Update export name to include custom preset name
+      if (isCustomPreset && customFields[preset]?.name) {
+        setExportName(
+          getDefaultExportName({
+            accountFromFilter: queryFilter.values?.account,
+            accountName: account?.name,
+            accountSlug: account?.slug,
+            loggedInUserCollectiveName: LoggedInUser?.collective?.name,
+            presetName: customFields[preset].name,
+          }),
+        );
+      } else if (!isCustomPreset) {
+        setExportName(
+          getDefaultExportName({
+            accountFromFilter: queryFilter.values?.account,
+            accountName: account?.name,
+            accountSlug: account?.slug,
+            loggedInUserCollectiveName: LoggedInUser?.collective?.name,
+          }),
+        );
+      }
     } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
       setUseFieldNames(true);
       handleTaxAndPaymentProcessorFeeSwitch(false);
     }
-  }, [presetOptions, preset]);
+  }, [presetOptions, preset, customFields, queryFilter.values?.account, account, LoggedInUser]);
 
   React.useEffect(() => {
     if (open && account) {
@@ -584,7 +613,7 @@ const ExportTransactionsCSVModal = ({
 
   return (
     <React.Fragment>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open && !isDeletingPreset} onOpenChange={setOpen}>
         {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
         <DialogContent className="gap-2 overflow-hidden p-0 md:max-w-4xl">
           <DialogHeader className="px-4 pt-6 sm:px-8">
@@ -592,7 +621,120 @@ const ExportTransactionsCSVModal = ({
               <FormattedMessage id="ExportTransactionsCSVModal.Title" defaultMessage="Export Transactions" />
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-4 sm:px-8">
+          {step === ModalStep.GENERATING && (
+            <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4 py-12 sm:px-8">
+              {hasExportFailed ? (
+                <React.Fragment>
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <div className="rounded-full bg-red-100 p-4">
+                      <svg
+                        className="h-8 w-8 text-red-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </div>
+                    <h2 className="text-lg font-bold">
+                      <FormattedMessage id="ExportRequest.Failed.Title" defaultMessage="Export Failed" />
+                    </h2>
+                    <p className="max-w-md text-sm text-slate-600">
+                      <FormattedMessage
+                        id="ExportRequest.Failed.Description"
+                        defaultMessage="We were unable to generate your export. Please try again or contact support if the problem persists."
+                      />
+                    </p>
+                    {exportRequestError && (
+                      <div className="mt-2 max-w-md rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+                        <span className="font-medium">
+                          <FormattedMessage id="Error" defaultMessage="Error" />:
+                        </span>{' '}
+                        {exportRequestError}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button onClick={handleGenerateExport} loading={isCreatingExport}>
+                      <FormattedMessage id="TryAgain" defaultMessage="Try Again" />
+                    </Button>
+                    <Button variant="outline" onClick={handleBackToConfiguration}>
+                      <FormattedMessage id="BackToConfiguration" defaultMessage="Back to Configuration" />
+                    </Button>
+                  </div>
+                </React.Fragment>
+              ) : isExportCompleted ? (
+                <React.Fragment>
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <div className="rounded-full bg-green-100 p-4">
+                      <svg
+                        className="h-8 w-8 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h2 className="text-lg font-bold">
+                      <FormattedMessage id="ExportRequest.Ready" defaultMessage="Your export request is ready!" />
+                    </h2>
+                    <p className="text-sm text-slate-600">
+                      <FormattedMessage
+                        id="ExportRequest.ReadyDescription"
+                        defaultMessage="Your export has been generated and is ready for download."
+                      />
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button variant="success" asChild>
+                      <Link href={exportRequestFileUrl} target="_blank">
+                        <FormattedMessage id="DownloadExport" defaultMessage="Download Export" />
+                      </Link>
+                    </Button>
+                    <Button variant="outline" onClick={handleBackToConfiguration}>
+                      <FormattedMessage id="CreateAnotherExport" defaultMessage="Create Another Export" />
+                    </Button>
+                  </div>
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <div className="size-5">
+                      <Spinner size="sm" />
+                    </div>
+                    <h2 className="text-lg font-bold">
+                      <FormattedMessage id="GeneratingExport" defaultMessage="Generating Export..." />
+                    </h2>
+                    <p className="max-w-md text-sm text-slate-600">
+                      <FormattedMessage
+                        id="ExportRequest.Generating"
+                        defaultMessage="Your export is being generated. You can check its progress in the Exports section or wait here until it finishes."
+                      />
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button variant="outline" asChild>
+                      <Link href={`/dashboard/${account?.slug}/exports`}>
+                        <FormattedMessage id="GoToExports" defaultMessage="Go to Exports" />
+                      </Link>
+                    </Button>
+                    <Button variant="outline" onClick={handleBackToConfiguration}>
+                      <FormattedMessage id="CreateAnotherExport" defaultMessage="Create Another Export" />
+                    </Button>
+                  </div>
+                </React.Fragment>
+              )}
+            </div>
+          )}
+          <div
+            className={cn(
+              'flex flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-4 sm:px-8',
+              step === ModalStep.GENERATING && 'hidden',
+            )}
+          >
             <div className="flex flex-col gap-4 sm:flex-row">
               <div className="flex flex-1 flex-col gap-2">
                 <h1 className="font-bold">
@@ -762,14 +904,6 @@ const ExportTransactionsCSVModal = ({
                 )}
               </div>
             </div>
-            {hasAsyncExportsFeature && (
-              <div className="flex flex-col gap-2">
-                <h1 className="font-bold">
-                  <FormattedMessage defaultMessage="Export name" id="ExportName" />
-                </h1>
-                <Input value={exportName} onChange={e => setExportName(e.target.value)} name="exportName" />
-              </div>
-            )}
             <div className="flex flex-col gap-2">
               <h1 className="font-bold">
                 <FormattedMessage defaultMessage="Export options" id="b7Sq18" />
@@ -807,6 +941,14 @@ const ExportTransactionsCSVModal = ({
                 </div>
               )}
             </div>
+            {hasAsyncExportsFeature && (
+              <div className="flex flex-col gap-2">
+                <h1 className="font-bold">
+                  <FormattedMessage defaultMessage="Export name" id="ExportName" />
+                </h1>
+                <Input value={exportName} onChange={e => setExportName(e.target.value)} name="exportName" />
+              </div>
+            )}
             {isAboveRowLimit && (
               <div className="flex flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4">
                 <p className="font-bold">
@@ -821,8 +963,12 @@ const ExportTransactionsCSVModal = ({
               </div>
             )}
           </div>
-
-          <DialogFooter className="flex flex-col gap-4 border-t border-solid border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <DialogFooter
+            className={cn(
+              'flex flex-col gap-4 border-t border-solid border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8',
+              step === ModalStep.GENERATING && 'hidden',
+            )}
+          >
             <div className="font-bold text-slate-700 sm:text-sm">
               {isFetchingRows ? (
                 <React.Fragment>
@@ -874,16 +1020,8 @@ const ExportTransactionsCSVModal = ({
               {hasAsyncExportsFeature ? (
                 <Button
                   disabled={disabled}
-                  onClick={() =>
-                    handleGenerateExport({
-                      fields,
-                      flattenTaxesAndPaymentProcessorFees,
-                      isHostReport,
-                      queryFilterVariables: queryFilter.variables,
-                      useFieldNames,
-                      fetchAll: true,
-                    })
-                  }
+                  loading={isCreatingExport || isLoadingExport}
+                  onClick={handleGenerateExport}
                   className="whitespace-nowrap"
                 >
                   <FormattedMessage id="GenerateExport" defaultMessage="Generate Export" />

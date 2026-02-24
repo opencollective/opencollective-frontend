@@ -1007,3 +1007,25 @@ export const PLATFORM_PRESETS = {
   DEFAULT: { fields: DEFAULT_FIELDS, flattenTaxesAndPaymentProcessorFees: false, useFieldNames: true },
   DEFAULT_2023: { fields: DEFAULT_FIELDS_2023, flattenTaxesAndPaymentProcessorFees: true },
 };
+
+type GetDefaultExportNameParams = {
+  accountFromFilter?: string;
+  accountName?: string;
+  accountSlug?: string;
+  loggedInUserCollectiveName?: string;
+  presetName?: string;
+};
+
+export const getDefaultExportName = ({
+  accountFromFilter,
+  accountName,
+  accountSlug,
+  loggedInUserCollectiveName,
+  presetName,
+}: GetDefaultExportNameParams): string => {
+  const name = accountFromFilter || accountName || accountSlug || loggedInUserCollectiveName || 'Your';
+  if (presetName) {
+    return `${name}'s transactions - ${presetName}`;
+  }
+  return `${name}'s transactions`;
+};

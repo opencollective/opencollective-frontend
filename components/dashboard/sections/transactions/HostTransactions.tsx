@@ -73,6 +73,8 @@ const hostTransactionsMetaDataQuery = gql`
       slug
       currency
       settings
+      hasMoneyManagement
+      type
       manualPaymentProviders {
         id
         name
