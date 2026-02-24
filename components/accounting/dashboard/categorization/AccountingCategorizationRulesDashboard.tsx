@@ -127,6 +127,7 @@ function AccountingCategorizationRules(props: AccountingCategorizationRulesProps
             })),
           },
         });
+        formikContext.resetForm({ values: values, errors: {}, touched: {} });
         toast({
           variant: 'success',
           message: <FormattedMessage defaultMessage="Rules updated" id="j3PF+6" />,

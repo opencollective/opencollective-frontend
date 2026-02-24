@@ -8,6 +8,8 @@ import { ChevronUp, Copy, GripVertical, Trash2 } from 'lucide-react';
 import type { HostContributionCategoryRulesQuery } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
+import { Switch } from '@/components/ui/Switch';
+
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { Card, CardContent, CardHeader } from '../../../ui/Card';
@@ -54,14 +56,34 @@ export function RuleCard(props: RuleCardProps) {
         >
           <GripVertical className="size-4" />
         </button>
-        <span className="shrink-0 text-sm text-muted-foreground">#{props.index + 1}</span>
-        <div className="flex min-w-0 flex-1 items-center gap-2">
+        <span
+          className={cn(
+            'shrink-0 text-sm text-muted-foreground',
+            rule.enabled === false && 'pointer-events-none opacity-50 select-none',
+          )}
+        >
+          #{props.index + 1}
+        </span>
+        <div
+          className={cn(
+            'flex min-w-0 flex-1 items-center gap-2',
+            rule.enabled === false && 'pointer-events-none opacity-50 select-none',
+          )}
+        >
           <p className="truncate font-medium">{rule.name}</p>
           {selectedCategory && (
             <Badge type="neutral" size="xs" round className="max-w-[200px] truncate px-3 py-1">
               <span className="text-muted-foreground">{selectedCategory.code}</span> {selectedCategory.name}
             </Badge>
           )}
+        </div>
+        <div className="flex items-center gap-1">
+          <Switch
+            checked={rule.enabled !== false}
+            onCheckedChange={value => {
+              formikContext.setFieldValue(`${props.formikPrefix}.enabled`, value);
+            }}
+          />
         </div>
         <Button type="button" variant="ghost" size="icon-sm" onClick={props.onCopy}>
           <Copy className="size-4" />
