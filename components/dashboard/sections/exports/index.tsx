@@ -275,6 +275,13 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
         status: ExportRequestStatus.FAILED,
       },
     },
+    {
+      id: 'expired',
+      label: intl.formatMessage({ defaultMessage: 'Expired', id: 'ExportStatus.Expired' }),
+      filter: {
+        status: ExportRequestStatus.EXPIRED,
+      },
+    },
   ];
 
   const queryFilter = useQueryFilter({
