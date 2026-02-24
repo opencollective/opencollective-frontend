@@ -5,8 +5,8 @@ import { FormattedMessage } from 'react-intl';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import { getErrorFromGraphqlException } from '@/lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { loggedInUserQuery } from '@/lib/graphql/queries';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import MessageBox from '../../MessageBox';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
