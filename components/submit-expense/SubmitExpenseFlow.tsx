@@ -26,6 +26,7 @@ type SubmitExpenseFlowProps = {
   submitExpenseTo?: string;
   payeeSlug?: string;
   endFlowButtonLabel?: React.ReactNode;
+  customData?: Record<string, unknown>;
 };
 
 const I18nMessages = defineMessages({
@@ -242,6 +243,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                   onSuccess={onSuccess}
                   onError={onError}
                   onExpenseInviteDeclined={onExpenseInviteDeclined}
+                  customData={props.customData}
                 />
               </div>
             </div>
@@ -264,6 +266,7 @@ function ExpenseFormikContainer(props: {
   draftKey?: string;
   duplicateExpense?: boolean;
   expenseId?: number;
+  customData?: Record<string, unknown>;
   onError: (err) => void;
   onSuccess: (result, type: 'edit' | 'new' | 'invite') => void;
   onExpenseInviteDeclined: () => void;
@@ -309,6 +312,7 @@ function ExpenseFormikContainer(props: {
     },
     startOptions: startOptions.current,
     handleOnSubmit: true,
+    customData: props.customData,
     onSuccess: props.onSuccess,
     onError: props.onError,
   });

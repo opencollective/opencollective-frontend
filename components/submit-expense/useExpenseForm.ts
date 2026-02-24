@@ -1643,6 +1643,7 @@ export function useExpenseForm(opts: {
   initialValues: ExpenseFormValues;
   startOptions: ExpenseFormStartOptions;
   handleOnSubmit?: boolean;
+  customData?: Record<string, unknown>;
   onSuccess?: (
     result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>,
     type: 'new' | 'invite' | 'edit',
@@ -1778,7 +1779,7 @@ export function useExpenseForm(opts: {
               : null,
             attachedFiles,
             currency: formOptions.expenseCurrency,
-            customData: null,
+            customData: opts.customData,
             invoiceInfo: values.invoiceInfo || null,
             invoiceFile:
               values.hasInvoiceOption === YesNoOption.NO

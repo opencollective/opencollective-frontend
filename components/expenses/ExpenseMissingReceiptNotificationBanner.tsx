@@ -1,62 +1,46 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-
-import { Flex } from '../../components/Grid';
-import MessageBox from '../../components/MessageBox';
-import StyledButton from '../../components/StyledButton';
-import { H4, P } from '../../components/Text';
-
+import MessageBox from '../MessageBox';
 import { Button } from '../ui/Button';
 
 import EditExpenseDialog from './EditExpenseDialog';
 
 const ExpenseMissingReceiptNotificationBanner = props => {
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
-
-  const { canAttachReceipts } = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE)
-    ? props.expense?.permissions || {}
-    : {};
+  const { canAttachReceipts } = props.expense?.permissions || {};
 
   return (
     <MessageBox py={3} px="26px" mb={4} type="warning">
-      <Flex>
-        <Flex ml={[0, 2]} flexDirection="column">
-          <H4 mb="10px" fontWeight="500">
+      <div className="flex">
+        <div className="ml-0 flex flex-col sm:ml-2">
+          <h4 className="mb-2">
             <FormattedMessage id="AttachReceipt" defaultMessage="Submit receipt" />
-          </H4>
-          <P lineHeight="20px">
+          </h4>
+          <p className="text-sm leading-5 tracking-tight">
             <FormattedMessage
               id="AttachReceiptInstructions"
               defaultMessage="This expense was automatically created by charging a linked credit card. To complete the process, add a description and upload the receipt. All charges must have receipts."
             />
-          </P>
-          <div className="mt-2.5">
-            {canAttachReceipts ? (
+          </p>
+          {canAttachReceipts && (
+            <div className="mt-2">
               <EditExpenseDialog
                 expense={props.expense}
                 field="attachReceipts"
                 dialogContentClassName="sm:max-w-2xl"
                 title={intl.formatMessage({ defaultMessage: 'Attach receipts', id: 'Expense.attachReceipts' })}
+                showTriggerTooltip={false} /** Not needed here, the button is explicit */
                 trigger={
                   <Button size="xs" variant="outline">
                     <FormattedMessage id="Expense.attachReceipts" defaultMessage="Attach receipts" />
                   </Button>
                 }
               />
-            ) : (
-              props.onEdit && (
-                <StyledButton buttonSize="tiny" mr={1} onClick={props.onEdit}>
-                  <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
-                </StyledButton>
-              )
-            )}
-          </div>
-        </Flex>
-      </Flex>
+            </div>
+          )}
+        </div>
+      </div>
     </MessageBox>
   );
 };
