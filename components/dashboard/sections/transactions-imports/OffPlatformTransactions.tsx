@@ -10,11 +10,13 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import type {
+  Amount,
   OffPlatformTransactionsQuery,
   OffPlatformTransactionsQueryVariables,
+  TransactionsImport,
+  TransactionsImportAccount,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Amount, TransactionsImport, TransactionsImportAccount } from '../../../../lib/graphql/types/v2/schema';
-import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
+import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';
@@ -35,7 +37,7 @@ import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledLink from '../../../StyledLink';
-import { actionsColumn, DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable, stickyColumnVariants } from '../../../table/DataTable';
 import {
   MultiPagesRowSelectionInitialState,
   multiPagesRowSelectionReducer,
@@ -526,6 +528,9 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                 columns={[
                   {
                     id: 'select',
+                    meta: {
+                      className: stickyColumnVariants({ variant: 'select' }),
+                    },
                     header: ({ table }) =>
                       importRows.some(row => !row.expense && !row.order) ? (
                         <Checkbox
@@ -685,15 +690,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                       );
                     },
                   },
-                  {
-                    id: 'Actions',
-                    ...actionsColumn,
-                    header: () => {
-                      return (
-                        <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
-                      );
-                    },
-                  },
+                  actionsColumn,
                 ]}
               />
               <div className="mt-8">

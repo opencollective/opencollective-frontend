@@ -5,8 +5,11 @@ import { z } from 'zod';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { integer } from '@/lib/filters/schemas';
-import type { KycTabPeopleDashboardQuery, KycVerificationCollection } from '@/lib/graphql/types/v2/graphql';
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import type {
+  AccountReferenceInput,
+  KycTabPeopleDashboardQuery,
+  KycVerificationCollection,
+} from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';

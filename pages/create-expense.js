@@ -323,7 +323,7 @@ class CreateExpensePage extends React.Component {
       } else if (!data.account || isHiddenAccount(data.account)) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (
-        !hasFeature(data.account, FEATURES.RECEIVE_EXPENSES) ||
+        (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES) && !hasFeature(data.account, FEATURES.RECEIVE_GRANTS)) ||
         data.account.supportedExpenseTypes.length === 0
       ) {
         return <PageFeatureNotSupported />;
@@ -576,7 +576,7 @@ const createExpensePageQuery = gql`
       supportedExpenseTypes
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
         MULTI_CURRENCY_EXPENSES
       }
       expensesTags {

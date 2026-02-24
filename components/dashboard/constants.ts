@@ -7,6 +7,7 @@ export const SECTIONS = {
   OVERVIEW: 'overview',
   REPORTS: 'reports',
   EXPENSE_REPORTS: 'reports/expenses',
+  CONTRIBUTIONS_REPORTS: 'reports/contributions',
   TRANSACTION_REPORTS: 'reports/transactions',
   CHART_OF_ACCOUNTS: 'chart-of-accounts',
   HOST_EXPENSES: 'host-expenses',
@@ -45,6 +46,9 @@ export const SECTIONS = {
   SEARCH: 'search',
   PAID_DISBURSEMENTS: 'paid-disbursements',
   PAY_DISBURSEMENTS: 'pay-disbursements',
+  APPROVE_PAYMENT_REQUESTS: 'approve-payment-requests',
+  PAYMENT_REQUESTS: 'payment-requests',
+  HOST_PAYMENT_REQUESTS: 'host-payment-requests',
 };
 
 export const ROOT_SECTIONS = {
@@ -96,7 +100,8 @@ export const LEGACY_SETTINGS_SECTIONS = {
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',
-  EXPORT: 'export',
+  WIDGETS: 'widgets',
+  EXPORTS: 'exports',
   FOR_DEVELOPERS: 'for-developers',
   USER_SECURITY: 'user-security',
   CUSTOM_EMAIL: 'custom-email',
@@ -115,6 +120,7 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.REPORTS,
   ALL_SECTIONS.TRANSACTION_REPORTS,
   ALL_SECTIONS.EXPENSE_REPORTS,
+  ALL_SECTIONS.CONTRIBUTIONS_REPORTS,
   ALL_SECTIONS.PAYMENT_RECEIPTS,
   ALL_SECTIONS.HOST_EXPENSES,
   ALL_SECTIONS.TRANSACTIONS,
@@ -172,9 +178,13 @@ export const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.collectivePage',
     defaultMessage: 'Profile Sections',
   },
-  [ALL_SECTIONS.EXPORT]: {
+  [ALL_SECTIONS.WIDGETS]: {
     defaultMessage: 'Widgets',
     id: 'jgOqxt',
+  },
+  [ALL_SECTIONS.EXPORTS]: {
+    defaultMessage: 'Exports',
+    id: 'Exports',
   },
   [ALL_SECTIONS.POLICIES]: {
     id: 'editCollective.menu.policies',
@@ -335,5 +345,17 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.SUBMITTED_GRANTS]: {
     defaultMessage: 'Issued Grant Requests',
     id: 'qKKz2G',
+  },
+  [ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS]: {
+    defaultMessage: 'Approve Payment Requests',
+    id: 'ApprovePaymentRequests',
+  },
+  [ALL_SECTIONS.PAYMENT_REQUESTS]: {
+    defaultMessage: 'Payment Requests',
+    id: 'PaymentRequests',
+  },
+  [ALL_SECTIONS.HOST_PAYMENT_REQUESTS]: {
+    defaultMessage: 'All Payment Requests',
+    id: 'HostPaymentRequests',
   },
 });

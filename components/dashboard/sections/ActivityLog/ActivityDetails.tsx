@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash';
 import { defineMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
-import type { Activity } from '../../../../lib/graphql/types/v2/schema';
+import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
 
 import { Box } from '../../../Grid';
 

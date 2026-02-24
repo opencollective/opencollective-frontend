@@ -2,8 +2,8 @@ import React from 'react';
 import { startCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/schema';
-import { ConnectedAccountService } from '@/lib/graphql/types/v2/schema';
+import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/graphql';
+import { ConnectedAccountService } from '@/lib/graphql/types/v2/graphql';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import Link from '@/components/Link';
@@ -108,7 +108,7 @@ export const ConnectedAccountsTable = ({ connectedAccounts, disconnect, reconnec
     <Table className="w-full">
       <TableBody>
         {connectedAccounts.map(connectedAccount => (
-          <TableRow key={connectedAccount.id} className="text-sm text-gray-700" highlightOnHover={false}>
+          <TableRow key={connectedAccount.id} className="bg-white text-sm text-gray-700" highlightOnHover={false}>
             <TableCell className="w-fit min-w-0">
               <Badge size="sm">
                 {connectedAccount.hash?.slice(0, 7) || connectedAccount.username || `#${connectedAccount.legacyId}`}

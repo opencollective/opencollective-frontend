@@ -5,10 +5,10 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import type {
+  Account,
   ManagePaymentMethodsQuery,
   ManagePaymentMethodsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
 
 import { Button } from '@/components/ui/Button';
 import { Separator } from '@/components/ui/Separator';
@@ -24,7 +24,7 @@ import PaymentMethodsTable from './PaymentMethodsTable';
 import PayoutMethodsTable from './PayoutMethodsTable';
 
 type ManagePaymentMethodsProps = {
-  account: Pick<Account, 'slug'>;
+  account: Pick<Account, 'slug' | 'type'>;
 };
 
 enum Modals {
@@ -63,7 +63,11 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
         <div>
           <div className="mb-1 flex w-full items-center gap-2 text-lg font-semibold">
             <div className="shrink-0">
-              <FormattedMessage defaultMessage="For Contributions" id="xf7EPu" />
+              {props.account.type === 'ORGANIZATION' ? (
+                <FormattedMessage defaultMessage="Receiving Money" id="editCollective.receivingMoney" />
+              ) : (
+                <FormattedMessage defaultMessage="For Contributions" id="xf7EPu" />
+              )}
             </div>
             <Separator className="shrink" />
             <Button
@@ -108,7 +112,11 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
         <div>
           <div className="mb-1 flex items-center gap-2 text-lg font-semibold">
             <div className="shrink-0">
-              <FormattedMessage defaultMessage="For Expenses" id="RF+AgF" />
+              {props.account.type === 'ORGANIZATION' ? (
+                <FormattedMessage defaultMessage="Sending Money" id="editCollective.sendingMoney" />
+              ) : (
+                <FormattedMessage defaultMessage="For Expenses" id="RF+AgF" />
+              )}
             </div>
             <Separator className="shrink" />
             <Button

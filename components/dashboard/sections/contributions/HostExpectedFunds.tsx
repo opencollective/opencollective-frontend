@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
 import type { DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
+import { ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
@@ -170,6 +170,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
+    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({
@@ -284,6 +285,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
             fromAccount: false,
             createdAt: false,
             lastChargedAt: false,
+            accountingCategory: true,
           }}
         />
       )}

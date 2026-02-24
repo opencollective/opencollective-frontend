@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import type { PlatformSubscriptionFeatures as PlatformSubscriptionFeaturesSchema } from '@/lib/graphql/types/v2/schema';
+import type { PlatformSubscriptionFeatures as PlatformSubscriptionFeaturesSchema } from '@/lib/graphql/types/v2/graphql';
 
 type PlatformSubscriptionFeaturesType = keyof Omit<PlatformSubscriptionFeaturesSchema, '__typename'>;
 

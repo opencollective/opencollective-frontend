@@ -28,6 +28,8 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
       isSaved
       canBeEdited
       canBeDeleted
+      createdAt
+      updatedAt
     }
     adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, COLLECTIVE, FUND]) {
       nodes {
@@ -129,13 +131,6 @@ export const expenseHostFields = gql`
       PAYPAL_PAYOUTS
       CHART_OF_ACCOUNTS
       TRANSFERWISE
-    }
-    paypalPreApproval {
-      id
-      balance {
-        currency
-        valueInCents
-      }
     }
     location {
       id
@@ -528,6 +523,10 @@ export const expensePageExpenseFieldsFragment = gql`
       canEdit
       canEditTags
       canEditAccountingCategory
+      editAccountingCategory {
+        allowed
+        reason
+      }
       canEditType
       canEditTitle
       canEditItems
@@ -607,7 +606,7 @@ export const expensePageExpenseFieldsFragment = gql`
           valueInCents
           currency
         }
-        taxAmount {
+        taxAmount(fetchTax: true) {
           valueInCents
           currency
         }
@@ -771,6 +770,10 @@ export const expensesListFieldsFragment = gql`
       canSeeInvoiceInfo
       canEditTags
       canEditAccountingCategory
+      editAccountingCategory {
+        allowed
+        reason
+      }
       canUnschedulePayment
       canHold
       canRelease

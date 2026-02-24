@@ -19,7 +19,6 @@ import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import EditTagsModal from '../../EditTagsModal';
-import FollowButton from '../../FollowButton';
 import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
@@ -176,7 +175,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
             />
           </Container>
         )}
-        <ContainerSectionContent pt={40} display="flex" flexDirection="column">
+        <ContainerSectionContent pt={40} display="flex" flexDirection="column" alignItems={['center', 'flex-start']}>
           {/* Collective presentation (name, logo, description...) */}
           <Container position="relative" mb={2} width={128}>
             <HeroAvatar collective={collective} isAdmin={isAdmin} />
@@ -189,6 +188,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               textAlign="left"
               data-cy="collective-title"
               wordBreak="normal"
+              textAlign={['center', 'left']}
             >
               {collective.name || collective.slug}
               <AccountTrustBadge account={collective} size={24} className="ml-3 inline-block" />
@@ -200,14 +200,13 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 <StyledLink key={company} as={UserCompany} mr={1} fontSize="20px" fontWeight={600} company={company} />
               ))}
           </Flex>
-          <div className="mt-2 flex">
-            <FollowButton buttonProps={{ buttonSize: 'tiny' }} account={collective} />
-          </div>
-
           {!isEvent && (
             <Fragment>
               {(isCollective || isOrganization || isFund || isProject) && (
-                <div className="my-7 mb-2 flex flex-wrap items-center gap-2" data-cy="collective-tags">
+                <div
+                  className="my-7 mb-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start"
+                  data-cy="collective-tags"
+                >
                   <StyledTag
                     textTransform="uppercase"
                     variant="rounded-left"
@@ -282,7 +281,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 </div>
               )}
               <Flex alignItems="center" flexWrap="wrap" fontSize="14px" gap="16px" mt={2}>
-                <Flex gap="16px" flexWrap="wrap">
+                <Flex gap="16px" flexWrap="wrap" m="0 auto">
                   {collective.canContact && (
                     <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
                       {btnProps => (

@@ -4,9 +4,8 @@ import { FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import type { DashboardOrdersQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -61,6 +60,7 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
+    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({

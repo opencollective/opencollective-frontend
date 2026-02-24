@@ -15,10 +15,12 @@ import type { ZodObjectDef } from 'zod';
 import { z } from 'zod';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
-import { getPayoutProfiles } from '../../lib/expenses';
+import { getPayoutProfiles, standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import type {
+  Amount,
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
+  CurrencyExchangeRateInput,
   EditExpenseFromDashboardMutation,
   EditExpenseFromDashboardMutationVariables,
   ExpenseFormExchangeRatesQuery,
@@ -30,15 +32,16 @@ import type {
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
   LocationInput,
+  MakeOptional,
+  RecurringExpenseInterval,
 } from '../../lib/graphql/types/v2/graphql';
-import type { Amount, CurrencyExchangeRateInput, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
 import {
   Currency,
   ExpenseLockableFields,
   ExpenseStatus,
   ExpenseType,
   PayoutMethodType,
-} from '../../lib/graphql/types/v2/schema';
+} from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getArrayValuesMemoizer, isValidEmail } from '../../lib/utils';
@@ -398,6 +401,8 @@ const formSchemaQuery = gql`
     isSaved
     canBeEdited
     canBeDeleted
+    createdAt
+    updatedAt
   }
 
   fragment ExpenseFormSchemaHostFields on Host {
@@ -593,7 +598,9 @@ type ExpenseFormOptions = {
   supportedExpenseTypes?: ExpenseType[];
   allowInvite?: boolean;
   payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
-  payoutMethods?: ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'];
+  payoutMethods?: Array<
+    MakeOptional<ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number], 'createdAt' | 'updatedAt'>
+  >;
   payoutMethod?:
     | ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]
     | ExpenseFormValues['newPayoutMethod'];
@@ -877,7 +884,7 @@ function buildFormSchema(
             .string()
             .nullish()
             .refine(v => {
-              if (!options.isAdminOfPayee) {
+              if (!options.isAdminOfPayee && options.payee?.type !== CollectiveType.VENDOR) {
                 return true;
               }
 
@@ -1788,7 +1795,7 @@ export function useExpenseForm(opts: {
                 exchangeRate: ei.amount.exchangeRate
                   ? ({
                       ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                      date: new Date(ei.amount.exchangeRate.date || ei.incurredAt),
+                      date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
                     } as CurrencyExchangeRateInput)
                   : null,
               },

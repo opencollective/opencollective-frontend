@@ -6,7 +6,7 @@ import { AlertTriangle, ArchiveIcon, Plug } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
+import type { TransactionsImport } from '../../../../lib/graphql/types/v2/graphql';
 import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
 import { useRedirectToGoCardlessConnect } from '@/lib/hooks/useRedirectToGoCardlessConnect';
 

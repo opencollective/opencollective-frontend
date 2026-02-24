@@ -8,7 +8,7 @@ import {
   AccountingCategoryAppliesTo,
   AccountingCategoryKind,
   ExpenseType,
-} from '../../../../lib/graphql/types/v2/schema';
+} from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { useFormikZod } from '@/components/FormikZod';

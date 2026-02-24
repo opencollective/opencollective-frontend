@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { get, omit } from 'lodash';
 import { useRouter } from 'next/router';
@@ -31,7 +31,6 @@ import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
@@ -48,7 +47,7 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from './filters';
-import { hostDashboardMetadataQuery, paidDisbursementsQuery } from './queries';
+import { paidDisbursementsMetadataQuery, paidDisbursementsQuery } from './queries';
 
 enum PaidDisbursementsTab {
   ALL = 'ALL',
@@ -92,7 +91,10 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, 'status'),
   date: { ...commonFilters.date, labelMsg: defineMessage({ defaultMessage: 'Date submitted', id: 'jKIFOK' }) },
   account: { ...hostedAccountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Paid from', id: 'jhYP1/' }) },
-  tag: expenseTagFilter.filter,
+  fromAccounts: {
+    ...commonFilters.fromAccounts,
+    labelMsg: defineMessage({ defaultMessage: 'Paid to', id: 'Expense.PaidTo' }),
+  },
   sort: sortFilter.filter,
 };
 
@@ -116,7 +118,12 @@ const getExpenseColumns = intl => [
                 values={{
                   paidOnDate: paidAt && <FormattedTime timeStyle={'short'} value={paidAt} />,
                   paidByAccount: (
-                    <LinkCollective collective={paidBy} withHoverCard className="text-xs">
+                    <LinkCollective
+                      collective={paidBy}
+                      withHoverCard
+                      className="text-xs"
+                      onClick={e => e.preventDefault()}
+                    >
                       <Avatar size={14} collective={paidBy} />
                     </LinkCollective>
                   ),
@@ -160,7 +167,7 @@ const getExpenseColumns = intl => [
               values={{
                 date: <DateTime dateStyle="medium" value={expense.createdAt} />,
                 submittedByAccount: (
-                  <LinkCollective collective={submittedBy} withHoverCard className="">
+                  <LinkCollective collective={submittedBy} withHoverCard onClick={e => e.preventDefault()}>
                     <Avatar size={14} collective={submittedBy} />
                   </LinkCollective>
                 ),
@@ -187,6 +194,7 @@ const getExpenseColumns = intl => [
               isFeatureEnabled(expense.host, 'CHART_OF_ACCOUNTS') &&
               get(expense, 'permissions.canEditAccountingCategory', false)
             }
+            editPermission={get(expense, 'permissions.editAccountingCategory')}
             allowNone
             showCodeInSelect={true}
           />
@@ -206,11 +214,12 @@ const getExpenseColumns = intl => [
           <LinkCollective
             collective={account}
             withHoverCard
-            className="group flex items-center gap-2 hover:no-underline"
+            className="flex items-center gap-2 hover:no-underline"
+            onClick={e => e.preventDefault()}
           >
             <Avatar size={24} collective={account} />
             <div className="flex flex-col overflow-hidden">
-              <span className="truncate font-medium group-hover:underline">{account.name}</span>
+              <span className="truncate font-medium">{account.name}</span>
               <span className="text-xs text-muted-foreground">{formatCollectiveType(intl, account.type)}</span>
             </div>
           </LinkCollective>
@@ -227,11 +236,16 @@ const getExpenseColumns = intl => [
       const payee = expense.payee;
       return (
         <div className="max-w-fit">
-          <LinkCollective collective={payee} withHoverCard className="group hover:no-underline">
+          <LinkCollective
+            collective={payee}
+            withHoverCard
+            className="hover:no-underline"
+            onClick={e => e.preventDefault()}
+          >
             <div className="flex items-center gap-2">
               <Avatar size={24} collective={payee} />
               <div className="flex flex-col overflow-hidden">
-                <span className="truncate font-medium group-hover:underline">{payee.name}</span>
+                <span className="truncate font-medium">{payee.name}</span>
                 <span className="text-xs text-muted-foreground">{formatCollectiveType(intl, payee.type)}</span>
               </div>
             </div>
@@ -253,7 +267,7 @@ const getExpenseColumns = intl => [
             <FormattedMoneyAmount amount={Math.abs(amount.valueInCents)} currency={amount.currency} />
           </span>
           <span className="text-xs text-muted-foreground">
-            {i18nPayoutMethodType(intl, expense.payoutMethod?.type, { aliasBankAccountToTransferWise: true })}
+            {i18nPayoutMethodType(intl, expense.payoutMethod?.type)}
           </span>
         </div>
       );
@@ -267,51 +281,48 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
-  const { data: metaData } = useQuery(hostDashboardMetadataQuery, {
-    variables: { hostSlug, withHoverCard: true },
-  });
-
-  const views: Views<FilterValues> = [
-    {
-      id: PaidDisbursementsTab.ALL,
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {},
-    },
-    {
-      id: PaidDisbursementsTab.INVOICES,
-      label: intl.formatMessage({ defaultMessage: 'Invoices', id: 'c0bGFo' }),
-      filter: {
-        type: ExpenseType.INVOICE,
+  const views: Views<FilterValues> = useMemo(
+    () => [
+      {
+        id: PaidDisbursementsTab.ALL,
+        label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+        filter: {},
       },
-    },
-    {
-      id: PaidDisbursementsTab.REIMBURSEMENTS,
-      label: intl.formatMessage({ defaultMessage: 'Reimbursements', id: 'wdu2yl' }),
-      filter: {
-        type: ExpenseType.RECEIPT,
+      {
+        id: PaidDisbursementsTab.INVOICES,
+        label: intl.formatMessage({ defaultMessage: 'Invoices', id: 'c0bGFo' }),
+        filter: {
+          type: [ExpenseType.INVOICE],
+        },
       },
-    },
-    {
-      id: PaidDisbursementsTab.GRANTS,
-      label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
-      filter: {
-        type: ExpenseType.GRANT,
+      {
+        id: PaidDisbursementsTab.REIMBURSEMENTS,
+        label: intl.formatMessage({ defaultMessage: 'Reimbursements', id: 'wdu2yl' }),
+        filter: {
+          type: [ExpenseType.RECEIPT],
+        },
       },
-    },
-  ];
-
-  const meta: FilterMeta = {
-    currency: metaData?.host?.currency,
-    hostSlug: hostSlug,
-    includeUncategorized: true,
-    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
-  };
+      {
+        id: PaidDisbursementsTab.GRANTS,
+        label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
+        filter: {
+          type: [ExpenseType.GRANT],
+        },
+      },
+    ],
+    [intl],
+  );
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
     filters,
-    meta,
+    meta: {
+      currency: account.currency,
+      hostSlug: hostSlug,
+      includeUncategorized: true,
+      accountingCategoryKinds: ExpenseAccountingCategoryKinds,
+    },
     views,
     skipFiltersOnReset: ['hostContext'],
   });
@@ -321,12 +332,29 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
     ...queryFilter.variables,
   };
 
-  const expenses = useQuery(paidDisbursementsQuery, {
+  const { data, error, loading, refetch } = useQuery(paidDisbursementsQuery, {
     variables,
   });
 
+  const { data: metaData } = useQuery(paidDisbursementsMetadataQuery, {
+    variables: {
+      hostSlug,
+      hostContext: queryFilter.values.hostContext,
+    },
+  });
+
+  const viewsWithCount: Views<FilterValues> = useMemo(
+    () =>
+      views.map(view => ({
+        ...view,
+        count: metaData?.[view.id]?.totalCount,
+      })),
+    [views, metaData],
+  );
+
   const getExpenseActions = useExpenseActions({
-    refetchList: expenses.refetch,
+    refetchList: refetch,
+    host: data?.host,
   });
 
   const pushSubpath = makePushSubpath(router);
@@ -337,8 +365,6 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
     onOpen: id => pushSubpath(id),
     onClose: () => pushSubpath(undefined),
   });
-
-  const { data, error, loading } = expenses;
 
   return (
     <div className="flex flex-col gap-4">
@@ -355,9 +381,10 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
             )}
           </div>
         }
+        description={<FormattedMessage defaultMessage="Disbursed payment and grant requests" id="eTiWF/" />}
       />
 
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} views={viewsWithCount} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
@@ -370,7 +397,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
       ) : (
         <React.Fragment>
           <DataTable
-            data={data?.expenses.nodes || []}
+            data={data?.expenses?.nodes.map(node => ({ ...node, host: data?.host })) ?? []}
             columns={getExpenseColumns(intl)}
             onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
             getRowId={row => String(row.legacyId)}

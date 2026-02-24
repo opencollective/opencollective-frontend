@@ -5,8 +5,7 @@ import type { z } from 'zod';
 
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
-import type { TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import type { Account } from '@/lib/graphql/types/v2/schema';
+import type { Account, TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
@@ -68,11 +67,29 @@ const accountTransactionsMetaDataQuery = gql`
       slug
       currency
       settings
+      type
       childrenAccounts {
         totalCount
         nodes {
           id
         }
+      }
+      ... on AccountWithHost {
+        host {
+          manualPaymentProviders {
+            id
+            name
+          }
+        }
+      }
+      ... on Host {
+        manualPaymentProviders {
+          id
+          name
+        }
+      }
+      ... on Organization {
+        hasMoneyManagement
       }
     }
   }
@@ -98,6 +115,8 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
       kinds: metaData?.transactions?.kinds,
       accountSlug,
       childrenAccounts: account.childrenAccounts?.nodes ?? [],
+      manualPaymentProviders:
+        metaData?.account?.manualPaymentProviders ?? metaData?.account?.host?.manualPaymentProviders,
     },
   });
 

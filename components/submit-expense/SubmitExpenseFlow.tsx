@@ -3,7 +3,7 @@ import { FormikProvider } from 'formik';
 import { X } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseType } from '../../lib/graphql/types/v2/schema';
+import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nGraphqlException } from '@/lib/errors';
 import { useNavigationWarning } from '@/lib/hooks/useNavigationWarning';

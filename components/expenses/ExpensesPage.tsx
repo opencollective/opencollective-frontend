@@ -6,12 +6,15 @@ import { FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
-import type { ExpensesPageQuery, HostDashboardExpensesQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type {
+  ExpensesPageQuery,
+  ExpensesPageQueryVariables,
+  HostDashboardExpensesQueryVariables,
+} from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { accountNavbarFieldsFragment } from '@/components/collective-navbar/fragments';
-import { expenseTagFilter } from '@/components/dashboard/filters/ExpenseTagsFilter';
 import { Pagination } from '@/components/dashboard/filters/Pagination';
 import type { FilterMeta as CommonFilterMeta } from '@/components/dashboard/sections/expenses/filters';
 import {
@@ -39,7 +42,7 @@ export const expensesPageQuery = gql`
     $fromAccount: AccountReferenceInput
     $limit: Int!
     $offset: Int!
-    $type: ExpenseType
+    $types: [ExpenseType]
     $tags: [String]
     $status: [ExpenseStatusFilter]
     $amount: AmountRangeInput
@@ -138,7 +141,7 @@ export const expensesPageQuery = gql`
       fromAccount: $fromAccount
       limit: $limit
       offset: $offset
-      type: $type
+      types: $types
       tag: $tags
       status: $status
       amount: $amount
@@ -180,7 +183,6 @@ export const schema = commonSchema.extend({ direction: expenseDirectionFilter.sc
 type FilterValues = z.infer<typeof schema>;
 
 type FilterMeta = CommonFilterMeta & {
-  expenseTags?: string[];
   includeUncategorized?: boolean;
   accountSlug: string;
 };
@@ -194,7 +196,6 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   direction: expenseDirectionFilter.filter,
   ...omit(commonFilters, ['searchTerm', 'status']),
   status: { ...commonFilters.status, static: false } as typeof commonFilters.status,
-  tag: expenseTagFilter.filter,
 };
 
 type ExpensesProps = {
@@ -212,7 +213,7 @@ const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) =>
     accountSlug: account?.slug,
   };
 
-  const queryFilter = useQueryFilter({
+  const queryFilter = useQueryFilter<typeof schema, ExpensesPageQueryVariables>({
     schema,
     toVariables,
     filters: isSubmitted ? omit(filters, ['direction']) : filters,

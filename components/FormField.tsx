@@ -26,6 +26,9 @@ export function FormField({
   privateMessage,
   validate,
   className,
+  labelClassName,
+  hintClassName,
+  errorClassName,
   isFastField = false,
   ...props
 }: {
@@ -47,6 +50,9 @@ export function FormField({
   privateMessage?: React.ReactNode;
   validate?: any;
   className?: string;
+  labelClassName?: string;
+  hintClassName?: string;
+  errorClassName?: string;
   autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
   autoFocus?: boolean;
   ref?: React.ForwardedRef<HTMLInputElement>;
@@ -100,7 +106,7 @@ export function FormField({
         return (
           <div className={cn('flex w-full flex-col gap-1', className)}>
             {label && (
-              <Label className="leading-normal" htmlFor={htmlFor}>
+              <Label className={cn('leading-normal', labelClassName)} htmlFor={htmlFor}>
                 {label}{' '}
                 {'required' in fieldAttributes && !fieldAttributes.required && (
                   <span className="font-normal text-muted-foreground">
@@ -116,9 +122,9 @@ export function FormField({
               </Label>
             )}
             {children ? children({ form, meta, field: fieldAttributes }) : <Input {...fieldAttributes} />}
-            {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
+            {hint && <p className={cn('text-sm text-muted-foreground', hintClassName)}>{hint}</p>}
             {hasError && showError && (
-              <p className="text-sm text-red-600">
+              <p className={cn('text-sm text-red-600', errorClassName)}>
                 {isOCError(error)
                   ? formatFormErrorMessage(intl, error)
                   : typeof error === 'string'

@@ -8,10 +8,11 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import type {
   AccountHoverCardFieldsFragment,
+  AccountingCategoryKind,
+  Expense,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { AccountingCategoryKind, Expense } from '../../../../lib/graphql/types/v2/schema';
-import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
+import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
@@ -24,8 +25,7 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import { accountFilter } from '../../filters/AccountFilter';
-import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
+import { expenseTypeFilter } from '../../filters/ExpenseTypeFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
@@ -53,8 +53,8 @@ const sortByFilter = buildSortFilter({
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
-  fromAccount: accountFilter.schema,
   sort: sortByFilter.schema,
+  type: expenseTypeFilter.schema.default(ExpenseType.GRANT),
 });
 
 type FilterValues = z.infer<typeof filterSchema>;
@@ -70,14 +70,15 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
   ...commonToVariables,
   limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
   account: hostedAccountFilter.toVariables,
-  fromAccount: accountFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, ['type', 'chargeHasReceipts']),
   account: hostedAccountFilter.filter,
-  tag: expenseTagFilter.filter,
-  fromAccount: { ...accountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Beneficiary', id: 'VfJsl4' }) },
+  fromAccounts: {
+    ...commonFilters.fromAccounts,
+    labelMsg: defineMessage({ defaultMessage: 'Beneficiary', id: 'VfJsl4' }),
+  },
 };
 
 const ROUTE_PARAMS = ['slug', 'section'];
@@ -117,13 +118,6 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
           nodes {
             id
             ...AccountHoverCardFields
-          }
-        }
-
-        expenseTags: expenseTagStats(host: { slug: $hostSlug }) {
-          nodes {
-            id
-            tag
           }
         }
       }
@@ -187,7 +181,6 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
   const variables = {
     hostSlug,
     ...queryFilter.variables,
-    type: ExpenseType.GRANT,
     fetchGrantHistory: true,
   };
 

@@ -12,8 +12,12 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import dayjs from '../../../lib/dayjs';
-import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
-import { CurrencyExchangeRateSourceType, ExpenseLockableFields } from '../../../lib/graphql/types/v2/schema';
+import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/graphql';
+import {
+  AccountType,
+  CurrencyExchangeRateSourceType,
+  ExpenseLockableFields,
+} from '../../../lib/graphql/types/v2/graphql';
 import { getIntlDisplayNames } from '../../../lib/i18n';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
@@ -288,6 +292,7 @@ type ExpenseItemProps = {
 
 function getExpenseItemProps(form: ExpenseForm) {
   return {
+    payeeType: form.options.payee?.type,
     ...pick(form, ['setFieldValue', 'isSubmitting', 'setFieldTouched']),
     ...pick(form.options, [
       'allowExpenseItemAttachment',
@@ -419,7 +424,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
         <div className="@container grow">
           <div className="mb-2">
             <FormField
-              required={props.isAdminOfPayee}
+              required={props.isAdminOfPayee || props.payeeType === AccountType.VENDOR}
               disabled={props.isDescriptionLocked || props.isSubmitting}
               label={intl.formatMessage({ defaultMessage: 'Item Description', id: 'xNL/oy' })}
               placeholder={intl.formatMessage({ defaultMessage: 'Enter what best describes the item', id: '/eapvj' })}
@@ -436,7 +441,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
           <div className="flex flex-col gap-4 @md:grid @md:grid-cols-3">
             {props.hasExpenseItemDate && (
               <FormField
-                required={props.isAdminOfPayee}
+                required={props.isAdminOfPayee || props.payeeType === AccountType.VENDOR}
                 disabled={props.isDateLocked || props.isSubmitting}
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
                 name={`expenseItems.${props.index}.incurredAt`}

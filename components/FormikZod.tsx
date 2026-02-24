@@ -31,7 +31,9 @@ type InputAttributesFromZodSchema =
 /**
  * A Zod schema that can be used in a Formik form. It can be a plain Zod object or a Zod effect that wraps a Zod object.
  */
-type SupportedZodSchema<Values = any> = z.ZodSchema<Values> | ZodEffects<z.ZodSchema<Values>>;
+type SupportedZodSchema<Values = any> =
+  | z.ZodType<Values, z.ZodTypeDef, any>
+  | ZodEffects<z.ZodType<Values, z.ZodTypeDef, any>>;
 
 /**
  * Some global configuration for the FormikZod component.
@@ -246,6 +248,11 @@ export const getInputAttributesFromZodSchema = (
   let field = getNestedFieldFromSchema(schema, name.split('.'));
   if (!field) {
     return {};
+  }
+
+  // Unwrap ZodEffects (e.g. from z.preprocess or z.transform) to get the inner schema
+  while (isZodType<z.ZodEffects<any>>(field, z.ZodFirstPartyTypeKind.ZodEffects)) {
+    field = field._def.schema;
   }
 
   const attributes = { name, required: true, defaultValue: undefined };

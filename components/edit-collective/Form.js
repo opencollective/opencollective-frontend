@@ -25,7 +25,6 @@ import Delete from './actions/Delete';
 import EmptyBalance from './actions/EmptyBalance';
 // Sections
 import CollectiveGoals from './sections/CollectiveGoals';
-import ConnectedAccounts from './sections/ConnectedAccounts';
 import CustomMessage from './sections/CustomMessage';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
@@ -78,10 +77,7 @@ class EditCollectiveForm extends React.Component {
       case ALL_SECTIONS.COLLECTIVE_PAGE:
         return <EditCollectivePage collective={collective} />;
 
-      case ALL_SECTIONS.CONNECTED_ACCOUNTS:
-        return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
-
-      case ALL_SECTIONS.EXPORT:
+      case ALL_SECTIONS.WIDGETS:
         return <Export collective={collective} />;
 
       case ALL_SECTIONS.HOST:

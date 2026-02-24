@@ -61,3 +61,22 @@ export function HostExpensesReportTabs({ queryFilter }) {
     </div>
   );
 }
+
+export function HostContributionsReportTabs({ queryFilter }) {
+  return (
+    <div className="grid grid-cols-2 divide-x rounded-t-xl border-b bg-muted">
+      <Tab
+        title={<FormattedMessage defaultMessage="Managed contributions" id="QpkT+/" />}
+        description={<FormattedMessage defaultMessage="Contributions to Hosted Collective accounts" id="rCoyX3" />}
+        isActive={!queryFilter.values.isHost}
+        onClick={() => queryFilter.setFilter('isHost', false)}
+      />
+      <Tab
+        title={<FormattedMessage defaultMessage="Operational contributions" id="lDrehw" />}
+        description={<FormattedMessage defaultMessage="Contributions to the Fiscal Host account" id="/5epu0" />}
+        isActive={queryFilter.values.isHost}
+        onClick={() => queryFilter.setFilter('isHost', true)}
+      />
+    </div>
+  );
+}

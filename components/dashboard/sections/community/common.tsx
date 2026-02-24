@@ -1,15 +1,19 @@
 import React, { useCallback } from 'react';
 import { capitalize, compact } from 'lodash';
+import type { LucideProps } from 'lucide-react';
 import {
   Archive,
   ArrowRightLeft,
   BookKey,
+  Building2,
   EarthIcon,
   EyeIcon,
   HandCoins,
   HelpCircle,
   Pencil,
   Receipt,
+  Store,
+  User,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -17,10 +21,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
 import type { Contributor } from '@/lib/graphql/types/v2/schema';
 import { KycProvider } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';
 import LinkCollective from '@/components/LinkCollective';
@@ -32,6 +39,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import { ALL_SECTIONS } from '../../constants';
 import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 
 type UsePersonActionsOptions = {
@@ -42,10 +50,26 @@ type UsePersonActionsOptions = {
   hasPersonaKYCFeature: boolean;
 };
 
+export const getCollectiveTypeIcon = (
+  type: AccountType | (typeof CollectiveType)[keyof typeof CollectiveType],
+  props?: LucideProps,
+): React.ReactNode => {
+  switch (type) {
+    case AccountType.ORGANIZATION:
+      return <Building2 {...props} />;
+    case AccountType.VENDOR:
+      return <Store {...props} />;
+    case CollectiveType.USER:
+    case AccountType.INDIVIDUAL:
+      return <User {...props} />;
+  }
+};
+
 export function usePersonActions(opts: UsePersonActionsOptions) {
   const intl = useIntl();
   const { showModal } = useModal();
   const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
 
   return useCallback<GetActions<Contributor>>(
     contributor => {
@@ -72,7 +96,9 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
         Icon: Receipt,
         onClick: () => {
           router.push({
-            pathname: `/dashboard/${hostSlug}/host-expenses`,
+            pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+              ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
+              : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
             query: { status: 'ALL', searchTerm: `@${contributorSlug}` },
           });
         },
@@ -195,6 +221,7 @@ type AssociatedCollective = CommunityAccountDetailQuery['account']['communitySta
 export function useAssociatedCollectiveActions(opts: UseAssociatedCollectiveActionsOpts) {
   const intl = useIntl();
   const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
 
   return useCallback<GetActions<AssociatedCollective>>(
     associatedCollective => {
@@ -221,7 +248,9 @@ export function useAssociatedCollectiveActions(opts: UseAssociatedCollectiveActi
         Icon: Receipt,
         onClick: () => {
           router.push({
-            pathname: `/dashboard/${hostSlug}/host-expenses`,
+            pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+              ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
+              : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
             query: { status: 'ALL', searchTerm: `@${opts.accountSlug}`, account: collectiveSlug },
           });
         },

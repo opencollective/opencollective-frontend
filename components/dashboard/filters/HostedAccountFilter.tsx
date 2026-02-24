@@ -5,8 +5,11 @@ import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { gql } from '../../../lib/graphql/helpers';
-import type { AccountFilterQuery, AccountHoverCardFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../../lib/graphql/types/v2/schema';
+import type {
+  Account,
+  AccountFilterQuery,
+  AccountHoverCardFieldsFragment,
+} from '../../../lib/graphql/types/v2/graphql';
 import { isMulti } from '@/lib/filters/schemas';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
@@ -47,7 +50,7 @@ export const AccountRenderer = (props: {
     <div className="flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
       <Avatar collective={account} radius={20} />
       <div className="relative flex flex-1 items-center justify-between gap-1 overflow-hidden">
-        <span className="truncate">{account.name ?? account.slug}</span>
+        <span className="truncate">{account.name || account.slug}</span>
       </div>
     </div>
   );

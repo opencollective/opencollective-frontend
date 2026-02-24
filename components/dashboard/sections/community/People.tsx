@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import type { FilterConfig } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
-import { AccountType, CommunityRelationType, type Contributor } from '@/lib/graphql/types/v2/schema';
+import { AccountType, CommunityRelationType, type Contributor } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
@@ -25,17 +25,29 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import { makeAmountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
+import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
 import { ContributorDetails } from './AccountDetail';
 import { usePersonActions } from './common';
 import { peopleHostDashboardQuery } from './queries';
+
+const totalContributedFilter = makeAmountFilter(
+  'totalContributed',
+  defineMessage({ defaultMessage: 'Total Contributed', id: 'TotalContributed' }),
+);
+
+const totalExpendedFilter = makeAmountFilter(
+  'totalExpended',
+  defineMessage({ defaultMessage: 'Total Expended', id: 'TotalExpended' }),
+);
 
 const RelationTypeSchema = isMulti(z.nativeEnum(CommunityRelationType)).optional();
 const relationTypeFilter: FilterConfig<z.infer<typeof RelationTypeSchema>> = {
@@ -229,11 +241,45 @@ enum ContributorsTab {
 
 const PAGE_SIZE = 20;
 
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  defaultValue: {
+    field: 'NAME',
+    direction: 'ASC',
+  },
+});
+
+const schema = z.object({
+  limit: integer.default(PAGE_SIZE),
+  offset: integer.default(0),
+  orderBy: sortFilter.schema,
+  relation: relationTypeFilter.schema,
+  searchTerm: searchFilter.schema,
+  account: z.string().optional(),
+  totalContributed: totalContributedFilter.schema,
+  totalExpended: totalExpendedFilter.schema,
+});
+const toVariables = {
+  account: hostedAccountFilter.toVariables,
+  totalContributed: totalContributedFilter.toVariables,
+  totalExpended: totalExpendedFilter.toVariables,
+  orderBy: sortFilter.toVariables,
+};
+const filters = {
+  orderBy: sortFilter.filter,
+  relation: relationTypeFilter.filter,
+  searchTerm: searchFilter.filter,
+  account: hostedAccountFilter.filter,
+  totalContributed: totalContributedFilter.filter,
+  totalExpended: totalExpendedFilter.filter,
+};
+
 type ContributorsProps = DashboardSectionProps;
 
 const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
   const intl = useIntl();
   const router = useRouter();
+  const { account } = useContext(DashboardContext);
   const pushSubpath = makePushSubpath(router);
 
   const views = [
@@ -267,22 +313,10 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
 
   const queryFilter = useQueryFilter({
     views,
-    schema: z.object({
-      limit: integer.default(PAGE_SIZE),
-      offset: integer.default(0),
-      relation: relationTypeFilter.schema,
-      searchTerm: searchFilter.schema,
-      account: z.string().optional(),
-    }),
-    toVariables: {
-      account: hostedAccountFilter.toVariables,
-    },
-    filters: {
-      relation: relationTypeFilter.filter,
-      searchTerm: searchFilter.filter,
-      account: hostedAccountFilter.filter,
-    },
-    meta: { hostSlug: accountSlug },
+    schema,
+    toVariables,
+    filters,
+    meta: { hostSlug: accountSlug, currency: account?.currency },
   });
 
   const {

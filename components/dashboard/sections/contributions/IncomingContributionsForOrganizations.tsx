@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import type { Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
-import { OrderStatus } from '../../../../lib/graphql/types/v2/schema';
+import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { isMulti } from '@/lib/filters/schemas';
 import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
@@ -16,7 +16,7 @@ import { HostContextFilter, hostContextFilter } from '../../filters/HostContextF
 import { hostedAccountsFilter } from '../../filters/HostedAccountFilter';
 import type { DashboardSectionProps } from '../../types';
 
-import ContributionsTable from './ContributionsTable';
+import ContributionsTable, { defaultVisibility } from './ContributionsTable';
 import type { FilterMeta } from './filters';
 import { ContributionAccountingCategoryKinds, filters, schema as baseSchema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
@@ -119,6 +119,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
+    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({
@@ -205,6 +206,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
         nbPlaceholders={nbPlaceholders}
         error={error}
         refetch={handleRefetch}
+        columnVisibility={{ ...defaultVisibility, accountingCategory: true }}
       />
     </div>
   );

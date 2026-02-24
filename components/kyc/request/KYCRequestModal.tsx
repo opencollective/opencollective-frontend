@@ -6,11 +6,12 @@ import { FormattedMessage } from 'react-intl';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { gql } from '@/lib/graphql/helpers';
 import type {
+  Account,
   AccountReferenceInput,
   KycRequestModalQuery,
   KycRequestModalQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import { type Account, KycProvider } from '@/lib/graphql/types/v2/schema';
+import { KycProvider } from '@/lib/graphql/types/v2/graphql';
 
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';

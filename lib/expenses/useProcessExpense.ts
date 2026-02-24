@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/client';
 import { expensePageExpenseFieldsFragment } from '../../components/expenses/graphql/fragments';
 
 import { gql } from '../graphql/helpers';
-import type { Expense, ProcessExpensePaymentParams } from '../graphql/types/v2/schema';
+import type { Expense, ProcessExpensePaymentParams } from '../graphql/types/v2/graphql';
 
 type ProcessExpenseAction = (params?: {
   paymentParams?: ProcessExpensePaymentParams;

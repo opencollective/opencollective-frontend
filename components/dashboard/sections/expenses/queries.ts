@@ -11,6 +11,7 @@ export const accountExpensesQuery = gql`
   query AccountExpenses(
     $account: AccountReferenceInput
     $fromAccount: AccountReferenceInput
+    $fromAccounts: [AccountReferenceInput]
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
@@ -36,6 +37,7 @@ export const accountExpensesQuery = gql`
     expenses(
       account: $account
       fromAccount: $fromAccount
+      fromAccounts: $fromAccounts
       limit: $limit
       offset: $offset
       type: $type
@@ -156,6 +158,7 @@ export const hostDashboardExpensesQuery = gql`
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
+    $types: [ExpenseType]
     $tags: [String]
     $status: [ExpenseStatusFilter]
     $amount: AmountRangeInput
@@ -168,6 +171,7 @@ export const hostDashboardExpensesQuery = gql`
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
     $fromAccount: AccountReferenceInput
+    $fromAccounts: [AccountReferenceInput]
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
     $fetchGrantHistory: Boolean!
@@ -177,9 +181,11 @@ export const hostDashboardExpensesQuery = gql`
       hostContext: $hostContext
       account: $account
       fromAccount: $fromAccount
+      fromAccounts: $fromAccounts
       limit: $limit
       offset: $offset
       type: $type
+      types: $types
       tag: $tags
       status: $status
       amount: $amount
@@ -235,16 +241,6 @@ export const hostInfoCardFields = gql`
       id
       address
       country
-    }
-    paypalPreApproval {
-      id
-      name
-      expiryDate
-      createdAt
-      balance {
-        currency
-        valueInCents
-      }
     }
     transferwise {
       id
@@ -314,15 +310,129 @@ export const hostDashboardMetadataQuery = gql`
 `;
 
 /**
- * Query for the Paid Disbursements page - fetches paid expenses with fields optimized for the table
+ * Query for the Payment Requests page - fetches counts for all, pending, paid, and rejected expenses
  */
+export const paymentRequestsMetadataQuery = gql`
+  query PaymentRequestsMetadata($accountSlug: String!) {
+    account(slug: $accountSlug) {
+      id
+      slug
+      name
+      imageUrl
+      type
+      currency
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+          name
+          slug
+          imageUrl
+          currency
+          type
+          isActive
+          isArchived
+        }
+      }
+
+      ... on AccountWithHost {
+        isApproved
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
+      ... on Organization {
+        isHost
+        isActive
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
+    }
+    expenseTagStats(account: { slug: $accountSlug }) {
+      nodes {
+        id
+        tag
+      }
+    }
+    all: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true) {
+      totalCount
+    }
+    pending: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [PENDING]) {
+      totalCount
+    }
+    paid: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [PAID]) {
+      totalCount
+    }
+    rejected: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [REJECTED]) {
+      totalCount
+    }
+  }
+  ${expenseHostFields}
+`;
+
+/**
+ * Metadata query for the Paid Disbursements page - fetches counts for all, invoices, reimbursements, and grants
+ */
+export const paidDisbursementsMetadataQuery = gql`
+  query PaidDisbursementsMetadata($hostSlug: String!, $hostContext: HostContext) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+    }
+    ALL: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID]) {
+      totalCount
+    }
+    INVOICES: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [INVOICE]) {
+      totalCount
+    }
+    REIMBURSEMENTS: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [RECEIPT]) {
+      totalCount
+    }
+    GRANTS: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [GRANT]) {
+      totalCount
+    }
+  }
+`;
+
+/**
+ * Metadata query for Host Payment Requests page - fetches counts by expense status
+ */
+export const hostPaymentRequestsMetadataQuery = gql`
+  query HostPaymentRequestsMetadata($hostSlug: String!, $hostContext: HostContext) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+    }
+    all: expenses(host: { slug: $hostSlug }, hostContext: $hostContext) {
+      totalCount
+    }
+    pending: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PENDING, UNVERIFIED]) {
+      totalCount
+    }
+    approved: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [APPROVED]) {
+      totalCount
+    }
+    rejected: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [REJECTED]) {
+      totalCount
+    }
+    paid: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID]) {
+      totalCount
+    }
+  }
+`;
+
 export const paidDisbursementsQuery = gql`
   query PaidDisbursements(
     $hostSlug: String!
     $hostContext: HostContext
     $limit: Int!
     $offset: Int!
-    $type: ExpenseType
+    $types: [ExpenseType]
     $tags: [String]
     $status: [ExpenseStatusFilter]
     $amount: AmountRangeInput
@@ -333,6 +443,7 @@ export const paidDisbursementsQuery = gql`
     $sort: ChronologicalOrderInput
     $account: AccountReferenceInput
     $accountingCategory: [String]
+    $fromAccounts: [AccountReferenceInput]
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -340,7 +451,7 @@ export const paidDisbursementsQuery = gql`
       account: $account
       limit: $limit
       offset: $offset
-      type: $type
+      types: $types
       tag: $tags
       status: $status
       amount: $amount
@@ -350,6 +461,7 @@ export const paidDisbursementsQuery = gql`
       searchTerm: $searchTerm
       orderBy: $sort
       accountingCategory: $accountingCategory
+      fromAccounts: $fromAccounts
     ) {
       totalCount
       offset
@@ -367,11 +479,11 @@ export const paidDisbursementsQuery = gql`
           imageUrl
           ...AccountHoverCardFields
         }
-        host {
-          id
-          ...ExpenseHostFields
-        }
       }
+    }
+    host(slug: $hostSlug) {
+      id
+      ...ExpenseHostFields
     }
   }
   ${expensesListFieldsFragment}

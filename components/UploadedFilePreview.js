@@ -7,6 +7,7 @@ import { styled } from 'styled-components';
 
 import { imagePreview } from '../lib/image-utils';
 import { getFileExtensionFromUrl } from '../lib/url-helpers';
+import { formatFileSize } from '@/lib/file-utils';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
@@ -16,7 +17,6 @@ import Spinner from './Spinner';
 import { fadeInDown } from './StyledKeyframes';
 import StyledLink from './StyledLink';
 import { P } from './Text';
-
 const FileTextIcon = styled(FileText)`
   opacity: 1;
 `;
@@ -70,18 +70,6 @@ const FileName = styled(P)`
   overflow: hidden;
   text-overflow: ellipsis;
 `;
-
-const formatFileSize = sizeInBytes => {
-  if (sizeInBytes < 1024) {
-    return `${sizeInBytes} bytes`;
-  } else if (sizeInBytes < 1048576) {
-    return `${(sizeInBytes / 1024).toFixed(2)} KB`;
-  } else if (sizeInBytes < 1073741824) {
-    return `${(sizeInBytes / 1048576).toFixed(2)} MB`;
-  } else {
-    return `${(sizeInBytes / 1073741824).toFixed(2)} GB`;
-  }
-};
 
 /**
  * To display the preview of a file uploaded on Open Collective.

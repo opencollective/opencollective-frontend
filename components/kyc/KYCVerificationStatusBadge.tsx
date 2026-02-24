@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { KycVerificationStatus } from '../../lib/graphql/types/v2/schema';
+import { KycVerificationStatus } from '../../lib/graphql/types/v2/graphql';
 
 import { Badge } from '../ui/Badge';
 

@@ -24,7 +24,7 @@ import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/erro
 import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
 import { gql } from '../../lib/graphql/helpers';
-import { AccountType } from '../../lib/graphql/types/v2/schema';
+import { AccountType } from '../../lib/graphql/types/v2/graphql';
 import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -507,24 +507,7 @@ class ContributionFlow extends React.Component {
       return null;
     }
 
-    const paymentMethod = {
-      // TODO: cleanup after this version is deployed in production
-
-      // Migration Step 1
-      // type: stepPayment.paymentMethod.providerType,
-      // legacyType: stepPayment.paymentMethod.providerType,
-      // service: stepPayment.paymentMethod.service,
-      // newType: stepPayment.paymentMethod.type,
-
-      // Migration Step 2
-      legacyType: stepPayment.paymentMethod.providerType,
-      service: stepPayment.paymentMethod.service,
-      newType: stepPayment.paymentMethod.type,
-
-      // Migration Step 3
-      // service: stepPayment.paymentMethod.service,
-      // type: stepPayment.paymentMethod.type,
-    };
+    const paymentMethod = pick(stepPayment.paymentMethod, ['service', 'type', 'manualPaymentProvider']);
 
     // Payment Method already registered
     if (stepPayment.paymentMethod.id) {

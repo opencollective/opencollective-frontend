@@ -1,5 +1,7 @@
 import { gql } from '../../../lib/graphql/helpers';
 
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+
 import { accountHoverCardFields } from '../../AccountHoverCard';
 import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
@@ -29,6 +31,11 @@ export const managedOrderFragment = gql`
     nextChargeDate
     paymentMethod {
       ...UpdatePaymentMethodFragment
+    }
+    manualPaymentProvider {
+      id
+      type
+      name
     }
     amount {
       value
@@ -112,6 +119,13 @@ export const managedOrderFragment = gql`
           slug
           paypalClientId
           supportedPaymentMethods
+
+          orderAccountingCategories: accountingCategories(kind: CONTRIBUTION) {
+            nodes {
+              id
+              ...AccountingCategorySelectFields
+            }
+          }
         }
       }
       ... on Organization {
@@ -120,6 +134,13 @@ export const managedOrderFragment = gql`
           slug
           paypalClientId
           supportedPaymentMethods
+
+          orderAccountingCategories: accountingCategories(kind: CONTRIBUTION) {
+            nodes {
+              id
+              ...AccountingCategorySelectFields
+            }
+          }
         }
       }
       ...AccountHoverCardFields
@@ -151,6 +172,7 @@ export const managedOrderFragment = gql`
   }
   ${accountHoverCardFields}
   ${paymentMethodFragment}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 export const manageContributionsQuery = gql`

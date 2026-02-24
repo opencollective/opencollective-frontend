@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { isEmpty, omit, omitBy } from 'lodash';
+import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
@@ -10,7 +10,7 @@ import {
   type AccountHoverCardFieldsFragment,
   type HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/schema';
+import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import {
   A,
   ARROW_DOWN_KEY,
@@ -22,26 +22,21 @@ import {
 } from '../../../../lib/hooks/useKeyboardKey';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { ExpenseMetaStatuses } from '@/lib/expense';
-import { isMulti, isNullable } from '@/lib/filters/schemas';
-import { i18nExpenseStatus } from '@/lib/i18n/expense';
-import { sortSelectOptions } from '@/lib/utils';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
-import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
+import { DefinitionTooltip } from '../reports/DefinitionTooltip';
 
 import ExpensePipelineOverview from './ExpensePipelineOverview';
 import type { FilterMeta as CommonFilterMeta } from './filters';
@@ -54,15 +49,8 @@ import {
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
-// TODO: As we add the "Approve Payment Requests" tool, also exclude 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'
-const ExpenseStatusesToExclude = ['PAID'];
-const PayExpenseStatusFilter = Object.fromEntries(
-  Object.entries(ExpenseStatusFilter).filter(([status]) => !ExpenseStatusesToExclude.includes(status)),
-) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID'>]: (typeof ExpenseStatusFilter)[K] };
-
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
-  status: isNullable(isMulti(z.nativeEnum(PayExpenseStatusFilter))),
   hostContext: hostContextFilter.schema,
 });
 
@@ -79,38 +67,10 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
   ...commonToVariables,
   limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
   account: hostedAccountFilter.toVariables,
-  status: value => {
-    /**
-     * As `status` is "nullable", this function will run even if the value is null.
-     * In that case we provide all possible status values as the variables to filter out anything else.
-     * We also exclude "READY_TO_PAY" since this can't be combined with other status filters,
-     * and is a subset of "APPROVED".
-     */
-    return isEmpty(value)
-      ? { status: Object.values(PayExpenseStatusFilter).filter(s => s !== 'READY_TO_PAY') }
-      : { status: value };
-  },
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
-  status: {
-    labelMsg: defineMessage({ id: 'expense.status', defaultMessage: 'Status' }),
-    Component: ({ valueRenderer, intl, ...props }) => (
-      <ComboSelectFilter
-        options={Object.values(PayExpenseStatusFilter)
-          .filter(
-            value =>
-              !props.meta?.hideExpensesMetaStatuses || !(ExpenseMetaStatuses as readonly string[]).includes(value),
-          )
-          .map(value => ({ label: valueRenderer({ intl, value }), value }))
-          .sort(sortSelectOptions)}
-        isMulti
-        {...props}
-      />
-    ),
-    valueRenderer: ({ intl, value }) => i18nExpenseStatus(intl, value),
-  },
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
 };
@@ -142,7 +102,6 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const query = router.query;
   const { account } = React.useContext(DashboardContext);
 
-  const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const pageRoute = `/dashboard/${hostSlug}/pay-disbursements`;
 
   // Konami Code
@@ -164,54 +123,57 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
   });
 
-  const views: Views<FilterValues> = [
-    {
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {},
-      id: 'all',
-    },
-    {
-      label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
-      filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'ready_to_pay',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
-      filter: {
-        lastCommentBy: [LastCommentBy.NON_HOST_ADMIN],
-        status: [
-          ExpenseStatusFilter.APPROVED,
-          ExpenseStatusFilter.ERROR,
-          ExpenseStatusFilter.INCOMPLETE,
-          ExpenseStatusFilter.ON_HOLD,
-        ],
+  const views: Views<FilterValues> = useMemo(
+    () => [
+      {
+        label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+        filter: {},
+        id: 'all',
       },
-      id: 'unreplied',
-    },
-    {
-      label: intl.formatMessage({ id: 'expense.batched', defaultMessage: 'Batched' }),
-      filter: {
-        status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
-        sort: { field: 'CREATED_AT', direction: 'ASC' },
+      {
+        label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
+        filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'ready_to_pay',
       },
-      id: 'scheduled_for_payment',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'On hold', id: 'bLx/Q9' }),
-      filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'on_hold',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
-      filter: { status: [ExpenseStatusFilter.INCOMPLETE], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'incomplete',
-    },
-    {
-      label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
-      filter: { status: [ExpenseStatusFilter.ERROR], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'error',
-    },
-  ];
+      {
+        label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
+        filter: {
+          lastCommentBy: [LastCommentBy.NON_HOST_ADMIN],
+          status: [
+            ExpenseStatusFilter.APPROVED,
+            ExpenseStatusFilter.ERROR,
+            ExpenseStatusFilter.INCOMPLETE,
+            ExpenseStatusFilter.ON_HOLD,
+          ],
+        },
+        id: 'unreplied',
+      },
+      {
+        label: intl.formatMessage({ id: 'expense.batched', defaultMessage: 'Batched' }),
+        filter: {
+          status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
+          sort: { field: 'CREATED_AT', direction: 'ASC' },
+        },
+        id: 'scheduled_for_payment',
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'On hold', id: 'bLx/Q9' }),
+        filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'on_hold',
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
+        filter: { status: [ExpenseStatusFilter.INCOMPLETE], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'incomplete',
+      },
+      {
+        label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
+        filter: { status: [ExpenseStatusFilter.ERROR], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'error',
+      },
+    ],
+    [intl],
+  );
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
@@ -235,14 +197,18 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   } = useQuery(hostDashboardMetadataQuery, {
     variables: {
       hostSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: queryFilter.values.hostContext,
     },
   });
 
-  const viewsWithCount: Views<FilterValues> = views.map(view => ({
-    ...view,
-    count: metaData?.[view.id]?.totalCount,
-  }));
+  const viewsWithCount: Views<FilterValues> = useMemo(
+    () =>
+      views.map(view => ({
+        ...view,
+        count: metaData?.[view.id]?.totalCount,
+      })),
+    [views, metaData],
+  );
 
   const variables = {
     hostSlug,
@@ -255,13 +221,6 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   });
 
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
-  React.useEffect(() => {
-    if (query.paypalApprovalError && !paypalPreApprovalError) {
-      setPaypalPreApprovalError(query.paypalApprovalError);
-      router.replace(pageRoute, omit(query, 'paypalApprovalError'), { shallow: true });
-    }
-  }, [query.paypalApprovalError]);
-
   const { data, error, loading } = expenses;
 
   const getQueryParams = newParams => {
@@ -274,38 +233,35 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="Pay Disbursements" id="El6h63" />
-            {account.hasHosting && (
-              <HostContextFilter
-                value={queryFilter.values.hostContext}
-                onChange={val => queryFilter.setFilter('hostContext', val)}
-                intl={intl}
-              />
-            )}
+            <HostContextFilter
+              value={queryFilter.values.hostContext}
+              onChange={val => queryFilter.setFilter('hostContext', val)}
+              intl={intl}
+            />
           </div>
         }
+        description={
+          <FormattedMessage
+            defaultMessage="Review, process and disburse payment and grant requests that are <DefinitionTooltip>ready to pay</DefinitionTooltip>."
+            id="AJOacS"
+            values={{
+              DefinitionTooltip: parts => (
+                <DefinitionTooltip
+                  key="definition"
+                  definition={
+                    <FormattedMessage
+                      defaultMessage="Requests that have been approved and can be covered by existing funds"
+                      id="ReadyToPayDefinition"
+                    />
+                  }
+                >
+                  {parts}
+                </DefinitionTooltip>
+              ),
+            }}
+          />
+        }
       />
-      {paypalPreApprovalError && (
-        <MessageBox type="warning" mb={3} withIcon>
-          {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
-            <FormattedMessage
-              id="paypal.preApproval.emailWarning"
-              defaultMessage="Warning: the associated PayPal email was changed from {oldEmail} to {newEmail}. If this was not intentional, click {refillBalance} and use the correct account."
-              values={{
-                oldEmail: <strong>{query.oldPaypalEmail}</strong>,
-                newEmail: <strong>{query.newPaypalEmail}</strong>,
-                refillBalance: (
-                  <q>
-                    <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
-                  </q>
-                ),
-              }}
-            />
-          ) : (
-            paypalPreApprovalError
-          )}
-        </MessageBox>
-      )}
-
       {!metaData?.host ? (
         <LoadingPlaceholder height={150} />
       ) : errorMetaData ? (

@@ -4,8 +4,6 @@
  * copy-pasted on https://github.com/opencollective/documentation/blob/v2/collectives/contribution-flow.md.
  */
 
-/* eslint-disable no-console */
-
 import jsdoc from 'jsdoc-api';
 import { partition, repeat } from 'lodash';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import type { KycProviderData, ManualKycProviderData, PersonaKycProviderData } from '@/lib/graphql/types/v2/schema';
-import { KycProvider } from '@/lib/graphql/types/v2/schema';
+import type { KycProviderData, ManualKycProviderData, PersonaKycProviderData } from '@/lib/graphql/types/v2/graphql';
+import { KycProvider } from '@/lib/graphql/types/v2/graphql';
 
 import { KYCVerificationManualProviderData } from './KYCVerificationManualProviderData';
 import { KYCVerificationPersonaProviderData } from './KYCVerificationPersonaProviderData';

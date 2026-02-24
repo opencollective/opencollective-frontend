@@ -156,6 +156,11 @@ enum OAuthScope {
   Perform critical administrative operations.
   """
   root
+
+  """
+  Manage export requests.
+  """
+  exportRequests
 }
 
 """
@@ -473,6 +478,11 @@ interface Account {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -588,6 +598,11 @@ interface Account {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -2179,6 +2194,7 @@ type Order {
   """
   totalContributed: Amount!
   paymentMethod: PaymentMethod
+  manualPaymentProvider: ManualPaymentProvider
   paymentProcessorUrl: String
 
   """
@@ -3244,6 +3260,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -3359,6 +3380,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -4027,6 +4053,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
   totalHostedAccounts: Int
   isOpenToApplications: Boolean
+
+  """
+  Returns whether the account has money management activated.
+  """
+  hasMoneyManagement: Boolean!
   termsUrl: URL
   plan: HostPlan!
 
@@ -4079,15 +4110,29 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   hostExpensesReport(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostExpensesReports
 
   """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  hostContributionsReport(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostExpensesReports
+
+  """
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
   """
   supportedPaymentMethods: [PaymentMethodLegacyType]
-  bankAccount: PayoutMethod
 
   """
-  Paypal preapproval info. Returns null if PayPal account is not connected.
+  Manual payment providers configured for this host
   """
-  paypalPreApproval: PaymentMethod
+  manualPaymentProviders(
+    """
+    Filter by provider type
+    """
+    type: ManualPaymentProviderType
+
+    """
+    Whether to include archived providers
+    """
+    includeArchived: Boolean! = false
+  ): [ManualPaymentProvider!]!
 
   """
   If the host supports PayPal, this will contain the client ID to use in the frontend
@@ -4320,6 +4365,21 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
+
+    """
+    Order of the results
+    """
+    orderBy: OrderByInput
   ): VendorCollection!
 
   """
@@ -4396,6 +4456,16 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter by specific Account currencies
     """
     currencies: [String]
+
+    """
+    Filter for accounts (Events) that started at a specific date range
+    """
+    startsAtFrom: DateTime
+
+    """
+    Filter for accounts (Events) that started at a specific date range
+    """
+    startsAtTo: DateTime
   ): HostedAccountCollection!
 
   """
@@ -4826,6 +4896,7 @@ type PlatformSubscriptionFeatures {
   UPDATES: Boolean!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
+  RECEIVE_GRANTS: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
 }
@@ -5141,6 +5212,7 @@ enum OrderByFieldType {
   BALANCE
   MEMBER_COUNT
   TOTAL_CONTRIBUTED
+  TOTAL_EXPENDED
   NAME
 
   """
@@ -5396,6 +5468,13 @@ input OrderReferenceInput {
   legacyId: Int
 }
 
+input ManualPaymentProviderReferenceInput {
+  """
+  The unique identifier of the manual payment provider
+  """
+  id: String!
+}
+
 input VirtualCardReferenceInput {
   id: String
 }
@@ -5482,6 +5561,26 @@ type ExpenseCollection implements Collection {
   totalCount: Int
   nodes: [Expense]
   totalAmount: ExpenseCollectionTotalAmount
+
+  """
+  The accounts that are payees of the expenses in this collection (scoped to the main query arguments), regardless of pagination. Returns a paginated and searchable collection.
+  """
+  payees(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Search term to filter by name or slug
+    """
+    searchTerm: String
+  ): AccountCollection!
 }
 
 type ExpenseCollectionTotalAmount {
@@ -5598,6 +5697,7 @@ enum ActivityType {
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
   COLLECTIVE_UNHOSTED
+  COLLECTIVE_BALANCE_TRANSFERRED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
   ORGANIZATION_CONVERTED_TO_COLLECTIVE
@@ -5654,6 +5754,8 @@ enum ActivityType {
   COLLECTIVE_TRANSACTION_CREATED
   TRANSACTIONS_IMPORT_CREATED
   TRANSACTIONS_IMPORT_ROW_UPDATED
+  EXPORT_REQUEST_COMPLETED
+  EXPORT_REQUEST_FAILED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -5682,6 +5784,10 @@ enum ActivityType {
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
+  MANUAL_PAYMENT_PROVIDER_CREATED
+  MANUAL_PAYMENT_PROVIDER_UPDATED
+  MANUAL_PAYMENT_PROVIDER_DELETED
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -6053,6 +6159,16 @@ type PayoutMethod {
   Whether this payout method can be archived
   """
   canBeArchived: Boolean
+
+  """
+  The date and time this payout method was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date and time this payout method was updated
+  """
+  updatedAt: DateTime!
 }
 
 """
@@ -6061,6 +6177,16 @@ PaymentMethod model
 type PaymentMethod {
   id: String
   legacyId: Int
+
+  """
+  The date and time this payout method was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date and time this payout method was updated
+  """
+  updatedAt: DateTime!
   name: String
   service: PaymentMethodService
   type: PaymentMethodType
@@ -6083,7 +6209,6 @@ type PaymentMethod {
   data: JSON
   limitedToHosts: [Host]
   expiryDate: DateTime
-  createdAt: DateTime
 
   """
   For monthly gift cards, this field will return the monthly limit
@@ -6138,6 +6263,11 @@ type PaymentMethod {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -7023,6 +7153,7 @@ type CollectiveFeatures {
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
+  RECEIVE_GRANTS: CollectiveFeatureStatus
   MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
@@ -7928,6 +8059,69 @@ type HostExpensesReportNode {
 }
 
 """
+A manual payment provider configured by a host for contributors to use
+"""
+type ManualPaymentProvider {
+  """
+  Unique identifier for this provider
+  """
+  id: String!
+
+  """
+  The type of manual payment provider
+  """
+  type: ManualPaymentProviderType!
+
+  """
+  Display name for this payment provider
+  """
+  name: NonEmptyString!
+
+  """
+  Payment instructions to show contributors (HTML)
+  """
+  instructions: String
+
+  """
+  Icon name for this payment provider
+  """
+  icon: String
+
+  """
+  Bank account details for BANK_TRANSFER type providers
+  """
+  accountDetails: JSON
+
+  """
+  Whether this provider has been archived
+  """
+  isArchived: Boolean!
+
+  """
+  When this provider was created
+  """
+  createdAt: DateTime!
+
+  """
+  When this provider was last updated
+  """
+  updatedAt: DateTime!
+}
+
+"""
+The type of manual payment provider
+"""
+enum ManualPaymentProviderType {
+  BANK_TRANSFER
+  OTHER
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
+"""
 Stripe connected account properties
 """
 type StripeConnectedAccount {
@@ -8181,11 +8375,6 @@ type TransactionsImport {
   ): TransactionsImportRowCollection!
   stats: TransactionsImportStats!
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 """
 Type of the import
@@ -9478,6 +9667,11 @@ type Bot implements Account {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -9593,6 +9787,11 @@ type Bot implements Account {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -10498,6 +10697,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -10613,6 +10817,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -12078,6 +12287,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -12193,6 +12407,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -13372,6 +13591,11 @@ type Individual implements Account {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -13487,6 +13711,11 @@ type Individual implements Account {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -14062,6 +14291,21 @@ type Individual implements Account {
   """
   email: String
   isGuest: Boolean!
+
+  """
+  Email address waiting for validation. Only visible to the user themselves.
+  """
+  emailWaitingForValidation: EmailAddress
+
+  """
+  Returns true if user account is limited (user can't use any feature)
+  """
+  isLimited: Boolean!
+
+  """
+  Returns true if user is a root user. Only visible to the user themselves.
+  """
+  isRoot: Boolean!
   requiresProfileCompletion: Boolean
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
@@ -14683,6 +14927,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -14798,6 +15047,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -15461,6 +15715,16 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Returns whether the account has hosting activated.
   """
   hasHosting: Boolean!
+
+  """
+  Returns whether this organization can be a vendor of the specified host. This checks if the organization only transacted with this host and all its admins are also admins of the host.
+  """
+  canBeVendorOf(
+    """
+    The host account to check against
+    """
+    host: AccountReferenceInput!
+  ): Boolean!
 }
 
 """
@@ -15833,6 +16097,11 @@ type Vendor implements Account & AccountWithContributions {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -15948,6 +16217,11 @@ type Vendor implements Account & AccountWithContributions {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -17010,6 +17284,17 @@ type Query {
     """
     searchTerm: String
     relation: [CommunityRelationType!]
+    orderBy: OrderByInput
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
     limit: Int! = 100
     offset: Int! = 0
   ): AccountCollection!
@@ -17225,6 +17510,43 @@ type Query {
     limit: Int! = 10
     offset: Int! = 0
   ): TagStatsCollection!
+  exportRequest(
+    """
+    Identifiers to retrieve the export request
+    """
+    exportRequest: ExportRequestReferenceInput!
+
+    """
+    If true, an error will be returned if the export request is missing
+    """
+    throwIfMissing: Boolean! = true
+  ): ExportRequest
+  exportRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The account to get export requests for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Filter by export request type
+    """
+    type: ExportRequestType
+
+    """
+    Filter by export request status
+    """
+    status: ExportRequestStatus
+  ): ExportRequestCollection!
   fund(
     """
     The public id identifying the Fund (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -17426,6 +17748,11 @@ type Query {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -17781,6 +18108,11 @@ type Query {
     Only return transactions for this order.
     """
     order: OrderReferenceInput
+
+    """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
@@ -19331,6 +19663,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
   COLLECTIVE_UNHOSTED
+  COLLECTIVE_BALANCE_TRANSFERRED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
   ORGANIZATION_CONVERTED_TO_COLLECTIVE
@@ -19387,6 +19720,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_TRANSACTION_CREATED
   TRANSACTIONS_IMPORT_CREATED
   TRANSACTIONS_IMPORT_ROW_UPDATED
+  EXPORT_REQUEST_COMPLETED
+  EXPORT_REQUEST_FAILED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -19415,6 +19750,10 @@ enum ActivityAndClassesType {
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
+  MANUAL_PAYMENT_PROVIDER_CREATED
+  MANUAL_PAYMENT_PROVIDER_UPDATED
+  MANUAL_PAYMENT_PROVIDER_DELETED
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -19502,6 +19841,136 @@ type TagStatsCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [TagStat]
+}
+
+"""
+An export request
+"""
+type ExportRequest {
+  """
+  Unique identifier for this export request
+  """
+  id: NonEmptyString!
+
+  """
+  Legacy numeric ID of this export request
+  """
+  legacyId: Int!
+
+  """
+  The name of the export request
+  """
+  name: NonEmptyString!
+
+  """
+  The type of export request
+  """
+  type: ExportRequestType!
+
+  """
+  The status of the export request
+  """
+  status: ExportRequestStatus!
+
+  """
+  The parameters of the export request
+  """
+  parameters: JSON
+
+  """
+  The account that requested this export
+  """
+  account: Account!
+
+  """
+  The user who created this export request
+  """
+  createdBy: Individual
+
+  """
+  The exported file (if completed)
+  """
+  file: FileInfo
+
+  """
+  The progress of the export request (0-100)
+  """
+  progress: Int
+
+  """
+  The error message if the export request failed
+  """
+  error: String
+
+  """
+  Whether a failed export request will be retried automatically
+  """
+  willRetry: Boolean!
+
+  """
+  The time the export request was created
+  """
+  createdAt: DateTime!
+
+  """
+  The time the export request was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The time when the export will expire
+  """
+  expiresAt: DateTime
+}
+
+"""
+The type of export request
+"""
+enum ExportRequestType {
+  """
+  Export request for transactions
+  """
+  TRANSACTIONS
+
+  """
+  Export request for hosted collectives
+  """
+  HOSTED_COLLECTIVES
+}
+
+"""
+The status of an export request
+"""
+enum ExportRequestStatus {
+  ENQUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+"""
+Input type for referencing an ExportRequest
+"""
+input ExportRequestReferenceInput {
+  """
+  The public id identifying the export request
+  """
+  id: String
+
+  """
+  The internal id of the export request
+  """
+  legacyId: Int
+}
+
+"""
+A collection of "ExportRequest"
+"""
+type ExportRequestCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [ExportRequest!]!
 }
 
 """
@@ -19841,6 +20310,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -19956,6 +20430,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -21008,6 +21487,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     order: OrderReferenceInput
 
     """
+    Only return transactions for contributions that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
+
+    """
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
@@ -21123,6 +21607,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return orders that match these payment method types
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    Only return orders that used this manual payment provider.
+    """
+    manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -22917,6 +23406,41 @@ type Mutation {
   ): PaymentIntent!
 
   """
+  Create a new export request. Scope: "account".
+  """
+  createExportRequest(
+    """
+    The export request to create
+    """
+    exportRequest: ExportRequestCreateInput!
+  ): ExportRequest!
+
+  """
+  Edit an existing export request. Scope: "account".
+  """
+  editExportRequest(
+    """
+    Reference to the export request to edit
+    """
+    exportRequest: ExportRequestReferenceInput!
+
+    """
+    The new name for the export request
+    """
+    name: NonEmptyString
+  ): ExportRequest!
+
+  """
+  Remove an existing export request. Scope: "account".
+  """
+  removeExportRequest(
+    """
+    Reference to the export request to remove
+    """
+    exportRequest: ExportRequestReferenceInput!
+  ): ExportRequest!
+
+  """
   Mark an account as confirmed
   """
   confirmGuestAccount(
@@ -23174,6 +23698,66 @@ type Mutation {
     """
     accept: Boolean!
   ): Boolean!
+
+  """
+  Create a new manual payment provider for a host. Scope: "host".
+  """
+  createManualPaymentProvider(
+    """
+    The host to create the manual payment provider for
+    """
+    host: AccountReferenceInput!
+
+    """
+    The manual payment provider data
+    """
+    manualPaymentProvider: ManualPaymentProviderCreateInput!
+  ): ManualPaymentProvider!
+
+  """
+  Update an existing manual payment provider. Scope: "host".
+  """
+  updateManualPaymentProvider(
+    """
+    Reference to the manual payment provider to update
+    """
+    manualPaymentProvider: ManualPaymentProviderReferenceInput!
+
+    """
+    The updated fields
+    """
+    input: ManualPaymentProviderUpdateInput!
+  ): ManualPaymentProvider!
+
+  """
+  Delete a manual payment provider. If orders reference this provider, it will be archived instead. Scope: "host".
+  """
+  deleteManualPaymentProvider(
+    """
+    Reference to the manual payment provider to delete
+    """
+    manualPaymentProvider: ManualPaymentProviderReferenceInput!
+  ): ManualPaymentProvider!
+
+  """
+  Reorder manual payment providers for a host. Scope: "host".
+  """
+  reorderManualPaymentProviders(
+    """
+    The host to reorder manual payment providers for
+    """
+    host: AccountReferenceInput!
+
+    """
+    The type of providers to reorder
+    """
+    type: ManualPaymentProviderType!
+
+    """
+    Ordered list of provider IDs
+    """
+    providers: [ManualPaymentProviderReferenceInput!]!
+  ): [ManualPaymentProvider!]!
 
   """
   Follows a given Collective. Scope: "account"
@@ -23588,7 +24172,7 @@ type Mutation {
     Payout Method reference
     """
     payoutMethod: PayoutMethodReferenceInput!
-  ): PayoutMethod!
+  ): PayoutMethod! @deprecated(reason: "2025-02-10: Payout methods cannot be restored.")
   editPayoutMethod(
     """
     Payout Method reference
@@ -23835,6 +24419,31 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): Account!
+
+  """
+  [Root only] Transfers balance from one account to another, creating BALANCE_TRANSFER transactions
+  """
+  rootTransferBalance(
+    """
+    Source account (balance goes down)
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Destination account (balance goes up)
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    Amount to transfer. Defaults to full balance of source account.
+    """
+    amount: AmountInput
+
+    """
+    Optional reason for audit trail
+    """
+    message: String
+  ): Order!
 
   """
   Refunds a transaction. Scope: "transactions".
@@ -25618,6 +26227,31 @@ type PaymentIntent {
 }
 
 """
+Input type for creating an ExportRequest
+"""
+input ExportRequestCreateInput {
+  """
+  The account to create the export request for
+  """
+  account: AccountReferenceInput!
+
+  """
+  A name for this export request
+  """
+  name: NonEmptyString!
+
+  """
+  The type of export to create
+  """
+  type: ExportRequestType!
+
+  """
+  Optional parameters for the export request
+  """
+  parameters: JSON
+}
+
+"""
 Response for the confirmGuestAccount mutation
 """
 type ConfirmGuestAccountResponse {
@@ -25697,6 +26331,55 @@ input MemberInvitationReferenceInput {
   The internal id of the invitation (ie: 580)
   """
   legacyId: Int
+}
+
+input ManualPaymentProviderCreateInput {
+  """
+  The type of manual payment provider
+  """
+  type: ManualPaymentProviderType!
+
+  """
+  Display name for this payment provider
+  """
+  name: NonEmptyString!
+
+  """
+  Payment instructions to show contributors (HTML allowed)
+  """
+  instructions: String!
+
+  """
+  Icon name for this payment provider
+  """
+  icon: String
+
+  """
+  Bank account details for BANK_TRANSFER type providers
+  """
+  accountDetails: JSON
+}
+
+input ManualPaymentProviderUpdateInput {
+  """
+  Display name for this payment provider
+  """
+  name: NonEmptyString
+
+  """
+  Payment instructions to show contributors (HTML allowed)
+  """
+  instructions: String
+
+  """
+  Icon name for this payment provider
+  """
+  icon: String
+
+  """
+  Bank account details for BANK_TRANSFER type providers
+  """
+  accountDetails: JSON
 }
 
 type FollowAccountResult {
@@ -25938,6 +26621,11 @@ input PaymentMethodInput {
   The Payment Intent ID used in this checkout
   """
   paymentIntentId: String
+
+  """
+  The Manual Payment Provider ID used in this checkout
+  """
+  manualPaymentProvider: ManualPaymentProviderReferenceInput
 }
 
 input CreditCardCreateInput {
@@ -26379,12 +27067,12 @@ input GoCardlessLinkInput {
   institutionId: String!
 
   """
-  Maximum number of days of transaction data to retrieve (default: 90)
+  Maximum number of days of transaction data to retrieve (default to the maximum allowed by the institution)
   """
   maxHistoricalDays: Int
 
   """
-  Number of days from acceptance that the access can be used (default: 90)
+  Number of days from acceptance that the access can be used (default to the maximum allowed by the institution)
   """
   accessValidForDays: Int
 
@@ -26672,10 +27360,12 @@ enum UploadedFileKind {
   EXPENSE_ATTACHED_FILE
   EXPENSE_ITEM
   TRANSACTIONS_IMPORT
+  TRANSACTIONS_CSV_EXPORT
   ACCOUNT_LONG_DESCRIPTION
   UPDATE
   COMMENT
   TIER_LONG_DESCRIPTION
+  CUSTOM_PAYMENT_METHOD_TEMPLATE
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
   EXPENSE_INVOICE
@@ -26989,6 +27679,7 @@ input PlatformSubscriptionFeaturesFeatures {
   UPDATES: Boolean!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
+  RECEIVE_GRANTS: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
 }

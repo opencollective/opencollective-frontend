@@ -1,7 +1,9 @@
 import React from 'react';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
+import { Kbd } from '@/components/ui/Kbd';
 
 import type LoggedInUser from './LoggedInUser';
 
@@ -19,6 +21,7 @@ export enum PREVIEW_FEATURE_KEYS {
   SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
   PLATFORM_BILLING = 'PLATFORM_BILLING',
   SIDEBAR_REORG_DISBURSEMENTS = 'SIDEBAR_REORG_DISBURSEMENTS',
+  ASYNC_EXPORTS = 'ASYNC_EXPORTS',
 }
 
 enum Categories {
@@ -41,6 +44,7 @@ export type PreviewFeature = {
   setIsEnabled?: (enable: boolean) => void;
   isEnabled?: () => boolean;
   hasAccess?: (loggedInUser: LoggedInUser) => boolean;
+  hide?: (loggedInUser: LoggedInUser) => boolean;
 };
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
@@ -93,10 +97,101 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS,
     title: <FormattedMessage defaultMessage="Keyboard Shortcuts" id="PreviewFeatures.keyboardShortcutsTitle" />,
     description: (
-      <FormattedMessage
-        defaultMessage="Navigate the expense flow more efficiently with keyboard shortcuts. Speed up your workflow and reduce mouse dependency for common actions."
-        id="PreviewFeatures.keyboardShortcutsDescription"
-      />
+      <React.Fragment>
+        <p>
+          <FormattedMessage
+            defaultMessage="Navigate the expense flow more efficiently with keyboard shortcuts. Speed up your workflow and reduce mouse dependency for common actions."
+            id="PreviewFeatures.keyboardShortcutsDescription"
+          />
+        </p>
+        <p className="mt-2">
+          <FormattedMessage defaultMessage="On Expenses dashboard: " id="Bmw33p" />
+          <ul className="mt-2 ml-4">
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to select the next Expense."
+                id="PreviewFeatures.keyboardShortcutsExpenseListNext"
+                values={{ key: <Kbd>J</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to select the previous Expense."
+                id="PreviewFeatures.keyboardShortcutsExpenseListPrev"
+                values={{ key: <Kbd>K</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to Pay selected Expense (if ready to pay)."
+                id="PreviewFeatures.keyboardShortcutsExpenseListPay"
+                values={{ key: <Kbd>P</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to check Security alerts for selected Expense."
+                id="PreviewFeatures.keyboardShortcutsExpenseListSecurity"
+                values={{ key: <Kbd>S</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to open Expense details."
+                id="PreviewFeatures.keyboardShortcutsExpenseListOpen"
+                values={{ key: <Kbd>Enter</Kbd> }}
+              />
+            </li>
+          </ul>
+        </p>
+        <p className="mt-2">
+          <FormattedMessage defaultMessage="On Expenses details: " id="UDjr0F" />
+          <ul className="mt-2 ml-4">
+            <li>
+              <FormattedMessage
+                defaultMessage="{leftKey} and {rightKey} to navigate through attachments."
+                id="PreviewFeatures.keyboardShortcutsExpenseDetailsAttachments"
+                values={{ leftKey: <Kbd>&larr;</Kbd>, rightKey: <Kbd>&rarr;</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to put selected Expense on Hold."
+                id="PreviewFeatures.keyboardShortcutsExpenseListHold"
+                values={{ key: <Kbd>H</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to mark selected Expense as Incomplete."
+                id="PreviewFeatures.keyboardShortcutsExpenseListIncomplete"
+                values={{ key: <Kbd>I</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to Pay selected Expense (if ready to pay)."
+                id="PreviewFeatures.keyboardShortcutsExpenseListPay"
+                values={{ key: <Kbd>P</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to enter Edit mode."
+                id="PreviewFeatures.keyboardShortcutsExpenseDetailsEdit"
+                values={{ key: <Kbd>E</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to close Expense details."
+                id="PreviewFeatures.keyboardShortcutsExpenseDetailsClose"
+                values={{ key: <Kbd>Esc</Kbd> }}
+              />
+            </li>
+          </ul>
+        </p>
+      </React.Fragment>
     ),
     publicBeta: true,
     category: Categories.GENERAL,
@@ -111,8 +206,12 @@ export const previewFeatures: PreviewFeature[] = [
       />
     ),
     category: Categories.GENERAL,
-    publicBeta: true,
+    publicBeta: false,
     enabledByDefaultFor: ['*'],
+    // Hide if not root and not manually enabled
+    hide: (loggedInUser: LoggedInUser) =>
+      !loggedInUser.isRoot &&
+      !get(loggedInUser, `collective.settings.earlyAccess.${PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW}`),
   },
   {
     key: PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
@@ -195,6 +294,19 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS,
     title: 'Sidebar Reorganization Disbursements',
     description: 'Reorganization of the "Expenses" section in the Host Dashboard',
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
+    category: Categories.HOSTING,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS,
+    title: <FormattedMessage defaultMessage="Async Exports" id="PreviewFeatures.asyncExportsTitle" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Enable background processing for large data exports. Exports will be processed asynchronously and you'll be notified when they're ready to download."
+        id="PreviewFeatures.asyncExportsDescription"
+      />
+    ),
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,

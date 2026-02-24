@@ -12,7 +12,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { gql } from '../../lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
-import { UploadedFileKind } from '../../lib/graphql/types/v2/schema';
+import { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';
 import { cn, omitDeep } from '../../lib/utils';

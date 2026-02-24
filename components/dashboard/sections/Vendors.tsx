@@ -10,7 +10,7 @@ import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
 import { boolean, limit, offset } from '@/lib/filters/schemas';
 import { gql } from '@/lib/graphql/helpers';
 import type { DashboardVendorsQuery, DashboardVendorsQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import { AccountType } from '@/lib/graphql/types/v2/schema';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 
@@ -30,9 +30,11 @@ import { setVendorArchiveMutation, vendorFieldFragment } from '../../vendors/que
 import VendorForm from '../../vendors/VendorForm';
 import { DashboardContext } from '../DashboardContext';
 import DashboardHeader from '../DashboardHeader';
+import { makeAmountFilter } from '../filters/AmountFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
+import { buildSortFilter } from '../filters/SortFilter';
 import type { DashboardSectionProps } from '../types';
 import { makePushSubpath } from '../utils';
 
@@ -73,8 +75,15 @@ const dashboardVendorsQuery = gql`
     }
     supportedPayoutMethods
     isTrustedHost
-    vendors(searchTerm: $searchTerm, isArchived: $isArchived, limit: $limit, offset: $offset)
-      @include(if: $onlyVendors) {
+    vendors(
+      searchTerm: $searchTerm
+      isArchived: $isArchived
+      limit: $limit
+      offset: $offset
+      totalContributed: $totalContributed
+      totalExpended: $totalExpended
+      orderBy: $orderBy
+    ) @include(if: $onlyVendors) {
       totalCount
       offset
       limit
@@ -107,7 +116,10 @@ const dashboardVendorsQuery = gql`
     $isArchived: Boolean
     $limit: Int
     $offset: Int
+    $totalContributed: AmountRangeInput
+    $totalExpended: AmountRangeInput
     $onlyVendors: Boolean!
+    $orderBy: OrderByInput
   ) {
     account(slug: $slug) {
       id
@@ -125,8 +137,16 @@ const dashboardVendorsQuery = gql`
         }
       }
     }
-    community(host: { slug: $slug }, type: [ORGANIZATION], searchTerm: $searchTerm, limit: $limit, offset: $offset)
-      @skip(if: $onlyVendors) {
+    community(
+      host: { slug: $slug }
+      type: [ORGANIZATION]
+      searchTerm: $searchTerm
+      totalContributed: $totalContributed
+      totalExpended: $totalExpended
+      limit: $limit
+      offset: $offset
+      orderBy: $orderBy
+    ) @skip(if: $onlyVendors) {
       totalCount
       offset
       limit
@@ -159,6 +179,14 @@ const dashboardVendorsQuery = gql`
   }
   ${vendorFieldFragment}
 `;
+
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  defaultValue: {
+    field: 'NAME',
+    direction: 'ASC',
+  },
+});
 
 const getColumns = ({ isVendor }) => {
   return [
@@ -284,18 +312,34 @@ const getColumns = ({ isVendor }) => {
 
 const PAGE_SIZE = 20;
 
+const totalContributed = makeAmountFilter(
+  'totalContributed',
+  defineMessage({ defaultMessage: 'Total Contributed', id: 'TotalContributed' }),
+);
+
+const totalExpended = makeAmountFilter(
+  'totalExpended',
+  defineMessage({ defaultMessage: 'Total Expended', id: 'TotalExpended' }),
+);
+
 const schema = z.object({
   limit: limit.default(PAGE_SIZE),
   offset,
   searchTerm: searchFilter.schema,
+  orderBy: sortFilter.schema,
   isArchived: boolean.optional().default(false),
   onlyVendors: boolean.optional().default(false),
+  totalContributed: totalContributed.schema,
+  totalExpended: totalExpended.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
 
 const filters: FilterComponentConfigs<FilterValues> = {
+  orderBy: sortFilter.filter,
   searchTerm: searchFilter.filter,
+  totalContributed: totalContributed.filter,
+  totalExpended: totalExpended.filter,
   isArchived: {
     labelMsg: defineMessage({ defaultMessage: 'Archived', id: '0HT+Ib' }),
     hide: () => true,
@@ -304,6 +348,12 @@ const filters: FilterComponentConfigs<FilterValues> = {
     labelMsg: defineMessage({ defaultMessage: 'Only Vendors', id: 'onlyVendors' }),
     hide: () => true,
   },
+};
+
+const toVariables = {
+  totalContributed: totalContributed.toVariables,
+  totalExpended: totalExpended.toVariables,
+  orderBy: sortFilter.toVariables,
 };
 
 const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
@@ -340,6 +390,11 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
     filters,
     schema,
     views,
+    toVariables,
+    meta: {
+      intl,
+      currency: account?.currency,
+    },
   });
   const {
     data,
@@ -442,22 +497,20 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : (
-        !loading && (
-          <React.Fragment>
-            <DataTable
-              columns={columns}
-              data={tableData?.nodes}
-              emptyMessage={() => <FormattedMessage id="NoVendors" defaultMessage="No vendors" />}
-              loading={loading}
-              onClickRow={row => {
-                handleDrawer(row.original as unknown as VendorFieldsFragment);
-              }}
-              getActions={getActions}
-              mobileTableView
-            />
-            <Pagination queryFilter={queryFilter} total={tableData?.totalCount} />
-          </React.Fragment>
-        )
+        <React.Fragment>
+          <DataTable
+            columns={columns}
+            data={tableData?.nodes}
+            emptyMessage={() => <FormattedMessage id="NoVendors" defaultMessage="No vendors" />}
+            loading={loading}
+            onClickRow={row => {
+              handleDrawer(row.original as unknown as VendorFieldsFragment);
+            }}
+            getActions={getActions}
+            mobileTableView
+          />
+          <Pagination queryFilter={queryFilter} total={tableData?.totalCount} />
+        </React.Fragment>
       )}
       {createEditVendor && (
         <StyledModal onClose={() => setCreateEditVendor(false)}>

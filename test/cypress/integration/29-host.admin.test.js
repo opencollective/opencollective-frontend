@@ -100,8 +100,10 @@ describe('host dashboard', () => {
       cy.wait(300);
       cy.get('[data-cy="add-funds-amount"]').type('{selectall}20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
-      cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
-      cy.contains(`@brusselstogetherasbl`).click();
+      const vendorName = randStr();
+      cy.get('[data-cy="add-funds-source"]').type(vendorName);
+      cy.contains(`Create vendor: ${vendorName}`).click();
+      cy.contains(`I confirm that`).click();
       cy.get('[data-cy="add-funds-submit-btn"]').click();
 
       cy.getByDataCy(`collective-${collectiveSlug}`).within(() => {
@@ -155,20 +157,84 @@ describe('host dashboard', () => {
 
       // Mark as paid
       cy.getByDataCy('MARK_AS_PAID-button').click();
-      cy.getByDataCy('payment-processor-fee').clear().type('4');
+      cy.getByDataCy('amount-received').should('be.visible');
+
+      // 1. With original amount, tip input should be disabled
+      cy.getByDataCy('platform-tip').should('be.disabled');
+
+      // 2. Change amount so tip input becomes enabled
+      cy.getByDataCy('amount-received').clear().type('510');
+      cy.getByDataCy('platform-tip').should('not.be.disabled');
+
+      // 3. Change the tip
       cy.getByDataCy('platform-tip').clear().type('10');
-      cy.getByDataCy('host-fee-percent').clear().type('9');
+
+      // 4. Restore original amount
+      cy.getByDataCy('amount-received').clear().type('500');
+
+      // 5. Tip should reset to default (0) and input disabled
+      cy.getByDataCy('platform-tip').should('be.disabled');
+      cy.getByDataCy('platform-tip')
+        .invoke('val')
+        .then(val => expect(parseFloat(val)).to.equal(0));
+
+      // 6. Submit and verify amounts (contribution 500, processor 4, host fee 9% → 45)
+      cy.getByDataCy('payment-processor-fee').clear().type('4');
+      cy.getByDataCy('host-fee-percent').last().clear().type('9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
       cy.contains('Paid').should('exist');
 
       cy.getByDataCy('view-transactions-button').click();
-
-      // Check transactions
       cy.contains('Contribution').should('exist');
-      cy.contains('€486.00').should('exist');
-
+      cy.contains('€500.00').should('exist');
       cy.contains('Host fee').should('exist');
-      cy.contains('€44.10').should('exist');
+      cy.contains('€45.00').should('exist');
+    });
+
+    it('Mark as paid with modified amount and tip, verify transaction amounts', () => {
+      // Create contribution (no platform tip)
+      cy.login({ redirect: '/dashboard/brusselstogetherasbl/expected-funds' });
+      cy.get('[data-cy="create-pending-contribution"]:first').click();
+      cy.get('[data-cy="create-pending-contribution-to"]:first').type('Veganizer');
+      cy.contains('[data-cy=select-option]', 'Veganizer BXL').click();
+      cy.get('[data-cy="create-pending-contribution-child"]:first').click();
+      cy.contains('[data-cy=select-option]', 'None').click();
+      cy.get('[data-cy="create-pending-contribution-source"]:first').type('Xavier');
+      cy.contains('[data-cy=select-option]', 'Xavier').click();
+      cy.get('[data-cy="create-pending-contribution-contact-name"]:first').type('Xavier');
+      cy.get('[data-cy="create-pending-contribution-fromAccountInfo-email"').type('yourname@yourhost.com');
+      cy.get('[data-cy="create-pending-contribution-amount"]:first').type('500');
+      cy.get('input#CreatePendingContribution-hostFeePercent').type('5');
+      cy.get('[data-cy="create-pending-contribution-expectedAt"]:first').click();
+      cy.contains('[data-cy=select-option]', '1 month').click();
+      const description = `Modified amount and tip ${randStr()}`;
+      cy.getByDataCy('create-pending-contribution-description').type(description);
+      cy.get('[data-cy="create-pending-contribution-submit-btn"]:first').click();
+      cy.get('tbody tr').first().as('createdContribution');
+      cy.get('@createdContribution').should('contain', 'Pending');
+
+      cy.get('tbody tr:first td button:last').first().click();
+      cy.contains('View details').click();
+      cy.contains(description).should('exist');
+      cy.contains('More actions').click();
+      cy.getByDataCy('MARK_AS_PAID-button').click();
+      cy.getByDataCy('amount-received').should('be.visible');
+
+      // Change amount so tip is editable, set tip and fees, submit with modified values
+      cy.getByDataCy('amount-received').clear().type('514'); // 500 + 10 tip + 4 processor
+      cy.getByDataCy('platform-tip').clear().type('10');
+      cy.getByDataCy('payment-processor-fee').clear().type('4');
+      cy.getByDataCy('host-fee-percent').last().clear().type('9');
+      cy.getByDataCy('order-confirmation-modal-submit').click();
+      cy.contains('Paid').should('exist');
+
+      // Verify transaction amounts: contribution 504 (514 - 10), platform tip 10, processor fee 4, host fee 9% of 504 = 45.36
+      cy.getByDataCy('view-transactions-button').click();
+      cy.contains('Contribution').should('exist');
+      cy.contains('€504.00').should('exist'); // amount received - platform tip
+      cy.contains('€10.00').should('exist'); // platform tip
+      cy.contains('Host fee').should('exist');
+      cy.contains('€45.36').should('exist');
     });
   });
 

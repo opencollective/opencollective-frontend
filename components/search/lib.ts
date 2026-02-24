@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
 
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { Comment, HostApplication, Order, Update } from '@/lib/graphql/types/v2/schema';
+import type { Comment, HostApplication, Order, Update } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import {
   getCollectivePageRoute,
   getCommentUrl,
@@ -13,6 +14,7 @@ import {
   getUpdateUrl,
 } from '@/lib/url-helpers';
 
+import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { useWorkspace } from '../WorkspaceProvider';
 
@@ -87,7 +89,12 @@ export function useGetLinkProps() {
           } else if (workspace.slug === expense.payee?.slug) {
             href = getDashboardRoute(workspace, `submitted-expenses?openExpenseId=${expense.legacyId}`);
           } else if (workspace.isHost && 'host' in expense.account && workspace.slug === expense.account.host?.slug) {
-            href = getDashboardRoute(workspace, `host-expenses?openExpenseId=${expense.legacyId}`);
+            href = getDashboardRoute(
+              workspace,
+              LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+                ? `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`
+                : `${ALL_SECTIONS.HOST_EXPENSES}?openExpenseId=${expense.legacyId}`,
+            );
           } else {
             href = getExpensePageUrl(expense);
           }

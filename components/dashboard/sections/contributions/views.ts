@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 
 import type { Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
-import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
+import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 
 import type { FilterValues } from './filters';
 

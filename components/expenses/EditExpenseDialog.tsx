@@ -9,15 +9,17 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
+import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import {
   type Currency,
   type CurrencyExchangeRateInput,
+  type Expense,
+  ExpenseLockableFields,
   ExpenseType,
   PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 import { getAccountReferenceInput } from '@/lib/collective';
-import { type Expense, ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
 
 import CollectivePicker from '../CollectivePicker';
 import { accountsQuery } from '../dashboard/sections/accounts/queries';
@@ -195,7 +197,7 @@ const EditPayee = ({ expense, onSubmit }) => {
               exchangeRate: ei.amount.exchangeRate
                 ? ({
                     ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                    date: new Date(ei.amount.exchangeRate.date || ei.incurredAt),
+                    date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
                   } as CurrencyExchangeRateInput)
                 : null,
             },
@@ -321,7 +323,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
             exchangeRate: ei.amount.exchangeRate
               ? ({
                   ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                  date: ei.amount.exchangeRate.date || ei.incurredAt,
+                  date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
                 } as CurrencyExchangeRateInput)
               : null,
           },
@@ -408,7 +410,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
           exchangeRate: ei.amount.exchangeRate
             ? ({
                 ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: ei.amount.exchangeRate.date || ei.incurredAt,
+                date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
               } as CurrencyExchangeRateInput)
             : null,
         },
@@ -491,7 +493,7 @@ const AttachReceipts = ({ expense, onSubmit }) => {
           exchangeRate: ei.amount.exchangeRate
             ? ({
                 ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: ei.amount.exchangeRate.date || ei.incurredAt,
+                date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
               } as CurrencyExchangeRateInput)
             : null,
         },
@@ -600,7 +602,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
           exchangeRate: ei.amount.exchangeRate
             ? ({
                 ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: ei.amount.exchangeRate.date || ei.incurredAt,
+                date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
               } as CurrencyExchangeRateInput)
             : null,
         },

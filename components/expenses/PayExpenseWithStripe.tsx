@@ -8,18 +8,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type {
   AccountStripePaymentMethodsQuery,
   AccountStripePaymentMethodsQueryVariables,
+  Expense,
+  ExpenseReferenceInput,
+  PaymentMethod,
 } from '@/lib/graphql/types/v2/graphql';
-import {
-  type Expense,
-  type ExpenseReferenceInput,
-  ExpenseType,
-  type PaymentMethod,
-  PaymentMethodService,
-} from '@/lib/graphql/types/v2/schema';
+import { ExpenseType, PaymentMethodService } from '@/lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '@/lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '@/lib/payment-method-utils';
 import { confirmPayment } from '@/lib/stripe/confirm-payment';
-import { StripePaymentMethodsLabels } from '@/lib/stripe/payment-methods';
+import { getStripePaymentMethodLabel } from '@/lib/stripe/payment-methods';
 import type { StripePaymentIntent } from '@/lib/stripe/usePaymentIntent';
 import usePaymentIntent from '@/lib/stripe/usePaymentIntent';
 
@@ -90,9 +87,9 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
     ],
   };
 
-  let availableMethodLabels = (paymentIntent?.payment_method_types ?? []).map(method => {
-    return StripePaymentMethodsLabels[method] ? intl.formatMessage(StripePaymentMethodsLabels[method]) : method;
-  });
+  let availableMethodLabels = (paymentIntent?.payment_method_types ?? []).map(method =>
+    getStripePaymentMethodLabel(intl, method),
+  );
 
   if (availableMethodLabels.length > 3) {
     availableMethodLabels = [...availableMethodLabels.slice(0, 3), 'etc'];
