@@ -147,6 +147,28 @@ export const ACTIVITIES_INFO = {
       id: 'Expense.Activity.Error',
       defaultMessage: 'Expense error',
     }),
+    renderDetails: ({ error }) => {
+      const message = error?.message || (
+        <FormattedMessage defaultMessage="An unknown error occurred" id="Error.Unknown" />
+      );
+      let details = null;
+      if (error?.details && Array.isArray(error.details)) {
+        details = (
+          <ul>
+            {error.details.map((detail, idx) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <li key={idx}>{detail.issue}</li>
+            ))}
+          </ul>
+        );
+      }
+      return (
+        <React.Fragment>
+          <p>{message}</p>
+          {details}
+        </React.Fragment>
+      );
+    },
   },
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
     type: 'error',
