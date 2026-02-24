@@ -67,6 +67,7 @@ const accountTransactionsMetaDataQuery = gql`
       slug
       currency
       settings
+      type
       childrenAccounts {
         totalCount
         nodes {
@@ -86,6 +87,9 @@ const accountTransactionsMetaDataQuery = gql`
           id
           name
         }
+      }
+      ... on Organization {
+        hasMoneyManagement
       }
     }
   }
