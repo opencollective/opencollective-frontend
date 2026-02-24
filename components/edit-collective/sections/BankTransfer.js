@@ -87,7 +87,7 @@ const editBankTransferMutation = gql`
 
 const renderBankInstructions = (instructions, bankAccountInfo) => {
   const amountInCents = 3000;
-  const currency = bankAccountInfo?.currency || Currency.USD;
+  const currency = bankAccountInfo?.data?.currency || Currency.USD;
   const formattedAmount = formatCurrency(amountInCents, currency, {
     currencyDisplay: 'code',
   });
