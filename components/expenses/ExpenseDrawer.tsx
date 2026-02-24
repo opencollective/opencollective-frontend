@@ -37,7 +37,7 @@ export default function ExpenseDrawer({
   const prevExpenseId = usePrevious(openExpenseLegacyId);
   const id = openExpenseLegacyId || prevExpenseId;
 
-  const { data, loading, error, refetch, fetchMore, startPolling, stopPolling } = useQuery(expensePageQuery, {
+  const { data, loading, error, refetch, fetchMore } = useQuery(expensePageQuery, {
     variables: id ? getVariablesFromQuery({ ExpenseId: id }) : undefined,
     skip: !id,
 
@@ -74,8 +74,6 @@ export default function ExpenseDrawer({
           client={client}
           fetchMore={fetchMore}
           legacyExpenseId={id}
-          startPolling={startPolling}
-          stopPolling={stopPolling}
           isDrawer
           onClose={handleClose}
           enableKeyboardShortcuts={hasKeyboardShortcutsEnabled}

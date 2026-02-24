@@ -174,11 +174,7 @@ export const getCategoryLabel = (
 /**
  * Returns true if the category is supported for the given expense type. Host admins can select any category.
  */
-export const isSupportedExpenseCategory = (
-  expenseType: ExpenseType,
-  category: AccountingCategory,
-  isHostAdmin: boolean,
-) => {
+const isSupportedExpenseCategory = (expenseType: ExpenseType, category: AccountingCategory, isHostAdmin: boolean) => {
   return (
     category?.kind === AccountingCategoryKind.EXPENSE &&
     (isHostAdmin || !category?.expensesTypes || category.expensesTypes.includes(expenseType))

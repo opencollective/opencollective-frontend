@@ -4,7 +4,6 @@ import React from 'react';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
-import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { MinusCircle } from '@styled-icons/feather/MinusCircle';
@@ -24,7 +23,6 @@ import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useKeyboardKey, { H, I } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
@@ -108,7 +106,6 @@ export const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
 const ExpenseMoreActionsButton = ({
   expense,
   onError,
-  onEdit,
   isDisabled,
   linkAction = 'copy',
   onModalToggle,
@@ -154,9 +151,6 @@ const ExpenseMoreActionsButton = ({
     },
   });
   const { LoggedInUser } = useLoggedInUser();
-
-  const hasNewSubmitExpenseFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
 
   const showDeleteConfirmMoreActions = isOpen => {
     setDeleteConfirm(isOpen);
@@ -290,12 +284,6 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </Action>
             )}
-            {onEdit && permissions.canEdit && (
-              <Action data-cy="edit-expense-btn" onClick={onEdit} disabled={processExpense.loading || isDisabled}>
-                <IconEdit size="16px" />
-                <FormattedMessage id="Edit" defaultMessage="Edit" />
-              </Action>
-            )}
             {!props.hasAttachedInvoiceFile &&
               permissions.canSeeInvoiceInfo &&
               [expenseTypes.INVOICE, expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING].includes(
@@ -355,7 +343,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
               )}
             </Action>
-            {hasNewSubmitExpenseFlow && shouldShowDuplicateExpenseButton(LoggedInUser, expense) && (
+            {shouldShowDuplicateExpenseButton(LoggedInUser, expense) && (
               <Action
                 onClick={() => {
                   setDuplicateExpenseId(expense.legacyId);

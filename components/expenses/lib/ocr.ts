@@ -115,16 +115,6 @@ export const filterParsableItems = (items: UploadFileResult['parsingResult']['ex
   }
 };
 
-export const checkExpenseSupportsOCR = (expenseType: ExpenseType, loggedInUser): boolean => {
-  if (['RECEIPT', 'CHARGE'].includes(expenseType)) {
-    return true;
-  } else if (expenseType === 'INVOICE') {
-    return Boolean(loggedInUser?.isRoot);
-  } else {
-    return false;
-  }
-};
-
 type FieldsWithOCRSupport = 'description' | 'incurredAt' | 'amountV2';
 
 type ExpenseItemFields = Extract<keyof ExpenseItemFormValues, FieldsWithOCRSupport>;
@@ -180,9 +170,4 @@ export const compareItemOCRValues = (item: ExpenseItemFormValues): ExpenseOCRVal
     );
     return result;
   }, {} as ExpenseOCRValuesComparison);
-};
-
-/** Return true if the item has an OCR parsing result */
-export const itemHasOCR = (item: ExpenseItemFormValues): boolean => {
-  return Boolean(item.__parsingResult);
 };

@@ -48,17 +48,6 @@ export const newExpenseItem = (attrs = {}, expenseCurrency: string): ExpenseItem
   amountV2: getExpenseItemAmountV2FromNewAttrs(attrs, expenseCurrency),
 });
 
-/** Helper to add a new item to the form */
-export const addNewExpenseItem = (
-  formik: FormikProps<ExpenseFormValues>,
-  defaultValues: Partial<ExpenseItemFormValues> = {},
-): void => {
-  formik.setFieldValue('items', [
-    ...(formik.values.items || []),
-    newExpenseItem(defaultValues, formik.values.currency),
-  ]);
-};
-
 /**
  * Returns true if the attachment require adding a file
  */
