@@ -348,7 +348,7 @@ export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete 
       try {
         await editExportRequest({
           variables: {
-            exportRequest: { id: exportRequest.id },
+            exportRequest: { id: exportRequestId },
             name: newName,
           },
         });
@@ -364,7 +364,7 @@ export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete 
         throw err;
       }
     },
-    [editExportRequest, exportRequest?.id, intl],
+    [editExportRequest, exportRequestId, intl],
   );
 
   const actions = React.useMemo(() => {
