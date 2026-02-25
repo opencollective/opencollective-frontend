@@ -4133,7 +4133,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     """
     includeArchived: Boolean! = false
   ): [ManualPaymentProvider!]!
-  bankAccount: PayoutMethod @deprecated(reason: "2026-01-23: Deprecated in favour of custom payment providers")
 
   """
   If the host supports PayPal, this will contain the client ID to use in the frontend
