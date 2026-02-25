@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { Copy, Download, FileText, Loader2, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
@@ -10,6 +10,7 @@ import { FieldLabels } from '../../../../lib/export-csv/transactions-csv';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import type { Action } from '@/lib/actions/types';
+import { i18nGraphqlException } from '@/lib/errors';
 import { formatFileSize } from '@/lib/file-utils';
 import type {
   AccountReferenceInput,
@@ -21,8 +22,10 @@ import type {
 import { ExportRequestStatus, ExportRequestType } from '@/lib/graphql/types/v2/graphql';
 import useClipboard from '@/lib/hooks/useClipboard';
 
+import EditValueDialog from '@/components/EditValueDialog';
 import { PaymentMethodLabel } from '@/components/PaymentMethodLabel';
 import { Separator } from '@/components/ui/Separator';
+import { toast } from '@/components/ui/useToast';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -34,6 +37,15 @@ import { DataList, DataListItem } from '../../../ui/DataList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
 import { ExportStatusLabels, ExportTypeLabels, getStatusClassName, getStatusIcon } from './constants';
+
+const editExportRequestMutation = gql`
+  mutation EditExportRequest($exportRequest: ExportRequestReferenceInput!, $name: NonEmptyString) {
+    editExportRequest(exportRequest: $exportRequest, name: $name) {
+      id
+      name
+    }
+  }
+`;
 
 const exportRequestFieldsFragment = gql`
   fragment ExportRequestDetailsFields on ExportRequest {
@@ -318,6 +330,7 @@ type ExportRequestDetailsDrawerProps = {
 export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete }: ExportRequestDetailsDrawerProps) => {
   const intl = useIntl();
   const { copy, isCopied } = useClipboard();
+  const [editExportRequest] = useMutation(editExportRequestMutation);
 
   const { data, loading, error } = useQuery<ExportRequestDetailsQuery, ExportRequestDetailsQueryVariables>(
     exportRequestQuery,
@@ -329,6 +342,30 @@ export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete 
   );
 
   const exportRequest = data?.exportRequest;
+
+  const handleEditName = React.useCallback(
+    async (newName: string) => {
+      try {
+        await editExportRequest({
+          variables: {
+            exportRequest: { id: exportRequest.id },
+            name: newName,
+          },
+        });
+        toast({
+          variant: 'success',
+          message: intl.formatMessage({
+            defaultMessage: 'Export name updated',
+            id: 'ExportNameUpdated',
+          }),
+        });
+      } catch (err) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
+        throw err;
+      }
+    },
+    [editExportRequest, exportRequest?.id, intl],
+  );
 
   const actions = React.useMemo(() => {
     if (!exportRequest) {
@@ -386,10 +423,19 @@ export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete 
             entityName={<FormattedMessage defaultMessage="Export" id="editCollective.menu.export" />}
             entityIdentifier={`#${exportRequest.legacyId}`}
             entityLabel={
-              <div className="flex items-center gap-2">
+              <React.Fragment>
                 <FileText className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">{exportRequest.name}</span>
-              </div>
+                <span className="font-medium">
+                  {exportRequest.name}
+                  <EditValueDialog
+                    title={intl.formatMessage({ defaultMessage: 'Edit export name', id: 'EditExportName' })}
+                    fieldLabel={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
+                    value={exportRequest.name}
+                    dataCy="edit-export-name-btn"
+                    onSubmit={handleEditName}
+                  />
+                </span>
+              </React.Fragment>
             }
           />
         )}
@@ -407,7 +453,6 @@ export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete 
                 label={<FormattedMessage defaultMessage="Type" id="expense.type" />}
                 value={intl.formatMessage(ExportTypeLabels[exportRequest.type])}
               />
-
               <DataListItem
                 label={<FormattedMessage defaultMessage="Status" id="expense.status" />}
                 value={
