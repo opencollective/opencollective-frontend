@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import { defineMessages, useIntl } from 'react-intl';
@@ -107,7 +108,13 @@ const OficoMembers = () => {
   return (
     <section className="px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <h2 className="mb-8 text-center text-[2rem] font-bold text-slate-800">
+        <motion.h2
+          className="mb-8 text-center text-[2rem] font-bold text-slate-800"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5 }}
+        >
           {formatMessage(messages.title, {
             OficoLink: () => (
               <Link key="ofico-link" href="https://openfinanceconsortium.org" className="underline">
@@ -122,52 +129,72 @@ const OficoMembers = () => {
               </Link>
             ),
           })}
-        </h2>
-        <p className="mx-auto mb-12 max-w-3xl text-center text-lg text-balance text-slate-800">
+        </motion.h2>
+        <motion.p
+          className="mx-auto mb-12 max-w-3xl text-center text-lg text-balance text-slate-800"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
           {formatMessage(messages.description)}
-        </p>
+        </motion.p>
 
         <div className="mb-12 flex flex-wrap justify-center gap-4">
-          {members.map(member => (
-            <Link
-              href={member.collectivePath}
+          {members.map((member, index) => (
+            <motion.div
               key={member.id}
-              className="w-full max-w-md overflow-hidden rounded-lg bg-background p-6 transition-colors duration-200 hover:bg-muted md:w-96"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
             >
-              <div className="relative flex h-52 w-full items-center justify-center overflow-hidden rounded-lg p-4">
-                <Image
-                  src={member.bgImage}
-                  alt={`${member.name} background`}
-                  fill
-                  className="object-cover"
-                  sizes="448px"
-                />
-                <div className="relative z-10">
-                  <Avatar radius="96px" src={member.logo} name={member.name} type="ORGANIZATION" className="bg-white" />
+              <Link
+                href={member.collectivePath}
+                className="w-full max-w-md overflow-hidden rounded-lg bg-background p-6 transition-colors duration-200 hover:bg-muted md:w-96 block"
+              >
+                <div className="relative flex h-52 w-full items-center justify-center overflow-hidden rounded-lg p-4">
+                  <Image
+                    src={member.bgImage}
+                    alt={`${member.name} background`}
+                    fill
+                    className="object-cover"
+                    sizes="448px"
+                  />
+                  <div className="relative z-10">
+                    <Avatar radius="96px" src={member.logo} name={member.name} type="ORGANIZATION" className="bg-white" />
+                  </div>
                 </div>
-              </div>
 
-              <div className="mt-3">
-                <div className="mb-3">
-                  <span className="text-sm font-medium text-muted-foreground">{member.location}</span>
+                <div className="mt-3">
+                  <div className="mb-3">
+                    <span className="text-sm font-medium text-muted-foreground">{member.location}</span>
+                  </div>
+
+                  <h3 className="mb-3 text-xl leading-tight font-bold">{member.name}</h3>
+
+                  <p className="leading-relaxed text-muted-foreground">{formatMessage(messages[member.description])}</p>
                 </div>
-
-                <h3 className="mb-3 text-xl leading-tight font-bold">{member.name}</h3>
-
-                <p className="leading-relaxed text-muted-foreground">{formatMessage(messages[member.description])}</p>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           ))}
         </div>
 
-        <div className="text-center">
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
           <Button asChild variant="outline" className="gap-2 rounded-full text-base" size="xl">
             <a href="https://oficonsortium.org/" target="_blank">
               {formatMessage(messages.learnMore)}
               <ExternalLink className="h-4 w-4" />
             </a>
           </Button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

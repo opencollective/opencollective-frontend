@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import NextImage from 'next/image';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -78,12 +79,31 @@ const Solutions = () => {
       </div>
 
       <div className="relative z-10 flex max-w-6xl flex-col items-center">
-        <h2 className="mb-10 text-center text-[2rem] font-bold text-oc">
+        <motion.h2
+          className="mb-10 text-center text-[2rem] font-bold text-oc"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
           <FormattedMessage {...messages['home.solutions.title']} />
-        </h2>
+        </motion.h2>
 
-        <div className="flex w-full max-w-[64rem] flex-col items-center gap-3 md:flex-row">
-          <div className="flex flex-1 flex-col rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
+        <motion.div
+          className="flex w-full max-w-[64rem] flex-col items-center gap-3 md:flex-row"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <motion.div
+            className="flex flex-1 flex-col rounded-xl border border-gray-200 bg-white p-8 shadow-lg"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+          >
             <div className="relative mb-6">
               <div className="absolute right-0 -bottom-1 left-0 w-full">
                 <NextImage
@@ -133,17 +153,30 @@ const Solutions = () => {
                 </div>
               </Link>
             </Button>
-          </div>
+          </motion.div>
 
-          <div className="relative flex items-center justify-center md:flex-col">
+          <motion.div
+            className="relative flex items-center justify-center md:flex-col"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
             <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-gray-200 bg-white shadow-lg">
               <span className="text-sm font-semibold text-slate-600">
                 <FormattedMessage id="Or" defaultMessage="OR" />
               </span>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="flex flex-1 flex-col rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
+          <motion.div
+            className="flex flex-1 flex-col rounded-xl border border-gray-200 bg-white p-8 shadow-lg"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+          >
             <div className="relative mb-6">
               <div className="absolute right-0 -bottom-1 left-0 w-3/4">
                 <NextImage
@@ -191,8 +224,8 @@ const Solutions = () => {
                 <ArrowRight size={16} />
               </Link>
             </Button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );
