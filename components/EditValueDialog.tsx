@@ -1,7 +1,7 @@
 import React from 'react';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Form } from 'formik';
-import { Pen, Pencil } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
