@@ -3405,6 +3405,8 @@
   "PreviewFeatures.searchCommandDescription": "Découvrez une nouvelle façon de rechercher des Collectifs, des transactions, des dépenses, et plus encore grâce à une interface intuitive dans le menu de commandes. Accédez plus rapidement aux informations grâce à de puissantes capacités de recherche.",
   "PreviewFeatures.searchCommandTitle": "Rechercher le menu de commande",
   "PreviewFeatures.searchResultsPage": "Page de résultats de recherche",
+  "PreviewFeatures.tableQuickActionsDescription": "Enable quick action buttons that appear on table rows when you hover over them. Perform common actions faster without opening the dropdown menu.",
+  "PreviewFeatures.tableQuickActionsTitle": "Table Quick Actions",
   "Pricing-Crowdfunding": "Contributions via le financement participatif",
   "Pricing-Crowdfunding-Price": "Gratuit avec les <PlatformTipsLink>Pourboires de la plateforme </PlatformTipsLink> activés",
   "Pricing-forOrganizations": "Tarif pour les Organisations",
