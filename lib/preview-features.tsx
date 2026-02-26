@@ -22,6 +22,7 @@ export enum PREVIEW_FEATURE_KEYS {
   PLATFORM_BILLING = 'PLATFORM_BILLING',
   SIDEBAR_REORG_DISBURSEMENTS = 'SIDEBAR_REORG_DISBURSEMENTS',
   ASYNC_EXPORTS = 'ASYNC_EXPORTS',
+  TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
 }
 
 enum Categories {
@@ -311,5 +312,18 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.TABLE_QUICK_ACTIONS,
+    title: <FormattedMessage defaultMessage="Table Quick Actions" id="PreviewFeatures.tableQuickActionsTitle" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Enable quick action buttons that appear on table rows when you hover over them. Perform common actions faster without opening the dropdown menu."
+        id="PreviewFeatures.tableQuickActionsDescription"
+      />
+    ),
+    publicBeta: true,
+    alwaysEnableInDev: true,
+    category: Categories.GENERAL,
   },
 ];
