@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form } from 'formik';
+import { round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -9,7 +10,6 @@ import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import type { Currency, Expense, ProcessExpensePaymentParams } from '../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus, ExpenseType, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
-import { cn } from '@/lib/utils';
 
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
@@ -26,10 +26,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../ui/AlertDialog';
-import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { Collapsible, CollapsibleContent } from '../ui/Collapsible';
 import { Label } from '../ui/Label';
+import { RadioGroup, RadioGroupCard } from '../ui/RadioGroup';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Separator } from '../ui/Separator';
 import { toast } from '../ui/useToast';
@@ -70,23 +70,44 @@ type MarkExpenseAsUnpaidModalProps = BaseModalProps & {
   onSuccess?: () => void;
 };
 
+const AMOUNT_REFUND_TYPE = {
+  FULL: 'full',
+  EXPENSE_AMOUNT: 'expense-amount',
+  OTHER: 'other',
+} as const;
+
 const createMarkAsUnpaidSchema = (totalPaidCents: number, intl: ReturnType<typeof useIntl>) =>
-  z.object({
-    newExpenseStatus: z.nativeEnum(MarkAsUnPaidExpenseStatus),
-    amountToRefund: z
-      .number()
-      .min(1, {
-        message: intl.formatMessage({ id: 'errors.amountInvalid', defaultMessage: 'Amount must be greater than 0' }),
-      })
-      .max(totalPaidCents, {
-        message: intl.formatMessage({
-          id: 'errors.amountExceedsTotal',
-          defaultMessage: 'Amount refunded cannot exceed the total amount paid',
-        }),
-      }),
-    message: z.string().optional(),
-    isHostCoveringPaymentProcessorFees: z.boolean(),
-  });
+  z
+    .object({
+      newExpenseStatus: z.nativeEnum(MarkAsUnPaidExpenseStatus),
+      amountRefundType: z.enum([AMOUNT_REFUND_TYPE.FULL, AMOUNT_REFUND_TYPE.EXPENSE_AMOUNT, AMOUNT_REFUND_TYPE.OTHER]),
+      amountToRefund: z.number(),
+      message: z.string().optional(),
+      isHostCoveringPaymentProcessorFees: z.boolean(),
+    })
+    .superRefine((data, ctx) => {
+      if (data.amountRefundType !== AMOUNT_REFUND_TYPE.OTHER) {
+        return;
+      }
+      if (data.amountToRefund < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['amountToRefund'],
+          message: intl.formatMessage({ id: 'errors.amountInvalid', defaultMessage: 'Amount must be greater than 0' }),
+        });
+        return;
+      }
+      if (data.amountToRefund > totalPaidCents) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['amountToRefund'],
+          message: intl.formatMessage({
+            id: 'errors.amountExceedsTotal',
+            defaultMessage: 'Amount refunded cannot exceed the total amount paid',
+          }),
+        });
+      }
+    });
 
 export type MarkAsUnpaidFormValues = z.infer<ReturnType<typeof createMarkAsUnpaidSchema>>;
 
@@ -106,10 +127,13 @@ export default function MarkExpenseAsUnpaidModal({
   const hostCurrency = expense.amountInHostCurrency?.currency ?? expense.paymentInfo?.processorFee?.currency;
   const processorFeeCents = expense.paymentInfo?.processorFee?.valueInCents ?? 0;
 
+  const expenseAmountCents = expense.amountInHostCurrency?.valueInCents ?? 0;
+
   const schema = React.useMemo(() => createMarkAsUnpaidSchema(totalPaidCents, intl), [totalPaidCents, intl]);
   const initialValues: MarkAsUnpaidFormValues = React.useMemo(
     () => ({
       newExpenseStatus: expenseStatusOptions[0]?.value ?? MarkAsUnPaidExpenseStatus.APPROVED,
+      amountRefundType: AMOUNT_REFUND_TYPE.FULL,
       amountToRefund: totalPaidCents,
       message: undefined,
       isHostCoveringPaymentProcessorFees: true,
@@ -167,7 +191,7 @@ export default function MarkExpenseAsUnpaidModal({
           enableReinitialize
           validateOnChange
         >
-          {({ values, setFieldValue, errors, isSubmitting }) => (
+          {({ values, setFieldValue, isSubmitting }) => (
             <Form>
               <AlertDialogHeader>
                 <AlertDialogTitle>
@@ -218,74 +242,102 @@ export default function MarkExpenseAsUnpaidModal({
                     defaultMessage: 'Amount refunded',
                   })}
                 >
-                  {({ meta }) => (
-                    <div>
-                      <InputAmount
-                        id="amount-refunded"
-                        data-cy="amount-refunded-input"
-                        type="number"
-                        currency={hostCurrency}
-                        min={1}
-                        max={totalPaidCents}
-                        value={values.amountToRefund}
-                        onChange={value => setFieldValue('amountToRefund', value)}
-                        required={true}
-                        error={Boolean(meta.error)}
-                      />
-                      {meta.error && <p className="mt-1 pl-2 text-xs text-red-500">{meta.error}</p>}
-                      {processorFeeCents > 0 && (
-                        <ul className="mt-1.5 list-inside list-disc space-y-0.5 pl-3 text-xs text-muted-foreground">
-                          <li>
-                            <FormattedMessage
-                              defaultMessage="Total amount: {total} (including {fee} processor fees)"
-                              id="expense.markAsUnpaid.totalAmount"
-                              values={{
-                                total: (
-                                  <Button
-                                    type="button"
-                                    variant="link"
-                                    className="h-auto p-0 text-xs text-muted-foreground underline hover:text-foreground"
-                                    onClick={() => setFieldValue('amountToRefund', totalPaidCents)}
-                                  >
-                                    {formatCurrency(totalPaidCents, hostCurrency as Currency)}
-                                  </Button>
-                                ),
-                                fee: formatCurrency(processorFeeCents, hostCurrency as Currency),
-                              }}
-                            />
-                          </li>
-                          <li>
-                            <FormattedMessage
-                              defaultMessage="Expense amount: {expenseAmount}"
-                              id="expense.markAsUnpaid.expenseAmount"
-                              values={{
-                                expenseAmount: (
-                                  <Button
-                                    type="button"
-                                    variant="link"
-                                    className="h-auto p-0 text-xs text-muted-foreground underline hover:text-foreground"
-                                    onClick={() =>
-                                      setFieldValue('amountToRefund', expense.amountInHostCurrency?.valueInCents ?? 0)
-                                    }
-                                  >
-                                    {formatCurrency(
-                                      expense.amountInHostCurrency?.valueInCents ?? 0,
-                                      (expense.amountInHostCurrency?.currency ?? hostCurrency) as Currency,
-                                    )}
-                                  </Button>
-                                ),
-                              }}
-                            />
-                          </li>
-                        </ul>
-                      )}
+                  {() => (
+                    <div className="space-y-2">
+                      <RadioGroup
+                        value={values.amountRefundType}
+                        onValueChange={value => {
+                          const type = value as MarkAsUnpaidFormValues['amountRefundType'];
+                          setFieldValue('amountRefundType', type);
+                          if (type === AMOUNT_REFUND_TYPE.FULL) {
+                            setFieldValue('amountToRefund', totalPaidCents);
+                          } else if (type === AMOUNT_REFUND_TYPE.EXPENSE_AMOUNT) {
+                            setFieldValue('amountToRefund', expenseAmountCents);
+                          } else if (type === AMOUNT_REFUND_TYPE.OTHER) {
+                            setFieldValue('amountToRefund', values.amountToRefund || expenseAmountCents);
+                          }
+                        }}
+                        className="flex flex-col gap-2"
+                      >
+                        <RadioGroupCard value={AMOUNT_REFUND_TYPE.FULL} className="flex flex-col">
+                          <div>
+                            <FormattedMessage id="expense.markAsUnpaid.fullAmount" defaultMessage="Full amount" />
+                            <p className="text-xs text-muted-foreground">
+                              <strong>{formatCurrency(totalPaidCents, hostCurrency as Currency)}</strong>
+                              {processorFeeCents > 0 && (
+                                <FormattedMessage
+                                  defaultMessage=" (including {fee} processor fees)"
+                                  id="expense.markAsUnpaid.fullAmount.helper"
+                                  values={{ fee: formatCurrency(processorFeeCents, hostCurrency as Currency) }}
+                                />
+                              )}
+                            </p>
+                          </div>
+                        </RadioGroupCard>
+                        {processorFeeCents > 0 && (
+                          <RadioGroupCard value={AMOUNT_REFUND_TYPE.EXPENSE_AMOUNT} className="flex flex-col">
+                            <div>
+                              <FormattedMessage
+                                id="expense.markAsUnpaid.expenseAmountWithoutFees"
+                                defaultMessage="Expense amount"
+                              />
+                              <p className="text-xs text-muted-foreground">
+                                <strong>{formatCurrency(expenseAmountCents, hostCurrency as Currency)}</strong>
+                                <FormattedMessage
+                                  defaultMessage=" ({fee} processor fees were not refunded)"
+                                  id="4GGoUc"
+                                  values={{ fee: formatCurrency(processorFeeCents, hostCurrency as Currency) }}
+                                />
+                              </p>
+                            </div>
+                          </RadioGroupCard>
+                        )}
+                        <RadioGroupCard
+                          value={AMOUNT_REFUND_TYPE.OTHER}
+                          showSubcontent={values.amountRefundType === AMOUNT_REFUND_TYPE.OTHER}
+                          subContent={
+                            <FormField name="amountToRefund" className="mt-1">
+                              {({ meta: amountMeta }) => (
+                                <div>
+                                  <InputAmount
+                                    id="amount-refunded"
+                                    data-cy="amount-refunded-input"
+                                    type="number"
+                                    currency={hostCurrency}
+                                    min={1}
+                                    max={totalPaidCents}
+                                    value={values.amountToRefund}
+                                    onChange={value => setFieldValue('amountToRefund', value)}
+                                    required={true}
+                                    error={Boolean(amountMeta.error)}
+                                  />
+                                  {amountMeta.error && (
+                                    <p className="mt-1 pl-2 text-xs text-red-500">{amountMeta.error}</p>
+                                  )}
+                                </div>
+                              )}
+                            </FormField>
+                          }
+                          className="flex flex-col"
+                        >
+                          <FormattedMessage id="expense.markAsUnpaid.otherAmount" defaultMessage="Other" />
+                        </RadioGroupCard>
+                      </RadioGroup>
                     </div>
                   )}
                 </FormField>
 
                 <Collapsible open={values.amountToRefund < totalPaidCents}>
                   <CollapsibleContent>
-                    <FormField name="isHostCoveringPaymentProcessorFees">
+                    <FormField
+                      name="isHostCoveringPaymentProcessorFees"
+                      label={
+                        <FormattedMessage
+                          id="expense.markAsUnpaid.coverProcessorFees"
+                          defaultMessage="Cover lost payment processor fees"
+                        />
+                      }
+                    >
                       {() => (
                         <div className="flex items-start gap-3 space-y-0 rounded-md border p-4">
                           <Checkbox
@@ -299,52 +351,29 @@ export default function MarkExpenseAsUnpaidModal({
                           <div className="grid gap-1.5 leading-none">
                             <Label
                               htmlFor="cover-processor-fees"
-                              className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              className="cursor-pointer text-xs text-muted-foreground"
                             >
                               <FormattedMessage
-                                id="expense.markAsUnpaid.coverProcessorFees"
-                                defaultMessage="Cover lost payment processor fees"
+                                id="expense.markAsUnpaid.coverProcessorFees.helper"
+                                defaultMessage="Restore the collective's full balance, covering the {feeAmount} non-refunded processor fees from the host budget."
+                                values={{
+                                  feeAmount: formatCurrency(
+                                    round(totalPaidCents - values.amountToRefund, 2),
+                                    hostCurrency as Currency,
+                                  ),
+                                }}
                               />
                             </Label>
-                            <p className="text-xs text-muted-foreground">
-                              <FormattedMessage
-                                id="expense.markAsUnpaid.coverProcessorFees.helper"
-                                defaultMessage="Check this to restore the collective's full balance, covering the processor fees from the host budget."
-                              />
-                            </p>
                           </div>
                         </div>
                       )}
                     </FormField>
-                    <p className="mt-2 text-sm text-muted-foreground italic">
-                      {values.isHostCoveringPaymentProcessorFees ? (
-                        <FormattedMessage
-                          id="expense.markAsUnpaid.summary.hostCoveringFees"
-                          defaultMessage="The collective will be refunded {amount}, including {paymentProcessorFees} in non-refunded payment processor fees covered by the host budget."
-                          values={{
-                            amount: formatCurrency(totalPaidCents, hostCurrency as Currency),
-                            paymentProcessorFees: formatCurrency(processorFeeCents, hostCurrency as Currency),
-                          }}
-                        />
-                      ) : (
-                        <FormattedMessage
-                          id="expense.markAsUnpaid.summary.hostNotCoveringFees"
-                          defaultMessage="The collective will be refunded {amount}. The {paymentProcessorFees} in non-refunded payment processor fees are lost."
-                          values={{
-                            amount: formatCurrency(values.amountToRefund, hostCurrency as Currency),
-                            paymentProcessorFees: formatCurrency(processorFeeCents, hostCurrency as Currency),
-                          }}
-                        />
-                      )}
-                    </p>
                   </CollapsibleContent>
                 </Collapsible>
 
-                <Separator className="my-6" />
-
                 <FormField
                   name="message"
-                  label={<FormattedMessage id="expense.markAsUnpaid.reason" defaultMessage="Reason (optional)" />}
+                  label={<FormattedMessage id="expense.markAsUnpaid.reason" defaultMessage="Reason" />}
                 >
                   {() => (
                     <RichTextEditor
@@ -370,7 +399,9 @@ export default function MarkExpenseAsUnpaidModal({
                   type="submit"
                   variant="destructive"
                   loading={isSubmitting}
-                  disabled={uploading || values.amountToRefund <= 0}
+                  disabled={
+                    uploading || (values.amountRefundType === AMOUNT_REFUND_TYPE.OTHER && values.amountToRefund <= 0)
+                  }
                   data-cy="confirmation-modal-continue"
                 >
                   <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
