@@ -294,9 +294,10 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS,
     title: 'Sidebar Reorganization Disbursements',
     description: 'Reorganization of the "Expenses" section in the Host Dashboard',
-    publicBeta: false,
+    publicBeta: true,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS,
