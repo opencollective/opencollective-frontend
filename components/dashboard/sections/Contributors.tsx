@@ -32,6 +32,7 @@ import type { DashboardSectionProps } from '../types';
 enum FilterMemberRole {
   FOLLOWER = MemberRole.FOLLOWER,
   BACKER = MemberRole.BACKER,
+  ATTENDEE = MemberRole.ATTENDEE,
 }
 
 const MemberRoleSchema = isMulti(z.nativeEnum(FilterMemberRole)).optional();
@@ -115,7 +116,7 @@ const dashboardContributorsMetadataQuery = gql`
           }
         }
       }
-      ALL: members(role: [BACKER, FOLLOWER]) {
+      ALL: members(role: [BACKER, FOLLOWER, ATTENDEE]) {
         totalCount
       }
       FOLLOWERS: members(role: [FOLLOWER]) {
@@ -324,7 +325,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   } = useQuery(dashboardContributorsQuery, {
     variables: {
       slug: accountSlug,
-      role: [MemberRole.FOLLOWER, MemberRole.BACKER],
+      role: [MemberRole.FOLLOWER, MemberRole.BACKER, MemberRole.ATTENDEE],
       ...queryFilter.variables,
     },
   });
