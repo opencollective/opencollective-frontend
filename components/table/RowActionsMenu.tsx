@@ -4,6 +4,8 @@ import { MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import type { Action } from '@/lib/actions/types';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import Link from '../Link';
 import Spinner from '../Spinner';
@@ -64,6 +66,9 @@ interface RowActionsMenuProps<TData> {
 }
 
 export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: RowActionsMenuProps<TData>) {
+  const { LoggedInUser } = useLoggedInUser();
+  const hasQuickActionsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.TABLE_QUICK_ACTIONS);
+
   if (!row.original) {
     return null;
   }
@@ -76,48 +81,55 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
   const { primary, secondary } = getActions(row.original, actionsMenuTriggerRef) ?? {};
   const hasNoActions = !primary?.length && !secondary?.length && !openDrawer;
 
+  if (!hasNoActions) {
+    return null;
+  }
+
+  const quickActions = hasQuickActionsEnabled
+    ? primary
+        .filter(a => a.Icon && !a.disabled) // only actions with Icons can be rendered as quick-actions, and should not be disabled
+        .slice(0, 2) // only show the first 2 primary actions
+    : [];
+
   return (
     <DropdownMenu>
       <ButtonGroup className="group/actions">
-        {primary
-          .filter(a => a.Icon && !a.disabled) // only actions with Icons can be rendered as quick-actions
-          .slice(0, 2) // only show the first 2 primary actions
-          .map(action => {
-            const icon = <action.Icon size={16} />;
-            const quickActionClassName =
-              'invisible flex border-transparent text-muted-foreground group-hover/row:visible group-hover/row:border-border group-has-data-[state=open]/actions:visible group-has-data-[state=open]/actions:border-border hover:bg-white hover:text-foreground hover:shadow-xs';
+        {quickActions.map(action => {
+          const icon = <action.Icon size={16} />;
+          const quickActionClassName =
+            'invisible flex border-transparent text-muted-foreground group-hover/row:visible group-hover/row:border-border group-has-data-[state=open]/actions:visible group-has-data-[state=open]/actions:border-border hover:bg-white hover:text-foreground hover:shadow-xs';
 
-            return (
-              <Tooltip key={action.key} disableHoverableContent>
-                <TooltipTrigger asChild>
-                  {action.href ? (
-                    <Button
-                      asChild
-                      size="icon-xs"
-                      variant="outline"
-                      disabled={action.disabled}
-                      className={quickActionClassName}
-                    >
-                      <Link href={action.href} onClick={action.onClick}>
-                        {icon}
-                      </Link>
-                    </Button>
-                  ) : (
-                    <Button
-                      size="icon-xs"
-                      variant="outline"
-                      disabled={action.disabled}
-                      className={quickActionClassName}
-                      onClick={action.onClick}
-                    >
+          return (
+            <Tooltip key={action.key} disableHoverableContent>
+              <TooltipTrigger asChild>
+                {action.href ? (
+                  <Button
+                    asChild
+                    size="icon-xs"
+                    variant="outline"
+                    disabled={action.disabled}
+                    className={quickActionClassName}
+                  >
+                    <Link href={action.href} onClick={action.onClick}>
                       {icon}
-                    </Button>
-                  )}
-                </TooltipTrigger>
-                <TooltipContent>{action.label}</TooltipContent>
-              </Tooltip>
-            );
-          })}
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    size="icon-xs"
+                    variant="outline"
+                    disabled={action.disabled}
+                    className={quickActionClassName}
+                    onClick={action.onClick}
+                  >
+                    {icon}
+                  </Button>
+                )}
+              </TooltipTrigger>
+              <TooltipContent>{action.label}</TooltipContent>
+            </Tooltip>
+          );
+        })}
 
         <DropdownMenuTrigger asChild ref={actionsMenuTriggerRef}>
           <Button
@@ -125,7 +137,6 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
             variant="outline"
             className="border-transparent text-muted-foreground group-hover/row:border-border hover:bg-white hover:text-foreground hover:shadow-xs data-[state=open]:border-border data-[state=open]:text-foreground"
             data-cy="actions-menu-trigger"
-            disabled={hasNoActions}
           >
             <MoreHorizontal size={18} />
           </Button>
