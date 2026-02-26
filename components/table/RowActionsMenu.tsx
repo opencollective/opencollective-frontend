@@ -81,15 +81,16 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
   const { primary, secondary } = getActions(row.original, actionsMenuTriggerRef) ?? {};
   const hasNoActions = !primary?.length && !secondary?.length && !openDrawer;
 
-  if (!hasNoActions) {
+  if (hasNoActions) {
     return null;
   }
 
-  const quickActions = hasQuickActionsEnabled
-    ? primary
-        .filter(a => a.Icon && !a.disabled) // only actions with Icons can be rendered as quick-actions, and should not be disabled
-        .slice(0, 2) // only show the first 2 primary actions
-    : [];
+  const quickActions =
+    hasQuickActionsEnabled && primary
+      ? primary
+          .filter(a => a.Icon && !a.disabled) // only actions with Icons can be rendered as quick-actions, and should not be disabled
+          .slice(0, 2) // only show the first 2 primary actions
+      : [];
 
   return (
     <DropdownMenu>
