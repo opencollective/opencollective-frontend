@@ -77,4 +77,5 @@ function ButtonGroupSeparator({
   );
 }
 
+// ts-unused-exports:disable-next-line
 export { ButtonGroup, ButtonGroupSeparator, ButtonGroupText, buttonGroupVariants };
