@@ -358,7 +358,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
               onClick={async () => {
                 try {
                   setDownloadingCsv(true);
-                  const filename = `${accountSlug}-contributors.csv`;
+                  const filename = `${accountSlug}-contributors`;
                   const url = `${process.env.REST_URL}/v2/${accountSlug}/contributors.csv?fetchAll=1`;
                   await fetchCSVFileFromRESTService(url, filename);
                 } catch (error) {
