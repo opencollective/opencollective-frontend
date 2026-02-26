@@ -2722,6 +2722,7 @@ export type CollectiveFeatures = {
   CONNECTED_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
   CONTACT_COLLECTIVE?: Maybe<CollectiveFeatureStatus>;
   CONTACT_FORM?: Maybe<CollectiveFeatureStatus>;
+  CONTRIBUTION_CATEGORIZATION_RULES?: Maybe<CollectiveFeatureStatus>;
   CONVERSATIONS?: Maybe<CollectiveFeatureStatus>;
   CREATE_COLLECTIVE?: Maybe<CollectiveFeatureStatus>;
   EMAIL_NOTIFICATIONS_PANEL?: Maybe<CollectiveFeatureStatus>;
@@ -2945,6 +2946,65 @@ export enum ConnectedAccountService {
   thegivingblock = 'thegivingblock',
   transferwise = 'transferwise',
   twitter = 'twitter'
+}
+
+/** A rule for categorizing contributions */
+export type ContributionAccountingCategoryRule = {
+  __typename?: 'ContributionAccountingCategoryRule';
+  accountingCategory: AccountingCategory;
+  createdAt: Scalars['DateTime']['output'];
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  predicates: Array<Scalars['JSONObject']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Input for creating or updating a contribution accounting category rule */
+export type ContributionAccountingCategoryRuleInput = {
+  /** The accounting category to apply the rule to */
+  accountingCategory?: InputMaybe<AccountingCategoryReferenceInput>;
+  /** Whether the rule is enabled */
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  /** The ID of the contribution accounting category rule to edit */
+  id?: InputMaybe<Scalars['String']['input']>;
+  /** The name of the rule */
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** The predicates of the rule */
+  predicates?: InputMaybe<Array<InputMaybe<ContributionAccountingCategoryRulePredicateInput>>>;
+};
+
+/** The operator of the predicate */
+export enum ContributionAccountingCategoryRuleOperator {
+  childrenOf = 'childrenOf',
+  contains = 'contains',
+  eq = 'eq',
+  gte = 'gte',
+  in = 'in',
+  lte = 'lte'
+}
+
+/** Input for creating or updating a contribution accounting category rule predicate */
+export type ContributionAccountingCategoryRulePredicateInput = {
+  /** The operator of the predicate */
+  operator?: InputMaybe<ContributionAccountingCategoryRuleOperator>;
+  /** The subject of the predicate */
+  subject?: InputMaybe<ContributionAccountingCategoryRuleSubject>;
+  /** The value of the predicate */
+  value: Scalars['JSON']['input'];
+};
+
+/** The subject of the predicate */
+export enum ContributionAccountingCategoryRuleSubject {
+  amount = 'amount',
+  currency = 'currency',
+  description = 'description',
+  frequency = 'frequency',
+  fromAccountType = 'fromAccountType',
+  paymentProcessor = 'paymentProcessor',
+  tierType = 'tierType',
+  toAccount = 'toAccount',
+  toAccountType = 'toAccountType'
 }
 
 export enum ContributionFrequency {
@@ -6312,6 +6372,7 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
+  contributionAccountingCategoryRules?: Maybe<Array<ContributionAccountingCategoryRule>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
   contributionStats: ContributionStats;
   /** All the persons and entities that contribute to this account */
@@ -8676,6 +8737,8 @@ export type Mutation = {
   unpublishUpdate: Update;
   updateAccountPlatformSubscription: Account;
   updateApplication?: Maybe<Application>;
+  /** Update the contribution accounting category rules. Returns the account with the updated rules. */
+  updateContributionAccountingCategoryRules: Account;
   /** Update an existing manual payment provider. Scope: "host". */
   updateManualPaymentProvider: ManualPaymentProvider;
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
@@ -9787,6 +9850,13 @@ export type MutationUpdateAccountPlatformSubscriptionArgs = {
 /** This is the root mutation */
 export type MutationUpdateApplicationArgs = {
   application: ApplicationUpdateInput;
+};
+
+
+/** This is the root mutation */
+export type MutationUpdateContributionAccountingCategoryRulesArgs = {
+  account: AccountReferenceInput;
+  rules: Array<ContributionAccountingCategoryRuleInput>;
 };
 
 
