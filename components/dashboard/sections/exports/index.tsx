@@ -1,5 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
+import dayjs from 'dayjs';
 import { Download, FileText, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -165,11 +166,24 @@ const getColumns = ({ intl }) => {
     },
     {
       accessorKey: 'createdAt',
-      header: intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }),
+      header: intl.formatMessage({ defaultMessage: 'Requested At', id: 'RequestedAt' }),
       cell: ({ row }) => {
         const exportRequest = row.original;
         return (
-          <div className="text-sm text-muted-foreground">{new Date(exportRequest.createdAt).toLocaleString()}</div>
+          <div className="text-sm text-muted-foreground">
+            <div>{dayjs(exportRequest.createdAt).format('LLL')}</div>
+            {exportRequest.expiresAt && (
+              <div className="text-xs">
+                <FormattedMessage
+                  id="ContributePayment.expiresOn"
+                  defaultMessage="Expires on {expiryDate}"
+                  values={{
+                    expiryDate: dayjs(exportRequest.expiresAt).format('LL'),
+                  }}
+                />
+              </div>
+            )}
+          </div>
         );
       },
     },
