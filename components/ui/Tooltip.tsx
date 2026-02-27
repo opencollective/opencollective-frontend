@@ -40,4 +40,5 @@ function TooltipContent({
   );
 }
 
+// ts-unused-exports:disable-next-line
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, TooltipPortal };
