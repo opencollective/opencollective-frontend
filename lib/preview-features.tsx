@@ -1,5 +1,4 @@
 import React from 'react';
-import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
@@ -11,8 +10,6 @@ import type LoggedInUser from './LoggedInUser';
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
-  INLINE_EDIT_EXPENSE = 'INLINE_EDIT_EXPENSE',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
   AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
   VERCEL_BACKEND = 'VERCEL_BACKEND',
@@ -195,36 +192,6 @@ export const previewFeatures: PreviewFeature[] = [
     ),
     publicBeta: true,
     category: Categories.GENERAL,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
-    title: <FormattedMessage defaultMessage="New Expense Submission Flow" id="PreviewFeatures.newExpenseFlowTitle" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="Experience an improved expense submission flow in the Dashboard with better user experience, clearer navigation, and enhanced form validation."
-        id="PreviewFeatures.newExpenseFlowDescription"
-      />
-    ),
-    category: Categories.GENERAL,
-    publicBeta: false,
-    enabledByDefaultFor: ['*'],
-    // Hide if not root and not manually enabled
-    hide: (loggedInUser: LoggedInUser) =>
-      !loggedInUser.isRoot &&
-      !get(loggedInUser, `collective.settings.earlyAccess.${PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW}`),
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
-    title: <FormattedMessage defaultMessage="Inline Expense Editing" id="PreviewFeatures.inlineEditExpenseTitle" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="Edit expense details directly in the Dashboard without navigating to separate pages."
-        id="PreviewFeatures.inlineEditExpenseDescription"
-      />
-    ),
-    category: Categories.GENERAL,
-    publicBeta: true,
-    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,

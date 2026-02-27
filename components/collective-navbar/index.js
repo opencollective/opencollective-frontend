@@ -18,12 +18,9 @@ import { display } from 'styled-system';
 import { expenseSubmissionAllowed, getContributeRoute, isIndividualAccount } from '../../lib/collective';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { isSupportedExpenseType } from '../../lib/expenses';
 import { gql } from '../../lib/graphql/helpers';
-import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 import theme from '@/lib/theme';
 
@@ -326,14 +323,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, i
 /**
  * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
  */
-const getMainAction = (
-  collective,
-  callsToAction,
-  LoggedInUser,
-  isNewExpenseFlowEnabled = false,
-  isNewGrantFlowEnabled = false,
-  onOpenSubmitExpenseModalClick = () => {},
-) => {
+const getMainAction = (collective, callsToAction, LoggedInUser, onOpenSubmitExpenseModalClick = () => {}) => {
   if (!collective || !callsToAction) {
     return null;
   }
@@ -362,7 +352,7 @@ const getMainAction = (
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <Link href={`${getCollectivePageRoute(collective)}/${isNewGrantFlowEnabled ? 'grants' : 'expenses'}/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/grants/new`}>
           <ActionButton tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
@@ -375,22 +365,13 @@ const getMainAction = (
   } else if (callsToAction.includes('hasSubmitExpense')) {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
-      component: isNewExpenseFlowEnabled ? (
+      component: (
         <ActionButton tabIndex="-1" onClick={onOpenSubmitExpenseModalClick}>
           <Receipt size="1em" />
           <Span ml={2}>
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </Span>
         </ActionButton>
-      ) : (
-        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`} data-cy="submit-expense-dropdown">
-          <ActionButton tabIndex="-1">
-            <Receipt size="1em" />
-            <Span ml={2}>
-              <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-            </Span>
-          </ActionButton>
-        </Link>
       ),
     };
   } else if (callsToAction.includes('hasManageSubscriptions')) {
@@ -482,12 +463,6 @@ const CollectiveNavbar = ({
 
   const loading = isLoading || dataLoading;
 
-  const isNewGrantFlowEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
-
-  const isNewExpenseFlowEnabled =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
-    (!isSupportedExpenseType(collective, ExpenseType.GRANT) || isNewGrantFlowEnabled);
-
   const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
@@ -497,23 +472,11 @@ const CollectiveNavbar = ({
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(
-    collective,
-    actionsArray,
-    LoggedInUser,
-    isNewExpenseFlowEnabled,
-    isNewGrantFlowEnabled,
-    () => setIsSubmitExpenseModalOpen(true),
-  );
+  const mainAction = getMainAction(collective, actionsArray, LoggedInUser, () => setIsSubmitExpenseModalOpen(true));
   const secondAction =
     actionsArray.length === 2 &&
-    getMainAction(
-      collective,
-      without(actionsArray, mainAction?.type),
-      LoggedInUser,
-      isNewExpenseFlowEnabled,
-      isNewGrantFlowEnabled,
-      () => setIsSubmitExpenseModalOpen(true),
+    getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser, () =>
+      setIsSubmitExpenseModalOpen(true),
     );
   const navbarRef = useRef(undefined);
   const mainContainerRef = useRef(undefined);
