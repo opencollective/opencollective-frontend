@@ -82,12 +82,14 @@ const offPlatformTransactionsQuery = gql`
       type
       policies {
         id
+        publicId
         REQUIRE_2FA_FOR_ADMINS
       }
       accountingCategories @skip(if: $fetchOnlyRowIds) {
         totalCount
         nodes {
           id
+          publicId
           ...AccountingCategorySelectFields
         }
       }
@@ -95,6 +97,7 @@ const offPlatformTransactionsQuery = gql`
         totalCount
         nodes {
           id
+          publicId
           source
           name
         }
@@ -117,9 +120,11 @@ const offPlatformTransactionsQuery = gql`
         limit
         nodes {
           id
+          publicId
           ...TransactionsImportRowFields @skip(if: $fetchOnlyRowIds)
           transactionsImport @skip(if: $fetchOnlyRowIds) {
             id
+            publicId
             source
             name
           }
@@ -132,9 +137,11 @@ const offPlatformTransactionsQuery = gql`
     }
     transactionsImport(id: $importId) @include(if: $hasImportFilter) {
       id
+      publicId
       lastSyncAt
       connectedAccount {
         id
+        publicId
       }
       institutionAccounts {
         id

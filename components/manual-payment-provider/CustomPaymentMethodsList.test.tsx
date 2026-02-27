@@ -23,6 +23,7 @@ const mockAccount = {
 
 const mockProvider: ManualPaymentProvider = {
   id: '1',
+  publicId: '1234567890',
   type: ManualPaymentProviderType.OTHER,
   name: 'Test Payment Method',
   instructions: 'Send {amount} to {account}',
