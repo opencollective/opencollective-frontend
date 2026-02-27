@@ -15,7 +15,7 @@ const StaticJoinCTAButtons = React.forwardRef<HTMLDivElement, JoinCTAButtonsProp
     <div ref={ref} className="flex flex-col gap-4 sm:flex-row">
       <Button asChild variant="marketing" className="rounded-full whitespace-nowrap" size="lg">
         <Link href="/signup/organization?active=true">
-          <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
+          <FormattedMessage defaultMessage="Create Organization Account" id="solutions.hero.joinAsOrg" />
         </Link>
       </Button>
       <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="lg">
