@@ -4,7 +4,8 @@ import type React from 'react';
 export type Action = {
   label: string;
   onClick?: (e: React.MouseEvent) => void;
-  href?: string;
+  href?: string; // used for links
+  target?: string; // used for links
   Icon?: LucideIcon;
   isLoading?: boolean;
   disabled?: boolean;

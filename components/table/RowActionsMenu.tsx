@@ -33,7 +33,7 @@ function DropdownActionItemContent({ action }: { action: Action }) {
 export function DropdownActionItem({ action }: { action: Action }) {
   const item = action.href ? (
     <DropdownMenuItem asChild className="gap-2.5" disabled={action.disabled} data-cy={action['data-cy']}>
-      <Link href={action.href} onClick={action.onClick}>
+      <Link href={action.href} target={action.target} onClick={action.onClick}>
         <DropdownActionItemContent action={action} />
       </Link>
     </DropdownMenuItem>
@@ -95,42 +95,29 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
   return (
     <DropdownMenu>
       <ButtonGroup className="group/actions">
-        {quickActions.map(action => {
-          const icon = <action.Icon size={16} />;
-          const quickActionClassName =
-            'invisible flex border-transparent text-muted-foreground group-hover/row:visible group-hover/row:border-border group-has-data-[state=open]/actions:visible group-has-data-[state=open]/actions:border-border hover:bg-white hover:text-foreground hover:shadow-xs';
-
-          return (
-            <Tooltip key={action.key} disableHoverableContent>
-              <TooltipTrigger asChild>
+        {quickActions.map(action => (
+          <Tooltip key={action.key} disableHoverableContent>
+            <TooltipTrigger asChild>
+              <Button
+                asChild={Boolean(action.href)}
+                size="icon-xs"
+                variant="outline"
+                disabled={action.disabled}
+                className="invisible flex border-transparent text-muted-foreground group-hover/row:visible group-hover/row:border-border group-has-data-[state=open]/actions:visible group-has-data-[state=open]/actions:border-border hover:bg-white hover:text-foreground hover:shadow-xs"
+                onClick={action.onClick}
+              >
                 {action.href ? (
-                  <Button
-                    asChild
-                    size="icon-xs"
-                    variant="outline"
-                    disabled={action.disabled}
-                    className={quickActionClassName}
-                  >
-                    <Link href={action.href} onClick={action.onClick}>
-                      {icon}
-                    </Link>
-                  </Button>
+                  <Link href={action.href} target={action.target}>
+                    <action.Icon size={16} />
+                  </Link>
                 ) : (
-                  <Button
-                    size="icon-xs"
-                    variant="outline"
-                    disabled={action.disabled}
-                    className={quickActionClassName}
-                    onClick={action.onClick}
-                  >
-                    {icon}
-                  </Button>
+                  <action.Icon size={16} />
                 )}
-              </TooltipTrigger>
-              <TooltipContent>{action.label}</TooltipContent>
-            </Tooltip>
-          );
-        })}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{action.label}</TooltipContent>
+          </Tooltip>
+        ))}
 
         <DropdownMenuTrigger asChild ref={actionsMenuTriggerRef}>
           <Button

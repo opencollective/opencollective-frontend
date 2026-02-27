@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import type { GetActions } from '@/lib/actions/types';
+import type { Action, GetActions } from '@/lib/actions/types';
 import { i18nGraphqlException } from '@/lib/errors';
 import { formatFileSize } from '@/lib/file-utils';
 import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
@@ -342,10 +342,10 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
     [intl, removeExportRequest, showConfirmationModal, toast],
   );
 
-  const getActions: GetActions<ExportRequestNode> = React.useCallback(
+  const getActions = React.useCallback<GetActions<ExportRequestNode>>(
     exportRequest => {
-      const primary = [];
-      const secondary = [];
+      const primary: Action[] = [];
+      const secondary: Action[] = [];
 
       if (exportRequest?.status === ExportRequestStatus.COMPLETED && exportRequest.file) {
         primary.push({
@@ -354,6 +354,7 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
           Icon: Download,
           href: exportRequest.file.url,
           target: '_blank',
+          onClick: () => console.log('click'),
         });
       }
 
@@ -361,7 +362,6 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
         key: 'delete',
         label: intl.formatMessage({ defaultMessage: 'Delete', id: 'actions.delete' }),
         Icon: Trash2,
-        variant: 'danger',
         onClick: () => handleRemove(exportRequest),
       });
 
