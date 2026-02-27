@@ -1,11 +1,11 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import dayjs from 'dayjs';
 import { Download, FileText, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import dayjs from '@/lib/dayjs';
 import { i18nGraphqlException } from '@/lib/errors';
 import { formatFileSize } from '@/lib/file-utils';
 import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
