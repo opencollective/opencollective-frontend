@@ -79,6 +79,17 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
   const { toast } = useToast();
   const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation);
   const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery);
+  const maskCard = { mask: Array.from({ length: 22 }, (_, i) => (i % 6 < 4 ? /\d/ : ' ')) };
+  const maskCvc = { mask: [/\d/, /\d/, /\d/] };
+  const maskExp = {
+    mask: [/[01]/, /\d/, '/', '2', '0', /\d/, /\d/],
+    postprocessors: [
+      ({ value, selection }, initial) =>
+        value.length === 2 && initial.value.length === 1
+          ? { value: `${value}/20`, selection: [5, 5] }
+          : { value, selection },
+    ],
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -329,32 +340,9 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
                   {...inputProps}
                   name="cardNumber"
                   id="cardNumber"
-                  onChange={formik.handleChange}
+                  onInput={formik.handleChange}
                   value={formik.values.cardNumber}
-                  mask={[
-                    /\d/,
-                    /\d/,
-                    /\d/,
-                    /\d/,
-                    ' ',
-                    ' ',
-                    /\d/,
-                    /\d/,
-                    /\d/,
-                    /\d/,
-                    ' ',
-                    ' ',
-                    /\d/,
-                    /\d/,
-                    /\d/,
-                    /\d/,
-                    ' ',
-                    ' ',
-                    /\d/,
-                    /\d/,
-                    /\d/,
-                    /\d/,
-                  ]}
+                  maskito={maskCard}
                   render={(ref, props) => (
                     <StyledInputGroup
                       prepend={<CreditCard height="18px" style={{ marginTop: '-1px' }} />}
@@ -379,9 +367,9 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
                   {...inputProps}
                   name="expiryDate"
                   id="expiryDate"
-                  onChange={formik.handleChange}
+                  onInput={formik.handleChange}
                   value={formik.values.expiryDate}
-                  mask={[/[01]/, /\d/, '/', '2', '0', /\d/, /\d/]}
+                  maskito={maskExp}
                   placeholder="MM/YYYY"
                   guide={false}
                   disabled={isBusy}
@@ -399,9 +387,9 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
                   {...inputProps}
                   id="cvv"
                   name="cvv"
-                  onChange={formik.handleChange}
+                  onInput={formik.handleChange}
                   value={formik.values.cvv}
-                  mask={[/\d/, /\d/, /\d/]}
+                  maskito={maskCvc}
                   guide={false}
                   placeholder="123"
                   disabled={isBusy}
