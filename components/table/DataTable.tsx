@@ -60,6 +60,7 @@ interface DataTableProps<TData, TValue> {
   rowSelection?: Record<string, boolean>;
   setRowSelection?: OnChangeFn<RowSelectionState>;
   enableMultiRowSelection?: boolean;
+  showQuickActions?: boolean;
 }
 
 const defaultGetRowId = (data: any) => data.id;
@@ -90,6 +91,7 @@ export function DataTable<TData, TValue>({
   rowSelection: rowSelectionFromProps,
   setRowSelection: setRowSelectionFromProps,
   enableMultiRowSelection,
+  showQuickActions,
   meta, // TODO: Possibly remove this prop once the getActions pattern is implemented fully
   ...tableProps
 }: DataTableProps<TData, TValue>) {
@@ -125,6 +127,7 @@ export function DataTable<TData, TValue>({
       hasDefaultColumnVisibility,
       setColumnVisibility,
       defaultColumnVisibility,
+      showQuickActions,
       ...meta,
     },
   });

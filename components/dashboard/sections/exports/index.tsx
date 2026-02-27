@@ -397,6 +397,7 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
             getActions={getActions}
             onClickRow={row => pushSubpath(row.original.id)}
             mobileTableView
+            showQuickActions
           />
           <Pagination queryFilter={queryFilter} total={data?.exportRequests?.totalCount} />
         </div>
