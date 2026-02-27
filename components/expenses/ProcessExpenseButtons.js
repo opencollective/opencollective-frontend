@@ -91,7 +91,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
         message: (
           <React.Fragment>
             <Link
-              href={`/dashboard/${host.slug}/${LoggedInUser.hasEnabledPreviewFeature(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) ? ALL_SECTIONS.PAY_DISBURSEMENTS : ALL_SECTIONS.HOST_EXPENSES}`}
+              href={`/dashboard/${host.slug}/${LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) ? ALL_SECTIONS.PAY_DISBURSEMENTS : ALL_SECTIONS.HOST_EXPENSES}`}
             >
               <FormattedMessage
                 id="PayExpenseModal.RefillBalanceError"

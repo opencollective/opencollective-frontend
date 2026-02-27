@@ -63,7 +63,7 @@ describe('Host agreements', () => {
 
     // ---- Agreement count should be displayed in the expenses list ----
     cy.getByDataCy('menu-item-Expenses').click();
-    cy.getByDataCy('menu-item-host-expenses').should('be.visible').click();
+    cy.getByDataCy('menu-item-pay-disbursements').should('be.visible').click();
     cy.contains('[data-cy="expense-container-2340"]', 'Vegan Dining Week Client Dinner').as('expense');
 
     // ---- Agreement count should be displayed on the expense ----

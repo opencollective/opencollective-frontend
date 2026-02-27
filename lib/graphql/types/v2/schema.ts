@@ -5609,6 +5609,7 @@ export type ExportRequestReferenceInput = {
 export enum ExportRequestStatus {
   COMPLETED = 'COMPLETED',
   ENQUEUED = 'ENQUEUED',
+  EXPIRED = 'EXPIRED',
   FAILED = 'FAILED',
   PROCESSING = 'PROCESSING'
 }

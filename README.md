@@ -42,6 +42,8 @@ This project requires an access to the Open Collective API.
 
 By default, it will try to connect to the Open Collective staging API, **you don't have to change anything**.
 
+**Logging in with staging:** Because captcha is not configured by default in local development, you need to create an account on [staging.opencollective.com](https://staging.opencollective.com/) first. You can then use this account to log in on your local frontend.
+
 In case you want to connect to the Open Collective API running locally:
 
 - clone, install and start [opencollective-api](https://github.com/opencollective/opencollective-api)

@@ -19946,6 +19946,7 @@ enum ExportRequestStatus {
   PROCESSING
   COMPLETED
   FAILED
+  EXPIRED
 }
 
 """
