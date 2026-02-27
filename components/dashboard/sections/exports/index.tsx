@@ -368,7 +368,6 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
           Icon: Download,
           href: exportRequest.file.url,
           target: '_blank',
-          onClick: () => console.log('click'),
         });
       }
 
