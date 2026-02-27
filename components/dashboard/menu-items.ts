@@ -345,7 +345,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Store,
     },
     {
-      if: !isIndividual && hasMoneyManagement,
+      if: !isIndividual && !isAccountantOnly && hasMoneyManagement,
       label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
       section: ALL_SECTIONS.PEOPLE,
       Icon: Users2,
@@ -468,7 +468,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isAccountantOnly,
       section: ALL_SECTIONS.UPDATES,
       Icon: Megaphone,
     },
