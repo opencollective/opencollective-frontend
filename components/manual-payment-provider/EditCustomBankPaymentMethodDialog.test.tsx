@@ -73,6 +73,7 @@ const mockHost = {
 
 const mockProvider: ManualPaymentProvider = {
   id: 'provider-1',
+  publicId: '1234567890',
   type: ManualPaymentProviderType.BANK_TRANSFER,
   name: 'Test Bank',
   instructions: '<p>Test bank instructions</p>',

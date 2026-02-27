@@ -168,7 +168,7 @@ const throttledCall = debounce((searchFunc, variables) => {
 type EditVirtualCardModalProps = {
   host: Account;
   collective?: Account;
-  virtualCard?: VirtualCard;
+  virtualCard?: Omit<VirtualCard, 'publicId'>;
   virtualCardRequest?: VirtualCardRequest;
   onSuccess: (el: React.ReactNode) => void;
   onClose: () => void;

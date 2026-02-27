@@ -48,6 +48,7 @@ const dashboardAccountsQueryFields = gql`
         slug
         policies {
           id
+          publicId
           REQUIRE_2FA_FOR_ADMINS
         }
       }
