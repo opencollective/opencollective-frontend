@@ -55,6 +55,7 @@ const editAccountFragment = gql`
     isHost
     tags
     location {
+      id
       name
       address
       country

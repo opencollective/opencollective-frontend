@@ -260,9 +260,6 @@ const FiscalHosting = ({ collective }) => {
         slug: collective.slug,
       },
     },
-    {
-      query: loggedInUserQuery,
-    },
   ];
 
   return (
