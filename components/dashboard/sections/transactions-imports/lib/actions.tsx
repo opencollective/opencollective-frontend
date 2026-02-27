@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { cloneDeep, pick, uniq, update } from 'lodash';
 import { ArchiveRestore, Banknote, Merge, PauseCircle, Receipt, SquareSlashIcon, Unlink } from 'lucide-react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
@@ -13,7 +13,6 @@ import type {
 import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2/graphql';
 
 import { useModal } from '../../../../ModalContext';
-import Spinner from '../../../../Spinner';
 import { useToast } from '../../../../ui/useToast';
 import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
@@ -176,7 +175,7 @@ export const useTransactionsImportActions = ({
       actions.primary.push({
         key: 'revert',
         Icon: Unlink,
-        label: <FormattedMessage defaultMessage="Unlink" id="Transaction.Unlink" />,
+        label: intl.formatMessage({ defaultMessage: 'Unlink', id: 'Transaction.Unlink' }),
         disabled: isUpdatingRow,
         onClick: () => {
           showModal(
@@ -195,7 +194,7 @@ export const useTransactionsImportActions = ({
         actions.primary.push({
           key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match" id="Qr9R5O" />,
+          label: intl.formatMessage({ defaultMessage: 'Match', id: 'Qr9R5O' }),
           disabled: isUpdatingRow,
           onClick: () =>
             showModal(
@@ -217,7 +216,7 @@ export const useTransactionsImportActions = ({
         actions.primary.push({
           key: 'add-funds',
           Icon: Banknote,
-          label: <FormattedMessage defaultMessage="Add funds" id="sx0aSl" />,
+          label: intl.formatMessage({ defaultMessage: 'Add funds', id: 'sx0aSl' }),
           disabled: isUpdatingRow,
           onClick: showAddFundsModal,
         });
@@ -225,7 +224,7 @@ export const useTransactionsImportActions = ({
         actions.primary.push({
           key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match" id="Qr9R5O" />,
+          label: intl.formatMessage({ defaultMessage: 'Match', id: 'Qr9R5O' }),
           disabled: isUpdatingRow,
           onClick: () => {
             showModal(
@@ -238,7 +237,7 @@ export const useTransactionsImportActions = ({
         actions.primary.push({
           key: 'create-expense',
           Icon: Receipt,
-          label: <FormattedMessage defaultMessage="Create expense" id="YUK+rq" />,
+          label: intl.formatMessage({ defaultMessage: 'Create expense', id: 'YUK+rq' }),
           disabled: isUpdatingRow,
           onClick: () => {
             showModal(
@@ -257,12 +256,8 @@ export const useTransactionsImportActions = ({
         Icon: PauseCircle,
         onClick: () => setRowsStatus([row.id], TransactionsImportRowStatus.ON_HOLD),
         disabled: isUpdatingRow,
-        label: (
-          <div>
-            <FormattedMessage defaultMessage="Put on Hold" id="+pCc8I" />
-            {isUpdatingRow && <Spinner size={14} className="ml-2" />}
-          </div>
-        ),
+        isLoading: isUpdatingRow,
+        label: intl.formatMessage({ defaultMessage: 'Put on Hold', id: '+pCc8I' }),
       });
     } else {
       actions.primary.push({
@@ -270,12 +265,8 @@ export const useTransactionsImportActions = ({
         Icon: ArchiveRestore,
         onClick: () => setRowsStatus([row.id], TransactionsImportRowStatus.PENDING),
         disabled: isUpdatingRow,
-        label: (
-          <div>
-            <FormattedMessage defaultMessage="Restore" id="zz6ObK" />
-            {isUpdatingRow && <Spinner size={14} className="ml-2" />}
-          </div>
-        ),
+        isLoading: isUpdatingRow,
+        label: intl.formatMessage({ defaultMessage: 'Restore', id: 'zz6ObK' }),
       });
     }
 
@@ -285,13 +276,8 @@ export const useTransactionsImportActions = ({
         Icon: SquareSlashIcon,
         onClick: () => setRowsStatus([row.id], TransactionsImportRowStatus.IGNORED),
         disabled: isUpdatingRow,
-        label: (
-          <div>
-            <FormattedMessage defaultMessage="No action" id="zue9QR" />
-
-            {isUpdatingRow && <Spinner size={14} className="ml-2" />}
-          </div>
-        ),
+        isLoading: isUpdatingRow,
+        label: intl.formatMessage({ defaultMessage: 'No action', id: 'zue9QR' }),
       });
     }
 
