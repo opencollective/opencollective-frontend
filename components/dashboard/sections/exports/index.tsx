@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import type { GetActions } from '@/lib/actions/types';
 import dayjs from '@/lib/dayjs';
 import { i18nGraphqlException } from '@/lib/errors';
 import { formatFileSize } from '@/lib/file-utils';
@@ -355,8 +356,8 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
     [intl, removeExportRequest, showConfirmationModal, toast],
   );
 
-  const getActions = React.useCallback(
-    (exportRequest: ExportRequestNode) => {
+  const getActions: GetActions<ExportRequestNode> = React.useCallback(
+    exportRequest => {
       const primary = [];
       const secondary = [];
 
@@ -365,9 +366,8 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
           key: 'download',
           label: intl.formatMessage({ defaultMessage: 'Download', id: 'Download' }),
           Icon: Download,
-          onClick: () => {
-            window.open(exportRequest.file.url, '_blank');
-          },
+          href: exportRequest.file.url,
+          target: '_blank',
         });
       }
 
