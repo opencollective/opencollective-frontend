@@ -6,7 +6,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash';
 import { Eraser } from 'lucide-react';
 import type { MouseEventHandler } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
 import { setRestAuthorizationCookie } from '../../lib/auth';
@@ -322,6 +322,7 @@ const ExportTransactionsCSVModal = ({
   const exportRequestFileUrl = exportRequestData?.exportRequest?.file?.url;
   // Type assertion needed until GraphQL types are regenerated
   const exportRequestError = (exportRequestData?.exportRequest as { error?: string } | undefined)?.error;
+  const exportRequestExpiresAt = (exportRequestData?.exportRequest as { expiresAt?: string } | undefined)?.expiresAt;
   const isExportCompleted = exportRequestStatus === 'COMPLETED' && exportRequestFileUrl;
 
   const handleGenerateExport = React.useCallback(async () => {
@@ -359,6 +360,16 @@ const ExportTransactionsCSVModal = ({
   const handleBackToConfiguration = React.useCallback(() => {
     setStep(ModalStep.CONFIGURE);
   }, []);
+
+  const handleClose = React.useCallback(
+    (open: boolean) => {
+      if (!open) {
+        setStep(ModalStep.CONFIGURE);
+      }
+      setOpen?.(open);
+    },
+    [setOpen],
+  );
 
   const totalAvailableFields = React.useMemo(
     () => FIELDS.filter(({ id: fieldId }) => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))).length,
@@ -613,7 +624,7 @@ const ExportTransactionsCSVModal = ({
 
   return (
     <React.Fragment>
-      <Dialog open={open && !isDeletingPreset} onOpenChange={setOpen}>
+      <Dialog open={open && !isDeletingPreset} onOpenChange={handleClose}>
         {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
         <DialogContent className="gap-2 overflow-hidden p-0 md:max-w-4xl">
           <DialogHeader className="px-4 pt-6 sm:px-8">
@@ -687,9 +698,20 @@ const ExportTransactionsCSVModal = ({
                         defaultMessage="Your export has been generated and is ready for download."
                       />
                     </p>
+                    {exportRequestExpiresAt && (
+                      <p className="text-sm text-slate-500">
+                        <FormattedMessage
+                          id="ExportRequest.ExpiresAt"
+                          defaultMessage="This export will expire on {expiresAt}."
+                          values={{
+                            expiresAt: <FormattedDate dateStyle="medium" value={exportRequestExpiresAt} />,
+                          }}
+                        />
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button variant="success" asChild>
+                    <Button asChild>
                       <Link href={exportRequestFileUrl} target="_blank">
                         <FormattedMessage id="DownloadExport" defaultMessage="Download Export" />
                       </Link>
