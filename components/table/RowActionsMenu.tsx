@@ -67,12 +67,15 @@ interface RowActionsMenuProps<TData> {
 
 export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: RowActionsMenuProps<TData>) {
   const { LoggedInUser } = useLoggedInUser();
-  const hasQuickActionsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.TABLE_QUICK_ACTIONS);
+  const hasQuickActionsPreviewEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.TABLE_QUICK_ACTIONS,
+  );
 
   if (!row.original) {
     return null;
   }
-  const { getActions, openDrawer } = table.options.meta;
+  const { getActions, openDrawer, showQuickActions } = table.options.meta;
+  const hasQuickActionsEnabled = showQuickActions || hasQuickActionsPreviewEnabled;
 
   if (!getActions) {
     return null;
