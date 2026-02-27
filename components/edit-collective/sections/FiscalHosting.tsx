@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import { API_V1_CONTEXT, gql } from '@/lib/graphql/helpers';
-import { loggedInUserQuery } from '@/lib/graphql/queries';
 import type { FiscalHostingQuery } from '@/lib/graphql/types/v2/graphql';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
