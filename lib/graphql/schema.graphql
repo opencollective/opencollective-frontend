@@ -1163,7 +1163,12 @@ type PlanType {
 }
 
 type Policies {
-  id: String
+  id: String @deprecated(reason: "2026-02-25: use publicId")
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
   EXPENSE_POLICIES: EXPENSE_POLICIES
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
