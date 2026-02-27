@@ -1,7 +1,7 @@
 import 'cypress-mailpit';
 
 import { API_V1_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
-import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
+import { loggedInUserQuery } from '../../../lib/graphql/queries';
 
 import { CreditCards } from '../../stripe-helpers';
 
@@ -740,12 +740,11 @@ export function graphqlQueryV2(token, body) {
 }
 
 function getLoggedInUserFromToken(token) {
-  return graphqlQuery(token, {
+  return graphqlQueryV2(token, {
     operationName: 'LoggedInUser',
     query: loggedInUserQuery.loc.source.body,
-    context: API_V1_CONTEXT,
   }).then(({ body }) => {
-    return body.data.LoggedInUser;
+    return body.data.loggedInAccount;
   });
 }
 

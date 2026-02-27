@@ -10,15 +10,15 @@ import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectivePageMutation } from '../../../lib/graphql/v1/mutations';
 import { editCollectivePageQuery } from '../../../lib/graphql/v1/queries';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
+import { loggedInUserQuery } from '@/lib/graphql/queries';
 
 import SettingsForm from '../../edit-collective/Form';
 import Loading from '../../Loading';
 import { useToast } from '../../ui/useToast';
 import { ALL_SECTIONS } from '../constants';
-import { adminPanelQuery } from '../queries';
 
 const AccountSettings = ({ account, section }) => {
-  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
+  const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
   const [state, setState] = React.useState({ status: undefined, result: undefined });
   const { toast } = useToast();
@@ -108,7 +108,7 @@ const AccountSettings = ({ account, section }) => {
         variables: { collective: CollectiveInputType },
         // It's heavy, but we need to refetch the information of the account after a mutation as fundamental
         // properties like its name or whether it's a fiscal host can change.
-        refetchQueries: [{ query: adminPanelQuery, variables: { slug: account.slug } }],
+        refetchQueries: [{ query: loggedInUserQuery }],
       });
       const updatedCollective = response.data.editCollective;
       setState({ ...state, status: 'saved', result: { error: null } });
@@ -120,7 +120,7 @@ const AccountSettings = ({ account, section }) => {
             ...router.query,
           },
         });
-        await refetchLoggedInUser();
+        // await refetchLoggedInUser();
       } else {
         setTimeout(() => {
           setState({ ...state, status: null });

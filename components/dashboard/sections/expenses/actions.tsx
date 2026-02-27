@@ -566,7 +566,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
           key: 'mark-as-spam',
           label: intl.formatMessage({ defaultMessage: 'Mark as Spam', id: 'actions.spam' }),
           onClick: () => {
-            const isSubmitter = expense.createdByAccount?.legacyId === LoggedInUser?.CollectiveId;
+            const isSubmitter = expense.createdByAccount?.legacyId === LoggedInUser?.legacyId;
 
             if (isSubmitter) {
               toast({

@@ -247,7 +247,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   const [step, setStep] = React.useState(STEPS.INFORMATION);
   const contentRef = React.useRef(undefined);
   const canApply = Boolean(data?.host?.isOpenToApplications);
-  const collectives = map(get(data, 'loggedInAccount.memberOf.nodes'), 'account');
+  const collectives = map(get(data, 'loggedInAccount.workspaces.nodes'), 'account');
   const selectedCollective = collective
     ? { ...collective, ...pick(data?.account, ['admins', 'memberInvitations']) }
     : collectives.length === 1

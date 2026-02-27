@@ -296,7 +296,7 @@ const ProcessExpenseButtons = ({
           variant="outlineDestructive"
           data-cy="spam-button"
           onClick={() => {
-            const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.CollectiveId;
+            const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.legacyId;
 
             if (isSubmitter) {
               toast({

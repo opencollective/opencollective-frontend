@@ -35,7 +35,7 @@ class RedeemForm extends React.Component {
         form: {
           code,
           email: LoggedInUser.email,
-          name: LoggedInUser.collective.name,
+          name: LoggedInUser.name,
         },
       };
     } else {

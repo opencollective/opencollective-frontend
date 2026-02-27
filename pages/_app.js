@@ -9,7 +9,6 @@ import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import '../lib/analytics/plausible';
-import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import { getIntlProps } from '../lib/i18n/request';
 import theme from '../lib/theme';
 import defaultColors from '../lib/theme/colors';
@@ -45,7 +44,7 @@ import memoizeOne from 'memoize-one';
 import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
 import { getTokenFromCookie } from '../lib/auth';
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
-import { loggedInUserQuery } from '../lib/graphql/v1/queries';
+import { loggedInUserQuery } from '../lib/graphql/queries';
 import { WhitelabelProviderContext } from '../lib/hooks/useWhitelabel';
 import LoggedInUser from '../lib/LoggedInUser';
 import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
@@ -120,10 +119,9 @@ class OpenCollectiveFrontendApp extends App {
         try {
           const result = await apolloClient.query({
             query: loggedInUserQuery,
-            context: API_V1_CONTEXT,
             fetchPolicy: 'network-only',
           });
-          props.LoggedInUserData = result.data.LoggedInUser;
+          props.LoggedInUserData = result.data.loggedInAccount;
         } catch (err) {
           Sentry.captureException(err);
         }

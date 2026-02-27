@@ -1,5 +1,4 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
 import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -9,14 +8,13 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
   ALL_SECTIONS,
-  ROOT_PROFILE_ACCOUNT,
   ROOT_PROFILE_KEY,
   ROOT_SECTIONS,
   SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS,
@@ -24,7 +22,6 @@ import {
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
-import { adminPanelQuery } from '../components/dashboard/queries';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
@@ -34,7 +31,6 @@ import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequire
 import { useWorkspace } from '../components/WorkspaceProvider';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
-import ErrorPage from '@/components/ErrorPage';
 import Header from '@/components/Header';
 import I18nFormatters from '@/components/I18nFormatters';
 import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
@@ -58,11 +54,11 @@ const messages = defineMessages({
   },
 });
 
-const getDefaultSectionForAccount = (account, loggedInUser) => {
-  if (!account) {
-    return null;
-  } else if (account.type === 'ROOT') {
+const getDefaultSectionForAccount = (account, loggedInUser, isRootDashboard) => {
+  if (isRootDashboard) {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
+  } else if (!account) {
+    return null;
   } else if (loggedInUser?.isAccountantOnly(account) && account.hasHosting) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else if (loggedInUser?.isAccountantOnly(account)) {
@@ -151,7 +147,7 @@ const getNotification = (intl, account) => {
  */
 const getProfileUrl = (
   loggedInUser: LoggedInUser,
-  contextAccount: DashboardQuery['account'],
+  contextAccount: WorkspaceAccount,
   account: { id: string; slug: string; type: string },
 ) => {
   if (!contextAccount) {
@@ -174,15 +170,17 @@ const getProfileUrl = (
   return null;
 };
 
-function getBlocker(LoggedInUser, account, section) {
+function getBlocker(LoggedInUser, account, section, isRootDashboard) {
+  if (isRootDashboard) {
+    return null;
+  }
+
   if (!LoggedInUser) {
     return <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />;
   } else if (!account) {
     return <FormattedMessage defaultMessage="This account doesn't exist" id="3ABdi3" />;
   } else if (account.isIncognito) {
     return <FormattedMessage defaultMessage="You cannot edit this collective" id="ZonfjV" />;
-  } else if (account.type === 'ROOT' && LoggedInUser.isRoot) {
-    return;
   }
 
   // Check permissions
@@ -246,33 +244,40 @@ const DashboardPage = () => {
   const intl = useIntl();
   const router = useRouter();
   const { slug, section, subpath } = parseQuery(router.query);
-  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
-  const { workspace, setWorkspace } = useWorkspace();
+  const { LoggedInUser, loadingLoggedInUser, refetchLoggedInUser } = useLoggedInUser();
+  const { workspace: savedWorkspace, setWorkspace } = useWorkspace();
   const isRootUser = LoggedInUser?.isRoot;
-  const defaultSlug = workspace.slug || LoggedInUser?.collective.slug;
+  const defaultSlug = savedWorkspace.slug || LoggedInUser?.slug;
   const activeSlug = slug || defaultSlug;
-  const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
+  const isRootDashboard = activeSlug === ROOT_PROFILE_KEY && LoggedInUser?.isRoot;
 
-  const { data, loading, error } = useQuery(adminPanelQuery, {
-    variables: { slug: activeSlug },
-    skip: !activeSlug || !LoggedInUser || isRootProfile,
-  });
-  const account = isRootProfile && isRootUser ? ROOT_PROFILE_ACCOUNT : data?.account;
-  const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
+  const account = LoggedInUser?.getWorkspace(activeSlug) ?? null;
+
+  // When a workspace account isn't found (e.g. navigating to a newly created event/project),
+  // refetch once to pick up the new account in the workspace data.
+  const lastRefetchedSlug = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (activeSlug && LoggedInUser && !account && !isRootDashboard && lastRefetchedSlug.current !== activeSlug) {
+      lastRefetchedSlug.current = activeSlug;
+      refetchLoggedInUser();
+    }
+  }, [activeSlug, LoggedInUser, account, isRootDashboard, refetchLoggedInUser]);
+
+  const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser, isRootDashboard);
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
     if (activeSlug) {
       if (LoggedInUser) {
-        const membership = LoggedInUser.memberOf.find(val => val.collective.slug === activeSlug);
-        setWorkspace({ slug: activeSlug, isHost: membership?.collective.isHost });
+        const ws = LoggedInUser.getWorkspace(activeSlug);
+        setWorkspace({ slug: activeSlug, isHost: ws?.isHost });
       }
     }
     // If there is no slug set (that means /dashboard)
     // And if there is an activeSlug (this means workspace OR LoggedInUser)
     // And a LoggedInUser
     // And if activeSlug is different than LoggedInUser slug
-    if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
+    if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.slug) {
       router.replace(`/dashboard/${activeSlug}`);
     }
     if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
@@ -280,27 +285,29 @@ const DashboardPage = () => {
     }
     // If slug is `me` and there is a LoggedInUser, redirect to the user's dashboard
     if (slug === 'me' && LoggedInUser) {
-      router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
+      router.replace(`/dashboard/${LoggedInUser.slug}${section ? `/${section}` : ''}`);
     }
   }, [activeSlug, LoggedInUser]);
 
   // Clear last visited workspace account if not admin
   React.useEffect(() => {
-    if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootProfile && isRootUser)) {
+    if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootDashboard && isRootUser)) {
       setWorkspace({ slug: undefined });
     }
   }, [account]);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
-  const isLoading = loading || loadingLoggedInUser;
-  const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
+
+  // Only wait for LoggedInUser to load, not for adminPanelQuery
+  const isLoading = loadingLoggedInUser;
+  const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection, isRootDashboard);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const accountIdentifier = account && (account.name || `@${account.slug}`);
 
-  if (!loading && !account && error) {
-    return <ErrorPage error={error} />;
-  }
+  // if (!accountLoading && !account && error) {
+  //   return <ErrorPage error={error} />;
+  // }
 
   return (
     <DashboardContext.Provider
@@ -314,6 +321,7 @@ const DashboardPage = () => {
         defaultSlug,
         setDefaultSlug: slug => setWorkspace({ slug }),
         getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
+        isRootDashboard,
       }}
     >
       <Header
@@ -328,7 +336,7 @@ const DashboardPage = () => {
           <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
             <p>{blocker}</p>
             {LoggedInUser && (
-              <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
+              <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.slug}`}>
                 <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
               </Link>
             )}
@@ -353,12 +361,7 @@ const DashboardPage = () => {
                   <TwoFactorAuthRequiredMessage className="lg:mt-16" />
                 ) : (
                   <div className="max-w-(--breakpoint-xl) min-w-0 flex-1 2xl:max-w-(--breakpoint-2xl)">
-                    <DashboardSection
-                      section={selectedSection}
-                      isLoading={isLoading}
-                      account={account}
-                      subpath={subpath}
-                    />
+                    <DashboardSection section={selectedSection} isLoading={isLoading} subpath={subpath} />
                   </div>
                 )}
               </div>

@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Lock } from '@styled-icons/material/Lock';
 import { get } from 'lodash';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import commentTypes from '../../lib/constants/commentTypes';
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { gql } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';
@@ -20,7 +21,6 @@ import SignInOrJoinFree, { SignInOverlayBackground } from '../SignInOrJoinFree';
 import StyledCheckbox from '../StyledCheckbox';
 import { P } from '../Text';
 import { Button } from '../ui/Button';
-import { withUser } from '../UserProvider';
 
 import { commentFieldsFragment } from './graphql';
 
@@ -92,23 +92,22 @@ const prepareCommentParams = (html, conversationId, expenseId, updateId, hostApp
  * If user is not logged in, the form will default to a sign in/up form.
  */
 const CommentForm = ({
-  id,
-  ConversationId,
-  ExpenseId,
-  UpdateId,
-  HostApplicationId,
-  onSuccess,
-  router,
-  loadingLoggedInUser,
-  LoggedInUser,
-  isDisabled,
-  canUsePrivateNote,
+  id = undefined,
+  ConversationId = undefined,
+  ExpenseId = undefined,
+  UpdateId = undefined,
+  HostApplicationId = undefined,
+  onSuccess = undefined,
+  isDisabled = false,
+  canUsePrivateNote = false,
   defaultType = commentTypes.COMMENT,
-  replyingToComment,
+  replyingToComment = undefined,
   minHeight = 250,
-  submitButtonJustify,
-  submitButtonVariant,
+  submitButtonJustify = undefined,
+  submitButtonVariant = undefined,
 }) => {
+  const router = useRouter();
+  const { loadingLoggedInUser, LoggedInUser } = useLoggedInUser();
   const [createComment, { loading, error }] = useMutation(createCommentMutation);
   const intl = useIntl();
   const [html, setHtml] = useState('');
@@ -234,4 +233,4 @@ const CommentForm = ({
   );
 };
 
-export default withUser(withRouter(CommentForm));
+export default CommentForm;

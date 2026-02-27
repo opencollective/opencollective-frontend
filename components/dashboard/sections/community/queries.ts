@@ -47,6 +47,7 @@ export const peopleHostDashboardQuery = gql`
           isGuest
           email
           location {
+            id
             country
           }
           kycStatus(requestedByAccount: { slug: $slug }) {

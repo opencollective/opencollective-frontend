@@ -1,6 +1,5 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { get } from 'lodash';
 import type { LucideIcon } from 'lucide-react';
 import {
   BookOpen,
@@ -18,7 +17,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';
-import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
@@ -31,6 +29,7 @@ import SignupLogin from '../SignupLogin';
 import { Badge } from '../ui/Badge';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Separator } from '../ui/Separator';
+import type { UserContextValue } from '../UserProvider';
 
 import { DrawerMenu } from './DrawerMenu';
 import { ProfileMenuIconsMap } from './Icons';
@@ -101,7 +100,7 @@ const MenuItem = ({
   );
 };
 
-const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserContextProps['logout']>[0] }) => {
+const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserContextValue['logout']>[0] }) => {
   const whitelabel = useWhitelabelProvider();
   const router = useRouter();
   const intl = useIntl();
@@ -112,7 +111,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
   const { data } = useQuery(memberInvitationsCountQuery, {
-    variables: { memberAccount: { slug: LoggedInUser?.collective?.slug } },
+    variables: { memberAccount: { slug: LoggedInUser?.slug } },
     skip: !LoggedInUser,
 
     // We ignore errors here because the logout action can trigger refetch before LoggedInUser is set to null and we don't really care if this query fails
@@ -140,21 +139,21 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
         <div className="flex flex-col sm:w-[228px]">
           <div className="flex flex-col gap-1 py-2">
             <div className="flex items-center gap-2 px-2 py-1">
-              <Avatar collective={LoggedInUser.collective} radius={32} />
+              <Avatar collective={LoggedInUser} radius={32} />
               <div className="truncate">
-                <div className="truncate text-sm font-medium">{LoggedInUser.collective.name}</div>
+                <div className="truncate text-sm font-medium">{LoggedInUser.name}</div>
                 <div className="truncate text-xs text-muted-foreground">{LoggedInUser.email}</div>
               </div>
             </div>
             <Separator className="my-1" />
             <MenuItem
               Icon={User}
-              href={`/${LoggedInUser.collective.slug}`}
+              href={`/${LoggedInUser.slug}`}
               label={intl.formatMessage({ id: 'menu.profile', defaultMessage: 'Profile' })}
             />
             <MenuItem
               Icon={LayoutDashboard}
-              href={`/dashboard/${LoggedInUser.collective.slug}`}
+              href={`/dashboard/${LoggedInUser.slug}`}
               label={intl.formatMessage({
                 id: 'Dashboard',
                 defaultMessage: 'Dashboard',
@@ -192,7 +191,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
             )}
             <MenuItem
               Icon={Settings}
-              href={`/dashboard/${LoggedInUser.collective.slug}/info`}
+              href={`/dashboard/${LoggedInUser.slug}/info`}
               label={intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' })}
             />
             <Separator className="my-1" />
@@ -252,7 +251,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
             className="rounded-full ring-black ring-offset-1 focus:ring-2 focus:outline-hidden"
             data-cy="user-menu-trigger"
           >
-            <Avatar collective={get(LoggedInUser, 'collective')} radius={32} />
+            <Avatar collective={LoggedInUser} radius={32} />
           </button>
         </PopoverTrigger>
         {!isMobile && (

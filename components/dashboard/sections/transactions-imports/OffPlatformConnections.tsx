@@ -44,6 +44,7 @@ const offPlatformConnectionsQuery = gql`
       id
       slug
       location {
+        id
         country
       }
       transactionsImports(limit: $limit, offset: $offset, type: [PLAID, GOCARDLESS]) {

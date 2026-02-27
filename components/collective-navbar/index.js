@@ -671,7 +671,7 @@ const CollectiveNavbar = ({
               onClose={(isSubmitted, hasSelectedViewAll) => {
                 setIsSubmitExpenseModalOpen(false);
                 if (isSubmitted && hasSelectedViewAll) {
-                  router.push(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
+                  router.push(`/dashboard/${LoggedInUser.slug}/submitted-expenses`);
                 }
               }}
               submitExpenseTo={collective?.slug}

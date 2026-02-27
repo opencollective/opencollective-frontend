@@ -767,7 +767,7 @@ describe('Expense flow', () => {
         type: 'INVOICE',
         userEmail: user.email,
         account: { legacyId: collective.id },
-        payee: { legacyId: user.CollectiveId },
+        payee: { id: user.id },
         description: 'Expense for E2E tests',
       }).then(createdExpense => {
         expense = createdExpense;

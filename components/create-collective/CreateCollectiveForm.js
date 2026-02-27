@@ -298,8 +298,8 @@ class CreateCollectiveForm extends React.Component {
                           </Flex>
                           <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
                             <OnboardingProfileCard
-                              key={loggedInUser.collective.id}
-                              collective={loggedInUser.collective}
+                              key={loggedInUser.legacyId}
+                              collective={loggedInUser.toV1Collective()}
                             />
                             {values.inviteMembers?.map(invite => (
                               <OnboardingProfileCard

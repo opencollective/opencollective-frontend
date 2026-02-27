@@ -18,6 +18,7 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
+import { isOrganization } from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
@@ -576,8 +577,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           <VendorForm
             host={dashboardAccount}
             supportsTaxForm={
-              'host' in dashboardAccount &&
-              'requiredLegalDocuments' in dashboardAccount.host &&
+              isOrganization(dashboardAccount) &&
               dashboardAccount.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)
             }
             vendor={editVendor}

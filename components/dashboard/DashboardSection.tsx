@@ -3,7 +3,6 @@ import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
 import { KYCRequests } from '../kyc/dashboard/KYCRequests';
@@ -166,16 +165,15 @@ interface DashboardSectionProps {
   isLoading?: boolean;
   section?: string;
   subpath?: string[];
-  /** The account. Can be null if isLoading is true */
-  account?: DashboardQuery['account'];
 }
 
-const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSectionProps) => {
+const DashboardSection = ({ isLoading, section, subpath }: DashboardSectionProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  const { activeSlug } = useContext(DashboardContext);
+  const { activeSlug, account } = useContext(DashboardContext);
 
   const { formatMessage } = useIntl();
 
+  // Only show the full loading placeholder when LoggedInUser hasn't loaded yet
   if (isLoading) {
     return (
       <div className="w-full pb-6">
@@ -184,6 +182,9 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
       </div>
     );
   }
+
+  // Use activeSlug for accountSlug (available immediately), account may still be loading
+  const accountSlug = activeSlug;
 
   const RootComponent = ROOT_COMPONENTS[section];
   if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
@@ -201,7 +202,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
     return (
       <div className="h-full w-full">
         <DashboardErrorBoundary>
-          <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
+          <DashboardComponent accountSlug={accountSlug} subpath={subpath} isDashboard />
         </DashboardErrorBoundary>
       </div>
     );
@@ -213,19 +214,19 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
     return (
       <div className="w-full">
         <DashboardErrorBoundary>
-          <LegacySettingsComponent accountSlug={account.slug} subpath={subpath} />
+          <LegacySettingsComponent accountSlug={accountSlug} subpath={subpath} />
         </DashboardErrorBoundary>
       </div>
     );
   }
 
-  // Settings component
+  // Settings component -- requires account for legacy AccountSettings wrapper
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
       <div className="mx-auto w-full max-w-(--breakpoint-md)">
         <DashboardErrorBoundary>
-          <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+          <SettingsComponent account={account} accountSlug={accountSlug} subpath={subpath} />
         </DashboardErrorBoundary>
       </div>
     );
