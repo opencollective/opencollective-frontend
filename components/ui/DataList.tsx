@@ -23,9 +23,20 @@ export function DataListItemValue({
   );
 }
 
-export function DataListItemLabel({ children, className }: { children?: React.ReactNode; className?: string }) {
+export function DataListItemLabel({
+  children,
+  className,
+  title,
+}: {
+  children?: React.ReactNode;
+  className?: string;
+  title?: string;
+}) {
   return (
-    <div className={cn('max-w-[240px] min-w-[180px] shrink-0 grow-0 basis-1/4 text-muted-foreground', className)}>
+    <div
+      className={cn('max-w-[240px] min-w-[180px] shrink-0 grow-0 basis-1/4 text-muted-foreground', className)}
+      title={title}
+    >
       {children}
     </div>
   );

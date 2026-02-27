@@ -433,6 +433,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const getActions = usePersonActions({
     accountSlug,
     hasKYCFeature: false,
+    hasPersonaKYCFeature: false,
     editVendor: setCreateEditVendor,
     archiveVendor: handleArchiveToggle,
   });
