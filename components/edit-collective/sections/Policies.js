@@ -76,6 +76,11 @@ const setPoliciesMutation = gql`
           requiredForCollectiveAdmins
         }
         EXPENSE_PUBLIC_VENDORS
+        REQUIRE_PAYPAL_VERIFICATION {
+          enabled
+          appliesToHostedCollectives
+          verificationValidityDays
+        }
       }
     }
   }
@@ -977,6 +982,57 @@ const Policies = ({ collective }) => {
                     formik.setFieldValue('policies', newPolicies);
                   }}
                 />
+              </div>
+            </Container>
+
+            <Container>
+              <SettingsSectionTitle>
+                <FormattedMessage defaultMessage="PayPal account verification" id="PayPal.Verification.Title" />
+              </SettingsSectionTitle>
+              <div className="mb-1">
+                <p className="mb-2 text-sm">
+                  <FormattedMessage
+                    defaultMessage="Require payees to connect and verify their PayPal account via OAuth before they can submit expenses using PayPal as payout method. This helps prevent fraud by ensuring the PayPal account is legitimate and belongs to the payee."
+                    id="PayPal.Verification.Description"
+                  />
+                </p>
+                <StyledCheckbox
+                  name="checkbox-REQUIRE_PAYPAL_VERIFICATION-enabled"
+                  label={
+                    <FormattedMessage
+                      defaultMessage="Require verified PayPal accounts for PayPal expense submissions"
+                      id="PayPal.Verification.RequireVerified"
+                    />
+                  }
+                  checked={Boolean(formik.values.policies?.REQUIRE_PAYPAL_VERIFICATION?.enabled)}
+                  onChange={({ checked }) => {
+                    const newPolicies = cloneDeep(formik.values.policies);
+                    set(newPolicies, 'REQUIRE_PAYPAL_VERIFICATION.enabled', checked);
+                    if (!checked) {
+                      set(newPolicies, 'REQUIRE_PAYPAL_VERIFICATION.appliesToHostedCollectives', false);
+                    }
+                    formik.setFieldValue('policies', newPolicies);
+                  }}
+                />
+                {hasHosting && formik.values.policies?.REQUIRE_PAYPAL_VERIFICATION?.enabled && (
+                  <div className="mt-2 ml-6">
+                    <StyledCheckbox
+                      name="checkbox-REQUIRE_PAYPAL_VERIFICATION-appliesToHostedCollectives"
+                      label={
+                        <FormattedMessage
+                          defaultMessage="Apply this policy to all collectives hosted by this fiscal host"
+                          id="PayPal.Verification.AppliesToHostedCollectives"
+                        />
+                      }
+                      checked={Boolean(formik.values.policies?.REQUIRE_PAYPAL_VERIFICATION?.appliesToHostedCollectives)}
+                      onChange={({ checked }) => {
+                        const newPolicies = cloneDeep(formik.values.policies);
+                        set(newPolicies, 'REQUIRE_PAYPAL_VERIFICATION.appliesToHostedCollectives', checked);
+                        formik.setFieldValue('policies', newPolicies);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </Container>
 
