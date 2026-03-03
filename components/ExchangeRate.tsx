@@ -7,7 +7,7 @@ import type { CurrencyExchangeRate, CurrencyExchangeRateInput } from '../lib/gra
 import { cn } from '../lib/utils';
 
 import { Input } from './ui/Input';
-import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from './ui/Tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 import { formatFxRateInfo } from './AmountWithExchangeRateInfo';
 import Spinner from './Spinner';
 
@@ -98,11 +98,9 @@ export const ExchangeRate = ({
           )}
         </div>
       </TooltipTrigger>
-      <TooltipPortal>
-        <TooltipContent data-cy={`${dataCy}-tooltip`}>
-          {formatFxRateInfo(intl, exchangeRate, { approximateCustomMessage, warning, error })}
-        </TooltipContent>
-      </TooltipPortal>
+      <TooltipContent data-cy={`${dataCy}-tooltip`}>
+        {formatFxRateInfo(intl, exchangeRate, { approximateCustomMessage, warning, error })}
+      </TooltipContent>
     </Tooltip>
   );
 };
