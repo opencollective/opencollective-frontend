@@ -354,7 +354,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
           <FormattedMessage id="People.Description" defaultMessage="People that interacted with your organization." />
         }
       />
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} hideCounts />
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && contributors.length === 0 ? (

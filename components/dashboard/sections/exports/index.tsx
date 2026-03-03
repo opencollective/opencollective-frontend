@@ -397,7 +397,7 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
           />
         }
       />
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} hideCounts />
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && exportRequests.length === 0 ? (
