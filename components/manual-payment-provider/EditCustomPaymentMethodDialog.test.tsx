@@ -35,6 +35,7 @@ jest.mock('../RichTextEditor', () => ({
 }));
 
 const mockProvider: ManualPaymentProvider = {
+  publicId: '1234567890',
   id: 'provider-1',
   type: ManualPaymentProviderType.OTHER,
   name: 'Test Provider',

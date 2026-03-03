@@ -14,6 +14,7 @@ export type CSVField =
   | 'effectiveDate'
   | 'id'
   | 'legacyId'
+  | 'publicId'
   | 'shortId'
   | 'shortGroup'
   | 'group'
@@ -54,12 +55,14 @@ export type CSVField =
   | 'hostType'
   | 'orderId'
   | 'orderLegacyId'
+  | 'orderPublicId'
   | 'orderFrequency'
   | 'orderProcessedDate'
   | 'orderCustomData'
   | 'paymentMethodService'
   | 'paymentMethodType'
   | 'expenseId'
+  | 'expensePublicId'
   | 'expenseLegacyId'
   | 'expenseType'
   | 'expenseTags'
@@ -72,6 +75,7 @@ export type CSVField =
   | 'taxIdNumber'
   | 'debitAndCreditAmounts'
   | 'refundLegacyId'
+  | 'refundPublicId'
   | 'expenseTotalAmount'
   | 'expenseCurrency'
   | 'expenseSubmittedByHandle'
@@ -92,6 +96,7 @@ export type CSVField =
   | 'isReverse'
   | 'isReversed'
   | 'reverseId'
+  | 'reversePublicId'
   | 'reverseLegacyId'
   | 'reverseKind';
 
@@ -103,6 +108,7 @@ export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   effectiveDate: 'Effective Date',
   id: 'Transaction ID',
   legacyId: 'Legacy Transaction ID',
+  publicId: 'Public Transaction ID',
   shortId: 'Short Transaction ID',
   shortGroup: 'Short Group ID',
   group: 'Group ID',
@@ -142,6 +148,7 @@ export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   hostName: 'Host Name',
   hostType: 'Host Type',
   orderId: 'Contribution ID',
+  orderPublicId: 'Public Contribution ID',
   orderLegacyId: 'Legacy Contribution ID',
   orderFrequency: 'Contribution Frequency',
   orderMemo: 'Contribution Memo',
@@ -150,6 +157,7 @@ export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   paymentMethodService: 'Payment Method Service',
   paymentMethodType: 'Payment Method Type',
   expenseId: 'Expense ID',
+  expensePublicId: 'Expense Public ID',
   expenseLegacyId: 'Legacy Expense ID',
   expenseType: 'Expense Type',
   expenseTags: 'Expense Tags',
@@ -218,6 +226,12 @@ export const FIELDS: Array<{
     group: 'transaction',
     tooltip: <FormattedMessage defaultMessage="A unique serial transaction identifier." id="ufJYd0" />,
     label: 'Transaction ID',
+  },
+  {
+    id: 'publicId',
+    group: 'transaction',
+    tooltip: <FormattedMessage defaultMessage="A unique public transaction identifier." id="HqK6q0" />,
+    label: 'Public Transaction ID',
   },
   {
     id: 'group',
@@ -530,6 +544,12 @@ export const FIELDS: Array<{
     label: 'Contribution ID',
   },
   {
+    id: 'orderPublicId',
+    group: 'order',
+    tooltip: <FormattedMessage defaultMessage="A unique public contribution identifier." id="6Ectq+" />,
+    label: 'Public Contribution ID',
+  },
+  {
     id: 'orderMemo',
     group: 'order',
     tooltip: (
@@ -572,6 +592,12 @@ export const FIELDS: Array<{
     group: 'expense',
     tooltip: <FormattedMessage defaultMessage="A unique platform identifier for an expense." id="ndQbVX" />,
     label: 'Expense ID',
+  },
+  {
+    id: 'expensePublicId',
+    group: 'expense',
+    tooltip: <FormattedMessage defaultMessage="A unique public expense identifier." id="M9Rxft" />,
+    label: 'Expense Public ID',
   },
   {
     id: 'expenseType',
@@ -730,6 +756,12 @@ export const FIELDS: Array<{
     label: 'Reverse Transaction ID',
   },
   {
+    id: 'reversePublicId',
+    group: 'transaction',
+    tooltip: <FormattedMessage defaultMessage="A unique public refund identifier." id="vidheT" />,
+    label: 'Public Refund ID',
+  },
+  {
     id: 'reverseKind',
     group: 'transaction',
     label: 'Reverse Kind',
@@ -883,6 +915,12 @@ export const FIELDS: Array<{
     id: 'refundId',
     group: 'legacy',
     label: 'Refund ID',
+  },
+  {
+    id: 'refundPublicId',
+    group: 'legacy',
+    tooltip: <FormattedMessage defaultMessage="A unique public refund identifier." id="vidheT" />,
+    label: 'Public Refund ID',
   },
   {
     id: 'isRefund',
