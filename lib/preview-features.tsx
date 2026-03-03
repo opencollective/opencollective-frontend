@@ -309,7 +309,6 @@ export const previewFeatures: PreviewFeature[] = [
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,
     alwaysEnableInDev: true,
-    dependsOn: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS,
   },
   {
     key: PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS,
