@@ -295,7 +295,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           if: hasIncomingOutgoingReorg,
-          section: ALL_SECTIONS.SUBMITTED_EXPENSES,
+          section: ALL_SECTIONS.ISSUED_PAYMENT_REQUESTS,
           label: intl.formatMessage({ defaultMessage: 'Issued Payment Requests', id: 'IssuedPaymentRequests' }),
         },
       ],

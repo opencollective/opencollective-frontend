@@ -155,6 +155,7 @@ export const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
     $hostSlug: String!
     $hostContext: HostContext
+    $direction: ExpenseDirection
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
@@ -179,6 +180,7 @@ export const hostDashboardExpensesQuery = gql`
     expenses(
       host: { slug: $hostSlug }
       hostContext: $hostContext
+      direction: $direction
       account: $account
       fromAccount: $fromAccount
       fromAccounts: $fromAccounts

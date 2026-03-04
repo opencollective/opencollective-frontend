@@ -1,36 +1,44 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { omit } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import type { Currency } from '@/lib/graphql/types/v2/graphql';
-import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
+import { ExpenseDirection, ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { SubmitExpenseFlow } from '../../../submit-expense/SubmitExpenseFlow';
 import { Button } from '../../../ui/Button';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
+import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
 import type { FilterMeta } from './filters';
-import { ExpenseAccountingCategoryKinds, filters, schema, toVariables } from './filters';
-import { accountExpensesQuery } from './queries';
+import { ExpenseAccountingCategoryKinds, filters, schema as baseSchema, toVariables } from './filters';
+import { hostDashboardExpensesQuery } from './queries';
 
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 
-const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
+const schema = baseSchema.extend({
+  hostContext: hostContextFilter.schema,
+});
+
+const IssuedPaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
+  const intl = useIntl();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
   const { LoggedInUser } = useLoggedInUser();
+  const { account } = useContext(DashboardContext);
 
   const omitExpenseTypes = [ExpenseType.GRANT];
 
@@ -38,16 +46,13 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     schema,
     toVariables,
     filters,
+    ...(account?.hasHosting ? { skipFiltersOnReset: ['hostContext'] } : {}),
   });
-  const createdByAccount = accountSlug === LoggedInUser?.collective.slug ? { slug: accountSlug } : null;
-  const fromAccount = !createdByAccount ? { slug: accountSlug } : null;
 
   const variables = {
-    collectiveSlug: accountSlug,
-    createdByAccount,
-    fromAccount,
-    fetchHostForExpenses: true,
-    hasAmountInCreatedByAccountCurrency: true, // To generate the `amountInCreatedByAccountCurrency` field below
+    hostSlug: accountSlug,
+    direction: ExpenseDirection.SUBMITTED,
+    hostContext: account?.hasHosting ? queryFilter.values.hostContext : undefined,
     fetchGrantHistory: false,
     ...queryFilter.variables,
   };
@@ -57,7 +62,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     loading,
     error,
     refetch: refetchExpenses,
-  } = useQuery(accountExpensesQuery, {
+  } = useQuery(hostDashboardExpensesQuery, {
     variables,
   });
 
@@ -70,16 +75,24 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const hasNewSubmitExpenseFlow =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
 
-  const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
+  const pageRoute = `/dashboard/${accountSlug}/issued-payment-requests`;
 
   return (
     <React.Fragment>
       <div className="flex flex-col gap-4">
         <DashboardHeader
-          title={<FormattedMessage defaultMessage="Issued Payment Requests" id="IssuedPaymentRequests" />}
-          // description={
-          //   <FormattedMessage defaultMessage="Expenses that you have submitted to other accounts." id="aKfm6V" />
-          // }
+          title={
+            <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
+              <FormattedMessage defaultMessage="Issued Payment Requests" id="IssuedPaymentRequests" />
+              {account?.hasHosting && (
+                <HostContextFilter
+                  value={queryFilter.values.hostContext}
+                  onChange={val => queryFilter.setFilter('hostContext', val)}
+                  intl={intl}
+                />
+              )}
+            </div>
+          }
           description={
             <FormattedMessage
               defaultMessage="Payment requests submitted by your organization to other platform accounts."
@@ -115,15 +128,14 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
           <React.Fragment>
             <ExpensesList
               isLoading={loading}
-              collective={data?.account}
-              host={data?.account?.isHost ? data?.account : data?.account?.host}
+              collective={data?.host}
+              host={data?.host}
               expenses={data?.expenses?.nodes}
               nbPlaceholders={queryFilter.values.limit}
               isInverted
               view={'submitter-new'}
               useDrawer
               openExpenseLegacyId={Number(router.query.openExpenseId)}
-              expenseFieldForTotalAmount="amountInCreatedByAccountCurrency"
               onDuplicateClick={expenseId => {
                 setDuplicateExpenseId(expenseId);
                 setIsExpenseFlowOpen(true);
@@ -161,4 +173,4 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   );
 };
 
-export default SubmittedExpenses;
+export default IssuedPaymentRequests;
