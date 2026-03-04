@@ -134,7 +134,7 @@
     "otplib": "13.2.1",
     "styled-components": "6.1.19",
     "styled-system": "5.1.5",
-    "tailwind-merge": "3.4.0",
+    "tailwind-merge": "3.5.0",
     "throng": "5.0.0",
     "trix": "2.1.16",
     "uuid": "13.0.0",
