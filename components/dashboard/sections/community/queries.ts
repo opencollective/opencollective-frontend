@@ -30,7 +30,6 @@ export const peopleHostDashboardQuery = gql`
       limit: $limit
       orderBy: $orderBy
     ) {
-      totalCount
       limit
       offset
       nodes {
