@@ -38,7 +38,7 @@ import { buildSortFilter } from '../filters/SortFilter';
 import type { DashboardSectionProps } from '../types';
 import { makePushSubpath } from '../utils';
 
-import { ContributorDetails } from './community/AccountDetail';
+import { AccountDetails } from './community/AccountDetail';
 import { usePersonActions } from './community/common';
 
 enum VendorsTab {
@@ -460,7 +460,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
   if (!isEmpty(id)) {
     return (
       <div className="h-full">
-        <ContributorDetails
+        <AccountDetails
           account={{ id: subpath[0] }}
           host={account}
           onClose={() => pushSubpath('')}

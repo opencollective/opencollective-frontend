@@ -186,7 +186,7 @@ export const communityAccountDetailQuery = gql`
             ...KYCVerificationFields
           }
         }
-        adminOf: memberOf(role: [ADMIN], accountType: [ORGANIZATION, VENDOR]) {
+        adminOf: memberOf(role: [ADMIN], accountType: [ORGANIZATION, VENDOR, COLLECTIVE, FUND]) {
           nodes {
             id
             role
@@ -218,7 +218,7 @@ export const communityAccountDetailQuery = gql`
       ... on Vendor {
         ...VendorFields
       }
-      members(role: [ADMIN, ACCOUNTANT, MEMBER, COMMUNITY_MANAGER]) {
+      admins: members(role: [ADMIN]) {
         nodes {
           id
           role

@@ -24,6 +24,7 @@ import { ContributionDrawer } from '@/components/contributions/ContributionDrawe
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import { KYCTabPeopleDashboard } from '@/components/kyc/dashboard/KYCTabPeopleDashboard';
+import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import StackedAvatars from '@/components/StackedAvatars';
 import StyledModal from '@/components/StyledModal';
@@ -79,14 +80,14 @@ enum AccountDetailView {
   KYC = 'KYC',
 }
 
-type ContributionDrawerProps = {
+type AccountDetailsProps = {
   onClose: () => void;
   account?: AccountReferenceInput;
   host?: DashboardContextType['account'];
   expectedAccountType?: AccountType;
 };
 
-export function ContributorDetails(props: ContributionDrawerProps) {
+export function AccountDetails(props: AccountDetailsProps) {
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const intl = useIntl();
   const { toast } = useToast();
@@ -187,6 +188,12 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const relations = compact(account?.communityStats?.relations).filter(
     (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes(CommunityRelationType.PAYEE)),
   );
+  const isOrgOrCollective = [AccountType.ORGANIZATION, AccountType.COLLECTIVE].includes(
+    account?.type || props.expectedAccountType,
+  );
+  const adminOf = account && 'adminOf' in account ? account.adminOf.nodes : [];
+  const admins = account && 'admins' in account ? account.admins.nodes : [];
+  const adminList = isOrgOrCollective ? admins : adminOf;
 
   const legalName = account?.legalName !== account?.name && account?.legalName;
   const taxForms = query.data?.host?.hostedLegalDocuments;
@@ -266,69 +273,55 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           </React.Fragment>
         }
       />
-      <div className="mt-2 flex justify-between">
-        {isLoading ? (
-          <Skeleton className="h-4 w-32" />
-        ) : (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {relations.length > 0 && (
-              <React.Fragment>
-                <div className="flex gap-1 align-middle">
-                  {relations.map(role => (
-                    <Badge key={role} size="sm" type="outline">
-                      {formatCommunityRelation(intl, role)}
-                    </Badge>
-                  ))}
-                </div>
-                <Dot size={14} />
-              </React.Fragment>
-            )}
-            <div className="flex items-center gap-1">
-              <BookKey size={14} />
-              <CopyID
-                value={props.account.id}
-                tooltipLabel={<FormattedMessage defaultMessage="Copy Account ID" id="D+P5Yx" />}
-                className="inline-flex items-center gap-1"
-                Icon={null}
-              >
-                {props.account.id.split('-')[0]}...
-              </CopyID>
-            </div>
-            {account && 'email' in account && (
-              <React.Fragment>
-                <Dot size={14} />
-                <div className="flex items-center gap-1">
-                  <Mail size={14} />
-                  <CopyID
-                    value={account.email}
-                    tooltipLabel={<FormattedMessage defaultMessage="Copy Email" id="8NlxGY" />}
-                    className="inline-flex items-center gap-1"
-                    Icon={null}
-                  >
-                    {account.email}
-                  </CopyID>
-                </div>
-              </React.Fragment>
-            )}
-            {account?.location?.country && (
-              <React.Fragment>
-                <Dot size={14} />
-                <div className="flex items-center gap-1">
-                  <span>{getFlagEmoji(account.location.country)}</span>
-                  <span>{getCountryDisplayName(intl, account.location.country)}</span>
-                </div>
-              </React.Fragment>
-            )}
-            {account?.socialLinks?.length > 0 && (
-              <React.Fragment>
-                <Dot size={14} />
-                <HeroSocialLinks className="size-6" socialLinks={account.socialLinks} />
-              </React.Fragment>
-            )}
+      {isLoading ? (
+        <Skeleton className="h-4 w-32" />
+      ) : (
+        <div className="mt-2 flex flex-wrap items-center gap-2 overflow-hidden text-xs text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <BookKey size={14} />
+            <CopyID
+              value={props.account.id}
+              tooltipLabel={<FormattedMessage defaultMessage="Copy Account ID" id="D+P5Yx" />}
+              className="inline-flex items-center gap-1"
+              Icon={null}
+            >
+              {props.account.id.split('-')[0]}...
+            </CopyID>
           </div>
-        )}
-      </div>
-      <div className="mt-4 flex flex-grow flex-col gap-8">
+          {account && 'email' in account && (
+            <React.Fragment>
+              <Dot size={14} />
+              <div className="flex items-center gap-1 overflow-hidden">
+                <Mail size={14} />
+                <CopyID
+                  value={account.email}
+                  tooltipLabel={<FormattedMessage defaultMessage="Copy Email" id="8NlxGY" />}
+                  className="inline-flex items-center gap-1"
+                  Icon={null}
+                >
+                  {account.email}
+                </CopyID>
+              </div>
+            </React.Fragment>
+          )}
+          {account?.location?.country && (
+            <React.Fragment>
+              <Dot size={14} />
+              <div className="flex items-center gap-1">
+                <span>{getFlagEmoji(account.location.country)}</span>
+                <span>{getCountryDisplayName(intl, account.location.country)}</span>
+              </div>
+            </React.Fragment>
+          )}
+          {account?.socialLinks?.length > 0 && (
+            <React.Fragment>
+              <Dot size={14} />
+              <HeroSocialLinks className="size-6" socialLinks={account.socialLinks} />
+            </React.Fragment>
+          )}
+        </div>
+      )}
+      <div className="mt-4 flex flex-grow flex-col gap-4">
         {query.error ? (
           <MessageBoxGraphqlError error={query.error} />
         ) : (
@@ -338,88 +331,28 @@ export function ContributorDetails(props: ContributionDrawerProps) {
               className="grid grid-cols-1 gap-12 aria-hidden:hidden xl:grid-cols-4"
               aria-hidden={selectedTab !== AccountDetailView.OVERVIEW}
             >
-              <div className="space-y-4 xl:order-2">
-                <h2 className="tight text-xl font-bold text-slate-800">
-                  <FormattedMessage defaultMessage="Details" id="Details" />
-                </h2>
-
-                <InfoList
-                  variant="compact"
-                  className="grid-cols-1 rounded-lg border p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1"
-                >
+              <div className="flex flex-col gap-4 sm:flex-row xl:order-2 xl:flex-col">
+                <InfoList variant="compact" className="flex grow-1 flex-col rounded-lg border p-4 xl:grow-0">
+                  <h2 className="tight text-lg font-bold text-slate-800">
+                    <FormattedMessage defaultMessage="Details" id="Details" />
+                  </h2>
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
                     value={account?.legalName}
                     isLoading={isLoading}
+                    className="text-nowrap"
                   />
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
                     value={account?.name || account?.slug}
                     isLoading={isLoading}
+                    className="text-nowrap"
                   />
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
                     value={
                       (account?.location?.country || account?.location?.address) && (
                         <LocationAddress location={account.location} />
-                      )
-                    }
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={
-                      account?.type === 'VENDOR' ? (
-                        <FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />
-                      ) : (
-                        <FormattedMessage defaultMessage="Joined the platform on" id="Vf1x2A" />
-                      )
-                    }
-                    value={account?.createdAt && <DateTime value={account.createdAt} dateStyle="long" />}
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="First interaction with Host" id="mJq3cC" />}
-                    value={
-                      account?.communityStats?.firstInteractionAt && (
-                        <RichActivityDate
-                          date={account?.communityStats?.firstInteractionAt}
-                          activity={query.data?.firstActivity?.nodes?.[0]}
-                        />
-                      )
-                    }
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="Last interaction with Host" id="0k5yUb" />}
-                    value={
-                      account?.communityStats?.lastInteractionAt && (
-                        <RichActivityDate
-                          date={account?.communityStats?.lastInteractionAt}
-                          activity={query.data?.lastActivity?.nodes?.[0]}
-                        />
-                      )
-                    }
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="Tax form" id="TaxForm" />}
-                    value={
-                      taxForms?.nodes[0] && (
-                        <div className="flex flex-col items-start gap-1">
-                          <AccountTaxFormStatus
-                            taxForm={taxForms.nodes[0]}
-                            host={query.data?.host}
-                            onRefetch={() => query.refetch()}
-                          />
-                          {taxForms?.totalCount > 1 && (
-                            <Link
-                              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
-                              href={getDashboardRoute(dashboardAccount, `host-tax-forms?account=${account?.slug}`)}
-                            >
-                              <FormattedMessage defaultMessage="View all" id="TaxForm.ViewAll" />
-                            </Link>
-                          )}
-                        </div>
                       )
                     }
                     isLoading={isLoading}
@@ -474,6 +407,120 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                     </React.Fragment>
                   )}
                 </InfoList>
+                <InfoList variant="compact" className="flex grow-1 flex-col rounded-lg border p-4 xl:grow-0">
+                  <h2 className="tight text-lg font-bold text-slate-800">
+                    <FormattedMessage defaultMessage="Insights" id="Insights" />
+                  </h2>
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Roles" id="Roles" />}
+                    value={
+                      relations.length > 0 && (
+                        <div className="flex flex-wrap items-baseline gap-1">
+                          {relations.map(role => (
+                            <Badge key={role} size="sm" type="outline" className="text-nowrap">
+                              {formatCommunityRelation(intl, role)}
+                            </Badge>
+                          ))}
+                        </div>
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={
+                      [AccountType.ORGANIZATION, AccountType.COLLECTIVE].includes(
+                        account?.type || props.expectedAccountType,
+                      ) ? (
+                        <FormattedMessage defaultMessage="Administrators" id="Administrators" />
+                      ) : (
+                        <FormattedMessage defaultMessage="Admin of" id="AdminOf" />
+                      )
+                    }
+                    value={
+                      adminList.length > 0 && (
+                        <div className="flex flex-wrap items-baseline gap-2">
+                          {adminList.map(member => (
+                            <Badge key={member.id} size="sm" type="outline" className="text-nowrap">
+                              <LinkCollective
+                                key={member.id}
+                                collective={member.account}
+                                withHoverCard
+                                className="flex items-center gap-1 text-nowrap"
+                              >
+                                <Avatar collective={member.account} size={16} />
+                                {member.account.name || member.account.slug}
+                              </LinkCollective>
+                            </Badge>
+                          ))}
+                        </div>
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Tax form" id="TaxForm" />}
+                    value={
+                      taxForms?.nodes[0] && (
+                        <div className="flex flex-col items-start gap-1">
+                          <AccountTaxFormStatus
+                            taxForm={taxForms.nodes[0]}
+                            host={query.data?.host}
+                            onRefetch={() => query.refetch()}
+                          />
+                          {taxForms?.totalCount > 1 && (
+                            <Link
+                              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
+                              href={getDashboardRoute(dashboardAccount, `host-tax-forms?account=${account?.slug}`)}
+                            >
+                              <FormattedMessage defaultMessage="View all" id="TaxForm.ViewAll" />
+                            </Link>
+                          )}
+                        </div>
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                </InfoList>
+                <InfoList variant="compact" className="flex grow-1 flex-col rounded-lg border p-4 xl:grow-0">
+                  <h2 className="tight text-lg font-bold text-slate-800 md:col-span-2 lg:col-span-3 xl:col-span-1">
+                    <FormattedMessage defaultMessage="Platform" id="Platform" />
+                  </h2>
+                  <InfoListItem
+                    title={
+                      account?.type === 'VENDOR' ? (
+                        <FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />
+                      ) : (
+                        <FormattedMessage defaultMessage="Joined the platform on" id="Vf1x2A" />
+                      )
+                    }
+                    value={account?.createdAt && <DateTime value={account.createdAt} dateStyle="long" />}
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="First interaction with Host" id="mJq3cC" />}
+                    value={
+                      account?.communityStats?.firstInteractionAt && (
+                        <RichActivityDate
+                          date={account?.communityStats?.firstInteractionAt}
+                          activity={query.data?.firstActivity?.nodes?.[0]}
+                        />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Last interaction with Host" id="0k5yUb" />}
+                    value={
+                      account?.communityStats?.lastInteractionAt && (
+                        <RichActivityDate
+                          date={account?.communityStats?.lastInteractionAt}
+                          activity={query.data?.lastActivity?.nodes?.[0]}
+                        />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                </InfoList>
               </div>
               <div className="space-y-4 xl:order-1 xl:col-span-3">
                 <h2 className="text-xl font-bold text-slate-800">
@@ -506,7 +553,10 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                         <FormattedMessage
                           defaultMessage="Organizations managed by this {type, select, ORGANIZATION {organization} INDIVIDUAL {individual} VENDOR {vendor} other {account}}."
                           id="psQUwJ"
-                          values={{ type: account?.type || props.expectedAccountType, hostName: dashboardAccount.name }}
+                          values={{
+                            type: account?.type || props.expectedAccountType,
+                            hostName: dashboardAccount.name,
+                          }}
                         />
                       </p>
                     </h2>
