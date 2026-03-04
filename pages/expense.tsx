@@ -14,7 +14,7 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/u
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import ErrorPage from '../components/ErrorPage';
-import Expense, { EXPENSE_PAGE_POLLING_INTERVAL } from '../components/expenses/Expense';
+import Expense from '../components/expenses/Expense';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import { expensePageQuery } from '../components/expenses/graphql/queries';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
@@ -37,7 +37,6 @@ const getPropsFromQuery = query => {
     legacyExpenseId: parseInt(query.ExpenseId),
     draftKey: query.key || null,
     collectiveSlug: query.collectiveSlug,
-    edit: query.edit,
   };
 };
 
@@ -99,21 +98,10 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
     addParentToURLIfMissing(router, queryResult.data?.expense?.account, `/expenses/${props.legacyExpenseId}`);
   });
 
-  const { collectiveSlug, edit, draftKey } = props;
+  const { collectiveSlug, draftKey } = props;
   const data = queryResult.data;
   const error = queryResult.error;
-  const { refetch, fetchMore, startPolling, stopPolling } = queryResult;
-
-  const onSubmitExpenseModalOpenChange = React.useCallback(
-    isOpen => {
-      if (isOpen) {
-        stopPolling?.();
-      } else {
-        startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
-      }
-    },
-    [startPolling, stopPolling],
-  );
+  const { refetch, fetchMore } = queryResult;
 
   if (!queryResult.loading) {
     if (!data || error) {
@@ -135,12 +123,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
 
   return (
     <Page collective={collective} canonicalURL={`${getCollectivePageCanonicalURL(collective)}/expense`} {...metadata}>
-      <CollectiveNavbar
-        collective={collective}
-        isLoading={!collective}
-        selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-        onSubmitExpenseModalOpenChange={onSubmitExpenseModalOpenChange}
-      />
+      <CollectiveNavbar collective={collective} isLoading={!collective} selectedCategory={NAVBAR_CATEGORIES.BUDGET} />
       <Flex flexDirection={['column', 'row']} px={[2, 3, 4]} py={[0, 5]} mt={3} data-cy="expense-page-content">
         <Box width={SIDE_MARGIN_WIDTH}></Box>
         <Box flex="1 1 650px" minWidth={300} maxWidth={[null, null, null, 792]} mr={[null, 2, 3, 4]} px={2}>
@@ -152,10 +135,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
             client={client}
             fetchMore={fetchMore}
             legacyExpenseId={props.legacyExpenseId}
-            startPolling={startPolling}
-            stopPolling={stopPolling}
             isRefetchingDataForUser={queryResult.loading}
-            edit={edit}
             draftKey={draftKey}
           />
         </Box>

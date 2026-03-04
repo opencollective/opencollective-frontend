@@ -11,6 +11,7 @@ type ExpensePolicyContainerProps = {
   title: React.ReactNode;
   policy: string;
   checked: boolean;
+  'data-cy'?: string;
   onAcknowledgedChanged: (acknowledged: boolean) => void;
 };
 
@@ -33,7 +34,7 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
       }}
       open={isOpen}
     >
-      <div className="group rounded-md border border-[#DCDDE0] p-4">
+      <div className="group rounded-md border border-[#DCDDE0] p-4" data-cy={props['data-cy']}>
         <CollapsibleTrigger asChild>
           <button className="flex w-full items-center text-start text-sm font-bold">
             <div className="grow">{props.title}</div>
