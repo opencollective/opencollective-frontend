@@ -72,9 +72,15 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     <React.Fragment>
       <div className="flex flex-col gap-4">
         <DashboardHeader
-          title={<FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />}
+          title={<FormattedMessage defaultMessage="Issued Payment Requests" id="IssuedPaymentRequests" />}
+          // description={
+          //   <FormattedMessage defaultMessage="Expenses that you have submitted to other accounts." id="aKfm6V" />
+          // }
           description={
-            <FormattedMessage defaultMessage="Expenses that you have submitted to other accounts." id="aKfm6V" />
+            <FormattedMessage
+              defaultMessage="Payment requests submitted by your organization to other platform accounts."
+              id="l204bH"
+            />
           }
           actions={
             <Button

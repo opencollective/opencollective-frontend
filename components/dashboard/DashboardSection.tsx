@@ -87,6 +87,7 @@ import {
 import { DashboardContext } from './DashboardContext';
 import DashboardErrorBoundary from './DashboardErrorBoundary';
 import DashboardHeader from './DashboardHeader';
+import IssuedPaymentRequests from './sections/expenses/IssuedPaymentRequests';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
@@ -109,6 +110,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.PAYMENT_REQUESTS]: PaymentRequests,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.ISSUED_PAYMENT_REQUESTS]: IssuedPaymentRequests,
   [SECTIONS.HOSTED_FUNDS]: HostedFunds,
   [SECTIONS.HOSTED_GRANTS]: HostedGrants,
   [SECTIONS.GRANTS]: Grants,

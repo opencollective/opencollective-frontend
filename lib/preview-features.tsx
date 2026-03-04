@@ -18,6 +18,7 @@ export enum PREVIEW_FEATURE_KEYS {
   SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
   PLATFORM_BILLING = 'PLATFORM_BILLING',
   SIDEBAR_REORG_DISBURSEMENTS = 'SIDEBAR_REORG_DISBURSEMENTS',
+  SIDEBAR_REORG_INCOMING_OUTGOING = 'SIDEBAR_REORG_INCOMING_OUTGOING',
   ASYNC_EXPORTS = 'ASYNC_EXPORTS',
   TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
 }
@@ -266,6 +267,16 @@ export const previewFeatures: PreviewFeature[] = [
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,
     enabledByDefaultFor: ['*'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
+    title: 'Sidebar Reorganization Incoming/Outgoing',
+    description:
+      'Renames "Expenses" to "Outgoing Money" and "Contributions" to "Incoming Money", and moves cross-account items to the appropriate groups.',
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
+    category: Categories.HOSTING,
+    alwaysEnableInDev: true,
   },
   {
     key: PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS,
