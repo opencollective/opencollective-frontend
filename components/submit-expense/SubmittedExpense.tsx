@@ -55,7 +55,6 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
             enableKeyboardShortcuts={false}
             drawerActionsContainer={null}
             canEditTags={false}
-            isEditing={false}
             isLoadingLoggedInUser={false}
             showProcessButtons={false}
             expense={expense}

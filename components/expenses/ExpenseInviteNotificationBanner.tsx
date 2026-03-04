@@ -103,30 +103,16 @@ const ExpenseInviteNotificationBanner = props => {
         <Image alt="" src="/static/images/pidgeon.png" width={132} height={132} />
         <Flex ml={[0, 2]} maxWidth="448px" flexDirection="column">
           <H4 mb="10px" fontWeight="500">
-            {props.createdUser ? (
-              <FormattedMessage id="VerifyEmailAddress" defaultMessage="Verify your email address" />
-            ) : (
-              <FormattedMessage id="InviteOnItsWay" defaultMessage="Your invite is on its way" />
-            )}
+            <FormattedMessage id="InviteOnItsWay" defaultMessage="Your invite is on its way" />
           </H4>
           <P lineHeight="20px">
-            {props.createdUser ? (
-              <FormattedMessage
-                id="VerifyEmailInstructions"
-                defaultMessage="A verification email has been sent to {email}. Click the link to complete submitting this expense. If you have not received the email, please check your spam."
-                values={{
-                  email: props.createdUser?.email || props.expense.draft?.payee?.name,
-                }}
-              />
-            ) : (
-              <FormattedMessage
-                id="Expense.InviteIsOnItsWay.Description"
-                defaultMessage="An invitation to submit this expense has been sent to {email}. Once they confirm and finish the process, it will appear on the expenses list."
-                values={{
-                  email: props.expense.draft?.payee?.email || props.expense.draft?.payee?.name,
-                }}
-              />
-            )}
+            <FormattedMessage
+              id="Expense.InviteIsOnItsWay.Description"
+              defaultMessage="An invitation to submit this expense has been sent to {email}. Once they confirm and finish the process, it will appear on the expenses list."
+              values={{
+                email: props.expense.draft?.payee?.email || props.expense.draft?.payee?.name,
+              }}
+            />
           </P>
           {canResendEmail && (
             <Flex mt="10px" flexWrap="wrap" gap="8px">
