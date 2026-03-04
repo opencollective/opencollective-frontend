@@ -20,7 +20,7 @@
     "@graphql-typed-document-node/core": "3.2.0",
     "@hcaptcha/react-hcaptcha": "1.13.1",
     "@hyperwatch/hyperwatch": "4.2.0",
-    "@icons-pack/react-simple-icons": "^10.0.0",
+    "@icons-pack/react-simple-icons": "^13.0.0",
     "@opencollective/taxes": "5.3.0",
     "@popperjs/core": "2.11.8",
     "@radix-ui/react-accordion": "1.2.12",
