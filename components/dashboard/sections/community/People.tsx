@@ -35,7 +35,7 @@ import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
-import { ContributorDetails } from './AccountDetail';
+import { AccountDetails } from './AccountDetail';
 import { usePersonActions } from './common';
 import { peopleHostDashboardQuery } from './queries';
 
@@ -390,7 +390,7 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
   if (!isEmpty(id)) {
     return (
       <div className="h-full">
-        <ContributorDetails
+        <AccountDetails
           account={{ id: subpath[0] }}
           host={account}
           onClose={() => pushSubpath('')}
