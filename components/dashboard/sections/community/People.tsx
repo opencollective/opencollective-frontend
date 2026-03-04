@@ -374,7 +374,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
             mobileTableView
             getActions={getActions}
           />
-          <Pagination queryFilter={queryFilter} total={data?.community?.totalCount} />
+          <Pagination queryFilter={queryFilter} hasMore={contributors.length === queryFilter.values?.limit} />
         </div>
       )}
     </div>
