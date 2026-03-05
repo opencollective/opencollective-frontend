@@ -5,7 +5,7 @@ import Pricing from '../components/pricing';
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default function PricingPage() {
+export default function LegacyPricingPage() {
   return (
     <Page>
       <Pricing />
