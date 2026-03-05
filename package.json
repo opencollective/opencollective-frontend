@@ -242,7 +242,7 @@
     "eslint": "^9.29.0",
     "eslint-config-opencollective": "^6.1.0",
     "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-cypress": "^5.0.0",
+    "eslint-plugin-cypress": "^6.0.0",
     "eslint-plugin-formatjs": "5.4.2",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
