@@ -123,6 +123,9 @@ export const kycStatusFields = gql`
     manual {
       ...KYCVerificationFields
     }
+    persona {
+      ...KYCVerificationFields
+    }
   }
 
   ${kycVerificationFields}
