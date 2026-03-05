@@ -380,7 +380,7 @@ exports.REWRITES = [
   },
   {
     source: '/pricing',
-    destination: isNewPricing ? '/new-pricing' : '/pricing',
+    destination: isNewPricing ? '/new-pricing' : '/legacy-pricing',
   },
   {
     source: '/organizations/pricing',
