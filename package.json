@@ -46,7 +46,7 @@
     "@simplewebauthn/browser": "13.2.2",
     "lib-address": "0.7.0",
     "@stripe/react-stripe-js": "3.10.0",
-    "@stripe/stripe-js": "2.4.0",
+    "@stripe/stripe-js": "8.9.0",
     "@styled-icons/boxicons-regular": "10.47.0",
     "@styled-icons/boxicons-solid": "10.47.0",
     "@styled-icons/fa-brands": "10.47.0",
