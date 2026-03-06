@@ -83,6 +83,7 @@ export function CategorizationRulesList(props: CategorizationRulesListProps) {
             value: '',
           },
         ],
+        enabled: true,
         categoryId: '',
       },
     ]);
