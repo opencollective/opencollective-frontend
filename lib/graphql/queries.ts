@@ -18,26 +18,18 @@ const workspaceSubFieldsFragment = gql`
     settings
     categories
     createdAt
-    canHaveChangelogUpdates # used by update Form view
+    canHaveChangelogUpdates
     policies {
-      # used by dashboard page
       id
       REQUIRE_2FA_FOR_ADMINS
     }
     features {
-      # split on various types?
       id
-      # VIRTUAL_CARDS split into Org & AccountWithHost
       USE_PAYMENT_METHODS
       EMIT_GIFT_CARDS
-      # OFF_PLATFORM_TRANSACTIONS
-      #TAX_FORMS
-      #AGREEMENTS
-      #KYC
       RECEIVE_GRANTS
     }
 
-    # supportedExpenseTypes # moved to ... on Collective
     ... on AccountWithParent {
       parent {
         id
@@ -50,9 +42,6 @@ const workspaceSubFieldsFragment = gql`
       }
     }
     ... on AccountWithHost {
-      # used by getNotification in pages/dashboard, maybe scope this to Collective?
-      # missing hostApplication?
-
       ... on Collective {
         features {
           id
@@ -82,8 +71,6 @@ const workspaceSubFieldsFragment = gql`
       host {
         id
         slug
-        # requiredLegalDocuments
-        # settings
       }
     }
 
@@ -95,14 +82,12 @@ const workspaceSubFieldsFragment = gql`
       }
     }
     ... on Organization {
-      ### for menu and section routing
       hasHosting
       hasMoneyManagement
       host {
         id
         slug
         requiredLegalDocuments
-        #settings
       }
       features {
         id
@@ -115,16 +100,8 @@ const workspaceSubFieldsFragment = gql`
       }
     }
     ... on Event {
-      # how is this used?
       endsAt
     }
-    # not used?
-    # location {
-    #   id
-    #   address
-    #   country
-    #   structured
-    # }
   }
 `;
 
@@ -191,37 +168,6 @@ export const loggedInUserQuery = gql`
           }
         }
       }
-      # memberOf(limit: 1) {
-      #   nodes {
-      #     id
-      #     role
-      #     account {
-      #       id
-      #       legacyId
-      #       slug
-      #       type
-      #       name
-      #       isHost
-      #       ... on AccountWithParent {
-      #         parent {
-      #           id
-      #           slug
-      #         }
-      #       }
-      #       ... on AccountWithHost {
-      #         host {
-      #           id
-      #         }
-      #       }
-      #       ... on Organization {
-      #         hasHosting
-      #       }
-      #     }
-      #   }
-      # }
-      # workspaces {
-      #   ...LoggedInUserWorkspaceFields
-      # }
     }
   }
   ${loggedInUserWorkspaceFieldsFragment}
