@@ -68,7 +68,7 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
   const [setSettings, { loading: mutating }] = useMutation(editCollectiveSettingsMutation, { context: API_V1_CONTEXT });
   const connectedAccounts = data?.account?.connectedAccounts;
   const userIsConnected = connectedAccounts?.some(
-    account => account.createdByAccount?.legacyId === LoggedInUser?.CollectiveId,
+    account => account.createdByAccount?.legacyId === LoggedInUser?.legacyId,
   );
 
   const handleConnect = async () => {

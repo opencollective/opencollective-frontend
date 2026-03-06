@@ -372,7 +372,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="Paid Disbursements" id="rwMrEx" />
-            {account.hasHosting && (
+            {'hasHosting' in account && account.hasHosting && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}

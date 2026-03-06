@@ -11,7 +11,7 @@ import HostTransactionsReports from './HostTransactionReports';
 const Reports = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const { account } = React.useContext(DashboardContext);
 
-  const hasHosting = account?.hasHosting;
+  const hasHosting = 'hasHosting' in account && account?.hasHosting;
 
   const reportType = subpath[0];
 

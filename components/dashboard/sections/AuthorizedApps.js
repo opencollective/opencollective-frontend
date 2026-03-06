@@ -43,7 +43,7 @@ const AuthorizedAppsSection = () => {
     <MessageBoxGraphqlError error={error} />
   ) : !data?.loggedInAccount?.oAuthAuthorizations?.totalCount ? (
     <div>
-      {LoggedInUser.collective.settings.oauthBeta ? (
+      {LoggedInUser.settings.oauthBeta ? (
         <P>
           <FormattedMessage defaultMessage="You haven't configured any application yet" id="7q8x3B" />
         </P>
@@ -55,7 +55,7 @@ const AuthorizedAppsSection = () => {
             values={{
               ForDevelopersLink: getI18nLink({
                 as: Link,
-                href: getDashboardRoute(LoggedInUser.collective, ALL_SECTIONS.FOR_DEVELOPERS),
+                href: getDashboardRoute(LoggedInUser, ALL_SECTIONS.FOR_DEVELOPERS),
               }),
             }}
           />
