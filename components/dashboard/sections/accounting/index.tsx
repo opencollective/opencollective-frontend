@@ -264,10 +264,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     [updateCategories, categories],
   );
 
-  const isContributionCategorizationRulesEnabled = isFeatureEnabled(
-    account,
-    FEATURES.CONTRIBUTION_CATEGORIZATION_RULES,
-  );
+  const isContributionCategorizationRulesEnabled = isFeatureEnabled(account, FEATURES.ACCOUNTING_CATEGORIZATION_RULES);
 
   const tabs = React.useMemo(
     () => [

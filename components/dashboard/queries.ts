@@ -102,7 +102,7 @@ export const adminPanelQuery = gql`
         EXPECTED_FUNDS
         CHARGE_HOSTING_FEES
         KYC
-        CATEGORIZATION_RULES
+        ACCOUNTING_CATEGORIZATION_RULES
         PERSONA_KYC
       }
       policies {
