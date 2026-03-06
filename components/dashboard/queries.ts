@@ -106,6 +106,7 @@ export const adminPanelQuery = gql`
       }
       policies {
         id
+        publicId
         REQUIRE_2FA_FOR_ADMINS
       }
       ... on Organization {
