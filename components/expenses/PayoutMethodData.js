@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { get, startCase, upperCase } from 'lodash';
+import { BadgeCheck, ShieldAlert } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -7,6 +8,17 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import Container from '../Container';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+
+/** Number of days after which a PayPal verification is considered stale for display purposes */
+const PAYPAL_VERIFICATION_STALE_DAYS = 90;
+
+const isPaypalVerificationStale = verifiedAt => {
+  if (!verifiedAt) {
+    return false;
+  }
+  const ageInDays = (Date.now() - new Date(verifiedAt).getTime()) / (1000 * 60 * 60 * 24);
+  return ageInDays > PAYPAL_VERIFICATION_STALE_DAYS;
+};
 
 const renderObject = object =>
   Object.entries(object).reduce((acc, [key, value]) => {
@@ -42,7 +54,11 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
   }
 
   switch (payoutMethod.type) {
-    case PayoutMethodType.PAYPAL:
+    case PayoutMethodType.PAYPAL: {
+      const paypalInfo = payoutMethod.paypalInfo;
+      const isVerified = payoutMethod.isVerified;
+      const verifiedAt = paypalInfo?.verifiedAt;
+      const isStale = isPaypalVerificationStale(verifiedAt);
       return (
         <div>
           {showLabel && (
@@ -55,8 +71,41 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
           <div className="overflow-hidden text-sm text-ellipsis text-slate-700">
             {getPmData(payoutMethod, 'email', isLoading)}
           </div>
+
+          {/* Verification status — shown when paypalInfo is available (host admins / permission holders) */}
+          {isLoading ? null : isVerified === true ? (
+            <div className={`mt-1 flex items-center gap-1 text-xs ${isStale ? 'text-yellow-700' : 'text-green-700'}`}>
+              {isStale ? <ShieldAlert size={12} /> : <BadgeCheck size={12} />}
+              {verifiedAt ? (
+                isStale ? (
+                  <FormattedMessage
+                    defaultMessage="PayPal account verified on {date} (stale — consider asking payee to reconnect)"
+                    id="PayPal.VerifiedStale"
+                    values={{ date: new Date(verifiedAt).toLocaleDateString() }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="PayPal account verified on {date}"
+                    id="PayPal.VerifiedOn"
+                    values={{ date: new Date(verifiedAt).toLocaleDateString() }}
+                  />
+                )
+              ) : (
+                <FormattedMessage defaultMessage="PayPal account verified" id="PayPal.Verified" />
+              )}
+              {paypalInfo?.name && paypalInfo.name !== getPmData(payoutMethod, 'email', false) && (
+                <span className="ml-1 text-muted-foreground">({paypalInfo.name})</span>
+              )}
+            </div>
+          ) : isVerified === false ? (
+            <div className="mt-1 flex items-center gap-1 text-xs text-yellow-700">
+              <ShieldAlert size={12} />
+              <FormattedMessage defaultMessage="PayPal account not verified via OAuth" id="PayPal.NotVerifiedOAuth" />
+            </div>
+          ) : null}
         </div>
       );
+    }
     case PayoutMethodType.OTHER:
       return (
         <div>

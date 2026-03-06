@@ -419,6 +419,10 @@ exports.REWRITES = [
     destination: '/services/plaid/oauth/callback',
   },
   {
+    source: '/services/paypal/callback',
+    destination: '/services/paypal/callback',
+  },
+  {
     source: '/services/gocardless/callback',
     destination: '/services/gocardless/callback',
   },
