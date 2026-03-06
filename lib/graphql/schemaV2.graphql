@@ -4049,6 +4049,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     """
     account: AccountReferenceInput
   ): AccountingCategoryCollection!
+  contributionAccountingCategoryRules: [ContributionAccountingCategoryRule!]
   hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
   totalHostedAccounts: Int
@@ -7180,6 +7181,7 @@ type CollectiveFeatures {
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
+  ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
@@ -7784,6 +7786,29 @@ enum AccountingCategoryKind {
 }
 
 """
+A rule for categorizing contributions
+"""
+type ContributionAccountingCategoryRule {
+  id: NonEmptyString!
+  name: NonEmptyString!
+  enabled: Boolean!
+  predicates: [JSONObject!]!
+  accountingCategory: AccountingCategory!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
+"""
 EXPERIMENTAL (this may change or be deleted): Host transaction report
 """
 type HostTransactionReports {
@@ -8115,11 +8140,6 @@ enum ManualPaymentProviderType {
   BANK_TRANSFER
   OTHER
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 """
 Stripe connected account properties
@@ -8576,11 +8596,6 @@ enum TransactionsImportRowStatus {
   """
   ON_HOLD
 }
-
-"""
-The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSONObject
 
 type TransactionsImportStats {
   """
@@ -22984,6 +22999,21 @@ type Mutation {
   ): Account!
 
   """
+  Update the contribution accounting category rules. Returns the account with the updated rules.
+  """
+  updateContributionAccountingCategoryRules(
+    """
+    The host to update the contribution accounting category rules for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The contribution accounting category rules to update
+    """
+    rules: [ContributionAccountingCategoryRuleInput!]!
+  ): Account!
+
+  """
   Add funds to the given account. Scope: "host".
   """
   addFunds(
@@ -25390,6 +25420,93 @@ input AccountingCategoryInput {
 }
 
 """
+Input for creating or updating a contribution accounting category rule
+"""
+input ContributionAccountingCategoryRuleInput {
+  """
+  The ID of the contribution accounting category rule to edit
+  """
+  id: String
+
+  """
+  The accounting category to apply the rule to
+  """
+  accountingCategory: AccountingCategoryReferenceInput!
+
+  """
+  The name of the rule
+  """
+  name: NonEmptyString!
+
+  """
+  Whether the rule is enabled
+  """
+  enabled: Boolean!
+
+  """
+  The predicates of the rule
+  """
+  predicates: [ContributionAccountingCategoryRulePredicateInput!]!
+}
+
+"""
+Reference to an accounting category
+"""
+input AccountingCategoryReferenceInput {
+  """
+  The ID of the accounting category
+  """
+  id: NonEmptyString!
+}
+
+"""
+Input for creating or updating a contribution accounting category rule predicate
+"""
+input ContributionAccountingCategoryRulePredicateInput {
+  """
+  The subject of the predicate
+  """
+  subject: ContributionAccountingCategoryRuleSubject!
+
+  """
+  The operator of the predicate
+  """
+  operator: ContributionAccountingCategoryRuleOperator!
+
+  """
+  The value of the predicate
+  """
+  value: JSON!
+}
+
+"""
+The subject of the predicate
+"""
+enum ContributionAccountingCategoryRuleSubject {
+  description
+  amount
+  currency
+  frequency
+  toAccount
+  toAccountType
+  fromAccountType
+  tierType
+  paymentProcessor
+}
+
+"""
+The operator of the predicate
+"""
+enum ContributionAccountingCategoryRuleOperator {
+  eq
+  gte
+  lte
+  contains
+  in
+  childrenOf
+}
+
+"""
 Input to set taxes for an expense
 """
 input TaxInput {
@@ -25417,16 +25534,6 @@ input TaxInput {
   An optional tax amount to make sure the tax displayed in your frontend matches the one calculated by the API
   """
   amount: AmountInput
-}
-
-"""
-Reference to an accounting category
-"""
-input AccountingCategoryReferenceInput {
-  """
-  The ID of the accounting category
-  """
-  id: NonEmptyString!
 }
 
 input TransactionsImportRowReferenceInput {
