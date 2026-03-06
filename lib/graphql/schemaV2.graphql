@@ -7593,16 +7593,14 @@ enum CommunityRelationType {
 
 type CommunityTransactionSummary {
   year: Int
-  expenseTotal: Amount!
-  expenseCount: Int!
-  contributionTotal: Amount!
-  contributionCount: Int!
-  expenseTotalAcc: Amount!
-  expenseCountAcc: Int!
-  contributionTotalAcc: Amount!
-  contributionCountAcc: Int!
-  orderCount: Int!
-  orderCountAcc: Int!
+  debitTotal: Amount!
+  debitCount: Int!
+  creditTotal: Amount!
+  creditCount: Int!
+  debitTotalAcc: Amount!
+  debitCountAcc: Int!
+  creditTotalAcc: Amount!
+  creditCountAcc: Int!
 }
 
 """

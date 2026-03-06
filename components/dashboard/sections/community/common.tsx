@@ -1,9 +1,14 @@
 import React, { useCallback } from 'react';
+import type { ColumnDef } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
+import { clsx } from 'clsx';
 import { capitalize, compact } from 'lodash';
 import type { LucideProps } from 'lucide-react';
 import {
   Archive,
+  ArrowDownRight,
   ArrowRightLeft,
+  ArrowUpRight,
   BookKey,
   Building2,
   EarthIcon,
@@ -16,22 +21,24 @@ import {
   User,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { AccountType } from '@/lib/graphql/types/v2/graphql';
 import type { Contributor } from '@/lib/graphql/types/v2/schema';
-import { KycProvider } from '@/lib/graphql/types/v2/schema';
+import { DateTimeField, KycProvider } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
+import { AccountHoverCard } from '@/components/AccountHoverCard';
 import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';
 import LinkCollective from '@/components/LinkCollective';
 import { useModal } from '@/components/ModalContext';
+import { ColumnHeader } from '@/components/table/ColumnHeader';
 import { actionsColumn } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
@@ -552,3 +559,85 @@ export const getMembersTableColumns = (intl, includeTransactionSummary = false) 
       },
     },
   ].filter(Boolean);
+
+const columnHelper = createColumnHelper<CommunityAccountDetailQuery['recentMoneyIn']['nodes']>();
+export const recentTransactionsColumns: ColumnDef<CommunityAccountDetailQuery['recentMoneyIn']['nodes']>[] = [
+  columnHelper.accessor('createdAt', {
+    id: 'date',
+    meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }) },
+    header: ctx => <ColumnHeader {...ctx} sortField={DateTimeField.CREATED_AT} />,
+    cell: ({ cell }) => {
+      const createdAt = cell.getValue();
+
+      return (
+        <div className="whitespace-nowrap">
+          <DateTime dateStyle="medium" timeStyle="short" value={createdAt} />
+        </div>
+      );
+    },
+  }),
+  columnHelper.accessor('account', {
+    meta: { className: 'w-32 2xl:w-48', labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }) },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ cell, row }) => {
+      const transaction = row.original;
+      const account = transaction.type === 'DEBIT' ? transaction.fromAccount : transaction.toAccount;
+
+      return (
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-1 truncate">
+              <Avatar collective={account} radius={20} />
+              <span className="truncate">{account?.name}</span>
+            </div>
+          }
+        />
+      );
+    },
+  }),
+  columnHelper.accessor('netAmount', {
+    meta: {
+      className: 'w-28',
+      align: 'right',
+      labelMsg: defineMessage({ defaultMessage: 'Amount', id: 'Fields.amount' }),
+    },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ cell, row }) => {
+      const netAmount = cell.getValue();
+      const transaction = row.original;
+
+      return (
+        <div
+          className={clsx(
+            'flex flex-row items-center truncate font-semibold antialiased',
+            transaction.type === 'CREDIT' ? 'text-green-600' : 'text-slate-700',
+          )}
+        >
+          {transaction.type === 'CREDIT' ? (
+            <ArrowUpRight className="text-green-600" size={20} />
+          ) : (
+            <ArrowDownRight className="text-red-600" size={20} />
+          )}
+          <FormattedMoneyAmount
+            amount={netAmount.valueInCents}
+            currency={netAmount.currency}
+            precision={2}
+            showCurrencyCode={false}
+          />
+        </div>
+      );
+    },
+  }),
+
+  columnHelper.accessor('netAmount.currency', {
+    id: 'currency',
+    header: null,
+    meta: { className: 'w-12', labelMsg: defineMessage({ defaultMessage: 'Currency', id: 'Currency' }) },
+    cell: ({ cell }) => {
+      const value = cell.getValue();
+
+      return <div className="antialiased">{value}</div>;
+    },
+  }),
+];

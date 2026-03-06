@@ -38,7 +38,7 @@ const formatSeriesData = ({ nodes = [], dateFrom, dateTo, timeUnit }): { x: numb
   for (let i = 0; i < nodes.length; i++) {
     const { date, amount } = nodes[i];
     if (keyedData[date]) {
-      keyedData[date].y = amount.value;
+      keyedData[date].y = Math.abs(amount.value ?? (amount.valueInCents ? amount.valueInCents / 100 : 0));
     } else {
       // Will be caught by error boundary.
       throw new Error('Time series data not aligned');

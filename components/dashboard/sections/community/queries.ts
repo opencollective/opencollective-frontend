@@ -197,20 +197,6 @@ export const communityAccountDetailQuery = gql`
               name
               type
               ...AccountHoverCardFields
-              communityStats(host: { slug: $hostSlug }) {
-                transactionSummary {
-                  expenseTotalAcc {
-                    valueInCents
-                    currency
-                  }
-                  expenseCountAcc
-                  contributionTotalAcc {
-                    valueInCents
-                    currency
-                  }
-                  contributionCountAcc
-                }
-              }
             }
           }
         }
@@ -251,58 +237,34 @@ export const communityAccountDetailQuery = gql`
         }
       }
       communityStats(host: { slug: $hostSlug }) {
-        associatedCollectives {
-          account {
-            id
-            isFrozen
-            ...AccountHoverCardFields
-          }
-          relations
-          firstInteractionAt
-          transactionSummary {
-            expenseTotal {
-              valueInCents
-              currency
-            }
-            expenseCount
-            contributionTotal {
-              valueInCents
-              currency
-            }
-            contributionCount
-          }
-        }
-        associatedOrganizations {
-          account {
-            id
-            ...AccountHoverCardFields
-          }
-          relations
-          firstInteractionAt
-          transactionSummary {
-            expenseTotal {
-              valueInCents
-              currency
-            }
-            expenseCount
-            contributionTotal {
-              valueInCents
-              currency
-            }
-            contributionCount
-          }
-        }
         relations
         transactionSummary {
           year
+          expenseCount
+          contributionCount
           expenseCountAcc
           contributionCountAcc
+          expenseTotal {
+            valueInCents
+            currency
+          }
+          contributionTotal {
+            valueInCents
+            currency
+          }
+          expenseTotalAcc {
+            valueInCents
+            currency
+          }
+          contributionTotalAcc {
+            valueInCents
+            currency
+          }
         }
         lastInteractionAt
         firstInteractionAt
       }
     }
-
     host(slug: $hostSlug) {
       id
       legacyId
@@ -339,6 +301,68 @@ export const communityAccountDetailQuery = gql`
     ) @include(if: $isIndividual) {
       nodes {
         ...CommunityAccountDetailActivityFields
+      }
+    }
+    transactions(
+      fromAccount: { id: $accountId }
+      host: { slug: $hostSlug }
+      orderBy: { field: CREATED_AT, direction: DESC }
+      limit: 100
+      kind: [CONTRIBUTION, EXPENSE, ADDED_FUNDS]
+    ) {
+      nodes {
+        id
+        legacyId
+        description
+        type
+        kind
+        createdAt
+        toAccount {
+          id
+          name
+          slug
+          imageUrl
+          type
+        }
+        fromAccount {
+          id
+          name
+          slug
+          imageUrl
+          type
+        }
+        netAmount {
+          valueInCents
+          currency
+        }
+      }
+    }
+    recentMoneyIn: transactions(
+      fromAccount: { id: $accountId }
+      host: { slug: $hostSlug }
+      limit: 5
+      orderBy: { field: CREATED_AT, direction: DESC }
+      kind: [CONTRIBUTION, ADDED_FUNDS]
+      type: CREDIT
+    ) {
+      nodes {
+        id
+        legacyId
+        description
+        type
+        kind
+        createdAt
+        account: toAccount {
+          id
+          name
+          slug
+          imageUrl
+          type
+        }
+        netAmount {
+          valueInCents
+          currency
+        }
       }
     }
   }
