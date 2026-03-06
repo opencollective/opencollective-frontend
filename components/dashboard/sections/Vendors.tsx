@@ -94,16 +94,16 @@ const dashboardVendorsQuery = gql`
           relations
           transactionSummary {
             year
-            expenseTotalAcc {
+            debitTotalAcc {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCountAcc
+            creditTotalAcc {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCountAcc
           }
         }
       }
@@ -162,16 +162,16 @@ const dashboardVendorsQuery = gql`
           relations
           transactionSummary {
             year
-            expenseTotalAcc {
+            debitTotalAcc {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCountAcc
+            creditTotalAcc {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCountAcc
           }
         }
       }
@@ -270,8 +270,8 @@ const getColumns = ({ isVendor }) => {
       cell: ({ row }) => {
         const account = row.original;
         const summary = account.communityStats?.transactionSummary?.[0];
-        const total = summary?.expenseTotalAcc;
-        const count = summary?.expenseCountAcc || 0;
+        const total = summary?.debitTotalAcc;
+        const count = summary?.debitCountAcc || 0;
 
         if (!total || count === 0) {
           return <span className="text-muted-foreground">—</span>;
@@ -291,8 +291,8 @@ const getColumns = ({ isVendor }) => {
       cell: ({ row }) => {
         const account = row.original;
         const summary = account.communityStats?.transactionSummary?.[0];
-        const total = summary?.contributionTotalAcc;
-        const count = summary?.contributionCountAcc || 0;
+        const total = summary?.creditTotalAcc;
+        const count = summary?.creditCountAcc || 0;
 
         if (!total || count === 0) {
           return <span className="text-muted-foreground">—</span>;

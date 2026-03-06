@@ -571,7 +571,7 @@ export const recentTransactionsColumns: ColumnDef<CommunityAccountDetailQuery['r
 
       return (
         <div className="whitespace-nowrap">
-          <DateTime dateStyle="medium" timeStyle="short" value={createdAt} />
+          <DateTime dateStyle="medium" value={createdAt} />
         </div>
       );
     },
@@ -627,17 +627,6 @@ export const recentTransactionsColumns: ColumnDef<CommunityAccountDetailQuery['r
           />
         </div>
       );
-    },
-  }),
-
-  columnHelper.accessor('netAmount.currency', {
-    id: 'currency',
-    header: null,
-    meta: { className: 'w-12', labelMsg: defineMessage({ defaultMessage: 'Currency', id: 'Currency' }) },
-    cell: ({ cell }) => {
-      const value = cell.getValue();
-
-      return <div className="antialiased">{value}</div>;
     },
   }),
 ];

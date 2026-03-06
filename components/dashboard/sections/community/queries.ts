@@ -56,16 +56,16 @@ export const peopleHostDashboardQuery = gql`
           relations
           transactionSummary {
             year
-            expenseTotalAcc {
+            debitTotalAcc {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCountAcc
+            creditTotalAcc {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCountAcc
           }
         }
       }
@@ -240,23 +240,23 @@ export const communityAccountDetailQuery = gql`
         relations
         transactionSummary {
           year
-          expenseCount
-          contributionCount
-          expenseCountAcc
-          contributionCountAcc
-          expenseTotal {
+          debitCount
+          creditCount
+          debitCountAcc
+          creditCountAcc
+          debitTotal {
             valueInCents
             currency
           }
-          contributionTotal {
+          creditTotal {
             valueInCents
             currency
           }
-          expenseTotalAcc {
+          debitTotalAcc {
             valueInCents
             currency
           }
-          contributionTotalAcc {
+          creditTotalAcc {
             valueInCents
             currency
           }
@@ -365,6 +365,34 @@ export const communityAccountDetailQuery = gql`
         }
       }
     }
+    recentMoneyOut: transactions(
+      fromAccount: { id: $accountId }
+      host: { slug: $hostSlug }
+      limit: 5
+      orderBy: { field: CREATED_AT, direction: DESC }
+      kind: [EXPENSE, ADDED_FUNDS]
+      type: DEBIT
+    ) {
+      nodes {
+        id
+        legacyId
+        description
+        type
+        kind
+        createdAt
+        account: toAccount {
+          id
+          name
+          slug
+          imageUrl
+          type
+        }
+        netAmount {
+          valueInCents
+          currency
+        }
+      }
+    }
   }
   ${accountHoverCardFields}
   ${kycVerificationFields}
@@ -411,16 +439,16 @@ export const communityAccountExpensesDetailQuery = gql`
       communityStats(host: $host) {
         transactionSummary {
           year
-          expenseTotal {
+          debitTotal {
             valueInCents
             currency
           }
-          expenseCount
-          expenseTotalAcc {
+          debitCount
+          debitTotalAcc {
             valueInCents
             currency
           }
-          expenseCountAcc
+          debitCountAcc
         }
       }
       submittedExpenses: expenses(
@@ -549,16 +577,16 @@ export const communityAccountContributionsDetailQuery = gql`
       communityStats(host: $host) {
         transactionSummary {
           year
-          contributionTotal {
+          creditTotal {
             valueInCents
             currency
           }
-          contributionCount
-          contributionTotalAcc {
+          creditCount
+          creditTotalAcc {
             valueInCents
             currency
           }
-          contributionCountAcc
+          creditCountAcc
         }
       }
       orders(host: $host, limit: $limit, offset: $offset) {

@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import { compact } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { formatCurrency } from '@/lib/currency-utils';
 import type {
   CommunityAccountDetailQuery,
   CommunityTransactionSummary,
@@ -21,7 +20,6 @@ import StackedAvatars from '@/components/StackedAvatars';
 import { DataTable } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { InfoList, InfoListItem } from '@/components/ui/InfoList';
-import PlotFigure, { Plot } from '@/components/ui/Plot';
 import { VendorContactTag } from '@/components/vendors/common';
 
 import Avatar from '../../../Avatar';
@@ -35,7 +33,7 @@ import { recentTransactionsColumns, RichActivityDate } from './common';
 
 function transactionSummaryToTimeSeries(
   summary: CommunityTransactionSummary[],
-  field: 'contributionTotal' | 'expenseTotal',
+  field: 'creditTotal' | 'debitTotal',
 ): TimeSeriesAmount | undefined {
   if (!summary?.length) {
     return undefined;
@@ -44,7 +42,7 @@ function transactionSummaryToTimeSeries(
   const summaryByYear = new Map(sorted.filter(e => e.year !== null).map(e => [e.year, e]));
   const firstYear = sorted[0].year ?? dayjs.utc().year();
   const currentYear = dayjs.utc().year();
-  const countField = field === 'contributionTotal' ? 'contributionCount' : 'expenseCount';
+  const countField = field === 'creditTotal' ? 'creditCount' : 'debitCount';
   const nodes = [];
   for (let year = firstYear; year <= currentYear; year++) {
     const entry = summaryByYear.get(year);
@@ -86,38 +84,28 @@ export const AccountDetailsOverviewTab = ({
   const admins = account && 'admins' in account ? account.admins.nodes : [];
   const adminList = isOrgOrCollective ? admins : adminOf;
 
-  const totalContributed = account?.communityStats?.transactionSummary[0]?.contributionTotalAcc || {
+  const totalContributed = account?.communityStats?.transactionSummary[0]?.creditTotalAcc || {
     valueInCents: 0,
     currency: dashboardAccount.currency,
   };
-  const chargeCount = account?.communityStats?.transactionSummary[0]?.contributionCountAcc || 0;
-  const submittedExpensesCount = account?.communityStats?.transactionSummary[0]?.expenseCountAcc || 0;
-  const totalPaid = account?.communityStats?.transactionSummary[0]?.expenseTotalAcc || {
+  const chargeCount = account?.communityStats?.transactionSummary[0]?.creditCountAcc || 0;
+  const submittedExpensesCount = account?.communityStats?.transactionSummary[0]?.debitCountAcc || 0;
+  const totalPaid = account?.communityStats?.transactionSummary[0]?.debitTotalAcc || {
     valueInCents: 0,
     currency: dashboardAccount.currency,
   };
 
   const credits = React.useMemo(
-    () => transactionSummaryToTimeSeries(account?.communityStats?.transactionSummary, 'contributionTotal'),
+    () => transactionSummaryToTimeSeries(account?.communityStats?.transactionSummary, 'creditTotal'),
     [account?.communityStats?.transactionSummary],
   );
   const debits = React.useMemo(
-    () => transactionSummaryToTimeSeries(account?.communityStats?.transactionSummary, 'expenseTotal'),
+    () => transactionSummaryToTimeSeries(account?.communityStats?.transactionSummary, 'debitTotal'),
     [account?.communityStats?.transactionSummary],
   );
 
-  const creditTransactions = React.useMemo(() => {
-    if (!query.data?.transactions?.nodes) {
-      return [];
-    }
-    return query.data.transactions.nodes.filter(transaction => transaction.type === 'CREDIT');
-  }, [query.data?.transactions?.nodes]);
-  const debitTransactions = React.useMemo(() => {
-    if (!query.data?.transactions?.nodes) {
-      return [];
-    }
-    return query.data.transactions.nodes.filter(transaction => transaction.type === 'DEBIT');
-  }, [query.data?.transactions?.nodes]);
+  const creditTransactions = query.data?.recentMoneyIn?.nodes ?? [];
+  const debitTransactions = query.data?.recentMoneyOut?.nodes ?? [];
 
   return (
     <div className="grid grid-cols-1 gap-12 xl:grid-cols-4">
@@ -332,7 +320,7 @@ export const AccountDetailsOverviewTab = ({
               />
             </div>
             <div className="flex flex-col gap-2">
-              <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="grid grid-flow-dense grid-cols-2 gap-4">
                 <Metric
                   label={<FormattedMessage defaultMessage="Total Contributed" id="TotalContributed" />}
                   amount={{ current: totalContributed }}
@@ -386,7 +374,7 @@ export const AccountDetailsOverviewTab = ({
               />
             </div>
             <div className="flex flex-col gap-2">
-              <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="grid grid-flow-dense grid-cols-2 gap-4">
                 <Metric
                   label={<FormattedMessage defaultMessage="Total Paid" id="TotalPaid" />}
                   amount={{ current: totalPaid }}
