@@ -32,6 +32,7 @@ const exportRequestQuery = gql`
       progress
       error
       willRetry
+      expiresAt
       file {
         id
         url

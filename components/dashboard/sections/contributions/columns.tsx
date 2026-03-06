@@ -243,7 +243,7 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
       const pm = row.original.paymentMethod;
       if (row.original.manualPaymentProvider) {
         return (
-          <div>
+          <div className="truncate">
             <Badge size="xs" type="neutral" className="mr-1">
               <FormattedMessage defaultMessage="Manual" id="PaymentMethod.Manual" />
             </Badge>

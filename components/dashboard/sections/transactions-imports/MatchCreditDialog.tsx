@@ -533,6 +533,7 @@ export const MatchCreditDialog = ({
                   });
                 }}
                 activeViewId={activeViewId}
+                hideCounts
                 resetFilters={filter => {
                   queryFilter.resetFilters({
                     ...getDefaultFilterValues(row, accounts, activeViewId, host),

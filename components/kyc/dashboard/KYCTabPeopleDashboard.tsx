@@ -16,11 +16,9 @@ import { accountHoverCardFields } from '@/components/AccountHoverCard';
 import { Pagination } from '@/components/dashboard/filters/Pagination';
 import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
-import { useModal } from '@/components/ModalContext';
-import { Button } from '@/components/ui/Button';
 
 import { kycVerificationCollectionFields } from '../graphql';
-import { KYCRequestModal } from '../request/KYCRequestModal';
+import { SubmitKYCVerificationButton } from '../request/SubmitKYCVerificationButton';
 
 import { KYCVerificationRequestsTable } from './KYCVerificationRequestsTable';
 
@@ -32,7 +30,6 @@ type KYCTabPeopleDashboardProps = {
 const PAGE_SIZE = 5;
 
 export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
-  const { showModal } = useModal();
   const queryFilter = useQueryFilter({
     skipRouter: true,
     schema: z.object({
@@ -82,14 +79,6 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
       ? (query.data.verifyAccount.kycVerifications as KycVerificationCollection)
       : { nodes: [], limit: 0, offset: 0, totalCount: 0 };
 
-  const onRequestKYCClick = React.useCallback(() => {
-    showModal(KYCRequestModal, {
-      requestedByAccount: props.requestedByAccount,
-      verifyAccount: props.verifyAccount,
-      refetchQueries: ['KYCTabPeopleDashboard', 'CommunityAccountDetail'],
-    });
-  }, [showModal, props.requestedByAccount, props.verifyAccount]);
-
   const hasVerifications = kycVerifications.totalCount > 0;
   const isEmpty = !query.loading && !query.error && !hasVerifications;
 
@@ -97,9 +86,11 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
     <div className="flex h-full flex-col">
       <div className="flex-1 space-y-6">
         <div className="flex items-center justify-end">
-          <Button onClick={onRequestKYCClick} size="sm">
-            <FormattedMessage defaultMessage="Submit KYC Verification" id="fS9N/M" />
-          </Button>
+          <SubmitKYCVerificationButton
+            requestedByAccount={props.requestedByAccount}
+            verifyAccount={props.verifyAccount}
+            refetchQueries={['KYCTabPeopleDashboard', 'CommunityAccountDetail']}
+          />
         </div>
         {query.error ? (
           <MessageBoxGraphqlError error={query.error} />

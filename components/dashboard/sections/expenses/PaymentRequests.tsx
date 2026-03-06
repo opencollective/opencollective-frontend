@@ -13,9 +13,7 @@ import {
   ExpenseType,
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
@@ -97,7 +95,6 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
-  const { LoggedInUser } = useLoggedInUser();
 
   const views: Views<FilterValues> = useMemo(
     () => [
@@ -177,9 +174,6 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     },
   });
 
-  const hasNewSubmitExpenseFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
-
   const pageRoute = `/dashboard/${accountSlug}/payment-requests`;
 
   return (
@@ -194,11 +188,9 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
             />
           }
           actions={
-            hasNewSubmitExpenseFlow ? (
-              <Button onClick={() => setIsExpenseFlowOpen(true)} size="sm" className="gap-1">
-                <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
-              </Button>
-            ) : null
+            <Button onClick={() => setIsExpenseFlowOpen(true)} size="sm" className="gap-1">
+              <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
+            </Button>
           }
         />
         {isSelfHosted && (

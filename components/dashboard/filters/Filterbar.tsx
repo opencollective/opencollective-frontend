@@ -7,10 +7,10 @@ import type { FilterComponentConfigs, resetFilters, SetFilter, Views } from '../
 import { filterShouldBeInAddFilterOptions, filterShouldDisplay } from '../../../lib/filters/filter-utils';
 import { cn } from '../../../lib/utils';
 
-import Tabs from '../../Tabs';
 import { Separator } from '../../ui/Separator';
 
 import FilterDropdown, { AddFilterDropdown } from './FilterDropdown';
+import FilterViews from './FilterViews';
 
 function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
   const filterKeys = React.useMemo(() => Object.keys(filters), [filters]);
@@ -111,6 +111,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   primaryFilters,
   primaryFilterClassName,
   lockViewFilters,
+  hideCounts,
 }: {
   values: FV;
   filters: FilterComponentConfigs<FV, FM>;
@@ -126,6 +127,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   primaryFilters?: string[];
   primaryFilterClassName?: string;
   lockViewFilters?: boolean;
+  hideCounts?: boolean;
 }) {
   const intl = useIntl();
   const { displayedFilters, remainingFilters } = useGetFilterbarOptions(filters, values, defaultSchemaValues, meta);
@@ -156,7 +158,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   return (
     <div className={cn('flex flex-col gap-4', className)}>
       {views?.length > 1 ? (
-        <Tabs tabs={views} selectedId={activeViewId} onChange={onTabChange} />
+        <FilterViews views={views} activeViewId={activeViewId} onChange={onTabChange} hideCounts={hideCounts} />
       ) : (
         !hideSeparator && <Separator />
       )}

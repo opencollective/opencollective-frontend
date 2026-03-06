@@ -4,6 +4,7 @@ import { compact, get, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 
@@ -89,6 +90,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
           <FormField name={currencyFieldName} disabled={disabled} label={formatMessage(msg.currency)}>
             {({ field }) => (
               <CurrencyPicker
+                availableCurrencies={PayPalSupportedCurrencies}
                 disabled={disabled}
                 inputId={field.id}
                 name={field.name}

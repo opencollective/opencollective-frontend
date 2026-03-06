@@ -1108,7 +1108,7 @@ type CollectiveFeatures {
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
-  CONTRIBUTION_CATEGORIZATION_RULES: CollectiveFeatureStatus
+  ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
@@ -1118,6 +1118,7 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
+  PERSONA_KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {

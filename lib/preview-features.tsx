@@ -1,5 +1,4 @@
 import React from 'react';
-import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
@@ -11,8 +10,6 @@ import type LoggedInUser from './LoggedInUser';
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
-  INLINE_EDIT_EXPENSE = 'INLINE_EDIT_EXPENSE',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
   AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
   VERCEL_BACKEND = 'VERCEL_BACKEND',
@@ -22,6 +19,7 @@ export enum PREVIEW_FEATURE_KEYS {
   PLATFORM_BILLING = 'PLATFORM_BILLING',
   SIDEBAR_REORG_DISBURSEMENTS = 'SIDEBAR_REORG_DISBURSEMENTS',
   ASYNC_EXPORTS = 'ASYNC_EXPORTS',
+  TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
 }
 
 enum Categories {
@@ -49,7 +47,7 @@ export type PreviewFeature = {
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
 const ENGINEERS = ['znarf', 'betree', 'leokewitz', 'henrique-silva', 'gustavlrsn', 'sudharaka-palamakumbura'];
-export const OFICO_MEMBER_ORGANIZATIONS = [
+const OFICO_MEMBER_ORGANIZATIONS = [
   'europe',
   'giftcollective',
   'oce-foundation-eur',
@@ -197,36 +195,6 @@ export const previewFeatures: PreviewFeature[] = [
     category: Categories.GENERAL,
   },
   {
-    key: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
-    title: <FormattedMessage defaultMessage="New Expense Submission Flow" id="PreviewFeatures.newExpenseFlowTitle" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="Experience an improved expense submission flow in the Dashboard with better user experience, clearer navigation, and enhanced form validation."
-        id="PreviewFeatures.newExpenseFlowDescription"
-      />
-    ),
-    category: Categories.GENERAL,
-    publicBeta: false,
-    enabledByDefaultFor: ['*'],
-    // Hide if not root and not manually enabled
-    hide: (loggedInUser: LoggedInUser) =>
-      !loggedInUser.isRoot &&
-      !get(loggedInUser, `collective.settings.earlyAccess.${PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW}`),
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
-    title: <FormattedMessage defaultMessage="Inline Expense Editing" id="PreviewFeatures.inlineEditExpenseTitle" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="Edit expense details directly in the Dashboard without navigating to separate pages."
-        id="PreviewFeatures.inlineEditExpenseDescription"
-      />
-    ),
-    category: Categories.GENERAL,
-    publicBeta: true,
-    enabledByDefaultFor: ['*'],
-  },
-  {
     key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
     title: <FormattedMessage defaultMessage="Search Command Menu" id="PreviewFeatures.searchCommandTitle" />,
     description: (
@@ -294,9 +262,10 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS,
     title: 'Sidebar Reorganization Disbursements',
     description: 'Reorganization of the "Expenses" section in the Host Dashboard',
-    publicBeta: false,
+    publicBeta: true,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS,
@@ -310,5 +279,18 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.TABLE_QUICK_ACTIONS,
+    title: <FormattedMessage defaultMessage="Table Quick Actions" id="PreviewFeatures.tableQuickActionsTitle" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Enable quick action buttons that appear on table rows when you hover over them. Perform common actions faster without opening the dropdown menu."
+        id="PreviewFeatures.tableQuickActionsDescription"
+      />
+    ),
+    publicBeta: true,
+    alwaysEnableInDev: true,
+    category: Categories.GENERAL,
   },
 ];

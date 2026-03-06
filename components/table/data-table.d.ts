@@ -22,6 +22,7 @@ declare module '@tanstack/react-table' {
     hasDefaultColumnVisibility?: boolean;
     openDrawer?: (row: Row<TData>, actionsMenuTriggerRef?: RefObject<HTMLElement>) => void;
     getActions?: GetActions<TData>;
+    showQuickActions?: boolean;
 
     // TODO: remove types below when all tables use getActions
     // Hosted Collectives table

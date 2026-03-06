@@ -6439,6 +6439,7 @@ type ConnectedAccount {
 All supported services a user can connect with
 """
 enum ConnectedAccountService {
+  persona
   paypal
   stripe
   stripe_customer
@@ -7180,7 +7181,7 @@ type CollectiveFeatures {
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
-  CONTRIBUTION_CATEGORIZATION_RULES: CollectiveFeatureStatus
+  ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
@@ -7190,6 +7191,7 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
+  PERSONA_KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -7669,9 +7671,10 @@ type KYCVerification {
 
 enum KYCProvider {
   MANUAL
+  PERSONA
 }
 
-union KYCProviderData = ManualKYCProviderData
+union KYCProviderData = ManualKYCProviderData | PersonaKYCProviderData
 
 """
 Manual KYC data
@@ -7681,6 +7684,31 @@ type ManualKYCProviderData {
   Notes added during manual verification
   """
   notes: String!
+}
+
+"""
+Persona KYC data
+"""
+type PersonaKYCProviderData {
+  """
+  Whether this persona inquiry was imported
+  """
+  imported: Boolean!
+
+  """
+  ID of the Persona inquiry
+  """
+  id: String!
+
+  """
+  Status of the Persona inquiry
+  """
+  status: String!
+
+  """
+  Contains KYC data verified by this inquiry
+  """
+  fields: JSON!
 }
 
 """
@@ -7761,14 +7789,19 @@ enum AccountingCategoryKind {
 A rule for categorizing contributions
 """
 type ContributionAccountingCategoryRule {
-  id: String!
-  name: String!
+  id: NonEmptyString!
+  name: NonEmptyString!
   enabled: Boolean!
   predicates: [JSONObject!]!
   accountingCategory: AccountingCategory!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
 
 """
 The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
@@ -8107,11 +8140,6 @@ enum ManualPaymentProviderType {
   BANK_TRANSFER
   OTHER
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 """
 Stripe connected account properties
@@ -14498,6 +14526,7 @@ A individual KYC verified status
 """
 type KYCStatus {
   manual: KYCVerification
+  persona: KYCVerification
 }
 
 """
@@ -25407,7 +25436,7 @@ input ContributionAccountingCategoryRuleInput {
   """
   The name of the rule
   """
-  name: String!
+  name: NonEmptyString!
 
   """
   Whether the rule is enabled
@@ -27792,12 +27821,17 @@ input PlatformSubscriptionPlanPricing {
 
 input RequestKYCVerificationInput {
   manual: RequestManualKYCVerificationInput
+  persona: RequestPersonaKYCVerificationInput
 }
 
 input RequestManualKYCVerificationInput {
   legalName: String!
   legalAddress: String
   notes: String
+}
+
+input RequestPersonaKYCVerificationInput {
+  importInquiryId: String
 }
 
 """

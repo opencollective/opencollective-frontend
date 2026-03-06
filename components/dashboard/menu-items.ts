@@ -345,7 +345,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Store,
     },
     {
-      if: !isIndividual && hasMoneyManagement,
+      if: !isIndividual && !isAccountantOnly && hasMoneyManagement,
       label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
       section: ALL_SECTIONS.PEOPLE,
       Icon: Users2,
@@ -359,6 +359,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           section: ALL_SECTIONS.KYC,
           label: intl.formatMessage({ defaultMessage: 'Requests', id: 'VirtualCards.Requests' }),
+        },
+        {
+          if: isFeatureEnabled(account, FEATURES.PERSONA_KYC),
+          section: ALL_SECTIONS.KYC_SETTINGS,
+          label: intl.formatMessage({ defaultMessage: 'Settings', id: 'Settings' }),
         },
       ],
     },
@@ -468,7 +473,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isAccountantOnly,
       section: ALL_SECTIONS.UPDATES,
       Icon: Megaphone,
     },

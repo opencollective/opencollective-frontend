@@ -2,15 +2,12 @@ import React from 'react';
 import { clsx } from 'clsx';
 import { includes, truncate } from 'lodash';
 import { Check, Copy, Ellipsis, Link } from 'lucide-react';
-import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { ExpensePageExpenseFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../../lib/hooks/useClipboard';
-import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { i18nExpenseType } from '../../../lib/i18n/expense';
-import { PREVIEW_FEATURE_KEYS } from '../../../lib/preview-features';
 import { getWebsiteUrl } from '../../../lib/utils';
 
 import { AccountHoverCard } from '../../AccountHoverCard';
@@ -43,13 +40,7 @@ const I18nMessages = defineMessages({
 });
 
 export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
-  const { LoggedInUser } = useLoggedInUser();
-  const router = useRouter();
-  const hasNewSubmitExpenseFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
-
   const canDuplicateExpense =
-    hasNewSubmitExpenseFlow &&
     [ExpenseType.INVOICE, ExpenseType.RECEIPT].includes(props.expense.type) &&
     props.expense.status !== ExpenseStatus.DRAFT;
 

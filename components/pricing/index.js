@@ -142,6 +142,25 @@ const Pricing = () => {
     <React.Fragment>
       <GlobalStyles />
       <TopBackgroundIllustration />
+      {parseToBoolean(getEnvVar('NEW_PRICING')) && (
+        <div className="flex items-center justify-center pt-12">
+          <div className="rounded-full bg-blue-50 px-6 py-3 text-sm text-blue-800">
+            <span>
+              <FormattedMessage
+                defaultMessage="We're updating our pricing. <LinkNewPricing>View new pricing for Organizations</LinkNewPricing>."
+                id="pricing.newModel.onLegacyPricing"
+                values={{
+                  LinkNewPricing: parts => (
+                    <Link href="/organizations/pricing" className="font-medium underline hover:text-blue-900">
+                      {parts}
+                    </Link>
+                  ),
+                }}
+              />
+            </span>
+          </div>
+        </div>
+      )}
       <Flex px="16px" pt="20px" pb={['40px', '20px']} justifyContent="center" alignItems="center">
         <Container
           textAlign="center"
@@ -150,26 +169,6 @@ const Pricing = () => {
           alignItems="center"
           width={['288px', '636px', '956px', null, '992px']}
         >
-          {parseToBoolean(getEnvVar('NEW_PRICING')) && (
-            <div className="mb-12 flex items-center justify-center">
-              <div className="rounded-full bg-blue-50 px-6 py-3 text-sm text-blue-800">
-                <span>
-                  <FormattedMessage
-                    defaultMessage="We've updated our platform pricing to support our long-term sustainability. <LinkNewPricing>View new pricing</LinkNewPricing>."
-                    id="pricing.newModel.onLegacyPricing"
-                    values={{
-                      LinkNewPricing: parts => (
-                        <Link href="/organizations/pricing" className="font-medium underline hover:text-blue-900">
-                          {parts}
-                        </Link>
-                      ),
-                    }}
-                  />
-                </span>
-              </div>
-            </div>
-          )}
-
           <MainTitle mb="14px">
             <FormattedMessage id="pricing.title" defaultMessage="Our Pricing Structure" />
           </MainTitle>

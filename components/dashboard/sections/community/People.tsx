@@ -337,8 +337,9 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
   const { account: dashboardAccount } = useContext(DashboardContext);
 
   const hasKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.KYC);
+  const hasPersonaKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.PERSONA_KYC);
 
-  const getActions = usePersonActions({ accountSlug, hasKYCFeature });
+  const getActions = usePersonActions({ accountSlug, hasKYCFeature, hasPersonaKYCFeature });
 
   const columns = React.useMemo(
     () => getColumns({ intl, hasKYCFeature }),
@@ -353,7 +354,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
           <FormattedMessage id="People.Description" defaultMessage="People that interacted with your organization." />
         }
       />
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} hideCounts />
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && contributors.length === 0 ? (
