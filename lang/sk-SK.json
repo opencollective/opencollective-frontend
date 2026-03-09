@@ -3398,7 +3398,7 @@
   "pricing.new.faq.tips.answer": "<p><strong>Platform Tips</strong> are optional contributions that financial contributors can add when they make a financial contribution on the platform. These tips support the <strong>Open Collective Platform</strong>, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your <strong>Organization</strong> or the <strong>Collectives</strong> you host receive, because they are added on top of the intended support.</p><p>If you prefer a more traditional pricing model, you can opt for a simple <strong>5% Crowdfunding Fee</strong> instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over.</p>",
   "pricing.new.faq.tips.question": "What are Platform Tips?",
   "pricing.newModel.onLegacyPricing": "We're updating our pricing. <LinkNewPricing>View new pricing for Organizations</LinkNewPricing>.",
-  "pricing.newModel.onNewPricing": "This is our updated pricing for Organizations, applying in 2026. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>.",
+  "pricing.newModel.onNewPricing": "This is our updated pricing for Organizations, applying for new customers from March 2026. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>.",
   "pricing.noHostFees": "{fee} ak neúčtujete Poplatky Hostiteľa svojim Kolektívom",
   "pricing.notes.paymentProcessor": "Poplatky za spracovanie platby sa uplatňujú pri použití <stripeLink></stripeLink>, <paypalLink></paypalLink> alebo <transferwiseLink></transferwiseLink>.",
   "pricing.outsideFunds": "Vonkajšie finančné prostriedky",
