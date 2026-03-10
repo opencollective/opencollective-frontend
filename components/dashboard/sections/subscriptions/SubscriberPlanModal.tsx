@@ -218,7 +218,7 @@ const SubscriberForm = (props: SubscriberFormProps) => {
                           {PlatformSubscriptionFeatureTitles[feature] ? (
                             <FormattedMessage {...PlatformSubscriptionFeatureTitles[feature]} />
                           ) : (
-                            startCase(feature)
+                            startCase(feature.toLowerCase())
                           )}
                         </Label>
                       </div>
