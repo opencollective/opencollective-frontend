@@ -93,17 +93,16 @@ const dashboardVendorsQuery = gql`
         communityStats(host: { slug: $slug }) {
           relations
           transactionSummary {
-            year
-            expenseTotalAcc {
+            debitTotal {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCount
+            creditTotal {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCount
           }
         }
       }
@@ -163,17 +162,16 @@ const dashboardVendorsQuery = gql`
         communityStats(host: { slug: $slug }) {
           relations
           transactionSummary {
-            year
-            expenseTotalAcc {
+            debitTotal {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCount
+            creditTotal {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCount
           }
         }
       }
@@ -271,9 +269,9 @@ const getColumns = ({ isVendor }) => {
       header: () => <FormattedMessage defaultMessage="Total Expenses" id="TotalExpenses" />,
       cell: ({ row }) => {
         const account = row.original;
-        const summary = account.communityStats?.transactionSummary?.[0];
-        const total = summary?.expenseTotalAcc;
-        const count = summary?.expenseCountAcc || 0;
+        const summary = account.communityStats?.transactionSummary;
+        const total = summary?.debitTotal;
+        const count = summary?.debitCount || 0;
 
         if (!total || count === 0) {
           return <span className="text-muted-foreground">—</span>;
@@ -292,9 +290,9 @@ const getColumns = ({ isVendor }) => {
       header: () => <FormattedMessage defaultMessage="Total Contributions" id="TotalContributions" />,
       cell: ({ row }) => {
         const account = row.original;
-        const summary = account.communityStats?.transactionSummary?.[0];
-        const total = summary?.contributionTotalAcc;
-        const count = summary?.contributionCountAcc || 0;
+        const summary = account.communityStats?.transactionSummary;
+        const total = summary?.creditTotal;
+        const count = summary?.creditCount || 0;
 
         if (!total || count === 0) {
           return <span className="text-muted-foreground">—</span>;

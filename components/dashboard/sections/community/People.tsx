@@ -8,7 +8,8 @@ import { z } from 'zod';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import type { FilterConfig } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
-import { AccountType, CommunityRelationType, type PeopleHostDashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type { PeopleHostDashboardQuery, PeopleHostDashboardQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
@@ -170,9 +171,9 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
     cell: ({ row }) => {
       const account = row.original;
-      const summary = account?.communityStats?.transactionSummary?.[0];
-      const total = summary?.expenseTotalAcc;
-      const count = summary?.expenseCountAcc || 0;
+      const summary = account?.communityStats?.transactionSummary;
+      const total = summary?.debitTotal;
+      const count = summary?.debitCount || 0;
 
       if (!total || count === 0) {
         return <span className="text-muted-foreground">—</span>;
@@ -196,9 +197,9 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
     cell: ({ row }) => {
       const account = row.original;
-      const summary = account?.communityStats?.transactionSummary?.[0];
-      const total = summary?.contributionTotalAcc;
-      const count = summary?.contributionCountAcc || 0;
+      const summary = account?.communityStats?.transactionSummary;
+      const total = summary?.creditTotal;
+      const count = summary?.creditCount || 0;
 
       if (!total || count === 0) {
         return <span className="text-muted-foreground">—</span>;
@@ -288,7 +289,6 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
       label: intl.formatMessage({ defaultMessage: 'All', id: 'All' }),
       filter: {},
     },
-
     {
       id: ContributorsTab.ADMINS,
       label: intl.formatMessage({ defaultMessage: 'Collective Admins', id: 'Update.notify.hostedCollectiveAdmins' }),
@@ -323,7 +323,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
     data,
     loading: queryLoading,
     error: queryError,
-  } = useQuery<PeopleHostDashboardQuery>(peopleHostDashboardQuery, {
+  } = useQuery<PeopleHostDashboardQuery, PeopleHostDashboardQueryVariables>(peopleHostDashboardQuery, {
     variables: {
       slug: accountSlug,
       ...queryFilter.variables,

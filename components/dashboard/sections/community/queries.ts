@@ -56,17 +56,16 @@ export const peopleHostDashboardQuery = gql`
         communityStats(host: { slug: $slug }) {
           relations
           transactionSummary {
-            year
-            expenseTotalAcc {
+            debitTotal {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCount
+            creditTotal {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCount
           }
         }
       }
@@ -199,20 +198,6 @@ export const communityAccountDetailQuery = gql`
               name
               type
               ...AccountHoverCardFields
-              communityStats(host: { slug: $hostSlug }) {
-                transactionSummary {
-                  expenseTotalAcc {
-                    valueInCents
-                    currency
-                  }
-                  expenseCountAcc
-                  contributionTotalAcc {
-                    valueInCents
-                    currency
-                  }
-                  contributionCountAcc
-                }
-              }
             }
           }
         }
@@ -252,59 +237,7 @@ export const communityAccountDetailQuery = gql`
           }
         }
       }
-      communityStats(host: { slug: $hostSlug }) {
-        associatedCollectives {
-          account {
-            id
-            isFrozen
-            ...AccountHoverCardFields
-          }
-          relations
-          firstInteractionAt
-          transactionSummary {
-            expenseTotal {
-              valueInCents
-              currency
-            }
-            expenseCount
-            contributionTotal {
-              valueInCents
-              currency
-            }
-            contributionCount
-          }
-        }
-        associatedOrganizations {
-          account {
-            id
-            ...AccountHoverCardFields
-          }
-          relations
-          firstInteractionAt
-          transactionSummary {
-            expenseTotal {
-              valueInCents
-              currency
-            }
-            expenseCount
-            contributionTotal {
-              valueInCents
-              currency
-            }
-            contributionCount
-          }
-        }
-        relations
-        transactionSummary {
-          year
-          expenseCountAcc
-          contributionCountAcc
-        }
-        lastInteractionAt
-        firstInteractionAt
-      }
     }
-
     host(slug: $hostSlug) {
       id
       publicId
@@ -364,6 +297,133 @@ export const communityAccountDetailQuery = gql`
   ${vendorFieldFragment}
 `;
 
+export const communityAccountOverviewQuery = gql`
+  query CommunityAccountOverview($accountId: String!, $hostSlug: String!) {
+    account(id: $accountId) {
+      id
+      communityStats(host: { slug: $hostSlug }) {
+        relations
+        transactionSummary {
+          debitCount
+          creditCount
+          debitTotal {
+            valueInCents
+            currency
+          }
+          creditTotal {
+            valueInCents
+            currency
+          }
+        }
+        creditTimeSeries: transactionSummaryTimeSeries(type: CREDIT) {
+          dateFrom
+          dateTo
+          timeUnit
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+            count
+          }
+        }
+        debitTimeSeries: transactionSummaryTimeSeries(type: DEBIT) {
+          dateFrom
+          dateTo
+          timeUnit
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+            count
+          }
+        }
+        lastInteractionAt
+        firstInteractionAt
+      }
+    }
+    recentMoneyIn: transactions(
+      fromAccount: { id: $accountId }
+      host: { slug: $hostSlug }
+      limit: 5
+      orderBy: { field: CREATED_AT, direction: DESC }
+      kind: [CONTRIBUTION, ADDED_FUNDS, EXPENSE]
+      type: CREDIT
+    ) {
+      nodes {
+        id
+        legacyId
+        description
+        type
+        kind
+        createdAt
+        order {
+          legacyId
+        }
+        toAccount {
+          id
+          name
+          slug
+          imageUrl
+          type
+        }
+        fromAccount {
+          id
+          name
+          slug
+          imageUrl
+          type
+        }
+        amount {
+          valueInCents
+          currency
+        }
+      }
+    }
+    recentMoneyOut: transactions(
+      fromAccount: { id: $accountId }
+      host: { slug: $hostSlug }
+      limit: 5
+      orderBy: { field: CREATED_AT, direction: DESC }
+      kind: [EXPENSE, ADDED_FUNDS]
+      type: DEBIT
+    ) {
+      nodes {
+        id
+        legacyId
+        description
+        type
+        kind
+        createdAt
+        expense {
+          legacyId
+        }
+        toAccount {
+          id
+          name
+          slug
+          imageUrl
+          type
+        }
+        fromAccount {
+          id
+          name
+          slug
+          imageUrl
+          type
+        }
+        amount {
+          valueInCents
+          currency
+        }
+      }
+    }
+  }
+`;
+
 export const communityAccountActivitiesQuery = gql`
   query CommunityAccountActivities($accountId: String!, $host: AccountReferenceInput!, $limit: Int!, $offset: Int!) {
     account(id: $accountId) {
@@ -401,17 +461,11 @@ export const communityAccountExpensesDetailQuery = gql`
       legacyId
       communityStats(host: $host) {
         transactionSummary {
-          year
-          expenseTotal {
+          debitTotal {
             valueInCents
             currency
           }
-          expenseCount
-          expenseTotalAcc {
-            valueInCents
-            currency
-          }
-          expenseCountAcc
+          debitCount
         }
       }
       submittedExpenses: expenses(
@@ -539,17 +593,11 @@ export const communityAccountContributionsDetailQuery = gql`
       legacyId
       communityStats(host: $host) {
         transactionSummary {
-          year
-          contributionTotal {
+          creditTotal {
             valueInCents
             currency
           }
-          contributionCount
-          contributionTotalAcc {
-            valueInCents
-            currency
-          }
-          contributionCountAcc
+          creditCount
         }
       }
       orders(host: $host, limit: $limit, offset: $offset) {

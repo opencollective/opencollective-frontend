@@ -1,13 +1,16 @@
 import React, { useCallback } from 'react';
+import type { ColumnDef } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
+import { clsx } from 'clsx';
 import { capitalize, compact } from 'lodash';
 import type { LucideProps } from 'lucide-react';
 import {
   Archive,
+  ArrowDownRight,
   ArrowRightLeft,
+  ArrowUpRight,
   BookKey,
   Building2,
-  EarthIcon,
-  EyeIcon,
   HandCoins,
   HelpCircle,
   Pencil,
@@ -20,16 +23,25 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { Account, CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
+import type {
+  CommunityAccountDetailQuery,
+  CommunityAccountOverviewQuery,
+  DashboardVendorsQuery,
+  PeopleHostDashboardQuery,
+  VendorFieldsFragment,
+} from '@/lib/graphql/types/v2/graphql';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
+import { DateTimeField, KycProvider } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
+import { AccountHoverCard } from '@/components/AccountHoverCard';
 import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';
 import LinkCollective from '@/components/LinkCollective';
 import { useModal } from '@/components/ModalContext';
+import { ColumnHeader } from '@/components/table/ColumnHeader';
 import { actionsColumn } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
@@ -62,15 +74,19 @@ export const getCollectiveTypeIcon = (
   }
 };
 
+export type CommunityAccount =
+  | PeopleHostDashboardQuery['community']['nodes'][number]
+  | DashboardVendorsQuery['community']['nodes'][number];
+
 export function usePersonActions(opts: UsePersonActionsOptions) {
   const intl = useIntl();
   const { showModal } = useModal();
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
 
-  return useCallback<GetActions<Account>>(
+  return useCallback<GetActions<CommunityAccount>>(
     contributor => {
-      const actions: ReturnType<GetActions<Account>> = {
+      const actions: ReturnType<GetActions<CommunityAccount>> = {
         primary: [],
         secondary: [],
       };
@@ -191,110 +207,6 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
       return actions;
     },
     [intl, showModal, router, opts],
-  );
-}
-
-type UseAssociatedCollectiveActionsOpts = Pick<UsePersonActionsOptions, 'accountSlug'>;
-type AssociatedCollective = CommunityAccountDetailQuery['account']['communityStats']['associatedCollectives'][number];
-
-export function useAssociatedCollectiveActions(opts: UseAssociatedCollectiveActionsOpts) {
-  const intl = useIntl();
-  const router = useRouter();
-  const { LoggedInUser } = useLoggedInUser();
-
-  return useCallback<GetActions<AssociatedCollective>>(
-    associatedCollective => {
-      const actions: ReturnType<GetActions<AssociatedCollective>> = {
-        primary: [],
-        secondary: [],
-      };
-
-      // The contributor in this context is actually an Account from the community query
-      const account = associatedCollective && 'account' in associatedCollective ? associatedCollective.account : null;
-      const collectiveSlug = account?.slug;
-      const hostSlug = router.query.slug as string;
-
-      if (!collectiveSlug || !hostSlug) {
-        return actions;
-      }
-
-      actions.primary.push({
-        key: 'view-expenses',
-        label: intl.formatMessage({
-          defaultMessage: 'View All Expenses',
-          id: 'ViewAllExpenses',
-        }),
-        Icon: Receipt,
-        onClick: () => {
-          router.push({
-            pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-              ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
-              : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
-            query: {
-              ...(!LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) && {
-                status: 'ALL',
-              }),
-              searchTerm: `@${opts.accountSlug}`,
-              account: collectiveSlug,
-            },
-          });
-        },
-      });
-      actions.primary.push({
-        key: 'view-contributions',
-        label: intl.formatMessage({
-          defaultMessage: 'View All Contributions',
-          id: 'ViewAllContributions',
-        }),
-        Icon: HandCoins,
-        onClick: () => {
-          router.push({
-            pathname: `/dashboard/${hostSlug}/incoming-contributions`,
-            query: { searchTerm: `@${opts.accountSlug}`, hostedAccounts: collectiveSlug },
-          });
-        },
-      });
-      actions.primary.push({
-        key: 'view-transactions',
-        label: intl.formatMessage({
-          defaultMessage: 'View All Transactions',
-          id: 'transactions.viewAll',
-        }),
-        Icon: ArrowRightLeft,
-        onClick: () => {
-          router.push({
-            pathname: `/dashboard/${hostSlug}/host-transactions`,
-            query: { searchTerm: `@${opts.accountSlug}`, account: collectiveSlug },
-          });
-        },
-      });
-
-      actions.secondary.push({
-        key: 'view-collective-details',
-        label: intl.formatMessage({
-          defaultMessage: 'View Collective Details',
-          id: 'CommunitySection.ViewCollectiveDetails',
-        }),
-        Icon: EyeIcon,
-        onClick: () => {
-          router.push(`/dashboard/${hostSlug}/hosted-collectives/${account.id}`);
-        },
-      });
-      actions.secondary.push({
-        key: 'view-collective-profile',
-        label: intl.formatMessage({
-          defaultMessage: 'View Collective Public Profile',
-          id: 'CommunitySection.ViewCollectiveProfile',
-        }),
-        Icon: EarthIcon,
-        onClick: () => {
-          router.push(`/${account.slug}`);
-        },
-      });
-
-      return actions;
-    },
-    [intl, router, opts.accountSlug],
   );
 }
 
@@ -537,3 +449,165 @@ export const getMembersTableColumns = (intl, includeTransactionSummary = false) 
       },
     },
   ].filter(Boolean);
+
+const CounterpartyAccount = ({ account }) => {
+  if (!account) {
+    return null;
+  }
+  return (
+    <AccountHoverCard
+      account={account}
+      trigger={
+        <div className="inline-flex items-center gap-1">
+          <Avatar collective={account} radius={16} />
+          <span className="truncate">{account.name}</span>
+        </div>
+      }
+    />
+  );
+};
+
+const getTransactionDescription = (transaction: {
+  description?: string;
+  type: string;
+  kind?: string;
+  fromAccount?: { id?: string; name?: string; slug?: string; type?: string; imageUrl?: string };
+  toAccount?: { id?: string; name?: string; slug?: string; type?: string; imageUrl?: string };
+}): React.ReactNode => {
+  const counterparty = transaction.type === 'CREDIT' ? transaction.toAccount : transaction.fromAccount;
+
+  switch (transaction.kind) {
+    case 'CONTRIBUTION':
+      return (
+        <div className="flex items-center gap-2 text-nowrap">
+          {transaction.type === 'CREDIT' ? (
+            <FormattedMessage
+              defaultMessage="Contribution to {account}"
+              id="CommunityTransaction.ContributionTo"
+              values={{ account: <CounterpartyAccount account={counterparty} /> }}
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Contribution from {account}"
+              id="CommunityTransaction.ContributionFrom"
+              values={{ account: <CounterpartyAccount account={counterparty} /> }}
+            />
+          )}
+        </div>
+      );
+    case 'ADDED_FUNDS':
+      return (
+        <div className="flex items-center gap-2 text-nowrap">
+          {transaction.type === 'CREDIT' ? (
+            <FormattedMessage
+              defaultMessage="Added funds to {account}"
+              id="CommunityTransaction.AddedFundsTo"
+              values={{ account: <CounterpartyAccount account={counterparty} /> }}
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Added funds from {account}"
+              id="CommunityTransaction.AddedFundsFrom"
+              values={{ account: <CounterpartyAccount account={counterparty} /> }}
+            />
+          )}
+        </div>
+      );
+    case 'EXPENSE':
+      return (
+        <div className="flex items-center gap-2 text-nowrap">
+          {transaction.type === 'CREDIT' ? (
+            <FormattedMessage
+              defaultMessage="Expense payment to {account}"
+              id="CommunityTransaction.ExpenseTo"
+              values={{ account: <CounterpartyAccount account={counterparty} /> }}
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Expense payment from {account}"
+              id="CommunityTransaction.ExpenseFrom"
+              values={{ account: <CounterpartyAccount account={counterparty} /> }}
+            />
+          )}
+        </div>
+      );
+    default:
+      return (
+        <div className="flex items-center gap-2 text-nowrap">
+          {transaction.type === 'CREDIT' ? (
+            <FormattedMessage
+              defaultMessage="Payment to {account}"
+              id="CommunityTransaction.PaymentTo"
+              values={{ account: <CounterpartyAccount account={counterparty} /> }}
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Payment from {account}"
+              id="CommunityTransaction.PaymentFrom"
+              values={{ account: <CounterpartyAccount account={counterparty} /> }}
+            />
+          )}
+        </div>
+      );
+  }
+};
+
+type RecentTransaction =
+  | CommunityAccountOverviewQuery['recentMoneyIn']['nodes'][number]
+  | CommunityAccountOverviewQuery['recentMoneyOut']['nodes'][number];
+const columnHelper = createColumnHelper<RecentTransaction>();
+export const recentTransactionsColumns: ColumnDef<RecentTransaction>[] = [
+  columnHelper.accessor('createdAt', {
+    id: 'date',
+    meta: { className: 'w-24' },
+    header: ctx => <ColumnHeader {...ctx} sortField={DateTimeField.CREATED_AT} />,
+    cell: ({ cell }) => {
+      const createdAt = cell.getValue() as string;
+
+      return (
+        <div className="whitespace-nowrap">
+          <DateTime dateStyle="medium" value={createdAt} />
+        </div>
+      );
+    },
+  }),
+  columnHelper.accessor('description', {
+    meta: { className: 'w-32 2xl:w-48' },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ row }) => {
+      const transaction = row.original;
+      return getTransactionDescription(transaction);
+    },
+  }),
+  columnHelper.accessor('amount', {
+    meta: {
+      className: 'w-28',
+      align: 'right',
+    },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ row }) => {
+      const transaction = row.original;
+
+      return (
+        <div
+          className={clsx(
+            'flex flex-row items-center truncate font-semibold antialiased',
+            transaction.type === 'CREDIT' ? 'text-green-600' : 'text-slate-700',
+          )}
+        >
+          {transaction.type === 'CREDIT' ? (
+            <ArrowUpRight className="text-green-600" size={20} />
+          ) : (
+            <ArrowDownRight className="text-red-600" size={20} />
+          )}
+          <FormattedMoneyAmount
+            amount={transaction.amount.valueInCents}
+            currency={transaction.amount.currency}
+            precision={2}
+            showCurrencyCode={false}
+          />
+        </div>
+      );
+    },
+  }),
+];
