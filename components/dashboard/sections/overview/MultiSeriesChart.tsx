@@ -12,7 +12,46 @@ import MessageBox from '../../../MessageBox';
 
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expanded }): ApexOptions => ({
+const DEFAULT_COLORS = [
+  '#1d4ed8', // blue
+  '#16a34a', // green
+  '#dc2626', // red
+  '#9333ea', // purple
+  '#ea580c', // orange
+  '#0891b2', // cyan
+  '#ca8a04', // yellow
+  '#be185d', // pink
+  '#4f46e5', // indigo
+  '#059669', // emerald
+];
+
+export interface MultiSeriesEntry {
+  label: string;
+  timeseries: TimeSeriesAmount;
+}
+
+export interface MultiSeriesChartProps {
+  series: MultiSeriesEntry[];
+  colors?: string[];
+  currency?: Currency;
+  expanded?: boolean;
+}
+
+const makeApexOptions = ({
+  currency,
+  timeUnit,
+  dateFrom,
+  intl,
+  expanded,
+  seriesEntries,
+}: {
+  currency?: Currency;
+  timeUnit: string;
+  dateFrom: string;
+  intl: ReturnType<typeof useIntl>;
+  expanded?: boolean;
+  seriesEntries: MultiSeriesEntry[];
+}): ApexOptions => ({
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },
@@ -26,14 +65,15 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     fontFamily: 'Inter, sans-serif',
   },
   legend: {
-    show: false,
+    show: expanded,
+    position: 'bottom',
+    horizontalAlign: 'left',
   },
   grid: {
     show: false,
     borderColor: '#90A4AE',
     strokeDashArray: 0,
     position: 'back',
-
     xaxis: {
       lines: {
         show: expanded,
@@ -93,11 +133,11 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     min: 0,
     labels: {
       show: expanded,
-      formatter: value =>
+      formatter: (value): string =>
         isNil(value)
           ? intl.formatMessage({ defaultMessage: 'No data', id: 'UG5qoS' })
           : !currency
-            ? value
+            ? String(value)
             : formatAmountForLegend(value, currency, intl.locale),
     },
   },
@@ -108,15 +148,8 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     y: {
       title: {
         formatter: (seriesName: string, { dataPointIndex }) => {
-          let startDate;
-
-          if (seriesName === 'current') {
-            startDate = dateFrom;
-          } else if (seriesName === 'comparison') {
-            startDate = compareFrom;
-          } else {
-            return '';
-          }
+          const entry = seriesEntries.find(e => e.label === seriesName);
+          const startDate = entry ? setDatesIfMissing(entry.timeseries).dateFrom : dateFrom;
           return formatDateLabel({ startDate, index: dataPointIndex, timeUnit });
         },
       },
@@ -124,47 +157,45 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
   },
 });
 
-const getSeries = ({ current, comparison }): ApexOptions['series'] => {
-  const series = [{ name: 'current', data: formatSeriesData(current), color: '#1d4ed8', zIndex: 2 }];
-  if (comparison) {
-    series.push({ name: 'comparison', data: formatSeriesData(comparison), color: '#cbd5e1', zIndex: 1 });
-  }
-  return series;
+const buildSeries = ({
+  entries,
+  colors,
+}: {
+  entries: { label: string; timeseries: TimeSeriesAmount }[];
+  colors: string[];
+}): ApexOptions['series'] => {
+  return entries.map((entry, index) => {
+    const ts = setDatesIfMissing(entry.timeseries);
+    return {
+      name: entry.label,
+      data: formatSeriesData({ ...ts }),
+      color: colors[index % colors.length],
+      zIndex: entries.length - index,
+    };
+  });
 };
 
-interface ComparisonChartProps {
-  current: TimeSeriesAmount;
-  comparison?: TimeSeriesAmount;
-  currency?: Currency;
-  expanded?: boolean;
-  isPeriod?: boolean;
-}
-
-function Chart({ current, comparison, expanded, currency }: ComparisonChartProps) {
+function Chart({ series: seriesEntries, colors = DEFAULT_COLORS, expanded, currency }: MultiSeriesChartProps) {
   const intl = useIntl();
 
-  // When using the "All time" option, the API does not return a dateFrom value, instead we pick the lowest returned date to start the time series.
-  // This is a temporary solution until the API returns the dateFrom value.
-  const currentWithDates = React.useMemo(() => setDatesIfMissing(current), [current]);
+  // Use the first series to derive shared timeUnit and dateFrom
+  const firstTimeseries = React.useMemo(() => setDatesIfMissing(seriesEntries[0].timeseries), [seriesEntries]);
 
-  const series = React.useMemo(
-    () => getSeries({ current: currentWithDates, comparison }),
-    [currentWithDates, comparison],
-  );
+  const apexSeries = React.useMemo(() => buildSeries({ entries: seriesEntries, colors }), [seriesEntries, colors]);
 
   const options = makeApexOptions({
     currency,
-    timeUnit: current.timeUnit,
-    dateFrom: currentWithDates.dateFrom,
-    compareFrom: comparison?.dateFrom,
+    timeUnit: firstTimeseries.timeUnit,
+    dateFrom: firstTimeseries.dateFrom,
     intl,
     expanded,
+    seriesEntries,
   });
 
-  return <ApexChart type="area" width="100%" height="100%" options={options} series={series} />;
+  return <ApexChart type="area" width="100%" height="100%" options={options} series={apexSeries} />;
 }
 
-export default function ComparisonChart(props: ComparisonChartProps) {
+export default function MultiSeriesChart(props: MultiSeriesChartProps) {
   return (
     <ErrorBoundary
       fallback={({ error }) => (

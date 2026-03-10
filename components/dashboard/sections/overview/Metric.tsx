@@ -39,7 +39,7 @@ export interface BaseMetricProps {
   timeseries?: {
     current: TimeSeriesAmount;
     comparison?: TimeSeriesAmount;
-    currency: Currency;
+    currency?: Currency;
   };
   helpLabel?: React.ReactNode;
   showCurrencyCode?: boolean;
