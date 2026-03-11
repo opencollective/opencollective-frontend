@@ -322,6 +322,18 @@ export const communityAccountDetailQuery = gql`
           ...LegalDocumentFields
         }
       }
+      features {
+        id
+        MULTI_CURRENCY_EXPENSES
+      }
+      requiredLegalDocuments
+      currency
+      transferwise {
+        id
+        availableCurrencies
+      }
+      supportedPayoutMethods
+      isTrustedHost
     }
 
     firstActivity: activities(

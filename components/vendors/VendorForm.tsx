@@ -572,6 +572,8 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                             payoutMethod={field.value}
                             host={host}
                             required={Boolean(formik.values.payoutMethod)}
+                            alwaysSave
+                            onlyDataFields
                           />
                         </div>
                       )}

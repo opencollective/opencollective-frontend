@@ -66,7 +66,15 @@ export const validatePayoutMethod = payoutMethod => {
  * This component is **fully controlled**, you need to call `validatePayoutMethod`
  * to proceed with the validation and pass the result with the `errors` prop.
  */
-const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSave = false, disabled = false }) => {
+const PayoutMethodForm = ({
+  payoutMethod,
+  fieldsPrefix,
+  host,
+  required,
+  alwaysSave = false,
+  disabled = false,
+  onlyDataFields = false,
+}) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const isNew = !payoutMethod.id;
@@ -167,6 +175,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
           host={host}
           optional={required === false}
           alwaysSave={alwaysSave}
+          onlyDataFields={onlyDataFields}
         />
       )}
       {isNew && !alwaysSave && (
