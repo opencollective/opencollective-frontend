@@ -209,7 +209,9 @@ const SubscriberDrawer = ({ id, openPlanModal }) => {
               <div className="flex w-full items-center gap-4">
                 <div className="flex items-center gap-3 overflow-hidden">
                   <Avatar collective={subscriber} className="" radius={32} />
-                  <p className="truncate text-xl font-semibold text-foreground">{subscriber.name}</p>
+                  <p className="truncate text-xl font-semibold text-foreground">
+                    <LinkCollective collective={subscriber}>{subscriber.name}</LinkCollective>
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Badge size="sm" type="outline">
