@@ -233,6 +233,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                   onClick={() => {
                     setEditVendor(account as unknown as VendorFieldsFragment);
                   }}
+                  disabled={!query.data?.host}
                 >
                   <FormattedMessage id="Edit" defaultMessage="Edit" />
                 </Button>
@@ -569,11 +570,11 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           getActions={() => ({})}
         />
       )}
-      {editVendor && (
+      {editVendor && query.data?.host && (
         <StyledModal onClose={() => setEditVendor(null)}>
           <VendorForm
-            host={query.data?.host}
-            supportsTaxForm={query.data?.host?.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)}
+            host={query.data.host}
+            supportsTaxForm={query.data.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)}
             vendor={editVendor}
             onSuccess={() => {
               setEditVendor(null);
