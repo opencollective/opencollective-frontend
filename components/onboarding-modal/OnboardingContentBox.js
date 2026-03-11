@@ -38,10 +38,9 @@ class OnboardingContentBox extends React.Component {
   }
 
   componentDidMount() {
-    const member = this.props.LoggedInUser.memberOf.filter(member => member.collective.id === this.props.collective.id);
-    this.setState({
-      admins: [{ role: 'ADMIN', member: this.props.LoggedInUser.collective, id: member[0].id }],
-    });
+    const membershipId = this.props.collective.admins?.[0]?.id;
+    const admins = [{ id: membershipId, role: 'ADMIN', member: this.props.LoggedInUser.toV1Collective() }];
+    this.setState({ admins }, () => this.props.updateAdmins(admins));
   }
 
   removeAdmin = collective => {
@@ -101,14 +100,14 @@ class OnboardingContentBox extends React.Component {
             </Flex>
             <Flex px={3} width="100%" flexWrap="wrap" data-cy="profile-card">
               <OnboardingProfileCard
-                key={this.props.LoggedInUser.collective.id}
-                collective={this.props.LoggedInUser.collective}
+                key={this.props.LoggedInUser.legacyId}
+                collective={this.props.LoggedInUser.toV1Collective()}
               />
               {this.props.memberInvitations.map(admin => (
                 <OnboardingProfileCard key={admin.memberAccount.id} collective={admin.memberAccount} isPending />
               ))}
               {admins
-                .filter(admin => admin.member.id !== this.props.LoggedInUser.collective.id)
+                .filter(admin => admin.member.id !== this.props.LoggedInUser.legacyId)
                 .map(admin => (
                   <OnboardingProfileCard
                     key={admin.member.id}

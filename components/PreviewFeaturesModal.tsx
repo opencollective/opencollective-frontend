@@ -56,13 +56,13 @@ const useTogglePreviewFeature = (feature: PreviewFeature, onManualFeatureUpdate:
     } else {
       await submitEditSettings({
         variables: {
-          account: { slug: LoggedInUser.collective.slug },
+          account: { slug: LoggedInUser.slug },
           key: `earlyAccess.${feature.key}`,
           value: checked,
         },
         update: (cache, { data }) => {
           cache.modify({
-            id: cache.identify(LoggedInUser.collective),
+            id: cache.identify({ __typename: 'Individual', id: LoggedInUser.id }),
             fields: { settings: () => data.editAccountSetting.settings },
           });
           updateLoggedInUserFromCache();

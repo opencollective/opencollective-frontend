@@ -1,19 +1,8 @@
 import React from 'react';
 
+import type { UserContextValue } from '../../components/UserProvider';
 import { UserContext } from '../../components/UserProvider';
 
-import type LoggedInUser from '../LoggedInUser';
-
-export type UserContextProps = {
-  errorLoggedInUser?: Error;
-  loadingLoggedInUser: boolean;
-  LoggedInUser: LoggedInUser | null;
-  login: (token?: string) => Promise<LoggedInUser>;
-  logout: (arg?: { redirect?: string; skipQueryRefetch?: boolean }) => Promise<void>;
-  refetchLoggedInUser: () => Promise<void>;
-  updateLoggedInUserFromCache: () => void;
-};
-
-const useLoggedInUser = (): UserContextProps => React.useContext(UserContext);
+const useLoggedInUser = (): UserContextValue => React.useContext(UserContext);
 
 export default useLoggedInUser;

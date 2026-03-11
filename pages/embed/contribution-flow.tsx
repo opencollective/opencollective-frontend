@@ -130,7 +130,7 @@ class EmbedContributionFlowPage extends React.Component<{
     } else {
       return (
         <Box height="100%" pt={3}>
-          <ContributionFlowContainer
+          <ContributionFlowContainer //  @ts-expect-error ContributionFlowContainer is a JS component wrapped in multiple HOCs that obscure its prop types
             isEmbed
             collective={account}
             host={account.host}
@@ -191,4 +191,8 @@ const addContributionFlowData = graphql(contributionFlowAccountQuery, {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default addContributionFlowData(withUser(injectIntl(withStripeLoader(withRouter(EmbedContributionFlowPage)))));
+export default addContributionFlowData(
+  withUser(injectIntl(withStripeLoader(withRouter(EmbedContributionFlowPage)))) as React.ComponentType<
+    Pick<React.ComponentProps<typeof EmbedContributionFlowPage>, 'collectiveSlug' | 'tierId'>
+  >,
+);

@@ -538,4 +538,10 @@ const addOrderSuccessQuery = graphql<{
   }),
 });
 
-export default withRouter(addOrderSuccessQuery(injectIntl(withUser(ContributionFlowSuccess))));
+export default withRouter(
+  addOrderSuccessQuery(
+    withUser(injectIntl(ContributionFlowSuccess)) as React.ComponentType<
+      Pick<React.ComponentProps<typeof ContributionFlowSuccess>, 'collective' | 'isEmbed' | 'router'>
+    >,
+  ),
+);

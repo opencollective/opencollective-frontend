@@ -159,7 +159,7 @@ const TransactionItem = ({ displayActions, collective, transaction }) => {
   const isCredit = type === TransactionTypes.CREDIT;
   const Item = isCredit ? CreditItem : DebitItem;
   const legacyCollectiveId = collective.legacyId || collective.id;
-  const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === legacyCollectiveId;
+  const isOwnUserProfile = LoggedInUser && LoggedInUser.legacyId === legacyCollectiveId;
   const avatarCollective = isCredit ? fromAccount : toAccount;
   const isPending = hasOrder && [ORDER_STATUS.PENDING].includes(order?.status);
 

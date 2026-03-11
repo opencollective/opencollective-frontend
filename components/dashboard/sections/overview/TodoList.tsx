@@ -299,10 +299,54 @@ export const HostTodoList = () => {
 };
 
 // Query for self-hosted organization specific todos (READY_TO_PAY, etc.)
-const moneyManagingOrgTodoQuery = gql`
-  query MoneyManagingOrgTodo($slug: String!) {
-    toPayExpenses: expenses(account: { slug: $slug }, status: [READY_TO_PAY], includeChildrenExpenses: true) {
-      totalCount
+const accountTodoQuery = gql`
+  query AccountTodo($slug: String!, $isOrgWithMoneyManagment: Boolean!) {
+    account(slug: $slug) {
+      toPayExpenses: expenses(status: [READY_TO_PAY], includeChildrenExpenses: true)
+        @include(if: $isOrgWithMoneyManagment) {
+        totalCount
+      }
+      pendingExpenses: expenses(
+        status: PENDING
+        direction: RECEIVED
+        includeChildrenExpenses: true
+        limit: 0
+        types: [INVOICE, RECEIPT, FUNDING_REQUEST, UNCLASSIFIED, CHARGE, SETTLEMENT]
+      ) {
+        totalCount
+      }
+      pendingGrants: expenses(
+        status: PENDING
+        direction: RECEIVED
+        includeChildrenExpenses: true
+        limit: 0
+        type: GRANT
+      ) {
+        totalCount
+      }
+      receivedGrantRequests: expenses(direction: RECEIVED, limit: 0, type: GRANT) {
+        totalCount
+      }
+      issuedGrantRequests: expenses(direction: SUBMITTED, limit: 0, type: GRANT) {
+        totalCount
+      }
+      pausedResumableIncomingContributions: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        includeHostedAccounts: false
+        includeChildrenAccounts: true
+        pausedBy: [COLLECTIVE, HOST, PLATFORM]
+      ) {
+        totalCount
+      }
+      pausedOutgoingContributions: orders(filter: OUTGOING, status: PAUSED, includeIncognito: true) {
+        totalCount
+      }
+      ... on AccountWithContributions {
+        canStartResumeContributionsProcess
+        hasResumeContributionsProcessStarted
+      }
     }
   }
 `;
@@ -321,22 +365,20 @@ export const AccountTodoList = () => {
 
   const isOrgWithMoneyManagment = account?.type === 'ORGANIZATION' && hasAccountMoneyManagement(account);
 
-  // Additional query for orgs with money management
-  const { data } = useQuery(moneyManagingOrgTodoQuery, {
-    variables: { slug: account?.slug },
-    skip: !isOrgWithMoneyManagment,
+  const { data } = useQuery(accountTodoQuery, {
+    variables: { slug: account?.slug, isOrgWithMoneyManagment },
   });
 
-  const pendingExpenseCount = account?.pendingExpenses?.totalCount || 0;
-  const pendingGrantCount = account?.pendingGrants?.totalCount || 0;
-  const pausedIncomingContributionsCount = account?.pausedResumableIncomingContributions?.totalCount || 0;
-  const pausedOutgoingContributions = account?.pausedOutgoingContributions?.totalCount || 0;
-  const canStartResumeContributionsProcess = account?.canStartResumeContributionsProcess;
+  const todoData = data?.account;
+
+  const toPayExpenseCount = todoData?.toPayExpenses?.totalCount || 0;
+  const pendingExpenseCount = todoData?.pendingExpenses?.totalCount || 0;
+  const pendingGrantCount = todoData?.pendingGrants?.totalCount || 0;
+  const pausedIncomingContributionsCount = todoData?.pausedResumableIncomingContributions?.totalCount || 0;
+  const pausedOutgoingContributions = todoData?.pausedOutgoingContributions?.totalCount || 0;
+  const canStartResumeContributionsProcess = todoData?.canStartResumeContributionsProcess;
   const canActOnPausedIncomingContributions =
     pausedIncomingContributionsCount > 0 && canStartResumeContributionsProcess;
-
-  // Expenses to pay, for orgs with money management
-  const toPayExpenseCount = data?.toPayExpenses?.totalCount || 0;
 
   const expensesHref = getDashboardRoute(
     account,

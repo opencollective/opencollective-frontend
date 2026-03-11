@@ -20,7 +20,7 @@ export default function Overview({ accountSlug, subpath }: DashboardSectionProps
   }
 
   // Host Overview
-  if (account.type === 'ORGANIZATION' && account.hasHosting) {
+  if (account.type === 'ORGANIZATION' && 'hasHosting' in account && account.hasHosting) {
     return <HostOverview accountSlug={accountSlug} />;
   }
 

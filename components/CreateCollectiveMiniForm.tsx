@@ -300,11 +300,11 @@ const CreateCollectiveMiniForm = ({
     if (excludeAdminFields) {
       const clonedValues = cloneDeep({ ...formValues, type });
       const assignAdmin = pick(clonedValues, ['name', 'legalName', 'website', 'type']);
-      values = assign(assignAdmin, { members: [{ member: { id: LoggedInUser.CollectiveId } }] });
+      values = assign(assignAdmin, { members: [{ member: { id: LoggedInUser.legacyId } }] });
     } else {
       values = cloneDeep({ ...formValues, type });
       if (addLoggedInUserAsAdmin && LoggedInUser && values.members) {
-        values.members.push({ member: { id: LoggedInUser.CollectiveId } });
+        values.members.push({ member: { id: LoggedInUser.legacyId } });
       }
     }
     return createCollective({ variables: prepareMutationVariables(values) }).then(({ data }) => {

@@ -30,8 +30,8 @@ type SigninPageProps = {
   isSuspiciousUserAgent: boolean;
   email: string;
   login: (token?: string) => Promise<LoggedInUser>;
-  errorLoggedInUser: string;
-  LoggedInUser: LoggedInUser;
+  errorLoggedInUser: string | Error | null;
+  LoggedInUser: LoggedInUser | null;
   loadingLoggedInUser: boolean;
   router: Router;
   whitelabel: WhitelabelProps;
@@ -219,6 +219,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
     }
 
     const error = errorLoggedInUser || this.state.error;
+    const errorMessage = error === null ? null : typeof error === 'string' ? error : error.message;
 
     if (loadingLoggedInUser || this.state.redirecting || (token && !error)) {
       return <LoadingGrid />;
@@ -226,17 +227,17 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
 
     return (
       <React.Fragment>
-        {error && !error.includes('Two-factor authentication is enabled') && (
+        {errorMessage && !errorMessage.includes('Two-factor authentication is enabled') && (
           <MessageBox type="error" withIcon mb={4} data-cy="signin-message-box">
             <strong>
               <FormattedMessage
                 id="login.failed"
                 defaultMessage="Sign In failed: {message}."
-                values={{ message: error }}
+                values={{ message: errorMessage }}
               />
             </strong>
             <br />
-            {!error?.includes('Two-factor authentication') && (
+            {!errorMessage?.includes('Two-factor authentication') && (
               <FormattedMessage
                 id="login.askAnother"
                 defaultMessage="You can ask for a new sign in link using the form below."
@@ -279,4 +280,4 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default withUser(withRouter(SigninPage));
+export default withRouter(withUser(SigninPage));

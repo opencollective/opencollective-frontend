@@ -119,7 +119,6 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
-    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({
@@ -137,7 +136,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostFinancialContributionsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: 'hasHosting' in account && account.hasHosting ? queryFilter.values.hostContext : undefined,
     },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -174,7 +173,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
-            {account.hasHosting && (
+            {'hasHosting' in account && account.hasHosting && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}
@@ -184,7 +183,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
           </div>
         }
         description={
-          account.hasHosting ? (
+          'hasHosting' in account && account.hasHosting ? (
             <FormattedMessage
               defaultMessage="Contributions made to your Organization and Collectives you host."
               id="To33FZ"

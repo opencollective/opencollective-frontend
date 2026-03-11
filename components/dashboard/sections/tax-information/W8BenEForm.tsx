@@ -113,7 +113,7 @@ export const getInitialValuesForW8BenE = (
   user: LoggedInUser,
   account: AccountFromTaxInformationQuery,
 ): W8BenETaxFormValues => {
-  const nameParts = splitName(user.collective.legalName || user.collective.name);
+  const nameParts = splitName(user.legalName || user.name);
   return merge(generateInitialValuesFromSchema(schema), {
     signer: nameParts,
     businessName: account.legalName || account.name,

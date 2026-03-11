@@ -38,7 +38,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     toVariables,
     filters,
   });
-  const createdByAccount = accountSlug === LoggedInUser?.collective.slug ? { slug: accountSlug } : null;
+  const createdByAccount = accountSlug === LoggedInUser?.slug ? { slug: accountSlug } : null;
   const fromAccount = !createdByAccount ? { slug: accountSlug } : null;
 
   const variables = {
@@ -61,7 +61,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   });
 
   const filterMeta: FilterMeta = {
-    currency: (LoggedInUser?.collective?.currency || 'USD') as Currency,
+    currency: (LoggedInUser?.currency || 'USD') as Currency,
     omitExpenseTypes,
     accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
