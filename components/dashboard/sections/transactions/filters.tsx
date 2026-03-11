@@ -65,6 +65,7 @@ export const schema = z.object({
   group: isMulti(z.string().uuid()).optional(),
   isRefund: boolean.optional(),
   hasDebt: boolean.optional(),
+  includeEditedReversedTransactions: boolean.optional(),
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -156,6 +157,19 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
           value,
         }));
       }, [intl]);
+      return <ComboSelectFilter options={options} {...props} />;
+    },
+  },
+  includeEditedReversedTransactions: {
+    labelMsg: defineMessage({ defaultMessage: 'Edited Reversals', id: 'transactions.editedReversals' }),
+    Component: ({ intl, ...props }) => {
+      const options = React.useMemo(
+        () => [
+          { value: true, label: intl.formatMessage({ defaultMessage: 'Include', id: 'include' }) },
+          { value: false, label: intl.formatMessage({ defaultMessage: 'Exclude', id: 'exclude' }) },
+        ],
+        [intl],
+      );
       return <ComboSelectFilter options={options} {...props} />;
     },
   },
