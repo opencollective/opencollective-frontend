@@ -118,6 +118,7 @@ export const transactionsTableQuery = gql`
     $accountingCategory: [String]
     $paymentMethod: [PaymentMethodReferenceInput]
     $payoutMethod: PayoutMethodReferenceInput
+    $includeEditedReversedTransactions: Boolean
   ) {
     transactions(
       host: $hostAccount
@@ -155,6 +156,7 @@ export const transactionsTableQuery = gql`
       accountingCategory: $accountingCategory
       paymentMethod: $paymentMethod
       payoutMethod: $payoutMethod
+      includeEditedReversedTransactions: $includeEditedReversedTransactions
     ) {
       ...TransactionsTableQueryCollectionFragment
     }
