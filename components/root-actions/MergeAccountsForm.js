@@ -95,6 +95,7 @@ const MergeAccountsForm = () => {
               inputId={id}
               onChange={option => setFromAccount(option?.value || null)}
               collective={fromAccount}
+              includeAllVendors
               isClearable
               noCache // Don't cache to prevent showing merged collectives
               skipGuests={false}
@@ -111,6 +112,7 @@ const MergeAccountsForm = () => {
               filterResults={accounts => (!fromAccount ? accounts : accounts.filter(a => a.id !== fromAccount.id))}
               collective={toAccount}
               types={fromAccount ? [fromAccount.type] : undefined}
+              includeAllVendors
               isClearable
               noCache // Don't cache to prevent showing merged collectives
               skipGuests={false}
