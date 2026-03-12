@@ -373,6 +373,7 @@ const formSchemaQuery = gql`
       MULTI_CURRENCY_EXPENSES
       PAYPAL_PAYOUTS
       CHART_OF_ACCOUNTS
+      PAYPAL_CONNECT
     }
   }
 
@@ -403,6 +404,7 @@ const formSchemaQuery = gql`
     canBeDeleted
     createdAt
     updatedAt
+    isVerified
   }
 
   fragment ExpenseFormSchemaHostFields on Host {
@@ -633,6 +635,7 @@ type ExpenseFormOptions = {
   canChangeAccount?: boolean;
   lockedFields?: ExpenseLockableFields[];
   hasInvalidAccount?: boolean;
+  isPaypalConnectEnabled?: boolean;
 };
 
 const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
@@ -1415,6 +1418,7 @@ async function buildFormOptions(
     if (host) {
       options.isHostAdmin = loggedInUser?.isAdminOfCollective(host) ?? false;
       options.host = host;
+      options.isPaypalConnectEnabled = host.features?.PAYPAL_CONNECT !== 'DISABLED';
       options.vendorsForAccount =
         'vendorsForAccount' in host ? (host.vendorsForAccount?.['nodes'] as ExpenseVendorFieldsFragment[]) || [] : [];
       options.showVendorsOption = options.isHostAdmin || ('vendors' in host ? host.vendors?.['totalCount'] > 0 : false);

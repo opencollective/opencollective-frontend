@@ -28,7 +28,9 @@ export default function CreatePayoutMethodModal({ account, open, onOpenChange, o
             newPayoutMethodTypes={[PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.PAYPAL, PayoutMethodType.OTHER]}
             loggedInAccount={account}
             payeeSlug={account.slug}
+            payee={account}
             refresh={onUpdate}
+            isPaypalConnectEnabled
           />
         </Formik>
       </DialogContent>

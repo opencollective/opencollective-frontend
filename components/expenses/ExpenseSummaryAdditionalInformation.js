@@ -170,7 +170,7 @@ const ExpenseSummaryAdditionalInformation = ({
                   values={{ item: <FormattedMessage key="item" id="Balance" defaultMessage="Balance" /> }}
                 />
               </Container>
-              <Box mt={2}>
+              <Box mt={2} fontSize="12px">
                 <FormattedMoneyAmount
                   amount={collective.stats.balanceWithBlockedFunds.valueInCents}
                   currency={collective.stats.balanceWithBlockedFunds.currency}
@@ -265,7 +265,7 @@ const ExpenseSummaryAdditionalInformation = ({
         />
 
         {payeeLocation && isInvoice && (
-          <Container whiteSpace="pre-wrap" color="black.700" fontSize="14px" lineHeight="16px" mt={2}>
+          <Container whiteSpace="pre-wrap" color="black.700" fontSize="12px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
           </Container>
         )}
