@@ -1107,6 +1107,7 @@ type CollectiveFeatures {
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
+  PAYPAL_CONNECT: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
@@ -1174,6 +1175,7 @@ type Policies {
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
   EXPENSE_PUBLIC_VENDORS: Boolean
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
+  REQUIRE_PAYPAL_VERIFICATION: REQUIRE_PAYPAL_VERIFICATION
 
   """
   Contribution threshold to enforce contributor info. This resolver can be called from the collective or the host, when resolved through the collective the thresholds are returned in the collective currency
@@ -1962,6 +1964,12 @@ enum CurrencyExchangeRateSourceType {
 type EXPENSE_CATEGORIZATION {
   requiredForExpenseSubmitters: Boolean
   requiredForCollectiveAdmins: Boolean
+}
+
+type REQUIRE_PAYPAL_VERIFICATION {
+  enabled: Boolean!
+  appliesToHostedCollectives: Boolean!
+  verificationValidityDays: Int
 }
 
 type CONTRIBUTOR_INFO_THRESHOLDS {

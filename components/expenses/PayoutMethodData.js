@@ -1,12 +1,15 @@
 import React, { Fragment } from 'react';
 import { get, startCase, upperCase } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { BadgeCheck, ShieldAlert } from 'lucide-react';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 
 import Container from '../Container';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import { Badge } from '../ui/Badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const renderObject = object =>
   Object.entries(object).reduce((acc, [key, value]) => {
@@ -42,9 +45,53 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
   }
 
   switch (payoutMethod.type) {
-    case PayoutMethodType.PAYPAL:
+    case PayoutMethodType.PAYPAL: {
+      const paypalInfo = payoutMethod.paypalInfo;
+      const isVerified = payoutMethod.isVerified;
+      const verifiedAt = paypalInfo?.verifiedAt;
       return (
         <div>
+          {/* Verification status — shown when paypalInfo is available (host admins / permission holders) */}
+          {isLoading ? null : isVerified === true ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge type="success" size="xs" className="mb-2 cursor-help px-2">
+                  <BadgeCheck size={12} />
+                  {verifiedAt ? (
+                    <FormattedMessage
+                      defaultMessage="Verified on {date}"
+                      id="FJwSTB"
+                      values={{ date: <FormattedDate value={verifiedAt} dateStyle="short" /> }}
+                    />
+                  ) : (
+                    <FormattedMessage defaultMessage="Verified" id="Z8971h" values={{ service: 'PayPal' }} />
+                  )}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs font-normal">
+                <FormattedMessage
+                  defaultMessage="This user connected their PayPal account, confirming ownership of this email address."
+                  id="PayoutMethod.PayPal.VerifiedTooltip"
+                />
+              </TooltipContent>
+            </Tooltip>
+          ) : isVerified === false ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge type="warning" size="xs" className="mb-2 cursor-help">
+                  <ShieldAlert size={12} />
+                  <FormattedMessage defaultMessage="Unverified account" id="VlBhuE" />
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs font-normal">
+                <FormattedMessage
+                  defaultMessage="This email was provided by the user and has not been verified through PayPal."
+                  id="PayoutMethod.PayPal.UnverifiedTooltip"
+                />
+              </TooltipContent>
+            </Tooltip>
+          ) : null}
+
           {showLabel && (
             <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
@@ -52,11 +99,13 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
               <PrivateInfoIcon />
             </Container>
           )}
+
           <div className="overflow-hidden text-sm text-ellipsis text-slate-700">
             {getPmData(payoutMethod, 'email', isLoading)}
           </div>
         </div>
       );
+    }
     case PayoutMethodType.OTHER:
       return (
         <div>

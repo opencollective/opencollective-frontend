@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Formik, useFormikContext } from 'formik';
 import { get, isEmpty, omit, pick, truncate } from 'lodash';
-import { Pencil, Trash2 } from 'lucide-react';
+import { BadgeCheck, Pencil, ShieldAlert, Trash2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -16,6 +16,7 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
+import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
 import { objectKeys } from '@/lib/utils';
@@ -26,11 +27,13 @@ import { FormField } from '@/components/FormField';
 import { useModal } from '@/components/ModalContext';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
 import MessageBox from '../../MessageBox';
 import { PayoutMethodLabel } from '../../PayoutMethodLabel';
+import PaypalConnectButton from '../../paypal/PaypalConnectButton';
 import { Button } from '../../ui/Button';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { useToast } from '../../ui/useToast';
@@ -42,6 +45,8 @@ import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
 import { updateAccountLegalNameMutation } from './mutations';
 import { privateInfoYouAndHost, privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
+
+const getPayoutMethodHTMLId = (payoutMethodId: string) => `payout-method-option-${payoutMethodId}`;
 
 type PayoutMethodSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
@@ -62,6 +67,7 @@ function getFormProps(form: ExpenseForm) {
       'isAdminOfPayee',
       'loggedInAccount',
       'expense',
+      'isPaypalConnectEnabled',
     ]),
   };
 }
@@ -162,6 +168,13 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     async newPayoutMethodId => {
       await refresh();
       setFieldValue('payoutMethodId', newPayoutMethodId);
+      // Scroll to the payout method, as it might end up in a different place
+      setTimeout(() => {
+        const payoutMethodElement = document.getElementById(getPayoutMethodHTMLId(newPayoutMethodId));
+        if (payoutMethodElement) {
+          payoutMethodElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
     },
     [refresh, setFieldValue],
   );
@@ -282,6 +295,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 disableWarningMessages={
                   payeeIsCollectiveFamilyType && !LoggedInUser.isAdminOfCollective(props.payee['host'])
                 }
+                isPaypalConnectEnabled={props['isPaypalConnectEnabled']}
               />
             ))}
 
@@ -299,12 +313,24 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 value="__newPayoutMethod"
                 data-cy="add-new-payout-method"
                 checked={isNewPayoutMethodSelected}
-                disabled={isLoading || props.initialLoading || props.isSubmitting}
+                disabled={isLoading || props.initialLoading || props.isSubmitting || !props.payee}
                 showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
                 className="min-w-0"
                 subContent={<NewPayoutMethodOptionWrapper />}
               >
-                <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
+                <div>
+                  <div>
+                    <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
+                  </div>
+                  {!props.payee && (
+                    <div className="mt-1 text-xs text-gray-500 italic">
+                      <FormattedMessage
+                        defaultMessage="Please fill the “Who is getting paid” section first."
+                        id="gu52Su"
+                      />
+                    </div>
+                  )}
+                </div>
               </RadioGroupCard>
             )}
         </RadioGroup>
@@ -348,7 +374,15 @@ function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
-    ...pick(form.options, ['account', 'newPayoutMethodTypes', 'payoutMethods', 'host', 'loggedInAccount', 'payee']),
+    ...pick(form.options, [
+      'account',
+      'newPayoutMethodTypes',
+      'payoutMethods',
+      'host',
+      'loggedInAccount',
+      'payee',
+      'isPaypalConnectEnabled',
+    ]),
   };
 }
 
@@ -357,8 +391,11 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
   const intl = useIntl();
   const { toast } = useToast();
   const [creatingPayoutMethod, setIsCreatingPayoutMethod] = React.useState(false);
+  const disabled = props.isSubmitting || !props.payee; // An empty payee is not supposed to happen since we disable the top option, but we're duplicating the logic in case another place in the code forces the selection.
 
   const { setFieldValue, setFieldTouched, validateForm, refresh } = props;
+
+  const isNewPaypalConnect = props.isPaypalConnectEnabled && props.newPayoutMethod?.type === PayoutMethodType.PAYPAL;
 
   const [createPayoutMethod] = useMutation<SavePayoutMethodMutation, SavePayoutMethodMutationVariables>(
     gql`
@@ -392,7 +429,9 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
 
         return;
       }
-      const errors = validatePayoutMethod(props.newPayoutMethod);
+      const errors = validatePayoutMethod(props.newPayoutMethod, {
+        isPaypalConnectEnabled: props.isPaypalConnectEnabled,
+      });
       if (!isEmpty(errors)) {
         return;
       }
@@ -412,6 +451,44 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       setIsCreatingPayoutMethod(false);
     }
   }, [createPayoutMethod, intl, props.newPayoutMethod, refresh, setFieldTouched, setFieldValue, toast, validateForm]);
+
+  const onPaypalConnectSuccess = React.useCallback(
+    async ({ payoutMethodId }: { payoutMethodId: string }) => {
+      try {
+        setIsCreatingPayoutMethod(true);
+        await refresh();
+        setFieldValue('payoutMethodId', payoutMethodId);
+        setFieldValue('newPayoutMethod', { data: {} });
+
+        // Scroll to the payout method, as it might end up in a different place
+        setTimeout(() => {
+          const payoutMethodElement = document.getElementById(getPayoutMethodHTMLId(payoutMethodId));
+          if (payoutMethodElement) {
+            payoutMethodElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+
+        toast({
+          variant: 'success',
+          message: (
+            <FormattedMessage defaultMessage="Your PayPal account has been connected." id="PayPal.ConnectSuccess" />
+          ),
+        });
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      } finally {
+        setIsCreatingPayoutMethod(false);
+      }
+    },
+    [intl, setFieldValue, toast, refresh],
+  );
+
+  const onPaypalConnectError = React.useCallback(
+    (err: Error) => {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
+    },
+    [intl, toast],
+  );
 
   const newPayoutMethodComboOptions = React.useMemo(
     () =>
@@ -452,7 +529,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
         <React.Fragment>
           <FormField
             name="newPayoutMethod.type"
-            disabled={props.isSubmitting}
+            disabled={disabled}
             label={intl.formatMessage({ defaultMessage: 'Choose a payout method', id: 'SlAq2H' })}
             isPrivate
             privateMessage={
@@ -465,7 +542,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
               <ComboSelect
                 {...field}
                 data-cy="payout-method-type-select"
-                disabled={props.isSubmitting}
+                disabled={disabled}
                 options={newPayoutMethodComboOptions}
                 onChange={onPayoutMethodTypeChange}
               />
@@ -474,12 +551,13 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
 
           {props.newPayoutMethod?.type && (
             <PayoutMethodForm
-              disabled={props.isSubmitting}
+              disabled={disabled}
               required
               alwaysSave
               fieldsPrefix="newPayoutMethod"
               payoutMethod={props.newPayoutMethod}
               host={props.host}
+              isPaypalConnectEnabled={props.isPaypalConnectEnabled}
             />
           )}
         </React.Fragment>
@@ -533,15 +611,28 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       )}
 
       {props.loggedInAccount && (
-        <div className="flex justify-end">
-          <Button
-            loading={creatingPayoutMethod || props.isSubmitting}
-            disabled={props.isSubmitting}
-            onClick={onSaveButtonClick}
-            className="mt-2"
-          >
-            <FormattedMessage defaultMessage="Save" id="save" />
-          </Button>
+        <div className="mt-4 flex justify-end">
+          {isNewPaypalConnect ? (
+            <PaypalConnectButton
+              className="w-full"
+              accountId={props.payee.id}
+              onSuccess={onPaypalConnectSuccess}
+              onError={onPaypalConnectError}
+              loading={creatingPayoutMethod}
+              disabled={disabled || !get(props.newPayoutMethod, 'data.currency')}
+              currency={get(props.newPayoutMethod, 'data.currency') as unknown as typeof PayPalSupportedCurrencies}
+              alias={get(props.newPayoutMethod, 'name')}
+            />
+          ) : (
+            <Button
+              loading={creatingPayoutMethod || props.isSubmitting}
+              disabled={disabled}
+              onClick={onSaveButtonClick}
+              className="w-full"
+            >
+              <FormattedMessage defaultMessage="Save" id="save" />
+            </Button>
+          )}
         </div>
       )}
     </div>
@@ -571,6 +662,7 @@ type PayoutMethodRadioGroupItemProps = {
   }>;
   moreActions?: React.ReactNode;
   account?: ExpenseForm['options']['account'];
+  isPaypalConnectEnabled?: boolean;
 };
 
 export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(props: PayoutMethodRadioGroupItemProps) {
@@ -627,6 +719,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
     }
   }, [submitLegalNameMutation, toast, intl]);
 
+  // Connect/edit/delete callbacks
   const [deletePayoutMethod] = useMutation(gql`
     mutation DeletePayoutMethod($payoutMethodId: String!) {
       removePayoutMethod(payoutMethodId: $payoutMethodId) {
@@ -752,6 +845,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
     >
       {({ setFieldTouched, setFieldValue, values, submitForm }) => (
         <CardComponent
+          id={getPayoutMethodHTMLId(props.payoutMethod.id)}
           value={props.payoutMethod.id}
           disabled={props.archived}
           showSubcontent={isOpen}
@@ -768,40 +862,42 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                       required
                       alwaysSave
                       fieldsPrefix={`editingPayoutMethod`}
-                      payoutMethod={omit(props.payoutMethod, 'id')}
+                      payoutMethod={omit(props.payoutMethod, 'id')} // This edit form should always create a new payout method
                       host={props.host}
+                      isPaypalConnectEnabled={props.isPaypalConnectEnabled}
                     />
-                    {values.editingPayoutMethod.name !==
-                      generatePayoutMethodName(
-                        intl,
-                        values.editingPayoutMethod.type,
-                        values.editingPayoutMethod.data,
-                      ) && (
-                      <Button
-                        disabled={props.isSubmitting}
-                        loading={props.isSubmitting}
-                        size="xs"
-                        variant="link"
-                        className="p-0"
-                        onClick={() => {
-                          setFieldValue(
-                            `editingPayoutMethod.name`,
-                            generatePayoutMethodName(
-                              intl,
-                              values.editingPayoutMethod.type,
-                              values.editingPayoutMethod.data,
-                            ),
-                          );
-                          setFieldTouched(`editingPayoutMethod.name`, false);
-                        }}
-                      >
-                        <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
-                      </Button>
-                    )}
+                    {props.payoutMethod.type !== PayoutMethodType.PAYPAL &&
+                      values.editingPayoutMethod.name !==
+                        generatePayoutMethodName(
+                          intl,
+                          values.editingPayoutMethod.type,
+                          values.editingPayoutMethod.data,
+                        ) && (
+                        <Button
+                          disabled={props.isSubmitting}
+                          loading={props.isSubmitting}
+                          size="xs"
+                          variant="link"
+                          className="p-0"
+                          onClick={() => {
+                            setFieldValue(
+                              `editingPayoutMethod.name`,
+                              generatePayoutMethodName(
+                                intl,
+                                values.editingPayoutMethod.type,
+                                values.editingPayoutMethod.data,
+                              ),
+                            );
+                            setFieldTouched(`editingPayoutMethod.name`, false);
+                          }}
+                        >
+                          <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
+                        </Button>
+                      )}
                   </div>
                 )}
 
-                <div className="mt-4 flex justify-end gap-2">
+                <div className="mt-6 flex justify-end gap-2">
                   <Button
                     disabled={isLoadingEditPayoutMethod || props.isSubmitting}
                     variant="secondary"
@@ -811,9 +907,57 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                   >
                     <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
                   </Button>
-                  <Button loading={isLoadingEditPayoutMethod} onClick={submitForm}>
-                    <FormattedMessage defaultMessage="Save" id="save" />
-                  </Button>
+                  {values.editingPayoutMethod.type === PayoutMethodType.PAYPAL &&
+                  props.isPaypalConnectEnabled &&
+                  !values.editingPayoutMethod.isVerified ? (
+                    <PaypalConnectButton
+                      accountId={props.payee.id}
+                      payoutMethodId={values.editingPayoutMethod.id}
+                      onSuccess={async ({ payoutMethodId }) => {
+                        try {
+                          // We have no guarantee that `payoutMethodId` is the same as the payout method we're updating, since the backend
+                          // might return a new one if the linked PayPal account email is different from the one we're editing.
+                          const hasCreatedNewPayoutMethod = values.editingPayoutMethod.id !== payoutMethodId;
+                          setIsLoadingEditPayoutMethod(true);
+                          setIsEditingPayoutMethod(false);
+                          await onPaymentMethodEdited(payoutMethodId);
+                          toast({
+                            variant: 'success',
+                            title: (
+                              <FormattedMessage
+                                defaultMessage="Your PayPal account has been connected."
+                                id="PayPal.ConnectSuccess"
+                              />
+                            ),
+                            duration: hasCreatedNewPayoutMethod ? 30_000 : undefined, // Give it more time to read the message below
+                            message: !hasCreatedNewPayoutMethod ? null : (
+                              <FormattedMessage
+                                defaultMessage="The email associated with the linked account does not match the one you edited, so we've created a new payout method. Feel free to archive the old one if you don't need it anymore."
+                                id="njBTeV"
+                              />
+                            ),
+                          });
+                        } catch (e) {
+                          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+                        } finally {
+                          setIsLoadingEditPayoutMethod(false);
+                        }
+                      }}
+                      onError={(err: Error) => {
+                        toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
+                      }}
+                      loading={isLoadingEditPayoutMethod}
+                      disabled={!get(values.editingPayoutMethod, 'data.currency')}
+                      currency={
+                        get(values.editingPayoutMethod, 'data.currency') as unknown as typeof PayPalSupportedCurrencies
+                      }
+                      alias={get(values.editingPayoutMethod, 'name')}
+                    />
+                  ) : (
+                    <Button loading={isLoadingEditPayoutMethod} onClick={submitForm}>
+                      <FormattedMessage defaultMessage="Save" id="save" />
+                    </Button>
+                  )}
                 </div>
               </React.Fragment>
             ) : props.archived ? (
@@ -952,12 +1096,35 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
             )
           }
         >
-          <div className="flex min-w-0 grow items-center gap-2">
+          <div className="flex min-w-0 grow flex-wrap items-center gap-2">
             <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />
             {props.archived && (
               <Badge type="outline" size="xs">
                 <FormattedMessage defaultMessage="Archived" id="Archived" />
               </Badge>
+            )}
+            {props.payoutMethod.type === PayoutMethodType.PAYPAL && props.payoutMethod.isVerified === true && (
+              <Badge type="success" size="xs" className="flex items-center gap-1">
+                <BadgeCheck size={10} />
+                <FormattedMessage defaultMessage="Verified" id="Verified" />
+              </Badge>
+            )}
+            {props.payoutMethod.type === PayoutMethodType.PAYPAL && props.payoutMethod.isVerified === false && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge type="warning" size="xs" className="flex cursor-help items-center gap-1">
+                    <ShieldAlert size={10} />
+                    <FormattedMessage defaultMessage="Unverified" id="Unverified" />
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <FormattedMessage
+                    defaultMessage="This PayPal account has not been verified via 'Log in with PayPal'.{canEdit, select, true { Edit this payout method to connect and verify.} other {}}"
+                    id="PayPal.Unverified.Tooltip"
+                    values={{ canEdit: isEditable ? 'true' : 'false' }}
+                  />
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
           {!isEditingPayoutMethod && isEditable && (

@@ -11,6 +11,8 @@ const PayoutMethodFragment = gql`
     canBeDeleted
     createdAt
     updatedAt
+    isVerified
+    paypalInfo
   }
 `;
 
