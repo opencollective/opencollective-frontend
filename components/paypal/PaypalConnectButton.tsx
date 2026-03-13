@@ -87,6 +87,7 @@ const PaypalConnectButton = ({
             { service: 'PayPal' },
           ),
         });
+        return;
       }
 
       popupRef.current = popup;

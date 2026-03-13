@@ -16,10 +16,7 @@ export interface PaypalCallbackLocation {
  * Processes the PayPal OAuth callback: reads code/error from the URL and
  * posts them to the opener via postMessage. Extracted for testability.
  */
-export function processPaypalCallback(
-  location: PaypalCallbackLocation,
-  opener: Window | null,
-): void {
+export function processPaypalCallback(location: PaypalCallbackLocation, opener: Window | null): void {
   // Check current domain to redirect ngrok to localhost in development
   const url = new URL(location.href);
   const expectedHostname = process.env.HOSTNAME ?? 'localhost';

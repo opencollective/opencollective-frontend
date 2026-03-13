@@ -5,7 +5,6 @@ import { useIntl } from 'react-intl';
 
 import type { PayoutMethod } from '../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../lib/graphql/types/v2/graphql';
-import { getCurrencySymbol } from '@/lib/currency-utils';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
 import { cn } from '@/lib/utils';
 

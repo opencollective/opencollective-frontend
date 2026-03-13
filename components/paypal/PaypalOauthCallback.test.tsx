@@ -5,7 +5,10 @@ import { render } from '@testing-library/react';
 
 import { PAYPAL_CONNECT_POPUP_MESSAGE } from '@/components/paypal/constants';
 
-import PaypalCallbackPage, { type PaypalCallbackLocation, processPaypalCallback } from '../../pages/services/paypal/oauth/callback';
+import PaypalCallbackPage, {
+  type PaypalCallbackLocation,
+  processPaypalCallback,
+} from '../../pages/services/paypal/oauth/callback';
 
 const mockLocation = (search: string): PaypalCallbackLocation => {
   const url = new URL(`http://localhost:3000/services/paypal/oauth/callback${search}`);

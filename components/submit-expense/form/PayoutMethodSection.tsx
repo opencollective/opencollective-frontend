@@ -620,7 +620,9 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
               onError={onPaypalConnectError}
               loading={creatingPayoutMethod}
               disabled={disabled || !get(props.newPayoutMethod, 'data.currency')}
-              currency={get(props.newPayoutMethod, 'data.currency') as unknown as typeof PayPalSupportedCurrencies}
+              currency={
+                get(props.newPayoutMethod, 'data.currency') as unknown as (typeof PayPalSupportedCurrencies)[number]
+              }
               alias={get(props.newPayoutMethod, 'name')}
             />
           ) : (
@@ -949,7 +951,10 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                       loading={isLoadingEditPayoutMethod}
                       disabled={!get(values.editingPayoutMethod, 'data.currency')}
                       currency={
-                        get(values.editingPayoutMethod, 'data.currency') as unknown as typeof PayPalSupportedCurrencies
+                        get(
+                          values.editingPayoutMethod,
+                          'data.currency',
+                        ) as unknown as (typeof PayPalSupportedCurrencies)[number]
                       }
                       alias={get(values.editingPayoutMethod, 'name')}
                     />

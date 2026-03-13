@@ -199,12 +199,9 @@ describe('PaypalConnectButton', () => {
         expect(mockToast).toHaveBeenCalledWith(expect.objectContaining({ variant: 'error' }));
       });
 
-      // The overlay is still shown when popup is null. Cancel it to clean up the
-      // message listener so it doesn't bleed into subsequent tests.
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
-      await waitFor(() => {
-        expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'PayPal login was cancelled' }));
-      });
+      // When popup is blocked, the component returns early without showing the overlay
+      // or calling onError. No cleanup needed.
+      expect(onError).not.toHaveBeenCalled();
     });
   });
 
