@@ -48,6 +48,7 @@ type ComboSelectProps = {
   noOptions?: React.ReactNode;
   'data-cy'?: string;
   name?: string;
+  'aria-label'?: string;
 };
 
 // eslint-disable-next-line prefer-arrow-callback
@@ -85,6 +86,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
             props.className,
           )}
           id={props.id}
+          aria-label={props['aria-label']}
           data-cy={props['data-cy']}
           data-testid={props['data-testid']}
           data-disabled={props.disabled ? true : undefined}
@@ -114,6 +116,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          aria-label={props['aria-label']}
           className={cn(
             'justify-between font-normal',
             { 'text-muted-foreground': !props.value },

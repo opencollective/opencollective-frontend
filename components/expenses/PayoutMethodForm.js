@@ -91,6 +91,7 @@ const PayoutMethodForm = ({
   disabled = false,
   /** When true, the PayPal Connect SDK button is shown and the manual email field is hidden */
   isPaypalConnectEnabled = false,
+  onlyDataFields = false,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -206,6 +207,7 @@ const PayoutMethodForm = ({
           host={host}
           optional={required === false}
           alwaysSave={alwaysSave}
+          onlyDataFields={onlyDataFields}
         />
       )}
       {isNew && !alwaysSave && (

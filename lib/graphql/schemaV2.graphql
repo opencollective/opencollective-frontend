@@ -513,6 +513,11 @@ interface Account {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -713,8 +718,6 @@ interface Account {
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -729,11 +732,13 @@ interface Account {
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -744,6 +749,12 @@ interface Account {
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+    direction: ExpenseDirection
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -3295,6 +3306,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -3495,8 +3511,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -3511,11 +3525,13 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -3526,6 +3542,16 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -5589,7 +5615,7 @@ type ExpenseCollectionTotalAmount {
 }
 
 """
-Describes the role in which an account is involved in an expense. This is used to filter
+Describes the role of the filtered account/host in an expense. Controls which side the account, accounts, and host/hostContext arguments apply to.
 """
 enum ExpenseDirection {
   """
@@ -9720,6 +9746,11 @@ type Bot implements Account {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -9920,8 +9951,6 @@ type Bot implements Account {
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -9936,11 +9965,13 @@ type Bot implements Account {
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -9951,6 +9982,16 @@ type Bot implements Account {
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -10750,6 +10791,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -10950,8 +10996,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -10966,11 +11010,13 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -10981,6 +11027,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -12340,6 +12396,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -12540,8 +12601,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -12556,11 +12615,13 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -12571,6 +12632,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -13644,6 +13715,11 @@ type Individual implements Account {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -13844,8 +13920,6 @@ type Individual implements Account {
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -13860,11 +13934,13 @@ type Individual implements Account {
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -13875,6 +13951,16 @@ type Individual implements Account {
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -14980,6 +15066,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -15180,8 +15271,6 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -15196,11 +15285,13 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -15211,6 +15302,16 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -16150,6 +16251,11 @@ type Vendor implements Account & AccountWithContributions {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -16350,8 +16456,6 @@ type Vendor implements Account & AccountWithContributions {
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -16366,11 +16470,13 @@ type Vendor implements Account & AccountWithContributions {
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -16381,6 +16487,16 @@ type Vendor implements Account & AccountWithContributions {
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -17378,11 +17494,13 @@ type Query {
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -17393,6 +17511,16 @@ type Query {
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -18161,6 +18289,11 @@ type Query {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
+
+    """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
 
     """
     To filter by transaction kind
@@ -20364,6 +20497,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -20564,8 +20702,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -20580,11 +20716,13 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -20595,6 +20733,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -21541,6 +21689,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -21741,8 +21894,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -21757,11 +21908,13 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts or direction=SUBMITTED and account/accounts instead")
 
     """
     An alternative to filter by fromAccount (singular), both cannot be used together
     """
     fromAccounts: [AccountReferenceInput]
+      @deprecated(reason: "2026-03-04: Use oppositeAccounts direction=SUBMITTED and account/accounts instead")
 
     """
     Reference of an account that is the payer of an expense
@@ -21772,6 +21925,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     An alternative to filter by accounts, both cannot be used together
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Controls which side of the expense the account/accounts and host/hostContext arguments apply to. RECEIVED (default) filters expenses where the accounts are the payer/receiver. SUBMITTED filters expenses where the accounts are the payee/submitter.
+    """
+    direction: ExpenseDirection = RECEIVED
+
+    """
+    Filter by accounts on the opposite side of the expense from the direction. Should be used together with account/accounts or host to narrow results. Use a single-item array for one account.
+    """
+    oppositeAccounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host

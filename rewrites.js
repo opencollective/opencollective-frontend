@@ -1,5 +1,6 @@
 const createOrderPage = '/contribution-flow';
 const contributionFlowSteps = '/details|profile|payment|summary|success';
+const isNewPricing = process.env.NEW_PRICING === 'true' || process.env.NEW_PRICING === '1';
 
 exports.REWRITES = [
   {
@@ -379,7 +380,7 @@ exports.REWRITES = [
   },
   {
     source: '/pricing',
-    destination: '/pricing',
+    destination: isNewPricing ? '/new-pricing' : '/legacy-pricing',
   },
   {
     source: '/organizations/pricing',

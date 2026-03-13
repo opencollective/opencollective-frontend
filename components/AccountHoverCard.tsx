@@ -238,6 +238,9 @@ const getInfoItems = (account): InfoItemProps[] => {
 };
 
 const getInfoItemsFromMembershipData = (data: UserContextualMembershipsQuery): InfoItemProps[] => {
+  const hasKycVerification = Object.values(
+    (data?.account && 'kycStatus' in data.account && data.account.kycStatus) || {},
+  ).some(kyc => kyc?.['status'] === KycVerificationStatus.VERIFIED);
   return [
     ...(data?.account?.hostAdminMemberships?.nodes?.map(membership => ({
       Icon: Building,
@@ -265,7 +268,7 @@ const getInfoItemsFromMembershipData = (data: UserContextualMembershipsQuery): I
         />
       ),
     })) || []),
-    data?.account?.['kycStatus']?.manual?.status === KycVerificationStatus.VERIFIED && {
+    hasKycVerification && {
       Icon: BadgeCheck,
       info: 'KYC Verified',
     },

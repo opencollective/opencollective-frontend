@@ -13,7 +13,7 @@ import type {
   CommunityAccountDetailQuery,
   VendorFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
-import { AccountType, CommunityRelationType, KycProvider, LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, CommunityRelationType, LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
@@ -140,7 +140,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     }
   }, [convertOrganizationToVendor, account, dashboardAccount, toast, intl, query]);
 
-  const kycStatus = query.data?.account && 'kycStatus' in query.data.account ? query.data.account['kycStatus'] : {};
+  const kycStatus = query.data?.account && 'kycStatus' in query.data.account ? query.data.account.kycStatus : {};
   const tabs = React.useMemo(
     () => [
       {
@@ -166,9 +166,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             {
               id: AccountDetailView.KYC,
               label: 'KYC',
-              count: Object.values(pick(kycStatus, [KycProvider.MANUAL.toLowerCase()])).filter(
-                status => status !== null,
-              ).length,
+              count: Object.values(kycStatus || {}).filter(kyc => !!kyc?.['status']).length,
             },
           ]
         : []),
@@ -235,6 +233,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                   onClick={() => {
                     setEditVendor(account as unknown as VendorFieldsFragment);
                   }}
+                  disabled={!query.data?.host}
                 >
                   <FormattedMessage id="Edit" defaultMessage="Edit" />
                 </Button>
@@ -571,15 +570,11 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           getActions={() => ({})}
         />
       )}
-      {editVendor && (
+      {editVendor && query.data?.host && (
         <StyledModal onClose={() => setEditVendor(null)}>
           <VendorForm
-            host={dashboardAccount}
-            supportsTaxForm={
-              'host' in dashboardAccount &&
-              'requiredLegalDocuments' in dashboardAccount.host &&
-              dashboardAccount.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)
-            }
+            host={query.data.host}
+            supportsTaxForm={query.data.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)}
             vendor={editVendor}
             onSuccess={() => {
               setEditVendor(null);
