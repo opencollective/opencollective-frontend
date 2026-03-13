@@ -60,6 +60,7 @@ function getFormProps(form: ExpenseForm) {
       'account',
       'host',
       'isHostAdmin',
+      'invitee',
       'payee',
       'payoutMethods',
       'newPayoutMethodTypes',
@@ -148,6 +149,13 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';
   const isVendor = props.payeeSlug === '__vendor' || props.payee?.type === CollectiveType.VENDOR;
+  const isInviteMode = ['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(props.payeeSlug);
+  const hasInviteeInfo =
+    props.invitee &&
+    (('email' in props.invitee && props.invitee.email) ||
+      ('slug' in props.invitee && props.invitee.slug) ||
+      ('organization' in props.invitee && props.invitee.organization?.slug));
+  const hasPayeeOrInviteeInfo = props.payee || (isInviteMode && hasInviteeInfo);
   const payeeIsCollectiveFamilyType =
     props.payee && (AccountTypesWithHost as readonly string[]).includes(props.payee.type);
   const payeeIsSameHost = props.payee && props.host && 'host' in props.payee && props.payee.host?.id === props.host.id;
@@ -313,7 +321,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 value="__newPayoutMethod"
                 data-cy="add-new-payout-method"
                 checked={isNewPayoutMethodSelected}
-                disabled={isLoading || props.initialLoading || props.isSubmitting || !props.payee}
+                disabled={isLoading || props.initialLoading || props.isSubmitting || !hasPayeeOrInviteeInfo}
                 showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
                 className="min-w-0"
                 subContent={<NewPayoutMethodOptionWrapper />}
@@ -391,7 +399,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
   const intl = useIntl();
   const { toast } = useToast();
   const [creatingPayoutMethod, setIsCreatingPayoutMethod] = React.useState(false);
-  const disabled = props.isSubmitting || !props.payee; // An empty payee is not supposed to happen since we disable the top option, but we're duplicating the logic in case another place in the code forces the selection.
+  const disabled = props.isSubmitting;
 
   const { setFieldValue, setFieldTouched, validateForm, refresh } = props;
 
@@ -557,7 +565,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
               fieldsPrefix="newPayoutMethod"
               payoutMethod={props.newPayoutMethod}
               host={props.host}
-              isPaypalConnectEnabled={props.isPaypalConnectEnabled}
+              isPaypalConnectEnabled={Boolean(props.isPaypalConnectEnabled && props.payee)}
             />
           )}
         </React.Fragment>
@@ -610,7 +618,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
         </MessageBox>
       )}
 
-      {props.loggedInAccount && (
+      {props.loggedInAccount && props.payee && (
         <div className="mt-4 flex justify-end">
           {isNewPaypalConnect ? (
             <PaypalConnectButton
