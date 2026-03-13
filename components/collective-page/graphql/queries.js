@@ -96,6 +96,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
         name
         slug
         type
+        hasHosting
         location {
           id
           country

@@ -1406,6 +1406,7 @@
   "EditCollective.VAT": "Настройки НДС",
   "EditCollective.VAT.Disabled": "Disable VAT",
   "EditCollective.VAT.Disabled.Warning": "Caution: Disabling VAT requires approval from your fiscal host. Please ensure you have discussed this with your host before saving.",
+  "EditCollective.VAT.Enabled": "Enable VAT",
   "EditCollective.VAT.Host": "Использовать настройки VAT представителя",
   "EditCollective.VAT.OwnSettings": "Use my own VAT number",
   "EditCollective.VATNumber": "Номер НДС",

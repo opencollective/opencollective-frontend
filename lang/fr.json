@@ -1406,6 +1406,7 @@
   "EditCollective.VAT": "Réglages de la TVA",
   "EditCollective.VAT.Disabled": "Désactiver la TVA",
   "EditCollective.VAT.Disabled.Warning": "Attention : La désactivation de la TVA nécessite l'approbation de votre Hôte Fiscal. Veuillez vous assurer que vous avez discuté avec votre Hôte avant de sauvegarder.",
+  "EditCollective.VAT.Enabled": "Enable VAT",
   "EditCollective.VAT.Host": "Utiliser la configuration de l'hôte fiscal",
   "EditCollective.VAT.OwnSettings": "Utiliser mon propre numéro de TVA",
   "EditCollective.VATNumber": "Numéro de TVA",
