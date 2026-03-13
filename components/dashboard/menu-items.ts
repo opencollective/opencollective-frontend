@@ -479,7 +479,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if:
-        !isOneOfTypes(account, [EVENT, USER]) &&
+        !isOneOfTypes(account, [EVENT, USER, INDIVIDUAL]) &&
         (!isOrganization || hasMoneyManagement) &&
         !isAccountantOnly &&
         !isCommunityManagerOnly,
@@ -533,7 +533,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.POLICIES,
-                if: isOneOfTypes(account, [USER, ORGANIZATION, COLLECTIVE]) && !isAccountantOnly,
+                if: isOneOfTypes(account, [USER, INDIVIDUAL, ORGANIZATION, COLLECTIVE]) && !isAccountantOnly,
               },
               {
                 section: ALL_SECTIONS.RECEIVING_MONEY,
