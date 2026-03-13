@@ -229,12 +229,15 @@ describe('host dashboard', () => {
       cy.contains('Paid').should('exist');
 
       // Verify transaction amounts: contribution 504 (514 - 10), platform tip 10, processor fee 4, host fee 9% of 504 = 45.36
+      // Note: Platform tip (€10) is recorded in the Platform's ledger, not visible in the host's transaction view.
       cy.getByDataCy('view-transactions-button').click();
+      cy.get('[data-cy="transactions-table"]').should('be.visible');
       cy.contains('Contribution').should('exist');
-      cy.contains('€504.00').should('exist'); // amount received - platform tip
-      cy.contains('€10.00').should('exist'); // platform tip
       cy.contains('Host fee').should('exist');
-      cy.contains('€45.36').should('exist');
+      cy.contains('€45.36').should('exist'); // Host fee row
+      // Click the Contribution row to open the drawer, which shows transaction.amount (€504 = gross contribution excl. platform tip)
+      cy.get('[data-cy="transactions-table"]').contains('tr', 'Contribution').click();
+      cy.contains('€504.00').should('exist'); // transaction.amount = amount received - platform tip
     });
   });
 
