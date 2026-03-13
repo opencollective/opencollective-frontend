@@ -352,7 +352,11 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                         id="Collective.Hero.Host"
                         defaultMessage="{FiscalHost}: {hostName}"
                         values={{
-                          FiscalHost: <DefinedTerm key="fiscal-host" term={Terms.FISCAL_HOST} color="black.700" />,
+                          FiscalHost: host.hasHosting ? (
+                            <DefinedTerm key="fiscal-host" term={Terms.FISCAL_HOST} color="black.700" />
+                          ) : (
+                            <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
+                          ),
                           hostName: (
                             <StyledLink
                               key="host-name"

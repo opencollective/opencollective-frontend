@@ -1406,6 +1406,7 @@
   "EditCollective.VAT": "Ustawienia podatku VAT",
   "EditCollective.VAT.Disabled": "Disable VAT",
   "EditCollective.VAT.Disabled.Warning": "Caution: Disabling VAT requires approval from your fiscal host. Please ensure you have discussed this with your host before saving.",
+  "EditCollective.VAT.Enabled": "Enable VAT",
   "EditCollective.VAT.Host": "Użyj gospodarza ustawień podatku VAT",
   "EditCollective.VAT.OwnSettings": "Use my own VAT number",
   "EditCollective.VATNumber": "Numer VAT (NIP)",
