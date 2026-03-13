@@ -125,6 +125,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
     },
   }),
   columnHelper.accessor('account', {
+    id: 'account',
     meta: { className: 'w-32 2xl:w-48', labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell }) => {
@@ -144,6 +145,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
     },
   }),
   columnHelper.accessor('oppositeAccount', {
+    id: 'oppositeAccount',
     meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Recipient/Sender', id: 'YT2bNN' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell, row }) => {
@@ -296,6 +298,10 @@ type TransactionsTableProps = {
   useAltTestLayout?: boolean;
   queryFilter: useQueryFilterReturnType<typeof schema, TransactionsTableQueryVariables>;
   refetchList?: () => void;
+  hideColumns?: string[];
+  hideHeader?: boolean;
+  hidePagination?: boolean;
+  footer?: React.ReactNode;
 };
 
 export default function TransactionsTable({
@@ -304,6 +310,10 @@ export default function TransactionsTable({
   nbPlaceholders,
   queryFilter,
   refetchList,
+  hideColumns,
+  hideHeader,
+  hidePagination,
+  footer,
 }: TransactionsTableProps) {
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
 
@@ -313,6 +323,12 @@ export default function TransactionsTable({
     credit: false,
   };
   const [columnVisibility, setColumnVisibility] = useLocalStorage('transactions-cols', defaultColumnVisibility);
+  const displayedColumns = React.useMemo(() => {
+    if (!hideColumns?.length) {
+      return columns;
+    }
+    return columns.filter(column => !hideColumns.includes(column.id));
+  }, [hideColumns]);
 
   const getActions = useTransactionActions<TransactionsTableQueryNode>({
     resetFilters: queryFilter.resetFilters,
@@ -330,7 +346,7 @@ export default function TransactionsTable({
       <DataTable
         data-cy="transactions-table"
         innerClassName="table-fixed text-muted-foreground"
-        columns={columns}
+        columns={displayedColumns}
         data={transactions?.nodes || []}
         loading={loading}
         nbPlaceholders={nbPlaceholders}
@@ -346,10 +362,12 @@ export default function TransactionsTable({
         getRowId={row => String(row.legacyId)}
         getActions={getActions}
         queryFilter={queryFilter}
+        hideHeader={hideHeader}
+        footer={footer}
         compact
       />
 
-      <Pagination queryFilter={queryFilter} total={transactions?.totalCount} />
+      {!hidePagination && <Pagination queryFilter={queryFilter} total={transactions?.totalCount} />}
       <TransactionDrawer
         {...drawerProps}
         transactionId={queryFilter.values.openTransactionId}

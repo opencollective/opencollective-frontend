@@ -552,9 +552,7 @@ const getTransactionDescription = (transaction: {
   }
 };
 
-type RecentTransaction =
-  | CommunityAccountOverviewQuery['recentMoneyIn']['nodes'][number]
-  | CommunityAccountOverviewQuery['recentMoneyOut']['nodes'][number];
+type RecentTransaction = CommunityAccountOverviewQuery['transactions']['nodes'][number];
 const columnHelper = createColumnHelper<RecentTransaction>();
 export const recentTransactionsColumns: ColumnDef<RecentTransaction>[] = [
   columnHelper.accessor('createdAt', {

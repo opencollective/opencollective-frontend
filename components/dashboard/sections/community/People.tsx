@@ -171,7 +171,7 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
     cell: ({ row }) => {
       const account = row.original;
-      const summary = account?.communityStats?.transactionSummary;
+      const summary = account?.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
       const total = summary?.debitTotal;
       const count = summary?.debitCount || 0;
 
@@ -197,7 +197,7 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
     cell: ({ row }) => {
       const account = row.original;
-      const summary = account?.communityStats?.transactionSummary;
+      const summary = account?.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
       const total = summary?.creditTotal;
       const count = summary?.creditCount || 0;
 

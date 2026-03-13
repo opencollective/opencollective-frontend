@@ -56,6 +56,7 @@ export const peopleHostDashboardQuery = gql`
         communityStats(host: { slug: $slug }) {
           relations
           transactionSummary {
+            kind
             debitTotal {
               valueInCents
               currency
@@ -304,6 +305,7 @@ export const communityAccountOverviewQuery = gql`
       communityStats(host: { slug: $hostSlug }) {
         relations
         transactionSummary {
+          kind
           debitCount
           creditCount
           debitTotal {
@@ -343,82 +345,6 @@ export const communityAccountOverviewQuery = gql`
         }
         lastInteractionAt
         firstInteractionAt
-      }
-    }
-    recentMoneyIn: transactions(
-      fromAccount: { id: $accountId }
-      host: { slug: $hostSlug }
-      limit: 5
-      orderBy: { field: CREATED_AT, direction: DESC }
-      kind: [CONTRIBUTION, ADDED_FUNDS, EXPENSE]
-      type: CREDIT
-    ) {
-      nodes {
-        id
-        legacyId
-        description
-        type
-        kind
-        createdAt
-        order {
-          legacyId
-        }
-        toAccount {
-          id
-          name
-          slug
-          imageUrl
-          type
-        }
-        fromAccount {
-          id
-          name
-          slug
-          imageUrl
-          type
-        }
-        amount {
-          valueInCents
-          currency
-        }
-      }
-    }
-    recentMoneyOut: transactions(
-      fromAccount: { id: $accountId }
-      host: { slug: $hostSlug }
-      limit: 5
-      orderBy: { field: CREATED_AT, direction: DESC }
-      kind: [EXPENSE, ADDED_FUNDS]
-      type: DEBIT
-    ) {
-      nodes {
-        id
-        legacyId
-        description
-        type
-        kind
-        createdAt
-        expense {
-          legacyId
-        }
-        toAccount {
-          id
-          name
-          slug
-          imageUrl
-          type
-        }
-        fromAccount {
-          id
-          name
-          slug
-          imageUrl
-          type
-        }
-        amount {
-          valueInCents
-          currency
-        }
       }
     }
   }
@@ -461,6 +387,7 @@ export const communityAccountExpensesDetailQuery = gql`
       legacyId
       communityStats(host: $host) {
         transactionSummary {
+          kind
           debitTotal {
             valueInCents
             currency
@@ -593,6 +520,7 @@ export const communityAccountContributionsDetailQuery = gql`
       legacyId
       communityStats(host: $host) {
         transactionSummary {
+          kind
           creditTotal {
             valueInCents
             currency

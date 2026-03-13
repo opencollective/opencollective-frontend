@@ -12,9 +12,11 @@ import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
 import { EmptyResults } from '../../EmptyResults';
+import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { Filterbar } from '../../filters/Filterbar';
+import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import {
@@ -41,6 +43,8 @@ const schema = z.object({
   type: z.nativeEnum(TransactionType).optional(),
   kind: commonSchema.shape.kind,
   openTransactionId: z.coerce.string().optional(),
+  account: hostedAccountFilter.schema,
+  accountingCategory: accountingCategoryFilter.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -48,6 +52,7 @@ type FilterValues = z.infer<typeof schema>;
 const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables> = {
   date: commonToVariables.date,
   amount: commonToVariables.amount,
+  account: hostedAccountFilter.toVariables,
 };
 
 const filters = {
@@ -57,6 +62,8 @@ const filters = {
   amount: commonFilters.amount,
   type: commonFilters.type,
   kind: commonFilters.kind,
+  account: hostedAccountFilter.filter,
+  accountingCategory: accountingCategoryFilter.filter,
 };
 
 enum TransactionsView {
@@ -81,25 +88,28 @@ export function AccountDetailTransactionsTab({ account, hostSlug }: AccountDetai
         filter: {},
       },
       {
-        id: TransactionsView.PAYOUTS,
-        label: intl.formatMessage({ defaultMessage: 'Payouts', id: 'Payouts' }),
-        filter: { kind: [TransactionKind.EXPENSE] },
-      },
-      {
         id: TransactionsView.CONTRIBUTIONS,
         label: intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' }),
         filter: { kind: [TransactionKind.ADDED_FUNDS, TransactionKind.CONTRIBUTION] },
+      },
+      {
+        id: TransactionsView.PAYOUTS,
+        label: intl.formatMessage({ defaultMessage: 'Payouts', id: 'Payouts' }),
+        filter: { kind: [TransactionKind.EXPENSE] },
       },
     ],
     [intl],
   );
 
-  const queryFilter = useQueryFilter({
+  const queryFilter = useQueryFilter<typeof schema, TransactionsTableQueryVariables>({
     schema,
     toVariables,
     filters,
     views,
     skipRouter: true,
+    meta: {
+      hostSlug: hostSlug,
+    },
   });
 
   const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {

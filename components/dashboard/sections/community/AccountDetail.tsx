@@ -296,6 +296,7 @@ export function AccountDetails(props: AccountDetailsProps) {
                 expectedAccountType={props.expectedAccountType}
                 setOpenContributionId={setOpenContributionId}
                 setOpenExpenseId={setOpenExpenseId}
+                handleTabChange={handleTabChange}
               />
             )}
             {selectedTab === AccountDetailView.TRANSACTIONS && account && (
