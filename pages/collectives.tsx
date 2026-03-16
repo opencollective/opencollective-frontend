@@ -92,7 +92,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
     }),
     description: defineMessage({
       id: 'collectives.features.section.financial-platform.description',
-      defaultMessage: 'An integrated toolbox for collaboratively and transparently managing your collective finances.',
+      defaultMessage: 'An integrated toolbox for collaboratively and transparently managing your finances.',
     }),
     bgColor: 'sky-100',
     fgColor: 'sky-600',
@@ -100,7 +100,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
       {
         title: defineMessage({
           id: 'collectives.features.item.everything-you-need.title',
-          defaultMessage: 'Everything you need in one place',
+          defaultMessage: 'Everything you need to know & do in one place',
         }),
         description: defineMessage({
           id: 'collectives.features.item.everything-you-need.description',
@@ -121,7 +121,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
         description: defineMessage({
           id: 'collectives.features.item.organize-your-money.description',
           defaultMessage:
-            'Organize your money and control your spending with accounts. Create accounts for reserves, crowdfunding contributions, and spending.',
+            'Organize your money and control your spending with accounts. Create accounts for holding reserves, for crowdfunding contributions and for spending.',
         }),
         media: {
           src: '/static/images/features/2.png',
@@ -137,10 +137,58 @@ const collectiveFeatureSections: IFeatureSection[] = [
         description: defineMessage({
           id: 'collectives.features.item.check-your-balance.description',
           defaultMessage:
-            'Your balance is always up-to-date and verifiable. Money added increases your balance; money spent decreases it. You always know where you stand.',
+            'Money added to an account increases its balance and money spent (or transferred) will decrease its balance. You always know where you stand because the balance is always up-to-date and verifiable.',
         }),
         media: {
           src: '/static/images/features/3.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.move-money-between-accounts.title',
+          defaultMessage: 'Move money between accounts',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.move-money-between-accounts.description',
+          defaultMessage:
+            'Transfer money easily between accounts. Starting a new project? Transfer an allocated amount into a separate account in order to manage spending.',
+        }),
+        media: {
+          src: '/static/images/features/4.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.give-people-control.title',
+          defaultMessage: 'Give people control',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.give-people-control.description',
+          defaultMessage:
+            'Assign administrators to manage specific accounts. Add or transfer money into the accounts them and let your team manage spending on their own.',
+        }),
+        media: {
+          src: '/static/images/features/5.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.tell-the-world.title',
+          defaultMessage: 'Tell the world your financial story',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.tell-the-world.description',
+          defaultMessage:
+            'Activate a public profile to make yourself and your financials visible to the world and to invite broader engagement with crowdfunding campaigns and payment requests.',
+        }),
+        media: {
+          src: '/static/images/features/6.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -154,7 +202,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
     }),
     description: defineMessage({
       id: 'collectives.features.section.money-in.description',
-      defaultMessage: 'Document and track all incoming money.',
+      defaultMessage: 'Document & track all incoming money.',
     }),
     bgColor: 'green-100',
     fgColor: 'green-600',
@@ -167,26 +215,10 @@ const collectiveFeatureSections: IFeatureSection[] = [
         description: defineMessage({
           id: 'collectives.features.item.accept-contributions.description',
           defaultMessage:
-            'Set up crowdfunding campaigns to engage your community. Completed contributions are automatically recorded and added to your account balances.',
+            'Setup crowdfunding campaigns to engage your community. Completed contributions are automatically recorded in the ledger and added to your account balances.',
         }),
         media: {
           src: '/static/images/features/8.png',
-          srcWidth: 1400,
-          srcHeight: 1400,
-        },
-      },
-      {
-        title: defineMessage({
-          id: 'collectives.features.item.track-grants.title',
-          defaultMessage: 'Track grants and pledged funds',
-        }),
-        description: defineMessage({
-          id: 'collectives.features.item.track-grants.description',
-          defaultMessage:
-            'Received a grant or pledge? Document and track expected income until it arrives and is added to your accounts.',
-        }),
-        media: {
-          src: '/static/images/features/9.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -198,23 +230,18 @@ const collectiveFeatureSections: IFeatureSection[] = [
       id: 'collectives.features.section.money-out.title',
       defaultMessage: 'Money Out',
     }),
-    description: defineMessage({
-      id: 'collectives.features.section.money-out.description',
-      defaultMessage:
-        'A straightforward suite of tools for submitting, reviewing, approving, and paying expenses — designed for community groups of all sizes.',
-    }),
     bgColor: 'rose-50',
     fgColor: 'rose-600',
     items: [
       {
         title: defineMessage({
-          id: 'collectives.features.item.submit-expenses.title',
-          defaultMessage: 'Submit expenses',
+          id: 'collectives.features.item.accept-payment-requests.title',
+          defaultMessage: 'Accept payment requests',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.submit-expenses.description',
+          id: 'collectives.features.item.accept-payment-requests.description',
           defaultMessage:
-            'A step-by-step expense form walks your members through filing correct and complete payment requests.',
+            'A step-by-step payment request form will walk users through filing correct and complete payment requests. Include your own unique instructions on how to properly submit a payment request in order to get paid.',
         }),
         media: {
           src: '/static/images/features/11.png',
@@ -224,32 +251,32 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.approve-expenses.title',
-          defaultMessage: 'Approve expenses',
+          id: 'collectives.features.item.invite-people-to-get-paid.title',
+          defaultMessage: 'Invite people to get paid',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.approve-expenses.description',
+          id: 'collectives.features.item.invite-people-to-get-paid.description',
           defaultMessage:
-            'Review submitted expenses as a team and approve the ones you want paid. Rejected or incomplete requests can be sent back for correction.',
+            'Send payment request invitations to people who are not on the platform. They will receive an invitation that will guide them to create a new user, complete and submit the payment request.',
         }),
         media: {
-          src: '/static/images/features/13.png',
+          src: '/static/images/features/12.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.get-paid.title',
-          defaultMessage: 'Get paid by your Fiscal Host',
+          id: 'collectives.features.item.approve-payment-requests.title',
+          defaultMessage: 'Approve payment requests',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.get-paid.description',
+          id: 'collectives.features.item.approve-payment-requests.description',
           defaultMessage:
-            'Approved expenses are forwarded to your Fiscal Host for payment. Your Fiscal Host processes payments on your behalf via their banking integrations.',
+            'Review payment requests that have been submitted. Approve the legitimate requests you wish to pay and reject or delete the others.',
         }),
         media: {
-          src: '/static/images/features/14.png',
+          src: '/static/images/features/13.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -264,20 +291,20 @@ const collectiveFeatureSections: IFeatureSection[] = [
     description: defineMessage({
       id: 'collectives.features.section.crowdfunding.description',
       defaultMessage:
-        'Create a variety of crowdfunding campaigns: simple tip-jars, one-time goals, monthly recurring goals, and yearly memberships for continuous community income.',
+        'Create a variety of crowdfunding campaigns: simple tip-jar with one time contributions, one-time goals, monthly recurring goals and even yearly memberships for continuous income.',
     }),
     bgColor: 'purple-100',
     fgColor: 'purple-600',
     items: [
       {
         title: defineMessage({
-          id: 'collectives.features.item.flexible-tiers.title',
-          defaultMessage: 'Flexible contribution tiers',
+          id: 'collectives.features.item.different-ways-to-contribute.title',
+          defaultMessage: 'Different ways to contribute',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.flexible-tiers.description',
+          id: 'collectives.features.item.different-ways-to-contribute.description',
           defaultMessage:
-            'Design tiers that are appropriate for you and your audience. Collect tips, one-time contributions, and recurring contributions.',
+            'Flexible tiers enable you to create a diversity of crowdfunding campaigns. Design tiers that are appropriate for you and your audience. Collect tips, one time contributions and recurring contributions.',
         }),
         media: {
           src: '/static/images/features/26.png',
@@ -287,16 +314,78 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.funding-goals.title',
-          defaultMessage: 'Set and commit to funding goals',
+          id: 'collectives.features.item.set-commit-to-funding-goals.title',
+          defaultMessage: 'Set & commit to funding goals',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.funding-goals.description',
+          id: 'collectives.features.item.set-commit-to-funding-goals.description',
           defaultMessage:
-            'Create one-time goals for specific projects or recurring goals to ask your community for long-term support.',
+            'Create one time goals for one time projects. Create recurring goals to ask your community for long term support.',
         }),
         media: {
           src: '/static/images/features/27.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+    ],
+  },
+  {
+    title: defineMessage({
+      id: 'collectives.features.section.accounting-accountability.title',
+      defaultMessage: 'Accounting & Accountability',
+    }),
+    description: defineMessage({
+      id: 'collectives.features.section.accounting-accountability.description',
+      defaultMessage:
+        'Review & verify financial activities and provide your accountants with reliable information for your accounting processes.',
+    }),
+    bgColor: 'orange-100',
+    fgColor: 'orange-600',
+    items: [
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.all-financial-activities-are-recorded.title',
+          defaultMessage: 'All financial activities are recorded',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.all-financial-activities-are-recorded.description',
+          defaultMessage:
+            'At the heart of the platform is a transaction ledger. All financial activities on the platform generate ledger transactions.',
+        }),
+        media: {
+          src: '/static/images/features/28.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.trace-and-verify.title',
+          defaultMessage: 'Trace and verify all financial activities',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.trace-and-verify.description',
+          defaultMessage:
+            'All financial platform activities (payment requests, contributions, grants, etc.) can be traced to their related ledger transactions and vice versa.',
+        }),
+        media: {
+          src: '/static/images/features/29.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.export-ledger-data.title',
+          defaultMessage: 'Export ledger data for your accountants',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.export-ledger-data.description',
+          defaultMessage: 'Provide your accountants with periodic exports of detailed ledger transactions.',
+        }),
+        media: {
+          src: '/static/images/features/31.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
