@@ -30,7 +30,7 @@ export interface IFeatureSection {
   }[];
 }
 
-const featureSections: IFeatureSection[] = [
+const defaultFeatureSections: IFeatureSection[] = [
   {
     title: defineMessage({
       id: 'solutions.features.section.financial-platform.title',
@@ -664,7 +664,8 @@ const featureSections: IFeatureSection[] = [
   },
 ];
 
-export default function Features() {
+export default function Features({ featureSections: featureSectionsProp }: { featureSections?: IFeatureSection[] }) {
+  const featureSections = featureSectionsProp ?? defaultFeatureSections;
   const intl = useIntl();
   const containerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);

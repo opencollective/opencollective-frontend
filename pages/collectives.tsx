@@ -1,0 +1,480 @@
+import React from 'react';
+import { defineMessage, FormattedMessage } from 'react-intl';
+import { ArrowRight } from 'lucide-react';
+
+import I18nFormatters from '../components/I18nFormatters';
+import NextIllustration from '../components/collectives/HomeNextIllustration';
+import Page from '../components/Page';
+import Features from '@/components/home/solutions/Features';
+import { JoinCTAButtons } from '@/components/home/solutions/JoinCTAButtons';
+import Testimonials from '@/components/home/solutions/Testimonials';
+import Image from '@/components/Image';
+import Link from '@/components/Link';
+import { Button } from '@/components/ui/Button';
+import type { IFeatureSection } from '@/components/home/solutions/Features';
+import type { Testimonial } from '@/components/home/solutions/Testimonials';
+
+const featureHighlights = [
+  {
+    imgSrc: '/static/images/product/participatory.png',
+    title: defineMessage({
+      defaultMessage: 'Be Fiscally Hosted',
+      id: 'collectives.features.fiscallyHosted',
+    }),
+    description: defineMessage({
+      defaultMessage: 'Join a Fiscal Host that handles banking, taxes, accounting, legal, and payments on your behalf.',
+      id: 'collectives.features.fiscallyHosted.description',
+    }),
+  },
+  {
+    imgSrc: '/static/images/product/crowdfunding.png',
+    title: defineMessage({
+      defaultMessage: 'Raise & Crowdfund Money',
+      id: 'collectives.features.crowdfund',
+    }),
+    description: defineMessage({
+      defaultMessage:
+        'Launch campaigns to collect contributions from your community with one-time or recurring support.',
+      id: 'collectives.features.crowdfund.description',
+    }),
+  },
+  {
+    imgSrc: '/static/images/product/expenses.png',
+    title: defineMessage({
+      defaultMessage: 'Spend Transparently',
+      id: 'collectives.features.spendTransparently',
+    }),
+    description: defineMessage({
+      defaultMessage: 'Submit, approve and pay expenses in a transparent and community-accountable way.',
+      id: 'collectives.features.spendTransparently.description',
+    }),
+  },
+  {
+    imgSrc: '/static/images/product/ledger.png',
+    title: defineMessage({
+      defaultMessage: 'Participatory Finances',
+      id: 'collectives.features.participatoryFinances',
+    }),
+    description: defineMessage({
+      defaultMessage: 'Empower your members to manage finances with simplified, approachable financial tools.',
+      id: 'collectives.features.participatoryFinances.description',
+    }),
+  },
+  {
+    imgSrc: '/static/images/product/transparency.png',
+    title: defineMessage({
+      defaultMessage: 'Real-Time Balances',
+      id: 'collectives.features.realTimeBalances',
+    }),
+    description: defineMessage({
+      defaultMessage: 'Keep track of your balance, income and spending with up-to-the-minute visibility.',
+      id: 'collectives.features.realTimeBalances.description',
+    }),
+  },
+  {
+    imgSrc: '/static/images/product/hosting.png',
+    title: defineMessage({
+      defaultMessage: 'Full Transparency',
+      id: 'collectives.features.transparency',
+    }),
+    description: defineMessage({
+      defaultMessage: 'Share your finances, transactions and real-time balances openly with your community.',
+      id: 'collectives.features.transparency.description',
+    }),
+  },
+];
+
+const collectiveFeatureSections: IFeatureSection[] = [
+  {
+    title: defineMessage({
+      id: 'collectives.features.section.financial-platform.title',
+      defaultMessage: 'Financial Platform',
+    }),
+    description: defineMessage({
+      id: 'collectives.features.section.financial-platform.description',
+      defaultMessage: 'An integrated toolbox for collaboratively and transparently managing your collective finances.',
+    }),
+    bgColor: 'sky-100',
+    fgColor: 'sky-600',
+    items: [
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.everything-you-need.title',
+          defaultMessage: 'Everything you need in one place',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.everything-you-need.description',
+          defaultMessage:
+            'Your dashboard brings together all the tools you need to collaboratively manage your finances and stay on top of financial activities that require your attention.',
+        }),
+        media: {
+          src: '/static/images/features/1.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.organize-your-money.title',
+          defaultMessage: 'Organize your money',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.organize-your-money.description',
+          defaultMessage:
+            'Organize your money and control your spending with accounts. Create accounts for reserves, crowdfunding contributions, and spending.',
+        }),
+        media: {
+          src: '/static/images/features/2.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.check-your-balance.title',
+          defaultMessage: 'Check your balance',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.check-your-balance.description',
+          defaultMessage:
+            'Your balance is always up-to-date and verifiable. Money added increases your balance; money spent decreases it. You always know where you stand.',
+        }),
+        media: {
+          src: '/static/images/features/3.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+    ],
+  },
+  {
+    title: defineMessage({
+      id: 'collectives.features.section.money-in.title',
+      defaultMessage: 'Money In',
+    }),
+    description: defineMessage({
+      id: 'collectives.features.section.money-in.description',
+      defaultMessage: 'Document and track all incoming money.',
+    }),
+    bgColor: 'green-100',
+    fgColor: 'green-600',
+    items: [
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.accept-contributions.title',
+          defaultMessage: 'Accept contributions',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.accept-contributions.description',
+          defaultMessage:
+            'Set up crowdfunding campaigns to engage your community. Completed contributions are automatically recorded and added to your account balances.',
+        }),
+        media: {
+          src: '/static/images/features/8.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.track-grants.title',
+          defaultMessage: 'Track grants and pledged funds',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.track-grants.description',
+          defaultMessage:
+            'Received a grant or pledge? Document and track expected income until it arrives and is added to your accounts.',
+        }),
+        media: {
+          src: '/static/images/features/9.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+    ],
+  },
+  {
+    title: defineMessage({
+      id: 'collectives.features.section.money-out.title',
+      defaultMessage: 'Money Out',
+    }),
+    description: defineMessage({
+      id: 'collectives.features.section.money-out.description',
+      defaultMessage:
+        'A straightforward suite of tools for submitting, reviewing, approving, and paying expenses — designed for community groups of all sizes.',
+    }),
+    bgColor: 'rose-50',
+    fgColor: 'rose-600',
+    items: [
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.submit-expenses.title',
+          defaultMessage: 'Submit expenses',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.submit-expenses.description',
+          defaultMessage:
+            'A step-by-step expense form walks your members through filing correct and complete payment requests.',
+        }),
+        media: {
+          src: '/static/images/features/11.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.approve-expenses.title',
+          defaultMessage: 'Approve expenses',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.approve-expenses.description',
+          defaultMessage:
+            'Review submitted expenses as a team and approve the ones you want paid. Rejected or incomplete requests can be sent back for correction.',
+        }),
+        media: {
+          src: '/static/images/features/13.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.get-paid.title',
+          defaultMessage: 'Get paid by your Fiscal Host',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.get-paid.description',
+          defaultMessage:
+            'Approved expenses are forwarded to your Fiscal Host for payment. Your Fiscal Host processes payments on your behalf via their banking integrations.',
+        }),
+        media: {
+          src: '/static/images/features/14.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+    ],
+  },
+  {
+    title: defineMessage({
+      id: 'collectives.features.section.crowdfunding.title',
+      defaultMessage: 'Crowdfunding',
+    }),
+    description: defineMessage({
+      id: 'collectives.features.section.crowdfunding.description',
+      defaultMessage:
+        'Create a variety of crowdfunding campaigns: simple tip-jars, one-time goals, monthly recurring goals, and yearly memberships for continuous community income.',
+    }),
+    bgColor: 'purple-100',
+    fgColor: 'purple-600',
+    items: [
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.flexible-tiers.title',
+          defaultMessage: 'Flexible contribution tiers',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.flexible-tiers.description',
+          defaultMessage:
+            'Design tiers that are appropriate for you and your audience. Collect tips, one-time contributions, and recurring contributions.',
+        }),
+        media: {
+          src: '/static/images/features/26.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+      {
+        title: defineMessage({
+          id: 'collectives.features.item.funding-goals.title',
+          defaultMessage: 'Set and commit to funding goals',
+        }),
+        description: defineMessage({
+          id: 'collectives.features.item.funding-goals.description',
+          defaultMessage:
+            'Create one-time goals for specific projects or recurring goals to ask your community for long-term support.',
+        }),
+        media: {
+          src: '/static/images/features/27.png',
+          srcWidth: 1400,
+          srcHeight: 1400,
+        },
+      },
+    ],
+  },
+];
+
+const collectiveTestimonials: Testimonial[] = [
+  {
+    paragraphs: [
+      'Open Collective has democratised community organising, helping to build trust and foster collaboration and transparency across community-led work.',
+      'Our continued partnership with Open Collective has enabled our network of more than 600 fiscally hosted community groups worldwide to manage their finances with ease and reassurance, thus freeing up headspace to focus on front-line impact and long-term strategy.',
+    ],
+    author: 'Esther Foreman',
+    role: 'CEO and Chair of the Board',
+    org: 'Social Change Nest',
+    avatar: '/static/images/testimonials/esther-foreman.jpg',
+    orgLink: 'https://thesocialchangenest.org',
+  },
+  {
+    paragraphs: [
+      'Open Collective has enabled us to distribute funds across community groups and collectives in transparent and clear ways.',
+      'The platform has unlocked our capacity to build sustainable infrastructure for our work — peer to peer learning and action — in meaningful and sustainable ways.',
+    ],
+    author: 'Anna Garlands',
+    role: 'Co-Director',
+    org: 'Huddlecraft',
+    avatar: '/static/images/testimonials/anna-garlands.jpeg',
+    orgLink: 'https://www.huddlecraft.com/',
+  },
+  {
+    paragraphs: [
+      'Open Collective enables us to deliver valuable services to numerous collectives in a structured and automated way.',
+      'Our communities appreciate how efficient and user-friendly the platform is, allowing them not only to fundraise but also to manage their budgets and expenses transparently.',
+    ],
+    author: 'Babette',
+    org: 'All For Climate',
+    avatar: '/static/images/testimonials/babette.png',
+    orgLink: 'https://allforclimate.earth/',
+  },
+];
+
+const Collectives = () => {
+  return (
+    <Page>
+      {/* Hero */}
+      <div className="mt-20 flex items-center justify-center px-4">
+        <div className="flex max-w-6xl flex-col items-center">
+          <h1 className="text-center text-5xl font-bold tracking-tight text-balance text-oc sm:text-6xl md:text-7xl md:font-extrabold">
+            <FormattedMessage
+              defaultMessage="Your cause needs a home. We provide the foundations."
+              id="collectives.hero.title"
+            />
+          </h1>
+          <div className="my-4 max-w-4xl sm:my-8">
+            <p className="text-center text-xl text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="Focus on your mission, not on bureaucracy. Open Collective gives your project the ability to legally accept donations and manage money, without the headache of becoming a registered entity."
+                id="collectives.hero.subtitle"
+              />
+            </p>
+          </div>
+
+          <JoinCTAButtons onPage="collectives" />
+
+          <div className="mt-4 mb-4">
+            <NextIllustration
+              display="block"
+              width={1035}
+              height={1035}
+              className="-my-10 h-[512px] w-[512px] overflow-hidden"
+              alt="Collectives illustration"
+              src="/static/images/birds.png"
+            />
+          </div>
+        </div>
+      </div>
+
+      <h2 className="my-20 text-center text-4xl font-bold tracking-tight text-balance text-oc">
+        <FormattedMessage
+          defaultMessage="Fund movements, not paperwork.{newLine}Drive your collective to create change."
+          id="gTvF5F"
+          values={I18nFormatters}
+        />
+      </h2>
+
+      {/* Feature highlights grid */}
+      <div className="mx-auto max-w-6xl px-4 pb-16">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+          {featureHighlights.map(feature => (
+            <div key={feature.title.id} className="flex flex-col items-center text-center">
+              <div className="relative mb-2 size-16">
+                <Image src={feature.imgSrc} fill aria-hidden alt="" style={{ height: undefined }} />
+              </div>
+              <h3 className="mb-3 text-lg font-semibold text-foreground">
+                <FormattedMessage {...feature.title} />
+              </h3>
+              <p className="leading-relaxed text-balance text-muted-foreground">
+                <FormattedMessage {...feature.description} />
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* What is a Fiscal Host? */}
+      <div className="bg-green-50 py-16">
+        <div className="mx-auto max-w-5xl px-4">
+          <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:gap-12">
+            <div className="flex-1">
+              <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                <FormattedMessage defaultMessage="What is a Fiscal Host?" id="collectives.fiscalHost.title" />
+              </h2>
+              <p className="mb-4 leading-relaxed text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="A Fiscal Host is a legally registered organization — usually a non-profit — that can hold and manage money on behalf of groups like yours legally and simply."
+                  id="collectives.fiscalHost.description1"
+                />
+              </p>
+              <p className="leading-relaxed text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="Your Fiscal Host takes care of banking, taxes, accounting, legal compliance, and payments, so your collective can focus on your mission."
+                  id="collectives.fiscalHost.description2"
+                />
+              </p>
+            </div>
+            <div className="flex-shrink-0">
+              <NextIllustration
+                width={300}
+                height={300}
+                src="/static/images/home/fiscalhost-illustration.png"
+                alt="Fiscal Host illustration"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features (scrolling accordion) */}
+      <div className="flex flex-1 justify-center">
+        <div className="max-w-7xl flex-1">
+          <Features featureSections={collectiveFeatureSections} />
+        </div>
+      </div>
+
+      {/* Testimonials */}
+      <Testimonials testimonials={collectiveTestimonials} />
+
+      {/* Find your Fiscal Host CTA */}
+      <div className="bg-oc-blue-tints-900 py-16 text-white">
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+            <FormattedMessage defaultMessage="Find your Fiscal Host" id="collectives.findHost.title" />
+          </h2>
+          <p className="mb-8 text-lg text-white/80">
+            <FormattedMessage
+              defaultMessage="Browse Fiscal Hosts that are ready to welcome your collective. Find the right fit for your community and get started."
+              id="collectives.findHost.description"
+            />
+          </p>
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="rounded-full border-white text-foreground hover:bg-white hover:text-oc-blue-tints-900"
+          >
+            <Link href="/search?isHost=true" className="flex items-center gap-2">
+              <FormattedMessage defaultMessage="Discover Fiscal Hosts" id="collectives.findHost.cta" />
+              <ArrowRight size={16} />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </Page>
+  );
+};
+
+// next.js export
+// ts-unused-exports:disable-next-line
+export default Collectives;

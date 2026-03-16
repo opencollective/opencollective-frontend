@@ -12,7 +12,16 @@ const messages = defineMessages({
   },
 });
 
-const testimonials = [
+export type Testimonial = {
+  paragraphs: string[];
+  author: string;
+  role?: string;
+  org: string;
+  avatar: string;
+  orgLink: string;
+};
+
+const defaultTestimonials: Testimonial[] = [
   {
     paragraphs: [
       'The Open Collective platform is a critical part of how we operate. It streamlines our operations, saving us time and reducing administrative overhead. By automating many tasks related to managing financial contributions and expenses, we’re able to focus more attention on supporting our hosted collectives’ individual needs.',
@@ -72,7 +81,7 @@ const testimonials = [
   },
 ];
 
-const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[0] }) => (
+const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => (
   <Card className="h-full">
     <CardContent className="flex-1 px-6">
       <blockquote>
@@ -109,7 +118,8 @@ const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[0
   </Card>
 );
 
-const Testimonials = () => {
+const Testimonials = ({ testimonials: testimonialsProp }: { testimonials?: Testimonial[] }) => {
+  const testimonials = testimonialsProp ?? defaultTestimonials;
   return (
     <section className="relative pt-16 pb-30">
       <div className="absolute inset-0 overflow-hidden">
