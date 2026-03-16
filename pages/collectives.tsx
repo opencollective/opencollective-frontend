@@ -108,7 +108,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Your dashboard brings together all the tools you need to collaboratively manage your finances and stay on top of financial activities that require your attention.',
         }),
         media: {
-          src: '/static/images/features/1.png',
+          src: '/static/images/features/collective/1.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -124,7 +124,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Organize your money and control your spending with accounts. Create accounts for holding reserves, for crowdfunding contributions and for spending.',
         }),
         media: {
-          src: '/static/images/features/2.png',
+          src: '/static/images/features/collective/2.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -140,7 +140,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Money added to an account increases its balance and money spent (or transferred) will decrease its balance. You always know where you stand because the balance is always up-to-date and verifiable.',
         }),
         media: {
-          src: '/static/images/features/3.png',
+          src: '/static/images/features/collective/3.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -156,7 +156,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Transfer money easily between accounts. Starting a new project? Transfer an allocated amount into a separate account in order to manage spending.',
         }),
         media: {
-          src: '/static/images/features/4.png',
+          src: '/static/images/features/collective/4.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -172,7 +172,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Assign administrators to manage specific accounts. Add or transfer money into the accounts them and let your team manage spending on their own.',
         }),
         media: {
-          src: '/static/images/features/5.png',
+          src: '/static/images/features/collective/5.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -188,7 +188,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Activate a public profile to make yourself and your financials visible to the world and to invite broader engagement with crowdfunding campaigns and payment requests.',
         }),
         media: {
-          src: '/static/images/features/6.png',
+          src: '/static/images/features/collective/6.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -218,7 +218,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Setup crowdfunding campaigns to engage your community. Completed contributions are automatically recorded in the ledger and added to your account balances.',
         }),
         media: {
-          src: '/static/images/features/8.png',
+          src: '/static/images/features/collective/7.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -244,7 +244,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'A step-by-step payment request form will walk users through filing correct and complete payment requests. Include your own unique instructions on how to properly submit a payment request in order to get paid.',
         }),
         media: {
-          src: '/static/images/features/11.png',
+          src: '/static/images/features/collective/8.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -260,7 +260,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Send payment request invitations to people who are not on the platform. They will receive an invitation that will guide them to create a new user, complete and submit the payment request.',
         }),
         media: {
-          src: '/static/images/features/12.png',
+          src: '/static/images/features/collective/9.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -276,7 +276,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Review payment requests that have been submitted. Approve the legitimate requests you wish to pay and reject or delete the others.',
         }),
         media: {
-          src: '/static/images/features/13.png',
+          src: '/static/images/features/collective/10.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -307,7 +307,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Flexible tiers enable you to create a diversity of crowdfunding campaigns. Design tiers that are appropriate for you and your audience. Collect tips, one time contributions and recurring contributions.',
         }),
         media: {
-          src: '/static/images/features/26.png',
+          src: '/static/images/features/collective/11.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -323,7 +323,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'Create one time goals for one time projects. Create recurring goals to ask your community for long term support.',
         }),
         media: {
-          src: '/static/images/features/27.png',
+          src: '/static/images/features/collective/12.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -354,7 +354,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'At the heart of the platform is a transaction ledger. All financial activities on the platform generate ledger transactions.',
         }),
         media: {
-          src: '/static/images/features/28.png',
+          src: '/static/images/features/collective/13.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -370,7 +370,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
             'All financial platform activities (payment requests, contributions, grants, etc.) can be traced to their related ledger transactions and vice versa.',
         }),
         media: {
-          src: '/static/images/features/29.png',
+          src: '/static/images/features/collective/14.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
@@ -385,7 +385,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
           defaultMessage: 'Provide your accountants with periodic exports of detailed ledger transactions.',
         }),
         media: {
-          src: '/static/images/features/31.png',
+          src: '/static/images/features/collective/16.png',
           srcWidth: 1400,
           srcHeight: 1400,
         },
