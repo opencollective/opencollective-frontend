@@ -39,6 +39,7 @@ import Contributors from './sections/Contributors';
 import ApprovePaymentRequests from './sections/expenses/ApprovePaymentRequests';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import HostPaymentRequests from './sections/expenses/HostPaymentRequests';
+import IssuedPaymentRequests from './sections/expenses/IssuedPaymentRequests';
 import { PaidDisbursements } from './sections/expenses/PaidDisbursements';
 import PayDisbursements from './sections/expenses/PayDisbursements';
 import PaymentRequests from './sections/expenses/PaymentRequests';
@@ -86,7 +87,6 @@ import {
 import { DashboardContext } from './DashboardContext';
 import DashboardErrorBoundary from './DashboardErrorBoundary';
 import DashboardHeader from './DashboardHeader';
-import IssuedPaymentRequests from './sections/expenses/IssuedPaymentRequests';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,

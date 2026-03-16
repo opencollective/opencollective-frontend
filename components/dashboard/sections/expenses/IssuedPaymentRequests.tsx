@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import { get, omit } from 'lodash';
+import { omit } from 'lodash';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -10,25 +10,18 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import type {
-  Account,
   AccountHoverCardFieldsFragment,
-  Expense,
-  Host,
   HostDashboardExpensesQuery,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpenseDirection, ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
-import { isFeatureEnabled } from '@/lib/allowed-features';
 import { limit } from '@/lib/filters/schemas';
 import { useDrawer } from '@/lib/hooks/useDrawer';
 import { i18nExpenseType } from '@/lib/i18n/expense';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
-import { ExpenseAccountingCategoryPill } from '@/components/expenses/ExpenseAccountingCategoryPill';
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 
 import Avatar from '../../../Avatar';
@@ -60,12 +53,7 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from './filters';
-import {
-  dashboardExpensesQuery,
-  expenseHostQuery,
-  hostDashboardExpensesQuery,
-  issuedPaymentRequestsMetadataQuery,
-} from './queries';
+import { dashboardExpensesQuery, expenseHostQuery, issuedPaymentRequestsMetadataQuery } from './queries';
 
 type HostExpensesQueryNode = NonNullable<HostDashboardExpensesQuery['expenses']['nodes']>[number];
 
@@ -324,11 +312,7 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
 
   const expenses = data?.expenses;
 
-  const {
-    data: hostData,
-    loading: hostLoading,
-    error: hostError,
-  } = useQuery(expenseHostQuery, {
+  const { data: hostData } = useQuery(expenseHostQuery, {
     variables: {
       slug: accountSlug,
     },

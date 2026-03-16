@@ -11,7 +11,7 @@ import type { FilterValues } from './filters';
 /**
  * View IDs used by IncomingContributions and OutgoingContributions
  */
-export enum IncomingOutgoingContributionTabs {
+enum IncomingOutgoingContributionTabs {
   ALL = 'ALL',
   RECURRING = 'RECURRING',
   ONETIME = 'ONETIME',
@@ -120,7 +120,7 @@ export function getContributionViews(intl: IntlShape): Views<FilterValues> {
   ];
 }
 
-export type IncomingOutgoingContributionViewCounts = Partial<Record<IncomingOutgoingContributionTabs, number>>;
+type IncomingOutgoingContributionViewCounts = Partial<Record<IncomingOutgoingContributionTabs, number>>;
 
 interface UseIncomingOutgoingContributionViewCountsResult {
   viewCounts: IncomingOutgoingContributionViewCounts;

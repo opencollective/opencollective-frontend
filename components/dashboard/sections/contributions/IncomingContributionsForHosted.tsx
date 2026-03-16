@@ -6,6 +6,7 @@ import type { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { AccountOrdersFilter } from '@/lib/graphql/types/v2/schema';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -24,7 +25,6 @@ import {
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 import { dashboardOrdersQuery } from './queries';
 import { getContributionViews, useFetchContributionViewCounts } from './views';
-import { AccountOrdersFilter } from '@/lib/graphql/types/v2/schema';
 
 const schema = baseSchema.extend({ tier: tierFilter.schema, account: childAccountFilter.schema });
 

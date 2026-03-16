@@ -558,7 +558,6 @@ export const dashboardExpensesQuery = gql`
     $sort: ChronologicalOrderInput
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
-    #$fromAccount: AccountReferenceInput
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String] # $isHost: Boolean! # $hostSlug: String # should we just use slug instead?
     $fetchGrantHistory: Boolean! #
@@ -568,7 +567,6 @@ export const dashboardExpensesQuery = gql`
       direction: $direction
       account: $account
       host: $host
-      # fromAccount: $fromAccount
       oppositeAccounts: $oppositeAccounts
       includeChildrenExpenses: $includeChildrenExpenses
       limit: $limit
