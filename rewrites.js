@@ -17,11 +17,11 @@ exports.REWRITES = [
   },
   {
     source: '/organizations',
-    destination: '/solutions',
+    destination: '/organizations',
   },
   {
     source: '/solutions',
-    destination: '/solutions',
+    destination: '/organizations',
   },
   {
     source: '/:pageSlug(widgets|tos|privacypolicy|hiring|about)',

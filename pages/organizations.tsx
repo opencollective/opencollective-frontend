@@ -715,7 +715,7 @@ const featureSections: IFeatureSection[] = [
   },
 ];
 
-const Solutions = () => {
+const Organizations = () => {
   return (
     <Page>
       <div className="mt-20 flex items-center justify-center px-4">
@@ -780,4 +780,4 @@ const Solutions = () => {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default Solutions;
+export default Organizations;
