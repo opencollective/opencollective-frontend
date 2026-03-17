@@ -11,7 +11,7 @@ interface JoinCTAButtonsProps {
 }
 
 const StaticJoinCTAButtons = React.forwardRef<HTMLDivElement, JoinCTAButtonsProps>((props, ref) => {
-  const primaryHref = props.onPage === 'collectives' ? '/create' : '/signup/organization?active=true';
+  const primaryHref = props.onPage === 'collectives' ? '/signup/collective' : '/signup/organization?active=true';
   const primaryLabel =
     props.onPage === 'collectives' ? (
       <FormattedMessage defaultMessage="Create a Collective" id="collectives.hero.createCollective" />

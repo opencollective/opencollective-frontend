@@ -18,34 +18,33 @@ const featureHighlights = [
   {
     imgSrc: '/static/images/product/participatory.png',
     title: defineMessage({
-      defaultMessage: 'Be Fiscally Hosted',
+      defaultMessage: 'Fiscal Hosting',
       id: 'collectives.features.fiscallyHosted',
     }),
     description: defineMessage({
-      defaultMessage: 'Join a Fiscal Host that handles banking, taxes, accounting, legal, and payments on your behalf.',
+      defaultMessage: 'Join a fiscal host that can handle legal and financial compliance on your behalf.',
       id: 'collectives.features.fiscallyHosted.description',
     }),
   },
   {
     imgSrc: '/static/images/product/crowdfunding.png',
     title: defineMessage({
-      defaultMessage: 'Raise & Crowdfund Money',
+      defaultMessage: 'Raise Money & Crowdfund',
       id: 'collectives.features.crowdfund',
     }),
     description: defineMessage({
-      defaultMessage:
-        'Launch campaigns to collect contributions from your community with one-time or recurring support.',
+      defaultMessage: 'Accept donations, grants, and sponsorships to fund your work.',
       id: 'collectives.features.crowdfund.description',
     }),
   },
   {
     imgSrc: '/static/images/product/expenses.png',
     title: defineMessage({
-      defaultMessage: 'Spend Transparently',
+      defaultMessage: 'Spend Money',
       id: 'collectives.features.spendTransparently',
     }),
     description: defineMessage({
-      defaultMessage: 'Submit, approve and pay expenses in a transparent and community-accountable way.',
+      defaultMessage: 'Submit expenses, review and approve invoices and reimbursements.',
       id: 'collectives.features.spendTransparently.description',
     }),
   },
@@ -56,29 +55,31 @@ const featureHighlights = [
       id: 'collectives.features.participatoryFinances',
     }),
     description: defineMessage({
-      defaultMessage: 'Empower your members to manage finances with simplified, approachable financial tools.',
+      defaultMessage: 'Multiple administrators can coordinate project finances with multiple accounts.',
       id: 'collectives.features.participatoryFinances.description',
     }),
   },
   {
     imgSrc: '/static/images/product/transparency.png',
     title: defineMessage({
-      defaultMessage: 'Real-Time Balances',
+      defaultMessage: 'Real-Time Balance',
       id: 'collectives.features.realTimeBalances',
     }),
     description: defineMessage({
-      defaultMessage: 'Keep track of your balance, income and spending with up-to-the-minute visibility.',
+      defaultMessage:
+        'Keep track of balances, income and spending using up-to-the-minute balances based on our internal transaction ledger.',
       id: 'collectives.features.realTimeBalances.description',
     }),
   },
   {
     imgSrc: '/static/images/product/hosting.png',
     title: defineMessage({
-      defaultMessage: 'Full Transparency',
+      defaultMessage: 'Transparency',
       id: 'collectives.features.transparency',
     }),
     description: defineMessage({
-      defaultMessage: 'Share your finances, transactions and real-time balances openly with your community.',
+      defaultMessage:
+        'Be accountable to your community by openly communicating your finances, transactions and real-time balances.',
       id: 'collectives.features.transparency.description',
     }),
   },
@@ -442,7 +443,7 @@ const Collectives = () => {
             />
           </h1>
           <div className="my-4 max-w-4xl sm:my-8">
-            <p className="text-center text-xl text-muted-foreground">
+            <p className="text-center text-xl text-balance text-muted-foreground">
               <FormattedMessage
                 defaultMessage="Focus on your mission, not on bureaucracy. Open Collective gives your project the ability to legally accept donations and manage money, without the headache of becoming a registered entity."
                 id="collectives.hero.subtitle"
@@ -452,14 +453,13 @@ const Collectives = () => {
 
           <JoinCTAButtons onPage="collectives" />
 
-          <div className="mt-4 mb-4">
-            <NextIllustration
-              display="block"
-              width={1035}
-              height={1035}
-              className="-my-10 h-[512px] w-[512px] overflow-hidden"
-              alt="Collectives illustration"
-              src="/static/images/birds.png"
+          <div className="my-12">
+            <Image
+              width={1024}
+              height={731}
+              className="w-full max-w-[500px]"
+              alt=""
+              src="/static/images/home/nurturing-illustration.png"
             />
           </div>
         </div>
@@ -493,33 +493,50 @@ const Collectives = () => {
       </div>
 
       {/* What is a Fiscal Host? */}
-      <div className="bg-green-50 py-16">
-        <div className="mx-auto max-w-5xl px-4">
+      <div className="px-4 py-16">
+        <div className="mx-auto max-w-5xl rounded-2xl bg-[hsl(113,53%,97%)] px-8 py-10 md:px-12 md:py-12">
           <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:gap-12">
+            <div className="w-full max-w-[220px] shrink-0">
+              <Image
+                width={676}
+                height={432}
+                className="w-full"
+                src="/static/images/become-a-host/whoAreFiscalHost-illustration.png"
+                alt=""
+              />
+            </div>
+
             <div className="flex-1">
-              <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                <FormattedMessage defaultMessage="What is a Fiscal Host?" id="collectives.fiscalHost.title" />
+              <h2 className="mb-4 text-3xl font-bold tracking-tight text-oc sm:text-4xl">
+                <FormattedMessage defaultMessage="What is a fiscal host?" id="collectives.fiscalHost.title" />
               </h2>
-              <p className="mb-4 leading-relaxed text-muted-foreground">
+              <p className="mb-4 leading-relaxed text-foreground">
                 <FormattedMessage
-                  defaultMessage="A Fiscal Host is a legally registered organization — usually a non-profit — that can hold and manage money on behalf of groups like yours legally and simply."
+                  defaultMessage="Fiscal hosts are legally incorporated organisations (typically non-profit) that provide the legal and financial umbrella for your group, so you can focus on your mission."
                   id="collectives.fiscalHost.description1"
                 />
               </p>
-              <p className="leading-relaxed text-muted-foreground">
+              <p className="mb-4 leading-relaxed text-foreground">
                 <FormattedMessage
-                  defaultMessage="Your Fiscal Host takes care of banking, taxes, accounting, legal compliance, and payments, so your collective can focus on your mission."
+                  defaultMessage="Your project operates using the fiscal host's legal entity and bank account instead of having to set up your own. The host provides administrative services, oversight, and support."
                   id="collectives.fiscalHost.description2"
                 />
               </p>
-            </div>
-            <div className="flex-shrink-0">
-              <NextIllustration
-                width={300}
-                height={300}
-                src="/static/images/home/fiscalhost-illustration.png"
-                alt="Fiscal Host illustration"
-              />
+              <p className="mb-6 text-sm leading-relaxed text-muted-foreground italic">
+                <FormattedMessage
+                  defaultMessage="Fiscal hosting is also called fiscal sponsorship, fund-holding, or auspicing in different places around the world."
+                  id="collectives.fiscalHost.note"
+                />
+              </p>
+              <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="lg">
+                <Link href="/fiscal-hosting" className="flex items-center gap-2">
+                  <FormattedMessage
+                    defaultMessage="Learn more about fiscal hosting"
+                    id="collectives.fiscalHost.learnMore"
+                  />
+                  <ArrowRight size={16} />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
