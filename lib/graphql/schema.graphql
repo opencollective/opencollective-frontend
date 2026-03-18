@@ -1166,6 +1166,11 @@ type PlanType {
 
 type Policies {
   id: String
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
   EXPENSE_POLICIES: EXPENSE_POLICIES
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
@@ -1175,7 +1180,6 @@ type Policies {
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
   EXPENSE_PUBLIC_VENDORS: Boolean
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
-  REQUIRE_PAYPAL_VERIFICATION: REQUIRE_PAYPAL_VERIFICATION
 
   """
   Contribution threshold to enforce contributor info. This resolver can be called from the collective or the host, when resolved through the collective the thresholds are returned in the collective currency
@@ -1964,12 +1968,6 @@ enum CurrencyExchangeRateSourceType {
 type EXPENSE_CATEGORIZATION {
   requiredForExpenseSubmitters: Boolean
   requiredForCollectiveAdmins: Boolean
-}
-
-type REQUIRE_PAYPAL_VERIFICATION {
-  enabled: Boolean!
-  appliesToHostedCollectives: Boolean!
-  verificationValidityDays: Int
 }
 
 type CONTRIBUTOR_INFO_THRESHOLDS {

@@ -189,7 +189,7 @@ export type ExpenseForm = ExpenseFormik & {
   refresh: () => void;
 };
 
-const formSchemaQuery = gql`
+const expenseFormSchemaQuery = gql`
   query ExpenseFormSchema(
     $collectiveSlug: String
     $hasCollectiveSlug: Boolean!
@@ -505,6 +505,7 @@ const formSchemaQuery = gql`
       }
     }
     ... on Organization {
+      hasHosting
       host {
         ...ExpenseFormSchemaHostFields
       }
@@ -649,7 +650,7 @@ const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
 const memoizedExpenseFormSchema = memoizeOne(
   async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
-      query: formSchemaQuery,
+      query: expenseFormSchemaQuery,
 
       variables: variables,
       errorPolicy: 'all',
