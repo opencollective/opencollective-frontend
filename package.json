@@ -76,7 +76,7 @@
     "country-currency-emoji-flags": "1.1.1",
     "csv-parse": "6.1.0",
     "currency-symbol-map": "5.1.0",
-    "dayjs": "1.11.19",
+    "dayjs": "1.11.20",
     "debug": "4.4.3",
     "diff": "8.0.3",
     "dotenv": "17.3.1",
