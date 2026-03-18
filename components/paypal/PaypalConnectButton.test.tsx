@@ -49,6 +49,9 @@ const simulatePopupMessage = (data: Record<string, unknown>) => {
   });
 };
 
+/** Valid OAuth state JWT for tests (matches format from API) */
+const TEST_STATE = 'eyJhbGciOiJIUzI1NiJ9.eyJDb2xsZWN0aXZlSWQiOjEsInVzZXJJZCI6MX0.test';
+
 describe('PaypalConnectButton', () => {
   let mockPopup: { closed: boolean; close: jest.Mock; focus: jest.Mock };
 
@@ -208,7 +211,7 @@ describe('PaypalConnectButton', () => {
   // ─── Message event handling ───────────────────────────────────────────────
 
   describe('Message event handling', () => {
-    it('calls fetch and then onSuccess when the popup sends a valid auth code', async () => {
+    it('calls fetch and then onSuccess when the popup sends a valid auth code and state', async () => {
       const user = userEvent.setup();
       const onSuccess = jest.fn();
 
@@ -216,7 +219,11 @@ describe('PaypalConnectButton', () => {
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
-      simulatePopupMessage({ type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth_code_123' });
+      simulatePopupMessage({
+        type: PAYPAL_CONNECT_POPUP_MESSAGE,
+        code: 'auth_code_123',
+        state: TEST_STATE,
+      });
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
@@ -227,22 +234,46 @@ describe('PaypalConnectButton', () => {
       });
     });
 
-    it('sends accountId, currency, payoutMethodId, and alias in the request body', async () => {
+    it('sends code, state, accountId, currency, payoutMethodId, and alias in the request body', async () => {
       const user = userEvent.setup();
 
       renderButton({ payoutMethodId: 'pm-existing', alias: 'My PayPal' });
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
-      simulatePopupMessage({ type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth_code_123' });
+      simulatePopupMessage({
+        type: PAYPAL_CONNECT_POPUP_MESSAGE,
+        code: 'auth_code_123',
+        state: TEST_STATE,
+      });
 
       await waitFor(() => expect(global.fetch).toHaveBeenCalled());
       const body = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
       expect(body.code).toBe('auth_code_123');
+      expect(body.state).toBe(TEST_STATE);
       expect(body.accountId).toBe('account-123');
       expect(body.currency).toBe('USD');
       expect(body.payoutMethodId).toBe('pm-existing');
       expect(body.name).toBe('My PayPal');
+    });
+
+    it('calls onError when the popup sends code without state', async () => {
+      const user = userEvent.setup();
+      const onError = jest.fn();
+
+      renderButton({ onError });
+      await user.click(screen.getByRole('button', { name: /connect paypal/i }));
+      await waitFor(() => screen.getByText(/don't see the paypal login window/i));
+
+      simulatePopupMessage({ type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth_code_123' });
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: 'PayPal did not return a valid OAuth state. Please try again.',
+          }),
+        );
+      });
     });
 
     it('calls onError when the popup sends an error message', async () => {
@@ -315,14 +346,18 @@ describe('PaypalConnectButton', () => {
       expect(onSuccess).not.toHaveBeenCalled();
     });
 
-    it('closes the popup overlay after receiving a valid auth code', async () => {
+    it('closes the popup overlay after receiving a valid auth code and state', async () => {
       const user = userEvent.setup();
 
       renderButton();
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
-      simulatePopupMessage({ type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth_code_123' });
+      simulatePopupMessage({
+        type: PAYPAL_CONNECT_POPUP_MESSAGE,
+        code: 'auth_code_123',
+        state: TEST_STATE,
+      });
 
       await waitFor(() => {
         expect(screen.queryByText(/don't see the paypal login window/i)).not.toBeInTheDocument();
@@ -346,7 +381,11 @@ describe('PaypalConnectButton', () => {
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
-      simulatePopupMessage({ type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'bad_code' });
+      simulatePopupMessage({
+        type: PAYPAL_CONNECT_POPUP_MESSAGE,
+        code: 'bad_code',
+        state: TEST_STATE,
+      });
 
       await waitFor(() => {
         expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Invalid authorization code' }));
@@ -366,7 +405,11 @@ describe('PaypalConnectButton', () => {
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
-      simulatePopupMessage({ type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth_code_123' });
+      simulatePopupMessage({
+        type: PAYPAL_CONNECT_POPUP_MESSAGE,
+        code: 'auth_code_123',
+        state: TEST_STATE,
+      });
 
       await waitFor(() => {
         expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Internal Server Error' }));
@@ -382,7 +425,11 @@ describe('PaypalConnectButton', () => {
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
-      simulatePopupMessage({ type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth_code_123' });
+      simulatePopupMessage({
+        type: PAYPAL_CONNECT_POPUP_MESSAGE,
+        code: 'auth_code_123',
+        state: TEST_STATE,
+      });
 
       await waitFor(() => {
         expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'fetch failed' }));
@@ -426,7 +473,11 @@ describe('PaypalConnectButton', () => {
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
       // Successful auth via message (sets hadSuccess.current = true)
-      simulatePopupMessage({ type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth_code_123' });
+      simulatePopupMessage({
+        type: PAYPAL_CONNECT_POPUP_MESSAGE,
+        code: 'auth_code_123',
+        state: TEST_STATE,
+      });
       await waitFor(() => expect(onSuccess).toHaveBeenCalled());
 
       // Popup closes after success — should not trigger an error

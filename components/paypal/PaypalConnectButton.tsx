@@ -93,7 +93,7 @@ const PaypalConnectButton = ({
       popupRef.current = popup;
       setIsPopupOpen(true);
 
-      const code = await new Promise<string>((resolve, reject) => {
+      const { code, state } = await new Promise<{ code: string; state: string }>((resolve, reject) => {
         const cleanup = () => {
           cancelRef.current = null;
           setIsPopupOpen(false);
@@ -117,8 +117,10 @@ const PaypalConnectButton = ({
           cleanup();
           if (event.data.error) {
             reject(new Error(event.data.error));
+          } else if (event.data.code && event.data.state) {
+            resolve({ code: event.data.code, state: event.data.state });
           } else if (event.data.code) {
-            resolve(event.data.code);
+            reject(new Error('PayPal did not return a valid state. Please try again.'));
           } else {
             reject(new Error('PayPal did not return an authorization code'));
           }
@@ -144,7 +146,7 @@ const PaypalConnectButton = ({
           'Content-Type': 'application/json',
           ...addAuthTokenToHeader(),
         },
-        body: JSON.stringify({ code, accountId, payoutMethodId, currency, name: alias }),
+        body: JSON.stringify({ code, state, accountId, payoutMethodId, currency, name: alias }),
       }).then(response => {
         if (!response.ok) {
           return response.json().then(json => {

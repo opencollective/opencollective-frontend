@@ -41,7 +41,25 @@ describe('processPaypalCallback', () => {
     processPaypalCallback(mockLocation('?code=auth_code_123'), mockOpener as unknown as Window);
 
     expect(mockPostMessage).toHaveBeenCalledWith(
-      { type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth_code_123', error: null },
+      { type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth_code_123', error: null, state: null },
+      'http://localhost:3000',
+    );
+  });
+
+  it('calls postMessage with code and state when URL has both params and opener exists', () => {
+    const stateJwt = 'eyJhbGciOiJIUzI1NiJ9.eyJDb2xsZWN0aXZlSWQiOjF9.test';
+    processPaypalCallback(
+      mockLocation(`?code=auth_code_123&state=${encodeURIComponent(stateJwt)}`),
+      mockOpener as unknown as Window,
+    );
+
+    expect(mockPostMessage).toHaveBeenCalledWith(
+      {
+        type: PAYPAL_CONNECT_POPUP_MESSAGE,
+        code: 'auth_code_123',
+        error: null,
+        state: stateJwt,
+      },
       'http://localhost:3000',
     );
   });
@@ -50,16 +68,16 @@ describe('processPaypalCallback', () => {
     processPaypalCallback(mockLocation('?error=access_denied'), mockOpener as unknown as Window);
 
     expect(mockPostMessage).toHaveBeenCalledWith(
-      { type: PAYPAL_CONNECT_POPUP_MESSAGE, code: null, error: 'access_denied' },
+      { type: PAYPAL_CONNECT_POPUP_MESSAGE, code: null, error: 'access_denied', state: null },
       'http://localhost:3000',
     );
   });
 
-  it('calls postMessage with null code and error when URL has neither and opener exists', () => {
+  it('calls postMessage with null code and error when URL has state only and opener exists', () => {
     processPaypalCallback(mockLocation('?state=xyz'), mockOpener as unknown as Window);
 
     expect(mockPostMessage).toHaveBeenCalledWith(
-      { type: PAYPAL_CONNECT_POPUP_MESSAGE, code: null, error: null },
+      { type: PAYPAL_CONNECT_POPUP_MESSAGE, code: null, error: null, state: 'xyz' },
       'http://localhost:3000',
     );
   });

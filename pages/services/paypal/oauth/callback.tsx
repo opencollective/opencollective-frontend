@@ -13,7 +13,7 @@ export interface PaypalCallbackLocation {
 }
 
 /**
- * Processes the PayPal OAuth callback: reads code/error from the URL and
+ * Processes the PayPal OAuth callback: reads code, error, and state from the URL and
  * posts them to the opener via postMessage. Extracted for testability.
  */
 export function processPaypalCallback(location: PaypalCallbackLocation, opener: Window | null): void {
@@ -31,10 +31,11 @@ export function processPaypalCallback(location: PaypalCallbackLocation, opener: 
     const params = new URLSearchParams(location.search);
     const code = params.get('code');
     const error = params.get('error');
+    const state = params.get('state');
 
     if (opener) {
       opener.postMessage(
-        { type: PAYPAL_CONNECT_POPUP_MESSAGE, code: code ?? null, error: error ?? null },
+        { type: PAYPAL_CONNECT_POPUP_MESSAGE, code: code ?? null, error: error ?? null, state: state ?? null },
         location.origin,
       );
     }
