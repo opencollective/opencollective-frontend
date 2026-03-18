@@ -16,6 +16,7 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
+import { NEW_PAYOUT_METHOD_ID, PAYEE_SLUG_NEW_VENDOR, PAYEE_SLUG_VENDOR } from '@/components/expenses/lib/constants';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
@@ -128,7 +129,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     if (!props.payoutMethodId && lastUsed) {
       setFieldValue('payoutMethodId', lastUsed?.id);
     } else if (
-      props.payoutMethodId !== '__newPayoutMethod' &&
+      props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
       (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
     ) {
       setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
@@ -147,15 +148,14 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     payoutMethods,
   ]);
 
-  const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';
-  const isVendor = props.payeeSlug === '__vendor' || props.payee?.type === CollectiveType.VENDOR;
-  const isInviteMode = ['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(props.payeeSlug);
+  const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === NEW_PAYOUT_METHOD_ID;
+  const isVendor = props.payeeSlug === PAYEE_SLUG_VENDOR || props.payee?.type === CollectiveType.VENDOR;
   const hasInviteeInfo =
     props.invitee &&
     (('email' in props.invitee && props.invitee.email) ||
       ('slug' in props.invitee && props.invitee.slug) ||
       ('organization' in props.invitee && props.invitee.organization?.slug));
-  const hasPayeeOrInviteeInfo = props.payee || (isInviteMode && hasInviteeInfo);
+  const hasPayeeOrInviteeInfo = props.payee || hasInviteeInfo;
   const payeeIsCollectiveFamilyType =
     props.payee && (AccountTypesWithHost as readonly string[]).includes(props.payee.type);
   const payeeIsSameHost = props.payee && props.host && 'host' in props.payee && props.payee.host?.id === props.host.id;
@@ -256,7 +256,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       !isLoadingPayee &&
       !isPickingProfileAdministered &&
       !isVendor &&
-      props.payeeSlug !== '__newVendor' &&
+      props.payeeSlug !== PAYEE_SLUG_NEW_VENDOR &&
       !props.isAdminOfPayee &&
       !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) ? (
         <MessageBox type="info">
@@ -272,7 +272,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             />
           )}
         </MessageBox>
-      ) : props.payeeSlug === '__newVendor' ? (
+      ) : props.payeeSlug === PAYEE_SLUG_NEW_VENDOR ? (
         <MessageBox type="info">
           <FormattedMessage defaultMessage="Save the vendor information to create a payout method" id="E8oTcs" />
         </MessageBox>
@@ -318,7 +318,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             !(isVendor && payoutMethods.length > 0) &&
             !payeeIsCollectiveFamilyType && (
               <RadioGroupCard
-                value="__newPayoutMethod"
+                value={NEW_PAYOUT_METHOD_ID}
                 data-cy="add-new-payout-method"
                 checked={isNewPayoutMethodSelected}
                 disabled={isLoading || props.initialLoading || props.isSubmitting || !hasPayeeOrInviteeInfo}
@@ -330,7 +330,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                   <div>
                     <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
                   </div>
-                  {!props.payee && (
+                  {!hasPayeeOrInviteeInfo && (
                     <div className="mt-1 text-xs text-gray-500 italic">
                       <FormattedMessage
                         defaultMessage="Please fill the “Who is getting paid” section first."

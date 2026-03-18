@@ -19,6 +19,7 @@ import {
   PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
+import { NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID, NEW_PAYOUT_METHOD_ID } from './lib/constants';
 import { getAccountReferenceInput } from '@/lib/collective';
 
 import CollectivePicker from '../CollectivePicker';
@@ -205,9 +206,9 @@ const EditPayee = ({ expense, onSubmit }) => {
             url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
           })),
           payoutMethod:
-            !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+            !values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID
               ? { ...values.newPayoutMethod, isSaved: false }
-              : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+              : values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID
                 ? {
                     type: PayoutMethodType.ACCOUNT_BALANCE,
                     data: {},
@@ -299,9 +300,9 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     async (values, h, formOptions) => {
       const editValues = {
         payoutMethod:
-          !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+          !values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID
             ? { ...values.newPayoutMethod, isSaved: false }
-            : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+            : values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID
               ? {
                   type: PayoutMethodType.ACCOUNT_BALANCE,
                   data: {},

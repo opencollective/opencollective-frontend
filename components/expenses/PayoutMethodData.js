@@ -86,7 +86,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
               </TooltipTrigger>
               <TooltipContent className="max-w-xs font-normal">
                 <FormattedMessage
-                  defaultMessage="This email was provided by the user and has not been verified through PayPal."
+                  defaultMessage="This email has not been verified through PayPal."
                   id="PayoutMethod.PayPal.UnverifiedTooltip"
                 />
               </TooltipContent>
