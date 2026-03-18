@@ -160,6 +160,7 @@ export const communityAccountDetailQuery = gql`
   query CommunityAccountDetail($accountId: String!, $hostSlug: String!, $isIndividual: Boolean!) {
     account(id: $accountId) {
       id
+      publicId
       legacyId
       slug
       name

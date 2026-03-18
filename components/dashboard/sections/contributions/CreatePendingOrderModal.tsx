@@ -110,6 +110,7 @@ const createPendingContributionModalQuery = gql`
       }
       policies {
         id
+        publicId
         REQUIRE_2FA_FOR_ADMINS
       }
       isTrustedHost
