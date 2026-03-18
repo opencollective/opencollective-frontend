@@ -285,12 +285,12 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             <div className="flex items-center gap-1">
               <BookKey size={14} />
               <CopyID
-                value={props.account.id}
+                value={account?.publicId || props.account.id}
                 tooltipLabel={<FormattedMessage defaultMessage="Copy Account ID" id="D+P5Yx" />}
                 className="inline-flex items-center gap-1"
                 Icon={null}
               >
-                {props.account.id.split('-')[0]}...
+                {account?.publicId || props.account.id.split('-')[0]}...
               </CopyID>
             </div>
             {account && 'email' in account && (
