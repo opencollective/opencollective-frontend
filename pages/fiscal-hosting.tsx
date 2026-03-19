@@ -95,9 +95,88 @@ const BulletList = ({ items }: { items: React.ReactElement[] }) => (
   </ul>
 );
 
-// ─── Section data ──────────────────────────────────────────────────────────────
+export const FindAFiscalHost = ({ showLinkToFiscalHostingPage = false }) => {
+  const intl = useIntl();
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+  return (
+    <SectionCard
+      className="bg-[hsla(34,89%,96%)]"
+      imgSrc="/static/images/fiscal-hosting/find.png"
+      imgWidth={500}
+      imgHeight={500}
+    >
+      <h2 className="mb-4 text-3xl font-bold tracking-tight text-oc sm:text-4xl">
+        <FormattedMessage defaultMessage="How to find a Fiscal Host?" id="fiscalHosting.findHost.title" />
+      </h2>
+      <p className="mb-6 leading-relaxed font-medium text-foreground">
+        <FormattedMessage
+          defaultMessage="To find the right fit, you'll want to consider factors such as legal status, geographic coverage, supported currencies, fees, and the types of projects they are able to host."
+          id="fiscalHosting.findHost.intro"
+        />
+      </p>
+      <AccordionItems
+        items={[
+          {
+            id: 'mission-alignment',
+            title: intl.formatMessage({
+              defaultMessage: 'Mission alignment',
+              id: 'fiscalHosting.missionAlignment',
+            }),
+            description: intl.formatMessage({
+              defaultMessage:
+                'Fiscal Hosts usually have specific topics or areas they are designed to serve. When it comes to the application process, their acceptance criteria will fit in that scope.',
+              id: 'fiscalHosting.findHost.missionAlignment',
+            }),
+          },
+          {
+            id: 'location',
+            title: intl.formatMessage({ defaultMessage: 'Location', id: 'SectionLocation.Title' }),
+            description: intl.formatMessage({
+              defaultMessage:
+                'Which country a fiscal host is based in will determine the currency your money will be accounted in, and where you are located in a legal sense. For example, if you are applying for an EU grant, you might need a fiscal host based in the EU.',
+              id: 'fiscalHosting.findHost.location',
+            }),
+          },
+          {
+            id: 'legal-structure',
+            title: intl.formatMessage({ defaultMessage: 'Legal structure', id: 'fiscalHosting.legalStructure' }),
+            description: intl.formatMessage({
+              defaultMessage:
+                'Do you want your host to be a charity, a company, a cooperative, or something else? For example, a charity structure can enable tax-deductible donations, but may also have more restrictions on allowed activities.',
+              id: 'fiscalHosting.findHost.legalStructure',
+            }),
+          },
+          {
+            id: 'fees',
+            title: intl.formatMessage({ defaultMessage: 'Fees', id: 'fiscalHosting.fees' }),
+            description: intl.formatMessage({
+              defaultMessage:
+                "Fiscal Hosts often charge a fee for the service they provide. Some hosts keep fees low and offer a lightweight service, while others have higher fees and provide more support. Some fiscal hosts don't charge fees at all.",
+              id: 'fiscalHosting.findHost.fees',
+            }),
+          },
+        ]}
+        style={{ '--primary': 'var(--color-yellow-600)' } as React.CSSProperties}
+        className="mb-8"
+      />
+      <div className="flex items-center gap-4">
+        <Button asChild variant="marketing" className="rounded-full whitespace-nowrap" size="lg">
+          <Link href="/search?isHost=true" className="flex items-center gap-2">
+            <FormattedMessage defaultMessage="Explore fiscal hosts on the platform" id="fiscalHosting.findHost.cta" />
+            <ArrowRight size={16} />
+          </Link>
+        </Button>
+        {showLinkToFiscalHostingPage && (
+          <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="lg">
+            <Link href="/fiscal-hosting" className="flex items-center gap-2">
+              <FormattedMessage defaultMessage="Learn more about fiscal hosting" id="yOzWJD" />
+            </Link>
+          </Button>
+        )}
+      </div>
+    </SectionCard>
+  );
+};
 
 const FiscalHostingPage = () => {
   const intl = useIntl();
@@ -127,7 +206,7 @@ const FiscalHostingPage = () => {
 
           <p className="mb-4 max-w-2xl text-lg leading-relaxed text-balance text-foreground">
             <FormattedMessage
-              defaultMessage="You have a mission. Maybe it's a community garden, an open-source software project, or a local activist group. You're ready to change the world, but then you hit a wall: &ldquo;How do we actually handle the money?&rdquo;"
+              defaultMessage={`You have a mission. Maybe it's a community garden, an open-source software project, or a local activist group. You're ready to change the world, but then you hit a wall: “How do we actually handle the money?”`}
               id="fiscalHosting.hero.intro1"
             />
           </p>
@@ -388,73 +467,7 @@ const FiscalHostingPage = () => {
         </SectionCard>
 
         {/* ── How to find a Fiscal Host? ────────────────────────────────────── */}
-        <SectionCard
-          className="bg-[hsla(34,89%,96%)]"
-          imgSrc="/static/images/fiscal-hosting/find.png"
-          imgWidth={500}
-          imgHeight={500}
-        >
-          <h2 className="mb-4 text-3xl font-bold tracking-tight text-oc sm:text-4xl">
-            <FormattedMessage defaultMessage="How to find a Fiscal Host?" id="fiscalHosting.findHost.title" />
-          </h2>
-          <p className="mb-6 leading-relaxed font-medium text-foreground">
-            <FormattedMessage
-              defaultMessage="To find the right fit, you'll want to consider factors such as legal status, geographic coverage, supported currencies, fees, and the types of projects they are able to host."
-              id="fiscalHosting.findHost.intro"
-            />
-          </p>
-          <AccordionItems
-            items={[
-              {
-                id: 'mission-alignment',
-                title: intl.formatMessage({
-                  defaultMessage: 'Mission alignment',
-                  id: 'fiscalHosting.missionAlignment',
-                }),
-                description: intl.formatMessage({
-                  defaultMessage:
-                    'Fiscal Hosts usually have specific topics or areas they are designed to serve. When it comes to the application process, their acceptance criteria will fit in that scope.',
-                  id: 'fiscalHosting.findHost.missionAlignment',
-                }),
-              },
-              {
-                id: 'location',
-                title: intl.formatMessage({ defaultMessage: 'Location', id: 'SectionLocation.Title' }),
-                description: intl.formatMessage({
-                  defaultMessage:
-                    'Which country a fiscal host is based in will determine the currency your money will be accounted in, and where you are located in a legal sense. For example, if you are applying for an EU grant, you might need a fiscal host based in the EU.',
-                  id: 'fiscalHosting.findHost.location',
-                }),
-              },
-              {
-                id: 'legal-structure',
-                title: intl.formatMessage({ defaultMessage: 'Legal structure', id: 'fiscalHosting.legalStructure' }),
-                description: intl.formatMessage({
-                  defaultMessage:
-                    'Do you want your host to be a charity, a company, a cooperative, or something else? For example, a charity structure can enable tax-deductible donations, but may also have more restrictions on allowed activities.',
-                  id: 'fiscalHosting.findHost.legalStructure',
-                }),
-              },
-              {
-                id: 'fees',
-                title: intl.formatMessage({ defaultMessage: 'Fees', id: 'fiscalHosting.fees' }),
-                description: intl.formatMessage({
-                  defaultMessage:
-                    "Fiscal Hosts often charge a fee for the service they provide. Some hosts keep fees low and offer a lightweight service, while others have higher fees and provide more support. Some fiscal hosts don't charge fees at all.",
-                  id: 'fiscalHosting.findHost.fees',
-                }),
-              },
-            ]}
-            style={{ '--primary': 'var(--color-yellow-600)' } as React.CSSProperties}
-            className="mb-8"
-          />
-          <Button asChild variant="marketing" className="rounded-full whitespace-nowrap" size="lg">
-            <Link href="/search?isHost=true" className="flex items-center gap-2">
-              <FormattedMessage defaultMessage="Explore fiscal hosts on the platform" id="fiscalHosting.findHost.cta" />
-              <ArrowRight size={16} />
-            </Link>
-          </Button>
-        </SectionCard>
+        <FindAFiscalHost />
       </div>
     </Page>
   );

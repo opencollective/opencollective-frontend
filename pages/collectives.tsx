@@ -13,6 +13,8 @@ import Image from '@/components/Image';
 import Link from '@/components/Link';
 import { Button } from '@/components/ui/Button';
 
+import { FindAFiscalHost } from './fiscal-hosting';
+
 const featureHighlights = [
   {
     imgSrc: '/static/images/product/hosting.png',
@@ -400,18 +402,22 @@ const collectiveTestimonials: Testimonial[] = [
       `Open Collective helped us fund-raise for our goal of open source development and knowledge, with the help of our donors and OpenCollective's platform we're able to provide knowledge to thousands of people, daily.`,
     ],
     author: 'Hytale Modding',
-    org: 'Visit Collective Page',
+    linkLabel: (
+      <FormattedMessage defaultMessage="Visit Collective Page" id="collectives.testimonials.visitCollectivePage" />
+    ),
     avatar: '/static/images/testimonials/hytalemodding.png',
-    orgLink: '/hytalemodding',
+    linkUrl: '/hytalemodding',
   },
   {
     paragraphs: [
       'Thanks to Open Collective, the main projects I work on are able to transparently send funds to & from the community. That allows us to pay the core team members to keep working on us, sponsor downstream individuals & projects we rely on, and showcase sponsors on our website - which is a big perk for those sponsors.',
     ],
     author: 'typescript-eslint',
-    org: 'Visit Collective Page',
+    linkLabel: (
+      <FormattedMessage defaultMessage="Visit Collective Page" id="collectives.testimonials.visitCollectivePage" />
+    ),
     avatar: '/static/images/testimonials/typescript-eslint.png',
-    orgLink: '/typescript-eslint',
+    linkUrl: '/typescript-eslint',
   },
 ];
 
@@ -507,7 +513,7 @@ const Collectives = () => {
                   id="collectives.fiscalHost.description2"
                 />
               </p>
-              <p className="mb-6 text-sm leading-relaxed text-muted-foreground italic">
+              <p className="mb-6 leading-relaxed text-muted-foreground italic">
                 <FormattedMessage
                   defaultMessage="Fiscal hosting is also called fiscal sponsorship, fund-holding, or auspicing in different places around the world."
                   id="collectives.fiscalHost.note"
@@ -533,6 +539,11 @@ const Collectives = () => {
 
       {/* Testimonials */}
       <Testimonials testimonials={collectiveTestimonials} />
+
+      {/* Find a Fiscal Host */}
+      <div className="px-4 pb-20">
+        <FindAFiscalHost showLinkToFiscalHostingPage />
+      </div>
     </Page>
   );
 };

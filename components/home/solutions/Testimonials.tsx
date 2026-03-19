@@ -16,9 +16,9 @@ export type Testimonial = {
   paragraphs: string[];
   author: string;
   role?: string;
-  org: string;
+  linkLabel: React.ReactNode;
   avatar: string;
-  orgLink: string;
+  linkUrl: string;
 };
 
 const defaultTestimonials: Testimonial[] = [
@@ -29,9 +29,9 @@ const defaultTestimonials: Testimonial[] = [
     ],
     author: 'Lauren Gardner',
     role: 'Executive Director',
-    org: 'Open Source Collective',
+    linkLabel: 'Open Source Collective',
     avatar: '/static/images/testimonials/lauren-gardner.png',
-    orgLink: 'https://oscollective.org',
+    linkUrl: 'https://oscollective.org',
   },
   {
     paragraphs: [
@@ -40,9 +40,9 @@ const defaultTestimonials: Testimonial[] = [
     ],
     author: 'Jean-François De Hertogh',
     role: 'Executive Director',
-    org: 'Open Collective Europe Foundation',
+    linkLabel: 'Open Collective Europe Foundation',
     avatar: '/static/images/testimonials/jf.png',
-    orgLink: 'https://www.oceurope.org',
+    linkUrl: 'https://www.oceurope.org',
   },
   {
     paragraphs: [
@@ -52,8 +52,8 @@ const defaultTestimonials: Testimonial[] = [
     ],
     author: 'Babette',
     avatar: '/static/images/testimonials/babette.png',
-    org: 'All For Climate',
-    orgLink: 'https://allforclimate.earth/',
+    linkLabel: 'All For Climate',
+    linkUrl: 'https://allforclimate.earth/',
   },
   {
     paragraphs: [
@@ -63,9 +63,9 @@ const defaultTestimonials: Testimonial[] = [
     ],
     author: 'Anna Garlands',
     avatar: '/static/images/testimonials/anna-garlands.jpeg',
-    org: 'Huddlecraft',
+    linkLabel: 'Huddlecraft',
     role: 'Co-Director',
-    orgLink: 'https://www.huddlecraft.com/',
+    linkUrl: 'https://www.huddlecraft.com/',
   },
   {
     paragraphs: [
@@ -75,9 +75,9 @@ const defaultTestimonials: Testimonial[] = [
     ],
     author: 'Esther Foreman',
     avatar: '/static/images/testimonials/esther-foreman.jpg',
-    org: 'Social Change Nest',
+    linkLabel: 'Social Change Nest',
     role: 'CEO and Chair of the Board',
-    orgLink: 'https://thesocialchangenest.org',
+    linkUrl: 'https://thesocialchangenest.org',
   },
 ];
 
@@ -109,8 +109,8 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => (
         <div className="flex-1">
           <div className="font-semibold text-slate-900">{testimonial.author}</div>
           <div className="text-sm text-slate-600">{testimonial.role}</div>
-          <a href={testimonial.orgLink} className="text-sm text-slate-500 underline hover:text-slate-700">
-            {testimonial.org}
+          <a href={testimonial.linkUrl} className="text-sm text-slate-500 underline hover:text-slate-700">
+            {testimonial.linkLabel}
           </a>
         </div>
       </div>
