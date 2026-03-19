@@ -1,42 +1,31 @@
 import React from 'react';
 import { ArrowRight, InfoIcon } from 'lucide-react';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { cn } from '@/lib/utils';
 
 import Page from '../components/Page';
+import I18nFormatters from '@/components/I18nFormatters';
 import Image from '@/components/Image';
 import Link from '@/components/Link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
-import { Button } from '@/components/ui/Button';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
-import I18nFormatters from '@/components/I18nFormatters';
-
-// ─── Layout config ────────────────────────────────────────────────────────────
-
-const ALTERNATE_IMAGE_POSITIONS = false;
-
-// ─── Internal Components ──────────────────────────────────────────────────────
+import { Button } from '@/components/ui/Button';
 
 type SectionCardProps = {
   className?: string;
-  index?: number;
   imgSrc: string;
   imgWidth: number;
   imgHeight: number;
+  footer?: React.ReactNode;
   children: React.ReactNode;
 };
 
-const SectionCard = ({ className, index = 0, imgSrc, imgWidth, imgHeight, children }: SectionCardProps) => {
-  const imageOnRight = ALTERNATE_IMAGE_POSITIONS && index % 2 !== 0;
+const SectionCard = ({ className, imgSrc, imgWidth, imgHeight, footer, children }: SectionCardProps) => {
   return (
     <section className={cn('!mx-auto !my-12 max-w-6xl rounded-3xl p-12', className)}>
       <div className="mx-auto max-w-5xl">
-        <div
-          className={cn('flex flex-col items-start gap-10 md:flex-row md:items-start md:gap-16', {
-            'md:flex-row-reverse': imageOnRight,
-          })}
-        >
+        <div className="flex flex-col items-start gap-10 md:flex-row md:items-start md:gap-16">
           <div className="w-full max-w-[260px] shrink-0">
             <Image
               src={imgSrc}
@@ -49,6 +38,7 @@ const SectionCard = ({ className, index = 0, imgSrc, imgWidth, imgHeight, childr
           </div>
           <div className="flex-1">{children}</div>
         </div>
+        {footer && <div className="mt-5">{footer}</div>}
       </div>
     </section>
   );
@@ -107,84 +97,6 @@ const BulletList = ({ items }: { items: React.ReactElement[] }) => (
 
 // ─── Section data ──────────────────────────────────────────────────────────────
 
-const howItWorksItems = [
-  {
-    id: 'find-a-host',
-    title: defineMessage({ defaultMessage: 'Find a Host', id: 'fiscalHosting.howOperate.step1' }),
-    description: defineMessage({
-      defaultMessage:
-        'Search for a fiscal host that aligns with your mission and your financial needs. Hosts usually specialize in specific locations (like the US or Europe) or specific causes (like climate action or tech), and they are only permitted to host projects whose missions align with their own legal charters.',
-      id: 'fiscalHosting.howOperate.step1.description',
-    }),
-  },
-  {
-    id: 'apply-and-join',
-    title: defineMessage({ defaultMessage: 'Apply & Join', id: 'fiscalHosting.howOperate.step2' }),
-    description: defineMessage({
-      defaultMessage:
-        'Once accepted, you operate under their legal status. You get the benefits of being a "legal entity" without the overhead. Your funds are held and managed by the fiscal host, who reviews, approves, and executes financial activities on your behalf.',
-      id: 'fiscalHosting.howOperate.step2.description',
-    }),
-  },
-  {
-    id: 'managed-finances',
-    title: defineMessage({ defaultMessage: 'Managed Finances', id: 'fiscalHosting.howOperate.step3' }),
-    description: defineMessage({
-      defaultMessage:
-        'The fiscal host takes responsibility for accounting, reporting, and legal compliance related to your funds. Your funds are held by the host. When you need to spend money, you submit a request; they review, approve, and execute the payment for you.',
-      id: 'fiscalHosting.howOperate.step3.description',
-    }),
-  },
-  {
-    id: 'simple-fees',
-    title: defineMessage({ defaultMessage: 'Simple Fees', id: 'fiscalHosting.howOperate.step4' }),
-    description: defineMessage({
-      defaultMessage:
-        'In exchange for doing the heavy lifting (accounting, legal, and banking), hosts typically charge a small percentage of your income as a service fee.',
-      id: 'fiscalHosting.howOperate.step4.description',
-    }),
-  },
-];
-
-const findHostItems = [
-  {
-    id: 'mission-alignment',
-    title: defineMessage({ defaultMessage: 'Mission alignment', id: 'fiscalHosting.missionAlignment' }),
-    description: defineMessage({
-      defaultMessage:
-        'Fiscal Hosts usually have specific topics or areas they are designed to serve. When it comes to the application process, their acceptance criteria will fit in that scope.',
-      id: 'fiscalHosting.findHost.missionAlignment',
-    }),
-  },
-  {
-    id: 'location',
-    title: defineMessage({ defaultMessage: 'Location', id: 'SectionLocation.Title' }),
-    description: defineMessage({
-      defaultMessage:
-        'Which country a fiscal host is based in will determine the currency your money will be accounted in, and where you are located in a legal sense. For example, if you are applying for an EU grant, you might need a fiscal host based in the EU.',
-      id: 'fiscalHosting.findHost.location',
-    }),
-  },
-  {
-    id: 'legal-structure',
-    title: defineMessage({ defaultMessage: 'Legal structure', id: 'fiscalHosting.legalStructure' }),
-    description: defineMessage({
-      defaultMessage:
-        'Do you want your host to be a charity, a company, a cooperative, or something else? For example, a charity structure can enable tax-deductible donations, but may also have more restrictions on allowed activities.',
-      id: 'fiscalHosting.findHost.legalStructure',
-    }),
-  },
-  {
-    id: 'fees',
-    title: defineMessage({ defaultMessage: 'Fees', id: 'fiscalHosting.fees' }),
-    description: defineMessage({
-      defaultMessage:
-        "Fiscal Hosts often charge a fee for the service they provide. Some hosts keep fees low and offer a lightweight service, while others have higher fees and provide more support. Some fiscal hosts don't charge fees at all.",
-      id: 'fiscalHosting.findHost.fees',
-    }),
-  },
-];
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const FiscalHostingPage = () => {
@@ -203,6 +115,7 @@ const FiscalHostingPage = () => {
               src="/static/images/fiscal-hosting/hero.png"
               width={639}
               height={619}
+              priority
               alt=""
               style={{ height: undefined }}
             />
@@ -227,7 +140,6 @@ const FiscalHostingPage = () => {
       <div className="px-4 pb-20">
         {/* ── What is a fiscal host? ────────────────────────────────────────── */}
         <SectionCard
-          index={0}
           className="bg-blue-50"
           imgSrc="/static/images/become-a-host/whoAreFiscalHost-illustration.png"
           imgWidth={676}
@@ -265,7 +177,6 @@ const FiscalHostingPage = () => {
 
         {/* ── Why would you need fiscal hosting? ───────────────────────────── */}
         <SectionCard
-          index={1}
           className="bg-[hsl(54,91%,95%)]"
           imgSrc="/static/images/fiscal-hosting/legal.png"
           imgWidth={500}
@@ -315,7 +226,6 @@ const FiscalHostingPage = () => {
 
         {/* ── How does fiscal hosting operate? ─────────────────────────────── */}
         <SectionCard
-          index={2}
           className="bg-[hsl(0,73%,97%)]"
           imgSrc="/static/images/fiscal-hosting/birds-nurturing.png"
           imgWidth={500}
@@ -331,22 +241,65 @@ const FiscalHostingPage = () => {
             />
           </p>
           <AccordionItems
-            items={howItWorksItems.map(i => ({
-              ...i,
-              title: intl.formatMessage(i.title),
-              description: intl.formatMessage(i.description),
-            }))}
+            items={[
+              {
+                id: 'find-a-host',
+                title: intl.formatMessage({ defaultMessage: 'Find a Host', id: 'fiscalHosting.howOperate.step1' }),
+                description: intl.formatMessage({
+                  defaultMessage:
+                    'Search for a fiscal host that aligns with your mission and your financial needs. Hosts usually specialize in specific locations (like the US or Europe) or specific causes (like climate action or tech), and they are only permitted to host projects whose missions align with their own legal charters.',
+                  id: 'fiscalHosting.howOperate.step1.description',
+                }),
+              },
+              {
+                id: 'apply-and-join',
+                title: intl.formatMessage({ defaultMessage: 'Apply & Join', id: 'fiscalHosting.howOperate.step2' }),
+                description: intl.formatMessage({
+                  defaultMessage:
+                    'Once accepted, you operate under their legal status. You get the benefits of being a "legal entity" without the overhead. Your funds are held and managed by the fiscal host, who reviews, approves, and executes financial activities on your behalf.',
+                  id: 'fiscalHosting.howOperate.step2.description',
+                }),
+              },
+              {
+                id: 'managed-finances',
+                title: intl.formatMessage({ defaultMessage: 'Managed Finances', id: 'fiscalHosting.howOperate.step3' }),
+                description: intl.formatMessage({
+                  defaultMessage:
+                    'The fiscal host takes responsibility for accounting, reporting, and legal compliance related to your funds. Your funds are held by the host. When you need to spend money, you submit a request; they review, approve, and execute the payment for you.',
+                  id: 'fiscalHosting.howOperate.step3.description',
+                }),
+              },
+              {
+                id: 'simple-fees',
+                title: intl.formatMessage({ defaultMessage: 'Simple Fees', id: 'fiscalHosting.howOperate.step4' }),
+                description: intl.formatMessage({
+                  defaultMessage:
+                    'In exchange for doing the heavy lifting (accounting, legal, and banking), hosts typically charge a small percentage of your income as a service fee.',
+                  id: 'fiscalHosting.howOperate.step4.description',
+                }),
+              },
+            ]}
             style={{ '--primary': 'var(--color-red-600)' } as React.CSSProperties}
           />
         </SectionCard>
 
         {/* ── What is a Collective? ─────────────────────────────────────────── */}
         <SectionCard
-          index={3}
           className="bg-[hsl(113,53%,97%)]"
           imgSrc="/static/images/fiscal-hosting/music.png"
           imgWidth={500}
           imgHeight={500}
+          footer={
+            <Alert>
+              <InfoIcon size={16} />
+              <AlertDescription>
+                <FormattedMessage
+                  defaultMessage="You can create a Collective at any time, however, to financially activate your Collective (enabling you to actually receive and spend money) you must connect with a fiscal host willing to provide you with their legal and financial infrastructure."
+                  id="fiscalHosting.whatIsCollective.p3"
+                />
+              </AlertDescription>
+            </Alert>
+          }
         >
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-oc sm:text-4xl">
             <FormattedMessage defaultMessage="What is a Collective?" id="pricing.faq.collective.title" />
@@ -357,26 +310,22 @@ const FiscalHostingPage = () => {
               id="fiscalHosting.whatIsCollective.p1"
             />
           </p>
-          <p className="mb-3 leading-relaxed text-foreground">
+          <p className="mb-4 leading-relaxed text-foreground">
             <FormattedMessage
               defaultMessage='A "Collective" is your "mini organization" within the fiscal host. In it you will find the tools you need to collaboratively manage your money.'
               id="fiscalHosting.whatIsCollective.p2"
             />
           </p>
-          <Alert className="mb-4 text-muted-foreground">
-            <InfoIcon size={16} />
-            <AlertDescription>
-              <FormattedMessage
-                defaultMessage="You can create a Collective at any time, however, to financially activate your Collective (enabling you to actually receive and spend money) you must connect with a fiscal host willing to provide you with their legal and financial infrastructure."
-                id="fiscalHosting.whatIsCollective.p3"
-              />
-            </AlertDescription>
-          </Alert>
+          <Button asChild variant="marketing" className="rounded-full whitespace-nowrap" size="lg">
+            <Link href="/signup/collective" className="flex items-center gap-2">
+              <FormattedMessage defaultMessage="Create a Collective" id="home.create" />
+              <ArrowRight size={16} />
+            </Link>
+          </Button>
         </SectionCard>
 
         {/* ── What are Certified Fiscal Hosts? ─────────────────────────────── */}
         <SectionCard
-          index={4}
           className="bg-[hsl(264,100%,98%)]"
           imgSrc="/static/images/fiscal-hosting/certified.png"
           imgWidth={500}
@@ -440,7 +389,6 @@ const FiscalHostingPage = () => {
 
         {/* ── How to find a Fiscal Host? ────────────────────────────────────── */}
         <SectionCard
-          index={5}
           className="bg-[hsla(34,89%,96%)]"
           imgSrc="/static/images/fiscal-hosting/find.png"
           imgWidth={500}
@@ -456,11 +404,47 @@ const FiscalHostingPage = () => {
             />
           </p>
           <AccordionItems
-            items={findHostItems.map(i => ({
-              ...i,
-              title: intl.formatMessage(i.title),
-              description: intl.formatMessage(i.description),
-            }))}
+            items={[
+              {
+                id: 'mission-alignment',
+                title: intl.formatMessage({
+                  defaultMessage: 'Mission alignment',
+                  id: 'fiscalHosting.missionAlignment',
+                }),
+                description: intl.formatMessage({
+                  defaultMessage:
+                    'Fiscal Hosts usually have specific topics or areas they are designed to serve. When it comes to the application process, their acceptance criteria will fit in that scope.',
+                  id: 'fiscalHosting.findHost.missionAlignment',
+                }),
+              },
+              {
+                id: 'location',
+                title: intl.formatMessage({ defaultMessage: 'Location', id: 'SectionLocation.Title' }),
+                description: intl.formatMessage({
+                  defaultMessage:
+                    'Which country a fiscal host is based in will determine the currency your money will be accounted in, and where you are located in a legal sense. For example, if you are applying for an EU grant, you might need a fiscal host based in the EU.',
+                  id: 'fiscalHosting.findHost.location',
+                }),
+              },
+              {
+                id: 'legal-structure',
+                title: intl.formatMessage({ defaultMessage: 'Legal structure', id: 'fiscalHosting.legalStructure' }),
+                description: intl.formatMessage({
+                  defaultMessage:
+                    'Do you want your host to be a charity, a company, a cooperative, or something else? For example, a charity structure can enable tax-deductible donations, but may also have more restrictions on allowed activities.',
+                  id: 'fiscalHosting.findHost.legalStructure',
+                }),
+              },
+              {
+                id: 'fees',
+                title: intl.formatMessage({ defaultMessage: 'Fees', id: 'fiscalHosting.fees' }),
+                description: intl.formatMessage({
+                  defaultMessage:
+                    "Fiscal Hosts often charge a fee for the service they provide. Some hosts keep fees low and offer a lightweight service, while others have higher fees and provide more support. Some fiscal hosts don't charge fees at all.",
+                  id: 'fiscalHosting.findHost.fees',
+                }),
+              },
+            ]}
             style={{ '--primary': 'var(--color-yellow-600)' } as React.CSSProperties}
             className="mb-8"
           />
