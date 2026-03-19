@@ -58,7 +58,7 @@ const messages = defineMessages({
   },
   'home.solutions.unincorporated.button': {
     id: 'home.solutions.unincorporated.button',
-    defaultMessage: 'Learn more',
+    defaultMessage: 'Explore Collective Features',
   },
 });
 

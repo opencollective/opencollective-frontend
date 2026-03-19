@@ -1,22 +1,21 @@
 import React from 'react';
-import { defineMessage, FormattedMessage } from 'react-intl';
 import { ArrowRight } from 'lucide-react';
+import { defineMessage, FormattedMessage } from 'react-intl';
 
 import I18nFormatters from '../components/I18nFormatters';
-import NextIllustration from '../components/collectives/HomeNextIllustration';
 import Page from '../components/Page';
+import type { IFeatureSection } from '@/components/home/solutions/Features';
 import Features from '@/components/home/solutions/Features';
 import { JoinCTAButtons } from '@/components/home/solutions/JoinCTAButtons';
+import type { Testimonial } from '@/components/home/solutions/Testimonials';
 import Testimonials from '@/components/home/solutions/Testimonials';
 import Image from '@/components/Image';
 import Link from '@/components/Link';
 import { Button } from '@/components/ui/Button';
-import type { IFeatureSection } from '@/components/home/solutions/Features';
-import type { Testimonial } from '@/components/home/solutions/Testimonials';
 
 const featureHighlights = [
   {
-    imgSrc: '/static/images/product/participatory.png',
+    imgSrc: '/static/images/product/hosting.png',
     title: defineMessage({
       defaultMessage: 'Fiscal Hosting',
       id: 'collectives.features.fiscallyHosted',
@@ -38,7 +37,7 @@ const featureHighlights = [
     }),
   },
   {
-    imgSrc: '/static/images/product/expenses.png',
+    imgSrc: '/static/images/product/money.png',
     title: defineMessage({
       defaultMessage: 'Spend Money',
       id: 'collectives.features.spendTransparently',
@@ -49,7 +48,7 @@ const featureHighlights = [
     }),
   },
   {
-    imgSrc: '/static/images/product/ledger.png',
+    imgSrc: '/static/images/product/expenses.png',
     title: defineMessage({
       defaultMessage: 'Participatory Finances',
       id: 'collectives.features.participatoryFinances',
@@ -60,7 +59,7 @@ const featureHighlights = [
     }),
   },
   {
-    imgSrc: '/static/images/product/transparency.png',
+    imgSrc: '/static/images/product/ledger.png',
     title: defineMessage({
       defaultMessage: 'Real-Time Balance',
       id: 'collectives.features.realTimeBalances',
@@ -72,7 +71,7 @@ const featureHighlights = [
     }),
   },
   {
-    imgSrc: '/static/images/product/hosting.png',
+    imgSrc: '/static/images/product/transparency.png',
     title: defineMessage({
       defaultMessage: 'Transparency',
       id: 'collectives.features.transparency',
@@ -398,35 +397,21 @@ const collectiveFeatureSections: IFeatureSection[] = [
 const collectiveTestimonials: Testimonial[] = [
   {
     paragraphs: [
-      'Open Collective has democratised community organising, helping to build trust and foster collaboration and transparency across community-led work.',
-      'Our continued partnership with Open Collective has enabled our network of more than 600 fiscally hosted community groups worldwide to manage their finances with ease and reassurance, thus freeing up headspace to focus on front-line impact and long-term strategy.',
+      `Open Collective helped us fund-raise for our goal of open source development and knowledge, with the help of our donors and OpenCollective's platform we're able to provide knowledge to thousands of people, daily.`,
     ],
-    author: 'Esther Foreman',
-    role: 'CEO and Chair of the Board',
-    org: 'Social Change Nest',
-    avatar: '/static/images/testimonials/esther-foreman.jpg',
-    orgLink: 'https://thesocialchangenest.org',
+    author: 'Hytale Modding',
+    org: 'Visit Collective Page',
+    avatar: '/static/images/testimonials/hytalemodding.png',
+    orgLink: '/hytalemodding',
   },
   {
     paragraphs: [
-      'Open Collective has enabled us to distribute funds across community groups and collectives in transparent and clear ways.',
-      'The platform has unlocked our capacity to build sustainable infrastructure for our work — peer to peer learning and action — in meaningful and sustainable ways.',
+      'Thanks to Open Collective, the main projects I work on are able to transparently send funds to & from the community. That allows us to pay the core team members to keep working on us, sponsor downstream individuals & projects we rely on, and showcase sponsors on our website - which is a big perk for those sponsors.',
     ],
-    author: 'Anna Garlands',
-    role: 'Co-Director',
-    org: 'Huddlecraft',
-    avatar: '/static/images/testimonials/anna-garlands.jpeg',
-    orgLink: 'https://www.huddlecraft.com/',
-  },
-  {
-    paragraphs: [
-      'Open Collective enables us to deliver valuable services to numerous collectives in a structured and automated way.',
-      'Our communities appreciate how efficient and user-friendly the platform is, allowing them not only to fundraise but also to manage their budgets and expenses transparently.',
-    ],
-    author: 'Babette',
-    org: 'All For Climate',
-    avatar: '/static/images/testimonials/babette.png',
-    orgLink: 'https://allforclimate.earth/',
+    author: 'typescript-eslint',
+    org: 'Visit Collective Page',
+    avatar: '/static/images/testimonials/typescript-eslint.png',
+    orgLink: '/typescript-eslint',
   },
 ];
 
@@ -551,32 +536,6 @@ const Collectives = () => {
 
       {/* Testimonials */}
       <Testimonials testimonials={collectiveTestimonials} />
-
-      {/* Find your Fiscal Host CTA */}
-      <div className="bg-oc-blue-tints-900 py-16 text-white">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-            <FormattedMessage defaultMessage="Find your Fiscal Host" id="collectives.findHost.title" />
-          </h2>
-          <p className="mb-8 text-lg text-white/80">
-            <FormattedMessage
-              defaultMessage="Browse Fiscal Hosts that are ready to welcome your collective. Find the right fit for your community and get started."
-              id="collectives.findHost.description"
-            />
-          </p>
-          <Button
-            asChild
-            variant="outline"
-            size="lg"
-            className="rounded-full border-white text-foreground hover:bg-white hover:text-oc-blue-tints-900"
-          >
-            <Link href="/search?isHost=true" className="flex items-center gap-2">
-              <FormattedMessage defaultMessage="Discover Fiscal Hosts" id="collectives.findHost.cta" />
-              <ArrowRight size={16} />
-            </Link>
-          </Button>
-        </div>
-      </div>
     </Page>
   );
 };
