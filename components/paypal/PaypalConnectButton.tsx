@@ -120,7 +120,7 @@ const PaypalConnectButton = ({
           } else if (event.data.code && event.data.state) {
             resolve({ code: event.data.code, state: event.data.state });
           } else if (event.data.code) {
-            reject(new Error('PayPal did not return a valid state. Please try again.'));
+            reject(new Error('PayPal did not return a valid OAuth state. Please try again.'));
           } else {
             reject(new Error('PayPal did not return an authorization code'));
           }
