@@ -1,10 +1,9 @@
 import React from 'react';
 
-import type { KycProviderData, ManualKycProviderData, PersonaKycProviderData } from '@/lib/graphql/types/v2/graphql';
+import type { KycProviderData, ManualKycProviderData } from '@/lib/graphql/types/v2/graphql';
 import { KycProvider } from '@/lib/graphql/types/v2/graphql';
 
 import { KYCVerificationManualProviderData } from './KYCVerificationManualProviderData';
-import { KYCVerificationPersonaProviderData } from './KYCVerificationPersonaProviderData';
 
 type KYCVerificationProviderDataProps = {
   providerData: KycProviderData;
@@ -17,8 +16,6 @@ export function KYCVerificationProviderData(props: KYCVerificationProviderDataPr
   switch (props.provider) {
     case KycProvider.MANUAL:
       return <KYCVerificationManualProviderData providerData={providerData as ManualKycProviderData} />;
-    case KycProvider.PERSONA:
-      return <KYCVerificationPersonaProviderData providerData={providerData as PersonaKycProviderData} />;
     default:
       return null;
   }
