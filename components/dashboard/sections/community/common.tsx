@@ -99,7 +99,12 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
             pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
               ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
               : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
-            query: { status: 'ALL', searchTerm: `@${contributorSlug}` },
+            query: {
+              ...(!LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) && {
+                status: 'ALL',
+              }),
+              searchTerm: `@${contributorSlug}`,
+            },
           });
         },
       });
@@ -251,7 +256,13 @@ export function useAssociatedCollectiveActions(opts: UseAssociatedCollectiveActi
             pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
               ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
               : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
-            query: { status: 'ALL', searchTerm: `@${opts.accountSlug}`, account: collectiveSlug },
+            query: {
+              ...(!LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) && {
+                status: 'ALL',
+              }),
+              searchTerm: `@${opts.accountSlug}`,
+              account: collectiveSlug,
+            },
           });
         },
       });
