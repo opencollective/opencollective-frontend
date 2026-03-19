@@ -450,7 +450,7 @@ const Collectives = () => {
         </div>
       </div>
 
-      <h2 className="my-20 text-center text-4xl font-bold tracking-tight text-balance text-oc">
+      <h2 className="mb-12 text-center text-4xl font-bold tracking-tight text-balance text-oc">
         <FormattedMessage
           defaultMessage="Fund movements, not paperwork.{newLine}Drive your collective to create change."
           id="gTvF5F"
