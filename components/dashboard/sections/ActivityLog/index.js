@@ -61,6 +61,7 @@ const activityLogQuery = gql`
       totalCount
       nodes {
         id
+        publicId
         createdAt
         type
         data
