@@ -18,7 +18,7 @@ const featureHighlights = [
     imgSrc: '/static/images/product/hosting.png',
     title: defineMessage({
       defaultMessage: 'Fiscal Hosting',
-      id: 'collectives.features.fiscallyHosted',
+      id: 'editCollective.fiscalHosting',
     }),
     description: defineMessage({
       defaultMessage: 'Join a fiscal host that can handle legal and financial compliance on your behalf.',
@@ -40,7 +40,7 @@ const featureHighlights = [
     imgSrc: '/static/images/product/money.png',
     title: defineMessage({
       defaultMessage: 'Spend Money',
-      id: 'collectives.features.spendTransparently',
+      id: 'home.whatCanYouDoSection.spendMoney',
     }),
     description: defineMessage({
       defaultMessage: 'Submit expenses, review and approve invoices and reimbursements.',
@@ -51,7 +51,7 @@ const featureHighlights = [
     imgSrc: '/static/images/product/expenses.png',
     title: defineMessage({
       defaultMessage: 'Participatory Finances',
-      id: 'collectives.features.participatoryFinances',
+      id: 'solutions.features.participatoryFinances',
     }),
     description: defineMessage({
       defaultMessage: 'Multiple administrators can coordinate project finances with multiple accounts.',
@@ -74,7 +74,7 @@ const featureHighlights = [
     imgSrc: '/static/images/product/transparency.png',
     title: defineMessage({
       defaultMessage: 'Transparency',
-      id: 'collectives.features.transparency',
+      id: 'becomeASponsor.transparency',
     }),
     description: defineMessage({
       defaultMessage:
@@ -87,11 +87,11 @@ const featureHighlights = [
 const collectiveFeatureSections: IFeatureSection[] = [
   {
     title: defineMessage({
-      id: 'collectives.features.section.financial-platform.title',
+      id: 'solutions.features.section.financial-platform.title',
       defaultMessage: 'Financial Platform',
     }),
     description: defineMessage({
-      id: 'collectives.features.section.financial-platform.description',
+      id: 'solutions.features.section.financial-platform.description',
       defaultMessage: 'An integrated toolbox for collaboratively and transparently managing your finances.',
     }),
     bgColor: 'sky-100',
@@ -99,11 +99,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
     items: [
       {
         title: defineMessage({
-          id: 'collectives.features.item.everything-you-need.title',
+          id: 'solutions.features.item.everything-you-need-to-know-do-in-one-place.title',
           defaultMessage: 'Everything you need to know & do in one place',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.everything-you-need.description',
+          id: 'solutions.features.item.everything-you-need-to-know-do-in-one-place.description',
           defaultMessage:
             'Your dashboard brings together all the tools you need to collaboratively manage your finances and stay on top of financial activities that require your attention.',
         }),
@@ -115,11 +115,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.organize-your-money.title',
+          id: 'solutions.features.item.organize-your-money.title',
           defaultMessage: 'Organize your money',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.organize-your-money.description',
+          id: 'solutions.features.item.organize-your-money.description',
           defaultMessage:
             'Organize your money and control your spending with accounts. Create accounts for holding reserves, for crowdfunding contributions and for spending.',
         }),
@@ -131,11 +131,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.check-your-balance.title',
+          id: 'solutions.features.item.check-your-balance.title',
           defaultMessage: 'Check your balance',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.check-your-balance.description',
+          id: 'solutions.features.item.check-your-balance.description',
           defaultMessage:
             'Money added to an account increases its balance and money spent (or transferred) will decrease its balance. You always know where you stand because the balance is always up-to-date and verifiable.',
         }),
@@ -147,11 +147,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.move-money-between-accounts.title',
+          id: 'solutions.features.item.move-money-between-accounts.title',
           defaultMessage: 'Move money between accounts',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.move-money-between-accounts.description',
+          id: 'solutions.features.item.move-money-between-accounts.description',
           defaultMessage:
             'Transfer money easily between accounts. Starting a new project? Transfer an allocated amount into a separate account in order to manage spending.',
         }),
@@ -163,11 +163,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.give-people-control.title',
+          id: 'solutions.features.item.give-people-control.title',
           defaultMessage: 'Give people control',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.give-people-control.description',
+          id: 'solutions.features.item.give-people-control.description',
           defaultMessage:
             'Assign administrators to manage specific accounts. Add or transfer money into the accounts them and let your team manage spending on their own.',
         }),
@@ -179,11 +179,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.tell-the-world.title',
+          id: 'solutions.features.item.tell-the-world-your-financial-story.title',
           defaultMessage: 'Tell the world your financial story',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.tell-the-world.description',
+          id: 'solutions.features.item.tell-the-world-your-financial-story.description',
           defaultMessage:
             'Activate a public profile to make yourself and your financials visible to the world and to invite broader engagement with crowdfunding campaigns and payment requests.',
         }),
@@ -197,11 +197,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
   },
   {
     title: defineMessage({
-      id: 'collectives.features.section.money-in.title',
+      id: 'solutions.features.section.money-in.title',
       defaultMessage: 'Money In',
     }),
     description: defineMessage({
-      id: 'collectives.features.section.money-in.description',
+      id: 'solutions.features.section.money-in.description',
       defaultMessage: 'Document & track all incoming money.',
     }),
     bgColor: 'green-100',
@@ -209,11 +209,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
     items: [
       {
         title: defineMessage({
-          id: 'collectives.features.item.accept-contributions.title',
+          id: 'solutions.features.item.accept-contributions.title',
           defaultMessage: 'Accept contributions',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.accept-contributions.description',
+          id: 'solutions.features.item.accept-contributions.description',
           defaultMessage:
             'Setup crowdfunding campaigns to engage your community. Completed contributions are automatically recorded in the ledger and added to your account balances.',
         }),
@@ -227,7 +227,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
   },
   {
     title: defineMessage({
-      id: 'collectives.features.section.money-out.title',
+      id: 'solutions.features.section.money-out.title',
       defaultMessage: 'Money Out',
     }),
     bgColor: 'rose-50',
@@ -239,7 +239,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
           defaultMessage: 'Accept payment requests',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.accept-payment-requests.description',
+          id: 'solutions.features.item.accept-requests-from-people-asking-to-get-paid.description',
           defaultMessage:
             'A step-by-step payment request form will walk users through filing correct and complete payment requests. Include your own unique instructions on how to properly submit a payment request in order to get paid.',
         }),
@@ -251,11 +251,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.invite-people-to-get-paid.title',
+          id: 'solutions.features.item.invite-people-to-get-paid.title',
           defaultMessage: 'Invite people to get paid',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.invite-people-to-get-paid.description',
+          id: 'solutions.features.item.invite-people-to-get-paid.description',
           defaultMessage:
             'Send payment request invitations to people who are not on the platform. They will receive an invitation that will guide them to create a new user, complete and submit the payment request.',
         }),
@@ -267,11 +267,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.approve-payment-requests.title',
+          id: 'DKcbG3',
           defaultMessage: 'Approve payment requests',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.approve-payment-requests.description',
+          id: 'solutions.features.item.approve-payment-requests.description',
           defaultMessage:
             'Review payment requests that have been submitted. Approve the legitimate requests you wish to pay and reject or delete the others.',
         }),
@@ -285,7 +285,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
   },
   {
     title: defineMessage({
-      id: 'collectives.features.section.crowdfunding.title',
+      id: 'solutions.features.crowdfunding',
       defaultMessage: 'Crowdfunding',
     }),
     description: defineMessage({
@@ -298,11 +298,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
     items: [
       {
         title: defineMessage({
-          id: 'collectives.features.item.different-ways-to-contribute.title',
+          id: 'solutions.features.item.different-ways-to-contribute.title',
           defaultMessage: 'Different ways to contribute',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.different-ways-to-contribute.description',
+          id: 'solutions.features.item.different-ways-to-contribute.description',
           defaultMessage:
             'Flexible tiers enable you to create a diversity of crowdfunding campaigns. Design tiers that are appropriate for you and your audience. Collect tips, one time contributions and recurring contributions.',
         }),
@@ -314,11 +314,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.set-commit-to-funding-goals.title',
+          id: 'solutions.features.item.set-commit-to-funding-goals.title',
           defaultMessage: 'Set & commit to funding goals',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.set-commit-to-funding-goals.description',
+          id: 'solutions.features.item.set-commit-to-funding-goals.description',
           defaultMessage:
             'Create one time goals for one time projects. Create recurring goals to ask your community for long term support.',
         }),
@@ -332,11 +332,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
   },
   {
     title: defineMessage({
-      id: 'collectives.features.section.accounting-accountability.title',
+      id: 'solutions.features.section.accounting-accountability.title',
       defaultMessage: 'Accounting & Accountability',
     }),
     description: defineMessage({
-      id: 'collectives.features.section.accounting-accountability.description',
+      id: 'solutions.features.section.accounting-accountability.description',
       defaultMessage:
         'Review & verify financial activities and provide your accountants with reliable information for your accounting processes.',
     }),
@@ -345,11 +345,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
     items: [
       {
         title: defineMessage({
-          id: 'collectives.features.item.all-financial-activities-are-recorded.title',
+          id: 'solutions.features.item.all-financial-activities-are-recorded.title',
           defaultMessage: 'All financial activities are recorded',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.all-financial-activities-are-recorded.description',
+          id: 'solutions.features.item.all-financial-activities-are-recorded.description',
           defaultMessage:
             'At the heart of the platform is a transaction ledger. All financial activities on the platform generate ledger transactions.',
         }),
@@ -361,11 +361,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.trace-and-verify.title',
+          id: 'solutions.features.item.trace-and-verify-all-financial-activities.title',
           defaultMessage: 'Trace and verify all financial activities',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.trace-and-verify.description',
+          id: 'solutions.features.item.trace-and-verify-all-financial-activities.description',
           defaultMessage:
             'All financial platform activities (payment requests, contributions, grants, etc.) can be traced to their related ledger transactions and vice versa.',
         }),
@@ -377,11 +377,11 @@ const collectiveFeatureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'collectives.features.item.export-ledger-data.title',
+          id: 'solutions.features.item.export-ledger-data-for-your-accountants.title',
           defaultMessage: 'Export ledger data for your accountants',
         }),
         description: defineMessage({
-          id: 'collectives.features.item.export-ledger-data.description',
+          id: 'solutions.features.item.export-ledger-data-for-your-accountants.description',
           defaultMessage: 'Provide your accountants with periodic exports of detailed ledger transactions.',
         }),
         media: {
@@ -493,7 +493,7 @@ const Collectives = () => {
 
             <div className="flex-1">
               <h2 className="mb-4 text-3xl font-bold tracking-tight text-oc sm:text-4xl">
-                <FormattedMessage defaultMessage="What is a fiscal host?" id="collectives.fiscalHost.title" />
+                <FormattedMessage defaultMessage="What is a fiscal host?" id="fiscalHosting.whatIsFiscalHost" />
               </h2>
               <p className="mb-4 leading-relaxed text-foreground">
                 <FormattedMessage
@@ -515,10 +515,7 @@ const Collectives = () => {
               </p>
               <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="lg">
                 <Link href="/fiscal-hosting" className="flex items-center gap-2">
-                  <FormattedMessage
-                    defaultMessage="Learn more about fiscal hosting"
-                    id="collectives.fiscalHost.learnMore"
-                  />
+                  <FormattedMessage defaultMessage="Learn more about fiscal hosting" id="yOzWJD" />
                   <ArrowRight size={16} />
                 </Link>
               </Button>

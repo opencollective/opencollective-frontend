@@ -209,7 +209,7 @@ const FiscalHostingPage = () => {
           </div>
 
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-oc sm:text-5xl md:text-6xl">
-            <FormattedMessage defaultMessage="Fiscal Hosting" id="fiscalHosting.hero.title" />
+            <FormattedMessage defaultMessage="Fiscal Hosting" id="editCollective.fiscalHosting" />
           </h1>
 
           <p className="mb-4 max-w-2xl text-lg leading-relaxed text-balance text-foreground">
@@ -349,7 +349,7 @@ const FiscalHostingPage = () => {
           imgHeight={500}
         >
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-oc sm:text-4xl">
-            <FormattedMessage defaultMessage="What is a Collective?" id="fiscalHosting.whatIsCollective.title" />
+            <FormattedMessage defaultMessage="What is a Collective?" id="pricing.faq.collective.title" />
           </h2>
           <p className="mb-3 leading-relaxed text-foreground">
             <FormattedMessage

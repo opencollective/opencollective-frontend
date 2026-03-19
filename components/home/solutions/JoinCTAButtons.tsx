@@ -14,7 +14,7 @@ const StaticJoinCTAButtons = React.forwardRef<HTMLDivElement, JoinCTAButtonsProp
   const primaryHref = props.onPage === 'collectives' ? '/signup/collective' : '/signup/organization?active=true';
   const primaryLabel =
     props.onPage === 'collectives' ? (
-      <FormattedMessage defaultMessage="Create a Collective" id="collectives.hero.createCollective" />
+      <FormattedMessage defaultMessage="Create a Collective" id="home.create" />
     ) : (
       <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
     );
@@ -23,7 +23,7 @@ const StaticJoinCTAButtons = React.forwardRef<HTMLDivElement, JoinCTAButtonsProp
   let secondaryLabel: React.ReactNode;
   if (props.onPage === 'collectives') {
     secondaryHref = '/search?isHost=true';
-    secondaryLabel = <FormattedMessage defaultMessage="Find a Fiscal Host" id="collectives.hero.findFiscalHost" />;
+    secondaryLabel = <FormattedMessage defaultMessage="Find a Fiscal Host" id="join.findAFiscalHost" />;
   } else if (props.onPage === 'pricing') {
     secondaryHref = '/organizations';
     secondaryLabel = <FormattedMessage defaultMessage="See Features" id="Hm2JMp" />;
