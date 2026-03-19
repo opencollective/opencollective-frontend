@@ -2890,6 +2890,7 @@ type Expense {
   """
   transactionImportRow: TransactionsImportRow
   platformBillingData: JSON
+  kycStatus: ExpenseKYCStatus
 }
 
 """
@@ -5819,6 +5820,10 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_INVITE_DECLINED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  COLLECTIVE_EXPENSE_KYC_PAYOUT_METHOD_CHANGED
+  COLLECTIVE_EXPENSE_KYC_REQUESTED
+  COLLECTIVE_EXPENSE_KYC_VERIFIED
+  COLLECTIVE_EXPENSE_KYC_REVOKED
   TAXFORM_REQUEST
   TAXFORM_RECEIVED
   TAXFORM_INVALIDATED
@@ -6562,7 +6567,6 @@ type ConnectedAccount {
 All supported services a user can connect with
 """
 enum ConnectedAccountService {
-  persona
   paypal
   stripe
   stripe_customer
@@ -7318,7 +7322,6 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
-  PERSONA_KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -7823,10 +7826,9 @@ type KYCVerification {
 
 enum KYCProvider {
   MANUAL
-  PERSONA
 }
 
-union KYCProviderData = ManualKYCProviderData | PersonaKYCProviderData
+union KYCProviderData = ManualKYCProviderData
 
 """
 Manual KYC data
@@ -7836,31 +7838,6 @@ type ManualKYCProviderData {
   Notes added during manual verification
   """
   notes: String!
-}
-
-"""
-Persona KYC data
-"""
-type PersonaKYCProviderData {
-  """
-  Whether this persona inquiry was imported
-  """
-  imported: Boolean!
-
-  """
-  ID of the Persona inquiry
-  """
-  id: String!
-
-  """
-  Status of the Persona inquiry
-  """
-  status: String!
-
-  """
-  Contains KYC data verified by this inquiry
-  """
-  fields: JSON!
 }
 
 """
@@ -9382,6 +9359,20 @@ enum ExpenseLockableFields {
   Locks the type field.
   """
   TYPE
+}
+
+type ExpenseKYCStatus {
+  payee: ExpensePayeeKYC
+}
+
+type ExpensePayeeKYC {
+  status: ExpensePayeeKYCStatus
+}
+
+enum ExpensePayeeKYCStatus {
+  NOT_REQUESTED
+  PENDING
+  VERIFIED
 }
 
 """
@@ -14840,7 +14831,6 @@ A individual KYC verified status
 """
 type KYCStatus {
   manual: KYCVerification
-  persona: KYCVerification
 }
 
 """
@@ -20107,6 +20097,10 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_INVITE_DECLINED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  COLLECTIVE_EXPENSE_KYC_PAYOUT_METHOD_CHANGED
+  COLLECTIVE_EXPENSE_KYC_REQUESTED
+  COLLECTIVE_EXPENSE_KYC_VERIFIED
+  COLLECTIVE_EXPENSE_KYC_REVOKED
   TAXFORM_REQUEST
   TAXFORM_RECEIVED
   TAXFORM_INVALIDATED
