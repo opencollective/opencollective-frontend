@@ -159,7 +159,7 @@ export const FindAFiscalHost = ({ showLinkToFiscalHostingPage = false }) => {
         style={{ '--primary': 'var(--color-yellow-600)' } as React.CSSProperties}
         className="mb-8"
       />
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <Button asChild variant="marketing" className="rounded-full whitespace-nowrap" size="lg">
           <Link href="/search?isHost=true" className="flex items-center gap-2">
             <FormattedMessage defaultMessage="Explore fiscal hosts on the platform" id="fiscalHosting.findHost.cta" />
