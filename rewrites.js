@@ -4,6 +4,10 @@ const isNewPricing = process.env.NEW_PRICING === 'true' || process.env.NEW_PRICI
 
 exports.REWRITES = [
   {
+    source: '/id/:id*',
+    destination: '/api/id/:id*',
+  },
+  {
     source: '/:pageSlug(become-a-host|become-a-fiscal-host)',
     destination: '/become-a-host',
   },
@@ -290,7 +294,7 @@ exports.REWRITES = [
     destination: '/create-conversation',
   },
   {
-    source: '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)',
+    source: '/:collectiveSlug/conversations/:slug?-:id([a-z0-9_]+)',
     destination: '/conversation',
   },
   // Legacy Banners/Widgets/Buttons

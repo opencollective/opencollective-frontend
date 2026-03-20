@@ -43,7 +43,7 @@ module.exports = expressApp => {
       '/api',
       proxy(baseApiUrl, {
         proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
-          for (const key of ['oc-env', 'oc-secret', 'oc-application', 'Content-Type']) {
+          for (const key of ['oc-env', 'oc-secret', 'oc-application', 'Content-Type', 'Cookie', 'Authorization']) {
             if (srcReq.headers[key]) {
               proxyReqOpts.headers[key] = srcReq.headers[key];
             }
