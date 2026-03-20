@@ -1,7 +1,8 @@
+import React from 'react';
 import type { TransformCallback } from 'interweave';
 import { Markup } from 'interweave';
+import { CircleHelp, Smartphone } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import React from 'react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 import generateQrCode from 'sepa-payment-qr-code';
@@ -13,6 +14,8 @@ import { cn } from '@/lib/utils';
 
 import type { TEMPLATE_VARIABLES } from './constants';
 import { formatAccountDetails } from './utils';
+
+const EPC_QR_WIKI = 'https://wikipedia.org/wiki/EPC_QR_code';
 
 type CustomPaymentMethodInstructionsProps = {
   /** HTML instructions template with variables like {account}, {amount}, etc. */
@@ -115,13 +118,53 @@ export const CustomPaymentMethodInstructions = ({
   const qrCodeData = formatQrCode(values.accountDetails, values.amount, values.OrderId.toString());
 
   return (
-    <div className={cn('whitespace-pre-wrap [&_a]:text-blue-600 [&_a:hover]:underline', className)}>
-      <Markup content={rendered} transform={transform} />
+    <div>
+      <div
+        className={cn(
+          'rounded border-l-4 border-blue-400 bg-gray-50 px-5 py-5 text-sm whitespace-pre-wrap shadow lg:text-base [&_a]:text-blue-600 [&_a:hover]:underline',
+          className,
+        )}
+      >
+        <Markup content={rendered} transform={transform} />
+      </div>
       {qrCodeData && (
-        <div>
-          <br />
-          <FormattedMessage defaultMessage="If your banking app supports QR codes, scan the code below:" id="CustomPaymentMethod.QRCodeLabel" />
-          <QRCodeSVG value={qrCodeData} size={256} level="L" includeMargin data-cy="qr-code" />
+        <div
+          className={cn(
+            'relative mt-6 overflow-hidden rounded-xl border border-oc-blue-tints-050 bg-oc-blue-tints-050 p-4 sm:p-5',
+          )}
+        >
+          <div className="relative grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-8">
+            <div className="min-w-0 py-3 text-start">
+              <div className="mb-3 flex items-start gap-2.5">
+                <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-oc-blue-tints-700" aria-hidden />
+                <h3 className="text-base font-semibold text-gray-900">
+                  <FormattedMessage defaultMessage="Scan to pay" id="eE6omW" />
+                </h3>
+              </div>
+              <p className="text-sm leading-relaxed text-gray-600">
+                <FormattedMessage
+                  defaultMessage="This QR code carries the data for a SEPA credit transfer. Many banking apps in Europe let you scan it to fill in the payee, amount, and reference."
+                  id="CustomPaymentMethod.QRCodeDescription"
+                />
+              </p>
+              <p className="mt-2">
+                <a
+                  href={EPC_QR_WIKI}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex max-w-full items-center gap-1.5 text-xs text-gray-500 underline decoration-gray-400/50 underline-offset-2 transition-colors hover:text-oc-blue-tints-700 hover:decoration-oc-blue-tints-700/40"
+                >
+                  <CircleHelp className="h-3.5 w-3.5 shrink-0 opacity-80" aria-hidden />
+                  <FormattedMessage defaultMessage="Learn more about EPC QR" id="7SKbnh" />
+                </a>
+              </p>
+            </div>
+            <div className="flex justify-center md:justify-end">
+              <div className="rounded-lg border border-gray-200/80 bg-white p-4 shadow-sm">
+                <QRCodeSVG value={qrCodeData} size={192} level="L" data-cy="qr-code" />
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

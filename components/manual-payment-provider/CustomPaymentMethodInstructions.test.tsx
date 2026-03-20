@@ -178,5 +178,36 @@ describe('CustomPaymentMethodInstructions', () => {
       expect(screen.getByText(/test-collective is the collective/)).toBeInTheDocument();
       expect(screen.getByText(/Donate to test-collective/)).toBeInTheDocument();
     });
+
+    it('renders EPC QR section with title, Wikipedia link, and QR for EUR + IBAN', () => {
+      const eurValues = {
+        amount: { valueInCents: 2420, currency: Currency.EUR },
+        collectiveSlug: 'test-collective',
+        OrderId: 51431,
+        accountDetails: {
+          accountHolderName: 'Open Collective Europe',
+          details: {
+            IBAN: 'BE69967102423878',
+            BIC: 'TRWIBEB1XXX',
+          },
+        },
+      };
+      const { container } = render(
+        withRequiredProviders(
+          <CustomPaymentMethodInstructions instructions="Please pay {amount}." values={eurValues} />,
+        ),
+      );
+      expect(screen.getByText(/Scan to pay/)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /This QR code carries the data for a SEPA credit transfer\. Many banking apps in Europe let you scan it to fill in the payee, amount, and reference\./,
+        ),
+      ).toBeInTheDocument();
+      const link = screen.getByRole('link', { name: /Learn more about EPC QR/i });
+      expect(link).toHaveAttribute('href', 'https://wikipedia.org/wiki/EPC_QR_code');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(container.querySelector('[data-cy="qr-code"]')).toBeInTheDocument();
+    });
   });
 });
