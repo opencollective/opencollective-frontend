@@ -8,6 +8,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { AccountType, ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import {
+  PAYEE_SLUG_INVITE,
+  PAYEE_SLUG_INVITE_EXISTING_USER,
+  PAYEE_SLUG_INVITE_SOMEONE,
+  PAYEE_SLUG_NEW_VENDOR,
+  PAYEE_SLUG_VENDOR,
+} from '@/components/expenses/lib/constants';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { FormField } from '@/components/FormField';
@@ -83,6 +90,9 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
     [lastUsedProfile?.slug, myProfiles, personalProfile?.slug],
   );
   const hasOtherProfiles = otherProfiles.length > 0;
+  const isInvite = [PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
+    props.payeeSlug,
+  );
 
   const { setFieldValue, setFieldTouched } = props;
   React.useEffect(() => {
@@ -198,8 +208,8 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
       {!isLoading && props.allowInvite && (
         <RadioGroupCard
           value="__inviteSomeone"
-          checked={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.payeeSlug)}
-          showSubcontent={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.payeeSlug)}
+          checked={isInvite}
+          showSubcontent={isInvite}
           disabled={props.initialLoading || props.isSubmitting}
           className="min-w-0"
           subContent={
@@ -207,10 +217,10 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
               <CollectivePickerAsync
                 inputId="payee-invite-picker"
                 disabled={props.isSubmitting}
-                onFocus={() => props.setFieldValue('payeeSlug', '__inviteSomeone')}
+                onFocus={() => props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE_SOMEONE)}
                 invitable
                 expenseType={props.expenseTypeOption}
-                collective={props.payeeSlug === '__inviteExistingUser' ? props.payee : null}
+                collective={props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER ? props.payee : null}
                 types={[
                   CollectiveType.COLLECTIVE,
                   CollectiveType.EVENT,
@@ -222,15 +232,15 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                 onChange={option => {
                   if (option?.value?.id) {
                     props.setFieldValue('inviteeExistingAccount', option.value.slug);
-                    props.setFieldValue('payeeSlug', '__inviteExistingUser');
+                    props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE_EXISTING_USER);
                   }
                 }}
                 onInvite={() => {
-                  props.setFieldValue('payeeSlug', '__invite');
+                  props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE);
                 }}
               />
 
-              {props.payeeSlug === '__inviteExistingUser' && props.payee && (
+              {props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER && props.payee && (
                 <React.Fragment>
                   <Separator className="mt-3" />
                   <div className="mt-3">
@@ -247,7 +257,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                 </React.Fragment>
               )}
 
-              {props.payeeSlug === '__invite' && (
+              {props.payeeSlug === PAYEE_SLUG_INVITE && (
                 <React.Fragment>
                   <Separator className="mt-3" />
                   <div className="mt-3">
@@ -286,7 +296,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
               <div className="mt-4">
                 <FormattedMessage
                   id="ExpenseForm.SignUp.SignIn"
-                  defaultMessage="We will use this email to create your account. If you already have an account {loginLink}."
+                  defaultMessage="We will use this email to create your account. If you already have an account, {loginLink}."
                   values={{ loginLink: <LoginBtn className="p-0" asLink /> }}
                 />
               </div>
@@ -339,8 +349,8 @@ const VendorOption = React.memo(function VendorOption(props: {
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendor, setSelectedVendor] = React.useState(undefined);
   const isVendorSelected =
-    props.payeeSlug === '__vendor' ||
-    props.payeeSlug === '__newVendor' ||
+    props.payeeSlug === PAYEE_SLUG_VENDOR ||
+    props.payeeSlug === PAYEE_SLUG_NEW_VENDOR ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
     selectedVendor?.slug === props.payeeSlug;
 
@@ -348,7 +358,7 @@ const VendorOption = React.memo(function VendorOption(props: {
 
   return (
     <RadioGroupCard
-      value="__vendor"
+      value={PAYEE_SLUG_VENDOR}
       checked={isVendorSelected}
       showSubcontent={isVendorSelected}
       disabled={props.isSubmitting}
@@ -356,7 +366,7 @@ const VendorOption = React.memo(function VendorOption(props: {
       subContent={
         <div>
           <CollectivePickerAsync
-            inputId="__vendor"
+            inputId={PAYEE_SLUG_VENDOR}
             useBeneficiaryForVendor={isBeneficiary}
             isSearchable
             types={['VENDOR']}
@@ -365,22 +375,24 @@ const VendorOption = React.memo(function VendorOption(props: {
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
             collective={
-              props.payeeSlug === '__vendor' || props.payeeSlug === '__newVendor' ? null : selectedVendor || props.payee
+              props.payeeSlug === PAYEE_SLUG_VENDOR || props.payeeSlug === PAYEE_SLUG_NEW_VENDOR
+                ? null
+                : selectedVendor || props.payee
             }
             handleCreateForm
             onCreateClick={() => {
-              props.setFieldValue('payeeSlug', '__newVendor');
+              props.setFieldValue('payeeSlug', PAYEE_SLUG_NEW_VENDOR);
               setSelectedVendor(null);
             }}
             onChange={e => {
               const selected = e.value;
               const slug = selected?.slug;
               setSelectedVendor(selected);
-              props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
+              props.setFieldValue('payeeSlug', !slug ? PAYEE_SLUG_VENDOR : slug);
             }}
             vendorVisibleToAccountIds={props.account.legacyId}
           />
-          {props.payeeSlug === '__newVendor' && (
+          {props.payeeSlug === PAYEE_SLUG_NEW_VENDOR && (
             <React.Fragment>
               <Separator className="mt-3" />
               <div className="mt-3">
@@ -395,7 +407,7 @@ const VendorOption = React.memo(function VendorOption(props: {
                   host={props.host}
                   supportsTaxForm={false}
                   onCancel={() => {
-                    props.setFieldValue('payeeSlug', '__vendor');
+                    props.setFieldValue('payeeSlug', PAYEE_SLUG_VENDOR);
                     setSelectedVendor(null);
                   }}
                 />

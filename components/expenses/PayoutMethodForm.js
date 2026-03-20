@@ -34,18 +34,34 @@ const msg = defineMessages({
   },
 });
 
-/** Use this function to validate the payout method */
-export const validatePayoutMethod = payoutMethod => {
+/**
+ * Use this function to validate the payout method.
+ * Pass `isPaypalConnectEnabled: true` when the platform has PayPal Connect configured —
+ * in that case a `connectedAccountId` is required instead of a manually typed email.
+ */
+export const validatePayoutMethod = (payoutMethod, { isPaypalConnectEnabled = false } = {}) => {
   const errors = {};
 
   if (!payoutMethod || !payoutMethod.type) {
     set(errors, 'type', createError(ERROR.FORM_FIELD_REQUIRED));
   } else if (payoutMethod.type === PayoutMethodType.PAYPAL) {
-    const email = get(payoutMethod, 'data.email');
-    if (!email) {
-      set(errors, 'data.email', createError(ERROR.FORM_FIELD_REQUIRED));
-    } else if (!isEmail(email)) {
-      set(errors, 'data.email', createError(ERROR.FORM_FIELD_PATTERN));
+    if (isPaypalConnectEnabled) {
+      // Require a connected account when PayPal Connect is configured
+      if (!get(payoutMethod, 'data.connectedAccountId')) {
+        set(errors, 'data.connectedAccountId', createError(ERROR.FORM_FIELD_REQUIRED));
+      }
+      // Email is set automatically by onSuccess; still validate its format if present
+      const email = get(payoutMethod, 'data.email');
+      if (email && !isEmail(email)) {
+        set(errors, 'data.email', createError(ERROR.FORM_FIELD_PATTERN));
+      }
+    } else {
+      const email = get(payoutMethod, 'data.email');
+      if (!email) {
+        set(errors, 'data.email', createError(ERROR.FORM_FIELD_REQUIRED));
+      } else if (!isEmail(email)) {
+        set(errors, 'data.email', createError(ERROR.FORM_FIELD_PATTERN));
+      }
     }
   } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
     if (!payoutMethod.data?.accountHolderName) {
@@ -73,13 +89,14 @@ const PayoutMethodForm = ({
   required,
   alwaysSave = false,
   disabled = false,
+  /** When true, the PayPal Connect SDK button is shown and the manual email field is hidden */
+  isPaypalConnectEnabled = false,
   onlyDataFields = false,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const isNew = !payoutMethod.id;
   const form = useFormikContext();
-
   const getFieldName = React.useCallback(field => compact([fieldsPrefix, field]).join('.'), [fieldsPrefix]);
   const currencyFieldName = getFieldName('data.currency');
 
@@ -90,6 +107,17 @@ const PayoutMethodForm = ({
     },
     [currencyFieldName, setFieldValue],
   );
+
+  // We used to allow any currency for PayPal payout methods. To gracefully migrate them, we allow editing but reset the currency if it's not supported.
+  React.useEffect(() => {
+    if (
+      payoutMethod.type === PayoutMethodType.PAYPAL &&
+      payoutMethod.data?.currency &&
+      !PayPalSupportedCurrencies.includes(payoutMethod.data.currency)
+    ) {
+      setFieldValue(currencyFieldName, null);
+    }
+  }, [payoutMethod.data.currency, payoutMethod.type, currencyFieldName, setFieldValue]);
 
   return (
     <div className="space-y-3">
@@ -107,14 +135,18 @@ const PayoutMethodForm = ({
               />
             )}
           </FormField>
-          <FormField
-            type="email"
-            name={getFieldName('data.email')}
-            label={formatMessage(msg.paypalEmail)}
-            disabled={!isNew || disabled}
-            required={required !== false}
-            placeholder="e.g., yourname@yourhost.com"
-          />
+
+          {/* Email field: hidden when PayPal Connect is enabled for new methods */}
+          {!payoutMethod.isVerified && !(isNew && isPaypalConnectEnabled) && (
+            <FormField
+              type="email"
+              name={getFieldName('data.email')}
+              label={formatMessage(msg.paypalEmail)}
+              disabled={!isNew || disabled}
+              required={required !== false}
+              placeholder="e.g., yourname@yourhost.com"
+            />
+          )}
           {alwaysSave && (
             <FormField
               disabled={disabled}

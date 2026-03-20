@@ -30,6 +30,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
       canBeDeleted
       createdAt
       updatedAt
+      isVerified
     }
     adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, COLLECTIVE, FUND]) {
       nodes {
@@ -512,6 +513,7 @@ export const expensePageExpenseFieldsFragment = gql`
       isSaved
       canBeEdited
       canBeDeleted
+      isVerified
     }
     virtualCard {
       id

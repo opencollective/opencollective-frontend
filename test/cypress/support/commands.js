@@ -177,7 +177,7 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
   const expense = {
     tags: ['Engineering'],
     type: 'INVOICE',
-    payoutMethod: { type: 'PAYPAL', data: { email: userEmail || randomEmail() } },
+    payoutMethod: { type: 'PAYPAL', data: { email: userEmail || randomEmail(), currency: 'USD' } },
     description: 'Expense 1',
     items: [{ description: 'Some stuff', amount: 1000 }],
     ...params,

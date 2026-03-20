@@ -3755,7 +3755,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -6280,6 +6280,11 @@ type PayoutMethod {
   canBeArchived: Boolean
 
   """
+  For PayPal payout methods: whether the PayPal account has been verified via OAuth. Null for other types.
+  """
+  isVerified: Boolean
+
+  """
   The date and time this payout method was created
   """
   createdAt: DateTime!
@@ -7312,6 +7317,7 @@ type CollectiveFeatures {
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
+  PAYPAL_CONNECT: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
@@ -10310,7 +10316,7 @@ type Bot implements Account {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -11360,7 +11366,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -12980,7 +12986,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -14319,7 +14325,7 @@ type Individual implements Account {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -15694,7 +15700,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -16889,7 +16895,7 @@ type Vendor implements Account & AccountWithContributions {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -21159,7 +21165,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -22356,7 +22362,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
