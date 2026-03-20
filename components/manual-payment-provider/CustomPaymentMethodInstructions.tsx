@@ -1,13 +1,13 @@
 import React from 'react';
 import type { TransformCallback } from 'interweave';
 import { Markup } from 'interweave';
+import { truncate } from 'lodash';
 import { CircleHelp, Smartphone } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
-import generateQrCode from 'sepa-payment-qr-code';
 
-import { formatCurrency } from '@/lib/currency-utils';
+import { centsAmountToFloat, formatCurrency } from '@/lib/currency-utils';
 import type { Amount } from '@/lib/graphql/types/v2/graphql';
 import { Currency } from '@/lib/graphql/types/v2/schema';
 import { cn } from '@/lib/utils';
@@ -83,17 +83,25 @@ const replaceVariablesInHTML = (
 
 /** Creates an EPC QR-Code */
 const formatQrCode = (bankAccount, amount, reference) => {
-  if (!bankAccount?.details?.IBAN || amount.currency !== Currency.EUR) {
+  if (!bankAccount?.details?.IBAN || !bankAccount.details.BIC || amount.currency !== Currency.EUR || amount < 1) {
     return;
   }
-  const data = {
-    name: bankAccount.accountHolderName,
-    iban: bankAccount.details.IBAN,
-    bic: bankAccount.details.BIC,
-    amount: amount.valueInCents / 100,
-    unstructuredReference: reference,
-  };
-  return generateQrCode(data);
+
+  // See https://en.wikipedia.org/wiki/EPC_QR_code / https://www.europeanpaymentscouncil.eu/document-library/guidance-documents/standardisation-qr-codes-mscts for format specification
+  return [
+    'BCD', // Service Tag - Bank Customer Data
+    '002', // Version
+    '1', // Character Set
+    'SCT', // Identification Code - SEPA Credit Transfer
+    bankAccount.details.BIC, // BIC of the Beneficiary Bank
+    truncate(bankAccount.accountHolderName, { length: 70 }), // Name of the Beneficiary
+    bankAccount.details.IBAN, // Account number of the Beneficiary
+    `EUR${centsAmountToFloat(amount.valueInCents).toFixed(2)}`, // Amount of the Credit Transfer in Euro
+    '', // Reason (4 chars max)
+    '', // Remittance Information (structured)
+    truncate(reference, { length: 140 }), // Remittance Information (unstructured)
+    '', // Beneficiary to originator information
+  ].join('\n');
 };
 
 /**
@@ -116,7 +124,6 @@ export const CustomPaymentMethodInstructions = ({
   }
 
   const qrCodeData = formatQrCode(values.accountDetails, values.amount, values.OrderId.toString());
-
   return (
     <div>
       <div

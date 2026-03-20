@@ -130,7 +130,6 @@
     "react-window": "1.8.11",
     "redis": "4.7.1",
     "sanitize-html": "2.17.0",
-    "sepa-payment-qr-code": "^2.0.2",
     "slugify": "1.6.8",
     "spdx-license-list": "6.11.0",
     "styled-components": "6.1.19",
