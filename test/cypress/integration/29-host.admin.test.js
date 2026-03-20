@@ -129,7 +129,7 @@ describe('host dashboard', () => {
       cy.get('[data-cy="create-pending-contribution-source"]:first').type('Xavier');
       cy.contains('[data-cy=select-option]', 'Xavier').click();
       cy.get('[data-cy="create-pending-contribution-contact-name"]:first').type('Xavier');
-      cy.get('[data-cy="create-pending-contribution-fromAccountInfo-email"').type('yourname@yourhost.com');
+      cy.get('[data-cy="create-pending-contribution-fromAccountInfo-email"]').type('yourname@yourhost.com');
       cy.get('[data-cy="create-pending-contribution-amount"]:first').type('500');
       cy.get('input#CreatePendingContribution-hostFeePercent').type('5'); // 5%
       cy.get('[data-cy="create-pending-contribution-expectedAt"]:first').click();
@@ -180,7 +180,7 @@ describe('host dashboard', () => {
 
       // 6. Submit and verify amounts (contribution 500, processor 4, host fee 9% → 45)
       cy.getByDataCy('payment-processor-fee').clear().type('4');
-      cy.getByDataCy('host-fee-percent').last().clear().type('9');
+      cy.getByDataCy('confirm-contribution-host-fee-percent').clear().type('9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
       cy.contains('Paid').should('exist');
 
@@ -202,7 +202,7 @@ describe('host dashboard', () => {
       cy.get('[data-cy="create-pending-contribution-source"]:first').type('Xavier');
       cy.contains('[data-cy=select-option]', 'Xavier').click();
       cy.get('[data-cy="create-pending-contribution-contact-name"]:first').type('Xavier');
-      cy.get('[data-cy="create-pending-contribution-fromAccountInfo-email"').type('yourname@yourhost.com');
+      cy.get('[data-cy="create-pending-contribution-fromAccountInfo-email"]').type('yourname@yourhost.com');
       cy.get('[data-cy="create-pending-contribution-amount"]:first').type('500');
       cy.get('input#CreatePendingContribution-hostFeePercent').type('5');
       cy.get('[data-cy="create-pending-contribution-expectedAt"]:first').click();
@@ -221,10 +221,12 @@ describe('host dashboard', () => {
       cy.getByDataCy('amount-received').should('be.visible');
 
       // Change amount so tip is editable, set tip and fees, submit with modified values
-      cy.getByDataCy('amount-received').clear().type('514'); // 500 + 10 tip + 4 processor
-      cy.getByDataCy('platform-tip').clear().type('10');
-      cy.getByDataCy('payment-processor-fee').clear().type('4');
-      cy.getByDataCy('host-fee-percent').last().clear().type('9');
+      // Use select-all so the controlled amount field reliably becomes €514.00 (51400 cents), not €510.00
+      cy.getByDataCy('amount-received').type('{selectall}514'); // 500 + 10 tip + 4 processor
+      cy.getByDataCy('platform-tip').should('not.be.disabled');
+      cy.getByDataCy('platform-tip').type('{selectall}10');
+      cy.getByDataCy('payment-processor-fee').type('{selectall}4');
+      cy.getByDataCy('confirm-contribution-host-fee-percent').type('{selectall}9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
       cy.contains('Paid').should('exist');
 
