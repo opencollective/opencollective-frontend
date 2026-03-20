@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import type { FilterConfig } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
-import { AccountType, CommunityRelationType, type Contributor } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, CommunityRelationType, type PeopleHostDashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
@@ -323,7 +323,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
     data,
     loading: queryLoading,
     error: queryError,
-  } = useQuery(peopleHostDashboardQuery, {
+  } = useQuery<PeopleHostDashboardQuery>(peopleHostDashboardQuery, {
     variables: {
       slug: accountSlug,
       ...queryFilter.variables,
@@ -360,13 +360,16 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
         <EmptyResults hasFilters={queryFilter.hasFilters} onResetFilters={() => queryFilter.resetFilters({})} />
       ) : (
         <div className="flex flex-col gap-4">
-          <DataTable<Contributor, Contributor>
+          <DataTable<
+            PeopleHostDashboardQuery['community']['nodes'][number],
+            PeopleHostDashboardQuery['community']['nodes'][number]
+          >
             loading={loading}
             columns={columns}
             data={contributors}
             nbPlaceholders={queryFilter.values?.limit || 10}
             onClickRow={row => {
-              pushSubpath(row.original.id as string);
+              pushSubpath(row.original.publicId as string);
             }}
             mobileTableView
             getActions={getActions}

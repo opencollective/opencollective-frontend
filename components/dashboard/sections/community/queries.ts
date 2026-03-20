@@ -36,6 +36,7 @@ export const peopleHostDashboardQuery = gql`
       nodes {
         id
         legacyId
+        publicId
         slug
         name
         legalName
@@ -307,6 +308,7 @@ export const communityAccountDetailQuery = gql`
 
     host(slug: $hostSlug) {
       id
+      publicId
       legacyId
       slug
       hostedLegalDocuments(

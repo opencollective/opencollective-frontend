@@ -124,6 +124,7 @@ const dashboardVendorsQuery = gql`
     account(slug: $slug) {
       id
       legacyId
+      publicId
       ... on AccountWithHost {
         host {
           id
@@ -152,6 +153,7 @@ const dashboardVendorsQuery = gql`
       limit
       nodes {
         id
+        publicId
         legacyId
         slug
         name
@@ -424,7 +426,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
   );
   const handleDrawer = (vendor: VendorFieldsFragment | string | undefined) => {
     if (vendor) {
-      pushSubpath(typeof vendor === 'string' ? vendor : vendor.id);
+      pushSubpath(typeof vendor === 'string' ? vendor : vendor.publicId);
     } else {
       pushSubpath(undefined);
       setCreateEditVendor(false);

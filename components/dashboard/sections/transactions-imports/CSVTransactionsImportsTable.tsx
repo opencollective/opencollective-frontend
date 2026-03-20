@@ -95,7 +95,9 @@ export const CSVTransactionsImportsTable = ({ accountSlug }) => {
             loading={loading}
             data={data?.host?.transactionsImports?.nodes}
             emptyMessage={() => <FormattedMessage defaultMessage="No CSV imported yet" id="5Tw/Vx" />}
-            onClickRow={({ id }) => router.push(getCSVTransactionsImportRoute(accountSlug, id))}
+            onClickRow={({ original: { publicId } }) => {
+              router.push(getCSVTransactionsImportRoute(accountSlug, publicId));
+            }}
             columns={[
               {
                 header: intl.formatMessage({ defaultMessage: 'Source', id: 'AddFundsModal.source' }),

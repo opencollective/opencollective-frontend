@@ -3,6 +3,7 @@ import { gql } from '../../../../lib/graphql/helpers';
 const PayoutMethodFragment = gql`
   fragment PayoutMethodFields on PayoutMethod {
     id
+    publicId
     type
     name
     isSaved
@@ -18,6 +19,7 @@ const PayoutMethodFragment = gql`
 const PaymentMethodFragment = gql`
   fragment PaymentMethodFields on PaymentMethod {
     id
+    publicId
     legacyId
     name
     data

@@ -24,6 +24,7 @@ const createPersonalTokenMutation = gql`
   mutation CreatePersonalToken($personalToken: PersonalTokenCreateInput!) {
     createPersonalToken(personalToken: $personalToken) {
       id
+      publicId
       name
       scope
       expiresAt

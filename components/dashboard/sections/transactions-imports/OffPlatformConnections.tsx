@@ -220,7 +220,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link
-                            href={`/dashboard/${accountSlug}/off-platform-transactions?importIds=${row.original.id}`}
+                            href={`/dashboard/${accountSlug}/off-platform-transactions?importIds=${row.original.publicId}`}
                           >
                             <ArrowRightLeftIcon size={16} />
                             <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />

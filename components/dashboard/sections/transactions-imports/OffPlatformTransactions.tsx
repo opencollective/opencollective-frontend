@@ -96,6 +96,7 @@ const offPlatformTransactionsQuery = gql`
         totalCount
         nodes {
           id
+          publicId
           source
           name
         }
@@ -121,6 +122,7 @@ const offPlatformTransactionsQuery = gql`
           ...TransactionsImportRowFields @skip(if: $fetchOnlyRowIds)
           transactionsImport @skip(if: $fetchOnlyRowIds) {
             id
+            publicId
             source
             name
           }
@@ -256,7 +258,7 @@ const transactionsImportFilter: FilterConfig<z.infer<typeof transactionsImportFi
         <ComboSelectFilter
           options={transactionsImports
             .map(transactionsImport => ({
-              value: transactionsImport.id,
+              value: transactionsImport.publicId,
               label: `${transactionsImport.source} - ${transactionsImport.name}`,
             }))
             .sort(sortSelectOptions)}
@@ -265,7 +267,9 @@ const transactionsImportFilter: FilterConfig<z.infer<typeof transactionsImportFi
       );
     },
     valueRenderer: ({ value, meta }) => {
-      const transactionsImport = meta.transactionsImports?.find(transactionsImport => transactionsImport.id === value);
+      const transactionsImport = meta.transactionsImports?.find(
+        transactionsImport => transactionsImport.id === value || transactionsImport.publicId === value,
+      );
       if (!transactionsImport) {
         return '';
       } else {

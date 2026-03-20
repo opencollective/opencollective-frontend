@@ -419,6 +419,7 @@ const expenseFormSchemaQuery = gql`
   fragment ExpenseFormSchemaHostFields on Host {
     id
     legacyId
+    publicId
     name
     legalName
     slug
@@ -488,6 +489,7 @@ const expenseFormSchemaQuery = gql`
 
   fragment ExpenseFormAccountFields on Account {
     id
+    publicId
     legacyId
     name
     slug

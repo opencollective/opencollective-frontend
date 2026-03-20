@@ -169,7 +169,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             hostApplications={hostApplications?.nodes}
             nbPlaceholders={nbPlaceholders}
             loading={loading}
-            openApplication={application => queryFilter.setFilter('hostApplicationId', application.id, false)}
+            openApplication={application => queryFilter.setFilter('hostApplicationId', application.publicId, false)}
           />
           <Pagination queryFilter={queryFilter} total={hostApplications?.totalCount} />
         </React.Fragment>

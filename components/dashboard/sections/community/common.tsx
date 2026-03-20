@@ -20,7 +20,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { CommunityAccountDetailQuery, Contributor, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import type { Account, CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
@@ -68,9 +68,9 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
 
-  return useCallback<GetActions<Contributor>>(
+  return useCallback<GetActions<Account>>(
     contributor => {
-      const actions: ReturnType<GetActions<Contributor>> = {
+      const actions: ReturnType<GetActions<Account>> = {
         primary: [],
         secondary: [],
       };

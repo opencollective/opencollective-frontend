@@ -166,11 +166,11 @@ export const getHostDashboardTransactionsRoute = (
 };
 
 export const getOauthAppSettingsRoute = (account, app) => {
-  return getDashboardRoute(account, `for-developers/oauth/${app.id}`);
+  return getDashboardRoute(account, `for-developers/oauth/${app.publicId}`);
 };
 
 export const getPersonalTokenSettingsRoute = (account, token) => {
-  return getDashboardRoute(account, `for-developers/personal-tokens/${token.id}`);
+  return getDashboardRoute(account, `for-developers/personal-tokens/${token.publicId}`);
 };
 
 export const getOffPlatformTransactionsRoute = (hostSlug: string, importId = null) => {
