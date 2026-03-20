@@ -187,9 +187,6 @@ export const communityAccountDetailQuery = gql`
           manual {
             ...KYCVerificationFields
           }
-          persona {
-            ...KYCVerificationFields
-          }
         }
         adminOf: memberOf(role: [ADMIN], accountType: [ORGANIZATION, VENDOR]) {
           nodes {

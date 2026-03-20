@@ -21,7 +21,6 @@ import { Dialog, DialogContent } from '../../ui/Dialog';
 import { kycVerificationFields } from '../graphql';
 
 import { ManualKYCRequest } from './manual/ManualKYCRequest';
-import { PersonaKYCRequest } from './persona/PersonaKYCRequest';
 import { KYCRequestIntroduction } from './KYCRequestIntroduction';
 import { KYCRequestPickUser } from './KYCRequestPickUser';
 
@@ -31,11 +30,7 @@ enum Steps {
   PROVIDER_FORM = 'PROVIDER_FORM',
 }
 
-export type KYCRequestModalProviderOptions = {
-  persona?: {
-    isImport?: boolean;
-  };
-};
+export type KYCRequestModalProviderOptions = object;
 
 type KYCRequestModalProps = {
   requestedByAccount: AccountReferenceInput;
@@ -54,9 +49,6 @@ export function KYCRequestModal(props: KYCRequestModalProps) {
           id
           name
           settings
-          personaConnectedAccount: connectedAccounts(service: persona) {
-            id
-          }
         }
         verifyAccount: account(id: $verifyAccountId) @include(if: $isAccountSelected) {
           id
@@ -179,23 +171,6 @@ function KYCRequestModalContent(props: KYCRequestModalContentProps) {
             requestedByAccount={props.requestedByAccount}
             verifyAccount={verifyAccountReferenceInput}
             refetchQueries={props.refetchQueries}
-          />
-        ) : props.provider === KycProvider.PERSONA ? (
-          <PersonaKYCRequest
-            backLabel={
-              hasPickUserStep ? (
-                <FormattedMessage defaultMessage="Back" id="Back" />
-              ) : (
-                <FormattedMessage defaultMessage="Return to KYC Introduction" id="gL+IfB" />
-              )
-            }
-            hasPersonaConnectedAccount={!!props.data?.requestedByAccount?.personaConnectedAccount?.length}
-            onNext={() => props.setOpen(false)}
-            onBack={() => setStep(hasPickUserStep ? Steps.PICK_USER : Steps.INTRODUCTION)}
-            requestedByAccount={props.requestedByAccount}
-            verifyAccount={verifyAccountReferenceInput}
-            refetchQueries={props.refetchQueries}
-            options={props.providerOptions?.persona}
           />
         ) : null)}
     </React.Fragment>

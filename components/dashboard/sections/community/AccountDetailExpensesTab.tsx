@@ -266,7 +266,9 @@ export function ExpensesTab({ account, host, setOpenExpenseId, expectedAccountTy
               'date[type]': 'BETWEEN',
               'date[gte]': `${summary.year}-01-01`,
               'date[lte]': `${summary.year}-12-31`,
-              status: 'ALL',
+              ...(!LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) && {
+                status: 'ALL',
+              }),
             },
           });
         },
