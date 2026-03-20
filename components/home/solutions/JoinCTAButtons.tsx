@@ -7,27 +7,39 @@ import Link from '@/components/Link';
 import { Button } from '@/components/ui/Button';
 
 interface JoinCTAButtonsProps {
-  onPage: 'pricing' | 'solutions';
+  onPage: 'pricing' | 'solutions' | 'collectives';
 }
 
 const StaticJoinCTAButtons = React.forwardRef<HTMLDivElement, JoinCTAButtonsProps>((props, ref) => {
+  const primaryHref = props.onPage === 'collectives' ? '/signup/collective' : '/signup/organization?active=true';
+  const primaryLabel =
+    props.onPage === 'collectives' ? (
+      <FormattedMessage defaultMessage="Create a Collective" id="home.create" />
+    ) : (
+      <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
+    );
+
+  let secondaryHref: string;
+  let secondaryLabel: React.ReactNode;
+  if (props.onPage === 'collectives') {
+    secondaryHref = '/search?isHost=true';
+    secondaryLabel = <FormattedMessage defaultMessage="Find a Fiscal Host" id="join.findAFiscalHost" />;
+  } else if (props.onPage === 'pricing') {
+    secondaryHref = '/organizations';
+    secondaryLabel = <FormattedMessage defaultMessage="See Features" id="Hm2JMp" />;
+  } else {
+    secondaryHref = '/organizations/pricing';
+    secondaryLabel = <FormattedMessage defaultMessage="See Pricing" id="solutions.hero.seePricing" />;
+  }
+
   return (
     <div ref={ref} className="flex flex-col gap-4 sm:flex-row">
       <Button asChild variant="marketing" className="rounded-full whitespace-nowrap" size="lg">
-        <Link href="/signup/organization?active=true">
-          <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
-        </Link>
+        <Link href={primaryHref}>{primaryLabel}</Link>
       </Button>
       <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="lg">
-        <Link
-          href={props.onPage === 'pricing' ? '/organizations' : '/organizations/pricing'}
-          className="flex items-center gap-2"
-        >
-          {props.onPage === 'pricing' ? (
-            <FormattedMessage defaultMessage="See Features" id="Hm2JMp" />
-          ) : (
-            <FormattedMessage defaultMessage="See Pricing" id="solutions.hero.seePricing" />
-          )}
+        <Link href={secondaryHref} className="flex items-center gap-2">
+          {secondaryLabel}
           <ArrowRight size={16} />
         </Link>
       </Button>
