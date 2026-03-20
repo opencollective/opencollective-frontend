@@ -354,12 +354,12 @@ class ContributionFlowSuccess extends React.Component<
                     <IconComponent className="mr-1 h-4 w-4" /> <span>{manualPaymentProvider.name}</span>
                   </Badge>
                 </div>
-                <div className="rounded border-l-4 border-blue-400 bg-gray-50 px-5 py-5 text-sm shadow lg:text-base">
+                <div>
                   <CustomPaymentMethodInstructions
                     instructions={manualPaymentProvider.instructions}
                     values={{
                       amount: { valueInCents: totalAmount, currency },
-                      collectiveSlug: get(data, 'order.toAccount.name', ''),
+                      collectiveSlug: get(data, 'order.toAccount.slug', ''),
                       OrderId: get(data, 'order.legacyId', 0),
                       accountDetails: manualPaymentProvider.accountDetails,
                     }}
