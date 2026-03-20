@@ -13,7 +13,7 @@ import { useToast } from '../ui/useToast';
 
 import { PAYPAL_CONNECT_POPUP_MESSAGE } from './constants';
 
-const PAYPAL_CONNECT_SCOPES = 'openid profile email address https://uri.paypal.com/services/paypalattributes';
+const PAYPAL_CONNECT_SCOPES = 'openid profile email https://uri.paypal.com/services/paypalattributes';
 
 const openPaypalPopup = (authorizeUrl: string, clientId: string, redirectUri: string): Window | null => {
   const url = new URL(authorizeUrl);
