@@ -82,7 +82,7 @@ const replaceVariablesInHTML = (
 };
 
 /** Creates an EPC QR-Code */
-export const formatQrCode = (bankAccount, amount, reference) => {
+const formatQrCode = (bankAccount, amount, reference) => {
   if (!bankAccount?.details?.IBAN || amount.currency !== Currency.EUR) {
     return;
   }
