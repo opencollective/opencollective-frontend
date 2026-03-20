@@ -83,7 +83,12 @@ const replaceVariablesInHTML = (
 
 /** Creates an EPC QR-Code */
 const formatQrCode = (bankAccount, amount, reference) => {
-  if (!bankAccount?.details?.IBAN || !bankAccount.details.BIC || amount.currency !== Currency.EUR || amount < 1) {
+  if (
+    !bankAccount?.details?.IBAN ||
+    !bankAccount.details.BIC ||
+    amount.currency !== Currency.EUR ||
+    amount.valueInCents < 1
+  ) {
     return;
   }
 
@@ -96,7 +101,7 @@ const formatQrCode = (bankAccount, amount, reference) => {
     bankAccount.details.BIC, // BIC of the Beneficiary Bank
     truncate(bankAccount.accountHolderName, { length: 70 }), // Name of the Beneficiary
     bankAccount.details.IBAN, // Account number of the Beneficiary
-    `EUR${centsAmountToFloat(amount.valueInCents).toFixed(2)}`, // Amount of the Credit Transfer in Euro
+    `EUR${(centsAmountToFloat(amount.valueInCents) ?? 0).toFixed(2)}`, // Amount of the Credit Transfer in Euro
     '', // Reason (4 chars max)
     '', // Remittance Information (structured)
     truncate(reference, { length: 140 }), // Remittance Information (unstructured)
