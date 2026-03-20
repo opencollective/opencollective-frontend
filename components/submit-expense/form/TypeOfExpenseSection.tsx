@@ -111,6 +111,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
             {showHostInstructions && props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
+                  data-cy="host-invoice-policy"
                   title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
                   checked={props.acknowledgedHostInvoiceExpensePolicy}
@@ -127,6 +128,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
             {showCollectiveInstructions && props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
+                  data-cy="collective-invoice-policy"
                   title={<FormattedMessage defaultMessage="Collective instructions to submit an invoice" id="NeQw7m" />}
                   policy={props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
                   checked={props.acknowledgedCollectiveInvoiceExpensePolicy}
@@ -142,6 +144,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
             {showHostInstructions && props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
+                  data-cy="host-receipt-policy"
                   title={<FormattedMessage defaultMessage="Host instructions to submit a reimbursement" id="TVWH39" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                   checked={props.acknowledgedHostReceiptExpensePolicy}
@@ -158,6 +161,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
             {showCollectiveInstructions && props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
+                  data-cy="collective-receipt-policy"
                   title={
                     <FormattedMessage defaultMessage="Collective instructions to submit a reimbursement" id="HU0N8f" />
                   }

@@ -144,11 +144,11 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
       </div>
       {activeModal === Modals.CREATE_PAYOUT_METHOD && (
         <CreatePayoutMethodModal
-          account={props.account}
+          account={query.data.account}
           open
           onOpenChange={open => setActiveModal(open ? Modals.CREATE_PAYOUT_METHOD : null)}
-          onUpdate={() => {
-            query.refetch();
+          onUpdate={async () => {
+            await query.refetch();
             setActiveModal(null);
           }}
         />

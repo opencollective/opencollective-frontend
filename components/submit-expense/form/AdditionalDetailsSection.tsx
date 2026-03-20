@@ -142,6 +142,7 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
                 defaultValue={props.privateMessage}
                 fontSize="13px"
                 data-cy="ExpenseNotesEditor"
+                aria-label={intl.formatMessage({ defaultMessage: 'Additional notes', id: 'xqG0ln' })}
               />
             )
           }

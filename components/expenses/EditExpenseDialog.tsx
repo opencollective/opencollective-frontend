@@ -19,6 +19,7 @@ import {
   PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
+import { NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID, NEW_PAYOUT_METHOD_ID } from './lib/constants';
 import { getAccountReferenceInput } from '@/lib/collective';
 
 import CollectivePicker from '../CollectivePicker';
@@ -205,9 +206,9 @@ const EditPayee = ({ expense, onSubmit }) => {
             url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
           })),
           payoutMethod:
-            !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+            !values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID
               ? { ...values.newPayoutMethod, isSaved: false }
-              : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+              : values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID
                 ? {
                     type: PayoutMethodType.ACCOUNT_BALANCE,
                     data: {},
@@ -299,9 +300,9 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     async (values, h, formOptions) => {
       const editValues = {
         payoutMethod:
-          !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+          !values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID
             ? { ...values.newPayoutMethod, isSaved: false }
-            : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+            : values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID
               ? {
                   type: PayoutMethodType.ACCOUNT_BALANCE,
                   data: {},
@@ -941,6 +942,7 @@ export default function EditExpenseDialog({
   dialogContentClassName,
   triggerClassName,
   trigger,
+  showTriggerTooltip = true,
 }: {
   expense: Expense;
   field:
@@ -953,12 +955,15 @@ export default function EditExpenseDialog({
     | 'type'
     | 'attachments'
     | 'invoiceFile'
+    | 'attachReceipts'
     | 'privateMessage';
   title: string;
   description?: string;
   dialogContentClassName?: string;
   triggerClassName?: string;
   trigger?: React.ReactNode;
+  /** Set to true by default because most triggers are icons. Set this to false when using a button with explicit text. */
+  showTriggerTooltip?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
   const intl = useIntl();
@@ -991,20 +996,27 @@ export default function EditExpenseDialog({
     },
     [editExpense, intl, expense.id],
   );
+
+  const dialogTrigger = (
+    <DialogTrigger asChild data-cy={`edit-expense-${field}-btn`}>
+      {trigger || (
+        <Button size="icon-xs" variant="outline" className={cn('h-7 w-7', triggerClassName)}>
+          <Pen size={15} />
+        </Button>
+      )}
+    </DialogTrigger>
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <DialogTrigger asChild data-cy={`edit-expense-${field}-btn`}>
-            {trigger || (
-              <Button size="icon-xs" variant="outline" className={cn('h-7 w-7', triggerClassName)}>
-                <Pen size={16} />
-              </Button>
-            )}
-          </DialogTrigger>
-        </TooltipTrigger>
-        <TooltipContent>{title}</TooltipContent>
-      </Tooltip>
+      {showTriggerTooltip ? (
+        <Tooltip>
+          <TooltipTrigger asChild>{dialogTrigger}</TooltipTrigger>
+          <TooltipContent>{title}</TooltipContent>
+        </Tooltip>
+      ) : (
+        dialogTrigger
+      )}
 
       <DialogContent className={dialogContentClassName}>
         <DialogHeader>

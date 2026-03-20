@@ -5,6 +5,7 @@ import { accountHoverCardFields } from '../../../AccountHoverCard';
 export const HostApplicationFields = gql`
   fragment HostApplicationFields on HostApplication {
     id
+    publicId
     message
     customData
     status

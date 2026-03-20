@@ -37,7 +37,7 @@ import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 
-const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
+const { ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
 export type PageMenuItem = {
   type?: 'page';
@@ -126,6 +126,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
 
   const isIndividual = isIndividualAccount(account);
   const isOrganization = isOrganizationAccount(account);
+  const isEvent = account.type === EVENT;
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
   const hasMoneyManagement = hasAccountMoneyManagement(account);
@@ -345,7 +346,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Store,
     },
     {
-      if: !isIndividual && hasMoneyManagement,
+      if: !isIndividual && !isAccountantOnly && hasMoneyManagement,
       label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
       section: ALL_SECTIONS.PEOPLE,
       Icon: Users2,
@@ -468,13 +469,14 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isAccountantOnly,
       section: ALL_SECTIONS.UPDATES,
       Icon: Megaphone,
     },
     {
       if:
-        !isOneOfTypes(account, [EVENT, USER]) &&
+        !isIndividual &&
+        !isEvent &&
         (!isOrganization || hasMoneyManagement) &&
         !isAccountantOnly &&
         !isCommunityManagerOnly,
@@ -528,7 +530,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.POLICIES,
-                if: isOneOfTypes(account, [USER, ORGANIZATION, COLLECTIVE]) && !isAccountantOnly,
+                if: (isIndividual || isOneOfTypes(account, [ORGANIZATION, COLLECTIVE])) && !isAccountantOnly,
               },
               {
                 section: ALL_SECTIONS.RECEIVING_MONEY,
@@ -581,7 +583,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.PAYMENT_RECEIPTS,
-          if: isOneOfTypes(account, [INDIVIDUAL, USER, ORGANIZATION]),
+          if: isIndividual || isOrganization,
         },
         {
           section: ALL_SECTIONS.GIFT_CARDS,
@@ -631,7 +633,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.FOR_DEVELOPERS,
-          if: isOneOfTypes(account, [COLLECTIVE, USER, INDIVIDUAL, ORGANIZATION]) && !isAccountantOnly,
+          if: (isIndividual || isOneOfTypes(account, [COLLECTIVE, ORGANIZATION])) && !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.WEBHOOKS,

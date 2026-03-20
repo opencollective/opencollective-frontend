@@ -21,7 +21,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { CommunityAccountDetailQuery, Contributor, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import { AccountType } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
@@ -96,7 +96,12 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
             pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
               ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
               : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
-            query: { status: 'ALL', searchTerm: `@${contributorSlug}` },
+            query: {
+              ...(!LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) && {
+                status: 'ALL',
+              }),
+              searchTerm: `@${contributorSlug}`,
+            },
           });
         },
       });
@@ -169,14 +174,16 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
         actions.secondary.push({
           key: 'request-kyc',
           label: intl.formatMessage({
-            defaultMessage: 'Request KYC Verification',
-            id: 'Kio9p/',
+            defaultMessage: 'Submit Manual KYC Verification',
+            id: 'y47Tc8',
           }),
           Icon: BookKey,
           onClick: () =>
             showModal(KYCRequestModal, {
               requestedByAccount: { slug: opts.accountSlug },
               verifyAccount: { id: contributor.id },
+              provider: KycProvider.MANUAL,
+              refetchQueries: ['PeopleHostDashboard'],
             }),
         });
       }
@@ -223,7 +230,13 @@ export function useAssociatedCollectiveActions(opts: UseAssociatedCollectiveActi
             pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
               ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
               : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
-            query: { status: 'ALL', searchTerm: `@${opts.accountSlug}`, account: collectiveSlug },
+            query: {
+              ...(!LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) && {
+                status: 'ALL',
+              }),
+              searchTerm: `@${opts.accountSlug}`,
+              account: collectiveSlug,
+            },
           });
         },
       });

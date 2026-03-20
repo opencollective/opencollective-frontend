@@ -492,7 +492,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
           )
         }
       />
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} hideCounts />
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : (

@@ -9,8 +9,6 @@ const path = require('path');
 require('./env');
 const { REWRITES } = require('./rewrites');
 
-const isHeroku = process.env.IS_HEROKU === 'true';
-
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: true,
@@ -26,7 +24,6 @@ const nextConfig = {
   },
   images: {
     disableStaticImages: true,
-    unoptimized: isHeroku, // See https://github.com/vercel/next.js/issues/54482. Should try to remove after updating to NextJS 15.
   },
   outputFileTracingIncludes: {
     '/_document': ['./.next/language-manifest.json'],
@@ -38,6 +35,7 @@ const nextConfig = {
       'node_modules/canvas/build', // https://github.com/wojtekmaj/react-pdf/issues/1504#issuecomment-2007090872
     ],
   },
+  allowedDevOrigins: ['localhost', '127.0.0.1', '::1', '*.ngrok-free.dev'],
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
     config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs

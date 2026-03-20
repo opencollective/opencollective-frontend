@@ -82,6 +82,7 @@ const offPlatformTransactionsQuery = gql`
       type
       policies {
         id
+        publicId
         REQUIRE_2FA_FOR_ADMINS
       }
       accountingCategories @skip(if: $fetchOnlyRowIds) {

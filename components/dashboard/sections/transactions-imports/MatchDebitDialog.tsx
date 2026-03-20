@@ -465,6 +465,7 @@ export const MatchDebitDialog = ({
               });
             }}
             activeViewId={activeViewId}
+            hideCounts
             resetFilters={filter => {
               queryFilter.resetFilters({
                 ...getDefaultFilterValues(row, accounts, activeViewId, host),

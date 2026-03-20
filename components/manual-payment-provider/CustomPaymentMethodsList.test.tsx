@@ -22,6 +22,7 @@ const mockAccount = {
 };
 
 const mockProvider: ManualPaymentProvider = {
+  publicId: '1234567890',
   id: '1',
   type: ManualPaymentProviderType.OTHER,
   name: 'Test Payment Method',

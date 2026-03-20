@@ -10,8 +10,6 @@ import { INVITE, VIRTUAL_CARD } from '../../lib/constants/payout-method';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
@@ -107,12 +105,7 @@ const ExpenseSummaryAdditionalInformation = ({
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === ExpenseStatus.PAID;
-  const { LoggedInUser } = useLoggedInUser();
-  const { canEditPaidBy, canEditPayee, canEditPayoutMethod } = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
-  )
-    ? expense?.permissions || {}
-    : {};
+  const { canEditPaidBy, canEditPayee, canEditPayoutMethod } = expense?.permissions || {};
 
   if (isLoading) {
     return <LoadingPlaceholder height={150} mt={3} />;
@@ -177,7 +170,7 @@ const ExpenseSummaryAdditionalInformation = ({
                   values={{ item: <FormattedMessage key="item" id="Balance" defaultMessage="Balance" /> }}
                 />
               </Container>
-              <Box mt={2}>
+              <Box mt={2} fontSize="12px">
                 <FormattedMoneyAmount
                   amount={collective.stats.balanceWithBlockedFunds.valueInCents}
                   currency={collective.stats.balanceWithBlockedFunds.currency}
@@ -272,7 +265,7 @@ const ExpenseSummaryAdditionalInformation = ({
         />
 
         {payeeLocation && isInvoice && (
-          <Container whiteSpace="pre-wrap" color="black.700" fontSize="14px" lineHeight="16px" mt={2}>
+          <Container whiteSpace="pre-wrap" color="black.700" fontSize="12px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
           </Container>
         )}

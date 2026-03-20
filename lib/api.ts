@@ -222,6 +222,21 @@ export function disconnectAccount(collectiveId, service) {
   }).then(checkResponseStatus);
 }
 
+/**
+ * Returns the PayPal Connect public client ID from the platform backend.
+ * Returns null if PayPal Connect is not configured
+ */
+export function getPaypalConnectConfig(accountId: string): Promise<{
+  clientId: string;
+  redirectUri: string;
+  authorizeUrl: string;
+} | null> {
+  const url = new URL(`${window.location.origin}/api/connected-accounts/paypal/connect-config`);
+  url.searchParams.set('accountId', accountId);
+  url.searchParams.set('redirect', window.location.href.replace(/\?.*/, ''));
+  return fetch(url.toString()).then(response => (response.ok ? response.json() : null));
+}
+
 export function checkUserExistence(email) {
   if (!isValidEmail(email)) {
     return Promise.resolve(false);

@@ -79,6 +79,8 @@ type RichTextEditorProps = RichTextEditorContainerProps & {
   videoEmbedEnabled?: boolean;
   imageUploadEnabled?: boolean;
   'data-cy': string;
+  /** Accessible label for the editor element (for screen readers) */
+  'aria-label'?: string;
   /** Called when an image is being uploaded to set a boolean */
   setUploading?: (uploading: boolean) => void;
 };
@@ -743,6 +745,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
               autofocus: !disabled && autoFocus ? true : undefined,
               placeholder: placeholder,
               disabled,
+              'aria-label': this.props['aria-label'],
             })}
             <Container position="absolute" bottom="1em" right="1em">
               {showCount && !disabled && (

@@ -1,5 +1,6 @@
 const createOrderPage = '/contribution-flow';
 const contributionFlowSteps = '/details|profile|payment|summary|success';
+const isNewPricing = process.env.NEW_PRICING === 'true' || process.env.NEW_PRICING === '1';
 
 exports.REWRITES = [
   {
@@ -16,11 +17,11 @@ exports.REWRITES = [
   },
   {
     source: '/organizations',
-    destination: '/solutions',
+    destination: '/organizations',
   },
   {
     source: '/solutions',
-    destination: '/solutions',
+    destination: '/organizations',
   },
   {
     source: '/:pageSlug(widgets|tos|privacypolicy|hiring|about)',
@@ -379,7 +380,7 @@ exports.REWRITES = [
   },
   {
     source: '/pricing',
-    destination: '/pricing',
+    destination: isNewPricing ? '/new-pricing' : '/legacy-pricing',
   },
   {
     source: '/organizations/pricing',
@@ -416,6 +417,10 @@ exports.REWRITES = [
   {
     source: '/services/plaid/oauth/callback',
     destination: '/services/plaid/oauth/callback',
+  },
+  {
+    source: '/services/paypal/oauth/callback',
+    destination: '/services/paypal/oauth/callback',
   },
   {
     source: '/services/gocardless/callback',

@@ -5,6 +5,8 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import type { Action, GetActions } from '@/lib/actions/types';
+import dayjs from '@/lib/dayjs';
 import { i18nGraphqlException } from '@/lib/errors';
 import { formatFileSize } from '@/lib/file-utils';
 import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
@@ -165,11 +167,24 @@ const getColumns = ({ intl }) => {
     },
     {
       accessorKey: 'createdAt',
-      header: intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }),
+      header: intl.formatMessage({ defaultMessage: 'Requested At', id: 'RequestedAt' }),
       cell: ({ row }) => {
         const exportRequest = row.original;
         return (
-          <div className="text-sm text-muted-foreground">{new Date(exportRequest.createdAt).toLocaleString()}</div>
+          <div className="text-sm text-muted-foreground">
+            <div>{dayjs(exportRequest.createdAt).format('LLL')}</div>
+            {exportRequest.expiresAt && (
+              <div className="text-xs">
+                <FormattedMessage
+                  id="ContributePayment.expiresOn"
+                  defaultMessage="Expires on {expiryDate}"
+                  values={{
+                    expiryDate: dayjs(exportRequest.expiresAt).format('LL'),
+                  }}
+                />
+              </div>
+            )}
+          </div>
         );
       },
     },
@@ -341,19 +356,18 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
     [intl, removeExportRequest, showConfirmationModal, toast],
   );
 
-  const getActions = React.useCallback(
-    (exportRequest: ExportRequestNode) => {
-      const primary = [];
-      const secondary = [];
+  const getActions = React.useCallback<GetActions<ExportRequestNode>>(
+    exportRequest => {
+      const primary: Action[] = [];
+      const secondary: Action[] = [];
 
       if (exportRequest?.status === ExportRequestStatus.COMPLETED && exportRequest.file) {
         primary.push({
           key: 'download',
           label: intl.formatMessage({ defaultMessage: 'Download', id: 'Download' }),
           Icon: Download,
-          onClick: () => {
-            window.open(exportRequest.file.url, '_blank');
-          },
+          href: exportRequest.file.url,
+          target: '_blank',
         });
       }
 
@@ -361,7 +375,6 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
         key: 'delete',
         label: intl.formatMessage({ defaultMessage: 'Delete', id: 'actions.delete' }),
         Icon: Trash2,
-        variant: 'danger',
         onClick: () => handleRemove(exportRequest),
       });
 
@@ -383,7 +396,7 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
           />
         }
       />
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} hideCounts />
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && exportRequests.length === 0 ? (
@@ -398,6 +411,7 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
             getActions={getActions}
             onClickRow={row => pushSubpath(row.original.id)}
             mobileTableView
+            showQuickActions
           />
           <Pagination queryFilter={queryFilter} total={data?.exportRequests?.totalCount} />
         </div>

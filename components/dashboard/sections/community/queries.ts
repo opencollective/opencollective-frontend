@@ -160,6 +160,7 @@ export const communityAccountDetailQuery = gql`
   query CommunityAccountDetail($accountId: String!, $hostSlug: String!, $isIndividual: Boolean!) {
     account(id: $accountId) {
       id
+      publicId
       legacyId
       slug
       name
@@ -319,6 +320,18 @@ export const communityAccountDetailQuery = gql`
           ...LegalDocumentFields
         }
       }
+      features {
+        id
+        MULTI_CURRENCY_EXPENSES
+      }
+      requiredLegalDocuments
+      currency
+      transferwise {
+        id
+        availableCurrencies
+      }
+      supportedPayoutMethods
+      isTrustedHost
     }
 
     firstActivity: activities(

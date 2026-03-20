@@ -294,7 +294,7 @@ function HostApplication({
                 ApplicationId: () =>
                   applicationId ? (
                     <StyledTag display="inline-block" verticalAlign="middle" mx={1} fontSize="12px">
-                      #{applicationId.split('-')[0]}
+                      #{application?.publicId}
                     </StyledTag>
                   ) : (
                     <LoadingPlaceholder className="inline-block" height={20} width={60} />

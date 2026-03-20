@@ -51,7 +51,7 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
                 values={{
                   ActivityId: () => (
                     <StyledTag display="inline-block" verticalAlign="middle" ml={2} fontSize="12px">
-                      #{activity.id.split('-')[0]}
+                      #{activity.publicId}
                     </StyledTag>
                   ),
                 }}

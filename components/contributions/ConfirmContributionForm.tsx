@@ -309,7 +309,7 @@ export const ConfirmContributionForm = ({
                 <StyledInputPercentage
                   id="confirmContribution-taxRate"
                   name="tax.rate"
-                  data-cy="host-fee-percent"
+                  data-cy="confirm-contribution-tax-rate"
                   value={taxPercent}
                   onChange={value => setTaxPercent(value)}
                 />
@@ -328,7 +328,7 @@ export const ConfirmContributionForm = ({
                 <StyledInputPercentage
                   id="confirmContribution-hostFee"
                   name="hostFeePercent"
-                  data-cy="host-fee-percent"
+                  data-cy="confirm-contribution-host-fee-percent"
                   value={hostFeePercent}
                   onChange={value => setHostFeePercent(value)}
                 />

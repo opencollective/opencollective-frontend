@@ -12,7 +12,16 @@ const messages = defineMessages({
   },
 });
 
-const testimonials = [
+export type Testimonial = {
+  paragraphs: string[];
+  author: string;
+  role?: string;
+  linkLabel: React.ReactNode;
+  avatar: string;
+  linkUrl: string;
+};
+
+const defaultTestimonials: Testimonial[] = [
   {
     paragraphs: [
       'The Open Collective platform is a critical part of how we operate. It streamlines our operations, saving us time and reducing administrative overhead. By automating many tasks related to managing financial contributions and expenses, we’re able to focus more attention on supporting our hosted collectives’ individual needs.',
@@ -20,9 +29,9 @@ const testimonials = [
     ],
     author: 'Lauren Gardner',
     role: 'Executive Director',
-    org: 'Open Source Collective',
+    linkLabel: 'Open Source Collective',
     avatar: '/static/images/testimonials/lauren-gardner.png',
-    orgLink: 'https://oscollective.org',
+    linkUrl: 'https://oscollective.org',
   },
   {
     paragraphs: [
@@ -31,9 +40,9 @@ const testimonials = [
     ],
     author: 'Jean-François De Hertogh',
     role: 'Executive Director',
-    org: 'Open Collective Europe Foundation',
+    linkLabel: 'Open Collective Europe Foundation',
     avatar: '/static/images/testimonials/jf.png',
-    orgLink: 'https://www.oceurope.org',
+    linkUrl: 'https://www.oceurope.org',
   },
   {
     paragraphs: [
@@ -43,8 +52,8 @@ const testimonials = [
     ],
     author: 'Babette',
     avatar: '/static/images/testimonials/babette.png',
-    org: 'All For Climate',
-    orgLink: 'https://allforclimate.earth/',
+    linkLabel: 'All For Climate',
+    linkUrl: 'https://allforclimate.earth/',
   },
   {
     paragraphs: [
@@ -54,9 +63,9 @@ const testimonials = [
     ],
     author: 'Anna Garlands',
     avatar: '/static/images/testimonials/anna-garlands.jpeg',
-    org: 'Huddlecraft',
+    linkLabel: 'Huddlecraft',
     role: 'Co-Director',
-    orgLink: 'https://www.huddlecraft.com/',
+    linkUrl: 'https://www.huddlecraft.com/',
   },
   {
     paragraphs: [
@@ -66,13 +75,13 @@ const testimonials = [
     ],
     author: 'Esther Foreman',
     avatar: '/static/images/testimonials/esther-foreman.jpg',
-    org: 'Social Change Nest',
+    linkLabel: 'Social Change Nest',
     role: 'CEO and Chair of the Board',
-    orgLink: 'https://thesocialchangenest.org',
+    linkUrl: 'https://thesocialchangenest.org',
   },
 ];
 
-const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[0] }) => (
+const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => (
   <Card className="h-full">
     <CardContent className="flex-1 px-6">
       <blockquote>
@@ -100,8 +109,8 @@ const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[0
         <div className="flex-1">
           <div className="font-semibold text-slate-900">{testimonial.author}</div>
           <div className="text-sm text-slate-600">{testimonial.role}</div>
-          <a href={testimonial.orgLink} className="text-sm text-slate-500 underline hover:text-slate-700">
-            {testimonial.org}
+          <a href={testimonial.linkUrl} className="text-sm text-slate-500 underline hover:text-slate-700">
+            {testimonial.linkLabel}
           </a>
         </div>
       </div>
@@ -109,7 +118,8 @@ const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[0
   </Card>
 );
 
-const Testimonials = () => {
+const Testimonials = ({ testimonials: testimonialsProp }: { testimonials?: Testimonial[] }) => {
+  const testimonials = testimonialsProp ?? defaultTestimonials;
   return (
     <section className="relative pt-16 pb-30">
       <div className="absolute inset-0 overflow-hidden">
