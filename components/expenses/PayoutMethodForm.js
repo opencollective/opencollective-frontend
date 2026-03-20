@@ -112,7 +112,7 @@ const PayoutMethodForm = ({
   React.useEffect(() => {
     if (
       payoutMethod.type === PayoutMethodType.PAYPAL &&
-      payoutMethod.data.currency &&
+      payoutMethod.data?.currency &&
       !PayPalSupportedCurrencies.includes(payoutMethod.data.currency)
     ) {
       setFieldValue(currencyFieldName, null);
