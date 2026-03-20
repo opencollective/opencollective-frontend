@@ -73,6 +73,9 @@ const PaypalConnectButton = ({
   const handleConnect = async () => {
     setIsLoading(true);
     try {
+      // Reset per attempt so a prior successful connect does not suppress
+      // closed-popup rejection on a later cancelled flow (see closedPoll).
+      hadSuccess.current = false;
       const config = await getPaypalConnectConfig(accountId);
       if (!config?.clientId || !config?.redirectUri || !config?.authorizeUrl) {
         throw new Error('PayPal Connect is not available at the moment.');
