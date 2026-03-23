@@ -2819,6 +2819,7 @@
   "Metric.NoDisbursements": "No disbursements to {name}",
   "Metric.NoTimeseries": "No time series data available",
   "MF9M1y": "Unhosted Collectives",
+  "mfS5he": "Your payout will be sent in this currency.",
   "mGnvLd": "Cannot send member invitation",
   "mGSAXe": "{field} has invalid value \"{value}\". Expected: \"{expected}\"",
   "miGVdq": "Grant application to {account}",

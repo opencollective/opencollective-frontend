@@ -2819,6 +2819,7 @@
   "Metric.NoDisbursements": "No disbursements to {name}",
   "Metric.NoTimeseries": "No time series data available",
   "MF9M1y": "Unhosted Collectives",
+  "mfS5he": "Your payout will be sent in this currency.",
   "mGnvLd": "Kan lid geen uitnodiging sturen",
   "mGSAXe": "{field} heeft ongeldige waarde \"{value}\". Verwacht: \"{expected}\"",
   "miGVdq": "Grant application to {account}",
