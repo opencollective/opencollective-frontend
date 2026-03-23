@@ -419,6 +419,41 @@ const collectiveTestimonials: Testimonial[] = [
     avatar: '/static/images/testimonials/typescript-eslint.png',
     linkUrl: '/typescript-eslint',
   },
+  {
+    paragraphs: [
+      `As an open source project, transparency isn't optional, it's core to who we are. Before Open Collective, financial contributions felt complicated. People wanted to support Mautic, but the process was unclear and tracking where money went required manual reporting that we frankly didn't have capacity for.`,
+      `Since we started using Open Collective, anyone can see our financial reality in real-time. The platform itself saves our small team hours of financial admin, but more importantly, it proves that open source projects can operate with the same financial transparency we bring to our code. It's a huge asset to the world and shows that there's another way of working - leading with transparency.`,
+    ],
+    author: 'Mautic',
+    avatar: '/static/images/testimonials/mautic.png',
+    linkLabel: (
+      <FormattedMessage defaultMessage="Visit Collective Page" id="collectives.testimonials.visitCollectivePage" />
+    ),
+    linkUrl: '/mautic',
+  },
+  {
+    paragraphs: [
+      `For years I searched for the right way to fund Project Liminality. Ever since discovering Open Collective, I can say with confidence that I've found it. Stewarding a deeply value-driven, open-source initiative, Open Collective's infrastructure — and more importantly, the incredible ecosystem it attracts — has proven to be the ideal environment for this vision to become reality.`,
+      `Ever since setting up my collective, I've been recommending it to every friend on a similar path. If you're holding a dream of a more beautiful world, this is the container to make it come true.`,
+    ],
+    author: 'ProjectLiminality',
+    avatar: '/static/images/testimonials/projectliminality.png',
+    linkLabel: (
+      <FormattedMessage defaultMessage="Visit Collective Page" id="collectives.testimonials.visitCollectivePage" />
+    ),
+    linkUrl: '/projectliminality',
+  },
+  {
+    paragraphs: [
+      `I'm one of the IT co-leads for Trans Aid Cymru, a mutual aid organisation run by and for TIN (Trans, Intersex & Non-binary) people in Wales. Just wanna say a big thanks for all the work the OpenCollective devs do! The GraphQL API is excellent BTW, we are now making use of it in our day-to-day mutual aid work.`,
+    ],
+    author: 'Trans Aid Cymru',
+    avatar: '/static/images/testimonials/transaidcymru.png',
+    linkLabel: (
+      <FormattedMessage defaultMessage="Visit Collective Page" id="collectives.testimonials.visitCollectivePage" />
+    ),
+    linkUrl: '/transaidcymru',
+  },
 ];
 
 const Collectives = () => {
