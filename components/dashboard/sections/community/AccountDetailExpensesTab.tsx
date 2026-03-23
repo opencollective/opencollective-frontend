@@ -297,6 +297,7 @@ export function ExpensesTab({ account, host, setOpenExpenseId, expectedAccountTy
           <Metric
             label={<FormattedMessage defaultMessage="Total Paid" id="TotalPaid" />}
             amount={{ current: totalPaid }}
+            useAbsoluteAmount
             loading={loading}
           />
           <Metric

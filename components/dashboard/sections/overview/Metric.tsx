@@ -48,6 +48,8 @@ export interface BaseMetricProps {
   currency?: Currency;
   isSnapshot?: boolean;
   hide?: boolean;
+  /** When true, amounts are shown as magnitude (e.g. spent). Default is signed values. */
+  useAbsoluteAmount?: boolean;
 }
 
 type MetricDivProps = BaseMetricProps & Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'>;
@@ -71,6 +73,7 @@ export function Metric({
   showTimeSeries = false,
   helpLabel,
   isSnapshot = false,
+  useAbsoluteAmount = false,
   ...props
 }: MetricProps) {
   let value, comparisonValue;
@@ -111,7 +114,7 @@ export function Metric({
               <span className="block text-2xl font-bold">
                 {amount?.current ? (
                   <FormattedMoneyAmount
-                    amount={Math.abs(amount.current.valueInCents)}
+                    amount={useAbsoluteAmount ? Math.abs(amount.current.valueInCents) : amount.current.valueInCents}
                     currency={amount.current.currency}
                     precision={2}
                     showCurrencyCode={showCurrencyCode}
@@ -135,7 +138,9 @@ export function Metric({
                   values={{
                     countOrAmount: amount ? (
                       <FormattedMoneyAmount
-                        amount={Math.abs(amount.comparison.valueInCents)}
+                        amount={
+                          useAbsoluteAmount ? Math.abs(amount.comparison.valueInCents) : amount.comparison.valueInCents
+                        }
                         currency={amount.comparison.currency}
                         precision={2}
                         showCurrencyCode={false}
@@ -152,7 +157,9 @@ export function Metric({
                   values={{
                     countOrAmount: amount ? (
                       <FormattedMoneyAmount
-                        amount={Math.abs(amount.comparison.valueInCents)}
+                        amount={
+                          useAbsoluteAmount ? Math.abs(amount.comparison.valueInCents) : amount.comparison.valueInCents
+                        }
                         currency={amount.comparison.currency}
                         precision={2}
                         showCurrencyCode={false}
