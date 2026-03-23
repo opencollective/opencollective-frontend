@@ -123,7 +123,15 @@ const PayoutMethodForm = ({
     <div className="space-y-3">
       {payoutMethod.type === PayoutMethodType.PAYPAL && (
         <React.Fragment>
-          <FormField name={currencyFieldName} disabled={disabled} label={formatMessage(msg.currency)}>
+          <FormField
+            name={currencyFieldName}
+            disabled={disabled}
+            label={formatMessage(msg.currency)}
+            hint={intl.formatMessage({
+              defaultMessage: 'Your payout will be sent in this currency.',
+              id: 'mfS5he',
+            })}
+          >
             {({ field }) => (
               <CurrencyPicker
                 availableCurrencies={PayPalSupportedCurrencies}
@@ -167,7 +175,15 @@ const PayoutMethodForm = ({
       )}
       {payoutMethod.type === PayoutMethodType.OTHER && (
         <React.Fragment>
-          <FormField name={currencyFieldName} disabled={disabled} label={formatMessage(msg.currency)}>
+          <FormField
+            name={currencyFieldName}
+            disabled={disabled}
+            label={formatMessage(msg.currency)}
+            hint={intl.formatMessage({
+              defaultMessage: 'Your payout will be sent in this currency.',
+              id: 'mfS5he',
+            })}
+          >
             {({ field }) => (
               <CurrencyPicker
                 inputId={field.id}
