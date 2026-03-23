@@ -235,7 +235,11 @@ function DataTableRow({
     <TableRow
       data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
       data-state={row.getIsSelected() && 'selected'}
-      className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
+      className={cn(
+        getRowClassName?.(row),
+        onClickRow && 'cursor-pointer',
+        rowHasIndicator?.(row) && 'overflow-hidden',
+      )}
       {...(onClickRow && {
         onClick: e => onClickRow(row, actionsMenuTriggerRef, e),
       })}
