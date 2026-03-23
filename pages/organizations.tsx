@@ -744,6 +744,7 @@ const Organizations = () => {
               className="-my-10 h-[512px] w-[512px] overflow-hidden"
               alt="Organizations illustration"
               src="/static/images/birds.png"
+              loading="eager"
             />
           </div>
         </div>
