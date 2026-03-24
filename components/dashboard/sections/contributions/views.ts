@@ -26,7 +26,7 @@ const incomingOutgoingContributionViewCountsQuery = gql`
       RECURRING: orders(
         filter: $filter
         frequency: [MONTHLY, YEARLY]
-        status: [ACTIVE, ERROR]
+        status: [ACTIVE, PROCESSING, ERROR]
         includeIncognito: true
         includeChildrenAccounts: true
       ) {
@@ -84,7 +84,7 @@ export function useIncomingOutgoingContributionViews(
       label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
       filter: {
         frequency: [ContributionFrequency.MONTHLY, ContributionFrequency.YEARLY],
-        status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
+        status: [OrderStatus.ACTIVE, OrderStatus.PROCESSING, OrderStatus.ERROR],
       },
       count: data?.account?.[IncomingOutgoingContributionTabs.RECURRING]?.totalCount,
     },
