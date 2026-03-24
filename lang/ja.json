@@ -760,6 +760,7 @@
   "ClearSelection": "Clear Selection",
   "Clipboard.Copied": "コピーしました！",
   "Clipboard.Copy": "クリップボードにコピー",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "コピー",
   "Close": "閉じる",
   "closeDetails": "詳細を閉じる",

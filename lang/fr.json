@@ -760,6 +760,7 @@
   "ClearSelection": "Effacer la sélection",
   "Clipboard.Copied": "Copié !",
   "Clipboard.Copy": "Copier",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "Copier",
   "Close": "Fermer",
   "closeDetails": "Masquer les détails",

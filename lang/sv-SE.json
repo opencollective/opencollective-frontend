@@ -760,6 +760,7 @@
   "ClearSelection": "Clear Selection",
   "Clipboard.Copied": "Kopierad!",
   "Clipboard.Copy": "Kopiera till urklipp",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "Kopiera",
   "Close": "Avsluta",
   "closeDetails": "Stäng detaljer",

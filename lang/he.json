@@ -760,6 +760,7 @@
   "ClearSelection": "Clear Selection",
   "Clipboard.Copied": "הועתק!",
   "Clipboard.Copy": "העתקה ללוח גזירים",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "Copy",
   "Close": "סגירה",
   "closeDetails": "סגירת הפרטים",

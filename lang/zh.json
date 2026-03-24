@@ -760,6 +760,7 @@
   "ClearSelection": "取消选择",
   "Clipboard.Copied": "已复制！",
   "Clipboard.Copy": "复制到剪贴板",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "复制",
   "Close": "关闭",
   "closeDetails": "关闭详情",

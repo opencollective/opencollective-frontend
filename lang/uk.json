@@ -760,6 +760,7 @@
   "ClearSelection": "Скасувати вибір",
   "Clipboard.Copied": "Скопійовано!",
   "Clipboard.Copy": "Копіювати до буферу обміну",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "Копіювати",
   "Close": "Закрити",
   "closeDetails": "Закрити подробиці",

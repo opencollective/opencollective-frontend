@@ -760,6 +760,7 @@
   "ClearSelection": "Selectie wissen",
   "Clipboard.Copied": "Gekopieerd!",
   "Clipboard.Copy": "Kopieer naar klembord",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "Kopiëren",
   "Close": "Sluit",
   "closeDetails": "Gegevens sluiten",

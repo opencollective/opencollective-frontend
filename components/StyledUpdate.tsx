@@ -3,11 +3,13 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Markup } from 'interweave';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 import { borders } from 'styled-system';
 
 import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
+import { i18nGraphqlException } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
@@ -16,6 +18,7 @@ import type LoggedInUser from '@/lib/LoggedInUser';
 import EmojiReactionPicker from './conversations/EmojiReactionPicker';
 import CommentReactions from './conversations/EmojiReactions';
 import { UpdateStatus } from './dashboard/sections/updates/common';
+import { toast } from './ui/useToast';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -65,7 +68,7 @@ type StyledUpdateProps = {
   LoggedInUser?: LoggedInUser;
   isReloadingData?: boolean;
   deleteUpdate?: ({ variables }: { variables: { id: string } }) => void;
-  intl: any;
+  intl: IntlShape;
   router: Router;
   /** Reactions associated with this update **/
   reactions?: any;
@@ -104,9 +107,7 @@ class StyledUpdate extends Component<
       await this.props.deleteUpdate({ variables: { id: this.props.update.id } });
       this.props.router.push(`/${this.props.collective.slug}`);
     } catch (err) {
-      // TODO: this should be reported to the user
-      // eslint-disable-next-line no-console
-      console.error('Update -> deleteUpdate -> error: ', err);
+      toast({ variant: 'error', message: i18nGraphqlException(this.props.intl, err) });
     }
   };
 
