@@ -13,19 +13,27 @@ import { Currency } from '@/lib/graphql/types/v2/schema';
 import { cn } from '@/lib/utils';
 
 import type { TEMPLATE_VARIABLES } from './constants';
+import { DEFAULT_REFERENCE_TEMPLATE } from './constants';
 import { formatAccountDetails } from './utils';
 
 const EPC_QR_WIKI = 'https://wikipedia.org/wiki/EPC_QR_code';
 
+type InstructionValues = {
+  amount: Amount;
+  collectiveSlug: string;
+  OrderId: number;
+  accountDetails?: Record<string, unknown>;
+};
+
 type CustomPaymentMethodInstructionsProps = {
   /** HTML instructions template with variables like {account}, {amount}, etc. */
   instructions: string;
-  values: {
-    amount: Amount;
-    collectiveSlug: string;
-    OrderId: number;
-    accountDetails?: Record<string, unknown>;
-  };
+  values: InstructionValues;
+  /**
+   * Plain-text template for the payment reference (`{reference}` in instructions).
+   * Defaults to `{contributionId}`. Do not use `{reference}` inside this template.
+   */
+  referenceTemplate?: string;
   /** Additional className for styling */
   className?: string;
 };
@@ -42,20 +50,51 @@ const transform: TransformCallback = node => {
   return undefined;
 };
 
-const ValueRenderers: Record<
-  TEMPLATE_VARIABLES,
-  (values: CustomPaymentMethodInstructionsProps['values'], intl: IntlShape) => string
-> = {
-  reference: (values: CustomPaymentMethodInstructionsProps['values']) => values.OrderId.toString(),
-  OrderId: (values: CustomPaymentMethodInstructionsProps['values']) => values.OrderId.toString(),
-  amount: (values: CustomPaymentMethodInstructionsProps['values'], intl: IntlShape) =>
-    formatCurrency(values.amount.valueInCents, values.amount.currency, {
-      locale: intl.locale,
-      currencyDisplay: 'symbol',
-    }),
-  collective: (values: CustomPaymentMethodInstructionsProps['values']) => values.collectiveSlug,
-  account: (values: CustomPaymentMethodInstructionsProps['values']) =>
-    formatAccountDetails(values.accountDetails, { asSafeHTML: true }),
+type SegmentMode = 'instructionHtml' | 'referencePlain';
+
+/** Renders template segments; `{account}` is HTML in instructions and plain text in the reference template. */
+const renderTemplateSegment = (
+  key: string,
+  values: InstructionValues,
+  intl: IntlShape,
+  mode: SegmentMode,
+): string | undefined => {
+  switch (key as TEMPLATE_VARIABLES) {
+    case 'amount':
+      return formatCurrency(values.amount.valueInCents, values.amount.currency, {
+        locale: intl.locale,
+        currencyDisplay: 'symbol',
+      });
+    case 'collective':
+      return values.collectiveSlug;
+    case 'OrderId':
+    case 'contributionId':
+      return values.OrderId.toString();
+    case 'account':
+      return formatAccountDetails(values.accountDetails, {
+        asSafeHTML: mode === 'instructionHtml',
+      });
+    default:
+      return undefined;
+  }
+};
+
+/**
+ * Resolves the payment reference string from the host-configured template.
+ */
+export const resolvePaymentReferenceFromTemplate = (
+  referenceTemplate: string | undefined,
+  values: InstructionValues,
+  intl: IntlShape,
+): string => {
+  const effective = referenceTemplate?.trim() ? referenceTemplate.trim() : DEFAULT_REFERENCE_TEMPLATE;
+  return effective.replace(/{([^\s{}][\s\S]*?)}/g, (match, key: string) => {
+    if (key === 'reference') {
+      return match;
+    }
+    const segment = renderTemplateSegment(key, values, intl, 'referencePlain');
+    return segment !== undefined ? segment : match;
+  });
 };
 
 /**
@@ -64,20 +103,23 @@ const ValueRenderers: Record<
  */
 const replaceVariablesInHTML = (
   instructions: string,
-  values: CustomPaymentMethodInstructionsProps['values'],
+  values: InstructionValues,
   intl: IntlShape,
+  resolvedReference: string,
 ): string => {
   if (!instructions) {
     return '';
   }
 
   return instructions.replace(/{([^\s{}][\s\S]*?)}/g, (match, key) => {
-    const renderer = ValueRenderers[key as TEMPLATE_VARIABLES];
-    if (renderer) {
-      return renderer(values, intl);
-    } else {
-      return match;
+    if (key === 'reference') {
+      return resolvedReference;
     }
+    const segment = renderTemplateSegment(key, values, intl, 'instructionHtml');
+    if (segment !== undefined) {
+      return segment;
+    }
+    return match;
   });
 };
 
@@ -118,17 +160,23 @@ export const CustomPaymentMethodInstructions = ({
   instructions,
   className,
   values,
+  referenceTemplate,
 }: CustomPaymentMethodInstructionsProps) => {
   const intl = useIntl();
+  const resolvedReference = React.useMemo(
+    () => resolvePaymentReferenceFromTemplate(referenceTemplate, values, intl),
+    [referenceTemplate, values, intl],
+  );
+
   const rendered = React.useMemo(
-    () => replaceVariablesInHTML(instructions, values, intl),
-    [instructions, values, intl],
+    () => replaceVariablesInHTML(instructions, values, intl, resolvedReference),
+    [instructions, values, intl, resolvedReference],
   );
   if (!rendered) {
     return null;
   }
 
-  const qrCodeData = formatQrCode(values.accountDetails, values.amount, values.OrderId.toString());
+  const qrCodeData = formatQrCode(values.accountDetails, values.amount, resolvedReference);
   return (
     <div>
       <div

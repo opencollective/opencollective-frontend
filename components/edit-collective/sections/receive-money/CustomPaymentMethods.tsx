@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
-import { type Account, type ManualPaymentProvider, ManualPaymentProviderType } from '@/lib/graphql/types/v2/graphql';
+import { type Account, type ManualPaymentProvider } from '@/lib/graphql/types/v2/graphql';
 
 import { useModal } from '@/components/ModalContext';
 
@@ -43,7 +43,10 @@ const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefe
   const [customProviders, otherProviders] = partition(manualPaymentProviders, p => p.type === 'OTHER');
 
   const handleSave = React.useCallback(
-    async (values: { name: string; instructions: string; icon?: string }, editingProvider?: ManualPaymentProvider) => {
+    async (
+      values: { name: string; instructions: string; icon?: string; referenceTemplate: string },
+      editingProvider?: ManualPaymentProvider,
+    ) => {
       try {
         if (editingProvider) {
           // Update existing
@@ -51,10 +54,10 @@ const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefe
             variables: {
               manualPaymentProvider: { id: editingProvider.id },
               input: {
-                type: ManualPaymentProviderType.OTHER,
                 name: values.name,
                 instructions: values.instructions,
                 icon: values.icon,
+                referenceTemplate: values.referenceTemplate,
               },
             },
           });
@@ -68,6 +71,7 @@ const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefe
                 name: values.name,
                 instructions: values.instructions,
                 icon: values.icon,
+                referenceTemplate: values.referenceTemplate,
               },
             },
           });

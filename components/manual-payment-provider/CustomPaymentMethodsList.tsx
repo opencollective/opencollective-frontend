@@ -140,6 +140,7 @@ export const CustomPaymentMethodsList = ({
                         <div className="mt-3 mb-2 rounded border bg-gray-50 p-4 text-sm sm:p-5">
                           <CustomPaymentMethodInstructions
                             instructions={provider.instructions}
+                            referenceTemplate={provider.referenceTemplate ?? undefined}
                             values={{
                               amount: { valueInCents: 3000, currency: account.currency },
                               collectiveSlug: account.slug,

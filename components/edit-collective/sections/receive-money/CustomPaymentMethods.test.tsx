@@ -41,7 +41,10 @@ jest.mock('../../../manual-payment-provider/EditCustomPaymentMethodDialog', () =
       {provider && <div>Editing: {provider.name}</div>}
       <button
         onClick={async () => {
-          await onSave({ name: 'Test', instructions: 'Test instructions', icon: 'venmo' }, provider || undefined);
+          await onSave(
+            { name: 'Test', instructions: 'Test instructions', icon: 'venmo', referenceTemplate: '{contributionId}' },
+            provider || undefined,
+          );
         }}
       >
         Save
@@ -80,6 +83,7 @@ const buildCreateProviderMock = () => ({
         name: 'Test',
         instructions: 'Test instructions',
         icon: 'venmo',
+        referenceTemplate: '{contributionId}',
       },
     },
   },
@@ -91,6 +95,7 @@ const buildCreateProviderMock = () => ({
         name: 'Test',
         instructions: 'Test instructions',
         icon: 'venmo',
+        referenceTemplate: '{contributionId}',
         accountDetails: null,
         isArchived: false,
         createdAt: new Date().toISOString(),
@@ -106,10 +111,10 @@ const buildUpdateProviderMock = (providerId: string) => ({
     variables: {
       manualPaymentProvider: { id: providerId },
       input: {
-        type: 'OTHER',
         name: 'Test',
         instructions: 'Test instructions',
         icon: 'venmo',
+        referenceTemplate: '{contributionId}',
       },
     },
   },
@@ -121,6 +126,7 @@ const buildUpdateProviderMock = (providerId: string) => ({
         name: 'Test',
         instructions: 'Test instructions',
         icon: 'venmo',
+        referenceTemplate: '{contributionId}',
         accountDetails: null,
         isArchived: false,
         createdAt: new Date().toISOString(),

@@ -395,7 +395,8 @@ describe('EditCustomBankPaymentMethodDialog', () => {
   });
 
   describe('Template Variables Help', () => {
-    it('renders variables help section including account variable', () => {
+    it('renders variables help section including account variable', async () => {
+      const user = userEvent.setup();
       render(
         withRequiredProviders(
           <MockedProvider mocks={[buildHostQueryMock()]} addTypename={false}>
@@ -409,8 +410,9 @@ describe('EditCustomBankPaymentMethodDialog', () => {
         ),
       );
 
-      // Check that all variables are mentioned in the help section
-      // Using getAllByText since variables appear in multiple places (help text, editor content, etc.)
+      await user.click(screen.getByRole('button', { name: /Available template variables/i }));
+
+      // Check that all variables are mentioned in the collapsible help section
       expect(screen.getAllByText(/{account}/).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/{amount}/).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/{collective}/).length).toBeGreaterThan(0);
@@ -490,6 +492,7 @@ describe('EditCustomBankPaymentMethodDialog', () => {
                 instructions: expect.any(String),
                 icon: 'Landmark',
                 accountDetails: {},
+                referenceTemplate: '{contributionId}',
               }),
             ]}
             addTypename={false}
@@ -527,6 +530,7 @@ describe('EditCustomBankPaymentMethodDialog', () => {
                 instructions: expect.any(String),
                 icon: 'Landmark',
                 accountDetails: {},
+                referenceTemplate: '{contributionId}',
               }),
             ]}
             addTypename={false}

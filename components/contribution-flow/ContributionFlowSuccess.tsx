@@ -357,6 +357,7 @@ class ContributionFlowSuccess extends React.Component<
                 <div>
                   <CustomPaymentMethodInstructions
                     instructions={manualPaymentProvider.instructions}
+                    referenceTemplate={manualPaymentProvider.referenceTemplate ?? undefined}
                     values={{
                       amount: { valueInCents: totalAmount, currency },
                       collectiveSlug: get(data, 'order.toAccount.slug', ''),

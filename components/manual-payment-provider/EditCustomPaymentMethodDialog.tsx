@@ -10,15 +10,19 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { InputGroup } from '../ui/Input';
 import { Label } from '../ui/Label';
 
-import { COMMON_TEMPLATE_VARIABLES } from './constants';
+import { DEFAULT_REFERENCE_TEMPLATE, EDIT_DIALOG_UNIFIED_VARIABLES_OTHER } from './constants';
 import { CustomPaymentMethodIconInput } from './CustomPaymentMethodIconInput';
-import { CustomPaymentMethodInstructionsVariablesHelp } from './CustomPaymentMethodInstructionsVariablesHelp';
 import { CustomPaymentMethodTemplateEditor } from './CustomPaymentMethodTemplateEditor';
+import {
+  ManualPaymentDialogTemplateVariablesCollapsible,
+  PaymentReferenceTemplatePreviewHint,
+} from './ManualPaymentTemplateDialogHelpers';
 
 type FormValues = {
   name: string;
   instructions: string;
   icon: string;
+  referenceTemplate: string;
 };
 
 type EditCustomPaymentMethodDialogProps = {
@@ -35,6 +39,7 @@ export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: Edi
     name: provider?.name || '',
     instructions: provider?.instructions || '',
     icon: provider?.icon || '',
+    referenceTemplate: provider?.referenceTemplate?.trim() ? provider.referenceTemplate : DEFAULT_REFERENCE_TEMPLATE,
   };
 
   const handleClose = () => {
@@ -67,6 +72,12 @@ export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: Edi
               errors.instructions = intl.formatMessage({
                 defaultMessage: 'Instructions are required',
                 id: 'CustomPaymentMethod.Instructions.Required',
+              });
+            }
+            if (!values.referenceTemplate || values.referenceTemplate.trim() === '') {
+              errors.referenceTemplate = intl.formatMessage({
+                defaultMessage: 'Payment reference template is required',
+                id: 'CustomPaymentMethod.ReferenceTemplate.Required',
               });
             }
             return errors;
@@ -113,16 +124,61 @@ export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: Edi
                   }}
                 />
                 <div className="mt-6 border-t pt-6">
+                  <ManualPaymentDialogTemplateVariablesCollapsible variables={EDIT_DIALOG_UNIFIED_VARIABLES_OTHER} />
+                </div>
+                <div className="mt-6">
+                  <Label className="mb-2 block text-sm font-bold" htmlFor="input-payment-reference-template">
+                    <FormattedMessage
+                      defaultMessage="Payment reference"
+                      id="CustomPaymentMethod.ReferenceTemplate.Title"
+                    />
+                  </Label>
+                  <p className="mb-2 text-xs text-gray-600">
+                    <FormattedMessage
+                      defaultMessage="What payers enter as the transfer reference. Shown as {reference} in instructions - use characters their bank or payment app supports."
+                      id="CustomPaymentMethod.ReferenceTemplate.Description"
+                      values={{
+                        reference: (
+                          <code className="rounded bg-slate-100 px-1 py-0.5 text-[11px] text-slate-700">
+                            {'{reference}'}
+                          </code>
+                        ),
+                      }}
+                    />
+                  </p>
+                  <InputGroup
+                    type="text"
+                    id="input-payment-reference-template"
+                    value={values.referenceTemplate}
+                    className="w-full font-mono text-xs"
+                    onChange={e => setFieldValue('referenceTemplate', e.target.value)}
+                    onBlur={() => setFieldTouched('referenceTemplate', true)}
+                    placeholder={DEFAULT_REFERENCE_TEMPLATE}
+                    error={Boolean(errors.referenceTemplate && touched.referenceTemplate)}
+                    data-cy="custom-payment-reference-template"
+                  />
+                  <PaymentReferenceTemplatePreviewHint
+                    referenceTemplate={values.referenceTemplate}
+                    previewValues={{
+                      amount: { valueInCents: 3000, currency: Currency.USD },
+                      collectiveSlug: 'acme',
+                      OrderId: 76400,
+                    }}
+                  />
+                  {errors.referenceTemplate && touched.referenceTemplate && (
+                    <p className="mt-1 text-sm text-red-600">{errors.referenceTemplate}</p>
+                  )}
+                </div>
+                <div className="mt-6">
                   <Label className="mb-2 block text-sm font-bold">
                     <FormattedMessage defaultMessage="Instructions" id="sV2v5L" />
                   </Label>
                   <p className="mb-2 text-xs text-gray-600">
                     <FormattedMessage
-                      defaultMessage="Payment instructions that will be displayed to the contributors. You can use variables:"
-                      id="ghmpbR"
+                      defaultMessage="Rich text instructions for contributors. Use the variables from the section above."
+                      id="CustomPaymentMethod.Instructions.IntroAboveVariables"
                     />
                   </p>
-                  <CustomPaymentMethodInstructionsVariablesHelp variables={COMMON_TEMPLATE_VARIABLES} />
                   <CustomPaymentMethodTemplateEditor
                     error={Boolean(errors.instructions && touched.instructions)}
                     value={values.instructions}
@@ -130,6 +186,7 @@ export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: Edi
                       setFieldValue('instructions', value);
                       setFieldTouched('instructions', true);
                     }}
+                    referenceTemplate={values.referenceTemplate}
                     values={{
                       amount: { valueInCents: 3000, currency: Currency.USD },
                       collectiveSlug: 'acme',

@@ -8240,6 +8240,11 @@ type ManualPaymentProvider {
   accountDetails: JSON
 
   """
+  Plain-text template used to build the payment reference shown as {reference} in instructions (default {contributionId})
+  """
+  referenceTemplate: String
+
+  """
   Whether this provider has been archived
   """
   isArchived: Boolean!
@@ -26829,6 +26834,11 @@ input ManualPaymentProviderCreateInput {
   Bank account details for BANK_TRANSFER type providers
   """
   accountDetails: JSON
+
+  """
+  Plain-text template for the payment reference (e.g. {contributionId}). Variables: amount, collective, OrderId, contributionId, account. Do not use {reference} here.
+  """
+  referenceTemplate: String
 }
 
 input ManualPaymentProviderUpdateInput {
@@ -26851,6 +26861,11 @@ input ManualPaymentProviderUpdateInput {
   Bank account details for BANK_TRANSFER type providers
   """
   accountDetails: JSON
+
+  """
+  Plain-text template for the payment reference (e.g. {contributionId}). Variables: amount, collective, OrderId, contributionId, account. Do not use {reference} here.
+  """
+  referenceTemplate: String
 }
 
 type FollowAccountResult {

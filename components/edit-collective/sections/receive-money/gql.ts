@@ -8,6 +8,7 @@ const manualPaymentProviderFragment = gql`
     instructions
     icon
     accountDetails
+    referenceTemplate
     isArchived
     createdAt
     updatedAt
