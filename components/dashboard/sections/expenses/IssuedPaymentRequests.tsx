@@ -126,7 +126,6 @@ function getExpenseColumns(intl: IntlShape): ColumnDef<HostExpensesQueryNode, un
                 defaultMessage="Submitted by {submittedByAccount}"
                 id="HJQNkj"
                 values={{
-                  date: <DateTime dateStyle="medium" value={expense.createdAt} />,
                   submittedByAccount: (
                     <LinkCollective
                       collective={submittedBy}
@@ -212,7 +211,7 @@ function getExpenseColumns(intl: IntlShape): ColumnDef<HostExpensesQueryNode, un
 }
 
 const filterSchema = commonSchema.extend({
-  account: z.string().optional(),
+  fromAccount: z.string().optional(),
   hostContext: hostContextFilter.schema,
   limit: limit.default(20),
 });
@@ -229,12 +228,12 @@ type FilterMeta = CommonFilterMeta & {
 
 const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
   ...commonToVariables,
-  account: hostedAccountFilter.toVariables,
+  fromAccount: hostedAccountFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
-  account: hostedAccountFilter.filter,
+  fromAccount: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
 };
 
@@ -290,7 +289,7 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
         hostContext: queryFilter.values.hostContext,
       }
     : {
-        account: { slug: accountSlug },
+        fromAccount: { slug: accountSlug },
         includeChildrenExpenses: true,
       };
   const variables = {

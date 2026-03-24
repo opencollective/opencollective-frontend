@@ -3,8 +3,6 @@ import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
   Award,
-  BanknoteArrowDown,
-  BanknoteArrowUp,
   BarChart2,
   BookOpenCheck,
   BookUserIcon,
@@ -146,8 +144,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
   );
 
-  const useNewMoneyIcons = false;
-
   const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
   const hasReceivedGrantRequests = account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
@@ -188,7 +184,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: hasIncomingOutgoingReorg
         ? intl.formatMessage({ defaultMessage: 'Outgoing Money', id: 'OutgoingMoney' })
         : intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
-      Icon: useNewMoneyIcons ? BanknoteArrowDown : Receipt,
+      Icon: Receipt,
       subMenu: [
         {
           if: hasHosting && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
@@ -268,7 +264,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: hasIncomingOutgoingReorg
         ? intl.formatMessage({ defaultMessage: 'Incoming Money', id: 'IncomingMoney' })
         : intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: useNewMoneyIcons ? BanknoteArrowUp : Coins,
+      Icon: Coins,
       subMenu: [
         {
           if: !isIndividual,

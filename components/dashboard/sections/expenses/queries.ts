@@ -433,12 +433,12 @@ export const issuedPaymentRequestsMetadataQuery = gql`
   query IssuedPaymentRequestsMetadata(
     $fromHost: AccountReferenceInput
     $hostContext: HostContext
-    $account: AccountReferenceInput
+    $fromAccount: AccountReferenceInput
     $includeChildrenExpenses: Boolean
   ) {
     all: expenses(
       hostContext: $hostContext
-      account: $account
+      fromAccount: $fromAccount
       includeChildrenExpenses: $includeChildrenExpenses
       fromHost: $fromHost
     ) {
@@ -446,7 +446,7 @@ export const issuedPaymentRequestsMetadataQuery = gql`
     }
     issued: expenses(
       hostContext: $hostContext
-      account: $account
+      fromAccount: $fromAccount
       includeChildrenExpenses: $includeChildrenExpenses
       fromHost: $fromHost
       status: [PENDING, APPROVED]
@@ -455,7 +455,7 @@ export const issuedPaymentRequestsMetadataQuery = gql`
     }
     paid: expenses(
       hostContext: $hostContext
-      account: $account
+      fromAccount: $fromAccount
       includeChildrenExpenses: $includeChildrenExpenses
       fromHost: $fromHost
       status: [PAID]
@@ -534,6 +534,8 @@ export const paidDisbursementsQuery = gql`
 export const dashboardExpensesQuery = gql`
   query DashboardExpenses(
     $account: AccountReferenceInput
+    $fromAccount: AccountReferenceInput
+    $host: AccountReferenceInput
     $fromHost: AccountReferenceInput
     $hostContext: HostContext
     $fromAccounts: [AccountReferenceInput]
@@ -559,7 +561,9 @@ export const dashboardExpensesQuery = gql`
     expenses(
       hostContext: $hostContext
       fromHost: $fromHost
+      host: $host
       account: $account
+      fromAccount: $fromAccount
       fromAccounts: $fromAccounts
       includeChildrenExpenses: $includeChildrenExpenses
       limit: $limit
@@ -607,11 +611,6 @@ export const dashboardExpensesQuery = gql`
         }
       }
     }
-
-    # host(slug: $slug) @include(if: $isHost) {
-    #   id
-    #   ...ExpenseHostFields
-    # }
   }
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
