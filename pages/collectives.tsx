@@ -451,6 +451,7 @@ const Collectives = () => {
               className="w-full max-w-[500px]"
               alt=""
               src="/static/images/home/nurturing-illustration.png"
+              loading="eager"
             />
           </div>
         </div>
