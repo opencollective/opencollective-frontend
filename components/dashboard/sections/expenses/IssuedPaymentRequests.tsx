@@ -2,7 +2,6 @@ import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import { omit } from 'lodash';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -14,7 +13,7 @@ import type {
   HostDashboardExpensesQuery,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseDirection, ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
@@ -234,7 +233,7 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
-  ...omit(commonFilters, 'fromAccounts'),
+  ...commonFilters,
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
 };
@@ -287,7 +286,7 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
 
   const accountVariables = account?.hasHosting
     ? {
-        host: { slug: accountSlug },
+        fromHost: { slug: accountSlug },
         hostContext: queryFilter.values.hostContext,
       }
     : {
@@ -296,7 +295,6 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
       };
   const variables = {
     ...accountVariables,
-    direction: ExpenseDirection.SUBMITTED,
     fetchGrantHistory: false,
     ...queryFilter.variables,
   };

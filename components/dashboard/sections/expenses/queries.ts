@@ -155,7 +155,6 @@ export const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
     $hostSlug: String!
     $hostContext: HostContext
-    $direction: ExpenseDirection
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
@@ -180,7 +179,6 @@ export const hostDashboardExpensesQuery = gql`
     expenses(
       host: { slug: $hostSlug }
       hostContext: $hostContext
-      direction: $direction
       account: $account
       fromAccount: $fromAccount
       fromAccounts: $fromAccounts
@@ -433,36 +431,33 @@ export const hostPaymentRequestsMetadataQuery = gql`
  */
 export const issuedPaymentRequestsMetadataQuery = gql`
   query IssuedPaymentRequestsMetadata(
-    $host: AccountReferenceInput
+    $fromHost: AccountReferenceInput
     $hostContext: HostContext
     $account: AccountReferenceInput
     $includeChildrenExpenses: Boolean
   ) {
     all: expenses(
-      host: $host
       hostContext: $hostContext
       account: $account
       includeChildrenExpenses: $includeChildrenExpenses
-      direction: SUBMITTED
+      fromHost: $fromHost
     ) {
       totalCount
     }
     issued: expenses(
-      host: $host
       hostContext: $hostContext
       account: $account
       includeChildrenExpenses: $includeChildrenExpenses
-      direction: SUBMITTED
+      fromHost: $fromHost
       status: [PENDING, APPROVED]
     ) {
       totalCount
     }
     paid: expenses(
-      host: $host
       hostContext: $hostContext
       account: $account
       includeChildrenExpenses: $includeChildrenExpenses
-      direction: SUBMITTED
+      fromHost: $fromHost
       status: [PAID]
     ) {
       totalCount
@@ -539,10 +534,9 @@ export const paidDisbursementsQuery = gql`
 export const dashboardExpensesQuery = gql`
   query DashboardExpenses(
     $account: AccountReferenceInput
-    $host: AccountReferenceInput
+    $fromHost: AccountReferenceInput
     $hostContext: HostContext
-    $direction: ExpenseDirection
-    $oppositeAccounts: [AccountReferenceInput]
+    $fromAccounts: [AccountReferenceInput]
     $includeChildrenExpenses: Boolean
     $limit: Int!
     $offset: Int!
@@ -564,10 +558,9 @@ export const dashboardExpensesQuery = gql`
   ) {
     expenses(
       hostContext: $hostContext
-      direction: $direction
+      fromHost: $fromHost
       account: $account
-      host: $host
-      oppositeAccounts: $oppositeAccounts
+      fromAccounts: $fromAccounts
       includeChildrenExpenses: $includeChildrenExpenses
       limit: $limit
       offset: $offset
@@ -600,8 +593,8 @@ export const dashboardExpensesQuery = gql`
             type: GRANT
             direction: SUBMITTED
             limit: 1
-            host: $host
-            account: $host
+            host: $fromHost
+            account: $fromHost
           ) @include(if: $fetchGrantHistory) {
             totalAmount {
               amount {
