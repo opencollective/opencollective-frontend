@@ -267,14 +267,15 @@ export default function AccountTable({ accountSlug, queryFilter, metric }) {
     return nodes.map(node => {
       const current = node[metric.id].current.valueInCents ?? node[metric.id].current;
       const comparison = node[metric.id].comparison?.valueInCents ?? node[metric.id].comparison;
+      const useAbs = metric.useAbsoluteAmount === true;
       return {
         ...node,
-        current: Math.abs(current),
-        comparison: !isNil(comparison) ? Math.abs(comparison) : undefined,
+        current: useAbs ? Math.abs(current) : current,
+        comparison: !isNil(comparison) ? (useAbs ? Math.abs(comparison) : comparison) : undefined,
         percentageDifference: getPercentageDifference(current, comparison),
       };
     });
-  }, [metric.id, data]);
+  }, [metric.id, metric.useAbsoluteAmount, data]);
 
   if (error) {
     return <MessageBoxGraphqlError error={error} />;
