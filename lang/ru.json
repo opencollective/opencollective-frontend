@@ -760,6 +760,7 @@
   "ClearSelection": "Отменить выбор",
   "Clipboard.Copied": "Скопировано!",
   "Clipboard.Copy": "Скопировать в буфер обмена",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "Скопировать",
   "Close": "Закрыть",
   "closeDetails": "Скрыть подробности",

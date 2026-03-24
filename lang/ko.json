@@ -760,6 +760,7 @@
   "ClearSelection": "Clear Selection",
   "Clipboard.Copied": "복사되었습니다!",
   "Clipboard.Copy": "클립보드에 복사",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "Copy",
   "Close": "닫기",
   "closeDetails": "닫기",

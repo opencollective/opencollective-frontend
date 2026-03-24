@@ -760,6 +760,7 @@
   "ClearSelection": "Clear Selection",
   "Clipboard.Copied": "Zkopírováno!",
   "Clipboard.Copy": "Kopírovat do schránky",
+  "Clipboard.CopyFailed": "Could not copy to clipboard. Please try selecting the text and copying manually.",
   "Clipboard.CopyShort": "Kopírovat",
   "Close": "Zavřít",
   "closeDetails": "Zavřít podrobnosti",
