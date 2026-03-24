@@ -24,9 +24,12 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Label } from '../ui/Label';
 import { useToast } from '../ui/useToast';
 
-import { BANK_ACCOUNT_TEMPLATE_VARIABLE, COMMON_TEMPLATE_VARIABLES } from './constants';
-import { CustomPaymentMethodInstructionsVariablesHelp } from './CustomPaymentMethodInstructionsVariablesHelp';
+import { DEFAULT_REFERENCE_TEMPLATE, EDIT_DIALOG_UNIFIED_VARIABLES_BANK } from './constants';
 import { CustomPaymentMethodTemplateEditor } from './CustomPaymentMethodTemplateEditor';
+import {
+  ManualPaymentDialogTemplateVariablesCollapsible,
+  PaymentReferenceTemplatePreviewHint,
+} from './ManualPaymentTemplateDialogHelpers';
 
 type EditCustomBankPaymentMethodDialogProps = {
   open: boolean;
@@ -44,6 +47,7 @@ type FormValues = {
   name: string;
   instructions: string;
   icon: string;
+  referenceTemplate: string;
   accountDetails: Record<string, unknown>;
 };
 
@@ -71,6 +75,9 @@ export const EditCustomBankPaymentMethodDialog = ({
     name: manualPaymentProvider?.name || '',
     instructions: manualPaymentProvider?.instructions || BANK_TRANSFER_DEFAULT_INSTRUCTIONS,
     icon: manualPaymentProvider?.icon || 'Landmark',
+    referenceTemplate: manualPaymentProvider?.referenceTemplate?.trim()
+      ? manualPaymentProvider.referenceTemplate
+      : DEFAULT_REFERENCE_TEMPLATE,
     accountDetails: (manualPaymentProvider?.accountDetails as Record<string, unknown>) || {},
   };
 
@@ -86,6 +93,7 @@ export const EditCustomBankPaymentMethodDialog = ({
               instructions: values.instructions,
               icon: values.icon,
               accountDetails: values.accountDetails,
+              referenceTemplate: values.referenceTemplate,
             },
           },
         });
@@ -100,6 +108,7 @@ export const EditCustomBankPaymentMethodDialog = ({
               instructions: values.instructions,
               icon: values.icon,
               accountDetails: values.accountDetails,
+              referenceTemplate: values.referenceTemplate,
             },
           },
         });
@@ -135,7 +144,20 @@ export const EditCustomBankPaymentMethodDialog = ({
             )}
           </DialogTitle>
         </DialogHeader>
-        <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+        <Formik
+          initialValues={initialValues}
+          validate={values => {
+            const errors: Partial<Record<keyof FormValues, string>> = {};
+            if (!values.referenceTemplate || values.referenceTemplate.trim() === '') {
+              errors.referenceTemplate = intl.formatMessage({
+                defaultMessage: 'Payment reference template is required',
+                id: 'CustomPaymentMethod.ReferenceTemplate.Required',
+              });
+            }
+            return errors;
+          }}
+          onSubmit={handleSubmit}
+        >
           {({ handleSubmit, setFieldTouched, errors, touched, isSubmitting, setFieldValue, dirty, values }) => (
             <form onSubmit={handleSubmit}>
               <div className="mb-2">
@@ -219,6 +241,55 @@ export const EditCustomBankPaymentMethodDialog = ({
               </div>
 
               <div className="mt-6 border-t pt-6">
+                <ManualPaymentDialogTemplateVariablesCollapsible variables={EDIT_DIALOG_UNIFIED_VARIABLES_BANK} />
+              </div>
+
+              <div className="mt-6">
+                <Label className="mb-2 block text-sm font-bold" htmlFor="input-bank-payment-reference-template">
+                  <FormattedMessage
+                    defaultMessage="Payment reference"
+                    id="CustomPaymentMethod.ReferenceTemplate.Title"
+                  />
+                </Label>
+                <p className="mb-2 text-xs text-gray-600">
+                  <FormattedMessage
+                    defaultMessage="What payers enter as the transfer reference. Shown as {reference} in instructions - use characters their bank or payment app supports."
+                    id="CustomPaymentMethod.ReferenceTemplate.Description"
+                    values={{
+                      reference: (
+                        <code className="rounded bg-slate-100 px-1 py-0.5 text-[11px] text-slate-700">
+                          {'{reference}'}
+                        </code>
+                      ),
+                    }}
+                  />
+                </p>
+                <InputGroup
+                  type="text"
+                  id="input-bank-payment-reference-template"
+                  value={values.referenceTemplate}
+                  className="w-full font-mono text-xs"
+                  onChange={e => setFieldValue('referenceTemplate', e.target.value)}
+                  onBlur={() => setFieldTouched('referenceTemplate', true)}
+                  placeholder={DEFAULT_REFERENCE_TEMPLATE}
+                  error={Boolean(errors.referenceTemplate && touched.referenceTemplate)}
+                  data-cy="bank-transfer-reference-template"
+                />
+                <PaymentReferenceTemplatePreviewHint
+                  referenceTemplate={values.referenceTemplate}
+                  previewValues={{
+                    amount: { valueInCents: 3000, currency: account.currency },
+                    collectiveSlug: 'example-collective',
+                    OrderId: 76400,
+                    accountDetails: values.accountDetails,
+                  }}
+                />
+                {errors.referenceTemplate && touched.referenceTemplate && (
+                  <p className="mt-1 text-sm text-red-600">{errors.referenceTemplate}</p>
+                )}
+              </div>
+
+              <div className="mt-6">
                 <Label className="mb-2 block text-sm font-bold">
                   <FormattedMessage
                     id="paymentMethods.manual.instructions.title"
@@ -227,16 +298,14 @@ export const EditCustomBankPaymentMethodDialog = ({
                 </Label>
                 <p className="mb-2 text-xs text-gray-600">
                   <FormattedMessage
-                    defaultMessage="Payment instructions that will be displayed to the contributors. You can use variables:"
-                    id="ghmpbR"
+                    defaultMessage="Rich text instructions for contributors. Use the variables from the section above."
+                    id="CustomPaymentMethod.Instructions.IntroAboveVariables"
                   />
                 </p>
-                <CustomPaymentMethodInstructionsVariablesHelp
-                  variables={[BANK_ACCOUNT_TEMPLATE_VARIABLE, ...COMMON_TEMPLATE_VARIABLES]}
-                />
                 <CustomPaymentMethodTemplateEditor
                   value={values.instructions}
                   onChange={value => setFieldValue('instructions', value)}
+                  referenceTemplate={values.referenceTemplate}
                   data-cy="bank-transfer-instructions-editor"
                   values={{
                     amount: { valueInCents: 3000, currency: account.currency },
@@ -251,7 +320,11 @@ export const EditCustomBankPaymentMethodDialog = ({
                 <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </Button>
-                <Button type="submit" disabled={isSubmitting || !dirty} loading={isSubmitting}>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || !dirty || Object.keys(errors).length > 0}
+                  loading={isSubmitting}
+                >
                   <FormattedMessage id="save" defaultMessage="Save" />
                 </Button>
               </DialogFooter>

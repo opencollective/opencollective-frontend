@@ -426,7 +426,8 @@ describe('EditCustomPaymentMethodDialog', () => {
   });
 
   describe('Template Variables Help', () => {
-    it('renders variables help section', () => {
+    it('renders variables help section', async () => {
+      const user = userEvent.setup();
       render(
         withRequiredProviders(
           <EditCustomPaymentMethodDialog
@@ -438,8 +439,9 @@ describe('EditCustomPaymentMethodDialog', () => {
         ),
       );
 
-      // Check that common variables are mentioned
-      // Using getAllByText since variables may appear in multiple places
+      await user.click(screen.getByRole('button', { name: /Available template variables/i }));
+
+      // Check that common variables are mentioned (inside expanded collapsible)
       expect(screen.getAllByText(/{amount}/).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/{collective}/).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/{reference}/).length).toBeGreaterThan(0);

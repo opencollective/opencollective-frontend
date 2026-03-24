@@ -20,6 +20,8 @@ type CustomPaymentMethodTemplateEditorProps = {
     OrderId: number;
     accountDetails?: Record<string, unknown>;
   };
+  /** Payment reference template for resolving `{reference}` in the preview */
+  referenceTemplate?: string;
   /** Optional placeholder text */
   placeholder?: string;
   /** Optional minimum height for the editor */
@@ -38,6 +40,7 @@ export const CustomPaymentMethodTemplateEditor = ({
   value,
   onChange,
   values,
+  referenceTemplate,
   placeholder,
   editorMinHeight = 200,
   error = undefined,
@@ -79,7 +82,11 @@ export const CustomPaymentMethodTemplateEditor = ({
       </TabsContent>
       <TabsContent value="preview">
         <div className="min-h-[275px] rounded border bg-gray-50 px-3 py-6 text-sm" id="instructions-preview">
-          <CustomPaymentMethodInstructions instructions={value} values={values} />
+          <CustomPaymentMethodInstructions
+            instructions={value}
+            values={values}
+            referenceTemplate={referenceTemplate}
+          />
         </div>
       </TabsContent>
     </Tabs>

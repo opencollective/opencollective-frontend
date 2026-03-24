@@ -126,6 +126,7 @@ export const orderSuccessFragment = gql`
       instructions
       icon
       accountDetails
+      referenceTemplate
     }
     amount {
       value

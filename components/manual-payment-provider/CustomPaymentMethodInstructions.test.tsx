@@ -9,9 +9,14 @@ import { render, screen } from '@testing-library/react';
 import jsQR from 'jsqr';
 
 import { Currency } from '@/lib/graphql/types/v2/graphql';
+import { createIntl, createIntlCache } from 'react-intl';
+
 import { withRequiredProviders } from '../../test/providers';
 
-import { CustomPaymentMethodInstructions } from './CustomPaymentMethodInstructions';
+import {
+  CustomPaymentMethodInstructions,
+  resolvePaymentReferenceFromTemplate,
+} from './CustomPaymentMethodInstructions';
 
 /** Rasterizes the rendered QR SVG and decodes its payload with jsQR (validates pixels match the encoded string). */
 async function decodeQrPayloadFromSvg(svg: SVGSVGElement): Promise<string> {
@@ -189,6 +194,20 @@ describe('CustomPaymentMethodInstructions', () => {
       expect(screen.getByText(/Reference: 789/)).toBeInTheDocument();
     });
 
+    it('resolves {reference} from referenceTemplate', () => {
+      const instructions = 'Reference: {reference}';
+      render(
+        withRequiredProviders(
+          <CustomPaymentMethodInstructions
+            instructions={instructions}
+            referenceTemplate="OC-{contributionId}"
+            values={defaultValues}
+          />,
+        ),
+      );
+      expect(screen.getByText(/Reference: OC-789/)).toBeInTheDocument();
+    });
+
     it('handles list formatting with variables', () => {
       const instructions = '<ul><li>Send {amount}</li><li>For {collective}</li></ul>';
       render(
@@ -271,5 +290,52 @@ describe('CustomPaymentMethodInstructions', () => {
       ].join('\n');
       expect(decoded).toBe(expectedEpcQrPayload);
     });
+
+    it('uses resolved reference from referenceTemplate in EPC QR payload', async () => {
+      const eurValues = {
+        amount: { valueInCents: 2420, currency: Currency.EUR },
+        collectiveSlug: 'test-collective',
+        OrderId: 51431,
+        accountDetails: {
+          accountHolderName: 'A Valid Collective',
+          details: {
+            IBAN: 'BE69967102423878',
+            BIC: 'TRWIBEB1XXX',
+          },
+        },
+      };
+      const { container } = render(
+        withRequiredProviders(
+          <CustomPaymentMethodInstructions
+            instructions="Please pay {amount}."
+            referenceTemplate="REF-{contributionId}"
+            values={eurValues}
+          />,
+        ),
+      );
+      const qrSvg = container.querySelector('[data-cy="qr-code"]');
+      expect(qrSvg).toBeInTheDocument();
+      const decoded = await decodeQrPayloadFromSvg(qrSvg as SVGSVGElement);
+      const lines = decoded.split('\n');
+      // Remittance field is the 11th line (index 10) in the EPC payload.
+      expect(lines[10]).toBe('REF-51431');
+    });
+  });
+});
+
+describe('resolvePaymentReferenceFromTemplate', () => {
+  const intl = createIntl({ locale: 'en', messages: {} }, createIntlCache());
+  const values = {
+    amount: { valueInCents: 10000, currency: Currency.USD },
+    collectiveSlug: 'slug',
+    OrderId: 42,
+  };
+
+  it('defaults to {contributionId}', () => {
+    expect(resolvePaymentReferenceFromTemplate(undefined, values, intl)).toBe('42');
+  });
+
+  it('leaves unknown placeholders in place', () => {
+    expect(resolvePaymentReferenceFromTemplate('{unknown}', values, intl)).toBe('{unknown}');
   });
 });

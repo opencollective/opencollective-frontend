@@ -8232,6 +8232,8 @@ export type ManualPaymentProvider = {
   isArchived: Scalars['Boolean']['output'];
   /** Display name for this payment provider */
   name: Scalars['NonEmptyString']['output'];
+  /** Plain-text template used to build the payment reference shown as {reference} in instructions (default {contributionId}) */
+  referenceTemplate?: Maybe<Scalars['String']['output']>;
   /** The type of manual payment provider */
   type: ManualPaymentProviderType;
   /** When this provider was last updated */
@@ -8247,6 +8249,8 @@ export type ManualPaymentProviderCreateInput = {
   instructions: Scalars['String']['input'];
   /** Display name for this payment provider */
   name: Scalars['NonEmptyString']['input'];
+  /** Plain-text template for the payment reference (e.g. {contributionId}) */
+  referenceTemplate?: InputMaybe<Scalars['String']['input']>;
   /** The type of manual payment provider */
   type: ManualPaymentProviderType;
 };
@@ -8271,6 +8275,8 @@ export type ManualPaymentProviderUpdateInput = {
   instructions?: InputMaybe<Scalars['String']['input']>;
   /** Display name for this payment provider */
   name?: InputMaybe<Scalars['NonEmptyString']['input']>;
+  /** Plain-text template for the payment reference (e.g. {contributionId}) */
+  referenceTemplate?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum MarkAsUnPaidExpenseStatus {
