@@ -7,13 +7,10 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { AccountOrdersFilter } from '@/lib/graphql/types/v2/schema';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
-import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
@@ -27,10 +24,7 @@ import {
 import { dashboardOrdersQuery } from './queries';
 import { getContributionViews, useFetchContributionViewCounts } from './views';
 
-const schema = baseSchema.extend({
-  account: childAccountFilter.schema,
-  hostContext: hostContextFilter.schema,
-});
+const schema = baseSchema.extend({ account: childAccountFilter.schema });
 
 type FilterValues = z.infer<typeof schema>;
 type FilterMeta = BaseFilterMeta & {
@@ -58,9 +52,6 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
-  const { LoggedInUser } = useLoggedInUser();
-  const useHostContext =
-    account?.hasHosting && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING);
 
   const views = React.useMemo(() => getContributionViews(intl), [intl]);
 
@@ -80,12 +71,10 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
     meta: filterMeta,
     views,
     filters,
-    skipFiltersOnReset: ['hostContext'],
   });
 
   const baseVars = {
     slug: accountSlug,
-    hostContext: useHostContext ? queryFilter.values.hostContext : undefined,
     filter: AccountOrdersFilter.OUTGOING,
   };
 
@@ -105,7 +94,6 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
       ...baseVars,
       includeIncognito: true,
       ...queryFilter.variables,
-      hostContext: useHostContext ? queryFilter.values.hostContext : undefined,
     },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -125,18 +113,7 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
-        title={
-          <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
-            <FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />
-            {useHostContext && (
-              <HostContextFilter
-                value={queryFilter.values.hostContext}
-                onChange={val => queryFilter.setFilter('hostContext', val)}
-                intl={intl}
-              />
-            )}
-          </div>
-        }
+        title={<FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />}
         description={
           <FormattedMessage
             id="OutgoingContributions.description"
