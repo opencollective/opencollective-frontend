@@ -49,17 +49,17 @@ export const moreActionsThunk = (account: ManagePaymentMethodsQuery['account']) 
     const transactionsLink = getDashboardRoute(
       account,
       isPaymentMethodList
-        ? `transactions?${paymentInfo.map(pm => `paymentMethodId=${pm.id}`).join('&')}`
-        : `transactions?payoutMethodId=${paymentInfo.id}`,
+        ? `transactions?${paymentInfo.map(pm => `paymentMethodId=${pm.publicId}`).join('&')}`
+        : `transactions?payoutMethodId=${paymentInfo.publicId}`,
     );
     const ordersLink =
       isPaymentMethodList &&
       getDashboardRoute(
         account,
-        `outgoing-contributions?${paymentInfo.map(pm => `paymentMethodId=${pm.id}`).join('&')}`,
+        `outgoing-contributions?${paymentInfo.map(pm => `paymentMethodId=${pm.publicId}`).join('&')}`,
       );
     const expensesLink =
-      !isPaymentMethodList && getDashboardRoute(account, `submitted-expenses?payoutMethodId=${paymentInfo.id}`);
+      !isPaymentMethodList && getDashboardRoute(account, `submitted-expenses?payoutMethodId=${paymentInfo.publicId}`);
 
     return (
       <DropdownMenu>

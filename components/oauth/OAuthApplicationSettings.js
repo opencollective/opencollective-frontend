@@ -32,6 +32,7 @@ import { validateOauthApplicationValues } from './lib';
 const applicationSettingsFragment = gql`
   fragment ApplicationSettings on Application {
     id
+    publicId
     name
     description
     preAuthorize2FA

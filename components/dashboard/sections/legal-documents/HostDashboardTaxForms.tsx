@@ -36,6 +36,7 @@ import LegalDocumentsTable from './LegalDocumentsTable';
 export const legalDocumentFields = gql`
   fragment LegalDocumentFields on LegalDocument {
     id
+    publicId
     year
     type
     status
@@ -178,14 +179,14 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
             nbPlaceholders={NB_LEGAL_DOCUMENTS_DISPLAYED}
             resetFilters={() => queryFilter.resetFilters({})}
             getActions={getActions}
-            onOpen={document => setFocusedLegalDocumentId(document.id)}
+            onOpen={document => setFocusedLegalDocumentId(document.publicId)}
           />
           <Pagination queryFilter={queryFilter} total={data?.host?.taxForms?.totalCount} />
           {data?.host && (
             <LegalDocumentDrawer
               open={Boolean(focusedLegalDocumentId)}
               host={data.host}
-              document={data.host.taxForms.nodes.find(d => d.id === focusedLegalDocumentId)}
+              document={data.host.taxForms.nodes.find(d => d.publicId === focusedLegalDocumentId)}
               onClose={() => setFocusedLegalDocumentId(null)}
               getActions={getActions}
             />

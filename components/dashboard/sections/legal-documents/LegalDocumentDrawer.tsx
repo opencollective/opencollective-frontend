@@ -89,7 +89,7 @@ export default function LegalDocumentDrawer({
             dropdownTriggerRef={dropdownTriggerRef}
             actions={getActions(document, dropdownTriggerRef)}
             entityName={intl.formatMessage({ defaultMessage: 'Tax form', id: 'TaxForm' })}
-            entityIdentifier={<CopyID value={document.id}>{document.id}</CopyID>}
+            entityIdentifier={<CopyID value={document.publicId}>{document.publicId}</CopyID>}
             entityLabel={
               <LinkCollective
                 className="hover:text-primary hover:underline"

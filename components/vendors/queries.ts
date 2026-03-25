@@ -7,6 +7,7 @@ export type { VendorFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 export const vendorFieldFragment = gql`
   fragment VendorFields on Vendor {
     id
+    publicId
     slug
     name
     legalName
