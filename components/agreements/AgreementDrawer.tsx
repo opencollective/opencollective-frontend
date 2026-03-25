@@ -60,7 +60,7 @@ export default function AgreementDrawer({
           <DrawerHeader
             actions={actions}
             entityName={<FormattedMessage defaultMessage="Agreement" id="J3yqC3" />}
-            entityIdentifier={`${agreement.publicId}`}
+            entityIdentifier={agreement.publicId}
             entityLabel={agreement.title}
             dropdownTriggerRef={dropdownTriggerRef}
           />
