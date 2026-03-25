@@ -334,7 +334,9 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
   const importType = importData?.type;
   const hasStepper = !importData?.file;
   const importRows = importData?.rows?.nodes ?? [];
-  const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
+  const selectedRowIdx = !focus
+    ? -1
+    : importRows.findIndex(row => row.id === focus.rowId || row.publicId === focus.rowId);
 
   const { getActions, setRowsStatus } = useTransactionsImportActions({
     host: importData?.account?.['host'],
