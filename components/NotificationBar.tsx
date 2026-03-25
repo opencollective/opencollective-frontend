@@ -38,7 +38,7 @@ const CloseIcon = styled(Close)`
   cursor: pointer;
 `;
 
-const NotificationBarContainer = styled(Container)`
+const NotificationBarContainer = styled(Container)<{ $isSticky: boolean }>`
   background-color: ${props => getBackgroundColor(props.type)};
   color: ${props => props.theme.colors.blue[900]};
   position: relative;
@@ -75,6 +75,14 @@ const NotificationBar = ({
   inline = false,
   dismiss = undefined,
   isSticky = false,
+}: {
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  type: 'warning' | 'error' | 'success' | 'info';
+  actions?: React.ReactNode;
+  inline?: boolean;
+  dismiss?: () => void;
+  isSticky?: boolean;
 }) => {
   return (
     <NotificationBarContainer
