@@ -99,7 +99,10 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           <AmountLine color="black.700">
             <Label>
               {stepDetails.isNewPlatformTip ? (
-                <FormattedMessage defaultMessage="Optional tip to the platform" id="JVRAzE" />
+                <FormattedMessage
+                  defaultMessage="Optional contribution to the platform"
+                  id="platformTip.summaryLabel"
+                />
               ) : (
                 <FormattedMessage
                   id="SupportProject"
