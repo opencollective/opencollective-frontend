@@ -4380,9 +4380,14 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   isTrustedHost: Boolean!
 
   """
-  Returns whether the host is trusted or not
+  Returns whether the host is a first party host
   """
   isFirstPartyHost: Boolean!
+
+  """
+  Returns whether the host allows adding funds from all accounts
+  """
+  allowAddFundsFromAllAccounts: Boolean!
 
   """
   Returns whether the host has any Stripe disputed orders
