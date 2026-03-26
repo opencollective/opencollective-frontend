@@ -78,6 +78,14 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
   const intl = useIntl();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
+
+  // Reset editing state when navigating back to details step
+  React.useEffect(() => {
+    if (props.step === 'details') {
+      setIsEditing(false);
+    }
+  }, [props.step]);
+
   const isCompact = props.step !== 'details' && !isEditing;
 
   const usesDollarPresets = props.amount > 0 && props.amount < DOLLAR_PRESET_THRESHOLD;
@@ -123,15 +131,13 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
       return;
     }
     props.onChange(props.selectedOption, getTipValueForOption(props.selectedOption));
-  }, [props.amount]);
+  }, [props.amount, getTipValueForOption]);
 
   if (props.amount === 0) {
     return null;
   }
 
   const tipAmount = formatCurrency(props.value, props.currency as Currency, { locale: intl.locale });
-  const percentage =
-    props.value && props.amount && props.amount > 0 ? ((props.value / props.amount) * 100).toFixed(0) : '0';
 
   // Build StyledButtonSet items: [presetKeys..., OTHER]
   const buttonItems = [...presets.map(p => p.key), PlatformTipOption.OTHER];
@@ -247,6 +253,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
             <StyledInputAmount
               id="feesOnTop"
               name="platformTip"
+              aria-label="Custom platform tip amount"
               data-cy="platform-tip-other-amount"
               disabled={!props.amount}
               currency={props.currency}
