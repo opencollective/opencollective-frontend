@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import dayjs from 'dayjs';
 import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -36,7 +37,7 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
 import ErrorPage from '@/components/ErrorPage';
 import Header from '@/components/Header';
-import I18nFormatters from '@/components/I18nFormatters';
+import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
 import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 
 const messages = defineMessages({
@@ -72,7 +73,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   }
 };
 
-const getNotification = (intl, account) => {
+const getNotification = (intl, account): React.ComponentProps<typeof NotificationBar> => {
   if (account?.isArchived) {
     if (account.type === 'USER') {
       return {
@@ -142,6 +143,26 @@ const getNotification = (intl, account) => {
         ),
       };
     }
+  } else if (
+    account?.isHost &&
+    account?.settings?.automaticBillingMigration &&
+    dayjs().diff(dayjs(account?.settings?.automaticBillingMigration), 'week') < 8
+  ) {
+    return {
+      type: 'info',
+      title: <FormattedMessage defaultMessage="New platform pricing" id="rLJm+c" />,
+      description: (
+        <FormattedMessage
+          defaultMessage="Your account has been migrated to the <PricingLink>new pricing</PricingLink>. The <BillinkLink>Platform Billing</BillinkLink> section of your dashboard will let you review your current usage and update your plan. Contact our <ContactLink>support team</ContactLink> if you have any questions."
+          id="automaticBillingMigrationDescription"
+          values={{
+            PricingLink: getI18nLink({ as: Link, href: '/pricing' }),
+            BillinkLink: getI18nLink({ as: Link, href: getDashboardRoute(account, 'platform-subscription') }),
+            ContactLink: getI18nLink({ as: Link, href: '/contact' }),
+          }}
+        />
+      ),
+    };
   }
 };
 
