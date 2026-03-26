@@ -143,17 +143,10 @@ type PlatformTipContainerProps = {
   amount: number;
   currency: string;
   onChange: (selectedOption: PlatformTipOption, value?: number) => void;
-  step: string;
 };
 
 export function PlatformTipContainer(props: PlatformTipContainerProps) {
   const intl = useIntl();
-  const [isCollapsed, setIsCollapsed] = React.useState(true);
-
-  React.useEffect(() => {
-    setIsCollapsed(true);
-  }, [props.step]);
-
   const percentage = props.value && props.amount && props.amount > 0 ? props.value / props.amount : 0;
 
   const message = React.useMemo(() => {
@@ -192,13 +185,13 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
         <Flex alignItems="center" gap={10}>
           <Image alt="Platform Tip" src="/static/images/platform-tip-jar.png" height={64} width={64} />
           <Box flexGrow={1} fontWeight="500" fontSize="20px">
-            <FormattedMessage defaultMessage="Help us keep Open Collective sustainable" id="15EPUo" />
+            <FormattedMessage defaultMessage="Help us keep the platform sustainable" id="dGKNng" />
           </Box>
         </Flex>
         <P my="12px" fontWeight="400" fontSize="16px">
           <FormattedMessage
-            defaultMessage="Adding a platform tip helps us to maintain the platform and introduce new features. <Link>Why?</Link>"
-            id="sKMOr5"
+            defaultMessage="Open Finance Consortium is a community-governed non-profit that builds and maintains the platform. Help us keep the platform sustainable. <Link>Why?</Link>"
+            id="oFiCoTipDesc"
             values={{
               Link: chunk => {
                 return (
@@ -222,13 +215,8 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
               }}
             />
           </div>
-          {isCollapsed && props.selectedOption !== PlatformTipOption.NONE && (
-            <StyledLinkButton onClick={() => setIsCollapsed(false)}>
-              <FormattedMessage id="Edit" defaultMessage="Edit" />
-            </StyledLinkButton>
-          )}
         </div>
-        <div className={clsx('mt-3', { hidden: isCollapsed || props.selectedOption === PlatformTipOption.NONE })}>
+        <div className={clsx('mt-3', { hidden: props.selectedOption === PlatformTipOption.NONE })}>
           <PlatformTipInput
             disabled={!props.amount}
             amount={props.amount}
@@ -238,29 +226,28 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
             onChange={props.onChange}
           />
         </div>
-        {(!isCollapsed || props.selectedOption === PlatformTipOption.NONE) && (
-          <React.Fragment>
-            <P mt="12px" fontWeight="400" fontSize="16px">
-              {message}
-            </P>
-            <div className="mt-3">
-              <StyledCheckbox
-                name="accept-payment-method-warning"
-                checked={percentage === 0}
-                onChange={({ checked }) =>
-                  checked
-                    ? props.onChange(PlatformTipOption.NONE, 0)
-                    : props.onChange(PlatformTipOption.FIFTEEN_PERCENT, Math.round(0.15 * props.amount))
-                }
-                label={
-                  <span className="text-sm">
-                    <FormattedMessage defaultMessage="I don't want to contribute to Open Collective" id="2fKAKF" />
-                  </span>
-                }
-              />
-            </div>
-          </React.Fragment>
-        )}
+        <P mt="12px" fontWeight="400" fontSize="16px">
+          {message}
+        </P>
+        <div className="mt-3">
+          <StyledCheckbox
+            name="accept-payment-method-warning"
+            checked={percentage === 0}
+            onChange={({ checked }) =>
+              checked
+                ? props.onChange(PlatformTipOption.NONE, 0)
+                : props.onChange(PlatformTipOption.FIFTEEN_PERCENT, Math.round(0.15 * props.amount))
+            }
+            label={
+              <span className="text-sm">
+                <FormattedMessage
+                  defaultMessage="I don't want to contribute to the platform"
+                  id="noTipCheckbox"
+                />
+              </span>
+            }
+          />
+        </div>
       </Box>
       {isWhyPlatformTipModalOpen && <WhyPlatformTipModal onClose={() => setIsWhyPlatformTipModalOpen(false)} />}
     </React.Fragment>

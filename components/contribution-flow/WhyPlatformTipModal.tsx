@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { Flex } from '../Grid';
 import Image from '../Image';
+import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 
@@ -21,8 +22,8 @@ export function WhyPlatformTipModal(props: WhyPlatformTipModalProps) {
       <ModalBody>
         <div className="relative">
           <Image
-            alt="Open Collective Team"
-            src="/static/images/oc-team-2023.png"
+            alt="Open Finance Consortium Team"
+            src="/static/images/ofico-team.jpeg"
             width="440"
             height="293"
             style={{
@@ -32,8 +33,8 @@ export function WhyPlatformTipModal(props: WhyPlatformTipModalProps) {
         </div>
         <P mt={3} fontSize="16px" lineHeight="24px">
           <FormattedMessage
-            defaultMessage="At Open Collective, we work every day to make sure that our platform is a safe and simple place for collectives to grow.<br></br>This includes introducing new and exciting features, fixing bugs, and making sure that it works the way our users expect.<br></br>Your platform tip will go towards helping us maintain that work - and ensuring that collectives all over the world have access to the tools they need to make communities better, and make change happen."
-            id="ym6cRo"
+            defaultMessage="Open Finance Consortium is a community-governed non-profit that builds and maintains the platform.<br></br>Your platform tip will go towards helping us maintain that work - and ensuring that collectives all over the world have access to the tools they need to make communities better, and make change happen."
+            id="oFiCoWhyModal"
             values={{
               br: () => (
                 <span>
@@ -44,11 +45,10 @@ export function WhyPlatformTipModal(props: WhyPlatformTipModalProps) {
             }}
           />
         </P>
-        <P mt={3} fontSize="16px" lineHeight="24px" fontWeight="800">
-          <FormattedMessage
-            defaultMessage="Collectives use Open Collective's crowdfunding technology for free! We have a 0% platform fee on incoming funds."
-            id="Onqdsz"
-          />
+        <P mt={3} fontSize="16px" lineHeight="24px">
+          <StyledLink href="https://oficonsortium.org/" openInNewTab>
+            <FormattedMessage defaultMessage="About Open Finance Consortium" id="aboutOFiCo" /> →
+          </StyledLink>
         </P>
       </ModalBody>
     </StyledModal>

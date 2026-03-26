@@ -174,7 +174,6 @@ class ContributionFlowStepContainer extends React.Component {
         </StyledCard>
         {showPlatformTip && stepDetails.isNewPlatformTip && (
           <PlatformTipContainer
-            step={step.name}
             amount={stepDetails.amount}
             currency={currency}
             selectedOption={stepDetails.platformTipOption}
