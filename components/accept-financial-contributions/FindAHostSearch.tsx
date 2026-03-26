@@ -60,6 +60,8 @@ const findAFiscalHostQuery = gql`
         name
         slug
         description
+        imageUrl(height: 96)
+        backgroundImageUrl(height: 208)
         longDescription
         currency
         totalHostedCollectives
