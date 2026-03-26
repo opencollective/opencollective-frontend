@@ -256,7 +256,7 @@ const addFundsAccountQueryHostFieldsFragment = gql`
       id
       REQUIRE_2FA_FOR_ADMINS
     }
-    isTrustedHost
+    allowAddFundsFromAllAccounts
     vendors(forAccount: { slug: $slug }) {
       nodes {
         id
@@ -785,7 +785,7 @@ const AddFundsModalContentWithCollective = ({
                     name="fromAccount"
                     htmlFor="addFunds-fromAccount"
                     label={
-                      host?.isTrustedHost ? (
+                      host?.allowAddFundsFromAllAccounts ? (
                         <FormattedMessage defaultMessage="Source" id="AddFundsModal.source" />
                       ) : (
                         <FormattedMessage defaultMessage="Vendor" id="dU1t5Z" />
@@ -799,7 +799,7 @@ const AddFundsModalContentWithCollective = ({
                           loading={isCreatingVendor}
                           inputId={field.id}
                           data-cy="add-funds-source"
-                          types={host?.isTrustedHost ? ['VENDOR', 'ORGANIZATION'] : ['VENDOR']}
+                          types={host?.allowAddFundsFromAllAccounts ? ['VENDOR', 'ORGANIZATION'] : ['VENDOR']}
                           error={field.error}
                           onBlur={() => form.setFieldTouched(field.name, true)}
                           onChange={({ value }) => {
