@@ -3,7 +3,7 @@ import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { first } from 'lodash';
-import { Image, Info, Palette, Tags } from 'lucide-react';
+import { Image, Palette, Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -354,7 +354,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                         defaultMessage="{FiscalHost}: {hostName}"
                         values={{
                           FiscalHost: host.hasHosting ? (
-                            <DefinedTerm key="fiscal-host" term={Terms.FISCAL_HOST} color="black.700" />
+                            <DefinedTerm
+                              key="fiscal-host"
+                              term={Terms.FISCAL_HOST}
+                              color="black.700"
+                              borderColor="#969ba3"
+                            />
                           ) : (
                             <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
                           ),
@@ -435,15 +440,18 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           {collective.platformContributionAvailable && (
                             <React.Fragment>
                               <span aria-hidden>+</span>
-                              <Tooltip>
+                              <Tooltip delayDuration={100}>
                                 <TooltipTrigger asChild>
-                                  <span className="inline-flex cursor-help items-center gap-0.5 border-b-2 border-dotted border-[#969ba3] pb-px text-inherit no-underline">
-                                    <FormattedMessage id="Hero.PlatformTip" defaultMessage="Platform tip" />
+                                  <span className="inline-flex cursor-help items-center gap-0.5 border-b-2 border-dotted border-[#969ba3] pb-px text-neutral-700 no-underline">
+                                    <FormattedMessage
+                                      id="Transaction.kind.PLATFORM_TIP"
+                                      defaultMessage="Platform tip"
+                                    />
                                   </span>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <FormattedMessage
-                                    defaultMessage="Contributors to collectives hosted here are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>"
+                                    defaultMessage="Contributors to Collectives hosted by this Fiscal Host are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>"
                                     id="ApplyToHostCard.platformTips.tooltip"
                                     values={{
                                       b: chunks => <strong>{chunks}</strong>,
@@ -473,7 +481,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           defaultMessage="Platform fee: {fee}"
                           values={{
                             fee: (
-                              <DefinedTerm key="platform-fee" term={Terms.PLATFORM_FEE} color="black.700">
+                              <DefinedTerm
+                                key="platform-fee"
+                                term={Terms.PLATFORM_FEE}
+                                color="black.700"
+                                borderColor="#969ba3"
+                              >
                                 {collective.platformFeePercent}%
                               </DefinedTerm>
                             ),

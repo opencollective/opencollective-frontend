@@ -181,11 +181,6 @@ export const transactionsQueryCollectionFragment = gql`
           currency
           valueInCents
         }
-        toAccount {
-          id
-          slug
-          name
-        }
       }
     }
   }

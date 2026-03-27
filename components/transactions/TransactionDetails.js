@@ -22,6 +22,7 @@ import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
 import { Button } from '../ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 // Check whether transfer is child collective to parent or if the transfer is from host to one of its collectives
 const isInternalTransfer = (fromAccount, toAccount) => {
@@ -239,30 +240,38 @@ const TransactionDetails = ({ displayActions, transaction }) => {
           {platformTipTransaction && (
             <React.Fragment>
               <DetailTitle>
-                <FormattedMessage id="TransactionDetails.relatedTransactions" defaultMessage="Related Transactions" />
+                <FormattedMessage id="Sz+Qhv" defaultMessage="Related Transactions" />
               </DetailTitle>
               <DetailDescription>
                 <ul className="list-inside list-disc">
                   <li>
-                    <Link
-                      href={`/${toAccount.slug}/transactions?kind=PLATFORM_TIP&searchTerm=%23${platformTipTransaction.legacyId}`}
-                      className="underline decoration-slate-400 decoration-dashed underline-offset-2 transition-colors hover:decoration-slate-600"
-                    >
-                      <FormattedMessage
-                        defaultMessage="{amount} tip to the {WebsiteName} platform"
-                        id="NOCt2A"
-                        values={{
-                          WebsiteName,
-                          amount: (
-                            <FormattedMoneyAmount
-                              amount={platformTipTransaction.netAmount.valueInCents}
-                              currency={platformTipTransaction.netAmount.currency}
-                              showCurrencyCode={false}
-                            />
-                          ),
-                        }}
-                      />
-                    </Link>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div className="underline decoration-slate-400 decoration-dashed underline-offset-2 transition-colors hover:decoration-slate-600">
+                          <FormattedMessage
+                            defaultMessage="{amount} tip to the {WebsiteName} platform"
+                            id="NOCt2A"
+                            values={{
+                              WebsiteName,
+                              amount: (
+                                <FormattedMoneyAmount
+                                  amount={Math.abs(platformTipTransaction.netAmount.valueInCents)}
+                                  currency={platformTipTransaction.netAmount.currency}
+                                  showCurrencyCode={false}
+                                />
+                              ),
+                            }}
+                          />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <FormattedMessage
+                          defaultMessage="This tip was added by the contributor on top of their contribution to help support the {WebsiteName} platform."
+                          id="WPiq1H"
+                          values={{ WebsiteName }}
+                        />
+                      </TooltipContent>
+                    </Tooltip>
                   </li>
                 </ul>
               </DetailDescription>
