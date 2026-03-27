@@ -1,14 +1,9 @@
 import React, { useCallback } from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
-import { createColumnHelper } from '@tanstack/react-table';
-import { clsx } from 'clsx';
-import { capitalize, compact } from 'lodash';
+import { capitalize } from 'lodash';
 import type { LucideProps } from 'lucide-react';
 import {
   Archive,
-  ArrowDownRight,
   ArrowRightLeft,
-  ArrowUpRight,
   BookKey,
   Building2,
   HandCoins,
@@ -28,34 +23,25 @@ import type {
   DashboardVendorsQuery,
   KycStatusFieldsFragment,
   PeopleHostDashboardQuery,
-  TransactionsTableQuery,
   VendorFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
 import { AccountType } from '@/lib/graphql/types/v2/graphql';
-import { DateTimeField, KycProvider } from '@/lib/graphql/types/v2/schema';
+import { KycProvider } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
-import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
-import { AccountHoverCard } from '@/components/AccountHoverCard';
 import { KYCVerificationProviderBadge } from '@/components/kyc/drawer/KYCVerificationProviderBadge';
 import { i18nKYCVerificationStatus } from '@/components/kyc/intl';
 import { KYCVerificationStatusBadge } from '@/components/kyc/KYCVerificationStatusBadge';
 import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';
-import LinkCollective from '@/components/LinkCollective';
 import { useModal } from '@/components/ModalContext';
-import { ColumnHeader } from '@/components/table/ColumnHeader';
-import { actionsColumn } from '@/components/table/DataTable';
-import { Badge } from '@/components/ui/Badge';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/HoverCard';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
-import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { ALL_SECTIONS } from '../../constants';
 import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
@@ -225,7 +211,7 @@ export enum AccountDetailView {
   KYC = 'kyc',
 }
 
-export type CommunityAccount =
+type CommunityAccount =
   | PeopleHostDashboardQuery['community']['nodes'][number]
   | DashboardVendorsQuery['community']['nodes'][number];
 
@@ -349,7 +335,7 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
             showModal(KYCRequestModal, {
               requestedByAccount: { slug: opts.accountSlug },
               verifyAccount: { id: contributor.id },
-              provider: KycProvider.MANUAL,
+              provider: KycProvider.MANUAL as any,
               refetchQueries: ['PeopleHostDashboard'],
             }),
         });
@@ -357,7 +343,7 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
 
       return actions;
     },
-    [intl, showModal, router, opts],
+    [intl, showModal, router, opts, LoggedInUser],
   );
 }
 
@@ -395,368 +381,3 @@ export const RichActivityDate = ({
     </Tooltip>
   );
 };
-
-export const associatedTableColumns = intl =>
-  compact([
-    {
-      accessorKey: 'account',
-      header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
-      meta: {
-        className: 'max-w-48',
-      },
-      cell: ({ row }) => {
-        const { account } = row.original;
-        return (
-          <div className="flex min-w-0 items-center overflow-hidden">
-            {account.isFrozen && (
-              <Badge type="info" size="xs" className="mr-2">
-                <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
-              </Badge>
-            )}
-            <LinkCollective
-              collective={account}
-              className="flex min-w-0 items-center gap-1 overflow-hidden"
-              withHoverCard
-            >
-              <Avatar size={24} collective={account} mr={2} />
-              <span className="truncate">{account.name}</span>
-            </LinkCollective>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'relations',
-      header: intl.formatMessage({ defaultMessage: 'Roles', id: 'c35gM5' }),
-      cell: ({ row }) => {
-        const relations =
-          row.original.relations?.filter(
-            (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')),
-          ) || [];
-        return (
-          <div className="flex gap-1 align-middle">
-            {relations.map(role => (
-              <div
-                key={role}
-                className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
-              >
-                {formatCommunityRelation(intl, role)}
-              </div>
-            ))}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'expenses',
-      header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
-      cell: ({ row }) => {
-        const summary = row.original.transactionSummary;
-        const total = summary?.expenseTotal;
-        const count = summary?.expenseCount || 0;
-
-        if (!total || count === 0) {
-          return <span className="text-muted-foreground">—</span>;
-        }
-
-        return (
-          <div className="text-sm">
-            <FormattedMoneyAmount
-              amount={Math.abs(total.valueInCents)}
-              currency={total.currency}
-              showCurrencyCode={false}
-            />
-            <span className="ml-1 text-muted-foreground">({count})</span>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'contributions',
-      header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
-      cell: ({ row }) => {
-        const summary = row.original.transactionSummary;
-        const total = summary?.contributionTotal;
-        const count = summary?.contributionCount || 0;
-
-        if (!total || count === 0) {
-          return <span className="text-muted-foreground">—</span>;
-        }
-
-        return (
-          <div className="text-sm">
-            <FormattedMoneyAmount
-              amount={Math.abs(total.valueInCents)}
-              currency={total.currency}
-              showCurrencyCode={false}
-            />
-            <span className="ml-1 text-muted-foreground">({count})</span>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'firstInteraction',
-      header: intl.formatMessage({ defaultMessage: 'First Interaction', id: 'FirstInteraction' }),
-      cell: ({ row }) => {
-        const date = row.original.firstInteractionAt;
-        return date ? <DateTime value={date} dateStyle="medium" /> : <span className="text-muted-foreground">—</span>;
-      },
-    },
-    actionsColumn,
-  ]);
-
-export const getMembersTableColumns = (intl, includeTransactionSummary = false) =>
-  [
-    {
-      accessorKey: 'account',
-      header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
-      meta: {
-        className: 'max-w-48',
-      },
-      cell: ({ row }) => {
-        const { account } = row.original;
-        const legalName = account.legalName !== account.name && account.legalName;
-        return (
-          <div className="flex items-center text-nowrap">
-            <LinkCollective
-              collective={account}
-              className="flex min-w-0 items-center gap-1 overflow-hidden"
-              withHoverCard
-            >
-              <Avatar size={24} collective={account} mr={2} />
-              <span className="truncate">{account.name || account.slug}</span>
-              {legalName && <span className="ml-1 truncate text-muted-foreground">{`(${legalName})`}</span>}
-            </LinkCollective>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'role',
-      header: intl.formatMessage({ defaultMessage: 'Role', id: 'members.role.label' }),
-      cell: ({ row }) => {
-        return (
-          <div className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset">
-            {capitalize(row.original.role.replace('_', ' ').toLowerCase())}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'createdAt',
-      header: intl.formatMessage({ defaultMessage: 'Member Since', id: 'MemberSince' }),
-      cell: ({ row }) => {
-        const date = row.original.createdAt;
-        return date ? <DateTime value={date} dateStyle="medium" /> : <span className="text-muted-foreground">—</span>;
-      },
-    },
-    includeTransactionSummary && {
-      accessorKey: 'expenses',
-      header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
-      cell: ({ row }) => {
-        const summary = row.original.account?.communityStats?.transactionSummary?.[0];
-        const total = summary?.expenseTotalAcc;
-        const count = summary?.expenseCountAcc || 0;
-
-        if (!total || count === 0) {
-          return <span className="text-muted-foreground">—</span>;
-        }
-
-        return (
-          <div className="text-sm">
-            <FormattedMoneyAmount
-              amount={Math.abs(total.valueInCents)}
-              currency={total.currency}
-              showCurrencyCode={false}
-            />
-            <span className="ml-1 text-muted-foreground">({count})</span>
-          </div>
-        );
-      },
-    },
-    includeTransactionSummary && {
-      accessorKey: 'contributions',
-      header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
-      cell: ({ row }) => {
-        const summary = row.original.account.communityStats?.transactionSummary?.[0];
-        const total = summary?.contributionTotalAcc;
-        const count = summary?.contributionCountAcc || 0;
-
-        if (!total || count === 0) {
-          return <span className="text-muted-foreground">—</span>;
-        }
-
-        return (
-          <div className="text-sm">
-            <FormattedMoneyAmount
-              amount={Math.abs(total.valueInCents)}
-              currency={total.currency}
-              showCurrencyCode={false}
-            />
-            <span className="ml-1 text-muted-foreground">({count})</span>
-          </div>
-        );
-      },
-    },
-  ].filter(Boolean);
-
-const CounterpartyAccount = ({ account }) => {
-  if (!account) {
-    return null;
-  }
-  return (
-    <AccountHoverCard
-      account={account}
-      trigger={
-        <div className="inline-flex items-center gap-1">
-          <Avatar collective={account} radius={16} />
-          <span className="truncate">{account.name}</span>
-        </div>
-      }
-    />
-  );
-};
-
-const getTransactionDescription = (transaction: {
-  description?: string;
-  type: string;
-  kind?: string;
-  fromAccount?: { id?: string; name?: string; slug?: string; type?: string; imageUrl?: string };
-  toAccount?: { id?: string; name?: string; slug?: string; type?: string; imageUrl?: string };
-}): React.ReactNode => {
-  const counterparty = transaction.type === 'CREDIT' ? transaction.toAccount : transaction.fromAccount;
-
-  switch (transaction.kind) {
-    case 'CONTRIBUTION':
-      return (
-        <div className="flex items-center gap-2 text-nowrap">
-          {transaction.type === 'CREDIT' ? (
-            <FormattedMessage
-              defaultMessage="Contribution to {account}"
-              id="CommunityTransaction.ContributionTo"
-              values={{ account: <CounterpartyAccount account={counterparty} /> }}
-            />
-          ) : (
-            <FormattedMessage
-              defaultMessage="Contribution from {account}"
-              id="CommunityTransaction.ContributionFrom"
-              values={{ account: <CounterpartyAccount account={counterparty} /> }}
-            />
-          )}
-        </div>
-      );
-    case 'ADDED_FUNDS':
-      return (
-        <div className="flex items-center gap-2 text-nowrap">
-          {transaction.type === 'CREDIT' ? (
-            <FormattedMessage
-              defaultMessage="Added funds to {account}"
-              id="CommunityTransaction.AddedFundsTo"
-              values={{ account: <CounterpartyAccount account={counterparty} /> }}
-            />
-          ) : (
-            <FormattedMessage
-              defaultMessage="Added funds from {account}"
-              id="CommunityTransaction.AddedFundsFrom"
-              values={{ account: <CounterpartyAccount account={counterparty} /> }}
-            />
-          )}
-        </div>
-      );
-    case 'EXPENSE':
-      return (
-        <div className="flex items-center gap-2 text-nowrap">
-          {transaction.type === 'CREDIT' ? (
-            <FormattedMessage
-              defaultMessage="Expense payment to {account}"
-              id="CommunityTransaction.ExpenseTo"
-              values={{ account: <CounterpartyAccount account={counterparty} /> }}
-            />
-          ) : (
-            <FormattedMessage
-              defaultMessage="Expense payment from {account}"
-              id="CommunityTransaction.ExpenseFrom"
-              values={{ account: <CounterpartyAccount account={counterparty} /> }}
-            />
-          )}
-        </div>
-      );
-    default:
-      return (
-        <div className="flex items-center gap-2 text-nowrap">
-          {transaction.type === 'CREDIT' ? (
-            <FormattedMessage
-              defaultMessage="Payment to {account}"
-              id="CommunityTransaction.PaymentTo"
-              values={{ account: <CounterpartyAccount account={counterparty} /> }}
-            />
-          ) : (
-            <FormattedMessage
-              defaultMessage="Payment from {account}"
-              id="CommunityTransaction.PaymentFrom"
-              values={{ account: <CounterpartyAccount account={counterparty} /> }}
-            />
-          )}
-        </div>
-      );
-  }
-};
-
-type RecentTransaction = TransactionsTableQuery['transactions']['nodes'][number];
-const columnHelper = createColumnHelper<RecentTransaction>();
-export const recentTransactionsColumns: ColumnDef<RecentTransaction>[] = [
-  columnHelper.accessor('createdAt', {
-    id: 'date',
-    meta: { className: 'w-24' },
-    header: ctx => <ColumnHeader {...ctx} sortField={DateTimeField.CREATED_AT} />,
-    cell: ({ cell }) => {
-      const createdAt = cell.getValue() as string;
-
-      return (
-        <div className="whitespace-nowrap">
-          <DateTime dateStyle="medium" value={createdAt} />
-        </div>
-      );
-    },
-  }),
-  columnHelper.accessor('description', {
-    meta: { className: 'w-32 2xl:w-48' },
-    header: ctx => <ColumnHeader {...ctx} />,
-    cell: ({ row }) => {
-      const transaction = row.original;
-      return getTransactionDescription(transaction);
-    },
-  }),
-  columnHelper.accessor('amount', {
-    meta: {
-      className: 'w-28',
-      align: 'right',
-    },
-    header: ctx => <ColumnHeader {...ctx} />,
-    cell: ({ row }) => {
-      const transaction = row.original;
-
-      return (
-        <div
-          className={clsx(
-            'flex flex-row items-center truncate font-semibold antialiased',
-            transaction.type === 'CREDIT' ? 'text-green-600' : 'text-slate-700',
-          )}
-        >
-          {transaction.type === 'CREDIT' ? (
-            <ArrowUpRight className="text-green-600" size={20} />
-          ) : (
-            <ArrowDownRight className="text-red-600" size={20} />
-          )}
-          <FormattedMoneyAmount
-            amount={transaction.amount.valueInCents}
-            currency={transaction.amount.currency}
-            precision={2}
-            showCurrencyCode={false}
-          />
-        </div>
-      );
-    },
-  }),
-];
