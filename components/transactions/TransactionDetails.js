@@ -14,6 +14,7 @@ import { getDashboardTransactionsRoute, getHostDashboardTransactionsRoute } from
 import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import { WebsiteName } from '../I18nFormatters';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
@@ -107,6 +108,9 @@ const TransactionDetails = ({ displayActions, transaction }) => {
   );
   const paymentProcessorCover = transaction.relatedTransactions?.find(
     t => t.kind === TransactionKind.PAYMENT_PROCESSOR_COVER && t.type === TransactionTypes.CREDIT,
+  );
+  const platformTipTransaction = transaction.relatedTransactions?.find(
+    t => t.kind === TransactionKind.PLATFORM_TIP && t.type === TransactionTypes.CREDIT,
   );
   const isProcessing = [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(order?.status);
   const isCollectiveAdmin = LoggedInUser?.isAdminOfCollective(toAccount);
@@ -232,6 +236,38 @@ const TransactionDetails = ({ displayActions, transaction }) => {
                 </DetailDescription>
               </React.Fragment>
             )}
+          {platformTipTransaction && (
+            <React.Fragment>
+              <DetailTitle>
+                <FormattedMessage id="TransactionDetails.relatedTransactions" defaultMessage="Related Transactions" />
+              </DetailTitle>
+              <DetailDescription>
+                <ul className="list-inside list-disc">
+                  <li>
+                    <Link
+                      href={`/${toAccount.slug}/transactions?kind=PLATFORM_TIP&searchTerm=%23${platformTipTransaction.legacyId}`}
+                      className="underline decoration-slate-400 decoration-dashed underline-offset-2 transition-colors hover:decoration-slate-600"
+                    >
+                      <FormattedMessage
+                        defaultMessage="{amount} tip to the {WebsiteName} platform"
+                        id="NOCt2A"
+                        values={{
+                          WebsiteName,
+                          amount: (
+                            <FormattedMoneyAmount
+                              amount={platformTipTransaction.netAmount.valueInCents}
+                              currency={platformTipTransaction.netAmount.currency}
+                              showCurrencyCode={false}
+                            />
+                          ),
+                        }}
+                      />
+                    </Link>
+                  </li>
+                </ul>
+              </DetailDescription>
+            </React.Fragment>
+          )}
         </Flex>
       )}
       <Flex flexDirection="column" width={[1, 0.35]}>

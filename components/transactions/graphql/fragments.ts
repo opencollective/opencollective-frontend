@@ -172,13 +172,19 @@ export const transactionsQueryCollectionFragment = gql`
           slug
         }
       }
-      relatedTransactions(kind: [HOST_FEE, PAYMENT_PROCESSOR_FEE, PAYMENT_PROCESSOR_COVER, TAX]) {
+      relatedTransactions(kind: [HOST_FEE, PAYMENT_PROCESSOR_FEE, PAYMENT_PROCESSOR_COVER, TAX, PLATFORM_TIP]) {
         id
+        legacyId
         type
         kind
         netAmount {
           currency
           valueInCents
+        }
+        toAccount {
+          id
+          slug
+          name
         }
       }
     }
