@@ -183,10 +183,16 @@ const dashboardVendorsQuery = gql`
 `;
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  fieldSchema: z.enum(['NAME', 'CREATED_AT', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
   defaultValue: {
     field: 'NAME',
     direction: 'ASC',
+  },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({
+      defaultMessage: 'Created',
+      id: 'created',
+    }),
   },
 });
 

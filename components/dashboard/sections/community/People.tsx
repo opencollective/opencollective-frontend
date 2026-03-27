@@ -243,10 +243,16 @@ enum ContributorsTab {
 const PAGE_SIZE = 20;
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  fieldSchema: z.enum(['NAME', 'CREATED_AT', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
   defaultValue: {
     field: 'NAME',
     direction: 'ASC',
+  },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({
+      defaultMessage: 'Created',
+      id: 'created',
+    }),
   },
 });
 
@@ -297,7 +303,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
     {
       id: ContributorsTab.CONTRIBUTORS,
       label: intl.formatMessage({ defaultMessage: 'Financial Contributors', id: 'FinancialContributors' }),
-      filter: { relation: [CommunityRelationType.CONTRIBUTOR, CommunityRelationType.ATTENDEE] },
+      filter: { relation: [CommunityRelationType.CONTRIBUTOR] },
     },
     {
       id: ContributorsTab.EXPENSE_SUBMITTERS,
