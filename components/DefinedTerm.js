@@ -134,7 +134,16 @@ const UnderlinedTerm = styled.span`
  * Underlines the given word and show a tooltip with the definition when focused
  * or hovered. Both the term and the definition are translated.
  */
-const DefinedTerm = ({ intl, term, textTransform, fontSize, children, color = 'black.700', extraTooltipContent }) => {
+const DefinedTerm = ({
+  intl,
+  term,
+  textTransform,
+  fontSize,
+  children,
+  color = 'black.700',
+  borderColor = color,
+  extraTooltipContent,
+}) => {
   return (
     <StyledTooltip
       content={() => (
@@ -145,7 +154,13 @@ const DefinedTerm = ({ intl, term, textTransform, fontSize, children, color = 'b
       )}
     >
       {props => (
-        <UnderlinedTerm {...props} textTransform={textTransform} color={color} borderColor={color} fontSize={fontSize}>
+        <UnderlinedTerm
+          {...props}
+          textTransform={textTransform}
+          color={color}
+          borderColor={borderColor}
+          fontSize={fontSize}
+        >
           {children || intl.formatMessage(TranslatedTerms[term])}
         </UnderlinedTerm>
       )}

@@ -3,7 +3,7 @@ import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { first } from 'lodash';
-import { Image, Palette, Tags } from 'lucide-react';
+import { Image, Info, Palette, Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -33,6 +33,7 @@ import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
 import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
 import { Button } from '../../ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
 import UserCompany from '../../UserCompany';
 import ContainerSectionContent from '../ContainerSectionContent';
 
@@ -414,19 +415,55 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                             <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal hosting" />
                           </StyledLink>
                         )}
-                        <Container color="black.700" fontSize="12px">
+                        <div className="inline-flex flex-wrap items-baseline gap-1 text-xs">
                           <FormattedMessage
                             id="Hero.HostFee"
                             defaultMessage="Host fee: {fee}"
                             values={{
                               fee: (
-                                <DefinedTerm key="host-fee" term={Terms.HOST_FEE} color="black.700">
+                                <DefinedTerm
+                                  key="host-fee"
+                                  term={Terms.HOST_FEE}
+                                  color="black.700"
+                                  borderColor="#969ba3"
+                                >
                                   {collective.hostFeePercent || 0}%
                                 </DefinedTerm>
                               ),
                             }}
                           />
-                        </Container>
+                          {collective.platformContributionAvailable && (
+                            <React.Fragment>
+                              <span aria-hidden>+</span>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="inline-flex cursor-help items-center gap-0.5 border-b-2 border-dotted border-[#969ba3] pb-px text-inherit no-underline">
+                                    <FormattedMessage id="Hero.PlatformTip" defaultMessage="Platform tip" />
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <FormattedMessage
+                                    defaultMessage="Contributors to collectives hosted here are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>"
+                                    id="ApplyToHostCard.platformTips.tooltip"
+                                    values={{
+                                      b: chunks => <strong>{chunks}</strong>,
+                                      LearnMoreLink: chunks => (
+                                        <a
+                                          href="https://documentation.opencollective.com/giving-to-collectives/platform-tips"
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="underline"
+                                        >
+                                          {chunks}
+                                        </a>
+                                      ),
+                                    }}
+                                  />
+                                </TooltipContent>
+                              </Tooltip>
+                            </React.Fragment>
+                          )}
+                        </div>
                       </Fragment>
                     )}
                     {collective.platformFeePercent > 0 && (
