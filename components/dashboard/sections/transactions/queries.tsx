@@ -66,6 +66,11 @@ export const transactionsTableQueryCollectionFragment = gql`
       expense {
         id
         type
+        legacyId
+      }
+      order {
+        id
+        legacyId
       }
       permissions {
         id

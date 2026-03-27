@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Row } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import { clsx } from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
@@ -95,12 +95,12 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
     id: 'date',
     meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }) },
     header: ctx => <ColumnHeader {...ctx} sortField={DateTimeField.CREATED_AT} />,
-    cell: ({ cell }) => {
+    cell: ({ cell, table }) => {
       const createdAt = cell.getValue() as TransactionsTableQueryNode['createdAt'];
-
+      const timeStyle = table.options.meta?.timeStyle === null ? undefined : table.options.meta?.timeStyle || 'short';
       return (
         <div className="whitespace-nowrap">
-          <DateTime dateStyle="medium" timeStyle="short" value={createdAt} />
+          <DateTime dateStyle="medium" timeStyle={timeStyle} value={createdAt} />
         </div>
       );
     },
@@ -171,6 +171,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
   }),
 
   columnHelper.accessor('kind', {
+    id: 'kind',
     meta: { className: 'w-32 2xl:w-auto', labelMsg: defineMessage({ defaultMessage: 'Kind', id: 'Transaction.Kind' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell, table, row }) => {
@@ -186,7 +187,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
             <span className="truncate">{kindLabel}</span>
             {isExpense && expense?.type && <Badge size="xs">{i18nExpenseType(intl, expense.type)}</Badge>}
           </div>
-          <div>
+          <div className="flex items-center gap-1">
             <RefundBadge transaction={row.original} />
             {isInReview && (
               <Badge size="xs" type={'warning'} className="items-center gap-1">
@@ -291,7 +292,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
   actionsColumn,
 ];
 
-type TransactionsTableProps = {
+export type TransactionsTableProps = {
   transactions: { nodes: TransactionsTableQueryNode[]; totalCount: number };
   loading?: boolean;
   nbPlaceholders?: number;
@@ -302,6 +303,13 @@ type TransactionsTableProps = {
   hideHeader?: boolean;
   hidePagination?: boolean;
   footer?: React.ReactNode;
+  meta?: {
+    timeStyle?: 'short' | 'long' | 'medium' | 'full' | 'none' | null;
+  };
+  /** You optionally override onClickRow with a function that returns a boolean that informs if the override is successfully or not.
+   * When returning false, TransactionsTable will open its own transaction drawer.
+   */
+  onClickRow?: (row: Row<TransactionsTableQueryNode>) => boolean;
 };
 
 export default function TransactionsTable({
@@ -314,6 +322,8 @@ export default function TransactionsTable({
   hideHeader,
   hidePagination,
   footer,
+  onClickRow,
+  meta,
 }: TransactionsTableProps) {
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
 
@@ -351,7 +361,7 @@ export default function TransactionsTable({
         loading={loading}
         nbPlaceholders={nbPlaceholders}
         onClickRow={(row, menuRef) => {
-          openDrawer(row.id, menuRef);
+          return onClickRow?.(row) || openDrawer(row.id, menuRef);
         }}
         onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
         rowHasIndicator={row => row.original.group === hoveredGroup}
@@ -364,6 +374,7 @@ export default function TransactionsTable({
         queryFilter={queryFilter}
         hideHeader={hideHeader}
         footer={footer}
+        meta={meta}
         compact
       />
 

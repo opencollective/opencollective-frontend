@@ -181,6 +181,36 @@ export const communityAccountDetailQuery = gql`
         address
       }
       isVerified
+      pendingExpenses: expenses(
+        status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
+        direction: SUBMITTED
+        host: { slug: $hostSlug }
+      ) {
+        totalCount
+      }
+      spamExpenses: expenses(status: [SPAM], direction: SUBMITTED, host: { slug: $hostSlug }) {
+        totalCount
+      }
+      rejectedExpenses: expenses(status: [REJECTED], direction: SUBMITTED, host: { slug: $hostSlug }) {
+        totalCount
+      }
+      communityStats(host: { slug: $hostSlug }) {
+        id
+        relations
+        transactionSummary {
+          kind
+          debitCount
+          creditCount
+          debitTotal {
+            valueInCents
+            currency
+          }
+          creditTotal {
+            valueInCents
+            currency
+          }
+        }
+      }
       ... on Individual {
         email
         kycStatus(requestedByAccount: { slug: $hostSlug }) {
@@ -303,6 +333,7 @@ export const communityAccountOverviewQuery = gql`
     account(id: $accountId) {
       id
       communityStats(host: { slug: $hostSlug }) {
+        id
         relations
         transactionSummary {
           kind

@@ -19,15 +19,16 @@ import {
   User,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type {
   CommunityAccountDetailQuery,
-  CommunityAccountOverviewQuery,
   DashboardVendorsQuery,
+  KycStatusFieldsFragment,
   PeopleHostDashboardQuery,
+  TransactionsTableQuery,
   VendorFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
 import { AccountType } from '@/lib/graphql/types/v2/graphql';
@@ -35,15 +36,21 @@ import { DateTimeField, KycProvider } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
+import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { AccountHoverCard } from '@/components/AccountHoverCard';
+import { KYCVerificationProviderBadge } from '@/components/kyc/drawer/KYCVerificationProviderBadge';
+import { i18nKYCVerificationStatus } from '@/components/kyc/intl';
+import { KYCVerificationStatusBadge } from '@/components/kyc/KYCVerificationStatusBadge';
 import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';
 import LinkCollective from '@/components/LinkCollective';
 import { useModal } from '@/components/ModalContext';
 import { ColumnHeader } from '@/components/table/ColumnHeader';
 import { actionsColumn } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/Badge';
+import { DataList, DataListItem } from '@/components/ui/DataList';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/HoverCard';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import Avatar from '../../../Avatar';
@@ -51,6 +58,8 @@ import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { ALL_SECTIONS } from '../../constants';
 import { getActivityVariables } from '../ActivityLog/ActivityDescription';
+import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
+import { LegalDocumentStatusBadge } from '../legal-documents/LegalDocumentStatusBadge';
 
 type UsePersonActionsOptions = {
   accountSlug: string;
@@ -73,6 +82,148 @@ export const getCollectiveTypeIcon = (
       return <User {...props} />;
   }
 };
+
+type TaxFormBadgeProps = {
+  taxForms: CommunityAccountDetailQuery['host']['hostedLegalDocuments'];
+  host?: CommunityAccountDetailQuery['host'];
+};
+
+export function TaxFormBadge({ taxForms }: TaxFormBadgeProps) {
+  const intl = useIntl();
+  const taxForm = taxForms?.nodes?.[0];
+  if (!taxForm) {
+    return null;
+  }
+  return (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <LegalDocumentStatusBadge
+          size="sm"
+          status={taxForm.status}
+          className="cursor-pointer"
+          label={
+            <React.Fragment>
+              <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />{' '}
+            </React.Fragment>
+          }
+        />
+      </HoverCardTrigger>
+      <HoverCardContent className="w-72 text-sm" align="start">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-medium">
+              <FormattedMessage defaultMessage="US Tax Form" id="TaxForm.USTitle" />
+              {taxForm.year && <span className="ml-1 text-muted-foreground">({taxForm.year})</span>}
+            </span>
+            <LegalDocumentServiceBadge size="sm" service={taxForm.service} />
+          </div>
+          <DataList className="gap-1 text-sm font-normal">
+            <DataListItem
+              label={<FormattedMessage defaultMessage="Status" id="LegalDocument.Status" />}
+              value={i18nLegalDocumentStatus(intl, taxForm.status)}
+              labelClassName="min-w-0 w-24 basis-auto"
+            />
+            {taxForm.requestedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Requested" id="Expense.RequestedDate" />}
+                value={<FormattedDate value={taxForm.requestedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+            {taxForm.updatedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Last Updated" id="LastUpdated" />}
+                value={<FormattedDate value={taxForm.updatedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+          </DataList>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
+type KYCStatusBadgeProps = {
+  kycStatus: KycStatusFieldsFragment | null | undefined;
+};
+
+export function KYCStatusBadge({ kycStatus }: KYCStatusBadgeProps) {
+  const intl = useIntl();
+  const verification = kycStatus?.manual;
+  if (!verification) {
+    return null;
+  }
+
+  return (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <KYCVerificationStatusBadge
+          size="sm"
+          status={verification.status}
+          className="cursor-pointer"
+          label={
+            <React.Fragment>
+              <FormattedMessage defaultMessage="KYC" id="KYC" />{' '}
+            </React.Fragment>
+          }
+        />
+      </HoverCardTrigger>
+      <HoverCardContent className="w-72 text-sm" align="start">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-medium">
+              <FormattedMessage defaultMessage="KYC Verification" id="odBeoC" />
+            </span>
+            {verification.provider && <KYCVerificationProviderBadge provider={verification.provider} />}
+          </div>
+          <DataList className="gap-1 text-sm font-normal">
+            <DataListItem
+              label={<FormattedMessage defaultMessage="Status" id="LegalDocument.Status" />}
+              value={i18nKYCVerificationStatus(intl, verification.status)}
+              labelClassName="min-w-0 w-24 basis-auto"
+            />
+            {verification.requestedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Requested" id="Expense.RequestedDate" />}
+                value={<FormattedDate value={verification.requestedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+            {verification.verifiedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Verified at" id="CJrQQ0" />}
+                value={<FormattedDate value={verification.verifiedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+            {verification.revokedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Revoked at" id="PDbgKg" />}
+                value={<FormattedDate value={verification.revokedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+            {verification.createdByUser && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Added by" id="KYC.AddedBy" />}
+                value={verification.createdByUser.name}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+          </DataList>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
+export enum AccountDetailView {
+  OVERVIEW = 'overview',
+  TRANSACTIONS = 'transactions',
+  ACTIVITIES = 'activities',
+  KYC = 'kyc',
+}
 
 export type CommunityAccount =
   | PeopleHostDashboardQuery['community']['nodes'][number]
@@ -552,7 +703,7 @@ const getTransactionDescription = (transaction: {
   }
 };
 
-type RecentTransaction = CommunityAccountOverviewQuery['transactions']['nodes'][number];
+type RecentTransaction = TransactionsTableQuery['transactions']['nodes'][number];
 const columnHelper = createColumnHelper<RecentTransaction>();
 export const recentTransactionsColumns: ColumnDef<RecentTransaction>[] = [
   columnHelper.accessor('createdAt', {

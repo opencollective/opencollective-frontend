@@ -177,11 +177,18 @@ const buildSeries = ({
 
 function Chart({ series: seriesEntries, colors = DEFAULT_COLORS, expanded, currency }: MultiSeriesChartProps) {
   const intl = useIntl();
+  const timeseriesWithNodes = React.useMemo(
+    () => seriesEntries.filter(series => series.timeseries.nodes.length > 0),
+    [seriesEntries],
+  );
+
+  if (timeseriesWithNodes.length === 0) {
+    return null;
+  }
 
   // Use the first series to derive shared timeUnit and dateFrom
-  const firstTimeseries = React.useMemo(() => setDatesIfMissing(seriesEntries[0].timeseries), [seriesEntries]);
-
-  const apexSeries = React.useMemo(() => buildSeries({ entries: seriesEntries, colors }), [seriesEntries, colors]);
+  const firstTimeseries = setDatesIfMissing(timeseriesWithNodes[0].timeseries);
+  const apexSeries = buildSeries({ entries: timeseriesWithNodes, colors });
 
   const options = makeApexOptions({
     currency,
@@ -189,7 +196,7 @@ function Chart({ series: seriesEntries, colors = DEFAULT_COLORS, expanded, curre
     dateFrom: firstTimeseries.dateFrom,
     intl,
     expanded,
-    seriesEntries,
+    seriesEntries: timeseriesWithNodes,
   });
 
   return <ApexChart type="area" width="100%" height="100%" options={options} series={apexSeries} />;

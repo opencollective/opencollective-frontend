@@ -1,16 +1,24 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FiltersToVariables } from '@/lib/filters/filter-types';
 import { limit, offset } from '@/lib/filters/schemas';
-import type { TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type {
+  CommunityAccountDetailQuery,
+  CommunityTransactionSummary,
+  TransactionsTableQueryVariables,
+} from '@/lib/graphql/types/v2/graphql';
 import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import { getDashboardRoute } from '@/lib/url-helpers';
 
+import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
 
+import { DashboardContext } from '../../DashboardContext';
 import { EmptyResults } from '../../EmptyResults';
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
@@ -25,6 +33,7 @@ import {
   toVariables as commonToVariables,
 } from '../transactions/filters';
 import { transactionsTableQuery } from '../transactions/queries';
+import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
 
 const schema = z.object({
@@ -73,12 +82,31 @@ enum TransactionsView {
 }
 
 type AccountDetailTransactionsTabProps = {
-  account: { id: string };
+  account: CommunityAccountDetailQuery['account'];
   hostSlug: string;
+  handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
 };
 
-export function AccountDetailTransactionsTab({ account, hostSlug }: AccountDetailTransactionsTabProps) {
+const getCountForView = (
+  view: { id: TransactionsView; filter: { kind?: TransactionKind[] }; label: string },
+  transactionSummary?: CommunityTransactionSummary[],
+) => {
+  const summaries = transactionSummary?.filter(summary => view.filter?.kind?.includes(summary.kind as TransactionKind));
+  if (!summaries || summaries.length === 0) {
+    return view;
+  }
+  const count = summaries.reduce((acc, summary) => acc + summary.creditCount + summary.debitCount, 0);
+  return { ...view, count };
+};
+
+export function AccountDetailTransactionsTab({
+  account,
+  hostSlug,
+  handleTransactionTableRowClick,
+}: AccountDetailTransactionsTabProps) {
   const intl = useIntl();
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
+  const pendingExpenseCount = account?.pendingExpenses?.totalCount || 0;
 
   const views = React.useMemo(
     () => [
@@ -125,9 +153,41 @@ export function AccountDetailTransactionsTab({ account, hostSlug }: AccountDetai
 
   const transactions = data?.transactions;
 
+  const viewsWithCount = React.useMemo(
+    () =>
+      views.map(view =>
+        getCountForView(view, 'communityStats' in account && account.communityStats?.transactionSummary),
+      ),
+    [views, account],
+  );
+
   return (
     <div className="flex flex-col gap-4">
-      <Filterbar hideCounts {...queryFilter} />
+      {pendingExpenseCount > 0 && (
+        <Alert variant="info">
+          <AlertDescription>
+            <FormattedMessage
+              id="AccountDetail.TransactionsTab.PendingExpensesAlert"
+              defaultMessage="This account has <a>{count} pending payment requests</a>."
+              values={{
+                count: pendingExpenseCount,
+                a: chunks => (
+                  <Link
+                    href={getDashboardRoute(
+                      dashboardAccount,
+                      `pay-disbursements?sort%5Bfield%5D=CREATED_AT&sort%5Bdirection%5D=DESC&fromAccounts=${account.slug}&status=PENDING&status=APPROVED&status=ON_HOLD&status=INCOMPLETE&status=ERROR`,
+                    )}
+                    className="text-blue-600 underline"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+              }}
+            />
+          </AlertDescription>
+        </Alert>
+      )}
+      <Filterbar {...queryFilter} views={viewsWithCount} />
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && !transactions?.nodes?.length ? (
@@ -144,6 +204,7 @@ export function AccountDetailTransactionsTab({ account, hostSlug }: AccountDetai
             nbPlaceholders={queryFilter.values.limit}
             queryFilter={queryFilter}
             refetchList={refetch}
+            onClickRow={handleTransactionTableRowClick}
           />
         </React.Fragment>
       )}

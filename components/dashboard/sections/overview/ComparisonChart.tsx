@@ -124,8 +124,8 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
   },
 });
 
-const getSeries = ({ current, comparison }): ApexOptions['series'] => {
-  const series = [{ name: 'current', data: formatSeriesData(current), color: '#1d4ed8', zIndex: 2 }];
+const getSeries = ({ current, comparison, color = '#1d4ed8' }): ApexOptions['series'] => {
+  const series = [{ name: 'current', data: formatSeriesData(current), color, zIndex: 2 }];
   if (comparison) {
     series.push({ name: 'comparison', data: formatSeriesData(comparison), color: '#cbd5e1', zIndex: 1 });
   }
@@ -138,9 +138,10 @@ interface ComparisonChartProps {
   currency?: Currency;
   expanded?: boolean;
   isPeriod?: boolean;
+  color?: string;
 }
 
-function Chart({ current, comparison, expanded, currency }: ComparisonChartProps) {
+function Chart({ current, comparison, expanded, currency, color }: ComparisonChartProps) {
   const intl = useIntl();
 
   // When using the "All time" option, the API does not return a dateFrom value, instead we pick the lowest returned date to start the time series.
@@ -148,8 +149,8 @@ function Chart({ current, comparison, expanded, currency }: ComparisonChartProps
   const currentWithDates = React.useMemo(() => setDatesIfMissing(current), [current]);
 
   const series = React.useMemo(
-    () => getSeries({ current: currentWithDates, comparison }),
-    [currentWithDates, comparison],
+    () => getSeries({ current: currentWithDates, comparison, color }),
+    [currentWithDates, comparison, color],
   );
 
   const options = makeApexOptions({
