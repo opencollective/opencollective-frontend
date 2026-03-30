@@ -38,7 +38,10 @@ const getValue = (value, rawValue, isEmpty) => {
     return '';
   }
 
-  return isNaN(value) || value === null ? rawValue : value / 100;
+  if (isNaN(value) || value === null) {
+    return rawValue;
+  }
+  return (value / 100).toFixed(2);
 };
 
 const getError = (curVal, minAmount, required) => {

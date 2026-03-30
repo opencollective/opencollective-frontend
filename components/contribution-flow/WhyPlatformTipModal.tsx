@@ -16,7 +16,7 @@ export function WhyPlatformTipModal(props: WhyPlatformTipModalProps) {
       <ModalHeader>
         <Flex alignItems="center" gap="12px" mr="20px">
           <Image alt="Open Collective" src="/static/images/opencollective-icon.png" width={64} height={64} />
-          <FormattedMessage defaultMessage="Help us keep the Open Collective platform sustainable." id="platformTip.helperText" />
+          <FormattedMessage defaultMessage="Help us keep the Open Collective platform sustainable" id="platformTip.modalTitle" />
         </Flex>
       </ModalHeader>
       <ModalBody>

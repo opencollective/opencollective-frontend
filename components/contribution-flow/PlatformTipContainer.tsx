@@ -1,4 +1,5 @@
 import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -39,30 +40,9 @@ const PERCENTAGE_OPTIONS: TipPreset[] = [
 
 type TipPreset = {
   key: PlatformTipOption;
-  percent?: number;
-  fixedValue?: number;
+  percent: number;
 };
 
-// For small contributions (< $20), show friendly fixed dollar presets.
-function getDollarPresets(amountInCents: number): TipPreset[] {
-  const amountDollars = amountInCents / 100;
-  let values: number[];
-
-  if (amountDollars <= 10) {
-    values = [100, 200, 300]; // $1, $2, $3
-  } else {
-    values = [200, 300, 500]; // $2, $3, $5
-  }
-
-  return [
-    { key: PlatformTipOption.TEN_PERCENT, fixedValue: values[0] },
-    { key: PlatformTipOption.FIFTEEN_PERCENT, fixedValue: values[1] },
-    { key: PlatformTipOption.TWENTY_PERCENT, fixedValue: values[2] },
-  ];
-}
-
-// Threshold below which we show dollar amounts instead of percentages (2000 cents = $20)
-const DOLLAR_PRESET_THRESHOLD = 2000;
 
 type PlatformTipContainerProps = {
   value: number;
@@ -88,11 +68,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
 
   const isCompact = props.step !== 'details' && !isEditing;
 
-  const usesDollarPresets = props.amount > 0 && props.amount < DOLLAR_PRESET_THRESHOLD;
-  const presets = React.useMemo(
-    () => (usesDollarPresets ? getDollarPresets(props.amount) : PERCENTAGE_OPTIONS),
-    [usesDollarPresets, props.amount],
-  );
+  const presets = PERCENTAGE_OPTIONS;
 
   const getTipValueForOption = React.useCallback(
     (optionKey: PlatformTipOption): number => {
@@ -100,10 +76,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
         return 0;
       }
       const preset = presets.find(p => p.key === optionKey);
-      if (preset) {
-        return preset.fixedValue ?? Math.round((preset.percent ?? 0.15) * props.amount);
-      }
-      return Math.round(0.15 * props.amount);
+      return preset ? Math.round(preset.percent * props.amount) : Math.round(0.15 * props.amount);
     },
     [presets, props.amount],
   );
@@ -156,18 +129,9 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
     if (!preset) {
       return null;
     }
-    if (preset.fixedValue != null) {
-      const dollars = preset.fixedValue / 100;
-      const label = dollars % 1 === 0 ? `$${dollars}` : `$${dollars.toFixed(2)}`;
-      return (
-        <Span fontSize={fontSize} lineHeight="22px" fontWeight={fontWeight}>
-          {label}
-        </Span>
-      );
-    }
     return (
       <Span fontSize={fontSize} lineHeight="22px" fontWeight={fontWeight}>
-        {`${(preset.percent ?? 0) * 100}%`}
+        {`${preset.percent * 100}%`}
       </Span>
     );
   };
@@ -178,18 +142,11 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
       <StyledCard mt={3} p={[12, 24]} mx={[16, 'none']} borderRadius={15} bg="#F9FAFB" data-cy="platform-tip-container">
         <Flex justifyContent="space-between" alignItems="center">
           <P fontSize="13px" lineHeight="18px" color="black.700">
-            {props.selectedOption === PlatformTipOption.NONE ? (
-              <FormattedMessage
-                defaultMessage="No contribution to the platform"
-                id="platformTip.noTip"
-              />
-            ) : (
-              <FormattedMessage
-                defaultMessage="Optional contribution to the platform: <bold>{amount}</bold>"
-                id="platformTip.compactSummary"
-                values={{ amount: tipAmount, bold: chunks => <strong>{chunks}</strong> }}
-              />
-            )}
+            <FormattedMessage
+              defaultMessage="Voluntary contribution to the platform: <bold>{amount}</bold>"
+              id="platformTip.compactSummary"
+              values={{ amount: tipAmount, bold: chunks => <strong>{chunks}</strong> }}
+            />
           </P>
           <StyledLinkButton fontSize="13px" onClick={() => setIsEditing(true)}>
             <FormattedMessage id="Edit" defaultMessage="Edit" />
@@ -202,31 +159,42 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
   return (
     <React.Fragment>
       <StyledCard mt={3} p={[12, 24]} mx={[16, 'none']} borderRadius={15} bg="#F9FAFB" data-cy="platform-tip-container">
-        {/* Description */}
+        {/* Title */}
+        <P fontSize="13px" lineHeight="18px" color="black.700" fontWeight="500" mb={1}>
+          <FormattedMessage
+            defaultMessage="Help us keep the Open Collective platform sustainable"
+            id="platformTip.modalTitle"
+          />
+        </P>
+
+        {/* Social proof + learn more */}
         <P fontSize="13px" lineHeight="18px" color="black.700" mb={2}>
           <FormattedMessage
-            defaultMessage="Help us keep the Open Collective platform sustainable."
-            id="platformTip.helperText"
+            defaultMessage="One in two contributors adds a voluntary contribution averaging 15%. Together, these contributions cover 25% of our operating costs and help keep the platform running for everyone. <link>Learn more</link>"
+            id="platformTip.socialProof"
+            values={{
+              link: chunks => (
+                <StyledLinkButton fontSize="13px" onClick={() => setIsModalOpen(true)}>
+                  {chunks}
+                </StyledLinkButton>
+              ),
+            }}
           />
-          {' '}
-          <StyledLinkButton fontSize="13px" onClick={() => setIsModalOpen(true)}>
-            <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
-          </StyledLinkButton>
         </P>
         <P fontSize="13px" lineHeight="18px" color="black.700" mb={2}>
           <FormattedMessage
-            defaultMessage="Optional contribution: <bold>{amount}</bold>"
+            defaultMessage="Voluntary contribution: <bold>{amount}</bold>"
             id="platformTip.currentAmount"
             values={{ amount: tipAmount, bold: chunks => <strong>{chunks}</strong> }}
           />
         </P>
 
-        {/* Tip selector — matches amount picker style */}
+        {/* Tip selector */}
         <Flex width="100%">
           <StyledButtonSet
             data-cy="platform-tip-options"
             role="group"
-            aria-label="Platform tip amount"
+            aria-label="Platform contribution amount"
             width="100%"
             justifyContent="center"
             items={buttonItems}
@@ -247,13 +215,13 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
           </StyledButtonSet>
         </Flex>
 
-        {/* Custom amount input — same layout as main contribution Other input */}
-        {props.selectedOption === PlatformTipOption.OTHER && (
+        {/* Custom amount input */}
+        {(props.selectedOption === PlatformTipOption.OTHER || props.selectedOption === PlatformTipOption.NONE) && (
           <Flex justifyContent="space-between" alignItems="center" mt={2}>
             <StyledInputAmount
               id="feesOnTop"
               name="platformTip"
-              aria-label="Custom platform tip amount"
+              aria-label="Custom platform contribution amount"
               data-cy="platform-tip-other-amount"
               disabled={!props.amount}
               currency={props.currency}
@@ -270,10 +238,10 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
         <Box mt={3}>
           <StyledCheckbox
             name="platform-tip-opt-out"
-            checked={props.selectedOption === PlatformTipOption.NONE}
+            checked={props.selectedOption === PlatformTipOption.NONE || (props.selectedOption === PlatformTipOption.OTHER && props.value === 0)}
             onChange={({ checked }) =>
               checked
-                ? props.onChange(PlatformTipOption.NONE, 0)
+                ? props.onChange(PlatformTipOption.OTHER, 0)
                 : props.onChange(PlatformTipOption.FIFTEEN_PERCENT, Math.round(0.15 * props.amount))
             }
             label={
@@ -286,15 +254,24 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
             }
             data-cy="platform-tip-none"
           />
-          {props.selectedOption === PlatformTipOption.NONE && (
-            <P fontSize="12px" lineHeight="16px" color="black.500" mt={2} ml="26px">
-              <FormattedMessage
-                defaultMessage="No worries, we're grateful you're supporting {collectiveName}. If you change your mind, every bit helps our small team keep the platform running. 💙"
-                id="platformTip.optOutNudge"
-                values={{ collectiveName: props.collectiveName }}
-              />
-            </P>
-          )}
+          <AnimatePresence>
+            {(props.selectedOption === PlatformTipOption.NONE || (props.selectedOption === PlatformTipOption.OTHER && props.value === 0)) && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <P fontSize="12px" lineHeight="16px" color="black.500" mt={2} ml="26px">
+                  <FormattedMessage
+                    defaultMessage="No worries, we're grateful you're supporting {collectiveName}. If you change your mind, every bit helps our small team keep the platform running. 💙"
+                    id="platformTip.optOutNudge"
+                    values={{ collectiveName: props.collectiveName }}
+                  />
+                </P>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </Box>
       </StyledCard>
 
