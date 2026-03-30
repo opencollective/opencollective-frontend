@@ -8,6 +8,10 @@ exports.REWRITES = [
     destination: '/api/id/:id*',
   },
   {
+    source: '/permalink/:id*',
+    destination: '/api/id/:id*',
+  },
+  {
     source: '/:pageSlug(become-a-host|become-a-fiscal-host)',
     destination: '/become-a-host',
   },
