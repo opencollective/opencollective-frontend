@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { omitBy } from 'lodash';
+import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -22,6 +22,7 @@ import {
 } from '../../../../lib/hooks/useKeyboardKey';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
@@ -179,11 +180,17 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     [intl],
   );
 
+  const hasKycFeature = isFeatureEnabled(account, FEATURES.KYC);
+
+  const effectiveFilters = useMemo(() => {
+    return hasKycFeature ? filters : omit(filters, 'kycStatus');
+  }, [hasKycFeature]);
+
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
     defaultFilterValues: views[1].filter,
-    filters,
+    filters: effectiveFilters,
     meta: {
       currency: account.currency,
       hostSlug: hostSlug,

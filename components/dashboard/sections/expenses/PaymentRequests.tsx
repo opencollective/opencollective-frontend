@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { get, omit } from 'lodash';
 import { useRouter } from 'next/router';
@@ -14,6 +14,7 @@ import {
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
@@ -21,9 +22,11 @@ import ExpensesList from '../../../expenses/ExpensesList';
 import StyledButton from '../../../StyledButton';
 import { SubmitExpenseFlow } from '../../../submit-expense/SubmitExpenseFlow';
 import { Button } from '../../../ui/Button';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
+import { expenseKYCStatusFilter } from '../../filters/ExpenseKYCStatusFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { AccountRenderer } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
@@ -41,6 +44,7 @@ import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
 const schema = commonSchema.extend({
   account: z.string().nullable().default(null),
+  kycStatus: expenseKYCStatusFilter.schema,
 });
 
 const schemaWithoutHost = schema.omit({ accountingCategory: true });
@@ -66,6 +70,7 @@ const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, 
       return { account: { slug } };
     }
   },
+  kycStatus: expenseKYCStatusFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
@@ -85,6 +90,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },
+  kycStatus: expenseKYCStatusFilter.filter,
 };
 
 const filtersWithoutHost = omit(filters, 'accountingCategory');
@@ -95,6 +101,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
+  const { account } = useContext(DashboardContext);
 
   const views: Views<FilterValues> = useMemo(
     () => [
@@ -142,6 +149,18 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
   const hostSlug = get(metadata, 'account.host.slug');
 
+  const hasKycFeature = isFeatureEnabled(account, FEATURES.KYC);
+
+  const effectiveFilters = useMemo(() => {
+    const base = hostSlug ? filters : filtersWithoutHost;
+    return hasKycFeature ? base : omit(base, 'kycStatus');
+  }, [hasKycFeature, hostSlug]);
+
+  const effectiveSchema = useMemo(() => {
+    const base = hostSlug ? schema : schemaWithoutHost;
+    return hasKycFeature ? base : base.omit({ kycStatus: true });
+  }, [hasKycFeature, hostSlug]);
+
   const omitExpenseTypes = [ExpenseType.GRANT];
 
   const filterMeta: FilterMeta = {
@@ -156,11 +175,11 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
-  const queryFilter = useQueryFilter<typeof schema | typeof schemaWithoutHost, ExpensesPageQueryVariables>({
-    schema: hostSlug ? schema : schemaWithoutHost,
+  const queryFilter = useQueryFilter<typeof effectiveSchema, ExpensesPageQueryVariables>({
+    schema: effectiveSchema,
     toVariables,
     meta: filterMeta,
-    filters: hostSlug ? filters : filtersWithoutHost,
+    filters: effectiveFilters,
     views,
   });
 

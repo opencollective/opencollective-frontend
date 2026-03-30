@@ -14,10 +14,12 @@ type ExpenseKYCStatusBadgeProps = {
 
 const i18nExpensePayeeKycStatus = defineMessages({
   [ExpensePayeeKycStatus.PENDING]: {
-    defaultMessage: 'KYC Pending', id: 'YC8RDd',
+    defaultMessage: 'KYC Pending',
+    id: 'YC8RDd',
   },
   [ExpensePayeeKycStatus.VERIFIED]: {
-    defaultMessage: 'KYC Verified', id: 'eEXNr4',
+    defaultMessage: 'KYC Verified',
+    id: 'eEXNr4',
   },
 });
 
