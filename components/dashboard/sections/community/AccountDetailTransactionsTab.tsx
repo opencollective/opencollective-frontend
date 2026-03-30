@@ -54,6 +54,10 @@ const schema = z.object({
   openTransactionId: z.coerce.string().optional(),
   account: hostedAccountFilter.schema,
   accountingCategory: accountingCategoryFilter.schema,
+  group: commonSchema.shape.group,
+  isRefund: commonSchema.shape.isRefund,
+  merchantId: commonSchema.shape.merchantId,
+  expenseType: commonSchema.shape.expenseType,
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -73,6 +77,10 @@ const filters = {
   kind: commonFilters.kind,
   account: hostedAccountFilter.filter,
   accountingCategory: accountingCategoryFilter.filter,
+  group: commonFilters.group,
+  isRefund: commonFilters.isRefund,
+  merchantId: commonFilters.merchantId,
+  expenseType: commonFilters.expenseType,
 };
 
 enum TransactionsView {
@@ -205,6 +213,10 @@ export function AccountDetailTransactionsTab({
             queryFilter={queryFilter}
             refetchList={refetch}
             onClickRow={handleTransactionTableRowClick}
+            redirectRelatedTransactionsTo={getDashboardRoute(
+              dashboardAccount,
+              dashboardAccount.hasHosting ? 'host-transactions' : 'transactions',
+            )}
           />
         </React.Fragment>
       )}

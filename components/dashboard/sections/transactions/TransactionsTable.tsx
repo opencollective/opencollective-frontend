@@ -310,6 +310,8 @@ export type TransactionsTableProps = {
    * When returning false, TransactionsTable will open its own transaction drawer.
    */
   onClickRow?: (row: Row<TransactionsTableQueryNode>) => boolean;
+  /** Pass base path of desired dashboard if you want to redirect user to another view when clicking to list related transactions. */
+  redirectRelatedTransactionsTo?: string;
 };
 
 export default function TransactionsTable({
@@ -324,6 +326,7 @@ export default function TransactionsTable({
   footer,
   onClickRow,
   meta,
+  redirectRelatedTransactionsTo,
 }: TransactionsTableProps) {
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
 
@@ -343,6 +346,7 @@ export default function TransactionsTable({
   const getActions = useTransactionActions<TransactionsTableQueryNode>({
     resetFilters: queryFilter.resetFilters,
     refetchList,
+    redirectRelatedTransactionsTo,
   });
 
   const { openDrawer, drawerProps } = useDrawer({
