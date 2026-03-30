@@ -9,6 +9,8 @@ import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
 import { H1, P } from '../components/Text';
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default function AccessDeniedPage() {
   return (
     <Page
@@ -25,9 +27,7 @@ export default function AccessDeniedPage() {
             <FormattedMessage defaultMessage="Access denied" id="T26lW2" />
           </H1>
           <P my="24px" fontSize="20px" fontWeight="500" color="black.800" textAlign="center">
-            <FormattedMessage
-              defaultMessage="You are not allowed to access this resource." id="mqblI9"
-            />
+            <FormattedMessage defaultMessage="You are not allowed to access this resource." id="mqblI9" />
           </P>
 
           <Flex flexWrap="wrap" justifyContent="center" mt={2}>
