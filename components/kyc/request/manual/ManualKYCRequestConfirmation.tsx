@@ -34,9 +34,9 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
       mutation RequestManualKYCVerification(
         $requestedByAccount: AccountReferenceInput!
         $verifyAccount: AccountReferenceInput!
-        $request: RequestKYCVerificationInput!
+        $request: SubmitKYCVerificationInput!
       ) {
-        requestKYCVerification(
+        submitKYCVerification(
           requestedByAccount: $requestedByAccount
           verifyAccount: $verifyAccount
           request: $request
@@ -51,7 +51,7 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
       refetchQueries: props.refetchQueries,
       variables: {
         requestedByAccount: getAccountReferenceInput(props.requestedByAccount),
-        verifyAccount: props.verifyAccount,
+        verifyAccount: getAccountReferenceInput(props.verifyAccount),
         request: { manual: props.request },
       },
     },

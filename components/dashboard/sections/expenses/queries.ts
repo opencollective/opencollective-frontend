@@ -175,6 +175,7 @@ export const hostDashboardExpensesQuery = gql`
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
     $fetchGrantHistory: Boolean!
+    $kycStatus: ExpenseKYCStatusFilter
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -198,6 +199,7 @@ export const hostDashboardExpensesQuery = gql`
       virtualCards: $virtualCards
       lastCommentBy: $lastCommentBy
       accountingCategory: $accountingCategory
+      kycStatus: $kycStatus
     ) {
       totalCount
       offset
