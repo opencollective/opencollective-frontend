@@ -883,6 +883,11 @@ interface Account {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
     direction: ExpenseDirection
   ): ExpenseCollection!
   settings: JSON!
@@ -3717,6 +3722,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -5935,6 +5945,14 @@ enum ActivityType {
   KYC_REQUESTED
   KYC_REVOKED
   KYC_VERIFIED
+}
+
+"""
+Describes the values allowed to filter expenses KYC statuses, namely all the KYC statuses.
+"""
+enum ExpenseKYCStatusFilter {
+  VERIFIED
+  PENDING
 }
 
 """
@@ -10278,6 +10296,11 @@ type Bot implements Account {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -11323,6 +11346,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -12938,6 +12966,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -14272,6 +14305,11 @@ type Individual implements Account {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -15642,6 +15680,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -16832,6 +16875,11 @@ type Vendor implements Account & AccountWithContributions {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -17859,6 +17907,11 @@ type Query {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   expenseTagStats(
     """
@@ -21090,6 +21143,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -22282,6 +22340,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -25437,6 +25500,27 @@ type Mutation {
   ): KYCVerification!
 
   """
+  Submits a KYC verification
+  """
+  submitKYCVerification(
+    """
+    Account request KYC Verification
+    """
+    requestedByAccount: AccountReferenceInput!
+
+    """
+    Account that will be verified
+    """
+    verifyAccount: AccountReferenceInput!
+    provider: KYCProvider!
+
+    """
+    Provider specific request data
+    """
+    request: SubmitKYCVerificationInput!
+  ): KYCVerification!
+
+  """
   Revoke the KYC Verification
   """
   revokeKYCVerification(kycVerification: KYCVerificationReferenceInput!): KYCVerification!
@@ -28146,17 +28230,22 @@ input PlatformSubscriptionPlanPricing {
 
 input RequestKYCVerificationInput {
   manual: RequestManualKYCVerificationInput
-  persona: RequestPersonaKYCVerificationInput
 }
 
 input RequestManualKYCVerificationInput {
-  legalName: String!
+  legalName: String
   legalAddress: String
   notes: String
 }
 
-input RequestPersonaKYCVerificationInput {
-  importInquiryId: String
+input SubmitKYCVerificationInput {
+  manual: SubmitManualKYCVerificationInput
+}
+
+input SubmitManualKYCVerificationInput {
+  legalName: String!
+  legalAddress: String
+  notes: String
 }
 
 """
