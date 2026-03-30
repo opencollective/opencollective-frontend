@@ -32,7 +32,7 @@ export default function AccessDeniedPage() {
 
           <Flex flexWrap="wrap" justifyContent="center" mt={2}>
             <StyledButton m={2} buttonStyle="secondary" onClick={() => Router.back()}>
-              <FormattedMessage defaultMessage="Go back" id="8N5NtR" />
+              <FormattedMessage defaultMessage="Go back" id="orvpWh" />
             </StyledButton>
           </Flex>
         </Flex>
