@@ -135,11 +135,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isSimpleIndividual = isIndividual && !hasHosting;
   const isSimpleOrganization = isOrganization && !hasMoneyManagement;
   const isHostedType = isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]);
-
-  const hasPlatformBillingEnabled = Boolean(
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) || account.platformSubscription,
-  );
-
   const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
     PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
   );
@@ -546,7 +541,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               {
                 section: ALL_SECTIONS.PLATFORM_SUBSCRIPTION,
                 label: intl.formatMessage({ defaultMessage: 'Platform Billing', id: 'beRXFK' }),
-                if: !isIndividual && hasPlatformBillingEnabled,
+                if: hasMoneyManagement || account.platformSubscription,
               },
               {
                 section: ALL_SECTIONS.FISCAL_HOSTING,
