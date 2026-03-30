@@ -1,14 +1,15 @@
 import { useQuery } from '@apollo/client';
-import { useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
 
 import type { Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
 import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountOrdersFilter, HostContext } from '@/lib/graphql/types/v2/schema';
 
 import type { FilterValues } from './filters';
 
 /**
- * Views used by IncomingContributions and OutgoingContributions
+ * View IDs used by IncomingContributions and OutgoingContributions
  */
 enum IncomingOutgoingContributionTabs {
   ALL = 'ALL',
@@ -19,11 +20,19 @@ enum IncomingOutgoingContributionTabs {
 }
 
 const incomingOutgoingContributionViewCountsQuery = gql`
-  query IncomingOutgoingContributionViewCounts($slug: String!, $filter: AccountOrdersFilter!) {
+  query IncomingOutgoingContributionViewCounts(
+    $slug: String!
+    $hostContext: HostContext
+    $filter: AccountOrdersFilter!
+  ) {
     account(slug: $slug) {
       id
 
+      ALL: orders(hostContext: $hostContext, filter: $filter, includeIncognito: true, includeChildrenAccounts: true) {
+        totalCount
+      }
       RECURRING: orders(
+        hostContext: $hostContext
         filter: $filter
         frequency: [MONTHLY, YEARLY]
         status: [ACTIVE, PROCESSING, ERROR]
@@ -33,6 +42,7 @@ const incomingOutgoingContributionViewCountsQuery = gql`
         totalCount
       }
       ONETIME: orders(
+        hostContext: $hostContext
         filter: $filter
         frequency: [ONETIME]
         status: [PAID, PROCESSING]
@@ -42,42 +52,40 @@ const incomingOutgoingContributionViewCountsQuery = gql`
       ) {
         totalCount
       }
-      CANCELED: orders(filter: $filter, status: [CANCELLED], includeIncognito: true, includeChildrenAccounts: true) {
+      CANCELED: orders(
+        hostContext: $hostContext
+        filter: $filter
+        status: [CANCELLED]
+        includeIncognito: true
+        includeChildrenAccounts: true
+      ) {
         totalCount
       }
-      PAUSED: orders(filter: $filter, status: [PAUSED], includeIncognito: true, includeChildrenAccounts: true) {
+      PAUSED: orders(
+        hostContext: $hostContext
+        filter: $filter
+        status: [PAUSED]
+        includeIncognito: true
+        includeChildrenAccounts: true
+      ) {
         totalCount
       }
     }
   }
 `;
 
-interface UseContributionFlowViewsResult {
-  views: Views<FilterValues>;
-  loading: boolean;
-  refetch: () => void;
-}
-
 /**
- * Hook to fetch views and their counts for incoming/outgoing contributions
+ * View definitions (id, label, filter) without counts. Use this for queryFilter so that
+ * view structure does not depend on the count query. Pass the result to useQueryFilter,
+ * then use useIncomingOutgoingContributionViews with queryFilter-derived vars to get
+ * viewCounts and merge for display.
  */
-export function useIncomingOutgoingContributionViews(
-  slug: string,
-  direction: 'INCOMING' | 'OUTGOING',
-): UseContributionFlowViewsResult {
-  const intl = useIntl();
-
-  const { data, loading, refetch } = useQuery(incomingOutgoingContributionViewCountsQuery, {
-    variables: { slug, filter: direction },
-
-    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
-  });
-  const views = [
+export function getContributionViews(intl: IntlShape): Views<FilterValues> {
+  return [
     {
       id: IncomingOutgoingContributionTabs.ALL,
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
-      count: data?.account?.[IncomingOutgoingContributionTabs.ALL]?.totalCount,
     },
     {
       id: IncomingOutgoingContributionTabs.RECURRING,
@@ -86,7 +94,6 @@ export function useIncomingOutgoingContributionViews(
         frequency: [ContributionFrequency.MONTHLY, ContributionFrequency.YEARLY],
         status: [OrderStatus.ACTIVE, OrderStatus.PROCESSING, OrderStatus.ERROR],
       },
-      count: data?.account?.[IncomingOutgoingContributionTabs.RECURRING]?.totalCount,
     },
     {
       id: IncomingOutgoingContributionTabs.ONETIME,
@@ -95,7 +102,6 @@ export function useIncomingOutgoingContributionViews(
         frequency: [ContributionFrequency.ONETIME],
         status: [OrderStatus.PAID, OrderStatus.PROCESSING],
       },
-      count: data?.account?.[IncomingOutgoingContributionTabs.ONETIME]?.totalCount,
     },
     {
       id: IncomingOutgoingContributionTabs.PAUSED,
@@ -103,7 +109,6 @@ export function useIncomingOutgoingContributionViews(
       filter: {
         status: [OrderStatus.PAUSED],
       },
-      count: data?.account?.[IncomingOutgoingContributionTabs.PAUSED]?.totalCount,
     },
     {
       id: IncomingOutgoingContributionTabs.CANCELED,
@@ -111,12 +116,50 @@ export function useIncomingOutgoingContributionViews(
       filter: {
         status: [OrderStatus.CANCELLED],
       },
-      count: data?.account?.[IncomingOutgoingContributionTabs.CANCELED]?.totalCount,
     },
   ];
+}
+
+type IncomingOutgoingContributionViewCounts = Partial<Record<IncomingOutgoingContributionTabs, number>>;
+
+interface UseIncomingOutgoingContributionViewCountsResult {
+  viewCounts: IncomingOutgoingContributionViewCounts;
+  loading: boolean;
+  refetch: () => void;
+}
+
+/**
+ * Fetches view counts for incoming/outgoing contributions. Depends on slug, hostContext, and filter
+ * (e.g. from queryFilter). Use with getIncomingOutgoingContributionViews: pass views to
+ * useQueryFilter, then call this hook with the same vars you use for the main query, and merge
+ * viewCounts onto views for display.
+ */
+export function useFetchContributionViewCounts({
+  slug,
+  hostContext,
+  filter,
+}: {
+  slug: string;
+  hostContext?: HostContext;
+  filter: AccountOrdersFilter;
+}): UseIncomingOutgoingContributionViewCountsResult {
+  const { data, loading, refetch } = useQuery(incomingOutgoingContributionViewCountsQuery, {
+    variables: { slug, hostContext, filter },
+
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  const account = data?.account;
+  const viewCounts: IncomingOutgoingContributionViewCounts = {
+    [IncomingOutgoingContributionTabs.ALL]: account?.ALL?.totalCount,
+    [IncomingOutgoingContributionTabs.RECURRING]: account?.RECURRING?.totalCount,
+    [IncomingOutgoingContributionTabs.ONETIME]: account?.ONETIME?.totalCount,
+    [IncomingOutgoingContributionTabs.PAUSED]: account?.PAUSED?.totalCount,
+    [IncomingOutgoingContributionTabs.CANCELED]: account?.CANCELED?.totalCount,
+  };
 
   return {
-    views,
+    viewCounts,
     loading,
     refetch,
   };

@@ -39,6 +39,7 @@ import Contributors from './sections/Contributors';
 import ApprovePaymentRequests from './sections/expenses/ApprovePaymentRequests';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import HostPaymentRequests from './sections/expenses/HostPaymentRequests';
+import IssuedPaymentRequests from './sections/expenses/IssuedPaymentRequests';
 import { PaidDisbursements } from './sections/expenses/PaidDisbursements';
 import PayDisbursements from './sections/expenses/PayDisbursements';
 import PaymentRequests from './sections/expenses/PaymentRequests';
@@ -108,6 +109,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.PAYMENT_REQUESTS]: PaymentRequests,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.ISSUED_PAYMENT_REQUESTS]: IssuedPaymentRequests,
   [SECTIONS.HOSTED_FUNDS]: HostedFunds,
   [SECTIONS.HOSTED_GRANTS]: HostedGrants,
   [SECTIONS.GRANTS]: Grants,

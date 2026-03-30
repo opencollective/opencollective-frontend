@@ -7,6 +7,7 @@ import {
   BookOpenCheck,
   BookUserIcon,
   Building,
+  Coins,
   CreditCard,
   FileText,
   HandCoins,
@@ -139,6 +140,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) || account.platformSubscription,
   );
 
+  const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
+  );
+
   const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
   const hasReceivedGrantRequests = account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
@@ -167,14 +172,18 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if: (isSimpleIndividual || isSimpleOrganization) && !isCommunityManagerOnly,
-      section: ALL_SECTIONS.SUBMITTED_EXPENSES,
+      section: hasIncomingOutgoingReorg ? ALL_SECTIONS.ISSUED_PAYMENT_REQUESTS : ALL_SECTIONS.SUBMITTED_EXPENSES,
       Icon: Receipt,
-      label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+      label: hasIncomingOutgoingReorg
+        ? intl.formatMessage({ defaultMessage: 'Payment Requests', id: 'PaymentRequests' })
+        : intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
     },
     {
       if: !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
       type: 'group',
-      label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+      label: hasIncomingOutgoingReorg
+        ? intl.formatMessage({ defaultMessage: 'Outgoing Money', id: 'OutgoingMoney' })
+        : intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
       Icon: Receipt,
       subMenu: [
         {
@@ -225,6 +234,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           label: intl.formatMessage({ defaultMessage: 'Payment Requests', id: 'PaymentRequests' }),
         },
         {
+          if: !hasIncomingOutgoingReorg,
           section: ALL_SECTIONS.SUBMITTED_EXPENSES,
           label: intl.formatMessage(
             {
@@ -233,6 +243,59 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
             },
             { accountName: account.name },
           ),
+        },
+        {
+          if: hasIncomingOutgoingReorg,
+          section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+          label: intl.formatMessage({ defaultMessage: 'Outgoing Contributions', id: 'OutgoingContributions' }),
+        },
+      ],
+    },
+
+    {
+      if: (isSimpleIndividual || isSimpleOrganization) && !isCommunityManagerOnly,
+      section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+      label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
+      Icon: HandCoins,
+    },
+    {
+      if: !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
+      type: 'group',
+      label: hasIncomingOutgoingReorg
+        ? intl.formatMessage({ defaultMessage: 'Incoming Money', id: 'IncomingMoney' })
+        : intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
+      Icon: Coins,
+      subMenu: [
+        {
+          if: !isIndividual,
+          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'IncomingContributions' }),
+          section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
+        },
+        {
+          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
+          label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
+          section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
+        },
+        {
+          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
+          label: intl.formatMessage({ defaultMessage: 'Incomplete Contributions', id: 'IncompleteContributions' }),
+          section: ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
+        },
+        {
+          if: !hasIncomingOutgoingReorg,
+          label: intl.formatMessage(
+            {
+              id: 'PVqJoO',
+              defaultMessage: 'From {accountName}',
+            },
+            { accountName: account.name },
+          ),
+          section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+        },
+        {
+          if: hasIncomingOutgoingReorg,
+          section: ALL_SECTIONS.ISSUED_PAYMENT_REQUESTS,
+          label: intl.formatMessage({ defaultMessage: 'Issued Payment Requests', id: 'IssuedPaymentRequests' }),
         },
       ],
     },
@@ -279,45 +342,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.CONTRIBUTORS,
       label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
       Icon: BookUserIcon,
-    },
-    {
-      if: (isSimpleIndividual || isSimpleOrganization) && !isCommunityManagerOnly,
-      section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
-      label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: HandCoins,
-    },
-    {
-      if: !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
-      type: 'group',
-      label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: HandCoins,
-      subMenu: [
-        {
-          if: !isIndividual,
-          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'IncomingContributions' }),
-          section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
-        },
-        {
-          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
-          label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
-          section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
-        },
-        {
-          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
-          label: intl.formatMessage({ defaultMessage: 'Incomplete Contributions', id: 'IncompleteContributions' }),
-          section: ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
-        },
-        {
-          label: intl.formatMessage(
-            {
-              id: 'PVqJoO',
-              defaultMessage: 'From {accountName}',
-            },
-            { accountName: account.name },
-          ),
-          section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
-        },
-      ],
     },
     {
       if: hasHosting && !isAccountantOnly && !isCommunityManagerOnly,

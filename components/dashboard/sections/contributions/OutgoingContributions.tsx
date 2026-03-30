@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { AccountOrdersFilter } from '@/lib/graphql/types/v2/schema';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -21,7 +22,7 @@ import {
   toVariables as baseToVariables,
 } from './filters';
 import { dashboardOrdersQuery } from './queries';
-import { useIncomingOutgoingContributionViews } from './views';
+import { getContributionViews, useFetchContributionViewCounts } from './views';
 
 const schema = baseSchema.extend({ account: childAccountFilter.schema });
 
@@ -49,9 +50,10 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 };
 
 const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
+  const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
-  const { views, refetch: refetchViews } = useIncomingOutgoingContributionViews(accountSlug, 'OUTGOING');
+  const views = React.useMemo(() => getContributionViews(intl), [intl]);
 
   const filterMeta: FilterMeta = {
     currency: account.currency,
@@ -71,10 +73,25 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
     filters,
   });
 
+  const baseVars = {
+    slug: accountSlug,
+    filter: AccountOrdersFilter.OUTGOING,
+  };
+
+  const { viewCounts, refetch: refetchViews } = useFetchContributionViewCounts(baseVars);
+
+  const viewsWithCount = React.useMemo(
+    () =>
+      views.map(v => ({
+        ...v,
+        count: viewCounts[v.id as keyof typeof viewCounts],
+      })),
+    [views, viewCounts],
+  );
+
   const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
     variables: {
-      slug: accountSlug,
-      filter: 'OUTGOING',
+      ...baseVars,
       includeIncognito: true,
       ...queryFilter.variables,
     },
@@ -87,8 +104,9 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
     refetchViews();
   }, [refetch, refetchViews]);
 
-  const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
-  const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+  const currentViewCount = viewsWithCount.find(v => v.id === queryFilter.activeViewId)?.count;
+  const nbPlaceholders =
+    (currentViewCount ?? 0) < queryFilter.values.limit ? (currentViewCount ?? 0) : queryFilter.values.limit;
 
   const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
 
@@ -107,7 +125,7 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
       <ContributionsTable
         accountSlug={accountSlug}
         queryFilter={queryFilter}
-        views={views}
+        views={viewsWithCount}
         orders={orders}
         loading={loading}
         nbPlaceholders={nbPlaceholders}
