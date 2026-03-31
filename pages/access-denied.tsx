@@ -12,7 +12,6 @@ import { H1, P } from '../components/Text';
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function AccessDeniedPage() {
-
   const intl = useIntl();
 
   return (
