@@ -153,7 +153,13 @@ export function AccountKYCStatusBadge(props: AccountKYCStatusBadgeProps) {
     showModal(KYCRequestModal, {
       requestedByAccount: props.host,
       verifyAccount: props.account,
-      refetchQueries: ['AccountKYCStatusBadgeIndividual'],
+      refetchQueries: [
+        'AccountKYCStatusBadgeIndividual',
+        'ExpensePage',
+        'HostDashboardExpenses',
+        'ExpensePipelineOverview',
+        'HostDashboardMetadata',
+      ],
       provider: KycProvider.MANUAL,
     });
   }, [showModal, props.host, props.account]);
@@ -162,7 +168,13 @@ export function AccountKYCStatusBadge(props: AccountKYCStatusBadgeProps) {
     showModal(CreateManualKYCRequestModal, {
       requestedByAccount: props.host,
       verifyAccount: props.account,
-      refetchQueries: ['AccountKYCStatusBadgeIndividual'],
+      refetchQueries: [
+        'AccountKYCStatusBadgeIndividual',
+        'ExpensePage',
+        'HostDashboardExpenses',
+        'ExpensePipelineOverview',
+        'HostDashboardMetadata',
+      ],
     });
   }, [showModal, props.host, props.account]);
 
@@ -218,7 +230,15 @@ export function AccountKYCStatusBadge(props: AccountKYCStatusBadgeProps) {
       </DropdownMenuContent>
 
       {kycVerification && (
-        <KYCVerificationInfoModal verification={kycVerification} open={isDetailsOpen} setOpen={setDetailsOpen} />
+        <KYCVerificationInfoModal
+          verification={kycVerification}
+          open={isDetailsOpen}
+          setOpen={setDetailsOpen}
+          onSubmitVerificationClick={() => {
+            setDetailsOpen(false);
+            openSubmitManualKYCModal();
+          }}
+        />
       )}
     </DropdownMenu>
   );
