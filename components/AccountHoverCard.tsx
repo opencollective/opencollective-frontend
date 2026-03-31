@@ -32,6 +32,7 @@ import Spinner from './Spinner';
 export const accountHoverCardFields = gql`
   fragment AccountHoverCardFields on Account {
     id
+    publicId
     name
     legalName
     slug

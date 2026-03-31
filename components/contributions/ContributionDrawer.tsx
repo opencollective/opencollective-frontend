@@ -39,6 +39,7 @@ const contributionDrawerQuery = gql`
     order(order: { legacyId: $orderId }) {
       id
       legacyId
+      publicId
       nextChargeDate
       lastChargedAt
       amount {
@@ -297,12 +298,22 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           }
           forceMoreActions
           entityIdentifier={
-            <CopyID
-              value={props.orderId}
-              tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
-            >
-              #{props.orderId}
-            </CopyID>
+            <div className="flex items-center gap-1">
+              <CopyID
+                value={props.orderId}
+                tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
+              >
+                #{props.orderId}
+              </CopyID>
+              {order?.publicId && (
+                <CopyID
+                  value={order.publicId}
+                  tooltipLabel={<FormattedMessage defaultMessage="Copy contribution public ID" id="G4u5yE" />}
+                >
+                  {order.publicId.substring(0, 8)}...
+                </CopyID>
+              )}
+            </div>
           }
           entityLabel={
             isLoading ? (

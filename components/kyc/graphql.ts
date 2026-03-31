@@ -35,6 +35,7 @@ export const kycVerificationFields = gql`
     revokedAt
     createdByUser {
       id
+      publicId
       name
       legalName
       slug
