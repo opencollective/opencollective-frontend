@@ -427,7 +427,13 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       currency: values.referenceCurrency || formOptions.expenseCurrency,
       tax:
         values.hasTax && values.tax
-          ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+          ? [
+              {
+                rate: values.tax.rate,
+                type: formOptions.taxType,
+                idNumber: values.tax.idNumber,
+              },
+            ]
           : [],
     };
     return onSubmit(editValues);
@@ -592,7 +598,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
       expenseTypeOption: true,
     },
   });
-  const transformedOnSubmit = values => {
+  const transformedOnSubmit = (values, h, formOptions) => {
     const editValues = {
       items: values.expenseItems.map(ei => ({
         id: ei.id,
@@ -624,7 +630,13 @@ const EditExpenseType = ({ expense, onSubmit }) => {
       type: values.expenseTypeOption,
       tax:
         values.hasTax && values.tax
-          ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+          ? [
+              {
+                rate: values.tax.rate,
+                type: formOptions.taxType,
+                idNumber: values.tax.idNumber,
+              },
+            ]
           : [],
     };
     return onSubmit(editValues);
