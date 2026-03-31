@@ -1,6 +1,6 @@
 import React from 'react';
 import Router from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import Container from '../components/Container';
 import { Flex } from '../components/Grid';
@@ -12,11 +12,14 @@ import { H1, P } from '../components/Text';
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function AccessDeniedPage() {
+
+  const intl = useIntl();
+
   return (
     <Page
       data-cy="error-page"
       title="Access denied"
-      description="You do not have access to this resource."
+      description={intl.formatMessage({ defaultMessage: 'You are not allowed to access this resource.', id: 'mqblI9' })}
       noRobots
       showSearch={false}
     >
