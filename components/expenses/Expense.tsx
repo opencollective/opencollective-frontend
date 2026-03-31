@@ -287,9 +287,11 @@ function Expense(props: ExpenseProps) {
                 LinkCollective: text => <LinkCollective collective={expense?.account}>{text}</LinkCollective>,
               }}
             />
-            <div>
-              <CopyID value={expense?.publicId}>{expense?.publicId?.substring(0, 8)}...</CopyID>
-            </div>
+            {expense?.publicId && (
+              <div>
+                <CopyID value={expense?.publicId}>{expense?.publicId?.substring(0, 8)}...</CopyID>
+              </div>
+            )}
           </div>
         ) : (
           <LoadingPlaceholder height={32} maxWidth={'200px'} />
