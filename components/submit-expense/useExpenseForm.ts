@@ -1900,7 +1900,7 @@ export function useExpenseForm(opts: {
             onSuccess(result, 'edit');
           } else if (
             formOptions.payee?.type === CollectiveType.VENDOR ||
-            formOptions.payoutProfiles.some(p => p.slug === values.payeeSlug)
+            formOptions.payoutProfiles?.some(p => p.slug === values.payeeSlug)
           ) {
             result = await createExpense({
               variables: {
