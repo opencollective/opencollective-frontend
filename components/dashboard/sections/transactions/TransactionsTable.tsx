@@ -1,10 +1,11 @@
 import React from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Row } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import { clsx } from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
+import type { GetActions } from '../../../../lib/actions/types';
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { DateTimeField } from '../../../../lib/graphql/types/v2/graphql';
 import { useDrawer } from '../../../../lib/hooks/useDrawer';
@@ -95,12 +96,12 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
     id: 'date',
     meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }) },
     header: ctx => <ColumnHeader {...ctx} sortField={DateTimeField.CREATED_AT} />,
-    cell: ({ cell }) => {
+    cell: ({ cell, table }) => {
       const createdAt = cell.getValue() as TransactionsTableQueryNode['createdAt'];
-
+      const timeStyle = table.options.meta?.timeStyle === null ? undefined : table.options.meta?.timeStyle || 'short';
       return (
         <div className="whitespace-nowrap">
-          <DateTime dateStyle="medium" timeStyle="short" value={createdAt} />
+          <DateTime dateStyle="medium" timeStyle={timeStyle} value={createdAt} />
         </div>
       );
     },
@@ -125,6 +126,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
     },
   }),
   columnHelper.accessor('account', {
+    id: 'account',
     meta: { className: 'w-32 2xl:w-48', labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell }) => {
@@ -144,6 +146,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
     },
   }),
   columnHelper.accessor('oppositeAccount', {
+    id: 'oppositeAccount',
     meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Recipient/Sender', id: 'YT2bNN' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell, row }) => {
@@ -169,6 +172,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
   }),
 
   columnHelper.accessor('kind', {
+    id: 'kind',
     meta: { className: 'w-32 2xl:w-auto', labelMsg: defineMessage({ defaultMessage: 'Kind', id: 'Transaction.Kind' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell, table, row }) => {
@@ -184,7 +188,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
             <span className="truncate">{kindLabel}</span>
             {isExpense && expense?.type && <Badge size="xs">{i18nExpenseType(intl, expense.type)}</Badge>}
           </div>
-          <div>
+          <div className="flex items-center gap-1">
             <RefundBadge transaction={row.original} />
             {isInReview && (
               <Badge size="xs" type={'warning'} className="items-center gap-1">
@@ -289,13 +293,26 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
   actionsColumn,
 ];
 
-type TransactionsTableProps = {
+export type TransactionsTableProps = {
   transactions: { nodes: TransactionsTableQueryNode[]; totalCount: number };
   loading?: boolean;
   nbPlaceholders?: number;
   useAltTestLayout?: boolean;
   queryFilter: useQueryFilterReturnType<typeof schema, TransactionsTableQueryVariables>;
   refetchList?: () => void;
+  hideColumns?: string[];
+  hideHeader?: boolean;
+  hidePagination?: boolean;
+  footer?: React.ReactNode;
+  meta?: {
+    timeStyle?: 'short' | 'long' | 'medium' | 'full' | 'none' | null;
+  };
+  /** You optionally override onClickRow with a function that returns a boolean that informs if the override is successfully or not.
+   * When returning false, TransactionsTable will open its own transaction drawer.
+   */
+  onClickRow?: (row: Row<TransactionsTableQueryNode>) => boolean;
+  /** Optional custom getActions to override the default transaction actions. */
+  getActions?: GetActions<TransactionsTableQueryNode>;
 };
 
 export default function TransactionsTable({
@@ -304,6 +321,13 @@ export default function TransactionsTable({
   nbPlaceholders,
   queryFilter,
   refetchList,
+  hideColumns,
+  hideHeader,
+  hidePagination,
+  footer,
+  onClickRow,
+  meta,
+  getActions: getActionsProp,
 }: TransactionsTableProps) {
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
 
@@ -313,11 +337,19 @@ export default function TransactionsTable({
     credit: false,
   };
   const [columnVisibility, setColumnVisibility] = useLocalStorage('transactions-cols', defaultColumnVisibility);
+  const displayedColumns = React.useMemo(() => {
+    if (!hideColumns?.length) {
+      return columns;
+    }
+    return columns.filter(column => !hideColumns.includes(column.id));
+  }, [hideColumns]);
 
-  const getActions = useTransactionActions<TransactionsTableQueryNode>({
+  const getDefaultActions = useTransactionActions<TransactionsTableQueryNode>({
     resetFilters: queryFilter.resetFilters,
     refetchList,
   });
+
+  const getActions = React.useMemo(() => getActionsProp ?? getDefaultActions, [getActionsProp, getDefaultActions]);
 
   const { openDrawer, drawerProps } = useDrawer({
     open: Boolean(queryFilter.values.openTransactionId),
@@ -330,12 +362,12 @@ export default function TransactionsTable({
       <DataTable
         data-cy="transactions-table"
         innerClassName="table-fixed text-muted-foreground"
-        columns={columns}
+        columns={displayedColumns}
         data={transactions?.nodes || []}
         loading={loading}
         nbPlaceholders={nbPlaceholders}
         onClickRow={(row, menuRef) => {
-          openDrawer(row.id, menuRef);
+          return onClickRow?.(row) || openDrawer(row.id, menuRef);
         }}
         onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
         rowHasIndicator={row => row.original.group === hoveredGroup}
@@ -346,10 +378,13 @@ export default function TransactionsTable({
         getRowId={row => String(row.legacyId)}
         getActions={getActions}
         queryFilter={queryFilter}
+        hideHeader={hideHeader}
+        footer={footer}
+        meta={meta}
         compact
       />
 
-      <Pagination queryFilter={queryFilter} total={transactions?.totalCount} />
+      {!hidePagination && <Pagination queryFilter={queryFilter} total={transactions?.totalCount} />}
       <TransactionDrawer
         {...drawerProps}
         transactionId={queryFilter.values.openTransactionId}
