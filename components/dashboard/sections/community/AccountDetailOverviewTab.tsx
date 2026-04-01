@@ -347,7 +347,7 @@ export const AccountDetailsOverviewTab = ({
                 values={{ name }}
               />
             }
-            loading={query.loading}
+            loading={isLoading}
             showTimeSeries
             expanded
             amount={{ current: totalContributed }}
@@ -371,7 +371,7 @@ export const AccountDetailsOverviewTab = ({
                 values={{ name }}
               />
             }
-            loading={query.loading}
+            loading={isLoading}
             showTimeSeries
             expanded
             amount={{ current: totalPaid }}
