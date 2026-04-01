@@ -98,6 +98,33 @@ const HiddenTagItem = styled(StyledLink)`
   }
 `;
 
+function parseUniqueCompanies(collectiveCompany) {
+  const uniqueCompanies = new Set();
+  let multiTokenCompany = '';
+  collectiveCompany
+    ?.trim()
+    .split(' ')
+    .forEach(word => {
+      if (word.startsWith('@')) {
+        if (multiTokenCompany.trim() !== '') {
+          uniqueCompanies.add(multiTokenCompany);
+        }
+        uniqueCompanies.add(word.toLowerCase());
+        multiTokenCompany = '';
+      } else {
+        if (multiTokenCompany !== '') {
+          multiTokenCompany += ' ';
+        }
+        multiTokenCompany += word;
+      }
+    });
+
+  if (multiTokenCompany !== '') {
+    uniqueCompanies.add(multiTokenCompany);
+  }
+  return [...uniqueCompanies];
+}
+
 /**
  * Collective's page Hero/Banner/Cover component.
  */
@@ -118,7 +145,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const connectedAccountIsHost = firstConnectedAccount && host && firstConnectedAccount.collective.id === host.id;
   const displayedConnectedAccount = connectedAccountIsHost ? null : firstConnectedAccount;
   // get only unique references
-  const companies = [...new Set(collective.company?.trim().toLowerCase().split(' '))];
+  const companies = parseUniqueCompanies(collective.company);
   const tagCount = collective.tags?.length;
   const displayedTags = collective.tags?.slice(0, 3);
   const hiddenTags = collective.tags?.slice(3);
@@ -194,7 +221,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               <AccountTrustBadge account={collective} size={24} className="ml-3 inline-block" />
             </H1>
           </Box>
-          <Flex>
+          <Flex flexDirection="row" alignItems="center">
             {companies.length > 0 &&
               companies.map(company => (
                 <StyledLink key={company} as={UserCompany} mr={1} fontSize="20px" fontWeight={600} company={company} />
