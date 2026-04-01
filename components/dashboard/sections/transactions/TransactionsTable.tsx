@@ -5,6 +5,7 @@ import { clsx } from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
+import type { GetActions } from '../../../../lib/actions/types';
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { DateTimeField } from '../../../../lib/graphql/types/v2/graphql';
 import { useDrawer } from '../../../../lib/hooks/useDrawer';
@@ -310,8 +311,8 @@ export type TransactionsTableProps = {
    * When returning false, TransactionsTable will open its own transaction drawer.
    */
   onClickRow?: (row: Row<TransactionsTableQueryNode>) => boolean;
-  /** Pass base path of desired dashboard if you want to redirect user to another view when clicking to list related transactions. */
-  redirectRelatedTransactionsTo?: string;
+  /** Optional custom getActions to override the default transaction actions. */
+  getActions?: GetActions<TransactionsTableQueryNode>;
 };
 
 export default function TransactionsTable({
@@ -326,7 +327,7 @@ export default function TransactionsTable({
   footer,
   onClickRow,
   meta,
-  redirectRelatedTransactionsTo,
+  getActions: getActionsProp,
 }: TransactionsTableProps) {
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
 
@@ -343,11 +344,12 @@ export default function TransactionsTable({
     return columns.filter(column => !hideColumns.includes(column.id));
   }, [hideColumns]);
 
-  const getActions = useTransactionActions<TransactionsTableQueryNode>({
+  const getDefaultActions = useTransactionActions<TransactionsTableQueryNode>({
     resetFilters: queryFilter.resetFilters,
     refetchList,
-    redirectRelatedTransactionsTo,
   });
+
+  const getActions = React.useMemo(() => getActionsProp ?? getDefaultActions, [getActionsProp, getDefaultActions]);
 
   const { openDrawer, drawerProps } = useDrawer({
     open: Boolean(queryFilter.values.openTransactionId),

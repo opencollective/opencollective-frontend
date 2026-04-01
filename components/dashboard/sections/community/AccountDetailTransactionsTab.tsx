@@ -27,6 +27,7 @@ import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
+import { useTransactionActions } from '../transactions/actions';
 import {
   filters as commonFilters,
   schema as commonSchema,
@@ -35,6 +36,7 @@ import {
 import { transactionsTableQuery } from '../transactions/queries';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
+import type { TransactionsTableQueryNode } from '../transactions/types';
 
 const schema = z.object({
   limit: limit.default(15),
@@ -116,6 +118,11 @@ export function AccountDetailTransactionsTab({
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const pendingExpenseCount = account?.pendingExpenses?.totalCount || 0;
 
+  const redirectRelatedTransactionsTo = getDashboardRoute(
+    dashboardAccount,
+    dashboardAccount.hasHosting ? 'host-transactions' : 'transactions',
+  );
+
   const views = React.useMemo(
     () => [
       {
@@ -160,6 +167,21 @@ export function AccountDetailTransactionsTab({
   });
 
   const transactions = data?.transactions;
+
+  const defaultGetActions = useTransactionActions<TransactionsTableQueryNode>({
+    resetFilters: queryFilter.resetFilters,
+    redirectRelatedTransactionsTo,
+  });
+
+  const getActions = React.useCallback<typeof defaultGetActions>(
+    (transaction, onCloseFocusRef, refetch) => {
+      const { secondary } = defaultGetActions(transaction, onCloseFocusRef, refetch);
+      return {
+        secondary: secondary?.filter(a => a.key === 'view-transactions'),
+      };
+    },
+    [defaultGetActions],
+  );
 
   const viewsWithCount = React.useMemo(
     () =>
@@ -213,10 +235,7 @@ export function AccountDetailTransactionsTab({
             queryFilter={queryFilter}
             refetchList={refetch}
             onClickRow={handleTransactionTableRowClick}
-            redirectRelatedTransactionsTo={getDashboardRoute(
-              dashboardAccount,
-              dashboardAccount.hasHosting ? 'host-transactions' : 'transactions',
-            )}
+            getActions={getActions}
           />
         </React.Fragment>
       )}
