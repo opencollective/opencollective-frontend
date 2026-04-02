@@ -526,6 +526,8 @@
   "ApplyToHost": "Apply",
   "ApplyToHost.PickCollective": "どのアカウントで {hostName} に申し込みますか？",
   "ApplyToHost.WriteMessage": "財務ホストへのメッセージ",
+  "ApplyToHostCard.platformTips": "Platform Tips",
+  "ApplyToHostCard.platformTips.tooltip": "Contributors to Collectives hosted by this Fiscal Host are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>",
   "appRejectionReason.placeholder": "なぜこの申請は拒否されるのですか?",
   "ApprovePaymentRequests": "Approve Payment Requests",
   "aQEXoc": "{includedCollectives} Active {includedCollectives, plural, one {collective} other {collectives}} / {includedExpensesPerMonth} paid {includedExpensesPerMonth, plural, one {expense} other {expenses}}",

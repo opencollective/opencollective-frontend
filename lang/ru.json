@@ -526,6 +526,8 @@
   "ApplyToHost": "Применить",
   "ApplyToHost.PickCollective": "Какая учетная запись применяется к {hostName}?",
   "ApplyToHost.WriteMessage": "Сообщение для налогового хоста",
+  "ApplyToHostCard.platformTips": "Platform Tips",
+  "ApplyToHostCard.platformTips.tooltip": "Contributors to Collectives hosted by this Fiscal Host are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>",
   "appRejectionReason.placeholder": "Почему это заявление отклоняется?",
   "ApprovePaymentRequests": "Approve Payment Requests",
   "aQEXoc": "{includedCollectives} Active {includedCollectives, plural, one {collective} other {collectives}} / {includedExpensesPerMonth} paid {includedExpensesPerMonth, plural, one {expense} other {expenses}}",

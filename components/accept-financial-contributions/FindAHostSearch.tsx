@@ -66,6 +66,7 @@ const findAFiscalHostQuery = gql`
         currency
         totalHostedCollectives
         hostFeePercent
+        platformContributionAvailable
         isTrustedHost
         isFirstPartyHost
         isVerified
