@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
-import { isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash';
+import { debounce, isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
@@ -49,6 +49,7 @@ import { userMustSetAccountingCategory } from '../expenses/lib/accounting-catego
 import {
   NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID,
   NEW_PAYOUT_METHOD_ID,
+  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
   PAYEE_SLUG_INVITE,
   PAYEE_SLUG_INVITE_EXISTING_USER,
   PAYEE_SLUG_INVITE_SOMEONE,
@@ -1352,12 +1353,34 @@ function buildFormSchema(
     }),
   });
 
-  return pickSchemaFields ? schema.pick(pickSchemaFields as { [K in keyof z.infer<typeof schema>]?: true }) : schema;
+  const addRefine = (schema, pickSchemaFields) => {
+    return schema.superRefine((value, ctx) => {
+      if (!pickSchemaFields || (pickSchemaFields['accountSlug'] && pickSchemaFields['payeeSlug'])) {
+        if (value.accountSlug && value.payeeSlug && value.accountSlug === value.payeeSlug) {
+          const issue = {
+            code: z.ZodIssueCode.custom,
+            message: intl.formatMessage({
+              id: 'ExpenseForm.PayerPayeeMustDiffer',
+              defaultMessage: 'The account paying and the account getting paid must be different.',
+            }),
+          };
+
+          ctx.addIssue({ ...issue, path: ['accountSlug'] });
+          ctx.addIssue({ ...issue, path: ['payeeSlug'] });
+        }
+      }
+    });
+  };
+
+  return addRefine(
+    pickSchemaFields ? schema.pick(pickSchemaFields as { [K in keyof z.infer<typeof schema>]?: true }) : schema,
+    pickSchemaFields,
+  );
 }
 
 function getPayeeSlug(values: ExpenseFormValues): string {
   switch (values.payeeSlug) {
-    case '__findAccountIAdminister':
+    case PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER:
     case PAYEE_SLUG_INVITE:
     case PAYEE_SLUG_INVITE_SOMEONE:
     case PAYEE_SLUG_VENDOR:
@@ -1500,7 +1523,7 @@ async function buildFormOptions(
       options.payoutProfiles = getPayoutProfiles(query.data.loggedInAccount);
       options.isAdminOfPayee =
         options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
-        values.payeeSlug === '__findAccountIAdminister';
+        values.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER;
       if (payee && payee.type !== CollectiveType.VENDOR && options.isAdminOfPayee) {
         // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
         if (payee['host'] && host && payee['host'].id !== host.id) {
@@ -1684,6 +1707,14 @@ type ExpenseFormStartOptions = {
   isInlineEdit?: boolean;
   pickSchemaFields?: Record<string, boolean>;
 };
+
+/**
+ * The form does not always surface errors properly, this will help to troubleshoot.
+ */
+const logFormValidationError = debounce((...params) => {
+  // eslint-disable-next-line no-console
+  console.warn(...params);
+}, 1000);
 
 /**
  * Central hook for managing expense form state, validation, data fetching, and submission.
@@ -1994,8 +2025,7 @@ export function useExpenseForm(opts: {
         }
 
         if (!isEmpty(errs)) {
-          // eslint-disable-next-line no-console
-          console.log('Form validation error', errs, values); // The form does not always surface errors properly, this will help to troubleshoot.
+          logFormValidationError('Form validation error', errs, values);
         }
 
         return errs;

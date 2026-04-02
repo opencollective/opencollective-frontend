@@ -1669,6 +1669,7 @@
   "ExpenseForm.GrantSubjectPlaceholder": "e.g., Research, software development, etc.",
   "ExpenseForm.inviteeOrgDescriptionLabel": "Wat doet je organisatie?",
   "ExpenseForm.InvoiceInfo": "Additional invoice information",
+  "ExpenseForm.PayerPayeeMustDiffer": "The account paying and the account getting paid must be different.",
   "ExpenseForm.PayoutOptionLabel": "Uitbetalingsmethode",
   "ExpenseForm.ReceiptLabel": "Vergoeding",
   "ExpenseForm.SavePayout": "Sla deze informatie op voor toekomstige uitbetalingen",

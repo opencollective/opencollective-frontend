@@ -1669,6 +1669,7 @@
   "ExpenseForm.GrantSubjectPlaceholder": "e.g., Research, software development, etc.",
   "ExpenseForm.inviteeOrgDescriptionLabel": "Was macht deine Organisation?",
   "ExpenseForm.InvoiceInfo": "Zusätzliche Rechnungsinformationen",
+  "ExpenseForm.PayerPayeeMustDiffer": "The account paying and the account getting paid must be different.",
   "ExpenseForm.PayoutOptionLabel": "Auszahlungsmethode",
   "ExpenseForm.ReceiptLabel": "Rückerstattung",
   "ExpenseForm.SavePayout": "Diese Karte für zukünftige Zahlungen speichern",

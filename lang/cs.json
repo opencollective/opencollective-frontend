@@ -1669,6 +1669,7 @@
   "ExpenseForm.GrantSubjectPlaceholder": "e.g., Research, software development, etc.",
   "ExpenseForm.inviteeOrgDescriptionLabel": "What does your organization do?",
   "ExpenseForm.InvoiceInfo": "Doplňující informace o faktuře",
+  "ExpenseForm.PayerPayeeMustDiffer": "The account paying and the account getting paid must be different.",
   "ExpenseForm.PayoutOptionLabel": "Způsob výplaty",
   "ExpenseForm.ReceiptLabel": "Reimbursement",
   "ExpenseForm.SavePayout": "Save this info for future payouts",
