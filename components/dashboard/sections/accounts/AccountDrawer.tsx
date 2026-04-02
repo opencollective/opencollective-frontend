@@ -225,7 +225,7 @@ const AccountDetails = ({ accountId, getActions }: AccountDetailsProps) => {
         entityName={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
         entityIdentifier={
           <div className="flex items-center gap-1">
-            <CopyID value={account?.publicId || id}>{account?.publicId || id}...</CopyID>
+            <CopyID value={account?.publicId || id}>{account?.publicId || id}</CopyID>
           </div>
         }
         separateRowForEntityLabel

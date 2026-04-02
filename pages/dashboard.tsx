@@ -185,7 +185,7 @@ const getProfileUrl = (
         ? contextAccount
         : null;
 
-  if (context && (typeof account?.id === 'string' || (account.publicId && typeof account.publicId === 'string'))) {
+  if (context && (typeof account?.id === 'string' || (account?.publicId && typeof account.publicId === 'string'))) {
     if (account?.type === CollectiveType.INDIVIDUAL) {
       return getDashboardRoute({ slug: context.slug }, `people/${account?.publicId || account?.id}`);
     } else if ([CollectiveType.VENDOR, CollectiveType.ORGANIZATION].includes(account?.type as any)) {

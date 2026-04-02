@@ -288,7 +288,7 @@ function Expense(props: ExpenseProps) {
               }}
             />
             {expense?.publicId && (
-              <div>
+              <div className="text-sm">
                 <CopyID value={expense?.publicId}>{expense?.publicId?.substring(0, 8)}...</CopyID>
               </div>
             )}
