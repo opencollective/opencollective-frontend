@@ -196,9 +196,9 @@ const StyledCollectiveCard = ({
               </P>
             )}
 
-            <Flex my={2} alignItems="center">
+            <Flex my={2} alignItems="center" gap={4}>
               {collective.location?.country && (
-                <Box mr={1}>
+                <Box mr={1} fontSize="14px">
                   {getFlagEmoji(collective.location?.country)}
                   <Span ml={1}></Span>
                   {getCountryDisplayName(intl, collective.location?.country)}

@@ -4134,7 +4134,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   """
   hasMoneyManagement: Boolean!
   termsUrl: URL
-  plan: HostPlan!
+  plan: HostPlan! @deprecated(reason: "2026-04-02: Replaced by new pricing")
 
   """
   EXPERIMENTAL (this may change or be removed)

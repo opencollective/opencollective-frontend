@@ -645,6 +645,7 @@ const searchPageQuery = gql`
           host {
             id
             hostFeePercent
+            platformContributionAvailable
             totalHostedCollectives
             isTrustedHost
             isFirstPartyHost
@@ -655,6 +656,7 @@ const searchPageQuery = gql`
           host {
             id
             hostFeePercent
+            platformContributionAvailable
             totalHostedCollectives
             isTrustedHost
             isFirstPartyHost
