@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { clsx } from 'clsx';
 import { isNil } from 'lodash';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
@@ -6,11 +6,14 @@ import { FormattedMessage } from 'react-intl';
 
 import type { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
 
+import Image from '@/components/Image';
+
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { InfoTooltipIcon } from '../../../InfoTooltipIcon';
 import type { BadgeProps } from '../../../ui/Badge';
 import { Badge } from '../../../ui/Badge';
 import { Skeleton } from '../../../ui/Skeleton';
+import { Tabs, TabsList, TabsTrigger } from '../../../ui/Tabs';
 
 import ComparisonChart from './ComparisonChart';
 
@@ -39,9 +42,10 @@ export interface BaseMetricProps {
   timeseries?: {
     current: TimeSeriesAmount;
     comparison?: TimeSeriesAmount;
-    currency: Currency;
+    currency?: Currency;
   };
   helpLabel?: React.ReactNode;
+  noTimeseriesLabel?: React.ReactNode;
   showCurrencyCode?: boolean;
   showTimeSeries?: boolean;
   expanded?: boolean;
@@ -50,6 +54,7 @@ export interface BaseMetricProps {
   hide?: boolean;
   /** When true, amounts are shown as magnitude (e.g. spent). Default is signed values. */
   useAbsoluteAmount?: boolean;
+  color?: string;
 }
 
 type MetricDivProps = BaseMetricProps & Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'>;
@@ -72,17 +77,49 @@ export function Metric({
   showCurrencyCode = false,
   showTimeSeries = false,
   helpLabel,
+  noTimeseriesLabel,
   isSnapshot = false,
   useAbsoluteAmount = false,
+  color,
   ...props
 }: MetricProps) {
+  const [view, setView] = useState<'amount' | 'count'>('amount');
+  const showViewToggle =
+    !!amount && !!count && (timeseries?.current?.nodes?.some(n => n.count !== null && n.count !== undefined) ?? false);
+  const effectiveAmount = showViewToggle && view === 'count' ? undefined : amount;
+  const effectiveCount = showViewToggle && view === 'amount' ? undefined : count;
+
+  const countTimeseries = useMemo(() => {
+    if (!timeseries?.current) {
+      return undefined;
+    }
+    const transformNodes = (ts: typeof timeseries.current) => ({
+      ...ts,
+      nodes: ts.nodes.map(node => ({
+        ...node,
+        amount: undefined,
+        count: node.count ?? 0,
+      })),
+    });
+    return {
+      current: transformNodes(timeseries.current),
+      comparison: timeseries.comparison ? transformNodes(timeseries.comparison) : undefined,
+      currency: undefined as Currency | undefined,
+    };
+  }, [timeseries]);
+
+  const effectiveTimeseries = showViewToggle && view === 'count' ? countTimeseries : timeseries;
+  const effectiveTimeseriesHasNonZeroNodes =
+    effectiveTimeseries?.current?.nodes?.length > 0 &&
+    effectiveTimeseries.current.nodes.some(n => (n.count ?? n.amount?.valueInCents ?? n.amount?.value ?? 0) > 0);
+
   let value, comparisonValue;
-  if (amount?.current) {
-    value = amount.current.valueInCents;
-    comparisonValue = amount.comparison?.valueInCents;
-  } else if (count?.current) {
-    value = count.current;
-    comparisonValue = count.comparison;
+  if (effectiveAmount?.current) {
+    value = effectiveAmount.current.valueInCents;
+    comparisonValue = effectiveAmount.comparison?.valueInCents;
+  } else if (effectiveCount?.current) {
+    value = effectiveCount.current;
+    comparisonValue = effectiveCount.comparison;
   }
   const percentageDiff = getPercentageDifference(value, comparisonValue);
   const isButton = 'onClick' in props;
@@ -98,12 +135,26 @@ export function Metric({
       )}
       {...(isButton && { onClick: props.onClick })}
     >
-      <div className="w-full space-y-1 p-3">
+      <div className="flex h-full w-full flex-col space-y-1 p-3">
         <div>
-          {label && (
-            <div className="flex items-center gap-1">
-              <span className="block text-sm font-medium tracking-tight">{label}</span>
-              {helpLabel && <InfoTooltipIcon size={14}>{helpLabel}</InfoTooltipIcon>}
+          {(label || showViewToggle) && (
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1">
+                {label && <span className="block text-sm font-medium tracking-tight">{label}</span>}
+                {helpLabel && <InfoTooltipIcon size={14}>{helpLabel}</InfoTooltipIcon>}
+              </div>
+              {showViewToggle && (
+                <Tabs value={view} onValueChange={v => setView(v as 'amount' | 'count')}>
+                  <TabsList className="h-7 p-0.5">
+                    <TabsTrigger value="amount" className="h-6 px-2 text-xs">
+                      <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
+                    </TabsTrigger>
+                    <TabsTrigger value="count" className="h-6 px-2 text-xs">
+                      <FormattedMessage defaultMessage="Count" id="Count" />
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              )}
             </div>
           )}
 
@@ -112,15 +163,19 @@ export function Metric({
           ) : (
             <div className="flex items-center gap-2">
               <span className="block text-2xl font-bold">
-                {amount?.current ? (
+                {effectiveAmount?.current ? (
                   <FormattedMoneyAmount
-                    amount={useAbsoluteAmount ? Math.abs(amount.current.valueInCents) : amount.current.valueInCents}
-                    currency={amount.current.currency}
+                    amount={
+                      useAbsoluteAmount
+                        ? Math.abs(effectiveAmount.current.valueInCents)
+                        : effectiveAmount.current.valueInCents
+                    }
+                    currency={effectiveAmount.current.currency}
                     precision={2}
                     showCurrencyCode={showCurrencyCode}
                   />
                 ) : (
-                  count?.current.toLocaleString()
+                  effectiveCount?.current?.toLocaleString()
                 )}
               </span>
 
@@ -136,17 +191,19 @@ export function Metric({
                   defaultMessage="{countOrAmount} at start of period"
                   id="Pa4OAa"
                   values={{
-                    countOrAmount: amount ? (
+                    countOrAmount: effectiveAmount ? (
                       <FormattedMoneyAmount
                         amount={
-                          useAbsoluteAmount ? Math.abs(amount.comparison.valueInCents) : amount.comparison.valueInCents
+                          useAbsoluteAmount
+                            ? Math.abs(effectiveAmount.comparison.valueInCents)
+                            : effectiveAmount.comparison.valueInCents
                         }
-                        currency={amount.comparison.currency}
+                        currency={effectiveAmount.comparison.currency}
                         precision={2}
                         showCurrencyCode={false}
                       />
                     ) : (
-                      count.comparison.toLocaleString()
+                      effectiveCount.comparison?.toLocaleString()
                     ),
                   }}
                 />
@@ -155,17 +212,19 @@ export function Metric({
                   defaultMessage="{countOrAmount} previous period"
                   id="T5nXXx"
                   values={{
-                    countOrAmount: amount ? (
+                    countOrAmount: effectiveAmount ? (
                       <FormattedMoneyAmount
                         amount={
-                          useAbsoluteAmount ? Math.abs(amount.comparison.valueInCents) : amount.comparison.valueInCents
+                          useAbsoluteAmount
+                            ? Math.abs(effectiveAmount.comparison.valueInCents)
+                            : effectiveAmount.comparison.valueInCents
                         }
-                        currency={amount.comparison.currency}
+                        currency={effectiveAmount.comparison.currency}
                         precision={2}
                         showCurrencyCode={false}
                       />
                     ) : (
-                      count.comparison.toLocaleString()
+                      effectiveCount.comparison.toLocaleString()
                     ),
                   }}
                 />
@@ -176,11 +235,29 @@ export function Metric({
           )}
         </div>
 
-        {showTimeSeries && timeseries && (
-          <div className={clsx('relative', expanded ? 'h-[220px]' : 'h-[110px]')}>
-            {timeseries.current && <ComparisonChart expanded={expanded} {...timeseries} />}
-          </div>
-        )}
+        {showTimeSeries &&
+          effectiveTimeseries &&
+          (effectiveTimeseriesHasNonZeroNodes ? (
+            <div className={clsx('relative', expanded ? 'h-[220px]' : 'h-[110px]')}>
+              <ComparisonChart expanded={expanded} color={color} {...effectiveTimeseries} />
+            </div>
+          ) : (
+            <div className="flex grow flex-col items-center justify-center">
+              <Image
+                alt="No results found illustration with a magnifying glass."
+                className="z-10 sm:h-40 sm:w-40"
+                src="/static/images/no-results.png"
+                height={128}
+                width={128}
+                style={{ height: 128, width: 128 }}
+              />
+              <div className="mb-4 text-center text-sm text-muted-foreground">
+                {noTimeseriesLabel ?? (
+                  <FormattedMessage id="Metric.NoTimeseries" defaultMessage="No time series data available" />
+                )}
+              </div>
+            </div>
+          ))}
       </div>
 
       {children && <div className="border-t">{children}</div>}

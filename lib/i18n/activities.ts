@@ -543,6 +543,10 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'Sent a reminder about expiring credit card to <Account></Account>',
     id: '++1FQ+',
   },
+  PLATFORM_SUBSCRIPTION_UPDATED: {
+    defaultMessage: 'Platform subscription updated for <Account></Account>',
+    id: '/USn0U',
+  },
   USER_PAYMENT_METHOD_CREATED: {
     defaultMessage: 'Created a new payment method for <Account></Account>',
     id: 'afrSHa',
@@ -886,6 +890,10 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   ORDERS_SUSPICIOUS: {
     defaultMessage: 'Suspicious contribution',
     id: 'oocfGT',
+  },
+  PLATFORM_SUBSCRIPTION_UPDATED: {
+    defaultMessage: 'Platform subscription updated',
+    id: '8oLWFR',
   },
   ACTIVATED_COLLECTIVE_AS_HOST: {
     defaultMessage: 'Activated as host',

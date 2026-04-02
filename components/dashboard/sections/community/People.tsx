@@ -8,7 +8,8 @@ import { z } from 'zod';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import type { FilterConfig } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
-import { AccountType, CommunityRelationType, type PeopleHostDashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type { PeopleHostDashboardQuery, PeopleHostDashboardQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
@@ -35,7 +36,7 @@ import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
-import { ContributorDetails } from './AccountDetail';
+import { AccountDetails } from './AccountDetail';
 import { usePersonActions } from './common';
 import { peopleHostDashboardQuery } from './queries';
 
@@ -170,9 +171,9 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
     cell: ({ row }) => {
       const account = row.original;
-      const summary = account?.communityStats?.transactionSummary?.[0];
-      const total = summary?.expenseTotalAcc;
-      const count = summary?.expenseCountAcc || 0;
+      const summary = account?.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+      const total = summary?.debitTotal;
+      const count = summary?.debitCount || 0;
 
       if (!total || count === 0) {
         return <span className="text-muted-foreground">—</span>;
@@ -196,9 +197,9 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
     cell: ({ row }) => {
       const account = row.original;
-      const summary = account?.communityStats?.transactionSummary?.[0];
-      const total = summary?.contributionTotalAcc;
-      const count = summary?.contributionCountAcc || 0;
+      const summary = account?.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+      const total = summary?.creditTotal;
+      const count = summary?.creditCount || 0;
 
       if (!total || count === 0) {
         return <span className="text-muted-foreground">—</span>;
@@ -242,10 +243,16 @@ enum ContributorsTab {
 const PAGE_SIZE = 20;
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  fieldSchema: z.enum(['NAME', 'CREATED_AT', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
   defaultValue: {
     field: 'NAME',
     direction: 'ASC',
+  },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({
+      defaultMessage: 'Created',
+      id: 'created',
+    }),
   },
 });
 
@@ -288,7 +295,6 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
       label: intl.formatMessage({ defaultMessage: 'All', id: 'All' }),
       filter: {},
     },
-
     {
       id: ContributorsTab.ADMINS,
       label: intl.formatMessage({ defaultMessage: 'Collective Admins', id: 'Update.notify.hostedCollectiveAdmins' }),
@@ -297,7 +303,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
     {
       id: ContributorsTab.CONTRIBUTORS,
       label: intl.formatMessage({ defaultMessage: 'Financial Contributors', id: 'FinancialContributors' }),
-      filter: { relation: [CommunityRelationType.CONTRIBUTOR, CommunityRelationType.ATTENDEE] },
+      filter: { relation: [CommunityRelationType.CONTRIBUTOR] },
     },
     {
       id: ContributorsTab.EXPENSE_SUBMITTERS,
@@ -323,7 +329,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
     data,
     loading: queryLoading,
     error: queryError,
-  } = useQuery<PeopleHostDashboardQuery>(peopleHostDashboardQuery, {
+  } = useQuery<PeopleHostDashboardQuery, PeopleHostDashboardQueryVariables>(peopleHostDashboardQuery, {
     variables: {
       slug: accountSlug,
       ...queryFilter.variables,
@@ -374,7 +380,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
             mobileTableView
             getActions={getActions}
           />
-          <Pagination queryFilter={queryFilter} total={data?.community?.totalCount} />
+          <Pagination queryFilter={queryFilter} hasMore={contributors.length === queryFilter.values?.limit} />
         </div>
       )}
     </div>
@@ -390,7 +396,7 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
   if (!isEmpty(id)) {
     return (
       <div className="h-full">
-        <ContributorDetails
+        <AccountDetails
           account={{ id: subpath[0] }}
           host={account}
           onClose={() => pushSubpath('')}

@@ -1,0 +1,244 @@
+import React from 'react';
+import { useQuery } from '@apollo/client';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
+
+import type { FiltersToVariables } from '@/lib/filters/filter-types';
+import { limit, offset } from '@/lib/filters/schemas';
+import type {
+  CommunityAccountDetailQuery,
+  CommunityTransactionSummary,
+  TransactionsTableQueryVariables,
+} from '@/lib/graphql/types/v2/graphql';
+import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import { getDashboardRoute } from '@/lib/url-helpers';
+
+import Link from '@/components/Link';
+import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
+
+import { DashboardContext } from '../../DashboardContext';
+import { EmptyResults } from '../../EmptyResults';
+import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
+import { amountFilter } from '../../filters/AmountFilter';
+import { dateFilter } from '../../filters/DateFilter';
+import { Filterbar } from '../../filters/Filterbar';
+import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
+import { searchFilter } from '../../filters/SearchFilter';
+import { buildSortFilter } from '../../filters/SortFilter';
+import { useTransactionActions } from '../transactions/actions';
+import {
+  filters as commonFilters,
+  schema as commonSchema,
+  toVariables as commonToVariables,
+} from '../transactions/filters';
+import { transactionsTableQuery } from '../transactions/queries';
+import type { TransactionsTableProps } from '../transactions/TransactionsTable';
+import TransactionsTable from '../transactions/TransactionsTable';
+import type { TransactionsTableQueryNode } from '../transactions/types';
+
+const schema = z.object({
+  limit: limit.default(15),
+  offset,
+  date: dateFilter.schema,
+  amount: amountFilter.schema,
+  sort: buildSortFilter({
+    fieldSchema: z.enum(['CREATED_AT', 'EFFECTIVE_DATE']),
+    defaultValue: {
+      field: 'CREATED_AT',
+      direction: 'DESC',
+    },
+  }).schema,
+  searchTerm: searchFilter.schema,
+  type: z.nativeEnum(TransactionType).optional(),
+  kind: commonSchema.shape.kind,
+  openTransactionId: z.coerce.string().optional(),
+  account: hostedAccountFilter.schema,
+  accountingCategory: accountingCategoryFilter.schema,
+  group: commonSchema.shape.group,
+  isRefund: commonSchema.shape.isRefund,
+  merchantId: commonSchema.shape.merchantId,
+  expenseType: commonSchema.shape.expenseType,
+});
+
+type FilterValues = z.infer<typeof schema>;
+
+const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables> = {
+  date: commonToVariables.date,
+  amount: commonToVariables.amount,
+  account: hostedAccountFilter.toVariables,
+};
+
+const filters = {
+  searchTerm: commonFilters.searchTerm,
+  date: commonFilters.date,
+  sort: commonFilters.sort,
+  amount: commonFilters.amount,
+  type: commonFilters.type,
+  kind: commonFilters.kind,
+  account: hostedAccountFilter.filter,
+  accountingCategory: accountingCategoryFilter.filter,
+  group: commonFilters.group,
+  isRefund: commonFilters.isRefund,
+  merchantId: commonFilters.merchantId,
+  expenseType: commonFilters.expenseType,
+};
+
+enum TransactionsView {
+  ALL = 'ALL',
+  PAYOUTS = 'PAYOUTS',
+  CONTRIBUTIONS = 'CONTRIBUTIONS',
+}
+
+type AccountDetailTransactionsTabProps = {
+  account: CommunityAccountDetailQuery['account'];
+  hostSlug: string;
+  handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
+};
+
+const getCountForView = (
+  view: { id: TransactionsView; filter: { kind?: TransactionKind[] }; label: string },
+  transactionSummary?: CommunityTransactionSummary[],
+) => {
+  const summaries = transactionSummary?.filter(summary => view.filter?.kind?.includes(summary.kind as TransactionKind));
+  if (!summaries || summaries.length === 0) {
+    return view;
+  }
+  const count = summaries.reduce((acc, summary) => acc + summary.creditCount + summary.debitCount, 0);
+  return { ...view, count };
+};
+
+export function AccountDetailTransactionsTab({
+  account,
+  hostSlug,
+  handleTransactionTableRowClick,
+}: AccountDetailTransactionsTabProps) {
+  const intl = useIntl();
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
+  const pendingExpenseCount = account?.pendingExpenses?.totalCount || 0;
+
+  const redirectRelatedTransactionsTo = getDashboardRoute(
+    dashboardAccount,
+    dashboardAccount.hasHosting ? 'host-transactions' : 'transactions',
+  );
+
+  const views = React.useMemo(
+    () => [
+      {
+        id: TransactionsView.ALL,
+        label: intl.formatMessage({ defaultMessage: 'All', id: 'All' }),
+        filter: {},
+      },
+      {
+        id: TransactionsView.CONTRIBUTIONS,
+        label: intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' }),
+        filter: { kind: [TransactionKind.ADDED_FUNDS, TransactionKind.CONTRIBUTION] },
+      },
+      {
+        id: TransactionsView.PAYOUTS,
+        label: intl.formatMessage({ defaultMessage: 'Payouts', id: 'Payouts' }),
+        filter: { kind: [TransactionKind.EXPENSE] },
+      },
+    ],
+    [intl],
+  );
+
+  const queryFilter = useQueryFilter<typeof schema, TransactionsTableQueryVariables>({
+    schema,
+    toVariables,
+    filters,
+    views,
+    skipRouter: true,
+    meta: {
+      hostSlug: hostSlug,
+    },
+  });
+
+  const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
+    variables: {
+      fromAccount: { id: account.id },
+      hostAccount: { slug: hostSlug },
+      includeIncognitoTransactions: true,
+      includeChildrenTransactions: false,
+      ...queryFilter.variables,
+    },
+    notifyOnNetworkStatusChange: true,
+  });
+
+  const transactions = data?.transactions;
+
+  const defaultGetActions = useTransactionActions<TransactionsTableQueryNode>({
+    resetFilters: queryFilter.resetFilters,
+    redirectRelatedTransactionsTo,
+  });
+
+  const getActions = React.useCallback<typeof defaultGetActions>(
+    (transaction, onCloseFocusRef, refetch) => {
+      const { secondary } = defaultGetActions(transaction, onCloseFocusRef, refetch);
+      return {
+        secondary: secondary?.filter(a => a.key === 'view-transactions'),
+      };
+    },
+    [defaultGetActions],
+  );
+
+  const viewsWithCount = React.useMemo(
+    () =>
+      views.map(view =>
+        getCountForView(view, 'communityStats' in account && account.communityStats?.transactionSummary),
+      ),
+    [views, account],
+  );
+
+  return (
+    <div className="flex flex-col gap-4">
+      {pendingExpenseCount > 0 && (
+        <Alert variant="info">
+          <AlertDescription>
+            <FormattedMessage
+              id="AccountDetail.TransactionsTab.PendingExpensesAlert"
+              defaultMessage="This account has <a>{count} pending payment requests</a>."
+              values={{
+                count: pendingExpenseCount,
+                a: chunks => (
+                  <Link
+                    href={getDashboardRoute(
+                      dashboardAccount,
+                      `pay-disbursements?sort%5Bfield%5D=CREATED_AT&sort%5Bdirection%5D=DESC&fromAccounts=${account.slug}&status=PENDING&status=APPROVED&status=ON_HOLD&status=INCOMPLETE&status=ERROR`,
+                    )}
+                    className="text-blue-600 underline"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+              }}
+            />
+          </AlertDescription>
+        </Alert>
+      )}
+      <Filterbar {...queryFilter} views={viewsWithCount} />
+      {error ? (
+        <MessageBoxGraphqlError error={error} />
+      ) : !loading && !transactions?.nodes?.length ? (
+        <EmptyResults
+          hasFilters={queryFilter.hasFilters}
+          entityType="TRANSACTIONS"
+          onResetFilters={() => queryFilter.resetFilters({})}
+        />
+      ) : (
+        <React.Fragment>
+          <TransactionsTable
+            transactions={transactions}
+            loading={loading}
+            nbPlaceholders={queryFilter.values.limit}
+            queryFilter={queryFilter}
+            refetchList={refetch}
+            onClickRow={handleTransactionTableRowClick}
+            getActions={getActions}
+          />
+        </React.Fragment>
+      )}
+    </div>
+  );
+}

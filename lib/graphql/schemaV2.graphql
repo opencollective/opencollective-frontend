@@ -7715,10 +7715,17 @@ type TransactionsAmountGroup {
 }
 
 type CommunityStats {
+  id: String!
   associatedCollectives: [CommunityAssociatedAccount]
   associatedOrganizations: [CommunityAssociatedAccount]
   relations: [CommunityRelationType]!
   transactionSummary: [CommunityTransactionSummary!]!
+  transactionSummaryTimeSeries(
+    """
+    The type of transactions to return: CREDIT, DEBIT, or REFUND_DEBIT
+    """
+    type: CommunityTransactionType!
+  ): TimeSeriesAmount!
   lastInteractionAt: DateTime
   firstInteractionAt: DateTime
   activities(
@@ -7753,17 +7760,19 @@ enum CommunityRelationType {
 }
 
 type CommunityTransactionSummary {
-  year: Int
-  expenseTotal: Amount!
-  expenseCount: Int!
-  contributionTotal: Amount!
-  contributionCount: Int!
-  expenseTotalAcc: Amount!
-  expenseCountAcc: Int!
-  contributionTotalAcc: Amount!
-  contributionCountAcc: Int!
-  orderCount: Int!
-  orderCountAcc: Int!
+  kind: String
+  debitTotal: Amount!
+  debitCount: Int!
+  creditTotal: Amount!
+  creditCount: Int!
+  refundDebitTotal: Amount
+  refundDebitCount: Int
+}
+
+enum CommunityTransactionType {
+  CREDIT
+  DEBIT
+  REFUND_DEBIT
 }
 
 """

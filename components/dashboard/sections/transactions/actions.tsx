@@ -45,6 +45,7 @@ const refundTransactionMutation = gql`
 export function useTransactionActions<T extends TransactionsTableQueryNode>({
   resetFilters = null,
   refetchList = null,
+  redirectRelatedTransactionsTo = undefined,
 } = {}) {
   const intl = useIntl();
 
@@ -149,9 +150,12 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
           key: 'view-transactions',
           label: intl.formatMessage({ defaultMessage: 'View related transactions', id: '+9+Ty6' }),
           onClick: () =>
-            resetFilters?.({
-              group: [transaction.group, transaction.refundTransaction?.group].filter(Boolean),
-            }),
+            resetFilters?.(
+              {
+                group: [transaction.group, transaction.refundTransaction?.group].filter(Boolean),
+              },
+              redirectRelatedTransactionsTo,
+            ),
           Icon: Filter,
           if: Boolean(transaction.group),
         },

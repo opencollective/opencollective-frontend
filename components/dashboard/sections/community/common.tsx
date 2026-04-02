@@ -1,13 +1,11 @@
 import React, { useCallback } from 'react';
-import { capitalize, compact } from 'lodash';
+import { capitalize } from 'lodash';
 import type { LucideProps } from 'lucide-react';
 import {
   Archive,
   ArrowRightLeft,
   BookKey,
   Building2,
-  EarthIcon,
-  EyeIcon,
   HandCoins,
   HelpCircle,
   Pencil,
@@ -16,29 +14,38 @@ import {
   User,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { Account, CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
+import type {
+  CommunityAccountDetailQuery,
+  DashboardVendorsQuery,
+  KycStatusFieldsFragment,
+  PeopleHostDashboardQuery,
+  VendorFieldsFragment,
+} from '@/lib/graphql/types/v2/graphql';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
+import { KycProvider } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
-import { formatCommunityRelation } from '@/lib/i18n/community-relation';
+import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
+import { KYCVerificationProviderBadge } from '@/components/kyc/drawer/KYCVerificationProviderBadge';
+import { i18nKYCVerificationStatus } from '@/components/kyc/intl';
+import { KYCVerificationStatusBadge } from '@/components/kyc/KYCVerificationStatusBadge';
 import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';
-import LinkCollective from '@/components/LinkCollective';
 import { useModal } from '@/components/ModalContext';
-import { actionsColumn } from '@/components/table/DataTable';
-import { Badge } from '@/components/ui/Badge';
+import { DataList, DataListItem } from '@/components/ui/DataList';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/HoverCard';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
-import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { ALL_SECTIONS } from '../../constants';
 import { getActivityVariables } from '../ActivityLog/ActivityDescription';
+import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
+import { LegalDocumentStatusBadge } from '../legal-documents/LegalDocumentStatusBadge';
 
 type UsePersonActionsOptions = {
   accountSlug: string;
@@ -62,15 +69,161 @@ export const getCollectiveTypeIcon = (
   }
 };
 
+type TaxFormBadgeProps = {
+  taxForms: CommunityAccountDetailQuery['host']['hostedLegalDocuments'];
+  host?: CommunityAccountDetailQuery['host'];
+};
+
+export function TaxFormBadge({ taxForms }: TaxFormBadgeProps) {
+  const intl = useIntl();
+  const taxForm = taxForms?.nodes?.[0];
+  if (!taxForm) {
+    return null;
+  }
+  return (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <LegalDocumentStatusBadge
+          size="sm"
+          status={taxForm.status}
+          className="cursor-pointer"
+          label={
+            <React.Fragment>
+              <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />{' '}
+            </React.Fragment>
+          }
+        />
+      </HoverCardTrigger>
+      <HoverCardContent className="w-72 text-sm" align="start">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-medium">
+              <FormattedMessage defaultMessage="US Tax Form" id="TaxForm.USTitle" />
+              {taxForm.year && <span className="ml-1 text-muted-foreground">({taxForm.year})</span>}
+            </span>
+            <LegalDocumentServiceBadge size="sm" service={taxForm.service} />
+          </div>
+          <DataList className="gap-1 text-sm font-normal">
+            <DataListItem
+              label={<FormattedMessage defaultMessage="Status" id="LegalDocument.Status" />}
+              value={i18nLegalDocumentStatus(intl, taxForm.status)}
+              labelClassName="min-w-0 w-24 basis-auto"
+            />
+            {taxForm.requestedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Requested" id="Expense.RequestedDate" />}
+                value={<FormattedDate value={taxForm.requestedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+            {taxForm.updatedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Last Updated" id="LastUpdated" />}
+                value={<FormattedDate value={taxForm.updatedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+          </DataList>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
+type KYCStatusBadgeProps = {
+  kycStatus: KycStatusFieldsFragment | null | undefined;
+};
+
+export function KYCStatusBadge({ kycStatus }: KYCStatusBadgeProps) {
+  const intl = useIntl();
+  const verification = kycStatus?.manual;
+  if (!verification) {
+    return null;
+  }
+
+  return (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <KYCVerificationStatusBadge
+          size="sm"
+          status={verification.status}
+          className="cursor-pointer"
+          label={
+            <React.Fragment>
+              <FormattedMessage defaultMessage="KYC" id="KYC" />{' '}
+            </React.Fragment>
+          }
+        />
+      </HoverCardTrigger>
+      <HoverCardContent className="w-72 text-sm" align="start">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-medium">
+              <FormattedMessage defaultMessage="KYC Verification" id="odBeoC" />
+            </span>
+            {verification.provider && <KYCVerificationProviderBadge provider={verification.provider} />}
+          </div>
+          <DataList className="gap-1 text-sm font-normal">
+            <DataListItem
+              label={<FormattedMessage defaultMessage="Status" id="LegalDocument.Status" />}
+              value={i18nKYCVerificationStatus(intl, verification.status)}
+              labelClassName="min-w-0 w-24 basis-auto"
+            />
+            {verification.requestedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Requested" id="Expense.RequestedDate" />}
+                value={<FormattedDate value={verification.requestedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+            {verification.verifiedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Verified at" id="CJrQQ0" />}
+                value={<FormattedDate value={verification.verifiedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+            {verification.revokedAt && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Revoked at" id="PDbgKg" />}
+                value={<FormattedDate value={verification.revokedAt} dateStyle="medium" />}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+            {verification.createdByUser && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Added by" id="KYC.AddedBy" />}
+                value={verification.createdByUser.name}
+                labelClassName="min-w-0 w-24 basis-auto"
+              />
+            )}
+          </DataList>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
+export enum AccountDetailView {
+  OVERVIEW = 'overview',
+  TRANSACTIONS = 'transactions',
+  ACTIVITIES = 'activities',
+  KYC = 'kyc',
+}
+
+type CommunityAccount =
+  | PeopleHostDashboardQuery['community']['nodes'][number]
+  | DashboardVendorsQuery['community']['nodes'][number];
+
 export function usePersonActions(opts: UsePersonActionsOptions) {
   const intl = useIntl();
   const { showModal } = useModal();
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
 
-  return useCallback<GetActions<Account>>(
+  return useCallback<GetActions<CommunityAccount>>(
     contributor => {
-      const actions: ReturnType<GetActions<Account>> = {
+      const actions: ReturnType<GetActions<CommunityAccount>> = {
         primary: [],
         secondary: [],
       };
@@ -182,7 +335,7 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
             showModal(KYCRequestModal, {
               requestedByAccount: { slug: opts.accountSlug },
               verifyAccount: { id: contributor.id },
-              provider: KycProvider.MANUAL,
+              provider: KycProvider.MANUAL as any,
               refetchQueries: ['PeopleHostDashboard'],
             }),
         });
@@ -190,111 +343,7 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
 
       return actions;
     },
-    [intl, showModal, router, opts],
-  );
-}
-
-type UseAssociatedCollectiveActionsOpts = Pick<UsePersonActionsOptions, 'accountSlug'>;
-type AssociatedCollective = CommunityAccountDetailQuery['account']['communityStats']['associatedCollectives'][number];
-
-export function useAssociatedCollectiveActions(opts: UseAssociatedCollectiveActionsOpts) {
-  const intl = useIntl();
-  const router = useRouter();
-  const { LoggedInUser } = useLoggedInUser();
-
-  return useCallback<GetActions<AssociatedCollective>>(
-    associatedCollective => {
-      const actions: ReturnType<GetActions<AssociatedCollective>> = {
-        primary: [],
-        secondary: [],
-      };
-
-      // The contributor in this context is actually an Account from the community query
-      const account = associatedCollective && 'account' in associatedCollective ? associatedCollective.account : null;
-      const collectiveSlug = account?.slug;
-      const hostSlug = router.query.slug as string;
-
-      if (!collectiveSlug || !hostSlug) {
-        return actions;
-      }
-
-      actions.primary.push({
-        key: 'view-expenses',
-        label: intl.formatMessage({
-          defaultMessage: 'View All Expenses',
-          id: 'ViewAllExpenses',
-        }),
-        Icon: Receipt,
-        onClick: () => {
-          router.push({
-            pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-              ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
-              : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
-            query: {
-              ...(!LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) && {
-                status: 'ALL',
-              }),
-              searchTerm: `@${opts.accountSlug}`,
-              account: collectiveSlug,
-            },
-          });
-        },
-      });
-      actions.primary.push({
-        key: 'view-contributions',
-        label: intl.formatMessage({
-          defaultMessage: 'View All Contributions',
-          id: 'ViewAllContributions',
-        }),
-        Icon: HandCoins,
-        onClick: () => {
-          router.push({
-            pathname: `/dashboard/${hostSlug}/incoming-contributions`,
-            query: { searchTerm: `@${opts.accountSlug}`, hostedAccounts: collectiveSlug },
-          });
-        },
-      });
-      actions.primary.push({
-        key: 'view-transactions',
-        label: intl.formatMessage({
-          defaultMessage: 'View All Transactions',
-          id: 'transactions.viewAll',
-        }),
-        Icon: ArrowRightLeft,
-        onClick: () => {
-          router.push({
-            pathname: `/dashboard/${hostSlug}/host-transactions`,
-            query: { searchTerm: `@${opts.accountSlug}`, account: collectiveSlug },
-          });
-        },
-      });
-
-      actions.secondary.push({
-        key: 'view-collective-details',
-        label: intl.formatMessage({
-          defaultMessage: 'View Collective Details',
-          id: 'CommunitySection.ViewCollectiveDetails',
-        }),
-        Icon: EyeIcon,
-        onClick: () => {
-          router.push(`/dashboard/${hostSlug}/hosted-collectives/${account.id}`);
-        },
-      });
-      actions.secondary.push({
-        key: 'view-collective-profile',
-        label: intl.formatMessage({
-          defaultMessage: 'View Collective Public Profile',
-          id: 'CommunitySection.ViewCollectiveProfile',
-        }),
-        Icon: EarthIcon,
-        onClick: () => {
-          router.push(`/${account.slug}`);
-        },
-      });
-
-      return actions;
-    },
-    [intl, router, opts.accountSlug],
+    [intl, showModal, router, opts, LoggedInUser],
   );
 }
 
@@ -332,208 +381,3 @@ export const RichActivityDate = ({
     </Tooltip>
   );
 };
-
-export const associatedTableColumns = intl =>
-  compact([
-    {
-      accessorKey: 'account',
-      header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
-      meta: {
-        className: 'max-w-48',
-      },
-      cell: ({ row }) => {
-        const { account } = row.original;
-        return (
-          <div className="flex min-w-0 items-center overflow-hidden">
-            {account.isFrozen && (
-              <Badge type="info" size="xs" className="mr-2">
-                <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
-              </Badge>
-            )}
-            <LinkCollective
-              collective={account}
-              className="flex min-w-0 items-center gap-1 overflow-hidden"
-              withHoverCard
-            >
-              <Avatar size={24} collective={account} mr={2} />
-              <span className="truncate">{account.name}</span>
-            </LinkCollective>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'relations',
-      header: intl.formatMessage({ defaultMessage: 'Roles', id: 'c35gM5' }),
-      cell: ({ row }) => {
-        const relations =
-          row.original.relations?.filter(
-            (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')),
-          ) || [];
-        return (
-          <div className="flex gap-1 align-middle">
-            {relations.map(role => (
-              <div
-                key={role}
-                className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
-              >
-                {formatCommunityRelation(intl, role)}
-              </div>
-            ))}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'expenses',
-      header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
-      cell: ({ row }) => {
-        const summary = row.original.transactionSummary;
-        const total = summary?.expenseTotal;
-        const count = summary?.expenseCount || 0;
-
-        if (!total || count === 0) {
-          return <span className="text-muted-foreground">—</span>;
-        }
-
-        return (
-          <div className="text-sm">
-            <FormattedMoneyAmount
-              amount={Math.abs(total.valueInCents)}
-              currency={total.currency}
-              showCurrencyCode={false}
-            />
-            <span className="ml-1 text-muted-foreground">({count})</span>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'contributions',
-      header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
-      cell: ({ row }) => {
-        const summary = row.original.transactionSummary;
-        const total = summary?.contributionTotal;
-        const count = summary?.contributionCount || 0;
-
-        if (!total || count === 0) {
-          return <span className="text-muted-foreground">—</span>;
-        }
-
-        return (
-          <div className="text-sm">
-            <FormattedMoneyAmount
-              amount={Math.abs(total.valueInCents)}
-              currency={total.currency}
-              showCurrencyCode={false}
-            />
-            <span className="ml-1 text-muted-foreground">({count})</span>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'firstInteraction',
-      header: intl.formatMessage({ defaultMessage: 'First Interaction', id: 'FirstInteraction' }),
-      cell: ({ row }) => {
-        const date = row.original.firstInteractionAt;
-        return date ? <DateTime value={date} dateStyle="medium" /> : <span className="text-muted-foreground">—</span>;
-      },
-    },
-    actionsColumn,
-  ]);
-
-export const getMembersTableColumns = (intl, includeTransactionSummary = false) =>
-  [
-    {
-      accessorKey: 'account',
-      header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
-      meta: {
-        className: 'max-w-48',
-      },
-      cell: ({ row }) => {
-        const { account } = row.original;
-        const legalName = account.legalName !== account.name && account.legalName;
-        return (
-          <div className="flex items-center text-nowrap">
-            <LinkCollective
-              collective={account}
-              className="flex min-w-0 items-center gap-1 overflow-hidden"
-              withHoverCard
-            >
-              <Avatar size={24} collective={account} mr={2} />
-              <span className="truncate">{account.name || account.slug}</span>
-              {legalName && <span className="ml-1 truncate text-muted-foreground">{`(${legalName})`}</span>}
-            </LinkCollective>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'role',
-      header: intl.formatMessage({ defaultMessage: 'Role', id: 'members.role.label' }),
-      cell: ({ row }) => {
-        return (
-          <div className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset">
-            {capitalize(row.original.role.replace('_', ' ').toLowerCase())}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'createdAt',
-      header: intl.formatMessage({ defaultMessage: 'Member Since', id: 'MemberSince' }),
-      cell: ({ row }) => {
-        const date = row.original.createdAt;
-        return date ? <DateTime value={date} dateStyle="medium" /> : <span className="text-muted-foreground">—</span>;
-      },
-    },
-    includeTransactionSummary && {
-      accessorKey: 'expenses',
-      header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
-      cell: ({ row }) => {
-        const summary = row.original.account?.communityStats?.transactionSummary?.[0];
-        const total = summary?.expenseTotalAcc;
-        const count = summary?.expenseCountAcc || 0;
-
-        if (!total || count === 0) {
-          return <span className="text-muted-foreground">—</span>;
-        }
-
-        return (
-          <div className="text-sm">
-            <FormattedMoneyAmount
-              amount={Math.abs(total.valueInCents)}
-              currency={total.currency}
-              showCurrencyCode={false}
-            />
-            <span className="ml-1 text-muted-foreground">({count})</span>
-          </div>
-        );
-      },
-    },
-    includeTransactionSummary && {
-      accessorKey: 'contributions',
-      header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
-      cell: ({ row }) => {
-        const summary = row.original.account.communityStats?.transactionSummary?.[0];
-        const total = summary?.contributionTotalAcc;
-        const count = summary?.contributionCountAcc || 0;
-
-        if (!total || count === 0) {
-          return <span className="text-muted-foreground">—</span>;
-        }
-
-        return (
-          <div className="text-sm">
-            <FormattedMoneyAmount
-              amount={Math.abs(total.valueInCents)}
-              currency={total.currency}
-              showCurrencyCode={false}
-            />
-            <span className="ml-1 text-muted-foreground">({count})</span>
-          </div>
-        );
-      },
-    },
-  ].filter(Boolean);
