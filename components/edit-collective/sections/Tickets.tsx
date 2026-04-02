@@ -1,6 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
@@ -12,6 +13,7 @@ import AdminContributeCardsContainer from '../../contribute-cards/AdminContribut
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import { editAccountSettingsMutation } from '../mutations';
 import { listTierQuery } from '../tiers/EditTierModal';
@@ -51,7 +53,7 @@ const Tickets = ({ collective }) => {
   const [draggingId, setDraggingId] = React.useState(null);
   const [error, setError] = React.useState(null);
 
-  const variables = { accountSlug: collective.slug };
+  const variables = { accountSlug: collective.slug, tiersOnlyValid: false };
   const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables });
   const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation);
 
@@ -60,6 +62,8 @@ const Tickets = ({ collective }) => {
   const orderKeys = get(collective.settings, TICKETS_ORDER_KEY, EMPTY_ARRAY);
   const tickets = React.useMemo(() => tiers.filter(tier => tier.type === TierTypes.TICKET), [tiers]);
   const sortedTickets = React.useMemo(() => sortTickets(tickets, orderKeys), [tickets, orderKeys]);
+  const supportedTierTypes = data?.account?.supportedTierTypes ?? collective?.supportedTierTypes ?? [];
+  const canCreateTickets = supportedTierTypes.includes(TierTypes.TICKET);
 
   const onTicketsReorder = async cards => {
     const cardKeys = cards.map(c => c.key);
@@ -87,6 +91,14 @@ const Tickets = ({ collective }) => {
       ) : (
         <div>
           {error && <MessageBoxGraphqlError mb={5} error={error} />}
+          {!canCreateTickets && (
+            <MessageBox type="info" withIcon mb={4}>
+              <FormattedMessage
+                defaultMessage="Event tickets are disabled by your fiscal host. Reach out to them for more information."
+                id="CRnx3s"
+              />
+            </MessageBox>
+          )}
           <div>
             <AdminContributeCardsContainer
               collective={collective}
@@ -94,6 +106,7 @@ const Tickets = ({ collective }) => {
               CardsContainer={CardsContainer as any}
               enableReordering={true}
               createNewType="TICKET"
+              hideCreateNew={!canCreateTickets}
               onTierUpdate={() => refetch()}
               onReorder={onTicketsReorder}
               draggingId={draggingId}

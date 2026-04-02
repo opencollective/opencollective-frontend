@@ -42,9 +42,17 @@ const { FUND, PROJECT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
 
-function getTierTypeOptions(intl, collectiveType) {
-  const simplifiedTierTypes = [
-    { value: TIER, label: capitalize(intl.formatMessage({ id: 'tier.type.tier', defaultMessage: 'generic tier' })) },
+/**
+ * Returns tier type options for the type select. Filters by supportedTierTypes when provided.
+ * @param supportedTierTypes - Optional array of tier types the account supports (from API supportedTierTypes field).
+ *        When null/undefined, all types are shown.
+ */
+export function getTierTypeOptions(intl, collectiveType, supportedTierTypes: string[] | null = null) {
+  const allSimplifiedTierTypes = [
+    {
+      value: TIER,
+      label: capitalize(intl.formatMessage({ id: 'tier.type.tier', defaultMessage: 'generic tier' })),
+    },
     {
       value: SERVICE,
       label: capitalize(intl.formatMessage({ id: 'tier.type.service', defaultMessage: 'service (e.g., support)' })),
@@ -59,16 +67,23 @@ function getTierTypeOptions(intl, collectiveType) {
     },
   ];
 
-  const membershipTierType = {
-    value: MEMBERSHIP,
-    label: capitalize(intl.formatMessage({ id: 'tier.type.membership', defaultMessage: 'membership (recurring)' })),
-  };
+  // Filter out unsupported
+  const tierTypes = isNil(supportedTierTypes)
+    ? allSimplifiedTierTypes
+    : allSimplifiedTierTypes.filter(opt => supportedTierTypes.includes(opt.value));
 
   if (collectiveType === PROJECT) {
-    return simplifiedTierTypes;
+    return tierTypes;
   }
 
-  return [...simplifiedTierTypes, membershipTierType];
+  if (isNil(supportedTierTypes) || supportedTierTypes.includes(MEMBERSHIP)) {
+    tierTypes.push({
+      value: MEMBERSHIP,
+      label: capitalize(intl.formatMessage({ id: 'tier.type.membership', defaultMessage: 'membership (recurring)' })),
+    });
+  }
+
+  return tierTypes;
 }
 
 function getReceiptTemplates(intl, host) {
@@ -94,9 +109,12 @@ const collectiveSupportsInterval = collective => {
   return collective.type !== CollectiveType.EVENT;
 };
 
-function FormFields({ collective, values, hideTypeSelect }) {
+function FormFields({ collective, values, hideTypeSelect, supportedTierTypes }) {
   const intl = useIntl();
-  const tierTypeOptions = React.useMemo(() => getTierTypeOptions(intl, collective.type), [intl, collective.type]);
+  const tierTypeOptions = React.useMemo(
+    () => getTierTypeOptions(intl, collective.type, supportedTierTypes),
+    [intl, collective.type, supportedTierTypes],
+  );
   const intervalOptions = React.useMemo(() => {
     if (!collectiveSupportsInterval(collective)) {
       return [{ value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) }];
@@ -602,7 +620,7 @@ const ContributeCardPreviewContainer = styled.div`
   }
 `;
 
-export default function EditTierModal({ tier, collective, onClose, onUpdate, forcedType }) {
+export default function EditTierModal({ tier, collective, onClose, onUpdate, forcedType, supportedTierTypes }) {
   const [formDirty, setFormDirty] = React.useState(false);
   const intl = useIntl();
 
@@ -651,6 +669,7 @@ export default function EditTierModal({ tier, collective, onClose, onUpdate, for
           forcedType={forcedType}
           onUpdate={onUpdate}
           setFormDirty={setFormDirty}
+          supportedTierTypes={supportedTierTypes}
         />
       </DialogContent>
     </Dialog>
@@ -716,11 +735,12 @@ const editTiersFieldsFragment = gql`
 `;
 
 export const listTierQuery = gql`
-  query AccountTiers($accountSlug: String!) {
+  query AccountTiers($accountSlug: String!, $tiersOnlyValid: Boolean) {
     account(slug: $accountSlug) {
       id
       ... on AccountWithContributions {
-        tiers {
+        supportedTierTypes
+        tiers(onlyValid: $tiersOnlyValid) {
           nodes {
             id
             ...EditTiersFields
@@ -728,7 +748,7 @@ export const listTierQuery = gql`
         }
       }
       ... on Organization {
-        tiers {
+        tiers(onlyValid: $tiersOnlyValid) {
           nodes {
             id
             ...EditTiersFields
@@ -791,6 +811,7 @@ function EditTierFormInner({
   isDeleting,
   isConfirmingDelete,
   setFormDirty,
+  supportedTierTypes,
 }) {
   const intl = useIntl();
   const { values, isSubmitting, dirty } = formik;
@@ -814,7 +835,12 @@ function EditTierFormInner({
       <div className="flex-1">
         <ModalSectionContainer>
           <EditSectionContainer>
-            <FormFields collective={collective} values={values} hideTypeSelect={Boolean(forcedType)} />
+            <FormFields
+              collective={collective}
+              values={values}
+              hideTypeSelect={Boolean(forcedType)}
+              supportedTierTypes={supportedTierTypes}
+            />
           </EditSectionContainer>
           <PreviewSectionContainer>
             <div className="block">
@@ -868,7 +894,7 @@ function EditTierFormInner({
   );
 }
 
-function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setFormDirty }) {
+function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setFormDirty, supportedTierTypes }) {
   const intl = useIntl();
   const isEditing = Boolean(tier?.id);
   const initialValues = React.useMemo(() => {
@@ -1006,6 +1032,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setForm
               isDeleting={isDeleting}
               isConfirmingDelete={isConfirmingDelete}
               setFormDirty={setFormDirty}
+              supportedTierTypes={supportedTierTypes}
             />
           );
         }}
