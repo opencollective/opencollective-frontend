@@ -1669,6 +1669,7 @@
   "ExpenseForm.GrantSubjectPlaceholder": "e.g., Research, software development, etc.",
   "ExpenseForm.inviteeOrgDescriptionLabel": "你的组织从事什么？",
   "ExpenseForm.InvoiceInfo": "更多发票信息",
+  "ExpenseForm.PayerPayeeMustDiffer": "The account paying and the account getting paid must be different.",
   "ExpenseForm.PayoutOptionLabel": "支付方法",
   "ExpenseForm.ReceiptLabel": "报销",
   "ExpenseForm.SavePayout": "保存此信息用于未来的付款",

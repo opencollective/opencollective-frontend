@@ -1669,6 +1669,7 @@
   "ExpenseForm.GrantSubjectPlaceholder": "e.g., Research, software development, etc.",
   "ExpenseForm.inviteeOrgDescriptionLabel": "Czym zajmuje się Twoja organizacja?",
   "ExpenseForm.InvoiceInfo": "Dodatkowe informacje na fakturze",
+  "ExpenseForm.PayerPayeeMustDiffer": "The account paying and the account getting paid must be different.",
   "ExpenseForm.PayoutOptionLabel": "Metoda wypłaty",
   "ExpenseForm.ReceiptLabel": "Zwrot kosztów",
   "ExpenseForm.SavePayout": "Zachowaj tę informację dla przyszłych wypłat",

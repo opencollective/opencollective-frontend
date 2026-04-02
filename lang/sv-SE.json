@@ -1669,6 +1669,7 @@
   "ExpenseForm.GrantSubjectPlaceholder": "e.g., Research, software development, etc.",
   "ExpenseForm.inviteeOrgDescriptionLabel": "Vad gör din organisation?",
   "ExpenseForm.InvoiceInfo": "Övrig information",
+  "ExpenseForm.PayerPayeeMustDiffer": "The account paying and the account getting paid must be different.",
   "ExpenseForm.PayoutOptionLabel": "Utbetalningsmetod",
   "ExpenseForm.ReceiptLabel": "Ersättning",
   "ExpenseForm.SavePayout": "Spara denna information för framtida utbetalningar",
