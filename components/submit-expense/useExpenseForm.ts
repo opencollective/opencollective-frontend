@@ -474,11 +474,7 @@ const expenseFormSchemaQuery = gql`
       taxType
     }
     payoutMethods {
-      id
-      type
-      name
-      data
-      isSaved
+      ...ExpenseFormPayoutMethods
     }
     visibleToAccounts {
       id
@@ -601,6 +597,9 @@ const expenseFormSchemaQuery = gql`
         id
         slug
       }
+    }
+    ... on Vendor {
+      ...ExpenseVendorFields
     }
   }
 
@@ -1496,6 +1495,10 @@ async function buildFormOptions(
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
       options.accountingCategories = host.accountingCategories.nodes;
+
+      if (startOptions.duplicateExpense && expense?.payee?.type === CollectiveType.VENDOR) {
+        options.vendorsForAccount = [...options.vendorsForAccount, expense.payee as ExpenseVendorFieldsFragment];
+      }
     } else {
       options.supportedPayoutMethods = [PayoutMethodType.OTHER, PayoutMethodType.BANK_ACCOUNT];
     }
@@ -2322,7 +2325,7 @@ export function useExpenseForm(opts: {
       formOptions.expense?.id &&
       formOptions.expense.currency &&
       !expenseForm.values.referenceCurrency &&
-      formOptions.availableReferenceCurrencies.length > 1
+      formOptions.availableReferenceCurrencies?.length > 1
     ) {
       setFieldValue('referenceCurrency', formOptions.expense.currency);
     }
