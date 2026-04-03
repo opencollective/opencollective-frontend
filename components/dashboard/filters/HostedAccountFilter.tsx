@@ -19,8 +19,20 @@ import { accountFilterQuery } from './AccountFilter';
 import ComboSelectFilter from './ComboSelectFilter';
 
 const hostedAccountFilterSearchQuery = gql`
-  query HostedAccountFilterSearch($searchTerm: String, $hostSlug: String, $orderBy: OrderByInput) {
-    accounts(searchTerm: $searchTerm, host: { slug: $hostSlug }, orderBy: $orderBy) {
+  query HostedAccountFilterSearch(
+    $searchTerm: String
+    $hostSlug: String
+    $orderBy: OrderByInput
+    $includeAccountsWithTransactionsForHost: Boolean
+    $includeArchived: Boolean
+  ) {
+    accounts(
+      searchTerm: $searchTerm
+      host: { slug: $hostSlug }
+      orderBy: $orderBy
+      includeAccountsWithTransactionsForHost: $includeAccountsWithTransactionsForHost
+      includeArchived: $includeArchived
+    ) {
       nodes {
         id
         ...AccountHoverCardFields
@@ -104,6 +116,8 @@ const resultNodeToOption = account => ({
 
 export type HostedAccountFilterMeta = {
   hostSlug: string;
+  /** When true (e.g. host ledger transactions), include accounts with past host ledger rows via the API. */
+  includeAccountsWithLedgerHistoryForHost?: boolean;
   hostedAccounts?: Partial<AccountHoverCardFieldsFragment>[];
   disableHostedAccountsSearch?: boolean;
 };
@@ -120,7 +134,12 @@ function HostedAccountFilter({
   const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>(defaultAccounts);
 
   const [search, { loading, data }] = useLazyQuery(hostedAccountFilterSearchQuery, {
-    variables: { hostSlug: meta.hostSlug },
+    variables: {
+      hostSlug: meta.hostSlug,
+      ...(meta.hostSlug && meta.includeAccountsWithLedgerHistoryForHost
+        ? { includeAccountsWithTransactionsForHost: true, includeArchived: true }
+        : {}),
+    },
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
   });

@@ -21,7 +21,7 @@ import { EmptyResults } from '../../EmptyResults';
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { Filterbar } from '../../filters/Filterbar';
-import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
+import { hostedAccountFilter, type HostedAccountFilterMeta } from '../../filters/HostedAccountFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import type { FilterMeta as CommonFilterMeta } from './filters';
@@ -37,9 +37,7 @@ export const schema = commonSchema.extend({
 
 export type FilterValues = z.infer<typeof schema>;
 
-type FilterMeta = CommonFilterMeta & {
-  hostSlug: string;
-};
+type FilterMeta = CommonFilterMeta & HostedAccountFilterMeta;
 
 // Only needed when values and key of filters are different
 // to expected key and value of QueryVariables
@@ -123,6 +121,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSecti
       currency: account?.currency,
       kinds: metaData?.transactions?.kinds,
       hostSlug: hostSlug,
+      includeAccountsWithLedgerHistoryForHost: true,
       paymentMethodTypes: metaData?.transactions?.paymentMethodTypes,
       manualPaymentProviders: metaData?.host?.manualPaymentProviders,
     },

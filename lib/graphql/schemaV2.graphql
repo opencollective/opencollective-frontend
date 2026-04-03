@@ -17525,6 +17525,11 @@ type Query {
     Filter accounts that have a last transaction before this date
     """
     lastTransactionTo: DateTime
+
+    """
+    When used with `host`, also include accounts that are not currently approved under that host but have ledger rows in `Transactions` with this host as `HostCollectiveId`. Requires the remote user to be an admin of the host.
+    """
+    includeAccountsWithTransactionsForHost: Boolean
   ): AccountCollection!
   activities(
     """
