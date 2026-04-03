@@ -21,7 +21,19 @@ type BoxProps = SpaceProps &
     css?: string | object;
   };
 
-const FILTERED_PROPS = new Set(['display', 'width', 'height']);
+const FILTERED_PROPS = new Set([
+  'display',
+  'width',
+  'height',
+  'borderWidth',
+  'borderStyle',
+  'borderColor',
+  'borderRadius',
+  'overflowX',
+  'overflowY',
+  'boxShadow',
+  'textAlign',
+]);
 
 export const Box = styled.div.withConfig({
   shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
