@@ -920,7 +920,7 @@ interface Account {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this account can use to pay for Orders
