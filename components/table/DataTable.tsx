@@ -199,7 +199,7 @@ export function DataTable<TData, TValue>({
             ))
         ) : (
           <TableRow highlightOnHover={false}>
-            <TableCell colSpan={columns.length} compact={compact}>
+            <TableCell colSpan={table.getVisibleFlatColumns().length} compact={compact}>
               <div className="p-4 text-center text-slate-500">
                 {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" id="UG5qoS" />}
               </div>
@@ -211,7 +211,7 @@ export function DataTable<TData, TValue>({
       {footer && (
         <tfoot>
           <tr>
-            <th colSpan={table.getCenterLeafColumns().length}>{footer}</th>
+            <th colSpan={table.getVisibleFlatColumns().length}>{footer}</th>
           </tr>
         </tfoot>
       )}
@@ -235,7 +235,11 @@ function DataTableRow({
     <TableRow
       data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
       data-state={row.getIsSelected() && 'selected'}
-      className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
+      className={cn(
+        getRowClassName?.(row),
+        onClickRow && 'cursor-pointer',
+        rowHasIndicator?.(row) && 'overflow-hidden',
+      )}
       {...(onClickRow && {
         onClick: e => onClickRow(row, actionsMenuTriggerRef, e),
       })}

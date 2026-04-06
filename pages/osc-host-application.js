@@ -130,7 +130,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   const collective = data?.account;
   const canApplyWithCollective = collective && collective.isAdmin && collective.type === CollectiveType.COLLECTIVE;
   const hasHost = collective && collective?.host?.id;
-  const popularTags = hostData?.tagStats.nodes.map(({ tag }) => tag).filter(tag => !IGNORED_TAGS.includes(tag));
+  const popularTags = hostData?.tagStats?.nodes?.map(({ tag }) => tag).filter(tag => !IGNORED_TAGS.includes(tag)) || [];
 
   React.useEffect(() => {
     if (step === 'form' && collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {

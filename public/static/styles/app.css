@@ -388,7 +388,7 @@
 }
 @utility row-indicator {
   &::before {
-    @apply absolute inset-y-[-1px] left-0 w-0.5 bg-primary content-[''];
+    @apply absolute inset-y-[-1px] left-0 w-0.5 bg-primary content-[''] h-full top-0;
   }
 }
 

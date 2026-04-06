@@ -16,7 +16,6 @@ export enum PREVIEW_FEATURE_KEYS {
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
-  PLATFORM_BILLING = 'PLATFORM_BILLING',
   SIDEBAR_REORG_DISBURSEMENTS = 'SIDEBAR_REORG_DISBURSEMENTS',
   SIDEBAR_REORG_INCOMING_OUTGOING = 'SIDEBAR_REORG_INCOMING_OUTGOING',
   ASYNC_EXPORTS = 'ASYNC_EXPORTS',
@@ -81,15 +80,6 @@ export const previewFeatures: PreviewFeature[] = [
     ),
     alwaysEnableInDev: true,
     publicBeta: true,
-    category: Categories.GENERAL,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.PLATFORM_BILLING,
-    title: 'Platform billing',
-    description: 'New platform billing dashboard',
-    alwaysEnableInDev: true,
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.GENERAL,
   },
   {

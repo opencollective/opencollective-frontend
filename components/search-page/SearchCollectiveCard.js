@@ -1,4 +1,5 @@
 import React from 'react';
+import { Info } from 'lucide-react';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -7,6 +8,7 @@ import Container from '../Container';
 import Currency from '../Currency';
 import { Box } from '../Grid';
 import { Span } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import StyledCollectiveCard from './StyledCollectiveCard';
 
@@ -44,13 +46,47 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                   <FormattedMessage id="Currency" defaultMessage="Currency" />
                 </Span>
               </Box>
-              <Box>
-                <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.host.hostFeePercent}%`}</Span>
-                {` `}
-                <Span fontSize="12px" fontWeight={400} color="black.700">
-                  <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
-                </Span>
-              </Box>
+              <div className="flex items-center gap-1.5 text-xs text-slate-700">
+                <span>
+                  <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.host.hostFeePercent}%`}</Span>
+                  {` `}
+                  <Span fontSize="12px" fontWeight={400}>
+                    <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
+                  </Span>
+                </span>
+                {collective.host.platformContributionAvailable && (
+                  <div className="flex items-center gap-1">
+                    +{' '}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="mt-1 inline-flex cursor-help items-center gap-1 underline decoration-slate-300 decoration-dashed underline-offset-2 transition-colors hover:decoration-slate-400">
+                          <FormattedMessage defaultMessage="Platform Tips" id="ApplyToHostCard.platformTips" />
+                          <Info size={12} className="shrink-0 text-slate-500" aria-hidden />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <FormattedMessage
+                          defaultMessage="Contributors to Collectives hosted by this Fiscal Host are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>"
+                          id="ApplyToHostCard.platformTips.tooltip"
+                          values={{
+                            b: chunks => <strong>{chunks}</strong>,
+                            LearnMoreLink: chunks => (
+                              <a
+                                href="https://documentation.opencollective.com/giving-to-collectives/platform-tips"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline"
+                              >
+                                {chunks}
+                              </a>
+                            ),
+                          }}
+                        />
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                )}
+              </div>
             </React.Fragment>
           ) : (
             <React.Fragment>
