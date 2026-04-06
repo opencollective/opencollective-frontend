@@ -925,5 +925,11 @@ export const expensesListAdminFieldsFragment = gql`
         }
       }
     }
+
+    kycStatus {
+      payee {
+        status
+      }
+    }
   }
 `;
