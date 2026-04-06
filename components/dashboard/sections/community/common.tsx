@@ -32,7 +32,7 @@ import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
-import { KYCVerificationProviderBadge } from '@/components/kyc/drawer/KYCVerificationProviderBadge';
+import { KYCVerificationProviderBadge } from '@/components/kyc/components/KYCVerificationProviderBadge';
 import { i18nKYCVerificationStatus } from '@/components/kyc/intl';
 import { KYCVerificationStatusBadge } from '@/components/kyc/KYCVerificationStatusBadge';
 import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';

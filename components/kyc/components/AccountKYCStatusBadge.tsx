@@ -50,7 +50,7 @@ function getKycBadgeState(
     return null;
   }
 
-  if (!status || status === KycVerificationStatusEnum.REVOKED) {
+  if (!status || [KycVerificationStatusEnum.REVOKED, KycVerificationStatusEnum.EXPIRED].includes(status)) {
     return {
       label: intl.formatMessage({ defaultMessage: 'Initiate KYC', id: 'initiate-kyc' }),
       state: 'INITIATE',
@@ -72,8 +72,6 @@ function getKycBadgeState(
         containerClassName: 'bg-green-100 text-green-800',
       };
     case KycVerificationStatusEnum.FAILED:
-    case KycVerificationStatusEnum.EXPIRED:
-    default:
       return {
         label: intl.formatMessage({ defaultMessage: 'KYC Rejected', id: 'h2ilrh' }),
         state: 'REJECTED',
@@ -188,7 +186,11 @@ export function AccountKYCStatusBadge(props: AccountKYCStatusBadgeProps) {
     props.className,
   );
 
-  if ((!kycVerification || kycVerification?.status === KycVerificationStatusEnum.REVOKED) && !props.showActions) {
+  if (
+    (!kycVerification ||
+      [KycVerificationStatusEnum.REVOKED, KycVerificationStatusEnum.EXPIRED].includes(kycVerification?.status)) &&
+    !props.showActions
+  ) {
     return null;
   }
 
@@ -196,7 +198,9 @@ export function AccountKYCStatusBadge(props: AccountKYCStatusBadgeProps) {
     return <div className={containerClassName}>{badgeState.label}</div>;
   }
 
-  const canRequest = !kycVerification || kycVerification?.status === KycVerificationStatusEnum.REVOKED;
+  const canRequest =
+    !kycVerification ||
+    [KycVerificationStatusEnum.REVOKED, KycVerificationStatusEnum.EXPIRED].includes(kycVerification?.status);
   const canSubmit = canRequest || kycVerification?.status === KycVerificationStatusEnum.PENDING;
 
   return (
@@ -219,7 +223,7 @@ export function AccountKYCStatusBadge(props: AccountKYCStatusBadgeProps) {
         )}
         {canRequest && (
           <DropdownMenuItem onClick={openRequestManualKYCModal} className="gap-2 px-3 py-2">
-            <FormattedMessage defaultMessage="Request KYC Verification" id="Kio9p/" />
+            <FormattedMessage defaultMessage="Mark as KYC required" id="BfRgNs" />
           </DropdownMenuItem>
         )}
         {canSubmit && (
