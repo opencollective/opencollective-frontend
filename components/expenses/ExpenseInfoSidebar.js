@@ -59,7 +59,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, c
                         blockedFunds: (
                           <FormattedMoneyAmount
                             amount={blockedFundsAmount.valueInCents}
-                            currency={balance.currency}
+                            currency={blockedFundsAmount.currency}
                             precision={CurrencyPrecision.DEFAULT}
                           />
                         ),
@@ -74,14 +74,14 @@ const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, c
                     precision={CurrencyPrecision.DEFAULT}
                   />
                 </DefinitionTooltip>
-              ) : (
+              ) : balance ? (
                 <FormattedMoneyAmount
                   currency={balance.currency}
                   amount={balance.valueInCents}
                   amountClassName="text-foreground"
                   precision={CurrencyPrecision.DEFAULT}
                 />
-              )}
+              ) : null}
 
               {host && (
                 <P fontSize="11px" color="black.700" mt={3}>

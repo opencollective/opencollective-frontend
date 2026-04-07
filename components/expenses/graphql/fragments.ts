@@ -793,6 +793,7 @@ export const expensesListFieldsFragment = gql`
       name
       data
       isSaved
+      isVerified
     }
     payee {
       id
@@ -863,6 +864,7 @@ export const expensesListAdminFieldsFragment = gql`
       type
       name
       data
+      isVerified
     }
     items {
       id
@@ -923,6 +925,12 @@ export const expensesListAdminFieldsFragment = gql`
           name
           imageUrl
         }
+      }
+    }
+
+    kycStatus {
+      payee {
+        status
       }
     }
   }

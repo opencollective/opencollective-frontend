@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
+import { FocusScope } from '@radix-ui/react-focus-scope';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import ReactAnimateHeight from 'react-animate-height';
 import { FormattedMessage } from 'react-intl';
@@ -89,7 +90,12 @@ export function Survey({
   }
 
   return (
-    <React.Fragment>
+    <FocusScope
+      trapped={showForm}
+      loop
+      onMountAutoFocus={e => e.preventDefault()}
+      onUnmountAutoFocus={e => e.preventDefault()}
+    >
       <ReactAnimateHeight duration={150} height={completed ? 0 : 'auto'}>
         <div className="flex flex-col gap-4">
           <p className={hasParentTitle ? 'font-normal' : 'font-bold'}>{question}</p>
@@ -157,6 +163,6 @@ export function Survey({
           </p>
         )}
       </ReactAnimateHeight>
-    </React.Fragment>
+    </FocusScope>
   );
 }

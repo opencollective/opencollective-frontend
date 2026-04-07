@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { omitBy } from 'lodash';
+import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -22,6 +22,7 @@ import {
 } from '../../../../lib/hooks/useKeyboardKey';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
@@ -30,6 +31,7 @@ import StyledButton from '../../../StyledButton';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import { expenseKYCStatusFilter } from '../../filters/ExpenseKYCStatusFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
@@ -52,6 +54,7 @@ import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
   hostContext: hostContextFilter.schema,
+  kycStatus: expenseKYCStatusFilter.schema,
 });
 
 type FilterValues = z.infer<typeof filterSchema>;
@@ -67,12 +70,14 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
   ...commonToVariables,
   limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
   account: hostedAccountFilter.toVariables,
+  kycStatus: expenseKYCStatusFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
+  kycStatus: expenseKYCStatusFilter.filter,
 };
 
 /**
@@ -175,11 +180,17 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     [intl],
   );
 
+  const hasKycFeature = isFeatureEnabled(account, FEATURES.KYC);
+
+  const effectiveFilters = useMemo(() => {
+    return hasKycFeature ? filters : omit(filters, 'kycStatus');
+  }, [hasKycFeature]);
+
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
     defaultFilterValues: views[1].filter,
-    filters,
+    filters: effectiveFilters,
     meta: {
       currency: account.currency,
       hostSlug: hostSlug,

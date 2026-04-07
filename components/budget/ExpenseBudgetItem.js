@@ -16,6 +16,8 @@ import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 import { isFeatureEnabled } from '@/lib/allowed-features';
 
+import { ExpenseKYCStatusBadge } from '../kyc/components/ExpenseKYCStatusBadge';
+
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
@@ -142,7 +144,6 @@ const ExpenseBudgetItem = ({
   const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
   const lastComment = expense?.lastComment?.nodes?.[0];
   const approvedBy = expense?.approvedBy?.length > 0 ? expense.approvedBy : null;
-
   return (
     <ExpenseContainer
       px={[3, '24px']}
@@ -394,6 +395,9 @@ const ExpenseBudgetItem = ({
                   showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
                   payee={expense.payee}
                 />
+              )}
+              {isLoggedInUserExpenseHostAdmin && expense.kycStatus?.payee?.status && (
+                <ExpenseKYCStatusBadge className="ml-1" status={expense.kycStatus?.payee?.status} />
               )}
             </Flex>
           )}

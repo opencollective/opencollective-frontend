@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Form, FormikProvider, useFormikContext } from 'formik';
 import { pick } from 'lodash';
-import { Pen } from 'lucide-react';
+import { AlertCircle, Pen } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -37,6 +37,7 @@ import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSect
 import { InvoiceFormOption } from '../submit-expense/form/TypeOfExpenseSection';
 import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
 import { InviteeAccountType, useExpenseForm, YesNoOption } from '../submit-expense/useExpenseForm';
+import { Alert, AlertDescription } from '../ui/Alert';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Collapsible, CollapsibleContent } from '../ui/Collapsible';
@@ -150,7 +151,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
       {({ setFieldValue, values }) => {
         // Check if the selected account is the same as the current expense account
         const isSameAccount = values.destinationAccount?.id === expense.account.id;
-
+        const payerIsPayee = expense.payee?.id === values.destinationAccount?.id;
         return (
           <Form className="space-y-4">
             <FormField name="destinationAccount">
@@ -165,7 +166,18 @@ const EditPaidBy = ({ expense, handleClose }) => {
                 />
               )}
             </FormField>
-            <EditExpenseActionButtons disabled={isSameAccount || isLoading} loading={submitting} />
+            {payerIsPayee && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertDescription>
+                  <AlertCircle className="inline-block align-text-bottom" size={16} />{' '}
+                  <FormattedMessage
+                    id="ExpenseForm.PayerPayeeMustDiffer"
+                    defaultMessage="The account paying and the account getting paid must be different."
+                  />
+                </AlertDescription>
+              </Alert>
+            )}
+            <EditExpenseActionButtons disabled={isSameAccount || payerIsPayee || isLoading} loading={submitting} />
           </Form>
         );
       }}
@@ -178,7 +190,14 @@ const EditPayee = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: { expenseItems: true, hasTax: true, tax: true, payoutMethodId: true, payeeSlug: true },
+    pickSchemaFields: {
+      expenseItems: true,
+      hasTax: true,
+      tax: true,
+      payoutMethodId: true,
+      payeeSlug: true,
+      accountSlug: true,
+    },
   });
   const transformedOnSubmit = React.useCallback(
     async (values, h, formOptions) => {
@@ -231,6 +250,7 @@ const EditPayee = ({ expense, onSubmit }) => {
     formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
+      accountSlug: expense.account.slug,
       expenseItems: [
         {
           amount: {

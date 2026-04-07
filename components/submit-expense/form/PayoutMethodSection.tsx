@@ -16,7 +16,12 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
-import { NEW_PAYOUT_METHOD_ID, PAYEE_SLUG_NEW_VENDOR, PAYEE_SLUG_VENDOR } from '@/components/expenses/lib/constants';
+import {
+  NEW_PAYOUT_METHOD_ID,
+  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
+  PAYEE_SLUG_NEW_VENDOR,
+  PAYEE_SLUG_VENDOR,
+} from '@/components/expenses/lib/constants';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
@@ -98,7 +103,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   const { LoggedInUser } = useLoggedInUser();
 
   const isLoadingPayee = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
-  const isPickingProfileAdministered = props.payeeSlug === '__findAccountIAdminister';
+  const isPickingProfileAdministered = props.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER;
 
   const payoutMethods = React.useMemo(() => {
     if (!props.payoutMethods) {
