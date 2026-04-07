@@ -89,10 +89,7 @@ export const HostTodoList = () => {
         {
           id: 'expenses',
           title: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
-          href: getDashboardRoute(
-            account,
-            ALL_SECTIONS.PAY_DISBURSEMENTS,
-          ),
+          href: getDashboardRoute(account, ALL_SECTIONS.PAY_DISBURSEMENTS),
           icon: Receipt,
           iconBgColor: 'bg-green-50',
           iconColor: 'text-green-700',
@@ -127,10 +124,7 @@ export const HostTodoList = () => {
                 },
                 { count: data?.missingReceiptExpenses.totalCount },
               ),
-              href: getDashboardRoute(
-                account,
-                ALL_SECTIONS.PAID_DISBURSEMENTS,
-              ),
+              href: getDashboardRoute(account, ALL_SECTIONS.PAID_DISBURSEMENTS),
               queryParams: `?chargeHasReceipts=false`,
             },
 
@@ -332,10 +326,7 @@ export const AccountTodoList = () => {
   // Expenses to pay, for orgs with money management
   const toPayExpenseCount = data?.toPayExpenses?.totalCount || 0;
 
-  const expensesHref = getDashboardRoute(
-    account,
-    ALL_SECTIONS.PAYMENT_REQUESTS,
-  );
+  const expensesHref = getDashboardRoute(account, ALL_SECTIONS.PAYMENT_REQUESTS);
 
   const createLink = (href: string) => (chunks: React.ReactNode) => (
     <Link className="font-medium text-primary hover:underline" href={href}>

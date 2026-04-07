@@ -236,10 +236,7 @@ interface TransactionDetailsProps {
 
 const getExpenseUrl = (dashboardAccount, expense) => {
   if (dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id) {
-    return getDashboardRoute(
-      expense.host,
-      `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`,
-    );
+    return getDashboardRoute(expense.host, `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`);
   } else if (dashboardAccount?.id === expense.account.id) {
     return getDashboardRoute(expense.account, `expenses?openExpenseId=${expense.legacyId}`);
   }

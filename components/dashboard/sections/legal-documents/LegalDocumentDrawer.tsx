@@ -182,18 +182,14 @@ export default function LegalDocumentDrawer({
                       <li>
                         <Link
                           className="text-primary underline"
-                          href={getDashboardRoute(
-                            host,
-                            ALL_SECTIONS.HOST_PAYMENT_REQUESTS,
-                            {
-                              params: new URLSearchParams([
-                                ['searchTerm', `@${document.account.slug}`],
-                                ['type', 'INVOICE'],
-                                ['type', 'GRANT'],
-                                ['type', 'UNCLASSIFIED'],
-                              ]),
-                            },
-                          )}
+                          href={getDashboardRoute(host, ALL_SECTIONS.HOST_PAYMENT_REQUESTS, {
+                            params: new URLSearchParams([
+                              ['searchTerm', `@${document.account.slug}`],
+                              ['type', 'INVOICE'],
+                              ['type', 'GRANT'],
+                              ['type', 'UNCLASSIFIED'],
+                            ]),
+                          })}
                         >
                           <FormattedMessage
                             defaultMessage="...and {count} more"

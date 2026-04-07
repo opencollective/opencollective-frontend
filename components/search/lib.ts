@@ -88,10 +88,7 @@ export function useGetLinkProps() {
           } else if (workspace.slug === expense.payee?.slug) {
             href = getDashboardRoute(workspace, `submitted-expenses?openExpenseId=${expense.legacyId}`);
           } else if (workspace.isHost && 'host' in expense.account && workspace.slug === expense.account.host?.slug) {
-            href = getDashboardRoute(
-              workspace,
-              `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`,
-            );
+            href = getDashboardRoute(workspace, `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`);
           } else {
             href = getExpensePageUrl(expense);
           }
