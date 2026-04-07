@@ -14,7 +14,7 @@ import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-pro
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
-import { CopyID } from '../CopyId';
+import { CopyIDDropdown } from '../CopyId';
 import DateTime from '../DateTime';
 import DrawerHeader from '../DrawerHeader';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -39,6 +39,7 @@ const contributionDrawerQuery = gql`
     order(order: { legacyId: $orderId }) {
       id
       legacyId
+      publicId
       nextChargeDate
       lastChargedAt
       amount {
@@ -302,12 +303,29 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           }
           forceMoreActions
           entityIdentifier={
-            <CopyID
-              value={props.orderId}
-              tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
-            >
-              #{props.orderId}
-            </CopyID>
+            <div className="flex items-center gap-1">
+              <CopyIDDropdown
+                tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
+                ids={[
+                  {
+                    name: <FormattedMessage defaultMessage="Order ID" id="GfBSPQ" />,
+                    label: `#${props.orderId}`,
+                    value: `${props.orderId}`,
+                    tooltipLabel: <FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />,
+                  },
+                  ...(order?.publicId
+                    ? [
+                        {
+                          name: <FormattedMessage defaultMessage="Order Public ID" id="Y0PZn+" />,
+                          label: order.publicId,
+                          value: order.publicId,
+                          tooltipLabel: <FormattedMessage defaultMessage="Copy contribution public ID" id="G4u5yE" />,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            </div>
           }
           entityLabel={
             isLoading ? (

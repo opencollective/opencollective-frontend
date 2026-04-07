@@ -249,6 +249,7 @@ export const expensePageExpenseFieldsFragment = gql`
   fragment ExpensePageExpenseFields on Expense {
     id
     legacyId
+    publicId
     description
     longDescription
     currency
@@ -684,6 +685,7 @@ export const expensesListFieldsFragment = gql`
   fragment ExpensesListFieldsFragment on Expense {
     id
     legacyId
+    publicId
     description
     reference
     status

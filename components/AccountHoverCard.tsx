@@ -36,6 +36,7 @@ const AccountKYCStatusBadge = React.lazy(() =>
 export const accountHoverCardFields = gql`
   fragment AccountHoverCardFields on Account {
     id
+    publicId
     name
     legalName
     slug

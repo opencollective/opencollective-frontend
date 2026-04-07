@@ -6,6 +6,7 @@ const dashboardAccountsQueryFields = gql`
   fragment DashboardAccountsQueryFields on Account {
     id
     legacyId
+    publicId
     name
     slug
     type

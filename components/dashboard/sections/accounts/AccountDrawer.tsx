@@ -223,7 +223,11 @@ const AccountDetails = ({ accountId, getActions }: AccountDetailsProps) => {
         actions={actions}
         dropdownTriggerRef={dropdownTriggerRef}
         entityName={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
-        entityIdentifier={<CopyID value={id}>{id}</CopyID>}
+        entityIdentifier={
+          <div className="flex items-center gap-1">
+            <CopyID value={account?.publicId || id}>{account?.publicId || id}</CopyID>
+          </div>
+        }
         separateRowForEntityLabel
         entityLabel={
           <div className="w-full">
