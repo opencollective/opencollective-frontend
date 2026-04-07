@@ -15,7 +15,6 @@ import { gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
 import {
@@ -81,7 +80,7 @@ const messages = defineMessages({
   },
 });
 
-const getErrorContent = (intl, error, host, LoggedInUser) => {
+const getErrorContent = (intl, error, host) => {
   // TODO: The proper way to check for error types is with error.type, not the message
   const message = error?.message;
   if (message) {
@@ -90,9 +89,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
         title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance', id: 'BmZrOu' }),
         message: (
           <React.Fragment>
-            <Link
-              href={`/dashboard/${host.slug}/${LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) ? ALL_SECTIONS.PAY_DISBURSEMENTS : ALL_SECTIONS.HOST_EXPENSES}`}
-            >
+            <Link href={`/dashboard/${host.slug}/${ALL_SECTIONS.PAY_DISBURSEMENTS}`}>
               <FormattedMessage
                 id="PayExpenseModal.RefillBalanceError"
                 defaultMessage="Refill your balance from the Host dashboard"
@@ -227,7 +224,7 @@ const ProcessExpenseButtons = ({
 
       return true;
     } catch (e) {
-      toast({ variant: 'error', ...getErrorContent(intl, e, host, LoggedInUser) });
+      toast({ variant: 'error', ...getErrorContent(intl, e, host) });
       return false;
     }
   };
