@@ -412,7 +412,7 @@ const DetailsForm = ({
   return (
     <div className="mt-2 flex flex-col">
       <FormField
-        disabled={disabled}
+        disabled={disabled || transactionTypeValues.length === 0}
         name={transactionMethodFieldName}
         label={transactionMethodLabel}
         validate={validateRequiredInput(intl, { name: transactionMethodLabel }, !disabled)}
