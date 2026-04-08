@@ -8,8 +8,6 @@ import type { Account, LegalDocumentFieldsFragment } from '../../../../lib/graph
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -74,7 +72,6 @@ export default function LegalDocumentDrawer({
   getActions,
 }: Readonly<LegalDocumentDrawerProps>) {
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
   const dropdownTriggerRef = React.useRef(undefined);
   const { data, loading } = useQuery(legalDocumentDrawerQuery, {
     variables: { hostId: host.id, accountId: get(document, 'account.id') },
@@ -185,25 +182,14 @@ export default function LegalDocumentDrawer({
                       <li>
                         <Link
                           className="text-primary underline"
-                          href={getDashboardRoute(
-                            host,
-                            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-                              ? ALL_SECTIONS.HOST_PAYMENT_REQUESTS
-                              : ALL_SECTIONS.HOST_EXPENSES,
-                            {
-                              params: new URLSearchParams([
-                                ['searchTerm', `@${document.account.slug}`],
-                                ['type', 'INVOICE'],
-                                ['type', 'GRANT'],
-                                ['type', 'UNCLASSIFIED'],
-                                ...(!LoggedInUser?.hasPreviewFeatureEnabled(
-                                  PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS,
-                                )
-                                  ? [['status', 'ALL']] // Only needed for the `host-expenses` tool as it has a default value for status
-                                  : []),
-                              ]),
-                            },
-                          )}
+                          href={getDashboardRoute(host, ALL_SECTIONS.HOST_PAYMENT_REQUESTS, {
+                            params: new URLSearchParams([
+                              ['searchTerm', `@${document.account.slug}`],
+                              ['type', 'INVOICE'],
+                              ['type', 'GRANT'],
+                              ['type', 'UNCLASSIFIED'],
+                            ]),
+                          })}
                         >
                           <FormattedMessage
                             defaultMessage="...and {count} more"

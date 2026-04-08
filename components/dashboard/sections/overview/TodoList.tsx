@@ -8,7 +8,6 @@ import { hasAccountMoneyManagement } from '../../../../lib/collective';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { gql } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -90,12 +89,7 @@ export const HostTodoList = () => {
         {
           id: 'expenses',
           title: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
-          href: getDashboardRoute(
-            account,
-            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-              ? ALL_SECTIONS.PAY_DISBURSEMENTS
-              : ALL_SECTIONS.HOST_EXPENSES,
-          ),
+          href: getDashboardRoute(account, ALL_SECTIONS.PAY_DISBURSEMENTS),
           icon: Receipt,
           iconBgColor: 'bg-green-50',
           iconColor: 'text-green-700',
@@ -130,13 +124,8 @@ export const HostTodoList = () => {
                 },
                 { count: data?.missingReceiptExpenses.totalCount },
               ),
-              href: getDashboardRoute(
-                account,
-                LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-                  ? ALL_SECTIONS.PAID_DISBURSEMENTS
-                  : ALL_SECTIONS.HOST_EXPENSES,
-              ),
-              queryParams: `?chargeHasReceipts=false${LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) ? '' : '&status=ALL'}`,
+              href: getDashboardRoute(account, ALL_SECTIONS.PAID_DISBURSEMENTS),
+              queryParams: `?chargeHasReceipts=false`,
             },
 
             {
@@ -317,7 +306,6 @@ type AccountTodoItem = {
 // For Hosted Collectives and Orgs with money management (but without hosting)
 export const AccountTodoList = () => {
   const { account } = React.useContext(DashboardContext);
-  const { LoggedInUser } = useLoggedInUser();
 
   const isOrgWithMoneyManagment = account?.type === 'ORGANIZATION' && hasAccountMoneyManagement(account);
 
@@ -338,12 +326,7 @@ export const AccountTodoList = () => {
   // Expenses to pay, for orgs with money management
   const toPayExpenseCount = data?.toPayExpenses?.totalCount || 0;
 
-  const expensesHref = getDashboardRoute(
-    account,
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-      ? ALL_SECTIONS.PAYMENT_REQUESTS
-      : ALL_SECTIONS.EXPENSES,
-  );
+  const expensesHref = getDashboardRoute(account, ALL_SECTIONS.PAYMENT_REQUESTS);
 
   const createLink = (href: string) => (chunks: React.ReactNode) => (
     <Link className="font-medium text-primary hover:underline" href={href}>

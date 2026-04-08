@@ -65,7 +65,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
   } else if (loggedInUser?.isAccountantOnly(account) && account.hasHosting) {
-    return ALL_SECTIONS.HOST_EXPENSES;
+    return ALL_SECTIONS.PAY_DISBURSEMENTS;
   } else if (loggedInUser?.isAccountantOnly(account)) {
     return ALL_SECTIONS.PAYMENT_RECEIPTS;
   } else {

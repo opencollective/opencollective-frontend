@@ -30,7 +30,6 @@ import { KycProvider } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { KYCVerificationProviderBadge } from '@/components/kyc/components/KYCVerificationProviderBadge';
 import { i18nKYCVerificationStatus } from '@/components/kyc/intl';
@@ -246,13 +245,8 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
         Icon: Receipt,
         onClick: () => {
           router.push({
-            pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-              ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
-              : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
+            pathname: `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`,
             query: {
-              ...(!LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) && {
-                status: 'ALL',
-              }),
               searchTerm: `@${contributorSlug}`,
             },
           });
