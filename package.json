@@ -282,7 +282,7 @@
     "tailwindcss-animate": "1.0.7",
     "ts-unused-exports": "^11.0.0",
     "tsx": "^4.11.2",
-    "typescript": "^5.8.3",
+    "typescript": "^6.0.0",
     "typescript-eslint": "^8.35.0",
     "url-loader": "^4.1.1",
     "webpack": "^5.91.0"
