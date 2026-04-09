@@ -173,7 +173,8 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name="city"]:invalid').should('have.length', 1); // Empty
 
       // Fill profile info
-      cy.get('input[name=name]').type('Rick Astley');
+      cy.get('input[name=name]').type('Rick');
+      cy.getByDataCy('input-legalName').type('Rick Astley');
       cy.get('input[name=email]').type(`{selectall}${secondEmail}`);
       cy.get('input[name="address1"]').type('323 Logic Street');
       cy.get('input[name="postalCode"]').type('83740');

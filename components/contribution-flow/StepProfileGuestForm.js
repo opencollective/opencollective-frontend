@@ -163,7 +163,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         labelFontWeight="700"
         isPrivate
         hideOptionalLabel={requiredInformation.legalName}
-        required={requiredInformation.legalName && !data?.name}
+        required={requiredInformation.legalName}
         hint={
           requiredInformation.legalName && useGenericLegalNameHint ? (
             <FormattedMessage
