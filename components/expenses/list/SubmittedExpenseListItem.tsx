@@ -8,7 +8,7 @@ import type { ExpensePageExpenseFieldsFragment } from '../../../lib/graphql/type
 import { ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../../lib/hooks/useClipboard';
 import { i18nExpenseType } from '../../../lib/i18n/expense';
-import { getWebsiteUrl } from '../../../lib/utils';
+import { getPermalinkUrl } from '../../../lib/url-helpers';
 
 import { AccountHoverCard } from '../../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../../AmountWithExchangeRateInfo';
@@ -170,7 +170,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
             <DropdownMenuItem
               onClick={e => {
                 e.stopPropagation();
-                clipboard.copy(`${getWebsiteUrl()}/${props.expense.account.slug}/expenses/${props.expense.legacyId}`);
+                clipboard.copy(getPermalinkUrl(props.expense.publicId));
               }}
             >
               {clipboard.isCopied ? <Check className="h-4 w-4" /> : <Link className="h-4 w-4" />}
