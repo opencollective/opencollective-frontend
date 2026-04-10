@@ -3232,6 +3232,7 @@
   "PendingContributionSummary": "{status, select, PENDING {Pending Contribution} other {Contribution}} to {account}",
   "People": "People",
   "People.Description": "People that interacted with your organization.",
+  "People.ExportCSV": "Export Contributors",
   "PEp9t9": "Expected Total Amount",
   "Period": "תקופה",
   "Period.days": "days",

@@ -3232,6 +3232,7 @@
   "PendingContributionSummary": "给 {account} 的 {status, select, PENDING {待定贡献} other {贡献}}",
   "People": "People",
   "People.Description": "People that interacted with your organization.",
+  "People.ExportCSV": "Export Contributors",
   "PEp9t9": "预计总金额",
   "Period": "时期",
   "Period.days": "天",

@@ -26,6 +26,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import ExportContributorsCSVButton from '../../ExportContributorsCSVButton';
 import { makeAmountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
@@ -357,6 +358,12 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
         title={<FormattedMessage id="People" defaultMessage="People" />}
         description={
           <FormattedMessage id="People.Description" defaultMessage="People that interacted with your organization." />
+        }
+        actions={
+          <ExportContributorsCSVButton
+            accountSlug={accountSlug}
+            label={<FormattedMessage id="People.ExportCSV" defaultMessage="Export Contributors" />}
+          />
         }
       />
       <Filterbar {...queryFilter} hideCounts />
