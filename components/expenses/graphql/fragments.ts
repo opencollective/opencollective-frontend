@@ -671,6 +671,12 @@ export const expensePageExpenseFieldsFragment = gql`
       scope
       details
     }
+    kycStatus {
+      payee {
+        type
+        status
+      }
+    }
   }
 
   ${expenseHostFields}
@@ -930,6 +936,7 @@ export const expensesListAdminFieldsFragment = gql`
 
     kycStatus {
       payee {
+        type
         status
       }
     }

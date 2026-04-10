@@ -12,6 +12,7 @@ import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
 import { AccountKYCStatusBadge } from '../kyc/components/AccountKYCStatusBadge';
+import { ExpenseAdminKYCSection } from '../kyc/components/ExpenseAdminKYCSection';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
@@ -280,6 +281,7 @@ const ExpenseSummaryAdditionalInformation = ({
         )}
 
         <AccountKYCStatusBadge className="mt-2" account={payee} host={host} showActions />
+        <ExpenseAdminKYCSection className="mt-3" kycPayee={expense.kycStatus?.payee} account={payee} host={host} />
       </PrivateInfoColumn>
       <PrivateInfoColumn mr={0}>
         <div className="flex justify-between gap-2">

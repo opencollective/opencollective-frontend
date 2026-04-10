@@ -8,9 +8,16 @@ import { kycVerificationProviderName } from '../intl';
 
 type KYCVerificationProviderBadgeProps = {
   provider: KycProvider;
+  className?: string;
 };
 
-export function KYCVerificationProviderBadge(props: KYCVerificationProviderBadgeProps) {
-  const { provider } = props;
-  return <Badge type="neutral">{kycVerificationProviderName(provider)}</Badge>;
+export function KYCVerificationProviderBadge({ provider, className }: KYCVerificationProviderBadgeProps) {
+  return (
+    <Badge
+      type="neutral"
+      className={`rounded-sm px-2 py-0.75 text-[11px] font-bold tracking-wide uppercase ${className ?? ''}`}
+    >
+      {kycVerificationProviderName(provider)}
+    </Badge>
+  );
 }
