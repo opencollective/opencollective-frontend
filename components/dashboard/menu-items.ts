@@ -314,6 +314,41 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
+      if: !hasMoneyManagement && !isCommunityManagerOnly,
+      section: ALL_SECTIONS.TRANSACTIONS,
+      Icon: ArrowRightLeft,
+    },
+    {
+      if: hasMoneyManagement && !isCommunityManagerOnly,
+      type: 'group',
+      label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
+      Icon: ArrowRightLeft,
+      subMenu: [
+        {
+          section: hasHosting ? ALL_SECTIONS.HOST_TRANSACTIONS : ALL_SECTIONS.TRANSACTIONS,
+          label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+        },
+        {
+          section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
+          label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
+          if: shouldIncludeMenuItemWithLegacyFallback(
+            account,
+            FEATURES.OFF_PLATFORM_TRANSACTIONS,
+            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+          ),
+        },
+        {
+          section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
+          label: intl.formatMessage({ defaultMessage: 'CSV Imports', id: 'd3jA/o' }),
+          if: shouldIncludeMenuItemWithLegacyFallback(
+            account,
+            FEATURES.OFF_PLATFORM_TRANSACTIONS,
+            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+          ),
+        },
+      ],
+    },
+    {
       if: !isIndividual && isHostedType && !isCommunityManagerOnly,
       section: ALL_SECTIONS.CONTRIBUTORS,
       label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
@@ -432,41 +467,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.TIERS,
       label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
       Icon: HeartHandshake,
-    },
-    {
-      if: !hasMoneyManagement && !isCommunityManagerOnly,
-      section: ALL_SECTIONS.TRANSACTIONS,
-      Icon: ArrowRightLeft,
-    },
-    {
-      if: hasMoneyManagement && !isCommunityManagerOnly,
-      type: 'group',
-      label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
-      Icon: ArrowRightLeft,
-      subMenu: [
-        {
-          section: hasHosting ? ALL_SECTIONS.HOST_TRANSACTIONS : ALL_SECTIONS.TRANSACTIONS,
-          label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
-        },
-        {
-          section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
-          label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
-          if: shouldIncludeMenuItemWithLegacyFallback(
-            account,
-            FEATURES.OFF_PLATFORM_TRANSACTIONS,
-            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
-          ),
-        },
-        {
-          section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
-          label: intl.formatMessage({ defaultMessage: 'CSV Imports', id: 'd3jA/o' }),
-          if: shouldIncludeMenuItemWithLegacyFallback(
-            account,
-            FEATURES.OFF_PLATFORM_TRANSACTIONS,
-            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
-          ),
-        },
-      ],
     },
     {
       if: !isIndividual && !isAccountantOnly,
