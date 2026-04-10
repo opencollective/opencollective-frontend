@@ -102,6 +102,7 @@ export const adminPanelQuery = gql`
         EXPECTED_FUNDS
         CHARGE_HOSTING_FEES
         KYC
+        ACCOUNTING_CATEGORIZATION_RULES
       }
       policies {
         id
