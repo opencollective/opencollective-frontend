@@ -9402,7 +9402,20 @@ type ExpenseKYCStatus {
 }
 
 type ExpensePayeeKYC {
+  """
+  Whether the payee is an individual or a multi-admin account (Organization, Collective, Project, Event, Fund, Vendor)
+  """
+  type: ExpensePayeeKYCType
   status: ExpensePayeeKYCStatus
+  adminVerifications: [KYCVerification!]
+}
+
+"""
+Whether the payee is an individual (its own KYC) or a multi-admin account (rollup over admin KYC)
+"""
+enum ExpensePayeeKYCType {
+  INDIVIDUAL
+  ACCOUNT
 }
 
 enum ExpensePayeeKYCStatus {
