@@ -3232,6 +3232,7 @@
   "PendingContributionSummary": "{account}로 {status, select, PENDING {대기중인 기여} other {기여}}",
   "People": "People",
   "People.Description": "People that interacted with your organization.",
+  "People.ExportCSV": "Export Contributors",
   "PEp9t9": "Expected Total Amount",
   "Period": "기간",
   "Period.days": "days",
