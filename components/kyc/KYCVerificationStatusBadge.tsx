@@ -3,11 +3,13 @@ import { useIntl } from 'react-intl';
 
 import { KycVerificationStatus } from '../../lib/graphql/types/v2/graphql';
 
+import type { BadgeProps } from '../ui/Badge';
 import { Badge } from '../ui/Badge';
 
 import { i18nKYCVerificationStatus } from './intl';
-type KYCVerificationStatusBadgeProps = {
+type KYCVerificationStatusBadgeProps = BadgeProps & {
   status: KycVerificationStatus;
+  label?: React.ReactNode;
 };
 
 function getBadgeType(status: KycVerificationStatus) {
@@ -26,6 +28,11 @@ function getBadgeType(status: KycVerificationStatus) {
 
 export function KYCVerificationStatusBadge(props: KYCVerificationStatusBadgeProps) {
   const intl = useIntl();
-  const { status } = props;
-  return <Badge type={getBadgeType(status)}>{i18nKYCVerificationStatus(intl, status)}</Badge>;
+  const { status, label, ...badgeProps } = props;
+  return (
+    <Badge {...badgeProps} type={getBadgeType(status)}>
+      {label}
+      {i18nKYCVerificationStatus(intl, status)}
+    </Badge>
+  );
 }

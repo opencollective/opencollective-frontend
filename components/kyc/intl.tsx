@@ -24,18 +24,20 @@ const KYC_STATUS_MESSAGES = defineMessages({
     id: 'KYCVerificationStatus.VERIFIED',
     defaultMessage: 'Verified',
   },
+  UNVERIFIED: {
+    id: 'KYCVerificationStatus.UNVERIFIED',
+    defaultMessage: 'Unverified',
+  },
 });
 
 export function i18nKYCVerificationStatus(intl: IntlShape, status: KycVerificationStatus) {
   const message = KYC_STATUS_MESSAGES[status];
-  return message ? intl.formatMessage(message) : status;
+  return message ? intl.formatMessage(message) : intl.formatMessage(KYC_STATUS_MESSAGES.UNVERIFIED);
 }
 
 export function kycVerificationProviderName(provider: KycProvider) {
   switch (provider) {
     case KycProvider.MANUAL:
       return 'Manual';
-    case KycProvider.PERSONA:
-      return 'Persona';
   }
 }

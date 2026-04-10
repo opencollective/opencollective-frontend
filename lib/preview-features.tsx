@@ -16,8 +16,7 @@ export enum PREVIEW_FEATURE_KEYS {
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
-  PLATFORM_BILLING = 'PLATFORM_BILLING',
-  SIDEBAR_REORG_DISBURSEMENTS = 'SIDEBAR_REORG_DISBURSEMENTS',
+  SIDEBAR_REORG_INCOMING_OUTGOING = 'SIDEBAR_REORG_INCOMING_OUTGOING',
   ASYNC_EXPORTS = 'ASYNC_EXPORTS',
   TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
 }
@@ -80,15 +79,6 @@ export const previewFeatures: PreviewFeature[] = [
     ),
     alwaysEnableInDev: true,
     publicBeta: true,
-    category: Categories.GENERAL,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.PLATFORM_BILLING,
-    title: 'Platform billing',
-    description: 'New platform billing dashboard',
-    alwaysEnableInDev: true,
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.GENERAL,
   },
   {
@@ -259,13 +249,14 @@ export const previewFeatures: PreviewFeature[] = [
     category: Categories.FOR_NERDS,
   },
   {
-    key: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS,
-    title: 'Sidebar Reorganization Disbursements',
-    description: 'Reorganization of the "Expenses" section in the Host Dashboard',
-    publicBeta: true,
+    key: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
+    title: 'Sidebar Reorganization Incoming/Outgoing',
+    description:
+      'Renames "Expenses" to "Outgoing Money" and "Contributions" to "Incoming Money", and moves cross-account items to the appropriate groups.',
+    publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,
-    enabledByDefaultFor: ['*'],
+    alwaysEnableInDev: true,
   },
   {
     key: PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS,

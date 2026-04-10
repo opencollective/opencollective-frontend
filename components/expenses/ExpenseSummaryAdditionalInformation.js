@@ -11,6 +11,8 @@ import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
+import { AccountKYCStatusBadge } from '../kyc/components/AccountKYCStatusBadge';
+
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -170,7 +172,7 @@ const ExpenseSummaryAdditionalInformation = ({
                   values={{ item: <FormattedMessage key="item" id="Balance" defaultMessage="Balance" /> }}
                 />
               </Container>
-              <Box mt={2}>
+              <Box mt={2} fontSize="12px">
                 <FormattedMoneyAmount
                   amount={collective.stats.balanceWithBlockedFunds.valueInCents}
                   currency={collective.stats.balanceWithBlockedFunds.currency}
@@ -265,7 +267,7 @@ const ExpenseSummaryAdditionalInformation = ({
         />
 
         {payeeLocation && isInvoice && (
-          <Container whiteSpace="pre-wrap" color="black.700" fontSize="14px" lineHeight="16px" mt={2}>
+          <Container whiteSpace="pre-wrap" color="black.700" fontSize="12px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
           </Container>
         )}
@@ -276,6 +278,8 @@ const ExpenseSummaryAdditionalInformation = ({
             </StyledLink>
           </P>
         )}
+
+        <AccountKYCStatusBadge className="mt-2" account={payee} host={host} showActions />
       </PrivateInfoColumn>
       <PrivateInfoColumn mr={0}>
         <div className="flex justify-between gap-2">

@@ -137,6 +137,11 @@ interface CollectiveInterface {
   List of all notifications for this collective
   """
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -1107,6 +1112,7 @@ type CollectiveFeatures {
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
+  PAYPAL_CONNECT: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
   ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
@@ -1118,7 +1124,6 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
-  PERSONA_KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -1166,6 +1171,11 @@ type PlanType {
 
 type Policies {
   id: String
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
   EXPENSE_POLICIES: EXPENSE_POLICIES
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
@@ -1456,6 +1466,11 @@ enum Currency {
   Lari
   """
   GEL
+
+  """
+  Ghana Cedi
+  """
+  GHS
 
   """
   Gibraltar Pound
@@ -2238,6 +2253,11 @@ type Collective implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
     @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
@@ -2330,7 +2350,7 @@ type Collective implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -2527,6 +2547,11 @@ type Event implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
     @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
@@ -2619,7 +2644,7 @@ type Event implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -2816,6 +2841,11 @@ type Fund implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
     @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
@@ -2908,7 +2938,7 @@ type Fund implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -3105,6 +3135,11 @@ type Organization implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
     @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
@@ -3197,7 +3232,7 @@ type Organization implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -3394,6 +3429,11 @@ type Project implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
     @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
@@ -3486,7 +3526,7 @@ type Project implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -3978,6 +4018,11 @@ type User implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
     @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
@@ -4070,7 +4115,7 @@ type User implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -4269,6 +4314,11 @@ type Vendor implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
     @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
@@ -4361,7 +4411,7 @@ type Vendor implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!

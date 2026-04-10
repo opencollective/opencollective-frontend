@@ -9,7 +9,7 @@ import { border, color, compose, flexbox, grid, layout, space, typography } from
 
 import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 
-export const boxProps = compose(space, color, layout, typography, flexbox, grid, border);
+const boxProps = compose(space, color, layout, typography, flexbox, grid, border);
 
 type BoxProps = SpaceProps &
   ColorProps &

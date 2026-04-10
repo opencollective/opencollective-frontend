@@ -19,7 +19,10 @@ const createCollectiveHostQuery = gql`
       type
       slug
       name
+      createdAt
       currency
+      hostFeePercent
+      platformContributionAvailable
       isOpenToApplications
       isSuspended
       termsUrl

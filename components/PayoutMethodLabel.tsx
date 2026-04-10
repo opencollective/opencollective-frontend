@@ -1,4 +1,5 @@
 import React from 'react';
+import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { truncate } from 'lodash';
 import { useIntl } from 'react-intl';
 
@@ -7,6 +8,7 @@ import { PayoutMethodType } from '../lib/graphql/types/v2/graphql';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
 import { cn } from '@/lib/utils';
 
+import { Badge } from './ui/Badge';
 import { PayoutMethodIcon } from './PayoutMethodIcon';
 
 const MAX_PAYOUT_OPTION_DATA_LENGTH = 20;
@@ -25,6 +27,7 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
   }
   const pm = props.payoutMethod;
   const customLabel = pm.name;
+  const currency = pm.data?.currency;
   let defaultLabel: React.ReactNode;
 
   switch (pm.type) {
@@ -42,8 +45,8 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
         defaultLabel = `Clabe ${pm.data.details.clabe}`;
       } else if (pm.data?.details?.bankgiroNumber) {
         defaultLabel = `Bankgiro ${pm.data.details.bankgiroNumber}`;
-      } else if (pm.data?.accountHolderName && pm.data?.currency) {
-        defaultLabel = `${pm.data.accountHolderName} (${pm.data.currency})`;
+      } else if (pm.data?.accountHolderName) {
+        defaultLabel = `${pm.data.accountHolderName}`;
       }
       break;
     }
@@ -65,8 +68,17 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
       {props.showIcon && <PayoutMethodIcon size={props.iconSize} payoutMethod={pm} />}
       <span className="truncate whitespace-break-spaces sm:whitespace-nowrap">
         {defaultLabel}{' '}
-        {customLabel ? <span className="whitespace-nowrap text-muted-foreground">{customLabel}</span> : null}
+        {customLabel && customLabel !== defaultLabel ? (
+          <span className="whitespace-nowrap text-muted-foreground">{customLabel}</span>
+        ) : null}
       </span>
+      {currency && (
+        <Badge size="xs" className="px-1.5 whitespace-nowrap">
+          <span className="text-[11px]">{getEmojiByCurrencyCode(currency)}</span>
+          &nbsp;
+          <span className="text-xs text-muted-foreground">{currency}</span>
+        </Badge>
+      )}
     </div>
   );
 }

@@ -7,7 +7,6 @@ import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
 import { KYCRequests } from '../kyc/dashboard/KYCRequests';
-import { KYCSettings } from '../kyc/dashboard/settings/KYCSettings';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import AccountSettingsForm from '../root-actions/AccountSettings';
@@ -38,8 +37,8 @@ import IncompleteContributions from './sections/contributions/IncompleteContribu
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
 import ApprovePaymentRequests from './sections/expenses/ApprovePaymentRequests';
-import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import HostPaymentRequests from './sections/expenses/HostPaymentRequests';
+import IssuedPaymentRequests from './sections/expenses/IssuedPaymentRequests';
 import { PaidDisbursements } from './sections/expenses/PaidDisbursements';
 import PayDisbursements from './sections/expenses/PayDisbursements';
 import PaymentRequests from './sections/expenses/PaymentRequests';
@@ -94,7 +93,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
   [SECTIONS.OFF_PLATFORM_TRANSACTIONS]: OffPlatformTransactions,
   [SECTIONS.LEDGER_CSV_IMPORTS]: CSVTransactionsImports,
-  [SECTIONS.HOST_EXPENSES]: HostExpenses,
+  [SECTIONS.HOST_EXPENSES]: PayDisbursements,
   [SECTIONS.PAY_DISBURSEMENTS]: PayDisbursements,
   [SECTIONS.PAID_DISBURSEMENTS]: PaidDisbursements,
   [SECTIONS.APPROVE_PAYMENT_REQUESTS]: ApprovePaymentRequests,
@@ -109,6 +108,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.PAYMENT_REQUESTS]: PaymentRequests,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.ISSUED_PAYMENT_REQUESTS]: IssuedPaymentRequests,
   [SECTIONS.HOSTED_FUNDS]: HostedFunds,
   [SECTIONS.HOSTED_GRANTS]: HostedGrants,
   [SECTIONS.GRANTS]: Grants,
@@ -117,7 +117,6 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.PEOPLE]: PeopleRouter,
   [SECTIONS.KYC]: KYCRequests,
-  [SECTIONS.KYC_SETTINGS]: KYCSettings,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,

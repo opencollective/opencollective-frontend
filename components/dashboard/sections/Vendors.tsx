@@ -38,7 +38,7 @@ import { buildSortFilter } from '../filters/SortFilter';
 import type { DashboardSectionProps } from '../types';
 import { makePushSubpath } from '../utils';
 
-import { ContributorDetails } from './community/AccountDetail';
+import { AccountDetails } from './community/AccountDetail';
 import { usePersonActions } from './community/common';
 
 enum VendorsTab {
@@ -93,17 +93,17 @@ const dashboardVendorsQuery = gql`
         communityStats(host: { slug: $slug }) {
           relations
           transactionSummary {
-            year
-            expenseTotalAcc {
+            kind
+            debitTotal {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCount
+            creditTotal {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCount
           }
         }
       }
@@ -124,6 +124,7 @@ const dashboardVendorsQuery = gql`
     account(slug: $slug) {
       id
       legacyId
+      publicId
       ... on AccountWithHost {
         host {
           id
@@ -152,6 +153,7 @@ const dashboardVendorsQuery = gql`
       limit
       nodes {
         id
+        publicId
         legacyId
         slug
         name
@@ -161,17 +163,17 @@ const dashboardVendorsQuery = gql`
         communityStats(host: { slug: $slug }) {
           relations
           transactionSummary {
-            year
-            expenseTotalAcc {
+            kind
+            debitTotal {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCount
+            creditTotal {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCount
           }
         }
       }
@@ -181,10 +183,16 @@ const dashboardVendorsQuery = gql`
 `;
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  fieldSchema: z.enum(['NAME', 'CREATED_AT', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
   defaultValue: {
     field: 'NAME',
     direction: 'ASC',
+  },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({
+      defaultMessage: 'Created',
+      id: 'created',
+    }),
   },
 });
 
@@ -269,9 +277,9 @@ const getColumns = ({ isVendor }) => {
       header: () => <FormattedMessage defaultMessage="Total Expenses" id="TotalExpenses" />,
       cell: ({ row }) => {
         const account = row.original;
-        const summary = account.communityStats?.transactionSummary?.[0];
-        const total = summary?.expenseTotalAcc;
-        const count = summary?.expenseCountAcc || 0;
+        const summary = account.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+        const total = summary?.debitTotal;
+        const count = summary?.debitCount || 0;
 
         if (!total || count === 0) {
           return <span className="text-muted-foreground">—</span>;
@@ -290,9 +298,9 @@ const getColumns = ({ isVendor }) => {
       header: () => <FormattedMessage defaultMessage="Total Contributions" id="TotalContributions" />,
       cell: ({ row }) => {
         const account = row.original;
-        const summary = account.communityStats?.transactionSummary?.[0];
-        const total = summary?.contributionTotalAcc;
-        const count = summary?.contributionCountAcc || 0;
+        const summary = account.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+        const total = summary?.creditTotal;
+        const count = summary?.creditCount || 0;
 
         if (!total || count === 0) {
           return <span className="text-muted-foreground">—</span>;
@@ -424,7 +432,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
   );
   const handleDrawer = (vendor: VendorFieldsFragment | string | undefined) => {
     if (vendor) {
-      pushSubpath(typeof vendor === 'string' ? vendor : vendor.id);
+      pushSubpath(typeof vendor === 'string' ? vendor : vendor.publicId);
     } else {
       pushSubpath(undefined);
       setCreateEditVendor(false);
@@ -433,7 +441,6 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const getActions = usePersonActions({
     accountSlug,
     hasKYCFeature: false,
-    hasPersonaKYCFeature: false,
     editVendor: setCreateEditVendor,
     archiveVendor: handleArchiveToggle,
   });
@@ -460,7 +467,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
   if (!isEmpty(id)) {
     return (
       <div className="h-full">
-        <ContributorDetails
+        <AccountDetails
           account={{ id: subpath[0] }}
           host={account}
           onClose={() => pushSubpath('')}

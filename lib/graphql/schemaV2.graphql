@@ -3,7 +3,12 @@ An OAuth application.
 """
 type Application {
   id: String!
-  legacyId: Int!
+
+  """
+  The resource public id (ie: app_xxxxxxxx)
+  """
+  publicId: String!
+  legacyId: Int! @deprecated(reason: "2026-02-25: use publicId")
   type: ApplicationType
     @deprecated(
       reason: "2022-06-16: This Application object will only be used for OAuth tokens. Use PersonalToken for user tokens"
@@ -44,6 +49,11 @@ An OAuth authorization
 """
 type OAuthAuthorization {
   id: String
+
+  """
+  The resource public id (ie: utok_xxxxxxxx)
+  """
+  publicId: String!
   account: Individual!
   application: Application!
 
@@ -176,6 +186,11 @@ interface Account {
   The internal database identifier of the collective (ie: 580)
   """
   legacyId: Int! @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The slug identifying the account (ie: babel)
@@ -513,6 +528,11 @@ interface Account {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -713,8 +733,6 @@ interface Account {
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
-    direction: ExpenseDirection
-
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -746,12 +764,17 @@ interface Account {
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -860,6 +883,12 @@ interface Account {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
+    direction: ExpenseDirection
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -896,7 +925,7 @@ interface Account {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this account can use to pay for Orders
@@ -1452,6 +1481,11 @@ enum Currency {
   GEL
 
   """
+  Ghana Cedi
+  """
+  GHS
+
+  """
   Gibraltar Pound
   """
   GIP
@@ -1912,14 +1946,14 @@ enum ImageFormat {
 
 input AccountReferenceInput {
   """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, acc_xxxxxxxx)
   """
   id: String
 
   """
   The internal id of the account (ie: 580)
   """
-  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 
   """
   The slug identifying the account (ie: babel for https://opencollective.com/babel)
@@ -2018,14 +2052,14 @@ enum OrderDirection {
 
 input TierReferenceInput {
   """
-  The id assigned to the Tier
+  The id assigned to the Tier (ie: tier_xxxxxxxx)
   """
   id: String
 
   """
   The DB id assigned to the Tier
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 
   """
   Pass this flag to reference the custom tier (/donate)
@@ -2038,6 +2072,11 @@ An invitation to join the members of a collective
 """
 type MemberInvitation {
   id: String!
+
+  """
+  The resource public id (ie: mi_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The person who invited the member, if any
@@ -2057,7 +2096,12 @@ Tier model
 """
 type Tier {
   id: String!
-  legacyId: Int!
+
+  """
+  The resource public id (ie: tier_xxxxxxxx)
+  """
+  publicId: String!
+  legacyId: Int! @deprecated(reason: "2026-02-25: use publicId")
   slug: String
   name: String
   description: String
@@ -2151,7 +2195,12 @@ Order model
 """
 type Order {
   id: String!
-  legacyId: Int!
+
+  """
+  The resource public id (ie: or_xxxxxxxx)
+  """
+  publicId: String!
+  legacyId: Int! @deprecated(reason: "2026-02-25: use publicId")
   description: String
 
   """
@@ -2325,6 +2374,11 @@ Transaction interface shared by all kind of transactions (Debit, Credit)
 interface Transaction {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: tx_xxxxxxxx)
+  """
+  publicId: String!
   uuid: String! @deprecated(reason: "2021-08-15: Use id instead.")
   group: String!
   type: TransactionType!
@@ -2563,9 +2617,14 @@ type Expense {
   id: String!
 
   """
+  The resource public id (ie: ex_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   Legacy ID as returned by API V1. Avoid relying on this field as it may be removed in the future.
   """
-  legacyId: Int!
+  legacyId: Int! @deprecated(reason: "2026-02-25: use publicId")
 
   """
   Title/main description for this expense
@@ -2839,6 +2898,7 @@ type Expense {
   """
   transactionImportRow: TransactionsImportRow
   platformBillingData: JSON
+  kycStatus: ExpenseKYCStatus
 }
 
 """
@@ -2871,6 +2931,11 @@ Fields for an accounting category
 """
 type AccountingCategory {
   id: String!
+
+  """
+  The resource public id (ie: acat_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The code of the accounting category
@@ -2929,6 +2994,11 @@ This represents an Host account
 type Host implements Account & AccountWithContributions & AccountWithPlatformSubscription {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The slug identifying the account (ie: babel)
@@ -3295,6 +3365,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -3528,12 +3603,17 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -3642,6 +3722,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -3678,7 +3763,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -4060,7 +4145,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   """
   hasMoneyManagement: Boolean!
   termsUrl: URL
-  plan: HostPlan!
+  plan: HostPlan! @deprecated(reason: "2026-04-02: Replaced by new pricing")
 
   """
   EXPERIMENTAL (this may change or be removed)
@@ -4299,9 +4384,14 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   isTrustedHost: Boolean!
 
   """
-  Returns whether the host is trusted or not
+  Returns whether the host is a first party host
   """
   isFirstPartyHost: Boolean!
+
+  """
+  Returns whether the host allows adding funds from all accounts
+  """
+  allowAddFundsFromAllAccounts: Boolean!
 
   """
   Returns whether the host has any Stripe disputed orders
@@ -4984,7 +5074,12 @@ type HostPlan {
   """
   The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
   """
-  id: String
+  id: String!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The name of the plan
@@ -5065,6 +5160,11 @@ type LegalDocument {
   Unique identifier for this legal document
   """
   id: String!
+
+  """
+  The resource public id (ie: ld_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The year this legal document is for
@@ -5402,14 +5502,14 @@ enum CurrencyExchangeRateSourceType {
 
 input ExpenseReferenceInput {
   """
-  The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, ex_xxxxxxxx)
   """
   id: String
 
   """
   The internal id of the expense (ie: 580)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 """
@@ -5459,37 +5559,40 @@ enum ExpenseType {
 
 input OrderReferenceInput {
   """
-  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, or_xxxxxxxx)
   """
   id: String
 
   """
   The legacy public id identifying the order (ie: 4242)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 input ManualPaymentProviderReferenceInput {
   """
-  The unique identifier of the manual payment provider
+  The unique identifier of the manual payment provider (ie: mpp_xxxxxxxx)
   """
   id: String!
 }
 
 input VirtualCardReferenceInput {
+  """
+  The public id identifying the virtual card (ie: vc_xxxxxxxx)
+  """
   id: String
 }
 
 input PaymentMethodReferenceInput {
   """
-  The id assigned to the payment method
+  The id assigned to the payment method (ie: pm_xxxxxxxx)
   """
   id: String
 }
 
 input PayoutMethodReferenceInput {
   """
-  The id assigned to the payout method
+  The id assigned to the payout method (ie: po_xxxxxxxx)
   """
   id: String
 }
@@ -5590,7 +5693,7 @@ type ExpenseCollectionTotalAmount {
 }
 
 """
-Describes the role in which an account is involved in an expense. This is used to filter
+Describes the role of the filtered account/host in an expense. Controls which side the account, accounts, and host/hostContext arguments apply to.
 """
 enum ExpenseDirection {
   """
@@ -5731,6 +5834,10 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_INVITE_DECLINED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  COLLECTIVE_EXPENSE_KYC_PAYOUT_METHOD_CHANGED
+  COLLECTIVE_EXPENSE_KYC_REQUESTED
+  COLLECTIVE_EXPENSE_KYC_VERIFIED
+  COLLECTIVE_EXPENSE_KYC_REVOKED
   TAXFORM_REQUEST
   TAXFORM_RECEIVED
   TAXFORM_INVALIDATED
@@ -5842,6 +5949,14 @@ enum ActivityType {
 }
 
 """
+Describes the values allowed to filter expenses KYC statuses, namely all the KYC statuses.
+"""
+enum ExpenseKYCStatusFilter {
+  VERIFIED
+  PENDING
+}
+
+"""
 A collection of "Conversations"
 """
 type ConversationCollection implements Collection {
@@ -5856,6 +5971,11 @@ A conversation thread
 """
 type Conversation {
   id: String!
+
+  """
+  The resource public id (ie: conv_xxxxxxxx)
+  """
+  publicId: String!
   slug: String!
   title: String!
   createdAt: DateTime!
@@ -5883,6 +6003,11 @@ This represents an Comment
 """
 type Comment {
   id: String
+
+  """
+  The resource public id (ie: cmt_xxxxxxxx)
+  """
+  publicId: String!
   createdAt: DateTime
   html: String
   fromAccount: Account
@@ -5926,6 +6051,11 @@ enum CommentType {
 
 type HostApplication {
   id: String!
+
+  """
+  The resource public id (ie: ha_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The account who applied to this host
@@ -5989,7 +6119,12 @@ This represents an Update
 """
 type Update {
   id: String!
-  legacyId: Int
+
+  """
+  The resource public id (ie: upd_xxxxxxxx)
+  """
+  publicId: String!
+  legacyId: Int @deprecated(reason: "2026-02-25: use publicId")
   slug: String!
 
   """
@@ -6127,6 +6262,11 @@ type PayoutMethod {
   id: String!
 
   """
+  The resource public id (ie: po_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   The type of this payout method (usually the payment provider)
   """
   type: PayoutMethodType
@@ -6162,6 +6302,11 @@ type PayoutMethod {
   canBeArchived: Boolean
 
   """
+  For PayPal payout methods: whether the PayPal account has been verified via OAuth. Null for other types.
+  """
+  isVerified: Boolean
+
+  """
   The date and time this payout method was created
   """
   createdAt: DateTime!
@@ -6177,6 +6322,11 @@ PaymentMethod model
 """
 type PaymentMethod {
   id: String
+
+  """
+  The resource public id (ie: pm_xxxxxxxx)
+  """
+  publicId: String!
   legacyId: Int
 
   """
@@ -6407,9 +6557,14 @@ type ConnectedAccount {
   id: String!
 
   """
+  The resource public id (ie: ca_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   The internal database identifier of the Connected Account (ie: 580)
   """
-  legacyId: Int @deprecated(reason: "2020-05-01: should only be used during the transition to GraphQL API v2.")
+  legacyId: Int @deprecated(reason: "2026-02-25: use publicId")
 
   """
   The date on which the ConnectedAccount was created
@@ -6439,7 +6594,6 @@ type ConnectedAccount {
 All supported services a user can connect with
 """
 enum ConnectedAccountService {
-  persona
   paypal
   stripe
   stripe_customer
@@ -6508,6 +6662,11 @@ Stats for the Account
 """
 type AccountStats {
   id: String
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -7180,6 +7339,7 @@ type CollectiveFeatures {
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
+  PAYPAL_CONNECT: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
   ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
@@ -7191,7 +7351,6 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
-  PERSONA_KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -7237,6 +7396,11 @@ enum VirtualCardStatus {
 
 type Policies {
   id: String
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
   EXPENSE_POLICIES: EXPENSE_POLICIES
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
@@ -7307,6 +7471,11 @@ type ActivitySubscription {
   id: String!
 
   """
+  The resource public id (ie: not_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   The channel this setting is notifying through
   """
   channel: ActivityChannel!
@@ -7355,6 +7524,11 @@ type AccountPermissions {
   id: String!
 
   """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   Whether the current user can add funds to this account
   """
   addFunds: Permission!
@@ -7394,6 +7568,11 @@ type Activity {
   Unique identifier for this activity
   """
   id: String!
+
+  """
+  The resource public id (ie: act_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The type of the activity
@@ -7556,10 +7735,17 @@ type TransactionsAmountGroup {
 }
 
 type CommunityStats {
+  id: String!
   associatedCollectives: [CommunityAssociatedAccount]
   associatedOrganizations: [CommunityAssociatedAccount]
   relations: [CommunityRelationType]!
   transactionSummary: [CommunityTransactionSummary!]!
+  transactionSummaryTimeSeries(
+    """
+    The type of transactions to return: CREDIT, DEBIT, or REFUND_DEBIT
+    """
+    type: CommunityTransactionType!
+  ): TimeSeriesAmount!
   lastInteractionAt: DateTime
   firstInteractionAt: DateTime
   activities(
@@ -7594,17 +7780,19 @@ enum CommunityRelationType {
 }
 
 type CommunityTransactionSummary {
-  year: Int
-  expenseTotal: Amount!
-  expenseCount: Int!
-  contributionTotal: Amount!
-  contributionCount: Int!
-  expenseTotalAcc: Amount!
-  expenseCountAcc: Int!
-  contributionTotalAcc: Amount!
-  contributionCountAcc: Int!
-  orderCount: Int!
-  orderCountAcc: Int!
+  kind: String
+  debitTotal: Amount!
+  debitCount: Int!
+  creditTotal: Amount!
+  creditCount: Int!
+  refundDebitTotal: Amount
+  refundDebitCount: Int
+}
+
+enum CommunityTransactionType {
+  CREDIT
+  DEBIT
+  REFUND_DEBIT
 }
 
 """
@@ -7632,6 +7820,11 @@ type KYCVerification {
   Unique identifier for this KYC verification
   """
   id: String!
+
+  """
+  The resource public id (ie: kyc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   Provider used to make this KYC verification
@@ -7671,10 +7864,9 @@ type KYCVerification {
 
 enum KYCProvider {
   MANUAL
-  PERSONA
 }
 
-union KYCProviderData = ManualKYCProviderData | PersonaKYCProviderData
+union KYCProviderData = ManualKYCProviderData
 
 """
 Manual KYC data
@@ -7684,31 +7876,6 @@ type ManualKYCProviderData {
   Notes added during manual verification
   """
   notes: String!
-}
-
-"""
-Persona KYC data
-"""
-type PersonaKYCProviderData {
-  """
-  Whether this persona inquiry was imported
-  """
-  imported: Boolean!
-
-  """
-  ID of the Persona inquiry
-  """
-  id: String!
-
-  """
-  Status of the Persona inquiry
-  """
-  status: String!
-
-  """
-  Contains KYC data verified by this inquiry
-  """
-  fields: JSON!
 }
 
 """
@@ -7759,7 +7926,12 @@ An webhook attached to an account
 """
 type Webhook {
   id: String!
-  legacyId: Int!
+
+  """
+  The resource public id (ie: not_xxxxxxxx)
+  """
+  publicId: String!
+  legacyId: Int! @deprecated(reason: "2026-02-25: use publicId")
   activityType: ActivityType
   webhookUrl: URL
   account: Account!
@@ -8093,6 +8265,11 @@ type ManualPaymentProvider {
   id: String!
 
   """
+  The resource public id (ie: mpp_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   The type of manual payment provider
   """
   type: ManualPaymentProviderType!
@@ -8219,6 +8396,11 @@ An agreement
 """
 type Agreement {
   id: String
+
+  """
+  The resource public id (ie: agr_xxxxxxxx)
+  """
+  publicId: String!
   title: String!
 
   """
@@ -8283,6 +8465,11 @@ type TransactionsImport {
   The public id of the import
   """
   id: String!
+
+  """
+  The resource public id (ie: ti_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   Account that holds the import
@@ -8502,6 +8689,11 @@ type TransactionsImportRow {
   id: String!
 
   """
+  The resource public id (ie: tir_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   The source id of the row
   """
   sourceId: NonEmptyString!
@@ -8687,6 +8879,11 @@ type ExpenseValuesByRole {
   id: NonEmptyString!
 
   """
+  The resource public id (ie: ex_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   The values provided by the expense submitter(s)
   """
   submitter: ExpenseValuesRoleDetails
@@ -8735,6 +8932,11 @@ type ExpenseAttachedFile {
   Unique identifier for this file
   """
   id: String!
+
+  """
+  The resource public id (ie: eaf_xxxxxxxx)
+  """
+  publicId: String!
   url: URL
 
   """
@@ -8756,6 +8958,11 @@ type ExpenseItem {
   Unique identifier for this expense item
   """
   id: String!
+
+  """
+  The resource public id (ie: ei_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   Amount of this item
@@ -8846,6 +9053,11 @@ Fields for the user permissions on an expense
 """
 type ExpensePermissions {
   id: String!
+
+  """
+  The resource public id (ie: ex_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   Whether the current user can edit the expense
@@ -9094,6 +9306,11 @@ type RecurringExpense {
   id: String!
 
   """
+  The resource public id (ie: re_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   The interval in which this recurring expense is created
   """
   interval: RecurringExpenseInterval!
@@ -9195,6 +9412,20 @@ enum ExpenseLockableFields {
   TYPE
 }
 
+type ExpenseKYCStatus {
+  payee: ExpensePayeeKYC
+}
+
+type ExpensePayeeKYC {
+  status: ExpensePayeeKYCStatus
+}
+
+enum ExpensePayeeKYCStatus {
+  NOT_REQUESTED
+  PENDING
+  VERIFIED
+}
+
 """
 Fields for the user permissions on an transaction
 """
@@ -9232,6 +9463,11 @@ Fields for the user permissions on an order
 """
 type OrderPermissions {
   id: String!
+
+  """
+  The resource public id (ie: or_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   Whether the current user can mark this order as expired
@@ -9321,6 +9557,11 @@ type TierStats {
   id: String!
 
   """
+  The resource public id (ie: tier_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   Total amount donated for this tier, in cents.
   """
   totalAmountReceived: Amount!
@@ -9351,6 +9592,11 @@ This represents a Bot account
 type Bot implements Account {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The slug identifying the account (ie: babel)
@@ -9717,6 +9963,11 @@ type Bot implements Account {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -9950,12 +10201,17 @@ type Bot implements Account {
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -10064,6 +10320,11 @@ type Bot implements Account {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -10100,7 +10361,7 @@ type Bot implements Account {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -10381,6 +10642,11 @@ This represents a Collective account
 type Collective implements Account & AccountWithHost & AccountWithContributions & AccountWithPlatformSubscription {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The slug identifying the account (ie: babel)
@@ -10747,6 +11013,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -10980,12 +11251,17 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -11094,6 +11370,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -11130,7 +11411,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -11677,6 +11958,11 @@ This represents a Credit transaction
 type Credit implements Transaction {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: tx_xxxxxxxx)
+  """
+  publicId: String!
   uuid: String! @deprecated(reason: "2021-08-15: Use id instead.")
   group: String!
   type: TransactionType!
@@ -11824,6 +12110,11 @@ This represents a Debit transaction
 type Debit implements Transaction {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: tx_xxxxxxxx)
+  """
+  publicId: String!
   uuid: String! @deprecated(reason: "2021-08-15: Use id instead.")
   group: String!
   type: TransactionType!
@@ -11971,6 +12262,11 @@ This represents an Event account
 type Event implements Account & AccountWithHost & AccountWithContributions & AccountWithParent {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The slug identifying the account (ie: babel)
@@ -12337,6 +12633,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -12570,12 +12871,17 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -12684,6 +12990,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -12720,7 +13031,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -13177,6 +13488,11 @@ interface FileInfo {
   id: String!
 
   """
+  The resource public id (ie: uf_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   URL to access the file
   """
   url: URL!
@@ -13205,6 +13521,11 @@ type ImageFileInfo implements FileInfo {
   Unique identifier for the file
   """
   id: String!
+
+  """
+  The resource public id (ie: uf_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   URL to access the file
@@ -13249,6 +13570,11 @@ type GenericFileInfo implements FileInfo {
   id: String!
 
   """
+  The resource public id (ie: uf_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   URL to access the file
   """
   url: URL!
@@ -13275,6 +13601,11 @@ This represents an Individual account
 type Individual implements Account {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The slug identifying the account (ie: babel)
@@ -13641,6 +13972,11 @@ type Individual implements Account {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -13874,12 +14210,17 @@ type Individual implements Account {
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -13988,6 +14329,11 @@ type Individual implements Account {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -14024,7 +14370,7 @@ type Individual implements Account {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -14430,6 +14776,11 @@ type PersonalToken {
   id: String!
 
   """
+  The resource public id (ie: pt_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   A friendly name for users to easily find their personal tokens
   """
   name: String
@@ -14475,6 +14826,11 @@ User two factor authentication method
 """
 type UserTwoFactorMethod {
   id: String!
+
+  """
+  The resource public id (ie: u2f_xxxxxxxx)
+  """
+  publicId: String!
   method: TwoFactorMethod!
   name: String!
   createdAt: DateTime!
@@ -14526,7 +14882,6 @@ A individual KYC verified status
 """
 type KYCStatus {
   manual: KYCVerification
-  persona: KYCVerification
 }
 
 """
@@ -14534,6 +14889,11 @@ This represents a Member relationship (ie: Organization backing a Collective)
 """
 type Member {
   id: String!
+
+  """
+  The resource public id (ie: mem_xxxxxxxx)
+  """
+  publicId: String!
   role: MemberRole!
   tier: Tier
   createdAt: DateTime!
@@ -14572,6 +14932,11 @@ This represents a MemberOf relationship (ie: Collective backed by an Organizatio
 """
 type MemberOf {
   id: String!
+
+  """
+  The resource public id (ie: mem_xxxxxxxx)
+  """
+  publicId: String!
   role: MemberRole!
   tier: Tier
   createdAt: DateTime!
@@ -14611,6 +14976,11 @@ This represents an Organization account
 type Organization implements Account & AccountWithContributions & AccountWithPlatformSubscription {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The slug identifying the account (ie: babel)
@@ -14977,6 +15347,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -15210,12 +15585,17 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -15324,6 +15704,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -15360,7 +15745,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -15750,6 +16135,11 @@ type TransferWise {
   Unique identifier for this Wise object
   """
   id: String!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
   requiredFields(
     """
     The 3 letter code identifying the currency you want to receive (ie: USD, EUR, BRL, GBP)
@@ -15781,6 +16171,11 @@ This represents a Vendor account
 type Vendor implements Account & AccountWithContributions {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The slug identifying the account (ie: babel)
@@ -16147,6 +16542,11 @@ type Vendor implements Account & AccountWithContributions {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -16380,12 +16780,17 @@ type Vendor implements Account & AccountWithContributions {
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -16494,6 +16899,11 @@ type Vendor implements Account & AccountWithContributions {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -16530,7 +16940,7 @@ type Vendor implements Account & AccountWithContributions {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -16922,6 +17332,11 @@ A Virtual Card used to pay expenses
 """
 type VirtualCard {
   id: String
+
+  """
+  The resource public id (ie: vc_xxxxxxxx)
+  """
+  publicId: String!
   account: Account
   host: Host
   assignee: Individual
@@ -16955,7 +17370,12 @@ A Virtual Card request
 """
 type VirtualCardRequest {
   id: String!
-  legacyId: Int
+
+  """
+  The resource public id (ie: vcr_xxxxxxxx)
+  """
+  publicId: String!
+  legacyId: Int @deprecated(reason: "2026-02-25: use publicId")
   purpose: String
   notes: String
   status: VirtualCardRequestStatus
@@ -17237,14 +17657,14 @@ type Query {
   ): ActivityCollection!
   application(
     """
-    The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, app_xxxxxxxx)
     """
     id: String
 
     """
     The legacy public id identifying the application (ie: 4242)
     """
-    legacyId: Int
+    legacyId: Int @deprecated(reason: "2026-02-25: use id")
 
     """
     The clientId for the application.
@@ -17392,12 +17812,17 @@ type Query {
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -17506,6 +17931,11 @@ type Query {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   expenseTagStats(
     """
@@ -18160,6 +18590,11 @@ type Query {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -18336,14 +18771,14 @@ type Query {
   """
   personalToken(
     """
-    The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, pt_xxxxxxxx)
     """
     id: String
 
     """
     The legacy public id identifying the personal-token (ie: 4242)
     """
-    legacyId: Int
+    legacyId: Int @deprecated(reason: "2026-02-25: use id")
   ): PersonalToken
   virtualCard(
     """
@@ -19711,6 +20146,10 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_INVITE_DECLINED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  COLLECTIVE_EXPENSE_KYC_PAYOUT_METHOD_CHANGED
+  COLLECTIVE_EXPENSE_KYC_REQUESTED
+  COLLECTIVE_EXPENSE_KYC_VERIFIED
+  COLLECTIVE_EXPENSE_KYC_REVOKED
   TAXFORM_REQUEST
   TAXFORM_RECEIVED
   TAXFORM_INVALIDATED
@@ -19868,9 +20307,14 @@ type ExportRequest {
   id: NonEmptyString!
 
   """
+  The resource public id (ie: er_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   Legacy numeric ID of this export request
   """
-  legacyId: Int!
+  legacyId: Int! @deprecated(reason: "2026-02-25: use publicId")
 
   """
   The name of the export request
@@ -19969,14 +20413,14 @@ Input type for referencing an ExportRequest
 """
 input ExportRequestReferenceInput {
   """
-  The public id identifying the export request
+  The public id identifying the export request (ie: er_xxxxxxxx)
   """
   id: String
 
   """
   The internal id of the export request
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 """
@@ -19995,6 +20439,11 @@ This represents an Project account
 type Fund implements Account & AccountWithHost & AccountWithContributions {
   id: String!
   legacyId: Int!
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
 
   """
   The slug identifying the account (ie: babel)
@@ -20361,6 +20810,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -20594,12 +21048,17 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -20708,6 +21167,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -20744,7 +21208,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -21174,6 +21638,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   legacyId: Int!
 
   """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
+
+  """
   The slug identifying the account (ie: babel)
   """
   slug: String!
@@ -21538,6 +22007,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     includeDebts: Boolean! = false
 
     """
+    Whether to include the reversed transactions created due to an edit.
+    """
+    includeEditedReversedTransactions: Boolean! = true
+
+    """
     To filter by transaction kind
     """
     kind: [TransactionKind]
@@ -21771,12 +22245,17 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     accounts: [AccountReferenceInput]
 
     """
-    Return expenses only for this host
+    Return expenses only for this host (payer / collective side)
     """
     host: AccountReferenceInput
 
     """
-    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    Return expenses only for payees (fromCollective) hosted by this host. Cannot be used together with `host`.
+    """
+    fromHost: AccountReferenceInput
+
+    """
+    If `host` or `fromHost` is provided, select whether to include ALL, INTERNAL or HOSTED accounts (payer when using `host`, payee when using `fromHost`).
     """
     hostContext: HostContext
 
@@ -21885,6 +22364,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Filter expenses by activities
     """
     activity: ExpenseActivityFilter
+
+    """
+    Filter expenses by KYC status
+    """
+    kycStatus: ExpenseKYCStatusFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -21921,7 +22405,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Whether to include archived payout methods
     """
     includeArchived: Boolean = false
-  ): [PayoutMethod]
+  ): [PayoutMethod!]
 
   """
   The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
@@ -22567,14 +23051,14 @@ type SearchResultsUpdates {
 
 input TransactionReferenceInput {
   """
-  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, tx_xxxxxxxx)
   """
   id: String
 
   """
   The internal id of the transaction (ie: 580)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 """
@@ -22585,8 +23069,11 @@ type PaypalPlan {
 }
 
 input VirtualCardRequestReferenceInput {
+  """
+  The public id identifying the virtual card request (ie: vcr_xxxxxxxx)
+  """
   id: String
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 """
@@ -22601,7 +23088,7 @@ type VirtualCardRequestCollection implements Collection {
 
 input HostApplicationReferenceInput {
   """
-  The public id identifying the host application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the host application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, ha_xxxxxxxx)
   """
   id: String
 }
@@ -25052,6 +25539,27 @@ type Mutation {
   ): KYCVerification!
 
   """
+  Submits a KYC verification
+  """
+  submitKYCVerification(
+    """
+    Account request KYC Verification
+    """
+    requestedByAccount: AccountReferenceInput!
+
+    """
+    Account that will be verified
+    """
+    verifyAccount: AccountReferenceInput!
+    provider: KYCProvider!
+
+    """
+    Provider specific request data
+    """
+    request: SubmitKYCVerificationInput!
+  ): KYCVerification!
+
+  """
   Revoke the KYC Verification
   """
   revokeKYCVerification(kycVerification: KYCVerificationReferenceInput!): KYCVerification!
@@ -25260,13 +25768,16 @@ type AddTwoFactorAuthTokenToIndividualResponse {
 }
 
 input UserTwoFactorMethodReferenceInput {
+  """
+  The public id identifying the user two factor method (ie: u2f_xxxxxxxx)
+  """
   id: String
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 input AccountUpdateInput {
   """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, acc_xxxxxxxx)
   """
   id: String!
   name: String
@@ -25382,7 +25893,7 @@ Input for creating or updating an account category
 """
 input AccountingCategoryInput {
   """
-  The ID of the accounting category to edit
+  The ID of the accounting category to edit (ie: acat_xxxxxxxx)
   """
   id: NonEmptyString
   kind: AccountingCategoryKind! = EXPENSE
@@ -25454,7 +25965,7 @@ Reference to an accounting category
 """
 input AccountingCategoryReferenceInput {
   """
-  The ID of the accounting category
+  The ID of the accounting category (ie: acat_xxxxxxxx)
   """
   id: NonEmptyString!
 }
@@ -25538,7 +26049,7 @@ input TaxInput {
 
 input TransactionsImportRowReferenceInput {
   """
-  The id of the row
+  The id of the row (ie: tir_xxxxxxxx)
   """
   id: NonEmptyString!
 }
@@ -25563,14 +26074,14 @@ Input type for Application
 """
 input ApplicationUpdateInput {
   """
-  The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, app_xxxxxxxx)
   """
   id: String
 
   """
   The legacy public id identifying the application (ie: 4242)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 
   """
   The clientId for the application.
@@ -25583,14 +26094,14 @@ input ApplicationUpdateInput {
 
 input ApplicationReferenceInput {
   """
-  The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, app_xxxxxxxx)
   """
   id: String
 
   """
   The legacy public id identifying the application (ie: 4242)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 
   """
   The clientId for the application.
@@ -25599,6 +26110,9 @@ input ApplicationReferenceInput {
 }
 
 input CommentUpdateInput {
+  """
+  The public id identifying the comment (ie: cmt_xxxxxxxx)
+  """
   id: String!
   html: String
 }
@@ -25635,15 +26149,15 @@ input CommentCreateInput {
 
 input ConversationReferenceInput {
   """
-  The public id identifying the conversation
+  The public id identifying the conversation (ie: conv_xxxxxxxx)
   """
   id: String
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 input UpdateReferenceInput {
   """
-  The public id identifying the update
+  The public id identifying the update (ie: upd_xxxxxxxx)
   """
   id: String
 }
@@ -25687,14 +26201,14 @@ input ConnectedAccountCreateInput {
 
 input ConnectedAccountReferenceInput {
   """
-  The public id identifying the connected account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the connected account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, ca_xxxxxxxx)
   """
   id: String
 
   """
   The internal id of the account (ie: 580)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 type EmojiReactionResponse {
@@ -25711,7 +26225,7 @@ type EmojiReactionResponse {
 
 input CommentReferenceInput {
   """
-  The public id identifying the comment
+  The public id identifying the comment (ie: cmt_xxxxxxxx)
   """
   id: String
 }
@@ -25807,12 +26321,17 @@ input PayoutMethodInput {
   """
   The unique identifier of the payout method
   """
-  id: String
+  id: String @deprecated(reason: "2026-02-25: use publicId")
+
+  """
+  The resource public id (ie: po_xxxxxxxx)
+  """
+  publicId: String
 
   """
   The legacy identifier used in older systems
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use publicId")
 
   """
   Additional data specific to the payout method type. For custom payout methods (type=OTHER), must contain only `content` (string) and `currency` fields. For other types, may contain type-specific details (e.g., bank account details, PayPal email)
@@ -25864,7 +26383,7 @@ input ExpenseItemCreateInput {
 
 input ExpenseAttachedFileInput {
   """
-  ID of the file
+  The public id identifying the expense attached file (ie: eaf_xxxxxxxx)
   """
   id: String
 
@@ -25913,7 +26432,7 @@ input RecurringExpenseInput {
 
 input ExpenseUpdateInput {
   """
-  ID of the expense that you are trying to edit
+  The public id identifying the expense (ie: ex_xxxxxxxx)
   """
   id: String!
 
@@ -26010,7 +26529,7 @@ input ExpenseUpdateInput {
 
 input ExpenseItemInput {
   """
-  ID of the item
+  The public id identifying the expense item (ie: ei_xxxxxxxx)
   """
   id: String
 
@@ -26042,14 +26561,14 @@ input ExpenseItemInput {
 
 input NewAccountOrReferenceInput {
   """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, acc_xxxxxxxx)
   """
   id: String
 
   """
   The internal id of the account (ie: 580)
   """
-  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 
   """
   The slug identifying the account (ie: babel for https://opencollective.com/babel)
@@ -26431,14 +26950,14 @@ type IndividualConfirmEmailResponse {
 
 input MemberInvitationReferenceInput {
   """
-  The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, mi_xxxxxxxx)
   """
   id: String
 
   """
   The internal id of the invitation (ie: 580)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 input ManualPaymentProviderCreateInput {
@@ -26502,7 +27021,7 @@ type UnfollowAccountResult {
 
 input OAuthAuthorizationReferenceInput {
   """
-  The id identifying the OAuth Authorization (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The id identifying the OAuth Authorization (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, utok_xxxxxxxx)
   """
   id: String
 }
@@ -26685,7 +27204,7 @@ An input to use for creating or retrieving payment methods
 """
 input PaymentMethodInput {
   """
-  The id assigned to the payment method
+  The id assigned to the payment method (ie: pm_xxxxxxxx)
   """
   id: String
 
@@ -26934,14 +27453,14 @@ Input to edit an existing pending order
 """
 input PendingOrderEditInput {
   """
-  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, or_xxxxxxxx)
   """
   id: String
 
   """
   The legacy public id identifying the order (ie: 4242)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 
   """
   The contribution amount, without platform contribution and taxes
@@ -27103,7 +27622,7 @@ type PlaidLinkTokenCreateResponse {
 
 input TransactionsImportReferenceInput {
   """
-  The id of the row
+  The id of the row (ie: ti_xxxxxxxx)
   """
   id: NonEmptyString!
 }
@@ -27300,7 +27819,7 @@ type TransactionsImportEditResponse {
 
 input TransactionsImportRowUpdateInput {
   """
-  The id of the row
+  The id of the row (ie: tir_xxxxxxxx)
   """
   id: NonEmptyString!
 
@@ -27379,6 +27898,9 @@ input UpdateCreateInput {
 Input type for UpdateType
 """
 input UpdateUpdateInput {
+  """
+  The public id identifying the update (ie: upd_xxxxxxxx)
+  """
   id: String!
   slug: String
   title: String
@@ -27491,7 +28013,10 @@ input OCRParsingOptionsInput {
 }
 
 input VirtualCardInput {
-  id: String
+  """
+  The public id identifying the virtual card (ie: vc_xxxxxxxx)
+  """
+  id: String!
   name: String
   last4: String
   data: JSONObject
@@ -27521,33 +28046,33 @@ Input type to update a Webhook
 """
 input WebhookUpdateInput {
   """
-  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, not_xxxxxxxx)
   """
   id: String
 
   """
   The legacy public id identifying the webhook (ie: 4242)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
   activityType: ActivityType! = ACTIVITY_ALL
   webhookUrl: URL!
 }
 
 input WebhookReferenceInput {
   """
-  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, not_xxxxxxxx)
   """
   id: String
 
   """
   The legacy public id identifying the webhook (ie: 4242)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 input TierUpdateInput {
   """
-  The public id identifying the tier (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the tier (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, tier_xxxxxxxx)
   """
   id: String!
   amount: AmountInput
@@ -27609,14 +28134,14 @@ Input type for PersonalToken
 """
 input PersonalTokenUpdateInput {
   """
-  The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, pt_xxxxxxxx)
   """
   id: String
 
   """
   The legacy public id identifying the personal-token (ie: 4242)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
   name: String
   scope: [OAuthScope]
   expiresAt: String
@@ -27629,14 +28154,14 @@ input PersonalTokenUpdateInput {
 
 input PersonalTokenReferenceInput {
   """
-  The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, pt_xxxxxxxx)
   """
   id: String
 
   """
   The legacy public id identifying the personal-token (ie: 4242)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 type TagResponse {
@@ -27646,14 +28171,14 @@ type TagResponse {
 
 input AgreementReferenceInput {
   """
-  The public id identifying the agreement (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the agreement (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, agr_xxxxxxxx)
   """
   id: String
 
   """
   The internal id of the agreement (ie: 580)
   """
-  legacyId: Int
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 }
 
 input VendorCreateInput {
@@ -27699,14 +28224,14 @@ input VendorContactInput {
 
 input VendorEditInput {
   """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re, acc_xxxxxxxx)
   """
   id: String
 
   """
   The internal id of the account (ie: 580)
   """
-  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+  legacyId: Int @deprecated(reason: "2026-02-25: use id")
 
   """
   The slug identifying the account (ie: babel for https://opencollective.com/babel)
@@ -27821,17 +28346,22 @@ input PlatformSubscriptionPlanPricing {
 
 input RequestKYCVerificationInput {
   manual: RequestManualKYCVerificationInput
-  persona: RequestPersonaKYCVerificationInput
 }
 
 input RequestManualKYCVerificationInput {
-  legalName: String!
+  legalName: String
   legalAddress: String
   notes: String
 }
 
-input RequestPersonaKYCVerificationInput {
-  importInquiryId: String
+input SubmitKYCVerificationInput {
+  manual: SubmitManualKYCVerificationInput
+}
+
+input SubmitManualKYCVerificationInput {
+  legalName: String!
+  legalAddress: String
+  notes: String
 }
 
 """

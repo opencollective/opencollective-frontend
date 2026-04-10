@@ -103,10 +103,10 @@ export const adminPanelQuery = gql`
         CHARGE_HOSTING_FEES
         KYC
         ACCOUNTING_CATEGORIZATION_RULES
-        PERSONA_KYC
       }
       policies {
         id
+        publicId
         REQUIRE_2FA_FOR_ADMINS
       }
       ... on Organization {

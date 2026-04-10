@@ -141,6 +141,7 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
       showCurrencyCode: true,
       isSnapshot: true,
       showTimeSeries: true,
+      noTimeseriesLabel: <FormattedMessage defaultMessage="No data for selected period" id="Metric.NoDataForperiod" />,
     },
     {
       id: 'received',
@@ -151,6 +152,7 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
     },
     {
       id: 'spent',
+      useAbsoluteAmount: true,
       label: <FormattedMessage defaultMessage="Spent" id="111qQK" />,
       helpLabel: <FormattedMessage defaultMessage="Total amount spent this period" id="6ctWuQ" />,
       amount: data?.account.spent,

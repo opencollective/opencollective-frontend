@@ -143,6 +143,7 @@ const transactionsImportQuery = gql`
   ) {
     transactionsImport(id: $importId) {
       id
+      publicId
       source
       name
       lastSyncAt
@@ -201,9 +202,11 @@ const transactionsImportQuery = gql`
         limit
         nodes {
           id
+          publicId
           ...TransactionsImportRowFields @skip(if: $fetchOnlyRowIds)
           transactionsImport @skip(if: $fetchOnlyRowIds) {
             id
+            publicId
             source
             name
           }
@@ -331,7 +334,9 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
   const importType = importData?.type;
   const hasStepper = !importData?.file;
   const importRows = importData?.rows?.nodes ?? [];
-  const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
+  const selectedRowIdx = !focus
+    ? -1
+    : importRows.findIndex(row => row.id === focus.rowId || row.publicId === focus.rowId);
 
   const { getActions, setRowsStatus } = useTransactionsImportActions({
     host: importData?.account?.['host'],
@@ -546,11 +551,11 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                     }
                     data={importRows}
                     getActions={getActions}
-                    openDrawer={row => setFocus({ rowId: row.original.id })}
+                    openDrawer={row => setFocus({ rowId: row.original.publicId })}
                     onClickRow={(row, _, e) => {
                       // Ignore click when on checkbox or "Note" icon
                       if (!(e.target as Element).closest('button')) {
-                        setFocus({ rowId: row.original.id });
+                        setFocus({ rowId: row.original.publicId });
                       }
                     }}
                     emptyMessage={() => (
@@ -672,7 +677,7 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                               className="relative"
                               variant="ghost"
                               size="icon-xs"
-                              onClick={() => setFocus({ rowId: row.original.id, noteForm: true })}
+                              onClick={() => setFocus({ rowId: row.original.publicId, noteForm: true })}
                             >
                               <MessageSquare size={16} className={hasNote ? 'text-neutral-700' : 'text-neutral-300'} />
                             </Button>

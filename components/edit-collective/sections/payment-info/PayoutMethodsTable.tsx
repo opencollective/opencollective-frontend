@@ -51,6 +51,7 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
           isChecked
           isEditable
           disableWarningMessages
+          isPaypalConnectEnabled
         />
       ))}
       {archived?.length > 0 && (

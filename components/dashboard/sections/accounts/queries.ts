@@ -6,6 +6,7 @@ const dashboardAccountsQueryFields = gql`
   fragment DashboardAccountsQueryFields on Account {
     id
     legacyId
+    publicId
     name
     slug
     type
@@ -48,6 +49,7 @@ const dashboardAccountsQueryFields = gql`
         slug
         policies {
           id
+          publicId
           REQUIRE_2FA_FOR_ADMINS
         }
       }

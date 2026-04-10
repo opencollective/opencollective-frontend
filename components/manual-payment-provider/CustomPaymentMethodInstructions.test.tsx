@@ -1,12 +1,55 @@
+/**
+ * Load data-URL images so the QR SVG can be rasterized and decoded with jsQR.
+ * @jest-environment-options {"resources": "usable"}
+ */
 import '@testing-library/jest-dom';
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import jsQR from 'jsqr';
 
 import { Currency } from '@/lib/graphql/types/v2/graphql';
 import { withRequiredProviders } from '../../test/providers';
 
 import { CustomPaymentMethodInstructions } from './CustomPaymentMethodInstructions';
+
+/** Rasterizes the rendered QR SVG and decodes its payload with jsQR (validates pixels match the encoded string). */
+async function decodeQrPayloadFromSvg(svg: SVGSVGElement): Promise<string> {
+  let serialized = new XMLSerializer().serializeToString(svg);
+  if (!serialized.includes('xmlns=')) {
+    serialized = serialized.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+  }
+  const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(serialized)}`;
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth || img.width;
+      const h = img.naturalHeight || img.height;
+      const scale = 4;
+      const canvas = document.createElement('canvas');
+      canvas.width = w * scale;
+      canvas.height = h * scale;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Canvas 2D context unavailable'));
+        return;
+      }
+      ctx.imageSmoothingEnabled = false;
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const result = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+      if (!result?.data) {
+        reject(new Error('jsQR could not read QR from rendered SVG'));
+        return;
+      }
+      resolve(result.data);
+    };
+    img.onerror = () => reject(new Error('Failed to load QR SVG as image'));
+    img.src = dataUrl;
+  });
+}
 
 describe('CustomPaymentMethodInstructions', () => {
   const defaultValues = {
@@ -177,6 +220,56 @@ describe('CustomPaymentMethodInstructions', () => {
       // Verify the full text is rendered correctly
       expect(screen.getByText(/test-collective is the collective/)).toBeInTheDocument();
       expect(screen.getByText(/Donate to test-collective/)).toBeInTheDocument();
+    });
+
+    it('renders EPC QR section with title, Wikipedia link, and QR for EUR + IBAN', async () => {
+      const eurValues = {
+        amount: { valueInCents: 2420, currency: Currency.EUR },
+        collectiveSlug: 'test-collective',
+        OrderId: 51431,
+        accountDetails: {
+          accountHolderName: 'A Valid Collective',
+          details: {
+            IBAN: 'BE69967102423878',
+            BIC: 'TRWIBEB1XXX',
+          },
+        },
+      };
+      const { container } = render(
+        withRequiredProviders(
+          <CustomPaymentMethodInstructions instructions="Please pay {amount}." values={eurValues} />,
+        ),
+      );
+      expect(screen.getByText(/Scan to pay/)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /This QR code carries the data for a SEPA credit transfer\. Many banking apps in Europe let you scan it to fill in the payee, amount, and reference\./,
+        ),
+      ).toBeInTheDocument();
+      const link = screen.getByRole('link', { name: /Learn more about EPC QR/i });
+      expect(link).toHaveAttribute('href', 'https://wikipedia.org/wiki/EPC_QR_code');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      const qrSvg = container.querySelector('[data-cy="qr-code"]');
+      expect(qrSvg).toBeInTheDocument();
+      expect(qrSvg?.tagName.toLowerCase()).toBe('svg');
+      const decoded = await decodeQrPayloadFromSvg(qrSvg as SVGSVGElement);
+      // EPC QR payload for the values above (service tag BCD, SEPA credit transfer, EUR 24.20, ref 51431).
+      const expectedEpcQrPayload = [
+        'BCD',
+        '002',
+        '1',
+        'SCT',
+        'TRWIBEB1XXX',
+        'A Valid Collective',
+        'BE69967102423878',
+        'EUR24.20',
+        '',
+        '',
+        '51431',
+        '',
+      ].join('\n');
+      expect(decoded).toBe(expectedEpcQrPayload);
     });
   });
 });

@@ -199,7 +199,7 @@ export function DataTable<TData, TValue>({
             ))
         ) : (
           <TableRow highlightOnHover={false}>
-            <TableCell colSpan={columns.length} compact={compact}>
+            <TableCell colSpan={table.getVisibleFlatColumns().length} compact={compact}>
               <div className="p-4 text-center text-slate-500">
                 {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" id="UG5qoS" />}
               </div>
@@ -211,7 +211,7 @@ export function DataTable<TData, TValue>({
       {footer && (
         <tfoot>
           <tr>
-            <th colSpan={table.getCenterLeafColumns().length}>{footer}</th>
+            <th colSpan={table.getVisibleFlatColumns().length}>{footer}</th>
           </tr>
         </tfoot>
       )}
@@ -235,7 +235,11 @@ function DataTableRow({
     <TableRow
       data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
       data-state={row.getIsSelected() && 'selected'}
-      className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
+      className={cn(
+        getRowClassName?.(row),
+        onClickRow && 'cursor-pointer',
+        rowHasIndicator?.(row) && 'overflow-hidden',
+      )}
       {...(onClickRow && {
         onClick: e => onClickRow(row, actionsMenuTriggerRef, e),
       })}
@@ -280,7 +284,7 @@ export const stickyColumnVariants = cva(
         select:
           'left-0 z-1 w-10 max-w-10 min-w-10 [filter:drop-shadow(2px_0px_6px_rgba(0,0,0,var(--scroll-shadow-left,0)))] [clip-path:inset(0px_-20px_0px_0px)]',
         actions:
-          'right-0 w-12 max-w-12 min-w-12 !pr-2 [filter:drop-shadow(-2px_0px_6px_rgba(0,0,0,var(--scroll-shadow-right,0)))]', //[clip-path:inset(0px_0px_0px_-20px)]
+          'right-0 w-12 max-w-12 min-w-12 !pr-2 [filter:drop-shadow(-2px_0px_6px_rgba(0,0,0,var(--scroll-shadow-right,0)))]', // [clip-path:inset(0px_0px_0px_-20px)]
       },
     },
   },

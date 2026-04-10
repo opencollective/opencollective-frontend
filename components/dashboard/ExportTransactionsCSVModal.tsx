@@ -159,6 +159,13 @@ const makeUrl = ({
     url.searchParams.set('hasDebt', queryFilter.variables.hasDebt ? '1' : '0');
   }
 
+  if (!isNil(queryFilter.variables.includeEditedReversedTransactions)) {
+    url.searchParams.set(
+      'includeEditedReversedTransactions',
+      queryFilter.variables.includeEditedReversedTransactions ? '1' : '0',
+    );
+  }
+
   if (queryFilter.variables.order) {
     url.searchParams.set('orderId', String((queryFilter.variables.order as OrderReferenceInput).legacyId));
   }

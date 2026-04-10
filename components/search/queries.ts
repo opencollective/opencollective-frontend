@@ -3,6 +3,7 @@ import { gql } from '@apollo/client';
 export const searchAccountFieldsFragment = gql`
   fragment SearchAccountFields on Account {
     id
+    publicId
     name
     slug
     imageUrl(height: $imageHeight)

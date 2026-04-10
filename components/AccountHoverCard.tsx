@@ -19,7 +19,6 @@ import { KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { DashboardContext } from './dashboard/DashboardContext';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
-import { kycStatusFields } from './kyc/graphql';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
 import { AccountTrustBadge } from './AccountTrustBadge';
@@ -29,9 +28,15 @@ import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Link from './Link';
 import Spinner from './Spinner';
 
+// account kyc badge might display an account hover card, so we need to lazy load it to avoid circular dependencies
+const AccountKYCStatusBadge = React.lazy(() =>
+  import('./kyc/components/AccountKYCStatusBadge').then(mod => ({ default: mod.AccountKYCStatusBadge })),
+);
+
 export const accountHoverCardFields = gql`
   fragment AccountHoverCardFields on Account {
     id
+    publicId
     name
     legalName
     slug
@@ -101,8 +106,6 @@ const userContextualMembershipsQuery = gql`
     $hostSlug: String
     $getHostAdmin: Boolean!
     $getAccountAdmin: Boolean!
-    $dashboardAccountSlug: String
-    $hasDashboardAccountSlug: Boolean!
   ) {
     account(slug: $userSlug) {
       id
@@ -130,14 +133,8 @@ const userContextualMembershipsQuery = gql`
           }
         }
       }
-      ... on Individual {
-        kycStatus(requestedByAccount: { slug: $dashboardAccountSlug }) @include(if: $hasDashboardAccountSlug) {
-          ...KYCStatusFields
-        }
-      }
     }
   }
-  ${kycStatusFields}
 `;
 
 const getInfoItems = (account): InfoItemProps[] => {
@@ -315,8 +312,6 @@ export const AccountHoverCard = ({
       hostSlug,
       getHostAdmin: !!hostSlug,
       getAccountAdmin: !!accountSlug && accountSlug !== hostSlug, // Don't fetch account admin membership if the account is also the host
-      dashboardAccountSlug: dashboardAccount?.slug,
-      hasDashboardAccountSlug: !!dashboardAccount?.slug,
     },
     // Skip query if account is not an individual, if there no accountSlug or hostSlug in `includeAdminMembership`, or if the hover card is not open or hovered
     skip: !isIndividual || !account?.slug || !(accountSlug || hostSlug) || !(open || hasBeenHovered),
@@ -355,6 +350,9 @@ export const AccountHoverCard = ({
         {...hoverCardContentProps}
       >
         <div className="relative flex flex-col gap-4 text-sm">
+          <div className="absolute top-0 right-0">
+            {open && <AccountKYCStatusBadge account={account} host={dashboardAccount} />}
+          </div>
           <div className="flex flex-col gap-3 overflow-hidden break-words">
             <div className="flex justify-between">
               <Link href={accountUrl}>

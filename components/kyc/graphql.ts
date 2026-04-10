@@ -6,27 +6,14 @@ const kycVerificationManualProviderDataFields = gql`
   }
 `;
 
-const kycVerificationPersonaProviderDataFields = gql`
-  fragment PersonaKYCProviderDataFields on PersonaKYCProviderData {
-    id
-    status
-    imported
-    fields
-  }
-`;
-
 const kycVerificationProviderDataFields = gql`
   fragment KYCProviderDataFields on KYCProviderData {
     ... on ManualKYCProviderData {
       ...ManualKYCProviderDataFields
     }
-    ... on PersonaKYCProviderData {
-      ...PersonaKYCProviderDataFields
-    }
   }
 
   ${kycVerificationManualProviderDataFields}
-  ${kycVerificationPersonaProviderDataFields}
 `;
 
 const kycVerificationActionsFields = gql`
@@ -48,6 +35,7 @@ export const kycVerificationFields = gql`
     revokedAt
     createdByUser {
       id
+      publicId
       name
       legalName
       slug
@@ -121,9 +109,6 @@ export const kycVerificationCollectionFields = gql`
 export const kycStatusFields = gql`
   fragment KYCStatusFields on KYCStatus {
     manual {
-      ...KYCVerificationFields
-    }
-    persona {
       ...KYCVerificationFields
     }
   }

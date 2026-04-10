@@ -366,10 +366,10 @@ export const getRequiredInformation = (stepProfile, stepDetails, collective, pro
   const thresholds = collective?.policies?.CONTRIBUTOR_INFO_THRESHOLDS;
   return {
     legalName:
-      tier?.requireAddress || tier?.type === TierTypes.TICKET || thresholds?.legalName
-        ? totalAmount >= thresholds?.legalName
-        : false,
-    address: tier?.requireAddress || thresholds?.address ? totalAmount >= thresholds?.address : false,
+      tier?.requireAddress ||
+      tier?.type === TierTypes.TICKET ||
+      (thresholds?.legalName ? totalAmount >= thresholds?.legalName : false),
+    address: tier?.requireAddress || (thresholds?.address ? totalAmount >= thresholds?.address : false),
   };
 };
 

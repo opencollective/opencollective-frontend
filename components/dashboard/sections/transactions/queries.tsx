@@ -66,6 +66,11 @@ export const transactionsTableQueryCollectionFragment = gql`
       expense {
         id
         type
+        legacyId
+      }
+      order {
+        id
+        legacyId
       }
       permissions {
         id
@@ -86,6 +91,7 @@ export const transactionsTableQuery = gql`
   query TransactionsTable(
     $hostAccount: AccountReferenceInput
     $account: [AccountReferenceInput!]
+    $fromAccount: AccountReferenceInput
     $excludeAccount: [AccountReferenceInput!]
     $limit: Int!
     $offset: Int!
@@ -118,10 +124,12 @@ export const transactionsTableQuery = gql`
     $accountingCategory: [String]
     $paymentMethod: [PaymentMethodReferenceInput]
     $payoutMethod: PayoutMethodReferenceInput
+    $includeEditedReversedTransactions: Boolean
   ) {
     transactions(
       host: $hostAccount
       account: $account
+      fromAccount: $fromAccount
       excludeAccount: $excludeAccount
       limit: $limit
       offset: $offset
@@ -155,6 +163,7 @@ export const transactionsTableQuery = gql`
       accountingCategory: $accountingCategory
       paymentMethod: $paymentMethod
       payoutMethod: $payoutMethod
+      includeEditedReversedTransactions: $includeEditedReversedTransactions
     ) {
       ...TransactionsTableQueryCollectionFragment
     }

@@ -109,7 +109,7 @@ fi
 echo ""
 
 echo "Killing all node processes"
-kill $MAILDEV_PID
+kill $MAILPIT_PID
 kill $STRIPE_WEBHOOK_PID
 kill $API_PID
 kill $FRONTEND_PID

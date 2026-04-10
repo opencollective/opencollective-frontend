@@ -46,6 +46,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       isFirstPartyHost
       hostFeePercent
       platformFeePercent
+      platformContributionAvailable
       image
       imageUrl(height: 256)
       canApply
@@ -96,6 +97,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
         name
         slug
         type
+        hasHosting
         location {
           id
           country
