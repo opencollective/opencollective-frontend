@@ -20,7 +20,6 @@ export const planFeatures = gql`
     UPDATES
     RECEIVE_FINANCIAL_CONTRIBUTIONS
     RECEIVE_EXPENSES
-    RECEIVE_GRANTS
     ACCOUNT_MANAGEMENT
   }
 `;
