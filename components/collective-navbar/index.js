@@ -317,7 +317,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, i
       isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE' && isIndividualAccount(collective),
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
-      isFeatureAvailable(collective, 'RECEIVE_GRANTS') && expenseSubmissionAllowed(collective, LoggedInUser),
+      isFeatureAvailable(collective, 'FUNDS_GRANTS_MANAGEMENT') && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isAllowedAddFunds,
   };
 };

@@ -249,7 +249,7 @@ const getSectionsToRemoveForUser = (collective, isAdmin) => {
   if (
     features[FEATURES.TRANSACTIONS] !== 'ACTIVE' &&
     features[FEATURES.RECEIVE_EXPENSES] !== 'ACTIVE' &&
-    features[FEATURES.RECEIVE_GRANTS] !== 'ACTIVE'
+    features[FEATURES.FUNDS_GRANTS_MANAGEMENT] !== 'ACTIVE'
   ) {
     toRemove.add(Sections.BUDGET);
   }
