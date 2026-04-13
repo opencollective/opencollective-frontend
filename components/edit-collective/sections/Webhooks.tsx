@@ -150,7 +150,8 @@ class Webhooks extends React.Component<Props, State> {
 
     // Features
     const canReceiveExpenses =
-      isFeatureEnabled(collective, FEATURES.RECEIVE_EXPENSES) || isFeatureEnabled(collective, FEATURES.RECEIVE_GRANTS);
+      isFeatureEnabled(collective, FEATURES.RECEIVE_EXPENSES) ||
+      isFeatureEnabled(collective, FEATURES.FUNDS_GRANTS_MANAGEMENT);
     const canReceiveContributions = isFeatureEnabled(collective, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS);
     const canUseVirtualCards = isFeatureEnabled(collective, FEATURES.VIRTUAL_CARDS);
     const canUseUpdates = isFeatureEnabled(collective, FEATURES.UPDATES);
@@ -422,7 +423,7 @@ const editCollectiveWebhooksQuery = gqlV1 /* GraphQL */ `
       isHost
       features {
         RECEIVE_EXPENSES
-        RECEIVE_GRANTS
+        FUNDS_GRANTS_MANAGEMENT
         VIRTUAL_CARDS
         RECEIVE_FINANCIAL_CONTRIBUTIONS
         UPDATES
