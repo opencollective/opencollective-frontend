@@ -6,6 +6,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { hasAccountMoneyManagement } from '@/lib/collective';
 import type { FilterConfig } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
 import type { PeopleHostDashboardQuery, PeopleHostDashboardQueryVariables } from '@/lib/graphql/types/v2/graphql';
@@ -342,6 +343,8 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
   const error = queryError;
 
   const { account: dashboardAccount } = useContext(DashboardContext);
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const hasHosting = account.hasHosting;
 
   const hasKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.KYC);
 
@@ -360,10 +363,13 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
           <FormattedMessage id="People.Description" defaultMessage="People that interacted with your organization." />
         }
         actions={
-          <ExportContributorsCSVButton
-            accountSlug={accountSlug}
-            label={<FormattedMessage id="People.ExportCSV" defaultMessage="Export Contributors" />}
-          />
+          hasMoneyManagement &&
+          !hasHosting && (
+            <ExportContributorsCSVButton
+              accountSlug={accountSlug}
+              label={<FormattedMessage id="People.ExportCSV" defaultMessage="Export Contributors" />}
+            />
+          )
         }
       />
       <Filterbar {...queryFilter} hideCounts />
