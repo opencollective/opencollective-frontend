@@ -56,6 +56,18 @@ export const getDefaultCurrencyPrecision = (currency: Currency): number => {
   return (ZERO_DECIMAL_CURRENCIES as readonly string[]).includes(currency) ? 0 : 2;
 };
 
+/**
+ * Rounds a cents amount to the nearest unit. Useful when calculating percentage-based amounts,
+ * to make sure that zero-decimal currencies are rounded to the nearest 100.
+ *
+ * @example roundCentsAmount(1234, 'USD') => 1234
+ * @example roundCentsAmount(1234, 'JPY') => 1200
+ */
+export const roundCentsAmount = (amountInCents: number, currency: Currency | string): number => {
+  const roundDigits = (ZERO_DECIMAL_CURRENCIES as readonly string[]).includes(currency) ? -2 : 0;
+  return round(amountInCents, roundDigits);
+};
+
 export function formatCurrency(
   amount: Amount | number | null,
   currency: Currency = Currency.USD,
