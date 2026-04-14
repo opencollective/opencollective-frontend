@@ -2,7 +2,7 @@ import React from 'react';
 import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { formatCurrency } from '../../lib/currency-utils';
+import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -27,7 +27,7 @@ const DEFAULT_PLATFORM_TIP_INDEX = 1;
 export const DEFAULT_PLATFORM_TIP_PERCENTAGE = DEFAULT_PERCENTAGES[DEFAULT_PLATFORM_TIP_INDEX];
 
 const getOptionFromPercentage = (amount, currency, percentage) => {
-  const tipAmount = isNaN(amount) ? 0 : Math.round(amount * percentage);
+  const tipAmount = isNaN(amount) ? 0 : roundCentsAmount(amount * percentage, currency);
   let label = `${tipAmount / 100} ${currency}`;
   if (tipAmount) {
     label += ` (${percentage * 100}%)`; // Don't show percentages of 0
