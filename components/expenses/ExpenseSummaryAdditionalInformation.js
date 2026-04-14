@@ -281,7 +281,13 @@ const ExpenseSummaryAdditionalInformation = ({
         )}
 
         <AccountKYCStatusBadge className="mt-2" account={payee} host={host} showActions />
-        <ExpenseAdminKYCSection className="mt-3" kycPayee={expense.kycStatus?.payee} account={payee} host={host} />
+        <ExpenseAdminKYCSection
+          className="mt-3"
+          kycPayee={expense.kycStatus?.payee}
+          payeeAccountType={payee?.type}
+          account={payee}
+          host={host}
+        />
       </PrivateInfoColumn>
       <PrivateInfoColumn mr={0}>
         <div className="flex justify-between gap-2">

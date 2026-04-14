@@ -2,8 +2,8 @@ import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { AccountReferenceInput, ExpensePayeeKyc } from '@/lib/graphql/types/v2/graphql';
-import { ExpensePayeeKycStatus, ExpensePayeeKycType } from '@/lib/graphql/types/v2/graphql';
+import type { AccountReferenceInput, AccountType, ExpensePayeeKyc } from '@/lib/graphql/types/v2/graphql';
+import { ExpensePayeeKycStatus } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
@@ -12,6 +12,7 @@ import { AccountAdminKYCModal } from './AccountAdminKYCModal';
 
 type ExpenseAdminKYCSectionProps = {
   kycPayee: ExpensePayeeKyc | null | undefined;
+  payeeAccountType: AccountType;
   account: AccountReferenceInput;
   host: AccountReferenceInput & { slug: string };
   className?: string;
@@ -22,14 +23,16 @@ const statusStyles: Record<string, string> = {
   [ExpensePayeeKycStatus.VERIFIED]: 'bg-green-100 text-green-800',
 };
 
-export function ExpenseAdminKYCSection({ kycPayee, account, host, className }: ExpenseAdminKYCSectionProps) {
+export function ExpenseAdminKYCSection({
+  kycPayee,
+  payeeAccountType,
+  account,
+  host,
+  className,
+}: ExpenseAdminKYCSectionProps) {
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
 
-  if (
-    !kycPayee ||
-    kycPayee.type !== ExpensePayeeKycType.ACCOUNT ||
-    kycPayee.status === ExpensePayeeKycStatus.NOT_REQUESTED
-  ) {
+  if (!kycPayee || payeeAccountType === 'INDIVIDUAL' || kycPayee.status === ExpensePayeeKycStatus.NOT_REQUESTED) {
     return null;
   }
 

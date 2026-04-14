@@ -673,7 +673,6 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     kycStatus {
       payee {
-        type
         status
       }
     }
@@ -936,7 +935,6 @@ export const expensesListAdminFieldsFragment = gql`
 
     kycStatus {
       payee {
-        type
         status
       }
     }
