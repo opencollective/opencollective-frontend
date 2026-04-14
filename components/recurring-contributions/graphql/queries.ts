@@ -28,6 +28,7 @@ export const managedOrderFragment = gql`
   fragment ManagedOrderFields on Order {
     id
     legacyId
+    publicId
     nextChargeDate
     paymentMethod {
       ...UpdatePaymentMethodFragment

@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { fetchCSVFileFromRESTService } from '../../../lib/api';
 import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
 import { MemberRole } from '../../../lib/graphql/types/v2/graphql';
@@ -16,10 +15,9 @@ import LinkCollective from '../../LinkCollective';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import { DataTable } from '../../table/DataTable';
 import { Span } from '../../Text';
-import { Button } from '../../ui/Button';
-import { useToast } from '../../ui/useToast';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
+import ExportContributorsCSVButton from '../ExportContributorsCSVButton';
 import ComboSelectFilter from '../filters/ComboSelectFilter';
 import { emailFilter } from '../filters/EmailFilter';
 import { Filterbar } from '../filters/Filterbar';
@@ -331,8 +329,6 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   });
 
   const contributors = data?.account?.members.nodes || [];
-  const { toast } = useToast();
-
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
 
@@ -343,38 +339,11 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
-  const [isDownloadingCsv, setDownloadingCsv] = React.useState(false);
-
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Contributors" defaultMessage="Contributors" />}
-        actions={
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              loading={isDownloadingCsv}
-              onClick={async () => {
-                try {
-                  setDownloadingCsv(true);
-                  const filename = `${accountSlug}-contributors`;
-                  const url = `${process.env.REST_URL}/v2/${accountSlug}/contributors.csv?fetchAll=1`;
-                  await fetchCSVFileFromRESTService(url, filename);
-                } catch (error) {
-                  toast({
-                    variant: 'error',
-                    message: error.message,
-                  });
-                } finally {
-                  setDownloadingCsv(false);
-                }
-              }}
-            >
-              <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-            </Button>
-          </div>
-        }
+        actions={<ExportContributorsCSVButton accountSlug={accountSlug} />}
       />
 
       <Filterbar {...queryFilter} />

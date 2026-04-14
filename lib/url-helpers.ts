@@ -443,3 +443,7 @@ export const getCommentUrl = (comment: Comment, loggedInUser: LoggedInUser) => {
     return getCollectivePageRoute(comment.account);
   }
 };
+
+export function getPermalinkUrl(publicId: string): string {
+  return `${getWebsiteUrl()}/permalink/${publicId}`;
+}

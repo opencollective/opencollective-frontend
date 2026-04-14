@@ -31,7 +31,7 @@ import { ExpenseStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { getCollectivePageCanonicalURL, getDashboardRoute } from '../../../../lib/url-helpers';
+import { getDashboardRoute, getPermalinkUrl } from '../../../../lib/url-helpers';
 import { collectiveAdminsMustConfirmAccountingCategory } from '@/components/expenses/lib/accounting-categories';
 
 import { shouldShowDuplicateExpenseButton } from '@/components/expenses/ExpenseMoreActionsButton';
@@ -362,7 +362,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
     };
 
     const handleCopyLink = () => {
-      copy(`${getCollectivePageCanonicalURL(expense.account)}/expenses/${expense.legacyId}`);
+      copy(getPermalinkUrl(expense.publicId));
     };
 
     const handleDownloadInvoice = () => {

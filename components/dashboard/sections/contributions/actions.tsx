@@ -7,7 +7,7 @@ import type { GetActions } from '../../../../lib/actions/types';
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { getWebsiteUrl } from '../../../../lib/utils';
+import { getPermalinkUrl } from '../../../../lib/url-helpers';
 import useClipboard from '@/lib/hooks/useClipboard';
 
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
@@ -256,18 +256,13 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       });
     }
 
-    const toAccount = order.toAccount;
-    const legacyId = order.legacyId;
-    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, getWebsiteUrl());
-
     actions.secondary.push({
       key: 'copy-link',
       Icon: LinkIcon,
       label: intl.formatMessage({ defaultMessage: 'Copy link', id: 'CopyLink' }),
       onClick: e => {
-        e.preventDefault(); // Prevent dropdown from closing when copying
-
-        copy(orderUrl);
+        e.preventDefault();
+        copy(getPermalinkUrl(order.publicId));
         toast({
           message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
           variant: 'success',

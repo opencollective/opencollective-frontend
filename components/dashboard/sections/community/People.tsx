@@ -6,6 +6,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { hasAccountMoneyManagement } from '@/lib/collective';
 import type { FilterConfig } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
 import type { PeopleHostDashboardQuery, PeopleHostDashboardQueryVariables } from '@/lib/graphql/types/v2/graphql';
@@ -26,6 +27,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import ExportContributorsCSVButton from '../../ExportContributorsCSVButton';
 import { makeAmountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
@@ -341,6 +343,8 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
   const error = queryError;
 
   const { account: dashboardAccount } = useContext(DashboardContext);
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const hasHosting = account.hasHosting;
 
   const hasKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.KYC);
 
@@ -357,6 +361,15 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
         title={<FormattedMessage id="People" defaultMessage="People" />}
         description={
           <FormattedMessage id="People.Description" defaultMessage="People that interacted with your organization." />
+        }
+        actions={
+          hasMoneyManagement &&
+          !hasHosting && (
+            <ExportContributorsCSVButton
+              accountSlug={accountSlug}
+              label={<FormattedMessage id="People.ExportCSV" defaultMessage="Export Contributors" />}
+            />
+          )
         }
       />
       <Filterbar {...queryFilter} hideCounts />

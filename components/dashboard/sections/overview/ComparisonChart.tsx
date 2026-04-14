@@ -170,7 +170,7 @@ export default function ComparisonChart(props: ComparisonChartProps) {
     <ErrorBoundary
       fallback={({ error }) => (
         <MessageBox type="error" withIcon>
-          {error.message}
+          {error['message']}
         </MessageBox>
       )}
     >
