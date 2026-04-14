@@ -29,6 +29,7 @@ import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import InputAmount from '../InputAmount';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import { UpgradePlanCTA } from '../platform-subscriptions/UpgradePlanCTA';
@@ -36,7 +37,6 @@ import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInput from '../StyledInput';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
@@ -582,13 +582,12 @@ const PayExpenseModal = ({
                   }
                 >
                   {inputProps => (
-                    <StyledInputAmount
+                    <InputAmount
                       {...inputProps}
                       currency={host.currency}
                       currencyDisplay="FULL"
                       value={formik.values.expenseAmountInHostCurrency}
                       data-cy="expense-amount-paid"
-                      maxWidth="100%"
                       min={10 ** (2 - getDefaultCurrencyPrecision(host.currency))}
                       onChange={value => formik.setFieldValue('expenseAmountInHostCurrency', value)}
                     />
@@ -612,12 +611,11 @@ const PayExpenseModal = ({
                   }
                 >
                   {inputProps => (
-                    <StyledInputAmount
+                    <InputAmount
                       {...inputProps}
                       currency={host.currency}
                       currencyDisplay="FULL"
                       value={formik.values.paymentProcessorFeeInHostCurrency}
-                      maxWidth="100%"
                       min={0}
                       max={formik.values.expenseAmountInHostCurrency || 100000000}
                       onChange={value => formik.setFieldValue('paymentProcessorFeeInHostCurrency', value)}

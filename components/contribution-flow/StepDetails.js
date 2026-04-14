@@ -14,8 +14,8 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 
+import InputAmount from '../../components/InputAmount';
 import StyledButtonSet from '../../components/StyledButtonSet';
-import StyledInputAmount from '../../components/StyledInputAmount';
 import StyledInputField from '../../components/StyledInputField';
 
 import { AutoCollapse } from '../AutoCollapse';
@@ -149,15 +149,14 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
           />
           {isOtherAmountSelected && (
             <Flex justifyContent="space-between" alignItems="center" mt={2}>
-              <StyledInputAmount
+              <InputAmount
                 name="custom-amount"
                 type="number"
                 currency={currency}
                 value={stepDetails?.amount}
-                width={1}
+                className="w-full"
                 min={minAmount}
                 currencyDisplay="full"
-                prependProps={{ color: 'black.500' }}
                 required
                 onChange={(value, event) => {
                   // Increase/Decrease the amount by $0.5 instead of $0.01 when using the arrows

@@ -12,10 +12,10 @@ import { gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box } from '../../Grid';
+import InputAmount from '../../InputAmount';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledCheckbox from '../../StyledCheckbox';
-import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
 import { H4, P } from '../../Text';
 import { Button } from '../../ui/Button';
@@ -187,7 +187,7 @@ const Security = ({ collective }) => {
               {values.payoutsTwoFactorAuth.enabled && (
                 <StyledInputField name="rollingLimit" htmlFor="rollingLimit" disabled={loading} mr="24px">
                   {inputProps => (
-                    <StyledInputAmount
+                    <InputAmount
                       {...inputProps}
                       currency={data.account.currency}
                       type="number"
@@ -196,7 +196,6 @@ const Security = ({ collective }) => {
                       onChange={value => setFieldValue('payoutsTwoFactorAuth.rollingLimit', value)}
                       min={100}
                       disabled={!values.payoutsTwoFactorAuth.enabled}
-                      px="2px"
                       placeholder={intl.formatMessage({
                         id: 'collective.contributionPolicy.placeholder',
                         defaultMessage: 'E.g. what types of contributions you will and will not accept.',
