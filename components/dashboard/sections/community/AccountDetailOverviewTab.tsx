@@ -402,7 +402,7 @@ export const AccountDetailsOverviewTab = ({
                 timeStyle: null,
               }}
               onClickRow={handleTransactionTableRowClick}
-              hideColumns={['oppositeAccount', 'kind', 'actions']}
+              columns={['date', 'account', 'amount', 'currency']}
               footer={
                 recentCredits?.nodes?.length > 0 && (
                   <div className="flex min-h-[49px] w-full items-center justify-center border-t">
@@ -433,7 +433,7 @@ export const AccountDetailsOverviewTab = ({
                 timeStyle: null,
               }}
               onClickRow={handleTransactionTableRowClick}
-              hideColumns={['oppositeAccount', 'kind', 'actions']}
+              columns={['date', 'account', 'amount', 'currency']}
               footer={
                 recentDebits?.nodes?.length > 0 && (
                   <div className="flex min-h-[49px] w-full items-center justify-center border-t">
