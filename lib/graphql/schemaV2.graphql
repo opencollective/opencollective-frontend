@@ -728,6 +728,11 @@ interface Account {
     host: AccountReferenceInput
 
     """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
+
+    """
     Return only orders created by these users. Limited to 1000 users at a time.
     """
     createdBy: [AccountReferenceInput]
@@ -3565,6 +3570,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     host: AccountReferenceInput
 
     """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
+
+    """
     Return only orders created by these users. Limited to 1000 users at a time.
     """
     createdBy: [AccountReferenceInput]
@@ -5657,6 +5667,21 @@ enum ExpectedFundsFilter {
 }
 
 """
+Filters orders based on whether the opposite account (the other side of the order) is internal or external. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children (events/projects).
+"""
+enum OppositeAccountScope {
+  """
+  Only orders where the opposite account is within the same scope (same fiscal host, or same account hierarchy)
+  """
+  INTERNAL
+
+  """
+  Only orders where the opposite account is outside the scope
+  """
+  EXTERNAL
+}
+
+"""
 A collection of "Expenses"
 """
 type ExpenseCollection implements Collection {
@@ -6522,6 +6547,11 @@ type PaymentMethod {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
 
     """
     Return only orders created by these users. Limited to 1000 users at a time.
@@ -10163,6 +10193,11 @@ type Bot implements Account {
     host: AccountReferenceInput
 
     """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
+
+    """
     Return only orders created by these users. Limited to 1000 users at a time.
     """
     createdBy: [AccountReferenceInput]
@@ -11211,6 +11246,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
 
     """
     Return only orders created by these users. Limited to 1000 users at a time.
@@ -12833,6 +12873,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     host: AccountReferenceInput
 
     """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
+
+    """
     Return only orders created by these users. Limited to 1000 users at a time.
     """
     createdBy: [AccountReferenceInput]
@@ -14170,6 +14215,11 @@ type Individual implements Account {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
 
     """
     Return only orders created by these users. Limited to 1000 users at a time.
@@ -15547,6 +15597,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     host: AccountReferenceInput
 
     """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
+
+    """
     Return only orders created by these users. Limited to 1000 users at a time.
     """
     createdBy: [AccountReferenceInput]
@@ -16740,6 +16795,11 @@ type Vendor implements Account & AccountWithContributions {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
 
     """
     Return only orders created by these users. Limited to 1000 users at a time.
@@ -18301,6 +18361,11 @@ type Query {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
 
     """
     Return only orders created by these users. Limited to 1000 users at a time.
@@ -21010,6 +21075,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     host: AccountReferenceInput
 
     """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
+
+    """
     Return only orders created by these users. Limited to 1000 users at a time.
     """
     createdBy: [AccountReferenceInput]
@@ -22205,6 +22275,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Filter orders by whether the opposite account is INTERNAL or EXTERNAL. For fiscal hosts, internal means within the same host. For regular accounts, internal means within the account and its children. When combined with `filter` (INCOMING/OUTGOING), the opposite account is the other side of the order.
+    """
+    oppositeAccountScope: OppositeAccountScope
 
     """
     Return only orders created by these users. Limited to 1000 users at a time.

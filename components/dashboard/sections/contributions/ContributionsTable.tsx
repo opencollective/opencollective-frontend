@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ApolloError } from '@apollo/client';
-import type { VisibilityState } from '@tanstack/react-table';
+import type { ColumnDef, VisibilityState } from '@tanstack/react-table';
 import { useRouter } from 'next/router';
 
 import type {
@@ -19,7 +19,7 @@ import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 
 import { useContributionActions } from './actions';
-import { columns } from './columns';
+import { columns as defaultColumns } from './columns';
 import type { FilterMeta, schema } from './filters';
 
 type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
@@ -33,6 +33,7 @@ type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
   refetch?: () => void;
   onlyExpectedFunds?: boolean;
   hostSlug?: string;
+  columns?: ColumnDef<ManagedOrderFieldsFragment>[];
   columnVisibility?: VisibilityState;
 };
 
@@ -54,6 +55,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
   error,
   refetch,
   hostSlug,
+  columns = defaultColumns,
   columnVisibility = defaultVisibility,
 }: ContributionsTableProps<FilterValues>) {
   const router = useRouter();

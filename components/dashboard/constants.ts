@@ -49,6 +49,7 @@ export const SECTIONS = {
   PAYMENT_REQUESTS: 'payment-requests',
   HOST_PAYMENT_REQUESTS: 'host-payment-requests',
   ISSUED_PAYMENT_REQUESTS: 'issued-payment-requests',
+  INTERNAL_TRANSFERS: 'internal-transfers',
 };
 
 export const ROOT_SECTIONS = {
@@ -135,6 +136,7 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.HOST_TRANSACTIONS,
   ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
   ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+  ALL_SECTIONS.INTERNAL_TRANSFERS,
   ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
   ALL_SECTIONS.CONTRIBUTORS,
   ALL_SECTIONS.GRANTS,
@@ -348,6 +350,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.SUBMITTED_GRANTS]: {
     defaultMessage: 'Issued Grant Requests',
     id: 'qKKz2G',
+  },
+  [ALL_SECTIONS.INTERNAL_TRANSFERS]: {
+    defaultMessage: 'Internal Transfers',
+    id: 'InternalTransfers',
   },
   [ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS]: {
     defaultMessage: 'Approve Payment Requests',

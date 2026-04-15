@@ -2401,6 +2401,8 @@
   "IncompleteContributions": "Incomplete Contributions",
   "initiate-kyc": "Initiate KYC",
   "InputTypeCountry.placeholder": "あなたの国を選んでください",
+  "InternalTransfers": "Internal Transfers",
+  "InternalTransfers.description": "Money moved (using contributions) within your organization.",
   "InvalidURL": "Invalid URL. It must start with http:// or https://.",
   "Invitation.Accepted": "許可済",
   "Invitation.Declined": "辞退済",
