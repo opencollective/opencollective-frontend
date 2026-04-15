@@ -252,6 +252,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
     },
   }),
   columnHelper.accessor('netAmount', {
+    id: 'amount',
     meta: {
       className: 'w-28',
       align: 'right',
@@ -300,7 +301,7 @@ export type TransactionsTableProps = {
   useAltTestLayout?: boolean;
   queryFilter: useQueryFilterReturnType<typeof schema, TransactionsTableQueryVariables>;
   refetchList?: () => void;
-  hideColumns?: string[];
+  columns?: string[];
   hideHeader?: boolean;
   hidePagination?: boolean;
   footer?: React.ReactNode;
@@ -321,7 +322,7 @@ export default function TransactionsTable({
   nbPlaceholders,
   queryFilter,
   refetchList,
-  hideColumns,
+  columns: displayedColumnsIds,
   hideHeader,
   hidePagination,
   footer,
@@ -338,11 +339,11 @@ export default function TransactionsTable({
   };
   const [columnVisibility, setColumnVisibility] = useLocalStorage('transactions-cols', defaultColumnVisibility);
   const displayedColumns = React.useMemo(() => {
-    if (!hideColumns?.length) {
-      return columns;
+    if (displayedColumnsIds?.length) {
+      return columns.filter(column => displayedColumnsIds.includes(column.id));
     }
-    return columns.filter(column => !hideColumns.includes(column.id));
-  }, [hideColumns]);
+    return columns;
+  }, [displayedColumnsIds]);
 
   const getDefaultActions = useTransactionActions<TransactionsTableQueryNode>({
     resetFilters: queryFilter.resetFilters,
@@ -372,7 +373,7 @@ export default function TransactionsTable({
         onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
         rowHasIndicator={row => row.original.group === hoveredGroup}
         mobileTableView
-        columnVisibility={columnVisibility}
+        columnVisibility={displayedColumnsIds ? undefined : columnVisibility}
         setColumnVisibility={setColumnVisibility}
         defaultColumnVisibility={defaultColumnVisibility}
         getRowId={row => String(row.legacyId)}

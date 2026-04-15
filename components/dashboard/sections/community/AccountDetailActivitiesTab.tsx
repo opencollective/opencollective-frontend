@@ -24,10 +24,11 @@ export function ActivitiesTab({ account, host, setOpenExpenseId }) {
 
   const { data, loading, error } = useQuery(communityAccountActivitiesQuery, {
     variables: {
-      accountId: account.id,
+      accountId: account?.id,
       host: getAccountReferenceInput(host),
       ...pagination.variables,
     },
+    skip: !account || !host,
   });
 
   if (error) {
