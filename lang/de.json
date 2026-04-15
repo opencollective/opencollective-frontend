@@ -2404,6 +2404,8 @@
   "IncompleteContributions": "Incomplete Contributions",
   "initiate-kyc": "Initiate KYC",
   "InputTypeCountry.placeholder": "Bitte wähle dein Land aus",
+  "InternalTransfers": "Internal Transfers",
+  "InternalTransfers.description": "Money moved (using contributions) within your organization.",
   "InvalidURL": "Ungültige URL. Sie muss mit http:// oder https:// beginnen.",
   "Invitation.Accepted": "Bestätigt",
   "Invitation.Declined": "Abgelehnt",
