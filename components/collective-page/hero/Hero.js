@@ -98,29 +98,29 @@ const HiddenTagItem = styled(StyledLink)`
   }
 `;
 
-function parseUniqueCompanies(collectiveCompany) {
+export function parseUniqueCompanies(collectiveCompany) {
   const uniqueCompanies = new Set();
-  let multiTokenCompany = '';
+  let multiTokenString = '';
   collectiveCompany
     ?.trim()
     .split(' ')
     .forEach(word => {
       if (word.startsWith('@')) {
-        if (multiTokenCompany.trim() !== '') {
-          uniqueCompanies.add(multiTokenCompany);
+        if (multiTokenString.trim() !== '') {
+          uniqueCompanies.add(multiTokenString);
         }
         uniqueCompanies.add(word.toLowerCase());
-        multiTokenCompany = '';
+        multiTokenString = '';
       } else {
-        if (multiTokenCompany !== '') {
-          multiTokenCompany += ' ';
+        if (multiTokenString !== '') {
+          multiTokenString += ' ';
         }
-        multiTokenCompany += word;
+        multiTokenString += word;
       }
     });
 
-  if (multiTokenCompany !== '') {
-    uniqueCompanies.add(multiTokenCompany);
+  if (multiTokenString !== '') {
+    uniqueCompanies.add(multiTokenString);
   }
   return [...uniqueCompanies];
 }
