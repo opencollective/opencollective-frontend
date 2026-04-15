@@ -282,7 +282,7 @@ const InputAmount = ({
       name={name}
       min={minAmount}
       max={max / 100}
-      value={isEditing ? rawValue : !value || isNaN(value) ? rawValue : (value / 100).toFixed(precision)}
+      value={isEditing ? rawValue : isNil(value) || isNaN(value) ? rawValue : (value / 100).toFixed(precision)}
       onWheel={ignoreOnWheel}
       onChange={e => {
         setEditing(true);
