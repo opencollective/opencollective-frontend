@@ -17,6 +17,7 @@ type ExpensePolicyContainerProps = {
 
 export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
   const [isOpen, setIsOpen] = React.useState(!props.checked);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (!props.checked) {
@@ -34,7 +35,11 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
       }}
       open={isOpen}
     >
-      <div className="group rounded-md border border-[#DCDDE0] p-4" data-cy={props['data-cy']}>
+      <div
+        ref={containerRef}
+        className="group scroll-mt-40 rounded-md border border-[#DCDDE0] p-4"
+        data-cy={props['data-cy']}
+      >
         <CollapsibleTrigger asChild>
           <button className="flex w-full items-center text-start text-sm font-bold">
             <div className="grow">{props.title}</div>
@@ -54,6 +59,9 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
                       props.onAcknowledgedChanged(v as boolean);
                       if (v) {
                         setIsOpen(false);
+                        window.setTimeout(() => {
+                          containerRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                        }, 220);
                       }
                     }}
                   />
