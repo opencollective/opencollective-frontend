@@ -9417,6 +9417,9 @@ type ExpenseKYCStatus {
 }
 
 type ExpensePayeeKYC {
+  """
+  Expense payee KYC status
+  """
   status: ExpensePayeeKYCStatus
 }
 
