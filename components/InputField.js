@@ -125,7 +125,7 @@ const HelpBlock = styled(Box)`
 
 /**
  * @deprecated InputField is deprecated and should be avoided for new developments.
- * Please use the `Styled*` equivalents: `StyledInput`, `StyledInputAmount`, etc.
+ * Please use the newer equivalents: `StyledInput`, `InputAmount`, etc.
  */
 class InputField extends React.Component {
   static propTypes = {

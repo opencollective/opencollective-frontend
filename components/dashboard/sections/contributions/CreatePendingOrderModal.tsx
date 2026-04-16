@@ -25,13 +25,13 @@ import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import { confirmContributionFieldsFragment } from '../../../contributions/ConfirmContributionForm';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Box, Flex } from '../../../Grid';
+import InputAmount from '../../../InputAmount';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import type { BaseModalProps } from '../../../ModalContext';
 import StyledHr from '../../../StyledHr';
 import StyledInput from '../../../StyledInput';
-import StyledInputAmount from '../../../StyledInputAmount';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledInputPercentage from '../../../StyledInputPercentage';
 import StyledSelect from '../../../StyledSelect';
@@ -591,13 +591,13 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             flex="1 1"
           >
             {({ form, field }) => (
-              <StyledInputAmount
+              <InputAmount
                 id={field.id}
                 data-cy="create-pending-contribution-amount"
+                className="max-w-full"
                 currency={currency}
                 error={field.error}
                 value={field.value}
-                maxWidth="100%"
                 onChange={value => form.setFieldValue(field.name, value)}
                 onBlur={() => form.setFieldTouched(field.name, true)}
               />
@@ -614,13 +614,13 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 flex="1 1"
               >
                 {({ form, field }) => (
-                  <StyledInputAmount
+                  <InputAmount
                     id={field.id}
                     data-cy="create-pending-contribution-tip-amount"
+                    className="max-w-full"
                     currency={currency}
                     error={field.error}
                     value={field.value}
-                    maxWidth="100%"
                     onChange={value => form.setFieldValue(field.name, value)}
                     onBlur={() => form.setFieldTouched(field.name, true)}
                     min={field.value ? 0 : undefined}

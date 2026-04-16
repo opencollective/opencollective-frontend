@@ -9,9 +9,9 @@ import theme from '../../lib/theme';
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import Image from '../Image';
+import InputAmount from '../InputAmount';
 import StyledButtonSet from '../StyledButtonSet';
 import StyledCheckbox from '../StyledCheckbox';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledLinkButton from '../StyledLinkButton';
 import { P } from '../Text';
 
@@ -122,7 +122,7 @@ function PlatformTipInput(props: PlatformTipInputProps) {
       </StyledButtonSet>
       {props.selectedOption === PlatformTipOption.OTHER && (
         <Flex mt={3} justifyContent="flex-end">
-          <StyledInputAmount
+          <InputAmount
             id="feesOnTop"
             name="platformTip"
             data-cy="platform-tip-other-amount"
