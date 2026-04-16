@@ -784,6 +784,21 @@ interface Account {
     createdByAccount: AccountReferenceInput
 
     """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
+
+    """
     Use this field to filter expenses on their statuses
     """
     status: [ExpenseStatusFilter]
@@ -3621,6 +3636,21 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
+
+    """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
 
     """
     Use this field to filter expenses on their statuses
@@ -7736,8 +7766,6 @@ type TransactionsAmountGroup {
 
 type CommunityStats {
   id: String!
-  associatedCollectives: [CommunityAssociatedAccount]
-  associatedOrganizations: [CommunityAssociatedAccount]
   relations: [CommunityRelationType]!
   transactionSummary: [CommunityTransactionSummary!]!
   transactionSummaryTimeSeries(
@@ -7746,6 +7774,7 @@ type CommunityStats {
     """
     type: CommunityTransactionType!
   ): TimeSeriesAmount!
+  adminControls: [CommunityAdminControlsSummary!]!
   lastInteractionAt: DateTime
   firstInteractionAt: DateTime
   activities(
@@ -7759,14 +7788,6 @@ type CommunityStats {
     """
     offset: Int! = 0
   ): ActivityCollection
-}
-
-type CommunityAssociatedAccount {
-  account: Account
-  relations: [CommunityRelationType]
-  lastInteractionAt: DateTime
-  firstInteractionAt: DateTime
-  transactionSummary: CommunityTransactionSummary!
 }
 
 enum CommunityRelationType {
@@ -7793,6 +7814,23 @@ enum CommunityTransactionType {
   CREDIT
   DEBIT
   REFUND_DEBIT
+}
+
+type CommunityAdminControlsSummary {
+  action: ExpenseActionType!
+  debitTotal: Amount!
+  debitCount: Int!
+  creditTotal: Amount!
+  creditCount: Int!
+  refundDebitTotal: Amount!
+  refundDebitCount: Int!
+}
+
+enum ExpenseActionType {
+  APPROVED
+  PAID
+  REJECTED
+  INVITED
 }
 
 """
@@ -10221,6 +10259,21 @@ type Bot implements Account {
     createdByAccount: AccountReferenceInput
 
     """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
+
+    """
     Use this field to filter expenses on their statuses
     """
     status: [ExpenseStatusFilter]
@@ -11269,6 +11322,21 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
+
+    """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
 
     """
     Use this field to filter expenses on their statuses
@@ -12891,6 +12959,21 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     createdByAccount: AccountReferenceInput
 
     """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
+
+    """
     Use this field to filter expenses on their statuses
     """
     status: [ExpenseStatusFilter]
@@ -14228,6 +14311,21 @@ type Individual implements Account {
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
+
+    """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
 
     """
     Use this field to filter expenses on their statuses
@@ -15605,6 +15703,21 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     createdByAccount: AccountReferenceInput
 
     """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
+
+    """
     Use this field to filter expenses on their statuses
     """
     status: [ExpenseStatusFilter]
@@ -16800,6 +16913,21 @@ type Vendor implements Account & AccountWithContributions {
     createdByAccount: AccountReferenceInput
 
     """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
+
+    """
     Use this field to filter expenses on their statuses
     """
     status: [ExpenseStatusFilter]
@@ -17830,6 +17958,21 @@ type Query {
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
+
+    """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
 
     """
     Use this field to filter expenses on their statuses
@@ -21068,6 +21211,21 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     createdByAccount: AccountReferenceInput
 
     """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
+
+    """
     Use this field to filter expenses on their statuses
     """
     status: [ExpenseStatusFilter]
@@ -22263,6 +22421,21 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
+
+    """
+    Return expenses only paid by this INDIVIDUAL account
+    """
+    paidByAccount: AccountReferenceInput
+
+    """
+    Return expenses only approved by this INDIVIDUAL account
+    """
+    approvedByAccount: AccountReferenceInput
+
+    """
+    Return expenses only rejected by this INDIVIDUAL account
+    """
+    rejectedByAccount: AccountReferenceInput
 
     """
     Use this field to filter expenses on their statuses

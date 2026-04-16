@@ -76,6 +76,7 @@ const ExpensesList = ({
   setOpenExpenseLegacyId = undefined,
   openExpenseLegacyId = undefined,
   onDuplicateClick = undefined,
+  displaySummaryFooter = true,
 }) => {
   const { LoggedInUser } = useLoggedInUser();
   // Initial values for expense in drawer
@@ -185,7 +186,7 @@ const ExpensesList = ({
           ))}
         </FlipMove>
       )}
-      {!isLoading && (
+      {!isLoading && displaySummaryFooter && (
         <FooterContainer>
           <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
             <Flex
