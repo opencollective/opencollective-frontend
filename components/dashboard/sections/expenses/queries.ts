@@ -28,6 +28,9 @@ export const accountExpensesQuery = gql`
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
     $createdByAccount: AccountReferenceInput
+    $approvedByAccount: AccountReferenceInput
+    $paidByAccount: AccountReferenceInput
+    $rejectedByAccount: AccountReferenceInput
     $includeChildrenExpenses: Boolean
     $fetchHostForExpenses: Boolean!
     $hasAmountInCreatedByAccountCurrency: Boolean!
@@ -56,6 +59,9 @@ export const accountExpensesQuery = gql`
       createdByAccount: $createdByAccount
       includeChildrenExpenses: $includeChildrenExpenses
       accountingCategory: $accountingCategory
+      paidByAccount: $paidByAccount
+      approvedByAccount: $approvedByAccount
+      rejectedByAccount: $rejectedByAccount
     ) {
       totalCount
       offset
@@ -176,6 +182,9 @@ export const hostDashboardExpensesQuery = gql`
     $accountingCategory: [String]
     $fetchGrantHistory: Boolean!
     $kycStatus: ExpenseKYCStatusFilter
+    $approvedByAccount: AccountReferenceInput
+    $paidByAccount: AccountReferenceInput
+    $rejectedByAccount: AccountReferenceInput
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -200,6 +209,9 @@ export const hostDashboardExpensesQuery = gql`
       lastCommentBy: $lastCommentBy
       accountingCategory: $accountingCategory
       kycStatus: $kycStatus
+      approvedByAccount: $approvedByAccount
+      paidByAccount: $paidByAccount
+      rejectedByAccount: $rejectedByAccount
     ) {
       totalCount
       offset
@@ -485,6 +497,9 @@ export const paidDisbursementsQuery = gql`
     $account: AccountReferenceInput
     $accountingCategory: [String]
     $fromAccounts: [AccountReferenceInput]
+    $approvedByAccount: AccountReferenceInput
+    $paidByAccount: AccountReferenceInput
+    $rejectedByAccount: AccountReferenceInput
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -503,6 +518,9 @@ export const paidDisbursementsQuery = gql`
       orderBy: $sort
       accountingCategory: $accountingCategory
       fromAccounts: $fromAccounts
+      approvedByAccount: $approvedByAccount
+      paidByAccount: $paidByAccount
+      rejectedByAccount: $rejectedByAccount
     ) {
       totalCount
       offset
@@ -559,6 +577,9 @@ export const dashboardExpensesQuery = gql`
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String] # $isHost: Boolean! # $hostSlug: String # should we just use slug instead?
     $fetchGrantHistory: Boolean! #
+    $approvedByAccount: AccountReferenceInput
+    $paidByAccount: AccountReferenceInput
+    $rejectedByAccount: AccountReferenceInput
   ) {
     expenses(
       hostContext: $hostContext
@@ -584,6 +605,9 @@ export const dashboardExpensesQuery = gql`
       virtualCards: $virtualCards
       lastCommentBy: $lastCommentBy
       accountingCategory: $accountingCategory
+      approvedByAccount: $approvedByAccount
+      paidByAccount: $paidByAccount
+      rejectedByAccount: $rejectedByAccount
     ) {
       totalCount
       offset
