@@ -8,6 +8,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { saveInvoice } from '../../../lib/transactions';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import Avatar from '../../Avatar';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
@@ -21,18 +22,6 @@ dayjs.extend(utc);
 // Types
 // ---------------------------------------------------------------------------
 
-export type InvoiceHost = {
-  id: number;
-  slug: string;
-  name: string;
-  imageUrl: string;
-};
-
-export type InvoiceFromCollective = {
-  id: number;
-  slug: string;
-};
-
 export type InvoiceData = {
   slug: string;
   year: number;
@@ -40,8 +29,8 @@ export type InvoiceData = {
   totalAmount: number;
   totalTransactions: number;
   currency: string;
-  fromCollective: InvoiceFromCollective;
-  host: InvoiceHost;
+  fromCollective: Partial<GraphQLV1Collective>;
+  host: Partial<GraphQLV1Collective>;
 };
 
 type FilterValue = 'PAST_12_MONTHS' | number;
@@ -79,7 +68,7 @@ export const invoicesQuery = gqlV1 /* GraphQL */ `
 
 const filterInvoices = (allInvoices: InvoiceData[], filterBy: FilterValue): InvoiceData[] => {
   if (filterBy === 'PAST_12_MONTHS') {
-    const twelveMonthsAgo = dayjs().subtract(11, 'month');
+    const twelveMonthsAgo = dayjs().subtract(11, 'month').startOf('month');
     return allInvoices.filter(i => {
       const dateMonth = dayjs.utc(`${i.year}-${i.month}`, 'YYYY-M');
       return dateMonth.isAfter(twelveMonthsAgo);
@@ -286,11 +275,7 @@ const YearSummary = ({ invoices, year }: YearSummaryProps) => {
                   })
                 }
               >
-                <FormattedMessage
-                  id="paymentReceipts.downloadYearReceipt"
-                  defaultMessage="Download {year} receipt"
-                  values={{ year: String(year) }}
-                />
+                <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />
               </Button>
             </div>
           );
