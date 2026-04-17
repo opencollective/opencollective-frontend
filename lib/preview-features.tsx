@@ -253,8 +253,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Sidebar Reorganization Incoming/Outgoing',
     description:
       'Renames "Expenses" to "Outgoing Money" and "Contributions" to "Incoming Money", and moves cross-account items to the appropriate groups.',
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
+    publicBeta: true,
     category: Categories.HOSTING,
     alwaysEnableInDev: true,
   },
