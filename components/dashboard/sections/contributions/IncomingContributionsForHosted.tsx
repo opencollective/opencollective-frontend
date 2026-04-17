@@ -5,8 +5,11 @@ import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { OppositeAccountScope } from '../../../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { AccountOrdersFilter } from '@/lib/graphql/types/v2/schema';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -57,6 +60,10 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) => {
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
+  const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
+  );
 
   const views = React.useMemo(() => getContributionViews(intl), [intl]);
 
@@ -81,6 +88,7 @@ const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) 
   const { viewCounts, refetch: refetchViews } = useFetchContributionViewCounts({
     slug: accountSlug,
     filter: AccountOrdersFilter.INCOMING,
+    ...(hasIncomingOutgoingReorg && { oppositeAccountScope: OppositeAccountScope.EXTERNAL }),
   });
 
   const viewsWithCount = React.useMemo(
@@ -96,6 +104,7 @@ const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) 
     variables: {
       slug: accountSlug,
       filter: 'INCOMING',
+      ...(hasIncomingOutgoingReorg && { oppositeAccountScope: OppositeAccountScope.EXTERNAL }),
       includeIncognito: true,
       includeChildrenAccounts: true,
       ...queryFilter.variables,

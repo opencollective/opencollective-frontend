@@ -1,21 +1,23 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { OppositeAccountScope } from '../../../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { AccountOrdersFilter } from '@/lib/graphql/types/v2/schema';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
+import { useModal } from '../../../ModalContext';
+import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import type { DashboardSectionProps } from '../../types';
+import InternalTransferModal from '../accounts/InternalTransferModal';
 
+import { columns } from './columns';
 import ContributionsTable from './ContributionsTable';
 import type { FilterMeta as BaseFilterMeta } from './filters';
 import {
@@ -25,7 +27,6 @@ import {
   toVariables as baseToVariables,
 } from './filters';
 import { dashboardOrdersQuery } from './queries';
-import { getContributionViews, useFetchContributionViewCounts } from './views';
 
 const schema = baseSchema.extend({ account: childAccountFilter.schema });
 
@@ -52,15 +53,24 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   account: childAccountFilter.filter,
 };
 
-const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
-  const intl = useIntl();
-  const { account } = useContext(DashboardContext);
-  const { LoggedInUser } = useLoggedInUser();
-  const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
-  );
+const internalTransferColumns = columns.map(col => {
+  if ('accessorKey' in col && col.accessorKey === 'fromAccount') {
+    return { ...col, meta: { ...col.meta, labelMsg: defineMessage({ defaultMessage: 'From', id: 'dM+p3/' }) } };
+  }
+  if ('accessorKey' in col && col.accessorKey === 'toAccount') {
+    return { ...col, meta: { ...col.meta, labelMsg: defineMessage({ defaultMessage: 'To', id: 'To' }) } };
+  }
+  return col;
+});
 
-  const views = React.useMemo(() => getContributionViews(intl), [intl]);
+const InternalTransfers = ({ accountSlug }: DashboardSectionProps) => {
+  const { account } = useContext(DashboardContext);
+  const { showModal } = useModal();
+
+  const activeAccounts = React.useMemo(
+    () => [account, ...(account.childrenAccounts?.nodes?.filter(a => a.isActive) || [])],
+    [account],
+  );
 
   const filterMeta: FilterMeta = {
     currency: account.currency,
@@ -76,65 +86,66 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
     schema,
     toVariables,
     meta: filterMeta,
-    views,
     filters,
   });
 
   const baseVars = {
     slug: accountSlug,
-    filter: AccountOrdersFilter.OUTGOING,
-    ...(hasIncomingOutgoingReorg && { oppositeAccountScope: OppositeAccountScope.EXTERNAL }),
+    filter: AccountOrdersFilter.INCOMING,
+    oppositeAccountScope: OppositeAccountScope.INTERNAL,
   };
-
-  const { viewCounts, refetch: refetchViews } = useFetchContributionViewCounts(baseVars);
-
-  const viewsWithCount = React.useMemo(
-    () =>
-      views.map(v => ({
-        ...v,
-        count: viewCounts[v.id as keyof typeof viewCounts],
-      })),
-    [views, viewCounts],
-  );
 
   const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
     variables: {
       ...baseVars,
       includeIncognito: true,
+      includeChildrenAccounts: true,
       ...queryFilter.variables,
     },
-
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
   const handleRefetch = React.useCallback(() => {
     refetch();
-    refetchViews();
-  }, [refetch, refetchViews]);
+  }, [refetch]);
 
-  const currentViewCount = viewsWithCount.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders =
-    (currentViewCount ?? 0) < queryFilter.values.limit ? (currentViewCount ?? 0) : queryFilter.values.limit;
+    (data?.account?.orders?.totalCount ?? 0) < queryFilter.values.limit
+      ? (data?.account?.orders?.totalCount ?? 0)
+      : queryFilter.values.limit;
 
   const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
 
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />}
+        title={<FormattedMessage id="InternalTransfers" defaultMessage="Internal Transfers" />}
         description={
           <FormattedMessage
-            id="OutgoingContributions.description"
-            defaultMessage="Manage your contributions to other accounts."
+            id="InternalTransfers.description"
+            defaultMessage="Money moved (using contributions) within your organization."
           />
+        }
+        actions={
+          activeAccounts.length > 1 && (
+            <Button
+              size="xs"
+              variant="outline"
+              onClick={() => {
+                showModal(InternalTransferModal, { parentAccount: account }, 'internal-transfer-modal');
+              }}
+            >
+              <FormattedMessage defaultMessage="New internal transfer" id="v4unZI" />
+            </Button>
+          )
         }
       />
 
       <ContributionsTable
         accountSlug={accountSlug}
         queryFilter={queryFilter}
-        views={viewsWithCount}
         orders={orders}
+        columns={internalTransferColumns}
         loading={loading}
         nbPlaceholders={nbPlaceholders}
         error={error}
@@ -144,4 +155,4 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
   );
 };
 
-export default OutgoingContributions;
+export default InternalTransfers;

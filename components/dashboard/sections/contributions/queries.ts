@@ -31,6 +31,7 @@ export const dashboardOrdersQuery = gql`
     $tier: [TierReferenceInput!]
     $hostedAccounts: [AccountReferenceInput!]
     $createdBy: [AccountReferenceInput]
+    $oppositeAccountScope: OppositeAccountScope
   ) {
     account(slug: $slug) {
       id
@@ -61,6 +62,7 @@ export const dashboardOrdersQuery = gql`
         tier: $tier
         hostedAccounts: $hostedAccounts
         createdBy: $createdBy
+        oppositeAccountScope: $oppositeAccountScope
       ) {
         totalCount
         nodes {
