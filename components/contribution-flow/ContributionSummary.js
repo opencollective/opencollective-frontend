@@ -1,5 +1,6 @@
 import React from 'react';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import { ExternalLink } from 'lucide-react';
 import { get } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -202,6 +203,27 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         </React.Fragment>
       )}
       <StyledHr borderColor="black.500" my={1} />
+      <P color="black.500" fontSize="11px" mt={2} mb={1}>
+        <FormattedMessage
+          id="ContributionSummary.CountryDetectionAttribution"
+          defaultMessage="Country detection powered by {osmLink}"
+          values={{
+            osmLink: (
+              <StyledLink
+                href="https://www.openstreetmap.org/"
+                openInNewTab
+                color="black.900"
+                display="inline-flex"
+                alignItems="center"
+                gap={1}
+              >
+                OpenStreetMap
+                <ExternalLink size={12} style={{ display: 'inline-block' }} />
+              </StyledLink>
+            ),
+          }}
+        />
+      </P>
       {stepDetails.interval && stepDetails.interval !== INTERVALS.oneTime && (
         <Container color="black.800" fontSize="12px" mt={3}>
           {!stepPayment || stepPayment.isKeyOnly ? (
