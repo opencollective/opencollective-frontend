@@ -280,10 +280,13 @@ const ExportTransactionsCSVModal = ({
   canCreatePreset = true,
 }: ExportTransactionsCSVModalProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  const hasAsyncExportsFeature =
-    account?.type === AccountType.ORGANIZATION &&
-    hasAccountMoneyManagement(account) &&
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS);
+  const hasAsyncExportsFeature = React.useMemo(
+    () =>
+      account?.type === AccountType.ORGANIZATION &&
+      hasAccountMoneyManagement(account) &&
+      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS),
+    [account, LoggedInUser],
+  );
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
@@ -454,6 +457,25 @@ const ExportTransactionsCSVModal = ({
     ];
   }, [customFields, canCreatePreset]);
 
+  /** Handle existing "Tax and PaymentProcessorFee" columns toggle.
+   * When setting it to true, we'll make sure that both columns are present in the selected fields, adding the missing ones if they're not.
+   * When setting it to false, we'll enforce whatever is set in the preset.
+   * */
+  const handleTaxAndPaymentProcessorFeeSwitch = React.useCallback(
+    checked => {
+      setFlattenTaxesAndPaymentProcessorFees(checked);
+      if (checked) {
+        setFields(uniq([...fields, 'paymentProcessorFee', 'taxAmount']));
+      } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
+        setFields(without(fields, 'paymentProcessorFee', 'taxAmount'));
+      } else {
+        const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
+        setFields(selectedSet?.fields || []);
+      }
+    },
+    [fields, preset, presetOptions, setFlattenTaxesAndPaymentProcessorFees],
+  );
+
   React.useEffect(() => {
     const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
     const isCustomPreset = !PLATFORM_PRESETS[preset] && preset in customFields;
@@ -503,13 +525,21 @@ const ExportTransactionsCSVModal = ({
       setUseFieldNames(true);
       handleTaxAndPaymentProcessorFeeSwitch(false);
     }
-  }, [presetOptions, preset, customFields, queryFilter.values?.account, account, LoggedInUser]);
+  }, [
+    presetOptions,
+    preset,
+    customFields,
+    queryFilter.values?.account,
+    account,
+    LoggedInUser,
+    handleTaxAndPaymentProcessorFeeSwitch,
+  ]);
 
   React.useEffect(() => {
-    if (open && account) {
+    if (open && account && !hasAsyncExportsFeature) {
       fetchRows();
     }
-  }, [queryFilter.values, account, open]);
+  }, [queryFilter.values, account, open, hasAsyncExportsFeature]);
 
   React.useEffect(() => {
     setRestAuthorizationCookie();
@@ -528,22 +558,6 @@ const ExportTransactionsCSVModal = ({
     },
     [fields],
   );
-
-  /** Handle existing "Tax and PaymentProcessorFee" columns toggle.
-   * When setting it to true, we'll make sure that both columns are present in the selected fields, adding the missing ones if they're not.
-   * When setting it to false, we'll enforce whatever is set in the preset.
-   * */
-  const handleTaxAndPaymentProcessorFeeSwitch = checked => {
-    setFlattenTaxesAndPaymentProcessorFees(checked);
-    if (checked) {
-      setFields(uniq([...fields, 'paymentProcessorFee', 'taxAmount']));
-    } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
-      setFields(without(fields, 'paymentProcessorFee', 'taxAmount'));
-    } else {
-      const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
-      setFields(selectedSet?.fields || []);
-    }
-  };
 
   const handleGroupSwitch = ({ name, checked }) => {
     if (checked) {
@@ -621,7 +635,7 @@ const ExportTransactionsCSVModal = ({
     setIsEditingPreset(!isEditingPreset);
   };
 
-  const isAboveRowLimit = exportedRows > 100e3;
+  const isAboveRowLimit = !hasAsyncExportsFeature && exportedRows > 100e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
   const disabled = !account || isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]
