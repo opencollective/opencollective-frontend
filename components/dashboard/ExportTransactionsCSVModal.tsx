@@ -280,10 +280,13 @@ const ExportTransactionsCSVModal = ({
   canCreatePreset = true,
 }: ExportTransactionsCSVModalProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  const hasAsyncExportsFeature =
-    account?.type === AccountType.ORGANIZATION &&
-    hasAccountMoneyManagement(account) &&
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS);
+  const hasAsyncExportsFeature = React.useMemo(
+    () =>
+      account?.type === AccountType.ORGANIZATION &&
+      hasAccountMoneyManagement(account) &&
+      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS),
+    [account, LoggedInUser],
+  );
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
@@ -454,6 +457,25 @@ const ExportTransactionsCSVModal = ({
     ];
   }, [customFields, canCreatePreset]);
 
+  /** Handle existing "Tax and PaymentProcessorFee" columns toggle.
+   * When setting it to true, we'll make sure that both columns are present in the selected fields, adding the missing ones if they're not.
+   * When setting it to false, we'll enforce whatever is set in the preset.
+   * */
+  const handleTaxAndPaymentProcessorFeeSwitch = React.useCallback(
+    checked => {
+      setFlattenTaxesAndPaymentProcessorFees(checked);
+      if (checked) {
+        setFields(fields => uniq([...fields, 'paymentProcessorFee', 'taxAmount']));
+      } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
+        setFields(fields => without(fields, 'paymentProcessorFee', 'taxAmount'));
+      } else {
+        const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
+        setFields(selectedSet?.fields || []);
+      }
+    },
+    [preset, presetOptions, setFlattenTaxesAndPaymentProcessorFees],
+  );
+
   React.useEffect(() => {
     const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
     const isCustomPreset = !PLATFORM_PRESETS[preset] && preset in customFields;
@@ -503,13 +525,21 @@ const ExportTransactionsCSVModal = ({
       setUseFieldNames(true);
       handleTaxAndPaymentProcessorFeeSwitch(false);
     }
-  }, [presetOptions, preset, customFields, queryFilter.values?.account, account, LoggedInUser]);
+  }, [
+    presetOptions,
+    preset,
+    customFields,
+    queryFilter.values?.account,
+    account,
+    LoggedInUser,
+    handleTaxAndPaymentProcessorFeeSwitch,
+  ]);
 
   React.useEffect(() => {
-    if (open && account) {
+    if (open && account && !hasAsyncExportsFeature) {
       fetchRows();
     }
-  }, [queryFilter.values, account, open]);
+  }, [queryFilter.values, account, open, hasAsyncExportsFeature]);
 
   React.useEffect(() => {
     setRestAuthorizationCookie();
@@ -518,45 +548,29 @@ const ExportTransactionsCSVModal = ({
     );
   }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl, useFieldNames]);
 
-  const handleFieldSwitch = React.useCallback(
+  const handleFieldSwitch = React.useCallback(({ name, checked }) => {
+    if (checked) {
+      setFields(fields => [...fields, name]);
+    } else {
+      setFields(fields => without(fields, name));
+    }
+  }, []);
+
+  const handleGroupSwitch = React.useCallback(
     ({ name, checked }) => {
       if (checked) {
-        setFields([...fields, name]);
+        setFields(fields =>
+          uniq([
+            ...fields,
+            ...GROUP_FIELDS[name].filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))),
+          ]),
+        );
       } else {
-        setFields(without(fields, name));
+        setFields(fields => fields.filter(f => !GROUP_FIELDS[name].includes(f as any)));
       }
     },
-    [fields],
+    [isHostReport],
   );
-
-  /** Handle existing "Tax and PaymentProcessorFee" columns toggle.
-   * When setting it to true, we'll make sure that both columns are present in the selected fields, adding the missing ones if they're not.
-   * When setting it to false, we'll enforce whatever is set in the preset.
-   * */
-  const handleTaxAndPaymentProcessorFeeSwitch = checked => {
-    setFlattenTaxesAndPaymentProcessorFees(checked);
-    if (checked) {
-      setFields(uniq([...fields, 'paymentProcessorFee', 'taxAmount']));
-    } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
-      setFields(without(fields, 'paymentProcessorFee', 'taxAmount'));
-    } else {
-      const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
-      setFields(selectedSet?.fields || []);
-    }
-  };
-
-  const handleGroupSwitch = ({ name, checked }) => {
-    if (checked) {
-      setFields(
-        uniq([
-          ...fields,
-          ...GROUP_FIELDS[name].filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))),
-        ]),
-      );
-    } else {
-      setFields(fields.filter(f => !GROUP_FIELDS[name].includes(f as any)));
-    }
-  };
 
   const handleDragStart = event => {
     setDraggingTag(event.active.id);
@@ -621,13 +635,68 @@ const ExportTransactionsCSVModal = ({
     setIsEditingPreset(!isEditingPreset);
   };
 
-  const isAboveRowLimit = exportedRows > 100e3;
+  const groupFields = React.useMemo(
+    () =>
+      GROUP_FIELDS[tab]
+        .filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId)))
+        .map(fieldId => {
+          const field = FIELDS.find(f => f.id === fieldId);
+          return (
+            <div key={fieldId} className="mb-2 flex items-center gap-1">
+              <Checkbox
+                id={fieldId}
+                checked={fields.includes(fieldId)}
+                onCheckedChange={checked => handleFieldSwitch({ name: fieldId, checked })}
+              />
+              <label
+                htmlFor={fieldId}
+                className="ml-1 cursor-pointer text-sm leading-none font-normal! peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {field?.label || fieldId}
+              </label>
+              {field?.tooltip && <InfoTooltipIcon>{field.tooltip}</InfoTooltipIcon>}
+            </div>
+          );
+        }),
+    [fields, tab, isHostReport, handleFieldSwitch],
+  );
+
+  const canEditFields = React.useMemo(
+    () => preset === FIELD_OPTIONS.NEW_PRESET || isEditingPreset,
+    [preset, isEditingPreset],
+  );
+  const dragAndDropFields = React.useMemo(
+    () =>
+      canEditFields && fields.length > 0 ? (
+        <DndContext
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragEnd}
+        >
+          <SortableContext items={fields}>
+            {fields.map(field => (
+              <FieldTag key={field} id={field} canDrag />
+            ))}
+          </SortableContext>
+          <DragOverlay>{draggingTag ? <FieldTag id={draggingTag} dragElement /> : null}</DragOverlay>
+        </DndContext>
+      ) : fields.length ? (
+        fields.map(field => <FieldTag key={field} id={field} />)
+      ) : (
+        <p className="self-center text-xs">
+          <FormattedMessage defaultMessage="You have not selected any fields for export." id="EMjZZT" />
+        </p>
+      ),
+    [canEditFields, fields, draggingTag, handleDragOver],
+  );
+
+  const isAboveRowLimit = !hasAsyncExportsFeature && exportedRows > 100e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
   const disabled = !account || isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]
     ?.filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId)))
     .every(f => fields.includes(f));
-  const canEditFields = preset === FIELD_OPTIONS.NEW_PRESET || isEditingPreset;
 
   return (
     <React.Fragment>
@@ -842,38 +911,11 @@ const ExportTransactionsCSVModal = ({
                         </label>
                       </div>
                     </div>
-                    <div className="gap-2 sm:columns-2">
-                      {React.useMemo(
-                        () =>
-                          GROUP_FIELDS[tab]
-                            .filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId)))
-                            .map(fieldId => {
-                              const field = FIELDS.find(f => f.id === fieldId);
-                              return (
-                                <div key={fieldId} className="mb-2 flex items-center gap-1">
-                                  <Checkbox
-                                    id={fieldId}
-                                    checked={fields.includes(fieldId)}
-                                    onCheckedChange={checked => handleFieldSwitch({ name: fieldId, checked })}
-                                  />
-                                  <label
-                                    htmlFor={fieldId}
-                                    className="ml-1 cursor-pointer text-sm leading-none font-normal! peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                  >
-                                    {field?.label || fieldId}
-                                  </label>
-                                  {field?.tooltip && <InfoTooltipIcon>{field.tooltip}</InfoTooltipIcon>}
-                                </div>
-                              );
-                            }),
-                        [fields, tab, isHostReport, handleFieldSwitch],
-                      )}
-                    </div>
+                    <div className="gap-2 sm:columns-2">{groupFields}</div>
                   </div>
                 </div>
               </CollapsibleContent>
             </Collapsible>
-
             <div>
               <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -905,33 +947,7 @@ const ExportTransactionsCSVModal = ({
                 )}
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-2 rounded-lg bg-slate-100 p-2">
-                {React.useMemo(
-                  () =>
-                    canEditFields && fields.length > 0 ? (
-                      <DndContext
-                        onDragStart={handleDragStart}
-                        onDragOver={handleDragOver}
-                        onDragEnd={handleDragEnd}
-                        onDragCancel={handleDragEnd}
-                      >
-                        <SortableContext items={fields}>
-                          {fields.map(field => (
-                            <FieldTag key={field} id={field} canDrag />
-                          ))}
-                        </SortableContext>
-                        <DragOverlay>{draggingTag ? <FieldTag id={draggingTag} dragElement /> : null}</DragOverlay>
-                      </DndContext>
-                    ) : fields.length ? (
-                      fields.map(field => <FieldTag key={field} id={field} />)
-                    ) : (
-                      <p className="self-center text-xs">
-                        <FormattedMessage defaultMessage="You have not selected any fields for export." id="EMjZZT" />
-                      </p>
-                    ),
-                  [canEditFields, fields, draggingTag, handleDragOver],
-                )}
-              </div>
+              <div className="mt-4 flex flex-wrap gap-2 rounded-lg bg-slate-100 p-2">{dragAndDropFields}</div>
             </div>
             <div className="flex flex-col gap-2">
               <h1 className="font-bold">
