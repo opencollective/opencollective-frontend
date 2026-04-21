@@ -3976,7 +3976,6 @@
   "StHpyn": "crwdns27564:0crwdne27564:0",
   "Stripe.Initialization.Error": "crwdns20100:0crwdne20100:0",
   "Stripe.PaymentMethod.Label.acss_debit": "crwdns24601:0crwdne24601:0",
-  "Stripe.PaymentMethod.Label.alipay": "crwdns24605:0crwdne24605:0",
   "Stripe.PaymentMethod.Label.au_becs_debit": "crwdns24607:0crwdne24607:0",
   "Stripe.PaymentMethod.Label.bacs_debit": "crwdns24609:0crwdne24609:0",
   "Stripe.PaymentMethod.Label.bancontact": "crwdns24611:0crwdne24611:0",
