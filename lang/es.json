@@ -3976,7 +3976,6 @@
   "StHpyn": "Cambio neto",
   "Stripe.Initialization.Error": "Hubo un problema al inicializar el formulario de pago. Por favor, recarga la página e inténtalo de nuevo.",
   "Stripe.PaymentMethod.Label.acss_debit": "Débito ACSS",
-  "Stripe.PaymentMethod.Label.alipay": "Alipay",
   "Stripe.PaymentMethod.Label.au_becs_debit": "Débito directo BECS",
   "Stripe.PaymentMethod.Label.bacs_debit": "Débito directo BACS",
   "Stripe.PaymentMethod.Label.bancontact": "Bancontact",

@@ -3976,7 +3976,6 @@
   "StHpyn": "Changement net",
   "Stripe.Initialization.Error": "Il y a eu un problème lors de l'initialisation du paiement. Veuillez recharger la page et réessayer.",
   "Stripe.PaymentMethod.Label.acss_debit": "Débit SACR",
-  "Stripe.PaymentMethod.Label.alipay": "Alipay",
   "Stripe.PaymentMethod.Label.au_becs_debit": "Prélèvement Becs",
   "Stripe.PaymentMethod.Label.bacs_debit": "Prélèvement Bacs",
   "Stripe.PaymentMethod.Label.bancontact": "Bancontact",

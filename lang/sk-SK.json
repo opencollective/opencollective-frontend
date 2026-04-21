@@ -3976,7 +3976,6 @@
   "StHpyn": "Net change",
   "Stripe.Initialization.Error": "Vyskytol sa problém s inicializáciou platobného formulára. Prosím, znovunačítajte stránku a skúste to znova.",
   "Stripe.PaymentMethod.Label.acss_debit": "ACSS Debit",
-  "Stripe.PaymentMethod.Label.alipay": "Alipay",
   "Stripe.PaymentMethod.Label.au_becs_debit": "BECS Direct Debit",
   "Stripe.PaymentMethod.Label.bacs_debit": "Bacs Direct Debit",
   "Stripe.PaymentMethod.Label.bancontact": "Bancontact",

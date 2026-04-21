@@ -3976,7 +3976,6 @@
   "StHpyn": "Net change",
   "Stripe.Initialization.Error": "There was a problem initializing the payment form. Please reload the page and try again.",
   "Stripe.PaymentMethod.Label.acss_debit": "ACSS Debit",
-  "Stripe.PaymentMethod.Label.alipay": "Alipay",
   "Stripe.PaymentMethod.Label.au_becs_debit": "BECS Direct Debit",
   "Stripe.PaymentMethod.Label.bacs_debit": "Bacs Direct Debit",
   "Stripe.PaymentMethod.Label.bancontact": "Bancontact",

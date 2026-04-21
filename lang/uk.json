@@ -3976,7 +3976,6 @@
   "StHpyn": "Net change",
   "Stripe.Initialization.Error": "Сталася помилка під час ініціалізації форми оплати. Оновіть сторінку та спробуйте ще раз.",
   "Stripe.PaymentMethod.Label.acss_debit": "ACSS Дебет",
-  "Stripe.PaymentMethod.Label.alipay": "Alipay",
   "Stripe.PaymentMethod.Label.au_becs_debit": "Прямий дебет BECS",
   "Stripe.PaymentMethod.Label.bacs_debit": "Прямий дебет Bacs",
   "Stripe.PaymentMethod.Label.bancontact": "Bancontact",
