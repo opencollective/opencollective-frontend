@@ -17,11 +17,11 @@ import { DEFAULT_MINIMUM_AMOUNT, DEFAULT_PRESETS } from '../../lib/tier-utils';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
+import InputAmount from '../InputAmount';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import PayWithPaypalButton from '../PayWithPaypalButton';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledRadioList from '../StyledRadioList';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
@@ -377,14 +377,13 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
                             <FormattedMessage id="RecurringContributions.customAmount" defaultMessage="Custom amount" />
                           </P>
                           <Box>
-                            <StyledInputAmount
+                            <InputAmount
                               type="number"
                               data-cy="recurring-contribution-custom-amount-input"
                               currency={currency}
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
                               min={DEFAULT_MINIMUM_AMOUNT}
-                              px="2px"
                             />
                           </Box>
                           <P fontSize="12px" fontWeight="600" my={2}>

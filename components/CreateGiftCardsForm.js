@@ -20,13 +20,13 @@ import Container from './Container';
 import CreateGiftCardsSuccess from './CreateGiftCardsSuccess';
 import { Box, Flex } from './Grid';
 import { I18nSupportLink } from './I18nFormatters';
+import InputAmount from './InputAmount';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import PaymentMethodSelect from './PaymentMethodSelect';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInput from './StyledInput';
-import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
 
@@ -477,7 +477,7 @@ class CreateGiftCardsForm extends Component {
         </MessageBox>
         <Flex flexDirection="column">
           <InlineField name="amount" label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}>
-            <StyledInputAmount
+            <InputAmount
               id="giftcard-amount"
               currency={currency}
               prepend={currency}

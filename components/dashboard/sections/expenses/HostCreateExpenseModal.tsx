@@ -32,8 +32,8 @@ import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePic
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Dropzone from '../../../Dropzone';
 import { FormikZod } from '../../../FormikZod';
+import { InputAmountWithDynamicFxRate } from '../../../InputAmountWithDynamicFxRate';
 import type { BaseModalProps } from '../../../ModalContext';
-import { StyledInputAmountWithDynamicFxRate } from '../../../StyledInputAmountWithDynamicFxRate';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledSelect from '../../../StyledSelect';
 import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
@@ -303,7 +303,7 @@ export const HostCreateExpenseModal = ({
                       {({ field }) => (
                         <div>
                           <div className="flex justify-between gap-2 [&>div]:w-full">
-                            <StyledInputAmountWithDynamicFxRate
+                            <InputAmountWithDynamicFxRate
                               onChange={valueInCents => setFieldValue('amount', { ...values.amount, valueInCents })}
                               onCurrencyChange={currency => setFieldValue('amount', { ...values.amount, currency })}
                               onExchangeRateChange={exchangeRate =>

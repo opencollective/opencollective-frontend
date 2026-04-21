@@ -7,7 +7,7 @@ import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
 import Container from '../Container';
 import { Flex } from '../Grid';
 import Image from '../Image';
-import StyledInputAmount from '../StyledInputAmount';
+import InputAmount from '../InputAmount';
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
 
@@ -142,7 +142,7 @@ const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed
       </Flex>
       {selectedOption.value === 'CUSTOM' && (
         <Flex justifyContent="flex-end" mt={2}>
-          <StyledInputAmount id="feesOnTop" name="platformTip" currency={currency} onChange={onChange} value={value} />
+          <InputAmount id="feesOnTop" name="platformTip" currency={currency} onChange={onChange} value={value} />
         </Flex>
       )}
     </Container>
