@@ -11,7 +11,11 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { integer } from '../../../../lib/filters/schemas';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { SubscriberFieldsFragment, SubscribersQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type {
+  PlanFeaturesFragment,
+  SubscriberFieldsFragment,
+  SubscribersQueryVariables,
+} from '@/lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -235,6 +239,8 @@ export const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   lastTransactionDateFilter: lastTransactionDateFilter.filter,
 };
 
+type PlanFeatureKey = keyof Omit<PlanFeaturesFragment, '__typename'>;
+
 export const AVAILABLE_FEATURES = [
   'TRANSFERWISE',
   'PAYPAL_PAYOUTS',
@@ -252,5 +258,13 @@ export const AVAILABLE_FEATURES = [
   'UPDATES',
   'RECEIVE_FINANCIAL_CONTRIBUTIONS',
   'RECEIVE_EXPENSES',
+  'RECEIVE_GRANTS',
   'ACCOUNT_MANAGEMENT',
-] as const;
+] as const satisfies readonly PlanFeatureKey[];
+
+// Compile-time check: all PlanFeaturesFragment keys must be in AVAILABLE_FEATURES
+type Assert<T extends true> = T;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- type exists for compile-time validation only
+type _AssertAllPlanFeaturesPresent = Assert<
+  Exclude<PlanFeatureKey, (typeof AVAILABLE_FEATURES)[number]> extends never ? true : false
+>;

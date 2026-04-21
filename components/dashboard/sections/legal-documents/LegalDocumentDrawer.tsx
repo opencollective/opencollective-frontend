@@ -4,11 +4,10 @@ import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, LegalDocumentFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
-import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -23,6 +22,7 @@ import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import { DataList, DataListItem } from '../../../ui/DataList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
+import { ALL_SECTIONS } from '../../constants';
 
 import { LegalDocumentServiceBadge } from './LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from './LegalDocumentStatusBadge';
@@ -86,7 +86,7 @@ export default function LegalDocumentDrawer({
             dropdownTriggerRef={dropdownTriggerRef}
             actions={getActions(document, dropdownTriggerRef)}
             entityName={intl.formatMessage({ defaultMessage: 'Tax form', id: 'TaxForm' })}
-            entityIdentifier={<CopyID value={document.id}>{document.id}</CopyID>}
+            entityIdentifier={<CopyID value={document.publicId}>{document.publicId}</CopyID>}
             entityLabel={
               <LinkCollective
                 className="hover:text-primary hover:underline"
@@ -182,10 +182,14 @@ export default function LegalDocumentDrawer({
                       <li>
                         <Link
                           className="text-primary underline"
-                          href={getDashboardRoute(
-                            host,
-                            `host-expenses?searchTerm=@${document.account.slug}&status=ALL&types=INVOICE,GRANT,UNCLASSIFIED`,
-                          )}
+                          href={getDashboardRoute(host, ALL_SECTIONS.HOST_PAYMENT_REQUESTS, {
+                            params: new URLSearchParams([
+                              ['searchTerm', `@${document.account.slug}`],
+                              ['type', 'INVOICE'],
+                              ['type', 'GRANT'],
+                              ['type', 'UNCLASSIFIED'],
+                            ]),
+                          })}
                         >
                           <FormattedMessage
                             defaultMessage="...and {count} more"

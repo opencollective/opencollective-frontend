@@ -1,11 +1,9 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { useMutation } from '@apollo/client';
+import React, { useState } from 'react';
 import { Megaphone, Settings, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import DismissibleMessage from '../../../DismissibleMessage';
 import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
@@ -21,43 +19,16 @@ import {
 import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
-import { editAccountSettingMutation } from './queries';
 import { Timeline } from './Timeline';
 import { AccountTodoList } from './TodoList';
+import { useSetupGuide } from './useSetupGuide';
 import { WelcomeIndividual } from './Welcome';
 
 const Home = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
-  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [showWelcomeGuide, setShowWelcomeGuide] = useState(
-    LoggedInUser?.shouldDisplaySetupGuide?.(LoggedInUser?.collective) ?? undefined,
-  );
+  const [showWelcomeGuide, handleSetupGuideToggle] = useSetupGuide();
   const slug = router.query?.as || accountSlug;
-  const [editAccountSetting] = useMutation(editAccountSettingMutation);
-
-  const handleSetupGuideToggle = useCallback(
-    async (open: boolean) => {
-      setShowWelcomeGuide(open);
-
-      await editAccountSetting({
-        variables: {
-          account: { legacyId: LoggedInUser.collective.id },
-          key: `showSetupGuide.id${LoggedInUser.collective.id}`,
-          value: open,
-        },
-      }).catch(() => {});
-      await refetchLoggedInUser();
-    },
-    [LoggedInUser, editAccountSetting, refetchLoggedInUser],
-  );
-
-  useLayoutEffect(() => {
-    if (LoggedInUser) {
-      const showSetupGuide = LoggedInUser?.shouldDisplaySetupGuide?.(LoggedInUser?.collective);
-      setShowWelcomeGuide(showSetupGuide !== undefined ? showSetupGuide : true);
-    }
-  }, [LoggedInUser, setShowWelcomeGuide]);
 
   return (
     <div className="flex flex-col-reverse xl:flex-row">

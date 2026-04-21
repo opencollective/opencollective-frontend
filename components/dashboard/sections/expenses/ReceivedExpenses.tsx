@@ -6,18 +6,14 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import {
   type Account,
+  type ExpensesPageQueryVariables,
   ExpenseStatusFilter,
   ExpenseType,
   PayoutMethodType,
-} from '../../../../lib/graphql/types/v2/schema';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
+} from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
-import { i18nExpenseType } from '@/lib/i18n/expense';
-import { sortSelectOptions } from '@/lib/utils';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
@@ -58,8 +54,8 @@ type FilterMeta = CommonFilterMeta & {
   expenseTags?: string[];
   hostSlug?: string;
   includeUncategorized: boolean;
-  omitExpenseTypesInFilter?: ExpenseType[];
 };
+
 const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, FilterMeta> = {
   ...commonToVariables,
   account: (slug, key, meta) => {
@@ -91,18 +87,6 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },
-  type: {
-    labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
-    Component: ({ meta, valueRenderer, intl, ...props }) => (
-      <ComboSelectFilter
-        options={Object.values(omit(ExpenseType, [ExpenseType.FUNDING_REQUEST, ...meta.omitExpenseTypesInFilter]))
-          .map(value => ({ label: valueRenderer({ value, intl }), value }))
-          .sort(sortSelectOptions)}
-        {...props}
-      />
-    ),
-    valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
-  },
 };
 
 const filtersWithoutHost = omit(filters, 'accountingCategory');
@@ -112,7 +96,6 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
-  const { LoggedInUser } = useLoggedInUser();
 
   const {
     data: metadata,
@@ -125,7 +108,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
   const hostSlug = get(metadata, 'account.host.slug');
 
-  const omitExpenseTypesInFilter = [ExpenseType.GRANT];
+  const omitExpenseTypes = [ExpenseType.GRANT];
 
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
@@ -133,14 +116,13 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       ? [metadata.account, ...metadata.account.childrenAccounts.nodes]
       : undefined,
     accountSlug,
-    expenseTags: metadata?.expenseTagStats?.nodes?.map(({ tag }) => tag),
     hostSlug: hostSlug,
     includeUncategorized: true,
-    omitExpenseTypesInFilter,
+    omitExpenseTypes,
     accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
-  const queryFilter = useQueryFilter<typeof schema | typeof schemaWithoutHost, { type: ExpenseType }>({
+  const queryFilter = useQueryFilter<typeof schema | typeof schemaWithoutHost, ExpensesPageQueryVariables>({
     schema: hostSlug ? schema : schemaWithoutHost,
     toVariables,
     meta: filterMeta,
@@ -154,14 +136,8 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       hasAmountInCreatedByAccountCurrency: false,
       fetchGrantHistory: false,
       ...queryFilter.variables,
-      ...(!queryFilter.variables.type
-        ? { types: Object.values(ExpenseType).filter(v => !omitExpenseTypesInFilter.includes(v)) }
-        : {}),
     },
   });
-
-  const hasNewSubmitExpenseFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
 
   const pageRoute = `/dashboard/${accountSlug}/expenses`;
 
@@ -172,11 +148,9 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
           title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
           description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
           actions={
-            hasNewSubmitExpenseFlow ? (
-              <Button onClick={() => setIsExpenseFlowOpen(true)} size="sm" className="gap-1">
-                <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
-              </Button>
-            ) : null
+            <Button onClick={() => setIsExpenseFlowOpen(true)} size="sm" className="gap-1">
+              <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
+            </Button>
           }
         />
         {isSelfHosted && (

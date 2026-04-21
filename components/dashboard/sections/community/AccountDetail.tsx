@@ -1,125 +1,144 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { pick } from 'lodash';
-import { ArrowLeft, BookKey, Dot, Mail } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
-import { CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
-import type { Account, AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
-import { KycProvider } from '@/lib/graphql/types/v2/schema';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { formatCommunityRelation } from '@/lib/i18n/community-relation';
-import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
-import { getDashboardRoute } from '@/lib/url-helpers';
+import { i18nGraphqlException } from '@/lib/errors';
+import { gql } from '@/lib/graphql/helpers';
+import type {
+  AccountReferenceInput,
+  CommunityAccountDetailQuery,
+  VendorFieldsFragment,
+} from '@/lib/graphql/types/v2/graphql';
+import { AccountType, LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
+import formatCollectiveType from '@/lib/i18n/collective-type';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
-import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import { KYCTabPeopleDashboard } from '@/components/kyc/dashboard/KYCTabPeopleDashboard';
-import LinkCollective from '@/components/LinkCollective';
-import LocationAddress from '@/components/LocationAddress';
-import { DataTable } from '@/components/table/DataTable';
+import StyledModal from '@/components/StyledModal';
 import Tabs from '@/components/Tabs';
 import { Badge } from '@/components/ui/Badge';
-import { InfoList, InfoListItem } from '@/components/ui/InfoList';
+import { setVendorArchiveMutation, vendorFieldFragment } from '@/components/vendors/queries';
+import VendorForm from '@/components/vendors/VendorForm';
 
 import Avatar from '../../../Avatar';
+import ConfirmationModal from '../../../ConfirmationModal';
 import { CopyID } from '../../../CopyId';
-import DateTime from '../../../DateTime';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import { Skeleton } from '../../../ui/Skeleton';
+import { useToast } from '../../../ui/useToast';
+import type { DashboardContextType } from '../../DashboardContext';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
+import { makeReplaceSubpath } from '../../utils';
+import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 
 import { ActivitiesTab } from './AccountDetailActivitiesTab';
-import { ContributionsTab } from './AccountDetailContributionsTab';
-import { ExpensesTab } from './AccountDetailExpensesTab';
-import { AccountTaxFormStatus } from './AccountTaxFormStatus';
+import { AccountDetailsOverviewTab } from './AccountDetailOverviewTab';
+import { AccountDetailTransactionsTab } from './AccountDetailTransactionsTab';
+import { AccountDetailView, getCollectiveTypeIcon, KYCStatusBadge, TaxFormBadge } from './common';
 import { communityAccountDetailQuery } from './queries';
 
-const associatedCollectiveColumns = intl => [
-  {
-    accessorKey: 'account',
-    header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
-    cell: ({ row }) => {
-      const { account } = row.original;
-      return (
-        <div className="flex items-center text-nowrap">
-          {account.isFrozen && (
-            <Badge type="info" size="xs" className="mr-2">
-              <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
-            </Badge>
-          )}
-          <LinkCollective collective={account} className="flex items-center gap-1" withHoverCard>
-            <Avatar size={24} collective={account} mr={2} />
-            {account.name}
-          </LinkCollective>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'relations',
-    header: intl.formatMessage({ defaultMessage: 'Roles', id: 'c35gM5' }),
-    cell: ({ row }) => {
-      const relations =
-        row.original.relations?.filter(
-          (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')),
-        ) || [];
-      return (
-        <div className="flex gap-1 align-middle">
-          {relations.map(role => (
-            <div
-              key={role}
-              className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
-            >
-              {formatCommunityRelation(intl, role)}
-            </div>
-          ))}
-        </div>
-      );
-    },
-  },
-];
+const convertOrganizationMutation = gql`
+  mutation ConvertOrganizationToVendor($organization: AccountReferenceInput!, $host: AccountReferenceInput!) {
+    convertOrganizationToVendor(organization: $organization, host: $host) {
+      id
+      ...VendorFields
+    }
+  }
+  ${vendorFieldFragment}
+`;
 
-enum AccountDetailView {
-  OVERVIEW = 'OVERVIEW',
-  EXPENSES = 'EXPENSES',
-  CONTRIBUTIONS = 'CONTRIBUTIONS',
-  ACTIVITIES = 'ACTIVITIES',
-  KYC = 'KYC',
-}
-
-type ContributionDrawerProps = {
+type AccountDetailsProps = {
   onClose: () => void;
   account?: AccountReferenceInput;
-  host?: Pick<Account, 'id' | 'currency' | 'slug'>;
+  host?: DashboardContextType['account'];
+  expectedAccountType?: AccountType;
 };
 
-export function ContributorDetails(props: ContributionDrawerProps) {
+export function AccountDetails(props: AccountDetailsProps) {
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const intl = useIntl();
-  const [selectedTab, setSelectedTab] = React.useState<AccountDetailView>(AccountDetailView.OVERVIEW);
+  const router = useRouter();
+  const selectedTab = router.query?.subpath?.[1] || AccountDetailView.OVERVIEW;
+  const setSelectedTab = React.useCallback(
+    (tab: AccountDetailView) => {
+      if (selectedTab !== tab) {
+        const pushSubpath = makeReplaceSubpath(router);
+        pushSubpath(`${props.account.id}/${tab}`);
+      }
+    },
+    [router, props.account.id, selectedTab],
+  );
+
+  const { toast } = useToast();
   const [openExpenseId, setOpenExpenseId] = React.useState(null);
   const [openContributionId, setOpenContributionId] = React.useState(null);
-
-  const { LoggedInUser } = useLoggedInUser();
+  const [editVendor, setEditVendor] = React.useState<VendorFieldsFragment>(null);
+  const [displayConvertToVendor, setDisplayConvertToVendor] = React.useState(false);
 
   const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
     variables: {
       accountId: props.account.id,
-      hostSlug: props.host.slug,
+      hostSlug: dashboardAccount.slug,
+      isIndividual: props.expectedAccountType === AccountType.INDIVIDUAL,
     },
-    // Since tabs data is loaded on demand, we don't want to refetch when switching tabs
-    nextFetchPolicy: 'standby',
   });
+  const isLoading = query.loading || !query.data;
+  const account = query.data?.account;
+  const taxForms = query.data?.host?.hostedLegalDocuments;
+  const [archiveVendor] = useMutation(setVendorArchiveMutation);
+  const [convertOrganizationToVendor] = useMutation(convertOrganizationMutation);
 
-  const kycStatus = query.data?.account && 'kycStatus' in query.data.account ? query.data.account['kycStatus'] : {};
+  const handleSetArchive = React.useCallback(
+    async vendor => {
+      await archiveVendor({
+        variables: { vendor: pick(vendor, ['id']), archive: !vendor.isArchived },
+        refetchQueries: ['CommunityAccountDetail', 'DashboardVendors'],
+      });
+      await query.refetch();
+    },
+    [archiveVendor, query],
+  );
+
+  const handleConvertOrganizationToVendor = React.useCallback(async () => {
+    try {
+      const result = await convertOrganizationToVendor({
+        variables: { organization: { id: account.id }, host: { id: dashboardAccount.id } },
+      });
+      toast({
+        variant: 'success',
+        message: <FormattedMessage defaultMessage="Organization converted to vendor" id="HwKF7/" />,
+      });
+      setEditVendor(result.data.convertOrganizationToVendor);
+      setDisplayConvertToVendor(false);
+      await query.refetch();
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    }
+  }, [convertOrganizationToVendor, account, dashboardAccount, toast, intl, query]);
+
+  const handleTransactionTableRowClick = React.useCallback<TransactionsTableProps['onClickRow']>(
+    row => {
+      if ('expense' in row.original && row.original?.expense) {
+        setOpenExpenseId(row.original.expense.legacyId);
+        return true;
+      } else if ('order' in row.original && row.original?.order) {
+        setOpenContributionId(row.original.order.legacyId);
+        return true;
+      }
+      return false;
+    },
+    [setOpenContributionId, setOpenExpenseId],
+  );
+
   const tabs = React.useMemo(
     () => [
       {
@@ -127,14 +146,8 @@ export function ContributorDetails(props: ContributionDrawerProps) {
         label: <FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />,
       },
       {
-        id: AccountDetailView.EXPENSES,
-        label: <FormattedMessage defaultMessage="Expenses" id="Expenses" />,
-        count: query.data?.account?.communityStats?.transactionSummary[0]?.expenseCountAcc || 0,
-      },
-      {
-        id: AccountDetailView.CONTRIBUTIONS,
-        label: <FormattedMessage defaultMessage="Contributions" id="Contributions" />,
-        count: query.data?.account?.communityStats?.transactionSummary[0]?.contributionCountAcc || 0,
+        id: AccountDetailView.TRANSACTIONS,
+        label: <FormattedMessage defaultMessage="Money Movement" id="MoneyMovement" />,
       },
       {
         id: AccountDetailView.ACTIVITIES,
@@ -145,14 +158,14 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             {
               id: AccountDetailView.KYC,
               label: 'KYC',
-              count: Object.values(pick(kycStatus, [KycProvider.MANUAL.toLowerCase()])).filter(
-                status => status !== null,
-              ).length,
+              count: Object.values(
+                query.data?.account && 'kycStatus' in query.data.account ? query.data.account.kycStatus : {},
+              ).filter(kyc => !!kyc?.['status']).length,
             },
           ]
         : []),
     ],
-    [query.data, query.data?.account?.type, LoggedInUser, kycStatus],
+    [query.data, dashboardAccount],
   );
 
   const handleTabChange = React.useCallback(
@@ -162,15 +175,11 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     [setSelectedTab],
   );
 
-  const isLoading = query.loading || !query.data;
-  const account = query.data?.account;
-  const relations =
-    account?.communityStats?.relations?.filter(
-      (relation, _, relations) =>
-        !(relation === CommunityRelationType.EXPENSE_SUBMITTER && relations.includes(CommunityRelationType.PAYEE)),
-    ) || [];
   const legalName = account?.legalName !== account?.name && account?.legalName;
-  const taxForms = query.data?.host?.hostedLegalDocuments;
+  const canBeConvertedToVendor = account?.type === 'ORGANIZATION' ? account['canBeVendorOf'] : false;
+
+  const rejectedExpensesCount = account?.rejectedExpenses?.totalCount || 0;
+  const spamExpensesCount = account?.spamExpenses?.totalCount || 0;
 
   return (
     <div className="flex h-full flex-col">
@@ -180,7 +189,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
       </button>
       <DashboardHeader
         title={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {isLoading ? (
               <React.Fragment>
                 <Skeleton className="aspect-square size-9" />
@@ -188,194 +197,135 @@ export function ContributorDetails(props: ContributionDrawerProps) {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <Avatar collective={account} size={36} />
-                {account.name || account.slug}
-                {legalName && <span className="font-semibold text-muted-foreground">{`(${legalName})`}</span>}
-                <div className="flex flex-wrap gap-1 align-middle">
-                  {relations.map(role => (
-                    <div
-                      key={role}
-                      className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
-                    >
-                      {formatCommunityRelation(intl, role)}
-                    </div>
-                  ))}
+                <Avatar collective={account} size={60} />
+                <div className="flex flex-col">
+                  <div>
+                    {account.name || account.slug}
+                    {legalName && <span className="ml-1 font-semibold text-muted-foreground">{`(${legalName})`}</span>}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1">
+                    <Badge size="sm" type="outline" className="gap-1 rounded-full">
+                      {getCollectiveTypeIcon(account?.type || props.expectedAccountType, { size: 12 })}
+                      {formatCollectiveType(intl, account?.type || props.expectedAccountType)}
+                    </Badge>
+                    {account?.type === CollectiveType.INDIVIDUAL &&
+                      isFeatureEnabled(dashboardAccount, FEATURES.KYC) && (
+                        <KYCStatusBadge
+                          kycStatus={
+                            query.data?.account && 'kycStatus' in query.data.account ? query.data.account.kycStatus : {}
+                          }
+                        />
+                      )}
+                    <TaxFormBadge taxForms={taxForms} host={query.data?.host} />
+                    {rejectedExpensesCount > 0 && (
+                      <Badge size="sm" type={'error'}>
+                        <FormattedMessage
+                          defaultMessage="{count} rejected expenses"
+                          id="RejectedExpensesCount"
+                          values={{
+                            count: rejectedExpensesCount,
+                          }}
+                        />
+                      </Badge>
+                    )}
+                    {spamExpensesCount > 0 && (
+                      <Badge size="sm" type={'error'}>
+                        <FormattedMessage
+                          defaultMessage="{count} spam expenses"
+                          id="SpamExpensesCount"
+                          values={{
+                            count: spamExpensesCount,
+                          }}
+                        />
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </React.Fragment>
             )}
           </div>
         }
         actions={
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/${account?.slug}`}>
-              <FormattedMessage defaultMessage="View Profile" id="viewProfile" />
-            </Link>
-          </Button>
+          <React.Fragment>
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/${account?.slug}`}>
+                <FormattedMessage defaultMessage="View Profile" id="viewProfile" />
+              </Link>
+            </Button>
+            <CopyID
+              value={typeof window !== 'undefined' && window.location.href}
+              className="relative inline-flex h-9 items-center justify-center gap-1 rounded-md border border-input bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+              Icon={null}
+              toastOnCopy
+            >
+              <FormattedMessage defaultMessage="Copy URL" id="P8QaSQ" />
+            </CopyID>
+            {account?.type === CollectiveType.VENDOR && (
+              <React.Fragment>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setEditVendor(account as unknown as VendorFieldsFragment);
+                  }}
+                  disabled={!query.data?.host}
+                >
+                  <FormattedMessage id="Edit" defaultMessage="Edit" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    handleSetArchive(account as unknown as VendorFieldsFragment);
+                  }}
+                >
+                  {(account as unknown as VendorFieldsFragment).isArchived ? (
+                    <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage="Unarchive" />
+                  ) : (
+                    <FormattedMessage id="collective.archive.confirm.btn" defaultMessage="Archive" />
+                  )}
+                </Button>
+              </React.Fragment>
+            )}
+            {canBeConvertedToVendor && (
+              <Button
+                size="sm"
+                onClick={() => {
+                  setDisplayConvertToVendor(true);
+                }}
+              >
+                <FormattedMessage defaultMessage="Convert to Vendor" id="ConvertToVendor" />
+              </Button>
+            )}
+          </React.Fragment>
         }
       />
-      <div className="mt-2 flex justify-between">
-        {isLoading ? (
-          <Skeleton className="h-4 w-32" />
-        ) : (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <BookKey size={14} />
-              <CopyID
-                value={props.account.id}
-                tooltipLabel={<FormattedMessage defaultMessage="Copy Account ID" id="D+P5Yx" />}
-                className="inline-flex items-center gap-1"
-                Icon={null}
-              >
-                {props.account.id.split('-')[0]}...
-              </CopyID>
-            </div>
-            {account['email'] && (
-              <React.Fragment>
-                <Dot size={14} />
-                <div className="flex items-center gap-1">
-                  <Mail size={14} />
-                  <CopyID
-                    value={account['email']}
-                    tooltipLabel={<FormattedMessage defaultMessage="Copy Email" id="8NlxGY" />}
-                    className="inline-flex items-center gap-1"
-                    Icon={null}
-                  >
-                    {account['email']}
-                  </CopyID>
-                </div>
-              </React.Fragment>
-            )}
-            {account.location?.country && (
-              <React.Fragment>
-                <Dot size={14} />
-                <div className="flex items-center gap-1">
-                  <span>{getFlagEmoji(account.location.country)}</span>
-                  <span>{getCountryDisplayName(intl, account.location.country)}</span>
-                </div>
-              </React.Fragment>
-            )}
-            {account.socialLinks?.length > 0 && (
-              <React.Fragment>
-                <Dot size={14} />
-                <HeroSocialLinks className="size-6" socialLinks={account.socialLinks} />
-              </React.Fragment>
-            )}
-          </div>
-        )}
-      </div>
-      <div className="mt-4 flex flex-grow flex-col gap-8">
+      <div className="mt-4 flex flex-grow flex-col gap-4">
         {query.error ? (
           <MessageBoxGraphqlError error={query.error} />
         ) : (
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
-            <div
-              className="grid grid-cols-1 gap-12 aria-hidden:hidden xl:grid-cols-4"
-              aria-hidden={selectedTab !== AccountDetailView.OVERVIEW}
-            >
-              <div className="space-y-4 xl:order-2">
-                <h2 className="tight text-xl font-bold text-slate-800">
-                  <FormattedMessage defaultMessage="Details" id="Details" />
-                </h2>
-                <InfoList variant="compact" className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1">
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
-                    value={account?.legalName}
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
-                    value={account?.name || account?.slug}
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
-                    value={
-                      (account?.location?.country || account?.location?.address) && (
-                        <LocationAddress location={account.location} />
-                      )
-                    }
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="Joined the platform on" id="Vf1x2A" />}
-                    value={account?.createdAt && <DateTime value={account.createdAt} dateStyle="long" />}
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="First interaction with Host" id="mJq3cC" />}
-                    value={
-                      account?.communityStats?.firstInteractionAt && (
-                        <DateTime value={account?.communityStats?.firstInteractionAt} dateStyle="long" />
-                      )
-                    }
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="Last interaction with Host" id="0k5yUb" />}
-                    value={
-                      account?.communityStats?.lastInteractionAt && (
-                        <DateTime value={account?.communityStats?.lastInteractionAt} dateStyle="long" />
-                      )
-                    }
-                    isLoading={isLoading}
-                  />
-                  <InfoListItem
-                    title={<FormattedMessage defaultMessage="Tax form" id="TaxForm" />}
-                    value={
-                      taxForms?.nodes[0] && (
-                        <div className="flex flex-col items-start gap-1">
-                          <AccountTaxFormStatus
-                            taxForm={taxForms.nodes[0]}
-                            host={query.data?.host}
-                            onRefetch={() => query.refetch()}
-                          />
-                          {taxForms?.totalCount > 1 && (
-                            <Link
-                              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
-                              href={getDashboardRoute(props.host, `host-tax-forms?account=${account?.slug}`)}
-                            >
-                              <FormattedMessage defaultMessage="View all" id="TaxForm.ViewAll" />
-                            </Link>
-                          )}
-                        </div>
-                      )
-                    }
-                    isLoading={isLoading}
-                  />
-                </InfoList>
-              </div>
-
-              <div className="space-y-4 xl:order-1 xl:col-span-3">
-                <h2 className="text-xl font-bold text-slate-800">
-                  <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
-                </h2>
-                <DataTable
-                  data={account?.communityStats?.associatedCollectives || []}
-                  columns={associatedCollectiveColumns(intl)}
-                  loading={isLoading}
-                />
-                <h2 className="mt-12 text-xl font-bold text-slate-800">
-                  <FormattedMessage defaultMessage="Associated Organizations" id="E9PjGp" />
-                </h2>
-                <DataTable
-                  data={account?.communityStats?.associatedOrganizations || []}
-                  columns={associatedCollectiveColumns(intl)}
-                  loading={isLoading}
-                />
-              </div>
-            </div>
-            {selectedTab === AccountDetailView.CONTRIBUTIONS && (
-              <ContributionsTab account={account} host={props.host} setOpenContributionId={setOpenContributionId} />
+            {selectedTab === AccountDetailView.OVERVIEW && (
+              <AccountDetailsOverviewTab
+                query={query}
+                expectedAccountType={props.expectedAccountType}
+                handleTransactionTableRowClick={handleTransactionTableRowClick}
+                handleTabChange={handleTabChange}
+              />
             )}
-            {selectedTab === AccountDetailView.EXPENSES && (
-              <ExpensesTab account={account} host={props.host} setOpenExpenseId={setOpenExpenseId} />
+            {selectedTab === AccountDetailView.TRANSACTIONS && account && (
+              <AccountDetailTransactionsTab
+                account={account}
+                hostSlug={dashboardAccount.slug}
+                handleTransactionTableRowClick={handleTransactionTableRowClick}
+              />
             )}
             {selectedTab === AccountDetailView.ACTIVITIES && (
-              <ActivitiesTab account={account} host={props.host} setOpenExpenseId={setOpenExpenseId} />
+              <ActivitiesTab account={account} host={dashboardAccount} setOpenExpenseId={setOpenExpenseId} />
             )}
             {selectedTab === AccountDetailView.KYC && (
-              <KYCTabPeopleDashboard requestedByAccount={props.host} verifyAccount={props.account} />
+              <KYCTabPeopleDashboard requestedByAccount={dashboardAccount} verifyAccount={props.account} />
             )}
           </React.Fragment>
         )}
@@ -390,6 +340,44 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           orderId={openContributionId}
           getActions={() => ({})}
         />
+      )}
+      {editVendor && query.data?.host && (
+        <StyledModal onClose={() => setEditVendor(null)}>
+          <VendorForm
+            host={query.data.host}
+            supportsTaxForm={query.data.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)}
+            vendor={editVendor}
+            onSuccess={() => {
+              setEditVendor(null);
+              query.refetch();
+            }}
+            onCancel={() => setEditVendor(null)}
+            isModal
+          />
+        </StyledModal>
+      )}
+      {displayConvertToVendor && (
+        <ConfirmationModal
+          width="100%"
+          maxWidth="570px"
+          onClose={() => setDisplayConvertToVendor(false)}
+          header={
+            <FormattedMessage
+              defaultMessage="Convert {orgname} into a managed vendor?"
+              values={{ orgname: account.name }}
+              id="convertVendorHeader"
+            />
+          }
+          continueHandler={handleConvertOrganizationToVendor}
+        >
+          <p>
+            <FormattedMessage
+              defaultMessage="By doing so, this organization will be: {br}- Transformed into a vendor; {br}- No longer be accessible to its admins as an organization on the platform; and, {br}- Will no longer have a public profile."
+              id="Ai2X+o"
+              values={{ br: <br /> }}
+            />
+          </p>
+        </ConfirmationModal>
       )}
     </div>
   );

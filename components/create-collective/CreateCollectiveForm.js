@@ -16,6 +16,7 @@ import NextIllustration from '../collectives/HomeNextIllustration';
 import CollectiveTagsInput from '../CollectiveTagsInput';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
+import HostPricingInfoRow from '../HostPricingInfoRow';
 import { getI18nLink } from '../I18nFormatters';
 import InputTypeLocation from '../InputTypeLocation';
 import MessageBox from '../MessageBox';
@@ -153,26 +154,36 @@ class CreateCollectiveForm extends React.Component {
         <Box>
           <Flex flexDirection="column" mb={[2, 4, 48]} px={2} pt={2}>
             {host ? (
-              <Flex justifyContent="center" alignItems="center">
-                <Box mr={3}>
-                  <Avatar radius={96} collective={host} />
-                </Box>
-                <Box maxWidth={345}>
-                  <H1
-                    fontSize={['20px', '32px']}
-                    lineHeight={['24px', '40px']}
-                    fontWeight="500"
-                    textAlign="left"
-                    color="black.900"
-                  >
-                    <FormattedMessage
-                      id="host.applyTo"
-                      defaultMessage="Apply to {hostName}"
-                      values={{ hostName: host.name }}
-                    />
-                  </H1>
-                </Box>
-              </Flex>
+              <React.Fragment>
+                <Flex justifyContent="center" alignItems="center" flexDirection="column" gap={16}>
+                  <Box>
+                    <Avatar radius={96} collective={host} />
+                  </Box>
+                  <Box maxWidth={345}>
+                    <H1
+                      fontSize={['20px', '32px']}
+                      lineHeight={['24px', '40px']}
+                      fontWeight="500"
+                      textAlign="center"
+                      color="black.900"
+                    >
+                      <FormattedMessage
+                        id="host.applyTo"
+                        defaultMessage="Apply to {hostName}"
+                        values={{ hostName: <strong>{host.name}</strong> }}
+                      />
+                    </H1>
+                  </Box>
+                </Flex>
+                <div className="mt-6 flex justify-center">
+                  <HostPricingInfoRow
+                    createdAt={host.createdAt}
+                    currency={host.currency}
+                    hostFeePercent={host.hostFeePercent}
+                    platformContributionAvailable={host.platformContributionAvailable}
+                  />
+                </div>
+              </React.Fragment>
             ) : (
               <div>
                 <Box mb={[2, 3]}>

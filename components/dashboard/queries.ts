@@ -102,9 +102,11 @@ export const adminPanelQuery = gql`
         EXPECTED_FUNDS
         CHARGE_HOSTING_FEES
         KYC
+        ACCOUNTING_CATEGORIZATION_RULES
       }
       policies {
         id
+        publicId
         REQUIRE_2FA_FOR_ADMINS
       }
       ... on Organization {
@@ -117,6 +119,16 @@ export const adminPanelQuery = gql`
           legacyId
           requiredLegalDocuments
           hostFeePercent
+          manualPaymentProviders {
+            id
+            name
+          }
+        }
+      }
+      ... on Host {
+        manualPaymentProviders {
+          id
+          name
         }
       }
       ... on AccountWithParent {
@@ -146,6 +158,10 @@ export const adminPanelQuery = gql`
           slug
           name
           settings
+          manualPaymentProviders {
+            id
+            name
+          }
           policies {
             id
             EXPENSE_AUTHOR_CANNOT_APPROVE {

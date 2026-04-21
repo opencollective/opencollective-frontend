@@ -3,21 +3,24 @@ import { useMutation, useQuery } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Form, FormikProvider, useFormikContext } from 'formik';
 import { pick } from 'lodash';
-import { Pen } from 'lucide-react';
+import { AlertCircle, Pen } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
+import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import {
   type Currency,
   type CurrencyExchangeRateInput,
+  type Expense,
+  ExpenseLockableFields,
   ExpenseType,
   PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
+import { NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID, NEW_PAYOUT_METHOD_ID } from './lib/constants';
 import { getAccountReferenceInput } from '@/lib/collective';
-import { type Expense, ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
 
 import CollectivePicker from '../CollectivePicker';
 import { accountsQuery } from '../dashboard/sections/accounts/queries';
@@ -34,6 +37,7 @@ import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSect
 import { InvoiceFormOption } from '../submit-expense/form/TypeOfExpenseSection';
 import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
 import { InviteeAccountType, useExpenseForm, YesNoOption } from '../submit-expense/useExpenseForm';
+import { Alert, AlertDescription } from '../ui/Alert';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Collapsible, CollapsibleContent } from '../ui/Collapsible';
@@ -147,7 +151,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
       {({ setFieldValue, values }) => {
         // Check if the selected account is the same as the current expense account
         const isSameAccount = values.destinationAccount?.id === expense.account.id;
-
+        const payerIsPayee = expense.payee?.id === values.destinationAccount?.id;
         return (
           <Form className="space-y-4">
             <FormField name="destinationAccount">
@@ -162,7 +166,18 @@ const EditPaidBy = ({ expense, handleClose }) => {
                 />
               )}
             </FormField>
-            <EditExpenseActionButtons disabled={isSameAccount || isLoading} loading={submitting} />
+            {payerIsPayee && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertDescription>
+                  <AlertCircle className="inline-block align-text-bottom" size={16} />{' '}
+                  <FormattedMessage
+                    id="ExpenseForm.PayerPayeeMustDiffer"
+                    defaultMessage="The account paying and the account getting paid must be different."
+                  />
+                </AlertDescription>
+              </Alert>
+            )}
+            <EditExpenseActionButtons disabled={isSameAccount || payerIsPayee || isLoading} loading={submitting} />
           </Form>
         );
       }}
@@ -175,7 +190,14 @@ const EditPayee = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: { expenseItems: true, hasTax: true, tax: true, payoutMethodId: true, payeeSlug: true },
+    pickSchemaFields: {
+      expenseItems: true,
+      hasTax: true,
+      tax: true,
+      payoutMethodId: true,
+      payeeSlug: true,
+      accountSlug: true,
+    },
   });
   const transformedOnSubmit = React.useCallback(
     async (values, h, formOptions) => {
@@ -195,7 +217,7 @@ const EditPayee = ({ expense, onSubmit }) => {
               exchangeRate: ei.amount.exchangeRate
                 ? ({
                     ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                    date: new Date(ei.amount.exchangeRate.date || ei.incurredAt),
+                    date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
                   } as CurrencyExchangeRateInput)
                 : null,
             },
@@ -203,9 +225,9 @@ const EditPayee = ({ expense, onSubmit }) => {
             url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
           })),
           payoutMethod:
-            !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+            !values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID
               ? { ...values.newPayoutMethod, isSaved: false }
-              : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+              : values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID
                 ? {
                     type: PayoutMethodType.ACCOUNT_BALANCE,
                     data: {},
@@ -228,6 +250,7 @@ const EditPayee = ({ expense, onSubmit }) => {
     formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
+      accountSlug: expense.account.slug,
       expenseItems: [
         {
           amount: {
@@ -297,9 +320,9 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     async (values, h, formOptions) => {
       const editValues = {
         payoutMethod:
-          !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+          !values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID
             ? { ...values.newPayoutMethod, isSaved: false }
-            : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+            : values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID
               ? {
                   type: PayoutMethodType.ACCOUNT_BALANCE,
                   data: {},
@@ -321,7 +344,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
             exchangeRate: ei.amount.exchangeRate
               ? ({
                   ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                  date: ei.amount.exchangeRate.date || ei.incurredAt,
+                  date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
                 } as CurrencyExchangeRateInput)
               : null,
           },
@@ -408,7 +431,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
           exchangeRate: ei.amount.exchangeRate
             ? ({
                 ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: ei.amount.exchangeRate.date || ei.incurredAt,
+                date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
               } as CurrencyExchangeRateInput)
             : null,
         },
@@ -424,7 +447,13 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       currency: values.referenceCurrency || formOptions.expenseCurrency,
       tax:
         values.hasTax && values.tax
-          ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+          ? [
+              {
+                rate: values.tax.rate,
+                type: formOptions.taxType,
+                idNumber: values.tax.idNumber,
+              },
+            ]
           : [],
     };
     return onSubmit(editValues);
@@ -491,7 +520,7 @@ const AttachReceipts = ({ expense, onSubmit }) => {
           exchangeRate: ei.amount.exchangeRate
             ? ({
                 ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: ei.amount.exchangeRate.date || ei.incurredAt,
+                date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
               } as CurrencyExchangeRateInput)
             : null,
         },
@@ -589,7 +618,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
       expenseTypeOption: true,
     },
   });
-  const transformedOnSubmit = values => {
+  const transformedOnSubmit = (values, h, formOptions) => {
     const editValues = {
       items: values.expenseItems.map(ei => ({
         id: ei.id,
@@ -600,7 +629,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
           exchangeRate: ei.amount.exchangeRate
             ? ({
                 ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: ei.amount.exchangeRate.date || ei.incurredAt,
+                date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
               } as CurrencyExchangeRateInput)
             : null,
         },
@@ -621,7 +650,13 @@ const EditExpenseType = ({ expense, onSubmit }) => {
       type: values.expenseTypeOption,
       tax:
         values.hasTax && values.tax
-          ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+          ? [
+              {
+                rate: values.tax.rate,
+                type: formOptions.taxType,
+                idNumber: values.tax.idNumber,
+              },
+            ]
           : [],
     };
     return onSubmit(editValues);
@@ -939,6 +974,7 @@ export default function EditExpenseDialog({
   dialogContentClassName,
   triggerClassName,
   trigger,
+  showTriggerTooltip = true,
 }: {
   expense: Expense;
   field:
@@ -951,12 +987,15 @@ export default function EditExpenseDialog({
     | 'type'
     | 'attachments'
     | 'invoiceFile'
+    | 'attachReceipts'
     | 'privateMessage';
   title: string;
   description?: string;
   dialogContentClassName?: string;
   triggerClassName?: string;
   trigger?: React.ReactNode;
+  /** Set to true by default because most triggers are icons. Set this to false when using a button with explicit text. */
+  showTriggerTooltip?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
   const intl = useIntl();
@@ -989,20 +1028,27 @@ export default function EditExpenseDialog({
     },
     [editExpense, intl, expense.id],
   );
+
+  const dialogTrigger = (
+    <DialogTrigger asChild data-cy={`edit-expense-${field}-btn`}>
+      {trigger || (
+        <Button size="icon-xs" variant="outline" className={cn('h-7 w-7', triggerClassName)}>
+          <Pen size={15} />
+        </Button>
+      )}
+    </DialogTrigger>
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <DialogTrigger asChild data-cy={`edit-expense-${field}-btn`}>
-            {trigger || (
-              <Button size="icon-xs" variant="outline" className={cn('h-7 w-7', triggerClassName)}>
-                <Pen size={16} />
-              </Button>
-            )}
-          </DialogTrigger>
-        </TooltipTrigger>
-        <TooltipContent>{title}</TooltipContent>
-      </Tooltip>
+      {showTriggerTooltip ? (
+        <Tooltip>
+          <TooltipTrigger asChild>{dialogTrigger}</TooltipTrigger>
+          <TooltipContent>{title}</TooltipContent>
+        </Tooltip>
+      ) : (
+        dialogTrigger
+      )}
 
       <DialogContent className={dialogContentClassName}>
         <DialogHeader>

@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '../../../../lib/filters/schemas';
-import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
+import type { TransactionsImport } from '../../../../lib/graphql/types/v2/graphql';
 import { usePlaidConnectDialog } from '../../../../lib/hooks/usePlaidConnectDialog';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { TransactionImportListFieldsFragment } from './lib/graphql';
@@ -220,7 +220,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link
-                            href={`/dashboard/${accountSlug}/off-platform-transactions?importIds=${row.original.id}`}
+                            href={`/dashboard/${accountSlug}/off-platform-transactions?importIds=${row.original.publicId}`}
                           >
                             <ArrowRightLeftIcon size={16} />
                             <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />

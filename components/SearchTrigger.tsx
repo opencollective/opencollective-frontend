@@ -40,13 +40,25 @@ const SearchTrigger = ({ setShowSearchModal }) => {
           <FormattedMessage
             defaultMessage="Type {slash} to search..."
             id="1LlM9Z"
-            values={{ slash: <span className="rounded-sm border bg-slate-100 px-1">/</span> }}
+            values={{
+              slash: (
+                <span className="rounded-sm border bg-slate-100 px-1" key="slash">
+                  /
+                </span>
+              ),
+            }}
           />
         ) : (
           <FormattedMessage
             defaultMessage="Type {slash} to search for Collectives..."
             id="/Y9m/t"
-            values={{ slash: <span className="rounded-sm border bg-slate-100 px-1">/</span> }}
+            values={{
+              slash: (
+                <span className="rounded-sm border bg-slate-100 px-1" key="slash">
+                  /
+                </span>
+              ),
+            }}
           />
         )}
       </span>

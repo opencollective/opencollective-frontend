@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { TimeUnit } from '../../../lib/graphql/types/v2/schema';
+import { TimeUnit } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
 import { childAccountFilter } from '../../dashboard/filters/ChildAccountFilter';

@@ -6,8 +6,7 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import type { UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
@@ -47,7 +46,7 @@ const UpdatePost = ({ update, account }) => {
     <div className="flex flex-col gap-4 rounded-2xl border p-4">
       <div>
         <div className="flex justify-between">
-          <Link href={getDashboardRoute(account, `updates/${update.id}`)} className="text-xl font-medium">
+          <Link href={getDashboardRoute(account, `updates/${update.publicId}`)} className="text-xl font-medium">
             {update.title}
           </Link>
           <UpdateStatus update={update} />
@@ -184,7 +183,7 @@ const UpdatesList = () => {
           ) : (
             <React.Fragment>
               {updates?.nodes?.map(update => (
-                <UpdatePost key={update.id} update={update} account={account} />
+                <UpdatePost key={update.publicId} update={update} account={account} />
               ))}
               <Pagination total={(data || previousData)?.account?.updates?.totalCount} queryFilter={queryFilter} />
             </React.Fragment>

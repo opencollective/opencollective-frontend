@@ -18,6 +18,8 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ## Development
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=76222279)
+
 ### Prerequisite
 
 1. Make sure you have Node.js version 20.x and NPM version >=9.0.0.
@@ -39,6 +41,8 @@ npm install
 This project requires an access to the Open Collective API.
 
 By default, it will try to connect to the Open Collective staging API, **you don't have to change anything**.
+
+**Logging in with staging:** Because captcha is not configured by default in local development, you need to create an account on [staging.opencollective.com](https://staging.opencollective.com/) first. You can then use this account to log in on your local frontend.
 
 In case you want to connect to the Open Collective API running locally:
 

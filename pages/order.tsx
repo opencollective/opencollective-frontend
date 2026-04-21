@@ -7,7 +7,7 @@ import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
 import dayjs from '../lib/dayjs';
 import { gql } from '../lib/graphql/helpers';
-import type { Account, AccountWithHost } from '../lib/graphql/types/v2/schema';
+import type { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../lib/hooks/usePrevious';
 import { i18nPaymentMethodProviderType } from '../lib/i18n/payment-method-provider-type';

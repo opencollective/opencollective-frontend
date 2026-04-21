@@ -4,11 +4,11 @@ import { Edit, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type {
+  AccountingCategory,
   AccountingCategoryTableQuery,
   AccountingCategoryTableQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema';
-import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { I18nItalic } from '../../../I18nFormatters';

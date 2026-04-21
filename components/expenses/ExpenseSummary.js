@@ -1,24 +1,19 @@
 import React, { Fragment } from 'react';
-import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
 import { Download, MessageSquare } from 'lucide-react';
-import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import { styled } from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { i18nGraphqlException } from '../../lib/errors';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { cn, parseToBoolean } from '../../lib/utils';
+import { cn } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
 import { isFeatureEnabled } from '@/lib/allowed-features';
-import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -33,7 +28,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import Tags from '../Tags';
-import { H1, P, Span } from '../Text';
+import { P, Span } from '../Text';
 import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
@@ -49,17 +44,6 @@ import ExpenseStatusTag from './ExpenseStatusTag';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
 import ExpenseTypeTag from './ExpenseTypeTag';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
-
-export const SummaryHeader = styled(H1)`
-  > a {
-    color: inherit;
-    text-decoration: underline;
-
-    &:hover {
-      color: ${themeGet('colors.black.600')};
-    }
-  }
-`;
 
 const CreatedByUserLink = ({ account }) => {
   return (
@@ -94,13 +78,11 @@ const ExpenseSummary = ({
   host,
   isLoading,
   isLoadingLoggedInUser,
-  isEditing,
   borderless = undefined,
   canEditTags,
   showProcessButtons,
   onClose = undefined,
   onDelete,
-  onEdit,
   drawerActionsContainer,
   openFileViewer,
   enableKeyboardShortcuts,
@@ -110,7 +92,6 @@ const ExpenseSummary = ({
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const router = useRouter();
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
@@ -124,15 +105,11 @@ const ExpenseSummary = ({
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
-  const { LoggedInUser } = useLoggedInUser();
+  const LoggedInUser = useLoggedInUser().LoggedInUser;
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
-  const { canEditTitle, canEditType, canEditItems, canUsePrivateNote } = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
-  )
-    ? expense?.permissions || {}
-    : {};
+  const { canEditTitle, canEditType, canEditItems, canUsePrivateNote, canAttachReceipts } = expense?.permissions || {};
   const invoiceFile = React.useMemo(
     () => expense?.invoiceFile || expense?.draft?.invoiceFile,
     [expense?.invoiceFile, expense?.draft?.invoiceFile],
@@ -141,10 +118,6 @@ const ExpenseSummary = ({
     () => (expense?.attachedFiles?.length ? expense.attachedFiles : (expense?.draft?.attachedFiles ?? [])),
     [expense?.attachedFiles, expense?.draft?.attachedFiles],
   );
-  const hasNewEditFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
-    !parseToBoolean(router.query.forceLegacyFlow);
-
   const processButtons = (
     <Flex
       display="flex"
@@ -155,7 +128,6 @@ const ExpenseSummary = ({
       gridGap={[2, 3]}
     >
       <ExpenseMoreActionsButton
-        onEdit={hasNewEditFlow ? undefined : onEdit}
         onCloneModalOpenChange={onCloneModalOpenChange}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
@@ -257,7 +229,7 @@ const ExpenseSummary = ({
       )}
 
       <div className="flex items-baseline gap-2">
-        {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, host) && (
+        {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, collective?.host || host) && (
           <React.Fragment>
             <ExpenseAccountingCategoryPill
               host={host}
@@ -266,6 +238,7 @@ const ExpenseSummary = ({
               canEdit={
                 isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') && Boolean(expense.permissions?.canEditAccountingCategory)
               }
+              editPermission={expense.permissions?.editAccountingCategory}
               allowNone={!isLoggedInUserExpenseHostAdmin}
               showCodeInSelect={isLoggedInUserExpenseHostAdmin}
             />
@@ -289,6 +262,7 @@ const ExpenseSummary = ({
                   values={{
                     name: (
                       <AccountHoverCard
+                        key="name"
                         account={createdByAccount}
                         includeAdminMembership={{
                           accountSlug: expense.account?.slug,
@@ -310,6 +284,7 @@ const ExpenseSummary = ({
                   values={{
                     name: (
                       <AccountHoverCard
+                        key="name"
                         account={createdByAccount}
                         includeAdminMembership={{
                           accountSlug: expense.account?.slug,
@@ -334,6 +309,7 @@ const ExpenseSummary = ({
                     values={{
                       name: (
                         <AccountHoverCard
+                          key="name"
                           account={expense.approvedBy.find(Boolean)}
                           includeAdminMembership={{
                             accountSlug: expense.account.slug,
@@ -378,7 +354,12 @@ const ExpenseSummary = ({
                   defaultMessage="Ref: {reference}"
                   values={{
                     reference: (
-                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                      <TruncatedTextWithTooltip
+                        key="reference"
+                        value={expense.reference}
+                        length={10}
+                        truncatePosition="middle"
+                      />
                     ),
                   }}
                 />
@@ -412,14 +393,21 @@ const ExpenseSummary = ({
           <h3 className="text-lg font-semibold">
             <FormattedMessage defaultMessage="Expense Details" id="+5Kafe" />
           </h3>
-          {canEditItems && (
+          {canEditItems ? (
             <EditExpenseDialog
               expense={expense}
               dialogContentClassName="sm:max-w-2xl"
               field="expenseDetails"
               title={intl.formatMessage({ defaultMessage: 'Edit expense details', id: 'expense.editDetails' })}
             />
-          )}
+          ) : canAttachReceipts ? (
+            <EditExpenseDialog
+              expense={expense}
+              dialogContentClassName="sm:max-w-2xl"
+              field="attachReceipts"
+              title={intl.formatMessage({ defaultMessage: 'Edit expense details', id: 'expense.editDetails' })}
+            />
+          ) : null}
         </div>
         <Flex mt={4} mb={2} alignItems="center" gridGap={2}>
           {!expense && isLoading ? (
@@ -487,7 +475,7 @@ const ExpenseSummary = ({
                             id="withColon"
                             defaultMessage="{item}:"
                             values={{
-                              item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+                              item: <FormattedMessage key="item" id="expense.incurredAt" defaultMessage="Date" />,
                             }}
                           />{' '}
                           {/* Using timeZone=UTC as we only store the date as a UTC string, without time */}
@@ -550,7 +538,7 @@ const ExpenseSummary = ({
                 currency={expense.currency}
                 items={expenseItems}
                 taxes={expenseTaxes}
-                expenseTotalAmount={isEditing ? null : expense.amount}
+                expenseTotalAmount={expense.amount}
               />
             )}
           </Flex>
@@ -675,17 +663,16 @@ const ExpenseSummary = ({
         host={host}
         expense={expense}
         collective={collective}
-        isDraft={!isEditing && expense?.status === ExpenseStatus.DRAFT}
+        isDraft={expense?.status === ExpenseStatus.DRAFT}
       />
-      {!isEditing &&
-        (drawerActionsContainer ? (
-          createPortal(processButtons, drawerActionsContainer)
-        ) : showProcessButtons ? (
-          <Fragment>
-            <StyledHr flex="1" mt={4} mb={3} borderColor="black.300" />
-            {processButtons}
-          </Fragment>
-        ) : null)}
+      {drawerActionsContainer ? (
+        createPortal(processButtons, drawerActionsContainer)
+      ) : showProcessButtons ? (
+        <Fragment>
+          <StyledHr flex="1" mt={4} mb={3} borderColor="black.300" />
+          {processButtons}
+        </Fragment>
+      ) : null}
     </StyledCard>
   );
 };

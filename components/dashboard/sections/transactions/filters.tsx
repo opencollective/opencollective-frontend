@@ -5,9 +5,12 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { boolean, integer, isMulti, limit, offset } from '../../../../lib/filters/schemas';
-import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Currency, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
-import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/schema';
+import type {
+  Currency,
+  PaymentMethodType,
+  TransactionsTableQueryVariables,
+} from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nHasDebt } from '../../../../lib/i18n/has-debt';
 import { i18nIsRefund } from '../../../../lib/i18n/is-refund';
@@ -62,6 +65,7 @@ export const schema = z.object({
   group: isMulti(z.string().uuid()).optional(),
   isRefund: boolean.optional(),
   hasDebt: boolean.optional(),
+  includeEditedReversedTransactions: boolean.optional(),
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -70,6 +74,7 @@ export type FilterMeta = {
   currency?: Currency;
   paymentMethodTypes?: PaymentMethodType[];
   kinds?: TransactionKind[];
+  manualPaymentProviders?: Array<{ id: string; name: string }>;
 };
 
 // Only needed when values and key of filters are different
@@ -152,6 +157,19 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
           value,
         }));
       }, [intl]);
+      return <ComboSelectFilter options={options} {...props} />;
+    },
+  },
+  includeEditedReversedTransactions: {
+    labelMsg: defineMessage({ defaultMessage: 'Edited Reversals', id: 'transactions.editedReversals' }),
+    Component: ({ intl, ...props }) => {
+      const options = React.useMemo(
+        () => [
+          { value: true, label: intl.formatMessage({ defaultMessage: 'Include', id: 'include' }) },
+          { value: false, label: intl.formatMessage({ defaultMessage: 'Exclude', id: 'exclude' }) },
+        ],
+        [intl],
+      );
       return <ComboSelectFilter options={options} {...props} />;
     },
   },

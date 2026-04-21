@@ -24,12 +24,13 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import {
-  type TransactionsImportQuery,
-  type TransactionsImportQueryVariables,
+import type {
+  Account,
+  Amount,
+  TransactionsImportQuery,
+  TransactionsImportQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Amount } from '../../../../lib/graphql/types/v2/schema';
-import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
+import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';
@@ -52,7 +53,7 @@ import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledLink from '../../../StyledLink';
-import { actionsColumn, DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable, stickyColumnVariants } from '../../../table/DataTable';
 import {
   MultiPagesRowSelectionInitialState,
   multiPagesRowSelectionReducer,
@@ -142,6 +143,7 @@ const transactionsImportQuery = gql`
   ) {
     transactionsImport(id: $importId) {
       id
+      publicId
       source
       name
       lastSyncAt
@@ -180,6 +182,7 @@ const transactionsImportQuery = gql`
         slug
         currency
         policies {
+          id
           REQUIRE_2FA_FOR_ADMINS
         }
         ... on AccountWithHost {
@@ -199,9 +202,11 @@ const transactionsImportQuery = gql`
         limit
         nodes {
           id
+          publicId
           ...TransactionsImportRowFields @skip(if: $fetchOnlyRowIds)
           transactionsImport @skip(if: $fetchOnlyRowIds) {
             id
+            publicId
             source
             name
           }
@@ -329,7 +334,9 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
   const importType = importData?.type;
   const hasStepper = !importData?.file;
   const importRows = importData?.rows?.nodes ?? [];
-  const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
+  const selectedRowIdx = !focus
+    ? -1
+    : importRows.findIndex(row => row.id === focus.rowId || row.publicId === focus.rowId);
 
   const { getActions, setRowsStatus } = useTransactionsImportActions({
     host: importData?.account?.['host'],
@@ -544,11 +551,11 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                     }
                     data={importRows}
                     getActions={getActions}
-                    openDrawer={row => setFocus({ rowId: row.original.id })}
+                    openDrawer={row => setFocus({ rowId: row.original.publicId })}
                     onClickRow={(row, _, e) => {
                       // Ignore click when on checkbox or "Note" icon
                       if (!(e.target as Element).closest('button')) {
-                        setFocus({ rowId: row.original.id });
+                        setFocus({ rowId: row.original.publicId });
                       }
                     }}
                     emptyMessage={() => (
@@ -557,6 +564,9 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                     columns={[
                       {
                         id: 'select',
+                        meta: {
+                          className: stickyColumnVariants({ variant: 'select' }),
+                        },
                         header: ({ table }) =>
                           importRows.some(row => !row.expense && !row.order) ? (
                             <Checkbox
@@ -667,20 +677,14 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                               className="relative"
                               variant="ghost"
                               size="icon-xs"
-                              onClick={() => setFocus({ rowId: row.original.id, noteForm: true })}
+                              onClick={() => setFocus({ rowId: row.original.publicId, noteForm: true })}
                             >
                               <MessageSquare size={16} className={hasNote ? 'text-neutral-700' : 'text-neutral-300'} />
                             </Button>
                           );
                         },
                       },
-                      {
-                        id: 'actions',
-                        ...actionsColumn,
-                        header: () => (
-                          <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
-                        ),
-                      },
+                      actionsColumn,
                     ]}
                   />
                   <div className="mt-8">

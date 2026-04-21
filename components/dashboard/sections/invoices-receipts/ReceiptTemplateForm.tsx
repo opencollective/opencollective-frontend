@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { UploadFileResult } from '@/lib/graphql/types/v2/schema';
+import type { UploadFileResult } from '@/lib/graphql/types/v2/graphql';
 
 import Dropzone, { DROPZONE_ACCEPT_IMAGES } from '../../../Dropzone';
 import { Input } from '../../../ui/Input';

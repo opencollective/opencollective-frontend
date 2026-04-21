@@ -32,13 +32,13 @@ import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../.
 import { hasAccountMoneyManagement, isIndividualAccount, isOrganizationAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { ExpenseType } from '../../lib/graphql/types/v2/schema';
+import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 
-const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
+const { ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
 export type PageMenuItem = {
   type?: 'page';
@@ -127,6 +127,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
 
   const isIndividual = isIndividualAccount(account);
   const isOrganization = isOrganizationAccount(account);
+  const isEvent = account.type === EVENT;
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
   const hasMoneyManagement = hasAccountMoneyManagement(account);
@@ -134,9 +135,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isSimpleIndividual = isIndividual && !hasHosting;
   const isSimpleOrganization = isOrganization && !hasMoneyManagement;
   const isHostedType = isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]);
-
-  const hasPlatformBillingEnabled = Boolean(
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) || account.platformSubscription,
+  const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
   );
 
   const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
@@ -167,33 +167,50 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if: (isSimpleIndividual || isSimpleOrganization) && !isCommunityManagerOnly,
-      section: ALL_SECTIONS.SUBMITTED_EXPENSES,
+      section: hasIncomingOutgoingReorg ? ALL_SECTIONS.ISSUED_PAYMENT_REQUESTS : ALL_SECTIONS.SUBMITTED_EXPENSES,
       Icon: Receipt,
-      label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+      label: hasIncomingOutgoingReorg
+        ? intl.formatMessage({ defaultMessage: 'Payment Requests', id: 'PaymentRequests' })
+        : intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
     },
     {
       if: !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
       type: 'group',
-      label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+      label: hasIncomingOutgoingReorg
+        ? intl.formatMessage({ defaultMessage: 'Outgoing Money', id: 'OutgoingMoney' })
+        : intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
       Icon: Receipt,
       subMenu: [
         {
           if: hasHosting,
-          section: ALL_SECTIONS.HOST_EXPENSES,
-          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+          section: ALL_SECTIONS.PAY_DISBURSEMENTS,
+          label: intl.formatMessage({ defaultMessage: 'Pay Disbursements', id: 'El6h63' }),
         },
         {
-          if: !isIndividual,
-          section: ALL_SECTIONS.EXPENSES,
-          label: intl.formatMessage(
-            {
-              id: 'hZhgoW',
-              defaultMessage: 'To {accountName}',
-            },
-            { accountName: account.name },
-          ),
+          section: ALL_SECTIONS.PAID_DISBURSEMENTS,
+          if: hasHosting,
+          label: intl.formatMessage({
+            defaultMessage: 'Paid Disbursements',
+            id: 'rwMrEx',
+          }),
         },
         {
+          if: hasHosting,
+          section: ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS,
+          label: intl.formatMessage({ defaultMessage: 'Approve Payment Requests', id: 'ApprovePaymentRequests' }),
+        },
+        {
+          if: hasHosting,
+          section: ALL_SECTIONS.HOST_PAYMENT_REQUESTS,
+          label: intl.formatMessage({ defaultMessage: 'All Payment Requests', id: 'HostPaymentRequests' }),
+        },
+        {
+          if: !isIndividual && !hasHosting,
+          section: ALL_SECTIONS.PAYMENT_REQUESTS,
+          label: intl.formatMessage({ defaultMessage: 'Payment Requests', id: 'PaymentRequests' }),
+        },
+        {
+          if: !hasIncomingOutgoingReorg,
           section: ALL_SECTIONS.SUBMITTED_EXPENSES,
           label: intl.formatMessage(
             {
@@ -202,6 +219,59 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
             },
             { accountName: account.name },
           ),
+        },
+        {
+          if: hasIncomingOutgoingReorg,
+          section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+          label: intl.formatMessage({ defaultMessage: 'Outgoing Contributions', id: 'OutgoingContributions' }),
+        },
+      ],
+    },
+
+    {
+      if: (isSimpleIndividual || isSimpleOrganization) && !isCommunityManagerOnly,
+      section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+      label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
+      Icon: HandCoins,
+    },
+    {
+      if: !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
+      type: 'group',
+      label: hasIncomingOutgoingReorg
+        ? intl.formatMessage({ defaultMessage: 'Incoming Money', id: 'IncomingMoney' })
+        : intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
+      Icon: Coins,
+      subMenu: [
+        {
+          if: !isIndividual,
+          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'IncomingContributions' }),
+          section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
+        },
+        {
+          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
+          label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
+          section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
+        },
+        {
+          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
+          label: intl.formatMessage({ defaultMessage: 'Incomplete Contributions', id: 'IncompleteContributions' }),
+          section: ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
+        },
+        {
+          if: !hasIncomingOutgoingReorg,
+          label: intl.formatMessage(
+            {
+              id: 'PVqJoO',
+              defaultMessage: 'From {accountName}',
+            },
+            { accountName: account.name },
+          ),
+          section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+        },
+        {
+          if: hasIncomingOutgoingReorg,
+          section: ALL_SECTIONS.ISSUED_PAYMENT_REQUESTS,
+          label: intl.formatMessage({ defaultMessage: 'Issued Payment Requests', id: 'IssuedPaymentRequests' }),
         },
       ],
     },
@@ -244,50 +314,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isIndividual && (isHostedType || hasMoneyManagement) && !isCommunityManagerOnly,
+      if: !isIndividual && isHostedType && !isCommunityManagerOnly,
       section: ALL_SECTIONS.CONTRIBUTORS,
       label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
       Icon: BookUserIcon,
-    },
-    {
-      if: (isSimpleIndividual || isSimpleOrganization) && !isCommunityManagerOnly,
-      section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
-      label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: HandCoins,
-    },
-    {
-      if: !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
-      type: 'group',
-      label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: HandCoins,
-      subMenu: [
-        {
-          if: !isIndividual,
-          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'IncomingContributions' }),
-          section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
-        },
-        {
-          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
-          label: intl.formatMessage({ defaultMessage: 'Incomplete Contributions', id: 'IncompleteContributions' }),
-          section: ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
-        },
-        {
-          label: intl.formatMessage(
-            {
-              id: 'PVqJoO',
-              defaultMessage: 'From {accountName}',
-            },
-            { accountName: account.name },
-          ),
-          section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
-        },
-      ],
-    },
-    {
-      if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
-      label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
-      Icon: Coins,
-      section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
     },
     {
       if: hasHosting && !isAccountantOnly && !isCommunityManagerOnly,
@@ -311,10 +341,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
     {
-      if:
-        !isIndividual &&
-        hasMoneyManagement &&
-        LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD),
+      if: hasMoneyManagement && !isAccountantOnly && !isCommunityManagerOnly,
+      section: ALL_SECTIONS.VENDORS,
+      Icon: Store,
+    },
+    {
+      if: !isIndividual && !isAccountantOnly && hasMoneyManagement,
       label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
       section: ALL_SECTIONS.PEOPLE,
       Icon: Users2,
@@ -376,6 +408,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.EXPENSE_REPORTS,
           label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
         },
+        {
+          section: ALL_SECTIONS.CONTRIBUTIONS_REPORTS,
+          label: intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' }),
+        },
       ],
     },
     {
@@ -384,11 +420,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: BarChart2,
       section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
-    {
-      if: hasMoneyManagement && !isAccountantOnly && !isCommunityManagerOnly,
-      section: ALL_SECTIONS.VENDORS,
-      Icon: Store,
-    },
+
     {
       if: isType(account, EVENT) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TICKETS,
@@ -437,13 +469,14 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isAccountantOnly,
       section: ALL_SECTIONS.UPDATES,
       Icon: Megaphone,
     },
     {
       if:
-        !isOneOfTypes(account, [EVENT, USER]) &&
+        !isIndividual &&
+        !isEvent &&
         (!isOrganization || hasMoneyManagement) &&
         !isAccountantOnly &&
         !isCommunityManagerOnly,
@@ -489,7 +522,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               {
                 section: ALL_SECTIONS.PLATFORM_SUBSCRIPTION,
                 label: intl.formatMessage({ defaultMessage: 'Platform Billing', id: 'beRXFK' }),
-                if: !isIndividual && hasPlatformBillingEnabled,
+                if: hasMoneyManagement || account.platformSubscription,
               },
               {
                 section: ALL_SECTIONS.FISCAL_HOSTING,
@@ -497,7 +530,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.POLICIES,
-                if: isOneOfTypes(account, [USER, ORGANIZATION, COLLECTIVE]) && !isAccountantOnly,
+                if: (isIndividual || isOneOfTypes(account, [ORGANIZATION, COLLECTIVE])) && !isAccountantOnly,
               },
               {
                 section: ALL_SECTIONS.RECEIVING_MONEY,
@@ -550,7 +583,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.PAYMENT_RECEIPTS,
-          if: isOneOfTypes(account, [INDIVIDUAL, USER, ORGANIZATION]),
+          if: isIndividual || isOrganization,
         },
         {
           section: ALL_SECTIONS.GIFT_CARDS,
@@ -588,12 +621,19 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) && !isAccountantOnly,
         },
         {
-          section: ALL_SECTIONS.EXPORT,
-          if: isOneOfTypes(account, [COLLECTIVE, PROJECT, FUND]),
+          section: ALL_SECTIONS.WIDGETS,
+          if: isOneOfTypes(account, [COLLECTIVE, PROJECT, FUND]) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.EXPORTS,
+          if:
+            isOneOfTypes(account, [ORGANIZATION]) &&
+            hasMoneyManagement &&
+            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS),
         },
         {
           section: ALL_SECTIONS.FOR_DEVELOPERS,
-          if: isOneOfTypes(account, [COLLECTIVE, USER, INDIVIDUAL, ORGANIZATION]) && !isAccountantOnly,
+          if: (isIndividual || isOneOfTypes(account, [COLLECTIVE, ORGANIZATION])) && !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.WEBHOOKS,

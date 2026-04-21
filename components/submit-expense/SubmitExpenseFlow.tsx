@@ -3,14 +3,14 @@ import { FormikProvider } from 'formik';
 import { X } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseType } from '../../lib/graphql/types/v2/schema';
+import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nGraphqlException } from '@/lib/errors';
 import { useNavigationWarning } from '@/lib/hooks/useNavigationWarning';
 
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
-import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from '../ui/Dialog';
 import { useToast } from '../ui/useToast';
 
 import { SubmitExpenseFlowForm } from './form/SubmitExpenseFlowForm';
@@ -26,6 +26,7 @@ type SubmitExpenseFlowProps = {
   submitExpenseTo?: string;
   payeeSlug?: string;
   endFlowButtonLabel?: React.ReactNode;
+  customData?: Record<string, unknown>;
 };
 
 const I18nMessages = defineMessages({
@@ -143,13 +144,13 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
         >
           <div className="relative flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden before:absolute before:top-0 before:right-0 before:left-0 before:-z-1 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')] sm:bg-[#F8FAFC]">
             <header className="z-30 flex min-w-screen items-center justify-between border-b border-slate-100 bg-background px-4 py-3 sm:px-10">
-              <span className="text-xl leading-7 font-bold text-slate-800">
+              <DialogTitle className="text-xl leading-7 font-bold text-slate-800">
                 <FormattedMessage
                   defaultMessage="Expense #{submittedExpenseId} has been submitted successfully!"
                   id="e1biOC"
                   values={{ submittedExpenseId }}
                 />
-              </span>
+              </DialogTitle>
               <Button
                 onClick={() => handleOnClose()}
                 variant="ghost"
@@ -162,7 +163,12 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 </span>
               </Button>
 
-              <Button onClick={() => handleOnClose()} variant="ghost" className="cursor-pointer sm:hidden">
+              <Button
+                onClick={() => handleOnClose()}
+                variant="ghost"
+                className="cursor-pointer sm:hidden"
+                aria-label={intl.formatMessage({ id: 'Close', defaultMessage: 'Close' })}
+              >
                 <X />
               </Button>
             </header>
@@ -211,9 +217,9 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
       >
         <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden sm:bg-[#F8FAFC]">
           <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
-            <span className="text-xl leading-7 font-bold text-slate-800">
+            <DialogTitle className="text-xl leading-7 font-bold text-slate-800">
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-            </span>
+            </DialogTitle>
             <Button
               onClick={() => handleOnClose()}
               variant="ghost"
@@ -226,7 +232,12 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               </span>
             </Button>
 
-            <Button onClick={() => handleOnClose()} variant="ghost" className="cursor-pointer sm:hidden">
+            <Button
+              onClick={() => handleOnClose()}
+              variant="ghost"
+              className="cursor-pointer sm:hidden"
+              aria-label={intl.formatMessage({ id: 'Close', defaultMessage: 'Close' })}
+            >
               <X />
             </Button>
           </header>
@@ -242,6 +253,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                   onSuccess={onSuccess}
                   onError={onError}
                   onExpenseInviteDeclined={onExpenseInviteDeclined}
+                  customData={props.customData}
                 />
               </div>
             </div>
@@ -264,6 +276,7 @@ function ExpenseFormikContainer(props: {
   draftKey?: string;
   duplicateExpense?: boolean;
   expenseId?: number;
+  customData?: Record<string, unknown>;
   onError: (err) => void;
   onSuccess: (result, type: 'edit' | 'new' | 'invite') => void;
   onExpenseInviteDeclined: () => void;
@@ -309,6 +322,7 @@ function ExpenseFormikContainer(props: {
     },
     startOptions: startOptions.current,
     handleOnSubmit: true,
+    customData: props.customData,
     onSuccess: props.onSuccess,
     onError: props.onError,
   });

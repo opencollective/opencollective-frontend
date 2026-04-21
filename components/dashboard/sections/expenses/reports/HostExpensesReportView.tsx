@@ -10,8 +10,10 @@ import {
   type HostExpensesReportQuery,
   type HostExpensesReportQueryVariables,
 } from '../../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatus } from '../../../../../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '../../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
+
+import { ALL_SECTIONS } from '@/components/dashboard/constants';
 
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import Link from '../../../../Link';
@@ -137,11 +139,11 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                   <tbody>
                     {data.map((item, i) => {
                       const url = new URL(
-                        item.isHost
-                          ? `/dashboard/${props.accountSlug}/expenses`
-                          : `/dashboard/${props.accountSlug}/host-expenses`,
+                        `/dashboard/${props.accountSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`,
                         window.location.href,
                       );
+
+                      url.searchParams.set('hostContext', item.isHost ? 'INTERNAL' : 'HOSTED');
 
                       url.searchParams.set('accountingCategory', item.accountingCategory?.code || UNCATEGORIZED_VALUE);
                       url.searchParams.set('status', ExpenseStatus.PAID);

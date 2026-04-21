@@ -14,7 +14,7 @@ import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-pro
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
-import { CopyID } from '../CopyId';
+import { CopyIDDropdown } from '../CopyId';
 import DateTime from '../DateTime';
 import DrawerHeader from '../DrawerHeader';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -25,6 +25,7 @@ import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCateg
 import OrderStatusTag from '../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import Tags from '../Tags';
+import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../ui/DataList';
 import { InfoList, InfoListItem } from '../ui/InfoList';
@@ -38,6 +39,7 @@ const contributionDrawerQuery = gql`
     order(order: { legacyId: $orderId }) {
       id
       legacyId
+      publicId
       nextChargeDate
       lastChargedAt
       amount {
@@ -53,6 +55,11 @@ const contributionDrawerQuery = gql`
       paymentMethod {
         id
         type
+      }
+      manualPaymentProvider {
+        id
+        type
+        name
       }
       status
       description
@@ -231,6 +238,11 @@ const contributionDrawerQuery = gql`
     expense {
       id
       type
+      legacyId
+    }
+    order {
+      id
+      legacyId
     }
     permissions {
       id
@@ -291,12 +303,29 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           }
           forceMoreActions
           entityIdentifier={
-            <CopyID
-              value={props.orderId}
-              tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
-            >
-              #{props.orderId}
-            </CopyID>
+            <div className="flex items-center gap-1">
+              <CopyIDDropdown
+                tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
+                ids={[
+                  {
+                    name: <FormattedMessage defaultMessage="Order ID" id="GfBSPQ" />,
+                    label: `#${props.orderId}`,
+                    value: `${props.orderId}`,
+                    tooltipLabel: <FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />,
+                  },
+                  ...(order?.publicId
+                    ? [
+                        {
+                          name: <FormattedMessage defaultMessage="Order Public ID" id="Y0PZn+" />,
+                          label: order.publicId,
+                          value: order.publicId,
+                          tooltipLabel: <FormattedMessage defaultMessage="Copy contribution public ID" id="G4u5yE" />,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            </div>
           }
           entityLabel={
             isLoading ? (
@@ -496,11 +525,18 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                     <DataListItemValue>
                       {isLoading ? (
                         <Skeleton className="h-5 w-44" />
+                      ) : query.data.order.paymentMethod?.type ? (
+                        <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
+                      ) : query.data.order.manualPaymentProvider ? (
+                        <div className="flex items-center gap-1">
+                          <Badge size="xs" type="neutral">
+                            <FormattedMessage defaultMessage="Manual" id="PaymentMethod.Manual" />
+                          </Badge>
+                          <span>{query.data.order.manualPaymentProvider.name}</span>
+                        </div>
                       ) : query.data.order.status === OrderStatus.PENDING ? (
                         i18nPaymentMethodProviderType(intl, query.data.order.pendingContributionData.paymentMethod)
-                      ) : (
-                        <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
-                      )}
+                      ) : null}
                     </DataListItemValue>
                   </DataListItem>
                   {query.data?.order?.status === OrderStatus.PENDING && (

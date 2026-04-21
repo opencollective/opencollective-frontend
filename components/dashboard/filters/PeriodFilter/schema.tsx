@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { SimpleDateString } from '../../../../lib/filters/schemas';
-import { TimeUnit } from '../../../../lib/graphql/types/v2/schema';
+import { TimeUnit } from '../../../../lib/graphql/types/v2/graphql';
 
 export enum PeriodFilterType {
   TODAY = 'TODAY',

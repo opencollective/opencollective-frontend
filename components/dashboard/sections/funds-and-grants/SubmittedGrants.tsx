@@ -7,8 +7,8 @@ import { FormattedMessage } from 'react-intl';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { isIndividualAccount } from '@/lib/collective';
-import type { Expense } from '@/lib/graphql/types/v2/schema';
-import { ExpenseType } from '@/lib/graphql/types/v2/schema';
+import type { Expense } from '@/lib/graphql/types/v2/graphql';
+import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import { DataTable } from '@/components/table/DataTable';

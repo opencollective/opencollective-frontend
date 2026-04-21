@@ -22,6 +22,7 @@ const schema = baseSchema.extend({
 enum IncompleteContributionsView {
   PENDING = 'PENDING',
   EXPIRED = 'EXPIRED',
+  PAID = 'PAID',
 }
 
 const incompleteContributionsMetadataQuery = gql`
@@ -48,6 +49,15 @@ const incompleteContributionsMetadataQuery = gql`
       ) {
         totalCount
       }
+      PAID: orders(
+        filter: INCOMING
+        status: [PAID]
+        includeIncognito: true
+        hostContext: $hostContext
+        expectedFundsFilter: ONLY_MANUAL
+      ) {
+        totalCount
+      }
     }
   }
 `;
@@ -62,6 +72,7 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
+    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const views = [
@@ -77,6 +88,13 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
       label: intl.formatMessage({ defaultMessage: 'Expired', id: 'RahCRH' }),
       filter: {
         status: [OrderStatus.EXPIRED],
+      },
+    },
+    {
+      id: IncompleteContributionsView.PAID,
+      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+      filter: {
+        status: [OrderStatus.PAID],
       },
     },
   ];

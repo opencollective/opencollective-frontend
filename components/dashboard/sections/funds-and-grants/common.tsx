@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '@/lib/constants/collectives';
 import useProcessExpense from '@/lib/expenses/useProcessExpense';
-import { type Expense, ExpenseStatus } from '@/lib/graphql/types/v2/schema';
+import { type Expense, ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
@@ -138,9 +138,9 @@ type MoreActionsMenuProps = {
 function MoreActionsMenu(props: MoreActionsMenuProps) {
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
+  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType | null>(null);
   const [isGrantFlowOpen, setIsGrantFlowOpen] = React.useState(false);
   const permissions = props.grant?.permissions;
-  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType>(null);
   const processExpense = useProcessExpense({
     expense: props.grant,
   });
@@ -205,7 +205,16 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
         </DropdownMenuContent>
       </DropdownMenu>
       {processModal && (
-        <ConfirmProcessExpenseModal type={processModal} expense={props.grant} onClose={() => setProcessModal(null)} />
+        <ConfirmProcessExpenseModal
+          type={processModal}
+          open={!!processModal}
+          setOpen={open => {
+            if (!open) {
+              setProcessModal(null);
+            }
+          }}
+          expense={props.grant}
+        />
       )}
       {isGrantFlowOpen && (
         <SubmitGrantFlow

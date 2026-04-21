@@ -8,7 +8,7 @@ import type {
   ContributionFrequency,
   ExpenseReferenceInput,
   GuestInfoInput,
-} from '../graphql/types/v2/schema';
+} from '../graphql/types/v2/graphql';
 import { loadScriptAsync } from '../utils';
 
 const createPaymentIntentMutation = gql`

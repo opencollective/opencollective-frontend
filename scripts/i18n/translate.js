@@ -33,6 +33,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
   'created on', // Can have different masculine/feminine for some languages based on the context
   'on hold',
   'discover',
+  'manual',
 ]);
 
 /**

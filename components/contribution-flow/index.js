@@ -19,12 +19,12 @@ import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
 import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
-import { formatCurrency } from '../../lib/currency-utils';
+import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
 import { gql } from '../../lib/graphql/helpers';
-import { AccountType } from '../../lib/graphql/types/v2/schema';
+import { AccountType } from '../../lib/graphql/types/v2/graphql';
 import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -189,7 +189,9 @@ class ContributionFlow extends React.Component {
           ? queryParams.interval
           : getDefaultInterval(props.tier),
         amount,
-        platformTip: this.canHavePlatformTips() ? Math.round(amount * quantity * DEFAULT_PLATFORM_TIP_PERCENTAGE) : 0,
+        platformTip: this.canHavePlatformTips()
+          ? roundCentsAmount(amount * quantity * DEFAULT_PLATFORM_TIP_PERCENTAGE, currency)
+          : 0,
         platformTipOption: PlatformTipOption.FIFTEEN_PERCENT,
         isNewPlatformTip: isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, LoggedInUser),
         currency,
@@ -507,24 +509,7 @@ class ContributionFlow extends React.Component {
       return null;
     }
 
-    const paymentMethod = {
-      // TODO: cleanup after this version is deployed in production
-
-      // Migration Step 1
-      // type: stepPayment.paymentMethod.providerType,
-      // legacyType: stepPayment.paymentMethod.providerType,
-      // service: stepPayment.paymentMethod.service,
-      // newType: stepPayment.paymentMethod.type,
-
-      // Migration Step 2
-      legacyType: stepPayment.paymentMethod.providerType,
-      service: stepPayment.paymentMethod.service,
-      newType: stepPayment.paymentMethod.type,
-
-      // Migration Step 3
-      // service: stepPayment.paymentMethod.service,
-      // type: stepPayment.paymentMethod.type,
-    };
+    const paymentMethod = pick(stepPayment.paymentMethod, ['service', 'type', 'manualPaymentProvider']);
 
     // Payment Method already registered
     if (stepPayment.paymentMethod.id) {

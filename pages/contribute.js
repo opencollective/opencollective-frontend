@@ -379,7 +379,7 @@ const contributePageQuery = gqlV1 /* GraphQL */ `
       }
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
       }
       host {
         id

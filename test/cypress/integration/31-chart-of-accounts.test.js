@@ -39,42 +39,6 @@ describe('Chart of Accounts', () => {
     cy.contains('Workspace Expenses');
     cy.contains('Contractor Expenses');
 
-    // Test filtering by kind
-    cy.get('[data-cy=add-filter]').click();
-    cy.get('[data-value="Kind"]').click();
-    cy.contains('Added Funds').click();
-    cy.get('[data-cy=apply-filter]').click();
-    cy.get('[data-cy=apply-filter]').should('not.exist');
-    cy.contains('No chart of accounts');
-
-    cy.get('[data-cy=filter-kind]').click();
-    cy.get('[data-cy=combo-select-option]').contains('Expenses').click();
-    cy.get('[data-cy=apply-filter]').click();
-    cy.contains('Workspace Expenses');
-
-    // Clear filtering by kind
-    cy.get('[data-cy=remove-filter-kind]').click();
-    cy.contains('Workspace Expenses');
-    cy.contains('Contractor Expenses');
-
-    // Test filtering by visibility
-    cy.get('[data-cy=add-filter]').click();
-    cy.get('[data-value="Visible only to host admins"]').click();
-    cy.get('[data-cy=combo-select-option]').contains('Yes').click();
-    cy.get('[data-cy=apply-filter]').click();
-    cy.get('[data-cy=apply-filter]').should('not.exist');
-    cy.contains('No chart of accounts');
-
-    cy.get('[data-cy=filter-hostOnly]').click();
-    cy.get('[data-cy=combo-select-option]').contains('No').click();
-    cy.get('[data-cy=apply-filter]').click();
-    cy.contains('Workspace Expenses');
-
-    // Clear filtering by visibility
-    cy.get('[data-cy=remove-filter-hostOnly]').click();
-    cy.contains('Workspace Expenses');
-    cy.contains('Contractor Expenses');
-
     // Test search by code
     cy.get('[data-cy=admin-panel-container] input').type('007');
     cy.contains('Workspace Expenses');

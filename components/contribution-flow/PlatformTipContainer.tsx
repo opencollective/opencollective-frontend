@@ -2,8 +2,8 @@ import React from 'react';
 import { clsx } from 'clsx';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { formatCurrency } from '../../lib/currency-utils';
-import type { Currency } from '../../lib/graphql/types/v2/schema';
+import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
+import type { Currency } from '../../lib/graphql/types/v2/graphql';
 import theme from '../../lib/theme';
 
 import { Box, Flex } from '../Grid';
@@ -81,9 +81,9 @@ function PlatformTipInput(props: PlatformTipInputProps) {
         return;
       }
 
-      props.onChange(value, Math.round(options[value].percent * props.amount));
+      props.onChange(value, roundCentsAmount(options[value].percent * props.amount, props.currency));
     },
-    [props.onChange, props.selectedOption, props.amount, options],
+    [props.onChange, props.selectedOption, props.amount, options, props.currency],
   );
 
   const onOtherChange = React.useCallback(
@@ -97,10 +97,10 @@ function PlatformTipInput(props: PlatformTipInputProps) {
     const newTipAmount =
       props.selectedOption === PlatformTipOption.OTHER
         ? props.value
-        : Math.round(options[props.selectedOption].percent * props.amount);
+        : roundCentsAmount(options[props.selectedOption].percent * props.amount, props.currency);
 
     props.onChange(props.selectedOption, newTipAmount);
-  }, [options, props.amount, props.value, props.selectedOption]);
+  }, [options, props.amount, props.value, props.selectedOption, props.currency]);
 
   return (
     <Box data-cy="platform-tip-input">
@@ -250,7 +250,10 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
                 onChange={({ checked }) =>
                   checked
                     ? props.onChange(PlatformTipOption.NONE, 0)
-                    : props.onChange(PlatformTipOption.FIFTEEN_PERCENT, Math.round(0.15 * props.amount))
+                    : props.onChange(
+                        PlatformTipOption.FIFTEEN_PERCENT,
+                        roundCentsAmount(0.15 * props.amount, props.currency),
+                      )
                 }
                 label={
                   <span className="text-sm">

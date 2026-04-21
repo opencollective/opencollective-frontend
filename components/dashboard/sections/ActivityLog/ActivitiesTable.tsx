@@ -2,7 +2,7 @@ import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
-import type { Activity } from '../../../../lib/graphql/types/v2/schema';
+import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
 import { BREAKPOINTS, useWindowResize } from '../../../../lib/hooks/useWindowResize';
 
 import DateTime from '../../../DateTime';
@@ -65,7 +65,7 @@ const tableColumns: ColumnDef<Activity>[] = [
     cell: ({ cell }) => {
       const activity = cell.row.original;
       return (
-        <div className="flex items-center gap-1 truncate">
+        <div className="flex flex-wrap items-center gap-1 break-words">
           <ActivityDescription activity={activity} />
         </div>
       );

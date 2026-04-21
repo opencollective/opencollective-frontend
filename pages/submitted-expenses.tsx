@@ -9,7 +9,7 @@ import { getCollectivePageMetadata, isIndividualAccount } from '../lib/collectiv
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { generateNotFoundError } from '../lib/errors';
-import { ExpenseStatus } from '../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import type { ExpensesPageQuery } from '@/lib/graphql/types/v2/graphql';
 import { getSSRVariablesFromQuery } from '@/lib/hooks/useQueryFilter';

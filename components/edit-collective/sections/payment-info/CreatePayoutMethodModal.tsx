@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import { noop } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { PayoutMethodType } from '@/lib/graphql/types/v2/schema';
+import { PayoutMethodType } from '@/lib/graphql/types/v2/graphql';
 
 import { validatePayoutMethod } from '@/components/expenses/PayoutMethodForm';
 import { NewPayoutMethodOptionWrapper } from '@/components/submit-expense/form/PayoutMethodSection';
@@ -28,7 +28,9 @@ export default function CreatePayoutMethodModal({ account, open, onOpenChange, o
             newPayoutMethodTypes={[PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.PAYPAL, PayoutMethodType.OTHER]}
             loggedInAccount={account}
             payeeSlug={account.slug}
+            payee={account}
             refresh={onUpdate}
+            isPaypalConnectEnabled
           />
         </Formik>
       </DialogContent>

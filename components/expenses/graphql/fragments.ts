@@ -28,6 +28,9 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
       isSaved
       canBeEdited
       canBeDeleted
+      createdAt
+      updatedAt
+      isVerified
     }
     adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, COLLECTIVE, FUND]) {
       nodes {
@@ -129,13 +132,6 @@ export const expenseHostFields = gql`
       PAYPAL_PAYOUTS
       CHART_OF_ACCOUNTS
       TRANSFERWISE
-    }
-    paypalPreApproval {
-      id
-      balance {
-        currency
-        valueInCents
-      }
     }
     location {
       id
@@ -253,6 +249,7 @@ export const expensePageExpenseFieldsFragment = gql`
   fragment ExpensePageExpenseFields on Expense {
     id
     legacyId
+    publicId
     description
     longDescription
     currency
@@ -517,6 +514,7 @@ export const expensePageExpenseFieldsFragment = gql`
       isSaved
       canBeEdited
       canBeDeleted
+      isVerified
     }
     virtualCard {
       id
@@ -528,6 +526,10 @@ export const expensePageExpenseFieldsFragment = gql`
       canEdit
       canEditTags
       canEditAccountingCategory
+      editAccountingCategory {
+        allowed
+        reason
+      }
       canEditType
       canEditTitle
       canEditItems
@@ -607,7 +609,7 @@ export const expensePageExpenseFieldsFragment = gql`
           valueInCents
           currency
         }
-        taxAmount {
+        taxAmount(fetchTax: true) {
           valueInCents
           currency
         }
@@ -639,11 +641,15 @@ export const expensePageExpenseFieldsFragment = gql`
           amount
           feesPayer
         }
-        relatedTransactions(kind: PAYMENT_PROCESSOR_FEE) {
+        relatedTransactions(kind: [PAYMENT_PROCESSOR_FEE, EXPENSE]) {
           id
           type
           kind
           amount {
+            valueInCents
+            currency
+          }
+          netAmountInPayeeCurrency {
             valueInCents
             currency
           }
@@ -665,6 +671,11 @@ export const expensePageExpenseFieldsFragment = gql`
       scope
       details
     }
+    kycStatus {
+      payee {
+        status
+      }
+    }
   }
 
   ${expenseHostFields}
@@ -679,6 +690,7 @@ export const expensesListFieldsFragment = gql`
   fragment ExpensesListFieldsFragment on Expense {
     id
     legacyId
+    publicId
     description
     reference
     status
@@ -767,6 +779,10 @@ export const expensesListFieldsFragment = gql`
       canSeeInvoiceInfo
       canEditTags
       canEditAccountingCategory
+      editAccountingCategory {
+        allowed
+        reason
+      }
       canUnschedulePayment
       canHold
       canRelease
@@ -782,6 +798,7 @@ export const expensesListFieldsFragment = gql`
       name
       data
       isSaved
+      isVerified
     }
     payee {
       id
@@ -852,6 +869,7 @@ export const expensesListAdminFieldsFragment = gql`
       type
       name
       data
+      isVerified
     }
     items {
       id
@@ -912,6 +930,12 @@ export const expensesListAdminFieldsFragment = gql`
           name
           imageUrl
         }
+      }
+    }
+
+    kycStatus {
+      payee {
+        status
       }
     }
   }

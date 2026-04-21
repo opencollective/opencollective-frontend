@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Account } from '../lib/graphql/types/v2/schema';
+import type { Account } from '../lib/graphql/types/v2/graphql';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 import Avatar from './Avatar';

@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 import type { BorderProps, ColorProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { background, border, color, layout, space, system, typography } from 'styled-system';
 
+import { defaultShouldForwardProp } from '../lib/styled_components_utils';
 import { textDecoration, whiteSpace } from '../lib/styled-system-custom-properties';
 import type { ButtonSize, ButtonStyle } from '../lib/theme/variants/button';
 import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
@@ -24,39 +25,52 @@ type StyledLinkProps = BorderProps &
     $hoverColor?: string;
   };
 
+const FILTERED_PROPS = new Set([
+  'buttonStyle',
+  'buttonSize',
+  'openInNewTab',
+  'openInNewTabNoFollow',
+  'openInNewTabNoFollowRelMe',
+  'truncateOverflow',
+]);
+
 /**
  * styled-component anchor tag using styled-system
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
-  const base = {
-    color: props.color ?? 'primary.500',
-    $hoverColor: props.$hoverColor ?? 'primary.400',
-  };
+const StyledLink = styled.a
+  .withConfig({
+    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+  })
+  .attrs<StyledLinkProps>(props => {
+    const base = {
+      color: props.color ?? 'primary.500',
+      $hoverColor: props.$hoverColor ?? 'primary.400',
+    };
 
-  if (props.openInNewTab) {
-    return {
-      ...base,
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    };
-  } else if (props.openInNewTabNoFollow) {
-    return {
-      ...base,
-      target: '_blank',
-      rel: 'noopener noreferrer nofollow',
-    };
-  } else if (props.openInNewTabNoFollowRelMe) {
-    return {
-      ...base,
-      target: '_blank',
-      rel: 'noopener noreferrer nofollow me',
-    };
-  } else {
-    return base;
-  }
-})<StyledLinkProps>`
+    if (props.openInNewTab) {
+      return {
+        ...base,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      };
+    } else if (props.openInNewTabNoFollow) {
+      return {
+        ...base,
+        target: '_blank',
+        rel: 'noopener noreferrer nofollow',
+      };
+    } else if (props.openInNewTabNoFollowRelMe) {
+      return {
+        ...base,
+        target: '_blank',
+        rel: 'noopener noreferrer nofollow me',
+      };
+    } else {
+      return base;
+    }
+  })<StyledLinkProps>`
   cursor: pointer;
   text-decoration: none;
 

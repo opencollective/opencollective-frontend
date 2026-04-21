@@ -11,7 +11,7 @@ import { HostedCollectiveTypes } from '@/lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
 import type { HostedCollectiveFieldsFragment, HostedCollectivesQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import { HostFeeStructure } from '@/lib/graphql/types/v2/schema';
+import { HostFeeStructure } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
 

@@ -93,7 +93,7 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
 
   return (
     <Flex {...props}>
-      <Flex justifyContent="space-between" alignItems="center" flexGrow={1}>
+      <Flex justifyContent="space-between" alignItems="center" flexGrow={1} gap="8px" flexWrap="wrap">
         <P fontSize="20px" lineHeight="20px" fontWeight="500">
           <FormattedMessage id="Contributions" defaultMessage="Contributions" />
         </P>

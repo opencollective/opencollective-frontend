@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash';
 
-import { type TransactionsImportRow, TransactionsImportRowStatus } from '@/lib/graphql/types/v2/schema';
+import { type TransactionsImportRow, TransactionsImportRowStatus } from '@/lib/graphql/types/v2/graphql';
 
 export const getPossibleActionsForSelectedRows = (
   selectedRows: Pick<TransactionsImportRow, 'id' | 'status'>[],

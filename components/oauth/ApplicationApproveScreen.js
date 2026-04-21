@@ -91,6 +91,10 @@ const SCOPES_INFO = {
     label: <FormattedMessage defaultMessage="Administrate fiscal hosts." id="iHkkt+" />,
     icon: <Network size={16} />,
   },
+  exportRequests: {
+    label: <FormattedMessage defaultMessage="Manage export requests." id="exportRequests" />,
+    icon: <Receipt size={16} />,
+  },
   /* We disable those scopes for now */
   /*
   applications: {

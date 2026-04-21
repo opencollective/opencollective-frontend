@@ -2,14 +2,14 @@ import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { PlusIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
-import { ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
+import type { DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
-import type { DashboardOrdersQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
@@ -17,11 +17,13 @@ import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { expectedDateFilter } from '../../filters/DateFilter';
+import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
+import { orderCreatedByFilter, type OrderCreatedByFilterMeta } from '../../filters/OrderCreatedByFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
 import CreatePendingContributionModal from './CreatePendingOrderModal';
-import type { FilterMeta } from './filters';
+import type { FilterMeta as BaseFilterMeta } from './filters';
 import {
   ContributionAccountingCategoryKinds,
   filters as baseFilters,
@@ -39,7 +41,7 @@ enum ContributionsTab {
 }
 
 const hostExpectedFundsMetadataQuery = gql`
-  query HostExpectedFundsMetadata($slug: String!, $expectedFundsFilter: ExpectedFundsFilter) {
+  query HostExpectedFundsMetadata($slug: String!, $hostContext: HostContext) {
     account(slug: $slug) {
       id
       slug
@@ -60,35 +62,35 @@ const hostExpectedFundsMetadataQuery = gql`
       }
       PENDING: orders(
         filter: INCOMING
-        expectedFundsFilter: $expectedFundsFilter
+        expectedFundsFilter: ONLY_PENDING
         status: [PENDING]
-        hostContext: ALL
+        hostContext: $hostContext
       ) {
         totalCount
       }
       EXPIRED: orders(
         filter: INCOMING
-        expectedFundsFilter: $expectedFundsFilter
+        expectedFundsFilter: ONLY_PENDING
         status: [EXPIRED]
-        hostContext: ALL
+        hostContext: $hostContext
       ) {
         totalCount
       }
       PAID: orders(
         filter: INCOMING
-        expectedFundsFilter: $expectedFundsFilter
+        expectedFundsFilter: ONLY_PENDING
         status: [PAID]
         includeIncognito: true
-        hostContext: ALL
+        hostContext: $hostContext
       ) {
         totalCount
       }
       CANCELED: orders(
         filter: INCOMING
-        expectedFundsFilter: $expectedFundsFilter
+        expectedFundsFilter: ONLY_PENDING
         status: [CANCELLED]
         includeIncognito: true
-        hostContext: ALL
+        hostContext: $hostContext
       ) {
         totalCount
       }
@@ -98,15 +100,25 @@ const hostExpectedFundsMetadataQuery = gql`
 
 const schema = baseSchema.extend({
   expectedDate: expectedDateFilter.schema,
+  hostContext: hostContextFilter.schema,
+  createdBy: orderCreatedByFilter.schema,
+  expectedFundsFilter: z.literal(ExpectedFundsFilter.ONLY_PENDING).default(ExpectedFundsFilter.ONLY_PENDING),
 });
+
+type FilterMeta = BaseFilterMeta & OrderCreatedByFilterMeta;
+
 type FilterValues = z.infer<typeof schema>;
+
 const toVariables: FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta> = {
-  ...baseToVariables,
+  ...(baseToVariables as FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta>),
   expectedDate: expectedDateFilter.toVariables,
+  createdBy: orderCreatedByFilter.toVariables,
 };
+
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...baseFilters,
   expectedDate: expectedDateFilter.filter,
+  createdBy: orderCreatedByFilter.filter,
 };
 
 function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
@@ -158,6 +170,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
+    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({
@@ -166,14 +179,14 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     meta: filterMeta,
     views,
     filters,
+    skipFiltersOnReset: ['hostContext'],
   });
 
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostExpectedFundsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      expectedFundsFilter: ExpectedFundsFilter.ONLY_PENDING,
+      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
     },
-
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     skip: isUpgradeRequired,
   });
@@ -183,8 +196,6 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       slug: accountSlug,
       filter: 'INCOMING',
       includeIncognito: true,
-      hostContext: 'ALL',
-      expectedFundsFilter: ExpectedFundsFilter.ONLY_PENDING,
       ...queryFilter.variables,
     },
 
@@ -210,8 +221,24 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />}
-        description={<FormattedMessage defaultMessage="Expected funds for Collectives you host." id="tNEw2N" />}
+        title={
+          <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
+            <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />
+            {account.hasHosting && (
+              <HostContextFilter
+                value={queryFilter.values.hostContext}
+                onChange={val => queryFilter.setFilter('hostContext', val)}
+                intl={intl}
+              />
+            )}
+          </div>
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Expected funds for your Organization and Collectives you host."
+            id="dNG8Qp"
+          />
+        }
         actions={
           <React.Fragment>
             <Button
@@ -252,8 +279,13 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
           hostSlug={accountSlug}
           columnVisibility={{
             legacyId: true,
-            fromAccount: false,
             expectedAt: true,
+            createdByAccount: true,
+            paymentMethod: false,
+            fromAccount: false,
+            createdAt: false,
+            lastChargedAt: false,
+            accountingCategory: true,
           }}
         />
       )}

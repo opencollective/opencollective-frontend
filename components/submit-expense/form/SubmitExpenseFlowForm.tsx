@@ -3,7 +3,7 @@ import { useFormikContext } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../../../lib/utils';
-import { ExpenseStatus } from '@/lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
 import ExpenseInviteWelcome from '@/components/expenses/ExpenseInviteWelcome';
 

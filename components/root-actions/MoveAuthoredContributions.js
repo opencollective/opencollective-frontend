@@ -204,6 +204,7 @@ const MoveAuthoredContributions = () => {
           <CollectivePickerAsync
             skipGuests={false}
             inputId={id}
+            includeAllVendors
             collective={fromAccount}
             isClearable
             onChange={option => {
@@ -250,6 +251,7 @@ const MoveAuthoredContributions = () => {
           <CollectivePickerAsync
             inputId={id}
             collective={newFromAccount}
+            includeAllVendors
             isClearable
             onChange={option => setNewFromAccount(option?.value || null)}
             disabled={!fromAccount}

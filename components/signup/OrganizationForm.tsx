@@ -64,8 +64,8 @@ const createOrganizationSchema = z.object({
     name: z.string().min(5).max(255),
     slug: z.string().min(5).max(255),
     legalName: z.string().min(5).max(255),
-    description: z.string().max(255).optional(),
-    website: z.string().url().optional(),
+    description: z.preprocess(val => (val === '' ? undefined : val), z.string().max(255).optional()),
+    website: z.preprocess(val => (val === '' ? undefined : val), z.string().url().optional()),
     currency: z.string().length(3),
   }),
   individual: z.object({ id: z.number() }),
@@ -86,22 +86,21 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
   const [showCountrySelect, setShowCountrySelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [captchaResult, setCaptchaResult] = useState(null);
-  const getCountryLabel = useCallback(
-    (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`,
-    [intl],
-  );
-  const countryOptions = useMemo(
-    () =>
-      orderBy(
-        Object.keys(CountryIso).map(code => ({
-          value: code,
-          label: getCountryLabel(code),
-        })),
-        ['label'],
-        ['asc'],
-      ),
-    [getCountryLabel],
-  );
+  const getCountryLabel = (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`;
+
+  const countryOptions = useMemo(() => {
+    const entries = Object.keys(CountryIso).map(code => ({
+      code,
+      emoji: getFlagEmoji(code),
+      name: i18nCountryName(intl, code),
+    }));
+
+    return orderBy(entries, ['name'], ['asc']).map(({ code, emoji, name }) => ({
+      value: code,
+      label: `${emoji} ${name}`,
+    }));
+  }, [intl]);
+
   const currencyOptions = useMemo(
     () =>
       Object.keys(Currency).map(code => ({
@@ -156,14 +155,14 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
     }
   }, [formikRef]);
 
-  const onSubmit = async (values: CreateOrganizationValuesSchema) => {
-    const { individual, roleDescription, organization } = values;
+  const onSubmit = async (values: z.input<typeof createOrganizationSchema>) => {
+    const { individual, roleDescription, organization } = createOrganizationSchema.parse(values);
     try {
       setLoading(true);
       const result = await createOrganization({
         variables: {
           individual: 'id' in individual ? null : omit(individual, ['passwordConfirmation']),
-          organization: organization,
+          organization,
           captcha: captchaResult,
           roleDescription,
           hasMoneyManagement: parseToBoolean(router.query?.active) || parseToBoolean(router.query?.hasMoneyManagement),

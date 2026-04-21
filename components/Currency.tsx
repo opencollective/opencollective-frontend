@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 
 import { ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
 import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
-import type { Currency as CurrencyEnum } from '../lib/graphql/types/v2/schema';
+import type { Currency as CurrencyEnum } from '../lib/graphql/types/v2/graphql';
 import { cn } from '../lib/utils';
 
 type CurrencyProps = {
@@ -39,7 +39,7 @@ const Currency = ({
   } else if (precision < 2 && value < 100 && value !== 0) {
     // Force precision if number is < $1 to never display $0 for small amounts (except if value is actually 0)
     precision = 2;
-  } else if (ZERO_DECIMAL_CURRENCIES.includes(currency)) {
+  } else if ((ZERO_DECIMAL_CURRENCIES as readonly string[]).includes(currency)) {
     precision = 0;
   }
 

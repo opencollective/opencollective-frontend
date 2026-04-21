@@ -4,7 +4,7 @@ import { includes } from 'lodash';
 
 import type { ExpensePageQuery, ExpensePageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { isFeatureEnabled } from '@/lib/allowed-features';
-import { ExpenseType } from '@/lib/graphql/types/v2/schema';
+import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
 import ExpenseSummary from '../expenses/ExpenseSummary';
 import { expensePageQuery } from '../expenses/graphql/queries';
@@ -55,7 +55,6 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
             enableKeyboardShortcuts={false}
             drawerActionsContainer={null}
             canEditTags={false}
-            isEditing={false}
             isLoadingLoggedInUser={false}
             showProcessButtons={false}
             expense={expense}

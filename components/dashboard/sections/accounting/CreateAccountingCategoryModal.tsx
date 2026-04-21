@@ -1,8 +1,8 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema';
-import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
+import type { AccountingCategory } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 
 import { Button } from '@/components/ui/Button';
 

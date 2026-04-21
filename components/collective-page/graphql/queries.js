@@ -8,6 +8,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
       id
+      idV2
       slug
       path
       name
@@ -45,6 +46,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       isFirstPartyHost
       hostFeePercent
       platformFeePercent
+      platformContributionAvailable
       image
       imageUrl(height: 256)
       canApply
@@ -52,7 +54,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       supportedExpenseTypes
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
       }
       memberOf(onlyActiveCollectives: true, limit: 1) {
         id
@@ -95,6 +97,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
         name
         slug
         type
+        hasHosting
         location {
           id
           country

@@ -8,9 +8,8 @@ import { z } from 'zod';
 import { CollectiveType, HostedCollectiveTypes } from '../../../../lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import type { HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Collective } from '../../../../lib/graphql/types/v2/schema';
-import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Collective, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
@@ -30,6 +29,8 @@ import {
 } from '../../filters/CollectiveStatusFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { currencyFilter } from '../../filters/CurrencyFilter';
+import { dateFilter } from '../../filters/DateFilter';
+import { dateToVariables } from '../../filters/DateFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
@@ -43,7 +44,7 @@ import { cols } from './common';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME', 'UNHOSTED_AT']),
+  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME', 'UNHOSTED_AT', 'STARTS_AT']),
   defaultValue: {
     field: 'CREATED_AT',
     direction: 'DESC',
@@ -58,6 +59,15 @@ const sortFilter = buildSortFilter({
 
 const COLLECTIVES_PER_PAGE = 20;
 
+const startsAtDateFilter = {
+  ...dateFilter,
+  toVariables: value => dateToVariables(value, 'startsAt'),
+  filter: {
+    ...dateFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Event Starts Date', id: 'EventStartsDate' }),
+  },
+};
+
 const schema = z.object({
   limit: integer.default(COLLECTIVES_PER_PAGE),
   offset: integer.default(0),
@@ -68,11 +78,13 @@ const schema = z.object({
   status: collectiveStatusFilter.schema,
   consolidatedBalance: consolidatedBalanceFilter.schema,
   currencies: currencyFilter.schema,
+  startsAt: startsAtDateFilter.schema,
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
   status: collectiveStatusFilter.toVariables,
   consolidatedBalance: consolidatedBalanceFilter.toVariables,
+  startsAt: startsAtDateFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
@@ -113,6 +125,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   currencies: currencyFilter.filter,
   status: collectiveStatusFilter.filter,
   consolidatedBalance: consolidatedBalanceFilter.filter,
+  startsAt: startsAtDateFilter.filter,
 };
 
 const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
@@ -180,7 +193,6 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
 
   const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
     variables: { hostSlug, ...queryFilter.variables },
-
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 

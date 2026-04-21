@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { updateTransactionsImportRows } from './lib/graphql';
 import { i18nGraphqlException } from '@/lib/errors';
-import type { TransactionsImportRow } from '@/lib/graphql/types/v2/schema';
+import type { TransactionsImportRow } from '@/lib/graphql/types/v2/graphql';
 
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';

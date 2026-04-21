@@ -3,8 +3,8 @@ import { isNil, round } from 'lodash';
 
 import { CurrencyToCountry, ZERO_DECIMAL_CURRENCIES } from './constants/currency';
 import { CurrencyPrecision } from './constants/currency-precision';
-import type { Amount, CurrencyExchangeRate, CurrencyExchangeRateInput } from './graphql/types/v2/schema';
-import { Currency } from './graphql/types/v2/schema';
+import type { Amount, CurrencyExchangeRate, CurrencyExchangeRateInput } from './graphql/types/v2/graphql';
+import { Currency } from './graphql/types/v2/graphql';
 
 export type Options = {
   locale?: string;
@@ -53,7 +53,19 @@ export function graphqlAmountValueInCents(amount: Amount | number | null): numbe
 }
 
 export const getDefaultCurrencyPrecision = (currency: Currency): number => {
-  return ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2;
+  return (ZERO_DECIMAL_CURRENCIES as readonly string[]).includes(currency) ? 0 : 2;
+};
+
+/**
+ * Rounds a cents amount to the nearest unit. Useful when calculating percentage-based amounts,
+ * to make sure that zero-decimal currencies are rounded to the nearest 100.
+ *
+ * @example roundCentsAmount(1234, 'USD') => 1234
+ * @example roundCentsAmount(1234, 'JPY') => 1200
+ */
+export const roundCentsAmount = (amountInCents: number, currency: Currency | string): number => {
+  const roundDigits = (ZERO_DECIMAL_CURRENCIES as readonly string[]).includes(currency) ? -2 : 0;
+  return round(amountInCents, roundDigits);
 };
 
 export function formatCurrency(
@@ -90,7 +102,7 @@ export function formatCurrency(
   } else if (Object.prototype.hasOwnProperty.call(options, 'precision')) {
     minimumFractionDigits = options.precision;
     maximumFractionDigits = options.precision;
-  } else if (ZERO_DECIMAL_CURRENCIES.includes(currency)) {
+  } else if ((ZERO_DECIMAL_CURRENCIES as readonly string[]).includes(currency)) {
     minimumFractionDigits = 0;
     maximumFractionDigits = 0;
   }

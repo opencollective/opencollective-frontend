@@ -2,6 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
+import { Kbd } from '@/components/ui/Kbd';
 
 import type LoggedInUser from './LoggedInUser';
 
@@ -9,16 +10,15 @@ import type LoggedInUser from './LoggedInUser';
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
-  INLINE_EDIT_EXPENSE = 'INLINE_EDIT_EXPENSE',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
   AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
-  PLATFORM_BILLING = 'PLATFORM_BILLING',
-  PEOPLE_DASHBOARD = 'PEOPLE_DASHBOARD',
+  SIDEBAR_REORG_INCOMING_OUTGOING = 'SIDEBAR_REORG_INCOMING_OUTGOING',
+  ASYNC_EXPORTS = 'ASYNC_EXPORTS',
+  TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
 }
 
 enum Categories {
@@ -41,11 +41,12 @@ export type PreviewFeature = {
   setIsEnabled?: (enable: boolean) => void;
   isEnabled?: () => boolean;
   hasAccess?: (loggedInUser: LoggedInUser) => boolean;
+  hide?: (loggedInUser: LoggedInUser) => boolean;
 };
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
 const ENGINEERS = ['znarf', 'betree', 'leokewitz', 'henrique-silva', 'gustavlrsn', 'sudharaka-palamakumbura'];
-export const OFICO_MEMBER_ORGANIZATIONS = [
+const OFICO_MEMBER_ORGANIZATIONS = [
   'europe',
   'giftcollective',
   'oce-foundation-eur',
@@ -81,51 +82,107 @@ export const previewFeatures: PreviewFeature[] = [
     category: Categories.GENERAL,
   },
   {
-    key: PREVIEW_FEATURE_KEYS.PLATFORM_BILLING,
-    title: 'Platform billing',
-    description: 'New platform billing dashboard',
-    alwaysEnableInDev: true,
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
-    category: Categories.GENERAL,
-  },
-  {
     key: PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS,
     title: <FormattedMessage defaultMessage="Keyboard Shortcuts" id="PreviewFeatures.keyboardShortcutsTitle" />,
     description: (
-      <FormattedMessage
-        defaultMessage="Navigate the expense flow more efficiently with keyboard shortcuts. Speed up your workflow and reduce mouse dependency for common actions."
-        id="PreviewFeatures.keyboardShortcutsDescription"
-      />
+      <React.Fragment>
+        <p>
+          <FormattedMessage
+            defaultMessage="Navigate the expense flow more efficiently with keyboard shortcuts. Speed up your workflow and reduce mouse dependency for common actions."
+            id="PreviewFeatures.keyboardShortcutsDescription"
+          />
+        </p>
+        <p className="mt-2">
+          <FormattedMessage defaultMessage="On Expenses dashboard: " id="Bmw33p" />
+          <ul className="mt-2 ml-4">
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to select the next Expense."
+                id="PreviewFeatures.keyboardShortcutsExpenseListNext"
+                values={{ key: <Kbd>J</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to select the previous Expense."
+                id="PreviewFeatures.keyboardShortcutsExpenseListPrev"
+                values={{ key: <Kbd>K</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to Pay selected Expense (if ready to pay)."
+                id="PreviewFeatures.keyboardShortcutsExpenseListPay"
+                values={{ key: <Kbd>P</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to check Security alerts for selected Expense."
+                id="PreviewFeatures.keyboardShortcutsExpenseListSecurity"
+                values={{ key: <Kbd>S</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to open Expense details."
+                id="PreviewFeatures.keyboardShortcutsExpenseListOpen"
+                values={{ key: <Kbd>Enter</Kbd> }}
+              />
+            </li>
+          </ul>
+        </p>
+        <p className="mt-2">
+          <FormattedMessage defaultMessage="On Expenses details: " id="UDjr0F" />
+          <ul className="mt-2 ml-4">
+            <li>
+              <FormattedMessage
+                defaultMessage="{leftKey} and {rightKey} to navigate through attachments."
+                id="PreviewFeatures.keyboardShortcutsExpenseDetailsAttachments"
+                values={{ leftKey: <Kbd>&larr;</Kbd>, rightKey: <Kbd>&rarr;</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to put selected Expense on Hold."
+                id="PreviewFeatures.keyboardShortcutsExpenseListHold"
+                values={{ key: <Kbd>H</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to mark selected Expense as Incomplete."
+                id="PreviewFeatures.keyboardShortcutsExpenseListIncomplete"
+                values={{ key: <Kbd>I</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to Pay selected Expense (if ready to pay)."
+                id="PreviewFeatures.keyboardShortcutsExpenseListPay"
+                values={{ key: <Kbd>P</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to enter Edit mode."
+                id="PreviewFeatures.keyboardShortcutsExpenseDetailsEdit"
+                values={{ key: <Kbd>E</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="{key} to close Expense details."
+                id="PreviewFeatures.keyboardShortcutsExpenseDetailsClose"
+                values={{ key: <Kbd>Esc</Kbd> }}
+              />
+            </li>
+          </ul>
+        </p>
+      </React.Fragment>
     ),
     publicBeta: true,
     category: Categories.GENERAL,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
-    title: <FormattedMessage defaultMessage="New Expense Submission Flow" id="PreviewFeatures.newExpenseFlowTitle" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="Experience an improved expense submission flow in the Dashboard with better user experience, clearer navigation, and enhanced form validation."
-        id="PreviewFeatures.newExpenseFlowDescription"
-      />
-    ),
-    category: Categories.GENERAL,
-    publicBeta: true,
-    enabledByDefaultFor: ['*'],
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
-    title: <FormattedMessage defaultMessage="Inline Expense Editing" id="PreviewFeatures.inlineEditExpenseTitle" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="Edit expense details directly in the Dashboard without navigating to separate pages."
-        id="PreviewFeatures.inlineEditExpenseDescription"
-      />
-    ),
-    category: Categories.GENERAL,
-    publicBeta: true,
-    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
@@ -192,12 +249,39 @@ export const previewFeatures: PreviewFeature[] = [
     category: Categories.FOR_NERDS,
   },
   {
-    key: PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD,
-    title: 'People Dashboard',
-    description: 'Access a new dashboard to manage and engage with your community members.',
+    key: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
+    title: 'Sidebar Reorganization Incoming/Outgoing',
+    description:
+      'Renames "Expenses" to "Outgoing Money" and "Contributions" to "Incoming Money", and moves cross-account items to the appropriate groups.',
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,
     alwaysEnableInDev: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS,
+    title: <FormattedMessage defaultMessage="Async Exports" id="PreviewFeatures.asyncExportsTitle" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Enable background processing for large data exports. Exports will be processed asynchronously and you'll be notified when they're ready to download."
+        id="PreviewFeatures.asyncExportsDescription"
+      />
+    ),
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
+    category: Categories.HOSTING,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.TABLE_QUICK_ACTIONS,
+    title: <FormattedMessage defaultMessage="Table Quick Actions" id="PreviewFeatures.tableQuickActionsTitle" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Enable quick action buttons that appear on table rows when you hover over them. Perform common actions faster without opening the dropdown menu."
+        id="PreviewFeatures.tableQuickActionsDescription"
+      />
+    ),
+    publicBeta: true,
+    alwaysEnableInDev: true,
+    category: Categories.GENERAL,
   },
 ];

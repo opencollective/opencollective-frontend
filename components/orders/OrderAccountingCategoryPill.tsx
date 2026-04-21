@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import type { Account, AccountingCategory, Host, Order } from '../../lib/graphql/types/v2/schema';
+import type { Account, AccountingCategory, Host, Order } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 
 import AccountingCategorySelect from '../AccountingCategorySelect';
@@ -37,6 +37,8 @@ type AccountingCategoryPillProps = {
   allowNone?: boolean;
   /** Whether to show the category code in the select */
   showCodeInSelect?: boolean;
+  labelClassName?: string;
+  buttonClassName?: string;
 };
 
 const BADGE_CLASS = cn('red rounded-lg bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800');
@@ -53,6 +55,8 @@ export const OrderAdminAccountingCategoryPill = ({
   order,
   account,
   host,
+  labelClassName,
+  buttonClassName,
 }: Omit<AccountingCategoryPillProps, 'canEdit'>) => {
   const intl = useIntl();
   const [updateOrder, { loading }] = useMutation(updateOrderAccountingCategoryMutation);
@@ -78,8 +82,8 @@ export const OrderAdminAccountingCategoryPill = ({
         }
       }}
     >
-      <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-neutral-50 hover:opacity-90')}>
-        <span className="mr-1">{getCategoryLabel(order.accountingCategory)}</span>
+      <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-neutral-50 hover:opacity-90', buttonClassName)}>
+        <span className={cn('mr-1', labelClassName)}>{getCategoryLabel(order.accountingCategory)}</span>
         {loading ? <Spinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
     </AccountingCategorySelect>

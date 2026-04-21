@@ -28,7 +28,7 @@ const ImageDimensionsInstructions = ({ imageSize, intl }: ImageDimensionsInstruc
   }
 };
 
-import type { OcrParsingOptionsInput, UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/schema';
+import type { OcrParsingOptionsInput, UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/graphql';
 import { useGraphQLFileUploader } from '../lib/hooks/useGraphQLFileUploader';
 import { useImageUploader } from '../lib/hooks/useImageUploader';
 import { getImageDimensions } from '../lib/image-utils';

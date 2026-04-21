@@ -1,19 +1,22 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import type { Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
-import { OrderStatus } from '../../../../lib/graphql/types/v2/schema';
+import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { isMulti } from '@/lib/filters/schemas';
+import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
+import { hostedAccountsFilter } from '../../filters/HostedAccountFilter';
 import type { DashboardSectionProps } from '../../types';
 
-import ContributionsTable from './ContributionsTable';
+import ContributionsTable, { defaultVisibility } from './ContributionsTable';
 import type { FilterMeta } from './filters';
 import { ContributionAccountingCategoryKinds, filters, schema as baseSchema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
@@ -63,7 +66,10 @@ const hostFinancialContributionsMetadataQuery = gql`
   }
 `;
 
-const schema = baseSchema.extend({ hostContext: hostContextFilter.schema });
+const schema = baseSchema.extend({
+  hostContext: hostContextFilter.schema,
+  hostedAccounts: isMulti(z.string()).optional(),
+});
 
 export default function IncomingContributionsForOrganizations({ accountSlug }: DashboardSectionProps) {
   const intl = useIntl();
@@ -105,20 +111,26 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
     },
   ];
 
-  const filterMeta: FilterMeta = {
+  const filterMeta: FilterMeta & {
+    hostedAccounts?: Array<AccountHoverCardFieldsFragment>;
+  } = {
     currency: account.currency,
     accountSlug: account.slug,
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
+    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({
     schema,
-    toVariables,
+    toVariables: {
+      ...toVariables,
+      hostedAccounts: hostedAccountsFilter.toVariables,
+    },
     meta: filterMeta,
     views,
-    filters,
+    filters: { ...filters, hostedAccounts: hostedAccountsFilter.filter },
     skipFiltersOnReset: ['hostContext'],
   });
 
@@ -194,6 +206,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
         nbPlaceholders={nbPlaceholders}
         error={error}
         refetch={handleRefetch}
+        columnVisibility={{ ...defaultVisibility, accountingCategory: true }}
       />
     </div>
   );

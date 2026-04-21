@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';
-import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/schema';
+import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
   VirtualCardLimitIntervalI18n,

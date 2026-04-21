@@ -32,7 +32,7 @@ export function OrderResult({
               defaultMessage="Contribution from {fromAccount} to {toAccount}"
               id="HV6RkT"
               values={{
-                fromAccount: <span className="text-foreground">{order.fromAccount.name}</span>,
+                fromAccount: <span className="text-foreground">{order.fromAccount?.name || 'Incognito'}</span>,
                 toAccount: <span className="text-foreground">{order.toAccount.name}</span>,
               }}
             />

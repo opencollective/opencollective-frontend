@@ -243,7 +243,10 @@ const FormBody = ({ update, accountSlug }) => {
 
   const handleStatePersistence = React.useMemo(
     () => values => {
-      formPersister.saveValues(values);
+      const hasChanged = Object.keys(values).some(key => values[key] !== initialValues[key]);
+      if (hasChanged) {
+        formPersister.saveValues(values);
+      }
       const errors = requireFields(values, ['title', 'html']);
       return errors;
     },

@@ -6,8 +6,8 @@ import { borderColor, color, typography } from 'styled-system';
 
 import { textTransform } from '../lib/styled-system-custom-properties';
 
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 import Link from './Link';
-import StyledTooltip from './StyledTooltip';
 
 /**
  * All the terms defined here must have a matching translation
@@ -134,22 +134,30 @@ const UnderlinedTerm = styled.span`
  * Underlines the given word and show a tooltip with the definition when focused
  * or hovered. Both the term and the definition are translated.
  */
-const DefinedTerm = ({ intl, term, textTransform, fontSize, children, color = 'black.700', extraTooltipContent }) => {
+const DefinedTerm = ({
+  intl,
+  term,
+  textTransform,
+  fontSize,
+  children,
+  color = 'black.700',
+  borderColor = color,
+  extraTooltipContent,
+}) => {
   return (
-    <StyledTooltip
-      content={() => (
+    <Tooltip delayDuration={100}>
+      <TooltipTrigger asChild>
+        <UnderlinedTerm textTransform={textTransform} color={color} borderColor={borderColor} fontSize={fontSize}>
+          {children || intl.formatMessage(TranslatedTerms[term])}
+        </UnderlinedTerm>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-sm text-left text-xs leading-snug">
         <React.Fragment>
           {intl.formatMessage(TranslatedDefinitions[term], TranslationParams[term])}
           {extraTooltipContent}
         </React.Fragment>
-      )}
-    >
-      {props => (
-        <UnderlinedTerm {...props} textTransform={textTransform} color={color} borderColor={color} fontSize={fontSize}>
-          {children || intl.formatMessage(TranslatedTerms[term])}
-        </UnderlinedTerm>
-      )}
-    </StyledTooltip>
+      </TooltipContent>
+    </Tooltip>
   );
 };
 

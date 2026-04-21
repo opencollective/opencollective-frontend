@@ -6,7 +6,7 @@ import { z } from 'zod';
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { isMulti } from '../../../lib/filters/schemas';
 import { gql } from '../../../lib/graphql/helpers';
-import type { AccountingCategoryKind } from '@/lib/graphql/types/v2/schema';
+import type { AccountingCategoryKind } from '@/lib/graphql/types/v2/graphql';
 
 import { AccountingCategorySelectFieldsFragment, getCategoryLabel } from '../../AccountingCategorySelect';
 

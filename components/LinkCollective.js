@@ -64,7 +64,9 @@ const LinkCollective = ({
   );
 
   if (withHoverCard) {
-    return <AccountHoverCard {...hoverCardProps} account={collective} trigger={<span>{link}</span>} />;
+    return (
+      <AccountHoverCard {...hoverCardProps} account={collective} trigger={<span className="min-w-0">{link}</span>} />
+    );
   }
 
   return link;

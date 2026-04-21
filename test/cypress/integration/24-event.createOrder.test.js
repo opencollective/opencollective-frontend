@@ -45,6 +45,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="contribution-quantity"]').should('exist');
 
     cy.getByDataCy('cf-next-step').click();
+    cy.getByDataCy('input-legalName').type('John Doe');
     cy.getByDataCy('cf-next-step').contains('Get ticket').click();
 
     cy.wait(500);
@@ -70,6 +71,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="contribution-quantity"]').should('exist');
 
     cy.getByDataCy('cf-next-step').click();
+    cy.getByDataCy('input-legalName').type('John Doe');
 
     // Skip the step profile on the new contribution flow
     cy.getByDataCy('cf-next-step').click();
@@ -103,6 +105,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="contribution-quantity"]').should('exist');
 
     cy.getByDataCy('cf-next-step').click();
+    cy.getByDataCy('input-legalName').type('John Doe');
 
     // Skip the step profile on the new contribution flow
     cy.getByDataCy('cf-next-step').click();
@@ -140,6 +143,7 @@ describe('event.createOrder page', () => {
 
     cy.get('input[type=number][name=quantity]').type('{selectall}8');
     cy.getByDataCy('cf-next-step').click();
+    cy.getByDataCy('input-legalName').type('John Doe');
 
     // Skip the step profile on the new contribution flow
     cy.getByDataCy('cf-next-step').click();

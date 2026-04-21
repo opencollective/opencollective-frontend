@@ -3,6 +3,7 @@ import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 
 import Captcha, { isCaptchaEnabled } from '../Captcha';
@@ -56,6 +57,14 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
     () => getRequiredInformation(undefined, stepDetails, collective, undefined, tier),
     [stepDetails, collective, tier],
   );
+  const useGenericLegalNameHint =
+    tier?.type === TierTypes.TICKET ||
+    tier?.requireAddress ||
+    !collective.policies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName;
+  const useGenericAddressHint =
+    tier?.type === TierTypes.TICKET ||
+    tier?.requireAddress ||
+    !collective.policies.CONTRIBUTOR_INFO_THRESHOLDS?.address;
 
   return (
     <div className="flex flex-col gap-4">
@@ -154,9 +163,19 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         labelFontWeight="700"
         isPrivate
         hideOptionalLabel={requiredInformation.legalName}
-        required={requiredInformation.legalName && !data?.name}
+        required={requiredInformation.legalName}
         hint={
-          requiredInformation.legalName ? (
+          requiredInformation.legalName && useGenericLegalNameHint ? (
+            <FormattedMessage
+              defaultMessage="Required by {isSelfHosted, select, true {{collectiveName}} other {{hostName}}} for legal and compliance purposes."
+              id="legalName.hint.noThreshold"
+              values={{
+                hostName: collective.host.name,
+                collectiveName: collective.name,
+                isSelfHosted: collective.id === collective.host.id,
+              }}
+            />
+          ) : requiredInformation.legalName ? (
             <FormattedMessage
               defaultMessage="Required for legal purposes as your total anual contribution is more than {amount}. This information is private but it will be shared with {collectiveName}{isSelfHosted, select, false { and {hostName}} other {}}."
               id="RGpvqu"
@@ -202,17 +221,33 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
               <FormattedMessage defaultMessage="Address Requirement" id="Mc7YHZ" />
             </h1>
             <p>
-              <FormattedMessage
-                defaultMessage="Your total contributions in the current fiscal year to {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} exceeds {amount}. Therefore, {hostName} requires your legal address."
-                id="/Lrubf"
-                values={{
-                  amount: formatCurrency(collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.address, collective.currency),
-                  collectiveName: collective.name,
-                  hostName: collective.host.name,
-                  hostLink: <Link href={`/${collective.host.slug}`}>{collective.host.name}</Link>,
-                  isSelfHosted: collective.id === collective.host.id,
-                }}
-              />
+              {useGenericAddressHint ? (
+                <FormattedMessage
+                  defaultMessage="{isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} requires your legal address for legal and compliance purposes."
+                  id="address.requirement.noThreshold"
+                  values={{
+                    collectiveName: collective.name,
+                    hostName: collective.host.name,
+                    hostLink: <Link href={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                    isSelfHosted: collective.id === collective.host.id,
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Your total contributions in the current fiscal year to {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} exceeds {amount}. Therefore, {hostName} requires your legal address."
+                  id="/Lrubf"
+                  values={{
+                    amount: formatCurrency(
+                      collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.address,
+                      collective.currency,
+                    ),
+                    collectiveName: collective.name,
+                    hostName: collective.host.name,
+                    hostLink: <Link href={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                    isSelfHosted: collective.id === collective.host.id,
+                  }}
+                />
+              )}
             </p>
             <p className="mt-2">
               <FormattedMessage

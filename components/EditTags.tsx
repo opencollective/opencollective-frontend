@@ -5,7 +5,7 @@ import { uniqBy } from 'lodash';
 import { Search, Tags, TagsIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/schema';
+import type { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/graphql';
 import useDebouncedSearch from '../lib/hooks/useDebouncedSearch';
 
 import { Button } from './ui/Button';

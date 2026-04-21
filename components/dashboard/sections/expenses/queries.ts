@@ -11,6 +11,7 @@ export const accountExpensesQuery = gql`
   query AccountExpenses(
     $account: AccountReferenceInput
     $fromAccount: AccountReferenceInput
+    $fromAccounts: [AccountReferenceInput]
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
@@ -36,6 +37,7 @@ export const accountExpensesQuery = gql`
     expenses(
       account: $account
       fromAccount: $fromAccount
+      fromAccounts: $fromAccounts
       limit: $limit
       offset: $offset
       type: $type
@@ -152,9 +154,11 @@ export const accountExpensesMetadataQuery = gql`
 export const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
     $hostSlug: String!
+    $hostContext: HostContext
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
+    $types: [ExpenseType]
     $tags: [String]
     $status: [ExpenseStatusFilter]
     $amount: AmountRangeInput
@@ -167,17 +171,22 @@ export const hostDashboardExpensesQuery = gql`
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
     $fromAccount: AccountReferenceInput
+    $fromAccounts: [AccountReferenceInput]
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
     $fetchGrantHistory: Boolean!
+    $kycStatus: ExpenseKYCStatusFilter
   ) {
     expenses(
       host: { slug: $hostSlug }
+      hostContext: $hostContext
       account: $account
       fromAccount: $fromAccount
+      fromAccounts: $fromAccounts
       limit: $limit
       offset: $offset
       type: $type
+      types: $types
       tag: $tags
       status: $status
       amount: $amount
@@ -190,6 +199,7 @@ export const hostDashboardExpensesQuery = gql`
       virtualCards: $virtualCards
       lastCommentBy: $lastCommentBy
       accountingCategory: $accountingCategory
+      kycStatus: $kycStatus
     ) {
       totalCount
       offset
@@ -234,16 +244,6 @@ export const hostInfoCardFields = gql`
       address
       country
     }
-    paypalPreApproval {
-      id
-      name
-      expiryDate
-      createdAt
-      balance {
-        currency
-        valueInCents
-      }
-    }
     transferwise {
       id
       balances {
@@ -267,7 +267,7 @@ export const hostInfoCardFields = gql`
 `;
 
 export const hostDashboardMetadataQuery = gql`
-  query HostDashboardMetadata($hostSlug: String!) {
+  query HostDashboardMetadata($hostSlug: String!, $hostContext: HostContext) {
     host(slug: $hostSlug) {
       id
       ...HostInfoCardFields
@@ -282,42 +282,348 @@ export const hostDashboardMetadataQuery = gql`
     }
     unreplied: expenses(
       host: { slug: $hostSlug }
+      hostContext: $hostContext
       status: [APPROVED, ERROR, INCOMPLETE, ON_HOLD]
       lastCommentBy: [NON_HOST_ADMIN]
     ) {
       totalCount
     }
-    ready_to_pay: expenses(host: { slug: $hostSlug }, status: [READY_TO_PAY]) {
+    ready_to_pay: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [READY_TO_PAY]) {
       totalCount
     }
-    scheduled_for_payment: expenses(host: { slug: $hostSlug }, status: [SCHEDULED_FOR_PAYMENT]) {
+    scheduled_for_payment: expenses(
+      host: { slug: $hostSlug }
+      hostContext: $hostContext
+      status: [SCHEDULED_FOR_PAYMENT]
+    ) {
       totalCount
     }
-    on_hold: expenses(host: { slug: $hostSlug }, status: [ON_HOLD]) {
+    on_hold: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [ON_HOLD]) {
       totalCount
     }
-    incomplete: expenses(host: { slug: $hostSlug }, status: [INCOMPLETE]) {
+    incomplete: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [INCOMPLETE]) {
       totalCount
     }
-    error: expenses(host: { slug: $hostSlug }, status: [ERROR]) {
+    error: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [ERROR]) {
       totalCount
     }
+  }
+  ${hostInfoCardFields}
+`;
 
-    hostedAccounts: accounts(host: { slug: $hostSlug }, orderBy: { field: ACTIVITY, direction: DESC }) {
-      nodes {
-        id
-        ...AccountHoverCardFields
+/**
+ * Query for the Payment Requests page - fetches counts for all, pending, paid, and rejected expenses
+ */
+export const paymentRequestsMetadataQuery = gql`
+  query PaymentRequestsMetadata($accountSlug: String!) {
+    account(slug: $accountSlug) {
+      id
+      slug
+      name
+      imageUrl
+      type
+      currency
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+          name
+          slug
+          imageUrl
+          currency
+          type
+          isActive
+          isArchived
+        }
+      }
+
+      ... on AccountWithHost {
+        isApproved
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
+      ... on Organization {
+        isHost
+        isActive
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
-
-    expenseTags: expenseTagStats(host: { slug: $hostSlug }) {
+    expenseTagStats(account: { slug: $accountSlug }) {
       nodes {
         id
         tag
       }
     }
+    all: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true) {
+      totalCount
+    }
+    pending: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [PENDING]) {
+      totalCount
+    }
+    paid: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [PAID]) {
+      totalCount
+    }
+    rejected: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [REJECTED]) {
+      totalCount
+    }
   }
+  ${expenseHostFields}
+`;
 
+/**
+ * Metadata query for the Paid Disbursements page - fetches counts for all, invoices, reimbursements, and grants
+ */
+export const paidDisbursementsMetadataQuery = gql`
+  query PaidDisbursementsMetadata($hostSlug: String!, $hostContext: HostContext) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+    }
+    ALL: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID]) {
+      totalCount
+    }
+    INVOICES: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [INVOICE]) {
+      totalCount
+    }
+    REIMBURSEMENTS: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [RECEIPT]) {
+      totalCount
+    }
+    GRANTS: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [GRANT]) {
+      totalCount
+    }
+  }
+`;
+
+/**
+ * Metadata query for Host Payment Requests page - fetches counts by expense status
+ */
+export const hostPaymentRequestsMetadataQuery = gql`
+  query HostPaymentRequestsMetadata($hostSlug: String!, $hostContext: HostContext) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+    }
+    all: expenses(host: { slug: $hostSlug }, hostContext: $hostContext) {
+      totalCount
+    }
+    pending: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PENDING, UNVERIFIED]) {
+      totalCount
+    }
+    approved: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [APPROVED]) {
+      totalCount
+    }
+    rejected: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [REJECTED]) {
+      totalCount
+    }
+    paid: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID]) {
+      totalCount
+    }
+  }
+`;
+
+/**
+ * Metadata query for Issued Payment Requests page - fetches counts for All, Issued, and Paid views
+ */
+export const issuedPaymentRequestsMetadataQuery = gql`
+  query IssuedPaymentRequestsMetadata(
+    $fromHost: AccountReferenceInput
+    $hostContext: HostContext
+    $fromAccount: AccountReferenceInput
+    $includeChildrenExpenses: Boolean
+  ) {
+    all: expenses(
+      hostContext: $hostContext
+      fromAccount: $fromAccount
+      includeChildrenExpenses: $includeChildrenExpenses
+      fromHost: $fromHost
+    ) {
+      totalCount
+    }
+    issued: expenses(
+      hostContext: $hostContext
+      fromAccount: $fromAccount
+      includeChildrenExpenses: $includeChildrenExpenses
+      fromHost: $fromHost
+      status: [PENDING, APPROVED]
+    ) {
+      totalCount
+    }
+    paid: expenses(
+      hostContext: $hostContext
+      fromAccount: $fromAccount
+      includeChildrenExpenses: $includeChildrenExpenses
+      fromHost: $fromHost
+      status: [PAID]
+    ) {
+      totalCount
+    }
+  }
+`;
+
+export const paidDisbursementsQuery = gql`
+  query PaidDisbursements(
+    $hostSlug: String!
+    $hostContext: HostContext
+    $limit: Int!
+    $offset: Int!
+    $types: [ExpenseType]
+    $tags: [String]
+    $status: [ExpenseStatusFilter]
+    $amount: AmountRangeInput
+    $payoutMethodType: PayoutMethodType
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $searchTerm: String
+    $sort: ChronologicalOrderInput
+    $account: AccountReferenceInput
+    $accountingCategory: [String]
+    $fromAccounts: [AccountReferenceInput]
+  ) {
+    expenses(
+      host: { slug: $hostSlug }
+      hostContext: $hostContext
+      account: $account
+      limit: $limit
+      offset: $offset
+      types: $types
+      tag: $tags
+      status: $status
+      amount: $amount
+      payoutMethodType: $payoutMethodType
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      searchTerm: $searchTerm
+      orderBy: $sort
+      accountingCategory: $accountingCategory
+      fromAccounts: $fromAccounts
+    ) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        ...ExpensesListFieldsFragment
+        ...ExpensesListAdminFieldsFragment
+        paidAt
+        paidBy {
+          id
+          slug
+          name
+          type
+          imageUrl
+          ...AccountHoverCardFields
+        }
+      }
+    }
+    host(slug: $hostSlug) {
+      id
+      ...ExpenseHostFields
+    }
+  }
+  ${expensesListFieldsFragment}
+  ${expensesListAdminFieldsFragment}
   ${accountHoverCardFields}
-  ${hostInfoCardFields}
+  ${expenseHostFields}
+`;
+
+export const dashboardExpensesQuery = gql`
+  query DashboardExpenses(
+    $account: AccountReferenceInput
+    $fromAccount: AccountReferenceInput
+    $host: AccountReferenceInput
+    $fromHost: AccountReferenceInput
+    $hostContext: HostContext
+    $fromAccounts: [AccountReferenceInput]
+    $includeChildrenExpenses: Boolean
+    $limit: Int!
+    $offset: Int!
+    $type: ExpenseType
+    $types: [ExpenseType]
+    $tags: [String]
+    $status: [ExpenseStatusFilter]
+    $amount: AmountRangeInput
+    $payoutMethodType: PayoutMethodType
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $searchTerm: String
+    $sort: ChronologicalOrderInput
+    $chargeHasReceipts: Boolean
+    $virtualCards: [VirtualCardReferenceInput]
+    $lastCommentBy: [LastCommentBy]
+    $accountingCategory: [String] # $isHost: Boolean! # $hostSlug: String # should we just use slug instead?
+    $fetchGrantHistory: Boolean! #
+  ) {
+    expenses(
+      hostContext: $hostContext
+      fromHost: $fromHost
+      host: $host
+      account: $account
+      fromAccount: $fromAccount
+      fromAccounts: $fromAccounts
+      includeChildrenExpenses: $includeChildrenExpenses
+      limit: $limit
+      offset: $offset
+      type: $type
+      types: $types
+      tag: $tags
+      status: $status
+      amount: $amount
+      payoutMethodType: $payoutMethodType
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      searchTerm: $searchTerm
+      orderBy: $sort
+      chargeHasReceipts: $chargeHasReceipts
+      virtualCards: $virtualCards
+      lastCommentBy: $lastCommentBy
+      accountingCategory: $accountingCategory
+    ) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        ...ExpensesListFieldsFragment
+        ...ExpensesListAdminFieldsFragment
+
+        payee {
+          grantHistory: expenses(
+            status: PAID
+            type: GRANT
+            direction: SUBMITTED
+            limit: 1
+            host: $fromHost
+            account: $fromHost
+          ) @include(if: $fetchGrantHistory) {
+            totalAmount {
+              amount {
+                currency
+                valueInCents
+              }
+            }
+            totalCount
+          }
+        }
+      }
+    }
+  }
+  ${expensesListFieldsFragment}
+  ${expensesListAdminFieldsFragment}
+`;
+
+export const expenseHostQuery = gql`
+  query ExpenseHost($slug: String!) {
+    host(slug: $slug) {
+      id
+      ...ExpenseHostFields
+    }
+  }
+  ${expenseHostFields}
 `;

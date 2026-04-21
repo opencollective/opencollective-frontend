@@ -7,6 +7,20 @@ export function isMulti<T>(value: z.ZodType<T, any, any>) {
   return z.union([singleValueToArray, enumArray]);
 }
 
+// Allow filter values to be null in order to enable running the toVariables function even if the filter value is not set
+export function isNullable(value: z.ZodType<any, any>) {
+  return z
+    .union([
+      z
+        .string()
+        .refine(str => str === 'null' || str === '')
+        .transform(() => null)
+        .pipe(z.null()),
+      z.nullable(value),
+    ])
+    .default(null);
+}
+
 export const integer = z.coerce.number().min(0).int();
 export const offset = integer.default(0);
 export const limit = integer.default(20);

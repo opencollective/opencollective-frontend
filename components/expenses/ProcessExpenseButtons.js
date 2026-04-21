@@ -1,3 +1,4 @@
+// @deprecated: Use `useGetExpenseActions` instead
 import React from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
@@ -13,8 +14,9 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
-import { ExpenseStatus } from '@/lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
+import { ALL_SECTIONS } from '../dashboard/constants';
 import {
   getScheduledExpensesQueryVariables,
   scheduledExpensesQuery,
@@ -87,7 +89,7 @@ const getErrorContent = (intl, error, host) => {
         title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance', id: 'BmZrOu' }),
         message: (
           <React.Fragment>
-            <Link href={`/dashboard/${host.slug}/host-expenses`}>
+            <Link href={`/dashboard/${host.slug}/${ALL_SECTIONS.PAY_DISBURSEMENTS}`}>
               <FormattedMessage
                 id="PayExpenseModal.RefillBalanceError"
                 defaultMessage="Refill your balance from the Host dashboard"
@@ -385,9 +387,12 @@ const ProcessExpenseButtons = ({
       {confirmProcessExpenseAction && (
         <ConfirmProcessExpenseModal
           type={confirmProcessExpenseAction}
-          onClose={() => {
-            setConfirmProcessExpenseAction(null);
-            onModalToggle?.(false);
+          open={!!confirmProcessExpenseAction}
+          setOpen={open => {
+            if (!open) {
+              setConfirmProcessExpenseAction(null);
+              onModalToggle?.(false);
+            }
           }}
           expense={expense}
         />

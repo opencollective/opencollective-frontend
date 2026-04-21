@@ -20,8 +20,11 @@ import {
   PLATFORM_PRESETS,
 } from '../../lib/export-csv/hosted-collectives-csv';
 import type { CSVField } from '../../lib/export-csv/transactions-csv';
-import type { HostReportsQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../lib/graphql/types/v2/schema';
+import type {
+  Account,
+  HostReportsQueryVariables,
+  TransactionsPageQueryVariables,
+} from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -78,6 +81,13 @@ const makeUrl = ({ account, queryFilter, fields }) => {
     url.searchParams.set('isUnhosted', queryFilter.variables.isUnhosted ? '1' : '0');
   }
 
+  if (queryFilter.variables.startsAtFrom) {
+    url.searchParams.set('startsAtFrom', queryFilter.variables.startsAtFrom);
+  }
+  if (queryFilter.variables.startsAtTo) {
+    url.searchParams.set('startsAtTo', queryFilter.variables.startsAtTo);
+  }
+
   if (!isEmpty(fields)) {
     const selectedFields = fields.join(',').replace('debitAndCreditAmounts', 'debitAmount,creditAmount');
     url.searchParams.set('fields', selectedFields);
@@ -129,7 +139,7 @@ const DownloadLink = ({ url, disabled, children }: { url: string; disabled?: boo
   disabled ? (
     children
   ) : (
-    <a href={url} rel="noreferrer" target="_blank">
+    <a href={url} rel="noreferrer" target="_blank" onClick={() => setRestAuthorizationCookie()}>
       {children}
     </a>
   );

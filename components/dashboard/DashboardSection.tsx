@@ -36,9 +36,15 @@ import IncomingContributions from './sections/contributions/IncomingContribution
 import IncompleteContributions from './sections/contributions/IncompleteContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
-import HostExpenses from './sections/expenses/HostDashboardExpenses';
+import ApprovePaymentRequests from './sections/expenses/ApprovePaymentRequests';
+import HostPaymentRequests from './sections/expenses/HostPaymentRequests';
+import IssuedPaymentRequests from './sections/expenses/IssuedPaymentRequests';
+import { PaidDisbursements } from './sections/expenses/PaidDisbursements';
+import PayDisbursements from './sections/expenses/PayDisbursements';
+import PaymentRequests from './sections/expenses/PaymentRequests';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
+import Exports from './sections/exports';
 import { ApproveGrantRequests } from './sections/funds-and-grants/ApproveGrantRequests';
 import { Grants } from './sections/funds-and-grants/Grants';
 import { HostedFunds } from './sections/funds-and-grants/HostedFunds';
@@ -87,7 +93,11 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
   [SECTIONS.OFF_PLATFORM_TRANSACTIONS]: OffPlatformTransactions,
   [SECTIONS.LEDGER_CSV_IMPORTS]: CSVTransactionsImports,
-  [SECTIONS.HOST_EXPENSES]: HostExpenses,
+  [SECTIONS.HOST_EXPENSES]: PayDisbursements,
+  [SECTIONS.PAY_DISBURSEMENTS]: PayDisbursements,
+  [SECTIONS.PAID_DISBURSEMENTS]: PaidDisbursements,
+  [SECTIONS.APPROVE_PAYMENT_REQUESTS]: ApprovePaymentRequests,
+  [SECTIONS.HOST_PAYMENT_REQUESTS]: HostPaymentRequests,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
@@ -96,7 +106,9 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
   [SECTIONS.OVERVIEW]: Overview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
+  [SECTIONS.PAYMENT_REQUESTS]: PaymentRequests,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.ISSUED_PAYMENT_REQUESTS]: IssuedPaymentRequests,
   [SECTIONS.HOSTED_FUNDS]: HostedFunds,
   [SECTIONS.HOSTED_GRANTS]: HostedGrants,
   [SECTIONS.GRANTS]: Grants,
@@ -117,6 +129,10 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.VENDORS]: Vendors,
   [SECTIONS.ACCOUNTS]: Accounts,
   [SECTIONS.SEARCH]: Search,
+};
+
+const LEGACY_SETTINGS_COMPONENTS = {
+  [LEGACY_SETTINGS_SECTIONS.EXPORTS]: Exports,
 };
 
 const SETTINGS_COMPONENTS = {
@@ -192,15 +208,13 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
     );
   }
 
-  if (values(LEGACY_SECTIONS).includes(section)) {
+  // Legacy settings component (new sections without AccountSettings)
+  const LegacySettingsComponent = LEGACY_SETTINGS_COMPONENTS[section];
+  if (LegacySettingsComponent) {
     return (
       <div className="w-full">
-        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
-          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
-        )}
-
         <DashboardErrorBoundary>
-          <AccountSettings account={account} section={section} />
+          <LegacySettingsComponent accountSlug={account.slug} subpath={subpath} />
         </DashboardErrorBoundary>
       </div>
     );
@@ -213,6 +227,20 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
       <div className="mx-auto w-full max-w-(--breakpoint-md)">
         <DashboardErrorBoundary>
           <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+        </DashboardErrorBoundary>
+      </div>
+    );
+  }
+
+  if (values(LEGACY_SECTIONS).includes(section)) {
+    return (
+      <div className="w-full">
+        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
+          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
+        )}
+
+        <DashboardErrorBoundary>
+          <AccountSettings account={account} section={section} />
         </DashboardErrorBoundary>
       </div>
     );

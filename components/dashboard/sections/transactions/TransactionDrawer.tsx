@@ -31,6 +31,7 @@ import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 import { Skeleton } from '../../../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { ALL_SECTIONS } from '../../constants';
 import { DashboardContext } from '../../DashboardContext';
 
 import type { TransactionDetailsQueryNode } from './types';
@@ -235,7 +236,7 @@ interface TransactionDetailsProps {
 
 const getExpenseUrl = (dashboardAccount, expense) => {
   if (dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id) {
-    return getDashboardRoute(expense.host, `host-expenses?openExpenseId=${expense.legacyId}`);
+    return getDashboardRoute(expense.host, `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`);
   } else if (dashboardAccount?.id === expense.account.id) {
     return getDashboardRoute(expense.account, `expenses?openExpenseId=${expense.legacyId}`);
   }

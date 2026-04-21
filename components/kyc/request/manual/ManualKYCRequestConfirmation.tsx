@@ -4,8 +4,9 @@ import { ArrowLeft, FileText as FileTextIcon, Info, MapPin, Shield, User } from 
 import { FormattedMessage, useIntl } from 'react-intl';
 import type z from 'zod';
 
+import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import type { AccountReferenceInput } from '@/lib/graphql/types/v2/graphql';
 
 import { Button } from '@/components/ui/Button';
 import { DataList, DataListItem } from '@/components/ui/DataList';
@@ -13,6 +14,7 @@ import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
 import { useToast } from '@/components/ui/useToast';
 
 import { kycVerificationFields } from '../../graphql';
+import { KYCRequestAccountCard } from '../KYCRequestAccountCard';
 
 import type { ManualKYCRequestFormSchema } from './ManualKYCRequest';
 
@@ -32,9 +34,9 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
       mutation RequestManualKYCVerification(
         $requestedByAccount: AccountReferenceInput!
         $verifyAccount: AccountReferenceInput!
-        $request: RequestKYCVerificationInput!
+        $request: SubmitKYCVerificationInput!
       ) {
-        requestKYCVerification(
+        submitKYCVerification(
           requestedByAccount: $requestedByAccount
           verifyAccount: $verifyAccount
           request: $request
@@ -48,8 +50,8 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
     {
       refetchQueries: props.refetchQueries,
       variables: {
-        requestedByAccount: props.requestedByAccount,
-        verifyAccount: props.verifyAccount,
+        requestedByAccount: getAccountReferenceInput(props.requestedByAccount),
+        verifyAccount: getAccountReferenceInput(props.verifyAccount),
         request: { manual: props.request },
       },
     },
@@ -87,6 +89,7 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
       </DialogHeader>
 
       <div className="space-y-6 py-4">
+        {props.verifyAccount && <KYCRequestAccountCard account={props.verifyAccount} />}
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm text-slate-700">
             <FormattedMessage
@@ -109,20 +112,24 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
                     <FormattedMessage id="LegalName" defaultMessage="Legal Name" />
                   </div>
                 }
-                value={<span className="font-medium text-slate-900">{props.request.legalName}</span>}
+                labelClassName="min-w-auto sm:!basis-[180px]"
+                itemClassName="font-medium whitespace-pre-line text-slate-900 grow overflow-hidden"
+                value={props.request.legalName}
               />
 
-              <DataListItem
-                label={
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-slate-500" />
-                    <FormattedMessage id="LegalAddress" defaultMessage="Legal Address" />
-                  </div>
-                }
-                value={
-                  <div className="font-medium whitespace-pre-line text-slate-900">{props.request.legalAddress}</div>
-                }
-              />
+              {props.request.legalAddress && (
+                <DataListItem
+                  label={
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-slate-500" />
+                      <FormattedMessage id="LegalAddress" defaultMessage="Legal Address" />
+                    </div>
+                  }
+                  labelClassName="min-w-auto sm:!basis-[180px]"
+                  itemClassName="font-medium whitespace-pre-line text-slate-900 grow overflow-hidden"
+                  value={props.request.legalAddress}
+                />
+              )}
 
               {props.request.notes && (
                 <DataListItem
@@ -132,7 +139,9 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
                       <FormattedMessage defaultMessage="Additional Notes" id="PzWdQF" />
                     </div>
                   }
-                  value={<div className="whitespace-pre-line text-slate-700">{props.request.notes}</div>}
+                  labelClassName="min-w-auto sm:!basis-[180px]"
+                  itemClassName="whitespace-pre-line text-slate-700 grow overflow-hidden"
+                  value={props.request.notes}
                 />
               )}
             </DataList>

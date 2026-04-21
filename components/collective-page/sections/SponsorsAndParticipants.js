@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { exportRSVPs } from '../../../lib/export_file';
-import { TierType } from '@/lib/graphql/types/v2/schema';
+import { TierType } from '@/lib/graphql/types/v2/graphql';
 
 import { Box } from '../../Grid';
 import Responses from '../../Responses';

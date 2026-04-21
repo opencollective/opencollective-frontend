@@ -21,7 +21,7 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../lib/graphql/types/v2/graphql';
-import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } from '../../lib/graphql/types/v2/schema';
+import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
@@ -269,8 +269,8 @@ function ContributionTimeline(props: OrderTimelineProps) {
         />
       ) : (
         <FormattedMessage
-          defaultMessage="<Individual></Individual> sucessfully paid contribution"
-          id="OD2ut4"
+          defaultMessage="<Individual></Individual> successfully paid contribution"
+          id="d+zPjq"
           values={{ ...getActivityVariables(intl, props.order) }}
         />
       );

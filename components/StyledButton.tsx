@@ -13,6 +13,7 @@ import type {
 import { background, border, color, flexbox, layout, space, typography } from 'styled-system';
 
 import { mergeRefs } from '../lib/react-utils';
+import { defaultShouldForwardProp } from '../lib/styled_components_utils';
 import type { TextTransformProps, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
 import { textTransform, whiteSpace } from '../lib/styled-system-custom-properties';
 import type { ButtonSize, ButtonStyle } from '../lib/theme/variants/button';
@@ -41,12 +42,16 @@ export type StyledButtonProps = BackgroundProps &
     'data-cy'?: string;
   };
 
+const FILTERED_PROPS = new Set(['buttonStyle', 'buttonSize', 'loading', 'asLink', 'isBorderless', 'truncateOverflow']);
+
 /**
  * styled-component button using styled-system
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledButtonContent = styled.button<StyledButtonProps>`
+const StyledButtonContent = styled.button.withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+})<StyledButtonProps>`
   appearance: none;
   border: none;
   cursor: pointer;

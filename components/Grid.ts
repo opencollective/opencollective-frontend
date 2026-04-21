@@ -9,7 +9,7 @@ import { border, color, compose, flexbox, grid, layout, space, typography } from
 
 import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 
-export const boxProps = compose(space, color, layout, typography, flexbox, grid, border);
+const boxProps = compose(space, color, layout, typography, flexbox, grid, border);
 
 type BoxProps = SpaceProps &
   ColorProps &
@@ -24,7 +24,7 @@ type BoxProps = SpaceProps &
 const FILTERED_PROPS = new Set(['display', 'width', 'height']);
 
 export const Box = styled.div.withConfig({
-  shouldForwardProp: prop => defaultShouldForwardProp(prop) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
 })<BoxProps>(
   {
     boxSizing: 'border-box',
@@ -46,7 +46,9 @@ export const Flex = styled(Box)<FlexProps>(
 
 Flex.displayName = 'Flex';
 
-export const Grid = styled.div<BoxProps>(
+export const Grid = styled.div.withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+})<BoxProps>(
   {
     boxSizing: 'border-box',
     display: 'grid',

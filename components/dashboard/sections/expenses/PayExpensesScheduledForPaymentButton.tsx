@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../../../lib/api';
 import { gql } from '../../../../lib/graphql/helpers';
-import type { Host } from '../../../../lib/graphql/types/v2/schema';
+import type { Host } from '../../../../lib/graphql/types/v2/graphql';
 import { getWebsiteUrl } from '../../../../lib/utils';
 
 import ConfirmationModal from '../../../ConfirmationModal';

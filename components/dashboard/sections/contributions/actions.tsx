@@ -5,16 +5,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
+import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { getWebsiteUrl } from '../../../../lib/utils';
+import { getPermalinkUrl } from '../../../../lib/url-helpers';
+import useClipboard from '@/lib/hooks/useClipboard';
 
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { getTransactionsUrl } from '../../../contributions/ContributionTimeline';
-import { CopyID } from '../../../CopyId';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
-import Link from '../../../Link';
 import { useModal } from '../../../ModalContext';
 import { useToast } from '../../../ui/useToast';
 
@@ -54,6 +53,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
   const { toast } = useToast();
   const { showModal, showConfirmationModal } = useModal();
   const { LoggedInUser } = useLoggedInUser();
+  const { copy } = useClipboard();
 
   const [expireOrder] = useMutation(expireOrderMutation);
 
@@ -119,12 +119,9 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     if (![OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status)) {
       actions.secondary.push({
         key: 'view-transactions',
-        label: (
-          <Link href={transactionsUrl.toString()} className="flex flex-row items-center gap-2.5">
-            <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
-            <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
-          </Link>
-        ),
+        Icon: ArrowLeftRightIcon,
+        href: transactionsUrl.toString(),
+        label: intl.formatMessage({ defaultMessage: 'View transactions', id: 'DfQJQ6' }),
         onClick: () => {},
       });
     }
@@ -157,8 +154,9 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     }
 
     if (isExpectedFunds && (canMarkAsExpired || canMarkAsCompleted)) {
-      actions.primary.push({
+      actions.secondary.push({
         label: intl.formatMessage({ defaultMessage: 'Edit expected funds', id: 'hQAJH9' }),
+        Icon: Pencil,
         onClick: () => {
           showModal(
             CreatePendingContributionModal,
@@ -252,36 +250,24 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     if (order.paymentMethod?.type === PaymentMethodType.HOST) {
       actions.primary.push({
         key: 'edit-funds',
-        label: (
-          <React.Fragment>
-            <Pencil size={16} className="text-muted-foreground" />
-            {intl.formatMessage({ defaultMessage: 'Edit funds', id: 'Kbjd3f' })}
-          </React.Fragment>
-        ),
+        Icon: Pencil,
+        label: intl.formatMessage({ defaultMessage: 'Edit funds', id: 'Kbjd3f' }),
         onClick: () => showEditOrderModal('editAddedFunds'),
       });
     }
 
-    const toAccount = order.toAccount;
-    const legacyId = order.legacyId;
-    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, getWebsiteUrl());
-
     actions.secondary.push({
       key: 'copy-link',
-      label: (
-        <CopyID
-          Icon={null}
-          value={orderUrl}
-          tooltipLabel={<FormattedMessage defaultMessage="Copy link" id="CopyLink" />}
-          className=""
-        >
-          <div className="flex flex-row items-center gap-2.5">
-            <LinkIcon size={16} className="text-muted-foreground" />
-            <FormattedMessage defaultMessage="Copy link" id="CopyLink" />
-          </div>
-        </CopyID>
-      ),
-      onClick: () => {},
+      Icon: LinkIcon,
+      label: intl.formatMessage({ defaultMessage: 'Copy link', id: 'CopyLink' }),
+      onClick: e => {
+        e.preventDefault();
+        copy(getPermalinkUrl(order.publicId));
+        toast({
+          message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
+          variant: 'success',
+        });
+      },
     });
 
     return actions;

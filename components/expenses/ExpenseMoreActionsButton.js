@@ -1,8 +1,9 @@
+// @deprecated: Use `useGetExpenseActions` instead
+
 import React from 'react';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
-import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { MinusCircle } from '@styled-icons/feather/MinusCircle';
@@ -18,12 +19,11 @@ import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/schema';
+import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useKeyboardKey, { H, I } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute, getPermalinkUrl } from '../../lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { FullscreenFlowLoadingPlaceholder } from '../FullscreenFlowLoadingPlaceholder';
@@ -84,7 +84,7 @@ const getTransactionsUrl = (dashboardAccount, expense) => {
   return null;
 };
 
-const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
+export const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
   if (!LoggedInUser || !expense) {
     return false;
   }
@@ -106,7 +106,6 @@ const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
 const ExpenseMoreActionsButton = ({
   expense,
   onError,
-  onEdit,
   isDisabled,
   linkAction = 'copy',
   onModalToggle,
@@ -117,7 +116,7 @@ const ExpenseMoreActionsButton = ({
   onCloneModalOpenChange,
   ...props
 }) => {
-  const [processModal, setProcessModal] = React.useState(false);
+  const [processModal, setProcessModal] = React.useState(null);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
@@ -152,9 +151,6 @@ const ExpenseMoreActionsButton = ({
     },
   });
   const { LoggedInUser } = useLoggedInUser();
-
-  const hasNewSubmitExpenseFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
 
   const showDeleteConfirmMoreActions = isOpen => {
     setDeleteConfirm(isOpen);
@@ -288,12 +284,6 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </Action>
             )}
-            {onEdit && permissions.canEdit && (
-              <Action data-cy="edit-expense-btn" onClick={onEdit} disabled={processExpense.loading || isDisabled}>
-                <IconEdit size="16px" />
-                <FormattedMessage id="Edit" defaultMessage="Edit" />
-              </Action>
-            )}
             {!props.hasAttachedInvoiceFile &&
               permissions.canSeeInvoiceInfo &&
               [expenseTypes.INVOICE, expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING].includes(
@@ -342,7 +332,7 @@ const ExpenseMoreActionsButton = ({
               onClick={() =>
                 linkAction === 'link'
                   ? router.push(`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`)
-                  : copy(`${getCollectivePageCanonicalURL(expense.account)}/expenses/${expense.legacyId}`)
+                  : copy(getPermalinkUrl(expense.publicId))
               }
               disabled={processExpense.loading || isDisabled}
             >
@@ -353,7 +343,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
               )}
             </Action>
-            {hasNewSubmitExpenseFlow && shouldShowDuplicateExpenseButton(LoggedInUser, expense) && (
+            {shouldShowDuplicateExpenseButton(LoggedInUser, expense) && (
               <Action
                 onClick={() => {
                   setDuplicateExpenseId(expense.legacyId);
@@ -377,7 +367,16 @@ const ExpenseMoreActionsButton = ({
         )}
       </PopupMenu>
       {processModal && (
-        <ConfirmProcessExpenseModal type={processModal} expense={expense} onClose={() => setProcessModal(false)} />
+        <ConfirmProcessExpenseModal
+          type={processModal}
+          open={!!processModal}
+          setOpen={open => {
+            if (!open) {
+              setProcessModal(null);
+            }
+          }}
+          expense={expense}
+        />
       )}
       {hasDeleteConfirm && (
         <ExpenseConfirmDeletion

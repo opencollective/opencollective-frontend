@@ -4,7 +4,7 @@ import type { TaxFormType } from '../components/dashboard/sections/tax-informati
 
 import { CollectiveType } from './constants/collectives';
 import { TransactionTypes } from './constants/transactions';
-import type { Comment, Conversation, Expense, HostApplication, Order, Update } from './graphql/types/v2/schema';
+import type { Comment, Conversation, Expense, HostApplication, Order, Update } from './graphql/types/v2/graphql';
 import type LoggedInUser from './LoggedInUser';
 import { getWebsiteUrl } from './utils';
 import { getWindowLocation } from './window';
@@ -166,11 +166,11 @@ export const getHostDashboardTransactionsRoute = (
 };
 
 export const getOauthAppSettingsRoute = (account, app) => {
-  return getDashboardRoute(account, `for-developers/oauth/${app.id}`);
+  return getDashboardRoute(account, `for-developers/oauth/${app.publicId}`);
 };
 
 export const getPersonalTokenSettingsRoute = (account, token) => {
-  return getDashboardRoute(account, `for-developers/personal-tokens/${token.id}`);
+  return getDashboardRoute(account, `for-developers/personal-tokens/${token.publicId}`);
 };
 
 export const getOffPlatformTransactionsRoute = (hostSlug: string, importId = null) => {
@@ -443,3 +443,7 @@ export const getCommentUrl = (comment: Comment, loggedInUser: LoggedInUser) => {
     return getCollectivePageRoute(comment.account);
   }
 };
+
+export function getPermalinkUrl(publicId: string): string {
+  return `${getWebsiteUrl()}/permalink/${publicId}`;
+}

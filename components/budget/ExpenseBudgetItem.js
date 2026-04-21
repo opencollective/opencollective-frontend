@@ -8,13 +8,15 @@ import { space } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { getFilesFromExpense } from '../../lib/expenses';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 import { isFeatureEnabled } from '@/lib/allowed-features';
+
+import { ExpenseKYCStatusBadge } from '../kyc/components/ExpenseKYCStatusBadge';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -142,7 +144,6 @@ const ExpenseBudgetItem = ({
   const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
   const lastComment = expense?.lastComment?.nodes?.[0];
   const approvedBy = expense?.approvedBy?.length > 0 ? expense.approvedBy : null;
-
   return (
     <ExpenseContainer
       px={[3, '24px']}
@@ -221,6 +222,7 @@ const ExpenseBudgetItem = ({
                               textDecoration="none"
                               color="black.900"
                               fontSize={fontSize}
+                              overflowWrap="anywhere"
                               data-cy="expense-title"
                             >
                               {value}
@@ -246,6 +248,7 @@ const ExpenseBudgetItem = ({
                       isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') &&
                       get(expense, 'permissions.canEditAccountingCategory', false)
                     }
+                    editPermission={get(expense, 'permissions.editAccountingCategory')}
                     allowNone
                     showCodeInSelect={isLoggedInUserExpenseHostAdmin}
                   />
@@ -392,6 +395,9 @@ const ExpenseBudgetItem = ({
                   showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
                   payee={expense.payee}
                 />
+              )}
+              {isLoggedInUserExpenseHostAdmin && expense.kycStatus?.payee?.status && (
+                <ExpenseKYCStatusBadge className="ml-1" status={expense.kycStatus?.payee?.status} />
               )}
             </Flex>
           )}

@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { filterRawValueEntries, removeEmptyValues } from './lib/import-row-data';
 import type { getMatchInfo } from './lib/match';
-import type { TransactionsImport, TransactionsImportRow } from '@/lib/graphql/types/v2/schema';
+import type { TransactionsImport, TransactionsImportRow } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
 import DateTime from '@/components/DateTime';

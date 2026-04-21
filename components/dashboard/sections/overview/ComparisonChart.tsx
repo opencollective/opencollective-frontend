@@ -5,64 +5,12 @@ import { isNil } from 'lodash';
 import dynamic from 'next/dynamic';
 import { useIntl } from 'react-intl';
 
-import { formatAmountForLegend } from '../../../../lib/charts';
-import { getDayjsIsoUnit } from '../../../../lib/date-utils';
-import dayjs from '../../../../lib/dayjs';
-import type { Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/schema';
+import { formatAmountForLegend, formatDateLabel, formatSeriesData, setDatesIfMissing } from '../../../../lib/charts';
+import type { Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
 
 import MessageBox from '../../../MessageBox';
-import { formatPeriod } from '../../filters/PeriodCompareFilter';
 
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
-
-const formatSeriesData = ({ nodes = [], dateFrom, dateTo, timeUnit }): { x: number; y: number }[] => {
-  const keyedData = {};
-
-  const startDate = dayjs.utc(dateFrom).startOf(timeUnit === 'WEEK' ? 'isoWeek' : timeUnit);
-  const endDate = dayjs.utc(dateTo);
-  const now = dayjs.utc();
-  let currentDate = startDate;
-  let i = 0;
-
-  // Create entries for each period in the range
-  while (currentDate.isBefore(endDate) || currentDate.isSame(endDate)) {
-    keyedData[currentDate.toISOString()] = {
-      x: i,
-      y: now.isAfter(currentDate) ? 0 : undefined,
-    };
-    i++;
-    currentDate = currentDate.add(1, timeUnit);
-  }
-
-  // Add the time series data
-  for (let i = 0; i < nodes.length; i++) {
-    const { date, amount } = nodes[i];
-    if (keyedData[date]) {
-      keyedData[date].y = amount.value;
-    } else {
-      // Will be caught by error boundary.
-      throw new Error('Time series data not aligned');
-    }
-  }
-
-  return Object.values(keyedData);
-};
-
-const formatDateLabel = ({ startDate, index, timeUnit }): string => {
-  const date = dayjs.utc(startDate).add(index, timeUnit);
-  if (timeUnit === 'YEAR') {
-    return date.year().toString();
-  } else if (timeUnit === 'MONTH') {
-    return date.format('MMM YYYY');
-  } else if (timeUnit === 'WEEK') {
-    const endDate = date.add(6, 'day');
-    return formatPeriod({ from: date, to: endDate });
-  } else if (timeUnit === 'DAY') {
-    return date.format('MMM D, YYYY');
-  } else if (timeUnit === 'HOUR') {
-    return date.format('MMM D, YYYY h:mm A');
-  }
-};
 
 const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expanded }): ApexOptions => ({
   chart: {
@@ -137,7 +85,7 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     labels: {
       show: expanded && ['YEAR', 'MONTH'].includes(timeUnit),
       formatter: value => {
-        return formatDateLabel({ startDate: dateFrom, index: value, timeUnit });
+        return formatDateLabel({ startDate: dateFrom, index: Number(value), timeUnit });
       },
     },
   },
@@ -148,7 +96,9 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
       formatter: value =>
         isNil(value)
           ? intl.formatMessage({ defaultMessage: 'No data', id: 'UG5qoS' })
-          : formatAmountForLegend(value, currency, intl.locale),
+          : !currency
+            ? value
+            : formatAmountForLegend(value, currency, intl.locale),
     },
   },
   tooltip: {
@@ -174,8 +124,8 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
   },
 });
 
-const getSeries = ({ current, comparison }): ApexOptions['series'] => {
-  const series = [{ name: 'current', data: formatSeriesData(current), color: '#1d4ed8', zIndex: 2 }];
+const getSeries = ({ current, comparison, color = '#1d4ed8' }): ApexOptions['series'] => {
+  const series = [{ name: 'current', data: formatSeriesData(current), color, zIndex: 2 }];
   if (comparison) {
     series.push({ name: 'comparison', data: formatSeriesData(comparison), color: '#cbd5e1', zIndex: 1 });
   }
@@ -185,36 +135,13 @@ const getSeries = ({ current, comparison }): ApexOptions['series'] => {
 interface ComparisonChartProps {
   current: TimeSeriesAmount;
   comparison?: TimeSeriesAmount;
-  currency: Currency;
+  currency?: Currency;
   expanded?: boolean;
   isPeriod?: boolean;
+  color?: string;
 }
 
-function setDatesIfMissing(timeseries: TimeSeriesAmount): TimeSeriesAmount {
-  if (!timeseries.dateFrom || !timeseries.dateTo) {
-    let dateFrom, dateTo;
-
-    if (!timeseries.dateFrom) {
-      // find the lowest date by comparing all nodes in current
-      dateFrom = timeseries.nodes.reduce((lowest, node) => {
-        return node.date < lowest ? node.date : lowest;
-      }, timeseries.nodes[0].date);
-    }
-
-    if (!timeseries.dateTo) {
-      dateTo = dayjs.utc().endOf(getDayjsIsoUnit(timeseries.timeUnit));
-    }
-
-    return {
-      ...timeseries,
-      dateFrom: dateFrom,
-      dateTo: dateTo,
-    };
-  }
-  return timeseries;
-}
-
-function Chart({ current, comparison, expanded, currency }: ComparisonChartProps) {
+function Chart({ current, comparison, expanded, currency, color }: ComparisonChartProps) {
   const intl = useIntl();
 
   // When using the "All time" option, the API does not return a dateFrom value, instead we pick the lowest returned date to start the time series.
@@ -222,8 +149,8 @@ function Chart({ current, comparison, expanded, currency }: ComparisonChartProps
   const currentWithDates = React.useMemo(() => setDatesIfMissing(current), [current]);
 
   const series = React.useMemo(
-    () => getSeries({ current: currentWithDates, comparison }),
-    [currentWithDates, comparison],
+    () => getSeries({ current: currentWithDates, comparison, color }),
+    [currentWithDates, comparison, color],
   );
 
   const options = makeApexOptions({
@@ -243,7 +170,7 @@ export default function ComparisonChart(props: ComparisonChartProps) {
     <ErrorBoundary
       fallback={({ error }) => (
         <MessageBox type="error" withIcon>
-          {error.message}
+          {error['message']}
         </MessageBox>
       )}
     >

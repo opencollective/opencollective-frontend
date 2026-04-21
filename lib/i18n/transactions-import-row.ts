@@ -1,7 +1,7 @@
 import type { IntlShape } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
-import { TransactionsImportRowStatus } from '../graphql/types/v2/schema';
+import { TransactionsImportRowStatus } from '../graphql/types/v2/graphql';
 
 const MESSAGES = defineMessages({
   ALL: {

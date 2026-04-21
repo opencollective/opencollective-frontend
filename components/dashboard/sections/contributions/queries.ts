@@ -16,6 +16,7 @@ export const dashboardOrdersQuery = gql`
     $paymentMethod: [PaymentMethodReferenceInput]
     $paymentMethodService: [PaymentMethodService]
     $paymentMethodType: [PaymentMethodType]
+    $manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
     $accountingCategory: [String]
     $hostContext: HostContext
     $includeChildrenAccounts: Boolean
@@ -28,6 +29,8 @@ export const dashboardOrdersQuery = gql`
     $expectedFundsFilter: ExpectedFundsFilter
     $orderBy: ChronologicalOrderInput
     $tier: [TierReferenceInput!]
+    $hostedAccounts: [AccountReferenceInput!]
+    $createdBy: [AccountReferenceInput]
   ) {
     account(slug: $slug) {
       id
@@ -47,6 +50,7 @@ export const dashboardOrdersQuery = gql`
         paymentMethod: $paymentMethod
         paymentMethodService: $paymentMethodService
         paymentMethodType: $paymentMethodType
+        manualPaymentProvider: $manualPaymentProvider
         accountingCategory: $accountingCategory
         hostContext: $hostContext
         includeChildrenAccounts: $includeChildrenAccounts
@@ -55,6 +59,8 @@ export const dashboardOrdersQuery = gql`
         chargedDateFrom: $chargedDateFrom
         chargedDateTo: $chargedDateTo
         tier: $tier
+        hostedAccounts: $hostedAccounts
+        createdBy: $createdBy
       ) {
         totalCount
         nodes {

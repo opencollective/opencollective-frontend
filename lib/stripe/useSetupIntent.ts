@@ -3,7 +3,7 @@ import { ApolloError, useApolloClient } from '@apollo/client';
 import type { SetupIntent, Stripe } from '@stripe/stripe-js';
 
 import { gql } from '../graphql/helpers';
-import type { AccountReferenceInput, SetupIntent as GraphQLSetupIntent } from '../graphql/types/v2/schema';
+import type { AccountReferenceInput, SetupIntent as GraphQLSetupIntent } from '../graphql/types/v2/graphql';
 import { loadScriptAsync } from '../utils';
 
 const createSetupIntentMutation = gql`

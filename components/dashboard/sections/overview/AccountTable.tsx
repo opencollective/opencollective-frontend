@@ -6,8 +6,11 @@ import { isNil, omit } from 'lodash';
 import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpZA } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { AccountMetricsFragment, OverviewMetricsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Currency } from '../../../../lib/graphql/types/v2/schema';
+import type {
+  AccountMetricsFragment,
+  Currency,
+  OverviewMetricsQueryVariables,
+} from '../../../../lib/graphql/types/v2/graphql';
 import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
@@ -22,7 +25,7 @@ import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import { DashboardContext } from '../../DashboardContext';
 
-import type { schema } from './CollectiveOverview';
+import type { schema } from './DefaultOverview';
 import type { MetricProps } from './Metric';
 import { ChangeBadge, getPercentageDifference } from './Metric';
 import { metricsPerAccountQuery } from './queries';
@@ -264,14 +267,15 @@ export default function AccountTable({ accountSlug, queryFilter, metric }) {
     return nodes.map(node => {
       const current = node[metric.id].current.valueInCents ?? node[metric.id].current;
       const comparison = node[metric.id].comparison?.valueInCents ?? node[metric.id].comparison;
+      const useAbs = metric.useAbsoluteAmount === true;
       return {
         ...node,
-        current: Math.abs(current),
-        comparison: !isNil(comparison) ? Math.abs(comparison) : undefined,
+        current: useAbs ? Math.abs(current) : current,
+        comparison: !isNil(comparison) ? (useAbs ? Math.abs(comparison) : comparison) : undefined,
         percentageDifference: getPercentageDifference(current, comparison),
       };
     });
-  }, [metric.id, data]);
+  }, [metric.id, metric.useAbsoluteAmount, data]);
 
   if (error) {
     return <MessageBoxGraphqlError error={error} />;

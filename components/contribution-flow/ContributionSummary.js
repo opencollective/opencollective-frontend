@@ -16,7 +16,7 @@ import { Box } from '../Grid';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
-import { P, Span } from '../Text';
+import { Span } from '../Text';
 
 import { getTotalAmount } from './utils';
 
@@ -203,7 +203,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
       )}
       <StyledHr borderColor="black.500" my={1} />
       {stepDetails.interval && stepDetails.interval !== INTERVALS.oneTime && (
-        <P color="black.800" fontSize="12px" mt={3}>
+        <Container color="black.800" fontSize="12px" mt={3}>
           {!stepPayment || stepPayment.isKeyOnly ? (
             <FormattedMessage
               id="ContributionSummary.NextCharge"
@@ -259,7 +259,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               </Box>
             </React.Fragment>
           )}
-        </P>
+        </Container>
       )}
     </Container>
   );

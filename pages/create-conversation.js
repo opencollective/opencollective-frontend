@@ -167,7 +167,7 @@ const createConversationPageQuery = gql`
       }
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
       }
 
       ... on AccountWithHost {

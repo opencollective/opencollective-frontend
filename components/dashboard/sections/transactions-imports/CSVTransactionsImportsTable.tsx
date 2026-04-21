@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '../../../../lib/filters/schemas';
-import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
+import type { TransactionsImport } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsImportType } from '../../../../lib/i18n/transactions-import';
 import { capitalize } from '../../../../lib/utils';
@@ -95,7 +95,9 @@ export const CSVTransactionsImportsTable = ({ accountSlug }) => {
             loading={loading}
             data={data?.host?.transactionsImports?.nodes}
             emptyMessage={() => <FormattedMessage defaultMessage="No CSV imported yet" id="5Tw/Vx" />}
-            onClickRow={({ id }) => router.push(getCSVTransactionsImportRoute(accountSlug, id))}
+            onClickRow={({ original: { publicId } }) => {
+              router.push(getCSVTransactionsImportRoute(accountSlug, publicId));
+            }}
             columns={[
               {
                 header: intl.formatMessage({ defaultMessage: 'Source', id: 'AddFundsModal.source' }),

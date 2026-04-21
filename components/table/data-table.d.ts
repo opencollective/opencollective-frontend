@@ -5,7 +5,7 @@ import type { RefObject } from 'react';
 import type { IntlShape, MessageDescriptor } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
-import type { Account } from '../../lib/graphql/types/v2/schema';
+import type { Account } from '../../lib/graphql/types/v2/graphql';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 declare module '@tanstack/react-table' {
   interface ColumnMeta {
@@ -22,6 +22,7 @@ declare module '@tanstack/react-table' {
     hasDefaultColumnVisibility?: boolean;
     openDrawer?: (row: Row<TData>, actionsMenuTriggerRef?: RefObject<HTMLElement>) => void;
     getActions?: GetActions<TData>;
+    showQuickActions?: boolean;
 
     // TODO: remove types below when all tables use getActions
     // Hosted Collectives table

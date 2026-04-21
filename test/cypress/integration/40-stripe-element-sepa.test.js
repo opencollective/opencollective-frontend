@@ -13,16 +13,16 @@ function contributeNewSEPADebit({ name } = {}) {
       }
     });
 
-    cy.get('#Field-ibanInput').type('FR1420041010050500013M02606');
+    cy.get('#payment-ibanInput').type('FR1420041010050500013M02606');
 
     if (name) {
-      cy.get('#Field-nameInput').type(name);
+      cy.get('#payment-nameInput').type(name);
     }
 
-    cy.get('#Field-countryInput').select('FR');
-    cy.get('#Field-addressLine1Input').type('Street');
-    cy.get('#Field-postalCodeInput').type('01562');
-    cy.get('#Field-localityInput').type('Paris');
+    cy.get('#payment-countryInput').select('FR');
+    cy.get('#payment-addressLine1Input').type('Street');
+    cy.get('#payment-postalCodeInput').type('01562');
+    cy.get('#payment-localityInput').type('Paris');
   });
   cy.wait(2000);
   cy.get('button[data-cy="cf-next-step"]').click();

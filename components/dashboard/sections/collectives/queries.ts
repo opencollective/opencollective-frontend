@@ -5,6 +5,7 @@ import { accountHoverCardFields } from '../../../AccountHoverCard';
 export const HostApplicationFields = gql`
   fragment HostApplicationFields on HostApplication {
     id
+    publicId
     message
     customData
     status
@@ -261,6 +262,10 @@ const hostedCollectiveFields = gql`
     ... on AccountWithContributions {
       totalFinancialContributors
     }
+    ... on Event {
+      startsAt
+      endsAt
+    }
     childrenAccounts {
       nodes {
         id
@@ -352,6 +357,8 @@ export const hostedCollectivesQuery = gql`
     $balance: AmountRangeInput
     $consolidatedBalance: AmountRangeInput
     $currencies: [String]
+    $startsAtFrom: DateTime
+    $startsAtTo: DateTime
   ) {
     host(slug: $hostSlug) {
       id
@@ -381,6 +388,8 @@ export const hostedCollectivesQuery = gql`
         balance: $balance
         consolidatedBalance: $consolidatedBalance
         currencies: $currencies
+        startsAtFrom: $startsAtFrom
+        startsAtTo: $startsAtTo
       ) {
         offset
         limit

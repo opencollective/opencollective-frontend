@@ -243,6 +243,7 @@ export type AccountExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -297,6 +298,7 @@ export type AccountKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -353,6 +355,7 @@ export type AccountOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -367,6 +370,7 @@ export type AccountOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -445,6 +449,7 @@ export type AccountTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -1071,6 +1076,7 @@ export enum ActivityAndClassesType {
   COLLECTIVE = 'COLLECTIVE',
   COLLECTIVE_APPLY = 'COLLECTIVE_APPLY',
   COLLECTIVE_APPROVED = 'COLLECTIVE_APPROVED',
+  COLLECTIVE_BALANCE_TRANSFERRED = 'COLLECTIVE_BALANCE_TRANSFERRED',
   COLLECTIVE_COMMENT_CREATED = 'COLLECTIVE_COMMENT_CREATED',
   COLLECTIVE_CONTACT = 'COLLECTIVE_CONTACT',
   COLLECTIVE_CONVERSATION_CREATED = 'COLLECTIVE_CONVERSATION_CREATED',
@@ -1139,12 +1145,18 @@ export enum ActivityAndClassesType {
   DEACTIVATED_MONEY_MANAGEMENT = 'DEACTIVATED_MONEY_MANAGEMENT',
   EXPENSES = 'EXPENSES',
   EXPENSE_COMMENT_CREATED = 'EXPENSE_COMMENT_CREATED',
+  EXPORT_REQUEST_COMPLETED = 'EXPORT_REQUEST_COMPLETED',
+  EXPORT_REQUEST_FAILED = 'EXPORT_REQUEST_FAILED',
   FUND_EVENTS = 'FUND_EVENTS',
   HOST_APPLICATION_COMMENT_CREATED = 'HOST_APPLICATION_COMMENT_CREATED',
   HOST_APPLICATION_CONTACT = 'HOST_APPLICATION_CONTACT',
   KYC_REQUESTED = 'KYC_REQUESTED',
   KYC_REVOKED = 'KYC_REVOKED',
   KYC_VERIFIED = 'KYC_VERIFIED',
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED = 'MANUAL_PAYMENT_PROVIDER_ARCHIVED',
+  MANUAL_PAYMENT_PROVIDER_CREATED = 'MANUAL_PAYMENT_PROVIDER_CREATED',
+  MANUAL_PAYMENT_PROVIDER_DELETED = 'MANUAL_PAYMENT_PROVIDER_DELETED',
+  MANUAL_PAYMENT_PROVIDER_UPDATED = 'MANUAL_PAYMENT_PROVIDER_UPDATED',
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
@@ -1272,6 +1284,7 @@ export enum ActivityType {
   BACKYOURSTACK_DISPATCH_CONFIRMED = 'BACKYOURSTACK_DISPATCH_CONFIRMED',
   COLLECTIVE_APPLY = 'COLLECTIVE_APPLY',
   COLLECTIVE_APPROVED = 'COLLECTIVE_APPROVED',
+  COLLECTIVE_BALANCE_TRANSFERRED = 'COLLECTIVE_BALANCE_TRANSFERRED',
   COLLECTIVE_COMMENT_CREATED = 'COLLECTIVE_COMMENT_CREATED',
   COLLECTIVE_CONTACT = 'COLLECTIVE_CONTACT',
   COLLECTIVE_CONVERSATION_CREATED = 'COLLECTIVE_CONVERSATION_CREATED',
@@ -1338,11 +1351,17 @@ export enum ActivityType {
   DEACTIVATED_HOSTING = 'DEACTIVATED_HOSTING',
   DEACTIVATED_MONEY_MANAGEMENT = 'DEACTIVATED_MONEY_MANAGEMENT',
   EXPENSE_COMMENT_CREATED = 'EXPENSE_COMMENT_CREATED',
+  EXPORT_REQUEST_COMPLETED = 'EXPORT_REQUEST_COMPLETED',
+  EXPORT_REQUEST_FAILED = 'EXPORT_REQUEST_FAILED',
   HOST_APPLICATION_COMMENT_CREATED = 'HOST_APPLICATION_COMMENT_CREATED',
   HOST_APPLICATION_CONTACT = 'HOST_APPLICATION_CONTACT',
   KYC_REQUESTED = 'KYC_REQUESTED',
   KYC_REVOKED = 'KYC_REVOKED',
   KYC_VERIFIED = 'KYC_VERIFIED',
+  MANUAL_PAYMENT_PROVIDER_ARCHIVED = 'MANUAL_PAYMENT_PROVIDER_ARCHIVED',
+  MANUAL_PAYMENT_PROVIDER_CREATED = 'MANUAL_PAYMENT_PROVIDER_CREATED',
+  MANUAL_PAYMENT_PROVIDER_DELETED = 'MANUAL_PAYMENT_PROVIDER_DELETED',
+  MANUAL_PAYMENT_PROVIDER_UPDATED = 'MANUAL_PAYMENT_PROVIDER_UPDATED',
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
@@ -1763,6 +1782,7 @@ export type BotExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -1817,6 +1837,7 @@ export type BotKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -1880,6 +1901,7 @@ export type BotOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -1894,6 +1916,7 @@ export type BotOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -1972,6 +1995,7 @@ export type BotTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -2340,6 +2364,7 @@ export type CollectiveExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -2408,6 +2433,7 @@ export type CollectiveKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -2471,6 +2497,7 @@ export type CollectiveOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -2485,6 +2512,7 @@ export type CollectiveOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -2589,6 +2617,7 @@ export type CollectiveTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -2693,6 +2722,7 @@ export type CollectiveFeatures = {
   CONNECTED_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
   CONTACT_COLLECTIVE?: Maybe<CollectiveFeatureStatus>;
   CONTACT_FORM?: Maybe<CollectiveFeatureStatus>;
+  CONTRIBUTION_CATEGORIZATION_RULES?: Maybe<CollectiveFeatureStatus>;
   CONVERSATIONS?: Maybe<CollectiveFeatureStatus>;
   CREATE_COLLECTIVE?: Maybe<CollectiveFeatureStatus>;
   EMAIL_NOTIFICATIONS_PANEL?: Maybe<CollectiveFeatureStatus>;
@@ -2708,6 +2738,7 @@ export type CollectiveFeatures = {
   ORDER?: Maybe<CollectiveFeatureStatus>;
   PAYPAL_DONATIONS?: Maybe<CollectiveFeatureStatus>;
   PAYPAL_PAYOUTS?: Maybe<CollectiveFeatureStatus>;
+  PERSONA_KYC?: Maybe<CollectiveFeatureStatus>;
   PROJECTS?: Maybe<CollectiveFeatureStatus>;
   RECEIVE_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   RECEIVE_FINANCIAL_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
@@ -2797,7 +2828,10 @@ export type CommentUpdateInput = {
 export type CommunityAssociatedAccount = {
   __typename?: 'CommunityAssociatedAccount';
   account?: Maybe<Account>;
+  firstInteractionAt?: Maybe<Scalars['DateTime']['output']>;
+  lastInteractionAt?: Maybe<Scalars['DateTime']['output']>;
   relations?: Maybe<Array<Maybe<CommunityRelationType>>>;
+  transactionSummary: CommunityTransactionSummary;
 };
 
 export enum CommunityRelationType {
@@ -2839,7 +2873,7 @@ export type CommunityTransactionSummary = {
   expenseTotalAcc: Amount;
   orderCount: Scalars['Int']['output'];
   orderCountAcc: Scalars['Int']['output'];
-  year: Scalars['Int']['output'];
+  year?: Maybe<Scalars['Int']['output']>;
 };
 
 /** Response for the confirmGuestAccount mutation */
@@ -2905,6 +2939,7 @@ export enum ConnectedAccountService {
   /** @deprecated Not using this service anymore */
   meetup = 'meetup',
   paypal = 'paypal',
+  persona = 'persona',
   plaid = 'plaid',
   /** @deprecated Not using this service anymore */
   privacy = 'privacy',
@@ -2913,6 +2948,65 @@ export enum ConnectedAccountService {
   thegivingblock = 'thegivingblock',
   transferwise = 'transferwise',
   twitter = 'twitter'
+}
+
+/** A rule for categorizing contributions */
+export type ContributionAccountingCategoryRule = {
+  __typename?: 'ContributionAccountingCategoryRule';
+  accountingCategory: AccountingCategory;
+  createdAt: Scalars['DateTime']['output'];
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  predicates: Array<Scalars['JSONObject']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Input for creating or updating a contribution accounting category rule */
+export type ContributionAccountingCategoryRuleInput = {
+  /** The accounting category to apply the rule to */
+  accountingCategory?: InputMaybe<AccountingCategoryReferenceInput>;
+  /** Whether the rule is enabled */
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  /** The ID of the contribution accounting category rule to edit */
+  id?: InputMaybe<Scalars['String']['input']>;
+  /** The name of the rule */
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** The predicates of the rule */
+  predicates?: InputMaybe<Array<InputMaybe<ContributionAccountingCategoryRulePredicateInput>>>;
+};
+
+/** The operator of the predicate */
+export enum ContributionAccountingCategoryRuleOperator {
+  childrenOf = 'childrenOf',
+  contains = 'contains',
+  eq = 'eq',
+  gte = 'gte',
+  in = 'in',
+  lte = 'lte'
+}
+
+/** Input for creating or updating a contribution accounting category rule predicate */
+export type ContributionAccountingCategoryRulePredicateInput = {
+  /** The operator of the predicate */
+  operator?: InputMaybe<ContributionAccountingCategoryRuleOperator>;
+  /** The subject of the predicate */
+  subject?: InputMaybe<ContributionAccountingCategoryRuleSubject>;
+  /** The value of the predicate */
+  value: Scalars['JSON']['input'];
+};
+
+/** The subject of the predicate */
+export enum ContributionAccountingCategoryRuleSubject {
+  amount = 'amount',
+  currency = 'currency',
+  description = 'description',
+  frequency = 'frequency',
+  fromAccountType = 'fromAccountType',
+  paymentProcessor = 'paymentProcessor',
+  tierType = 'tierType',
+  toAccount = 'toAccount',
+  toAccountType = 'toAccountType'
 }
 
 export enum ContributionFrequency {
@@ -3627,6 +3721,7 @@ export type Credit = Transaction & {
   merchantId?: Maybe<Scalars['String']['output']>;
   netAmount: Amount;
   netAmountInHostCurrency: Amount;
+  netAmountInPayeeCurrency?: Maybe<Amount>;
   /** The account on the opposite side of the transaction (CREDIT -> sender, DEBIT -> recipient) */
   oppositeAccount?: Maybe<Account>;
   /** The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT) */
@@ -4053,7 +4148,9 @@ export enum DateTimeField {
   /** Transactions only: The date when a transaction was cleared by the payment processor */
   EFFECTIVE_DATE = 'EFFECTIVE_DATE',
   /** Orders only: The date when an order was last charged, defaults to createdAt if never charged */
-  LAST_CHARGED_AT = 'LAST_CHARGED_AT'
+  LAST_CHARGED_AT = 'LAST_CHARGED_AT',
+  /** Expenses only: The date when an expense was paid (based on the related transaction clearedAt) */
+  PAID_AT = 'PAID_AT'
 }
 
 /** This represents a Debit transaction */
@@ -4089,6 +4186,7 @@ export type Debit = Transaction & {
   merchantId?: Maybe<Scalars['String']['output']>;
   netAmount: Amount;
   netAmountInHostCurrency: Amount;
+  netAmountInPayeeCurrency?: Maybe<Amount>;
   /** The account on the opposite side of the transaction (CREDIT -> sender, DEBIT -> recipient) */
   oppositeAccount?: Maybe<Account>;
   /** The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT) */
@@ -4461,6 +4559,7 @@ export type EventExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -4529,6 +4628,7 @@ export type EventKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -4592,6 +4692,7 @@ export type EventOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -4606,6 +4707,7 @@ export type EventOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -4704,6 +4806,7 @@ export type EventTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -4858,6 +4961,8 @@ export type Expense = {
   merchantId?: Maybe<Scalars['String']['output']>;
   /** Whether this expense is on hold */
   onHold?: Maybe<Scalars['Boolean']['output']>;
+  /** The date on which the expense was paid */
+  paidAt?: Maybe<Scalars['DateTime']['output']>;
   /** The account who paid this expense */
   paidBy?: Maybe<Account>;
   /** The account being paid by this expense */
@@ -4970,8 +5075,18 @@ export type ExpenseCollection = Collection & {
   limit?: Maybe<Scalars['Int']['output']>;
   nodes?: Maybe<Array<Maybe<Expense>>>;
   offset?: Maybe<Scalars['Int']['output']>;
+  /** The accounts that are payees of the expenses in this collection (scoped to the main query arguments), regardless of pagination. Returns a paginated and searchable collection. */
+  payees: AccountCollection;
   totalAmount?: Maybe<ExpenseCollectionTotalAmount>;
   totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+/** A collection of "Expenses" */
+export type ExpenseCollectionPayeesArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ExpenseCollectionTotalAmount = {
@@ -5322,10 +5437,21 @@ export type ExpenseQuote = {
   __typename?: 'ExpenseQuote';
   /** The date on which the item was created */
   estimatedDeliveryAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Notices related to this quote */
+  notices?: Maybe<Array<Maybe<ExpenseQuoteNotice>>>;
   /** Amount of payment processor fee */
   paymentProcessorFeeAmount: Amount;
   /** Amount of this item */
   sourceAmount: Amount;
+};
+
+/** Fields for an expense quote notice */
+export type ExpenseQuoteNotice = {
+  __typename?: 'ExpenseQuoteNotice';
+  code: Scalars['String']['output'];
+  link: Scalars['String']['output'];
+  text: Scalars['String']['output'];
+  type: Scalars['String']['output'];
 };
 
 export type ExpenseReferenceInput = {
@@ -5474,6 +5600,87 @@ export type ExpenseValuesRoleDetails = {
   __typename?: 'ExpenseValuesRoleDetails';
   accountingCategory?: Maybe<AccountingCategory>;
 };
+
+/** An export request */
+export type ExportRequest = {
+  __typename?: 'ExportRequest';
+  /** The account that requested this export */
+  account: Account;
+  /** The time the export request was created */
+  createdAt: Scalars['DateTime']['output'];
+  /** The user who created this export request */
+  createdBy?: Maybe<Individual>;
+  /** The error message if the export request failed */
+  error?: Maybe<Scalars['String']['output']>;
+  /** The time when the export will expire */
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  /** The exported file (if completed) */
+  file?: Maybe<FileInfo>;
+  /** Unique identifier for this export request */
+  id: Scalars['NonEmptyString']['output'];
+  /** Legacy numeric ID of this export request */
+  legacyId: Scalars['Int']['output'];
+  /** The name of the export request */
+  name: Scalars['NonEmptyString']['output'];
+  /** The parameters of the export request */
+  parameters?: Maybe<Scalars['JSON']['output']>;
+  /** The progress of the export request (0-100) */
+  progress?: Maybe<Scalars['Int']['output']>;
+  /** The status of the export request */
+  status: ExportRequestStatus;
+  /** The type of export request */
+  type: ExportRequestType;
+  /** The time the export request was last updated */
+  updatedAt: Scalars['DateTime']['output'];
+  /** Whether a failed export request will be retried automatically */
+  willRetry: Scalars['Boolean']['output'];
+};
+
+/** A collection of "ExportRequest" */
+export type ExportRequestCollection = Collection & {
+  __typename?: 'ExportRequestCollection';
+  limit?: Maybe<Scalars['Int']['output']>;
+  nodes: Array<ExportRequest>;
+  offset?: Maybe<Scalars['Int']['output']>;
+  totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+/** Input type for creating an ExportRequest */
+export type ExportRequestCreateInput = {
+  /** The account to create the export request for */
+  account: AccountReferenceInput;
+  /** A name for this export request */
+  name: Scalars['NonEmptyString']['input'];
+  /** Optional parameters for the export request */
+  parameters?: InputMaybe<Scalars['JSON']['input']>;
+  /** The type of export to create */
+  type: ExportRequestType;
+};
+
+/** Input type for referencing an ExportRequest */
+export type ExportRequestReferenceInput = {
+  /** The public id identifying the export request */
+  id?: InputMaybe<Scalars['String']['input']>;
+  /** The internal id of the export request */
+  legacyId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** The status of an export request */
+export enum ExportRequestStatus {
+  COMPLETED = 'COMPLETED',
+  ENQUEUED = 'ENQUEUED',
+  EXPIRED = 'EXPIRED',
+  FAILED = 'FAILED',
+  PROCESSING = 'PROCESSING'
+}
+
+/** The type of export request */
+export enum ExportRequestType {
+  /** Export request for hosted collectives */
+  HOSTED_COLLECTIVES = 'HOSTED_COLLECTIVES',
+  /** Export request for transactions */
+  TRANSACTIONS = 'TRANSACTIONS'
+}
 
 /** All supported expense types */
 export enum FeesPayer {
@@ -5754,6 +5961,7 @@ export type FundExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -5822,6 +6030,7 @@ export type FundKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -5885,6 +6094,7 @@ export type FundOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5899,6 +6109,7 @@ export type FundOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -5997,6 +6208,7 @@ export type FundTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -6114,13 +6326,13 @@ export type GoCardlessLink = {
 
 /** Input for creating a GoCardless link */
 export type GoCardlessLinkInput = {
-  /** Number of days from acceptance that the access can be used (default: 90) */
+  /** Number of days from acceptance that the access can be used (default to the maximum allowed by the institution) */
   accessValidForDays?: InputMaybe<Scalars['Int']['input']>;
   /** Option to enable account selection view for the end user (default: true) */
   accountSelection?: InputMaybe<Scalars['Boolean']['input']>;
   /** The institution ID for this requisition */
   institutionId: Scalars['String']['input'];
-  /** Maximum number of days of transaction data to retrieve (default: 90) */
+  /** Maximum number of days of transaction data to retrieve (default to the maximum allowed by the institution) */
   maxHistoricalDays?: InputMaybe<Scalars['Int']['input']>;
   /** A two-letter country code (ISO 639-1) (default: "en") */
   userLanguage?: InputMaybe<Scalars['Locale']['input']>;
@@ -6150,6 +6362,7 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   /** List of activities that the logged-in user is subscribed for this collective */
   activitySubscriptions?: Maybe<Array<Maybe<ActivitySubscription>>>;
   backgroundImageUrl?: Maybe<Scalars['String']['output']>;
+  /** @deprecated 2026-01-23: Deprecated in favour of custom payment providers */
   bankAccount?: Maybe<PayoutMethod>;
   /** Whether this account can have changelog updates */
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
@@ -6161,6 +6374,7 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
+  contributionAccountingCategoryRules?: Maybe<Array<ContributionAccountingCategoryRule>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
   contributionStats: ContributionStats;
   /** All the persons and entities that contribute to this account */
@@ -6194,12 +6408,16 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   hasDisputedOrders?: Maybe<Scalars['Boolean']['output']>;
   /** Returns whether the host has any Stripe in review orders */
   hasInReviewOrders?: Maybe<Scalars['Boolean']['output']>;
+  /** Returns whether the account has money management activated. */
+  hasMoneyManagement: Scalars['Boolean']['output'];
   /** Returns true if the account has started the process to resume contributions */
   hasResumeContributionsProcessStarted: Scalars['Boolean']['output'];
   /** Host application requests */
   hostApplicationRequests: HostApplicationCollection;
   /** Applications for this host */
   hostApplications: HostApplicationCollection;
+  /** EXPERIMENTAL (this may change or be removed) */
+  hostContributionsReport?: Maybe<HostExpensesReports>;
   /** EXPERIMENTAL (this may change or be removed) */
   hostExpensesReport?: Maybe<HostExpensesReports>;
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
@@ -6255,6 +6473,8 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
+  /** Manual payment providers configured for this host */
+  manualPaymentProviders: Array<ManualPaymentProvider>;
   /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
@@ -6470,6 +6690,7 @@ export type HostExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -6520,6 +6741,14 @@ export type HostHostApplicationsArgs = {
   orderBy?: ChronologicalOrderInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<HostApplicationStatus>;
+};
+
+
+/** This represents an Host account */
+export type HostHostContributionsReportArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  timeUnit?: InputMaybe<TimeUnit>;
 };
 
 
@@ -6584,6 +6813,8 @@ export type HostHostedAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: InputMaybe<OrderByInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  startsAtFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  startsAtTo?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -6645,12 +6876,20 @@ export type HostKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
 /** This represents an Host account */
 export type HostLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
+};
+
+
+/** This represents an Host account */
+export type HostManualPaymentProvidersArgs = {
+  includeArchived?: Scalars['Boolean']['input'];
+  type?: InputMaybe<ManualPaymentProviderType>;
 };
 
 
@@ -6721,6 +6960,7 @@ export type HostOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -6735,6 +6975,7 @@ export type HostOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -6848,6 +7089,7 @@ export type HostTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -6905,7 +7147,10 @@ export type HostVendorsArgs = {
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: InputMaybe<OrderByInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  totalContributed?: InputMaybe<AmountRangeInput>;
+  totalExpended?: InputMaybe<AmountRangeInput>;
   visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
@@ -7292,6 +7537,8 @@ export type Individual = Account & {
   duplicatedFromAccount?: Maybe<Account>;
   /** Email for the account. For authenticated user: scope: "email". */
   email?: Maybe<Scalars['String']['output']>;
+  /** Email address waiting for validation. Only visible to the user themselves. */
+  emailWaitingForValidation?: Maybe<Scalars['EmailAddress']['output']>;
   /** Returns the emails of the account. Individuals only have one, but organizations can have multiple emails. */
   emails?: Maybe<Array<Scalars['EmailAddress']['output']>>;
   /** @deprecated 2024-11-04: Please use policies.EXPENSE_POLICIES */
@@ -7331,6 +7578,10 @@ export type Individual = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Returns true if user account is limited (user can't use any feature) */
+  isLimited: Scalars['Boolean']['output'];
+  /** Returns true if user is a root user. Only visible to the user themselves. */
+  isRoot: Scalars['Boolean']['output'];
   /** Whether this account is suspended */
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
@@ -7497,6 +7748,7 @@ export type IndividualExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -7563,6 +7815,7 @@ export type IndividualKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -7641,6 +7894,7 @@ export type IndividualOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -7655,6 +7909,7 @@ export type IndividualOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -7740,6 +7995,7 @@ export type IndividualTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -7828,15 +8084,17 @@ export type InviteMemberInput = {
 };
 
 export enum KycProvider {
-  MANUAL = 'MANUAL'
+  MANUAL = 'MANUAL',
+  PERSONA = 'PERSONA'
 }
 
-export type KycProviderData = ManualKycProviderData;
+export type KycProviderData = ManualKycProviderData | PersonaKycProviderData;
 
 /** A individual KYC verified status */
 export type KycStatus = {
   __typename?: 'KYCStatus';
   manual?: Maybe<KycVerification>;
+  persona?: Maybe<KycVerification>;
 };
 
 /** A KYC Verification */
@@ -8016,6 +8274,64 @@ export type ManualKycProviderData = {
   __typename?: 'ManualKYCProviderData';
   /** Notes added during manual verification */
   notes: Scalars['String']['output'];
+};
+
+/** A manual payment provider configured by a host for contributors to use */
+export type ManualPaymentProvider = {
+  __typename?: 'ManualPaymentProvider';
+  /** Bank account details for BANK_TRANSFER type providers */
+  accountDetails?: Maybe<Scalars['JSON']['output']>;
+  /** When this provider was created */
+  createdAt: Scalars['DateTime']['output'];
+  /** Icon name for this payment provider */
+  icon?: Maybe<Scalars['String']['output']>;
+  /** Unique identifier for this provider */
+  id: Scalars['String']['output'];
+  /** Payment instructions to show contributors (HTML) */
+  instructions?: Maybe<Scalars['String']['output']>;
+  /** Whether this provider has been archived */
+  isArchived: Scalars['Boolean']['output'];
+  /** Display name for this payment provider */
+  name: Scalars['NonEmptyString']['output'];
+  /** The type of manual payment provider */
+  type: ManualPaymentProviderType;
+  /** When this provider was last updated */
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ManualPaymentProviderCreateInput = {
+  /** Bank account details for BANK_TRANSFER type providers */
+  accountDetails?: InputMaybe<Scalars['JSON']['input']>;
+  /** Icon name for this payment provider */
+  icon?: InputMaybe<Scalars['String']['input']>;
+  /** Payment instructions to show contributors (HTML allowed) */
+  instructions: Scalars['String']['input'];
+  /** Display name for this payment provider */
+  name: Scalars['NonEmptyString']['input'];
+  /** The type of manual payment provider */
+  type: ManualPaymentProviderType;
+};
+
+export type ManualPaymentProviderReferenceInput = {
+  /** The unique identifier of the manual payment provider */
+  id: Scalars['String']['input'];
+};
+
+/** The type of manual payment provider */
+export enum ManualPaymentProviderType {
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  OTHER = 'OTHER'
+}
+
+export type ManualPaymentProviderUpdateInput = {
+  /** Bank account details for BANK_TRANSFER type providers */
+  accountDetails?: InputMaybe<Scalars['JSON']['input']>;
+  /** Icon name for this payment provider */
+  icon?: InputMaybe<Scalars['String']['input']>;
+  /** Payment instructions to show contributors (HTML allowed) */
+  instructions?: InputMaybe<Scalars['String']['input']>;
+  /** Display name for this payment provider */
+  name?: InputMaybe<Scalars['NonEmptyString']['input']>;
 };
 
 export enum MarkAsUnPaidExpenseStatus {
@@ -8198,8 +8514,12 @@ export type Mutation = {
   createExpense: Expense;
   /** Create a Stripe payment intent */
   createExpenseStripePaymentIntent: PaymentIntent;
+  /** Create a new export request. Scope: "account". */
+  createExportRequest: ExportRequest;
   /** Create a Fund. Scope: "account". */
   createFund?: Maybe<Fund>;
+  /** Create a new manual payment provider for a host. Scope: "host". */
+  createManualPaymentProvider: ManualPaymentProvider;
   /** [Root only] Create a member entry directly. For non-root users, use `inviteMember` */
   createMember: Member;
   /** To submit a new order. Scope: "orders". */
@@ -8241,6 +8561,8 @@ export type Mutation = {
   deleteConnectedAccount?: Maybe<ConnectedAccount>;
   /** Delete an expense. Only work if the expense is rejected - please check permissions.canDelete. Scope: "expenses". */
   deleteExpense: Expense;
+  /** Delete a manual payment provider. If orders reference this provider, it will be archived instead. Scope: "host". */
+  deleteManualPaymentProvider: ManualPaymentProvider;
   deletePersonalToken?: Maybe<PersonalToken>;
   /** Delete a tier. */
   deleteTier: Tier;
@@ -8282,6 +8604,8 @@ export type Mutation = {
   editConversation?: Maybe<Conversation>;
   /** To update an existing expense */
   editExpense: Expense;
+  /** Edit an existing export request. Scope: "account". */
+  editExportRequest: ExportRequest;
   /** Edit the status of a legal document */
   editLegalDocumentStatus: LegalDocument;
   /** Edit an existing member of the Collective. Scope: "account". */
@@ -8351,6 +8675,8 @@ export type Mutation = {
   rejectVirtualCardRequest: VirtualCardRequest;
   /** Remove an emoji reaction. Scope: "conversations", "expenses" or "updates". */
   removeEmojiReaction: EmojiReactionResponse;
+  /** Remove an existing export request. Scope: "account". */
+  removeExportRequest: ExportRequest;
   /** Removes the host for an account */
   removeHost: Account;
   /** Remove a member from the Collective. Scope: "account". */
@@ -8361,6 +8687,8 @@ export type Mutation = {
   removePayoutMethod: PayoutMethod;
   /** Remove 2FA from the Individual if it has been enabled. Scope: "account". */
   removeTwoFactorAuthTokenFromIndividual: Individual;
+  /** Reorder manual payment providers for a host. Scope: "host". */
+  reorderManualPaymentProviders: Array<ManualPaymentProvider>;
   /** Endpoint to accept or reject an invitation to become a member. Scope: "account". */
   replyToMemberInvitation: Scalars['Boolean']['output'];
   /** Requests an account to be verified using a KYC provider */
@@ -8379,8 +8707,8 @@ export type Mutation = {
   revokeOAuthAuthorization: OAuthAuthorization;
   /** [Root only] Anonymizes an account */
   rootAnonymizeAccount: Account;
-  /** Sends an email for guest to confirm their emails and create their Open Collective account */
-  sendGuestConfirmationEmail: Scalars['Boolean']['output'];
+  /** [Root only] Transfers balance from one account to another, creating BALANCE_TRANSFER transactions */
+  rootTransferBalance: Order;
   /** Send a message to an account. Scope: "account" */
   sendMessage?: Maybe<SendMessageResult>;
   /** Send In-App Survey response */
@@ -8413,6 +8741,10 @@ export type Mutation = {
   unpublishUpdate: Update;
   updateAccountPlatformSubscription: Account;
   updateApplication?: Maybe<Application>;
+  /** Update the contribution accounting category rules. Returns the account with the updated rules. */
+  updateContributionAccountingCategoryRules: Account;
+  /** Update an existing manual payment provider. Scope: "host". */
+  updateManualPaymentProvider: ManualPaymentProvider;
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
   updateOrder?: Maybe<Order>;
   /** Update the accounting category of an order. Scope: "orders". */
@@ -8663,9 +8995,22 @@ export type MutationCreateExpenseStripePaymentIntentArgs = {
 
 
 /** This is the root mutation */
+export type MutationCreateExportRequestArgs = {
+  exportRequest: ExportRequestCreateInput;
+};
+
+
+/** This is the root mutation */
 export type MutationCreateFundArgs = {
   fund: FundCreateInput;
   host?: InputMaybe<AccountReferenceInput>;
+};
+
+
+/** This is the root mutation */
+export type MutationCreateManualPaymentProviderArgs = {
+  host: AccountReferenceInput;
+  manualPaymentProvider: ManualPaymentProviderCreateInput;
 };
 
 
@@ -8824,6 +9169,12 @@ export type MutationDeleteConnectedAccountArgs = {
 /** This is the root mutation */
 export type MutationDeleteExpenseArgs = {
   expense: ExpenseReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationDeleteManualPaymentProviderArgs = {
+  manualPaymentProvider: ManualPaymentProviderReferenceInput;
 };
 
 
@@ -8992,6 +9343,13 @@ export type MutationEditExpenseArgs = {
   draftKey?: InputMaybe<Scalars['String']['input']>;
   expense: ExpenseUpdateInput;
   isDraftEdit?: Scalars['Boolean']['input'];
+};
+
+
+/** This is the root mutation */
+export type MutationEditExportRequestArgs = {
+  exportRequest: ExportRequestReferenceInput;
+  name?: InputMaybe<Scalars['NonEmptyString']['input']>;
 };
 
 
@@ -9261,6 +9619,12 @@ export type MutationRemoveEmojiReactionArgs = {
 
 
 /** This is the root mutation */
+export type MutationRemoveExportRequestArgs = {
+  exportRequest: ExportRequestReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationRemoveHostArgs = {
   account: AccountReferenceInput;
   message?: InputMaybe<Scalars['String']['input']>;
@@ -9297,6 +9661,14 @@ export type MutationRemoveTwoFactorAuthTokenFromIndividualArgs = {
   code?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<TwoFactorMethod>;
   userTwoFactorMethod?: InputMaybe<UserTwoFactorMethodReferenceInput>;
+};
+
+
+/** This is the root mutation */
+export type MutationReorderManualPaymentProvidersArgs = {
+  host: AccountReferenceInput;
+  providers: Array<ManualPaymentProviderReferenceInput>;
+  type: ManualPaymentProviderType;
 };
 
 
@@ -9364,8 +9736,11 @@ export type MutationRootAnonymizeAccountArgs = {
 
 
 /** This is the root mutation */
-export type MutationSendGuestConfirmationEmailArgs = {
-  email: Scalars['EmailAddress']['input'];
+export type MutationRootTransferBalanceArgs = {
+  amount?: InputMaybe<AmountInput>;
+  fromAccount: AccountReferenceInput;
+  message?: InputMaybe<Scalars['String']['input']>;
+  toAccount: AccountReferenceInput;
 };
 
 
@@ -9479,6 +9854,20 @@ export type MutationUpdateAccountPlatformSubscriptionArgs = {
 /** This is the root mutation */
 export type MutationUpdateApplicationArgs = {
   application: ApplicationUpdateInput;
+};
+
+
+/** This is the root mutation */
+export type MutationUpdateContributionAccountingCategoryRulesArgs = {
+  account: AccountReferenceInput;
+  rules: Array<ContributionAccountingCategoryRuleInput>;
+};
+
+
+/** This is the root mutation */
+export type MutationUpdateManualPaymentProviderArgs = {
+  input: ManualPaymentProviderUpdateInput;
+  manualPaymentProvider: ManualPaymentProviderReferenceInput;
 };
 
 
@@ -9612,6 +10001,8 @@ export enum OAuthScope {
   email = 'email',
   /** Create and manage expenses, payout methods. */
   expenses = 'expenses',
+  /** Manage export requests. */
+  exportRequests = 'exportRequests',
   /** Administrate fiscal hosts. */
   host = 'host',
   /** Access your incognito account. */
@@ -9689,6 +10080,7 @@ export type Order = {
   id: Scalars['String']['output'];
   lastChargedAt?: Maybe<Scalars['DateTime']['output']>;
   legacyId: Scalars['Int']['output'];
+  manualPaymentProvider?: Maybe<ManualPaymentProvider>;
   /** This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order. */
   membership?: Maybe<MemberOf>;
   /** Memo field which adds additional details about the order. For example in added funds this can be a note to mark what method (cheque, money order) the funds were received. */
@@ -9761,6 +10153,7 @@ export enum OrderByFieldType {
   /** Order by start date */
   STARTS_AT = 'STARTS_AT',
   TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED',
+  TOTAL_EXPENDED = 'TOTAL_EXPENDED',
   /** Order by the date the collective was unhosted */
   UNHOSTED_AT = 'UNHOSTED_AT'
 }
@@ -9776,10 +10169,20 @@ export type OrderByInput = {
 /** A collection of "Orders" */
 export type OrderCollection = Collection & {
   __typename?: 'OrderCollection';
+  /** The accounts that created the orders in this collection (only scoped to the `account`, `hostContext`, `includeChildrenAccounts`, `expectedFundsFilter` and `status` arguments), regardless of pagination. Returns a paginated and searchable collection. */
+  createdByUsers: AccountCollection;
   limit?: Maybe<Scalars['Int']['output']>;
   nodes?: Maybe<Array<Maybe<Order>>>;
   offset?: Maybe<Scalars['Int']['output']>;
   totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+/** A collection of "Orders" */
+export type OrderCollectionCreatedByUsersArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Some context about how an order was created */
@@ -9961,6 +10364,8 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   /** List of activities that the logged-in user is subscribed for this collective */
   activitySubscriptions?: Maybe<Array<Maybe<ActivitySubscription>>>;
   backgroundImageUrl?: Maybe<Scalars['String']['output']>;
+  /** Returns whether this organization can be a vendor of the specified host. This checks if the organization only transacted with this host and all its admins are also admins of the host. */
+  canBeVendorOf: Scalars['Boolean']['output'];
   /** Whether this account can have changelog updates */
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   /** Returns true if the remote user can start the process to resume contributions for account */
@@ -10138,6 +10543,12 @@ export type OrganizationBackgroundImageUrlArgs = {
 
 
 /** This represents an Organization account */
+export type OrganizationCanBeVendorOfArgs = {
+  host: AccountReferenceInput;
+};
+
+
+/** This represents an Organization account */
 export type OrganizationChildrenAccountsArgs = {
   accountType?: InputMaybe<Array<InputMaybe<AccountType>>>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10205,6 +10616,7 @@ export type OrganizationExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -10259,6 +10671,7 @@ export type OrganizationKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -10322,6 +10735,7 @@ export type OrganizationOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10336,6 +10750,7 @@ export type OrganizationOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -10433,6 +10848,7 @@ export type OrganizationTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -10574,6 +10990,7 @@ export type PaymentMethodOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10588,6 +11005,7 @@ export type PaymentMethodOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -10617,6 +11035,8 @@ export type PaymentMethodInput = {
    * @deprecated 2021-03-02: Please use service + type
    */
   legacyType?: InputMaybe<PaymentMethodLegacyType>;
+  /** The Manual Payment Provider ID used in this checkout */
+  manualPaymentProvider?: InputMaybe<ManualPaymentProviderReferenceInput>;
   /** Name of this payment method */
   name?: InputMaybe<Scalars['String']['input']>;
   /** @deprecated 2021-08-20: Please use type instead */
@@ -10877,6 +11297,19 @@ export type Permission = {
   allowed: Scalars['Boolean']['output'];
   reason?: Maybe<Scalars['String']['output']>;
   reasonDetails?: Maybe<Scalars['JSON']['output']>;
+};
+
+/** Persona KYC data */
+export type PersonaKycProviderData = {
+  __typename?: 'PersonaKYCProviderData';
+  /** Contains KYC data verified by this inquiry */
+  fields: Scalars['JSON']['output'];
+  /** ID of the Persona inquiry */
+  id: Scalars['String']['output'];
+  /** Whether this persona inquiry was imported */
+  imported: Scalars['Boolean']['output'];
+  /** Status of the Persona inquiry */
+  status: Scalars['String']['output'];
 };
 
 /** A personal token */
@@ -11549,6 +11982,7 @@ export type ProjectExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -11617,6 +12051,7 @@ export type ProjectKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -11680,6 +12115,7 @@ export type ProjectOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11694,6 +12130,7 @@ export type ProjectOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -11792,6 +12229,7 @@ export type ProjectTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -11885,6 +12323,8 @@ export type Query = {
   expense?: Maybe<Expense>;
   expenseTagStats: TagStatsCollection;
   expenses: ExpenseCollection;
+  exportRequest?: Maybe<ExportRequest>;
+  exportRequests: ExportRequestCollection;
   fund?: Maybe<Fund>;
   host?: Maybe<Host>;
   hostApplication?: Maybe<HostApplication>;
@@ -11967,14 +12407,17 @@ export type QueryAccountsArgs = {
 
 /** This is the root query */
 export type QueryActivitiesArgs = {
-  account: Array<AccountReferenceInput>;
+  account?: InputMaybe<Array<AccountReferenceInput>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   excludeParentAccount?: Scalars['Boolean']['input'];
+  host?: InputMaybe<AccountReferenceInput>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: Scalars['Boolean']['input'];
+  individual?: InputMaybe<AccountReferenceInput>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: ChronologicalOrderInput;
   timeline?: Scalars['Boolean']['input'];
   type?: InputMaybe<Array<ActivityAndClassesType>>;
 };
@@ -12003,8 +12446,11 @@ export type QueryCommunityArgs = {
   host?: InputMaybe<AccountReferenceInput>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: InputMaybe<OrderByInput>;
   relation?: InputMaybe<Array<CommunityRelationType>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  totalContributed?: InputMaybe<AmountRangeInput>;
+  totalExpended?: InputMaybe<AmountRangeInput>;
   type?: InputMaybe<Array<InputMaybe<AccountType>>>;
 };
 
@@ -12063,6 +12509,7 @@ export type QueryExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -12079,6 +12526,23 @@ export type QueryExpensesArgs = {
   type?: InputMaybe<ExpenseType>;
   types?: InputMaybe<Array<InputMaybe<ExpenseType>>>;
   virtualCards?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
+};
+
+
+/** This is the root query */
+export type QueryExportRequestArgs = {
+  exportRequest: ExportRequestReferenceInput;
+  throwIfMissing?: Scalars['Boolean']['input'];
+};
+
+
+/** This is the root query */
+export type QueryExportRequestsArgs = {
+  account: AccountReferenceInput;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  status?: InputMaybe<ExportRequestStatus>;
+  type?: InputMaybe<ExportRequestType>;
 };
 
 
@@ -12160,6 +12624,7 @@ export type QueryOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -12174,6 +12639,7 @@ export type QueryOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -12308,6 +12774,7 @@ export type QueryTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
@@ -12422,12 +12889,17 @@ export enum RefundKind {
 
 export type RequestKycVerificationInput = {
   manual?: InputMaybe<RequestManualKycVerificationInput>;
+  persona?: InputMaybe<RequestPersonaKycVerificationInput>;
 };
 
 export type RequestManualKycVerificationInput = {
-  legalAddress: Scalars['String']['input'];
+  legalAddress?: InputMaybe<Scalars['String']['input']>;
   legalName: Scalars['String']['input'];
   notes?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type RequestPersonaKycVerificationInput = {
+  importInquiryId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SearchResponse = {
@@ -13024,6 +13496,7 @@ export type Transaction = {
   merchantId?: Maybe<Scalars['String']['output']>;
   netAmount: Amount;
   netAmountInHostCurrency: Amount;
+  netAmountInPayeeCurrency?: Maybe<Amount>;
   oppositeAccount?: Maybe<Account>;
   /** The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT) */
   oppositeTransaction?: Maybe<Transaction>;
@@ -13355,6 +13828,7 @@ export enum TransactionsImportRowAction {
   DISMISS_ALL = 'DISMISS_ALL',
   PUT_ON_HOLD_ALL = 'PUT_ON_HOLD_ALL',
   RESTORE_ALL = 'RESTORE_ALL',
+  UNLINK = 'UNLINK',
   UPDATE_ROWS = 'UPDATE_ROWS'
 }
 
@@ -13705,11 +14179,13 @@ export enum UploadedFileKind {
   ACCOUNT_LONG_DESCRIPTION = 'ACCOUNT_LONG_DESCRIPTION',
   AGREEMENT_ATTACHMENT = 'AGREEMENT_ATTACHMENT',
   COMMENT = 'COMMENT',
+  CUSTOM_PAYMENT_METHOD_TEMPLATE = 'CUSTOM_PAYMENT_METHOD_TEMPLATE',
   EXPENSE_ATTACHED_FILE = 'EXPENSE_ATTACHED_FILE',
   EXPENSE_INVOICE = 'EXPENSE_INVOICE',
   EXPENSE_ITEM = 'EXPENSE_ITEM',
   RECEIPT_EMBEDDED_IMAGE = 'RECEIPT_EMBEDDED_IMAGE',
   TIER_LONG_DESCRIPTION = 'TIER_LONG_DESCRIPTION',
+  TRANSACTIONS_CSV_EXPORT = 'TRANSACTIONS_CSV_EXPORT',
   TRANSACTIONS_IMPORT = 'TRANSACTIONS_IMPORT',
   UPDATE = 'UPDATE'
 }
@@ -13971,6 +14447,7 @@ export type VendorExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -14025,6 +14502,7 @@ export type VendorKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -14088,6 +14566,7 @@ export type VendorOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14102,6 +14581,7 @@ export type VendorOrdersArgs = {
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
@@ -14193,6 +14673,7 @@ export type VendorTransactionsArgs = {
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   limit?: Scalars['Int']['input'];
+  manualPaymentProvider?: InputMaybe<Array<ManualPaymentProviderReferenceInput>>;
   maxAmount?: InputMaybe<Scalars['Int']['input']>;
   merchantId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   minAmount?: InputMaybe<Scalars['Int']['input']>;

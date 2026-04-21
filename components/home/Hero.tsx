@@ -24,6 +24,7 @@ const Hero = () => {
             src="/static/images/hero-illustration.png"
             width={2586}
             height={1597}
+            loading="eager"
             alt={intl.formatMessage({
               defaultMessage: 'Collaborative Money Management',
               id: 'home.collaborativeMoneyManagement',

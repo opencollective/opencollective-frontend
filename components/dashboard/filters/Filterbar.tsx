@@ -1,23 +1,27 @@
 import React from 'react';
 import { partition } from 'lodash';
+import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 
 import type { FilterComponentConfigs, resetFilters, SetFilter, Views } from '../../../lib/filters/filter-types';
 import { filterShouldBeInAddFilterOptions, filterShouldDisplay } from '../../../lib/filters/filter-utils';
 import { cn } from '../../../lib/utils';
 
-import Tabs from '../../Tabs';
 import { Separator } from '../../ui/Separator';
 
-import FilterDropdown from './FilterDropdown';
+import FilterDropdown, { AddFilterDropdown } from './FilterDropdown';
+import FilterViews from './FilterViews';
 
 function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
-  const filterKeys = Object.keys(filters);
+  const filterKeys = React.useMemo(() => Object.keys(filters), [filters]);
   const [displayedFilters, setDisplayedFilters] = React.useState(
     filterKeys.filter(key => filterShouldDisplay(key, { values, filters, defaultSchemaValues, meta })),
   );
-  const remainingFilters = filterKeys.filter(key =>
-    filterShouldBeInAddFilterOptions(key, { values, filters, defaultSchemaValues, meta }),
+
+  const remainingFilters = React.useMemo(
+    () =>
+      filterKeys.filter(key => filterShouldBeInAddFilterOptions(key, { values, filters, defaultSchemaValues, meta })),
+    [filterKeys, values, filters, defaultSchemaValues, meta],
   );
 
   // When the values change, this effect makes sure to update the displayed filter keys array and maintain the order of the filters
@@ -34,7 +38,27 @@ function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
   return { displayedFilters, remainingFilters };
 }
 
-const renderFilter = ({ filters, values, key, activeViewId, views, lockViewFilters, intl, meta, setFilter }) => {
+function renderFilter<FV extends Record<string, any>, FM>({
+  filters,
+  values,
+  key,
+  activeViewId,
+  views,
+  lockViewFilters,
+  intl,
+  meta,
+  setFilter,
+}: {
+  filters: FilterComponentConfigs<FV, FM>;
+  values: FV;
+  key: keyof FV & string;
+  activeViewId?: string;
+  views?: Views<FV>;
+  lockViewFilters?: boolean;
+  intl: IntlShape;
+  meta?: FM;
+  setFilter: SetFilter<FV>;
+}) {
   const filter = filters[key];
   const view = views?.find(v => v.id === activeViewId);
   const filterPartOfView = Boolean(view?.filter[key]);
@@ -53,6 +77,7 @@ const renderFilter = ({ filters, values, key, activeViewId, views, lockViewFilte
         highlighted={highlighted}
         intl={intl}
         meta={meta}
+        values={values}
       />
     );
   } else {
@@ -69,7 +94,7 @@ const renderFilter = ({ filters, values, key, activeViewId, views, lockViewFilte
       />
     );
   }
-};
+}
 
 export function Filterbar<FV extends Record<string, any>, FM>({
   values,
@@ -86,6 +111,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   primaryFilters,
   primaryFilterClassName,
   lockViewFilters,
+  hideCounts,
 }: {
   values: FV;
   filters: FilterComponentConfigs<FV, FM>;
@@ -101,6 +127,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   primaryFilters?: string[];
   primaryFilterClassName?: string;
   lockViewFilters?: boolean;
+  hideCounts?: boolean;
 }) {
   const intl = useIntl();
   const { displayedFilters, remainingFilters } = useGetFilterbarOptions(filters, values, defaultSchemaValues, meta);
@@ -130,7 +157,11 @@ export function Filterbar<FV extends Record<string, any>, FM>({
 
   return (
     <div className={cn('flex flex-col gap-4', className)}>
-      {views ? <Tabs tabs={views} selectedId={activeViewId} onChange={onTabChange} /> : !hideSeparator && <Separator />}
+      {views?.length > 1 ? (
+        <FilterViews views={views} activeViewId={activeViewId} onChange={onTabChange} hideCounts={hideCounts} />
+      ) : (
+        !hideSeparator && <Separator />
+      )}
       {Boolean(filtersOnTop.length) && (
         <div className={cn('repeat(auto-fit, minmax(200px, 1fr)) grid gap-2 [&_input]:w-full', primaryFilterClassName)}>
           {filtersOnTop.map(key => {
@@ -152,13 +183,9 @@ export function Filterbar<FV extends Record<string, any>, FM>({
           })}
 
           {remainingFilters.length > 0 && (
-            <FilterDropdown
+            <AddFilterDropdown
               filters={filters}
               values={values}
-              // If last option display it directly
-              {...(remainingFilters.length === 1 && {
-                filterKey: remainingFilters[0],
-              })}
               remainingFilters={remainingFilters}
               setFilter={setFilter}
               meta={meta}

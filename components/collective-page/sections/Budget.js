@@ -102,6 +102,7 @@ const budgetSectionQuery = gql`
       includeIncognitoTransactions: true
       includeGiftCardTransactions: true
       includeChildrenTransactions: true
+      includeEditedReversedTransactions: false
     ) {
       ...TransactionsQueryCollectionFragment
     }
@@ -135,6 +136,7 @@ const budgetSectionForIndividualQuery = gql`
       kind: $kind
       includeIncognitoTransactions: true
       includeGiftCardTransactions: true
+      includeEditedReversedTransactions: false
     ) {
       ...TransactionsQueryCollectionFragment
     }
@@ -187,6 +189,7 @@ const budgetSectionWithHostQuery = gql`
       includeIncognitoTransactions: true
       includeGiftCardTransactions: true
       includeChildrenTransactions: true
+      includeEditedReversedTransactions: false
     ) {
       ...TransactionsQueryCollectionFragment
     }

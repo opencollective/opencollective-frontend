@@ -20,6 +20,7 @@ const createApplicationMutation = gql`
   mutation CreateApplication($application: ApplicationCreateInput!) {
     createApplication(application: $application) {
       id
+      publicId
       name
     }
   }

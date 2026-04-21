@@ -5,8 +5,8 @@ import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import type { Account, AccountingCategory, Expense, ExpenseType, Host } from '../lib/graphql/types/v2/schema';
-import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../lib/graphql/types/v2/schema';
+import type { Account, AccountingCategory, Expense, ExpenseType, Host } from '../lib/graphql/types/v2/graphql';
+import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
@@ -39,7 +39,7 @@ type RequiredHostFields = Pick<Host, 'id' | 'slug' | 'type'> & {
 
 type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' | 'code' | 'kind'>;
 
-type AccountingCategorySelectProps = {
+export type AccountingCategorySelectProps = {
   host: RequiredHostFields;
   /** The account holding the expense. Only used when using the prediction service */
   account?: { id: Account['id']; slug: Account['slug']; parent?: { id: Account['id'] } };
@@ -174,11 +174,7 @@ export const getCategoryLabel = (
 /**
  * Returns true if the category is supported for the given expense type. Host admins can select any category.
  */
-export const isSupportedExpenseCategory = (
-  expenseType: ExpenseType,
-  category: AccountingCategory,
-  isHostAdmin: boolean,
-) => {
+const isSupportedExpenseCategory = (expenseType: ExpenseType, category: AccountingCategory, isHostAdmin: boolean) => {
   return (
     category?.kind === AccountingCategoryKind.EXPENSE &&
     (isHostAdmin || !category?.expensesTypes || category.expensesTypes.includes(expenseType))
@@ -278,7 +274,7 @@ const useExpenseCategoryPredictionService = (
 
   // Trigger new fetch predictions, and hide the current ones if we don't get a response within 1s (to avoid flickering)
   React.useEffect(() => {
-    if (hasValidParams) {
+    if (hasValidParams && host?.slug) {
       const hidePredictionsTimeout = setTimeout(() => setShowPreviousPredictions(false), 1000);
       throttledFetchPredictions({ hostSlug: host.slug, accountSlug: account.slug, ...inputData }).then(() => {
         clearTimeout(hidePredictionsTimeout);
@@ -287,7 +283,7 @@ const useExpenseCategoryPredictionService = (
         }
       });
     }
-  }, [host.slug, account?.slug, hasValidParams, ...Object.values(inputData)]);
+  }, [host?.slug, account?.slug, hasValidParams, ...Object.values(inputData)]);
 
   // Map returned categories with known ones to build `predictions`
   const predictions = React.useMemo(() => {
@@ -396,7 +392,14 @@ const AccountingCategorySelect = ({
   return (
     <div>
       <Popover open={isOpen} onOpenChange={setOpen}>
-        <PopoverTrigger asChild onBlur={onBlur} disabled={disabled}>
+        <PopoverTrigger
+          asChild
+          onBlur={onBlur}
+          disabled={disabled}
+          onClick={e => {
+            e.stopPropagation();
+          }}
+        >
           {children || (
             <Button
               id={id}
@@ -423,7 +426,11 @@ const AccountingCategorySelect = ({
             </Button>
           )}
         </PopoverTrigger>
-        <PopoverContent className="min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+        <PopoverContent
+          onClick={e => e.stopPropagation()}
+          className="min-w-[280px] p-0"
+          style={{ width: 'var(--radix-popover-trigger-width)' }}
+        >
           <Command>
             {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
 

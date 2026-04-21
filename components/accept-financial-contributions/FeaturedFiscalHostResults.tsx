@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
-import type { Account, Host } from '../../lib/graphql/types/v2/schema';
+import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
 import { Grid } from '../Grid';
 
@@ -23,7 +23,10 @@ export default function FeaturedFiscalHostResults({
   hosts,
   collective,
 }: {
-  hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
+  hosts: Pick<
+    Host,
+    'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent' | 'platformContributionAvailable'
+  >[];
   collective: Pick<Account, 'slug'>;
 }) {
   return (

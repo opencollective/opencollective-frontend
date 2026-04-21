@@ -7,13 +7,14 @@ export type { VendorFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 export const vendorFieldFragment = gql`
   fragment VendorFields on Vendor {
     id
+    publicId
     slug
     name
     legalName
     type
     description
     tags
-    imageUrl(height: 96)
+    imageUrl
     isArchived
     createdAt
 
@@ -70,18 +71,6 @@ export const vendorFieldFragment = gql`
     }
   }
   ${accountHoverCardFields}
-`;
-
-export const vendorDetailQuery = gql`
-  query VendorDetail($id: String!) {
-    account(id: $id) {
-      id
-      ... on Vendor {
-        ...VendorFields
-      }
-    }
-  }
-  ${vendorFieldFragment}
 `;
 
 export const setVendorArchiveMutation = gql`

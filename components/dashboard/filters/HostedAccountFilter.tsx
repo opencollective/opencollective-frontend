@@ -5,8 +5,11 @@ import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { gql } from '../../../lib/graphql/helpers';
-import type { AccountFilterQuery, AccountHoverCardFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../../lib/graphql/types/v2/schema';
+import type {
+  Account,
+  AccountFilterQuery,
+  AccountHoverCardFieldsFragment,
+} from '../../../lib/graphql/types/v2/graphql';
 import { isMulti } from '@/lib/filters/schemas';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
@@ -27,29 +30,27 @@ const hostedAccountFilterSearchQuery = gql`
   ${accountHoverCardFields}
 `;
 
-export const AccountRenderer = ({
-  account,
-  inOptionsList,
-}: {
+export const AccountRenderer = (props: {
   account: Partial<AccountHoverCardFieldsFragment> & {
     slug: Account['slug'];
   };
   inOptionsList?: boolean; // For positioning the HoverCard to the right to prevent blocking options list
 }) => {
   const { data } = useQuery<AccountFilterQuery>(accountFilterQuery, {
-    variables: { slug: account.slug },
+    variables: { slug: props.account.slug },
     fetchPolicy: 'cache-first',
 
     // skip query if there is already a field from the hover card data (such as description),
     // to prevent fetching all accounts when used in the combo select filter that already queries for these fields
-    skip: !!account.description && !!account.type,
+    skip: !!props.account.description && !!props.account.type,
   });
+  const account = data?.account ?? props.account;
 
   const trigger = (
     <div className="flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
       <Avatar collective={account} radius={20} />
       <div className="relative flex flex-1 items-center justify-between gap-1 overflow-hidden">
-        <span className="truncate">{account.name ?? account.slug}</span>
+        <span className="truncate">{account.name || account.slug}</span>
       </div>
     </div>
   );
@@ -61,7 +62,7 @@ export const AccountRenderer = ({
   return (
     <AccountHoverCard
       account={data.account}
-      {...(inOptionsList && { hoverCardContentProps: { side: 'right', sideOffset: 24 } })}
+      {...(props.inOptionsList && { hoverCardContentProps: { side: 'right', sideOffset: 24 } })}
       trigger={trigger}
     />
   );
@@ -108,46 +109,52 @@ export type HostedAccountFilterMeta = {
 };
 
 function HostedAccountFilter({
-  meta: { hostSlug, hostedAccounts, disableHostedAccountsSearch },
+  meta,
   ...props
 }: FilterComponentProps<z.infer<typeof schema | typeof multiSchema>, HostedAccountFilterMeta> &
   React.ComponentProps<typeof ComboSelectFilter>) {
-  const defaultAccounts = React.useMemo(() => hostedAccounts?.map(resultNodeToOption) || [], [hostedAccounts]);
+  const defaultAccounts = React.useMemo(
+    () => meta.hostedAccounts?.map(resultNodeToOption) || [],
+    [meta.hostedAccounts],
+  );
   const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>(defaultAccounts);
 
   const [search, { loading, data }] = useLazyQuery(hostedAccountFilterSearchQuery, {
-    variables: { hostSlug },
+    variables: { hostSlug: meta.hostSlug },
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
   });
 
   const searchFunc = React.useCallback(
     (searchTerm: string) => {
-      if (!searchTerm && defaultAccounts.length) {
-        setOptions(defaultAccounts);
-      } else {
-        search({
-          variables: {
-            searchTerm,
-            ...(!searchTerm && { orderBy: { field: 'ACTIVITY', direction: 'DESC' } }),
-          },
-        });
-      }
+      search({
+        variables: {
+          searchTerm: searchTerm || undefined,
+          ...(!searchTerm && { orderBy: { field: 'ACTIVITY', direction: 'DESC' } }),
+        },
+      });
     },
-    [defaultAccounts, search],
+    [search],
   );
 
+  // Load initial options on mount if no default accounts provided
   React.useEffect(() => {
-    if (!loading) {
-      setOptions(data?.accounts?.nodes.map(resultNodeToOption) || defaultAccounts);
+    if (!defaultAccounts.length) {
+      searchFunc('');
     }
-  }, [loading, data, defaultAccounts]);
+  }, [defaultAccounts.length, searchFunc]);
+
+  React.useEffect(() => {
+    if (!loading && data?.accounts?.nodes) {
+      setOptions(data.accounts.nodes.map(resultNodeToOption));
+    }
+  }, [loading, data]);
 
   return (
     <ComboSelectFilter
       options={options}
       loading={loading}
-      searchFunc={disableHostedAccountsSearch ? undefined : searchFunc}
+      searchFunc={meta.disableHostedAccountsSearch ? undefined : searchFunc}
       {...props}
     />
   );

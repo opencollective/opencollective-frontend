@@ -8,7 +8,7 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { isMulti, limit, offset } from '../../../../lib/filters/schemas';
 import type { HostApplicationsQuery, HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { HostApplicationStatus, LastCommentBy } from '../../../../lib/graphql/types/v2/schema';
+import { HostApplicationStatus, LastCommentBy } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nHostApplicationStatus from '../../../../lib/i18n/host-application-status';
 import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';
@@ -169,7 +169,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             hostApplications={hostApplications?.nodes}
             nbPlaceholders={nbPlaceholders}
             loading={loading}
-            openApplication={application => queryFilter.setFilter('hostApplicationId', application.id, false)}
+            openApplication={application => queryFilter.setFilter('hostApplicationId', application.publicId, false)}
           />
           <Pagination queryFilter={queryFilter} total={hostApplications?.totalCount} />
         </React.Fragment>

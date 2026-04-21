@@ -28,7 +28,7 @@ module.exports = {
         'components/edit-collective/actions/Delete.js',
         'components/edit-collective/EditUserEmailForm.js',
         'components/edit-collective/sections/GiftCards.tsx',
-        'components/edit-collective/sections/PaymentReceipts.js',
+        'components/edit-collective/sections/PaymentReceipts.tsx',
         'components/edit-collective/sections/Webhooks.tsx',
         'components/EditPublicMessagePopup.js',
         'components/MembershipsWithData.js',

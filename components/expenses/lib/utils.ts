@@ -1,32 +1,13 @@
-import { isEmpty, isNil, round, sumBy, uniq } from 'lodash';
+import { isNil, round, sumBy } from 'lodash';
 
-import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
-import { CollectiveType } from '../../../lib/constants/collectives';
-import { Currency, PayPalSupportedCurrencies } from '../../../lib/constants/currency';
-import expenseTypes from '../../../lib/constants/expenseTypes';
-import { PayoutMethodType } from '../../../lib/constants/payout-method';
 import { diffExchangeRates } from '../../../lib/currency-utils';
 
-import { validateTaxInput } from '../../taxes/TaxesFormikFields';
 import type { ExpenseItemFormValues } from '../types/FormValues';
 
 // Please adjust the values below based on `prepareItems` from `api/server/graphql/common/expenses.ts`
 // ts-unused-exports:disable-next-line
 export const FX_RATE_WARNING_THRESHOLD = 0.02;
 export const FX_RATE_ERROR_THRESHOLD = 0.1;
-
-export const checkRequiresAddress = values => {
-  const collectiveTypesRequiringAddress = [CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.ORGANIZATION];
-  const expenseTypesRequiringAddress = [expenseTypes.INVOICE, expenseTypes.GRANT];
-
-  return (
-    expenseTypesRequiringAddress.includes(values.type) &&
-    (values.payee?.isNewUser ||
-      (values.payee &&
-        !values.payee.isInvite &&
-        (collectiveTypesRequiringAddress.includes(values.payee.type) || values.payee.isHost)))
-  );
-};
 
 export const isTaxRateValid = rate => !isNil(rate) && rate >= 0 && rate <= 1;
 
@@ -103,59 +84,4 @@ export const computeExpenseAmounts = (expenseCurrency: string, items: ExpenseIte
 
 export const getAmountWithoutTaxes = (totalAmount, taxes) => {
   return totalAmount / (1 + sumBy(taxes, 'rate'));
-};
-
-export const validateExpenseTaxes = (intl, taxes) => {
-  const enabledTaxes = taxes?.filter(tax => !tax.isDisabled) || [];
-  if (!enabledTaxes.length) {
-    return null;
-  } else {
-    const taxesErrors = enabledTaxes.map(tax => validateTaxInput(intl, tax));
-    const hasErrors = taxesErrors.some(errors => !isEmpty(errors));
-    return hasErrors ? taxesErrors : null;
-  }
-};
-
-/**
- * Returns the list of supported currencies for this expense / payout method.
- * The collective currency always comes first.
- */
-export const getSupportedCurrencies = (collective, { payee, payoutMethod, type, currency }) => {
-  // We don't allow changing the currency for virtual card charges
-  if (type === expenseTypes.CHARGE) {
-    return [currency];
-  }
-
-  // Multi-currency opt-out
-  if (
-    !isFeatureEnabled(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
-    !isFeatureEnabled(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES) ||
-    payoutMethod?.type === PayoutMethodType.ACCOUNT_BALANCE
-  ) {
-    return [collective.currency];
-  }
-
-  // Allow any currency for invites
-  if (payee?.isInvite && !payoutMethod?.data?.currency) {
-    return Currency;
-  }
-
-  // Adapt based on payout method type
-  const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
-  if (isPayPal) {
-    const defaultCurrency = PayPalSupportedCurrencies.includes(collective.currency) ? collective.currency : 'USD';
-    return uniq([defaultCurrency, ...PayPalSupportedCurrencies]);
-  } else if (payoutMethod?.type === PayoutMethodType.OTHER) {
-    return Currency.includes(collective.currency) ? uniq([collective.currency, ...Currency]) : Currency;
-  } else {
-    return uniq(
-      [collective.currency, collective.host?.currency, payoutMethod?.currency, payoutMethod?.data?.currency].filter(
-        Boolean,
-      ),
-    );
-  }
-};
-
-export const expenseTypeSupportsItemCurrency = expenseType => {
-  return [expenseTypes.RECEIPT, expenseTypes.INVOICE].includes(expenseType);
 };

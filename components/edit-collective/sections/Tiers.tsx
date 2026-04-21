@@ -14,7 +14,7 @@ import { EMPTY_ARRAY } from '@/lib/constants/utils';
 import AdminContributeCardsContainer from '../../contribute-cards/AdminContributeCardsContainer';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
-import { Box, Grid } from '../../Grid';
+import { Box, Flex, Grid } from '../../Grid';
 import Image from '../../Image';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
@@ -57,14 +57,15 @@ const getSortedContributeCards = (collective, tiers, intl) => {
   });
 };
 
-const CardsContainer = styled(Grid).attrs({
-  justifyItems: 'center',
-  gridGap: '30px',
-  gridTemplateColumns: ['repeat(auto-fit, minmax(280px, 1fr))'],
-  gridAutoRows: ['1fr'],
+const CardsContainer = styled(Flex).attrs({
+  flexWrap: 'wrap',
+  gap: '40px',
+  justifyContent: 'flex-start',
 })`
   & > * {
     padding: 0;
+    min-width: 280px;
+    flex: 0 1 auto;
   }
 `;
 

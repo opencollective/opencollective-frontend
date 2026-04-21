@@ -241,7 +241,7 @@ const conversationsPageQuery = gql`
       }
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
       }
     }
   }

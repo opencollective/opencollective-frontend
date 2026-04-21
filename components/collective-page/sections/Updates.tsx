@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { gql } from '../../../lib/graphql/helpers';
-import type { Account, Update } from '../../../lib/graphql/types/v2/schema';
+import type { Account, Update } from '../../../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../lib/url-helpers';
 import { formatDate } from '../../../lib/utils';
 
@@ -221,7 +221,7 @@ const SectionUpdates = ({ collective, isAdmin }) => {
                           defaultMessage="Created on {date} (draft) by {author}"
                           values={{
                             date: formatDate(update.createdAt),
-                            author: <LinkCollective collective={update.fromAccount} />,
+                            author: <LinkCollective key="author" collective={update.fromAccount} />,
                           }}
                         />
                       )}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { SocialLink } from '../../lib/graphql/types/v2/schema';
+import type { SocialLink } from '../../lib/graphql/types/v2/graphql';
 import { iconForSocialLinkType } from '../../lib/social-links';
 import { cn } from '@/lib/utils';
 

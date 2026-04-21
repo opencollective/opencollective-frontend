@@ -12,6 +12,7 @@ import { padding } from 'styled-system';
 import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { gql } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
+import { FILTERS, normalizeSearchTypes } from '../lib/search-page-type-query';
 import { parseToBoolean } from '../lib/utils';
 import { textTransform } from '@/lib/styled-system-custom-properties';
 
@@ -47,16 +48,6 @@ const AllCardsContainer = styled(Grid).attrs({
   maxWidth: 1200,
   gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 2fr))',
 })``;
-
-const FILTERS = {
-  ALL: 'ALL',
-  COLLECTIVE: 'COLLECTIVE',
-  EVENT: 'EVENT',
-  ORGANIZATION: 'ORGANIZATION',
-  HOST: 'HOST',
-  PROJECT: 'PROJECT',
-  FUND: 'FUND',
-};
 
 const I18nFilters = defineMessages({
   [FILTERS.ALL]: {
@@ -144,13 +135,11 @@ const FilterButton = styled(StyledButton).attrs({
     `}
 `;
 
-const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
-
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
       term: query.q || '',
-      type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
+      type: normalizeSearchTypes(query.type),
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       onlyOpenToApplications: isNil(query.onlyOpenToApplications) ? true : parseToBoolean(query.onlyOpenToApplications),
       country: query.country || null,
@@ -310,7 +299,12 @@ class SearchPage extends React.Component {
       getSortOption('CREATED_AT.DESC'),
       getSortOption('CREATED_AT.ASC'),
     ];
-    const selectedTypeFilter = this.props.isHost ? 'HOST' : this.props.type.length === 1 ? this.props.type[0] : 'ALL';
+    const rawSelectedTypeFilter = this.props.isHost
+      ? 'HOST'
+      : this.props.type.length === 1
+        ? this.props.type[0]
+        : 'ALL';
+    const selectedTypeFilter = I18nFilters[rawSelectedTypeFilter] ? rawSelectedTypeFilter : 'ALL';
     const showonlyOpenToApplicationsFilter = selectedTypeFilter === 'HOST';
 
     return (
@@ -645,6 +639,7 @@ const searchPageQuery = gql`
           host {
             id
             hostFeePercent
+            platformContributionAvailable
             totalHostedCollectives
             isTrustedHost
             isFirstPartyHost
@@ -655,6 +650,7 @@ const searchPageQuery = gql`
           host {
             id
             hostFeePercent
+            platformContributionAvailable
             totalHostedCollectives
             isTrustedHost
             isFirstPartyHost

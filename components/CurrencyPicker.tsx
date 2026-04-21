@@ -57,6 +57,7 @@ const CurrencyPicker = React.memo(
         data-cy={props['data-cy'] || 'currency-picker'}
         error={!value}
         isSearchable={availableCurrencies.length > 10}
+        aria-label={intl.formatMessage({ defaultMessage: 'Currency', id: 'Currency' })}
         options={currencyOptions}
         value={value}
         onChange={onChange}

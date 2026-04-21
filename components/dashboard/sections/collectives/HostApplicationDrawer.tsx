@@ -9,7 +9,7 @@ import type {
   HostApplicationThreadQuery,
   HostApplicationThreadQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { HostApplicationStatus, ProcessHostApplicationAction } from '../../../../lib/graphql/types/v2/schema';
+import { HostApplicationStatus, ProcessHostApplicationAction } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nCustomApplicationFormLabel } from '../../../../lib/i18n/custom-application-form';
 
@@ -294,7 +294,7 @@ function HostApplication({
                 ApplicationId: () =>
                   applicationId ? (
                     <StyledTag display="inline-block" verticalAlign="middle" mx={1} fontSize="12px">
-                      #{applicationId.split('-')[0]}
+                      #{application?.publicId}
                     </StyledTag>
                   ) : (
                     <LoadingPlaceholder className="inline-block" height={20} width={60} />

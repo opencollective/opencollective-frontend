@@ -10,6 +10,7 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table';
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { cva } from 'class-variance-authority';
 import clsx from 'clsx';
 import { isEqual, omitBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -59,6 +60,7 @@ interface DataTableProps<TData, TValue> {
   rowSelection?: Record<string, boolean>;
   setRowSelection?: OnChangeFn<RowSelectionState>;
   enableMultiRowSelection?: boolean;
+  showQuickActions?: boolean;
 }
 
 const defaultGetRowId = (data: any) => data.id;
@@ -89,6 +91,7 @@ export function DataTable<TData, TValue>({
   rowSelection: rowSelectionFromProps,
   setRowSelection: setRowSelectionFromProps,
   enableMultiRowSelection,
+  showQuickActions,
   meta, // TODO: Possibly remove this prop once the getActions pattern is implemented fully
   ...tableProps
 }: DataTableProps<TData, TValue>) {
@@ -124,6 +127,7 @@ export function DataTable<TData, TValue>({
       hasDefaultColumnVisibility,
       setColumnVisibility,
       defaultColumnVisibility,
+      showQuickActions,
       ...meta,
     },
   });
@@ -195,7 +199,7 @@ export function DataTable<TData, TValue>({
             ))
         ) : (
           <TableRow highlightOnHover={false}>
-            <TableCell colSpan={columns.length} compact={compact}>
+            <TableCell colSpan={table.getVisibleFlatColumns().length} compact={compact}>
               <div className="p-4 text-center text-slate-500">
                 {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" id="UG5qoS" />}
               </div>
@@ -207,7 +211,7 @@ export function DataTable<TData, TValue>({
       {footer && (
         <tfoot>
           <tr>
-            <th colSpan={table.getCenterLeafColumns().length}>{footer}</th>
+            <th colSpan={table.getVisibleFlatColumns().length}>{footer}</th>
           </tr>
         </tfoot>
       )}
@@ -231,7 +235,11 @@ function DataTableRow({
     <TableRow
       data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
       data-state={row.getIsSelected() && 'selected'}
-      className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
+      className={cn(
+        getRowClassName?.(row),
+        onClickRow && 'cursor-pointer',
+        rowHasIndicator?.(row) && 'overflow-hidden',
+      )}
       {...(onClickRow && {
         onClick: e => onClickRow(row, actionsMenuTriggerRef, e),
       })}
@@ -268,20 +276,43 @@ type CellContext<TData, TValue> = TanCellContext<TData, TValue> & {
   actionsMenuTriggerRef?: React.MutableRefObject<any>;
 };
 
+export const stickyColumnVariants = cva(
+  'sticky bg-background group-data-[state=selected]/row:bg-muted has-data-[state=open]:bg-muted group-hover/row:[&:is(td)]:bg-muted',
+  {
+    variants: {
+      variant: {
+        select:
+          'left-0 z-1 w-10 max-w-10 min-w-10 [filter:drop-shadow(2px_0px_6px_rgba(0,0,0,var(--scroll-shadow-left,0)))] [clip-path:inset(0px_-20px_0px_0px)]',
+        actions:
+          'right-0 w-12 max-w-12 min-w-12 !pr-2 [filter:drop-shadow(-2px_0px_6px_rgba(0,0,0,var(--scroll-shadow-right,0)))]', // [clip-path:inset(0px_0px_0px_-20px)]
+      },
+    },
+  },
+);
+
+// Sticky actions column
 export const actionsColumn = {
-  accessorKey: 'actions',
-  header: ({ table }) => (
-    <div className="-mr-2 flex justify-end">
-      <ColumnToggleDropdown table={table} />
-    </div>
-  ),
-  meta: { className: 'w-14' },
+  id: 'actions',
+  header: ({ table }) => {
+    const { defaultColumnVisibility } = table.options.meta;
+    if (defaultColumnVisibility) {
+      return (
+        <div className="flex justify-end">
+          <ColumnToggleDropdown table={table} />
+        </div>
+      );
+    }
+    return null;
+  },
+  meta: {
+    className: stickyColumnVariants({ variant: 'actions' }),
+  },
   enableHiding: false,
   cell: (ctx: unknown) => {
     const { table, row, actionsMenuTriggerRef } = ctx as CellContext<any, any>;
     return (
       // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-      <div onClick={e => e.stopPropagation()} className="-mr-2 flex items-center justify-end">
+      <div onClick={e => e.stopPropagation()} className="flex items-center justify-end">
         <RowActionsMenu table={table} row={row} actionsMenuTriggerRef={actionsMenuTriggerRef} />
       </div>
     );

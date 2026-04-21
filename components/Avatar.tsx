@@ -10,7 +10,7 @@ import { border, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
 import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
-import { UploadedFileKind } from '@/lib/graphql/types/v2/schema';
+import { UploadedFileKind } from '@/lib/graphql/types/v2/graphql';
 import { useImageUploader } from '@/lib/hooks/useImageUploader';
 import { cn } from '@/lib/utils';
 

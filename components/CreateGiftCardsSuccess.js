@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/feather/CheckCircle';
 import { Clipboard } from '@styled-icons/feather/Clipboard';
 import { Printer } from '@styled-icons/feather/Printer';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { giftCardsDownloadUrl } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
 
 import { Button } from './ui/Button';
+import { toast } from './ui/useToast';
 import FileDownloader from './FileDownloader';
 import { Box, Flex } from './Grid';
 import StyledInput from './StyledInput';
@@ -28,8 +29,9 @@ const RedeemLinksTextarea = styled(StyledInput).attrs({ as: 'textarea' })`
 /**
  * Displays created gift cards, with an option to print them.
  */
-export default class CreateGiftCardsSuccess extends React.Component {
+class CreateGiftCardsSuccess extends React.Component {
   static propTypes = {
+    intl: PropTypes.object.isRequired,
     cards: PropTypes.arrayOf(
       PropTypes.shape({
         uuid: PropTypes.string.isRequired,
@@ -56,10 +58,14 @@ export default class CreateGiftCardsSuccess extends React.Component {
     try {
       this.redeemLinkTextareaRef.current.select();
       document.execCommand('copy');
-    } catch (e) {
-      // TODO: this should be reported to the user
-      // eslint-disable-next-line no-console
-      console.error('Cannot copy to clipboard', e);
+    } catch {
+      toast({
+        variant: 'error',
+        message: this.props.intl.formatMessage({
+          id: 'Clipboard.CopyFailed',
+          defaultMessage: 'Could not copy to clipboard. Please try selecting the text and copying manually.',
+        }),
+      });
     }
   };
 
@@ -146,3 +152,5 @@ export default class CreateGiftCardsSuccess extends React.Component {
     );
   }
 }
+
+export default injectIntl(CreateGiftCardsSuccess);

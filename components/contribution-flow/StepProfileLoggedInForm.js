@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 
 import { Flex } from '../Grid';
@@ -43,6 +44,14 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
     () => getRequiredInformation(data, stepDetails, collective, profiles, tier),
     [data, stepDetails, profiles, collective, tier],
   );
+  const useGenericLegalNameHint =
+    tier?.type === TierTypes.TICKET ||
+    tier?.requireAddress ||
+    !collective.policies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName;
+  const useGenericAddressHint =
+    tier?.type === TierTypes.TICKET ||
+    tier?.requireAddress ||
+    !collective.policies.CONTRIBUTOR_INFO_THRESHOLDS?.address;
 
   return (
     <Fragment>
@@ -109,19 +118,31 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
               labelFontWeight="700"
               isPrivate
               hint={
-                <FormattedMessage
-                  defaultMessage="Required by {isSelfHosted, select, true {{collectiveName}} other {{hostName}, the legal entity that provides {collectiveName} with financial services,}} as total contributions in the current fiscal year exceeds {amount}."
-                  id="0FWFFg"
-                  values={{
-                    amount: formatCurrency(
-                      collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.legalName,
-                      collective.currency,
-                    ),
-                    hostName: collective.host.name,
-                    collectiveName: collective.name,
-                    isSelfHosted: collective.id === collective.host.id,
-                  }}
-                />
+                useGenericLegalNameHint ? (
+                  <FormattedMessage
+                    defaultMessage="Required by {isSelfHosted, select, true {{collectiveName}} other {{hostName}}} for legal and compliance purposes."
+                    id="legalName.hint.noThreshold"
+                    values={{
+                      hostName: collective.host.name,
+                      collectiveName: collective.name,
+                      isSelfHosted: collective.id === collective.host.id,
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Required by {isSelfHosted, select, true {{collectiveName}} other {{hostName}, the legal entity that provides {collectiveName} with financial services,}} as total contributions in the current fiscal year exceeds {amount}."
+                    id="0FWFFg"
+                    values={{
+                      amount: formatCurrency(
+                        collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.legalName,
+                        collective.currency,
+                      ),
+                      hostName: collective.host.name,
+                      collectiveName: collective.name,
+                      isSelfHosted: collective.id === collective.host.id,
+                    }}
+                  />
+                )
               }
             >
               {inputProps => (
@@ -153,20 +174,33 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
                 <FormattedMessage defaultMessage="Address Requirement" id="Mc7YHZ" />
               </h1>
               <p>
-                <FormattedMessage
-                  defaultMessage="Your total contributions in the current fiscal year to {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} exceeds {amount}. Therefore, {hostName} requires your legal address."
-                  id="/Lrubf"
-                  values={{
-                    amount: formatCurrency(
-                      collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.address,
-                      collective.currency,
-                    ),
-                    collectiveName: collective.name,
-                    hostName: collective.host.name,
-                    hostLink: <Link href={`/${collective.host.slug}`}>{collective.host.name}</Link>,
-                    isSelfHosted: collective.id === collective.host.id,
-                  }}
-                />
+                {useGenericAddressHint ? (
+                  <FormattedMessage
+                    defaultMessage="{isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} requires your legal address for legal and compliance purposes."
+                    id="address.requirement.noThreshold"
+                    values={{
+                      collectiveName: collective.name,
+                      hostName: collective.host.name,
+                      hostLink: <Link href={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                      isSelfHosted: collective.id === collective.host.id,
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Your total contributions in the current fiscal year to {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} exceeds {amount}. Therefore, {hostName} requires your legal address."
+                    id="/Lrubf"
+                    values={{
+                      amount: formatCurrency(
+                        collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.address,
+                        collective.currency,
+                      ),
+                      collectiveName: collective.name,
+                      hostName: collective.host.name,
+                      hostLink: <Link href={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                      isSelfHosted: collective.id === collective.host.id,
+                    }}
+                  />
+                )}
               </p>
               <p className="mt-2">
                 <FormattedMessage

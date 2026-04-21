@@ -7,11 +7,12 @@ import { formatAccountName } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, VIRTUAL_CARD } from '../../lib/constants/payout-method';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+
+import { AccountKYCStatusBadge } from '../kyc/components/AccountKYCStatusBadge';
+import { ExpenseAdminKYCSection } from '../kyc/components/ExpenseAdminKYCSection';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
@@ -60,6 +61,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
           values={{
             totalPaidInvoices: (
               <FormattedMoneyAmount
+                key="total-paid-invoices"
                 amount={stats.totalPaidInvoices.valueInCents}
                 currency={stats.totalPaidInvoices.currency}
                 precision={2}
@@ -67,6 +69,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
             ),
             totalPaidReceipts: (
               <FormattedMoneyAmount
+                key="total-paid-receipts"
                 amount={stats.totalPaidReceipts.valueInCents}
                 currency={stats.totalPaidReceipts.currency}
                 precision={2}
@@ -74,12 +77,13 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
             ),
             totalPaidGrants: (
               <FormattedMoneyAmount
+                key="total-paid-grants"
                 amount={stats.totalPaidGrants.valueInCents}
                 currency={stats.totalPaidGrants.currency}
                 precision={2}
               />
             ),
-            currentYear: <span>{currentYear}</span>,
+            currentYear: <span key="year">{currentYear}</span>,
           }}
         />
       )}
@@ -104,12 +108,7 @@ const ExpenseSummaryAdditionalInformation = ({
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === ExpenseStatus.PAID;
-  const { LoggedInUser } = useLoggedInUser();
-  const { canEditPaidBy, canEditPayee, canEditPayoutMethod } = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
-  )
-    ? expense?.permissions || {}
-    : {};
+  const { canEditPaidBy, canEditPayee, canEditPayoutMethod } = expense?.permissions || {};
 
   if (isLoading) {
     return <LoadingPlaceholder height={150} mt={3} />;
@@ -171,10 +170,10 @@ const ExpenseSummaryAdditionalInformation = ({
                 <FormattedMessage
                   id="withColon"
                   defaultMessage="{item}:"
-                  values={{ item: <FormattedMessage id="Balance" defaultMessage="Balance" /> }}
+                  values={{ item: <FormattedMessage key="item" id="Balance" defaultMessage="Balance" /> }}
                 />
               </Container>
-              <Box mt={2}>
+              <Box mt={2} fontSize="12px">
                 <FormattedMoneyAmount
                   amount={collective.stats.balanceWithBlockedFunds.valueInCents}
                   currency={collective.stats.balanceWithBlockedFunds.currency}
@@ -196,7 +195,11 @@ const ExpenseSummaryAdditionalInformation = ({
                   defaultMessage="Host Agreements: <Color>{agreementsCount}</Color>"
                   id="uX+lpu"
                   values={{
-                    Color: text => <Span color="primary.600">{text}</Span>,
+                    Color: text => (
+                      <Span key="color" color="primary.600">
+                        {text}
+                      </Span>
+                    ),
                     agreementsCount: collective.hostAgreements.totalCount,
                   }}
                 />
@@ -265,7 +268,7 @@ const ExpenseSummaryAdditionalInformation = ({
         />
 
         {payeeLocation && isInvoice && (
-          <Container whiteSpace="pre-wrap" color="black.700" fontSize="14px" lineHeight="16px" mt={2}>
+          <Container whiteSpace="pre-wrap" color="black.700" fontSize="12px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
           </Container>
         )}
@@ -276,6 +279,15 @@ const ExpenseSummaryAdditionalInformation = ({
             </StyledLink>
           </P>
         )}
+
+        <AccountKYCStatusBadge className="mt-2" account={payee} host={host} showActions />
+        <ExpenseAdminKYCSection
+          className="mt-3"
+          kycPayee={expense.kycStatus?.payee}
+          payeeAccountType={payee?.type}
+          account={payee}
+          host={host}
+        />
       </PrivateInfoColumn>
       <PrivateInfoColumn mr={0}>
         <div className="flex justify-between gap-2">

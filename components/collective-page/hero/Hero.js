@@ -19,7 +19,6 @@ import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import EditTagsModal from '../../EditTagsModal';
-import FollowButton from '../../FollowButton';
 import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
@@ -34,6 +33,7 @@ import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
 import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
 import { Button } from '../../ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
 import UserCompany from '../../UserCompany';
 import ContainerSectionContent from '../ContainerSectionContent';
 
@@ -176,7 +176,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
             />
           </Container>
         )}
-        <ContainerSectionContent pt={40} display="flex" flexDirection="column">
+        <ContainerSectionContent pt={40} display="flex" flexDirection="column" alignItems={['center', 'flex-start']}>
           {/* Collective presentation (name, logo, description...) */}
           <Container position="relative" mb={2} width={128}>
             <HeroAvatar collective={collective} isAdmin={isAdmin} />
@@ -189,6 +189,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               textAlign="left"
               data-cy="collective-title"
               wordBreak="normal"
+              textAlign={['center', 'left']}
             >
               {collective.name || collective.slug}
               <AccountTrustBadge account={collective} size={24} className="ml-3 inline-block" />
@@ -200,14 +201,13 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 <StyledLink key={company} as={UserCompany} mr={1} fontSize="20px" fontWeight={600} company={company} />
               ))}
           </Flex>
-          <div className="mt-2 flex">
-            <FollowButton buttonProps={{ buttonSize: 'tiny' }} account={collective} />
-          </div>
-
           {!isEvent && (
             <Fragment>
               {(isCollective || isOrganization || isFund || isProject) && (
-                <div className="my-7 mb-2 flex flex-wrap items-center gap-2" data-cy="collective-tags">
+                <div
+                  className="my-7 mb-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start"
+                  data-cy="collective-tags"
+                >
                   <StyledTag
                     textTransform="uppercase"
                     variant="rounded-left"
@@ -282,7 +282,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 </div>
               )}
               <Flex alignItems="center" flexWrap="wrap" fontSize="14px" gap="16px" mt={2}>
-                <Flex gap="16px" flexWrap="wrap">
+                <Flex gap="16px" flexWrap="wrap" m="0 auto">
                   {collective.canContact && (
                     <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
                       {btnProps => (
@@ -333,7 +333,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       defaultMessage="Part of: {parentName}"
                       values={{
                         parentName: (
-                          <StyledLink as={LinkCollective} collective={collective.parentCollective} noTitle>
+                          <StyledLink
+                            key="parent-name"
+                            as={LinkCollective}
+                            collective={collective.parentCollective}
+                            noTitle
+                          >
                             <TruncatedTextWithTooltip value={collective.parentCollective.name} cursor="pointer" />
                           </StyledLink>
                         ),
@@ -348,9 +353,19 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                         id="Collective.Hero.Host"
                         defaultMessage="{FiscalHost}: {hostName}"
                         values={{
-                          FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
+                          FiscalHost: host.hasHosting ? (
+                            <DefinedTerm
+                              key="fiscal-host"
+                              term={Terms.FISCAL_HOST}
+                              color="black.700"
+                              borderColor="#969ba3"
+                            />
+                          ) : (
+                            <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
+                          ),
                           hostName: (
                             <StyledLink
+                              key="host-name"
                               as={LinkCollective}
                               collective={host}
                               data-cy="fiscalHostName"
@@ -371,6 +386,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           values={{
                             parentName: (
                               <StyledLink
+                                key="parent-name"
                                 as={LinkCollective}
                                 collective={displayedConnectedAccount.collective}
                                 noTitle
@@ -404,19 +420,58 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                             <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal hosting" />
                           </StyledLink>
                         )}
-                        <Container color="black.700" fontSize="12px">
+                        <div className="inline-flex flex-wrap items-baseline gap-1 text-xs">
                           <FormattedMessage
                             id="Hero.HostFee"
                             defaultMessage="Host fee: {fee}"
                             values={{
                               fee: (
-                                <DefinedTerm term={Terms.HOST_FEE} color="black.700">
+                                <DefinedTerm
+                                  key="host-fee"
+                                  term={Terms.HOST_FEE}
+                                  color="black.700"
+                                  borderColor="#969ba3"
+                                >
                                   {collective.hostFeePercent || 0}%
                                 </DefinedTerm>
                               ),
                             }}
                           />
-                        </Container>
+                          {collective.platformContributionAvailable && (
+                            <React.Fragment>
+                              <span aria-hidden>+</span>
+                              <Tooltip delayDuration={100}>
+                                <TooltipTrigger asChild>
+                                  <span className="inline-flex cursor-help items-center gap-0.5 border-b-2 border-dotted border-[#969ba3] pb-px text-neutral-700 no-underline">
+                                    <FormattedMessage
+                                      id="Transaction.kind.PLATFORM_TIP"
+                                      defaultMessage="Platform tip"
+                                    />
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <FormattedMessage
+                                    defaultMessage="Contributors to Collectives hosted by this Fiscal Host are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>"
+                                    id="ApplyToHostCard.platformTips.tooltip"
+                                    values={{
+                                      b: chunks => <strong>{chunks}</strong>,
+                                      LearnMoreLink: chunks => (
+                                        <a
+                                          href="https://documentation.opencollective.com/giving-to-collectives/platform-tips"
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="underline"
+                                        >
+                                          {chunks}
+                                        </a>
+                                      ),
+                                    }}
+                                  />
+                                </TooltipContent>
+                              </Tooltip>
+                            </React.Fragment>
+                          )}
+                        </div>
                       </Fragment>
                     )}
                     {collective.platformFeePercent > 0 && (
@@ -426,7 +481,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           defaultMessage="Platform fee: {fee}"
                           values={{
                             fee: (
-                              <DefinedTerm term={Terms.PLATFORM_FEE} color="black.700">
+                              <DefinedTerm
+                                key="platform-fee"
+                                term={Terms.PLATFORM_FEE}
+                                color="black.700"
+                                borderColor="#969ba3"
+                              >
                                 {collective.platformFeePercent}%
                               </DefinedTerm>
                             ),

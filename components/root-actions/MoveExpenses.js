@@ -76,6 +76,7 @@ export default function MoveExpenses() {
             types={allowedAccountTypes}
             inputId={id}
             collective={sourceAccount}
+            includeAllVendors
             isClearable
             onChange={option => {
               setSourceAccount(option?.value || null);
@@ -105,6 +106,7 @@ export default function MoveExpenses() {
           <CollectivePickerAsync
             types={allowedAccountTypes}
             inputId={id}
+            includeAllVendors
             disabled={selectedExpenses.length === 0}
             collective={destinationAccount}
             isClearable
