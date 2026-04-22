@@ -3819,10 +3819,8 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  """
-  The address associated to this account. This field is always public for collectives and events.
-  """
-  location: Location
+  "\n      Address. This field is public for hosts, otherwise:\n        - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n        - Hosts can see the address of organizations submitting expenses to their collectives.\n    "
+  location: Location @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
   categories: [String]!
   stats: AccountStats
 
@@ -4129,31 +4127,10 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   platformSubscription: PlatformSubscription
   platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
   legacyPlan: HostPlan!
-
-  """
-  List of accounting categories for this host
-  """
-  accountingCategories(
-    """
-    Filter accounting categories by kind
-    """
-    kind: [AccountingCategoryKind!]
-
-    """
-    Filter by accounting category applicable to this account
-    """
-    account: AccountReferenceInput
-  ): AccountingCategoryCollection!
-  contributionAccountingCategoryRules: [ContributionAccountingCategoryRule!]
   hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
   totalHostedAccounts: Int
   isOpenToApplications: Boolean
-
-  """
-  Returns whether the account has money management activated.
-  """
-  hasMoneyManagement: Boolean!
   termsUrl: URL
   plan: HostPlan! @deprecated(reason: "2026-04-02: Replaced by new pricing")
 
@@ -4209,41 +4186,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   EXPERIMENTAL (this may change or be removed)
   """
   hostContributionsReport(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostExpensesReports
-
-  """
-  The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
-  """
-  supportedPaymentMethods: [PaymentMethodLegacyType]
-
-  """
-  Manual payment providers configured for this host
-  """
-  manualPaymentProviders(
-    """
-    Filter by provider type
-    """
-    type: ManualPaymentProviderType
-
-    """
-    Whether to include archived providers
-    """
-    includeArchived: Boolean! = false
-  ): [ManualPaymentProvider!]!
-
-  """
-  If the host supports PayPal, this will contain the client ID to use in the frontend
-  """
-  paypalClientId: String
-
-  """
-  The list of payout methods this Host accepts for its expenses
-  """
-  supportedPayoutMethods: [PayoutMethodType]
-
-  """
-  Stripe connected account
-  """
-  stripe: StripeConnectedAccount
 
   """
   Applications for this host
@@ -4345,48 +4287,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   ): VirtualCardCollection!
   hostedVirtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   hostedVirtualCardCollectives(limit: Int! = 100, offset: Int! = 0): AccountCollection!
-  contributionStats(
-    """
-    A collection of accounts for which the contribution stats should be returned.
-    """
-    account: [AccountReferenceInput!]
-
-    """
-    Calculate contribution statistics beginning from this date.
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate contribution statistics until this date.
-    """
-    dateTo: DateTime
-
-    """
-    The time unit of the time series
-    """
-    timeUnit: TimeUnit
-  ): ContributionStats!
-  expenseStats(
-    """
-    A collection of accounts for which the expense stats should be returned.
-    """
-    account: [AccountReferenceInput!]
-
-    """
-    Calculate expense statistics beginning from this date.
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate expense statistics until this date.
-    """
-    dateTo: DateTime
-
-    """
-    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
-    """
-    timeUnit: TimeUnit
-  ): ExpenseStats!
 
   """
   Returns whether the host is trusted or not
@@ -4397,21 +4297,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   Returns whether the host is a first party host
   """
   isFirstPartyHost: Boolean!
-
-  """
-  Returns whether the host allows adding funds from all accounts
-  """
-  allowAddFundsFromAllAccounts: Boolean!
-
-  """
-  Returns whether the host has any Stripe disputed orders
-  """
-  hasDisputedOrders: Boolean
-
-  """
-  Returns whether the host has any Stripe in review orders
-  """
-  hasInReviewOrders: Boolean
 
   """
   Returns agreements with Hosted Accounts
@@ -4432,71 +4317,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     """
     accounts: [AccountReferenceInput]
   ): AgreementCollection!
-
-  """
-  Returns a list of vendors that works with this host
-  """
-  vendors(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Rank vendors based on their relationship with this account
-    """
-    forAccount: AccountReferenceInput
-
-    """
-    Only returns vendors that are visible to the given accounts
-    """
-    visibleToAccounts: [AccountReferenceInput]
-
-    """
-    Filter on archived vendors
-    """
-    isArchived: Boolean
-
-    """
-    Search vendors related to this term based on name, description, tags, slug, and location
-    """
-    searchTerm: String
-
-    """
-    Only return accounts that contributed within this amount range
-    """
-    totalContributed: AmountRangeInput
-
-    """
-    Only return accounts that expended within this amount range
-    """
-    totalExpended: AmountRangeInput
-
-    """
-    Order of the results
-    """
-    orderBy: OrderByInput
-  ): VendorCollection!
-
-  """
-  Returns a list of organizations that only transacted with this host and all its admins are also admins of this host.
-  """
-  potentialVendors(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): AccountCollection!
 
   """
   Returns a list of accounts hosted by this host
@@ -4570,11 +4390,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   ): HostedAccountCollection!
 
   """
-  Returns the legal documents required by this host
-  """
-  requiredLegalDocuments: [LegalDocumentType!]!
-
-  """
   Returns legal documents hosted by this host
   """
   hostedLegalDocuments(
@@ -4625,6 +4440,194 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   ): LegalDocumentCollection!
 
   """
+  List of accounting categories for this host
+  """
+  accountingCategories(
+    """
+    Filter accounting categories by kind
+    """
+    kind: [AccountingCategoryKind!]
+
+    """
+    Filter by accounting category applicable to this account
+    """
+    account: AccountReferenceInput
+  ): AccountingCategoryCollection! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+  contributionAccountingCategoryRules: [ContributionAccountingCategoryRule!]
+    @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Returns whether the account has money management activated.
+  """
+  hasMoneyManagement: Boolean! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  The list of payout methods this Host accepts for its expenses
+  """
+  supportedPayoutMethods: [PayoutMethodType]
+    @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Manual payment providers configured for this host
+  """
+  manualPaymentProviders(
+    """
+    Filter by provider type
+    """
+    type: ManualPaymentProviderType
+
+    """
+    Whether to include archived providers
+    """
+    includeArchived: Boolean! = false
+  ): [ManualPaymentProvider!]! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  If the host supports PayPal, this will contain the client ID to use in the frontend
+  """
+  paypalClientId: String @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
+  """
+  supportedPaymentMethods: [PaymentMethodLegacyType]
+    @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Stripe connected account
+  """
+  stripe: StripeConnectedAccount @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+  contributionStats(
+    """
+    A collection of accounts for which the contribution stats should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    Calculate contribution statistics beginning from this date.
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate contribution statistics until this date.
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series
+    """
+    timeUnit: TimeUnit
+  ): ContributionStats! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+  expenseStats(
+    """
+    A collection of accounts for which the expense stats should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    Calculate expense statistics beginning from this date.
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate expense statistics until this date.
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+  ): ExpenseStats! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Returns whether the host allows adding funds from all accounts
+  """
+  allowAddFundsFromAllAccounts: Boolean!
+    @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Returns whether the host has any Stripe disputed orders
+  """
+  hasDisputedOrders: Boolean @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Returns whether the host has any Stripe in review orders
+  """
+  hasInReviewOrders: Boolean @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Only returns vendors that are visible to the given accounts
+    """
+    visibleToAccounts: [AccountReferenceInput]
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
+
+    """
+    Order of the results
+    """
+    orderBy: OrderByInput
+  ): VendorCollection! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Returns a list of organizations that only transacted with this host and all its admins are also admins of this host.
+  """
+  potentialVendors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AccountCollection! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Returns the legal documents required by this host
+  """
+  requiredLegalDocuments: [LegalDocumentType!]!
+    @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
   Returns a list of transactions imports for this host
   """
   transactionsImports(
@@ -4652,7 +4655,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter by type of transactions import
     """
     type: [TransactionsImportType]
-  ): TransactionsImportsCollection!
+  ): TransactionsImportsCollection! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
 
   """
   Returns a list of transactions imports sources for this host
@@ -4662,7 +4665,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter by type of transactions import
     """
     type: [TransactionsImportType]
-  ): [NonEmptyString]!
+  ): [NonEmptyString]! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
   offPlatformTransactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -4703,12 +4706,13 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     The order of results
     """
     orderBy: TransactionsImportRowOrderInput! = { field: DATE, direction: DESC }
-  ): TransactionsImportRowCollection!
+  ): TransactionsImportRowCollection! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
 
   """
   Returns stats for off platform transactions
   """
   offPlatformTransactionsStats: TransactionsImportStats!
+    @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
 }
 
 """
@@ -7202,7 +7206,7 @@ type AccountStats {
   ): TimeSeriesAmount!
 
   """
-  The total amount managed by the account, including all its children accounts (events and projects), calculated using existing balance checkpoint. This is not a real-time value and may not reflect the current state of the account.
+  [Root only] The total amount managed by the account, including all its children accounts (events and projects), calculated using existing balance checkpoint. This is not a real-time value and may not reflect the current state of the account.
   """
   managedAmount: Amount
 }
@@ -7968,49 +7972,6 @@ type Webhook {
 }
 
 """
-A collection of "Accounting Categories"
-"""
-type AccountingCategoryCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-
-  """
-  The Accounting Categories
-  """
-  nodes: [AccountingCategory!]!
-}
-
-enum AccountingCategoryKind {
-  ADDED_FUNDS
-  CONTRIBUTION
-  EXPENSE
-}
-
-"""
-A rule for categorizing contributions
-"""
-type ContributionAccountingCategoryRule {
-  id: NonEmptyString!
-  name: NonEmptyString!
-  enabled: Boolean!
-  predicates: [JSONObject!]!
-  accountingCategory: AccountingCategory!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
-
-"""
-The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSONObject
-
-"""
 EXPERIMENTAL (this may change or be deleted): Host transaction report
 """
 type HostTransactionReports {
@@ -8286,6 +8247,108 @@ type HostExpensesReportNode {
 }
 
 """
+A collection of "Agreement"
+"""
+type AgreementCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Agreement!]
+}
+
+"""
+An agreement
+"""
+type Agreement {
+  id: String
+
+  """
+  The resource public id (ie: agr_xxxxxxxx)
+  """
+  publicId: String!
+  title: String!
+
+  """
+  Additional notes about the agreement for the host admins
+  """
+  notes: String
+
+  """
+  The time of creation of this agreement
+  """
+  createdAt: DateTime!
+  createdBy: Account
+  account: Account!
+  host: Host!
+  expiresAt: DateTime
+  attachment: FileInfo
+}
+
+"""
+A collection of hosted "Accounts"
+"""
+type HostedAccountCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Account]
+  currencies: [String]
+}
+
+"""
+A collection of "LegalDocument"
+"""
+type LegalDocumentCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [LegalDocument]
+}
+
+"""
+A collection of "Accounting Categories"
+"""
+type AccountingCategoryCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+
+  """
+  The Accounting Categories
+  """
+  nodes: [AccountingCategory!]!
+}
+
+enum AccountingCategoryKind {
+  ADDED_FUNDS
+  CONTRIBUTION
+  EXPENSE
+}
+
+"""
+A rule for categorizing contributions
+"""
+type ContributionAccountingCategoryRule {
+  id: NonEmptyString!
+  name: NonEmptyString!
+  enabled: Boolean!
+  predicates: [JSONObject!]!
+  accountingCategory: AccountingCategory!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
+"""
 A manual payment provider configured by a host for contributors to use
 """
 type ManualPaymentProvider {
@@ -8412,44 +8475,6 @@ type ExpenseStats {
 }
 
 """
-A collection of "Agreement"
-"""
-type AgreementCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Agreement!]
-}
-
-"""
-An agreement
-"""
-type Agreement {
-  id: String
-
-  """
-  The resource public id (ie: agr_xxxxxxxx)
-  """
-  publicId: String!
-  title: String!
-
-  """
-  Additional notes about the agreement for the host admins
-  """
-  notes: String
-
-  """
-  The time of creation of this agreement
-  """
-  createdAt: DateTime!
-  createdBy: Account
-  account: Account!
-  host: Host!
-  expiresAt: DateTime
-  attachment: FileInfo
-}
-
-"""
 A collection of Vendors
 """
 type VendorCollection implements Collection {
@@ -8457,27 +8482,6 @@ type VendorCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Vendor!]
-}
-
-"""
-A collection of hosted "Accounts"
-"""
-type HostedAccountCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Account]
-  currencies: [String]
-}
-
-"""
-A collection of "LegalDocument"
-"""
-type LegalDocumentCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [LegalDocument]
 }
 
 """
@@ -15849,7 +15853,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
+  "\n      Address. This field is public for hosts, otherwise:\n        - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n        - Hosts can see the address of organizations submitting expenses to their collectives.\n    "
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -16183,6 +16187,270 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     """
     host: AccountReferenceInput!
   ): Boolean!
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Only returns vendors that are visible to the given accounts
+    """
+    visibleToAccounts: [AccountReferenceInput]
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
+
+    """
+    Order of the results
+    """
+    orderBy: OrderByInput
+  ): VendorCollection!
+
+  """
+  Returns a list of organizations that only transacted with this host and all its admins are also admins of this host.
+  """
+  potentialVendors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AccountCollection!
+
+  """
+  Returns a list of transactions imports for this host
+  """
+  transactionsImports(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by status of transactions import
+    """
+    status: TransactionsImportStatus
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter by type of transactions import
+    """
+    type: [TransactionsImportType]
+  ): TransactionsImportsCollection!
+
+  """
+  Returns a list of transactions imports sources for this host
+  """
+  transactionsImportsSources(
+    """
+    Filter by type of transactions import
+    """
+    type: [TransactionsImportType]
+  ): [NonEmptyString]!
+  offPlatformTransactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter rows by status
+    """
+    status: TransactionsImportRowStatus
+
+    """
+    Search by text
+    """
+    searchTerm: String
+
+    """
+    Filter rows by plaid account id
+    """
+    accountId: [NonEmptyString]
+
+    """
+    The transactions import id(s)
+    """
+    importId: [NonEmptyString!]
+
+    """
+    Filter rows by import type
+    """
+    importType: [TransactionsImportType!]
+
+    """
+    The order of results
+    """
+    orderBy: TransactionsImportRowOrderInput! = { field: DATE, direction: DESC }
+  ): TransactionsImportRowCollection!
+
+  """
+  Returns stats for off platform transactions
+  """
+  offPlatformTransactionsStats: TransactionsImportStats!
+
+  """
+  Returns the legal documents required by this host
+  """
+  requiredLegalDocuments: [LegalDocumentType!]!
+
+  """
+  Returns whether the host has any Stripe disputed orders
+  """
+  hasDisputedOrders: Boolean
+
+  """
+  Returns whether the host has any Stripe in review orders
+  """
+  hasInReviewOrders: Boolean
+
+  """
+  Returns whether the host allows adding funds from all accounts
+  """
+  allowAddFundsFromAllAccounts: Boolean!
+  contributionStats(
+    """
+    A collection of accounts for which the contribution stats should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    Calculate contribution statistics beginning from this date.
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate contribution statistics until this date.
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series
+    """
+    timeUnit: TimeUnit
+  ): ContributionStats!
+  expenseStats(
+    """
+    A collection of accounts for which the expense stats should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    Calculate expense statistics beginning from this date.
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate expense statistics until this date.
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+  ): ExpenseStats!
+
+  """
+  The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
+  """
+  supportedPaymentMethods: [PaymentMethodLegacyType]
+
+  """
+  Manual payment providers configured for this host
+  """
+  manualPaymentProviders(
+    """
+    Filter by provider type
+    """
+    type: ManualPaymentProviderType
+
+    """
+    Whether to include archived providers
+    """
+    includeArchived: Boolean! = false
+  ): [ManualPaymentProvider!]!
+
+  """
+  If the host supports PayPal, this will contain the client ID to use in the frontend
+  """
+  paypalClientId: String
+
+  """
+  The list of payout methods this Host accepts for its expenses
+  """
+  supportedPayoutMethods: [PayoutMethodType]
+
+  """
+  Stripe connected account
+  """
+  stripe: StripeConnectedAccount
+
+  """
+  List of accounting categories for this host
+  """
+  accountingCategories(
+    """
+    Filter accounting categories by kind
+    """
+    kind: [AccountingCategoryKind!]
+
+    """
+    Filter by accounting category applicable to this account
+    """
+    account: AccountReferenceInput
+  ): AccountingCategoryCollection!
+  contributionAccountingCategoryRules: [ContributionAccountingCategoryRule!]
 }
 
 """
