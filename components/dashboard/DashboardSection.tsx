@@ -34,6 +34,7 @@ import PeopleRouter from './sections/community/People';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import IncompleteContributions from './sections/contributions/IncompleteContributions';
+import InternalTransfers from './sections/contributions/InternalTransfers';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
 import ApprovePaymentRequests from './sections/expenses/ApprovePaymentRequests';
@@ -119,6 +120,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.KYC]: KYCRequests,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
+  [SECTIONS.INTERNAL_TRANSFERS]: InternalTransfers,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
   [SECTIONS.INCOMPLETE_CONTRIBUTIONS]: IncompleteContributions,
   [SECTIONS.TRANSACTIONS]: AccountTransactions,

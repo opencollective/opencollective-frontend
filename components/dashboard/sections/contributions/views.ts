@@ -3,7 +3,7 @@ import type { IntlShape } from 'react-intl';
 
 import type { Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
-import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { ContributionFrequency, OppositeAccountScope, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import type { AccountOrdersFilter, HostContext } from '@/lib/graphql/types/v2/schema';
 
 import type { FilterValues } from './filters';
@@ -24,16 +24,24 @@ const incomingOutgoingContributionViewCountsQuery = gql`
     $slug: String!
     $hostContext: HostContext
     $filter: AccountOrdersFilter!
+    $oppositeAccountScope: OppositeAccountScope
   ) {
     account(slug: $slug) {
       id
 
-      ALL: orders(hostContext: $hostContext, filter: $filter, includeIncognito: true, includeChildrenAccounts: true) {
+      ALL: orders(
+        hostContext: $hostContext
+        filter: $filter
+        oppositeAccountScope: $oppositeAccountScope
+        includeIncognito: true
+        includeChildrenAccounts: true
+      ) {
         totalCount
       }
       RECURRING: orders(
         hostContext: $hostContext
         filter: $filter
+        oppositeAccountScope: $oppositeAccountScope
         frequency: [MONTHLY, YEARLY]
         status: [ACTIVE, PROCESSING, ERROR]
         includeIncognito: true
@@ -44,6 +52,7 @@ const incomingOutgoingContributionViewCountsQuery = gql`
       ONETIME: orders(
         hostContext: $hostContext
         filter: $filter
+        oppositeAccountScope: $oppositeAccountScope
         frequency: [ONETIME]
         status: [PAID, PROCESSING]
         includeIncognito: true
@@ -55,6 +64,7 @@ const incomingOutgoingContributionViewCountsQuery = gql`
       CANCELED: orders(
         hostContext: $hostContext
         filter: $filter
+        oppositeAccountScope: $oppositeAccountScope
         status: [CANCELLED]
         includeIncognito: true
         includeChildrenAccounts: true
@@ -64,6 +74,7 @@ const incomingOutgoingContributionViewCountsQuery = gql`
       PAUSED: orders(
         hostContext: $hostContext
         filter: $filter
+        oppositeAccountScope: $oppositeAccountScope
         status: [PAUSED]
         includeIncognito: true
         includeChildrenAccounts: true
@@ -138,13 +149,15 @@ export function useFetchContributionViewCounts({
   slug,
   hostContext,
   filter,
+  oppositeAccountScope,
 }: {
   slug: string;
   hostContext?: HostContext;
   filter: AccountOrdersFilter;
+  oppositeAccountScope?: OppositeAccountScope;
 }): UseIncomingOutgoingContributionViewCountsResult {
   const { data, loading, refetch } = useQuery(incomingOutgoingContributionViewCountsQuery, {
-    variables: { slug, hostContext, filter },
+    variables: { slug, hostContext, filter, oppositeAccountScope },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });

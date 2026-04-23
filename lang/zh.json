@@ -2404,6 +2404,8 @@
   "IncompleteContributions": "Incomplete Contributions",
   "initiate-kyc": "Initiate KYC",
   "InputTypeCountry.placeholder": "请选择你的国家/地区",
+  "InternalTransfers": "Internal Transfers",
+  "InternalTransfers.description": "Money moved (using contributions) within your organization.",
   "InvalidURL": "错误的链接，必须以 http:// 或 https:// 开头。",
   "Invitation.Accepted": "已接受",
   "Invitation.Declined": "已拒绝",

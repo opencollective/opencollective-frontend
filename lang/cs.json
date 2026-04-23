@@ -2404,6 +2404,8 @@
   "IncompleteContributions": "Incomplete Contributions",
   "initiate-kyc": "Initiate KYC",
   "InputTypeCountry.placeholder": "Vyberte prosím Vaši zemi",
+  "InternalTransfers": "Internal Transfers",
+  "InternalTransfers.description": "Money moved (using contributions) within your organization.",
   "InvalidURL": "Neplatná adresa URL. Musí začínat http:// nebo https://.",
   "Invitation.Accepted": "Přijato",
   "Invitation.Declined": "Zamítnuto",

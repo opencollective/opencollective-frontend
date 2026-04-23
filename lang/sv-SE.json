@@ -2404,6 +2404,8 @@
   "IncompleteContributions": "Incomplete Contributions",
   "initiate-kyc": "Initiate KYC",
   "InputTypeCountry.placeholder": "Välj land",
+  "InternalTransfers": "Internal Transfers",
+  "InternalTransfers.description": "Money moved (using contributions) within your organization.",
   "InvalidURL": "Ogiltig URL. Det måste börja med http:// eller https://.",
   "Invitation.Accepted": "Godkänd",
   "Invitation.Declined": "Nekad",
