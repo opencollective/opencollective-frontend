@@ -197,7 +197,9 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
             </div>
             <Separator className="w-auto grow border-b bg-border" />
             <div className="font-bold">
-              {!isFreeTier && (
+              {isFreeTier ? (
+                <FormattedMessage defaultMessage="Free subscription" id="CGUb/o" />
+              ) : (
                 <FormattedMessage
                   defaultMessage="{perMonth} / Month"
                   id="+2hntI"
