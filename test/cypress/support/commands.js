@@ -119,31 +119,36 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 });
 
 /**
- * Calls the mutation to edit the settings of an account
+ * Edit account fields via GraphQL v2 `editAccount`.
  */
-Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserEmail) => {
+Cypress.Commands.add('editAccount', (account, userEmail = defaultTestUserEmail) => {
   return signinRequestAndReturnToken({ email: userEmail }).then(token => {
-    return graphqlQuery(token, {
-      operationName: 'EditCollective',
-      query: gqlV1 /* GraphQL */ `
-        mutation EditCollective($collective: CollectiveInputType!) {
-          editCollective(collective: $collective) {
-            id
-            slug
-            name
-            settings
-            location {
-              id
-              country
+    return getIdV2FromReferenceInput(account, token)
+      .then(id => {
+        return graphqlQueryV2(token, {
+          operationName: 'EditAccount',
+          query: gql`
+            mutation EditAccount($account: AccountUpdateInput!) {
+              editAccount(account: $account) {
+                id
+                slug
+                name
+                settings
+                location {
+                  id
+                  country
+                }
+              }
             }
-          }
-        }
-      `,
-      context: API_V1_CONTEXT,
-      variables: { collective },
-    }).then(({ body }) => {
-      return body.data.createCollective;
-    });
+          `,
+          variables: {
+            account: { ...account, id },
+          },
+        });
+      })
+      .then(({ body }) => {
+        return body.data.editAccount;
+      });
   });
 });
 
@@ -685,6 +690,34 @@ Cypress.Commands.add('getOrderIdFromContributionSuccessPage', () => {
 });
 
 // ---- Private ----
+
+/**
+ * `editA
+ */
+function getIdV2FromReferenceInput(account, token) {
+  const { id, slug } = account;
+  if (typeof id === 'string') {
+    return account;
+  } else if (!slug) {
+    throw new Error(
+      'cy.editCollective: pass a GraphQL v2 account id string, or `slug` (with a legacy id) so the account can be resolved',
+    );
+  }
+
+  return graphqlQueryV2(token, {
+    operationName: 'CypressResolveCollectiveId',
+    query: gql`
+      query CypressResolveCollectiveId($slug: String!) {
+        account(slug: $slug) {
+          id
+        }
+      }
+    `,
+    variables: { slug },
+  }).then(({ body }) => {
+    return body.data.account.id;
+  });
+}
 
 /**
  * @param {object} user - should have `email` and `id` set
