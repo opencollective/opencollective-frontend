@@ -41,6 +41,7 @@ import { makeReplaceSubpath } from '../../utils';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 
 import { ActivitiesTab } from './AccountDetailActivitiesTab';
+import { AccountDetailManagedDisbursementsTab } from './AccountDetailManagedDisbursementsTab';
 import { AccountDetailsOverviewTab } from './AccountDetailOverviewTab';
 import { AccountDetailTransactionsTab } from './AccountDetailTransactionsTab';
 import { AccountDetailView, getCollectiveTypeIcon, KYCStatusBadge, TaxFormBadge } from './common';
@@ -140,31 +141,36 @@ export function AccountDetails(props: AccountDetailsProps) {
   );
 
   const tabs = React.useMemo(
-    () => [
-      {
-        id: AccountDetailView.OVERVIEW,
-        label: <FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />,
-      },
-      {
-        id: AccountDetailView.TRANSACTIONS,
-        label: <FormattedMessage defaultMessage="Money Movement" id="MoneyMovement" />,
-      },
-      {
-        id: AccountDetailView.ACTIVITIES,
-        label: <FormattedMessage defaultMessage="Activities" id="Activities" />,
-      },
-      ...(query.data?.account?.type === CollectiveType.INDIVIDUAL && isFeatureEnabled(dashboardAccount, FEATURES.KYC)
-        ? [
-            {
-              id: AccountDetailView.KYC,
-              label: 'KYC',
-              count: Object.values(
-                query.data?.account && 'kycStatus' in query.data.account ? query.data.account.kycStatus : {},
-              ).filter(kyc => !!kyc?.['status']).length,
-            },
-          ]
-        : []),
-    ],
+    () =>
+      [
+        {
+          id: AccountDetailView.OVERVIEW,
+          label: <FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />,
+        },
+        {
+          id: AccountDetailView.TRANSACTIONS,
+          label: <FormattedMessage defaultMessage="Money Movement" id="MoneyMovement" />,
+        },
+        query.data?.account?.type === CollectiveType.INDIVIDUAL && {
+          id: AccountDetailView.FINANCIAL_CONTROLS,
+          label: <FormattedMessage defaultMessage="Managed Disbursements" id="ManagedDisbursements" />,
+        },
+        {
+          id: AccountDetailView.ACTIVITIES,
+          label: <FormattedMessage defaultMessage="Activities" id="Activities" />,
+        },
+        ...(query.data?.account?.type === CollectiveType.INDIVIDUAL && isFeatureEnabled(dashboardAccount, FEATURES.KYC)
+          ? [
+              {
+                id: AccountDetailView.KYC,
+                label: 'KYC',
+                count: Object.values(
+                  query.data?.account && 'kycStatus' in query.data.account ? query.data.account.kycStatus : {},
+                ).filter(kyc => !!kyc?.['status']).length,
+              },
+            ]
+          : []),
+      ].filter(Boolean),
     [query.data, dashboardAccount],
   );
 
@@ -323,6 +329,13 @@ export function AccountDetails(props: AccountDetailsProps) {
             )}
             {selectedTab === AccountDetailView.ACTIVITIES && (
               <ActivitiesTab account={account} host={dashboardAccount} setOpenExpenseId={setOpenExpenseId} />
+            )}
+            {selectedTab === AccountDetailView.FINANCIAL_CONTROLS && (
+              <AccountDetailManagedDisbursementsTab
+                query={query}
+                openExpenseLegacyId={openExpenseId}
+                setOpenExpenseLegacyId={setOpenExpenseId}
+              />
             )}
             {selectedTab === AccountDetailView.KYC && (
               <KYCTabPeopleDashboard requestedByAccount={dashboardAccount} verifyAccount={props.account} />

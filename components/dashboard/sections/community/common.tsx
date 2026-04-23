@@ -208,6 +208,7 @@ export enum AccountDetailView {
   TRANSACTIONS = 'transactions',
   ACTIVITIES = 'activities',
   KYC = 'kyc',
+  FINANCIAL_CONTROLS = 'financial-controls',
 }
 
 type CommunityAccount =
