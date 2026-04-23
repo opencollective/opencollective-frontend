@@ -266,7 +266,7 @@ function Expense(props: ExpenseProps) {
     <Box ref={expenseTopRef}>
       <ExpenseHeader inDrawer={inDrawer}>
         {expense?.type && expense?.account ? (
-          <div className="flex items-center gap-1">
+          <React.Fragment>
             <FormattedMessage
               id="ExpenseTitle"
               defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} PLATFORM_BILLING {Platform bill} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
@@ -288,11 +288,11 @@ function Expense(props: ExpenseProps) {
               }}
             />
             {expense?.publicId && (
-              <div className="text-sm">
+              <span className="ml-1 inline-flex align-middle text-sm">
                 <CopyID value={expense?.publicId}>{expense?.publicId?.substring(0, 8)}...</CopyID>
-              </div>
+              </span>
             )}
-          </div>
+          </React.Fragment>
         ) : (
           <LoadingPlaceholder height={32} maxWidth={'200px'} />
         )}
