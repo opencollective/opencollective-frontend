@@ -1,7 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
-import { ArrowLeftRightIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
@@ -18,7 +17,6 @@ import { CopyIDDropdown } from '../CopyId';
 import DateTime from '../DateTime';
 import DrawerHeader from '../DrawerHeader';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
@@ -26,12 +24,12 @@ import OrderStatusTag from '../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import Tags from '../Tags';
 import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../ui/DataList';
 import { InfoList, InfoListItem } from '../ui/InfoList';
 import { Sheet, SheetContent } from '../ui/Sheet';
 import { Skeleton } from '../ui/Skeleton';
 
+import { ContributionPayments } from './ContributionPayments';
 import ContributionTimeline, { getTransactionsUrl } from './ContributionTimeline';
 
 const contributionDrawerQuery = gql`
@@ -154,6 +152,7 @@ const contributionDrawerQuery = gql`
         canResume
         canMarkAsExpired
         canMarkAsPaid
+        canHostRefund
         canEdit
         canComment
         canSeePrivateActivities
@@ -240,6 +239,12 @@ const contributionDrawerQuery = gql`
     isRefunded
     isRefund
     isOrderRejected
+    host {
+      id
+      slug
+      legacyId
+      type
+    }
     account {
       ...AccountHoverCardFields
       isIncognito
@@ -264,6 +269,13 @@ const contributionDrawerQuery = gql`
       canReject
     }
     paymentProcessorUrl
+    refundTransaction {
+      id
+      group
+    }
+    oppositeTransaction {
+      id
+    }
   }
   ${accountHoverCardFields}
   ${AccountingCategorySelectFieldsFragment}
@@ -274,25 +286,32 @@ type ContributionDrawerProps = {
   onClose: () => void;
   orderId?: number;
   getActions: GetActions<ContributionDrawerQuery['order']>;
+  showPaymentsSection?: boolean;
 };
 
-export function ContributionDrawer(props: ContributionDrawerProps) {
+export function ContributionDrawer({
+  open,
+  onClose,
+  orderId,
+  getActions,
+  showPaymentsSection = false,
+}: ContributionDrawerProps) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
 
   const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
     variables: {
-      orderId: props.orderId,
+      orderId,
     },
-    skip: !props.open || !props.orderId,
+    skip: !open || !orderId,
   });
 
-  const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== props.orderId;
+  const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== orderId;
   const dropdownTriggerRef = React.useRef(undefined);
   const order = query.data?.order;
   const actions = React.useMemo(
-    () => (order ? props.getActions(order, dropdownTriggerRef) : null),
-    [order, props.getActions, dropdownTriggerRef],
+    () => (order ? getActions(order, dropdownTriggerRef) : null),
+    [order, getActions, dropdownTriggerRef],
   );
   const transactionsUrl = React.useMemo(() => {
     const url = order && getTransactionsUrl(LoggedInUser, order);
@@ -303,8 +322,8 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
   }, [LoggedInUser, order]);
 
   return (
-    <Sheet open={props.open} onOpenChange={isOpen => !isOpen && props.onClose()}>
-      <SheetContent className="flex max-w-xl flex-col overflow-hidden">
+    <Sheet open={open} onOpenChange={isOpen => !isOpen && onClose()}>
+      <SheetContent className="flex max-w-2xl flex-col overflow-hidden">
         <DrawerHeader
           actions={actions}
           dropdownTriggerRef={dropdownTriggerRef}
@@ -315,6 +334,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
             </div>
           }
           forceMoreActions
+          // separateRowForEntityLabel
           entityIdentifier={
             <div className="flex items-center gap-1">
               <CopyIDDropdown
@@ -322,8 +342,8 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 ids={[
                   {
                     name: <FormattedMessage defaultMessage="Order ID" id="GfBSPQ" />,
-                    label: `#${props.orderId}`,
-                    value: `${props.orderId}`,
+                    label: `#${orderId}`,
+                    value: `${orderId}`,
                     tooltipLabel: <FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />,
                   },
                   ...(order?.publicId
@@ -609,25 +629,20 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   )}
                 </DataList>
 
+                {showPaymentsSection && (
+                  <ContributionPayments
+                    isLoading={isLoading}
+                    order={query.data?.order}
+                    transactionsUrl={transactionsUrl}
+                  />
+                )}
+
                 <div>
                   <div className="flex items-center justify-between gap-2 py-4">
                     <div className="text-slate-80 w-fit text-base leading-6 font-bold">
                       <FormattedMessage defaultMessage="Related Activity" id="LP8cIK" />
                     </div>
                     <hr className="grow border-neutral-300" />
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="xs"
-                      disabled={isLoading}
-                      loading={isLoading}
-                      data-cy="view-transactions-button"
-                    >
-                      <Link href={transactionsUrl?.toString() || '#'} className="flex flex-row items-center gap-2.5">
-                        <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
-                        <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
-                      </Link>
-                    </Button>
                   </div>
 
                   {isLoading ? (
