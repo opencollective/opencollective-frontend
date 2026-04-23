@@ -119,8 +119,8 @@ describe('event.createOrder page', () => {
 
   it('makes an order for tickets with VAT', () => {
     // Activate VAT for collective
-    cy.editCollective({
-      id: collective.id,
+    cy.editAccount({
+      slug: collective.slug,
       location: { country: 'BE' },
       settings: { VAT: { type: 'OWN', number: 'FRXX999999999' } },
     });
