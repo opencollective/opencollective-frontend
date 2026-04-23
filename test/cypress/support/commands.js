@@ -757,25 +757,29 @@ function getLoggedInUserFromToken(token) {
 function fillStripeInput(params) {
   const { container, card } = params || {};
   const stripeIframeSelector = '.__PrivateStripeElement iframe';
-  const iframePromise = container ? container.find(stripeIframeSelector) : cy.get(stripeIframeSelector);
-  const cardParams = card || CreditCards.CARD_DEFAULT;
+  const { creditCardNumber, expirationDate, cvcCode, postalCode } = card || CreditCards.CARD_DEFAULT;
 
-  return iframePromise.then(iframe => {
-    const { creditCardNumber, expirationDate, cvcCode, postalCode } = cardParams;
-    const body = iframe.contents().find('body');
-    const fillInput = (index, value) => {
-      if (value === undefined) {
-        return;
-      }
+  // Re-query the iframe body on every input fill so Cypress can retry through
+  // Stripe iframe re-renders (otherwise a cached `body` reference gets detached
+  // from the DOM and fails the chain with "subject is no longer attached").
+  const getIframeBody = () =>
+    (container ? cy.wrap(container).find(stripeIframeSelector) : cy.get(stripeIframeSelector))
+      .its('0.contentDocument.body')
+      .should('not.be.empty')
+      .then(cy.wrap);
 
-      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`, { force: true });
-    };
+  const fillInput = (index, value) => {
+    if (value === undefined) {
+      return;
+    }
 
-    fillInput(1, creditCardNumber);
-    fillInput(2, expirationDate);
-    fillInput(3, cvcCode);
-    fillInput(4, postalCode);
-  });
+    return getIframeBody().find(`input:eq(${index})`).type(`{selectall}${value}`, { force: true });
+  };
+
+  fillInput(1, creditCardNumber);
+  fillInput(2, expirationDate);
+  fillInput(3, cvcCode);
+  fillInput(4, postalCode);
 }
 
 function getEmail(emailMatcher, timeout = 8000) {
