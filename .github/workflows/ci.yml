@@ -23,8 +23,27 @@ env:
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
+  determine-runner:
+    name: Check runner availability
+    runs-on: ubuntu-24.04
+    outputs:
+      runner: ${{ steps.pick.outputs.runner }}
+    steps:
+      - name: Pick runner
+        id: pick
+        run: |
+          runners=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runners")
+          available=$(echo "$runners" | jq '.runners[] | select(.status == "online" and .busy == false)')
+          if [ -n "$available" ]; then
+            echo "runner=self-hosted" >> $GITHUB_OUTPUT
+          else
+            echo "runner=ubuntu-24.04" >> $GITHUB_OUTPUT
+          fi
   lint:
-    runs-on: ubuntu-latest
+    needs: determine-runner
+    runs-on: ${{ needs.determine-runner.outputs.runner }}
 
     timeout-minutes: 15
 
@@ -40,7 +59,8 @@ jobs:
       - run: npm run lint:quiet
 
   prettier:
-    runs-on: ubuntu-latest
+    needs: determine-runner
+    runs-on: ${{ needs.determine-runner.outputs.runner }}
 
     timeout-minutes: 15
 
@@ -56,7 +76,8 @@ jobs:
       - run: npm run prettier:check
 
   depcheck:
-    runs-on: ubuntu-latest
+    needs: determine-runner
+    runs-on: ${{ needs.determine-runner.outputs.runner }}
 
     timeout-minutes: 15
 
@@ -72,7 +93,8 @@ jobs:
       - run: npm run depcheck
 
   ts-unused-exports:
-    runs-on: ubuntu-latest
+    needs: determine-runner
+    runs-on: ${{ needs.determine-runner.outputs.runner }}
 
     timeout-minutes: 15
 
@@ -88,7 +110,8 @@ jobs:
       - run: npm run ts-unused-exports
 
   check-langs:
-    runs-on: ubuntu-latest
+    needs: determine-runner
+    runs-on: ${{ needs.determine-runner.outputs.runner }}
 
     timeout-minutes: 15
 
@@ -104,7 +127,8 @@ jobs:
       - run: npm run langs:check
 
   build:
-    runs-on: ubuntu-latest
+    needs: determine-runner
+    runs-on: ${{ needs.determine-runner.outputs.runner }}
 
     timeout-minutes: 15
 
@@ -139,7 +163,8 @@ jobs:
           key: ${{ runner.os }}-next-build-${{ github.sha }}
 
   test:
-    runs-on: ubuntu-latest
+    needs: determine-runner
+    runs-on: ${{ needs.determine-runner.outputs.runner }}
 
     timeout-minutes: 15
 
@@ -167,7 +192,8 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   typescript:
-    runs-on: ubuntu-latest
+    needs: determine-runner
+    runs-on: ${{ needs.determine-runner.outputs.runner }}
     timeout-minutes: 15
 
     steps:
