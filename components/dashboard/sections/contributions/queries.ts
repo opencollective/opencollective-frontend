@@ -2,6 +2,70 @@ import { gql } from '@apollo/client/core';
 
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 
+export const hostCancelContributionModalQuery = gql`
+  query HostCancelContributionModal($order: OrderReferenceInput!) {
+    order(order: $order) {
+      id
+      status
+      frequency
+      description
+      amount {
+        valueInCents
+        currency
+      }
+      totalAmount {
+        valueInCents
+        currency
+      }
+      fromAccount {
+        id
+        slug
+        name
+        imageUrl
+        type
+      }
+      toAccount {
+        id
+        slug
+        name
+        ... on AccountWithHost {
+          host {
+            id
+            slug
+            name
+          }
+        }
+        ... on Organization {
+          host {
+            id
+            slug
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const hostCancelOrderMutation = gql`
+  mutation HostCancelOrder(
+    $order: OrderReferenceInput!
+    $removeAsContributor: Boolean
+    $messageForContributor: String
+  ) {
+    cancelOrder(
+      order: $order
+      removeAsContributor: $removeAsContributor
+      messageForContributor: $messageForContributor
+    ) {
+      id
+      status
+      ...ManagedOrderFields
+    }
+  }
+  ${managedOrderFragment}
+`;
+
 export const dashboardOrdersQuery = gql`
   query DashboardOrders(
     $slug: String!

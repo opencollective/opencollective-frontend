@@ -139,6 +139,7 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
         nbPlaceholders={nbPlaceholders}
         error={error}
         refetch={handleRefetch}
+        showPaymentsSection
       />
     </div>
   );

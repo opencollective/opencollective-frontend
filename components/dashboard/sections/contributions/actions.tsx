@@ -1,23 +1,25 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, LinkIcon, Pencil } from 'lucide-react';
+import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, CircleX, LinkIcon, Pencil } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { getPermalinkUrl } from '../../../../lib/url-helpers';
+import {  getPermalinkUrl } from '../../../../lib/url-helpers';
 import useClipboard from '@/lib/hooks/useClipboard';
 
+import { getTransactionsUrl } from '@/components/contributions/ContributionTimeline';
+
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
-import { getTransactionsUrl } from '../../../contributions/ContributionTimeline';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
 import { useModal } from '../../../ModalContext';
 import { useToast } from '../../../ui/useToast';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
+import { HostCancelContributionModal } from './HostCancelContributionModal';
 
 const expireOrderMutation = gql`
   mutation ContributionsExpireOrder($orderId: Int) {
@@ -80,6 +82,12 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     };
 
     const isAdminOfOrder = LoggedInUser.isAdminOfCollective(order.fromAccount);
+    const isHostAdminOfToAccount = LoggedInUser?.isHostAdmin(order.toAccount);
+    const isSingleContribution = order.frequency === ContributionFrequency.ONETIME;
+    const canManageAsHost =
+      isHostAdminOfToAccount &&
+      !isSingleContribution &&
+      ![OrderStatus.PENDING, OrderStatus.EXPIRED, OrderStatus.REJECTED, OrderStatus.REFUNDED].includes(order.status);
     const canUpdateActiveOrder =
       order.frequency !== ContributionFrequency.ONETIME &&
       ![
@@ -162,7 +170,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
             CreatePendingContributionModal,
             {
               hostSlug: hostSlug || accountSlug,
-              edit: order as React.ComponentProps<typeof CreatePendingContributionModal>['edit'],
+              edit: order as unknown as React.ComponentProps<typeof CreatePendingContributionModal>['edit'],
               onSuccess: onMutationSuccess,
               onCloseFocusRef,
             },
@@ -244,6 +252,29 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
         }),
         onClick: () => showEditOrderModal('cancel'),
         'data-cy': 'recurring-contribution-menu-cancel-option',
+      });
+    }
+
+    if (canManageAsHost) {
+      actions.primary.push({
+        key: 'manage-contribution-as-host',
+        Icon: CircleX,
+        label: intl.formatMessage({
+          defaultMessage: 'Cancel contribution',
+          id: 'subscription.menu.cancelContribution',
+        }),
+        onClick: () => {
+          showModal(
+            HostCancelContributionModal,
+            {
+              order: { id: order.id, legacyId: order.legacyId },
+              onSuccess: onMutationSuccess,
+              onCloseFocusRef,
+            },
+            `host-cancel-contribution-${order.id}`,
+          );
+        },
+        'data-cy': 'manage-contribution-host-admin',
       });
     }
 
