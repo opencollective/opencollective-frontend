@@ -153,6 +153,7 @@ const contributionDrawerQuery = gql`
         canResume
         canMarkAsExpired
         canMarkAsPaid
+        canHostRefund
         canEdit
         canComment
         canSeePrivateActivities
@@ -251,6 +252,9 @@ const contributionDrawerQuery = gql`
       canReject
     }
     paymentProcessorUrl
+    oppositeTransaction {
+      id
+    }
   }
   ${accountHoverCardFields}
   ${AccountingCategorySelectFieldsFragment}
@@ -302,6 +306,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
             </div>
           }
           forceMoreActions
+         // separateRowForEntityLabel
           entityIdentifier={
             <div className="flex items-center gap-1">
               <CopyIDDropdown

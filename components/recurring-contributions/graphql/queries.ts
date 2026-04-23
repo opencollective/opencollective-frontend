@@ -71,6 +71,7 @@ export const managedOrderFragment = gql`
       canResume
       canMarkAsExpired
       canMarkAsPaid
+      canHostRefund
       canEdit
       canComment
       canSeePrivateActivities
@@ -169,6 +170,15 @@ export const managedOrderFragment = gql`
       name
       kind
       code
+    }
+    transactions {
+      id
+      isRefunded
+      isRefund
+      permissions {
+        id
+        canRefund
+      }
     }
   }
   ${accountHoverCardFields}

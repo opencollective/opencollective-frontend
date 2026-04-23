@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, LinkIcon, Pencil } from 'lucide-react';
+import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, LinkIcon, Pencil, Settings2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -18,6 +18,7 @@ import { useModal } from '../../../ModalContext';
 import { useToast } from '../../../ui/useToast';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
+import ManageContributionModal from './ManageContributionModal';
 
 const expireOrderMutation = gql`
   mutation ContributionsExpireOrder($orderId: Int) {
@@ -80,6 +81,20 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     };
 
     const isAdminOfOrder = LoggedInUser.isAdminOfCollective(order.fromAccount);
+    const isHostAdminOfToAccount = LoggedInUser?.isHostAdmin(order.toAccount);
+    const isSingleContribution = order.frequency === ContributionFrequency.ONETIME;
+    const hasRefundableTransactions = order.transactions?.some(
+      transaction => transaction?.permissions?.canRefund && !transaction.isRefund && !transaction.isRefunded,
+    );
+    const isCancelledRecurringWithoutRefundableTransactions =
+      order.frequency !== ContributionFrequency.ONETIME &&
+      order.status === OrderStatus.CANCELLED &&
+      !order.permissions.canHostRefund;
+    const canManageAsHost =
+      isHostAdminOfToAccount &&
+      !isCancelledRecurringWithoutRefundableTransactions &&
+      (!isSingleContribution || hasRefundableTransactions) &&
+      ![OrderStatus.PENDING, OrderStatus.EXPIRED, OrderStatus.REJECTED, OrderStatus.REFUNDED].includes(order.status);
     const canUpdateActiveOrder =
       order.frequency !== ContributionFrequency.ONETIME &&
       ![
@@ -162,7 +177,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
             CreatePendingContributionModal,
             {
               hostSlug: hostSlug || accountSlug,
-              edit: order as React.ComponentProps<typeof CreatePendingContributionModal>['edit'],
+              edit: order as unknown as React.ComponentProps<typeof CreatePendingContributionModal>['edit'],
               onSuccess: onMutationSuccess,
               onCloseFocusRef,
             },
@@ -244,6 +259,28 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
         }),
         onClick: () => showEditOrderModal('cancel'),
         'data-cy': 'recurring-contribution-menu-cancel-option',
+      });
+    }
+
+    if (canManageAsHost) {
+      actions.primary.push({
+        key: 'manage-contribution-as-host',
+        Icon: Settings2,
+        label: isSingleContribution
+          ? intl.formatMessage({ defaultMessage: 'Refund', id: 'Refund' })
+          : intl.formatMessage({ defaultMessage: 'Manage contribution', id: 'ManageOrder.Action' }),
+        onClick: () => {
+          showModal(
+            ManageContributionModal,
+            {
+              order: { id: order.id, legacyId: order.legacyId },
+              onSuccess: onMutationSuccess,
+              onCloseFocusRef,
+            },
+            `manage-contribution-${order.id}`,
+          );
+        },
+        'data-cy': 'manage-contribution-host-admin',
       });
     }
 

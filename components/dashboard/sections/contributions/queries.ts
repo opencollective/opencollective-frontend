@@ -2,6 +2,99 @@ import { gql } from '@apollo/client/core';
 
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 
+export const manageContributionModalQuery = gql`
+  query ManageContributionModal($order: OrderReferenceInput!) {
+    order(order: $order) {
+      id
+      status
+      frequency
+      description
+      amount {
+        valueInCents
+        currency
+      }
+      totalAmount {
+        valueInCents
+        currency
+      }
+      fromAccount {
+        id
+        slug
+        name
+        imageUrl
+        type
+      }
+      toAccount {
+        id
+        slug
+        name
+        ... on AccountWithHost {
+          host {
+            id
+            slug
+            name
+          }
+        }
+        ... on Organization {
+          host {
+            id
+            slug
+            name
+          }
+        }
+      }
+      transactions {
+        id
+        legacyId
+        createdAt
+        isRefunded
+        isRefund
+        amount {
+          valueInCents
+          currency
+        }
+        paymentProcessorFee {
+          valueInCents
+          currency
+        }
+        hostFee {
+          valueInCents
+          currency
+        }
+        permissions {
+          id
+          canRefund
+        }
+      }
+    }
+  }
+`;
+
+export const manageOrderMutation = gql`
+  mutation ManageOrder($order: OrderReferenceInput!, $action: ManageOrderInput!) {
+    manageOrder(order: $order, action: $action) {
+      order {
+        id
+        status
+        ...ManagedOrderFields
+      }
+      refundedTransactions {
+        id
+        legacyId
+      }
+      refundErrors {
+        code
+        message
+        transaction {
+          id
+          legacyId
+        }
+      }
+    }
+  }
+  ${managedOrderFragment}
+`;
+
 export const dashboardOrdersQuery = gql`
   query DashboardOrders(
     $slug: String!

@@ -5968,8 +5968,11 @@ enum ActivityType {
   HOST_APPLICATION_CONTACT
   HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
+  CONTRIBUTION_REFUNDED_BY_HOST
+  CONTRIBUTOR_REMOVED_BY_HOST
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
+  SUBSCRIPTION_CANCELED_BY_HOST
   SUBSCRIPTION_PAUSED
   SUBSCRIPTION_RESUMED
   SUBSCRIPTION_READY_TO_BE_RESUMED
@@ -9604,6 +9607,21 @@ type OrderPermissions {
   If paused, whether the current user can resume this order
   """
   canResume: Boolean!
+
+  """
+  Whether the current user can cancel this recurring contribution as a host admin through the host dashboard
+  """
+  canHostCancel: Boolean!
+
+  """
+  Whether the current user can refund at least one transaction of this order as a host admin through the host dashboard
+  """
+  canHostRefund: Boolean!
+
+  """
+  Whether the current user can remove the contributor from the collective public profile as a host admin
+  """
+  canHostRemoveAsContributor: Boolean!
 }
 
 type PendingOrderData {
@@ -20748,8 +20766,11 @@ enum ActivityAndClassesType {
   HOST_APPLICATION_CONTACT
   HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
+  CONTRIBUTION_REFUNDED_BY_HOST
+  CONTRIBUTOR_REMOVED_BY_HOST
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
+  SUBSCRIPTION_CANCELED_BY_HOST
   SUBSCRIPTION_PAUSED
   SUBSCRIPTION_RESUMED
   SUBSCRIPTION_READY_TO_BE_RESUMED
@@ -25054,6 +25075,21 @@ type Mutation {
   ): Order
 
   """
+  Host-admin action on an order. Atomically cancels the recurring contribution, refunds selected past charges, and/or removes the contributor from the collective public profile. Scope: "host".
+  """
+  manageOrder(
+    """
+    Reference to the order to manage
+    """
+    order: OrderReferenceInput!
+
+    """
+    The action(s) to perform on the order
+    """
+    action: ManageOrderInput!
+  ): ManageOrderResult!
+
+  """
   Update an Order's amount, tier, or payment method. Scope: "orders".
   """
   updateOrder(
@@ -27940,6 +27976,116 @@ input OrderContextInput {
   Whether this order was created using the new platform tip flow
   """
   isNewPlatformTipFlow: Boolean
+}
+
+"""
+Result of a host-admin `manageOrder` action
+"""
+type ManageOrderResult {
+  """
+  The order after the requested action(s) have been applied
+  """
+  order: Order!
+
+  """
+  Transactions that were successfully refunded
+  """
+  refundedTransactions: [Transaction!]!
+
+  """
+  Per-transaction refund errors (soft failures). Empty if all refunds succeeded.
+  """
+  refundErrors: [ManageOrderRefundError!]!
+}
+
+"""
+A per-transaction refund error returned by the manageOrder mutation
+"""
+type ManageOrderRefundError {
+  """
+  The transaction that could not be refunded
+  """
+  transaction: Transaction!
+
+  """
+  Human-readable message describing the failure
+  """
+  message: String!
+
+  """
+  Stable machine-readable error code
+  """
+  code: ManageOrderRefundErrorCode!
+}
+
+"""
+Stable error code describing why a specific transaction could not be refunded
+"""
+enum ManageOrderRefundErrorCode {
+  """
+  The transaction has already been refunded at the payment provider
+  """
+  ALREADY_REFUNDED
+
+  """
+  The transaction has been charged back and cannot be refunded
+  """
+  CHARGED_BACK
+
+  """
+  Stripe no longer accepts refunds for this charge (window expired)
+  """
+  STRIPE_REFUND_WINDOW_EXPIRED
+
+  """
+  The collective does not have enough funds to refund this transaction
+  """
+  INSUFFICIENT_FUNDS
+
+  """
+  The payment provider used for this transaction does not support refunds
+  """
+  PAYMENT_PROVIDER_UNSUPPORTED
+
+  """
+  An unknown error happened while refunding this transaction
+  """
+  UNKNOWN
+}
+
+"""
+Action to perform on an order as a host admin via `manageOrder`
+"""
+input ManageOrderInput {
+  """
+  Cancel the recurring contribution (requires a subscription)
+  """
+  cancel: Boolean! = false
+
+  """
+  Refund a set of past charges on the order
+  """
+  refund: ManageOrderRefundInput
+
+  """
+  Remove the contributor from the collective public profile (destroys the BACKER membership)
+  """
+  removeAsContributor: Boolean! = false
+
+  """
+  Optional message forwarded to the contributor in the notification emails
+  """
+  messageForContributor: String
+}
+
+"""
+Refund action input for the host-admin manageOrder mutation
+"""
+input ManageOrderRefundInput {
+  """
+  The transactions to refund. Must belong to the same order.
+  """
+  transactions: [TransactionReferenceInput!]!
 }
 
 input OrderUpdateInput {

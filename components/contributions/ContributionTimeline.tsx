@@ -3,6 +3,7 @@ import { clsx } from 'clsx';
 import dayjs from 'dayjs';
 import { flatten, groupBy, sortBy, startCase, uniq } from 'lodash';
 import {
+  ArrowRight,
   Calendar,
   ChevronDown,
   ChevronUp,
@@ -23,10 +24,12 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { i18nTransactionKind } from '../../lib/i18n/transaction';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
 
+import Avatar from '../Avatar';
 import ActivityDescription, { getActivityVariables } from '../dashboard/sections/ActivityLog/ActivityDescription';
 import { useTransactionActions } from '../dashboard/sections/transactions/actions';
 import DateTime from '../DateTime';
@@ -34,6 +37,11 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
 import { Button } from '../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
+
+// Prototype flag: toggle to render the per-transaction summary card below
+// transaction activities in the timeline. Kept off until the API-side change
+// that splits fees into separate transactions is rolled out everywhere.
+const SHOW_TRANSACTION_SUMMARY_CARD = true;
 
 type OrderTimelineProps = {
   order: ContributionDrawerQuery['order'];
@@ -198,6 +206,85 @@ const getActivityStyle = (type: ActivityType) => {
   }
 };
 
+type ContributionTransaction = ContributionDrawerQuery['order']['transactions'][number];
+
+type TransactionSummaryCardProps = {
+  transactions: ContributionDrawerQuery['order']['transactions'];
+};
+
+/**
+ * Deduplicates the double-entry transactions by pairing them with their
+ * oppositeTransaction. For each pair, we return the CREDIT side so the
+ * amount is positive and the flow reads as `oppositeAccount -> account`.
+ */
+function buildTransactionPairs(transactions: ContributionDrawerQuery['order']['transactions']): ContributionTransaction[] {
+  const byId = new Map(transactions.map(t => [t.id, t]));
+  const seen = new Set<string>();
+  const pairs: ContributionTransaction[] = [];
+
+  for (const txn of transactions) {
+    if (seen.has(txn.id)) {
+      continue;
+    }
+    seen.add(txn.id);
+
+    const opposite = txn.oppositeTransaction?.id ? byId.get(txn.oppositeTransaction.id) : null;
+    if (opposite) {
+      seen.add(opposite.id);
+    }
+
+    const creditSide = txn.type === 'CREDIT' ? txn : (opposite ?? txn);
+    pairs.push(creditSide);
+  }
+
+  return pairs;
+}
+
+function TransactionPairRow({ txn }: { txn: ContributionTransaction }) {
+  const intl = useIntl();
+  const isCredit = txn.type === 'CREDIT';
+  const fromAccount = isCredit ? txn.oppositeAccount : txn.account;
+  const toAccount = isCredit ? txn.account : txn.oppositeAccount;
+
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex min-w-0 items-center gap-1.5">
+        <Avatar collective={fromAccount} radius={18} />
+        <span className="max-w-[100px] truncate">{fromAccount.name}</span>
+        <ArrowRight size={12} className="shrink-0 text-muted-foreground" />
+        <Avatar collective={toAccount} radius={18} />
+        <span className="max-w-[100px] truncate">{toAccount.name}</span>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        <span className="text-muted-foreground">{i18nTransactionKind(intl, txn.kind)}</span>
+        <span className="font-medium">
+          <FormattedMoneyAmount
+            amount={Math.abs(txn.amount.valueInCents)}
+            currency={txn.amount.currency}
+            precision={2}
+            showCurrencyCode={false}
+          />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function TransactionSummaryCard({ transactions }: TransactionSummaryCardProps) {
+  const pairs = buildTransactionPairs(transactions);
+  if (pairs.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-2 flex flex-col gap-1.5 rounded-md border border-[#E1E7EF] bg-slate-50 p-3 text-xs">
+      {pairs.map(txn => (
+        <TransactionPairRow key={txn.id} txn={txn} />
+      ))}
+    </div>
+  );
+}
+
 function ContributionTimeline(props: OrderTimelineProps) {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
@@ -283,6 +370,7 @@ function ContributionTimeline(props: OrderTimelineProps) {
         collapsable: true,
         type: primaryTxn.isRefund ? 'warning' : 'success',
         normallyOpen: i === 0,
+        details: SHOW_TRANSACTION_SUMMARY_CARD ? <TransactionSummaryCard transactions={txn.transactions} /> : undefined,
         menu: (
           <React.Fragment>
             <DropdownMenuItem asChild>
@@ -451,7 +539,6 @@ function ContributionTimeline(props: OrderTimelineProps) {
                   <div className="text-xs leading-5 text-[#75777A]">
                     <DateTime value={t.date} timeStyle="short" />
                   </div>
-                  {t.details && <div className="mt-2">{t.details}</div>}
                 </div>
                 <div className="ml-auto flex gap-2">
                   {t.menu && (
@@ -471,6 +558,7 @@ function ContributionTimeline(props: OrderTimelineProps) {
                   )}
                 </div>
               </div>
+              {t.details && <div className="mt-2">{t.details}</div>}
             </li>
           </React.Fragment>
         );
