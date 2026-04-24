@@ -18252,7 +18252,7 @@ type Query {
     """
     Host context filter
     """
-    host: AccountReferenceInput
+    host: AccountReferenceInput!
     type: [AccountType]
 
     """
@@ -24703,6 +24703,11 @@ type Mutation {
   Update newsletter opt-in preference. Scope: "account".
   """
   setNewsletterOptIn(newsletterOptIn: Boolean!): Individual!
+
+  """
+  Create an incognito profile for the logged-in user, or return the existing one. Scope: "account".
+  """
+  createIncognitoProfile: Individual!
 
   """
   Set password to Individual. Scope: "account". 2FA.
