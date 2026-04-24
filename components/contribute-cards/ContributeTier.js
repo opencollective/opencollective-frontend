@@ -1,7 +1,8 @@
 import React from 'react';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { truncate } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { TriangleAlert } from 'lucide-react';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import INTERVALS from '../../lib/constants/intervals';
@@ -19,8 +20,8 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 import StyledProgressBar from '../StyledProgressBar';
-import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import Contribute from './Contribute';
 
@@ -54,27 +55,47 @@ const getContributionTypeFromTier = (tier, isPassed) => {
   }
 };
 
-const TierTitle = ({ collective, tier }) => {
+const TierTitle = ({ collective, tier, showAdminUnsupportedWarning = false }) => {
   const name = capitalize(tier.name);
-  if (!tier.useStandalonePage) {
-    return name;
-  } else {
-    return (
-      <StyledTooltip
-        content={() => <FormattedMessage id="ContributeTier.GoToPage" defaultMessage="Go to full details page" />}
-      >
-        <StyledLink
-          as={Link}
-          href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
-          color="black.900"
-          $hoverColor="black.900"
-          $underlineOnHover
-        >
-          {name}
-        </StyledLink>
-      </StyledTooltip>
-    );
-  }
+  return (
+    <React.Fragment>
+      {showAdminUnsupportedWarning ? (
+        <Tooltip>
+          <TooltipContent>
+            <FormattedMessage
+              defaultMessage="This tier type is disabled by your Fiscal Host. Edit it, or reach out to them for more information."
+              id="FQvzlx"
+            />
+          </TooltipContent>
+          <TooltipTrigger>
+            <div className="text-black-900 flex items-center gap-1 text-red-500 underline decoration-dashed underline-offset-4">
+              <TriangleAlert size={18} />
+              <span>{name}</span>
+            </div>
+          </TooltipTrigger>
+        </Tooltip>
+      ) : !tier.useStandalonePage ? (
+        name
+      ) : (
+        <Tooltip>
+          <TooltipContent>
+            <FormattedMessage id="ContributeTier.GoToPage" defaultMessage="Go to full details page" />
+          </TooltipContent>
+          <TooltipTrigger>
+            <StyledLink
+              as={Link}
+              href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
+              color="inherit"
+              $hoverColor="inherit"
+              $underlineOnHover
+            >
+              {name}
+            </StyledLink>
+          </TooltipTrigger>
+        </Tooltip>
+      )}
+    </React.Fragment>
+  );
 };
 
 const canContribute = (collective, LoggedInUser) => {
@@ -87,7 +108,8 @@ const canContribute = (collective, LoggedInUser) => {
   }
 };
 
-const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
+const ContributeTier = ({ collective, tier, isPreview, supportedTierTypes = undefined, isAdmin = false, ...props }) => {
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const { stats } = tier;
   const currency = tier.currency || collective.currency;
@@ -116,7 +138,13 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
   return (
     <Contribute
       route={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}/checkout`}
-      title={<TierTitle collective={collective} tier={tier} />}
+      title={
+        <TierTitle
+          collective={collective}
+          tier={tier}
+          showAdminUnsupportedWarning={Boolean(isAdmin && !supportedTierTypes?.includes(tier.type))}
+        />
+      }
       type={tierType}
       buttonText={tier.button}
       contributors={tier.contributors}
@@ -235,4 +263,4 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
   );
 };
 
-export default injectIntl(ContributeTier);
+export default ContributeTier;

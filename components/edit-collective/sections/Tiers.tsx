@@ -25,7 +25,7 @@ import { P, Span, Strong } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 import { listTierQuery } from '../tiers/EditTierModal';
 
-const getSortedContributeCards = (collective, tiers, intl) => {
+const getSortedContributeCards = (collective, tiers, supportedTierTypes, intl) => {
   const sortedTiers = sortTiersForCollective(collective, tiers);
   return sortedTiers.map(tier => {
     if (tier === 'custom') {
@@ -51,6 +51,8 @@ const getSortedContributeCards = (collective, tiers, intl) => {
           tier,
           hideContributors: true,
           hideCTA: true,
+          supportedTierTypes,
+          isAdmin: true,
         },
       };
     }
@@ -77,14 +79,15 @@ const Tiers = ({ collective }) => {
   const [draggingId, setDraggingId] = React.useState(null);
   const [error, setError] = React.useState(null);
 
-  const variables = { accountSlug: collective.slug };
+  const variables = { accountSlug: collective.slug, tiersOnlyValid: false };
   const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables });
   const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation);
   const intl = useIntl();
   const tiers = get(data, 'account.tiers.nodes', EMPTY_ARRAY);
+  const supportedTierTypes = get(data, 'account.supportedTierTypes', EMPTY_ARRAY);
   const contributeCards = React.useMemo(
-    () => getSortedContributeCards(collective, tiers, intl),
-    [collective, tiers, intl],
+    () => getSortedContributeCards(collective, tiers, supportedTierTypes, intl),
+    [collective, tiers, supportedTierTypes, intl],
   );
 
   const onTiersReorder = async cards => {
@@ -193,6 +196,7 @@ const Tiers = ({ collective }) => {
               setDraggingId={setDraggingId}
               isSaving={isSubmitting}
               canEdit
+              supportedTierTypes={supportedTierTypes}
             />
           </div>
         )}

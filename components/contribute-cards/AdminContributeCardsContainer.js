@@ -30,6 +30,8 @@ const AdminContributeCardsContainer = ({
   canEdit = false,
   isSaving,
   useTierModals = true,
+  hideCreateNew = false,
+  supportedTierTypes = undefined,
 }) => {
   const [items, setItems] = React.useState(cards || []);
 
@@ -115,29 +117,31 @@ const AdminContributeCardsContainer = ({
                 </ContributeCardContainer>
               );
             })}
-            <ContributeCardContainer>
-              {createNewType === 'PROJECT' ? (
-                <CreateNew data-cy="create-project" route={`/${collective.slug}/projects/create`}>
-                  {addNewMessage}
-                </CreateNew>
-              ) : useTierModals ? (
-                <CreateNew
-                  as="div"
-                  data-cy={createNewType === 'TICKET' ? 'create-ticket' : 'create-contribute-tier'}
-                  onClick={() => setShowTierModal('new')}
-                >
-                  {addNewMessage}
-                </CreateNew>
-              ) : createNewType === 'TICKET' ? (
-                <CreateNew data-cy="create-ticket" route={`/dashboard/${collective.slug}/tickets`}>
-                  {addNewMessage}
-                </CreateNew>
-              ) : (
-                <CreateNew data-cy="create-contribute-tier" route={`/dashboard/${collective.slug}/tiers`}>
-                  {addNewMessage}
-                </CreateNew>
-              )}
-            </ContributeCardContainer>
+            {!hideCreateNew && (
+              <ContributeCardContainer>
+                {createNewType === 'PROJECT' ? (
+                  <CreateNew data-cy="create-project" route={`/${collective.slug}/projects/create`}>
+                    {addNewMessage}
+                  </CreateNew>
+                ) : useTierModals ? (
+                  <CreateNew
+                    as="div"
+                    data-cy={createNewType === 'TICKET' ? 'create-ticket' : 'create-contribute-tier'}
+                    onClick={() => setShowTierModal('new')}
+                  >
+                    {addNewMessage}
+                  </CreateNew>
+                ) : createNewType === 'TICKET' ? (
+                  <CreateNew data-cy="create-ticket" route={`/dashboard/${collective.slug}/tickets`}>
+                    {addNewMessage}
+                  </CreateNew>
+                ) : (
+                  <CreateNew data-cy="create-contribute-tier" route={`/dashboard/${collective.slug}/tiers`}>
+                    {addNewMessage}
+                  </CreateNew>
+                )}
+              </ContributeCardContainer>
+            )}
             {showTierModal && (
               <EditTierModal
                 tier={showTierModal === 'new' ? null : showTierModal}
@@ -145,6 +149,7 @@ const AdminContributeCardsContainer = ({
                 onClose={closeTierModal}
                 forcedType={createNewType}
                 onUpdate={onTierUpdate}
+                supportedTierTypes={supportedTierTypes}
               />
             )}
           </CardsContainer>

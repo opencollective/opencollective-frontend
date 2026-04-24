@@ -4104,7 +4104,17 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    When true (default), exclude tiers with types that are no longer supported (e.g. types in host.disabledTierTypes). Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
   ): TierCollection!
+
+  """
+  Tier types that can be created for this account. Uses host disabledTierTypes and account overrides via Tier.isForbiddenTierType.
+  """
+  supportedTierTypes: [TierType!]!
 
   """
   All the persons and entities that contribute to this account
@@ -4778,7 +4788,17 @@ interface AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    When true (default), exclude tiers with types that are no longer supported (e.g. types in host.disabledTierTypes). Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
   ): TierCollection!
+
+  """
+  Tier types that can be created for this account. Uses host disabledTierTypes and account overrides via Tier.isForbiddenTierType.
+  """
+  supportedTierTypes: [TierType!]!
 
   """
   All the persons and entities that contribute to this account
@@ -4844,6 +4864,15 @@ type TierCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Tier]
+}
+
+enum TierType {
+  TIER
+  MEMBERSHIP
+  DONATION
+  TICKET
+  SERVICE
+  PRODUCT
 }
 
 """
@@ -9590,15 +9619,6 @@ type PendingOrderFromAccountInfo {
   email: String
 }
 
-enum TierType {
-  TIER
-  MEMBERSHIP
-  DONATION
-  TICKET
-  SERVICE
-  PRODUCT
-}
-
 enum TierInterval {
   month
   year
@@ -11887,7 +11907,17 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    When true (default), exclude tiers with types that are no longer supported (e.g. types in host.disabledTierTypes). Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
   ): TierCollection!
+
+  """
+  Tier types that can be created for this account. Uses host disabledTierTypes and account overrides via Tier.isForbiddenTierType.
+  """
+  supportedTierTypes: [TierType!]!
 
   """
   All the persons and entities that contribute to this account
@@ -13532,7 +13562,17 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    When true (default), exclude tiers with types that are no longer supported (e.g. types in host.disabledTierTypes). Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
   ): TierCollection!
+
+  """
+  Tier types that can be created for this account. Uses host disabledTierTypes and account overrides via Tier.isForbiddenTierType.
+  """
+  supportedTierTypes: [TierType!]!
 
   """
   All the persons and entities that contribute to this account
@@ -16228,7 +16268,17 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    When true (default), exclude tiers with types that are no longer supported (e.g. types in host.disabledTierTypes). Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
   ): TierCollection!
+
+  """
+  Tier types that can be created for this account. Uses host disabledTierTypes and account overrides via Tier.isForbiddenTierType.
+  """
+  supportedTierTypes: [TierType!]!
 
   """
   All the persons and entities that contribute to this account
@@ -17714,7 +17764,17 @@ type Vendor implements Account & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    When true (default), exclude tiers with types that are no longer supported (e.g. types in host.disabledTierTypes). Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
   ): TierCollection!
+
+  """
+  Tier types that can be created for this account. Uses host disabledTierTypes and account overrides via Tier.isForbiddenTierType.
+  """
+  supportedTierTypes: [TierType!]!
 
   """
   All the persons and entities that contribute to this account
@@ -22098,7 +22158,17 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    When true (default), exclude tiers with types that are no longer supported (e.g. types in host.disabledTierTypes). Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
   ): TierCollection!
+
+  """
+  Tier types that can be created for this account. Uses host disabledTierTypes and account overrides via Tier.isForbiddenTierType.
+  """
+  supportedTierTypes: [TierType!]!
 
   """
   All the persons and entities that contribute to this account
@@ -23320,7 +23390,17 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    When true (default), exclude tiers with types that are no longer supported (e.g. types in host.disabledTierTypes). Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
   ): TierCollection!
+
+  """
+  Tier types that can be created for this account. Uses host disabledTierTypes and account overrides via Tier.isForbiddenTierType.
+  """
+  supportedTierTypes: [TierType!]!
 
   """
   All the persons and entities that contribute to this account
