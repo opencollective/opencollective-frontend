@@ -146,7 +146,7 @@ export function KYCStatusBadge({ kycStatus }: KYCStatusBadgeProps) {
         <KYCVerificationStatusBadge
           size="sm"
           status={verification.status}
-          className="cursor-pointer"
+          className="cursor-pointer rounded-md text-xs font-medium"
           label={
             <React.Fragment>
               <FormattedMessage defaultMessage="KYC" id="KYC" />{' '}
