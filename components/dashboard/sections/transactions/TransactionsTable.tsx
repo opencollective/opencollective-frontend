@@ -305,8 +305,6 @@ export default function TransactionsTable({
   queryFilter,
   refetchList,
 }: TransactionsTableProps) {
-  const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
-
   const defaultColumnVisibility = {
     clearedAt: false,
     debit: false,
@@ -337,8 +335,6 @@ export default function TransactionsTable({
         onClickRow={(row, menuRef) => {
           openDrawer(row.id, menuRef);
         }}
-        onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
-        rowHasIndicator={row => row.original.group === hoveredGroup}
         mobileTableView
         columnVisibility={columnVisibility}
         setColumnVisibility={setColumnVisibility}
