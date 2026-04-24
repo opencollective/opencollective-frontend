@@ -9,6 +9,8 @@ import { getCurrentLocalDateStr } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import type { ConfirmContributionFieldsFragment, TaxInput } from '../../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../../lib/i18n/taxes';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { AccountType } from '@/lib/graphql/types/v2/schema';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -58,12 +60,18 @@ export const confirmContributionFieldsFragment = gql`
         host {
           id
           settings
+          features {
+            CHARGE_HOSTING_FEES
+          }
         }
       }
       ... on Organization {
         host {
           id
           settings
+          features {
+            CHARGE_HOSTING_FEES
+          }
         }
       }
     }
@@ -168,8 +176,12 @@ export const ConfirmContributionForm = ({
   const taxAmount = taxPercent ? Math.round(contributionAmount - grossContributionAmount) : null;
   const hostFee = Math.round((contributionAmount - taxAmount) * hostFeePercent) / 100;
   const netAmount = contributionAmount - paymentProcessorFee - hostFee - taxAmount;
-  const canAddHostFee = !order.toAccount['isHost'];
   const applicableTax = getApplicableTaxType(order.toAccount, order.toAccount['host']);
+  const canAddHostFee = Boolean(
+    order.hostFeePercent || // If a host fee was defined on the expected funds, we exceptionally allow it
+    (isFeatureEnabled(order.toAccount?.['host'], FEATURES.CHARGE_HOSTING_FEES) &&
+      order.toAccount.type !== AccountType.ORGANIZATION),
+  );
 
   return (
     <form
