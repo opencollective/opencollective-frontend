@@ -131,7 +131,7 @@
     "react-window": "1.8.11",
     "redis": "4.7.1",
     "sanitize-html": "2.17.3",
-    "slugify": "1.6.8",
+    "slugify": "1.6.9",
     "spdx-license-list": "6.11.0",
     "styled-components": "6.1.19",
     "styled-system": "5.1.5",
