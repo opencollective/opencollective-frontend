@@ -139,7 +139,7 @@
     "throng": "5.0.0",
     "trix": "2.1.18",
     "uuid": "14.0.0",
-    "validator": "13.15.26",
+    "validator": "13.15.35",
     "webpack-manifest-plugin": "6.0.1",
     "winston": "3.19.0",
     "zod": "3.25.76"
