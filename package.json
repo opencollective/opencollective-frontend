@@ -78,7 +78,7 @@
     "currency-symbol-map": "5.1.0",
     "dayjs": "1.11.20",
     "debug": "4.4.3",
-    "diff": "8.0.3",
+    "diff": "9.0.0",
     "dotenv": "17.3.1",
     "embla-carousel-react": "^8.6.0",
     "express": "4.22.1",
