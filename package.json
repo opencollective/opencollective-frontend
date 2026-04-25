@@ -21,7 +21,7 @@
     "@hcaptcha/react-hcaptcha": "2.0.2",
     "@hyperwatch/hyperwatch": "4.2.0",
     "@icons-pack/react-simple-icons": "^13.0.0",
-    "@opencollective/taxes": "5.3.0",
+    "@opencollective/taxes": "5.4.0",
     "@popperjs/core": "2.11.8",
     "@radix-ui/react-accordion": "1.2.12",
     "@radix-ui/react-alert-dialog": "1.1.15",
