@@ -99,7 +99,7 @@
     "load-script": "2.0.0",
     "lodash": "4.18.1",
     "lottie-react": "2.4.1",
-    "lucide-react": "0.577.0",
+    "lucide-react": "1.9.0",
     "memoize-one": "6.0.0",
     "next": "15.5.15",
     "node-fetch": "^2.7.0",
