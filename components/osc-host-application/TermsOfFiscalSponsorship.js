@@ -27,7 +27,7 @@ const messages = defineMessages({
 const FISCAL_SPONSOR_TERMS =
   'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub';
 
-const callRedirectToGithub = async collectiveSlug => {
+const _callRedirectToGithub = async collectiveSlug => {
   const urlParams = new URLSearchParams({
     context: 'createCollective',
     ...(collectiveSlug ? { CollectiveId: collectiveSlug } : null),
@@ -46,15 +46,28 @@ const callRedirectToGithub = async collectiveSlug => {
 const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
   const { LoggedInUser } = useLoggedInUser();
   const { formatMessage } = useIntl();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const router = useRouter();
   const [error, setError] = useState();
 
   const { collectiveSlug, redirectToGithub } = router.query;
 
-  if (LoggedInUser && redirectToGithub) {
-    callRedirectToGithub(collectiveSlug);
-  }
+  const callRedirectToGithub = React.useCallback(async collectiveSlug => {
+    try {
+      setIsRedirecting(true);
+      await _callRedirectToGithub(collectiveSlug);
+    } catch (error) {
+      setError(error.message);
+      setIsRedirecting(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (LoggedInUser && redirectToGithub) {
+      callRedirectToGithub();
+    }
+  }, [LoggedInUser, redirectToGithub, callRedirectToGithub]);
 
   return (
     <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
@@ -120,6 +133,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
             textAlign="center"
             buttonSize="large"
             buttonStyle="purple"
+            loading={isRedirecting}
             onClick={() => {
               if (!checked) {
                 setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
