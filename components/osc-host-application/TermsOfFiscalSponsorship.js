@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { addAuthTokenToHeader } from '../../lib/api';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
@@ -27,18 +27,20 @@ const messages = defineMessages({
 const FISCAL_SPONSOR_TERMS =
   'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub';
 
-const getGithubConnectUrl = collectiveSlug => {
+const callRedirectToGithub = async collectiveSlug => {
   const urlParams = new URLSearchParams({
     context: 'createCollective',
     ...(collectiveSlug ? { CollectiveId: collectiveSlug } : null),
   });
 
-  const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-  if (accessToken) {
-    urlParams.set('access_token', accessToken);
+  const response = await fetch(`/api/connected-accounts/github/oauthUrl?${urlParams.toString()}`, {
+    method: 'GET',
+    headers: addAuthTokenToHeader(),
+  });
+  const json = await response.json();
+  if (json?.redirectUrl) {
+    window.location.href = json.redirectUrl;
   }
-
-  return `/api/connected-accounts/github/oauthUrl?${urlParams.toString()}`;
 };
 
 const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
@@ -51,7 +53,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
   const { collectiveSlug, redirectToGithub } = router.query;
 
   if (LoggedInUser && redirectToGithub) {
-    window.location.href = getGithubConnectUrl(collectiveSlug);
+    callRedirectToGithub(collectiveSlug);
   }
 
   return (
@@ -127,7 +129,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
                   query: { next: `${router.asPath}?redirectToGithub=true` },
                 });
               } else {
-                window.location.href = getGithubConnectUrl(collectiveSlug);
+                callRedirectToGithub(collectiveSlug);
               }
             }}
           >
