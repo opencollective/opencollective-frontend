@@ -206,7 +206,7 @@
     "jest": "cross-env NODE_ENV=test TZ=UTC jest"
   },
   "devDependencies": {
-    "@codecov/webpack-plugin": "^1.9.1",
+    "@codecov/webpack-plugin": "^2.0.0",
     "@eslint/compat": "^2.0.0",
     "@formatjs/cli": "^6.2.12",
     "@graphql-codegen/cli": "6.2.1",
