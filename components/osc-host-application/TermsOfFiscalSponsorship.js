@@ -40,6 +40,9 @@ const _callRedirectToGithub = async collectiveSlug => {
   const json = await response.json();
   if (json?.redirectUrl) {
     window.location.href = json.redirectUrl;
+    return true;
+  } else {
+    return false;
   }
 };
 
@@ -56,7 +59,9 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
   const callRedirectToGithub = React.useCallback(async collectiveSlug => {
     try {
       setIsRedirecting(true);
-      await _callRedirectToGithub(collectiveSlug);
+      if ((await _callRedirectToGithub(collectiveSlug)) === false) {
+        setIsRedirecting(false);
+      }
     } catch (error) {
       setError(error.message);
       setIsRedirecting(false);
