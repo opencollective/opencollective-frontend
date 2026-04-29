@@ -105,6 +105,14 @@ const transactionQuery = gql`
           }
         }
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
       fromAccount {
         id
@@ -127,8 +135,17 @@ const transactionQuery = gql`
         name
         slug
         imageUrl
+        isIncognito
         type
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
 
       permissions {
@@ -360,12 +377,12 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                     value={
                       <LinkCollective
                         className="font-medium hover:text-primary"
-                        collective={transaction?.account}
+                        collective={transaction?.account?.mainProfile ?? transaction?.account}
                         withHoverCard
                       >
                         <div className="flex items-center gap-1">
-                          <Avatar radius={20} collective={transaction?.account} />
-                          {transaction?.account.name}
+                          <Avatar radius={24} collective={transaction?.account} />
+                          {(transaction?.account?.mainProfile ?? transaction?.account)?.name}
                         </div>
                       </LinkCollective>
                     }
@@ -383,7 +400,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                     value={
                       <LinkCollective
                         className="font-medium hover:text-primary"
-                        collective={transaction?.oppositeAccount}
+                        collective={transaction?.oppositeAccount?.mainProfile ?? transaction?.oppositeAccount}
                         withHoverCard
                       >
                         <div className="flex items-center gap-1">
@@ -392,8 +409,8 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                           ) : (
                             <ArrowRight className="inline-block shrink-0" size={16} />
                           )}
-                          <Avatar radius={20} collective={transaction?.oppositeAccount} />
-                          {transaction?.oppositeAccount?.name}
+                          <Avatar radius={24} collective={transaction?.oppositeAccount} />
+                          {(transaction?.oppositeAccount?.mainProfile ?? transaction?.oppositeAccount)?.name}
                         </div>
                       </LinkCollective>
                     }

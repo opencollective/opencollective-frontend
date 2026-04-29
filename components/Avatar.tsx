@@ -1,7 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { isEmpty } from 'lodash';
-import { ArrowUp, Calendar, LoaderCircle, Pencil, TestTube2, UserCog } from 'lucide-react';
+import { ArrowUp, Calendar, EyeOff, LoaderCircle, Pencil, TestTube2, UserCog } from 'lucide-react';
 import type { FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { styled } from 'styled-components';
@@ -45,6 +45,7 @@ const BaseAvatar = props => (
       backgroundImage: props.src ? `url(${props.src})` : null,
       backgroundSize: props.backgroundSize || 'cover',
       backgroundColor: props.backgroundColor,
+      color: props.color,
     }}
     {...props}
   />
@@ -125,7 +126,9 @@ const Avatar = ({
     type = collective.type;
     name = collective.name;
     if (collective.isIncognito) {
-      src = defaultImage.ANONYMOUS;
+      useIcon = true;
+      child = <EyeOff size={typeof radius === 'number' ? (radius <= 24 ? radius * 0.5 : radius * 0.4) : 16} />;
+      Object.assign(styleProps, { backgroundColor: 'black.900', color: 'white' });
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
       src = defaultImage.GUEST;
     } else if (useIcon) {
