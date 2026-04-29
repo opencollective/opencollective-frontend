@@ -53,10 +53,10 @@ export function TopList({ hostSlug, category, title, rows, loading }: TopListPro
           )}
         </span>
         <span className="col-span-4 text-right">
-          <FormattedMessage defaultMessage="Amount" id="/0TOL5" />
+          <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
         </span>
         <span className="col-span-1 text-right">
-          <FormattedMessage defaultMessage="Actions" id="wL7VAE" />
+          <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
         </span>
       </div>
       {loading ? (
