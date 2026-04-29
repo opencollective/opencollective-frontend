@@ -272,12 +272,14 @@ class SearchPage extends React.Component {
     router.push({ pathname: '/search', query: pickBy(query, value => !isNil(value)) });
   };
 
-  handleCopy = () => {
-    copy(window.location.href);
-    toast({
-      variant: 'success',
-      message: <FormattedMessage defaultMessage="Search Result Copied!" id="3x3DF3" />,
-    });
+  handleCopy = async () => {
+    const ok = await copy(window.location.href);
+    if (ok) {
+      toast({
+        variant: 'success',
+        message: <FormattedMessage defaultMessage="Search Result Copied!" id="3x3DF3" />,
+      });
+    }
   };
 
   render() {

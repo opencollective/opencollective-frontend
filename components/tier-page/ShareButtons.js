@@ -71,16 +71,18 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
       >
         <StyledRoundButton
           size={40}
-          onClick={() => {
-            copy(pageUrl);
-            setCopied(true);
-            if (updateCopyBtnTimeout) {
-              clearTimeout(updateCopyBtnTimeout);
+          onClick={async () => {
+            const ok = await copy(pageUrl);
+            if (ok) {
+              setCopied(true);
+              if (updateCopyBtnTimeout) {
+                clearTimeout(updateCopyBtnTimeout);
+              }
+              updateCopyBtnTimeout = setTimeout(() => {
+                setCopied(false);
+                updateCopyBtnTimeout = null;
+              }, 3000);
             }
-            updateCopyBtnTimeout = setTimeout(() => {
-              setCopied(false);
-              updateCopyBtnTimeout = null;
-            }, 3000);
           }}
         >
           <Clipboard size={15} />
