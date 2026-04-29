@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
 import type {
   HostMetricsOverviewSectionQuery,
@@ -22,6 +22,15 @@ const ROOT_TYPES: Record<Category, string[]> = {
   COLLECTIVE: ['COLLECTIVE'],
   FUND: ['FUND'],
 };
+
+const messages = defineMessages({
+  hostedCollectives: { defaultMessage: 'Hosted Collectives', id: 'HostedCollectives' },
+  hostedFunds: { defaultMessage: 'Hosted Funds', id: 'HostedFunds' },
+  topCollectivesByIncome: { defaultMessage: 'Top Collectives by Income', id: 'qe/a1+' },
+  topFundsByIncome: { defaultMessage: 'Top Funds by Income', id: 'IoN8/L' },
+  topCollectivesBySpending: { defaultMessage: 'Top Collectives by Spending', id: 'eYjMEN' },
+  topFundsBySpending: { defaultMessage: 'Top Funds by Spending', id: 'Vd28LQ' },
+});
 
 type HostMetricsOverviewSectionProps = {
   hostSlug: string;
@@ -79,13 +88,13 @@ export function HostMetricsOverviewSection({
     amount: r.values?.spendingAmount ?? null,
   }));
 
-  const titleId = category === 'FUND' ? { defaultMessage: 'Hosted Funds' } : { defaultMessage: 'Hosted Collectives' };
+  const titleMessage = category === 'FUND' ? messages.hostedFunds : messages.hostedCollectives;
 
   return (
     <div className="rounded-xl border bg-card p-4 sm:p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="flex items-baseline gap-2 text-lg font-semibold">
-          <FormattedMessage {...titleId} />:{' '}
+          <FormattedMessage {...titleMessage} />:{' '}
           {loading ? (
             <Skeleton className="inline-block h-6 w-12" />
           ) : (
@@ -102,11 +111,9 @@ export function HostMetricsOverviewSection({
           hostSlug={hostSlug}
           category={category}
           title={
-            category === 'FUND' ? (
-              <FormattedMessage defaultMessage="Top Funds by Income" id="IoN8/L" />
-            ) : (
-              <FormattedMessage defaultMessage="Top Collectives by Income" id="qe/a1+" />
-            )
+            <FormattedMessage
+              {...(category === 'FUND' ? messages.topFundsByIncome : messages.topCollectivesByIncome)}
+            />
           }
           rows={topByIncome}
           loading={loading}
@@ -115,11 +122,9 @@ export function HostMetricsOverviewSection({
           hostSlug={hostSlug}
           category={category}
           title={
-            category === 'FUND' ? (
-              <FormattedMessage defaultMessage="Top Funds by Spending" id="Vd28LQ" />
-            ) : (
-              <FormattedMessage defaultMessage="Top Collectives by Spending" id="eYjMEN" />
-            )
+            <FormattedMessage
+              {...(category === 'FUND' ? messages.topFundsBySpending : messages.topCollectivesBySpending)}
+            />
           }
           rows={topBySpending}
           loading={loading}
