@@ -9,7 +9,6 @@ import { isEmail } from 'validator';
 import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isTrustedSigninRedirectionUrl, isValidRelativeUrl } from '../lib/utils';
 import { getEnvVar } from '@/lib/env-utils';
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '@/lib/local-storage';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { getWhitelabelProviderFromRedirectionUrl, type WhitelabelProps } from '@/lib/whitelabel';
 
@@ -111,16 +110,17 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       this.setState({ success: true, redirecting: true });
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
-      let redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
-      const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(redirect);
-      if (isTrustedWhitelabel) {
-        const parsedUrl = new URL(redirect);
-        const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-        parsedUrl.searchParams.set('token', token);
-        parsedUrl.searchParams.set('next', parsedUrl.pathname);
-        parsedUrl.pathname = '/signin';
-        redirect = parsedUrl.toString();
-      }
+      const redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
+      // const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(redirect);
+      // if (isTrustedWhitelabel) {
+      //   const parsedUrl = new URL(redirect);
+      //   // TODO: This is a prototype, we should not use ACCESS_TOKEN for this redirection, but rather a short-lived token with dedicated scope
+      //   const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+      //   parsedUrl.searchParams.set('token', token);
+      //   parsedUrl.searchParams.set('next', parsedUrl.pathname);
+      //   parsedUrl.pathname = '/signin';
+      //   redirect = parsedUrl.toString();
+      // }
       const defaultRedirect = '/dashboard';
       await this.props.router.replace(redirect && redirect !== '/' ? redirect : defaultRedirect);
       window.scroll(0, 0);

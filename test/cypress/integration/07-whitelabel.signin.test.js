@@ -32,7 +32,7 @@ describe('white-label signin', () => {
     cy.url().should('include', `?next=http%3A%2F%2Flocal.opencollective%3A3000`);
   });
 
-  it('can signin with a valid token and redirected to white-labeled domain', () => {
+  xit('can signin with a valid token and redirected to white-labeled domain', () => {
     cy.visit(`http://localhost:3000/signin`);
     cy.generateToken().then(token => {
       cy.visit(`/signin/${token}?next=http%3A%2F%2Flocal.opencollective%3A3000%2F${colSlug}`);
@@ -63,7 +63,7 @@ describe('white-label signin', () => {
         });
     });
 
-    it('can signin with 2fa enabled', () => {
+    xit('can signin with 2fa enabled', () => {
       // now login with 2FA enabled
       cy.login({ email: user.email, redirect: `http://local.opencollective:3000/${colSlug}` });
       cy.complete2FAPrompt('123456');
