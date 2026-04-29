@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { hasAccountMoneyManagement, isHeavyAccount } from '@/lib/collective';
 import dayjs from '@/lib/dayjs';
 import { HostContext, type HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
@@ -23,6 +24,7 @@ import {
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { HostMetricsOverview } from '../../../metrics/host/dashboard-overview';
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -169,6 +171,8 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
       {hasMoneyManagement && account.platformSubscription && <PlatformBillingCollapsibleCard />}
 
       <HostTodoList />
+
+      {isFeatureEnabled(account, FEATURES.HOST_METRICS) && <HostMetricsOverview hostSlug={account.slug} />}
 
       <Card className="pb-3">
         <CardHeader>
