@@ -2733,6 +2733,8 @@
   "MemberInvitations.title": "保留中の招待状",
   "members.remove.cantRemoveLast": "最後の管理者は削除できません。先に別の管理者を追加してください。",
   "members.remove.confirm": "{name} @{slug} {hasEmail, select, 1 {({email})} other {}} を削除して本当によろしいですか？",
+  "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
+  "members.remove.integrations": "By removing this member, you will also remove their token(s) that connects this account to the following service(s): {services}.",
   "members.role.label": "役割",
   "Membership.ContributorSince": "{contributorType} として参加",
   "membership.since": "{date}から",

@@ -2733,6 +2733,8 @@
   "MemberInvitations.title": "Obesvarade inbjudningar",
   "members.remove.cantRemoveLast": "Den sista administratören kan inte tas bort. Lägg till en annan administratör först.",
   "members.remove.confirm": "Vill du verkligen ta bort {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?",
+  "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
+  "members.remove.integrations": "By removing this member, you will also remove their token(s) that connects this account to the following service(s): {services}.",
   "members.role.label": "Roll",
   "Membership.ContributorSince": "{contributorType} sedan",
   "membership.since": "sedan {date}",

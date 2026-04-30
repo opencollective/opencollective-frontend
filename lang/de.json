@@ -2733,6 +2733,8 @@
   "MemberInvitations.title": "Ausstehende Einladungen",
   "members.remove.cantRemoveLast": "Der letzte Administrator kann nicht entfernt werden. Bitte füge zuerst einen anderen Administrator hinzu.",
   "members.remove.confirm": "Möchtest du wirklich {name} @{slug} {hasEmail, select, 1 {({email})} other {}} entfernen?",
+  "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
+  "members.remove.integrations": "By removing this member, you will also remove their token(s) that connects this account to the following service(s): {services}.",
   "members.role.label": "Rolle",
   "Membership.ContributorSince": "{contributorType} seit",
   "membership.since": "seit {date}",
