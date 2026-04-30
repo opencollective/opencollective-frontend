@@ -27,6 +27,7 @@ export const teamSectionQuery = gql`
       id
       legacyId
       slug
+      name
       isFrozen
       type
       imageUrl(height: 256)
@@ -35,6 +36,25 @@ export const teamSectionQuery = gql`
           id
           slug
           type
+          name
+        }
+      }
+      connectedAccounts {
+        id
+        legacyId
+        service
+        createdAt
+        settings
+        hash
+        createdByAccount {
+          id
+          legacyId
+          name
+          slug
+        }
+        accountsMirrored {
+          id
+          slug
           name
         }
       }
