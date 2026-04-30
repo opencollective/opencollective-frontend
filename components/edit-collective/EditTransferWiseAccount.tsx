@@ -182,73 +182,75 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
   if (loading) {
     return <Skeleton className="mb-3 h-10 w-full" />;
   }
-  if (connectedAccounts.length === 0) {
-    return (
-      <React.Fragment>
-        <div className="mb-3 text-sm text-gray-700">
-          <FormattedMessage
-            id="collective.create.connectedAccounts.transferwise.description"
-            defaultMessage="Connect a Wise account to pay expenses with one click."
-          />
-        </div>
-        {error && (
-          <MessageBox withIcon type="error" mb={3}>
-            {error}
-          </MessageBox>
-        )}
-
-        <Button size="sm" className="w-fit" type="submit" onClick={handleConnect}>
-          <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'Wise' }} />
-        </Button>
-      </React.Fragment>
-    );
-  } else {
-    return (
-      <div className="flex flex-col gap-4">
-        <ConnectedAccountsTable
-          connectedAccounts={connectedAccounts as Partial<ConnectedAccount>[]}
-          disconnect={handleDisconnect}
-        />
-        {(!userIsConnected || connectedAccounts.length > 1) && (
-          <div className="flex w-full flex-row gap-2">
-            {!userIsConnected && (
-              <Button size="sm" className="w-fit" variant="outline" onClick={handleConnect}>
-                <FormattedMessage defaultMessage="Connect my Wise profile" id="EditWiseAccounts.connectMyUser.label" />
-              </Button>
-            )}
-            {connectedAccounts.length > 1 && (
-              <Button
-                size="sm"
-                className="w-fit"
-                variant="outlineDestructive"
-                onClick={handleDisconnectAll}
-                disabled={deleting}
-              >
-                <FormattedMessage id="EditWiseAccounts.disconnectAll.button" defaultMessage="Disconnect all users" />
-              </Button>
-            )}
+  return (
+    <React.Fragment>
+      {error && (
+        <MessageBox withIcon type="error" mb={3}>
+          {error}
+        </MessageBox>
+      )}
+      {connectedAccounts.length === 0 ? (
+        <React.Fragment>
+          <div className="mb-3 text-sm text-gray-700">
+            <FormattedMessage
+              id="collective.create.connectedAccounts.transferwise.description"
+              defaultMessage="Connect a Wise account to pay expenses with one click."
+            />
           </div>
-        )}
-        <div className="flex flex-col gap-2">
-          <h1 className="text-base font-bold">
-            <FormattedMessage id="header.options" defaultMessage="Options" />
-          </h1>
-          <StyledCheckbox
-            name="generateReference"
-            label={
-              <FormattedMessage
-                id="collective.connectedAccounts.wise.generateReference"
-                defaultMessage="Automatically generate the transfer reference based on Collective name and Expense ID."
-              />
-            }
-            checked={collective.settings?.transferwise?.generateReference !== false}
-            onChange={({ checked }) => handleUpdateSetting(checked)}
-            loading={mutating}
+          <Button size="sm" className="w-fit" type="submit" onClick={handleConnect}>
+            <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'Wise' }} />
+          </Button>
+        </React.Fragment>
+      ) : (
+        <div className="flex flex-col gap-4">
+          <ConnectedAccountsTable
+            connectedAccounts={connectedAccounts as Partial<ConnectedAccount>[]}
+            disconnect={handleDisconnect}
           />
+          {(!userIsConnected || connectedAccounts.length > 1) && (
+            <div className="flex w-full flex-row gap-2">
+              {!userIsConnected && (
+                <Button size="sm" className="w-fit" variant="outline" onClick={handleConnect}>
+                  <FormattedMessage
+                    defaultMessage="Connect my Wise profile"
+                    id="EditWiseAccounts.connectMyUser.label"
+                  />
+                </Button>
+              )}
+              {connectedAccounts.length > 1 && (
+                <Button
+                  size="sm"
+                  className="w-fit"
+                  variant="outlineDestructive"
+                  onClick={handleDisconnectAll}
+                  disabled={deleting}
+                >
+                  <FormattedMessage id="EditWiseAccounts.disconnectAll.button" defaultMessage="Disconnect all users" />
+                </Button>
+              )}
+            </div>
+          )}
+          <div className="flex flex-col gap-2">
+            <h1 className="text-base font-bold">
+              <FormattedMessage id="header.options" defaultMessage="Options" />
+            </h1>
+            <StyledCheckbox
+              name="generateReference"
+              label={
+                <FormattedMessage
+                  id="collective.connectedAccounts.wise.generateReference"
+                  defaultMessage="Automatically generate the transfer reference based on Collective name and Expense ID."
+                />
+              }
+              checked={collective.settings?.transferwise?.generateReference !== false}
+              onChange={({ checked }) => handleUpdateSetting(checked)}
+              loading={mutating}
+            />
+          </div>
         </div>
-      </div>
-    );
-  }
+      )}
+    </React.Fragment>
+  );
 };
 
 export default EditTransferWiseAccount;
