@@ -4,7 +4,6 @@ import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { Button } from './ui/Button';
-import Container from './Container';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P } from './Text';
 
@@ -61,15 +60,12 @@ const ConfirmationModal = ({
   const { formatMessage } = useIntl();
 
   return (
-    <StyledModal role="alertdialog" onClose={onClose} {...props}>
+    <StyledModal role="alertdialog" className="flex flex-col gap-4" onClose={onClose} {...props}>
       <ModalHeader onClose={onClose}>{header}</ModalHeader>
-      <ModalBody pt={2} mb="20px">
-        {children || <P>{body}</P>}
-      </ModalBody>
-      <ModalFooter>
-        <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
+      <ModalBody>{children || <P>{body}</P>}</ModalBody>
+      <ModalFooter showDivider={false}>
+        <div className="flex w-full justify-center gap-2 md:justify-end">
           <Button
-            className="mx-5 my-1 min-w-[140px]"
             autoFocus
             onClick={cancelHandler}
             disabled={submitting}
@@ -79,7 +75,6 @@ const ConfirmationModal = ({
             {cancelLabel || formatMessage(messages.cancel)}
           </Button>
           <Button
-            className="my-1 min-w-[140px]"
             data-cy="confirmation-modal-continue"
             loading={submitting}
             disabled={disableSubmit}
@@ -98,7 +93,7 @@ const ConfirmationModal = ({
           >
             {continueLabel || formatMessage(confirmBtnMsgs[type])}
           </Button>
-        </Container>
+        </div>
       </ModalFooter>
     </StyledModal>
   );
