@@ -46,6 +46,7 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
     cell: ({ row, table }) => {
       const { intl } = table.options.meta;
       const fromAccount = row.original.fromAccount;
+      const displayAccount = fromAccount.mainProfile ?? fromAccount;
       const createdBy = fromAccount.type !== AccountType.INDIVIDUAL && row.original.createdByAccount;
 
       return (
@@ -53,7 +54,7 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
           <div className="relative">
             <div>
               <AccountHoverCard
-                account={fromAccount}
+                account={displayAccount}
                 trigger={
                   <span>
                     <Avatar size={32} collective={fromAccount} displayTitle={false} />
@@ -67,7 +68,7 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
                   account={createdBy}
                   trigger={
                     <span>
-                      <Avatar size={16} collective={createdBy} displayTitle={false} />
+                      <Avatar size={20} collective={createdBy} displayTitle={false} />
                     </span>
                   }
                 />
@@ -76,11 +77,17 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
           </div>
           <div className="overflow-hidden">
             <div className="overflow-hidden text-sm leading-5 text-ellipsis whitespace-nowrap">
-              {fromAccount.name || fromAccount.slug}
+              {displayAccount.name || displayAccount.slug}
             </div>
 
             <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
-              {createdBy ? createdBy.name || createdBy.slug : formatCollectiveType(intl, fromAccount.type, 1)}
+              {createdBy ? (
+                createdBy.name || createdBy.slug
+              ) : fromAccount.isIncognito ? (
+                <FormattedMessage id="InIncognito" defaultMessage="In Incognito" />
+              ) : (
+                formatCollectiveType(intl, displayAccount.type, 1)
+              )}
             </div>
           </div>
         </div>

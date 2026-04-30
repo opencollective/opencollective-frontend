@@ -149,7 +149,8 @@ class ContributionFlow extends React.Component {
     refetchLoggedInUser: PropTypes.func,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
-    createCollective: PropTypes.func.isRequired, // from mutation
+    createCollective: PropTypes.func.isRequired, // from v1 mutation (used for new org creation)
+    createIncognitoProfile: PropTypes.func.isRequired, // from mutation
     router: PropTypes.object,
     onStepChange: PropTypes.func,
     onSuccess: PropTypes.func,
@@ -594,9 +595,18 @@ class ContributionFlow extends React.Component {
       this.setState({ isSubmitting: true });
 
       try {
-        const collectiveData = { ...stepProfile, type: stepProfile.type === 'INDIVIDUAL' ? 'USER' : stepProfile.type };
-        const { data: result } = await this.props.createCollective(collectiveData);
-        const createdProfile = result.createCollective;
+        let createdProfile;
+        if (stepProfile.id === 'incognito') {
+          const { data: result } = await this.props.createIncognitoProfile();
+          createdProfile = result.createIncognitoProfile;
+        } else {
+          const collectiveData = {
+            ...stepProfile,
+            type: stepProfile.type === 'INDIVIDUAL' ? 'USER' : stepProfile.type,
+          };
+          const { data: result } = await this.props.createCollective(collectiveData);
+          createdProfile = result.createCollective;
+        }
         await this.props.refetchLoggedInUser();
         this.setState({ stepProfile: createdProfile, isSubmitting: false });
       } catch (error) {
@@ -1066,6 +1076,23 @@ class ContributionFlow extends React.Component {
   }
 }
 
+const addCreateIncognitoProfileMutation = graphql(
+  gql`
+    mutation CreateIncognitoProfile {
+      createIncognitoProfile {
+        id
+        name
+        slug
+        type
+        isIncognito
+      }
+    }
+  `,
+  {
+    name: 'createIncognitoProfile',
+  },
+);
+
 const addCreateOrderMutation = graphql(
   gql`
     mutation CreateOrder($order: OrderCreateInput!) {
@@ -1095,5 +1122,11 @@ const addConfirmOrderMutation = graphql(
 );
 
 export default injectIntl(
-  withUser(addConfirmOrderMutation(addCreateOrderMutation(addCreateCollectiveMutation(withRouter(ContributionFlow))))),
+  withUser(
+    addConfirmOrderMutation(
+      addCreateOrderMutation(
+        addCreateIncognitoProfileMutation(addCreateCollectiveMutation(withRouter(ContributionFlow))),
+      ),
+    ),
+  ),
 );

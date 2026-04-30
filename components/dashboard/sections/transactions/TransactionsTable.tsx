@@ -131,14 +131,15 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell }) => {
       const account = cell.getValue();
+      const displayAccount = account?.mainProfile ?? account;
 
       return (
         <AccountHoverCard
-          account={account}
+          account={displayAccount}
           trigger={
             <div className="flex items-center gap-1 truncate">
               <Avatar collective={account} radius={20} />
-              <span className="truncate">{account?.name}</span>
+              <span className="truncate">{displayAccount?.name}</span>
             </div>
           }
         />
@@ -147,14 +148,15 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
   }),
   columnHelper.accessor('oppositeAccount', {
     id: 'oppositeAccount',
-    meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Recipient/Sender', id: 'YT2bNN' }) },
+    meta: { className: 'w-48 2xl:w-48', labelMsg: defineMessage({ defaultMessage: 'Recipient/Sender', id: 'YT2bNN' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell, row }) => {
       const account = cell.getValue();
+      const displayAccount = account?.mainProfile ?? account;
       const transaction = row.original;
       return (
         <AccountHoverCard
-          account={account}
+          account={displayAccount}
           trigger={
             <div className="flex items-center gap-1 truncate">
               {transaction.type === 'CREDIT' ? (
@@ -163,7 +165,7 @@ export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
                 <ArrowRight className="inline-block shrink-0" size={16} />
               )}
               <Avatar collective={account} radius={20} />
-              <span className="truncate">{account?.name}</span>
+              <span className="truncate">{displayAccount?.name}</span>
             </div>
           }
         />

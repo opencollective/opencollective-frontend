@@ -172,6 +172,16 @@ const contributionDrawerQuery = gql`
     isHost
     isArchived
     ...AccountHoverCardFields
+    mainProfile {
+      id
+      name
+      slug
+      type
+      imageUrl
+      isHost
+      isArchived
+      ...AccountHoverCardFields
+    }
     ... on Individual {
       isGuest
     }
@@ -373,13 +383,13 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                         <Skeleton className="h-6 w-48" />
                       ) : (
                         <LinkCollective
-                          collective={query.data.order.fromAccount}
+                          collective={query.data.order.fromAccount.mainProfile ?? query.data.order.fromAccount}
                           className="hover:text-primary hover:underline"
                           withHoverCard
                         >
                           <div className="flex items-center gap-1">
-                            <Avatar radius={20} collective={query.data.order.fromAccount} />
-                            {query.data.order.fromAccount.name}
+                            <Avatar radius={24} collective={query.data.order.fromAccount} />
+                            {(query.data.order.fromAccount.mainProfile ?? query.data.order.fromAccount).name}
                           </div>
                         </LinkCollective>
                       )
@@ -399,7 +409,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                           withHoverCard
                         >
                           <div className="flex items-center gap-1">
-                            <Avatar radius={20} collective={query.data.order.toAccount} />
+                            <Avatar radius={24} collective={query.data.order.toAccount} />
                             {query.data.order.toAccount.name}
                           </div>
                         </LinkCollective>
