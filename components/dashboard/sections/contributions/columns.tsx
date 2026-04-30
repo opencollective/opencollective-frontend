@@ -10,7 +10,7 @@ import { i18nFrequency } from '@/lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '@/lib/i18n/payment-method-provider-type';
 
 import { AccountHoverCard } from '@/components/AccountHoverCard';
-import Avatar, { IncognitoAvatar } from '@/components/Avatar';
+import Avatar from '@/components/Avatar';
 import { CopyID } from '@/components/CopyId';
 import DateTime from '@/components/DateTime';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
