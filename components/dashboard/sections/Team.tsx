@@ -341,7 +341,9 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
               member={showEditModal}
               collective={showEditModal.accountContext || data?.account}
               cancelHandler={() => setShowEditModal(null)}
-              connectedAccounts={data?.account && 'connectedAccounts' in data.account && data.account.connectedAccounts}
+              connectedAccounts={
+                data?.account && 'connectedAccounts' in data.account ? data.account.connectedAccounts : undefined
+              }
               onEdit={refetch}
               isLastAdmin={isLastAdmin}
               canRemove={!isLastAdmin}
