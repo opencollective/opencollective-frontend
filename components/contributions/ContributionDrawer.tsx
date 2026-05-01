@@ -71,11 +71,8 @@ const contributionDrawerQuery = gql`
         name
         description
       }
-      createdByAccount {
-        ...ContributionDrawerAccountFields
-      }
       individual: createdByAccount {
-        ...ContributionDrawerAccountFields
+        ...AccountHoverCardFields
       }
       fromAccount {
         ...ContributionDrawerAccountFields
@@ -115,16 +112,20 @@ const contributionDrawerQuery = gql`
           type
           createdAt
           fromAccount {
-            ...ContributionDrawerAccountFields
+            ...AccountHoverCardFields
+            isIncognito
           }
           account {
-            ...ContributionDrawerAccountFields
+            ...AccountHoverCardFields
+            isIncognito
           }
           host {
-            ...ContributionDrawerAccountFields
+            ...AccountHoverCardFields
+            isIncognito
           }
           individual {
-            ...ContributionDrawerAccountFields
+            ...AccountHoverCardFields
+            isIncognito
           }
           data
           transaction {
@@ -240,10 +241,12 @@ const contributionDrawerQuery = gql`
     isRefund
     isOrderRejected
     account {
-      ...ContributionDrawerAccountFields
+      ...AccountHoverCardFields
+      isIncognito
     }
     oppositeAccount {
-      ...ContributionDrawerAccountFields
+      ...AccountHoverCardFields
+      isIncognito
     }
     expense {
       id
