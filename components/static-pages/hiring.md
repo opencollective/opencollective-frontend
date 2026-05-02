@@ -264,7 +264,7 @@ Your message should be convincing enough for us to consider you and move to the 
 
 - About you. What's your story? Where you are coming from? What's you current status?
 - About us. How did you hear about Open Collective? What do you find interesting in Open Collective?
-- Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of (it doesn’t have to be an engineering one or even a technical one.)? What do you think you can bring to Open Collective?
+- Experience. What is your greatest achievement in software engineering? Can you tell us about a past project you're proud of (it doesn’t have to be an engineering one or even a technical one.)? What do you think you can bring to Open Collective?
 
 As part of our screening process, we'll also ask you to make a small contribution to [our codebase](https://github.com/opencollective). Have a look, do one now or be ready for it!
 -->
