@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 
 import { isHeavyAccount } from '../../../lib/collective';
 import { gql } from '../../../lib/graphql/helpers';
@@ -18,6 +18,7 @@ import TransactionsList from '../../transactions/TransactionsList';
 import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
+import injectIntl from '../../../lib/withIntl';
 
 const NB_DISPLAYED = 10;
 const FILTERS = { ALL: 'ALL', EXPENSES: 'EXPENSES', CONTRIBUTIONS: 'CONTRIBUTIONS' };

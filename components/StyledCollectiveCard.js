@@ -1,6 +1,6 @@
 import React from 'react';
 import { get } from 'lodash';
-import { injectIntl, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { getCollectiveMainTag } from '../lib/collective';
@@ -16,6 +16,7 @@ import StyledCard from './StyledCard';
 import StyledLink from './StyledLink';
 import StyledTag from './StyledTag';
 import { P, Span } from './Text';
+import injectIntl from '../lib/withIntl';
 
 const MaskSVG = props => (
   <svg

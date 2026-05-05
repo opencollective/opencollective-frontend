@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
@@ -15,6 +15,7 @@ import { Box, Flex } from './Grid';
 import { HideGlobalScroll } from './HideGlobalScroll';
 import Link from './Link';
 import { withUser } from './UserProvider';
+import injectIntl from '../lib/withIntl';
 
 const ListItem = styled.li`
   list-style: none;

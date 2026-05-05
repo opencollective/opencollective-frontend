@@ -1,8 +1,9 @@
-import { injectIntl } from 'react-intl';
+;
 import SelectCreatable from 'react-select/creatable';
 
 import type { StyledSelectCustomComponent } from './StyledSelect';
 import { makeStyledSelect } from './StyledSelect';
+import injectIntl from '../lib/withIntl';
 
 /**
  * A StyledSelect with creatable activated. See https://react-select.com/creatable

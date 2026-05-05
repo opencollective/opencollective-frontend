@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';
@@ -17,6 +17,7 @@ import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
 import { H1, P } from '../Text';
+import injectIntl from '../../lib/withIntl';
 
 const ContainerWithImage = styled(Container)`
   @media screen and (min-width: 40em) {

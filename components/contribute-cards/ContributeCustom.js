@@ -1,10 +1,11 @@
 import React from 'react';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';;
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Contribute from './Contribute';
+import injectIntl from '../../lib/withIntl';
 
 const messages = defineMessages({
   title: {

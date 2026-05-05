@@ -6,7 +6,7 @@ import { get, uniqBy } from 'lodash';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
@@ -51,6 +51,7 @@ import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
 import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
+import injectIntl from '../../lib/withIntl';
 
 // Styled components
 const ShareLink = styled(StyledLink).attrs({

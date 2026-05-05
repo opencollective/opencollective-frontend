@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
@@ -12,6 +12,7 @@ import CollectiveCard from './CollectiveCard';
 import Container from './Container';
 import { Flex } from './Grid';
 import LinkCollective from './LinkCollective';
+import injectIntl from '../lib/withIntl';
 
 const MemberContainer = styled.div`
   max-width: 300px;

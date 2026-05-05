@@ -5,7 +5,7 @@ import { cloneDeep, get, pick } from 'lodash';
 import { Info, PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { isURL } from 'validator';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
@@ -28,6 +28,7 @@ import { Separator } from '../../ui/Separator';
 import { toast } from '../../ui/useToast';
 
 import WebhookActivityInfoModal, { hasWebhookEventInfo } from './WebhookActivityInfoModal';
+import injectIntl from '../../../lib/withIntl';
 
 const EMPTY_WEBHOOKS = [];
 

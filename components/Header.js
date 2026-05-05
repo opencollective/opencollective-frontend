@@ -2,13 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import Head from 'next/head';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';;
 
 import { getCollectiveImage } from '../lib/image-utils';
 import { truncate } from '../lib/utils';
 
 import GlobalWarnings from './GlobalWarnings';
 import TopBar from './TopBar';
+import injectIntl from '../lib/withIntl';
 
 const messages = defineMessages({
   defaultTitle: {

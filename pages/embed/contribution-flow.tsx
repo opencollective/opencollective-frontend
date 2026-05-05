@@ -4,7 +4,7 @@ import { get, omit, pick } from 'lodash';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { injectIntl } from 'react-intl';
+;
 
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
@@ -24,6 +24,7 @@ import { Box } from '../../components/Grid';
 import Loading from '../../components/Loading';
 import { withStripeLoader } from '../../components/StripeProvider';
 import { withUser } from '../../components/UserProvider';
+import injectIntl from '../../lib/withIntl';
 
 class EmbedContributionFlowPage extends React.Component<{
   router: Router;

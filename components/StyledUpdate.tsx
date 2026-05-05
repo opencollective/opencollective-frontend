@@ -4,7 +4,7 @@ import { Markup } from 'interweave';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 import { borders } from 'styled-system';
 
@@ -30,6 +30,7 @@ import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
+import injectIntl from '../lib/withIntl';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;

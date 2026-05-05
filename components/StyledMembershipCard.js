@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedDate, FormattedMessage, injectIntl, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';;
 
 import roles from '../lib/constants/roles';
 import { formatCurrency } from '../lib/currency-utils';
@@ -9,6 +9,7 @@ import Container from './Container';
 import { Box } from './Grid';
 import StyledCollectiveCard from './StyledCollectiveCard';
 import { P, Span } from './Text';
+import injectIntl from '../lib/withIntl';
 
 /**
  * A card to show a user's membership.

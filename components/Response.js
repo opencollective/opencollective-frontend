@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 
 import Avatar from './Avatar';
 import Container from './Container';
 import LinkCollective from './LinkCollective';
+import injectIntl from '../lib/withIntl';
 
 class Response extends React.Component {
   static propTypes = {

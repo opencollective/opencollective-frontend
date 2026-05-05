@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
@@ -23,6 +23,7 @@ import SelectOwnFiscalHost from '../SelectOwnFiscalHost';
 
 import { ActiveFiscalHost } from './fiscal-host/ActiveFiscalHost';
 import AppliedToFiscalHost from './fiscal-host/AppliedToFiscalHost';
+import injectIntl from '../../../lib/withIntl';
 
 const OptionLabel = styled.label`
   display: block;

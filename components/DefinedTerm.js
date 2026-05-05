@@ -1,6 +1,6 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';;
 import { styled } from 'styled-components';
 import { borderColor, color, typography } from 'styled-system';
 
@@ -8,6 +8,7 @@ import { textTransform } from '../lib/styled-system-custom-properties';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 import Link from './Link';
+import injectIntl from '../lib/withIntl';
 
 /**
  * All the terms defined here must have a matching translation

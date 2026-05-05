@@ -1,6 +1,6 @@
 import React from 'react';
 import { Info } from 'lucide-react';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';;
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
@@ -11,6 +11,7 @@ import { Span } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import StyledCollectiveCard from './StyledCollectiveCard';
+import injectIntl from '../../lib/withIntl';
 
 /**
  * A card to show a collective on the search page.

@@ -2,7 +2,7 @@ import React from 'react';
 import { PopoverPortal } from '@radix-ui/react-popover';
 import { groupBy, intersection, isEqual, last, sortBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
@@ -17,6 +17,7 @@ import CreateCollectiveMiniForm from './CreateCollectiveMiniForm';
 import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
+import injectIntl from '../lib/withIntl';
 
 const CollectiveTypesI18n = defineMessages({
   [CollectiveType.COLLECTIVE]: {

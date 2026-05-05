@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl } from 'react-intl';
+;
 
 import languages from '../lib/constants/locales';
 import { loadScriptAsync } from '../lib/utils';
@@ -9,6 +9,7 @@ import Body from '../components/Body';
 import Header from '../components/Header';
 import Footer from '../components/navigation/Footer';
 import { withUser } from '../components/UserProvider';
+import injectIntl from '../lib/withIntl';
 
 import giftCardPageStyle from '!css-loader!../public/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
 import holidayGiftCardPageStyle from '!css-loader!../public/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line

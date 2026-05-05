@@ -1,6 +1,6 @@
 import React from 'react';
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { moneyCanMoveFromEvent } from '../../lib/events';
@@ -9,6 +9,7 @@ import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 
 import PendingApplicationActions from './PendingApplicationActions';
+import injectIntl from '../../lib/withIntl';
 
 const messages = defineMessages({
   // Collective Created

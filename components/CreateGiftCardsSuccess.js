@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/feather/CheckCircle';
 import { Clipboard } from '@styled-icons/feather/Clipboard';
 import { Printer } from '@styled-icons/feather/Printer';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { giftCardsDownloadUrl } from '../lib/url-helpers';
@@ -15,6 +15,7 @@ import FileDownloader from './FileDownloader';
 import { Box, Flex } from './Grid';
 import StyledInput from './StyledInput';
 import { P } from './Text';
+import injectIntl from '../lib/withIntl';
 
 const RedeemLinksTextarea = styled(StyledInput).attrs({ as: 'textarea' })`
   width: 95%;

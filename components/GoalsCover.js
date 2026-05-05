@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { debounce, get, maxBy, sortBy, truncate } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
@@ -9,6 +9,7 @@ import { formatCurrency } from '../lib/currency-utils';
 
 import Container from './Container';
 import { fadeIn } from './StyledKeyframes';
+import injectIntl from '../lib/withIntl';
 
 const getProgressColor = theme => theme.colors.primary[600];
 const getEmptyProgressColor = () => '#e2e2e2';

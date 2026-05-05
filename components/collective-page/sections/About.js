@@ -1,6 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 
 import { CollectiveType } from '@/lib/constants/collectives';
 import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
@@ -15,6 +15,7 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
+import injectIntl from '../../../lib/withIntl';
 
 // Dynamically load RichTextEditor to download it only if user can edit the page
 const RichTextEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;

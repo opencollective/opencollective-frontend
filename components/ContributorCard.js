@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { truncate } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';;
 import styled, { css } from 'styled-components';
 
 import roles from '../lib/constants/roles';
@@ -14,6 +14,7 @@ import LinkContributor from './LinkContributor';
 import StyledCard from './StyledCard';
 import StyledTag from './StyledTag';
 import { P } from './Text';
+import injectIntl from '../lib/withIntl';
 
 /** Main card */
 const MainContainer = styled(StyledCard)`

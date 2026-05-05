@@ -4,7 +4,7 @@ import { Mutation } from '@apollo/client/react/components';
 import { Camera } from '@styled-icons/feather/Camera';
 import { inRange } from 'lodash';
 import dynamic from 'next/dynamic';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';;
 import styled, { css } from 'styled-components';
 
 import { upload } from '../../../lib/api';
@@ -23,6 +23,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { P, Span } from '../../Text';
 import { useToast } from '../../ui/useToast';
+import injectIntl from '../../../lib/withIntl';
 
 const AVATAR_SIZE = 128;
 

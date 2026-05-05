@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';;
 
 import { sortEvents } from '../../../lib/events';
 
@@ -16,6 +16,7 @@ import StyledButton from '../../StyledButton';
 import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
+import injectIntl from '../../../lib/withIntl';
 
 class SectionEvents extends React.PureComponent {
   static propTypes = {

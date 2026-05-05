@@ -4,7 +4,7 @@ import { withApollo } from '@apollo/client/react/hoc';
 import * as Sentry from '@sentry/browser';
 import { capitalize, pick } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -17,6 +17,7 @@ import Spinner from '../Spinner';
 import { P } from '../Text';
 import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
+import injectIntl from '../../lib/withIntl';
 
 class EditConnectedAccount extends React.Component {
   static propTypes = {

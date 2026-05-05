@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import { truncate } from 'lodash';
-import { injectIntl } from 'react-intl';
+;
 import styled, { css } from 'styled-components';
 
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
@@ -11,6 +11,7 @@ import { getPaypal } from '../lib/paypal';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
 import StyledButton from './StyledButton';
+import injectIntl from '../lib/withIntl';
 
 const PaypalButtonContainer = styled.div<{ isLoading?: boolean }>`
   ${props =>

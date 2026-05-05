@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { get, omit } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
@@ -17,6 +17,7 @@ import StyledInput from '../../../StyledInput';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledSelect from '../../../StyledSelect';
 import { P } from '../../../Text';
+import injectIntl from '../../../../lib/withIntl';
 
 const MemberContainer = styled(Container)`
   border: 1px solid #dcdee0;

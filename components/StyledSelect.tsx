@@ -1,7 +1,7 @@
 import React from 'react';
 import { isNil, omitBy, truncate } from 'lodash';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import type {
   ContainerProps,
   DropdownIndicatorProps,
@@ -21,6 +21,7 @@ import SearchIcon from './SearchIcon';
 import StyledHr from './StyledHr';
 import StyledTag from './StyledTag';
 import { P } from './Text';
+import injectIntl from '../lib/withIntl';
 
 const Messages = defineMessages({
   loading: {

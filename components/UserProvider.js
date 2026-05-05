@@ -4,7 +4,7 @@ import { withApollo } from '@apollo/client/react/hoc';
 import { decodeJwt } from 'jose';
 import { get, isEqual } from 'lodash';
 import Router, { withRouter } from 'next/router';
-import { injectIntl } from 'react-intl';
+;
 
 import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
@@ -16,6 +16,7 @@ import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 
 import { toast } from './ui/useToast';
+import injectIntl from '../lib/withIntl';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
 import { get, trim } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';
@@ -30,6 +30,7 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, P } from '../Text';
+import injectIntl from '../../lib/withIntl';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};

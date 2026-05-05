@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { withRouter } from 'next/router';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
@@ -22,6 +22,7 @@ import SignIn from './SignIn';
 import StyledHr from './StyledHr';
 import { Span } from './Text';
 import { withUser } from './UserProvider';
+import injectIntl from '../lib/withIntl';
 
 const SignInFooterLink = styled(Link)`
   color: #323334;

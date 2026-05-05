@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';;
 
 import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
@@ -14,6 +14,7 @@ import StepDetails from './StepDetails';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
+import injectIntl from '../../lib/withIntl';
 
 class ContributionFlowStepContainer extends React.Component {
   static propTypes = {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { get, pick } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import Container from './Container';
@@ -13,6 +13,7 @@ import StyledButton from './StyledButton';
 import { fadeIn } from './StyledKeyframes';
 import StyledTextarea from './StyledTextarea';
 import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
+import injectIntl from '../lib/withIntl';
 
 /** Container used to show the description to users than can edit it */
 const EditIcon = styled(PencilAlt)`

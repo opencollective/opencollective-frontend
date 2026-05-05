@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedDate, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 import { width } from 'styled-system';
 
@@ -13,6 +13,7 @@ import Avatar from './Avatar';
 import Container from './Container';
 import Currency from './Currency';
 import Link from './Link';
+import injectIntl from '../lib/withIntl';
 
 const CardWrapper = styled(Container)`
   display: flex;

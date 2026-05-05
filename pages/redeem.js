@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
@@ -26,6 +26,7 @@ import RedeemSuccess from '../components/RedeemSuccess';
 import StyledButton from '../components/StyledButton';
 import { H1, H5, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
+import injectIntl from '../lib/withIntl';
 
 const ShadowBox = styled(Box)`
   box-shadow: 0px 8px 16px rgba(20, 20, 20, 0.12);

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get, sortBy, startCase } from 'lodash';
 import { Plus, Trash } from 'lucide-react';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { v4 as uuid } from 'uuid';
 
 import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
@@ -23,6 +23,7 @@ import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
 import { Button } from '../../ui/Button';
 import SettingsSubtitle from '../SettingsSubtitle';
+import injectIntl from '../../../lib/withIntl';
 
 const BORDER = '1px solid #efefef';
 const getInterpolationOption = value => ({ label: startCase(value), value });

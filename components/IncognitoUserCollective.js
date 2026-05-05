@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';;
 
 import Footer from './navigation/Footer';
 import { IncognitoAvatar } from './Avatar';
@@ -8,6 +8,7 @@ import Body from './Body';
 import { Flex } from './Grid';
 import Header from './Header';
 import { H1 } from './Text';
+import injectIntl from '../lib/withIntl';
 
 class IncognitoUserCollective extends React.Component {
   static propTypes = {

@@ -6,7 +6,7 @@ import { Linkedin } from '@styled-icons/feather/Linkedin';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import copy from 'copy-to-clipboard';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';;
 
 import { linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
 
@@ -15,6 +15,7 @@ import { Flex } from '../Grid';
 import StyledLink from '../StyledLink';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
+import injectIntl from '../../lib/withIntl';
 
 const messages = defineMessages({
   shareTitle: {

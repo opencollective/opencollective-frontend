@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { CardElement } from '@stripe/react-stripe-js';
 import { get } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 import { maxWidth } from 'styled-system';
 
@@ -11,6 +11,7 @@ import { formatCurrency } from '../lib/currency-utils';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { compose } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';

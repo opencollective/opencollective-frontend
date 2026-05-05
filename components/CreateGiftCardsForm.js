@@ -7,7 +7,7 @@ import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { isPrepaid } from '../lib/constants/payment-methods';
@@ -29,6 +29,7 @@ import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
+import injectIntl from '../lib/withIntl';
 
 const MIN_AMOUNT = 500;
 const MAX_AMOUNT = 100000000;

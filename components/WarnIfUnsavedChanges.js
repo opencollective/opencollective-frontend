@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Router from 'next/router';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';;
 
 import { IgnorableError } from '../lib/errors';
+import injectIntl from '../lib/withIntl';
 
 /**
  * A component to warn users if they try to leave with unsaved data. Just set
