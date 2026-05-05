@@ -5,8 +5,8 @@ import { withRouter } from 'next/router';
 import { styled } from 'styled-components';
 import { borderColor, borderRadius, height, typography } from 'styled-system';
 
+import injectIntl from '../lib/i18n/with-intl';
 import { compose } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 
 import { Box, Flex } from './Grid';
 import Spinner from './Spinner';

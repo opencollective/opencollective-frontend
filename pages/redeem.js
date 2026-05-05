@@ -9,8 +9,8 @@ import { fontSize, maxWidth } from 'styled-system';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import injectIntl from '../lib/i18n/with-intl';
 import { compose, isValidEmail } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 
 import Body from '../components/Body';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';

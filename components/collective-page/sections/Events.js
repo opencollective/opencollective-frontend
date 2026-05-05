@@ -4,7 +4,7 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';;
 
 import { sortEvents } from '../../../lib/events';
-import injectIntl from '../../../lib/withIntl';
+import injectIntl from '../../../lib/i18n/with-intl';
 
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';

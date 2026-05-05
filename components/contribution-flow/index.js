@@ -27,12 +27,12 @@ import { gql } from '../../lib/graphql/helpers';
 import { AccountType } from '../../lib/graphql/types/v2/graphql';
 import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
+import injectIntl from '../../lib/i18n/with-intl';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { followOrderRedirectUrl, getCollectivePageRoute } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
-import injectIntl from '../../lib/withIntl';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import { isCaptchaEnabled } from '../Captcha';

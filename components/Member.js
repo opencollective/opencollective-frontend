@@ -5,8 +5,8 @@ import { defineMessages } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
+import injectIntl from '../lib/i18n/with-intl';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 
 import Avatar from './Avatar';
 import CollectiveCard from './CollectiveCard';

@@ -8,7 +8,7 @@ import { styled } from 'styled-components';
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import roles from '../../../../lib/constants/roles';
 import formatMemberRole from '../../../../lib/i18n/member-role';
-import injectIntl from '../../../../lib/withIntl';
+import injectIntl from '../../../../lib/i18n/with-intl';
 
 import Avatar from '../../../Avatar';
 import Container from '../../../Container';

@@ -15,7 +15,7 @@ import { styled } from 'styled-components';
 import type { BorderProps, BorderRadiusProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { layout, space, typography } from 'styled-system';
 
-import injectIntl from '../lib/withIntl';
+import injectIntl from '../lib/i18n/with-intl';
 
 import Container from './Container';
 import { Flex } from './Grid';

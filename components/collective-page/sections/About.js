@@ -2,7 +2,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage } from 'react-intl';;
 
-import injectIntl from '../../../lib/withIntl';
+import injectIntl from '../../../lib/i18n/with-intl';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import { editCollectiveLongDescriptionMutation } from '@/lib/graphql/v1/mutations';

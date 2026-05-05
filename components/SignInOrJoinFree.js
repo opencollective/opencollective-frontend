@@ -10,8 +10,8 @@ import { isEmail } from 'validator';
 import { signin } from '../lib/api';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import injectIntl from '../lib/i18n/with-intl';
 import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 
 import { toast } from './ui/useToast';
 import Container from './Container';

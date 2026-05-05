@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';;
 import fetchGeoLocation from '../lib/geolocation_api';
 import { CountryIso } from '../lib/graphql/types/v2/graphql';
 import { getIntlDisplayNames } from '../lib/i18n';
-import injectIntl from '../lib/withIntl';
+import injectIntl from '../lib/i18n/with-intl';
 
 import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';

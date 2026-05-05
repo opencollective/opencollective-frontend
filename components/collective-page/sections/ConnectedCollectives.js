@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';;
 
 import { CONNECTED_COLLECTIVES_ORDER_KEY } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import injectIntl from '../../../lib/withIntl';
+import injectIntl from '../../../lib/i18n/with-intl';
 import { sortConnectedCollectives, updateCollectiveInGraphQLV1Cache } from '@/lib/collective';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
 

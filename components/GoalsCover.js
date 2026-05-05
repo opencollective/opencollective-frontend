@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import { formatCurrency } from '../lib/currency-utils';
-import injectIntl from '../lib/withIntl';
+import injectIntl from '../lib/i18n/with-intl';
 
 import Container from './Container';
 import { fadeIn } from './StyledKeyframes';

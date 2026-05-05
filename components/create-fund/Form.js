@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';
-import injectIntl from '../../lib/withIntl';
+import injectIntl from '../../lib/i18n/with-intl';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';

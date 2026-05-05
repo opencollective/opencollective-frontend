@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';;
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
-import injectIntl from '../../lib/withIntl';
+import injectIntl from '../../lib/i18n/with-intl';
 
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';

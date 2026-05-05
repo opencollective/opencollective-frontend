@@ -12,9 +12,9 @@ import { padding } from 'styled-system';
 import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { gql } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
+import injectIntl from '../lib/i18n/with-intl';
 import { FILTERS, normalizeSearchTypes } from '../lib/search-page-type-query';
 import { parseToBoolean } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 import { textTransform } from '@/lib/styled-system-custom-properties';
 
 import Container from '../components/Container';

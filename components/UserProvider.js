@@ -11,10 +11,10 @@ import { createError, ERROR, formatErrorMessage } from '../lib/errors';
 import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
+import injectIntl from '../lib/i18n/with-intl';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
-import injectIntl from '../lib/withIntl';
 
 import { toast } from './ui/useToast';
 

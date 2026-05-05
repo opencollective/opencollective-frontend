@@ -7,8 +7,8 @@ import { withRouter } from 'next/router';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
+import injectIntl from '../lib/i18n/with-intl';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
-import injectIntl from '../lib/withIntl';
 
 import Container from '../components/Container';
 import ContributionBlocker, {

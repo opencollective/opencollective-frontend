@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';;
 
 import { CollectiveCategory } from '../lib/constants/collectives';
-import injectIntl from '../lib/withIntl';
+import injectIntl from '../lib/i18n/with-intl';
 
 const TranslatedTags = defineMessages({
   [CollectiveCategory.ASSOCIATION]: {

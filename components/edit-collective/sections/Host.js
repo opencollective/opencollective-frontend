@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
-import injectIntl from '../../../lib/withIntl';
+import injectIntl from '../../../lib/i18n/with-intl';
 
 import { Separator } from '@/components/ui/Separator';
 

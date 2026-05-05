@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
-import injectIntl from '../lib/withIntl';
+import injectIntl from '../lib/i18n/with-intl';
 
 import { Flex } from './Grid';
 import InputField from './InputField';

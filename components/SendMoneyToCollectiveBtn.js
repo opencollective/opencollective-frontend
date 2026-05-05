@@ -7,8 +7,8 @@ import { FormattedMessage } from 'react-intl';;
 import { formatCurrency } from '../lib/currency-utils';
 import { gql } from '../lib/graphql/helpers';
 import { collectiveBalanceFragment } from '../lib/graphql/v1/fragments';
+import injectIntl from '../lib/i18n/with-intl';
 import { compose } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 
 import { Button } from './ui/Button';
 import { toast } from './ui/useToast';

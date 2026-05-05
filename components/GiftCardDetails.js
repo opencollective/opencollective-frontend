@@ -7,7 +7,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';;
 import styled, { withTheme } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
-import injectIntl from '../lib/withIntl';
+import injectIntl from '../lib/i18n/with-intl';
 
 import GiftCard from './icons/GiftCard';
 import { Button } from './ui/Button';

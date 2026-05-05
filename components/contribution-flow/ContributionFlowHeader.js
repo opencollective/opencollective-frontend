@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';;
 
-import injectIntl from '../../lib/withIntl';
+import injectIntl from '../../lib/i18n/with-intl';
 
 import Avatar, { ContributorAvatar } from '../Avatar';
 import Container from '../Container';

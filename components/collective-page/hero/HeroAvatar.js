@@ -12,8 +12,8 @@ import { isIndividualAccount } from '../../../lib/collective';
 import { AVATAR_HEIGHT_RANGE, AVATAR_WIDTH_RANGE } from '../../../lib/constants/collectives';
 import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectiveAvatarMutation } from '../../../lib/graphql/v1/mutations';
+import injectIntl from '../../../lib/i18n/with-intl';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
-import injectIntl from '../../../lib/withIntl';
 
 import Avatar from '../../Avatar';
 import ConfirmationModal from '../../ConfirmationModal';

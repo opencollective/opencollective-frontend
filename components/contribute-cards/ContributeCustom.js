@@ -2,8 +2,8 @@ import React from 'react';
 import { defineMessages } from 'react-intl';;
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import injectIntl from '../../lib/i18n/with-intl';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
-import injectIntl from '../../lib/withIntl';
 
 import Contribute from './Contribute';
 

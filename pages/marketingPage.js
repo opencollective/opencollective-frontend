@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 ;
 
 import languages from '../lib/constants/locales';
+import injectIntl from '../lib/i18n/with-intl';
 import { loadScriptAsync } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 
 import Body from '../components/Body';
 import Header from '../components/Header';

@@ -8,8 +8,8 @@ import { Twitter } from '@styled-icons/feather/Twitter';
 import copy from 'copy-to-clipboard';
 import { defineMessages } from 'react-intl';;
 
+import injectIntl from '../../lib/i18n/with-intl';
 import { linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
-import injectIntl from '../../lib/withIntl';
 
 import Container from '../Container';
 import { Flex } from '../Grid';

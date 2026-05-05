@@ -4,8 +4,8 @@ import { defineMessages } from 'react-intl';;
 import { styled } from 'styled-components';
 import { borderColor, color, typography } from 'styled-system';
 
+import injectIntl from '../lib/i18n/with-intl';
 import { textTransform } from '../lib/styled-system-custom-properties';
-import injectIntl from '../lib/withIntl';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 import Link from './Link';

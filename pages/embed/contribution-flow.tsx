@@ -8,8 +8,8 @@ import type { IntlShape } from 'react-intl';
 
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
+import injectIntl from '../../lib/i18n/with-intl';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
-import injectIntl from '../../lib/withIntl';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';

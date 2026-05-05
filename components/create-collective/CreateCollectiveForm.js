@@ -8,8 +8,8 @@ import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
+import injectIntl from '../../lib/i18n/with-intl';
 import withData from '../../lib/withData';
-import injectIntl from '../../lib/withIntl';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';

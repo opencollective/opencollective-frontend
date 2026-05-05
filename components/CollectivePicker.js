@@ -7,7 +7,7 @@ import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import injectIntl from '../lib/withIntl';
+import injectIntl from '../lib/i18n/with-intl';
 
 import { Popover, PopoverAnchor, PopoverContent } from './ui/Popover';
 import Avatar from './Avatar';

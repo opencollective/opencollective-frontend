@@ -6,9 +6,9 @@ import { Printer } from '@styled-icons/feather/Printer';
 import { FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
+import injectIntl from '../lib/i18n/with-intl';
 import { giftCardsDownloadUrl } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 
 import { Button } from './ui/Button';
 import { toast } from './ui/useToast';

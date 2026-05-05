@@ -11,9 +11,9 @@ import { borders } from 'styled-system';
 import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
 import { i18nGraphqlException } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
+import injectIntl from '../lib/i18n/with-intl';
 import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import EmojiReactionPicker from './conversations/EmojiReactionPicker';

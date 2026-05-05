@@ -7,9 +7,9 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';;
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
+import injectIntl from '../../lib/i18n/with-intl';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { getWebsiteUrl, isValidUrl, parseToBoolean } from '../../lib/utils';
-import injectIntl from '../../lib/withIntl';
 
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
 import { Box, Flex } from '../Grid';

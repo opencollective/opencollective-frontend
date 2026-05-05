@@ -4,9 +4,9 @@ import { get } from 'lodash';
 import Head from 'next/head';
 import { defineMessages } from 'react-intl';;
 
+import injectIntl from '../lib/i18n/with-intl';
 import { getCollectiveImage } from '../lib/image-utils';
 import { truncate } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 
 import GlobalWarnings from './GlobalWarnings';
 import TopBar from './TopBar';

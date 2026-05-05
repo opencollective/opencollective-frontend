@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';;
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
-import injectIntl from '../../lib/withIntl';
+import injectIntl from '../../lib/i18n/with-intl';
 
 import { Box, Flex } from '../Grid';
 import SignInOrJoinFree from '../SignInOrJoinFree';

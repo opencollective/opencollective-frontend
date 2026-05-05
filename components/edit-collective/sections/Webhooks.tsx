@@ -14,8 +14,8 @@ import { WebhookEvents } from '../../../lib/constants/notificationEvents';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
+import injectIntl from '../../../lib/i18n/with-intl';
 import { compose } from '../../../lib/utils';
-import injectIntl from '../../../lib/withIntl';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import { getI18nLink } from '../../I18nFormatters';

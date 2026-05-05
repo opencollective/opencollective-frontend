@@ -12,8 +12,8 @@ import { styled } from 'styled-components';
 
 import { isPrepaid } from '../lib/constants/payment-methods';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import injectIntl from '../lib/i18n/with-intl';
 import { compose, reportValidityHTML5 } from '../lib/utils';
-import injectIntl from '../lib/withIntl';
 
 import { Button } from './ui/Button';
 import CollectivePicker from './CollectivePicker';
