@@ -11,6 +11,7 @@ import { signin } from '../lib/api';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import { toast } from './ui/useToast';
 import Container from './Container';
@@ -22,7 +23,6 @@ import SignIn from './SignIn';
 import StyledHr from './StyledHr';
 import { Span } from './Text';
 import { withUser } from './UserProvider';
-import injectIntl from '../lib/withIntl';
 
 const SignInFooterLink = styled(Link)`
   color: #323334;

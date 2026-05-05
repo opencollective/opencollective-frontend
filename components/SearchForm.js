@@ -6,13 +6,13 @@ import { styled } from 'styled-components';
 import { borderColor, borderRadius, height, typography } from 'styled-system';
 
 import { compose } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import { Box, Flex } from './Grid';
 import Spinner from './Spinner';
 import StyledInput from './StyledInput';
 import StyledRoundButton from './StyledRoundButton';
 import { Span } from './Text';
-import injectIntl from '../lib/withIntl';
 
 const SearchInputContainer = styled(Flex)`
   border: 1px solid;

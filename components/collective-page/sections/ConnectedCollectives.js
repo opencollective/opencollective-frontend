@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';;
 
 import { CONNECTED_COLLECTIVES_ORDER_KEY } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import injectIntl from '../../../lib/withIntl';
 import { sortConnectedCollectives, updateCollectiveInGraphQLV1Cache } from '@/lib/collective';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
 
@@ -23,7 +24,6 @@ import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
-import injectIntl from '../../../lib/withIntl';
 
 // Dynamic imports
 const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {

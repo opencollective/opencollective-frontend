@@ -8,13 +8,14 @@ import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 import { isURL } from 'validator';
 
+import injectIntl from '../lib/withIntl';
+
 import Container from './Container';
 import Location from './Location';
 import MessageBox from './MessageBox';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import { Span } from './Text';
-import injectIntl from '../lib/withIntl';
 
 const ClearIcon = styled(Clear)`
   height: 20px;

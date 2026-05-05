@@ -13,6 +13,7 @@ import { AVATAR_HEIGHT_RANGE, AVATAR_WIDTH_RANGE } from '../../../lib/constants/
 import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectiveAvatarMutation } from '../../../lib/graphql/v1/mutations';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
+import injectIntl from '../../../lib/withIntl';
 
 import Avatar from '../../Avatar';
 import ConfirmationModal from '../../ConfirmationModal';
@@ -23,7 +24,6 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { P, Span } from '../../Text';
 import { useToast } from '../../ui/useToast';
-import injectIntl from '../../../lib/withIntl';
 
 const AVATAR_SIZE = 128;
 

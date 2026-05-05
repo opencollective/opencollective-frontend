@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
+import injectIntl from '../lib/withIntl';
 import { getEnvVar } from '@/lib/env-utils';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { parseToBoolean } from '@/lib/utils';
@@ -15,7 +16,6 @@ import { Box, Flex } from './Grid';
 import { HideGlobalScroll } from './HideGlobalScroll';
 import Link from './Link';
 import { withUser } from './UserProvider';
-import injectIntl from '../lib/withIntl';
 
 const ListItem = styled.li`
   list-style: none;

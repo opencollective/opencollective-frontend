@@ -1,6 +1,6 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
 import hoistNonReactStatics from 'hoist-non-react-statics';
+import { useIntl } from 'react-intl';
 
 export default function withIntl(WrappedComponent, options = {}) {
   const InjectIntl = props => {

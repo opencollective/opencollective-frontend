@@ -8,12 +8,12 @@ import { width } from 'styled-system';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import { imagePreview } from '../lib/image-utils';
 import { firstSentence } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import Avatar from './Avatar';
 import Container from './Container';
 import Currency from './Currency';
 import Link from './Link';
-import injectIntl from '../lib/withIntl';
 
 const CardWrapper = styled(Container)`
   display: flex;

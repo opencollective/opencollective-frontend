@@ -7,6 +7,7 @@ import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import injectIntl from '../lib/withIntl';
 
 import { Popover, PopoverAnchor, PopoverContent } from './ui/Popover';
 import Avatar from './Avatar';
@@ -17,7 +18,6 @@ import CreateCollectiveMiniForm from './CreateCollectiveMiniForm';
 import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
-import injectIntl from '../lib/withIntl';
 
 const CollectiveTypesI18n = defineMessages({
   [CollectiveType.COLLECTIVE]: {

@@ -3,6 +3,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';;
 import styled, { css } from 'styled-components';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import injectIntl from '../../lib/withIntl';
 
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
@@ -12,7 +13,6 @@ import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
-import injectIntl from '../../lib/withIntl';
 
 import {
   CONTRIBUTE_CARD_BORDER_RADIUS,

@@ -8,6 +8,7 @@ import { withRouter } from 'next/router';
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
+import injectIntl from '../lib/withIntl';
 
 import Container from '../components/Container';
 import ContributionBlocker, {
@@ -23,7 +24,6 @@ import Page from '../components/Page';
 import Redirect from '../components/Redirect';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
-import injectIntl from '../lib/withIntl';
 
 class NewContributionFlowPage extends React.Component {
   static getInitialProps({ query }) {

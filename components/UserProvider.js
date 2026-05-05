@@ -14,9 +14,9 @@ import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import injectIntl from '../lib/withIntl';
 
 import { toast } from './ui/useToast';
-import injectIntl from '../lib/withIntl';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,

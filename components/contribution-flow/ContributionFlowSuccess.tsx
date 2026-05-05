@@ -27,6 +27,7 @@ import {
   tweetURL,
 } from '../../lib/url-helpers';
 import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
+import injectIntl from '../../lib/withIntl';
 import type { NewContributionFlowOrderSuccessQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
@@ -51,7 +52,6 @@ import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
 import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
-import injectIntl from '../../lib/withIntl';
 
 // Styled components
 const ShareLink = styled(StyledLink).attrs({

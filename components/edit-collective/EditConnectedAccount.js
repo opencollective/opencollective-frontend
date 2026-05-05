@@ -9,6 +9,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';;
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { getWebsiteUrl, isValidUrl, parseToBoolean } from '../../lib/utils';
+import injectIntl from '../../lib/withIntl';
 
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
 import { Box, Flex } from '../Grid';
@@ -17,7 +18,6 @@ import Spinner from '../Spinner';
 import { P } from '../Text';
 import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
-import injectIntl from '../../lib/withIntl';
 
 class EditConnectedAccount extends React.Component {
   static propTypes = {

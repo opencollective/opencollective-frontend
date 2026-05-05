@@ -8,6 +8,7 @@ import { styled } from 'styled-components';
 
 import { giftCardsDownloadUrl } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import { Button } from './ui/Button';
 import { toast } from './ui/useToast';
@@ -15,7 +16,6 @@ import FileDownloader from './FileDownloader';
 import { Box, Flex } from './Grid';
 import StyledInput from './StyledInput';
 import { P } from './Text';
-import injectIntl from '../lib/withIntl';
 
 const RedeemLinksTextarea = styled(StyledInput).attrs({ as: 'textarea' })`
   width: 95%;

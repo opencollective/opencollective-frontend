@@ -10,6 +10,7 @@ import { fontSize, maxWidth } from 'styled-system';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose, isValidEmail } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import Body from '../components/Body';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
@@ -26,7 +27,6 @@ import RedeemSuccess from '../components/RedeemSuccess';
 import StyledButton from '../components/StyledButton';
 import { H1, H5, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import injectIntl from '../lib/withIntl';
 
 const ShadowBox = styled(Box)`
   box-shadow: 0px 8px 16px rgba(20, 20, 20, 0.12);

@@ -15,13 +15,14 @@ import { styled } from 'styled-components';
 import type { BorderProps, BorderRadiusProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { layout, space, typography } from 'styled-system';
 
+import injectIntl from '../lib/withIntl';
+
 import Container from './Container';
 import { Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledHr from './StyledHr';
 import StyledTag from './StyledTag';
 import { P } from './Text';
-import injectIntl from '../lib/withIntl';
 
 const Messages = defineMessages({
   loading: {

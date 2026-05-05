@@ -5,10 +5,10 @@ import { styled } from 'styled-components';
 import { borderColor, color, typography } from 'styled-system';
 
 import { textTransform } from '../lib/styled-system-custom-properties';
+import injectIntl from '../lib/withIntl';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 import Link from './Link';
-import injectIntl from '../lib/withIntl';
 
 /**
  * All the terms defined here must have a matching translation

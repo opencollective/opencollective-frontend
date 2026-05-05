@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 
 import roles from '../lib/constants/roles';
 import formatMemberRole from '../lib/i18n/member-role';
+import injectIntl from '../lib/withIntl';
 
 import { ContributorAvatar } from './Avatar';
 import EditPublicMessagePopup from './EditPublicMessagePopup';
@@ -14,7 +15,6 @@ import LinkContributor from './LinkContributor';
 import StyledCard from './StyledCard';
 import StyledTag from './StyledTag';
 import { P } from './Text';
-import injectIntl from '../lib/withIntl';
 
 /** Main card */
 const MainContainer = styled(StyledCard)`

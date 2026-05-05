@@ -32,6 +32,7 @@ import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { followOrderRedirectUrl, getCollectivePageRoute } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
+import injectIntl from '../../lib/withIntl';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import { isCaptchaEnabled } from '../Captcha';
@@ -64,7 +65,6 @@ import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
-import injectIntl from '../../lib/withIntl';
 import {
   getGQLV2AmountInput,
   getGuestInfoFromStepProfile,

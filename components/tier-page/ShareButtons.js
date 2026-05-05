@@ -9,13 +9,13 @@ import copy from 'copy-to-clipboard';
 import { defineMessages } from 'react-intl';;
 
 import { linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
+import injectIntl from '../../lib/withIntl';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
 import StyledLink from '../StyledLink';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
-import injectIntl from '../../lib/withIntl';
 
 const messages = defineMessages({
   shareTitle: {

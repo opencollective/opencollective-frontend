@@ -4,12 +4,12 @@ import { defineMessages, FormattedMessage } from 'react-intl';;
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { moneyCanMoveFromEvent } from '../../lib/events';
+import injectIntl from '../../lib/withIntl';
 
 import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 
 import PendingApplicationActions from './PendingApplicationActions';
-import injectIntl from '../../lib/withIntl';
 
 const messages = defineMessages({
   // Collective Created

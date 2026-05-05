@@ -6,10 +6,10 @@ import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import { formatCurrency } from '../lib/currency-utils';
+import injectIntl from '../lib/withIntl';
 
 import Container from './Container';
 import { fadeIn } from './StyledKeyframes';
-import injectIntl from '../lib/withIntl';
 
 const getProgressColor = theme => theme.colors.primary[600];
 const getEmptyProgressColor = () => '#e2e2e2';

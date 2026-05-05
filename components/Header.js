@@ -6,10 +6,10 @@ import { defineMessages } from 'react-intl';;
 
 import { getCollectiveImage } from '../lib/image-utils';
 import { truncate } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import GlobalWarnings from './GlobalWarnings';
 import TopBar from './TopBar';
-import injectIntl from '../lib/withIntl';
 
 const messages = defineMessages({
   defaultTitle: {

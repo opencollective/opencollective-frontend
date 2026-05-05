@@ -4,6 +4,7 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';;
 
 import { sortEvents } from '../../../lib/events';
+import injectIntl from '../../../lib/withIntl';
 
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
@@ -16,7 +17,6 @@ import StyledButton from '../../StyledButton';
 import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
-import injectIntl from '../../../lib/withIntl';
 
 class SectionEvents extends React.PureComponent {
   static propTypes = {

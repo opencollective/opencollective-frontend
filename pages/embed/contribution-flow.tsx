@@ -9,6 +9,7 @@ import type { IntlShape } from 'react-intl';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
+import injectIntl from '../../lib/withIntl';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
@@ -24,7 +25,6 @@ import { Box } from '../../components/Grid';
 import Loading from '../../components/Loading';
 import { withStripeLoader } from '../../components/StripeProvider';
 import { withUser } from '../../components/UserProvider';
-import injectIntl from '../../lib/withIntl';
 
 class EmbedContributionFlowPage extends React.Component<{
   router: Router;

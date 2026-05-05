@@ -8,6 +8,7 @@ import { styled } from 'styled-components';
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import roles from '../../../../lib/constants/roles';
 import formatMemberRole from '../../../../lib/i18n/member-role';
+import injectIntl from '../../../../lib/withIntl';
 
 import Avatar from '../../../Avatar';
 import Container from '../../../Container';
@@ -17,7 +18,6 @@ import StyledInput from '../../../StyledInput';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledSelect from '../../../StyledSelect';
 import { P } from '../../../Text';
-import injectIntl from '../../../../lib/withIntl';
 
 const MemberContainer = styled(Container)`
   border: 1px solid #dcdee0;

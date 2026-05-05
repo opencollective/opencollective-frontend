@@ -13,6 +13,7 @@ import { i18nGraphqlException } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import EmojiReactionPicker from './conversations/EmojiReactionPicker';
@@ -30,7 +31,6 @@ import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
-import injectIntl from '../lib/withIntl';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;

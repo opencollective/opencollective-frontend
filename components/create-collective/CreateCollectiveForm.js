@@ -9,6 +9,7 @@ import { styled } from 'styled-components';
 import { suggestSlug } from '../../lib/collective';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 import withData from '../../lib/withData';
+import injectIntl from '../../lib/withIntl';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -30,7 +31,6 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, P } from '../Text';
-import injectIntl from '../../lib/withIntl';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};

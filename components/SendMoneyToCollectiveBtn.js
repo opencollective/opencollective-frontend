@@ -8,11 +8,11 @@ import { formatCurrency } from '../lib/currency-utils';
 import { gql } from '../lib/graphql/helpers';
 import { collectiveBalanceFragment } from '../lib/graphql/v1/fragments';
 import { compose } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import { Button } from './ui/Button';
 import { toast } from './ui/useToast';
 import { Flex } from './Grid';
-import injectIntl from '../lib/withIntl';
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {

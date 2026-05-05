@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';;
 
+import injectIntl from '../../lib/withIntl';
+
 import Avatar, { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -10,7 +12,6 @@ import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
 
 import CollectiveTitleContainer from './CollectiveTitleContainer';
-import injectIntl from '../../lib/withIntl';
 
 class NewContributionFlowHeader extends React.Component {
   static propTypes = {

@@ -8,10 +8,10 @@ import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/inter
 import { getEnvVar } from '../lib/env-utils';
 import { gql } from '../lib/graphql/helpers';
 import { getPaypal } from '../lib/paypal';
+import injectIntl from '../lib/withIntl';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
 import StyledButton from './StyledButton';
-import injectIntl from '../lib/withIntl';
 
 const PaypalButtonContainer = styled.div<{ isLoading?: boolean }>`
   ${props =>

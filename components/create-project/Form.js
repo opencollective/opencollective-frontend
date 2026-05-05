@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';
+import injectIntl from '../../lib/withIntl';
 
 import CollectiveNavbar from '../collective-navbar';
 import NextIllustration from '../collectives/HomeNextIllustration';
@@ -17,7 +18,6 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import { H1, P } from '../Text';
-import injectIntl from '../../lib/withIntl';
 
 const ContainerWithImage = styled(Container)`
   @media screen and (min-width: 40em) {

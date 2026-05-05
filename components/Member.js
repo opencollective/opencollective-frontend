@@ -6,13 +6,13 @@ import { styled } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import Avatar from './Avatar';
 import CollectiveCard from './CollectiveCard';
 import Container from './Container';
 import { Flex } from './Grid';
 import LinkCollective from './LinkCollective';
-import injectIntl from '../lib/withIntl';
 
 const MemberContainer = styled.div`
   max-width: 300px;

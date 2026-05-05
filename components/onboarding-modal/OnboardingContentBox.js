@@ -2,6 +2,8 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';;
 
+import injectIntl from '../../lib/withIntl';
+
 import CollectivePickerAsync from '../../components/CollectivePickerAsync';
 import Container from '../../components/Container';
 import StyledHr from '../../components/StyledHr';
@@ -12,7 +14,6 @@ import { H1, P } from '../Text';
 
 import OnboardingProfileCard from './OnboardingProfileCard';
 import OnboardingSkipButton from './OnboardingSkipButton';
-import injectIntl from '../../lib/withIntl';
 
 class OnboardingContentBox extends React.Component {
   static propTypes = {

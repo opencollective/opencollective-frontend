@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 ;
 
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
+import injectIntl from '../lib/withIntl';
 
 import StyledSelect from './StyledSelect';
-import injectIntl from '../lib/withIntl';
 
 class PaymentMethodSelect extends Component {
   static propTypes = {

@@ -13,6 +13,7 @@ import { styled } from 'styled-components';
 import { isPrepaid } from '../lib/constants/payment-methods';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose, reportValidityHTML5 } from '../lib/utils';
+import injectIntl from '../lib/withIntl';
 
 import { Button } from './ui/Button';
 import CollectivePicker from './CollectivePicker';
@@ -29,7 +30,6 @@ import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
-import injectIntl from '../lib/withIntl';
 
 const MIN_AMOUNT = 500;
 const MAX_AMOUNT = 100000000;

@@ -15,6 +15,7 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
 import { compose } from '../../../lib/utils';
+import injectIntl from '../../../lib/withIntl';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import { getI18nLink } from '../../I18nFormatters';
@@ -28,7 +29,6 @@ import { Separator } from '../../ui/Separator';
 import { toast } from '../../ui/useToast';
 
 import WebhookActivityInfoModal, { hasWebhookEventInfo } from './WebhookActivityInfoModal';
-import injectIntl from '../../../lib/withIntl';
 
 const EMPTY_WEBHOOKS = [];
 

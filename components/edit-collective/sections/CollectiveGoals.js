@@ -6,6 +6,7 @@ import { Plus, Trash } from 'lucide-react';
 import { defineMessages, FormattedMessage } from 'react-intl';;
 import { v4 as uuid } from 'uuid';
 
+import injectIntl from '../../../lib/withIntl';
 import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
 
@@ -23,7 +24,6 @@ import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
 import { Button } from '../../ui/Button';
 import SettingsSubtitle from '../SettingsSubtitle';
-import injectIntl from '../../../lib/withIntl';
 
 const BORDER = '1px solid #efefef';
 const getInterpolationOption = value => ({ label: startCase(value), value });

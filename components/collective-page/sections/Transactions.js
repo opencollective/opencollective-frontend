@@ -4,6 +4,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';;
 
 import { isHeavyAccount } from '../../../lib/collective';
 import { gql } from '../../../lib/graphql/helpers';
+import injectIntl from '../../../lib/withIntl';
 
 import { Box } from '../../Grid';
 import Link from '../../Link';
@@ -18,7 +19,6 @@ import TransactionsList from '../../transactions/TransactionsList';
 import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
-import injectIntl from '../../../lib/withIntl';
 
 const NB_DISPLAYED = 10;
 const FILTERS = { ALL: 'ALL', EXPENSES: 'EXPENSES', CONTRIBUTIONS: 'CONTRIBUTIONS' };

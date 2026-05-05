@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';;
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import injectIntl from '../../../lib/withIntl';
 
 import { Separator } from '@/components/ui/Separator';
 
@@ -23,7 +24,6 @@ import SelectOwnFiscalHost from '../SelectOwnFiscalHost';
 
 import { ActiveFiscalHost } from './fiscal-host/ActiveFiscalHost';
 import AppliedToFiscalHost from './fiscal-host/AppliedToFiscalHost';
-import injectIntl from '../../../lib/withIntl';
 
 const OptionLabel = styled.label`
   display: block;
