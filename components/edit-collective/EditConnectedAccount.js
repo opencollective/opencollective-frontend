@@ -4,7 +4,7 @@ import { withApollo } from '@apollo/client/react/hoc';
 import * as Sentry from '@sentry/browser';
 import { capitalize, pick } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage } from 'react-intl';;
+import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
 import injectIntl from '../../lib/i18n/with-intl';

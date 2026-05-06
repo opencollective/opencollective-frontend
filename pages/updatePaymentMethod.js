@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { CardElement } from '@stripe/react-stripe-js';
 import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl';;
+import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { maxWidth } from 'styled-system';
 

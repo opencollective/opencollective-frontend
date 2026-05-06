@@ -4,7 +4,7 @@ import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
 import { get, groupBy, isEmpty, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage } from 'react-intl';;
+import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -377,4 +377,4 @@ const addRemovePayoutMethodMutation = graphql<PayoutMethodSelectProps>(removePay
   name: 'removePayoutMethod',
 });
 
-export default React.memo(injectIntl(addRemovePayoutMethodMutation(PayoutMethodSelect)));
+export default React.memo(injectIntl(addRemovePayoutMethodMutation(PayoutMethodSelect))) as any;

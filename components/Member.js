@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { defineMessages } from 'react-intl';;
+import { defineMessages } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';

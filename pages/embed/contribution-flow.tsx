@@ -4,7 +4,6 @@ import { get, omit, pick } from 'lodash';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-;
 
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';

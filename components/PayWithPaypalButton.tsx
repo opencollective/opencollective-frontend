@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import { truncate } from 'lodash';
-;
 import styled, { css } from 'styled-components';
 
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';

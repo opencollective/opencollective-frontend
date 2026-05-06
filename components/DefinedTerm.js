@@ -1,6 +1,6 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
-import { defineMessages } from 'react-intl';;
+import { defineMessages } from 'react-intl';
 import { styled } from 'styled-components';
 import { borderColor, color, typography } from 'styled-system';
 

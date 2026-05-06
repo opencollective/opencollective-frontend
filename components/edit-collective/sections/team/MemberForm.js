@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { get, omit } from 'lodash';
-import { defineMessages } from 'react-intl';;
+import { defineMessages } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';

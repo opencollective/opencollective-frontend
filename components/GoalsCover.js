@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { debounce, get, maxBy, sortBy, truncate } from 'lodash';
-import { defineMessages, FormattedMessage } from 'react-intl';;
+import { defineMessages, FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 

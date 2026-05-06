@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage } from 'react-intl';;
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 

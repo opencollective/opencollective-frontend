@@ -1,7 +1,7 @@
 import React from 'react';
 import { isNil, omitBy, truncate } from 'lodash';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage } from 'react-intl';;
+import { defineMessages, FormattedMessage } from 'react-intl';
 import type {
   ContainerProps,
   DropdownIndicatorProps,

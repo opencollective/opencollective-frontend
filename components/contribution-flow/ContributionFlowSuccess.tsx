@@ -6,7 +6,7 @@ import { get, uniqBy } from 'lodash';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage } from 'react-intl';;
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';

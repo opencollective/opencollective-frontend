@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-;
 
 import languages from '../lib/constants/locales';
 import injectIntl from '../lib/i18n/with-intl';

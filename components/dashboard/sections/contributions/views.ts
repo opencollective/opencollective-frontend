@@ -3,7 +3,7 @@ import type { IntlShape } from 'react-intl';
 
 import type { Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
-import type { OppositeAccountScope} from '../../../../lib/graphql/types/v2/graphql';
+import type { OppositeAccountScope } from '../../../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import type { AccountOrdersFilter, HostContext } from '@/lib/graphql/types/v2/schema';
 

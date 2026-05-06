@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import { FormattedMessage } from 'react-intl';;
+import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';

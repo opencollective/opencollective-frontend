@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';;
+import { FormattedMessage } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';

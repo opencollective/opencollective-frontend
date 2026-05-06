@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';;
+import { FormattedMessage } from 'react-intl';
 
 import injectIntl from '../../lib/i18n/with-intl';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages } from 'react-intl';;
+import { defineMessages } from 'react-intl';
 
 import { CollectiveCategory } from '../lib/constants/collectives';
 import injectIntl from '../lib/i18n/with-intl';

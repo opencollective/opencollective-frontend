@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { truncate } from 'lodash';
-import { FormattedMessage } from 'react-intl';;
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import roles from '../lib/constants/roles';

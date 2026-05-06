@@ -6,7 +6,7 @@ import { CardElement } from '@stripe/react-stripe-js';
 import { get, intersection, isEmpty, isEqual, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage } from 'react-intl';;
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { isURL } from 'validator';
 

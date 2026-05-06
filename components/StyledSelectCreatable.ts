@@ -1,4 +1,3 @@
-;
 import SelectCreatable from 'react-select/creatable';
 
 import injectIntl from '../lib/i18n/with-intl';

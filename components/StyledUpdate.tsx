@@ -4,7 +4,7 @@ import { Markup } from 'interweave';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage } from 'react-intl';;
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { borders } from 'styled-system';
 
@@ -317,4 +317,4 @@ const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
 
 const addGraphql = compose(addDeleteUpdateMutation);
 
-export default injectIntl<'intl', Omit<StyledUpdateProps, 'router'>>(addGraphql(withRouter(StyledUpdate)));
+export default injectIntl(addGraphql(withRouter(StyledUpdate)));

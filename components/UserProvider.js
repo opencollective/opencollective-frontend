@@ -4,7 +4,6 @@ import { withApollo } from '@apollo/client/react/hoc';
 import { decodeJwt } from 'jose';
 import { get, isEqual } from 'lodash';
 import Router, { withRouter } from 'next/router';
-;
 
 import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';

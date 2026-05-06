@@ -10,9 +10,7 @@ export default function withIntl(WrappedComponent: any, options?: { forwardRef?:
   };
 
   if (options && options.forwardRef) {
-    const ForwardedComponent = React.forwardRef((props: any, ref) => (
-      <InjectIntl {...props} forwardedRef={ref} />
-    ));
+    const ForwardedComponent = React.forwardRef((props: any, ref) => <InjectIntl {...props} forwardedRef={ref} />);
     return hoistNonReactStatics(ForwardedComponent, WrappedComponent) as any;
   }
 

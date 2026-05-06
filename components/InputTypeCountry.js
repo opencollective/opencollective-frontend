@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { isUndefined, orderBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { FormattedMessage } from 'react-intl';;
+import { FormattedMessage } from 'react-intl';
 
 import fetchGeoLocation from '../lib/geolocation_api';
 import { CountryIso } from '../lib/graphql/types/v2/graphql';

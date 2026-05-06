@@ -5,7 +5,7 @@ import { ShareAlt } from '@styled-icons/boxicons-regular/ShareAlt';
 import copy from 'copy-to-clipboard';
 import { differenceWith, isNil, pickBy, toLower, truncate, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage } from 'react-intl';;
+import { defineMessages, FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { padding } from 'styled-system';
 

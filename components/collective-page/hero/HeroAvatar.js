@@ -4,7 +4,7 @@ import { Mutation } from '@apollo/client/react/components';
 import { Camera } from '@styled-icons/feather/Camera';
 import { inRange } from 'lodash';
 import dynamic from 'next/dynamic';
-import { FormattedMessage } from 'react-intl';;
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { upload } from '../../../lib/api';

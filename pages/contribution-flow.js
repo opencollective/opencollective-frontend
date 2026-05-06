@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit } from 'lodash';
 import { withRouter } from 'next/router';
-;
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
