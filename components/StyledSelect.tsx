@@ -1,7 +1,7 @@
 import React from 'react';
 import { isNil, omitBy, truncate } from 'lodash';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import type {
   ContainerProps,
   DropdownIndicatorProps,
@@ -14,6 +14,8 @@ import Select, { components as ReactSelectComponents } from 'react-select';
 import { styled } from 'styled-components';
 import type { BorderProps, BorderRadiusProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { layout, space, typography } from 'styled-system';
+
+import injectIntl from '../lib/i18n/with-intl';
 
 import Container from './Container';
 import { Flex } from './Grid';

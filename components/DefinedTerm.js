@@ -1,9 +1,10 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import { styled } from 'styled-components';
 import { borderColor, color, typography } from 'styled-system';
 
+import injectIntl from '../lib/i18n/with-intl';
 import { textTransform } from '../lib/styled-system-custom-properties';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';

@@ -62,7 +62,6 @@ const ReceivingMoney = ({
             </CardHeader>
             <CardContent>
               <EditConnectedAccount
-                // @ts-expect-error EditConnectedAccount is not typed yet
                 collective={collective}
                 service="stripe"
                 variation="RECEIVING"

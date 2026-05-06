@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';
+import injectIntl from '../../lib/i18n/with-intl';
 
 import CollectiveNavbar from '../collective-navbar';
 import NextIllustration from '../collectives/HomeNextIllustration';

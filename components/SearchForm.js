@@ -1,10 +1,10 @@
 import React from 'react';
 import { Search, X } from 'lucide-react';
 import { withRouter } from 'next/router';
-import { injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 import { borderColor, borderRadius, height, typography } from 'styled-system';
 
+import injectIntl from '../lib/i18n/with-intl';
 import { compose } from '../lib/utils';
 
 import { Box, Flex } from './Grid';

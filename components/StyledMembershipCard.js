@@ -1,9 +1,10 @@
 import React from 'react';
-import { FormattedDate, FormattedMessage, injectIntl, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import { formatCurrency } from '../lib/currency-utils';
 import formatMemberRole from '../lib/i18n/member-role';
+import injectIntl from '../lib/i18n/with-intl';
 
 import Container from './Container';
 import { Box } from './Grid';

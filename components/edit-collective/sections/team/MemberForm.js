@@ -2,12 +2,13 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { get, omit } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import roles from '../../../../lib/constants/roles';
 import formatMemberRole from '../../../../lib/i18n/member-role';
+import injectIntl from '../../../../lib/i18n/with-intl';
 
 import Avatar from '../../../Avatar';
 import Container from '../../../Container';

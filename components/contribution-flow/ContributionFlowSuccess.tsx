@@ -6,7 +6,7 @@ import { get, uniqBy } from 'lodash';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
@@ -15,6 +15,7 @@ import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { gql } from '../../lib/graphql/helpers';
 import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import injectIntl from '../../lib/i18n/with-intl';
 import { iconForSocialLinkType } from '../../lib/social-links';
 import { getStripe } from '../../lib/stripe';
 import {

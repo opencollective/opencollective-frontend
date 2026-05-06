@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
+
+import injectIntl from '../../lib/i18n/with-intl';
 
 import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';

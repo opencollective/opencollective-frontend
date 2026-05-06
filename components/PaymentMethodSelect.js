@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl } from 'react-intl';
 
+import injectIntl from '../lib/i18n/with-intl';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
 
 import StyledSelect from './StyledSelect';

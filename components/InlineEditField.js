@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { get, pick } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
+
+import injectIntl from '../lib/i18n/with-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';

@@ -2,11 +2,12 @@ import React from 'react';
 import { PopoverPortal } from '@radix-ui/react-popover';
 import { groupBy, intersection, isEqual, last, sortBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import injectIntl from '../lib/i18n/with-intl';
 
 import { Popover, PopoverAnchor, PopoverContent } from './ui/Popover';
 import Avatar from './Avatar';

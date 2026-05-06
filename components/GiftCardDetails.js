@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
-import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
+import injectIntl from '../lib/i18n/with-intl';
 
 import GiftCard from './icons/GiftCard';
 import { Button } from './ui/Button';

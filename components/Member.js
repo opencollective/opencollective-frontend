@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
+import injectIntl from '../lib/i18n/with-intl';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
 
 import Avatar from './Avatar';

@@ -4,13 +4,14 @@ import { Markup } from 'interweave';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { borders } from 'styled-system';
 
 import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
 import { i18nGraphqlException } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
+import injectIntl from '../lib/i18n/with-intl';
 import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
 import type LoggedInUser from '@/lib/LoggedInUser';
@@ -316,4 +317,4 @@ const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
 
 const addGraphql = compose(addDeleteUpdateMutation);
 
-export default injectIntl<'intl', Omit<StyledUpdateProps, 'router'>>(addGraphql(withRouter(StyledUpdate)));
+export default injectIntl(addGraphql(withRouter(StyledUpdate)));

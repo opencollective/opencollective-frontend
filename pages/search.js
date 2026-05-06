@@ -5,13 +5,14 @@ import { ShareAlt } from '@styled-icons/boxicons-regular/ShareAlt';
 import copy from 'copy-to-clipboard';
 import { differenceWith, isNil, pickBy, toLower, truncate, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { padding } from 'styled-system';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { gql } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
+import injectIntl from '../lib/i18n/with-intl';
 import { FILTERS, normalizeSearchTypes } from '../lib/search-page-type-query';
 import { parseToBoolean } from '../lib/utils';
 import { textTransform } from '@/lib/styled-system-custom-properties';

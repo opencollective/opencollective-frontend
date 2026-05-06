@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit } from 'lodash';
 import { withRouter } from 'next/router';
-import { injectIntl } from 'react-intl';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
+import injectIntl from '../lib/i18n/with-intl';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
 
 import Container from '../components/Container';

@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { truncate } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import roles from '../lib/constants/roles';
 import formatMemberRole from '../lib/i18n/member-role';
+import injectIntl from '../lib/i18n/with-intl';
 
 import { ContributorAvatar } from './Avatar';
 import EditPublicMessagePopup from './EditPublicMessagePopup';

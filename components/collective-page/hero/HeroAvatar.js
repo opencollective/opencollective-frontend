@@ -4,7 +4,7 @@ import { Mutation } from '@apollo/client/react/components';
 import { Camera } from '@styled-icons/feather/Camera';
 import { inRange } from 'lodash';
 import dynamic from 'next/dynamic';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { upload } from '../../../lib/api';
@@ -12,6 +12,7 @@ import { isIndividualAccount } from '../../../lib/collective';
 import { AVATAR_HEIGHT_RANGE, AVATAR_WIDTH_RANGE } from '../../../lib/constants/collectives';
 import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectiveAvatarMutation } from '../../../lib/graphql/v1/mutations';
+import injectIntl from '../../../lib/i18n/with-intl';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
 
 import Avatar from '../../Avatar';

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import { truncate } from 'lodash';
-import { injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
 import { getEnvVar } from '../lib/env-utils';
 import { gql } from '../lib/graphql/helpers';
+import injectIntl from '../lib/i18n/with-intl';
 import { getPaypal } from '../lib/paypal';
 
 import LoadingPlaceholder from './LoadingPlaceholder';

@@ -4,10 +4,10 @@ import { get, omit, pick } from 'lodash';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { injectIntl } from 'react-intl';
 
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
+import injectIntl from '../../lib/i18n/with-intl';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
 import type LoggedInUser from '@/lib/LoggedInUser';
 

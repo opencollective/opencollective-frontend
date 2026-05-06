@@ -4,10 +4,11 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { CONNECTED_COLLECTIVES_ORDER_KEY } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import injectIntl from '../../../lib/i18n/with-intl';
 import { sortConnectedCollectives, updateCollectiveInGraphQLV1Cache } from '@/lib/collective';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
 
