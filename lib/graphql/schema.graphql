@@ -1192,7 +1192,12 @@ type Policies {
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
-  EXPENSE_PUBLIC_VENDORS: Boolean
+  EXPENSE_PUBLIC_VENDORS: Boolean @deprecated(reason: "Use USE_VENDOR_POLICY instead.")
+
+  """
+  Default rule for who can attribute financial activities to vendors under this host.
+  """
+  USE_VENDOR_POLICY: UseVendorPolicy
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
 
   """
@@ -1987,6 +1992,26 @@ enum CurrencyExchangeRateSourceType {
 type EXPENSE_CATEGORIZATION {
   requiredForExpenseSubmitters: Boolean
   requiredForCollectiveAdmins: Boolean
+}
+
+"""
+Who can attribute financial activities to a vendor
+"""
+enum UseVendorPolicy {
+  """
+  Only host admins can use this vendor.
+  """
+  HOST_ADMINS
+
+  """
+  Host admins and admins of hosted collectives.
+  """
+  HOST_AND_COLLECTIVE_ADMINS
+
+  """
+  Anyone who can submit an expense.
+  """
+  ALL_SUBMITTERS
 }
 
 type CONTRIBUTOR_INFO_THRESHOLDS {

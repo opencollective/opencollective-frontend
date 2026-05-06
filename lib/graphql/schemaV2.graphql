@@ -7511,7 +7511,12 @@ type Policies {
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
-  EXPENSE_PUBLIC_VENDORS: Boolean
+  EXPENSE_PUBLIC_VENDORS: Boolean @deprecated(reason: "Use USE_VENDOR_POLICY instead.")
+
+  """
+  Default rule for who can attribute financial activities to vendors under this host.
+  """
+  USE_VENDOR_POLICY: UseVendorPolicy
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
 
   """
@@ -7560,6 +7565,26 @@ type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
 type EXPENSE_CATEGORIZATION {
   requiredForExpenseSubmitters: Boolean
   requiredForCollectiveAdmins: Boolean
+}
+
+"""
+Who can attribute financial activities to a vendor
+"""
+enum UseVendorPolicy {
+  """
+  Only host admins can use this vendor.
+  """
+  HOST_ADMINS
+
+  """
+  Host admins and admins of hosted collectives.
+  """
+  HOST_AND_COLLECTIVE_ADMINS
+
+  """
+  Anyone who can submit an expense.
+  """
+  ALL_SUBMITTERS
 }
 
 type CONTRIBUTOR_INFO_THRESHOLDS {
@@ -17846,6 +17871,11 @@ type Vendor implements Account & AccountWithContributions {
   The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
   """
   visibleToAccounts: [Account]!
+
+  """
+  Per-vendor override for who can attribute financial activities to this vendor. Null means inherit from host.
+  """
+  useVendorPolicy: UseVendorPolicy
 }
 
 """
@@ -26485,7 +26515,8 @@ input PoliciesInput {
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
   EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
-  EXPENSE_PUBLIC_VENDORS: Boolean
+  EXPENSE_PUBLIC_VENDORS: Boolean @deprecated(reason: "Use USE_VENDOR_POLICY instead.")
+  USE_VENDOR_POLICY: UseVendorPolicy
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
   CONTRIBUTOR_INFO_THRESHOLDS: PoliciesContributorInfoThresholdsInput
 }
@@ -28828,6 +28859,11 @@ input VendorCreateInput {
   visibleToAccounts: [AccountReferenceInput]
 
   """
+  Per-vendor override for who can attribute financial activities. Null means inherit from host.
+  """
+  useVendorPolicy: UseVendorPolicy
+
+  """
   The profile avatar image
   """
   image: Upload
@@ -28881,6 +28917,11 @@ input VendorEditInput {
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
   visibleToAccounts: [AccountReferenceInput]
+
+  """
+  Per-vendor override for who can attribute financial activities. Null means inherit from host.
+  """
+  useVendorPolicy: UseVendorPolicy
 
   """
   The profile avatar image
