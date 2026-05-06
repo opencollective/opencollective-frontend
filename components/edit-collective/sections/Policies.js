@@ -32,6 +32,8 @@ import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
 import { Button } from '../../ui/Button';
 import { Collapsible, CollapsibleContent } from '../../ui/Collapsible';
+import { Label } from '../../ui/Label';
+import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
 import { Switch } from '../../ui/Switch';
 import { useToast } from '../../ui/useToast';
 
@@ -75,7 +77,7 @@ const setPoliciesMutation = gql`
           requiredForExpenseSubmitters
           requiredForCollectiveAdmins
         }
-        EXPENSE_PUBLIC_VENDORS
+        USE_VENDOR_POLICY
       }
     }
   }
@@ -945,39 +947,48 @@ const Policies = ({ collective }) => {
               <SettingsSectionTitle>
                 <FormattedMessage defaultMessage="Vendors" id="RilevA" />
               </SettingsSectionTitle>
-              <div className="mb-1">
-                <div className="mb-2 text-base font-bold">
-                  <FormattedMessage defaultMessage="Public Expense submission" id="p5Icf1" />
+              <P mb={3}>
+                <FormattedMessage defaultMessage="Who can attribute financial activities to vendors:" id="gQQN76" />
+              </P>
+              <RadioGroup
+                className="mb-1"
+                value={formik.values.policies?.USE_VENDOR_POLICY ?? 'HOST_AND_COLLECTIVE_ADMINS'}
+                onValueChange={value => {
+                  const newPolicies = cloneDeep(formik.values.policies);
+                  set(newPolicies, 'USE_VENDOR_POLICY', value);
+                  formik.setFieldValue('policies', newPolicies);
+                }}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="HOST_ADMINS" id="USE_VENDOR_POLICY-HOST_ADMINS" />
+                  <Label htmlFor="USE_VENDOR_POLICY-HOST_ADMINS" className="font-normal">
+                    <FormattedMessage
+                      defaultMessage="Only Admins of {orgName}"
+                      id="0x4xsj"
+                      values={{ orgName: collective.name }}
+                    />
+                  </Label>
                 </div>
-                <p className="mb-2 text-sm">
-                  {!hasHosting ? (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value="HOST_AND_COLLECTIVE_ADMINS"
+                    id="USE_VENDOR_POLICY-HOST_AND_COLLECTIVE_ADMINS"
+                  />
+                  <Label htmlFor="USE_VENDOR_POLICY-HOST_AND_COLLECTIVE_ADMINS" className="font-normal">
                     <FormattedMessage
-                      defaultMessage="By default only administrators can submit expenses on behalf of vendors. You can allow other users to also submit expenses on behalf vendors."
-                      id="QtxPLy"
+                      defaultMessage="{orgName} admins and collective admins"
+                      id="IaKZQb"
+                      values={{ orgName: collective.name }}
                     />
-                  ) : (
-                    <FormattedMessage
-                      defaultMessage="By default only fiscal host administrators can submit expenses on behalf of vendors. You can allow other users who submit expenses to collectives you host to also submit expenses on behalf vendors."
-                      id="dK5ItS"
-                    />
-                  )}
-                </p>
-                <StyledCheckbox
-                  name={`checkbox-EXPENSE_PUBLIC_VENDORS-requiredForExpenseSubmitters`}
-                  label={
-                    <FormattedMessage
-                      defaultMessage="Allow expense submission on behalf of vendors by all users"
-                      id="l15EJO"
-                    />
-                  }
-                  checked={formik.values.policies?.EXPENSE_PUBLIC_VENDORS}
-                  onChange={({ checked }) => {
-                    const newPolicies = cloneDeep(formik.values.policies);
-                    set(newPolicies, 'EXPENSE_PUBLIC_VENDORS', checked);
-                    formik.setFieldValue('policies', newPolicies);
-                  }}
-                />
-              </div>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="ALL_SUBMITTERS" id="USE_VENDOR_POLICY-ALL_SUBMITTERS" />
+                  <Label htmlFor="USE_VENDOR_POLICY-ALL_SUBMITTERS" className="font-normal">
+                    <FormattedMessage defaultMessage="Anybody" id="d6b55T" />
+                  </Label>
+                </div>
+              </RadioGroup>
             </Container>
 
             <Container>

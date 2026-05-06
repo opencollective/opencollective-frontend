@@ -401,6 +401,7 @@ const expenseFormSchemaQuery = gql`
         titlePolicy
         grantPolicy
       }
+      USE_VENDOR_POLICY
     }
   }
 
@@ -1488,9 +1489,9 @@ async function buildFormOptions(
       options.vendorsForAccount =
         'vendorsForAccount' in host ? (host.vendorsForAccount?.['nodes'] as ExpenseVendorFieldsFragment[]) || [] : [];
       const isInviteePayeeFlow = options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount;
-      options.showVendorsOption = isInviteePayeeFlow
-        ? false
-        : options.isHostAdmin || ('vendors' in host ? host.vendors?.['totalCount'] > 0 : false);
+
+      const userCanUseVendors = options.isHostAdmin || ('vendors' in host && host.vendors?.['totalCount'] > 0);
+      options.showVendorsOption = isInviteePayeeFlow ? false : userCanUseVendors;
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
