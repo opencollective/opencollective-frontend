@@ -87,6 +87,14 @@ export const managedOrderFragment = gql`
         isGuest
       }
       ...AccountHoverCardFields
+      mainProfile {
+        id
+        name
+        slug
+        imageUrl
+        type
+        ...AccountHoverCardFields
+      }
     }
     createdByAccount {
       id

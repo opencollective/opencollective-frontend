@@ -49,6 +49,14 @@ export const transactionsTableQueryCollectionFragment = gql`
         imageUrl
         type
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
       oppositeAccount {
         id
@@ -58,6 +66,14 @@ export const transactionsTableQueryCollectionFragment = gql`
         imageUrl
         type
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
       toAccount {
         id
