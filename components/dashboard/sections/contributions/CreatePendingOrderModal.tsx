@@ -131,6 +131,7 @@ const createPendingContributionModalCollectiveQuery = gql`
   query CreatePendingContributionCollective($slug: String!) {
     account(slug: $slug) {
       id
+      legacyId
       type
       currency
       childrenAccounts {
@@ -495,6 +496,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
               includeVendorsForHostId={collective?.host?.legacyId}
+              vendorVisibleToAccountIds={collective?.legacyId ? [collective.legacyId] : []}
               menuPortalTarget={null}
               creatable={['USER', 'VENDOR']}
               HostCollectiveId={host?.legacyId}

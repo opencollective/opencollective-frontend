@@ -526,6 +526,7 @@ const AddFundsModalContentWithCollective = ({
           variables: {
             vendor: {
               name: searchText,
+              visibleToAccounts: collective?.slug ? [{ slug: collective.slug }] : [],
             },
             host: { id: host.id },
           },
@@ -544,7 +545,7 @@ const AddFundsModalContentWithCollective = ({
         onError(error);
       }
     },
-    [createVendor, host?.id, intl],
+    [createVendor, host?.id, collective?.slug, intl],
   );
 
   const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
@@ -808,6 +809,7 @@ const AddFundsModalContentWithCollective = ({
                           collective={values.fromAccount}
                           menuPortalTarget={null}
                           includeVendorsForHostId={host?.legacyId || undefined}
+                          vendorVisibleToAccountIds={account?.legacyId ? [account.legacyId] : undefined}
                           creatable={['VENDOR']}
                           HostCollectiveId={host?.legacyId}
                           renderNewCollectiveOption={({ searchText, onCreatedCollective }) => {

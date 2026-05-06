@@ -404,6 +404,9 @@ class CollectivePicker extends React.PureComponent {
                     ? { ParentCollectiveId: this.props.HostCollectiveId }
                     : {}
                 }
+                vendorVisibleToAccountIds={
+                  createFormCollectiveType === CollectiveType.VENDOR ? this.props.vendorVisibleToAccountIds : undefined
+                }
                 {...prefillValue}
               />
             )}

@@ -108,6 +108,7 @@ export const adminPanelQuery = gql`
         id
         publicId
         REQUIRE_2FA_FOR_ADMINS
+        USE_VENDOR_POLICY
       }
       ... on Organization {
         hasHosting
