@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
+import { FEATURES } from '@/lib/allowed-features';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
@@ -9,6 +10,9 @@ import { Box } from '../components/Grid';
 import OrdersWithData from '../components/orders/OrdersWithData';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
+import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
+
+import Custom404 from './404';
 
 class OrdersPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
@@ -29,6 +33,14 @@ class OrdersPage extends React.Component {
   render() {
     const { slug, data, LoggedInUser } = this.props;
     const collective = data?.account;
+    if (data && !data.loading) {
+      if (!data.account) {
+        return <Custom404 />;
+      } else if (data.account.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+        return <PageFeatureNotSupported />;
+      }
+    }
+
     return (
       <Page>
         {(data?.loading || data?.account) && (

@@ -8,6 +8,7 @@ import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers
 import { isIndividualAccount, loggedInUserCanAccessFinancialData } from '../lib/collective';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import { FEATURES } from '@/lib/allowed-features';
 import type { TransactionsPageQuery } from '@/lib/graphql/types/v2/graphql';
 import { getSSRVariablesFromQuery } from '@/lib/hooks/useQueryFilter';
 
@@ -73,6 +74,8 @@ export default function TransactionsPage(props: InferGetServerSidePropsType<type
   } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, account)) {
     // Hack for funds that want to keep their budget "private"
     return <PageFeatureNotSupported showContactSupportLink={false} />;
+  } else if (account.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+    return <PageFeatureNotSupported />;
   }
 
   return (

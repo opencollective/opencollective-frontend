@@ -10,6 +10,7 @@ import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
+import { FEATURES } from '@/lib/allowed-features';
 
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import ErrorPage from '../components/ErrorPage';
@@ -17,6 +18,7 @@ import Loading from '../components/Loading';
 import Page from '../components/Page';
 import TierPageContent from '../components/tier-page';
 import { tierPageQuery } from '../components/tier-page/graphql/queries';
+import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 
 type TierPageProps = {
   collectiveSlug: string;
@@ -97,6 +99,8 @@ const TierPage = (pageProps: InferGetServerSidePropsType<typeof getServerSidePro
       return <ErrorPage data={data} error={error} />;
     } else if (!data?.Tier || !collective || collectiveSlug !== collective.slug) {
       return <ErrorPage data={data} error={{ type: 'NOT_FOUND' }} />;
+    } else if (collective.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+      return <PageFeatureNotSupported />;
     }
   }
 

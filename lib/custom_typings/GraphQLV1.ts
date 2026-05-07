@@ -9,6 +9,7 @@ export type GraphQLV1Collective = {
   imageUrl: string;
   type: keyof typeof CollectiveType;
   isArchived?: boolean;
+  isPrivate?: boolean;
   parentCollective?: GraphQLV1Collective;
   isFirstPartyHost?: boolean;
   isTrustedHost?: boolean;

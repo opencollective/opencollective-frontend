@@ -8,6 +8,7 @@ import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
 import type { Account } from '../lib/graphql/types/v2/graphql';
+import { FEATURES } from '@/lib/allowed-features';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -19,6 +20,7 @@ import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 
 const getPageMetaData = (intl: IntlShape, collective: Account) => {
   const baseMetadata = getCollectivePageMetadata(collective);
@@ -58,6 +60,8 @@ const CollectiveContact = () => {
       return <ErrorPage data={error} />;
     } else if (isHiddenAccount(data?.account)) {
       return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
+    } else if (data.account.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+      return <PageFeatureNotSupported />;
     }
   }
 

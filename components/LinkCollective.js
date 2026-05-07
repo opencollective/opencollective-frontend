@@ -1,5 +1,5 @@
 import React from 'react';
-import { truncate } from 'lodash';
+import { get, truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../lib/utils';
@@ -46,6 +46,8 @@ const LinkCollective = ({
         return collective.name;
       }
     } else if (!collective.slug || collective.type === 'VENDOR') {
+      return children || formatName(collective.name);
+    } else if (collective.isPrivate || get(collective, 'features.PUBLIC_PROFILE') === 'UNSUPPORTED') {
       return children || formatName(collective.name);
     }
   }

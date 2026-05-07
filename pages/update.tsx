@@ -24,6 +24,7 @@ import { Box, Flex } from '../components/Grid';
 import CommentIcon from '../components/icons/CommentIcon';
 import Page from '../components/Page';
 import StyledUpdate from '../components/StyledUpdate';
+import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 
 const updatePageQuery = gql`
   query UpdatePage($collectiveSlug: String, $updateSlug: String!, $offset: Int) {
@@ -176,6 +177,8 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
     return <ErrorPage data={props} />;
   } else if (!update) {
     return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
+  } else if (account.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+    return <PageFeatureNotSupported />;
   }
 
   return (

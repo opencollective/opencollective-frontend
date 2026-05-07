@@ -16,6 +16,10 @@ import { API_V1_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
+import { FEATURES } from '@/lib/allowed-features';
+import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/graphql';
+
+import FeatureNotSupported from '@/components/FeatureNotSupported';
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
@@ -422,6 +426,10 @@ const EditCollectivePage = ({ collective }) => {
   }
 
   const draggingSection = sections.find(section => section.name === draggingId);
+
+  if (collective.features[FEATURES.PUBLIC_PROFILE] === CollectiveFeatureStatus.UNSUPPORTED) {
+    return <FeatureNotSupported />;
+  }
 
   return (
     <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>

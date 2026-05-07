@@ -14,6 +14,9 @@ import i18nHostApplicationStatus from '../../../../lib/i18n/host-application-sta
 import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';
 import { sortSelectOptions } from '../../../../lib/utils';
 
+import NotFound from '@/components/NotFound';
+
+import FeatureNotSupported from '../../../FeatureNotSupported';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
@@ -148,6 +151,17 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+
+  if (!loading) {
+    if (!data?.host) {
+      return <NotFound />;
+    } else if (
+      (data?.host?.features?.RECEIVE_HOST_APPLICATIONS || metadata?.host?.features?.RECEIVE_HOST_APPLICATIONS) ===
+      'UNSUPPORTED'
+    ) {
+      return <FeatureNotSupported />;
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">

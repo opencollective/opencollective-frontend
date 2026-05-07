@@ -145,6 +145,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const showReceivedGrantRequests =
     hasReceivedGrantRequests ||
     (!isIndividual && !hasMoneyManagement && Boolean(account.supportedExpenseTypes?.includes?.(ExpenseType.GRANT)));
+  const isReceiveContributionsSupported = account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED';
 
   const items: MenuItem[] = [
     {
@@ -372,6 +373,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           label: intl.formatMessage({ id: 'HostApplications.Applications', defaultMessage: 'Applications' }),
           section: ALL_SECTIONS.HOST_APPLICATIONS,
+          if: account.features[FEATURES.RECEIVE_HOST_APPLICATIONS] !== 'UNSUPPORTED',
         },
       ],
     },
@@ -463,24 +465,25 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
 
     {
-      if: isType(account, EVENT) && !isCommunityManagerOnly,
+      if: isType(account, EVENT) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TICKETS,
       label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
       Icon: Ticket,
     },
     {
-      if: isType(account, EVENT) && !isCommunityManagerOnly,
+      if: isType(account, EVENT) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TIERS,
       label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
       Icon: HeartHandshake,
     },
     {
-      if: !isIndividual && !isAccountantOnly,
+      if: !isIndividual && !isAccountantOnly && account.features[FEATURES.UPDATES] !== 'UNSUPPORTED',
       section: ALL_SECTIONS.UPDATES,
       Icon: Megaphone,
     },
     {
       if:
+        isReceiveContributionsSupported &&
         !isIndividual &&
         !isEvent &&
         (!isOrganization || hasMoneyManagement) &&
@@ -520,7 +523,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.COLLECTIVE_PAGE,
-          if: !isAccountantOnly,
+          if: !isAccountantOnly && account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
         },
         // Host sections
         ...(hasMoneyManagement
@@ -540,7 +543,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.RECEIVING_MONEY,
-                if: !isAccountantOnly,
+                if: !isAccountantOnly && isReceiveContributionsSupported,
               },
               {
                 section: ALL_SECTIONS.SENDING_MONEY,
@@ -593,7 +596,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.GIFT_CARDS,
-          if: ['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS) && !isAccountantOnly,
+          if: isFeatureEnabled(account, FEATURES.EMIT_GIFT_CARDS) && !isAccountantOnly,
         },
         // Sections for individual accounts
         {
@@ -613,6 +616,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.COLLECTIVE_GOALS,
           if:
             !isAccountantOnly &&
+            account.features[FEATURES.COLLECTIVE_GOALS] !== 'UNSUPPORTED' &&
             (!isUndefined(account.settings?.collectivePage?.showGoals) ||
               isOneOfTypes(account, [COLLECTIVE, PROJECT]) ||
               (isOrganization && hasMoneyManagement && !hasHosting)),
@@ -624,11 +628,15 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.CUSTOM_EMAIL,
-          if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) && !isAccountantOnly,
+          if:
+            isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) && !isAccountantOnly && isReceiveContributionsSupported,
         },
         {
           section: ALL_SECTIONS.WIDGETS,
-          if: isOneOfTypes(account, [COLLECTIVE, PROJECT, FUND]) && !isAccountantOnly,
+          if:
+            isOneOfTypes(account, [COLLECTIVE, PROJECT, FUND]) &&
+            !isAccountantOnly &&
+            account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
         },
         {
           section: ALL_SECTIONS.EXPORTS,

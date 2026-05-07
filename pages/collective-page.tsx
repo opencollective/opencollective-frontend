@@ -29,6 +29,7 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '@/components/contribute-ca
 import GuestUserProfile from '@/components/GuestUserProfile';
 import IncognitoUserCollective from '@/components/IncognitoUserCollective';
 import OnboardingModal from '@/components/onboarding-modal/OnboardingModal';
+import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 
 import Custom404 from './404';
 
@@ -132,6 +133,8 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
       return <IncognitoUserCollective collective={collective} />;
     } else if (collective.isGuest) {
       return <GuestUserProfile account={collective} />;
+    } else if (collective.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+      return <PageFeatureNotSupported />;
     }
   }
 

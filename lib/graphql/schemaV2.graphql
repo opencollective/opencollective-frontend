@@ -237,6 +237,11 @@ interface Account {
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -3071,6 +3076,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -4092,7 +4102,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -7464,6 +7473,7 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
+  PUBLIC_PROFILE: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -9736,6 +9746,11 @@ type Bot implements Account {
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -10759,7 +10774,6 @@ type Bot implements Account {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 }
 
@@ -10814,6 +10828,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
 
   """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
@@ -11839,7 +11858,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -12476,6 +12494,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -13499,7 +13522,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -13853,6 +13875,11 @@ type Individual implements Account {
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
 
   """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
@@ -14876,7 +14903,6 @@ type Individual implements Account {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -15258,6 +15284,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
 
   """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
@@ -16281,7 +16312,6 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -16757,6 +16787,11 @@ type Vendor implements Account & AccountWithContributions {
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
 
   """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
@@ -17782,7 +17817,6 @@ type Vendor implements Account & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -21092,6 +21126,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -22115,7 +22154,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -22329,6 +22367,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -23352,7 +23395,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -25372,16 +25414,6 @@ type Mutation {
   Remove the given payout method. Scope: "expenses".
   """
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
-
-  """
-  Restore the given payout method. Scope: "expenses".
-  """
-  restorePayoutMethod(
-    """
-    Payout Method reference
-    """
-    payoutMethod: PayoutMethodReferenceInput!
-  ): PayoutMethod! @deprecated(reason: "2025-02-10: Payout methods cannot be restored.")
   editPayoutMethod(
     """
     Payout Method reference

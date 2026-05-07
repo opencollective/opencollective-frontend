@@ -15,11 +15,13 @@ import {
 import { Button } from '@/components/ui/Button';
 
 import type { WelcomeOrganizationQuery } from './graphql/types/v2/graphql';
+import { FEATURES } from './allowed-features';
 import { hasAccountMoneyManagement } from './collective';
 import type LoggedInUser from './LoggedInUser';
 
 export type Step = {
   id?: string;
+  if?: (account: WelcomeOrganizationQuery['account']) => boolean;
   title: string | ReactNode;
   completed: boolean;
   description: string | ReactNode;
@@ -41,7 +43,6 @@ type MakeStepParams = {
 type MakeStep = (params: MakeStepParams) => Step;
 
 export type Category = {
-  id: string;
   image: ReactNode;
   title: string | ReactNode;
   description: string | ReactNode;
@@ -49,6 +50,7 @@ export type Category = {
   className?: string;
   steps?: Array<MakeStep>;
   onClick?: () => void;
+  if?: (account: WelcomeOrganizationQuery['account']) => boolean;
 };
 
 const RedirectButton = ({
@@ -267,6 +269,7 @@ const ALL_STEPS = {
   profilePage: ({ account, router }) => ({
     id: 'profile-page',
     title: <FormattedMessage defaultMessage="Create your public profile page" id="SetupGuide.PublicProfile" />,
+    if: (account: WelcomeOrganizationQuery['account']) => !account.isPrivate,
     description: (
       <FormattedMessage
         defaultMessage="Your public profile lets the world know you are active on the platform. It tells your story with a written description of your {type, select, ORGANIZATION {Organization} COLLECTIVE {Collective} other {Account}}, your mission and what are your goals using the platform."
@@ -407,6 +410,8 @@ const ALL_STEPS = {
   }),
   contributionPolicy: ({ account, router }) => ({
     title: <FormattedMessage defaultMessage="Set your contribution policy" id="SetupGuide.ContributionPolicy" />,
+    if: (account: WelcomeOrganizationQuery['account']) =>
+      account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED',
     description: (
       <FormattedMessage
         defaultMessage="Describe your contribution policy to align expectations and build trust with contributors."
@@ -463,6 +468,7 @@ const ALL_STEPS = {
   }),
   hostApplications: ({ account, router }) => ({
     title: <FormattedMessage defaultMessage="Enable Collective applications" id="SetupGuide.HostApplications" />,
+    if: (account: WelcomeOrganizationQuery['account']) => !account.isPrivate,
     description: (
       <FormattedMessage
         defaultMessage="Open your doors to Collectives. Interested groups will be able to submit applications from your public profile page."
@@ -611,7 +617,7 @@ const ALL_STEPS = {
   }),
 } as const;
 
-export const ORGANIZATION_CATEGORIES = {
+export const ORGANIZATION_CATEGORIES: Record<string, Category> = {
   platformBasics: {
     image: <Image src="/static/images/welcome/planets.png" alt="PlatformBasics" width={40} height={40} />,
     title: <FormattedMessage defaultMessage="Platform Basics" id="Welcome.Organization.PlatformBasics" />,
@@ -653,6 +659,7 @@ export const ORGANIZATION_CATEGORIES = {
       />
     ),
     steps: [ALL_STEPS.moneyManagement, ALL_STEPS.stripe, ALL_STEPS.inviteAdmins, ALL_STEPS.contributionPolicy],
+    if: (account: WelcomeOrganizationQuery['account']) => !account.isPrivate,
   },
   expenseAutomations: {
     className: 'bg-yellow-50',
@@ -710,10 +717,11 @@ export const ORGANIZATION_CATEGORIES = {
   },
 };
 
-export const COLLECTIVE_CATEGORIES = {
+export const COLLECTIVE_CATEGORIES: Record<string, Category> = {
   setupProfile: {
     image: <Image src="/static/images/welcome/eye.png" alt="SetupProfile" width={40} height={40} />,
     title: <FormattedMessage defaultMessage="Setup Public Profile" id="Welcome.Collective.SetupProfile" />,
+    if: (account: WelcomeOrganizationQuery['account']) => account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
     description: (
       <FormattedMessage
         defaultMessage="Customise your public profile and increase discoverability"
@@ -731,6 +739,8 @@ export const COLLECTIVE_CATEGORIES = {
   },
   fundraise: {
     className: 'bg-yellow-50',
+    if: (account: WelcomeOrganizationQuery['account']) =>
+      account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED',
     image: <Image src="/static/images/welcome/jar.png" alt="FundRaise" width={42} height={40} />,
     title: <FormattedMessage defaultMessage="Fundraise" id="Welcome.Collective.Fundraise" />,
     description: (
@@ -767,7 +777,7 @@ export const COLLECTIVE_CATEGORIES = {
   },
 };
 
-export const INDIVIDUAL_CATEGORIES = {
+export const INDIVIDUAL_CATEGORIES: Record<string, Category> = {
   submitExpense: {
     image: <Image src="/static/images/welcome/planets.png" alt="PlatformBasics" width={40} height={40} />,
     title: <FormattedMessage defaultMessage="Submit expenses" id="Welcome.Individual.SubmitExpenses" />,

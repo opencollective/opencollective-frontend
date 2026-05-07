@@ -36,6 +36,7 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
           legacyId
           type
           slug
+          isPrivate
           name
           currency
           members {
@@ -198,7 +199,7 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
             />
           </p>
         )}
-        {collective?.stats?.consolidatedBalance.valueInCents === 0 && (
+        {collective?.stats?.consolidatedBalance.valueInCents === 0 && !collective.isPrivate && (
           <div className="mt-2 flex">
             <div>
               <Button variant="outline" size="lg" onClick={() => setIsConfirmingLeaveHost(true)}>
@@ -225,11 +226,15 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
           <LeaveHostModal account={collective} host={host} onClose={() => setIsConfirmingLeaveHost(false)} />
         )}
       </div>
-      <StyledHr my={4} />
-      <h2 className="mb-3 font-bold">
-        <FormattedMessage defaultMessage="Applications" id="DqD1yK" />
-      </h2>
-      <HostApplicationRequests accountSlug={collective?.slug} />
+      {!collective.isPrivate && (
+        <React.Fragment>
+          <StyledHr my={4} />
+          <h2 className="mb-3 font-bold">
+            <FormattedMessage defaultMessage="Applications" id="DqD1yK" />
+          </h2>
+          <HostApplicationRequests accountSlug={collective?.slug} />
+        </React.Fragment>
+      )}
     </div>
   );
 }

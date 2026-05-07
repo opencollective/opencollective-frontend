@@ -24,7 +24,7 @@ import { AccountTodoList } from './TodoList';
 import { useSetupGuide } from './useSetupGuide';
 import { WelcomeIndividual } from './Welcome';
 
-const Home = ({ accountSlug }: DashboardSectionProps) => {
+const Home = ({ accountSlug, account }: DashboardSectionProps) => {
   const router = useRouter();
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showWelcomeGuide, handleSetupGuideToggle] = useSetupGuide();
@@ -59,7 +59,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
             </DropdownMenu>
           }
         />
-        <WelcomeIndividual open={showWelcomeGuide} setOpen={handleSetupGuideToggle} />
+        <WelcomeIndividual open={showWelcomeGuide} setOpen={handleSetupGuideToggle} account={account} />
         <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
           <AccountTodoList />
           <div className="space-y-3">
