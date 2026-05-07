@@ -322,7 +322,7 @@ class ConversationPage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account || isHiddenAccount(data.account)) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError()} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }

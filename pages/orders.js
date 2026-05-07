@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
+import { isHiddenAccount } from '@/lib/collective';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
@@ -9,6 +10,8 @@ import { Box } from '../components/Grid';
 import OrdersWithData from '../components/orders/OrdersWithData';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
+
+import Custom404 from './404';
 
 class OrdersPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
@@ -29,6 +32,12 @@ class OrdersPage extends React.Component {
   render() {
     const { slug, data, LoggedInUser } = this.props;
     const collective = data?.account;
+    if (data && !data.loading) {
+      if (!data.account || isHiddenAccount(data.account)) {
+        return <Custom404 />;
+      }
+    }
+
     return (
       <Page>
         {(data?.loading || data?.account) && (

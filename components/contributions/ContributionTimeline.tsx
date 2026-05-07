@@ -88,9 +88,9 @@ export function getTransactionsUrl(
   let route = `/${order.toAccount.slug}/transactions`;
   if (LoggedInUser.isSelf(order.fromAccount)) {
     route = getDashboardRoute(order.fromAccount, 'transactions');
-  } else if ('host' in order.toAccount && LoggedInUser.canSeeAdminPanel(order.toAccount.host)) {
+  } else if ('host' in order.toAccount && LoggedInUser.canSeeDashboard(order.toAccount.host)) {
     route = getDashboardRoute(order.toAccount.host, 'host-transactions');
-  } else if (LoggedInUser.canSeeAdminPanel(order.toAccount)) {
+  } else if (LoggedInUser.canSeeDashboard(order.toAccount)) {
     route = getDashboardRoute(order.toAccount, 'transactions');
   }
 

@@ -7,10 +7,11 @@ import { FormattedMessage } from 'react-intl';
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/graphql';
+import type { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/schema';
 
+import FeatureNotSupported from '@/components/FeatureNotSupported';
 import { getI18nLink } from '@/components/I18nFormatters';
 import Stripe from '@/components/icons/Stripe';
-import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 import Loading from '../../Loading';
@@ -27,15 +28,14 @@ const ReceivingMoney = ({
 }: {
   collective: Pick<Account, 'type' | 'slug' | 'isHost' | 'currency'> & {
     connectedAccounts: Pick<ConnectedAccount, 'service'>[];
+    features: {
+      [FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS]: CollectiveFeatureStatus;
+    };
   };
 }) => {
   const { data, loading, refetch } = useQuery(editCollectiveBankTransferHostQuery, {
     variables: { slug: collective.slug },
   });
-
-  if (!hasAccountMoneyManagement(collective)) {
-    return <PageFeatureNotSupported />;
-  }
 
   const host = data?.host;
   const manualPaymentProviders = host?.manualPaymentProviders || [];
@@ -43,6 +43,11 @@ const ReceivingMoney = ({
 
   if (loading) {
     return <Loading />;
+  } else if (
+    !hasAccountMoneyManagement(collective) ||
+    collective.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] === 'UNSUPPORTED'
+  ) {
+    return <FeatureNotSupported />;
   }
 
   return (

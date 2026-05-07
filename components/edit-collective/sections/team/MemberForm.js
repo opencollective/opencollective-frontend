@@ -33,7 +33,7 @@ const memberFormMessages = defineMessages({
 });
 
 const MemberForm = props => {
-  const { intl, member, collectiveImg, bindSubmitForm, triggerSubmit } = props;
+  const { intl, member, collectiveImg, bindSubmitForm, triggerSubmit, isPrivateAccount } = props;
 
   const [memberRole, setMemberRole] = React.useState(member?.role || roles.ADMIN);
 
@@ -67,6 +67,10 @@ const MemberForm = props => {
     }
     return errors;
   };
+
+  const supportedRoles = isPrivateAccount
+    ? [roles.ADMIN, roles.ACCOUNTANT]
+    : [roles.ADMIN, roles.MEMBER, roles.COMMUNITY_MANAGER, roles.ACCOUNTANT];
 
   return (
     <Flex flexDirection="column" justifyContent="center">
@@ -114,7 +118,7 @@ const MemberForm = props => {
                         form.setFieldValue(field.name, value);
                         setMemberRole(value);
                       }}
-                      options={getOptions([roles.ADMIN, roles.MEMBER, roles.COMMUNITY_MANAGER, roles.ACCOUNTANT])}
+                      options={getOptions(supportedRoles)}
                     />
                     {hasRoleDescription(memberRole) && (
                       <div className="mt-2 gap-1 text-xs text-muted-foreground">

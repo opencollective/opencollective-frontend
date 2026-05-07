@@ -106,26 +106,28 @@ const FiscalHost = ({ account }) => {
         {({ handleSubmit, setFieldValue, values, dirty }) => {
           return (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <Card className="flex flex-row items-center justify-between p-4">
-                <div>
-                  <h1 className="font-bold">
-                    <FormattedMessage defaultMessage="Open to Applications" id="collective.application.label" />
-                  </h1>
-                  <p className="text-sm text-muted-foreground">
-                    <FormattedMessage
-                      defaultMessage="Enable new collectives to apply to join your fiscal host."
-                      id="FiscalHost.OpenToApplications.Description"
-                    />
-                  </p>
-                </div>
-                <Switch
-                  name="apply"
-                  checked={values.apply}
-                  onCheckedChange={checked => {
-                    setFieldValue('apply', checked);
-                  }}
-                />
-              </Card>
+              {!account.isPrivate && (
+                <Card className="flex flex-row items-center justify-between p-4">
+                  <div>
+                    <h1 className="font-bold">
+                      <FormattedMessage defaultMessage="Open to Applications" id="collective.application.label" />
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                      <FormattedMessage
+                        defaultMessage="Enable new collectives to apply to join your fiscal host."
+                        id="FiscalHost.OpenToApplications.Description"
+                      />
+                    </p>
+                  </div>
+                  <Switch
+                    name="apply"
+                    checked={values.apply}
+                    onCheckedChange={checked => {
+                      setFieldValue('apply', checked);
+                    }}
+                  />
+                </Card>
+              )}
               <Card className="flex flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -183,31 +185,38 @@ const FiscalHost = ({ account }) => {
                   name="tos"
                   hint={
                     <FormattedMessage
-                      defaultMessage="Link the terms and conditions under which your Host collects and holds funds. This appears on your public profile page and application form."
+                      defaultMessage="Link the terms and conditions under which your Host collects and holds funds.{isPrivate, select, false {This appears on your public profile page and application form.} other {}}"
                       id="FiscalHost.ToS.description"
+                      values={{
+                        isPrivate: account.isPrivate.toString(),
+                      }}
                     />
                   }
                 />
               </Card>
 
-              <div className="mt-4 flex w-full items-center">
-                <h1 className="grow-0 text-xl font-bold whitespace-nowrap">
-                  <FormattedMessage defaultMessage="Application Instructions" id="FiscalHost.Instructions" />
-                </h1>
-                <Separator className="my-1 ml-2 w-fit grow" />
-              </div>
+              {!account.isPrivate && (
+                <div>
+                  <div className="mt-4 flex w-full items-center">
+                    <h1 className="grow-0 text-xl font-bold whitespace-nowrap">
+                      <FormattedMessage defaultMessage="Application Instructions" id="FiscalHost.Instructions" />
+                    </h1>
+                    <Separator className="my-1 ml-2 w-fit grow" />
+                  </div>
 
-              <FormField
-                name="applyMessage"
-                hint={
-                  <FormattedMessage
-                    defaultMessage="These instructions appear on the application form (1000 character max)"
-                    id="FiscalHost.ApplyMessage.hint"
-                  />
-                }
-              >
-                {({ field }) => <Textarea className="min-h-32" {...field} />}
-              </FormField>
+                  <FormField
+                    name="applyMessage"
+                    hint={
+                      <FormattedMessage
+                        defaultMessage="These instructions appear on the application form (1000 character max)"
+                        id="FiscalHost.ApplyMessage.hint"
+                      />
+                    }
+                  >
+                    {({ field }) => <Textarea className="min-h-32" {...field} />}
+                  </FormField>
+                </div>
+              )}
 
               <div className="mt-4 flex flex-col gap-2 sm:justify-stretch">
                 <Button className="grow" type="submit" loading={submitting} disabled={!dirty}>

@@ -331,155 +331,207 @@ const Policies = ({ collective }) => {
       {error && <MessageBoxGraphqlError error={error} />}
       <form onSubmit={formik.handleSubmit} className="space-y-12">
         <Container>
-          <SettingsSectionTitle>
-            <FormattedMessage defaultMessage="Contributions" id="Contributions" />
-          </SettingsSectionTitle>
-
-          <Container mb={4}>
-            <div className="mb-2 font-bold">{formatMessage(messages['contributionPolicy.label'])}</div>
-            <StyledInputField
-              name="contributionPolicy"
-              htmlFor="contributionPolicy"
-              error={formik.errors.contributionPolicy}
-              disabled={isSubmittingSettings}
-            >
-              {inputProps => (
-                <RichTextEditor
-                  withBorders
-                  showCount
-                  maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
-                  error={formik.errors.contributionPolicy}
-                  version="simplified"
-                  editorMinHeight="12.5rem"
-                  editorMaxHeight={500}
-                  id={inputProps.id}
-                  inputName={inputProps.name}
-                  onChange={formik.handleChange}
-                  placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
-                  defaultValue={formik.values.contributionPolicy || ''}
-                  fontSize="14px"
-                />
-              )}
-            </StyledInputField>
-
-            {/* Mandatory Fields: For Organizations */}
-            {hasMoneyManagement && (
-              <div className="mt-4 flex flex-col gap-2">
-                <div className="font-bold">
-                  <FormattedMessage defaultMessage="Mandatory Information" id="IuoUBR" />
-                </div>
-                <div className="mb-2 text-sm text-gray-500">
-                  <FormattedMessage
-                    defaultMessage="Activate the fields that you want as mandatory information. Once activated, you can set up the threshold for the individual fields."
-                    id="erAK+p"
+          {collective.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED' && (
+            <Container mb={4}>
+              <SettingsSectionTitle>
+                <FormattedMessage defaultMessage="Contributions" id="Contributions" />
+              </SettingsSectionTitle>
+              <div className="mb-2 font-bold">{formatMessage(messages['contributionPolicy.label'])}</div>
+              <StyledInputField
+                name="contributionPolicy"
+                htmlFor="contributionPolicy"
+                error={formik.errors.contributionPolicy}
+                disabled={isSubmittingSettings}
+              >
+                {inputProps => (
+                  <RichTextEditor
+                    withBorders
+                    showCount
+                    maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
+                    error={formik.errors.contributionPolicy}
+                    version="simplified"
+                    editorMinHeight="12.5rem"
+                    editorMaxHeight={500}
+                    id={inputProps.id}
+                    inputName={inputProps.name}
+                    onChange={formik.handleChange}
+                    placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
+                    defaultValue={formik.values.contributionPolicy || ''}
+                    fontSize="14px"
                   />
-                </div>
-                <div className="flex flex-col rounded-2xl border p-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <h1 className="text-sm/6 font-bold">
-                      <FormattedMessage defaultMessage="Legal Name" id="LegalName" />
-                    </h1>
-                    <Switch
-                      name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-legalName`}
-                      checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)}
-                      onCheckedChange={checked => {
-                        const newPolicies = cloneDeep(formik.values.policies);
-                        if (checked) {
-                          set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.legalName', 250e2);
-                        } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)) {
-                          delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName;
-                        }
-                        formik.setFieldValue('policies', newPolicies);
-                      }}
+                )}
+              </StyledInputField>
+
+              {/* Rejected categories: For everyone */}
+              <Container mt={4}>
+                <SettingsSectionTitle>
+                  <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
+                </SettingsSectionTitle>
+                <P mb={2}>
+                  <FormattedMessage
+                    id="editCollective.rejectCategories.description"
+                    defaultMessage="Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)"
+                  />
+                </P>
+                <StyledSelect
+                  inputId="policy-select"
+                  isSearchable={false}
+                  isLoading={loading}
+                  placeholder={formatMessage(messages['rejectCategories.placeholder'])}
+                  minWidth={300}
+                  maxWidth={600}
+                  options={selectOptions}
+                  value={selected}
+                  onChange={selectedOptions => setSelected(selectedOptions)}
+                  isMulti
+                />
+              </Container>
+
+              {/* Allow collective admins to refund: For Host Organizations */}
+              {hasHosting && (
+                <Container mt={4}>
+                  <SettingsSectionTitle>
+                    <FormattedMessage defaultMessage="Refunds" id="pXQSzm" />
+                  </SettingsSectionTitle>
+
+                  <StyledCheckbox
+                    name={`checkbox-COLLECTIVE_ADMINS_CAN_REFUND`}
+                    label={
+                      <FormattedMessage
+                        defaultMessage="Allow collective admins to refund contributions for up to 30 days after the transaction date."
+                        id="ctV8Cf"
+                      />
+                    }
+                    checked={formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND}
+                    onChange={() =>
+                      formik.setFieldValue('policies', {
+                        ...formik.values.policies,
+                        COLLECTIVE_ADMINS_CAN_REFUND: !formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND,
+                      })
+                    }
+                  />
+                </Container>
+              )}
+
+              {/* Mandatory Information: For Organizations */}
+              {hasMoneyManagement && (
+                <div className="mt-6 flex flex-col gap-2">
+                  <div className="font-bold">
+                    <FormattedMessage defaultMessage="Mandatory Information" id="IuoUBR" />
+                  </div>
+                  <div className="mb-2 text-sm text-gray-500">
+                    <FormattedMessage
+                      defaultMessage="Activate the fields that you want as mandatory information. Once activated, you can set up the threshold for the individual fields."
+                      id="erAK+p"
                     />
                   </div>
-                  <Collapsible open={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)}>
-                    <CollapsibleContent className="animate-none! pt-2">
-                      <p className="text-sm">
-                        <FormattedMessage
-                          defaultMessage="Require the contributor to provide their legal name when they contribute more than:"
-                          id="MKoNvi"
-                        />
-                      </p>
-                      <StyledInputAmount
-                        className="mt-2 sm:max-w-1/3"
-                        maxWidth="11em"
-                        suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
-                        disabled={isSettingPolicies || authorCannotApproveExpenseEnforcedByHost}
-                        currency={data?.account?.currency}
-                        currencyDisplay="CODE"
-                        value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName || 250e2}
-                        onChange={value =>
-                          !isNil(value) &&
-                          formik.setFieldValue('policies', {
-                            ...formik.values.policies,
-                            ['CONTRIBUTOR_INFO_THRESHOLDS']: {
-                              ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
-                              legalName: value || 0,
-                            },
-                          })
-                        }
+                  <div className="flex flex-col rounded-2xl border p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <h1 className="text-sm/6 font-bold">
+                        <FormattedMessage defaultMessage="Legal Name" id="LegalName" />
+                      </h1>
+                      <Switch
+                        name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-legalName`}
+                        checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)}
+                        onCheckedChange={checked => {
+                          const newPolicies = cloneDeep(formik.values.policies);
+                          if (checked) {
+                            set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.legalName', 250e2);
+                          } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)) {
+                            delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName;
+                          }
+                          formik.setFieldValue('policies', newPolicies);
+                        }}
                       />
-                    </CollapsibleContent>
-                  </Collapsible>
-                </div>
-                <div className="flex flex-col rounded-2xl border p-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <h1 className="text-sm/6 font-bold">
-                      <FormattedMessage defaultMessage="Physical Address" id="OQhu3R" />
-                    </h1>
-
-                    <Switch
-                      name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-address`}
-                      checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)}
-                      onCheckedChange={checked => {
-                        const newPolicies = cloneDeep(formik.values.policies);
-                        if (checked) {
-                          set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.address', 500e2);
-                        } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address)) {
-                          delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address;
-                        }
-                        formik.setFieldValue('policies', newPolicies);
-                      }}
-                    />
+                    </div>
+                    <Collapsible open={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)}>
+                      <CollapsibleContent className="animate-none! pt-2">
+                        <p className="text-sm">
+                          <FormattedMessage
+                            defaultMessage="Require the contributor to provide their legal name when they contribute more than:"
+                            id="MKoNvi"
+                          />
+                        </p>
+                        <StyledInputAmount
+                          className="mt-2 sm:max-w-1/3"
+                          maxWidth="11em"
+                          suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
+                          disabled={isSettingPolicies || authorCannotApproveExpenseEnforcedByHost}
+                          currency={data?.account?.currency}
+                          currencyDisplay="CODE"
+                          value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName || 250e2}
+                          onChange={value =>
+                            !isNil(value) &&
+                            formik.setFieldValue('policies', {
+                              ...formik.values.policies,
+                              ['CONTRIBUTOR_INFO_THRESHOLDS']: {
+                                ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
+                                legalName: value || 0,
+                              },
+                            })
+                          }
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
+                  <div className="flex flex-col rounded-2xl border p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <h1 className="text-sm/6 font-bold">
+                        <FormattedMessage defaultMessage="Physical Address" id="OQhu3R" />
+                      </h1>
 
-                  <Collapsible open={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)}>
-                    <CollapsibleContent className="animate-none! pt-2">
-                      <p className="text-sm">
-                        <FormattedMessage
-                          defaultMessage="Require the contributor to provide their physical address when they contribute more than:"
-                          id="pKF7TO"
-                        />
-                      </p>
-                      <StyledInputAmount
-                        className="mt-2 sm:max-w-1/3"
-                        suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
-                        maxWidth="11em"
-                        disabled={
-                          isSettingPolicies ||
-                          authorCannotApproveExpenseEnforcedByHost ||
-                          isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)
-                        }
-                        currency={data?.account?.currency}
-                        currencyDisplay="CODE"
-                        value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address || 500e2}
-                        onChange={value =>
-                          formik.setFieldValue('policies', {
-                            ...formik.values.policies,
-                            ['CONTRIBUTOR_INFO_THRESHOLDS']: {
-                              ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
-                              address: value || 0,
-                            },
-                          })
-                        }
+                      <Switch
+                        name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-address`}
+                        checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)}
+                        onCheckedChange={checked => {
+                          const newPolicies = cloneDeep(formik.values.policies);
+                          if (checked) {
+                            set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.address', 500e2);
+                          } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address)) {
+                            delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address;
+                          }
+                          formik.setFieldValue('policies', newPolicies);
+                        }}
                       />
-                    </CollapsibleContent>
-                  </Collapsible>
+                    </div>
+
+                    <Collapsible open={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)}>
+                      <CollapsibleContent className="animate-none! pt-2">
+                        <p className="text-sm">
+                          <FormattedMessage
+                            defaultMessage="Require the contributor to provide their physical address when they contribute more than:"
+                            id="pKF7TO"
+                          />
+                        </p>
+                        <StyledInputAmount
+                          className="mt-2 sm:max-w-1/3"
+                          suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
+                          maxWidth="11em"
+                          disabled={
+                            isSettingPolicies ||
+                            authorCannotApproveExpenseEnforcedByHost ||
+                            isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)
+                          }
+                          currency={data?.account?.currency}
+                          currencyDisplay="CODE"
+                          value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address || 500e2}
+                          onChange={value =>
+                            formik.setFieldValue('policies', {
+                              ...formik.values.policies,
+                              ['CONTRIBUTOR_INFO_THRESHOLDS']: {
+                                ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
+                                address: value || 0,
+                              },
+                            })
+                          }
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
                 </div>
-              </div>
-            )}
-          </Container>
+              )}
+            </Container>
+          )}
 
           <SettingsSectionTitle id="expenses">{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>
 
@@ -1042,56 +1094,6 @@ const Policies = ({ collective }) => {
           </React.Fragment>
         )}
 
-        {/* Rejected categories: For everyone */}
-        <Container>
-          <SettingsSectionTitle>
-            <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
-          </SettingsSectionTitle>
-          <P mb={2}>
-            <FormattedMessage
-              id="editCollective.rejectCategories.description"
-              defaultMessage="Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)"
-            />
-          </P>
-          <StyledSelect
-            inputId="policy-select"
-            isSearchable={false}
-            isLoading={loading}
-            placeholder={formatMessage(messages['rejectCategories.placeholder'])}
-            minWidth={300}
-            maxWidth={600}
-            options={selectOptions}
-            value={selected}
-            onChange={selectedOptions => setSelected(selectedOptions)}
-            isMulti
-          />
-        </Container>
-
-        {/* Allow collective admins to refund: For Host Organizations */}
-        {hasHosting && (
-          <Container>
-            <SettingsSectionTitle>
-              <FormattedMessage defaultMessage="Refunds" id="pXQSzm" />
-            </SettingsSectionTitle>
-
-            <StyledCheckbox
-              name={`checkbox-COLLECTIVE_ADMINS_CAN_REFUND`}
-              label={
-                <FormattedMessage
-                  defaultMessage="Allow collective admins to refund contributions for up to 30 days after the transaction date."
-                  id="ctV8Cf"
-                />
-              }
-              checked={formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND}
-              onChange={() =>
-                formik.setFieldValue('policies', {
-                  ...formik.values.policies,
-                  COLLECTIVE_ADMINS_CAN_REFUND: !formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND,
-                })
-              }
-            />
-          </Container>
-        )}
         <div className="mt-10 flex w-full justify-stretch">
           <Button
             data-cy="submit-policy-btn"

@@ -26,6 +26,10 @@ const createCollectiveHostQuery = gql`
       isOpenToApplications
       isSuspended
       termsUrl
+      features {
+        id
+        PUBLIC_PROFILE
+      }
       policies {
         id
         COLLECTIVE_MINIMUM_ADMINS {
@@ -47,10 +51,8 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
 
   if (loading || loadingLoggedInUser) {
     return <ErrorPage loading={true} />;
-  }
-
-  if (!skipQuery && (!data || !data.host || isHiddenAccount(data.host))) {
-    return <ErrorPage error={generateNotFoundError(slug)} data={{ error }} log={false} />;
+  } else if (!skipQuery && (!data || !data.host || isHiddenAccount(data.host))) {
+    return <ErrorPage error={generateNotFoundError()} data={{ error }} log={false} />;
   }
 
   return (

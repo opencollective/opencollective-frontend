@@ -86,15 +86,17 @@ const mockCollective = {
   currency: 'USD',
   connectedAccounts: [],
   settings: {},
+  features: { RECEIVE_FINANCIAL_CONTRIBUTIONS: 'ACTIVE' },
 };
 
 describe('ReceivingMoney', () => {
   describe('Feature not supported', () => {
-    it('renders PageFeatureNotSupported when account does not have money management', () => {
+    it('renders PageFeatureNotSupported when account does not have money management', async () => {
       const collectiveWithoutFeature = {
         ...mockCollective,
         hasMoneyManagement: false,
         isHost: false,
+        features: { RECEIVE_FINANCIAL_CONTRIBUTIONS: 'UNSUPPORTED' },
       };
 
       render(
@@ -105,7 +107,12 @@ describe('ReceivingMoney', () => {
         ),
       );
 
-      expect(screen.getByText(/Page inaccessible/i)).toBeInTheDocument();
+      // Wait for `.Loading` div to be gone
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading-grid')).not.toBeInTheDocument();
+      });
+
+      expect(screen.getByText(/Access denied/i)).toBeInTheDocument();
     });
   });
 

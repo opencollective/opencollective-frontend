@@ -28,6 +28,7 @@ export const teamSectionQuery = gql`
       legacyId
       slug
       isFrozen
+      isPrivate
       type
       imageUrl(height: 256)
       ... on AccountWithParent {

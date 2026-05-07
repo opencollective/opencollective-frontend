@@ -4,7 +4,7 @@ import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata } from '../lib/collective';
+import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { CollectiveType } from '../lib/constants/collectives';
 import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
@@ -95,7 +95,7 @@ const TierPage = (pageProps: InferGetServerSidePropsType<typeof getServerSidePro
   if (!loading) {
     if (error) {
       return <ErrorPage data={data} error={error} />;
-    } else if (!data?.Tier || !collective || collectiveSlug !== collective.slug) {
+    } else if (!data?.Tier || !collective || collectiveSlug !== collective.slug || isHiddenAccount(collective)) {
       return <ErrorPage data={data} error={{ type: 'NOT_FOUND' }} />;
     }
   }
