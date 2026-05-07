@@ -900,7 +900,7 @@ interface Account {
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -3786,7 +3786,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -5907,6 +5907,11 @@ enum LastCommentBy {
   Expense Submitter
   """
   USER
+
+  """
+  Last comment author is not an admin of the expense payee (FromCollectiveId)
+  """
+  NON_FROM_ACCOUNT_ADMIN
 
   """
   Fiscal Host Admin
@@ -10981,7 +10986,7 @@ type Bot implements Account {
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -12070,7 +12075,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -13739,7 +13744,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -15127,7 +15132,7 @@ type Individual implements Account {
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -16541,7 +16546,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -19210,7 +19215,7 @@ type Vendor implements Account & AccountWithContributions {
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -20282,7 +20287,7 @@ type Query {
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -23562,7 +23567,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
@@ -24808,7 +24813,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     virtualCards: [VirtualCardReferenceInput]
 
     """
-    Filter expenses by the last user-role who replied to them
+    Filter expenses by the last user-role who replied to them. Requires some admin permissions on expenses.
     """
     lastCommentBy: [LastCommentBy]
 
