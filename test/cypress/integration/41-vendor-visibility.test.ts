@@ -1,7 +1,6 @@
 /* eslint-disable prefer-arrow-callback */
 
-import { gql } from '@apollo/client';
-
+import { fakeTag as gql } from '@/lib/graphql/helpers';
 import type { UseVendorPolicy } from '@/lib/graphql/types/v2/graphql';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from '../support/commands';
