@@ -161,7 +161,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSecti
         }
       />
 
-      <Filterbar {...queryFilter} hideCounts />
+      <Filterbar {...queryFilter} />
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && !transactions?.nodes?.length ? (
