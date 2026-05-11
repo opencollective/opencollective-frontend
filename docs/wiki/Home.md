@@ -22,6 +22,10 @@ Open product ideas, design directions, unresolved questions, and possible paths 
 
 Short dated notes about changes made in the repo, branches used, and where deeper implementation details live.
 
+### [Transformation](./transformation/README.md)
+
+Longer-term redesign and re-architecture work. Tracks pain points observed in the wild and the structural patterns they point to — the material that will eventually shape a fork of Open Collective.
+
 ## Current Snapshot
 
 - Primary active topic: Swish payments, Swish reimbursements, and plugin architecture for Open Collective
