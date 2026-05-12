@@ -10,15 +10,13 @@ import type {
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Skeleton } from '../../../ui/Skeleton';
 
-import { type MonthPeriod, previousPeriod } from './helpers';
+import { type HostedAccountType, type MonthPeriod, previousPeriod } from './helpers';
 import { MetricCards } from './MetricCards';
 import { MonthPicker } from './MonthPicker';
 import { hostMetricsOverviewSectionQuery } from './queries';
 import { TopList, type TopListRow } from './TopList';
 
-type Category = 'COLLECTIVE' | 'FUND';
-
-const ROOT_TYPES: Record<Category, string[]> = {
+const ROOT_TYPES: Record<HostedAccountType, string[]> = {
   COLLECTIVE: ['COLLECTIVE'],
   FUND: ['FUND'],
 };
@@ -34,7 +32,7 @@ const messages = defineMessages({
 
 type HostMetricsOverviewSectionProps = {
   hostSlug: string;
-  category: Category;
+  category: HostedAccountType;
   period: MonthPeriod;
   onPeriodChange: (period: MonthPeriod) => void;
 };

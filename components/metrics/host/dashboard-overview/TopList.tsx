@@ -13,7 +13,7 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { Skeleton } from '../../../ui/Skeleton';
 
-import { hostedAccountDrawerRoute } from './helpers';
+import { hostedAccountDrawerRoute, type HostedAccountType } from './helpers';
 
 type AccountSummary = AccountHoverCardFieldsFragment & {
   imageUrl?: string | null;
@@ -26,7 +26,7 @@ export type TopListRow = {
 
 type TopListProps = {
   hostSlug: string;
-  category: 'COLLECTIVE' | 'FUND';
+  category: HostedAccountType;
   title: React.ReactNode;
   rows: TopListRow[] | undefined;
   loading: boolean;

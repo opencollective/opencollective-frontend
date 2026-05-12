@@ -4,6 +4,8 @@ import dayjs from '@/lib/dayjs';
 
 import { ALL_SECTIONS } from '../../../dashboard/constants';
 
+export type HostedAccountType = 'COLLECTIVE' | 'FUND';
+
 export type MonthPeriod = { from: string; to: string; label: string };
 
 export function monthPeriodFor(date: dayjs.Dayjs, intl: IntlShape, isCurrent = false): MonthPeriod {
@@ -36,7 +38,7 @@ export function previousPeriod(period: MonthPeriod): { from: string; to: string 
 
 export function hostedAccountsRoute(opts: {
   hostSlug: string;
-  category: 'COLLECTIVE' | 'FUND';
+  category: HostedAccountType;
   filter: 'joinedBetween' | 'unhostedBetween' | 'hadActivityBetween' | 'noActivityBetween';
   range: { from: string; to: string };
   drawerAccountId?: string;
@@ -52,7 +54,7 @@ export function hostedAccountsRoute(opts: {
   };
 }
 
-export function hostedAccountDrawerRoute(hostSlug: string, category: 'COLLECTIVE' | 'FUND', accountId: string) {
+export function hostedAccountDrawerRoute(hostSlug: string, category: HostedAccountType, accountId: string) {
   const section = category === 'FUND' ? ALL_SECTIONS.HOSTED_FUNDS : ALL_SECTIONS.HOSTED_COLLECTIVES;
   return {
     pathname: `/dashboard/${hostSlug}/${section}/${accountId}`,

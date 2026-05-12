@@ -7,9 +7,7 @@ import Link from '@/components/Link';
 import { Skeleton } from '../../../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
-import { hostedAccountsRoute, type MonthPeriod, percentChange } from './helpers';
-
-type Category = 'COLLECTIVE' | 'FUND';
+import { hostedAccountsRoute, type HostedAccountType, type MonthPeriod, percentChange } from './helpers';
 
 const messages = defineMessages({
   activeCollectivesLabel: { defaultMessage: 'Active Collectives', id: 'b4gw3f' },
@@ -55,7 +53,7 @@ const messages = defineMessages({
   vsPreviousMonth: { defaultMessage: 'vs prev. month', id: 'HznlHL' },
 });
 
-const cardCopyByCategory = (category: Category) =>
+const cardCopyByCategory = (category: HostedAccountType) =>
   category === 'FUND'
     ? {
         active: { label: messages.activeFundsLabel, body: messages.activeFundsBody },
@@ -72,7 +70,7 @@ const cardCopyByCategory = (category: Category) =>
 
 type MetricCardsProps = {
   hostSlug: string;
-  category: Category;
+  category: HostedAccountType;
   period: MonthPeriod;
   loading: boolean;
   values: {
