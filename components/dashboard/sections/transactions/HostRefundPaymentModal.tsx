@@ -1,9 +1,9 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form, useFormikContext } from 'formik';
-import { ArrowDownRight, ArrowUpRight, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
@@ -34,7 +34,7 @@ import type { BaseModalProps } from '../../../ModalContext';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../ui/Dialog';
-import { Separator } from '../../../ui/Separator';
+import { Switch } from '../../../ui/Switch';
 import { Textarea } from '../../../ui/Textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { useToast } from '../../../ui/useToast';
@@ -199,6 +199,7 @@ type HostRefundPaymentModalProps = BaseModalProps & {
 const HostRefundPaymentFormSchema = z.object({
   cancelRecurringContribution: z.boolean(),
   removeAsContributor: z.boolean(),
+  sendMessage: z.boolean(),
   message: z.string().max(2000).optional(),
   ignoreBalanceCheck: z.boolean(),
 });
@@ -213,6 +214,8 @@ const Section: React.FC<{
 );
 
 type AllocationAccount = React.ComponentProps<typeof AccountHoverCard>['account'];
+type AllocationRole = 'contributor' | 'collective' | 'host' | 'platform' | 'other';
+type AllocationDirection = 'in' | 'out';
 
 type AllocationLine = {
   key: string;
@@ -220,6 +223,8 @@ type AllocationLine = {
   amount: number;
   sortKey?: string;
   kind?: TransactionKind;
+  direction: AllocationDirection;
+  role: AllocationRole;
 };
 
 type AllocationEntry = Pick<
@@ -230,6 +235,7 @@ type AllocationEntry = Pick<
 type AllocationGroupData = {
   key: string;
   account: AllocationAccount | null | undefined;
+  role: AllocationRole;
   lines: AllocationLine[];
   total: number;
 };
@@ -238,7 +244,6 @@ type PrincipalAccount = NonNullable<TransactionData['account'] | TransactionData
 
 type RefundAllocation = {
   currency?: string;
-  principalAccountId?: string;
   principalAccount?: PrincipalAccount | null;
   principalOutflowAmount: number;
   refundAmount: number;
@@ -249,26 +254,131 @@ type RefundAllocation = {
 const getAllocationAccountName = (account: AllocationAccount | null | undefined) =>
   account?.name || account?.slug || account?.id || '';
 
-const getAllocationEntrySortValue = (entry: AllocationGroupData, priorityAccountId?: string) => {
-  if (entry.account?.id === priorityAccountId) {
-    return `0-${getAllocationAccountName(entry.account)}`;
+const getRefundAccounts = (transaction: TransactionData) => {
+  const isCredit = transaction.type === TransactionType.CREDIT;
+
+  return {
+    principalAccount: isCredit ? transaction.account : transaction.oppositeAccount,
+    contributorAccount: isCredit ? transaction.oppositeAccount : transaction.account,
+  };
+};
+
+const getAllocationRole = (
+  account: AllocationAccount | null | undefined,
+  principalAccount: AllocationAccount | null | undefined,
+  contributorAccount: AllocationAccount | null | undefined,
+  host: AllocationAccount | null | undefined,
+): AllocationRole => {
+  if (!account?.id) {
+    return 'other';
   }
 
-  return `1-${getAllocationAccountName(entry.account)}`;
+  if (account.id === contributorAccount?.id) {
+    return 'contributor';
+  } else if (account.id === principalAccount?.id) {
+    return 'collective';
+  } else if (account.id === host?.id) {
+    return 'host';
+  }
+
+  return 'other';
+};
+
+const isPlatformTransactionKind = (kind: TransactionKind | null | undefined) =>
+  [
+    TransactionKind.PLATFORM_TIP,
+    TransactionKind.PLATFORM_TIP_DEBT,
+    TransactionKind.PLATFORM_FEE,
+    TransactionKind.HOST_FEE_SHARE,
+    TransactionKind.HOST_FEE_SHARE_DEBT,
+  ].includes(kind as TransactionKind);
+
+const getLineQualifier = (
+  intl: IntlShape,
+  kind: TransactionKind | undefined,
+  direction: AllocationDirection,
+  role: AllocationRole,
+) => {
+  if (!kind) {
+    return undefined;
+  }
+
+  switch (`${kind}:${direction}:${role}`) {
+    case `${TransactionKind.CONTRIBUTION}:in:contributor`:
+      return intl.formatMessage({ defaultMessage: 'Contribution', id: '0LK5eg' });
+    case `${TransactionKind.CONTRIBUTION}:out:collective`:
+      return intl.formatMessage({
+        defaultMessage: 'Contribution Amount deducted',
+        id: 'SLzvAI',
+      });
+    case `${TransactionKind.HOST_FEE}:in:collective`:
+      return intl.formatMessage({
+        defaultMessage: 'Host fee returned',
+        id: 'bfw5ca',
+      });
+    case `${TransactionKind.HOST_FEE}:out:host`:
+      return intl.formatMessage({
+        defaultMessage: 'Host fee returned to the collective',
+        id: 'sjf07L',
+      });
+    case `${TransactionKind.PAYMENT_PROCESSOR_COVER}:in:collective`:
+      return intl.formatMessage({
+        defaultMessage: 'Payment processor fee covered by host',
+        id: '0sT3hf',
+      });
+    case `${TransactionKind.PAYMENT_PROCESSOR_COVER}:out:host`:
+      return intl.formatMessage({
+        defaultMessage: 'Payment processor cover',
+        id: 'Transaction.kind.PAYMENT_PROCESSOR_COVER',
+      });
+    case `${TransactionKind.PAYMENT_PROCESSOR_FEE}:out:host`:
+      return intl.formatMessage({
+        defaultMessage: 'Payment processor cover',
+        id: 'Transaction.kind.PAYMENT_PROCESSOR_COVER',
+      });
+    case `${TransactionKind.PAYMENT_PROCESSOR_FEE}:in:collective`:
+      return intl.formatMessage({
+        defaultMessage: 'Payment processor fee refunded',
+        id: 'Ff/q7S',
+      });
+    case `${TransactionKind.PAYMENT_PROCESSOR_FEE}:out:platform`:
+      return intl.formatMessage({
+        defaultMessage: 'Payment processor fee',
+        id: 'contribution.paymentFee',
+      });
+    case `${TransactionKind.PLATFORM_TIP}:in:contributor`:
+      return intl.formatMessage({
+        defaultMessage: 'Platform tip',
+        id: 'Transaction.kind.PLATFORM_TIP',
+      });
+    case `${TransactionKind.PLATFORM_TIP}:out:platform`:
+      return intl.formatMessage({
+        defaultMessage: 'Platform tip reversal',
+        id: 'zLk0ik',
+      });
+  }
+
+  if (kind === TransactionKind.TAX) {
+    return direction === 'in'
+      ? intl.formatMessage({ defaultMessage: 'Tax refunded', id: 'GCqf3v' })
+      : intl.formatMessage({ defaultMessage: 'Tax reversal', id: 'unSvmK' });
+  }
+
+  return i18nTransactionKind(intl, kind);
 };
 
 const buildRefundAllocation = (transaction: TransactionData, intl: IntlShape): RefundAllocation => {
   const currency = transaction.amount?.currency ?? transaction.netAmount?.currency;
-  const isCredit = transaction.type === TransactionType.CREDIT;
-  const principalAccount = isCredit ? transaction.account : transaction.oppositeAccount;
-  const contributorAccount = isCredit ? transaction.oppositeAccount : transaction.account;
+  const { principalAccount, contributorAccount } = getRefundAccounts(transaction);
   const groups = new Map<string, AllocationGroupData>();
 
   const addLine = (account: AllocationAccount | null | undefined, line: AllocationLine) => {
     const key = account?.id ?? 'unknown';
+    const role = line.role;
     const group = groups.get(key) ?? {
       key,
       account,
+      role,
       lines: [],
       total: 0,
     };
@@ -289,25 +399,41 @@ const buildRefundAllocation = (transaction: TransactionData, intl: IntlShape): R
         return;
       }
 
-      const sourceAccount = entry.account?.type === AccountType.VENDOR ? entry.account : null;
-      const outflowAccount = sourceAccount && transaction.host ? transaction.host : entry.account;
-      const kindLabel = entry.kind ? i18nTransactionKind(intl, entry.kind) : undefined;
-      const sortKey = entry.kind === TransactionKind.CONTRIBUTION ? '' : (kindLabel ?? '');
+      const outflowAccount =
+        !isPlatformTransactionKind(entry.kind) && entry.account?.type === AccountType.VENDOR && transaction.host
+          ? transaction.host
+          : entry.account;
+      const outflowRole = isPlatformTransactionKind(entry.kind)
+        ? 'platform'
+        : getAllocationRole(outflowAccount, principalAccount, contributorAccount, transaction.host);
+      const inflowRole = getAllocationRole(
+        entry.oppositeAccount,
+        principalAccount,
+        contributorAccount,
+        transaction.host,
+      );
+      const outflowLabel = getLineQualifier(intl, entry.kind ?? undefined, 'out', outflowRole);
+      const inflowLabel = getLineQualifier(intl, entry.kind ?? undefined, 'in', inflowRole);
+      const sortKey = entry.kind === TransactionKind.CONTRIBUTION ? '' : String(inflowLabel ?? outflowLabel ?? '');
       const lineKey = `${entry.id}-${entry.kind ?? 'transaction'}`;
 
       addLine(outflowAccount, {
         key: `${lineKey}-outflow`,
-        qualifier: kindLabel,
+        qualifier: outflowLabel,
         amount: -amount,
         sortKey,
         kind: entry.kind ?? undefined,
+        direction: 'out',
+        role: outflowRole,
       });
       addLine(entry.oppositeAccount, {
         key: `${lineKey}-inflow`,
-        qualifier: kindLabel,
+        qualifier: inflowLabel,
         amount,
         sortKey,
         kind: entry.kind ?? undefined,
+        direction: 'in',
+        role: inflowRole,
       });
     });
 
@@ -317,95 +443,143 @@ const buildRefundAllocation = (transaction: TransactionData, intl: IntlShape): R
 
   const outflow = [...groups.values()]
     .filter(group => group.total < 0)
-    .sort((a, b) =>
-      getAllocationEntrySortValue(a, principalAccount?.id).localeCompare(
-        getAllocationEntrySortValue(b, principalAccount?.id),
-      ),
-    );
+    .sort((a, b) => getAllocationAccountName(a.account).localeCompare(getAllocationAccountName(b.account)));
   const inflow = [...groups.values()]
     .filter(group => group.total > 0)
-    .sort((a, b) =>
-      getAllocationEntrySortValue(a, contributorAccount?.id).localeCompare(
-        getAllocationEntrySortValue(b, contributorAccount?.id),
-      ),
-    );
-  const outflowWithReturnedLines = outflow.map(group => ({
-    ...group,
-    lines: group.lines.map(line => {
-      if (line.amount <= 0 || !line.kind) {
-        return line;
-      }
+    .sort((a, b) => getAllocationAccountName(a.account).localeCompare(getAllocationAccountName(b.account)));
 
-      return {
-        ...line,
-        qualifier: intl.formatMessage(
-          { defaultMessage: '{kind} returned', id: 'HostRefundPayment.Allocation.ReturnedLineQualifier' },
-          { kind: i18nTransactionKind(intl, line.kind) },
-        ),
-      };
-    }),
-  }));
-
-  const principalOutflowGroup = outflow.find(group => group.account?.id === principalAccount?.id);
+  const principalOutflowGroup = outflow.find(group => group.role === 'collective');
 
   return {
     currency,
-    principalAccountId: principalAccount?.id,
     principalAccount,
     principalOutflowAmount: principalOutflowGroup ? Math.abs(principalOutflowGroup.total) : 0,
     refundAmount: inflow.reduce((sum, group) => sum + group.total, 0),
-    outflow: outflowWithReturnedLines,
+    outflow,
     inflow,
   };
 };
 
-const AllocationGroup: React.FC<{
-  account: AllocationAccount | null | undefined;
-  lines: AllocationLine[];
-  currency: string;
-  showBalance?: boolean;
-}> = ({ account, lines, currency, showBalance }) => {
-  const total = lines.reduce((sum, line) => sum + line.amount, 0);
-  const hasQualifiers = lines.some(line => line.qualifier);
-  const getPrefix = (amount: number) => (amount > 0 ? '+' : '');
+const SectionTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
+  <div className={`text-xs font-semibold tracking-wide text-muted-foreground uppercase ${className ?? ''}`}>
+    {children}
+  </div>
+);
 
-  const accountForHoverCard = account ? (showBalance ? account : { ...account, stats: undefined }) : null;
-
+const AccountSummary: React.FC<{ account: AllocationAccount | null | undefined }> = ({ account }) => {
   const accountTrigger = (
     <div className="flex min-w-0 cursor-default items-center gap-2">
       <Avatar collective={account ?? undefined} radius={20} />
-      <div className="min-w-0">
-        <div className="truncate text-sm font-medium">{account?.name || account?.slug}</div>
-      </div>
+      <span className="min-w-0 truncate text-sm font-medium">{getAllocationAccountName(account)}</span>
     </div>
   );
 
+  return account ? <AccountHoverCard account={account} trigger={accountTrigger} /> : accountTrigger;
+};
+
+const ContributionDetail: React.FC<{ transaction: TransactionData; amount: number; currency?: string }> = ({
+  transaction,
+  amount,
+  currency,
+}) => {
+  const { principalAccount, contributorAccount } = getRefundAccounts(transaction);
+
   return (
-    <div>
-      <div className="flex items-center justify-between gap-4">
-        {accountForHoverCard ? (
-          <AccountHoverCard account={accountForHoverCard} trigger={accountTrigger} />
-        ) : (
-          accountTrigger
+    <Section>
+      <SectionTitle className="mb-4">
+        <FormattedMessage defaultMessage="Contribution detail" id="oJIBP2" />
+      </SectionTitle>
+      <div className="flex flex-col gap-3 text-sm">
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-muted-foreground">
+            <FormattedMessage defaultMessage="Contributed by" id="DdgpvU" />
+          </div>
+          <AccountSummary account={contributorAccount} />
+        </div>
+
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-muted-foreground">
+            <FormattedMessage defaultMessage="Contribution to" id="kQwHjA" />
+          </div>
+          <AccountSummary account={principalAccount} />
+        </div>
+
+        {currency && (
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-muted-foreground">
+              <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
+            </div>
+            <div className="text-right font-medium tabular-nums">
+              <FormattedMoneyAmount amount={amount} currency={currency} showCurrencyCode />
+            </div>
+          </div>
         )}
-        <span className="shrink-0 text-sm font-medium tabular-nums">
-          {getPrefix(total)}
-          <FormattedMoneyAmount amount={total} currency={currency} showCurrencyCode={false} />
+
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-muted-foreground">
+            <FormattedMessage defaultMessage="Date" id="expense.incurredAt" />
+          </div>
+          <div className="text-right font-medium">
+            <FormattedDate value={transaction.createdAt} day="numeric" month="long" year="numeric" />
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+};
+
+const AllocationGroupHeading: React.FC<{ group: AllocationGroupData }> = ({ group }) => {
+  if (group.role === 'contributor') {
+    return <FormattedMessage defaultMessage="Amount refunded to contributor" id="AYMOhy" />;
+  } else if (group.role === 'collective') {
+    return <FormattedMessage defaultMessage="Deducted from Collective balance" id="zh1XTV" />;
+  } else if (group.role === 'host') {
+    return <FormattedMessage defaultMessage="Deducted from Host balance" id="W3mNpa" />;
+  } else if (group.role === 'platform') {
+    return <FormattedMessage defaultMessage="Deducted from platform" id="vxQI0/" />;
+  }
+
+  return group.total > 0 ? (
+    <FormattedMessage
+      defaultMessage="Refunded to {account}"
+      id="K5RpBH"
+      values={{ account: getAllocationAccountName(group.account) }}
+    />
+  ) : (
+    <FormattedMessage
+      defaultMessage="Deducted from {account}"
+      id="HBPLC4"
+      values={{ account: getAllocationAccountName(group.account) }}
+    />
+  );
+};
+
+const AllocationGroup: React.FC<{
+  group: AllocationGroupData;
+  currency: string;
+}> = ({ group, currency }) => {
+  const getPrefix = (amount: number) => (amount > 0 ? '+' : '');
+
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between gap-3 text-sm font-semibold">
+        <span>
+          <AllocationGroupHeading group={group} />
+        </span>
+        <span className="shrink-0 tabular-nums">
+          {getPrefix(group.total)}
+          <FormattedMoneyAmount amount={group.total} currency={currency} showCurrencyCode={false} />
         </span>
       </div>
-      {hasQualifiers && (
-        <div className="mt-1 ml-7 flex flex-col gap-0.5">
-          {lines.map(line => (
-            <div key={line.key} className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span className="truncate">{line.qualifier}</span>
-              <span className="shrink-0 tabular-nums">
-                {getPrefix(line.amount)}
-                <FormattedMoneyAmount amount={line.amount} currency={currency} showCurrencyCode={false} />
-              </span>
-            </div>
-          ))}
+      {group.lines.map(line => (
+        <div key={line.key} className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+          <span className="truncate">{line.qualifier}</span>
+          <span className="shrink-0 tabular-nums">
+            {getPrefix(line.amount)}
+            <FormattedMoneyAmount amount={line.amount} currency={currency} showCurrencyCode={false} />
+          </span>
         </div>
-      )}
+      ))}
     </div>
   );
 };
@@ -428,7 +602,19 @@ const HostRefundPaymentForm: React.FC<HostRefundPaymentFormProps> = ({ transacti
   const { values, setFieldValue, isSubmitting } = useFormikContext<HostRefundPaymentFormValues>();
 
   const refundAllocation = React.useMemo(() => buildRefundAllocation(transaction, intl), [intl, transaction]);
-  const { currency, outflow, inflow, principalAccountId, principalAccount, principalOutflowAmount } = refundAllocation;
+  const { currency, refundAmount, outflow, inflow, principalAccount, principalOutflowAmount } = refundAllocation;
+  const allocationGroups = React.useMemo(() => {
+    const orderedGroups = [
+      inflow.find(group => group.role === 'contributor'),
+      outflow.find(group => group.role === 'collective'),
+      outflow.find(group => group.role === 'host'),
+      outflow.find(group => group.role === 'platform'),
+      ...inflow.filter(group => group.role !== 'contributor'),
+      ...outflow.filter(group => !['collective', 'host', 'platform'].includes(group.role)),
+    ];
+
+    return orderedGroups.filter((group): group is AllocationGroupData => Boolean(group && group.total));
+  }, [inflow, outflow]);
 
   const principalBalanceAmount = principalAccount?.stats?.balanceWithBlockedFunds;
   const principalBalanceInCents = principalBalanceAmount?.valueInCents;
@@ -441,133 +627,107 @@ const HostRefundPaymentForm: React.FC<HostRefundPaymentFormProps> = ({ transacti
 
   const submitLabel = (() => {
     if (values.cancelRecurringContribution && values.removeAsContributor) {
-      return (
-        <FormattedMessage defaultMessage="Refund, cancel & remove contributor" id="tcfKDv"  />
-      );
+      return <FormattedMessage defaultMessage="Refund, cancel & remove contributor" id="tcfKDv" />;
     }
     if (values.cancelRecurringContribution) {
-      return <FormattedMessage defaultMessage="Refund & cancel contribution" id="A3w8tJ"  />;
+      return <FormattedMessage defaultMessage="Refund & cancel contribution" id="A3w8tJ" />;
     }
     if (values.removeAsContributor) {
-      return <FormattedMessage defaultMessage="Refund & remove contributor" id="gbYv/S"  />;
+      return <FormattedMessage defaultMessage="Refund & remove contributor" id="gbYv/S" />;
     }
     return <FormattedMessage defaultMessage="Refund" id="Refund" />;
   })();
 
   return (
     <Form className="flex flex-col gap-4">
-      {currency && (outflow.length > 0 || inflow.length > 0) && (
+      <ContributionDetail transaction={transaction} amount={refundAmount} currency={currency} />
+
+      {currency && allocationGroups.length > 0 && (
         <Section>
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                <FormattedMessage defaultMessage="Refund from" id="SVyby7"  />
-                <ArrowDownRight className="size-5 shrink-0 text-red-600" aria-hidden />
-              </div>
-
-              <div className="flex min-w-0 flex-1 flex-col gap-4">
-                {outflow.map(group => (
-                  <AllocationGroup
-                    key={group.key}
-                    account={group.account}
-                    lines={group.lines}
-                    currency={currency}
-                    showBalance={group.account?.id === principalAccountId}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                <FormattedMessage defaultMessage="Refund to" id="BMuEYE" />
-                <ArrowUpRight className="size-5 shrink-0 text-green-600" aria-hidden />
-              </div>
-
-              <div className="flex min-w-0 flex-1 flex-col gap-4">
-                {inflow.map(group => (
-                  <AllocationGroup key={group.key} account={group.account} lines={group.lines} currency={currency} />
-                ))}
-              </div>
-            </div>
+            <SectionTitle>
+              <FormattedMessage defaultMessage="Refund allocation" id="UfZM5J" />
+            </SectionTitle>
+            {allocationGroups.map(group => (
+              <React.Fragment key={group.key}>
+                <AllocationGroup group={group} currency={currency} />
+                {group.role === 'collective' && isInsufficientBalance && principalBalanceCurrency && (
+                  <MessageBox type="warning" withIcon px={3} py={2}>
+                    <div className="flex flex-col gap-3">
+                      <span>
+                        <FormattedMessage
+                          defaultMessage="{collective}'s balance ({balance}) won't cover the {amount} that would be deducted to process this refund."
+                          id="RB/W6s"
+                          values={{
+                            collective: (
+                              <span className="font-medium">{principalAccount?.name || principalAccount?.slug}</span>
+                            ),
+                            balance: (
+                              <span className="font-medium tabular-nums">
+                                <FormattedMoneyAmount
+                                  amount={principalBalanceInCents}
+                                  currency={principalBalanceCurrency}
+                                  showCurrencyCode={false}
+                                />
+                              </span>
+                            ),
+                            amount: (
+                              <span className="font-medium tabular-nums">
+                                <FormattedMoneyAmount
+                                  amount={principalOutflowAmount}
+                                  currency={principalBalanceCurrency}
+                                  showCurrencyCode={false}
+                                />
+                              </span>
+                            ),
+                          }}
+                        />
+                      </span>
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <label className="flex cursor-pointer items-center gap-2">
+                          <Checkbox
+                            checked={values.ignoreBalanceCheck}
+                            onCheckedChange={checked => setFieldValue('ignoreBalanceCheck', checked === true)}
+                            disabled={isSubmitting}
+                          />
+                          <span className="font-medium">
+                            <FormattedMessage defaultMessage="Allow negative balance" id="CcDFSI" />
+                          </span>
+                        </label>
+                        <Tooltip>
+                          <TooltipTrigger
+                            className="inline-flex text-muted-foreground hover:text-foreground"
+                            tabIndex={-1}
+                          >
+                            <Info className="size-3.5" aria-hidden />
+                            <span className="sr-only">
+                              <FormattedMessage defaultMessage="More info" id="moreInfo" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <FormattedMessage
+                              defaultMessage="Process the refund and ignore the balance. The Collective's balance will go negative until additional contributions are received."
+                              id="+vpPIw"
+                            />
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </MessageBox>
+                )}
+              </React.Fragment>
+            ))}
           </div>
         </Section>
       )}
 
-      {isInsufficientBalance && principalBalanceCurrency && (
-        <MessageBox type="warning" withIcon px={3} py={2}>
-          <FormattedMessage
-            defaultMessage="{collective}'s balance ({balance}) won't cover the {amount} that would be deducted to process this refund." id="RB/W6s"
-            values={{
-              collective: <span className="font-medium">{principalAccount?.name || principalAccount?.slug}</span>,
-              balance: (
-                <span className="font-medium tabular-nums">
-                  <FormattedMoneyAmount
-                    amount={principalBalanceInCents}
-                    currency={principalBalanceCurrency}
-                    showCurrencyCode={false}
-                  />
-                </span>
-              ),
-              amount: (
-                <span className="font-medium tabular-nums">
-                  <FormattedMoneyAmount
-                    amount={principalOutflowAmount}
-                    currency={principalBalanceCurrency}
-                    showCurrencyCode={false}
-                  />
-                </span>
-              ),
-            }}
-          />
-        </MessageBox>
-      )}
-
-      {(options.showCancelRecurring ||
-        options.showRemoveAsContributor ||
-        options.showHostMessage ||
-        isInsufficientBalance) && (
-        <div className="flex flex-col gap-3">
-          <div className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-            <FormattedMessage defaultMessage="Options" id="header.options"  />
-          </div>
-
-          {(options.showCancelRecurring || options.showRemoveAsContributor || isInsufficientBalance) && (
-            <div className="mb-1.5 flex flex-col gap-2">
-              {isInsufficientBalance && principalBalanceCurrency && (
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5 text-sm">
-                    <label className="flex cursor-pointer items-center gap-2">
-                      <Checkbox
-                        checked={values.ignoreBalanceCheck}
-                        onCheckedChange={checked => setFieldValue('ignoreBalanceCheck', checked === true)}
-                        disabled={isSubmitting}
-                      />
-                      <span className="font-medium">
-                        <FormattedMessage
-                          defaultMessage="Allow negative balance" id="CcDFSI"
-                        />
-                      </span>
-                    </label>
-                    <Tooltip>
-                      <TooltipTrigger className="inline-flex text-muted-foreground hover:text-foreground" tabIndex={-1}>
-                        <Info className="size-3.5" aria-hidden />
-                        <span className="sr-only">
-                          <FormattedMessage defaultMessage="More info" id="moreInfo"  />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <FormattedMessage
-                          defaultMessage="Process the refund and ignore the balance. The Collective's balance will go negative until additional contributions are received." id="+vpPIw"
-                        />
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </div>
-              )}
-
+      {(options.showCancelRecurring || options.showRemoveAsContributor) && (
+        <Section>
+          <SectionTitle className="mb-3">
+            <FormattedMessage defaultMessage="Additional actions" id="vCd8DW" />
+          </SectionTitle>
+          {(options.showCancelRecurring || options.showRemoveAsContributor) && (
+            <div className="flex flex-col gap-2">
               {options.showCancelRecurring && (
                 <div className="flex items-center gap-1.5 text-sm">
                   <label className="flex cursor-pointer items-center gap-2">
@@ -577,21 +737,20 @@ const HostRefundPaymentForm: React.FC<HostRefundPaymentFormProps> = ({ transacti
                       disabled={isSubmitting}
                     />
                     <span className="font-medium">
-                      <FormattedMessage
-                        defaultMessage="Cancel recurring contribution" id="rvR3Fm"
-                      />
+                      <FormattedMessage defaultMessage="Cancel recurring contribution" id="rvR3Fm" />
                     </span>
                   </label>
                   <Tooltip>
                     <TooltipTrigger className="inline-flex text-muted-foreground hover:text-foreground" tabIndex={-1}>
                       <Info className="size-3.5" aria-hidden />
                       <span className="sr-only">
-                        <FormattedMessage defaultMessage="More info" id="moreInfo"  />
+                        <FormattedMessage defaultMessage="More info" id="moreInfo" />
                       </span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <FormattedMessage
-                        defaultMessage="No future charges will be made for this contribution." id="pB1jn6"
+                        defaultMessage="No future charges will be made for this contribution."
+                        id="pB1jn6"
                       />
                     </TooltipContent>
                   </Tooltip>
@@ -607,9 +766,7 @@ const HostRefundPaymentForm: React.FC<HostRefundPaymentFormProps> = ({ transacti
                       disabled={isSubmitting}
                     />
                     <span className="font-medium">
-                      <FormattedMessage
-                        defaultMessage="Remove contributor from Collective" id="BkIpny"
-                      />
+                      <FormattedMessage defaultMessage="Remove contributor from Collective" id="BkIpny" />
                     </span>
                   </label>
                   <Tooltip>
@@ -621,7 +778,8 @@ const HostRefundPaymentForm: React.FC<HostRefundPaymentFormProps> = ({ transacti
                     </TooltipTrigger>
                     <TooltipContent>
                       <FormattedMessage
-                        defaultMessage="The contributor will be hidden from public profile and exports, but the contribution stays in the ledger." id="qGlrSx"
+                        defaultMessage="The contributor will be hidden from public profile and exports, but the contribution stays in the ledger."
+                        id="qGlrSx"
                       />
                     </TooltipContent>
                   </Tooltip>
@@ -629,20 +787,31 @@ const HostRefundPaymentForm: React.FC<HostRefundPaymentFormProps> = ({ transacti
               )}
             </div>
           )}
+        </Section>
+      )}
 
-          {options.showHostMessage && (
-            <FormField
-              name="message"
-              label={<FormattedMessage defaultMessage="Message to contributor" id="TD/rN2"  />}
-              labelClassName="text-sm font-medium"
-            >
+      {options.showHostMessage && (
+        <Section>
+          <div className="flex items-center justify-between gap-4">
+            <SectionTitle>
+              <FormattedMessage defaultMessage="Send custom message to contributor" id="tLNi3x" />
+            </SectionTitle>
+            <Switch
+              checked={values.sendMessage}
+              onCheckedChange={checked => setFieldValue('sendMessage', checked === true)}
+              disabled={isSubmitting}
+            />
+          </div>
+          {values.sendMessage && (
+            <FormField name="message" className="mt-4">
               {({ field }) => (
                 <Textarea
                   {...field}
                   rows={3}
                   className="h-auto min-h-20"
                   placeholder={intl.formatMessage({
-                    defaultMessage: 'Type your message here...', id: 'Olq7Wf',
+                    defaultMessage: 'Type your message here...',
+                    id: 'Olq7Wf',
                   })}
                   disabled={isSubmitting}
                   maxLength={2000}
@@ -650,7 +819,7 @@ const HostRefundPaymentForm: React.FC<HostRefundPaymentFormProps> = ({ transacti
               )}
             </FormField>
           )}
-        </div>
+        </Section>
       )}
 
       <DialogFooter>
@@ -688,7 +857,6 @@ export const HostRefundPaymentModal = ({
   const queriedTransaction = data?.transaction ?? previousData?.transaction;
   const transaction = queriedTransaction?.id === transactionRef.id ? queriedTransaction : undefined;
   const order = transaction?.order;
-  const refundAmount = transaction ? buildRefundAllocation(transaction, intl).refundAmount : 0;
 
   const isFiscalHostAdmin = Boolean(transaction?.host && LoggedInUser?.isAdminOfCollective(transaction.host));
   const isRecurringOrder = Boolean(order?.frequency && order.frequency !== ContributionFrequency.ONETIME);
@@ -719,6 +887,7 @@ export const HostRefundPaymentModal = ({
     () => ({
       cancelRecurringContribution: options.showCancelRecurring,
       removeAsContributor: false,
+      sendMessage: false,
       message: '',
       ignoreBalanceCheck: false,
     }),
@@ -736,7 +905,7 @@ export const HostRefundPaymentModal = ({
           transaction: { id: transaction.id },
           cancelRecurringContribution: options.showCancelRecurring ? values.cancelRecurringContribution : null,
           removeAsContributor: options.showRemoveAsContributor ? values.removeAsContributor : null,
-          messageForContributor: options.showHostMessage ? values.message?.trim() || null : null,
+          messageForContributor: options.showHostMessage && values.sendMessage ? values.message?.trim() || null : null,
           ignoreBalanceCheck: options.canIgnoreBalanceCheck ? values.ignoreBalanceCheck : null,
         },
       });
@@ -752,21 +921,9 @@ export const HostRefundPaymentModal = ({
     }
   };
 
-  const dialogTitle = transaction?.amount ? (
-    <FormattedMessage
-      defaultMessage="Refund Payment of {amount}" id="jwmoP6"
-      values={{
-        amount: <FormattedMoneyAmount amount={refundAmount} currency={transaction.amount.currency} showCurrencyCode />,
-      }}
-    />
-  ) : (
-    <FormattedMessage defaultMessage="Refund Payment" id="er7gIB"  />
-  );
-
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-lg"
         onCloseAutoFocus={e => {
           if (onCloseFocusRef?.current) {
             e.preventDefault();
@@ -775,11 +932,11 @@ export const HostRefundPaymentModal = ({
         }}
       >
         <DialogHeader>
-          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogTitle>
+            <FormattedMessage defaultMessage="Refund contribution charge" id="gCyTuO" />
+          </DialogTitle>
           <DialogDescription>
-            <FormattedMessage
-              defaultMessage="Review and confirm the refund details." id="i4akIU"
-            />
+            <FormattedMessage defaultMessage="Review and confirm the refund details." id="i4akIU" />
           </DialogDescription>
         </DialogHeader>
 
@@ -790,7 +947,7 @@ export const HostRefundPaymentModal = ({
             {error ? (
               i18nGraphqlException(intl, error)
             ) : (
-              <FormattedMessage defaultMessage="Transaction not found" id="zAGlVG"  />
+              <FormattedMessage defaultMessage="Transaction not found" id="zAGlVG" />
             )}
           </MessageBox>
         ) : (

@@ -25,6 +25,7 @@ import OrderStatusTag from '../../../orders/OrderStatusTag';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../ui/Dialog';
+import { Switch } from '../../../ui/Switch';
 import { Textarea } from '../../../ui/Textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { useToast } from '../../../ui/useToast';
@@ -40,6 +41,7 @@ type HostCancelContributionModalProps = BaseModalProps & {
 
 const HostCancelContributionFormSchema = z.object({
   removeAsContributor: z.boolean(),
+  sendMessage: z.boolean(),
   message: z.string().max(2000).optional(),
 });
 
@@ -50,6 +52,12 @@ const Section: React.FC<{
   className?: string;
 }> = ({ children, className }) => (
   <div className={`rounded-lg border border-border bg-background p-4 ${className ?? ''}`}>{children}</div>
+);
+
+const SectionTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
+  <div className={`text-xs font-semibold tracking-wide text-muted-foreground uppercase ${className ?? ''}`}>
+    {children}
+  </div>
 );
 
 const DetailRow: React.FC<{
@@ -131,12 +139,11 @@ const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
         </div>
       </Section>
 
-      <div className="flex flex-col gap-3">
-        <div className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-          <FormattedMessage defaultMessage="Options" id="header.options" />
-        </div>
-
-        <div className="mb-1.5 flex flex-col gap-2">
+      <Section>
+        <SectionTitle className="mb-3">
+          <FormattedMessage defaultMessage="Additional actions" id="vCd8DW" />
+        </SectionTitle>
+        <div className="flex flex-col gap-2">
           <div className="flex items-center gap-1.5 text-sm">
             <label className="flex cursor-pointer items-center gap-2">
               <Checkbox
@@ -166,25 +173,37 @@ const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
             </Tooltip>
           </div>
         </div>
-      </div>
+      </Section>
 
-      <FormField
-        name="message"
-        label={<FormattedMessage defaultMessage="Message to contributor" id="TD/rN2"  />}
-        labelClassName="text-sm font-semibold"
-      >
-        {({ field }) => (
-          <Textarea
-            {...field}
-            rows={3}
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Type your message here...', id: 'Olq7Wf',
-            })}
+      <Section>
+        <div className="flex items-center justify-between gap-4">
+          <SectionTitle>
+            <FormattedMessage defaultMessage="Send custom message to contributor" id="tLNi3x" />
+          </SectionTitle>
+          <Switch
+            checked={values.sendMessage}
+            onCheckedChange={checked => setFieldValue('sendMessage', checked === true)}
             disabled={isSubmitting}
-            maxLength={2000}
           />
+        </div>
+        {values.sendMessage && (
+          <FormField name="message" className="mt-4">
+            {({ field }) => (
+              <Textarea
+                {...field}
+                rows={3}
+                className="h-auto min-h-20"
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'Type your message here...',
+                  id: 'Olq7Wf',
+                })}
+                disabled={isSubmitting}
+                maxLength={2000}
+              />
+            )}
+          </FormField>
         )}
-      </FormField>
+      </Section>
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
@@ -233,6 +252,7 @@ export const HostCancelContributionModal = ({
   const initialValues = React.useMemo<HostCancelContributionFormValues>(
     () => ({
       removeAsContributor: false,
+      sendMessage: false,
       message: '',
     }),
     [],
@@ -248,7 +268,7 @@ export const HostCancelContributionModal = ({
         variables: {
           order: { id: order.id },
           removeAsContributor: values.removeAsContributor,
-          messageForContributor: values.message?.trim() || null,
+          messageForContributor: values.sendMessage ? values.message?.trim() || null : null,
         },
       });
 
