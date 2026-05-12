@@ -562,11 +562,14 @@ describe('vendor visibility', () => {
           cy.contains(name).click();
           cy.contains('button', 'Edit').click();
 
-          cy.contains('In relation to the following selected accounts').click();
+          cy.get('#whereScope-specific').click();
           cy.get('#visibleToAccountsInput').type(collective.name);
           cy.root().closest('html').contains('[role="option"]', collective.name).click();
+          // eslint-disable-next-line cypress/no-unnecessary-waiting
+          cy.wait(150);
 
-          cy.contains('All expense submitters').click();
+          cy.get('#useVendorPolicy-ALL_SUBMITTERS').click();
+          cy.get('#useVendorPolicy-ALL_SUBMITTERS').should('have.attr', 'data-state', 'checked');
 
           cy.contains('button', /Update vendor/i).click();
           cy.contains(/Vendor Updated|Vendor updated/i, { timeout: 15000 }).should('be.visible');
