@@ -9617,19 +9617,14 @@ type OrderPermissions {
   canResume: Boolean!
 
   """
-  Whether the current user can cancel this recurring contribution as a host admin through the host dashboard
+  Whether the current user can cancel this recurring contribution
   """
-  canHostCancel: Boolean!
+  canCancel: Boolean!
 
   """
-  Whether the current user can refund at least one transaction of this order as a host admin through the host dashboard
+  Whether the current user can remove the contributor from the collective public profile
   """
-  canHostRefund: Boolean!
-
-  """
-  Whether the current user can remove the contributor from the collective public profile as a host admin
-  """
-  canHostRemoveAsContributor: Boolean!
+  canRemoveAsContributor: Boolean!
 }
 
 type PendingOrderData {
