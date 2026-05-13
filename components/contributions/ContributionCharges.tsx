@@ -190,7 +190,7 @@ export function ContributionCharges({
     <div className="mb-2">
       <div className="flex items-center justify-between gap-2 py-4">
         <div className="text-slate-80 w-fit text-base leading-6 font-bold">
-          <FormattedMessage defaultMessage="Charges" id="H8nU0u" />
+          <FormattedMessage defaultMessage="Charges" id="Dx5IBb"  />
         </div>
         <hr className="grow border-neutral-300" />
         <Button
@@ -215,7 +215,7 @@ export function ContributionCharges({
         nbPlaceholders={2}
         getRowId={chargeGroup => chargeGroup.group}
         getActions={getChargeActions}
-        emptyMessage={() => <FormattedMessage defaultMessage="No charges" id="YiMRGp" />}
+        emptyMessage={() => <FormattedMessage defaultMessage="No charges" id="WL+x9w" />}
         compact
         showQuickActions
       />
