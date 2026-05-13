@@ -136,8 +136,7 @@ const hostRefundPaymentTransactionQuery = gql`
         description
         permissions {
           id
-          canHostCancel
-          canHostRemoveAsContributor
+          canCancel
         }
       }
       permissions {

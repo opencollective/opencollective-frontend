@@ -83,11 +83,6 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     const isAdminOfOrder = LoggedInUser.isAdminOfCollective(order.fromAccount);
     const isHostAdminOfToAccount = LoggedInUser?.isHostAdmin(order.toAccount);
-    const isSingleContribution = order.frequency === ContributionFrequency.ONETIME;
-    const canCancelAsHost =
-      isHostAdminOfToAccount &&
-      !isSingleContribution &&
-      ![OrderStatus.PENDING, OrderStatus.EXPIRED, OrderStatus.REJECTED, OrderStatus.REFUNDED].includes(order.status);
     const canUpdateActiveOrder =
       order.frequency !== ContributionFrequency.ONETIME &&
       ![
@@ -101,11 +96,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       isAdminOfOrder;
 
     const canResume = order.status === OrderStatus.PAUSED && order.permissions.canResume;
-    const canCancel =
-      isAdminOfOrder &&
-      !canCancelAsHost &&
-      ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status) &&
-      order.frequency !== ContributionFrequency.ONETIME;
+    const canCancel = order.permissions.canCancel;
     const canMarkAsCompleted =
       [OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status) && order.permissions.canMarkAsPaid;
     const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
@@ -247,35 +238,24 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     if (canCancel) {
       actions.secondary.push({
         key: 'cancel-contribution',
-        label: intl.formatMessage({
-          defaultMessage: 'Cancel contribution',
-          id: 'subscription.menu.cancelContribution',
-        }),
-        onClick: () => showEditOrderModal('cancel'),
-        'data-cy': 'recurring-contribution-menu-cancel-option',
-      });
-    }
-
-    if (canCancelAsHost) {
-      actions.primary.push({
-        key: 'cancel-contribution-as-host',
         Icon: CircleX,
         label: intl.formatMessage({
           defaultMessage: 'Cancel contribution',
           id: 'subscription.menu.cancelContribution',
         }),
-        onClick: () => {
-          showModal(
-            HostCancelContributionModal,
-            {
-              order: { id: order.id, legacyId: order.legacyId },
-              onSuccess: onMutationSuccess,
-              onCloseFocusRef,
-            },
-            `host-cancel-contribution-${order.id}`,
-          );
-        },
-        'data-cy': 'manage-contribution-host-admin',
+        onClick: () =>
+          isHostAdminOfToAccount
+            ? showModal(
+                HostCancelContributionModal,
+                {
+                  order: { id: order.id, legacyId: order.legacyId },
+                  onSuccess: onMutationSuccess,
+                  onCloseFocusRef,
+                },
+                `host-cancel-contribution-${order.id}`,
+              )
+            : showEditOrderModal('cancel'),
+        'data-cy': 'recurring-contribution-menu-cancel-option',
       });
     }
 

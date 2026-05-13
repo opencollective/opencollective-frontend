@@ -152,7 +152,7 @@ const contributionDrawerQuery = gql`
         canResume
         canMarkAsExpired
         canMarkAsPaid
-        canHostRefund
+        canCancel
         canEdit
         canComment
         canSeePrivateActivities
