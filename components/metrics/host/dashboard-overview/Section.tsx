@@ -8,7 +8,6 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { Skeleton } from '../../../ui/Skeleton';
 
 import { type HostedAccountType, type MonthPeriod, previousPeriod } from './helpers';
 import { MetricCards } from './MetricCards';
@@ -24,10 +23,13 @@ const ROOT_TYPES: Record<HostedAccountType, string[]> = {
 const messages = defineMessages({
   hostedCollectives: { defaultMessage: 'Hosted Collectives', id: 'HostedCollectives' },
   hostedFunds: { defaultMessage: 'Hosted Funds', id: 'HostedFunds' },
-  topCollectivesByIncome: { defaultMessage: 'Top Collectives by Income', id: 'qe/a1+' },
-  topFundsByIncome: { defaultMessage: 'Top Funds by Income', id: 'IoN8/L' },
-  topCollectivesBySpending: { defaultMessage: 'Top Collectives by Spending', id: 'eYjMEN' },
-  topFundsBySpending: { defaultMessage: 'Top Funds by Spending', id: 'Vd28LQ' },
+  topCollectivesByReceived: {
+    defaultMessage: 'Top Collectives by Amount Received',
+    id: 'i97izo',
+  },
+  topFundsByReceived: { defaultMessage: 'Top Funds by Amount Received', id: 'jFXTBS' },
+  topCollectivesBySpent: { defaultMessage: 'Top Collectives by Amount Spent', id: 'TBxuUA' },
+  topFundsBySpent: { defaultMessage: 'Top Funds by Amount Spent', id: 'us7tE9' },
 });
 
 type HostMetricsOverviewSectionProps = {
@@ -48,8 +50,8 @@ export function HostMetricsOverviewSection({
     hostSlug,
     currentRange: { from: period.from, to: period.to },
     previousRange: { from: previous.from, to: previous.to },
-    financialFilters: { mainAccountType: { eq: category } },
-    membershipFilters: { accountType: { in: ROOT_TYPES[category] } },
+    financialFilters: { mainAccountType: { eq: category }, mainAccountIsArchived: false },
+    membershipFilters: { accountType: { in: ROOT_TYPES[category] }, isArchived: false },
     hostingFilters: { accountType: { in: ROOT_TYPES[category] } },
   };
 
@@ -79,11 +81,11 @@ export function HostMetricsOverviewSection({
 
   const topByIncome: TopListRow[] | undefined = m?.topByIncome?.rows?.map(r => ({
     account: r.group?.account ?? null,
-    amount: r.values?.incomeAmount ?? null,
+    amount: r.values?.amountReceived ?? null,
   }));
   const topBySpending: TopListRow[] | undefined = m?.topBySpending?.rows?.map(r => ({
     account: r.group?.account ?? null,
-    amount: r.values?.spendingAmount ?? null,
+    amount: r.values?.amountSpent ?? null,
   }));
 
   const titleMessage = category === 'FUND' ? messages.hostedFunds : messages.hostedCollectives;
@@ -91,13 +93,8 @@ export function HostMetricsOverviewSection({
   return (
     <div className="rounded-xl border bg-card p-4 sm:p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="flex items-baseline gap-2 text-lg font-semibold">
-          <FormattedMessage {...titleMessage} />:{' '}
-          {loading ? (
-            <Skeleton className="inline-block h-6 w-12" />
-          ) : (
-            <span className="tabular-nums">{values.hostedCurrent.toLocaleString()}</span>
-          )}
+        <h2 className="text-lg font-semibold">
+          <FormattedMessage {...titleMessage} />
         </h2>
         <MonthPicker value={period} onChange={onPeriodChange} />
       </div>
@@ -110,7 +107,7 @@ export function HostMetricsOverviewSection({
           category={category}
           title={
             <FormattedMessage
-              {...(category === 'FUND' ? messages.topFundsByIncome : messages.topCollectivesByIncome)}
+              {...(category === 'FUND' ? messages.topFundsByReceived : messages.topCollectivesByReceived)}
             />
           }
           rows={topByIncome}
@@ -120,9 +117,7 @@ export function HostMetricsOverviewSection({
           hostSlug={hostSlug}
           category={category}
           title={
-            <FormattedMessage
-              {...(category === 'FUND' ? messages.topFundsBySpending : messages.topCollectivesBySpending)}
-            />
+            <FormattedMessage {...(category === 'FUND' ? messages.topFundsBySpent : messages.topCollectivesBySpent)} />
           }
           rows={topBySpending}
           loading={loading}

@@ -52,10 +52,10 @@ export function TopList({ hostSlug, category, title, rows, loading }: TopListPro
             <FormattedMessage defaultMessage="Collective Name" id="Ig63Zx" />
           )}
         </span>
-        <span className="col-span-4 text-right">
+        <span className="col-span-4 pr-4 text-right">
           <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
         </span>
-        <span className="col-span-1 text-right">
+        <span className="sr-only col-span-1">
           <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
         </span>
       </div>
@@ -93,12 +93,8 @@ export function TopList({ hostSlug, category, title, rows, loading }: TopListPro
                       </Link>
                     }
                   />
-                  <span className="col-span-4 text-right tabular-nums">
-                    <FormattedMoneyAmount
-                      amount={amount.valueInCents}
-                      currency={amount.currency as never}
-                      precision={0}
-                    />
+                  <span className="col-span-4 pr-4 text-right tabular-nums">
+                    <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency as never} />
                   </span>
                   <span className="col-span-1 flex justify-end">
                     <DropdownMenu>

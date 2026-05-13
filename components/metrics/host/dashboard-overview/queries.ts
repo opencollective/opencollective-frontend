@@ -90,11 +90,11 @@ export const hostMetricsOverviewSectionQuery = gql`
         topByIncome: hostedCollectivesFinancialActivity(
           input: {
             dateRange: $currentRange
-            measures: [incomeAmount]
+            measures: [amountReceived]
             filters: $financialFilters
             groupBy: [account]
-            orderBy: [{ measure: incomeAmount, direction: desc }]
-            having: [{ measure: incomeAmount, op: gt, value: 0 }]
+            orderBy: [{ measure: amountReceived, direction: desc }]
+            having: [{ measure: amountReceived, op: gt, value: 0 }]
             limit: 5
           }
         ) {
@@ -111,7 +111,7 @@ export const hostMetricsOverviewSectionQuery = gql`
               }
             }
             values {
-              incomeAmount {
+              amountReceived {
                 valueInCents
                 currency
               }
@@ -122,11 +122,11 @@ export const hostMetricsOverviewSectionQuery = gql`
         topBySpending: hostedCollectivesFinancialActivity(
           input: {
             dateRange: $currentRange
-            measures: [spendingAmount]
+            measures: [amountSpent]
             filters: $financialFilters
             groupBy: [account]
-            orderBy: [{ measure: spendingAmount, direction: desc }]
-            having: [{ measure: spendingAmount, op: gt, value: 0 }]
+            orderBy: [{ measure: amountSpent, direction: desc }]
+            having: [{ measure: amountSpent, op: gt, value: 0 }]
             limit: 5
           }
         ) {
@@ -143,7 +143,7 @@ export const hostMetricsOverviewSectionQuery = gql`
               }
             }
             values {
-              spendingAmount {
+              amountSpent {
                 valueInCents
                 currency
               }

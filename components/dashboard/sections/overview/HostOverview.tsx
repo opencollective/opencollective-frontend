@@ -172,8 +172,6 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
 
       <HostTodoList />
 
-      {isFeatureEnabled(account, FEATURES.HOST_METRICS) && <HostMetricsOverview hostSlug={account.slug} />}
-
       <Card className="pb-3">
         <CardHeader>
           <CardTitle className="text-xl">
@@ -251,6 +249,8 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
           ) : null}
         </CardContent>
       </Card>
+
+      {isFeatureEnabled(account, FEATURES.HOST_METRICS) && <HostMetricsOverview hostSlug={account.slug} />}
 
       <div className="grid grid-cols-1 gap-6">
         <div className="order-1 space-y-6 xl:order-none">

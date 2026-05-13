@@ -62,10 +62,10 @@ const metricRangeFilterPill = (labelMsg: ReturnType<typeof defineMessage>) => ({
 });
 
 export const metricFilterConfigs = {
-  joinedBetween: metricRangeFilterPill(defineMessage({ defaultMessage: 'Joined', id: 'l8wanU' })),
-  unhostedBetween: metricRangeFilterPill(defineMessage({ defaultMessage: 'Churned', id: 'mqNDy4' })),
-  hadActivityBetween: metricRangeFilterPill(defineMessage({ defaultMessage: 'Active', id: 'Subscriptions.Active' })),
-  noActivityBetween: metricRangeFilterPill(
-    defineMessage({ defaultMessage: 'Inactive', id: 'virtualCard.status.inactive' }),
+  joinedBetween: metricRangeFilterPill(defineMessage({ defaultMessage: 'Joined host on', id: 'btsegv' })),
+  unhostedBetween: metricRangeFilterPill(defineMessage({ defaultMessage: 'Left host on', id: 'DhBUgD' })),
+  hadActivityBetween: metricRangeFilterPill(
+    defineMessage({ defaultMessage: 'Had financial activity on', id: 'b8tWyl' }),
   ),
+  noActivityBetween: metricRangeFilterPill(defineMessage({ defaultMessage: 'No financial activity on', id: '5A+fYY' })),
 };
