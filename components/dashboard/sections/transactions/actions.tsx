@@ -5,6 +5,7 @@ import type React from 'react';
 import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
+import { PaymentMethodService, TransactionDetailsQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { saveInvoice } from '../../../../lib/transactions';
@@ -12,6 +13,7 @@ import { saveInvoice } from '../../../../lib/transactions';
 import { useModal } from '../../../ModalContext';
 import { toast } from '../../../ui/useToast';
 
+import { HostRefundChargeModal } from './HostRefundChargeModal';
 import TransactionRejectModal from './TransactionRejectModal';
 import type { TransactionsTableQueryNode } from './types';
 
@@ -42,7 +44,7 @@ const refundTransactionMutation = gql`
   }
 `;
 
-export function useTransactionActions<T extends TransactionsTableQueryNode>({
+export function useTransactionActions<T extends TransactionsTableQueryNode | TransactionDetailsQuery['transaction']>({
   resetFilters = null,
   refetchList = null,
   redirectRelatedTransactionsTo = undefined,
@@ -67,6 +69,12 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
     }
 
     const isFiscalHostAdmin = LoggedInUser.isAdminOfCollective(transaction.host);
+    const isContributionCharge = Boolean(
+      transaction.order &&
+        transaction.paymentMethod?.service &&
+        [PaymentMethodService.PAYPAL, PaymentMethodService.STRIPE].includes(transaction.paymentMethod.service),
+    );
+
     const onMutationSuccess = () => {
       refetchList?.();
       refetch?.();
@@ -99,30 +107,42 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
           label: intl.formatMessage({ defaultMessage: 'Refund', id: 'Refund' }),
           if: transaction?.permissions.canRefund && !transaction.isRefunded,
           onClick: () => {
-            showConfirmationModal({
-              title: intl.formatMessage({
-                defaultMessage: 'Are you sure you want to refund this transaction?',
-                id: 'RL9ufl',
-              }),
-              description: intl.formatMessage({
-                defaultMessage:
-                  'Refunding will reimburse the full amount back to your contributor. They can contribute again in the future.',
-                id: 'Ntm6k6',
-              }),
-              checks: compact([
-                isFiscalHostAdmin && {
-                  id: 'ignoreBalanceCheck',
-                  label: intl.formatMessage({
-                    defaultMessage: 'Ignore Collective balance check',
-                    id: 'OGmPSV',
-                  }),
+            if (isContributionCharge && isFiscalHostAdmin) {
+              showModal(
+                HostRefundChargeModal,
+                {
+                  transaction: { id: transaction.id },
+                  onSuccess: onMutationSuccess,
+                  onCloseFocusRef,
                 },
-              ]),
-              onConfirm: handleRefundTransaction,
-              confirmLabel: intl.formatMessage({ defaultMessage: 'Refund', id: 'Refund' }),
-              ConfirmIcon: Undo2,
-              onCloseFocusRef,
-            });
+                `host-refund-charge-${transaction.id}`,
+              );
+            } else {
+              showConfirmationModal({
+                title: intl.formatMessage({
+                  defaultMessage: 'Are you sure you want to refund this transaction?',
+                  id: 'RL9ufl',
+                }),
+                description: intl.formatMessage({
+                  defaultMessage:
+                    'Refunding will reimburse the full amount back to your contributor. They can contribute again in the future.',
+                  id: 'Ntm6k6',
+                }),
+                checks: compact([
+                  isFiscalHostAdmin && {
+                    id: 'ignoreBalanceCheck',
+                    label: intl.formatMessage({
+                      defaultMessage: 'Ignore Collective balance check',
+                      id: 'OGmPSV',
+                    }),
+                  },
+                ]),
+                onConfirm: handleRefundTransaction,
+                confirmLabel: intl.formatMessage({ defaultMessage: 'Refund', id: 'Refund' }),
+                ConfirmIcon: Undo2,
+                onCloseFocusRef,
+              });
+            }
           },
           Icon: Undo2,
         },

@@ -82,6 +82,12 @@ const transactionQuery = gql`
       isDisputed
       isOrderRejected
       merchantId
+      host {
+        id
+        slug
+        legacyId
+        type
+      }
       account {
         id
         name
