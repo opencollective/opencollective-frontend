@@ -8,7 +8,7 @@ import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { saveInvoice } from '../../lib/transactions';
 
-import { HostRefundPaymentModal } from '../dashboard/sections/transactions/HostRefundPaymentModal';
+import { HostRefundChargeModal } from '../dashboard/sections/transactions/HostRefundChargeModal';
 import { useModal } from '../ModalContext';
 
 type PaymentActionTransaction = ContributionDrawerQuery['order']['transactions'][number];
@@ -20,11 +20,11 @@ type UsePaymentActionsOptions = {
 };
 
 /**
- * Actions menu used in the Payments section of the ContributionDrawer.
+ * Actions menu used in the Charges section of the ContributionDrawer.
  *
  * Distinct from {@link useTransactionActions}: this set is intentionally narrow
  * (Refund / View transactions / Download receipt) and the Refund flow opens
- * the host-focused {@link HostRefundPaymentModal} instead of the bare
+ * the host-focused {@link HostRefundChargeModal} instead of the bare
  * confirmation dialog.
  */
 export function usePaymentActions<T extends PaymentActionTransaction>({
@@ -69,7 +69,7 @@ export function usePaymentActions<T extends PaymentActionTransaction>({
           if: isHostAdmin && transaction.permissions?.canRefund && !transaction.isRefunded,
           onClick: () => {
             showModal(
-              HostRefundPaymentModal,
+              HostRefundChargeModal,
               {
                 transaction: { id: transaction.id },
                 onSuccess: onMutationSuccess,

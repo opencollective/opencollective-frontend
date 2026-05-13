@@ -29,7 +29,7 @@ import { InfoList, InfoListItem } from '../ui/InfoList';
 import { Sheet, SheetContent } from '../ui/Sheet';
 import { Skeleton } from '../ui/Skeleton';
 
-import { ContributionPayments } from './ContributionPayments';
+import { ContributionCharges } from './ContributionCharges';
 import ContributionTimeline, { getTransactionsUrl } from './ContributionTimeline';
 
 const contributionDrawerQuery = gql`
@@ -286,7 +286,7 @@ type ContributionDrawerProps = {
   onClose: () => void;
   orderId?: number;
   getActions: GetActions<ContributionDrawerQuery['order']>;
-  showPaymentsSection?: boolean;
+  showChargesSection?: boolean;
 };
 
 export function ContributionDrawer({
@@ -294,7 +294,7 @@ export function ContributionDrawer({
   onClose,
   orderId,
   getActions,
-  showPaymentsSection = false,
+  showChargesSection = false,
 }: ContributionDrawerProps) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -629,8 +629,8 @@ export function ContributionDrawer({
                   )}
                 </DataList>
 
-                {showPaymentsSection && (
-                  <ContributionPayments
+                {showChargesSection && (
+                  <ContributionCharges
                     isLoading={isLoading}
                     order={query.data?.order}
                     transactionsUrl={transactionsUrl}
