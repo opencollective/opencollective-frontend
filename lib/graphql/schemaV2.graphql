@@ -8338,23 +8338,54 @@ type HostedCollectivesFinancialActivityMetricsGroup {
   isMainAccount: Boolean
   accountType: String
   mainAccountType: String
+  isArchived: Boolean
+  mainAccountIsArchived: Boolean
   hostCurrency: String
 }
 
 type HostedCollectivesFinancialActivityMetricsValues {
   """
-  Net contributions and added funds, in host currency
+  Amount received in host currency, sums credit transactions, excluding refunds, refunded transactions and internal transfers.
+  Matches values returned from hostStats.totalAmountReceived(net: false).
   """
-  incomeAmount: Amount
+  amountReceived: Amount
 
   """
-  Net expenses paid out, in host currency
+  Net amount received in host currency, sums credit transactions with fees and taxes included, excluding refunds, refunded transactions and internal transfers.
+  Matches values returned from hostStats.totalAmountReceived(net: true).
   """
-  spendingAmount: Amount
+  amountReceivedNet: Amount
+
+  """
+  Amount spent in host currency, sums debit transactions, excluding refunds, refunded transactions and internal transfers.Matches values returned from hostStats.totalAmountSpent(net: false).
+  """
+  amountSpent: Amount
+
+  """
+  Net amount spent in host currency, sums debit transactions with fees and taxes included, excluding refunds, refunded transactions and internal transfers.Matches values returned from hostStats.totalAmountSpent(net: true).
+  """
+  amountSpentNet: Amount
+
+  """
+  Total number of transactions in the queried scope.
+  """
   transactionCount: Int
+
+  """
+  Distinct main accounts with at least one transaction of any kind. Child events/projects roll up to their parent.
+  """
   activeCollectives: Int
-  daysSinceLastActivity: Float
+
+  """
+  Most recent date with any ledger activity, as `YYYY-MM-DD`.
+  """
+  lastActiveDate: Date
 }
+
+"""
+A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar Date
 
 input HostedCollectivesFinancialActivityMetricsInput {
   dateRange: MetricsDateRangeInput!
@@ -8386,17 +8417,41 @@ input MetricsDateRangeInput {
 
 enum HostedCollectivesFinancialActivityMetricsMeasure {
   """
-  Net contributions and added funds, in host currency
+  Amount received in host currency, sums credit transactions, excluding refunds, refunded transactions and internal transfers.
+  Matches values returned from hostStats.totalAmountReceived(net: false).
   """
-  incomeAmount
+  amountReceived
 
   """
-  Net expenses paid out, in host currency
+  Net amount received in host currency, sums credit transactions with fees and taxes included, excluding refunds, refunded transactions and internal transfers.
+  Matches values returned from hostStats.totalAmountReceived(net: true).
   """
-  spendingAmount
+  amountReceivedNet
+
+  """
+  Amount spent in host currency, sums debit transactions, excluding refunds, refunded transactions and internal transfers.Matches values returned from hostStats.totalAmountSpent(net: false).
+  """
+  amountSpent
+
+  """
+  Net amount spent in host currency, sums debit transactions with fees and taxes included, excluding refunds, refunded transactions and internal transfers.Matches values returned from hostStats.totalAmountSpent(net: true).
+  """
+  amountSpentNet
+
+  """
+  Total number of transactions in the queried scope.
+  """
   transactionCount
+
+  """
+  Distinct main accounts with at least one transaction of any kind. Child events/projects roll up to their parent.
+  """
   activeCollectives
-  daysSinceLastActivity
+
+  """
+  Most recent date with any ledger activity, as `YYYY-MM-DD`.
+  """
+  lastActiveDate
 }
 
 input HostedCollectivesFinancialActivityMetricsFiltersAllOf {
@@ -8406,6 +8461,8 @@ input HostedCollectivesFinancialActivityMetricsFiltersAllOf {
   isMainAccount: Boolean
   accountType: MetricsStringFilter
   mainAccountType: MetricsStringFilter
+  isArchived: Boolean
+  mainAccountIsArchived: Boolean
   hostCurrency: MetricsStringFilter
 }
 
@@ -8431,6 +8488,8 @@ enum HostedCollectivesFinancialActivityMetricsDimension {
   isMainAccount
   accountType
   mainAccountType
+  isArchived
+  mainAccountIsArchived
   hostCurrency
 }
 
@@ -8509,6 +8568,7 @@ type HostedCollectivesMembershipMetricsRow {
 type HostedCollectivesMembershipMetricsGroup {
   account: Account
   accountType: String
+  isArchived: Boolean
   event: String
 }
 
@@ -8549,12 +8609,14 @@ enum HostedCollectivesMembershipMetricsMeasure {
 input HostedCollectivesMembershipMetricsFiltersAllOf {
   account: MetricsAccountReferenceFilter
   accountType: MetricsStringFilter
+  isArchived: Boolean
   event: MetricsStringFilter
 }
 
 enum HostedCollectivesMembershipMetricsDimension {
   account
   accountType
+  isArchived
   event
 }
 
@@ -28954,11 +29016,6 @@ type ExpenseParsedFileInfo {
 A positive float value between 0 and 100
 """
 scalar StrictPercentage
-
-"""
-A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-"""
-scalar Date
 
 type ExpenseItemParsedFileInfo {
   description: String
