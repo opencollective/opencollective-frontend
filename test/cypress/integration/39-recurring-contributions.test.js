@@ -103,9 +103,10 @@ describe('Recurring contributions', () => {
       cy.contains('Update amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
         cy.get('input[type="radio"]').check();
+        cy.get('input[type="radio"]').should('be.checked');
+        cy.getByDataCy('tier-amount-select').should('be.visible').and('contain', '$100').click();
       });
-      cy.getByDataCy('tier-amount-select').click();
-      cy.contains('[data-cy="select-option"]', '$250').click();
+      cy.contains('[data-cy="select-option"]', '$250').should('be.visible').click();
       cy.getByDataCy('recurring-contribution-update-order-button').click();
       cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
       cy.contains('[data-cy^="datatable-row"]', '$250.00').should('exist');
@@ -170,7 +171,7 @@ describe('Recurring contributions', () => {
           cy.getByDataCy('toast-notification').contains('Your recurring contribution has been cancelled');
           cy.getByDataCy('contribution-status').contains('Canceled');
         });
-      cy.openEmail(({ Subject }) => Subject.includes(`Contribution cancelled to Test Collective`)).then(email => {
+      cy.openEmail(({ Subject }) => Subject.includes(`Contribution to Test Collective cancelled`)).then(email => {
         const $html = cheerio.load(email.HTML);
         const emailBody = $html('body').text();
         expect(emailBody).to.include('Because I want to');
