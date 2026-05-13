@@ -84,7 +84,7 @@ const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
   const fromAccountName = order.fromAccount?.name || order.fromAccount?.slug;
   const toAccountName = order.toAccount?.name || order.toAccount?.slug;
   const submitLabel = values.removeAsContributor ? (
-    <FormattedMessage defaultMessage="Cancel & remove contributor" id="ssPeBO"  />
+    <FormattedMessage defaultMessage="Cancel & remove contributor" id="ssPeBO" />
   ) : (
     <FormattedMessage defaultMessage="Cancel recurring contribution" id="rvR3Fm" />
   );
@@ -152,16 +152,14 @@ const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
                 disabled={isSubmitting}
               />
               <span className="font-medium">
-                <FormattedMessage
-                  defaultMessage="Remove contributor from Collective" id="BkIpny"
-                />
+                <FormattedMessage defaultMessage="Remove contributor from Collective" id="BkIpny" />
               </span>
             </label>
             <Tooltip>
               <TooltipTrigger className="inline-flex text-muted-foreground hover:text-foreground" tabIndex={-1}>
                 <Info className="size-3.5" aria-hidden />
                 <span className="sr-only">
-                  <FormattedMessage defaultMessage="More info" id="moreInfo"  />
+                  <FormattedMessage defaultMessage="More info" id="moreInfo" />
                 </span>
               </TooltipTrigger>
               <TooltipContent>
@@ -275,7 +273,8 @@ export const HostCancelContributionModal = ({
       toast({
         variant: 'success',
         message: intl.formatMessage({
-          defaultMessage: 'Contribution updated', id: 'lkz2Rt',
+          defaultMessage: 'Contribution updated',
+          id: 'lkz2Rt',
         }),
       });
       onSuccess?.();
@@ -298,11 +297,12 @@ export const HostCancelContributionModal = ({
       >
         <DialogHeader>
           <DialogTitle>
-            <FormattedMessage defaultMessage="Cancel recurring contribution" id="rvR3Fm"  />
+            <FormattedMessage defaultMessage="Cancel recurring contribution" id="rvR3Fm" />
           </DialogTitle>
           <DialogDescription>
             <FormattedMessage
-              defaultMessage="Cancel this recurring contribution and optionally remove the contributor from the Collective profile." id="fkHGdz"
+              defaultMessage="Cancel this recurring contribution and optionally remove the contributor from the Collective profile."
+              id="fkHGdz"
             />
           </DialogDescription>
         </DialogHeader>
@@ -314,7 +314,7 @@ export const HostCancelContributionModal = ({
             {error ? (
               i18nGraphqlException(intl, error)
             ) : (
-              <FormattedMessage defaultMessage="Contribution not found" id="ECqvt3"  />
+              <FormattedMessage defaultMessage="Contribution not found" id="ECqvt3" />
             )}
           </MessageBox>
         ) : (
@@ -331,5 +331,3 @@ export const HostCancelContributionModal = ({
     </Dialog>
   );
 };
-
-export default HostCancelContributionModal;

@@ -964,5 +964,3 @@ export const HostRefundPaymentModal = ({
     </Dialog>
   );
 };
-
-export default HostRefundPaymentModal;
