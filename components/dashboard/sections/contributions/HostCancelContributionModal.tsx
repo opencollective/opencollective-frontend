@@ -225,7 +225,7 @@ export const HostCancelContributionModal = ({
   const intl = useIntl();
   const { toast } = useToast();
 
-  const { data, loading, error } = useQuery<
+  const { data, previousData, loading, error } = useQuery<
     HostCancelContributionModalQuery,
     HostCancelContributionModalQueryVariables
   >(hostCancelContributionModalQuery, {
@@ -234,7 +234,8 @@ export const HostCancelContributionModal = ({
     fetchPolicy: 'cache-and-network',
   });
 
-  const order = data?.order;
+  const queriedOrder = data?.order ?? previousData?.order;
+  const order = queriedOrder?.id === orderRef.id ? queriedOrder : undefined;
   const currency = order?.totalAmount?.currency ?? order?.amount?.currency;
   const [runCancelOrder] = useMutation<HostCancelOrderMutation, HostCancelOrderMutationVariables>(
     hostCancelOrderMutation,
@@ -319,7 +320,7 @@ export const HostCancelContributionModal = ({
           </MessageBox>
         ) : (
           <FormikZod<HostCancelContributionFormValues>
-            key={open ? order.id : 'closed'}
+            key={order.id}
             schema={HostCancelContributionFormSchema}
             initialValues={initialValues}
             onSubmit={handleSubmit}

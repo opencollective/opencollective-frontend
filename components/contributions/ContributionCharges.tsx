@@ -26,7 +26,7 @@ import { usePaymentActions } from './usePaymentActions';
 
 type ContributionTransaction = ContributionDrawerQuery['order']['transactions'][number];
 
-const PAYMENT_TRANSACTION_KINDS = [
+const CHARGE_TRANSACTION_KINDS = [
   TransactionKind.CONTRIBUTION,
   TransactionKind.ADDED_FUNDS,
   TransactionKind.BALANCE_TRANSFER,
@@ -34,18 +34,18 @@ const PAYMENT_TRANSACTION_KINDS = [
   TransactionKind.TAX,
 ];
 
-type PaymentGroup = {
+type ChargeGroup = {
   group: string;
   primaryTransaction: ContributionTransaction;
   transactions: ContributionTransaction[];
   amount: ContributionTransaction['amount'];
 };
 
-const paymentColumnHelper = createColumnHelper<PaymentGroup>();
+const chargeColumnHelper = createColumnHelper<ChargeGroup>();
 
 const getTimestamp = (value: string | Date) => new Date(value).getTime();
 
-function getPaymentGroupAmount(
+function getChargeGroupAmount(
   order: ContributionDrawerQuery['order'],
   transactions: ContributionTransaction[],
   primaryTransaction: ContributionTransaction,
@@ -55,7 +55,7 @@ function getPaymentGroupAmount(
       transaction.type === TransactionType.DEBIT &&
       transaction.account?.id === order.fromAccount?.id &&
       transaction.kind &&
-      PAYMENT_TRANSACTION_KINDS.includes(transaction.kind) &&
+      CHARGE_TRANSACTION_KINDS.includes(transaction.kind) &&
       !transaction.isRefund,
   );
 
@@ -77,7 +77,7 @@ function getPaymentGroupAmount(
   };
 }
 
-function buildPaymentGroups(order: ContributionDrawerQuery['order']): PaymentGroup[] {
+function buildChargeGroups(order: ContributionDrawerQuery['order']): ChargeGroup[] {
   const byGroup = new Map<string, ContributionTransaction[]>();
 
   for (const transaction of order?.transactions || []) {
@@ -91,21 +91,21 @@ function buildPaymentGroups(order: ContributionDrawerQuery['order']): PaymentGro
         group,
         primaryTransaction,
         transactions,
-        amount: getPaymentGroupAmount(order, transactions, primaryTransaction),
+        amount: getChargeGroupAmount(order, transactions, primaryTransaction),
       };
     })
-    .filter(paymentGroup => !paymentGroup.primaryTransaction.isRefund)
+    .filter(chargeGroup => !chargeGroup.primaryTransaction.isRefund)
     .sort((a, b) => getTimestamp(b.primaryTransaction.createdAt) - getTimestamp(a.primaryTransaction.createdAt));
 }
 
-function PaymentStatusBadge({ paymentGroup }: { paymentGroup: PaymentGroup }) {
-  if (paymentGroup.primaryTransaction.isOrderRejected) {
+function ChargeStatusBadge({ chargeGroup }: { chargeGroup: ChargeGroup }) {
+  if (chargeGroup.primaryTransaction.isOrderRejected) {
     return (
       <Badge size="xs" type="error">
         <FormattedMessage defaultMessage="Rejected" id="5qaD7s" />
       </Badge>
     );
-  } else if (paymentGroup.primaryTransaction.isRefunded) {
+  } else if (chargeGroup.primaryTransaction.isRefunded) {
     return (
       <Badge size="xs" type="warning">
         <FormattedMessage defaultMessage="Refunded" id="Gs86nL" />
@@ -120,14 +120,14 @@ function PaymentStatusBadge({ paymentGroup }: { paymentGroup: PaymentGroup }) {
   );
 }
 
-const paymentColumns: ColumnDef<PaymentGroup>[] = [
-  paymentColumnHelper.display({
+const chargeColumns: ColumnDef<ChargeGroup>[] = [
+  chargeColumnHelper.display({
     id: 'date',
     meta: { className: 'whitespace-nowrap' },
     header: () => <FormattedMessage defaultMessage="Date" id="expense.incurredAt" />,
     cell: ({ row }) => <DateTime value={row.original.primaryTransaction.createdAt} dateStyle="medium" />,
   }),
-  paymentColumnHelper.display({
+  chargeColumnHelper.display({
     id: 'description',
     meta: { className: 'min-w-0 max-w-64' },
     header: () => <FormattedMessage defaultMessage="Description" id="Fields.description" />,
@@ -142,25 +142,25 @@ const paymentColumns: ColumnDef<PaymentGroup>[] = [
       );
     },
   }),
-  paymentColumnHelper.accessor('amount', {
+  chargeColumnHelper.accessor('amount', {
     meta: { className: 'font-medium whitespace-nowrap' },
     header: () => <FormattedMessage defaultMessage="Amount" id="Fields.amount" />,
     cell: ({ cell }) => {
-      const amount = cell.getValue() as PaymentGroup['amount'];
+      const amount = cell.getValue() as ChargeGroup['amount'];
       return (
         <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} precision={2} showCurrencyCode />
       );
     },
   }),
-  paymentColumnHelper.display({
+  chargeColumnHelper.display({
     id: 'status',
     header: () => <FormattedMessage defaultMessage="Status" id="tzMNF3" />,
-    cell: ({ row }) => <PaymentStatusBadge paymentGroup={row.original} />,
+    cell: ({ row }) => <ChargeStatusBadge chargeGroup={row.original} />,
   }),
   actionsColumn,
 ];
 
-export function ContributionPayments({
+export function ContributionCharges({
   isLoading,
   order,
   transactionsUrl,
@@ -169,28 +169,28 @@ export function ContributionPayments({
   order: ContributionDrawerQuery['order'];
   transactionsUrl: URL | undefined;
 }) {
-  const paymentGroups = React.useMemo(() => (order ? buildPaymentGroups(order) : []), [order]);
+  const chargeGroups = React.useMemo(() => (order ? buildChargeGroups(order) : []), [order]);
   const transactionsQueryFilter = useQueryFilter<typeof transactionFilterSchema, TransactionsTableQueryVariables>({
     schema: transactionFilterSchema,
     toVariables: transactionFiltersToVariables,
     filters: transactionFilters,
     skipRouter: true,
   });
-  const getPaymentTransactionActions = usePaymentActions({
+  const getChargeTransactionActions = usePaymentActions({
     resetFilters: transactionsQueryFilter.resetFilters,
     redirectRelatedTransactionsTo: transactionsUrl?.pathname,
   });
-  const getPaymentActions = React.useCallback(
-    (paymentGroup: PaymentGroup, onCloseFocusRef) =>
-      getPaymentTransactionActions(paymentGroup.primaryTransaction, onCloseFocusRef),
-    [getPaymentTransactionActions],
+  const getChargeActions = React.useCallback(
+    (chargeGroup: ChargeGroup, onCloseFocusRef) =>
+      getChargeTransactionActions(chargeGroup.primaryTransaction, onCloseFocusRef),
+    [getChargeTransactionActions],
   );
 
   return (
     <div className="mb-2">
       <div className="flex items-center justify-between gap-2 py-4">
         <div className="text-slate-80 w-fit text-base leading-6 font-bold">
-          <FormattedMessage defaultMessage="Payments" id="iYc3Ld" />
+          <FormattedMessage defaultMessage="Charges" id="H8nU0u" />
         </div>
         <hr className="grow border-neutral-300" />
         <Button
@@ -209,13 +209,13 @@ export function ContributionPayments({
       </div>
 
       <DataTable
-        columns={paymentColumns}
-        data={paymentGroups}
+        columns={chargeColumns}
+        data={chargeGroups}
         loading={isLoading}
         nbPlaceholders={2}
-        getRowId={paymentGroup => paymentGroup.group}
-        getActions={getPaymentActions}
-        emptyMessage={() => <FormattedMessage defaultMessage="No payments" id="FrXIb+" />}
+        getRowId={chargeGroup => chargeGroup.group}
+        getActions={getChargeActions}
+        emptyMessage={() => <FormattedMessage defaultMessage="No charges" id="YiMRGp" />}
         compact
         showQuickActions
       />

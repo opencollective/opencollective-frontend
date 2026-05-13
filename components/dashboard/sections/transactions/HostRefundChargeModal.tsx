@@ -39,7 +39,7 @@ import { Textarea } from '../../../ui/Textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { useToast } from '../../../ui/useToast';
 
-const hostRefundPaymentTransactionQuery = gql`
+const hostRefundChargeTransactionQuery = gql`
   query HostRefundPaymentTransaction($transaction: TransactionReferenceInput!) {
     transaction(transaction: $transaction) {
       id
@@ -148,7 +148,7 @@ const hostRefundPaymentTransactionQuery = gql`
   ${accountHoverCardFields}
 `;
 
-const hostRefundPaymentMutation = gql`
+const hostRefundChargeMutation = gql`
   mutation HostRefundPayment(
     $transaction: TransactionReferenceInput!
     $cancelRecurringContribution: Boolean
@@ -190,12 +190,12 @@ const hostRefundPaymentMutation = gql`
 
 type TransactionData = NonNullable<HostRefundPaymentTransactionQuery['transaction']>;
 
-type HostRefundPaymentModalProps = BaseModalProps & {
+type HostRefundChargeModalProps = BaseModalProps & {
   transaction: { id: string; legacyId?: number };
   onSuccess?: () => void;
 };
 
-const HostRefundPaymentFormSchema = z.object({
+const HostRefundChargeFormSchema = z.object({
   cancelRecurringContribution: z.boolean(),
   removeAsContributor: z.boolean(),
   sendMessage: z.boolean(),
@@ -203,7 +203,7 @@ const HostRefundPaymentFormSchema = z.object({
   ignoreBalanceCheck: z.boolean(),
 });
 
-type HostRefundPaymentFormValues = z.infer<typeof HostRefundPaymentFormSchema>;
+type HostRefundChargeFormValues = z.infer<typeof HostRefundChargeFormSchema>;
 
 const Section: React.FC<{
   children: React.ReactNode;
@@ -590,15 +590,15 @@ type RefundOptions = {
   canIgnoreBalanceCheck: boolean;
 };
 
-type HostRefundPaymentFormProps = {
+type HostRefundChargeFormProps = {
   transaction: TransactionData;
   options: RefundOptions;
   onClose: () => void;
 };
 
-const HostRefundPaymentForm: React.FC<HostRefundPaymentFormProps> = ({ transaction, options, onClose }) => {
+const HostRefundChargeForm: React.FC<HostRefundChargeFormProps> = ({ transaction, options, onClose }) => {
   const intl = useIntl();
-  const { values, setFieldValue, isSubmitting } = useFormikContext<HostRefundPaymentFormValues>();
+  const { values, setFieldValue, isSubmitting } = useFormikContext<HostRefundChargeFormValues>();
 
   const refundAllocation = React.useMemo(() => buildRefundAllocation(transaction, intl), [intl, transaction]);
   const { currency, refundAmount, outflow, inflow, principalAccount, principalOutflowAmount } = refundAllocation;
@@ -833,13 +833,13 @@ const HostRefundPaymentForm: React.FC<HostRefundPaymentFormProps> = ({ transacti
   );
 };
 
-export const HostRefundPaymentModal = ({
+export const HostRefundChargeModal = ({
   transaction: transactionRef,
   open,
   setOpen,
   onCloseFocusRef,
   onSuccess,
-}: HostRefundPaymentModalProps) => {
+}: HostRefundChargeModalProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();
@@ -847,7 +847,7 @@ export const HostRefundPaymentModal = ({
   const { data, previousData, loading, error } = useQuery<
     HostRefundPaymentTransactionQuery,
     HostRefundPaymentTransactionQueryVariables
-  >(hostRefundPaymentTransactionQuery, {
+  >(hostRefundChargeTransactionQuery, {
     variables: { transaction: { id: transactionRef.id } },
     skip: !open,
     fetchPolicy: 'cache-and-network',
@@ -872,7 +872,7 @@ export const HostRefundPaymentModal = ({
   };
 
   const [runRefund] = useMutation<HostRefundPaymentMutation, HostRefundPaymentMutationVariables>(
-    hostRefundPaymentMutation,
+    hostRefundChargeMutation,
   );
 
   const handleClose = React.useCallback(
@@ -882,7 +882,7 @@ export const HostRefundPaymentModal = ({
     [setOpen],
   );
 
-  const initialValues = React.useMemo<HostRefundPaymentFormValues>(
+  const initialValues = React.useMemo<HostRefundChargeFormValues>(
     () => ({
       cancelRecurringContribution: options.showCancelRecurring,
       removeAsContributor: false,
@@ -893,7 +893,7 @@ export const HostRefundPaymentModal = ({
     [options.showCancelRecurring],
   );
 
-  const handleSubmit = async (values: HostRefundPaymentFormValues) => {
+  const handleSubmit = async (values: HostRefundChargeFormValues) => {
     if (!transaction) {
       return;
     }
@@ -950,13 +950,13 @@ export const HostRefundPaymentModal = ({
             )}
           </MessageBox>
         ) : (
-          <FormikZod<HostRefundPaymentFormValues>
+          <FormikZod<HostRefundChargeFormValues>
             key={transaction.id}
-            schema={HostRefundPaymentFormSchema}
+            schema={HostRefundChargeFormSchema}
             initialValues={initialValues}
             onSubmit={handleSubmit}
           >
-            <HostRefundPaymentForm transaction={transaction} options={options} onClose={() => handleClose(false)} />
+            <HostRefundChargeForm transaction={transaction} options={options} onClose={() => handleClose(false)} />
           </FormikZod>
         )}
       </DialogContent>

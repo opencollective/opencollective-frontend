@@ -149,7 +149,7 @@ const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) 
         nbPlaceholders={nbPlaceholders}
         error={error}
         refetch={handleRefetch}
-        showPaymentsSection
+        showChargesSection
       />
     </div>
   );
