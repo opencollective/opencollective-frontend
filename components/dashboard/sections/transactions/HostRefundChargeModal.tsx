@@ -15,8 +15,6 @@ import type {
 } from '../../../../lib/graphql/types/v2/graphql';
 import {
   AccountType,
-  ContributionFrequency,
-  OrderStatus,
   TransactionKind,
   TransactionType,
 } from '../../../../lib/graphql/types/v2/graphql';

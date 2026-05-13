@@ -237,6 +237,7 @@ const transactionQuery = gql`
         group
         createdAt
       }
+      paymentProcessorUrl
     }
   }
   ${accountHoverCardFields}
