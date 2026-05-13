@@ -5,7 +5,7 @@ import { ArrowLeftRightIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import type { ContributionDrawerQuery, TransactionsTableQueryVariables } from '../../lib/graphql/types/v2/graphql';
-import {  TransactionType } from '../../lib/graphql/types/v2/graphql';
+import { TransactionType } from '../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { i18nTransactionKind } from '../../lib/i18n/transaction';
 import { getDashboardRoute } from '@/lib/url-helpers';

@@ -75,7 +75,7 @@ function buildTransactionGroups(order: ContributionDrawerQuery['order']): Transa
   }));
 }
 
-export function getTransactionsUrl(
+function getTransactionsUrl(
   LoggedInUser: LoggedInUser,
   order: ContributionDrawerQuery['order'] | ManagedOrderFieldsFragment,
 ): URL {

@@ -13,11 +13,7 @@ import type {
   HostRefundPaymentTransactionQuery,
   HostRefundPaymentTransactionQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import {
-  AccountType,
-  TransactionKind,
-  TransactionType,
-} from '../../../../lib/graphql/types/v2/graphql';
+import { AccountType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 
