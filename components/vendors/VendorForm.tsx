@@ -203,7 +203,7 @@ const validateVendorForm = values => {
   if (values.vendorInfo?.taxFormUrl) {
     verifyURLPattern(errors, values, 'vendorInfo.taxFormUrl');
   }
-  if (values.imageUrl) {
+  if (values.imageUrl && !isImageServiceUrl(values.imageUrl)) {
     verifyURLPattern(errors, values, 'imageUrl');
   }
 
