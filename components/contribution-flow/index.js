@@ -46,7 +46,7 @@ import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
 import CollectiveTitleContainer from './CollectiveTitleContainer';
-import { INCOGNITO_PROFILE_ALIAS, PERSONAL_PROFILE_ALIAS, STEPS } from './constants';
+import { DEFAULT_PLATFORM_TIP_PERCENTAGE, INCOGNITO_PROFILE_ALIAS, PERSONAL_PROFILE_ALIAS, STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowStepContainer from './ContributionFlowStepContainer';
@@ -54,7 +54,6 @@ import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionFlowSuccess from './ContributionFlowSuccess';
 import ContributionSummary from './ContributionSummary';
 import { PlatformTipOption } from './PlatformTipContainer';
-import { DEFAULT_PLATFORM_TIP_PERCENTAGE } from './PlatformTipInput';
 import {
   ContributionFlowUrlQueryHelper,
   EmbedContributionFlowUrlQueryHelper,
@@ -132,6 +131,10 @@ class ContributionFlow extends React.Component {
       type: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
       platformContributionAvailable: PropTypes.bool,
+      host: PropTypes.shape({
+        slug: PropTypes.string,
+        legacyId: PropTypes.number,
+      }),
       parent: PropTypes.shape({
         slug: PropTypes.string,
       }),
@@ -194,7 +197,7 @@ class ContributionFlow extends React.Component {
           ? roundCentsAmount(amount * quantity * DEFAULT_PLATFORM_TIP_PERCENTAGE, currency)
           : 0,
         platformTipOption: PlatformTipOption.FIFTEEN_PERCENT,
-        isNewPlatformTip: isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, LoggedInUser),
+        isNewPlatformTip: isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, LoggedInUser, { collective }),
         currency,
       },
     };
@@ -211,6 +214,7 @@ class ContributionFlow extends React.Component {
       track(AnalyticsEvent.CONTRIBUTION_STARTED, {
         props: {
           [AnalyticsProperty.CONTRIBUTION_STEP]: this.getCurrentStepName(),
+          [AnalyticsProperty.CONTRIBUTION_IS_NEW_PLATFORM_TIP]: this.state.stepDetails.isNewPlatformTip,
         },
       });
 

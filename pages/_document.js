@@ -140,6 +140,7 @@ export default class IntlDocument extends Document {
       'TURNSTILE_SITEKEY',
       'DISABLE_CONTACT_FORM',
       'NEW_PRICING',
+      'NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE',
       'CAPTCHA_ENABLED',
       'CAPTCHA_PROVIDER',
       'DISABLE_MOCK_UPLOADS',

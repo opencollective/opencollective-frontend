@@ -98,15 +98,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         {Boolean(platformTip) && (
           <AmountLine color="black.700">
             <Label>
-              {stepDetails.isNewPlatformTip ? (
-                <FormattedMessage defaultMessage="Optional tip to the platform" id="JVRAzE" />
-              ) : (
-                <FormattedMessage
-                  id="SupportProject"
-                  defaultMessage="Support {projectName}"
-                  values={{ projectName: 'Open Collective' }}
-                />
-              )}
+              <FormattedMessage defaultMessage="Contribution to the Platform" id="platformTip.summaryLabel" />
             </Label>
             <Amount data-cy="ContributionSummary-Tip">
               <FormattedMoneyAmount amount={platformTip} currency={currency} />
@@ -118,7 +110,13 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
       <StyledHr borderColor="black.500" my={1} />
       <AmountLine color="black.800" fontWeight="500">
         <Label fontWeight="500">
-          <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
+          {!stepDetails.interval || stepDetails.interval === INTERVALS.oneTime ? (
+            <FormattedMessage id="TotalCharge" defaultMessage="Total charge" />
+          ) : stepDetails.interval === INTERVALS.year ? (
+            <FormattedMessage id="YearlyCharge" defaultMessage="Yearly charge" />
+          ) : (
+            <FormattedMessage id="MonthlyCharge" defaultMessage="Monthly charge" />
+          )}
         </Label>
         <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
           <FormattedMoneyAmount amount={totalAmount} currency={currency} />
@@ -187,8 +185,8 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                     verticalAlign="top"
                     content={
                       <FormattedMessage
-                        defaultMessage="Net Amount = Today's charge - Payment processor fee - Support Open Collective"
-                        id="4oy6Z0"
+                        defaultMessage="Net Amount = Total charge - Payment processor fee - Platform tip"
+                        id="netAmountFormula"
                       />
                     }
                   >
