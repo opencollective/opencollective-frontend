@@ -5,10 +5,13 @@ import { ArrowLeftRightIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import type { ContributionDrawerQuery, TransactionsTableQueryVariables } from '../../lib/graphql/types/v2/graphql';
-import { TransactionKind, TransactionType } from '../../lib/graphql/types/v2/graphql';
+import {  TransactionType } from '../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { i18nTransactionKind } from '../../lib/i18n/transaction';
+import { getDashboardRoute } from '@/lib/url-helpers';
 
+import { DashboardContext } from '../dashboard/DashboardContext';
+import { useTransactionActions } from '../dashboard/sections/transactions/actions';
 import {
   filters as transactionFilters,
   schema as transactionFilterSchema,
@@ -22,17 +25,8 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 
 import { getPrimaryContributionTransaction } from './transactionUtils';
-import { useChargeActions } from './useChargeActions';
 
 type ContributionTransaction = ContributionDrawerQuery['order']['transactions'][number];
-
-const CHARGE_TRANSACTION_KINDS = [
-  TransactionKind.CONTRIBUTION,
-  TransactionKind.ADDED_FUNDS,
-  TransactionKind.BALANCE_TRANSFER,
-  TransactionKind.PLATFORM_TIP,
-  TransactionKind.TAX,
-];
 
 type ChargeGroup = {
   group: string;
@@ -54,8 +48,6 @@ function getChargeGroupAmount(
     transaction =>
       transaction.type === TransactionType.DEBIT &&
       transaction.account?.id === order.fromAccount?.id &&
-      transaction.kind &&
-      CHARGE_TRANSACTION_KINDS.includes(transaction.kind) &&
       !transaction.isRefund,
   );
 
@@ -163,11 +155,9 @@ const chargeColumns: ColumnDef<ChargeGroup>[] = [
 export function ContributionCharges({
   isLoading,
   order,
-  transactionsUrl,
 }: {
   isLoading: boolean;
   order: ContributionDrawerQuery['order'];
-  transactionsUrl: URL | undefined;
 }) {
   const chargeGroups = React.useMemo(() => (order ? buildChargeGroups(order) : []), [order]);
   const transactionsQueryFilter = useQueryFilter<typeof transactionFilterSchema, TransactionsTableQueryVariables>({
@@ -176,9 +166,18 @@ export function ContributionCharges({
     filters: transactionFilters,
     skipRouter: true,
   });
-  const getChargeTransactionActions = useChargeActions({
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
+  const redirectRelatedTransactionsTo = getDashboardRoute(
+    dashboardAccount,
+    dashboardAccount.hasHosting ? 'host-transactions' : 'transactions',
+  );
+
+  const transactionsUrl = `${redirectRelatedTransactionsTo}?orderId=${order?.legacyId.toString()}`;
+
+  const getChargeTransactionActions = useTransactionActions<ContributionTransaction>({
     resetFilters: transactionsQueryFilter.resetFilters,
-    redirectRelatedTransactionsTo: transactionsUrl?.pathname,
+    redirectRelatedTransactionsTo: redirectRelatedTransactionsTo,
+    excludeActions: ['reject'],
   });
   const getChargeActions = React.useCallback(
     (chargeGroup: ChargeGroup, onCloseFocusRef) =>
@@ -190,7 +189,7 @@ export function ContributionCharges({
     <div className="mb-2">
       <div className="flex items-center justify-between gap-2 py-4">
         <div className="text-slate-80 w-fit text-base leading-6 font-bold">
-          <FormattedMessage defaultMessage="Charges" id="Dx5IBb"  />
+          <FormattedMessage defaultMessage="Charges" id="Dx5IBb" />
         </div>
         <hr className="grow border-neutral-300" />
         <Button
@@ -201,7 +200,7 @@ export function ContributionCharges({
           loading={isLoading}
           data-cy="view-transactions-button"
         >
-          <Link href={transactionsUrl?.toString() || '#'} className="flex flex-row items-center gap-2.5">
+          <Link href={transactionsUrl} className="flex flex-row items-center gap-2.5">
             <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
             <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
           </Link>

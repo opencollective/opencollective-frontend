@@ -7,16 +7,15 @@ import type { GetActions } from '../../../../lib/actions/types';
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { getPermalinkUrl } from '../../../../lib/url-helpers';
+import { getDashboardRoute, getPermalinkUrl } from '../../../../lib/url-helpers';
 import useClipboard from '@/lib/hooks/useClipboard';
-
-import { getTransactionsUrl } from '@/components/contributions/ContributionTimeline';
 
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
 import { useModal } from '../../../ModalContext';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import { HostCancelContributionModal } from './HostCancelContributionModal';
@@ -56,6 +55,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
   const { showModal, showConfirmationModal } = useModal();
   const { LoggedInUser } = useLoggedInUser();
   const { copy } = useClipboard();
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
 
   const [expireOrder] = useMutation(expireOrderMutation);
 
@@ -73,8 +73,10 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       refetch?.();
     };
 
-    const transactionsUrl = getTransactionsUrl(LoggedInUser, order);
-    transactionsUrl.searchParams.set('orderId', order.legacyId.toString());
+    const transactionsUrl = getDashboardRoute(
+      dashboardAccount,
+      `${dashboardAccount.hasHosting ? 'host-transactions' : 'transactions'}?orderId=${order.legacyId.toString()}`,
+    );
 
     const actions: ReturnType<GetActions<ManagedOrderFieldsFragment>> = {
       primary: [],

@@ -1,11 +1,12 @@
 import { gql, useMutation } from '@apollo/client';
 import { compact } from 'lodash';
-import { Download, Filter, MinusCircle, Undo2 } from 'lucide-react';
+import { Download, ExternalLink, Filter, MinusCircle, Undo2 } from 'lucide-react';
 import type React from 'react';
 import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import { PaymentMethodService, TransactionDetailsQuery } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionDetailsQuery } from '../../../../lib/graphql/types/v2/graphql';
+import { PaymentMethodService } from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { saveInvoice } from '../../../../lib/transactions';
@@ -16,6 +17,15 @@ import { toast } from '../../../ui/useToast';
 import { HostRefundChargeModal } from './HostRefundChargeModal';
 import TransactionRejectModal from './TransactionRejectModal';
 import type { TransactionsTableQueryNode } from './types';
+
+type TransactionActionKey = 'refund' | 'reject' | 'view-payment-processor' | 'view-transactions' | 'download';
+
+type UseTransactionActionsOptions = {
+  resetFilters?: (filters: Record<string, unknown>, redirectTo?: string) => void;
+  refetchList?: () => void;
+  redirectRelatedTransactionsTo?: string;
+  excludeActions?: TransactionActionKey[];
+};
 
 const refundTransactionMutation = gql`
   mutation RefundTransaction($transaction: TransactionReferenceInput!, $ignoreBalanceCheck: Boolean) {
@@ -48,7 +58,8 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
   resetFilters = null,
   refetchList = null,
   redirectRelatedTransactionsTo = undefined,
-} = {}) {
+  excludeActions = [],
+}: UseTransactionActionsOptions = {}) {
   const intl = useIntl();
 
   const { showModal, showConfirmationModal } = useModal();
@@ -58,6 +69,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
   const [refundTransaction] = useMutation(refundTransactionMutation);
 
   const { callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice, { useErrorToast: true });
+  const excludedActions = new Set(excludeActions);
 
   const getActions: GetActions<T> = (
     transaction: T,
@@ -71,8 +83,8 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
     const isFiscalHostAdmin = LoggedInUser.isAdminOfCollective(transaction.host);
     const isContributionCharge = Boolean(
       transaction.order &&
-        transaction.paymentMethod?.service &&
-        [PaymentMethodService.PAYPAL, PaymentMethodService.STRIPE].includes(transaction.paymentMethod.service),
+      transaction.paymentMethod?.service &&
+      [PaymentMethodService.PAYPAL, PaymentMethodService.STRIPE].includes(transaction.paymentMethod.service),
     );
 
     const onMutationSuccess = () => {
@@ -164,8 +176,15 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
           },
           Icon: MinusCircle,
         },
-      ].filter(a => a.if ?? true),
+      ].filter(action => !excludedActions.has(action.key as TransactionActionKey) && (action.if ?? true)),
       secondary: [
+        {
+          key: 'view-payment-processor',
+          label: intl.formatMessage({ defaultMessage: 'View in payment processor', id: 'NgSLbI' }),
+          href: transaction.paymentProcessorUrl,
+          Icon: ExternalLink,
+          if: Boolean(transaction.paymentProcessorUrl),
+        },
         {
           key: 'view-transactions',
           label: intl.formatMessage({ defaultMessage: 'View related transactions', id: '+9+Ty6' }),
@@ -173,11 +192,12 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
             resetFilters?.(
               {
                 group: [transaction.group, transaction.refundTransaction?.group].filter(Boolean),
+                orderId: transaction.order?.legacyId,
               },
               redirectRelatedTransactionsTo,
             ),
           Icon: Filter,
-          if: Boolean(transaction.group),
+          if: Boolean(transaction.group && resetFilters),
         },
         {
           key: 'download',
@@ -188,7 +208,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
           if: Boolean(transaction?.permissions.canDownloadInvoice),
           Icon: Download,
         },
-      ].filter(a => a.if ?? true),
+      ].filter(action => !excludedActions.has(action.key as TransactionActionKey) && (action.if ?? true)),
     };
   };
 

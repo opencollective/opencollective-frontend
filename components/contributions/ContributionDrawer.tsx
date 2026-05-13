@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '../../lib/actions/types';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
@@ -30,7 +29,7 @@ import { Sheet, SheetContent } from '../ui/Sheet';
 import { Skeleton } from '../ui/Skeleton';
 
 import { ContributionCharges } from './ContributionCharges';
-import ContributionTimeline, { getTransactionsUrl } from './ContributionTimeline';
+import ContributionTimeline from './ContributionTimeline';
 
 const contributionDrawerQuery = gql`
   query ContributionDrawer($orderId: Int!) {
@@ -262,6 +261,10 @@ const contributionDrawerQuery = gql`
       id
       legacyId
     }
+    paymentMethod {
+      id
+      service
+    }
     permissions {
       id
       canRefund
@@ -297,7 +300,6 @@ export function ContributionDrawer({
   showChargesSection = false,
 }: ContributionDrawerProps) {
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
 
   const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
     variables: {
@@ -309,17 +311,11 @@ export function ContributionDrawer({
   const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== orderId;
   const dropdownTriggerRef = React.useRef(undefined);
   const order = query.data?.order;
+
   const actions = React.useMemo(
     () => (order ? getActions(order, dropdownTriggerRef) : null),
     [order, getActions, dropdownTriggerRef],
   );
-  const transactionsUrl = React.useMemo(() => {
-    const url = order && getTransactionsUrl(LoggedInUser, order);
-    if (url) {
-      url.searchParams?.set('orderId', order.legacyId.toString());
-    }
-    return url;
-  }, [LoggedInUser, order]);
 
   return (
     <Sheet open={open} onOpenChange={isOpen => !isOpen && onClose()}>
@@ -334,7 +330,6 @@ export function ContributionDrawer({
             </div>
           }
           forceMoreActions
-          // separateRowForEntityLabel
           entityIdentifier={
             <div className="flex items-center gap-1">
               <CopyIDDropdown
@@ -629,13 +624,7 @@ export function ContributionDrawer({
                   )}
                 </DataList>
 
-                {showChargesSection && (
-                  <ContributionCharges
-                    isLoading={isLoading}
-                    order={query.data?.order}
-                    transactionsUrl={transactionsUrl}
-                  />
-                )}
+                {showChargesSection && <ContributionCharges isLoading={isLoading} order={query.data?.order} />}
 
                 <div>
                   <div className="flex items-center justify-between gap-2 py-4">
