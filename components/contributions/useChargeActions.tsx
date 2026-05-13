@@ -75,7 +75,7 @@ export function useChargeActions<T extends ChargeActionTransaction>({
                 onSuccess: onMutationSuccess,
                 onCloseFocusRef,
               },
-              `host-refund-payment-${transaction.id}`,
+              `host-refund-charge-${transaction.id}`,
             );
           },
           Icon: Undo2,
