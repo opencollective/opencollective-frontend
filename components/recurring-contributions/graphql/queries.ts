@@ -179,15 +179,6 @@ export const managedOrderFragment = gql`
       kind
       code
     }
-    transactions {
-      id
-      isRefunded
-      isRefund
-      permissions {
-        id
-        canRefund
-      }
-    }
   }
   ${accountHoverCardFields}
   ${paymentMethodFragment}

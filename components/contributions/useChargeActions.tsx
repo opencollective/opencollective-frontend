@@ -11,9 +11,9 @@ import { saveInvoice } from '../../lib/transactions';
 import { HostRefundChargeModal } from '../dashboard/sections/transactions/HostRefundChargeModal';
 import { useModal } from '../ModalContext';
 
-type PaymentActionTransaction = ContributionDrawerQuery['order']['transactions'][number];
+type ChargeActionTransaction = ContributionDrawerQuery['order']['transactions'][number];
 
-type UsePaymentActionsOptions = {
+type UseChargeActionsOptions = {
   resetFilters?: (filters: Record<string, unknown>, redirectTo?: string) => void;
   refetchList?: () => void;
   redirectRelatedTransactionsTo?: string;
@@ -27,11 +27,11 @@ type UsePaymentActionsOptions = {
  * the host-focused {@link HostRefundChargeModal} instead of the bare
  * confirmation dialog.
  */
-export function usePaymentActions<T extends PaymentActionTransaction>({
+export function useChargeActions<T extends ChargeActionTransaction>({
   resetFilters,
   refetchList,
   redirectRelatedTransactionsTo,
-}: UsePaymentActionsOptions = {}) {
+}: UseChargeActionsOptions = {}) {
   const intl = useIntl();
   const { showModal } = useModal();
   const { LoggedInUser } = useLoggedInUser();

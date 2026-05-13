@@ -137,6 +137,7 @@ const hostRefundChargeTransactionQuery = gql`
         permissions {
           id
           canCancel
+          canRemoveAsContributor
         }
       }
       permissions {
@@ -858,15 +859,10 @@ export const HostRefundChargeModal = ({
   const order = transaction?.order;
 
   const isFiscalHostAdmin = Boolean(transaction?.host && LoggedInUser?.isAdminOfCollective(transaction.host));
-  const isRecurringOrder = Boolean(order?.frequency && order.frequency !== ContributionFrequency.ONETIME);
-  const orderIsCancellable = Boolean(
-    order?.status &&
-    ![OrderStatus.CANCELLED, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status as OrderStatus),
-  );
 
   const options: RefundOptions = {
-    showCancelRecurring: Boolean(isRecurringOrder && orderIsCancellable && order?.permissions?.canHostCancel),
-    showRemoveAsContributor: Boolean(order?.permissions?.canHostRemoveAsContributor),
+    showCancelRecurring: Boolean(order?.permissions?.canCancel),
+    showRemoveAsContributor: Boolean(order?.permissions?.canRemoveAsContributor),
     showHostMessage: isFiscalHostAdmin,
     canIgnoreBalanceCheck: isFiscalHostAdmin,
   };

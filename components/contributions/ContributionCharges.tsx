@@ -22,7 +22,7 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 
 import { getPrimaryContributionTransaction } from './transactionUtils';
-import { usePaymentActions } from './usePaymentActions';
+import { useChargeActions } from './useChargeActions';
 
 type ContributionTransaction = ContributionDrawerQuery['order']['transactions'][number];
 
@@ -176,7 +176,7 @@ export function ContributionCharges({
     filters: transactionFilters,
     skipRouter: true,
   });
-  const getChargeTransactionActions = usePaymentActions({
+  const getChargeTransactionActions = useChargeActions({
     resetFilters: transactionsQueryFilter.resetFilters,
     redirectRelatedTransactionsTo: transactionsUrl?.pathname,
   });

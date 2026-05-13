@@ -162,7 +162,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
             CreatePendingContributionModal,
             {
               hostSlug: hostSlug || accountSlug,
-              edit: order as unknown as React.ComponentProps<typeof CreatePendingContributionModal>['edit'],
+              edit: order as React.ComponentProps<typeof CreatePendingContributionModal>['edit'],
               onSuccess: onMutationSuccess,
               onCloseFocusRef,
             },
