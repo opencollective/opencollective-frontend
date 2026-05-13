@@ -235,6 +235,11 @@ interface Account {
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -3064,6 +3069,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -10158,6 +10168,11 @@ type Bot implements Account {
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -11233,6 +11248,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -12888,6 +12908,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -14262,6 +14287,11 @@ type Individual implements Account {
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -15662,6 +15692,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -17156,6 +17191,11 @@ type Vendor implements Account & AccountWithContributions {
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -18686,7 +18726,7 @@ type Query {
     """
     Host context filter
     """
-    host: AccountReferenceInput
+    host: AccountReferenceInput!
     type: [AccountType]
 
     """
@@ -21484,6 +21524,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -22716,6 +22761,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
+  """
+  mainProfile: Account
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -25137,6 +25187,11 @@ type Mutation {
   Update newsletter opt-in preference. Scope: "account".
   """
   setNewsletterOptIn(newsletterOptIn: Boolean!): Individual!
+
+  """
+  Create an incognito profile for the logged-in user, or return the existing one. Scope: "account".
+  """
+  createIncognitoProfile: Individual!
 
   """
   Set password to Individual. Scope: "account". 2FA.
