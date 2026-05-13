@@ -7,7 +7,7 @@ import type { GetActions } from '../../../../lib/actions/types';
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import {  getPermalinkUrl } from '../../../../lib/url-helpers';
+import { getPermalinkUrl } from '../../../../lib/url-helpers';
 import useClipboard from '@/lib/hooks/useClipboard';
 
 import { getTransactionsUrl } from '@/components/contributions/ContributionTimeline';
@@ -84,7 +84,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     const isAdminOfOrder = LoggedInUser.isAdminOfCollective(order.fromAccount);
     const isHostAdminOfToAccount = LoggedInUser?.isHostAdmin(order.toAccount);
     const isSingleContribution = order.frequency === ContributionFrequency.ONETIME;
-    const canManageAsHost =
+    const canCancelAsHost =
       isHostAdminOfToAccount &&
       !isSingleContribution &&
       ![OrderStatus.PENDING, OrderStatus.EXPIRED, OrderStatus.REJECTED, OrderStatus.REFUNDED].includes(order.status);
@@ -103,6 +103,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     const canResume = order.status === OrderStatus.PAUSED && order.permissions.canResume;
     const canCancel =
       isAdminOfOrder &&
+      !canCancelAsHost &&
       ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status) &&
       order.frequency !== ContributionFrequency.ONETIME;
     const canMarkAsCompleted =
@@ -255,9 +256,9 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       });
     }
 
-    if (canManageAsHost) {
+    if (canCancelAsHost) {
       actions.primary.push({
-        key: 'manage-contribution-as-host',
+        key: 'cancel-contribution-as-host',
         Icon: CircleX,
         label: intl.formatMessage({
           defaultMessage: 'Cancel contribution',
