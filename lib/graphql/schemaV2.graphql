@@ -25660,7 +25660,7 @@ type Mutation {
   ): Order!
 
   """
-  Refunds a transaction. When performed by a Fiscal Host admin, a CONTRIBUTION_REFUNDED activity is emitted and the contributor is notified by email. Scope: "transactions".
+  Refunds a transaction. Scope: "transactions".
   """
   refundTransaction(
     """
