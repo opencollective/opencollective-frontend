@@ -57,12 +57,12 @@ jobs:
 
     services:
       redis:
-        image: redis
+        image: redis@sha256:0c341492924cad6f5483f9133e43bd6c51ecdecbcadfac5b51657393b6a7936c
         ports:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:16.13
+        image: postgres:16.13@sha256:5d143123fdf80462d1778cd4f24b9f7ca13c87174bca19141fb194c5a1ebca59
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -72,7 +72,7 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       minio:
-        image: minio/minio:edge-cicd
+        image: minio/minio:edge-cicd@sha256:29e8e51691d11e779468f275002779b221fd3902518d103e35c8a8bb2ef0f3ea
         ports:
           - 9000:9000
         options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
@@ -111,10 +111,10 @@ jobs:
           ./mc mb --ignore-existing minio/opencollective-e2e
 
       - name: Checkout (frontend)
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version-file: 'package.json'
           cache: 'npm'
@@ -139,7 +139,7 @@ jobs:
 
       - name: Checkout (api - matching branch)
         if: steps.check-matching-branch.outputs.status == 200
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
@@ -147,19 +147,19 @@ jobs:
 
       - name: Checkout (api - main)
         if: steps.check-matching-branch.outputs.status != 200
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
 
       - name: Checkout (images)
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           repository: opencollective/opencollective-images
           path: opencollective-images
 
       - name: Checkout (PDF)
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           repository: opencollective/opencollective-pdf
           path: opencollective-pdf
@@ -167,7 +167,7 @@ jobs:
       # Prepare API
 
       - name: Restore node_modules (api)
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         id: api-node-modules
         with:
           path: opencollective-api/node_modules
@@ -185,7 +185,7 @@ jobs:
       # Prepare Images
 
       - name: Restore node_modules (images)
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         id: images-node-modules
         with:
           path: opencollective-images/node_modules
@@ -203,7 +203,7 @@ jobs:
       # Prepare PDF
 
       - name: Restore node_modules (pdf)
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         id: pdf-node-modules
         with:
           path: opencollective-pdf/node_modules
@@ -221,7 +221,7 @@ jobs:
       # Prepare Frontend
 
       - name: Restore node_modules (frontend)
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         id: node-modules
         with:
           path: node_modules
@@ -232,7 +232,7 @@ jobs:
         run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
 
       - name: Restore Cypress
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         id: cypress
         with:
           path: ~/.cache/Cypress
@@ -243,7 +243,7 @@ jobs:
         run: npx cypress install
 
       - name: Restore .next build (frontend)
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         id: next-build
         with:
           path: .next
@@ -266,7 +266,7 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test recordings
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: cypress-recordings-${{ github.run_id }}-${{ strategy.job-index }}
           path: |
@@ -275,7 +275,7 @@ jobs:
         if: ${{ failure() }}
 
       - name: Archive download folder
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: downloads-${{ github.run_id }}-${{ strategy.job-index }}
           path: test/cypress/downloads
@@ -283,6 +283,6 @@ jobs:
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
