@@ -82,6 +82,12 @@ const transactionQuery = gql`
       isDisputed
       isOrderRejected
       merchantId
+      host {
+        id
+        slug
+        legacyId
+        type
+      }
       account {
         id
         name
@@ -231,6 +237,7 @@ const transactionQuery = gql`
         group
         createdAt
       }
+      paymentProcessorUrl
     }
   }
   ${accountHoverCardFields}

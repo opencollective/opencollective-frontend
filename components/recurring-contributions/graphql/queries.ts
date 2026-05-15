@@ -71,6 +71,7 @@ export const managedOrderFragment = gql`
       canResume
       canMarkAsExpired
       canMarkAsPaid
+      canCancel
       canEdit
       canComment
       canSeePrivateActivities

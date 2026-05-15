@@ -104,6 +104,8 @@ describe('Recurring contributions', () => {
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
         cy.get('input[type="radio"]').check();
       });
+
+      cy.wait(250);
       cy.getByDataCy('tier-amount-select').click();
       cy.contains('[data-cy="select-option"]', '$250').click();
       cy.getByDataCy('recurring-contribution-update-order-button').click();
@@ -170,7 +172,7 @@ describe('Recurring contributions', () => {
           cy.getByDataCy('toast-notification').contains('Your recurring contribution has been cancelled');
           cy.getByDataCy('contribution-status').contains('Canceled');
         });
-      cy.openEmail(({ Subject }) => Subject.includes(`Contribution cancelled to Test Collective`)).then(email => {
+      cy.openEmail(({ Subject }) => Subject.includes(`Contribution to Test Collective cancelled`)).then(email => {
         const $html = cheerio.load(email.HTML);
         const emailBody = $html('body').text();
         expect(emailBody).to.include('Because I want to');

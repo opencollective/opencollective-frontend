@@ -98,6 +98,7 @@ export const transactionsTableQueryCollectionFragment = gql`
         id
         service
       }
+      paymentProcessorUrl
     }
   }
   ${accountHoverCardFields}
