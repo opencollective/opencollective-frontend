@@ -4238,6 +4238,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   ): HostMetricsTimeSeries!
 
   """
+  Aggregated metrics for this host.
+  """
+  metrics: HostMetricsNamespace
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   hostExpensesReport(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostExpensesReports
@@ -4447,6 +4452,10 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter for accounts (Events) that started at a specific date range
     """
     startsAtTo: DateTime
+    joinedBetween: MetricsDateRangeInput
+    unhostedBetween: MetricsDateRangeInput
+    hadActivityBetween: MetricsDateRangeInput
+    noActivityBetween: MetricsDateRangeInput
   ): HostedAccountCollection!
 
   """
@@ -7455,6 +7464,7 @@ type CollectiveFeatures {
   PAYPAL_CONNECT: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
   ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
+  HOST_METRICS: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
@@ -8284,6 +8294,430 @@ type TimeSeriesAmountWithKindNode {
   date: DateTime!
   amount: Amount!
   kind: TransactionKind!
+}
+
+"""
+Aggregated metrics for a host
+"""
+type HostMetricsNamespace {
+  """
+  Daily per-collective income and spending under the host.
+  """
+  hostedCollectivesFinancialActivity(
+    input: HostedCollectivesFinancialActivityMetricsInput!
+  ): HostedCollectivesFinancialActivityMetricsResult!
+
+  """
+  Daily join/churn events for hosted collectives.
+  """
+  hostedCollectivesMembership(
+    input: HostedCollectivesMembershipMetricsInput!
+  ): HostedCollectivesMembershipMetricsResult!
+
+  """
+  Distinct collectives hosted by this host in a period.
+  """
+  hostedCollectivesHosting(input: HostedCollectivesHostingMetricsInput!): HostedCollectivesHostingMetricsResult!
+}
+
+type HostedCollectivesFinancialActivityMetricsResult implements MetricsResult {
+  dateFrom: DateTime!
+  dateTo: DateTime!
+  bucket: TimeUnit
+  groupBy: [String!]
+  rows: [HostedCollectivesFinancialActivityMetricsRow!]!
+}
+
+interface MetricsResult {
+  dateFrom: DateTime!
+  dateTo: DateTime!
+  bucket: TimeUnit
+  groupBy: [String!]
+}
+
+type HostedCollectivesFinancialActivityMetricsRow {
+  bucket: String
+  group: HostedCollectivesFinancialActivityMetricsGroup
+  values: HostedCollectivesFinancialActivityMetricsValues!
+}
+
+type HostedCollectivesFinancialActivityMetricsGroup {
+  account: Account
+  parent: Account
+  mainAccount: Account
+  isMainAccount: Boolean
+  accountType: String
+  mainAccountType: String
+  isArchived: Boolean
+  mainAccountIsArchived: Boolean
+  hostCurrency: String
+}
+
+type HostedCollectivesFinancialActivityMetricsValues {
+  """
+  Amount received in host currency, sums credit transactions, excluding refunds, refunded transactions and internal transfers.
+  Matches values returned from hostStats.totalAmountReceived(net: false).
+  """
+  amountReceived: Amount
+
+  """
+  Net amount received in host currency, sums credit transactions with fees and taxes included, excluding refunds, refunded transactions and internal transfers.
+  Matches values returned from hostStats.totalAmountReceived(net: true).
+  """
+  amountReceivedNet: Amount
+
+  """
+  Amount spent in host currency, sums debit transactions, excluding refunds, refunded transactions and internal transfers.Matches values returned from hostStats.totalAmountSpent(net: false).
+  """
+  amountSpent: Amount
+
+  """
+  Net amount spent in host currency, sums debit transactions with fees and taxes included, excluding refunds, refunded transactions and internal transfers.Matches values returned from hostStats.totalAmountSpent(net: true).
+  """
+  amountSpentNet: Amount
+
+  """
+  Total number of transactions in the queried scope.
+  """
+  transactionCount: Int
+
+  """
+  Distinct main accounts with at least one transaction of any kind. Child events/projects roll up to their parent.
+  """
+  activeCollectives: Int
+
+  """
+  Most recent date with any ledger activity, as `YYYY-MM-DD`.
+  """
+  lastActiveDate: Date
+}
+
+"""
+A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar Date
+
+input HostedCollectivesFinancialActivityMetricsInput {
+  dateRange: MetricsDateRangeInput!
+  measures: [HostedCollectivesFinancialActivityMetricsMeasure!]!
+  filters: HostedCollectivesFinancialActivityMetricsFiltersAllOf
+
+  """
+  Time grain. Omit for a single aggregate over the whole range.
+  """
+  bucket: TimeUnit
+  groupBy: [HostedCollectivesFinancialActivityMetricsDimension!]
+  having: [HostedCollectivesFinancialActivityMetricsHavingInput!]
+  orderBy: [HostedCollectivesFinancialActivityMetricsOrderByInput!]
+  limit: Int
+
+  """
+  IANA timezone applied to `DATE_TRUNC` when bucketing — determines where each month/week/day boundary falls. Independent of `dateRange` (which already carries the absolute window via ISO offsets): two queries with the same dateRange but different timezones can produce different bucket boundaries.
+  """
+  timezone: String = "UTC"
+}
+
+"""
+Date range `[from, to)`.
+"""
+input MetricsDateRangeInput {
+  from: DateTime!
+  to: DateTime!
+}
+
+enum HostedCollectivesFinancialActivityMetricsMeasure {
+  """
+  Amount received in host currency, sums credit transactions, excluding refunds, refunded transactions and internal transfers.
+  Matches values returned from hostStats.totalAmountReceived(net: false).
+  """
+  amountReceived
+
+  """
+  Net amount received in host currency, sums credit transactions with fees and taxes included, excluding refunds, refunded transactions and internal transfers.
+  Matches values returned from hostStats.totalAmountReceived(net: true).
+  """
+  amountReceivedNet
+
+  """
+  Amount spent in host currency, sums debit transactions, excluding refunds, refunded transactions and internal transfers.Matches values returned from hostStats.totalAmountSpent(net: false).
+  """
+  amountSpent
+
+  """
+  Net amount spent in host currency, sums debit transactions with fees and taxes included, excluding refunds, refunded transactions and internal transfers.Matches values returned from hostStats.totalAmountSpent(net: true).
+  """
+  amountSpentNet
+
+  """
+  Total number of transactions in the queried scope.
+  """
+  transactionCount
+
+  """
+  Distinct main accounts with at least one transaction of any kind. Child events/projects roll up to their parent.
+  """
+  activeCollectives
+
+  """
+  Most recent date with any ledger activity, as `YYYY-MM-DD`.
+  """
+  lastActiveDate
+}
+
+input HostedCollectivesFinancialActivityMetricsFiltersAllOf {
+  account: MetricsAccountReferenceFilter
+  parent: MetricsAccountReferenceFilter
+  mainAccount: MetricsAccountReferenceFilter
+  isMainAccount: Boolean
+  accountType: MetricsStringFilter
+  mainAccountType: MetricsStringFilter
+  isArchived: Boolean
+  mainAccountIsArchived: Boolean
+  hostCurrency: MetricsStringFilter
+}
+
+"""
+Filter a metric dimension that references an Account.
+"""
+input MetricsAccountReferenceFilter {
+  eq: AccountReferenceInput
+  in: [AccountReferenceInput!]
+  isNull: Boolean
+}
+
+input MetricsStringFilter {
+  eq: String
+  in: [String!]
+  isNull: Boolean
+}
+
+enum HostedCollectivesFinancialActivityMetricsDimension {
+  account
+  parent
+  mainAccount
+  isMainAccount
+  accountType
+  mainAccountType
+  isArchived
+  mainAccountIsArchived
+  hostCurrency
+}
+
+input HostedCollectivesFinancialActivityMetricsHavingInput {
+  measure: HostedCollectivesFinancialActivityMetricsMeasure!
+  op: MetricsHavingOp!
+  value: Float!
+}
+
+"""
+Comparison operator for HAVING clauses on a measure.
+"""
+enum MetricsHavingOp {
+  """
+  Greater than
+  """
+  gt
+
+  """
+  Greater than or equal
+  """
+  gte
+
+  """
+  Less than
+  """
+  lt
+
+  """
+  Less than or equal
+  """
+  lte
+
+  """
+  Equal
+  """
+  eq
+
+  """
+  Not equal
+  """
+  ne
+}
+
+input HostedCollectivesFinancialActivityMetricsOrderByInput {
+  measure: HostedCollectivesFinancialActivityMetricsMeasure!
+  direction: MetricsOrderByDirection!
+}
+
+enum MetricsOrderByDirection {
+  """
+  Ascending
+  """
+  asc
+
+  """
+  Descending
+  """
+  desc
+}
+
+type HostedCollectivesMembershipMetricsResult implements MetricsResult {
+  dateFrom: DateTime!
+  dateTo: DateTime!
+  bucket: TimeUnit
+  groupBy: [String!]
+  rows: [HostedCollectivesMembershipMetricsRow!]!
+}
+
+type HostedCollectivesMembershipMetricsRow {
+  bucket: String
+  group: HostedCollectivesMembershipMetricsGroup
+  values: HostedCollectivesMembershipMetricsValues!
+}
+
+type HostedCollectivesMembershipMetricsGroup {
+  account: Account
+  accountType: String
+  isArchived: Boolean
+  event: String
+}
+
+type HostedCollectivesMembershipMetricsValues {
+  joinedCount: Int
+  churnedCount: Int
+  joinedDistinctCollectives: Int
+  churnedDistinctCollectives: Int
+}
+
+input HostedCollectivesMembershipMetricsInput {
+  dateRange: MetricsDateRangeInput!
+  measures: [HostedCollectivesMembershipMetricsMeasure!]!
+  filters: HostedCollectivesMembershipMetricsFiltersAllOf
+
+  """
+  Time grain. Omit for a single aggregate over the whole range.
+  """
+  bucket: TimeUnit
+  groupBy: [HostedCollectivesMembershipMetricsDimension!]
+  having: [HostedCollectivesMembershipMetricsHavingInput!]
+  orderBy: [HostedCollectivesMembershipMetricsOrderByInput!]
+  limit: Int
+
+  """
+  IANA timezone applied to `DATE_TRUNC` when bucketing — determines where each month/week/day boundary falls. Independent of `dateRange` (which already carries the absolute window via ISO offsets): two queries with the same dateRange but different timezones can produce different bucket boundaries.
+  """
+  timezone: String = "UTC"
+}
+
+enum HostedCollectivesMembershipMetricsMeasure {
+  joinedCount
+  churnedCount
+  joinedDistinctCollectives
+  churnedDistinctCollectives
+}
+
+input HostedCollectivesMembershipMetricsFiltersAllOf {
+  account: MetricsAccountReferenceFilter
+  accountType: MetricsStringFilter
+  isArchived: Boolean
+  event: MetricsStringFilter
+}
+
+enum HostedCollectivesMembershipMetricsDimension {
+  account
+  accountType
+  isArchived
+  event
+}
+
+input HostedCollectivesMembershipMetricsHavingInput {
+  measure: HostedCollectivesMembershipMetricsMeasure!
+  op: MetricsHavingOp!
+  value: Float!
+}
+
+input HostedCollectivesMembershipMetricsOrderByInput {
+  measure: HostedCollectivesMembershipMetricsMeasure!
+  direction: MetricsOrderByDirection!
+}
+
+type HostedCollectivesHostingMetricsResult implements MetricsResult {
+  dateFrom: DateTime!
+  dateTo: DateTime!
+  bucket: TimeUnit
+  groupBy: [String!]
+  rows: [HostedCollectivesHostingMetricsRow!]!
+}
+
+type HostedCollectivesHostingMetricsRow {
+  bucket: String
+  group: HostedCollectivesHostingMetricsGroup
+  values: HostedCollectivesHostingMetricsValues!
+}
+
+type HostedCollectivesHostingMetricsGroup {
+  account: Account
+  parent: Account
+  accountType: String
+  mainAccountType: String
+  endDate: String
+}
+
+type HostedCollectivesHostingMetricsValues {
+  hostedCollectives: Int
+  daysHostedToDate: Float
+}
+
+input HostedCollectivesHostingMetricsInput {
+  dateRange: MetricsDateRangeInput!
+  measures: [HostedCollectivesHostingMetricsMeasure!]!
+  filters: HostedCollectivesHostingMetricsFiltersAllOf
+
+  """
+  Time grain. Omit for a single aggregate over the whole range.
+  """
+  bucket: TimeUnit
+  groupBy: [HostedCollectivesHostingMetricsDimension!]
+  having: [HostedCollectivesHostingMetricsHavingInput!]
+  orderBy: [HostedCollectivesHostingMetricsOrderByInput!]
+  limit: Int
+
+  """
+  IANA timezone applied to `DATE_TRUNC` when bucketing — determines where each month/week/day boundary falls. Independent of `dateRange` (which already carries the absolute window via ISO offsets): two queries with the same dateRange but different timezones can produce different bucket boundaries.
+  """
+  timezone: String = "UTC"
+}
+
+enum HostedCollectivesHostingMetricsMeasure {
+  hostedCollectives
+  daysHostedToDate
+}
+
+input HostedCollectivesHostingMetricsFiltersAllOf {
+  account: MetricsAccountReferenceFilter
+  parent: MetricsAccountReferenceFilter
+  accountType: MetricsStringFilter
+  mainAccountType: MetricsStringFilter
+  endDate: MetricsStringFilter
+}
+
+enum HostedCollectivesHostingMetricsDimension {
+  account
+  parent
+  accountType
+  mainAccountType
+  endDate
+}
+
+input HostedCollectivesHostingMetricsHavingInput {
+  measure: HostedCollectivesHostingMetricsMeasure!
+  op: MetricsHavingOp!
+  value: Float!
+}
+
+input HostedCollectivesHostingMetricsOrderByInput {
+  measure: HostedCollectivesHostingMetricsMeasure!
+  direction: MetricsOrderByDirection!
 }
 
 """
@@ -28637,11 +29071,6 @@ type ExpenseParsedFileInfo {
 A positive float value between 0 and 100
 """
 scalar StrictPercentage
-
-"""
-A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-"""
-scalar Date
 
 type ExpenseItemParsedFileInfo {
   description: String
