@@ -45,7 +45,7 @@
     "@sentry/browser": "10.50.0",
     "@sentry/nextjs": "10.50.0",
     "@simplewebauthn/browser": "13.3.0",
-    "@stripe/react-stripe-js": "3.10.0",
+    "@stripe/react-stripe-js": "6.3.0",
     "@stripe/stripe-js": "2.4.0",
     "@styled-icons/boxicons-regular": "10.47.0",
     "@styled-icons/boxicons-solid": "10.47.0",
