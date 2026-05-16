@@ -2734,6 +2734,8 @@
   "MemberInvitations.title": "待处理的邀请",
   "members.remove.cantRemoveLast": "最后一个管理员无法删除，请先添加其他管理员。",
   "members.remove.confirm": "你确定想要移除 {name} @{slug} {hasEmail, select, 1 {({email})} other {}} 吗？",
+  "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
+  "members.remove.integrations": "By removing this member, you will also remove their token(s) that connects this account to the following service(s): {services}.",
   "members.role.label": "角色",
   "Membership.ContributorSince": "{contributorType} 自从",
   "membership.since": "自 {date} 起",

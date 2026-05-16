@@ -2734,6 +2734,8 @@
   "MemberInvitations.title": "Invitations en attente",
   "members.remove.cantRemoveLast": "Le dernier administrateur ne peut pas être supprimé. Veuillez ajouter un autre administrateur avant.",
   "members.remove.confirm": "Voulez-vous vraiment enlever {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?",
+  "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
+  "members.remove.integrations": "By removing this member, you will also remove their token(s) that connects this account to the following service(s): {services}.",
   "members.role.label": "Rôle",
   "Membership.ContributorSince": "{contributorType} depuis le",
   "membership.since": "depuis {date}",
