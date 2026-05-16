@@ -29,10 +29,9 @@ import { H5, P, Span } from '../Text';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
 import CustomFields, { buildCustomFieldsConfig } from './CustomFields';
-import PlatformTipInput from './PlatformTipInput';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip, router, isEmbed }) => {
+const StepDetails = ({ onChange, stepDetails, collective, tier, router }) => {
   const intl = useIntl();
   const amount = stepDetails?.amount;
   const currency = tier?.amount.currency || collective.currency;
@@ -56,30 +55,38 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
   const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
   const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
 
-  const dispatchChange = (field, value) => {
-    // Assumption: we only have restrictions related to payment method types on recurring contributions
-    onChange({
-      stepDetails: { ...stepDetails, [field]: value },
-      ...(field === 'interval' && value !== INTERVALS.oneTime && { stepPayment: null }),
-      stepSummary: null,
-    });
-  };
+  const dispatchChange = React.useCallback(
+    (field, value) => {
+      // Assumption: we only have restrictions related to payment method types on recurring contributions
+      onChange({
+        stepDetails: { ...stepDetails, [field]: value },
+        ...(field === 'interval' && value !== INTERVALS.oneTime && { stepPayment: null }),
+        stepSummary: null,
+      });
+    },
+    [onChange, stepDetails],
+  );
 
   // If an interval has been set (either from the tier defaults, or form an URL param) and the
   // collective doesn't support it, we reset the interval
   React.useEffect(() => {
-    if (selectedInterval && ((!isFixedInterval && !supportsRecurring) || amount === 0)) {
+    if (
+      selectedInterval &&
+      selectedInterval !== INTERVALS.oneTime &&
+      ((!isFixedInterval && !supportsRecurring) || amount === 0)
+    ) {
       dispatchChange('interval', INTERVALS.oneTime);
     }
-  }, [selectedInterval, isFixedInterval, supportsRecurring, amount]);
+  }, [selectedInterval, isFixedInterval, supportsRecurring, amount, dispatchChange]);
 
   React.useEffect(() => {
     track(AnalyticsEvent.CONTRIBUTION_STARTED, {
       props: {
         [AnalyticsProperty.CONTRIBUTION_STEP]: 'details',
+        [AnalyticsProperty.CONTRIBUTION_IS_NEW_PLATFORM_TIP]: stepDetails.isNewPlatformTip,
       },
     });
-  }, []);
+  }, [stepDetails.isNewPlatformTip]);
 
   return (
     <Box width={1}>
@@ -270,18 +277,6 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
           </P>
           <StyledHr borderColor="black.300" mt={16} mb={32} />
         </React.Fragment>
-      )}
-      {showPlatformTip && (
-        <Box mt={28}>
-          <PlatformTipInput
-            currency={currency}
-            amount={stepDetails?.amount}
-            value={stepDetails?.platformTip}
-            quantity={stepDetails?.quantity}
-            onChange={value => dispatchChange('platformTip', value)}
-            isEmbed={isEmbed}
-          />
-        </Box>
       )}
       {!isEmpty(customFieldsConfig?.fields) && (
         <Box mt={28}>

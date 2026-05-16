@@ -43,6 +43,7 @@ type PlatformTipInputProps = {
 };
 
 function PlatformTipInput(props: PlatformTipInputProps) {
+  const { amount, currency, disabled, onChange, selectedOption, value } = props;
   const intl = useIntl();
 
   const options = React.useMemo(
@@ -76,38 +77,40 @@ function PlatformTipInput(props: PlatformTipInputProps) {
   );
 
   const onOptionChange = React.useCallback(
-    (value: PlatformTipOption) => {
-      if (props.selectedOption === value) {
+    (newSelectedOption: PlatformTipOption) => {
+      if (selectedOption === newSelectedOption) {
         return;
       }
 
-      props.onChange(value, roundCentsAmount(options[value].percent * props.amount, props.currency));
+      onChange(newSelectedOption, roundCentsAmount(options[newSelectedOption].percent * amount, currency));
     },
-    [props.onChange, props.selectedOption, props.amount, options, props.currency],
+    [amount, currency, onChange, options, selectedOption],
   );
 
   const onOtherChange = React.useCallback(
     value => {
-      props.onChange(props.selectedOption, value);
+      onChange(selectedOption, value);
     },
-    [props.onChange],
+    [onChange, selectedOption],
   );
 
   React.useEffect(() => {
     const newTipAmount =
-      props.selectedOption === PlatformTipOption.OTHER
-        ? props.value
-        : roundCentsAmount(options[props.selectedOption].percent * props.amount, props.currency);
+      selectedOption === PlatformTipOption.OTHER
+        ? value
+        : roundCentsAmount(options[selectedOption].percent * amount, currency);
 
-    props.onChange(props.selectedOption, newTipAmount);
-  }, [options, props.amount, props.value, props.selectedOption, props.currency]);
+    if (newTipAmount !== value) {
+      onChange(selectedOption, newTipAmount);
+    }
+  }, [amount, currency, onChange, options, selectedOption, value]);
 
   return (
     <Box data-cy="platform-tip-input">
       <StyledButtonSet
         data-cy="platform-tip-options"
         flexDirection={['column', 'row']}
-        disabled={props.disabled}
+        disabled={disabled}
         items={[
           PlatformTipOption.TEN_PERCENT,
           PlatformTipOption.FIFTEEN_PERCENT,
@@ -115,21 +118,21 @@ function PlatformTipInput(props: PlatformTipInputProps) {
           PlatformTipOption.THIRTY_PERCENT,
           PlatformTipOption.OTHER,
         ]}
-        selected={props.selectedOption}
+        selected={selectedOption}
         onChange={onOptionChange}
       >
         {({ item }) => options[item as number].label}
       </StyledButtonSet>
-      {props.selectedOption === PlatformTipOption.OTHER && (
+      {selectedOption === PlatformTipOption.OTHER && (
         <Flex mt={3} justifyContent="flex-end">
           <StyledInputAmount
             id="feesOnTop"
             name="platformTip"
             data-cy="platform-tip-other-amount"
-            disabled={props.disabled}
-            currency={props.currency}
+            disabled={disabled}
+            currency={currency}
             onChange={onOtherChange}
-            value={props.value}
+            value={value}
           />
         </Flex>
       )}
@@ -197,8 +200,8 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
         </Flex>
         <P my="12px" fontWeight="400" fontSize="16px">
           <FormattedMessage
-            defaultMessage="Adding a platform tip helps us to maintain the platform and introduce new features. <Link>Why?</Link>"
-            id="sKMOr5"
+            defaultMessage="Adding a platform tip helps us to maintain the platform and introduce new features. <Link>Learn more</Link>"
+            id="platformTip.oldLearnMore"
             values={{
               Link: chunk => {
                 return (
