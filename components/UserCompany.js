@@ -3,8 +3,10 @@ import React from 'react';
 import Link from './Link';
 
 const UserCompany = ({ company, ...props }) => {
-  if (!company || company[0] !== '@') {
-    return company;
+  if (!company) {
+    return null;
+  } else if (company[0] !== '@') {
+    return <span className="mr-1 text-xl">{company}</span>;
   }
 
   // This could be used to generate malicious URLs.
