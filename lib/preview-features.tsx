@@ -44,7 +44,7 @@ export type PreviewFeature = {
   hide?: (loggedInUser: LoggedInUser) => boolean;
 };
 
-const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
+export const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
 const ENGINEERS = ['znarf', 'betree', 'leokewitz', 'henrique-silva', 'gustavlrsn', 'sudharaka-palamakumbura'];
 const OFICO_MEMBER_ORGANIZATIONS = [
   'europe',

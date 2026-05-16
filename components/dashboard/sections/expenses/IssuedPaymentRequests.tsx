@@ -13,13 +13,14 @@ import type {
   HostDashboardExpensesQuery,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter, ExpenseType, LastCommentBy } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { limit } from '@/lib/filters/schemas';
 import { useDrawer } from '@/lib/hooks/useDrawer';
 import { i18nExpenseType } from '@/lib/i18n/expense';
+import { PLATFORM_ACCOUNTS } from '@/lib/preview-features';
 
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 
@@ -246,6 +247,19 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
 
   const omitExpenseTypes = [ExpenseType.GRANT];
 
+  // Special case here: for Ofitech, we include all statuses to make sure we notice people commenting on paid platform bills
+  const unrepliedStatuses = React.useMemo(() => {
+    return PLATFORM_ACCOUNTS.includes(accountSlug)
+      ? []
+      : [
+          ExpenseStatusFilter.PENDING,
+          ExpenseStatusFilter.APPROVED,
+          ExpenseStatusFilter.ERROR,
+          ExpenseStatusFilter.INCOMPLETE,
+          ExpenseStatusFilter.ON_HOLD,
+        ];
+  }, [accountSlug]);
+
   const views: Views<FilterValues> = useMemo(
     () => [
       {
@@ -259,12 +273,20 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
         filter: { status: [ExpenseStatusFilter.PENDING, ExpenseStatusFilter.APPROVED] },
       },
       {
+        id: 'unreplied',
+        label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
+        filter: {
+          lastCommentBy: [LastCommentBy.NON_FROM_ACCOUNT_ADMIN],
+          status: unrepliedStatuses,
+        },
+      },
+      {
         id: 'paid',
         label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
         filter: { status: [ExpenseStatusFilter.PAID] },
       },
     ],
-    [intl],
+    [intl, unrepliedStatuses],
   );
 
   const queryFilter = useQueryFilter({
@@ -317,7 +339,7 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
   });
 
   const { data: metaData } = useQuery(issuedPaymentRequestsMetadataQuery, {
-    variables: accountVariables,
+    variables: { ...accountVariables, unrepliedStatuses: unrepliedStatuses },
   });
 
   const viewsWithCount: Views<FilterValues> = useMemo(
