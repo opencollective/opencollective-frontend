@@ -10,6 +10,7 @@ import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import { FEATURES } from '@/lib/allowed-features';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -20,6 +21,7 @@ import { expensePageQuery } from '../components/expenses/graphql/queries';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import { Box, Flex } from '../components/Grid';
 import Page from '../components/Page';
+import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 
 export const getVariablesFromQuery = query => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
@@ -110,6 +112,8 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
       return <ErrorPage error={generateNotFoundError(null)} log={false} />;
     } else if (!data.expense.account || !isValidCollectiveSlug(collectiveSlug, data.expense)) {
       return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
+    } else if (data.expense.account.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+      return <PageFeatureNotSupported />;
     }
   }
 

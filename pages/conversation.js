@@ -325,6 +325,8 @@ class ConversationPage extends React.Component {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
+      } else if (data.account.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+        return <PageFeatureNotSupported />;
       }
     }
 

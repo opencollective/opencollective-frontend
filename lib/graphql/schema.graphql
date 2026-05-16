@@ -49,6 +49,7 @@ interface CollectiveInterface {
   isFirstPartyHost: Boolean!
   isVerified: Boolean!
   isIncognito: Boolean
+  isPrivate: Boolean!
 
   """
   Whether this account is frozen
@@ -1133,6 +1134,7 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
+  PUBLIC_PROFILE: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -2170,6 +2172,11 @@ type Collective implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
+
+  """
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
@@ -2470,6 +2477,11 @@ type Event implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -2774,6 +2786,11 @@ type Fund implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
+
+  """
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
@@ -3076,6 +3093,11 @@ type Organization implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
+
+  """
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
@@ -3376,6 +3398,11 @@ type Project implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -3975,6 +4002,11 @@ type User implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
+
+  """
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
@@ -4277,6 +4309,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile

@@ -158,8 +158,12 @@ class EditCollectiveForm extends React.Component {
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
             <Archive collective={collective} />
-            {[COLLECTIVE].includes(collective.type) && <ConvertToOrganization collective={collective} />}
-            {collective.type === ORGANIZATION && <ConvertToCollective collective={collective} />}
+            {!collective.isPrivate && collective.type === COLLECTIVE && (
+              <ConvertToOrganization collective={collective} />
+            )}
+            {!collective.isPrivate && collective.type === ORGANIZATION && (
+              <ConvertToCollective collective={collective} />
+            )}
             <Delete collective={collective} />
           </div>
         );

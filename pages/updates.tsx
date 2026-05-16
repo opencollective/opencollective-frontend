@@ -166,6 +166,8 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
       );
     } else if (!isFeatureSupported(collective, FEATURES.UPDATES)) {
       return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
+    } else if (collective.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+      return <PageFeatureNotSupported />;
     }
   }
 

@@ -11,6 +11,7 @@ import INTERVALS from '../../lib/constants/intervals';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
+import { FEATURES } from '@/lib/allowed-features';
 
 import CollectiveNavbar from '../collective-navbar';
 import { NAVBAR_CATEGORIES } from '../collective-navbar/constants';
@@ -368,50 +369,52 @@ class TierPage extends Component {
                     </ProgressInfoContainer>
                   )}
                   {/** Contribute button */}
-                  <Flex alignItems="center" mb={24}>
-                    <Box width={1}>
-                      {isPassed ? (
-                        <P textAlign="center">
-                          <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
+                  {collective.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED' && (
+                    <Flex alignItems="center" mb={24}>
+                      <Box width={1}>
+                        {isPassed ? (
+                          <P textAlign="center">
+                            <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
+                            <Link
+                              href={{
+                                pathname: `${getCollectivePageRoute(collective)}/contribute`,
+                                query: contributeQuery,
+                              }}
+                            >
+                              <FormattedMessage
+                                id="createOrder.backToTier"
+                                defaultMessage="View all the other ways to contribute"
+                              />
+                              .
+                            </Link>
+                          </P>
+                        ) : (
                           <Link
                             href={{
-                              pathname: `${getCollectivePageRoute(collective)}/contribute`,
+                              pathname: `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${
+                                tier.id
+                              }/checkout`,
                               query: contributeQuery,
                             }}
                           >
-                            <FormattedMessage
-                              id="createOrder.backToTier"
-                              defaultMessage="View all the other ways to contribute"
-                            />
-                            .
+                            <StyledButton
+                              buttonStyle="primary"
+                              buttonSize={['small', 'medium']}
+                              width={1}
+                              minWidth={128}
+                              data-cy="ContributeBtn"
+                            >
+                              {tier.button ? (
+                                tier.button
+                              ) : (
+                                <FormattedMessage id="Contribute" defaultMessage="Contribute" />
+                              )}
+                            </StyledButton>
                           </Link>
-                        </P>
-                      ) : (
-                        <Link
-                          href={{
-                            pathname: `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${
-                              tier.id
-                            }/checkout`,
-                            query: contributeQuery,
-                          }}
-                        >
-                          <StyledButton
-                            buttonStyle="primary"
-                            buttonSize={['small', 'medium']}
-                            width={1}
-                            minWidth={128}
-                            data-cy="ContributeBtn"
-                          >
-                            {tier.button ? (
-                              tier.button
-                            ) : (
-                              <FormattedMessage id="Contribute" defaultMessage="Contribute" />
-                            )}
-                          </StyledButton>
-                        </Link>
-                      )}
-                    </Box>
-                  </Flex>
+                        )}
+                      </Box>
+                    </Flex>
+                  )}
                   {/** Video */}
                   <Box my={24}>
                     <TierVideo

@@ -16,7 +16,7 @@ export default function Overview({ accountSlug, subpath }: DashboardSectionProps
 
   // Individual Overview
   if (isIndividualAccount(account)) {
-    return <IndividualOverview accountSlug={accountSlug} subpath={subpath} />;
+    return <IndividualOverview accountSlug={accountSlug} account={account} subpath={subpath} />;
   }
 
   // Host Overview

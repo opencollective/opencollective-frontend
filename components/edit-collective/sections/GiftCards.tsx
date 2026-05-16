@@ -7,10 +7,13 @@ import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import type { GraphQLV1PaymentMethod } from '@/lib/custom_typings/GraphQLV1';
 import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
+import FeatureNotSupported from '@/components/FeatureNotSupported';
 import { getI18nLink } from '@/components/I18nFormatters';
+import NotFound from '@/components/NotFound';
 
 import { ALL_SECTIONS, SECTION_LABELS } from '../../dashboard/constants';
 import DashboardHeader from '../../dashboard/DashboardHeader';
@@ -308,6 +311,14 @@ const GiftCards: React.FC<GiftCardsProps> = ({ collectiveId, collectiveSlug, lim
     },
     [collectiveSlug, getQueryParams, router],
   );
+
+  if (!loading) {
+    if (!data || !data.Collective) {
+      return <NotFound />;
+    } else if (!isFeatureEnabled(data.Collective, FEATURES.EMIT_GIFT_CARDS)) {
+      return <FeatureNotSupported />;
+    }
+  }
 
   return (
     <div>

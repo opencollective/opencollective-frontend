@@ -117,6 +117,8 @@ export default function ExpensesPage(props: InferGetServerSidePropsType<typeof g
   } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
     // Hack for funds that want to keep their budget "private"
     return <PageFeatureNotSupported showContactSupportLink={false} />;
+  } else if (account.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+    return <PageFeatureNotSupported />;
   }
 
   return (

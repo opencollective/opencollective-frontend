@@ -14,6 +14,7 @@ import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { getCollectiveTicketsOrder, sortTickets, sortTiersForCollective } from '../lib/tier-utils';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
+import { FEATURES } from '@/lib/allowed-features';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -34,6 +35,7 @@ import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
 import StyledButton from '../components/StyledButton';
 import { withUser } from '../components/UserProvider';
+import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 
 class ContributePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, verb } }) {
@@ -258,6 +260,8 @@ class ContributePage extends React.Component {
 
     if (!data || !data.Collective) {
       return <ErrorPage data={data} />;
+    } else if (data.Collective.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+      return <PageFeatureNotSupported />;
     }
 
     const collective = data.Collective;

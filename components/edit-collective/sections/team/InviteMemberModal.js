@@ -148,6 +148,7 @@ const InviteMemberModal = props => {
             collectiveImg={get(collective, 'imageUrl')}
             bindSubmitForm={bindSubmitForm}
             triggerSubmit={handleInviteMemberMutation}
+            isPrivateAccount={collective.isPrivate}
           />
           <div className="mt-2 flex justify-between gap-4">
             <Button

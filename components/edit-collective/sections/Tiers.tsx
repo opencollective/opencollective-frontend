@@ -9,7 +9,11 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
 import { sortTiersForCollective, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
+import { FEATURES } from '@/lib/allowed-features';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
+import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/graphql';
+
+import FeatureNotSupported from '@/components/FeatureNotSupported';
 
 import AdminContributeCardsContainer from '../../contribute-cards/AdminContributeCardsContainer';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
@@ -106,6 +110,10 @@ const Tiers = ({ collective }) => {
       setError(getErrorFromGraphqlException(e));
     }
   };
+
+  if (collective.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] === CollectiveFeatureStatus.UNSUPPORTED) {
+    return <FeatureNotSupported />;
+  }
 
   return (
     <div>
