@@ -11,7 +11,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { gql } from '../../lib/graphql/helpers';
-import type { AccountHoverCardFieldsFragment, DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
+import type { AccountHoverCardFieldsFragment, UseVendorPolicy } from '../../lib/graphql/types/v2/graphql';
 import { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';
@@ -39,6 +39,7 @@ import { RadioGroup, RadioGroupItem } from '../ui/RadioGroup';
 import { Switch } from '../ui/Switch';
 import { useToast } from '../ui/useToast';
 
+import { getUseVendorPolicyLabel } from './common';
 import type { VendorFieldsFragment } from './queries';
 import { vendorFieldFragment } from './queries';
 
@@ -80,9 +81,17 @@ const EDITABLE_FIELDS = [
   'vendorInfo.notes',
 ];
 
+type VendorHostProp = {
+  id: string;
+  legacyId: number;
+  slug: string;
+  name?: string | null;
+  policies?: { USE_VENDOR_POLICY?: UseVendorPolicy };
+};
+
 type VendorFormProps = {
   vendor?: VendorFieldsFragment;
-  host?: Omit<DashboardVendorsQuery['account'], 'vendors'>;
+  host?: VendorHostProp;
   onSuccess?: (vendor: VendorFieldsFragment) => void;
   onCancel: () => void;
   isModal?: boolean;
@@ -194,7 +203,7 @@ const validateVendorForm = values => {
   if (values.vendorInfo?.taxFormUrl) {
     verifyURLPattern(errors, values, 'vendorInfo.taxFormUrl');
   }
-  if (values.imageUrl) {
+  if (values.imageUrl && !isImageServiceUrl(values.imageUrl)) {
     verifyURLPattern(errors, values, 'imageUrl');
   }
 
@@ -228,6 +237,15 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
           slug: props.limitVisibilityOptionToAccount.slug,
         },
       ];
+    } else if (!props.limitVisibilityOptionToAccount) {
+      if (values.whereScope === 'host-only') {
+        data.visibleToAccounts = [{ slug: host.slug }];
+      } else if (values.whereScope === 'specific') {
+        data.visibleToAccounts = (values.visibleToAccounts ?? []).map(acc => ({ slug: acc.slug }));
+      } else {
+        data.visibleToAccounts = [];
+      }
+      data.useVendorPolicy = values.useVendorPolicy ?? null;
     } else {
       data.visibleToAccounts = (values.visibleToAccounts ?? []).map(acc => ({
         slug: acc.slug,
@@ -286,6 +304,19 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
 
   if (props.limitVisibilityOptionToAccount) {
     initialValues['accountVisibility'] = 'limit-visibility';
+  }
+
+  if (!props.limitVisibilityOptionToAccount) {
+    const visible = vendor?.visibleToAccounts ?? [];
+    if (visible.length === 1 && host?.slug && visible[0].slug === host.slug) {
+      initialValues['whereScope'] = 'host-only';
+      initialValues['visibleToAccounts'] = [];
+    } else if (visible.length > 0) {
+      initialValues['whereScope'] = 'specific';
+    } else {
+      initialValues['whereScope'] = 'all-hosted';
+    }
+    initialValues['useVendorPolicy'] = vendor?.useVendorPolicy ?? null;
   }
 
   const loading = isCreating || isEditing;
@@ -385,36 +416,124 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
               </StyledInputFormikField>
 
               {!props.limitVisibilityOptionToAccount && (
-                <StyledInputFormikField
-                  name="visibleToAccounts"
-                  label={intl.formatMessage({ defaultMessage: 'Visible to accounts', id: 'z3aZR5' })}
-                  labelProps={FIELD_LABEL_PROPS}
-                  required={false}
-                  mt={3}
-                >
-                  {({ field, form }) => (
-                    <div>
-                      <CollectivePickerAsync
-                        inputId="visibleToAccountsInput"
-                        isMulti
-                        collective={field.value}
-                        hostCollectiveIds={host.legacyId}
-                        filterResults={results =>
-                          results.filter(r => !(field.value ?? []).some(v => v.slug === r.slug))
-                        }
-                        onChange={selection => {
-                          form.setFieldValue('visibleToAccounts', [...(selection ?? []).map(sel => sel.value)]);
-                        }}
-                      />
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        <FormattedMessage
-                          defaultMessage="By default, vendors are visible to all hosted accounts. To restrict visibility of this vendor, pick hosted accounts."
-                          id="jEkeo9"
+                <React.Fragment>
+                  <div className="mt-3">
+                    <div className="mb-2 text-base font-bold">
+                      <FormattedMessage defaultMessage="Where can this vendor be used?" id="gwRGM1" />
+                    </div>
+                    <RadioGroup
+                      value={formik.values.whereScope ?? 'all-hosted'}
+                      onValueChange={value => formik.setFieldValue('whereScope', value)}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="host-only" id="whereScope-host-only" />
+                        <Label htmlFor="whereScope-host-only" className="font-normal">
+                          <FormattedMessage
+                            defaultMessage="Only in relation to {orgName}"
+                            id="w0rsxB"
+                            values={{ orgName: host?.name }}
+                          />
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="all-hosted" id="whereScope-all-hosted" />
+                        <Label htmlFor="whereScope-all-hosted" className="font-normal">
+                          <FormattedMessage
+                            defaultMessage="In relation to {orgName} & hosted collectives"
+                            id="7JtxSy"
+                            values={{ orgName: host?.name }}
+                          />
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="specific" id="whereScope-specific" />
+                        <Label htmlFor="whereScope-specific" className="font-normal">
+                          <FormattedMessage
+                            defaultMessage="In relation to the following selected accounts"
+                            id="4sNzY1"
+                          />
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                    {formik.values.whereScope === 'specific' && (
+                      <div className="mt-2 ml-6">
+                        <CollectivePickerAsync
+                          inputId="visibleToAccountsInput"
+                          isMulti
+                          collective={formik.values.visibleToAccounts}
+                          hostCollectiveIds={host?.legacyId}
+                          filterResults={results =>
+                            results.filter(r => !(formik.values.visibleToAccounts ?? []).some(v => v.slug === r.slug))
+                          }
+                          onChange={selection => {
+                            formik.setFieldValue('visibleToAccounts', [...(selection ?? []).map(sel => sel.value)]);
+                          }}
                         />
                       </div>
+                    )}
+                  </div>
+
+                  <div className="mt-3">
+                    <div className="mb-2 text-base font-bold">
+                      <FormattedMessage
+                        defaultMessage="Who can attribute financial activities to this vendor?"
+                        id="XcSJPs"
+                      />
                     </div>
-                  )}
-                </StyledInputFormikField>
+                    <RadioGroup
+                      value={formik.values.useVendorPolicy ?? 'INHERIT'}
+                      onValueChange={value =>
+                        formik.setFieldValue('useVendorPolicy', value === 'INHERIT' ? null : value)
+                      }
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="INHERIT" id="useVendorPolicy-inherit" />
+                        <Label htmlFor="useVendorPolicy-inherit" className="font-normal">
+                          <FormattedMessage
+                            defaultMessage="Host default ({inheritedLabel})"
+                            id="Yf0x/7"
+                            values={{
+                              inheritedLabel: getUseVendorPolicyLabel(
+                                host?.policies?.USE_VENDOR_POLICY,
+                                host?.name,
+                                intl,
+                              ),
+                            }}
+                          />
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="HOST_ADMINS" id="useVendorPolicy-HOST_ADMINS" />
+                        <Label htmlFor="useVendorPolicy-HOST_ADMINS" className="font-normal">
+                          <FormattedMessage
+                            defaultMessage="Only {orgName} admins"
+                            id="Ab202N"
+                            values={{ orgName: host?.name }}
+                          />
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value="HOST_AND_COLLECTIVE_ADMINS"
+                          id="useVendorPolicy-HOST_AND_COLLECTIVE_ADMINS"
+                        />
+                        <Label htmlFor="useVendorPolicy-HOST_AND_COLLECTIVE_ADMINS" className="font-normal">
+                          <FormattedMessage
+                            defaultMessage="{orgName} admins and collective admins"
+                            id="IaKZQb"
+                            values={{ orgName: host?.name }}
+                          />
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="ALL_SUBMITTERS" id="useVendorPolicy-ALL_SUBMITTERS" />
+                        <Label htmlFor="useVendorPolicy-ALL_SUBMITTERS" className="font-normal">
+                          <FormattedMessage defaultMessage="All expense submitters" id="Q4svuX" />
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </React.Fragment>
               )}
 
               {supportsTaxForm && (
@@ -582,57 +701,55 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 </React.Fragment>
               )}
 
-              {props.limitVisibilityOptionToAccount &&
-                !props.isBeneficiary &&
-                props.limitVisibilityOptionToAccount.hasHosting && (
-                  <StyledInputFormikField
-                    name="accountVisibility"
-                    label={intl.formatMessage({ defaultMessage: 'Visibility', id: 'JAkIqb' })}
-                    labelProps={FIELD_LABEL_PROPS}
-                    required={true}
-                    mt={3}
-                  >
-                    {({ field, form }) => (
-                      <div className="flex items-center gap-2">
-                        <RadioGroup
-                          id={field.name}
-                          value={field.value}
-                          onValueChange={value => form.setFieldValue('accountVisibility', value)}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="limit-visibility" id="limit-visibility" />
-                            <Label htmlFor="limit-visibility">
-                              <FormattedMessage
-                                defaultMessage="Visible to {account} only"
-                                id="q02wF4"
-                                values={{
-                                  account: (
-                                    <AccountHoverCard
-                                      account={props.limitVisibilityOptionToAccount}
-                                      trigger={
-                                        <span>
-                                          <span className="rounded border">
-                                            {props.limitVisibilityOptionToAccount.name}
-                                          </span>
+              {props.limitVisibilityOptionToAccount && !props.isBeneficiary && host && (
+                <StyledInputFormikField
+                  name="accountVisibility"
+                  label={intl.formatMessage({ defaultMessage: 'Visibility', id: 'JAkIqb' })}
+                  labelProps={FIELD_LABEL_PROPS}
+                  required={true}
+                  mt={3}
+                >
+                  {({ field, form }) => (
+                    <div className="flex items-center gap-2">
+                      <RadioGroup
+                        id={field.name}
+                        value={field.value}
+                        onValueChange={value => form.setFieldValue('accountVisibility', value)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="limit-visibility" id="limit-visibility" />
+                          <Label htmlFor="limit-visibility">
+                            <FormattedMessage
+                              defaultMessage="Visible to {account} only"
+                              id="q02wF4"
+                              values={{
+                                account: (
+                                  <AccountHoverCard
+                                    account={props.limitVisibilityOptionToAccount}
+                                    trigger={
+                                      <span>
+                                        <span className="rounded border">
+                                          {props.limitVisibilityOptionToAccount.name}
                                         </span>
-                                      }
-                                    />
-                                  ),
-                                }}
-                              />
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="visible-to-all" id="visible-to-all" />
-                            <Label htmlFor="visible-to-all">
-                              <FormattedMessage defaultMessage="Visible to all collectives and funds" id="DN5I4w" />
-                            </Label>
-                          </div>
-                        </RadioGroup>
-                      </div>
-                    )}
-                  </StyledInputFormikField>
-                )}
+                                      </span>
+                                    }
+                                  />
+                                ),
+                              }}
+                            />
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="visible-to-all" id="visible-to-all" />
+                          <Label htmlFor="visible-to-all">
+                            <FormattedMessage defaultMessage="Visible to all collectives and funds" id="DN5I4w" />
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  )}
+                </StyledInputFormikField>
+              )}
 
               {props.limitVisibilityOptionToAccount &&
                 formik.values.accountVisibility === 'limit-visibility' &&

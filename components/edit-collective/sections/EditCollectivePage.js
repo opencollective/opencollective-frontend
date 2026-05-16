@@ -60,7 +60,7 @@ export const getSettingsQuery = gql`
           requiredForExpenseSubmitters
           requiredForCollectiveAdmins
         }
-        EXPENSE_PUBLIC_VENDORS
+        USE_VENDOR_POLICY
         EXPENSE_POLICIES {
           invoicePolicy
           receiptPolicy

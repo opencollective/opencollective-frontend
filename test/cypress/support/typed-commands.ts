@@ -4,7 +4,7 @@
 import type { Message, MessageSummary } from 'cypress-mailpit/src/types';
 
 import { fakeTag as gql } from '../../../lib/graphql/helpers';
-import type { AmountInput, ExpenseType } from '@/lib/graphql/types/v2/graphql';
+import type { AccountReferenceInput, AmountInput, ExpenseType, UseVendorPolicy } from '@/lib/graphql/types/v2/graphql';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
 
@@ -89,6 +89,16 @@ declare global {
 
       createVendor: typeof createVendor;
 
+      graphqlQueryV2(
+        query: string,
+        options?: { variables?: Record<string, unknown>; token?: string | null },
+      ): Chainable<Record<string, unknown>>;
+
+      editAccount(
+        account: { slug: string; settings?: Record<string, unknown>; [key: string]: unknown },
+        userEmail?: string,
+      ): Chainable<unknown>;
+
       getAccount: typeof getAccount;
 
       checkToast(params: { variant: 'success' | 'error' | 'warning' | 'info'; message: string }): Chainable<void>;
@@ -118,9 +128,14 @@ Cypress.Commands.add('retryChain', function <
 Cypress.Commands.add('createVendor', createVendor);
 function createVendor(
   hostSlug: string,
-  vendor: { name: string; payoutMethod?: unknown },
+  vendor: {
+    name: string;
+    payoutMethod?: unknown;
+    visibleToAccounts?: AccountReferenceInput[];
+    useVendorPolicy?: UseVendorPolicy | `${UseVendorPolicy}`;
+  },
   userEmail: string,
-): Cypress.Chainable<{ name: string }> {
+): Cypress.Chainable<{ id: string; legacyId: number; slug: string; name: string }> {
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
     return graphqlQueryV2(token, {
       operationName: 'CreateVendor',
@@ -128,9 +143,16 @@ function createVendor(
         mutation CreateVendor($hostSlug: String!, $vendor: VendorCreateInput!) {
           createVendor(host: { slug: $hostSlug }, vendor: $vendor) {
             id
+            legacyId
             name
             slug
             hasPayoutMethod
+            useVendorPolicy
+            visibleToAccounts {
+              id
+              legacyId
+              slug
+            }
             __typename
           }
         }

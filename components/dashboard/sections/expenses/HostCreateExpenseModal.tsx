@@ -41,7 +41,11 @@ import { useToast } from '../../../ui/useToast';
 import { TransactionsImportRowDetails } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
 const hostCreateExpenseModalPayeeSelectQuery = gql`
-  query HostCreateExpenseModalPayeeSelect($hostId: String!, $forAccount: AccountReferenceInput) {
+  query HostCreateExpenseModalPayeeSelect(
+    $hostId: String!
+    $forAccount: AccountReferenceInput
+    $visibleToAccounts: [AccountReferenceInput]
+  ) {
     host(id: $hostId) {
       id
       slug
@@ -50,7 +54,7 @@ const hostCreateExpenseModalPayeeSelectQuery = gql`
       description
       isHost
       imageUrl(height: 64)
-      vendors(forAccount: $forAccount) {
+      vendors(forAccount: $forAccount, visibleToAccounts: $visibleToAccounts) {
         nodes {
           id
           slug
@@ -74,7 +78,11 @@ const PayeeSelect = ({
 } & React.ComponentProps<typeof CollectivePickerAsync>) => {
   const intl = useIntl();
   const { data, loading } = useQuery(hostCreateExpenseModalPayeeSelectQuery, {
-    variables: { hostId: host.id, forAccount: getAccountReferenceInput(forAccount) },
+    variables: {
+      hostId: host.id,
+      forAccount: getAccountReferenceInput(forAccount),
+      visibleToAccounts: forAccount?.slug ? [{ slug: forAccount.slug }] : null,
+    },
   });
   const recommendedVendors = data?.host?.vendors?.nodes || [];
   const defaultSources = [...recommendedVendors, host];
@@ -96,6 +104,7 @@ const PayeeSelect = ({
       customOptions={defaultSourcesOptions}
       menuPortalTarget={null}
       includeVendorsForHostId={host.legacyId}
+      vendorVisibleToAccountIds={forAccount?.legacyId ? [forAccount.legacyId] : undefined}
       creatable={['USER', 'VENDOR']}
       HostCollectiveId={host.legacyId}
       isLoading={loading}

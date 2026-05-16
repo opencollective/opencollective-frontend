@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql, gqlV1 } from '../lib/graphql/helpers';
 import { isValidEmail } from '../lib/utils';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
@@ -183,6 +183,19 @@ const createCollectiveMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
+const createVendorV2Mutation = gql`
+  mutation CreateVendorFromMiniForm($host: AccountReferenceInput!, $vendor: VendorCreateInput!) {
+    createVendor(host: $host, vendor: $vendor) {
+      id
+      legacyId
+      slug
+      name
+      type
+      imageUrl(height: 64)
+    }
+  }
+`;
+
 const createUserMutation = gqlV1 /* GraphQL */ `
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
@@ -232,6 +245,7 @@ interface CreateCollectiveMiniFormProps {
   optionalFields?: ('location.address' | 'location.country')[];
   /** Any other initial values to pass to the form */
   otherInitialValues?: object;
+  vendorVisibleToAccountIds?: number[];
 }
 
 /**
@@ -250,14 +264,22 @@ const CreateCollectiveMiniForm = ({
   email = '',
   name = '',
   otherInitialValues = {},
+  vendorVisibleToAccountIds,
 }: CreateCollectiveMiniFormProps) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
   const isVendor = type === CollectiveType.VENDOR;
   const noAdminFields = isOrganization && excludeAdminFields;
-  const mutation = isUser ? createUserMutation : createCollectiveMutation;
-  const [createCollective, { error: submitError }] = useMutation(mutation, { context: API_V1_CONTEXT });
+  const useV2VendorMutation = isVendor && Array.isArray(vendorVisibleToAccountIds);
+  const mutation = useV2VendorMutation
+    ? createVendorV2Mutation
+    : isUser
+      ? createUserMutation
+      : createCollectiveMutation;
+  const [createCollective, { error: submitError }] = useMutation(mutation, {
+    context: useV2VendorMutation ? undefined : API_V1_CONTEXT,
+  });
   const intl = useIntl();
   const { formatMessage } = intl;
 
@@ -296,6 +318,20 @@ const CreateCollectiveMiniForm = ({
   };
 
   const submit = formValues => {
+    if (useV2VendorMutation) {
+      const hostLegacyId = (otherInitialValues as { ParentCollectiveId?: number }).ParentCollectiveId;
+      return createCollective({
+        variables: {
+          host: { legacyId: hostLegacyId },
+          vendor: {
+            name: formValues.name,
+            legalName: formValues.legalName || undefined,
+            visibleToAccounts: vendorVisibleToAccountIds.map(legacyId => ({ legacyId })),
+          },
+        },
+      }).then(({ data }) => onSuccess(data.createVendor));
+    }
+
     let values;
     if (excludeAdminFields) {
       const clonedValues = cloneDeep({ ...formValues, type });
