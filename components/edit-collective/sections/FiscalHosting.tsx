@@ -2,9 +2,10 @@ import React from 'react';
 import type { InternalRefetchQueriesInclude } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client';
 import Image from 'next/image';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '@/lib/collective';
+import { i18nGraphqlException } from '@/lib/errors';
 import { API_V1_CONTEXT, gql } from '@/lib/graphql/helpers';
 import type { FiscalHostingQuery } from '@/lib/graphql/types/v2/graphql';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
@@ -15,10 +16,11 @@ import { DocumentationLink } from '@/components/Link';
 import { useModal } from '../../ModalContext';
 import type { ButtonProps } from '../../ui/Button';
 import { Button } from '../../ui/Button';
+import { useToast } from '../../ui/useToast';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const editMoneyManagementAndHostingMutation = gql`
+export const editMoneyManagementAndHostingMutation = gql`
   mutation EditMoneyManagementAndHosting(
     $organization: AccountReferenceInput!
     $hasMoneyManagement: Boolean
@@ -38,7 +40,7 @@ const editMoneyManagementAndHostingMutation = gql`
   }
 `;
 
-const fiscalHostingQuery = gql`
+export const fiscalHostingQuery = gql`
   query FiscalHosting($id: String!) {
     host(id: $id) {
       id
@@ -57,6 +59,8 @@ export const ToggleMoneyManagementButton = ({
   refetchQueries?: InternalRefetchQueriesInclude;
   children?: React.ReactNode;
 } & ButtonProps) => {
+  const intl = useIntl();
+  const { toast } = useToast();
   const { showConfirmationModal } = useModal();
   const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
     refetchQueries,
@@ -71,9 +75,13 @@ export const ToggleMoneyManagementButton = ({
 
   const handleMoneyManagementUpdate = async ({ activate }) => {
     if (activate) {
-      await editMoneyManagementAndHosting({
-        variables: { organization: { id: account.id }, hasMoneyManagement: true },
-      });
+      try {
+        await editMoneyManagementAndHosting({
+          variables: { organization: { id: account.id }, hasMoneyManagement: true },
+        });
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      }
     } else {
       showConfirmationModal({
         title: (
@@ -121,9 +129,13 @@ export const ToggleMoneyManagementButton = ({
         ),
         confirmDisabled: totalHostedAccounts > 0,
         onConfirm: async () => {
-          await editMoneyManagementAndHosting({
-            variables: { organization: { id: account.id }, hasMoneyManagement: false, hasHosting: false },
-          });
+          try {
+            await editMoneyManagementAndHosting({
+              variables: { organization: { id: account.id }, hasMoneyManagement: false, hasHosting: false },
+            });
+          } catch (e) {
+            toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          }
         },
         confirmLabel: <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />,
         variant: 'destructive',
@@ -158,6 +170,8 @@ export const ToggleFiscalHostingButton = ({
   refetchQueries?: InternalRefetchQueriesInclude;
   children?: React.ReactNode;
 } & ButtonProps) => {
+  const intl = useIntl();
+  const { toast } = useToast();
   const { showConfirmationModal } = useModal();
   const hasHosting = account.hasHosting;
   const hasMoneyManagement = hasAccountMoneyManagement(account);
@@ -167,15 +181,19 @@ export const ToggleFiscalHostingButton = ({
 
   const totalHostedAccounts = data?.host?.totalHostedAccounts;
 
-  const [editMoneyManagementAndHosting] = useMutation(editMoneyManagementAndHostingMutation, {
+  const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
     refetchQueries,
   });
 
   const handleFiscalHostUpdate = async ({ activate }) => {
     if (activate) {
-      await editMoneyManagementAndHosting({
-        variables: { organization: { id: account.id }, hasHosting: true },
-      });
+      try {
+        await editMoneyManagementAndHosting({
+          variables: { organization: { id: account.id }, hasHosting: true },
+        });
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      }
     } else {
       showConfirmationModal({
         title: (
@@ -208,10 +226,14 @@ export const ToggleFiscalHostingButton = ({
           </div>
         ),
         confirmDisabled: totalHostedAccounts > 0,
-        onConfirm: () => {
-          return editMoneyManagementAndHosting({
-            variables: { organization: { id: account.id }, hasHosting: false },
-          });
+        onConfirm: async () => {
+          try {
+            await editMoneyManagementAndHosting({
+              variables: { organization: { id: account.id }, hasHosting: false },
+            });
+          } catch (e) {
+            toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          }
         },
         confirmLabel: <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />,
         variant: 'destructive',
@@ -224,7 +246,7 @@ export const ToggleFiscalHostingButton = ({
       onClick={() => handleFiscalHostUpdate({ activate: !hasHosting })}
       disabled={!hasMoneyManagement}
       variant={loading || hasHosting ? 'outlineDestructive' : 'default'}
-      loading={loading}
+      loading={loading || mutating}
       {...props}
     >
       {children ||
