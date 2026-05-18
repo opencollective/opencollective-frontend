@@ -8,6 +8,7 @@ import StyledHr from '../StyledHr';
 import { H4 } from '../Text';
 import { withUser } from '../UserProvider';
 
+import { NewPlatformTipContainer } from './NewPlatformTipContainer';
 import { PlatformTipContainer } from './PlatformTipContainer';
 import ShareButton from './ShareButton';
 import StepDetails from './StepDetails';
@@ -84,8 +85,6 @@ class ContributionFlowStepContainer extends React.Component {
             onChange={this.props.onChange}
             stepDetails={stepDetails}
             stepPayment={stepPayment}
-            showPlatformTip={this.props.showPlatformTip && !stepDetails.isNewPlatformTip}
-            isEmbed={isEmbed}
           />
         );
 
@@ -147,6 +146,8 @@ class ContributionFlowStepContainer extends React.Component {
     const { stepDetails } = mainState;
 
     const currency = tier?.amount.currency || collective.currency;
+    // Review needed: preserve the old platform tip behavior, where percentages were based on amount * quantity.
+    const platformTipBaseAmount = (stepDetails.amount || 0) * (stepDetails.quantity || 1);
 
     return (
       <Box>
@@ -172,24 +173,43 @@ class ContributionFlowStepContainer extends React.Component {
             {this.renderStep(step.name)}
           </Flex>
         </StyledCard>
-        {showPlatformTip && stepDetails.isNewPlatformTip && (
-          <PlatformTipContainer
-            step={step.name}
-            amount={stepDetails.amount}
-            currency={currency}
-            selectedOption={stepDetails.platformTipOption}
-            value={stepDetails.platformTip}
-            onChange={(option, value) => {
-              this.props.onChange({
-                stepDetails: {
-                  ...stepDetails,
-                  platformTip: value,
-                  platformTipOption: option,
-                },
-              });
-            }}
-          />
-        )}
+        {showPlatformTip &&
+          (stepDetails.isNewPlatformTip ? (
+            <NewPlatformTipContainer
+              step={step.name}
+              collectiveName={collective.name}
+              amount={platformTipBaseAmount}
+              currency={currency}
+              selectedOption={stepDetails.platformTipOption}
+              value={stepDetails.platformTip}
+              onChange={(option, value) => {
+                this.props.onChange({
+                  stepDetails: {
+                    ...stepDetails,
+                    platformTip: value,
+                    platformTipOption: option,
+                  },
+                });
+              }}
+            />
+          ) : (
+            <PlatformTipContainer
+              step={step.name}
+              amount={platformTipBaseAmount}
+              currency={currency}
+              selectedOption={stepDetails.platformTipOption}
+              value={stepDetails.platformTip}
+              onChange={(option, value) => {
+                this.props.onChange({
+                  stepDetails: {
+                    ...stepDetails,
+                    platformTip: value,
+                    platformTipOption: option,
+                  },
+                });
+              }}
+            />
+          ))}
       </Box>
     );
   }

@@ -3,4 +3,5 @@ export const enum AnalyticsProperty {
   CONTRIBUTION_HAS_PLATFORM_TIP = 'contributionHasPlatformTip',
   CONTRIBUTION_PLATFORM_TIP_PERCENTAGE = 'contributionPlatformTipPercentage',
   CONTRIBUTION_IS_NEW_PLATFORM_TIP = 'contributionIsNewPlatformTip',
+  CONTRIBUTION_HOST_SLUG = 'contributionHostSlug',
 }

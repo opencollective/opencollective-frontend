@@ -70,6 +70,7 @@ const nextConfig = {
         HEROKU_SLUG_COMMIT: null,
         LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
         DISABLE_CONTACT_FORM: false,
+        NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: 50,
       }),
     );
 
