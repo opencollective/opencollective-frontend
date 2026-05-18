@@ -8,3 +8,15 @@ export const updateAccountLegalNameMutation = gql`
     }
   }
 `;
+
+export const createOrganizationFromExpenseFlowMutation = gql`
+  mutation CreateOrganizationFromExpenseFlow($organization: OrganizationCreateInput!) {
+    createOrganization(organization: $organization) {
+      id
+      slug
+      name
+      legalName
+      type
+    }
+  }
+`;

@@ -10,6 +10,7 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { AccountType, ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import {
+  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
   PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
   PAYEE_SLUG_INVITE,
   PAYEE_SLUG_INVITE_EXISTING_USER,
@@ -38,6 +39,7 @@ import { useToast } from '../../ui/useToast';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
+import { CreateLegalEntityPayeeForm } from './CreateLegalEntityPayeeForm';
 import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
@@ -87,12 +89,18 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
 
   const myProfiles = React.useMemo(() => props.payoutProfiles || [], [props.payoutProfiles]);
   const personalProfile = React.useMemo(() => myProfiles.find(p => p.type === AccountType.INDIVIDUAL), [myProfiles]);
+  const administeredProfiles = React.useMemo(
+    () => myProfiles.filter(p => p.slug !== personalProfile?.slug),
+    [myProfiles, personalProfile?.slug],
+  );
 
   const otherProfiles = React.useMemo(
     () => myProfiles.filter(p => p.slug !== personalProfile?.slug && p.slug !== lastUsedProfile?.slug),
     [lastUsedProfile?.slug, myProfiles, personalProfile?.slug],
   );
-  const hasOtherProfiles = otherProfiles.length > 0;
+  const singleOtherProfile = administeredProfiles.length === 1 ? otherProfiles[0] : null;
+  const hasMultipleOtherProfiles = administeredProfiles.length > 1 && otherProfiles.length > 0;
+  const hasAdministeredProfiles = administeredProfiles.length > 0;
   const isInvite = [PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
     props.payeeSlug,
   );
@@ -126,7 +134,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
 
     const otherProfileSelection = otherProfiles.find(p => p.slug === newPayeeSlug);
     const isMyOtherProfilesSelected =
-      hasOtherProfiles &&
+      hasMultipleOtherProfiles &&
       (!newPayeeSlug || newPayeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER || !!otherProfileSelection);
     setIsMyOtherProfilesSelected(isMyOtherProfilesSelected);
 
@@ -141,7 +149,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
     props.payeeSlug,
     personalProfile,
     otherProfiles,
-    hasOtherProfiles,
+    hasMultipleOtherProfiles,
     lastUsedProfile?.slug,
     props.initialLoading,
   ]);
@@ -187,7 +195,19 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           </RadioGroupCard>
         )}
 
-        {!isLoading && hasOtherProfiles && (
+        {!isLoading && singleOtherProfile && (
+          <RadioGroupCard
+            disabled={props.isSubmitting}
+            value={singleOtherProfile.slug}
+            showSubcontent={props.payeeSlug === singleOtherProfile.slug && isEmpty(singleOtherProfile.legalName)}
+            subContent={<LegalNameWarning account={singleOtherProfile} onLegalNameUpdate={props.refresh} />}
+            className="min-w-0"
+          >
+            <ExpenseAccountItem account={singleOtherProfile} />
+          </RadioGroupCard>
+        )}
+
+        {!isLoading && hasMultipleOtherProfiles && (
           <RadioGroupCard
             value={PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER}
             checked={isMyOtherProfilesSelected}
@@ -209,6 +229,29 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             }
           >
             <FormattedMessage defaultMessage="An account I administer" id="ZRMBXB" />
+          </RadioGroupCard>
+        )}
+
+        {!isLoading && !hasAdministeredProfiles && props.loggedInAccount && (
+          <RadioGroupCard
+            value={PAYEE_SLUG_CREATE_LEGAL_ENTITY}
+            checked={props.payeeSlug === PAYEE_SLUG_CREATE_LEGAL_ENTITY}
+            showSubcontent={props.payeeSlug === PAYEE_SLUG_CREATE_LEGAL_ENTITY}
+            disabled={props.isSubmitting}
+            className="min-w-0"
+            subContent={
+              <CreateLegalEntityPayeeForm
+                isSubmitting={props.isSubmitting}
+                refresh={props.refresh}
+                setFieldValue={props.setFieldValue}
+                setFieldTouched={props.setFieldTouched}
+              />
+            }
+          >
+            <FormattedMessage
+              defaultMessage="I would like to get paid through a legal entity"
+              id="SubmitExpense.payee.createLegalEntity"
+            />
           </RadioGroupCard>
         )}
 
