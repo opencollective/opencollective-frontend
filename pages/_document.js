@@ -95,10 +95,24 @@ export default class IntlDocument extends Document {
 
       const initialProps = await Document.getInitialProps(ctx);
 
+      const preconnectOrigins = [process.env.API_URL, process.env.IMAGES_URL]
+        .filter(Boolean)
+        .map(url => {
+          try {
+            const { origin } = new URL(url);
+            // Skip localhost / loopback origins - preconnect is only useful for remote hosts
+            return origin.includes('localhost') || origin.includes('127.0.0.1') ? null : origin;
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+
       return {
         ...initialProps,
         clientAnalytics,
         cspNonce: requestNonce,
+        preconnectOrigins,
         ...intlProps,
         styles: (
           <React.Fragment>
@@ -152,6 +166,12 @@ export default class IntlDocument extends Document {
     return (
       <Html lang={this.props.locale}>
         <Head nonce={this.props.cspNonce}>
+          {this.props.preconnectOrigins.map(origin => (
+            <React.Fragment key={origin}>
+              <link rel="preconnect" href={origin} />
+              <link rel="dns-prefetch" href={origin} />
+            </React.Fragment>
+          ))}
           <script nonce={this.props.cspNonce} defer src={languageManifest[this.props.locale]} />
           <link rel="icon" href="/static/images/favicon.ico.png" />
         </Head>
