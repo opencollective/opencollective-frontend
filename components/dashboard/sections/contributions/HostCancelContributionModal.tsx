@@ -73,21 +73,28 @@ const DetailRow: React.FC<{
 type HostCancelContributionFormProps = {
   order: OrderData;
   currency?: string;
+  showRemoveAsContributor: boolean;
   onClose: () => void;
 };
 
-const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({ order, currency, onClose }) => {
+const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
+  order,
+  currency,
+  showRemoveAsContributor,
+  onClose,
+}) => {
   const intl = useIntl();
   const { values, setFieldValue, isSubmitting } = useFormikContext<HostCancelContributionFormValues>();
 
   const summaryAmount = order.totalAmount?.valueInCents ?? order.amount?.valueInCents ?? 0;
   const fromAccountName = order.fromAccount?.name || order.fromAccount?.slug;
   const toAccountName = order.toAccount?.name || order.toAccount?.slug;
-  const submitLabel = values.removeAsContributor ? (
-    <FormattedMessage defaultMessage="Cancel & remove contributor" id="ssPeBO" />
-  ) : (
-    <FormattedMessage defaultMessage="Cancel recurring contribution" id="rvR3Fm" />
-  );
+  const submitLabel =
+    showRemoveAsContributor && values.removeAsContributor ? (
+      <FormattedMessage defaultMessage="Cancel & remove contributor" id="ssPeBO" />
+    ) : (
+      <FormattedMessage defaultMessage="Cancel recurring contribution" id="rvR3Fm" />
+    );
 
   return (
     <Form className="flex flex-col gap-4">
@@ -139,39 +146,41 @@ const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
         </div>
       </Section>
 
-      <Section>
-        <SectionTitle className="mb-3">
-          <FormattedMessage defaultMessage="Additional actions" id="vCd8DW" />
-        </SectionTitle>
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-1.5 text-sm">
-            <label className="flex cursor-pointer items-center gap-2">
-              <Checkbox
-                checked={values.removeAsContributor}
-                onCheckedChange={checked => setFieldValue('removeAsContributor', checked === true)}
-                disabled={isSubmitting}
-              />
-              <span className="font-medium">
-                <FormattedMessage defaultMessage="Remove contributor from Collective" id="BkIpny" />
-              </span>
-            </label>
-            <Tooltip>
-              <TooltipTrigger className="inline-flex text-muted-foreground hover:text-foreground" tabIndex={-1}>
-                <Info className="size-3.5" aria-hidden />
-                <span className="sr-only">
-                  <FormattedMessage defaultMessage="More info" id="moreInfo" />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <FormattedMessage
-                  defaultMessage="The contributor will be hidden from public profile and exports, but the contribution stays in the ledger."
-                  id="qGlrSx"
+      {showRemoveAsContributor && (
+        <Section>
+          <SectionTitle className="mb-3">
+            <FormattedMessage defaultMessage="Additional actions" id="vCd8DW" />
+          </SectionTitle>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-1.5 text-sm">
+              <label className="flex cursor-pointer items-center gap-2">
+                <Checkbox
+                  checked={values.removeAsContributor}
+                  onCheckedChange={checked => setFieldValue('removeAsContributor', checked === true)}
+                  disabled={isSubmitting}
                 />
-              </TooltipContent>
-            </Tooltip>
+                <span className="font-medium">
+                  <FormattedMessage defaultMessage="Remove contributor from Collective" id="BkIpny" />
+                </span>
+              </label>
+              <Tooltip>
+                <TooltipTrigger className="inline-flex text-muted-foreground hover:text-foreground" tabIndex={-1}>
+                  <Info className="size-3.5" aria-hidden />
+                  <span className="sr-only">
+                    <FormattedMessage defaultMessage="More info" id="moreInfo" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <FormattedMessage
+                    defaultMessage="The contributor will be hidden from public profile and exports, but the contribution stays in the ledger."
+                    id="qGlrSx"
+                  />
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
-        </div>
-      </Section>
+        </Section>
+      )}
 
       <Section>
         <div className="flex items-center justify-between gap-4">
@@ -237,6 +246,7 @@ export const HostCancelContributionModal = ({
   const queriedOrder = data?.order ?? previousData?.order;
   const order = queriedOrder?.id === orderRef.id ? queriedOrder : undefined;
   const currency = order?.totalAmount?.currency ?? order?.amount?.currency;
+  const showRemoveAsContributor = Boolean(order?.permissions?.canRemoveAsContributor);
   const [runCancelOrder] = useMutation<HostCancelOrderMutation, HostCancelOrderMutationVariables>(
     hostCancelOrderMutation,
   );
@@ -266,7 +276,7 @@ export const HostCancelContributionModal = ({
       await runCancelOrder({
         variables: {
           order: { id: order.id },
-          removeAsContributor: values.removeAsContributor,
+          removeAsContributor: showRemoveAsContributor ? values.removeAsContributor : null,
           messageForContributor: values.sendMessage ? values.message?.trim() || null : null,
         },
       });
@@ -301,10 +311,14 @@ export const HostCancelContributionModal = ({
             <FormattedMessage defaultMessage="Cancel recurring contribution" id="rvR3Fm" />
           </DialogTitle>
           <DialogDescription>
-            <FormattedMessage
-              defaultMessage="Cancel this recurring contribution and optionally remove the contributor from the Collective profile."
-              id="fkHGdz"
-            />
+            {showRemoveAsContributor ? (
+              <FormattedMessage
+                defaultMessage="Cancel this recurring contribution and optionally remove the contributor from the Collective profile."
+                id="fkHGdz"
+              />
+            ) : (
+              <FormattedMessage defaultMessage="Cancel this recurring contribution." id="Hk6+J8" />
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -325,7 +339,12 @@ export const HostCancelContributionModal = ({
             initialValues={initialValues}
             onSubmit={handleSubmit}
           >
-            <HostCancelContributionForm order={order} currency={currency} onClose={() => handleClose(false)} />
+            <HostCancelContributionForm
+              order={order}
+              currency={currency}
+              showRemoveAsContributor={showRemoveAsContributor}
+              onClose={() => handleClose(false)}
+            />
           </FormikZod>
         )}
       </DialogContent>

@@ -9,6 +9,10 @@ export const hostCancelContributionModalQuery = gql`
       status
       frequency
       description
+      permissions {
+        id
+        canRemoveAsContributor
+      }
       amount {
         valueInCents
         currency

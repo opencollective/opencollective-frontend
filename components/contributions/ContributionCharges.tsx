@@ -37,8 +37,6 @@ type ChargeGroup = {
 
 const chargeColumnHelper = createColumnHelper<ChargeGroup>();
 
-const getTimestamp = (value: string | Date) => new Date(value).getTime();
-
 function getChargeGroupAmount(
   order: ContributionDrawerQuery['order'],
   transactions: ContributionTransaction[],
@@ -87,7 +85,7 @@ function buildChargeGroups(order: ContributionDrawerQuery['order']): ChargeGroup
       };
     })
     .filter(chargeGroup => !chargeGroup.primaryTransaction.isRefund)
-    .sort((a, b) => getTimestamp(b.primaryTransaction.createdAt) - getTimestamp(a.primaryTransaction.createdAt));
+    .sort((a, b) => b.primaryTransaction.createdAt.localeCompare(a.primaryTransaction.createdAt));
 }
 
 function ChargeStatusBadge({ chargeGroup }: { chargeGroup: ChargeGroup }) {
