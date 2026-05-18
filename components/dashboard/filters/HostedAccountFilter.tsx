@@ -19,8 +19,18 @@ import { accountFilterQuery } from './AccountFilter';
 import ComboSelectFilter from './ComboSelectFilter';
 
 const hostedAccountFilterSearchQuery = gql`
-  query HostedAccountFilterSearch($searchTerm: String, $hostSlug: String, $orderBy: OrderByInput) {
-    accounts(searchTerm: $searchTerm, host: { slug: $hostSlug }, orderBy: $orderBy) {
+  query HostedAccountFilterSearch(
+    $searchTerm: String
+    $hostSlug: String
+    $orderBy: OrderByInput
+    $includePlatformVendors: Boolean
+  ) {
+    accounts(
+      searchTerm: $searchTerm
+      host: { slug: $hostSlug }
+      orderBy: $orderBy
+      includePlatformVendors: $includePlatformVendors
+    ) {
       nodes {
         id
         ...AccountHoverCardFields
@@ -120,7 +130,7 @@ function HostedAccountFilter({
   const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>(defaultAccounts);
 
   const [search, { loading, data }] = useLazyQuery(hostedAccountFilterSearchQuery, {
-    variables: { hostSlug: meta.hostSlug },
+    variables: { hostSlug: meta.hostSlug, includePlatformVendors: true },
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
   });
