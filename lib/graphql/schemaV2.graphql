@@ -2557,6 +2557,7 @@ enum TransactionType {
 
 enum TransactionKind {
   ADDED_FUNDS
+  APPLICATION_FEE
   BALANCE_TRANSFER
   CONTRIBUTION
   EXPENSE
@@ -18694,6 +18695,11 @@ type Query {
     Include vendors for this host
     """
     includeVendorsForHost: AccountReferenceInput
+
+    """
+    Include Open Collective platform-owned vendors (currently the global VENDOR account with slug "oc-platform"). Useful when filtering accounts under a host while still surfacing platform-owned vendors.
+    """
+    includePlatformVendors: Boolean
 
     """
     Filter by the balance of the account and its children accounts (events and projects)
