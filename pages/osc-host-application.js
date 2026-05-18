@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -7,7 +8,7 @@ import { CollectiveType, IGNORED_TAGS } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
 
-import ApplicationForm from '../components/osc-host-application/ApplicationForm';
+const ApplicationForm = dynamic(() => import('../components/osc-host-application/ApplicationForm'));
 import ConnectGithub from '../components/osc-host-application/ConnectGithub';
 import TermsOfFiscalSponsorship from '../components/osc-host-application/TermsOfFiscalSponsorship';
 import YourInitiativeIsNearlyThere from '../components/osc-host-application/YourInitiativeIsNearlyThere';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { getApplicableTaxes } from '@opencollective/taxes';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { TriangleAlert } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 

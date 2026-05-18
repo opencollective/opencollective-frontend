@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEmpty, isNil } from 'lodash';
+import { isEmpty, isNil } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 

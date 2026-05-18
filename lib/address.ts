@@ -7,7 +7,7 @@ import type { getCountryFields as _typeGetCountryFields } from 'lib-address';
 import type { AddressInput, CountryData } from 'lib-address/dist/types';
 // @ts-expect-error - lib-address/lite types require moduleResolution: "bundler" but the import works at runtime
 import { getCountryData, getCountryFields } from 'lib-address/lite';
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 import { defineMessages, type IntlShape } from 'react-intl';
 
 /**

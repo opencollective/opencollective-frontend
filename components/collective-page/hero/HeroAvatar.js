@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { useMutation } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { Camera } from '@styled-icons/feather/Camera';
-import { inRange } from 'lodash';
+import { inRange } from 'lodash-es';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';

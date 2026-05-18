@@ -1,5 +1,5 @@
 import React from 'react';
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/graphql';

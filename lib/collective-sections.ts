@@ -9,7 +9,7 @@
  * field to know which features user has access to.
  */
 
-import { cloneDeep, flatten, get } from 'lodash';
+import { cloneDeep, flatten, get } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';

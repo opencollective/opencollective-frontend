@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, groupBy, mapValues } from 'lodash';
+import { get, groupBy, mapValues } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 

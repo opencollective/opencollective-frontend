@@ -1,4 +1,4 @@
-import { isUndefined } from 'lodash';
+import { isUndefined } from 'lodash-es';
 import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,

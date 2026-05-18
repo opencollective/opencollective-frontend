@@ -15,5 +15,13 @@ module.exports = async () => {
     'node_modules/(?!(@scure|@otplib|@noble|uuid)/)',
   ];
 
+  // Map lodash-es to CJS lodash in the test environment to avoid ESM parse errors.
+  // The second entry handles sub-path imports like `lodash-es/range`.
+  nextConfig.moduleNameMapper = {
+    ...nextConfig.moduleNameMapper,
+    '^lodash-es$': '<rootDir>/node_modules/lodash',
+    '^lodash-es/(.*)$': '<rootDir>/node_modules/lodash/$1',
+  };
+
   return nextConfig;
 };

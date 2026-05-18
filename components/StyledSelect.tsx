@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil, omitBy, truncate } from 'lodash';
+import { isNil, omitBy, truncate } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import type {

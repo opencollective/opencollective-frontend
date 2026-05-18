@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { find, isUndefined } from 'lodash';
+import { find, isUndefined } from 'lodash-es';
 import { styled } from 'styled-components';
 import { size } from 'styled-system';
 

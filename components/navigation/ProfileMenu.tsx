@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import type { LucideIcon } from 'lucide-react';
 import {
   BookOpen,

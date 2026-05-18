@@ -1,7 +1,8 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash-es';
 import { AlertTriangle, ExternalLink, LinkIcon, ShieldCheck } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
@@ -32,7 +33,8 @@ import { type Toast, useToast } from '../../../ui/useToast';
 
 import AcceptRejectButtons from './AcceptRejectButtons';
 import { HostApplicationFields, processApplicationMutation } from './queries';
-import ValidatedRepositoryInfo from './ValidatedRepositoryInfo';
+
+const ValidatedRepositoryInfo = dynamic(() => import('./ValidatedRepositoryInfo'));
 
 const msg = defineMessages({
   approved: {

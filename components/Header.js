@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import Head from 'next/head';
 import { defineMessages, injectIntl } from 'react-intl';
 

@@ -4,7 +4,7 @@ import { BarChart } from '@styled-icons/material/BarChart';
 import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
 import { PieChart } from '@styled-icons/material/PieChart';
 import { Timeline } from '@styled-icons/material/Timeline';
-import { capitalize, sumBy } from 'lodash';
+import { capitalize, sumBy } from 'lodash-es';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { ChevronDown, ChevronUp, Menu } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';

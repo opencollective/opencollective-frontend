@@ -1,6 +1,6 @@
 import { URL } from 'url';
 
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 
 import { oauthServiceAllowlist } from '@/lib/constants/oauth';
 

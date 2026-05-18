@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 

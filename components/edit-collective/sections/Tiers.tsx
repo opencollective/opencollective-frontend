@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 

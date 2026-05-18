@@ -1,4 +1,4 @@
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 import { defineMessages } from 'react-intl';
 
 import { WebsiteName } from '../../components/I18nFormatters';

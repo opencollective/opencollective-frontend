@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
-import { get, trim } from 'lodash';
+import { get, trim } from 'lodash-es';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
-import { get, intersection, isEmpty, isEqual, isNil, omitBy, pick } from 'lodash';
+import { get, intersection, isEmpty, isEqual, isNil, omitBy, pick } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';

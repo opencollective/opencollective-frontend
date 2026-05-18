@@ -5,7 +5,7 @@ import path from 'path';
 
 import React from 'react';
 import * as Sentry from '@sentry/nextjs';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 import { createIntl, createIntlCache } from 'react-intl';
 import { ServerStyleSheet } from 'styled-components';

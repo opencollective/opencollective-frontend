@@ -1,7 +1,7 @@
 // Deprecated, use components/InputAmount.tsx instead
 import React from 'react';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
-import { clamp, isNil, isUndefined, round } from 'lodash';
+import { clamp, isNil, isUndefined, round } from 'lodash-es';
 
 import { Currency } from '../lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '../lib/currency-utils';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormikContext } from 'formik';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 
 import { captureMessage } from '../server/sentry';
 

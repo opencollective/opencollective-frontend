@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { includes } from 'lodash';
+import { includes } from 'lodash-es';
 
 import type { ExpensePageQuery, ExpensePageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { isFeatureEnabled } from '@/lib/allowed-features';

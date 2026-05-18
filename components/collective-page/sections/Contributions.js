@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { uniqWith } from 'lodash';
+import { uniqWith } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 

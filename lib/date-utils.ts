@@ -1,5 +1,5 @@
 import type { OpUnitType, UnitType } from 'dayjs';
-import { padStart } from 'lodash';
+import { padStart } from 'lodash-es';
 
 import INTERVALS from './constants/intervals';
 import { PAYMENT_METHOD_SERVICE } from './constants/payment-methods';

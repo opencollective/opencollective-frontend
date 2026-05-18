@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import type { NextPageContext } from 'next';
 
 import supportedLanguages from './supported-languages';

@@ -1,4 +1,4 @@
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 
 import type { TransactionReport } from '../../../../../lib/graphql/types/v2/graphql';
 

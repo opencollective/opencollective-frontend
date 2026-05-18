@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { capitalize } from 'lodash';
+import { capitalize } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';

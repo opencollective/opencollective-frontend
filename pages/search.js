@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular/ShareAlt';
 import copy from 'copy-to-clipboard';
-import { differenceWith, isNil, pickBy, toLower, truncate, uniqBy } from 'lodash';
+import { differenceWith, isNil, pickBy, toLower, truncate, uniqBy } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';

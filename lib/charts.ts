@@ -1,5 +1,5 @@
 import type { ManipulateType, OpUnitType } from 'dayjs';
-import { difference, flatten, get, groupBy, identity, uniq } from 'lodash';
+import { difference, flatten, get, groupBy, identity, uniq } from 'lodash-es';
 
 import { formatPeriod } from '../components/dashboard/filters/PeriodCompareFilter';
 

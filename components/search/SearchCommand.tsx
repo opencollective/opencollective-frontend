@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@apollo/client';
 import { Command as CommandPrimitive } from 'cmdk';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { ChevronRight, SearchIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

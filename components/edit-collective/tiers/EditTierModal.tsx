@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
-import { capitalize, isNil, omit } from 'lodash';
+import { capitalize, isNil, omit } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 

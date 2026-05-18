@@ -1,4 +1,4 @@
-import { has, isNil } from 'lodash';
+import { has, isNil } from 'lodash-es';
 import { parseToRgb, rgbToColorString } from 'polished';
 
 import { centsAmountToFloat, floatAmountToCents } from './currency-utils';

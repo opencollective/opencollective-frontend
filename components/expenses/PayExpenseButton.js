@@ -3,7 +3,7 @@
 import React from 'react';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as OtherIcon } from '@styled-icons/fa-solid/University';
-import { get, includes } from 'lodash';
+import { get, includes } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';

@@ -7,7 +7,7 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { mergeDeep } from '@apollo/client/utilities';
 import { createUploadLink } from 'apollo-upload-client';
-import { isUndefined, omitBy, pick } from 'lodash';
+import { isUndefined, omitBy, pick } from 'lodash-es';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';

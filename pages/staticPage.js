@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 
 import Link from '../components/Link';
 import NewsletterContainer from '../components/NewsletterContainer';

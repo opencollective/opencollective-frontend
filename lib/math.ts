@@ -1,4 +1,4 @@
-import { clamp } from 'lodash';
+import { clamp } from 'lodash-es';
 
 /**
  * Generates a scaling function from transforming a number from one range to another.

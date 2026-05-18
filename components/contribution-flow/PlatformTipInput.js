@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';

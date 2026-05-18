@@ -1,6 +1,6 @@
 import { URL } from 'url';
 
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 
 // next.js export
 // ts-unused-exports:disable-next-line

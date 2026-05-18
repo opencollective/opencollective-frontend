@@ -3,7 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash';
+import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash-es';
 import { Eraser } from 'lucide-react';
 import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';

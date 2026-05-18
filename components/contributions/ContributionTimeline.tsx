@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { clsx } from 'clsx';
 import dayjs from 'dayjs';
-import { flatten, groupBy, sortBy, startCase, uniq } from 'lodash';
+import { flatten, groupBy, sortBy, startCase, uniq } from 'lodash-es';
 import {
   Calendar,
   ChevronDown,

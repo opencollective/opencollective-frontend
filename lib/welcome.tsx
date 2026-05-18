@@ -1,5 +1,5 @@
 import React from 'react';
-import { compact, isEmpty, isNil, orderBy } from 'lodash';
+import { compact, isEmpty, isNil, orderBy } from 'lodash-es';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';

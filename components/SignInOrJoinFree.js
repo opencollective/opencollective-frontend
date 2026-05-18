@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { PropTypes } from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get, pick } from 'lodash';
+import { get, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';

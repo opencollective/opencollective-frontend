@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { debounce, omit, uniq } from 'lodash';
+import { debounce, omit, uniq } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { getInputBorderColor } from '../lib/styled_components_utils';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';

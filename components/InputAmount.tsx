@@ -1,6 +1,6 @@
 import React from 'react';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
-import { clamp, isNil, isUndefined, round } from 'lodash';
+import { clamp, isNil, isUndefined, round } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import { Currency, ZERO_DECIMAL_CURRENCIES } from '@/lib/constants/currency';

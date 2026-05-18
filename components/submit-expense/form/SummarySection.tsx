@@ -2,7 +2,7 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
-import { omit, pick, round } from 'lodash';
+import { omit, pick, round } from 'lodash-es';
 import { AtSign, Building, Contact, Globe, Lock, Mail } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 

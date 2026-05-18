@@ -1,6 +1,6 @@
 import React from 'react';
 import { Mail } from '@styled-icons/feather/Mail';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import ContactCollectiveBtn from '../../ContactCollectiveBtn';

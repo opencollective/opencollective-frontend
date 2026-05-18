@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
-import { get, isNil, map, pick } from 'lodash';
+import { get, isNil, map, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 

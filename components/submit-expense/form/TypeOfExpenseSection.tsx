@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow-callback */
 import React from 'react';
 import { useFormikContext } from 'formik';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';

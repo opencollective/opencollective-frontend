@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 

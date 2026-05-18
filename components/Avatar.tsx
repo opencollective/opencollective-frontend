@@ -1,6 +1,6 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'lodash-es';
 import { ArrowUp, Calendar, EyeOff, LoaderCircle, Pencil, TestTube2, UserCog } from 'lucide-react';
 import type { FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';

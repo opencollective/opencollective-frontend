@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { startCase, uniq } from 'lodash';
+import { startCase, uniq } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';

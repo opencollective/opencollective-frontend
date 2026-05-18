@@ -4,11 +4,10 @@ const path = require('path');
 
 const debug = require('debug');
 const dotenv = require('dotenv');
-const lodash = require('lodash');
 
 // Load extra env file on demand
 // e.g. `npm run dev production` -> `.env.production`
-const extraEnv = process.env.EXTRA_ENV || lodash.last(process.argv);
+const extraEnv = process.env.EXTRA_ENV || process.argv.at(-1);
 const extraEnvPath = path.join(__dirname, `.env.${extraEnv}`);
 if (fs.existsSync(extraEnvPath)) {
   dotenv.config({ path: extraEnvPath });

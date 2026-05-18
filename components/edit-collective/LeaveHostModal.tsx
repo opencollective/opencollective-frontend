@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { get, sum } from 'lodash';
+import { get, sum } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
