@@ -172,13 +172,13 @@ const nextConfig = {
       },
     });
 
-    // Load images in base64
+    // Load images in base64 (only for very small assets; larger files become URLs)
     config.module.rules.push({
       test: /\.(svg|png|jpg|gif)$/,
       use: {
         loader: 'url-loader',
         options: {
-          limit: 1000000,
+          limit: 8192,
         },
       },
       include: [path.resolve(__dirname, 'components')],
