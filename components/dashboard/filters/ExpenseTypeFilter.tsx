@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, omit } from 'lodash-es';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 

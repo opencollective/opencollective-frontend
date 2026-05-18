@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'lodash-es';
 import { ArrowLeftRightIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

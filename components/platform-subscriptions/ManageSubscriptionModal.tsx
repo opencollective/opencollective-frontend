@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { clsx } from 'clsx';
 import { useFormik } from 'formik';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { ArrowLeft, ArrowRight, Check, Info, Minus, Receipt, Shapes } from 'lucide-react';
 import Image from 'next/image';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';

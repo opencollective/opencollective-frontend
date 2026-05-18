@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
-import { debounce, isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash';
+import { debounce, isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';

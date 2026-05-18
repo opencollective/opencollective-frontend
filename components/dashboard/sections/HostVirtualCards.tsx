@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omitBy } from 'lodash';
+import { omitBy } from 'lodash-es';
 import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';

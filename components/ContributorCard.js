@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 

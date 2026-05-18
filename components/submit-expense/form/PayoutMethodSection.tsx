@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Formik, useFormikContext } from 'formik';
-import { get, isEmpty, omit, pick, truncate } from 'lodash';
+import { get, isEmpty, omit, pick, truncate } from 'lodash-es';
 import { BadgeCheck, Pencil, ShieldAlert, Trash2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';

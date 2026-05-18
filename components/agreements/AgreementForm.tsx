@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { cloneDeep, omit, pick } from 'lodash';
+import { cloneDeep, omit, pick } from 'lodash-es';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 

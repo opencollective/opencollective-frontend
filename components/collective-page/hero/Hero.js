@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from 'react';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
-import { first } from 'lodash';
+import { first } from 'lodash-es';
 import { Image, Palette, Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';

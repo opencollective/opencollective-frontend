@@ -1,5 +1,5 @@
 import React from 'react';
-import { groupBy, sortBy, truncate } from 'lodash';
+import { groupBy, sortBy, truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql } from '@apollo/client';
-import { get, isNull, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
+import { get, isNull, isUndefined, pick, remove, size, throttle, uniq } from 'lodash-es';
 import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';

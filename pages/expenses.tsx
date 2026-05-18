@@ -1,5 +1,5 @@
 import React from 'react';
-import { has, isNil, omitBy } from 'lodash';
+import { has, isNil, omitBy } from 'lodash-es';
 import type { InferGetServerSidePropsType } from 'next';
 import { defineMessages, useIntl } from 'react-intl';
 import type { z } from 'zod';

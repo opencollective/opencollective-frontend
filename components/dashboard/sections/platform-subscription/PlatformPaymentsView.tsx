@@ -1,5 +1,5 @@
 import React from 'react';
-import { omitBy, take } from 'lodash';
+import { omitBy, take } from 'lodash-es';
 import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';

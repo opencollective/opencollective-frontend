@@ -1,5 +1,5 @@
 import React from 'react';
-import get from 'lodash/get';
+import get from 'lodash-es/get';
 import { FixedSizeGrid } from 'react-window';
 import { styled } from 'styled-components';
 

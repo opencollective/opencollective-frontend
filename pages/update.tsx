@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { get, pick } from 'lodash';
+import { get, pick } from 'lodash-es';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 

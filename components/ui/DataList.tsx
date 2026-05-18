@@ -1,5 +1,5 @@
 import React from 'react';
-import { isObject } from 'lodash';
+import { isObject } from 'lodash-es';
 
 import { cn } from '../../lib/utils';
 

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { useFormikContext } from 'formik';
-import { compact, get, kebabCase, partition } from 'lodash';
+import { compact, get, kebabCase, partition } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';

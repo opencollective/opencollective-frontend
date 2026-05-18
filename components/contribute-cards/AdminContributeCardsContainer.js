@@ -1,7 +1,7 @@
 import React from 'react';
 import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import ContributeCardsContainer from '../collective-page/ContributeCardsContainer';

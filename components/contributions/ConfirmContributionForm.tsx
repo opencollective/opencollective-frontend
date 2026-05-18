@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { omit, pick } from 'lodash';
+import { omit, pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getCurrentLocalDateStr } from '../../lib/date-utils';

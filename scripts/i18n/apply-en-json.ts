@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import type { API, FileInfo, Options } from 'jscodeshift';
 import { run as jscodeshiftRun } from 'jscodeshift/src/Runner';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 
 import logger from '../../server/logger';
 

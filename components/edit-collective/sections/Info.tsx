@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { compact, get, isEqual, isNil, isUndefined, pick } from 'lodash';
+import { compact, get, isEqual, isNil, isUndefined, pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 

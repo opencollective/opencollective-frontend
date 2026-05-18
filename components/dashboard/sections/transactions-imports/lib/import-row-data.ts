@@ -1,4 +1,4 @@
-import { isEmpty, isObject } from 'lodash';
+import { isEmpty, isObject } from 'lodash-es';
 
 import type { CSVConfig } from './types';
 

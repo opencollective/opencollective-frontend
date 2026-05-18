@@ -7,7 +7,7 @@ import {
   TaxType,
 } from '@opencollective/taxes';
 import { Close } from '@styled-icons/material/Close';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 

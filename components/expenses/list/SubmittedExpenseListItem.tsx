@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { includes, truncate } from 'lodash';
+import { includes, truncate } from 'lodash-es';
 import { Check, Copy, Ellipsis, Link } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 

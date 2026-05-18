@@ -2,7 +2,7 @@
  * Makes use of but doesn't necessarily match opencollective-api/server/lib/allowed-features.ts
  */
 
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 
 export const FEATURES = {
   // Collective page features

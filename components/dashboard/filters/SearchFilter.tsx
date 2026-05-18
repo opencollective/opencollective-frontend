@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { Search, XIcon } from 'lucide-react';
 import { defineMessage, useIntl } from 'react-intl';
 import { z } from 'zod';

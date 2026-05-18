@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import type { QueryResult } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import type { PaymentIntentResult } from '@stripe/stripe-js';
-import { get, uniqBy } from 'lodash';
+import { get, uniqBy } from 'lodash-es';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';

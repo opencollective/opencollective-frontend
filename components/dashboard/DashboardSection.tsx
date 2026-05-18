@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { values } from 'lodash';
+import { values } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';

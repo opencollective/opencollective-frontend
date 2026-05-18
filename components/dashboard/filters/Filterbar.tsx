@@ -1,5 +1,5 @@
 import React from 'react';
-import { partition } from 'lodash';
+import { partition } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 

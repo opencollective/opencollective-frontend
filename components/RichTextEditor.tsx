@@ -1,6 +1,6 @@
 import React from 'react';
 import { css } from '@styled-system/css';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { styled } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';

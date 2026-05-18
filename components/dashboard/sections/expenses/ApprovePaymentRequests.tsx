@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { omit, omitBy } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';

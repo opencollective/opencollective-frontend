@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { omit, orderBy, pick } from 'lodash';
+import { omit, orderBy, pick } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';

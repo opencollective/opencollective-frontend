@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import type { ColumnDef } from '@tanstack/react-table';
-import { compact, isString, omit } from 'lodash';
+import { compact, isString, omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';

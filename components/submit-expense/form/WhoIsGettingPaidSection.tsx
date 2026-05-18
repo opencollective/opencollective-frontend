@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import type { FieldMetaProps } from 'formik';
 import { Field, useFormikContext } from 'formik';
-import { isEmpty, pick } from 'lodash';
+import { isEmpty, pick } from 'lodash-es';
 import { AlertCircle, Lock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

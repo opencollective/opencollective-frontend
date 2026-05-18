@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { compact, pick } from 'lodash';
+import { compact, pick } from 'lodash-es';
 import {
   Check,
   Copy,

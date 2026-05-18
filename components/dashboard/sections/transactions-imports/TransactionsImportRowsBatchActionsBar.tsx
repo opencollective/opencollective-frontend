@@ -1,5 +1,5 @@
 import React from 'react';
-import { size } from 'lodash';
+import { size } from 'lodash-es';
 import { PauseCircle, SquareSlashIcon, UndoDot } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

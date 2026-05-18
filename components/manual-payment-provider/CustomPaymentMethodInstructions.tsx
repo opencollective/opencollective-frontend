@@ -1,7 +1,7 @@
 import React from 'react';
 import type { TransformCallback } from 'interweave';
 import { Markup } from 'interweave';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { CircleHelp, Smartphone } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { IntlShape } from 'react-intl';

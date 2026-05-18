@@ -1,5 +1,5 @@
 import React from 'react';
-import { set } from 'lodash';
+import { set } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 

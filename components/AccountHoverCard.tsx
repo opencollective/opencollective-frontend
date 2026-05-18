@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import type { Content } from '@radix-ui/react-hover-card';
 import { clsx } from 'clsx';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import type { LucideIcon } from 'lucide-react';
 import { BadgeCheck, Banknote, Building, Calendar, FileText, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';

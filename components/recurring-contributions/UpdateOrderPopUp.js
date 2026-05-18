@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
-import { first, get, last, startCase } from 'lodash';
+import { first, get, last, startCase } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 

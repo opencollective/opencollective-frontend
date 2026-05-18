@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import { Field, Form, Formik } from 'formik';
-import { compact, isEmpty, pick, toString } from 'lodash';
+import { compact, isEmpty, pick, toString } from 'lodash-es';
 import { ArrowLeft, BookCheck, BookDashed } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FormattedMessage, useIntl } from 'react-intl';

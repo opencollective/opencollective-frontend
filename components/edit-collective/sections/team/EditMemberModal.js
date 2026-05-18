@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { Trash } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';

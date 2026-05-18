@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { omit, pick } from 'lodash';
+import { omit, pick } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import type { z } from 'zod';

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import type { FormikProps } from 'formik';
 import { FastField, Field } from 'formik';
-import { pickBy } from 'lodash';
+import { pickBy } from 'lodash-es';
 import type { InputHTMLAttributes } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

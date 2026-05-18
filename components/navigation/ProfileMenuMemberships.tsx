@@ -1,5 +1,5 @@
 import React from 'react';
-import { groupBy, isEmpty, uniqBy } from 'lodash';
+import { groupBy, isEmpty, uniqBy } from 'lodash-es';
 import { LayoutDashboard, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';

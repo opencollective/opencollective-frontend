@@ -1,4 +1,4 @@
-import { find, isEmpty, isUndefined, mapValues, omit, pickBy } from 'lodash';
+import { find, isEmpty, isUndefined, mapValues, omit, pickBy } from 'lodash-es';
 
 import type { TaxFormType } from '../components/dashboard/sections/tax-information/common';
 

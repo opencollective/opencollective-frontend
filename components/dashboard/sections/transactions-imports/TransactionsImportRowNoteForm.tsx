@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { updateTransactionsImportRows } from './lib/graphql';

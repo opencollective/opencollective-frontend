@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { FormikProvider } from 'formik';
-import { omitBy } from 'lodash';
+import { omitBy } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
