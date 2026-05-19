@@ -31,7 +31,7 @@ import ChangeTierWarningModal from './ChangeTierWarningModal';
 import CustomFields, { buildCustomFieldsConfig } from './CustomFields';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, stepDetails, collective, tier, router }) => {
+const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlatformTip }) => {
   const intl = useIntl();
   const amount = stepDetails?.amount;
   const currency = tier?.amount.currency || collective.currency;
@@ -83,11 +83,12 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, router }) => {
     track(AnalyticsEvent.CONTRIBUTION_STARTED, {
       props: {
         [AnalyticsProperty.CONTRIBUTION_STEP]: 'details',
-        [AnalyticsProperty.CONTRIBUTION_IS_NEW_PLATFORM_TIP]: stepDetails.isNewPlatformTip,
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails.isNewPlatformTip ? 'new' : 'old',
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: showPlatformTip,
         [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: collective?.host?.slug,
       },
     });
-  }, [stepDetails.isNewPlatformTip, collective?.host?.slug]);
+  }, [stepDetails.isNewPlatformTip, showPlatformTip, collective?.host?.slug]);
 
   return (
     <Box width={1}>

@@ -22,7 +22,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
-import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
+import { Experiment, isExperimentEnabled, isOpenSourceCollectiveHost } from '../../lib/experiments/experiments';
 import { gql } from '../../lib/graphql/helpers';
 import { AccountType } from '../../lib/graphql/types/v2/graphql';
 import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
@@ -169,6 +169,11 @@ class ContributionFlow extends React.Component {
     const currency = tier?.amount?.currency || collective.currency;
     const amount = queryParams.amount || getDefaultTierAmount(tier, collective, currency);
     const quantity = queryParams.quantity || 1;
+    // OSC-only A/B: half of OSC contributors that would otherwise see the tip get the tip step hidden.
+    // Cached on the instance so the variant is stable for the duration of the flow.
+    this.platformTipDisabledByExperiment =
+      isOpenSourceCollectiveHost(collective?.host) &&
+      isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, LoggedInUser, { collective });
     this.state = {
       error: null,
       stripe: null,
@@ -214,7 +219,10 @@ class ContributionFlow extends React.Component {
       track(AnalyticsEvent.CONTRIBUTION_STARTED, {
         props: {
           [AnalyticsProperty.CONTRIBUTION_STEP]: this.getCurrentStepName(),
-          [AnalyticsProperty.CONTRIBUTION_IS_NEW_PLATFORM_TIP]: this.state.stepDetails.isNewPlatformTip,
+          [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: this.state.stepDetails.isNewPlatformTip
+            ? 'new'
+            : 'old',
+          [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: this.canHavePlatformTips(),
           [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.collective?.host?.slug,
         },
       });
@@ -315,7 +323,8 @@ class ContributionFlow extends React.Component {
       [AnalyticsProperty.CONTRIBUTION_HAS_PLATFORM_TIP]: stepDetails.amount && stepDetails.platformTip > 0,
       [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_PERCENTAGE]:
         stepDetails.amount && stepDetails.platformTip > 0 ? stepDetails.platformTip / stepDetails.amount : 0,
-      [AnalyticsProperty.CONTRIBUTION_IS_NEW_PLATFORM_TIP]: stepDetails.isNewPlatformTip,
+      [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails.isNewPlatformTip ? 'new' : 'old',
+      [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: this.canHavePlatformTips(),
       [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.collective?.host?.slug,
     };
 
@@ -344,7 +353,11 @@ class ContributionFlow extends React.Component {
             paymentMethod: await this.getPaymentMethod(),
             platformTipAmount: getGQLV2AmountInput(stepDetails.platformTip, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
-            context: { isEmbed: this.props.isEmbed || false, isNewPlatformTipFlow: stepDetails.isNewPlatformTip },
+            context: {
+              isEmbed: this.props.isEmbed || false,
+              isNewPlatformTipFlow: stepDetails.isNewPlatformTip,
+              platformTipOffered: this.canHavePlatformTips(),
+            },
             tags: this.getQueryParams().tags,
             taxes: skipTaxes
               ? null
@@ -740,7 +753,9 @@ class ContributionFlow extends React.Component {
 
   canHavePlatformTips() {
     const { tier, collective } = this.props;
-    if (!collective.platformContributionAvailable) {
+    if (this.platformTipDisabledByExperiment) {
+      return false;
+    } else if (!collective.platformContributionAvailable) {
       return false;
     } else if (!tier) {
       return true;

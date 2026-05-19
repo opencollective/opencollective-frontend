@@ -3,6 +3,7 @@ import { parseToBoolean } from '../utils';
 
 export const enum Experiment {
   NEW_PLATFORM_TIP_FLOW = 'newPlatformTipFlow',
+  OPENSOURCE_PLATFORM_TIP_AB = 'opensourcePlatformTipAb',
 }
 
 type ExperimentConfig = {
@@ -33,7 +34,7 @@ function getNewPlatformTipFlowRolloutPercentage(): number {
   return Math.min(Math.max(percentage, 0), 100);
 }
 
-function isOpenSourceCollectiveHost(host?: { slug?: string; legacyId?: number | string }): boolean {
+export function isOpenSourceCollectiveHost(host?: { slug?: string; legacyId?: number | string }): boolean {
   return (
     host?.slug === OPEN_SOURCE_COLLECTIVE_HOST_SLUG || Number(host?.legacyId) === OPEN_SOURCE_COLLECTIVE_HOST_LEGACY_ID
   );
@@ -59,11 +60,27 @@ const experiments: Record<Experiment, ExperimentConfig> = {
         return false;
       }
 
+      // Open Source Collective stays on the legacy flow for now, no A/B.
       if (isOpenSourceCollectiveHost(context?.collective?.host)) {
-        return true;
+        return false;
       }
 
       return Math.random() * 100 < getNewPlatformTipFlowRolloutPercentage();
+    },
+  },
+  // OSC-only A/B for measuring the impact of platform tips on conversion.
+  // `true` means the tip step is hidden for this user.
+  [Experiment.OPENSOURCE_PLATFORM_TIP_AB]: {
+    enabled(_user, context): boolean {
+      if (typeof window === 'undefined' || NON_RANDOMIZED_ENVS.includes(process.env.OC_ENV)) {
+        return false;
+      }
+
+      if (!isOpenSourceCollectiveHost(context?.collective?.host)) {
+        return false;
+      }
+
+      return Math.random() < 0.5;
     },
   },
 };
