@@ -94,7 +94,7 @@ export function CreateLegalEntityPayeeForm(props: CreateLegalEntityPayeeFormProp
             variant: 'success',
             message: intl.formatMessage({
               defaultMessage: 'Organization account created',
-              id: 'SubmitExpense.CreateLegalEntity.success',
+              id: '94zozl',
             }),
           });
         }
@@ -143,7 +143,7 @@ function CreateLegalEntityFormFields(props: { isDisabled: boolean; mutationLoadi
       <FormField
         name="countryISO"
         disabled={isDisabled}
-        label={<FormattedMessage id="createCollective.form.country" defaultMessage="Country of Incorporation" />}
+        label={<FormattedMessage defaultMessage="Country of Incorporation" id="createCollective.form.country" />}
       >
         {({ field }) => (
           <InputCountry
@@ -190,7 +190,7 @@ function CreateLegalEntityFormFields(props: { isDisabled: boolean; mutationLoadi
       <FormField
         name="slug"
         disabled={isDisabled}
-        label={intl.formatMessage({ defaultMessage: 'Set your profile URL', id: 'createCollective.form.slugLabel' })}
+        label={intl.formatMessage({ defaultMessage: 'createCollective.form.slugLabel', id: '9sukjk' })}
       >
         {({ field }) => <InputGroup className="w-full" prepend="opencollective.com/" {...field} />}
       </FormField>
@@ -207,11 +207,10 @@ function CreateLegalEntityFormFields(props: { isDisabled: boolean; mutationLoadi
             <span>
               <FormattedMessage
                 defaultMessage="I am legally registered as an administrator of {entityName} and can represent it on the platform."
-                id="SubmitExpense.CreateLegalEntity.acknowledgement"
+                id="rlswHG"
                 values={{
                   entityName:
-                    form.values.legalName ||
-                    intl.formatMessage({ defaultMessage: 'this entity', id: 'SubmitExpense.thisEntity' }),
+                    form.values.legalName || intl.formatMessage({ defaultMessage: 'this entity', id: 'xYG/tI' }),
                 }}
               />
             </span>
@@ -225,7 +224,7 @@ function CreateLegalEntityFormFields(props: { isDisabled: boolean; mutationLoadi
         loading={props.mutationLoading}
         onClick={() => form.submitForm()}
       >
-        <FormattedMessage defaultMessage="Create Organization Account" id="SubmitExpense.CreateLegalEntity.submit" />
+        <FormattedMessage defaultMessage="Create Organization Account" id="jwJ8fG" />
       </Button>
     </div>
   );
