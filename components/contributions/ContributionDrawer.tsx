@@ -111,18 +111,50 @@ const contributionDrawerQuery = gql`
           fromAccount {
             ...AccountHoverCardFields
             isIncognito
+            mainProfile {
+              id
+              name
+              slug
+              type
+              imageUrl
+              ...AccountHoverCardFields
+            }
           }
           account {
             ...AccountHoverCardFields
             isIncognito
+            mainProfile {
+              id
+              name
+              slug
+              type
+              imageUrl
+              ...AccountHoverCardFields
+            }
           }
           host {
             ...AccountHoverCardFields
             isIncognito
+            mainProfile {
+              id
+              name
+              slug
+              type
+              imageUrl
+              ...AccountHoverCardFields
+            }
           }
           individual {
             ...AccountHoverCardFields
             isIncognito
+            mainProfile {
+              id
+              name
+              slug
+              type
+              imageUrl
+              ...AccountHoverCardFields
+            }
           }
           data
           transaction {
