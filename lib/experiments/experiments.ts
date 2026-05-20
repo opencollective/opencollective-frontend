@@ -22,7 +22,7 @@ type ExperimentContext = {
 const NON_RANDOMIZED_ENVS = ['ci', 'e2e', 'test'];
 const OPEN_SOURCE_COLLECTIVE_HOST_SLUG = 'opensource';
 const OPEN_SOURCE_COLLECTIVE_HOST_LEGACY_ID = 11004;
-const DEFAULT_NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = 50;
+const DEFAULT_NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = 0;
 
 function getNewPlatformTipFlowRolloutPercentage(): number {
   const percentage = parseInt(process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE, 10);
