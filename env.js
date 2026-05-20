@@ -49,7 +49,7 @@ const defaults = {
   LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
   DISABLE_CONTACT_FORM: false,
   NEW_PRICING: false,
-  NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: 50,
+  NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: 0,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {
