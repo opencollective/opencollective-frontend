@@ -2736,7 +2736,7 @@
   "members.remove.cantRemoveLast": "Der letzte Administrator kann nicht entfernt werden. Bitte füge zuerst einen anderen Administrator hinzu.",
   "members.remove.confirm": "Möchtest du wirklich {name} @{slug} {hasEmail, select, 1 {({email})} other {}} entfernen?",
   "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
-  "members.remove.integrations": "By removing this member, you will also remove their token(s) that connects this account to the following service(s): {services}.",
+  "members.remove.connectedAccountsWarning": "Please note that your organization relies on token(s) connect by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member.",
   "members.role.label": "Rolle",
   "Membership.ContributorSince": "{contributorType} seit",
   "membership.since": "seit {date}",

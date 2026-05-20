@@ -358,8 +358,8 @@ const EditMemberModal = ({
               {connectedAccountsByMember.length > 0 && (
                 <p>
                   <FormattedMessage
-                    id="members.remove.integrations"
-                    defaultMessage="By removing this member, you will also remove their token(s) that connects this account to the following service(s): {services}."
+                    id="members.remove.connectedAccountsWarning"
+                    defaultMessage="Please note that your organization relies on token(s) connect by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member."
                     values={{
                       services: connectedAccountsByMember.map(ca => i18nConnectedAccountService(ca.service)).join(', '),
                     }}
