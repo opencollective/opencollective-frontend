@@ -274,6 +274,7 @@ class ContributionFlowSuccess extends React.Component<
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS, {
       props: {
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: order.data?.isNewPlatformTipFlow ? 'new' : 'old',
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(order.platformTipEligible),
       },
     });
     this.setState({ successTracked: true });

@@ -319,10 +319,11 @@ class ContributionFlow extends React.Component {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     }
 
+    const platformTipBaseAmount = stepDetails.amount * stepDetails.quantity;
     const props = {
       [AnalyticsProperty.CONTRIBUTION_HAS_PLATFORM_TIP]: stepDetails.amount && stepDetails.platformTip > 0,
       [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_PERCENTAGE]:
-        stepDetails.amount && stepDetails.platformTip > 0 ? stepDetails.platformTip / stepDetails.amount : 0,
+        platformTipBaseAmount && stepDetails.platformTip > 0 ? stepDetails.platformTip / platformTipBaseAmount : 0,
       [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails.isNewPlatformTip ? 'new' : 'old',
       [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: this.canHavePlatformTips(),
       [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.collective?.host?.slug,
