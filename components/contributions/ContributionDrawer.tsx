@@ -109,52 +109,16 @@ const contributionDrawerQuery = gql`
           type
           createdAt
           fromAccount {
-            ...AccountHoverCardFields
-            isIncognito
-            mainProfile {
-              id
-              name
-              slug
-              type
-              imageUrl
-              ...AccountHoverCardFields
-            }
+            ...ActivityAccountFields
           }
           account {
-            ...AccountHoverCardFields
-            isIncognito
-            mainProfile {
-              id
-              name
-              slug
-              type
-              imageUrl
-              ...AccountHoverCardFields
-            }
+            ...ActivityAccountFields
           }
           host {
-            ...AccountHoverCardFields
-            isIncognito
-            mainProfile {
-              id
-              name
-              slug
-              type
-              imageUrl
-              ...AccountHoverCardFields
-            }
+            ...ActivityAccountFields
           }
           individual {
-            ...AccountHoverCardFields
-            isIncognito
-            mainProfile {
-              id
-              name
-              slug
-              type
-              imageUrl
-              ...AccountHoverCardFields
-            }
+            ...ActivityAccountFields
           }
           data
           transaction {
@@ -247,6 +211,19 @@ const contributionDrawerQuery = gql`
         id
         slug
       }
+    }
+  }
+
+  fragment ActivityAccountFields on Account {
+    ...AccountHoverCardFields
+    isIncognito
+    mainProfile {
+      id
+      name
+      slug
+      type
+      imageUrl
+      ...AccountHoverCardFields
     }
   }
 
