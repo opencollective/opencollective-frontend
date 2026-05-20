@@ -119,6 +119,7 @@ export const orderSuccessFragment = gql`
     status
     frequency
     data
+    platformTipEligible
     manualPaymentProvider {
       id
       type

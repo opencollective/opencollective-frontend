@@ -27995,6 +27995,11 @@ input OrderContextInput {
   Whether this order was created using the new platform tip flow
   """
   isNewPlatformTipFlow: Boolean
+
+  """
+  Whether the platform tip was offered to the user in the contribution flow. When explicitly false, the order is persisted as not eligible for platform tips (used by the OSC platform tip A/B).
+  """
+  platformTipOffered: Boolean
 }
 
 input OrderUpdateInput {
