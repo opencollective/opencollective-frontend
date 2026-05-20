@@ -18,6 +18,7 @@ import {
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
 import {
   NEW_PAYOUT_METHOD_ID,
+  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
   PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
   PAYEE_SLUG_NEW_VENDOR,
   PAYEE_SLUG_VENDOR,
@@ -103,7 +104,9 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   const { LoggedInUser } = useLoggedInUser();
 
   const isLoadingPayee = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
-  const isPickingProfileAdministered = props.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER;
+  const isPickingProfileAdministered = [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(
+    props.payeeSlug,
+  );
 
   const payoutMethods = React.useMemo(() => {
     if (!props.payoutMethods) {
