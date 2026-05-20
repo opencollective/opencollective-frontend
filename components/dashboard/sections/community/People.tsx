@@ -426,10 +426,10 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
 
   useEffect(() => {
     const mainProfilePublicId = accountData?.account?.mainProfile?.publicId;
-    if (mainProfilePublicId) {
+    if (mainProfilePublicId && mainProfilePublicId !== id) {
       replaceSubpath(mainProfilePublicId);
     }
-  }, [accountData, replaceSubpath]);
+  }, [accountData, replaceSubpath, id]);
 
   if (!isEmpty(id)) {
     return (
