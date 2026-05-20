@@ -190,7 +190,7 @@ function CreateLegalEntityFormFields(props: { isDisabled: boolean; mutationLoadi
       <FormField
         name="slug"
         disabled={isDisabled}
-        label={intl.formatMessage({ defaultMessage: 'createCollective.form.slugLabel', id: '9sukjk' })}
+        label={intl.formatMessage({ id: 'createCollective.form.slugLabel', defaultMessage: 'Set your profile URL' })}
       >
         {({ field }) => <InputGroup className="w-full" prepend="opencollective.com/" {...field} />}
       </FormField>
