@@ -5868,6 +5868,11 @@ enum LastCommentBy {
   USER
 
   """
+  Last comment author is not an admin of the expense payee (FromCollectiveId)
+  """
+  NON_FROM_ACCOUNT_ADMIN
+
+  """
   Fiscal Host Admin
   """
   HOST_ADMIN
