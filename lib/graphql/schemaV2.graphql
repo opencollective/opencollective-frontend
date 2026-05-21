@@ -4092,7 +4092,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -5080,7 +5079,6 @@ type PlatformSubscriptionFeatures {
   UPDATES: Boolean!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
-  RECEIVE_GRANTS: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
 }
@@ -7426,7 +7424,6 @@ type CollectiveFeatures {
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
-  RECEIVE_GRANTS: CollectiveFeatureStatus
   MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
@@ -10759,7 +10756,6 @@ type Bot implements Account {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 }
 
@@ -11839,7 +11835,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -13499,7 +13494,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -14876,7 +14870,6 @@ type Individual implements Account {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -16281,7 +16274,6 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -17782,7 +17774,6 @@ type Vendor implements Account & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -22115,7 +22106,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -23352,7 +23342,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -25372,16 +25361,6 @@ type Mutation {
   Remove the given payout method. Scope: "expenses".
   """
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
-
-  """
-  Restore the given payout method. Scope: "expenses".
-  """
-  restorePayoutMethod(
-    """
-    Payout Method reference
-    """
-    payoutMethod: PayoutMethodReferenceInput!
-  ): PayoutMethod! @deprecated(reason: "2025-02-10: Payout methods cannot be restored.")
   editPayoutMethod(
     """
     Payout Method reference
@@ -29008,7 +28987,6 @@ input PlatformSubscriptionFeaturesFeatures {
   UPDATES: Boolean!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
-  RECEIVE_GRANTS: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
 }

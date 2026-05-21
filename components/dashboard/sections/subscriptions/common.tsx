@@ -258,7 +258,6 @@ export const AVAILABLE_FEATURES = [
   'UPDATES',
   'RECEIVE_FINANCIAL_CONTRIBUTIONS',
   'RECEIVE_EXPENSES',
-  'RECEIVE_GRANTS',
   'ACCOUNT_MANAGEMENT',
 ] as const satisfies readonly PlanFeatureKey[];
 
