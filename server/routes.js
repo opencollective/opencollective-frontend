@@ -6,7 +6,7 @@ const proxy = require('express-http-proxy');
 const trim = require('lodash-es/trim').default;
 
 const downloadFileHandler = require('./download-file');
-const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
+const baseApiUrl = process.env.API_URL;
 
 const maxAge = (maxAge = 60) => {
   return (req, res, next) => {
