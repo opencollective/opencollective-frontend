@@ -1,4 +1,4 @@
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 
 import { ConnectedAccountService } from '../graphql/types/v2/graphql';
 
