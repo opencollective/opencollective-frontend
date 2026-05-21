@@ -209,7 +209,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   });
 
   const account = data?.account;
-  const exampleBaseUrl = account?.isPrivate ? `${process.env.WEBSITE_URL}/dashboard/` : process.env.WEBSITE_URL;
+  const exampleBaseUrl = account?.isPrivate ? `${process.env.WEBSITE_URL}/dashboard` : process.env.WEBSITE_URL;
 
   // Load Google Maps for address autocomplete. Individuals use a simplified location input.
   useEffect(() => {
@@ -285,7 +285,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
               values={{
                 previousHandle: account.slug,
                 newHandle: variables.account.slug,
-                exampleUrl: `${exampleBaseUrl}${variables.account.slug}`,
+                exampleUrl: `${exampleBaseUrl}/${variables.account.slug}`,
               }}
             />
           ),
@@ -397,7 +397,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
             )}
             {account.type !== EVENT && (
               <FormField name="slug" label={<FormattedMessage id="account.slug.label" defaultMessage="Handle" />}>
-                {({ field }) => <InputGroup className="w-full" prepend={exampleBaseUrl} {...field} />}
+                {({ field }) => <InputGroup className="w-full" prepend={`${exampleBaseUrl}/`} {...field} />}
               </FormField>
             )}
             {!account.isPrivate && (

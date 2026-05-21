@@ -456,7 +456,7 @@ const Policies = ({ collective }) => {
                           className="mt-2 sm:max-w-1/3"
                           maxWidth="11em"
                           suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
-                          disabled={isSettingPolicies || authorCannotApproveExpenseEnforcedByHost}
+                          disabled={isSettingPolicies}
                           currency={data?.account?.currency}
                           currencyDisplay="CODE"
                           value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName || 250e2}
@@ -508,9 +508,7 @@ const Policies = ({ collective }) => {
                           suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
                           maxWidth="11em"
                           disabled={
-                            isSettingPolicies ||
-                            authorCannotApproveExpenseEnforcedByHost ||
-                            isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)
+                            isSettingPolicies || isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)
                           }
                           currency={data?.account?.currency}
                           currencyDisplay="CODE"

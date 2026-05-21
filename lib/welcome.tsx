@@ -269,7 +269,8 @@ const ALL_STEPS = {
   profilePage: ({ account, router }) => ({
     id: 'profile-page',
     title: <FormattedMessage defaultMessage="Create your public profile page" id="SetupGuide.PublicProfile" />,
-    if: (account: WelcomeOrganizationQuery['account']) => !account.isPrivate,
+    if: (account: WelcomeOrganizationQuery['account']) =>
+      !account.isPrivate && account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
     description: (
       <FormattedMessage
         defaultMessage="Your public profile lets the world know you are active on the platform. It tells your story with a written description of your {type, select, ORGANIZATION {Organization} COLLECTIVE {Collective} other {Account}}, your mission and what are your goals using the platform."
