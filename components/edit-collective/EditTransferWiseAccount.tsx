@@ -189,7 +189,7 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
           {error}
         </MessageBox>
       )}
-      {connectedAccounts.length === 0 ? (
+      {!connectedAccounts?.length ? (
         <React.Fragment>
           <div className="mb-3 text-sm text-gray-700">
             <FormattedMessage

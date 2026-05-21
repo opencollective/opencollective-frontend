@@ -2736,7 +2736,7 @@
   "members.remove.cantRemoveLast": "最后一个管理员无法删除，请先添加其他管理员。",
   "members.remove.confirm": "你确定想要移除 {name} @{slug} {hasEmail, select, 1 {({email})} other {}} 吗？",
   "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
-  "members.remove.connectedAccountsWarning": "Please note that your organization relies on token(s) connect by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member.",
+  "members.remove.connectedAccountsWarning": "Please note that your organization relies on token(s) connected by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member.",
   "members.role.label": "角色",
   "Membership.ContributorSince": "{contributorType} 自从",
   "membership.since": "自 {date} 起",

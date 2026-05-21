@@ -80,21 +80,12 @@ const removeMemberMutation = gql`
   }
 `;
 
-const EditMemberModal = ({
-  intl,
-  member,
-  collective,
-  canRemove = false,
-  isLastAdmin,
-  cancelHandler,
-  onEdit,
-  connectedAccounts,
-}) => {
+const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAdmin, cancelHandler, onEdit }) => {
   const router = useRouter();
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const { toast } = useToast();
   const connectedAccountsByMember =
-    connectedAccounts
+    collective.connectedAccounts
       ?.filter(ca => [ConnectedAccountService.transferwise, ConnectedAccountService.paypal].includes(ca.service))
       .filter(ca => ca?.createdByAccount?.id === member.account.id) || [];
   const isInvitation = get(member, '__typename') === 'MemberInvitation';
@@ -243,18 +234,19 @@ const EditMemberModal = ({
         await refetchLoggedInUser();
       }
 
+      setShowRemoveConfirmation(false);
       onEdit?.();
       cancelHandler();
     } catch (error) {
       toast({
         variant: 'error',
         title: isInvitation ? (
-          <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />
-        ) : (
           <FormattedMessage
             id="editTeam.memberInvitation.remove.error"
             defaultMessage="Failed to remove member invitation."
           />
+        ) : (
+          <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />
         ),
         message: i18nGraphqlException(intl, error),
       });
@@ -274,8 +266,11 @@ const EditMemberModal = ({
           <DialogContent onClose={cancelHandler}>
             <DialogHeader>
               <DialogTitle>
-                <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
-                <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
+                {isInvitation ? (
+                  <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
+                ) : (
+                  <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
+                )}
               </DialogTitle>
             </DialogHeader>
 
@@ -342,38 +337,34 @@ const EditMemberModal = ({
           isDanger
           type="remove"
           header={<FormattedMessage id="Remove" defaultMessage="Remove" />}
-          body={
-            <div className="flex flex-col gap-2">
+          onClose={() => setShowRemoveConfirmation(false)}
+          continueHandler={handleRemoveMemberMutation}
+        >
+          <div className="flex flex-col gap-2">
+            <p>
+              <FormattedMessage
+                id="members.remove.confirmation"
+                defaultMessage="Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?"
+                values={{
+                  ...(member.account || member.memberAccount),
+                  hasEmail: (member.account || member.memberAccount).email ? 1 : 0,
+                  accountName: get(collective, 'name'),
+                }}
+              />
+            </p>
+            {connectedAccountsByMember.length > 0 && (
               <p>
                 <FormattedMessage
-                  id="members.remove.confirmation"
-                  defaultMessage="Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?"
+                  id="members.remove.connectedAccountsWarning"
+                  defaultMessage="Please note that your organization relies on token(s) connected by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member."
                   values={{
-                    ...(member.account || member.memberAccount),
-                    hasEmail: Number((member.account || member.memberAccount).email),
-                    accountName: get(collective, 'name'),
+                    services: connectedAccountsByMember.map(ca => i18nConnectedAccountService(ca.service)).join(', '),
                   }}
                 />
               </p>
-              {connectedAccountsByMember.length > 0 && (
-                <p>
-                  <FormattedMessage
-                    id="members.remove.connectedAccountsWarning"
-                    defaultMessage="Please note that your organization relies on token(s) connect by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member."
-                    values={{
-                      services: connectedAccountsByMember.map(ca => i18nConnectedAccountService(ca.service)).join(', '),
-                    }}
-                  />
-                </p>
-              )}
-            </div>
-          }
-          onClose={() => setShowRemoveConfirmation(false)}
-          continueHandler={async () => {
-            await handleRemoveMemberMutation();
-            setShowRemoveConfirmation(false);
-          }}
-        />
+            )}
+          </div>
+        </ConfirmationModal>
       )}
     </React.Fragment>
   );

@@ -44,8 +44,6 @@ export const teamSectionQuery = gql`
         legacyId
         service
         createdAt
-        settings
-        hash
         createdByAccount {
           id
           legacyId
