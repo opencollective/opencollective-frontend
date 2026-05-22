@@ -1,9 +1,11 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
+import type { BorderColorProps, ColorProps, TypographyProps } from 'styled-system';
 import { borderColor, color, typography } from 'styled-system';
 
+import type { TextTransformProps } from '../lib/styled-system-custom-properties';
 import { textTransform } from '../lib/styled-system-custom-properties';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
@@ -17,13 +19,15 @@ export const Terms = {
   FISCAL_HOST: 'FISCAL_HOST',
   GIFT_CARD: 'GIFT_CARD',
   HOST_FEE: 'HOST_FEE',
+  ADMINISTRATIVE_CONTRIBUTION: 'ADMINISTRATIVE_CONTRIBUTION',
   PLATFORM_FEE: 'PLATFORM_FEE',
+  PLATFORM_TIPS: 'PLATFORM_TIPS',
   ESTIMATED_BUDGET: 'ESTIMATED_BUDGET',
   EXPENSE_TYPE: 'EXPENSE_TYPE',
   TOTAL_RAISED: 'TOTAL_RAISED',
   TOTAL_INCOME: 'TOTAL_INCOME',
   BALANCE: 'BALANCE',
-};
+} as const;
 
 const TranslatedTerms = defineMessages({
   [Terms.FISCAL_HOST]: {
@@ -34,9 +38,17 @@ const TranslatedTerms = defineMessages({
     id: 'HostFee',
     defaultMessage: 'Host fee',
   },
+  [Terms.ADMINISTRATIVE_CONTRIBUTION]: {
+    id: 'AdministrativeContribution',
+    defaultMessage: 'Administrative contribution',
+  },
   [Terms.PLATFORM_FEE]: {
     id: 'PlatformFee',
     defaultMessage: 'Platform fee',
+  },
+  [Terms.PLATFORM_TIPS]: {
+    id: 'ApplyToHostCard.platformTips',
+    defaultMessage: 'Platform Tips',
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard',
@@ -73,11 +85,21 @@ const TranslatedDefinitions = defineMessages({
   [Terms.HOST_FEE]: {
     id: 'host.hostFee.help',
     defaultMessage:
-      'The Host Fee is what a Fiscal Host charges a Collective for its services, such as holding funds, making expense payouts, meeting tax obligations, and access to the Open Collective software platform.',
+      'Percentage of incoming contributions that this Fiscal Host retains as an administrative contribution for hosting services, such as holding funds, processing expense payouts, and handling accounting and tax obligations. <LearnMoreLink>Learn more ↗</LearnMoreLink>',
+  },
+  [Terms.ADMINISTRATIVE_CONTRIBUTION]: {
+    id: 'host.hostFee.help',
+    defaultMessage:
+      'Percentage of incoming contributions that this Fiscal Host retains as an administrative contribution for hosting services, such as holding funds, processing expense payouts, and handling accounting and tax obligations. <LearnMoreLink>Learn more ↗</LearnMoreLink>',
   },
   [Terms.PLATFORM_FEE]: {
     id: 'host.platformFee.help',
     defaultMessage: 'The Platform fee is what Open Collective charges for use of the software.',
+  },
+  [Terms.PLATFORM_TIPS]: {
+    id: 'ApplyToHostCard.platformTips.tooltip',
+    defaultMessage:
+      'Contributors to Collectives hosted by this Fiscal Host are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>',
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard.definition',
@@ -109,13 +131,46 @@ const TranslatedDefinitions = defineMessages({
 
 const GiftCardLearnMoreLink = msg => <Link href="/gift-cards">{msg}</Link>;
 
+const PlatformTipsLearnMoreLink = chunks => (
+  <a
+    href="https://documentation.opencollective.com/giving-to-collectives/platform-tips"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline"
+  >
+    {chunks}
+  </a>
+);
+
+const HostFeeLearnMoreLink = chunks => (
+  <a
+    href="https://documentation.opencollective.com/collectives/choosing-a-fiscal-host"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline"
+  >
+    {chunks}
+  </a>
+);
+
 const TranslationParams = {
   [Terms.GIFT_CARD]: {
     'learn-more-link': GiftCardLearnMoreLink,
   },
+  [Terms.PLATFORM_TIPS]: {
+    b: chunks => <strong>{chunks}</strong>,
+    LearnMoreLink: PlatformTipsLearnMoreLink,
+  },
+  [Terms.ADMINISTRATIVE_CONTRIBUTION]: {
+    b: chunks => <strong>{chunks}</strong>,
+    LearnMoreLink: HostFeeLearnMoreLink,
+  },
+  [Terms.HOST_FEE]: {
+    LearnMoreLink: HostFeeLearnMoreLink,
+  },
 };
 
-const UnderlinedTerm = styled.span`
+const UnderlinedTerm = styled.span<TextTransformProps & BorderColorProps & TypographyProps & ColorProps>`
   border-bottom: 2px dotted;
   cursor: help;
 
@@ -135,15 +190,23 @@ const UnderlinedTerm = styled.span`
  * or hovered. Both the term and the definition are translated.
  */
 const DefinedTerm = ({
-  intl,
   term,
-  textTransform,
-  fontSize,
-  children,
+  textTransform = undefined,
+  fontSize = undefined,
+  children = null,
   color = 'black.700',
   borderColor = color,
-  extraTooltipContent,
+  extraTooltipContent = null,
+}: {
+  term: keyof typeof Terms;
+  textTransform?: TextTransformProps['textTransform'];
+  fontSize?: TypographyProps['fontSize'];
+  children?: React.ReactNode;
+  color?: ColorProps['color'];
+  borderColor?: BorderColorProps['borderColor'];
+  extraTooltipContent?: React.ReactNode;
 }) => {
+  const intl = useIntl();
   return (
     <Tooltip delayDuration={100}>
       <TooltipTrigger asChild>
@@ -161,4 +224,4 @@ const DefinedTerm = ({
   );
 };
 
-export default injectIntl(DefinedTerm);
+export default DefinedTerm;

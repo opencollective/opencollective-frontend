@@ -25,7 +25,13 @@ export default function FeaturedFiscalHostResults({
 }: {
   hosts: Pick<
     Host,
-    'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent' | 'platformContributionAvailable'
+    | 'slug'
+    | 'totalHostedCollectives'
+    | 'description'
+    | 'currency'
+    | 'hostFeePercent'
+    | 'platformContributionAvailable'
+    | 'settings'
   >[];
   collective: Pick<Account, 'slug'>;
 }) {
