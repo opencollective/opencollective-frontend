@@ -25,7 +25,6 @@ import LoginBtn from '@/components/LoginBtn';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
-import VendorForm from '@/components/vendors/VendorForm';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -40,6 +39,7 @@ import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { CreateLegalEntityPayeeForm } from './CreateLegalEntityPayeeForm';
+import { CreateVendorPayeeForm } from './CreateVendorPayeeForm';
 import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
@@ -461,19 +461,13 @@ const VendorOption = React.memo(function VendorOption(props: {
             <React.Fragment>
               <Separator className="mt-3" />
               <div className="mt-3">
-                <VendorForm
+                <CreateVendorPayeeForm
+                  isSubmitting={props.isSubmitting}
+                  host={props.host}
                   isBeneficiary={isBeneficiary}
-                  limitVisibilityOptionToAccount={props.account}
                   onSuccess={selected => {
                     props.setFieldValue('payeeSlug', selected?.slug);
                     setSelectedVendor(selected);
-                  }}
-                  hidePayoutMethod
-                  host={props.host}
-                  supportsTaxForm={false}
-                  onCancel={() => {
-                    props.setFieldValue('payeeSlug', PAYEE_SLUG_VENDOR);
-                    setSelectedVendor(null);
                   }}
                 />
               </div>
