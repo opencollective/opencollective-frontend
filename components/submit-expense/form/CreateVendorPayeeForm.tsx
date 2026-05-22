@@ -25,7 +25,7 @@ type CreateVendorPayeeFormProps = {
 const getCreateVendorSchema = (requiredMessage: string) =>
   z.object({
     name: z.string().trim().min(1, requiredMessage).max(255),
-    legalName: z.preprocess(val => (val === '' ? undefined : val), z.string().max(255).optional()),
+    legalName: z.preprocess(val => (val === '' ? undefined : String(val).trim()), z.string().max(255).optional()),
   });
 
 type VendorFormValues = z.infer<ReturnType<typeof getCreateVendorSchema>>;
