@@ -4092,7 +4092,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -5978,6 +5977,8 @@ enum ActivityType {
   HOST_APPLICATION_CONTACT
   HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
+  CONTRIBUTION_REFUNDED
+  CONTRIBUTOR_REMOVED_BY_HOST
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
@@ -9614,6 +9615,16 @@ type OrderPermissions {
   If paused, whether the current user can resume this order
   """
   canResume: Boolean!
+
+  """
+  Whether the current user can cancel this recurring contribution
+  """
+  canCancel: Boolean!
+
+  """
+  Whether the current user can remove the contributor from the collective public profile
+  """
+  canRemoveAsContributor: Boolean!
 }
 
 type PendingOrderData {
@@ -10759,7 +10770,6 @@ type Bot implements Account {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 }
 
@@ -11839,7 +11849,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -13499,7 +13508,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -14876,7 +14884,6 @@ type Individual implements Account {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -16281,7 +16288,6 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -17782,7 +17788,6 @@ type Vendor implements Account & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -20788,6 +20793,8 @@ enum ActivityAndClassesType {
   HOST_APPLICATION_CONTACT
   HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
+  CONTRIBUTION_REFUNDED
+  CONTRIBUTOR_REMOVED_BY_HOST
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
@@ -22115,7 +22122,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -23352,7 +23358,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The offset to use to fetch
     """
     offset: Int! = 0
-    account: AccountReferenceInput!
   ): WebhookCollection!
 
   """
@@ -25106,6 +25111,16 @@ type Mutation {
     Category for cancelling subscription
     """
     reasonCode: String
+
+    """
+    Remove the contributor from the collective public profile. Host admins only.
+    """
+    removeAsContributor: Boolean = false
+
+    """
+    Optional message to send to the contributor. Host admins only.
+    """
+    messageForContributor: String
   ): Order
 
   """
@@ -25372,16 +25387,6 @@ type Mutation {
   Remove the given payout method. Scope: "expenses".
   """
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
-
-  """
-  Restore the given payout method. Scope: "expenses".
-  """
-  restorePayoutMethod(
-    """
-    Payout Method reference
-    """
-    payoutMethod: PayoutMethodReferenceInput!
-  ): PayoutMethod! @deprecated(reason: "2025-02-10: Payout methods cannot be restored.")
   editPayoutMethod(
     """
     Payout Method reference
@@ -25667,6 +25672,21 @@ type Mutation {
     If true, the refund will be processed even if it exceeds the balance of the Collective
     """
     ignoreBalanceCheck: Boolean
+
+    """
+    If true, cancel the associated recurring contribution. Host admins only.
+    """
+    cancelRecurringContribution: Boolean = false
+
+    """
+    If true, remove the contributor from the collective public profile. Host admins only.
+    """
+    removeAsContributor: Boolean = false
+
+    """
+    Optional message to include in the contributor notification email. Host admins only.
+    """
+    messageForContributor: String
   ): Transaction
 
   """

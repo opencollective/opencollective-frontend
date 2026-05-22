@@ -35,6 +35,7 @@ type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
   hostSlug?: string;
   columns?: ColumnDef<ManagedOrderFieldsFragment>[];
   columnVisibility?: VisibilityState;
+  showChargesSection?: boolean;
 };
 
 export const defaultVisibility: VisibilityState = {
@@ -57,6 +58,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
   hostSlug,
   columns = defaultColumns,
   columnVisibility = defaultVisibility,
+  showChargesSection = false,
 }: ContributionsTableProps<FilterValues>) {
   const router = useRouter();
 
@@ -148,6 +150,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
         onClose={() => onToggleOrderDrawer(null)}
         orderId={selectedContributionId}
         getActions={getActions}
+        showChargesSection={showChargesSection}
       />
     </React.Fragment>
   );
