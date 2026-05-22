@@ -2758,6 +2758,8 @@
   "MemberInvitations.title": "Čakajúce pozvánky",
   "members.remove.cantRemoveLast": "Posledného správcu nie je možné odstrániť. Najskôr prosím pridajte iného správcu.",
   "members.remove.confirm": "Skutočne si želáte odstrániť {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?",
+  "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
+  "members.remove.connectedAccountsWarning": "Please note that your organization relies on token(s) connected by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member.",
   "members.role.label": "Rola",
   "Membership.ContributorSince": "{contributorType} od",
   "membership.since": "od {date}",

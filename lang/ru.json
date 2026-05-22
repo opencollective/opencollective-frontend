@@ -2758,6 +2758,8 @@
   "MemberInvitations.title": "Ожидающие приглашений",
   "members.remove.cantRemoveLast": "Последний администратор не может быть удален. Сначала добавьте другого администратора.",
   "members.remove.confirm": "Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?",
+  "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
+  "members.remove.connectedAccountsWarning": "Please note that your organization relies on token(s) connected by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member.",
   "members.role.label": "Role",
   "Membership.ContributorSince": "{contributorType} с",
   "membership.since": "с {date}",

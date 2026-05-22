@@ -2758,6 +2758,8 @@
   "MemberInvitations.title": "保留中の招待状",
   "members.remove.cantRemoveLast": "最後の管理者は削除できません。先に別の管理者を追加してください。",
   "members.remove.confirm": "{name} @{slug} {hasEmail, select, 1 {({email})} other {}} を削除して本当によろしいですか？",
+  "members.remove.confirmation": "Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?",
+  "members.remove.connectedAccountsWarning": "Please note that your organization relies on token(s) connected by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member.",
   "members.role.label": "役割",
   "Membership.ContributorSince": "{contributorType} として参加",
   "membership.since": "{date}から",
