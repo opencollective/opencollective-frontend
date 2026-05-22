@@ -15,6 +15,7 @@ import type {
 } from '../../../../lib/graphql/types/v2/graphql';
 import { AccountType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
+import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
@@ -292,6 +293,7 @@ const getLineQualifier = (
   kind: TransactionKind | undefined,
   direction: AllocationDirection,
   role: AllocationRole,
+  principalAccountType?: string | null,
 ) => {
   if (!kind) {
     return undefined;
@@ -302,8 +304,8 @@ const getLineQualifier = (
       return intl.formatMessage({ defaultMessage: 'Contribution', id: '0LK5eg' });
     case `${TransactionKind.CONTRIBUTION}:out:collective`:
       return intl.formatMessage({
-        defaultMessage: 'Contribution Amount deducted',
-        id: 'SLzvAI',
+        defaultMessage: 'Contribution refunded',
+        id: 'tt3cH9',
       });
     case `${TransactionKind.HOST_FEE}:in:collective`:
       return intl.formatMessage({
@@ -311,10 +313,13 @@ const getLineQualifier = (
         id: 'bfw5ca',
       });
     case `${TransactionKind.HOST_FEE}:out:host`:
-      return intl.formatMessage({
-        defaultMessage: 'Host fee returned to the collective',
-        id: 'sjf07L',
-      });
+      return intl.formatMessage(
+        {
+          defaultMessage: 'Host fee returned to the {accountType}',
+          id: 'qk6D3l',
+        },
+        { accountType: formatCollectiveType(intl, principalAccountType) },
+      );
     case `${TransactionKind.PAYMENT_PROCESSOR_COVER}:in:collective`:
       return intl.formatMessage({
         defaultMessage: 'Payment processor fee covered by host',
@@ -359,6 +364,39 @@ const getLineQualifier = (
   }
 
   return i18nTransactionKind(intl, kind);
+};
+
+const PAYMENT_PROCESSOR_ALLOCATION_KINDS = [
+  TransactionKind.PAYMENT_PROCESSOR_FEE,
+  TransactionKind.PAYMENT_PROCESSOR_COVER,
+] as const;
+
+/** Hide offsetting processor fee lines when they net to zero on the same account (e.g. self-hosted orgs). */
+const collapseNetZeroPaymentProcessorFees = (group: AllocationGroupData): AllocationGroupData => {
+  const processorFeeLines = group.lines.filter(line =>
+    PAYMENT_PROCESSOR_ALLOCATION_KINDS.includes(line.kind as (typeof PAYMENT_PROCESSOR_ALLOCATION_KINDS)[number]),
+  );
+
+  if (!processorFeeLines.length) {
+    return group;
+  }
+
+  const processorFeeTotal = processorFeeLines.reduce((sum, line) => sum + line.amount, 0);
+
+  if (processorFeeTotal !== 0) {
+    return group;
+  }
+
+  const remainingLines = group.lines.filter(
+    line =>
+      !PAYMENT_PROCESSOR_ALLOCATION_KINDS.includes(line.kind as (typeof PAYMENT_PROCESSOR_ALLOCATION_KINDS)[number]),
+  );
+
+  return {
+    ...group,
+    lines: remainingLines,
+    total: remainingLines.reduce((sum, line) => sum + line.amount, 0),
+  };
 };
 
 const buildRefundAllocation = (transaction: TransactionData, intl: IntlShape): RefundAllocation => {
@@ -406,8 +444,8 @@ const buildRefundAllocation = (transaction: TransactionData, intl: IntlShape): R
         contributorAccount,
         transaction.host,
       );
-      const outflowLabel = getLineQualifier(intl, entry.kind ?? undefined, 'out', outflowRole);
-      const inflowLabel = getLineQualifier(intl, entry.kind ?? undefined, 'in', inflowRole);
+      const outflowLabel = getLineQualifier(intl, entry.kind ?? undefined, 'out', outflowRole, principalAccount?.type);
+      const inflowLabel = getLineQualifier(intl, entry.kind ?? undefined, 'in', inflowRole, principalAccount?.type);
       const sortKey = entry.kind === TransactionKind.CONTRIBUTION ? '' : String(inflowLabel ?? outflowLabel ?? '');
       const lineKey = `${entry.id}-${entry.kind ?? 'transaction'}`;
 
@@ -431,8 +469,9 @@ const buildRefundAllocation = (transaction: TransactionData, intl: IntlShape): R
       });
     });
 
-  groups.forEach(group => {
+  groups.forEach((group, key) => {
     group.lines.sort((a, b) => String(a.sortKey ?? '').localeCompare(String(b.sortKey ?? '')));
+    groups.set(key, collapseNetZeroPaymentProcessorFees(group));
   });
 
   const outflow = [...groups.values()]
@@ -523,10 +562,18 @@ const ContributionDetail: React.FC<{ transaction: TransactionData; amount: numbe
 };
 
 const AllocationGroupHeading: React.FC<{ group: AllocationGroupData }> = ({ group }) => {
+  const intl = useIntl();
+
   if (group.role === 'contributor') {
     return <FormattedMessage defaultMessage="Amount refunded to contributor" id="AYMOhy" />;
   } else if (group.role === 'collective') {
-    return <FormattedMessage defaultMessage="Deducted from Collective balance" id="zh1XTV" />;
+    return (
+      <FormattedMessage
+        defaultMessage="Deducted from {accountType} balance"
+        id="zh1XTV"
+        values={{ accountType: formatCollectiveType(intl, group.account?.type) }}
+      />
+    );
   } else if (group.role === 'host') {
     return <FormattedMessage defaultMessage="Deducted from Host balance" id="W3mNpa" />;
   } else if (group.role === 'platform') {
@@ -700,8 +747,9 @@ const HostRefundChargeForm: React.FC<HostRefundChargeFormProps> = ({ transaction
                           </TooltipTrigger>
                           <TooltipContent>
                             <FormattedMessage
-                              defaultMessage="Process the refund and ignore the balance. The Collective's balance will go negative until additional contributions are received."
+                              defaultMessage="Process the refund and ignore the balance. The {accountType}'s balance will go negative until additional contributions are received."
                               id="+vpPIw"
+                              values={{ accountType: formatCollectiveType(intl, principalAccount?.type) }}
                             />
                           </TooltipContent>
                         </Tooltip>
@@ -760,7 +808,11 @@ const HostRefundChargeForm: React.FC<HostRefundChargeFormProps> = ({ transaction
                       disabled={isSubmitting}
                     />
                     <span className="font-medium">
-                      <FormattedMessage defaultMessage="Remove contributor from Collective" id="BkIpny" />
+                      <FormattedMessage
+                        defaultMessage="Remove contributor from {accountType}"
+                        id="7xqR2m"
+                        values={{ accountType: formatCollectiveType(intl, principalAccount?.type) }}
+                      />
                     </span>
                   </label>
                   <Tooltip>
