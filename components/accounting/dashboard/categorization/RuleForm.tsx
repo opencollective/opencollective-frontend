@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormikContext } from 'formik';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { Plus, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

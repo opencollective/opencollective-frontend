@@ -9,7 +9,7 @@ import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Close } from '@styled-icons/material/Close';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { themeGet } from '@styled-system/theme-get';
-import { get, pickBy, without } from 'lodash';
+import { get, pickBy, without } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css, ThemeProvider } from 'styled-components';

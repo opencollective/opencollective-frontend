@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Image as ImageIcon } from '@styled-icons/boxicons-regular/Image';
 import { AngleDoubleDown } from '@styled-icons/fa-solid/AngleDoubleDown';
-import { cloneDeep, get, set } from 'lodash';
+import { cloneDeep, get, set } from 'lodash-es';
 import { RotateCcw, Save, Upload } from 'lucide-react';
 import ReactDropzone from 'react-dropzone';
 import Cropper from 'react-easy-crop';

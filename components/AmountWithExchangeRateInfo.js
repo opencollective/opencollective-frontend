@@ -1,6 +1,6 @@
 import React from 'react';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { round } from 'lodash';
+import { round } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { cn } from '../lib/utils';

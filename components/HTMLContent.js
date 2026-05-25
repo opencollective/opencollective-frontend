@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
-import { useIsomorphicLayoutEffect } from 'framer-motion';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 import { Markup } from 'interweave';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getLuminance } from 'polished';

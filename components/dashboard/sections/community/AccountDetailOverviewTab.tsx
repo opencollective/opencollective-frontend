@@ -1,7 +1,7 @@
 import React from 'react';
 import type { QueryResult } from '@apollo/client';
 import { useQuery } from '@apollo/client';
-import { compact } from 'lodash';
+import { compact } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 

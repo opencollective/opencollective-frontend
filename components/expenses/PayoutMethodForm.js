@@ -1,6 +1,6 @@
 import React from 'react';
 import { Field, useFormikContext } from 'formik';
-import { compact, get, set } from 'lodash';
+import { compact, get, set } from 'lodash-es';
 import { defineMessages, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
 

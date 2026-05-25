@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { CardElement, Elements } from '@stripe/react-stripe-js';
-import { get, merge, pick } from 'lodash';
+import { get, merge, pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '@/lib/errors';

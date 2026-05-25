@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { graphql } from '@apollo/client/react/hoc';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 

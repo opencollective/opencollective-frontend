@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PaymentMethod } from '@stripe/stripe-js';
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { defineMessages } from 'react-intl';
 

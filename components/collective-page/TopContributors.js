@@ -1,5 +1,5 @@
 import React from 'react';
-import { size } from 'lodash';
+import { size } from 'lodash-es';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 

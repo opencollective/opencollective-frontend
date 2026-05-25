@@ -4,7 +4,7 @@ import qs from 'querystring';
 import React from 'react';
 import { ChevronLeft } from '@styled-icons/boxicons-regular/ChevronLeft';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';

@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash-es';
 import { ArrowLeft, Lock, PlusCircle, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';

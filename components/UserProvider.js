@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { decodeJwt } from 'jose';
-import { get, isEqual } from 'lodash';
+import { get, isEqual } from 'lodash-es';
 import Router, { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 

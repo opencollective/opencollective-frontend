@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { groupBy, uniq } from 'lodash';
+import { groupBy, uniq } from 'lodash-es';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';

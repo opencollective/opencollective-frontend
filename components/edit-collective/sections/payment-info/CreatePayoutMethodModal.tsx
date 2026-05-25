@@ -1,7 +1,7 @@
 import React from 'react';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { Formik } from 'formik';
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '@/lib/graphql/types/v2/graphql';

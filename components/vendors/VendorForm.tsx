@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
-import { cloneDeep, pick } from 'lodash';
+import { cloneDeep, pick } from 'lodash-es';
 import { Download, Pencil, Trash, Upload, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import type { FileRejection } from 'react-dropzone';

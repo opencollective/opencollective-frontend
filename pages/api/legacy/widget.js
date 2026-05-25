@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { template } from 'lodash';
+import { template } from 'lodash-es';
 
 // next.js export
 // ts-unused-exports:disable-next-line

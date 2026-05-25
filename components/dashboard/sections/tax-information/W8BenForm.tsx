@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FormikProps } from 'formik';
-import { isEqual, merge, pick } from 'lodash';
+import { isEqual, merge, pick } from 'lodash-es';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';
 

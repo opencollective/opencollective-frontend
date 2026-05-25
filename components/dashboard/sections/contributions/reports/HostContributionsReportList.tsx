@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
-import { groupBy, orderBy, sumBy } from 'lodash';
+import { groupBy, orderBy, sumBy } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 

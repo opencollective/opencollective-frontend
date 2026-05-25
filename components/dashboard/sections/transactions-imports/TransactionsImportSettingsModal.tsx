@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { AlertTriangle, ArchiveIcon, Plug } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

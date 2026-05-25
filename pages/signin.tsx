@@ -1,5 +1,5 @@
 import React from 'react';
-import { mapValues } from 'lodash';
+import { mapValues } from 'lodash-es';
 import type { NextPageContext } from 'next';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';

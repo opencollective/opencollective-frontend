@@ -1,4 +1,4 @@
-import { compact, omit } from 'lodash';
+import { compact, omit } from 'lodash-es';
 import type { NextRouter } from 'next/router';
 
 const getRoutingOptions = (router: NextRouter, subpath) => ({

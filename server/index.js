@@ -5,7 +5,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const cloudflareIps = require('cloudflare-ip/ips.json');
-const { isEmpty } = require('lodash');
+const isEmpty = require('lodash-es/isEmpty').default;
 const throng = require('throng');
 
 const logger = require('./logger');

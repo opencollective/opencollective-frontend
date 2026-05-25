@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { themeGet } from '@styled-system/theme-get';
-import { get, isEmpty, pick, set } from 'lodash';
+import { get, isEmpty, pick, set } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 

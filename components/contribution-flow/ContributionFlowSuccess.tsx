@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import type { QueryResult } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import type { PaymentIntentResult } from '@stripe/stripe-js';
-import { get, uniqBy } from 'lodash';
+import { get, uniqBy } from 'lodash-es';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
@@ -11,6 +11,7 @@ import { styled } from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
+import { AnalyticsProperty } from '../../lib/analytics/properties';
 import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { gql } from '../../lib/graphql/helpers';
@@ -166,13 +167,21 @@ class ContributionFlowSuccess extends React.Component<
     isEmbed: boolean;
   },
   {
-    paymentIntentResult: PaymentIntentResult;
+    paymentIntentResult: PaymentIntentResult | null;
     loaded: boolean;
     surveyShown: boolean;
+    successTracked: boolean;
   }
 > {
+  state = {
+    paymentIntentResult: null,
+    loaded: false,
+    surveyShown: false,
+    successTracked: false,
+  };
+
   async componentDidMount() {
-    track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
+    this.trackSuccess();
 
     const isStripeRedirect = this.props.router.query.payment_intent_client_secret;
 
@@ -198,6 +207,8 @@ class ContributionFlowSuccess extends React.Component<
       intl,
       LoggedInUser,
     } = this.props;
+
+    this.trackSuccess();
 
     // Show survey for logged-in users on non-pending orders (only once)
     if (LoggedInUser && order && order.status !== ORDER_STATUS.PENDING && !this.state?.surveyShown) {
@@ -250,6 +261,23 @@ class ContributionFlowSuccess extends React.Component<
         });
       }
     }
+  }
+
+  trackSuccess() {
+    if (this.state?.successTracked) {
+      return;
+    }
+    const order = this.props.data?.order;
+    if (!order) {
+      return;
+    }
+    track(AnalyticsEvent.CONTRIBUTION_SUCCESS, {
+      props: {
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: order.data?.isNewPlatformTipFlow ? 'new' : 'old',
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(order.platformTipEligible),
+      },
+    });
+    this.setState({ successTracked: true });
   }
 
   getEmailFromQueryParams = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { FormattedDate, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';

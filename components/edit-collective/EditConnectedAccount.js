@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import * as Sentry from '@sentry/browser';
-import { capitalize, pick } from 'lodash';
+import { capitalize, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { capitalize } from 'lodash';
+import { capitalize } from 'lodash-es';
 import type { LucideProps } from 'lucide-react';
 import {
   Archive,

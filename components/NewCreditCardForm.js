@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
-import { isUndefined } from 'lodash';
+import { isUndefined } from 'lodash-es';
 import { HelpCircle } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';

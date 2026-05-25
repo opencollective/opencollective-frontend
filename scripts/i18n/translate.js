@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import lodash from 'lodash';
+import lodash from 'lodash-es';
 import { sync as mkdirpSync } from 'mkdirp';
 
 import locales from '../../lib/constants/locales';

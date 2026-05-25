@@ -1,5 +1,5 @@
 import React from 'react';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { injectIntl, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 

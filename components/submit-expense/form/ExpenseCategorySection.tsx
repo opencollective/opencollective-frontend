@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil, pick } from 'lodash';
+import { isNil, pick } from 'lodash-es';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

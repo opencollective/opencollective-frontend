@@ -1,7 +1,7 @@
 import React from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
-import { get, groupBy, isEmpty, truncate } from 'lodash';
+import { get, groupBy, isEmpty, truncate } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';

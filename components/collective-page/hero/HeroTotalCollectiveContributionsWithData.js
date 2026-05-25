@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';

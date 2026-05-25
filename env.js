@@ -4,11 +4,10 @@ const path = require('path');
 
 const debug = require('debug');
 const dotenv = require('dotenv');
-const lodash = require('lodash');
 
 // Load extra env file on demand
 // e.g. `npm run dev production` -> `.env.production`
-const extraEnv = process.env.EXTRA_ENV || lodash.last(process.argv);
+const extraEnv = process.env.EXTRA_ENV || process.argv.at(-1);
 const extraEnvPath = path.join(__dirname, `.env.${extraEnv}`);
 if (fs.existsSync(extraEnvPath)) {
   dotenv.config({ path: extraEnvPath });
@@ -50,6 +49,7 @@ const defaults = {
   LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
   DISABLE_CONTACT_FORM: false,
   NEW_PRICING: false,
+  NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: 0,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {

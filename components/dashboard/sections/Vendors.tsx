@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { compact, isEmpty, pick } from 'lodash';
+import { compact, isEmpty, pick } from 'lodash-es';
 import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';

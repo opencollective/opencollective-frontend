@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { compact, flatten, orderBy } from 'lodash';
+import { compact, flatten, orderBy } from 'lodash-es';
 import { Mail, MoreHorizontal, Pencil, PlusIcon } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 

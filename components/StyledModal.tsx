@@ -1,7 +1,7 @@
 // @deprecated, use `components/ui/Dialog` instead
 import React from 'react';
 import { clsx } from 'clsx';
-import { isNil, omitBy } from 'lodash';
+import { isNil, omitBy } from 'lodash-es';
 import { X } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';

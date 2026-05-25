@@ -1,5 +1,5 @@
 import React from 'react';
-import { round } from 'lodash';
+import { round } from 'lodash-es';
 import { InfoIcon } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
