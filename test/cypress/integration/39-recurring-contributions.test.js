@@ -34,15 +34,21 @@ describe('Recurring contributions', () => {
 
   it('Has contributions in the right categories', () => {
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+      cy.get('[data-cy^="datatable-row"]').should('have.length', 1);
+
       // Filter by Yearly frequency
       cy.getByDataCy('add-filter').click();
       cy.contains('Frequency').click();
-      cy.get('[data-cy="combo-select-option"][data-value=YEARLY]').click();
+      cy.contains('[data-cy="combo-select-option"]', 'Yearly').click();
+      cy.getByDataCy('apply-filter').should('not.be.disabled');
       cy.getByDataCy('apply-filter').click();
+      cy.getByDataCy('filter-frequency').should('exist');
       cy.get('[data-cy^="datatable-row"]').should('have.length', 0);
+
       // Filter by Monthly frequency
       cy.getByDataCy('filter-frequency').click();
-      cy.get('[data-cy="combo-select-option"][data-value=MONTHLY]').click();
+      cy.contains('[data-cy="combo-select-option"]', 'Monthly').click();
+      cy.getByDataCy('apply-filter').should('not.be.disabled');
       cy.getByDataCy('apply-filter').click();
       cy.get('[data-cy^="datatable-row"]').should('have.length', 1);
     });
