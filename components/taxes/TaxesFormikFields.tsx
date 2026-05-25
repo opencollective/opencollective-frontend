@@ -1,7 +1,7 @@
 import React from 'react';
 import { checkVATNumberFormat, GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
-import { get, isNil, round } from 'lodash';
+import { get, isNil, round } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 

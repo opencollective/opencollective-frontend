@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash-es';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 

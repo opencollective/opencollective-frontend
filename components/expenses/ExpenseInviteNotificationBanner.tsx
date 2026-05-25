@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { checkUserExistence, signin } from '../../lib/api';

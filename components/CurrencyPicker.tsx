@@ -1,6 +1,6 @@
 import React from 'react';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import { Currency } from '../lib/constants/currency';

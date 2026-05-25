@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';

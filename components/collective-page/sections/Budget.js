@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { get, orderBy } from 'lodash';
+import { get, orderBy } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 

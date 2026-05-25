@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 
 import { DISMISSABLE_HELP_MESSAGE_KEY } from '../lib/constants/dismissable-help-message';
 import { gql } from '../lib/graphql/helpers';

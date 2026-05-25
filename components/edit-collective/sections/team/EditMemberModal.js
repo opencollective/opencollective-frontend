@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { Trash } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -10,9 +10,12 @@ import roles from '../../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { gql } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
+import { ConnectedAccountService } from '@/lib/graphql/types/v2/graphql';
+import { i18nConnectedAccountService } from '@/lib/i18n/connected-account-service';
 
 import { Dialog, DialogContent, DialogHeader, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
 
+import ConfirmationModal from '../../../ConfirmationModal';
 import { Button } from '../../../ui/Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { useToast } from '../../../ui/useToast';
@@ -80,9 +83,11 @@ const removeMemberMutation = gql`
 const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAdmin, cancelHandler, onEdit }) => {
   const router = useRouter();
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
-
   const { toast } = useToast();
-
+  const connectedAccountsByMember =
+    collective.connectedAccounts
+      ?.filter(ca => [ConnectedAccountService.transferwise, ConnectedAccountService.paypal].includes(ca.service))
+      .filter(ca => ca?.createdByAccount?.id === member.account.id) || [];
   const isInvitation = get(member, '__typename') === 'MemberInvitation';
 
   const messages = defineMessages({
@@ -114,6 +119,8 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
     ],
     awaitRefetchQueries: true,
   });
+
+  const [showRemoveConfirmation, setShowRemoveConfirmation] = React.useState(false);
 
   let submitMemberForm = null;
 
@@ -197,65 +204,52 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
     }
   };
 
-  const confirmRemoveMember = memberEntry => {
-    const account = memberEntry.account || memberEntry.memberAccount;
-    return window.confirm(
-      intl.formatMessage(messages.removeConfirm, {
-        ...account,
-        hasEmail: Number(account.email),
-      }),
-    );
-  };
-
   const handleRemoveMemberMutation = async () => {
-    if (confirmRemoveMember(member)) {
-      try {
-        await removeMemberAccount({
-          variables: {
-            memberAccount: {
-              slug: get(member, 'account.slug') || get(member, 'memberAccount.slug'),
-            },
-            account: { slug: get(collective, 'slug') },
-            role: get(member, 'role'),
-            isInvitation,
+    try {
+      await removeMemberAccount({
+        variables: {
+          memberAccount: {
+            slug: get(member, 'account.slug') || get(member, 'memberAccount.slug'),
           },
-        });
+          account: { slug: get(collective, 'slug') },
+          role: get(member, 'role'),
+          isInvitation,
+        },
+      });
 
-        toast({
-          variant: 'success',
-          message: isInvitation ? (
-            <FormattedMessage
-              id="editTeam.memberInvitation.remove.success"
-              defaultMessage="Member invitation removed successfully."
-            />
-          ) : (
-            <FormattedMessage id="editTeam.member.remove.success" defaultMessage="Member removed successfully." />
-          ),
-        });
+      toast({
+        variant: 'success',
+        message: isInvitation ? (
+          <FormattedMessage
+            id="editTeam.memberInvitation.remove.success"
+            defaultMessage="Member invitation removed successfully."
+          />
+        ) : (
+          <FormattedMessage id="editTeam.member.remove.success" defaultMessage="Member removed successfully." />
+        ),
+      });
 
-        if (get(member, 'account.slug') === get(LoggedInUser, 'collective.slug')) {
-          await router.push({ pathname: `/${get(collective, 'slug')}` });
-          await refetchLoggedInUser();
-        }
-
-        onEdit?.();
-        cancelHandler();
-      } catch (error) {
-        toast({
-          variant: 'error',
-          title: isInvitation ? (
-            <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />
-          ) : (
-            <FormattedMessage
-              id="editTeam.memberInvitation.remove.error"
-              defaultMessage="Failed to remove member invitation."
-            />
-          ),
-          message: i18nGraphqlException(intl, error),
-        });
+      if (get(member, 'account.slug') === get(LoggedInUser, 'collective.slug')) {
+        await router.push({ pathname: `/${get(collective, 'slug')}` });
+        await refetchLoggedInUser();
       }
-    } else {
+
+      setShowRemoveConfirmation(false);
+      onEdit?.();
       cancelHandler();
+    } catch (error) {
+      toast({
+        variant: 'error',
+        title: isInvitation ? (
+          <FormattedMessage
+            id="editTeam.memberInvitation.remove.error"
+            defaultMessage="Failed to remove member invitation."
+          />
+        ) : (
+          <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />
+        ),
+        message: i18nGraphqlException(intl, error),
+      });
     }
   };
 
@@ -266,75 +260,113 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
   };
 
   return (
-    <Dialog onOpenChange={show => !show && cancelHandler()} open={true}>
-      <DialogPortal>
-        <DialogContent onClose={cancelHandler}>
-          <DialogHeader>
-            <DialogTitle>
-              <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
-              <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
-            </DialogTitle>
-          </DialogHeader>
+    <React.Fragment>
+      <Dialog onOpenChange={show => !show && cancelHandler()} open={true}>
+        <DialogPortal>
+          <DialogContent onClose={cancelHandler}>
+            <DialogHeader>
+              <DialogTitle>
+                {isInvitation ? (
+                  <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
+                ) : (
+                  <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
+                )}
+              </DialogTitle>
+            </DialogHeader>
 
-          <MemberForm
-            intl={intl}
-            collectiveImg={get(collective, 'imageUrl')}
-            member={member}
-            bindSubmitForm={bindSubmitForm}
-            triggerSubmit={isInvitation ? handleEditMemberInvitationMutation : handleEditMemberMutation}
-          />
-          <div className="mt-4 flex justify-between gap-2">
-            <Button
-              autoFocus
-              onClick={cancelHandler}
-              disabled={isEditingMember || isEditingMemberInvitation || isRemovingMember}
-              data-cy="confirmation-modal-cancel"
-              variant="outline"
-            >
-              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </Button>
-            <div className="flex gap-2">
-              {isLastAdmin && member.role === roles.ADMIN ? (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Button
-                      disabled={true}
-                      data-cy="remove-member"
-                      variant="outlineDestructive"
-                      onClick={handleRemoveMemberMutation}
-                    >
-                      <Trash size="18px" />
-                      <FormattedMessage id="Remove" defaultMessage="Remove" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{intl.formatMessage(messages.cantRemoveLast)}</TooltipContent>
-                </Tooltip>
-              ) : (
-                <Button
-                  variant="outlineDestructive"
-                  disabled={!canRemove}
-                  data-cy="remove-member"
-                  onClick={handleRemoveMemberMutation}
-                  loading={isRemovingMember}
-                >
-                  <Trash size="18px" />
-                  <FormattedMessage id="Remove" defaultMessage="Remove" />
-                </Button>
-              )}
+            <MemberForm
+              intl={intl}
+              collectiveImg={get(collective, 'imageUrl')}
+              member={member}
+              bindSubmitForm={bindSubmitForm}
+              triggerSubmit={isInvitation ? handleEditMemberInvitationMutation : handleEditMemberMutation}
+            />
+            <div className="mt-4 flex justify-between gap-2">
               <Button
-                data-cy="confirmation-modal-continue"
-                loading={isEditingMember || isEditingMemberInvitation}
-                disabled={isRemovingMember}
-                onClick={handleSubmitForm}
-                className="w-32"
+                autoFocus
+                onClick={cancelHandler}
+                disabled={isEditingMember || isEditingMemberInvitation || isRemovingMember}
+                data-cy="confirmation-modal-cancel"
+                variant="outline"
               >
-                <FormattedMessage id="save" defaultMessage="Save" />
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </Button>
+              <div className="flex gap-2">
+                {isLastAdmin && member.role === roles.ADMIN ? (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        disabled={true}
+                        data-cy="remove-member"
+                        variant="outlineDestructive"
+                        onClick={() => setShowRemoveConfirmation(true)}
+                      >
+                        <Trash size="18px" />
+                        <FormattedMessage id="Remove" defaultMessage="Remove" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{intl.formatMessage(messages.cantRemoveLast)}</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <Button
+                    variant="outlineDestructive"
+                    disabled={!canRemove}
+                    data-cy="remove-member"
+                    onClick={() => setShowRemoveConfirmation(true)}
+                  >
+                    <Trash size="18px" />
+                    <FormattedMessage id="Remove" defaultMessage="Remove" />
+                  </Button>
+                )}
+                <Button
+                  data-cy="confirmation-modal-continue"
+                  loading={isEditingMember || isEditingMemberInvitation}
+                  disabled={isRemovingMember}
+                  onClick={handleSubmitForm}
+                  className="w-32"
+                >
+                  <FormattedMessage id="save" defaultMessage="Save" />
+                </Button>
+              </div>
             </div>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+      {showRemoveConfirmation && (
+        <ConfirmationModal
+          isDanger
+          type="remove"
+          header={<FormattedMessage id="Remove" defaultMessage="Remove" />}
+          onClose={() => setShowRemoveConfirmation(false)}
+          continueHandler={handleRemoveMemberMutation}
+        >
+          <div className="flex flex-col gap-2">
+            <p>
+              <FormattedMessage
+                id="members.remove.confirmation"
+                defaultMessage="Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?"
+                values={{
+                  ...(member.account || member.memberAccount),
+                  hasEmail: (member.account || member.memberAccount).email ? 1 : 0,
+                  accountName: get(collective, 'name'),
+                }}
+              />
+            </p>
+            {connectedAccountsByMember.length > 0 && (
+              <p>
+                <FormattedMessage
+                  id="members.remove.connectedAccountsWarning"
+                  defaultMessage="Please note that your organization relies on token(s) connected by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member."
+                  values={{
+                    services: connectedAccountsByMember.map(ca => i18nConnectedAccountService(ca.service)).join(', '),
+                  }}
+                />
+              </p>
+            )}
           </div>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
+        </ConfirmationModal>
+      )}
+    </React.Fragment>
   );
 };
 

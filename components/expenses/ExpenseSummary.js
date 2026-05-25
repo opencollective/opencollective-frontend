@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { includes } from 'lodash';
+import { includes } from 'lodash-es';
 import { Download, MessageSquare } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';

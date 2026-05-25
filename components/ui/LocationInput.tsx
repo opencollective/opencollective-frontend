@@ -1,7 +1,7 @@
 import React, { Fragment, useMemo, useRef } from 'react';
 import type { Fixture } from '@ubilabs/react-geosuggest';
 import Geosuggest from '@ubilabs/react-geosuggest';
-import { get, isNil, omitBy, pick } from 'lodash';
+import { get, isNil, omitBy, pick } from 'lodash-es';
 import { X } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 

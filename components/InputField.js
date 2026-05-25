@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, isNil } from 'lodash';
+import { get, isNil } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 

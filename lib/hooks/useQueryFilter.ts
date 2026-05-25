@@ -1,5 +1,5 @@
 import React from 'react';
-import { forEach, isEmpty, isNil, isUndefined, omit, omitBy, pick } from 'lodash';
+import { forEach, isEmpty, isNil, isUndefined, omit, omitBy, pick } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import type { z } from 'zod';

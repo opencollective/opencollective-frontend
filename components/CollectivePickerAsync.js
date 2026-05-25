@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLazyQuery } from '@apollo/client';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';

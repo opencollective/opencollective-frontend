@@ -3,7 +3,7 @@ import type { DragEndEvent } from '@dnd-kit/core';
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useFormikContext } from 'formik';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { Plus } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

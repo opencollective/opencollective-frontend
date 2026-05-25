@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { Lock } from '@styled-icons/fa-solid/Lock';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 

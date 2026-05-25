@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Path } from 'dot-path-value';
 import { useFormikContext } from 'formik';
-import { get, isEmpty, startCase } from 'lodash';
+import { get, isEmpty, startCase } from 'lodash-es';
 import type { MessageDescriptor } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 

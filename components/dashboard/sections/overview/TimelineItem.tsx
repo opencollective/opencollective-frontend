@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { capitalize } from 'lodash';
+import { capitalize } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { type TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';

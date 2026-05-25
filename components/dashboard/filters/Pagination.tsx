@@ -1,6 +1,6 @@
 import React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { uniq } from 'lodash';
+import { uniq } from 'lodash-es';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

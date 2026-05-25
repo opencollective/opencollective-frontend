@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { clsx } from 'clsx';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

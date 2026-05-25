@@ -5,7 +5,7 @@ import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } 
 import { CSS } from '@dnd-kit/utilities';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
-import { cloneDeep, flatten, get, isEqual, set } from 'lodash';
+import { cloneDeep, flatten, get, isEqual, set } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 

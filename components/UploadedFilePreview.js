@@ -1,7 +1,7 @@
 import React from 'react';
 import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
-import { max } from 'lodash';
+import { max } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 

@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
-import { debounce, isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash';
+import { debounce, isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
@@ -49,6 +49,7 @@ import { userMustSetAccountingCategory } from '../expenses/lib/accounting-catego
 import {
   NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID,
   NEW_PAYOUT_METHOD_ID,
+  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
   PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
   PAYEE_SLUG_INVITE,
   PAYEE_SLUG_INVITE_EXISTING_USER,
@@ -1380,6 +1381,7 @@ function buildFormSchema(
 function getPayeeSlug(values: ExpenseFormValues): string {
   switch (values.payeeSlug) {
     case PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER:
+    case PAYEE_SLUG_CREATE_LEGAL_ENTITY:
     case PAYEE_SLUG_INVITE:
     case PAYEE_SLUG_INVITE_SOMEONE:
     case PAYEE_SLUG_VENDOR:
@@ -1526,7 +1528,7 @@ async function buildFormOptions(
       options.payoutProfiles = getPayoutProfiles(query.data.loggedInAccount);
       options.isAdminOfPayee =
         options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
-        values.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER;
+        [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(values.payeeSlug);
       if (payee && payee.type !== CollectiveType.VENDOR && options.isAdminOfPayee) {
         // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
         if (payee['host'] && host && payee['host'].id !== host.id) {

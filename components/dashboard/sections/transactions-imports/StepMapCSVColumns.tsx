@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { cloneDeep, isNil, set } from 'lodash';
+import { cloneDeep, isNil, set } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 

@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 
 import type LoggedInUser from '../../../lib/LoggedInUser';
 import { getPolicy } from '../../../lib/policies';

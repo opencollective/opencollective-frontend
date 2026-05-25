@@ -3,7 +3,7 @@ import type { ApolloClient } from '@apollo/client';
 import type { FetchMoreFunction } from '@apollo/client/react/hooks/useSuspenseQuery';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
-import { cloneDeep, get, includes, orderBy, uniqBy, update } from 'lodash';
+import { cloneDeep, get, includes, orderBy, uniqBy, update } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';

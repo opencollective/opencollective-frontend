@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
-import { assign, cloneDeep, get, pick } from 'lodash';
+import { assign, cloneDeep, get, pick } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';

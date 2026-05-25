@@ -1,4 +1,4 @@
-import { get, uniqBy } from 'lodash';
+import { get, uniqBy } from 'lodash-es';
 
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';

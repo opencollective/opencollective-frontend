@@ -9,3 +9,4 @@ export const PAYEE_SLUG_INVITE = '__invite';
 export const PAYEE_SLUG_INVITE_SOMEONE = '__inviteSomeone';
 export const PAYEE_SLUG_INVITE_EXISTING_USER = '__inviteExistingUser';
 export const PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER = '__findAccountIAdminister';
+export const PAYEE_SLUG_CREATE_LEGAL_ENTITY = '__createLegalEntity';

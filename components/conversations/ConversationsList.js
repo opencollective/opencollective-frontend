@@ -1,6 +1,6 @@
 import React from 'react';
 import { Markup } from 'interweave';
-import { size } from 'lodash';
+import { size } from 'lodash-es';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';

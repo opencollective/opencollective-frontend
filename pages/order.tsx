@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
+import { isEmpty, orderBy, partition, round, toNumber } from 'lodash-es';
 import type { GetServerSideProps } from 'next';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 

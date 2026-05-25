@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Form, FormikProvider, useFormikContext } from 'formik';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { AlertCircle, Pen } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';

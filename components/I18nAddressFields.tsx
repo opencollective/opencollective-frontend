@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FieldProps } from 'formik';
 import { Field } from 'formik';
-import { cloneDeep, isEmpty, isNil, orderBy, pick, pickBy, set, truncate } from 'lodash';
+import { cloneDeep, isEmpty, isNil, orderBy, pick, pickBy, set, truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { AddressFieldConfig, StructuredAddress, Zone } from '@/lib/address';

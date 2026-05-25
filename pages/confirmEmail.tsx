@@ -2,7 +2,7 @@ import React from 'react';
 import type { MutationFunction } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Email } from '@styled-icons/material/Email';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { ArrowLeft } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

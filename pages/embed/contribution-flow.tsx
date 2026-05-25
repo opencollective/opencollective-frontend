@@ -1,6 +1,6 @@
 import React from 'react';
 import { graphql } from '@apollo/client/react/hoc';
-import { get, omit, pick } from 'lodash';
+import { get, omit, pick } from 'lodash-es';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';

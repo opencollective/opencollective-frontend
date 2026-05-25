@@ -1,6 +1,6 @@
 import React from 'react';
 import { ApolloProvider } from '@apollo/client';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
-import { partition, pick } from 'lodash';
+import { partition, pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getAccountReferenceInput } from '@/lib/collective';

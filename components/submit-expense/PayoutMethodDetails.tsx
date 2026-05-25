@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { startCase, upperCase } from 'lodash';
+import { startCase, upperCase } from 'lodash-es';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

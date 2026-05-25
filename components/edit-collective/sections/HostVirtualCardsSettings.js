@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { useMutation } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { gql } from '../../../lib/graphql/helpers';

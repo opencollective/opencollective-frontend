@@ -72,7 +72,6 @@ const Solutions = () => {
           height={820}
           src="/static/images/blue-watercolor-bg.png"
           alt=""
-          priority
           className="h-full w-auto object-cover opacity-80"
         />
       </div>

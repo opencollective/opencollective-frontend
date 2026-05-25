@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { clsx } from 'clsx';
-import { isEmpty, isEqual, isNil } from 'lodash';
+import { isEmpty, isEqual, isNil } from 'lodash-es';
 import { Plus, X } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';

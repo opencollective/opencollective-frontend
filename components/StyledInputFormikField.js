@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { FastField, Field, useFormikContext } from 'formik';
-import { has, pickBy } from 'lodash';
+import { has, pickBy } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';

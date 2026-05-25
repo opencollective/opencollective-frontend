@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { trim } from 'lodash';
+import { trim } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V1_CONTEXT, gql } from '../../lib/graphql/helpers';

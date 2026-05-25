@@ -1,5 +1,5 @@
 import React from 'react';
-import { clamp } from 'lodash';
+import { clamp } from 'lodash-es';
 import { styled } from 'styled-components';
 import { border, color, layout } from 'styled-system';
 

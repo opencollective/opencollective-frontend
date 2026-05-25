@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { useElementSize } from '../lib/hooks/useElementSize';

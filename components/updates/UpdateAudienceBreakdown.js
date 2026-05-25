@@ -1,5 +1,5 @@
 import React from 'react';
-import { pick, pickBy, sum } from 'lodash';
+import { pick, pickBy, sum } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import LoadingPlaceholder from '../LoadingPlaceholder';
