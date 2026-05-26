@@ -6,6 +6,7 @@ import { get, isNil, map, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { checkUseAlternativeHostFeeNaming } from '../lib/collective';
 import { OPENSOURCE_COLLECTIVE_ID } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { requireFields } from '../lib/form-utils';
@@ -266,7 +267,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   }, [useTwoSteps]);
 
   return (
-    <StyledModal onClose={onClose} {...props}>
+    <StyledModal onClose={onClose} maxWidth="550px" {...props}>
       {loading ? (
         <React.Fragment>
           <ModalHeader hideCloseIcon>
@@ -347,6 +348,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                       currency={host.currency}
                       hostFeePercent={host.hostFeePercent}
                       platformContributionAvailable={host.platformContributionAvailable}
+                      useAlternativeHostFeeNaming={checkUseAlternativeHostFeeNaming(host)}
                     />
                     <Box my={3}>
                       {useTwoSteps && (
