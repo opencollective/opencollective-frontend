@@ -76,7 +76,7 @@ const ROOT_MENU = [
   },
   {
     type: 'group',
-    label: 'Subscriptions',
+    label: 'Platform Subscriptions',
     Icon: HandCoins,
     subMenu: [
       { label: 'Manage Subscriptions', section: ROOT_SECTIONS.SUBSCRIBERS },
