@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+import { FEATURES, isFeatureEnabled, requiresUpgrade } from '@/lib/allowed-features';
 import { HostedCollectiveTypes } from '@/lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
@@ -41,6 +41,7 @@ import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import CollectiveDetails from '../collectives/CollectiveDetails';
 import { cols, type HostedCollectivesDataTableMeta } from '../collectives/common';
+import { metricFilterConfigs, metricFilterSchema, metricFilterToVariables } from '../collectives/metric-filters';
 import { hostedCollectivesQuery } from '../collectives/queries';
 
 import { CreateFundModal } from './CreateFundModal';
@@ -61,26 +62,32 @@ const sortFilter = buildSortFilter({
 
 const COLLECTIVES_PER_PAGE = 20;
 
-const schema = z.object({
-  limit: integer.default(COLLECTIVES_PER_PAGE),
-  offset: integer.default(0),
-  searchTerm: searchFilter.schema,
-  sort: sortFilter.schema,
-  hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
-  type: z.enum([HostedCollectiveTypes.FUND]).default(HostedCollectiveTypes.FUND),
-  status: collectiveStatusFilter.schema,
-  consolidatedBalance: consolidatedBalanceFilter.schema,
-  currencies: currencyFilter.schema,
-});
+const buildSchema = (hasMetrics: boolean) =>
+  z.object({
+    limit: integer.default(COLLECTIVES_PER_PAGE),
+    offset: integer.default(0),
+    searchTerm: searchFilter.schema,
+    sort: sortFilter.schema,
+    hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
+    type: z.enum([HostedCollectiveTypes.FUND]).default(HostedCollectiveTypes.FUND),
+    status: collectiveStatusFilter.schema,
+    consolidatedBalance: consolidatedBalanceFilter.schema,
+    currencies: currencyFilter.schema,
+    ...(hasMetrics ? metricFilterSchema : {}),
+  });
 
-const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
+type Schema = z.infer<ReturnType<typeof buildSchema>>;
+
+const buildToVariables = (hasMetrics: boolean): FiltersToVariables<Schema, HostedCollectivesQueryVariables> => ({
   status: collectiveStatusFilter.toVariables,
   consolidatedBalance: consolidatedBalanceFilter.toVariables,
-};
+  ...(hasMetrics ? metricFilterToVariables : {}),
+});
 
-const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
+const buildFilters = (hasMetrics: boolean): FilterComponentConfigs<Schema> => ({
   sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
+  ...(hasMetrics ? metricFilterConfigs : {}),
   hostFeesStructure: {
     labelMsg: defineMessage({ id: 'FeeStructure', defaultMessage: 'Fee structure' }),
     Component: ({ intl, ...props }) => {
@@ -99,7 +106,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   currencies: currencyFilter.filter,
   status: collectiveStatusFilter.filter,
   consolidatedBalance: consolidatedBalanceFilter.filter,
-};
+});
 
 export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSectionProps) {
   const intl = useIntl();
@@ -112,6 +119,10 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
 
   const { account } = React.useContext(DashboardContext);
   const isUpgradeRequired = requiresUpgrade(account, FEATURES.FUNDS_GRANTS_MANAGEMENT);
+  const hasMetrics = isFeatureEnabled(account, FEATURES.HOST_METRICS);
+  const schema = useMemo(() => buildSchema(hasMetrics), [hasMetrics]);
+  const toVariables = useMemo(() => buildToVariables(hasMetrics), [hasMetrics]);
+  const filters = useMemo(() => buildFilters(hasMetrics), [hasMetrics]);
 
   const { data: metadata, refetch: refetchMetadata } = useQuery(
     gql`

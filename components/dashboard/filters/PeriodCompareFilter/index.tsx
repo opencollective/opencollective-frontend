@@ -144,7 +144,6 @@ function getPeriodDates(value: PeriodCompareFilterValueType): {
     dateTo = dayjs.utc(value.lte).endOf(IsoTimeUnit);
   }
 
-  // Adjust dateFrom to closest period start
   dateFrom = getClosestPeriodStart(dateFrom, value.timeUnit);
 
   let compareFrom, compareTo;
