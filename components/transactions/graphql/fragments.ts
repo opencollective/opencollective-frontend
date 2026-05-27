@@ -73,7 +73,6 @@ export const transactionsQueryCollectionFragment = gql`
         }
         ... on AccountWithHost {
           hostFeePercent
-          platformFeePercent
         }
         ...AccountHoverCardFields
       }
@@ -99,7 +98,6 @@ export const transactionsQueryCollectionFragment = gql`
         }
         ... on AccountWithHost {
           hostFeePercent
-          platformFeePercent
         }
         ...AccountHoverCardFields
       }

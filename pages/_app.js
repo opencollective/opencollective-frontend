@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
 import { polyfill as PolyfillInterweaveSSR } from 'interweave-ssr';
 import App from 'next/app';
-import localFont from 'next/font/local';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import '../lib/analytics/plausible';
+import { ApplyDocumentFont, inter } from '../lib/fonts';
 import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import { getIntlProps } from '../lib/i18n/request';
 import theme from '../lib/theme';
@@ -26,31 +26,6 @@ import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
-
-/**
- * Inter loaded via next/font/local so Next.js auto-preloads the primary WOFF2
- * and generates size-adjust CSS for the fallback font, eliminating CLS caused
- * by font-swap. Applied via inter.variable + inter.className on the app wrapper.
- */
-const inter = localFont({
-  src: [
-    { path: '../public/static/fonts/inter/Inter-Regular.woff2', weight: '400', style: 'normal' },
-    { path: '../public/static/fonts/inter/Inter-Italic.woff2', weight: '400', style: 'italic' },
-    { path: '../public/static/fonts/inter/Inter-Medium.woff2', weight: '500', style: 'normal' },
-    { path: '../public/static/fonts/inter/Inter-MediumItalic.woff2', weight: '500', style: 'italic' },
-    { path: '../public/static/fonts/inter/Inter-SemiBold.woff2', weight: '600', style: 'normal' },
-    { path: '../public/static/fonts/inter/Inter-SemiBoldItalic.woff2', weight: '600', style: 'italic' },
-    { path: '../public/static/fonts/inter/Inter-Bold.woff2', weight: '700', style: 'normal' },
-    { path: '../public/static/fonts/inter/Inter-BoldItalic.woff2', weight: '700', style: 'italic' },
-    { path: '../public/static/fonts/inter/Inter-ExtraBold.woff2', weight: '800', style: 'normal' },
-    { path: '../public/static/fonts/inter/Inter-ExtraBoldItalic.woff2', weight: '800', style: 'italic' },
-    { path: '../public/static/fonts/inter/Inter-Black.woff2', weight: '900', style: 'normal' },
-    { path: '../public/static/fonts/inter/Inter-BlackItalic.woff2', weight: '900', style: 'italic' },
-  ],
-  display: 'swap',
-  variable: '--font-inter',
-  adjustFontFallback: 'Arial',
-});
 
 Router.onRouteChangeStart = (url, { shallow }) => {
   if (!shallow) {
@@ -216,42 +191,46 @@ class OpenCollectiveFrontendApp extends App {
 
     return (
       <Fragment>
-        <div className={`${inter.variable} ${inter.className}`}>
-          <ApolloProvider
-            client={
-              this.props.apolloClient ||
-              this.getApolloClient(
-                typeof window !== 'undefined' ? window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME] : {},
-                pageProps?.[APOLLO_STATE_PROP_NAME],
-              )
-            }
-          >
-            <StyleSheetManager shouldForwardProp={defaultShouldForwardProp}>
-              <ThemeProvider theme={theme}>
-                <StripeProviderSSR>
-                  <IntlProvider locale={locale}>
-                    <TooltipProvider delayDuration={500} skipDelayDuration={100}>
-                      <UserProvider initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}>
-                        <WhitelabelProviderContext.Provider value={pageProps?.whitelabel?.provider}>
-                          <WorkspaceProvider>
-                            <ModalProvider>
-                              <NewsAndUpdatesProvider>
-                                <Component {...pageProps} />
-                                <Toaster />
-                                <GlobalNewsAndUpdates />
-                                <TwoFactorAuthenticationModal />
-                              </NewsAndUpdatesProvider>
-                            </ModalProvider>
-                          </WorkspaceProvider>
-                        </WhitelabelProviderContext.Provider>
-                      </UserProvider>
-                    </TooltipProvider>
-                  </IntlProvider>
-                </StripeProviderSSR>
-              </ThemeProvider>
-            </StyleSheetManager>
-          </ApolloProvider>
-        </div>
+        <ApplyDocumentFont>
+          <div className={`${inter.variable} ${inter.className}`}>
+            <ApolloProvider
+              client={
+                this.props.apolloClient ||
+                this.getApolloClient(
+                  typeof window !== 'undefined' ? window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME] : {},
+                  pageProps?.[APOLLO_STATE_PROP_NAME],
+                )
+              }
+            >
+              <StyleSheetManager shouldForwardProp={defaultShouldForwardProp}>
+                <ThemeProvider theme={theme}>
+                  <StripeProviderSSR>
+                    <IntlProvider locale={locale}>
+                      <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                        <UserProvider
+                          initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}
+                        >
+                          <WhitelabelProviderContext.Provider value={pageProps?.whitelabel?.provider}>
+                            <WorkspaceProvider>
+                              <ModalProvider>
+                                <NewsAndUpdatesProvider>
+                                  <Component {...pageProps} />
+                                  <Toaster />
+                                  <GlobalNewsAndUpdates />
+                                  <TwoFactorAuthenticationModal />
+                                </NewsAndUpdatesProvider>
+                              </ModalProvider>
+                            </WorkspaceProvider>
+                          </WhitelabelProviderContext.Provider>
+                        </UserProvider>
+                      </TooltipProvider>
+                    </IntlProvider>
+                  </StripeProviderSSR>
+                </ThemeProvider>
+              </StyleSheetManager>
+            </ApolloProvider>
+          </div>
+        </ApplyDocumentFont>
         <DefaultPaletteStyle palette={defaultColors.primary} />
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />

@@ -20,6 +20,7 @@ import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import EditTagsModal from '../../EditTagsModal';
 import { Box, Flex } from '../../Grid';
+import HostInfoDialog from '../../HostInformationDialog';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
@@ -33,7 +34,6 @@ import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
 import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
 import { Button } from '../../ui/Button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
 import UserCompany from '../../UserCompany';
 import ContainerSectionContent from '../ContainerSectionContent';
 
@@ -404,97 +404,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     )}
                   </Fragment>
                 )}
-                {hasHosting && (
-                  <Fragment>
-                    {collective.type !== CollectiveType.COLLECTIVE && (
-                      <Fragment>
-                        {collective.settings?.tos && (
-                          <StyledLink
-                            openInNewTab
-                            href={collective.settings.tos}
-                            borderBottom="2px dotted #969ba3"
-                            color="black.700"
-                            textDecoration="none"
-                            fontSize="12px"
-                          >
-                            <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal hosting" />
-                          </StyledLink>
-                        )}
-                        <div className="inline-flex flex-wrap items-baseline gap-1 text-xs">
-                          <FormattedMessage
-                            id="Hero.HostFee"
-                            defaultMessage="Host fee: {fee}"
-                            values={{
-                              fee: (
-                                <DefinedTerm
-                                  key="host-fee"
-                                  term={Terms.HOST_FEE}
-                                  color="black.700"
-                                  borderColor="#969ba3"
-                                >
-                                  {collective.hostFeePercent || 0}%
-                                </DefinedTerm>
-                              ),
-                            }}
-                          />
-                          {collective.platformContributionAvailable && (
-                            <React.Fragment>
-                              <span aria-hidden>+</span>
-                              <Tooltip delayDuration={100}>
-                                <TooltipTrigger asChild>
-                                  <span className="inline-flex cursor-help items-center gap-0.5 border-b-2 border-dotted border-[#969ba3] pb-px text-neutral-700 no-underline">
-                                    <FormattedMessage
-                                      id="Transaction.kind.PLATFORM_TIP"
-                                      defaultMessage="Platform tip"
-                                    />
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <FormattedMessage
-                                    defaultMessage="Contributors to Collectives hosted by this Fiscal Host are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>"
-                                    id="ApplyToHostCard.platformTips.tooltip"
-                                    values={{
-                                      b: chunks => <strong>{chunks}</strong>,
-                                      LearnMoreLink: chunks => (
-                                        <a
-                                          href="https://documentation.opencollective.com/giving-to-collectives/platform-tips"
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="underline"
-                                        >
-                                          {chunks}
-                                        </a>
-                                      ),
-                                    }}
-                                  />
-                                </TooltipContent>
-                              </Tooltip>
-                            </React.Fragment>
-                          )}
-                        </div>
-                      </Fragment>
-                    )}
-                    {collective.platformFeePercent > 0 && (
-                      <Container color="black.700" fontSize="12px">
-                        <FormattedMessage
-                          id="Hero.PlatformFee"
-                          defaultMessage="Platform fee: {fee}"
-                          values={{
-                            fee: (
-                              <DefinedTerm
-                                key="platform-fee"
-                                term={Terms.PLATFORM_FEE}
-                                color="black.700"
-                                borderColor="#969ba3"
-                              >
-                                {collective.platformFeePercent}%
-                              </DefinedTerm>
-                            ),
-                          }}
-                        />
-                      </Container>
-                    )}
-                  </Fragment>
+                {hasHosting && collective.type !== CollectiveType.COLLECTIVE && (
+                  <HostInfoDialog collective={collective} />
                 )}
               </Flex>
             </Fragment>

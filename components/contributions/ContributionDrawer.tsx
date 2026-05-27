@@ -311,6 +311,9 @@ export function ContributionDrawer({
   const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== orderId;
   const dropdownTriggerRef = React.useRef(undefined);
   const order = query.data?.order;
+  const contributorAccount = order?.fromAccount?.mainProfile ?? order?.fromAccount;
+  const contributorLegalName =
+    contributorAccount?.legalName !== contributorAccount?.name && contributorAccount?.legalName;
 
   const actions = React.useMemo(
     () => (order ? getActions(order, dropdownTriggerRef) : null),
@@ -401,13 +404,18 @@ export function ContributionDrawer({
                         <Skeleton className="h-6 w-48" />
                       ) : (
                         <LinkCollective
-                          collective={query.data.order.fromAccount.mainProfile ?? query.data.order.fromAccount}
-                          className="hover:text-primary hover:underline"
+                          collective={contributorAccount}
+                          className="group hover:text-primary hover:underline"
                           withHoverCard
                         >
-                          <div className="flex items-center gap-1">
+                          <div className="flex min-w-0 items-center gap-1">
                             <Avatar radius={24} collective={query.data.order.fromAccount} />
-                            {(query.data.order.fromAccount.mainProfile ?? query.data.order.fromAccount).name}
+                            <span className="min-w-0">
+                              {contributorAccount.name}
+                              {contributorLegalName && (
+                                <span className="text-muted-foreground group-hover:text-primary">{` (${contributorLegalName})`}</span>
+                              )}
+                            </span>
                           </div>
                         </LinkCollective>
                       )

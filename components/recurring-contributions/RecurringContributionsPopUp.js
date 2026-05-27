@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
@@ -262,8 +262,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                     ),
                   });
                 } catch (error) {
-                  const errorMsg = getErrorFromGraphqlException(error).message;
-                  toast({ variant: 'error', message: errorMsg });
+                  toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
                 }
               }}
             >

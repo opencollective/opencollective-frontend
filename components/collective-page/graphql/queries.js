@@ -32,6 +32,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       company
       type
       currency
+      createdAt
       settings
       isActive
       isApproved
