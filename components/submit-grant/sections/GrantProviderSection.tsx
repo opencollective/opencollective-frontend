@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow-callback */
 import React from 'react';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { AlertCircle } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

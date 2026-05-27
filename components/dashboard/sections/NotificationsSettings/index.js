@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { compact, flatten } from 'lodash';
+import { compact, flatten } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';

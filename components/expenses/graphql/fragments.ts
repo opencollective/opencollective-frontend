@@ -671,6 +671,11 @@ export const expensePageExpenseFieldsFragment = gql`
       scope
       details
     }
+    kycStatus {
+      payee {
+        status
+      }
+    }
   }
 
   ${expenseHostFields}

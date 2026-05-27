@@ -2,7 +2,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useFormikContext } from 'formik';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { ChevronUp, Copy, GripVertical, Trash2 } from 'lucide-react';
 
 import type { HostContributionCategoryRulesQuery } from '@/lib/graphql/types/v2/graphql';

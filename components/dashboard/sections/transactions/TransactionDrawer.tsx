@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { AlertTriangle, ArrowLeft, ArrowRight, InfoIcon, Undo } from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, which is required when used 'asChild' of HoverCardTrigger
 import Link from 'next/link';
@@ -82,6 +82,12 @@ const transactionQuery = gql`
       isDisputed
       isOrderRejected
       merchantId
+      host {
+        id
+        slug
+        legacyId
+        type
+      }
       account {
         id
         name
@@ -105,6 +111,14 @@ const transactionQuery = gql`
           }
         }
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
       fromAccount {
         id
@@ -127,8 +141,17 @@ const transactionQuery = gql`
         name
         slug
         imageUrl
+        isIncognito
         type
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
 
       permissions {
@@ -214,6 +237,7 @@ const transactionQuery = gql`
         group
         createdAt
       }
+      paymentProcessorUrl
     }
   }
   ${accountHoverCardFields}
@@ -360,12 +384,12 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                     value={
                       <LinkCollective
                         className="font-medium hover:text-primary"
-                        collective={transaction?.account}
+                        collective={transaction?.account?.mainProfile ?? transaction?.account}
                         withHoverCard
                       >
                         <div className="flex items-center gap-1">
-                          <Avatar radius={20} collective={transaction?.account} />
-                          {transaction?.account.name}
+                          <Avatar radius={24} collective={transaction?.account} />
+                          {(transaction?.account?.mainProfile ?? transaction?.account)?.name}
                         </div>
                       </LinkCollective>
                     }
@@ -383,7 +407,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                     value={
                       <LinkCollective
                         className="font-medium hover:text-primary"
-                        collective={transaction?.oppositeAccount}
+                        collective={transaction?.oppositeAccount?.mainProfile ?? transaction?.oppositeAccount}
                         withHoverCard
                       >
                         <div className="flex items-center gap-1">
@@ -392,8 +416,8 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                           ) : (
                             <ArrowRight className="inline-block shrink-0" size={16} />
                           )}
-                          <Avatar radius={20} collective={transaction?.oppositeAccount} />
-                          {transaction?.oppositeAccount?.name}
+                          <Avatar radius={24} collective={transaction?.oppositeAccount} />
+                          {(transaction?.oppositeAccount?.mainProfile ?? transaction?.oppositeAccount)?.name}
                         </div>
                       </LinkCollective>
                     }

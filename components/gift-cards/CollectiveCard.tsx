@@ -1,5 +1,5 @@
 import React from 'react';
-import { has } from 'lodash';
+import { has } from 'lodash-es';
 import type { ReactNode } from 'react';
 
 import type { GraphQLV1Collective } from '../../lib/custom_typings/GraphQLV1';

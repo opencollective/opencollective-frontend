@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check } from '@styled-icons/fa-solid/Check';
-import { difference, has } from 'lodash';
+import { difference, has } from 'lodash-es';
 import {
   AlertTriangle,
   ArrowRightLeft,

@@ -1,4 +1,4 @@
-import { kebabCase, mergeWith, omit } from 'lodash';
+import { kebabCase, mergeWith, omit } from 'lodash-es';
 
 import { WHITELABEL_DOMAINS } from '../lib/constants/whitelabel-providers';
 const env = process.env.OC_ENV;

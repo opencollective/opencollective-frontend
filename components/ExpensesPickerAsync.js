@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLazyQuery } from '@apollo/client';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { FormattedDate } from 'react-intl';
 
 import { gql } from '../lib/graphql/helpers';

@@ -4,7 +4,7 @@ import { GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { useFormikContext } from 'formik';
-import { get, isNil, pick, round, truncate } from 'lodash';
+import { get, isNil, pick, round, truncate } from 'lodash-es';
 import { ArrowDown, ArrowUp, Coins, Plus, Trash2 } from 'lucide-react';
 import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';

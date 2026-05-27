@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import { get, omit } from 'lodash';
+import { get, omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { omitBy } from 'lodash';
+import { omitBy } from 'lodash-es';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';

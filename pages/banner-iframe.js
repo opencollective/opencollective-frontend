@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Query } from '@apollo/client/react/components';
 import { graphql } from '@apollo/client/react/hoc';
-import { partition } from 'lodash';
+import { partition } from 'lodash-es';
 import Head from 'next/head';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';

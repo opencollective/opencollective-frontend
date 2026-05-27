@@ -1,5 +1,5 @@
 import React from 'react';
-import { omitBy } from 'lodash';
+import { omitBy } from 'lodash-es';
 import { defineMessage, useIntl } from 'react-intl';
 
 import { isIndividualAccount } from '../../../../lib/collective';

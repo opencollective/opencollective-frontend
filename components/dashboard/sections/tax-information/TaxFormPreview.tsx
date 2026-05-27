@@ -1,5 +1,5 @@
 import React from 'react';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import dynamic from 'next/dynamic';
 
 import { getTaxFormPDFServiceUrl } from '../../../../lib/url-helpers';

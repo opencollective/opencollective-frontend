@@ -1,4 +1,4 @@
-import { groupBy } from 'lodash';
+import { groupBy } from 'lodash-es';
 
 import { type TransactionsImportRow, TransactionsImportRowStatus } from '@/lib/graphql/types/v2/graphql';
 

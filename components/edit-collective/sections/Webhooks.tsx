@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ApolloCache, MutationFunction } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, get, pick } from 'lodash';
+import { cloneDeep, get, pick } from 'lodash-es';
 import { Info, PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';

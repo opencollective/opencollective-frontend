@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FormikProps } from 'formik';
-import { merge, pick } from 'lodash';
+import { merge, pick } from 'lodash-es';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';

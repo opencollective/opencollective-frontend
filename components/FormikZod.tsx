@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FormikConfig, FormikErrors, FormikValues } from 'formik';
 import { Formik, useFormik } from 'formik';
-import { defaultsDeep, get, isNil, mapValues, max, merge, set, xor } from 'lodash';
+import { defaultsDeep, get, isNil, mapValues, max, merge, set, xor } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 import type { ZodEffects, ZodIssue, ZodNullable, ZodOptional, ZodTypeAny } from 'zod';

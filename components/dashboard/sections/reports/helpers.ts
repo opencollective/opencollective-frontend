@@ -1,4 +1,4 @@
-import { isNil, isUndefined } from 'lodash';
+import { isNil, isUndefined } from 'lodash-es';
 
 import { getDayjsIsoUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';

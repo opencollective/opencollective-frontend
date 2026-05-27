@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { capitalize } from 'lodash';
+import { capitalize } from 'lodash-es';
 import type { LucideProps } from 'lucide-react';
 import {
   Archive,
@@ -146,7 +146,7 @@ export function KYCStatusBadge({ kycStatus }: KYCStatusBadgeProps) {
         <KYCVerificationStatusBadge
           size="sm"
           status={verification.status}
-          className="cursor-pointer"
+          className="cursor-pointer rounded-md text-xs font-medium"
           label={
             <React.Fragment>
               <FormattedMessage defaultMessage="KYC" id="KYC" />{' '}
@@ -208,6 +208,7 @@ export enum AccountDetailView {
   TRANSACTIONS = 'transactions',
   ACTIVITIES = 'activities',
   KYC = 'kyc',
+  FINANCIAL_CONTROLS = 'financial-controls',
 }
 
 type CommunityAccount =

@@ -1,4 +1,4 @@
-import { flatten } from 'lodash';
+import { flatten } from 'lodash-es';
 
 /** Helper to loop on specific test */
 // keep for future use?

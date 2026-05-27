@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
-import { get, last, omitBy } from 'lodash';
+import { get, last, omitBy } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';

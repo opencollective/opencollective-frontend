@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { ChevronRight } from 'lucide-react';
 
 import type { Views } from '../../../lib/filters/filter-types';

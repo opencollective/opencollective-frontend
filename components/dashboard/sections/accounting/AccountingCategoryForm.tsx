@@ -1,6 +1,6 @@
 import React from 'react';
 import type { useFormik } from 'formik';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 

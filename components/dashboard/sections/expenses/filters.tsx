@@ -14,6 +14,7 @@ import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { i18nChargeHasReceipts } from '../../../../lib/i18n/receipts-filter';
 
+import { accountFilter } from '../../filters/AccountFilter';
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
@@ -54,6 +55,9 @@ export const schema = z.object({
   accountingCategory: accountingCategoryFilter.schema,
   payoutMethodId: z.string().optional(),
   fromAccounts: expensePayeeFilter.schema,
+  approvedByAccount: accountFilter.schema,
+  paidByAccount: accountFilter.schema,
+  rejectedByAccount: accountFilter.schema,
 });
 
 export type FilterValues = z.infer<typeof schema>;
@@ -81,6 +85,9 @@ export const toVariables: FiltersToVariables<
   type: expenseTypeFilter.toVariables,
   status: expenseStatusFilter.toVariables,
   fromAccounts: expensePayeeFilter.toVariables,
+  approvedByAccount: accountFilter.toVariables,
+  paidByAccount: accountFilter.toVariables,
+  rejectedByAccount: accountFilter.toVariables,
 };
 
 // The filters config is used to populate the Filters component.
@@ -132,6 +139,18 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     valueRenderer: ({ value, intl }) => intl.formatMessage(LastCommentByFilterLabels[value]),
   },
   fromAccounts: expensePayeeFilter.filter,
+  approvedByAccount: {
+    ...accountFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Approved by', id: 'ApprovedBy' }),
+  },
+  paidByAccount: {
+    ...accountFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Paid by', id: 'PaidBy' }),
+  },
+  rejectedByAccount: {
+    ...accountFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Rejected by', id: 'RejectedBy' }),
+  },
   virtualCard: {
     labelMsg: defineMessage({ id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' }),
     valueRenderer: ({ value }) => <VirtualCardRenderer id={value} />,

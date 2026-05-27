@@ -128,6 +128,40 @@ describe('Expense flow', () => {
     describe('Create', () => {
       commonScenarios('invoice');
 
+      describe('Legal entity payee', () => {
+        it('User without administered accounts can create a legal entity and submit an invoice expense', () => {
+          const collectiveSlug = randomSlug();
+          cy.createCollectiveV2({
+            skipApproval: true,
+            host: { slug: 'e2e-host' },
+            collective: {
+              slug: collectiveSlug,
+              name: `${collectiveSlug} - e2eHostedCollective`,
+            },
+          });
+
+          const userSlug = randomSlug();
+          cy.signup({
+            user: { name: userSlug, email: `oc-test-${userSlug}@opencollective.com` },
+            redirect: `/dashboard/${userSlug}/submitted-expenses`,
+          });
+
+          cy.location('pathname').should('eq', `/dashboard/${userSlug}/submitted-expenses`);
+
+          const organizationSlug = randomSlug();
+          cy.contains('New expense').click();
+          submitExpense({
+            expenseType: 'invoice',
+            accountSlug: collectiveSlug,
+            createLegalEntityPayee: {
+              legalName: `${organizationSlug} Legal Inc.`,
+              name: `${organizationSlug} Organization`,
+              slug: organizationSlug,
+            },
+          });
+        });
+      });
+
       describe('Taxes', function () {
         it(`User can submit invoice expense with taxes`, function () {
           const colSlug = randomSlug();
@@ -483,6 +517,12 @@ function submitExpense(options: {
   titleSlug?: string;
   accountSlug: string;
   payeeSlug?: string;
+  createLegalEntityPayee?: {
+    legalName: string;
+    name: string;
+    slug: string;
+    country?: string;
+  };
   payoutMethod?: {
     type?: string;
     exists?: boolean;
@@ -514,6 +554,7 @@ function submitExpense(options: {
       ...options?.payoutMethod,
     },
   };
+  const effectivePayeeSlug = opts.payeeSlug ?? opts.createLegalEntityPayee?.slug;
 
   cy.get('#WHO_IS_PAYING').within(() => {
     cy.contains('Find account').click().parent().get('[role="combobox"]').click().type(`${opts.accountSlug}{enter}`);
@@ -521,7 +562,12 @@ function submitExpense(options: {
   });
 
   cy.get('#WHO_IS_GETTING_PAID').within(() => {
-    if (opts.payeeSlug) {
+    if (opts.createLegalEntityPayee) {
+      cy.contains('I would like to get paid through a legal entity').should('exist');
+      cy.contains('An account I administer').should('not.exist');
+      cy.contains('I would like to get paid through a legal entity').click();
+      fillCreateLegalEntityPayeeForm(opts.createLegalEntityPayee);
+    } else if (opts.payeeSlug) {
       cy.root().then($section => {
         const $option = $section.find(`button[role="radio"][value="${opts.payeeSlug}"]`);
         if ($option.length) {
@@ -551,13 +597,26 @@ function submitExpense(options: {
     }
   });
 
-  if (!opts.payoutMethod.exists && opts.payeeSlug) {
+  if (opts.createLegalEntityPayee) {
+    cy.checkToast({ variant: 'success', message: 'Organization account created' });
+    cy.get('#WHO_IS_GETTING_PAID').within(() => {
+      cy.get(`button[role="radio"][value="${opts.createLegalEntityPayee.slug}"]`).should(
+        'have.attr',
+        'data-state',
+        'checked',
+      );
+      cy.get('button[role="radio"][value="__createLegalEntity"]').should('not.exist');
+      cy.contains('I would like to get paid through a legal entity').should('not.exist');
+    });
+  }
+
+  if (!opts.payoutMethod.exists && effectivePayeeSlug) {
     fillNewPayoutMethod(opts.payoutMethod);
   } else {
     cy.get('#PAYOUT_METHOD').within(() => {
       cy.root().scrollIntoView();
 
-      if (!opts.payeeSlug) {
+      if (!effectivePayeeSlug) {
         cy.contains(
           'The person you are inviting to submit this expense will be asked to provide payout method details.',
         ).should('exist');
@@ -574,7 +633,7 @@ function submitExpense(options: {
 
   fillTypeOfExpense({
     expenseType: opts.expenseType,
-    hasInvoice: !!opts.payeeSlug,
+    hasInvoice: !!effectivePayeeSlug,
   });
 
   cy.get('#EXPENSE_ITEMS').within(() => {
@@ -676,7 +735,7 @@ function submitExpense(options: {
       cy.contains('label', 'Invoice')
         .parent()
         .within(() => {
-          if (opts.payeeSlug) {
+          if (effectivePayeeSlug) {
             cy.contains('INV0001');
             cy.get('a').should('have.length', 1);
           } else {
@@ -689,15 +748,15 @@ function submitExpense(options: {
     cy.contains('Recipient')
       .parent()
       .within(() => {
-        if (opts.payeeSlug) {
-          cy.contains(opts.payeeSlug).should('exist');
+        if (effectivePayeeSlug) {
+          cy.contains(effectivePayeeSlug).should('exist');
         }
       });
 
     cy.contains('Payout Method')
       .parent()
       .contains(
-        opts.payeeSlug
+        effectivePayeeSlug
           ? opts.payoutMethod.slug
           : 'The person you are inviting to submit this expense will be asked to provide payout method details.',
       )
@@ -809,6 +868,21 @@ function commonEditScenario(expenseType: 'invoice' | 'reimbursement') {
       cy.getByDataCy('expense-items-total-amount').should('have.text', '€111.00 EUR');
     });
   });
+}
+
+function fillCreateLegalEntityPayeeForm(options: { legalName: string; name: string; slug: string; country?: string }) {
+  cy.contains('label', 'Country of Incorporation').parent().find('[role="combobox"]').click();
+  // Country dropdown content is portaled outside #WHO_IS_GETTING_PAID (see ComboSelect Popover).
+  cy.root()
+    .closest('html')
+    .find('[data-cy="select-content"] input[placeholder="Search countries..."]')
+    .type(`${options.country ?? 'United States'}{enter}`);
+
+  cy.get('#input-legalName').click().type(options.legalName);
+  cy.get('#input-name').click().type(options.name);
+  cy.get('#input-slug').click().type(`{selectall}${options.slug}`);
+  cy.contains('I am legally registered as an administrator').click();
+  cy.contains('button', 'Create Organization Account').click();
 }
 
 function fillNewPayoutMethod(payoutMethod: {

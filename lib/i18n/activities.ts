@@ -169,8 +169,14 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     avatar: 'fromAccount',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
+    defaultMessage:
+      '<FromAccount></FromAccount> created new <Order>incomplete contribution</Order> to <Account></Account>',
+    id: 'P58PdR',
+    avatar: 'fromAccount',
+  },
+  ORDER_PENDING_CREATED: {
     defaultMessage: '<FromAccount></FromAccount> created new <Order>expected funds</Order> to <Account></Account>',
-    id: 'NvYiK0',
+    id: 'l71UN6',
     avatar: 'fromAccount',
   },
   ORDER_PROCESSED: {
@@ -513,13 +519,18 @@ export const ActivityDescriptionI18n = defineMessages({
     id: 'wWPkPb',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
-    defaultMessage: 'New <Order>expected funds</Order> from <FromAccount></FromAccount> to <Account></Account>',
-    id: 'kh8yZm',
+    defaultMessage:
+      'New <Order>incomplete contribution</Order> from <FromAccount></FromAccount> to <Account></Account>',
+    id: 'gxYl7H',
   },
   ORDER_PENDING_CONTRIBUTION_REMINDER: {
     defaultMessage:
-      'Sent reminder to <FromAccount></FromAccount> about <Order>expected funds</Order> to <Account></Account>',
-    id: '76qdIc',
+      'Sent reminder to <FromAccount></FromAccount> about <Order>incomplete contribution</Order> to <Account></Account>',
+    id: 'Qi4NNb',
+  },
+  ORDER_PENDING_CREATED: {
+    defaultMessage: 'New <Order>expected funds</Order> from <FromAccount></FromAccount> to <Account></Account>',
+    id: 'kh8yZm',
   },
   BACKYOURSTACK_DISPATCH_CONFIRMED: {
     defaultMessage: 'BackYourStack dispatch confirmed for <Account></Account>',
@@ -876,8 +887,8 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     id: 'oisSUu',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
-    defaultMessage: 'New expected funds',
-    id: 'kzIWOG',
+    defaultMessage: 'New incomplete contribution',
+    id: '0QbvtQ',
   },
   ORDER_PROCESSED: {
     defaultMessage: 'Contribution processed',

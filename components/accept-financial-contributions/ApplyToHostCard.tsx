@@ -1,19 +1,19 @@
 import React from 'react';
-import { Info } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
+import { checkUseAlternativeHostFeeNaming } from '../../lib/collective';
 import { confettiFireworks } from '../../lib/confettis';
 import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
 import ApplyToHostModal from '../ApplyToHostModal';
+import DefinedTerm, { Terms } from '../DefinedTerm';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const StyledCollectiveCardWrapper = styled(StyledCollectiveCard)`
   &:hover {
@@ -24,7 +24,13 @@ const StyledCollectiveCardWrapper = styled(StyledCollectiveCard)`
 export default function ApplyToHostCard(props: {
   host: Pick<
     Host,
-    'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent' | 'platformContributionAvailable'
+    | 'slug'
+    | 'totalHostedCollectives'
+    | 'description'
+    | 'currency'
+    | 'hostFeePercent'
+    | 'platformContributionAvailable'
+    | 'settings'
   >;
   collective: Pick<Account, 'slug'>;
 }) {
@@ -66,50 +72,30 @@ export default function ApplyToHostCard(props: {
               />
             </P>
             {(props.host.hostFeePercent !== null || props.host.platformContributionAvailable) && (
-              <div className="mt-1 flex items-center gap-1.5 text-sm">
+              <div className="mt-2 text-xs text-slate-700">
                 {props.host.hostFeePercent !== null && (
                   <span>
-                    <FormattedMessage
-                      defaultMessage="<b>{ hostFeePercent }%</b> Host fee"
-                      id="URR2Ki"
-                      values={{
-                        hostFeePercent: props.host.hostFeePercent,
-                        b: chunks => <strong>{chunks}</strong>,
-                      }}
-                    />
+                    <Span fontSize="14px" fontWeight={700} color="black.900">{`${props.host.hostFeePercent}%`}</Span>
+                    {` `}
+                    <Span fontSize="12px" fontWeight={400}>
+                      <DefinedTerm
+                        color="black.700"
+                        borderColor="#969ba3"
+                        fontSize="12px"
+                        term={
+                          checkUseAlternativeHostFeeNaming(props.host)
+                            ? Terms.ADMINISTRATIVE_CONTRIBUTION
+                            : Terms.HOST_FEE
+                        }
+                      />
+                    </Span>
                   </span>
                 )}
                 {props.host.platformContributionAvailable && (
-                  <div className="flex items-center gap-1">
-                    +{' '}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="inline-flex cursor-help items-center gap-1 underline decoration-slate-300 decoration-dashed underline-offset-2 transition-colors hover:decoration-slate-400">
-                          <FormattedMessage defaultMessage="Platform Tips" id="ApplyToHostCard.platformTips" />
-                          <Info size={12} className="shrink-0 text-slate-500" aria-hidden />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <FormattedMessage
-                          defaultMessage="Contributors to Collectives hosted by this Fiscal Host are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>"
-                          id="ApplyToHostCard.platformTips.tooltip"
-                          values={{
-                            b: chunks => <strong>{chunks}</strong>,
-                            LearnMoreLink: chunks => (
-                              <a
-                                href="https://documentation.opencollective.com/giving-to-collectives/platform-tips"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="underline"
-                              >
-                                {chunks}
-                              </a>
-                            ),
-                          }}
-                        />
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
+                  <React.Fragment>
+                    {props.host.hostFeePercent !== null && ' + '}
+                    <DefinedTerm color="black.700" borderColor="#969ba3" fontSize="12px" term={Terms.PLATFORM_TIPS} />
+                  </React.Fragment>
                 )}
               </div>
             )}

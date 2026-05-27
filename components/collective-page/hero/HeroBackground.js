@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, has } from 'lodash';
+import { get, has } from 'lodash-es';
 import styled, { css } from 'styled-components';
 
 import HeroBackgroundMask from '../../../public/static/images/collective-page/HeroBackgroundMask.svg';

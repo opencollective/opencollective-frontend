@@ -52,7 +52,6 @@ export const contributionFlowAccountFieldsFragment = gql`
       RECEIVE_FINANCIAL_CONTRIBUTIONS
     }
     ... on Organization {
-      platformFeePercent
       platformContributionAvailable
       host {
         id
@@ -61,7 +60,6 @@ export const contributionFlowAccountFieldsFragment = gql`
     }
     ... on AccountWithContributions {
       contributionPolicy
-      platformFeePercent
       platformContributionAvailable
       contributors(limit: 6, roles: [BACKER, ATTENDEE]) {
         totalCount
@@ -119,6 +117,7 @@ export const orderSuccessFragment = gql`
     status
     frequency
     data
+    platformTipEligible
     manualPaymentProvider {
       id
       type

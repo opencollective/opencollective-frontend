@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -89,7 +89,7 @@ class EditCollectiveForm extends React.Component {
         return <PaymentInformation account={collective} />;
 
       case ALL_SECTIONS.TIERS:
-        return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
+        return <Tiers collective={collective} />;
 
       case ALL_SECTIONS.TICKETS:
         return <Tickets collective={collective} />;

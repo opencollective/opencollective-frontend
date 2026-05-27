@@ -1,7 +1,7 @@
 import React from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import * as Sentry from '@sentry/browser';
-import { toUpper } from 'lodash';
+import { toUpper } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import Turnstile from 'react-turnstile';
 

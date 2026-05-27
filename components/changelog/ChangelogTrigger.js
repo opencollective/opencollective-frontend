@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
-import { cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash-es';
 import { Megaphone } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

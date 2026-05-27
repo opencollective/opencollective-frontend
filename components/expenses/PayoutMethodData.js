@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { get, startCase, upperCase } from 'lodash';
+import { get, startCase, upperCase } from 'lodash-es';
 import { BadgeCheck, ShieldAlert } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 

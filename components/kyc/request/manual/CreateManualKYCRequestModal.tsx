@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { FormikContext } from 'formik';
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'lodash-es';
 import { Shield } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import z from 'zod';

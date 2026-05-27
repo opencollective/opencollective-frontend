@@ -157,12 +157,13 @@ export function AccountDetailTransactionsTab({
 
   const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
     variables: {
-      fromAccount: { id: account.id },
+      fromAccount: { id: account?.id },
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
       includeChildrenTransactions: false,
       ...queryFilter.variables,
     },
+    skip: !account || !hostSlug,
     notifyOnNetworkStatusChange: true,
   });
 

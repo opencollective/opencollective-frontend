@@ -6,7 +6,7 @@ import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Stack } from '@styled-icons/remix-line/Stack';
-import { pickBy } from 'lodash';
+import { pickBy } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 

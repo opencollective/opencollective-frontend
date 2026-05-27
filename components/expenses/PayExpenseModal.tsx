@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { FormikProvider, useFormik, useFormikContext } from 'formik';
-import { cloneDeep, kebabCase, omit, round } from 'lodash';
+import { cloneDeep, kebabCase, omit, round } from 'lodash-es';
 import { CircleHelp } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';

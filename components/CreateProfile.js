@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { compact, isEmpty, pick, values } from 'lodash';
+import { compact, isEmpty, pick, values } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Captcha, { isCaptchaEnabled } from './Captcha';

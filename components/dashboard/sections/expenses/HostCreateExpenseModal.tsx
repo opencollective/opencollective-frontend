@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { groupBy, map, omit, pick } from 'lodash';
+import { groupBy, map, omit, pick } from 'lodash-es';
 import { Lock, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';

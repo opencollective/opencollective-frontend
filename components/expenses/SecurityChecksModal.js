@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
-import { compact, find, first, uniq, upperCase } from 'lodash';
+import { compact, find, first, uniq, upperCase } from 'lodash-es';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { round } from 'lodash';
+import { round } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nTaxType } from '../../lib/i18n/taxes';

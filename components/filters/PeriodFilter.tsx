@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { has } from 'lodash';
+import { has } from 'lodash-es';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { parseDateInterval, stripTime } from '../../lib/date-utils';

@@ -1,5 +1,5 @@
 import type { FormikProps } from 'formik';
-import { cloneDeep, get, isNil, set } from 'lodash';
+import { cloneDeep, get, isNil, set } from 'lodash-es';
 
 import type { Account, UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
 

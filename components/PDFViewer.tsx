@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { throttle } from 'lodash';
+import { throttle } from 'lodash-es';
 import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -10,6 +10,9 @@ import { styled } from 'styled-components';
 import Container from './Container';
 import { getI18nLink } from './I18nFormatters';
 import Loading from './Loading';
+
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/static/scripts/pdf.worker.min.mjs';
 

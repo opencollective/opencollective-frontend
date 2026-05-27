@@ -1,23 +1,24 @@
 import type { AnalyticsEvent } from './events';
 import type { AnalyticsProperty } from './properties';
 
+type PlausibleOptions = {
+  u?: string;
+  props?: Record<string, string | boolean | number>;
+};
+
+type PlausibleFunction = {
+  (event: string, options: PlausibleOptions): void;
+  q?: [string, PlausibleOptions][];
+};
+
 declare global {
   interface Window {
-    plausible?: {
-      (
-        event: string,
-        options: {
-          u?: string;
-          props?: Record<string, string | boolean | number>;
-        },
-      ): void;
-      q?: any[];
-    };
+    plausible?: PlausibleFunction;
   }
 }
 
 type TrackOptions = {
-  props?: Record<AnalyticsProperty, string | number | boolean>;
+  props?: Partial<Record<AnalyticsProperty, string | number | boolean>>;
 };
 
 export function track(event: AnalyticsEvent | 'pageview', options: TrackOptions = {}) {

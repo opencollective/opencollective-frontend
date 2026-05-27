@@ -1,4 +1,4 @@
-import { forOwn, isEqual, isNil, isNull, isPlainObject, isUndefined, omitBy, pick, setWith } from 'lodash';
+import { forOwn, isEqual, isNil, isNull, isPlainObject, isUndefined, omitBy, pick, setWith } from 'lodash-es';
 
 /* 
   Will take values in a flat object and if the key has structure of `key[subkey]` turn those into nested objects

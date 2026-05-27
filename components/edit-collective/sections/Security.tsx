@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Formik } from 'formik';
-import { get, pick } from 'lodash';
+import { get, pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 import { margin } from 'styled-system';

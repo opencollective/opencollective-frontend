@@ -2,7 +2,7 @@ import React from 'react';
 import type { ApolloClient, ApolloQueryResult, QueryOptions } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { getDataFromTree } from '@apollo/client/react/ssr';
-import { cloneDeep, isUndefined, omitBy, pick } from 'lodash';
+import { cloneDeep, isUndefined, omitBy, pick } from 'lodash-es';
 
 import { APOLLO_STATE_PROP_NAME, APOLLO_VARIABLES_PROP_NAME, initClient } from '../apollo-client';
 

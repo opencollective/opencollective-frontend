@@ -1,7 +1,7 @@
 import React from 'react';
 import type { DocumentNode } from '@apollo/client';
 import { useLazyQuery } from '@apollo/client';
-import { uniqBy } from 'lodash';
+import { uniqBy } from 'lodash-es';
 import { Search, Tags, TagsIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

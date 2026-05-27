@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
-import { get, trim } from 'lodash';
+import { get, trim } from 'lodash-es';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
-import { suggestSlug } from '../../lib/collective';
+import { checkUseAlternativeHostFeeNaming, suggestSlug } from '../../lib/collective';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 import withData from '../../lib/withData';
 
@@ -181,6 +181,7 @@ class CreateCollectiveForm extends React.Component {
                     currency={host.currency}
                     hostFeePercent={host.hostFeePercent}
                     platformContributionAvailable={host.platformContributionAvailable}
+                    useAlternativeHostFeeNaming={checkUseAlternativeHostFeeNaming(host)}
                   />
                 </div>
               </React.Fragment>

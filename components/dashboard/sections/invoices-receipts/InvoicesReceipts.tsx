@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Plus } from '@styled-icons/boxicons-regular/Plus';
 import { Trash } from '@styled-icons/boxicons-regular/Trash';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { Eye } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
