@@ -1968,12 +1968,8 @@
   "FiscalHostPolicies": "Politiques de l'Hôte fiscal",
   "fiscaltos": "conditions de parrainage fiscal",
   "FJBnaq": "ID du client et secret client",
-<<<<<<< HEAD
   "fjC4jU": "Inactive Funds",
-  "FJwSTB": "Verified on {date}",
-=======
   "FJwSTB": "Vérifié le {date}",
->>>>>>> origin/main
   "fkHGdz": "Cancel this recurring contribution and optionally remove the contributor from the Collective profile.",
   "FKMNjH": "Vous ne pourrez plus reprendre la synchronisation à l'avenir.",
   "FLqc8O": "Carte virtuelle ajoutée",
