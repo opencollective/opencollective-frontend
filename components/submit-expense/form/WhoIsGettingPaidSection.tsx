@@ -3,13 +3,11 @@ import { useMutation } from '@apollo/client';
 import type { FieldMetaProps } from 'formik';
 import { Field, useFormikContext } from 'formik';
 import { isEmpty, pick } from 'lodash-es';
-import { AlertCircle, Lock, PlusCircle } from 'lucide-react';
+import { AlertCircle, Lock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { gql } from '../../../lib/graphql/helpers';
-import type { VendorFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
 import { AccountType, ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import {
   PAYEE_SLUG_CREATE_LEGAL_ENTITY,
@@ -23,12 +21,12 @@ import {
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { FormField } from '@/components/FormField';
-import { I18nBold } from '@/components/I18nFormatters';
 import LoginBtn from '@/components/LoginBtn';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
-import { vendorFieldFragment } from '@/components/vendors/queries';
+import { quickCreateVendorRenderOption } from '@/components/vendors/QuickCreateVendorCollectiveOption';
+import { useQuickCreateVendor } from '@/components/vendors/useQuickCreateVendor';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -393,7 +391,6 @@ function VendorOptionWrapper() {
         vendorsForAccount={form.options.vendorsForAccount || []}
         account={form.options.account}
         host={form.options.host}
-        refresh={form.refresh}
         expenseTypeOption={form.values.expenseTypeOption}
       />
     );
@@ -409,13 +406,11 @@ const VendorOption = React.memo(function VendorOption(props: {
   vendorsForAccount: ExpenseForm['options']['vendorsForAccount'];
   account: ExpenseForm['options']['account'];
   host: ExpenseForm['options']['host'];
-  refresh: ExpenseForm['refresh'];
   expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
 }) {
-  const intl = useIntl();
-  const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(props.host);
+  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({ host: props.host });
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendor, setSelectedVendor] = React.useState(undefined);
   const isVendorSelected =
@@ -425,48 +420,6 @@ const VendorOption = React.memo(function VendorOption(props: {
     selectedVendor?.slug === props.payeeSlug;
 
   const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
-
-  const [createVendor, { loading: isCreatingVendor }] = useMutation(gql`
-    mutation CreateExpenseVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
-      createVendor(host: $host, vendor: $vendor) {
-        id
-        ...VendorFields
-      }
-    }
-    ${vendorFieldFragment}
-  `);
-
-  const onCreateVendorClick = React.useCallback(
-    async (
-      searchText: string,
-      { onSuccess, onError }: { onSuccess: (vendor: VendorFieldsFragment) => void; onError: (error: Error) => void },
-    ) => {
-      try {
-        const result = await createVendor({
-          variables: {
-            vendor: {
-              name: searchText,
-            },
-            host: { id: props.host.id },
-          },
-        });
-
-        toast({
-          variant: 'success',
-          message: intl.formatMessage({ defaultMessage: 'Vendor created', id: 'Ra9inC' }),
-        });
-        onSuccess(result.data.createVendor);
-        props.refresh();
-      } catch (error) {
-        toast({
-          variant: 'error',
-          message: i18nGraphqlException(intl, error),
-        });
-        onError(error);
-      }
-    },
-    [createVendor, props.host?.id, props.refresh, intl, toast],
-  );
 
   return (
     <RadioGroupCard
@@ -493,43 +446,7 @@ const VendorOption = React.memo(function VendorOption(props: {
                 : selectedVendor || props.payee
             }
             renderNewCollectiveOption={
-              isHostAdmin
-                ? ({ searchText, onCreatedCollective }) => {
-                    if (searchText.length > 0) {
-                      return (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          loading={isCreatingVendor}
-                          className="flex w-full items-center justify-between gap-2 text-sm text-gray-500"
-                          onClick={() =>
-                            onCreateVendorClick(searchText, {
-                              onSuccess: vendor => {
-                                onCreatedCollective(vendor);
-                              },
-                              onError: () => {},
-                            })
-                          }
-                        >
-                          <span>
-                            <FormattedMessage
-                              defaultMessage="Create vendor: <b>{vendorName}</b>"
-                              id="buY7Uz"
-                              values={{ vendorName: searchText, b: I18nBold }}
-                            />
-                          </span>
-                          <PlusCircle size={16} />
-                        </Button>
-                      );
-                    }
-
-                    return (
-                      <div>
-                        <FormattedMessage defaultMessage="Begin typing to create a vendor" id="Jx28lM" />
-                      </div>
-                    );
-                  }
-                : undefined
+              isHostAdmin ? quickCreateVendorRenderOption(createVendorFromSearch, isCreatingVendor) : undefined
             }
             onChange={e => {
               const selected = e.value;

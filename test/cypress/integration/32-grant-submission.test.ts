@@ -99,13 +99,9 @@ describe('Grant Submission Flow', () => {
     cy.contains('button', 'Proceed').click();
     cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
       cy.contains('A beneficiary').click();
-      cy.contains('A beneficiary').parent().get('[role="combobox"]').click();
-      cy.root().closest('html').contains('Create Beneficiary').click();
-
-      cy.contains('label', "Beneficiary's name").click();
-      cy.focused().type('A beneficiary name');
-
-      cy.contains('button', 'Create beneficiary').click();
+      const beneficiaryName = 'A beneficiary name';
+      cy.contains('A beneficiary').parent().get('[role="combobox"]').click().type(beneficiaryName);
+      cy.root().closest('html').contains(`Create vendor: ${beneficiaryName}`).click();
     });
 
     cy.get('#PAYOUT_METHOD').within(() => {
