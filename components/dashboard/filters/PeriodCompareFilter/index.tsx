@@ -144,13 +144,7 @@ function getPeriodDates(value: PeriodCompareFilterValueType): {
     dateTo = dayjs.utc(value.lte).endOf(IsoTimeUnit);
   }
 
-  const isToDate =
-    value.type === PeriodFilterType.MONTH_TO_DATE ||
-    value.type === PeriodFilterType.QUARTER_TO_DATE ||
-    value.type === PeriodFilterType.YEAR_TO_DATE;
-  if (!isToDate) {
-    dateFrom = getClosestPeriodStart(dateFrom, value.timeUnit);
-  }
+  dateFrom = getClosestPeriodStart(dateFrom, value.timeUnit);
 
   let compareFrom, compareTo;
 
