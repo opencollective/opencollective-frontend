@@ -365,6 +365,10 @@ export const hostedCollectivesQuery = gql`
     $currencies: [String]
     $startsAtFrom: DateTime
     $startsAtTo: DateTime
+    $joinedBetween: MetricsDateRangeInput
+    $unhostedBetween: MetricsDateRangeInput
+    $hadActivityBetween: MetricsDateRangeInput
+    $noActivityBetween: MetricsDateRangeInput
   ) {
     host(slug: $hostSlug) {
       id
@@ -397,6 +401,10 @@ export const hostedCollectivesQuery = gql`
         currencies: $currencies
         startsAtFrom: $startsAtFrom
         startsAtTo: $startsAtTo
+        joinedBetween: $joinedBetween
+        unhostedBetween: $unhostedBetween
+        hadActivityBetween: $hadActivityBetween
+        noActivityBetween: $noActivityBetween
       ) {
         offset
         limit
