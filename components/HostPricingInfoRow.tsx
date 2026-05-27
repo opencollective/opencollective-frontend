@@ -1,25 +1,29 @@
 import React from 'react';
-import { Info } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
+import DefinedTerm, { Terms } from './DefinedTerm';
 
 type HostPricingInfoRowProps = {
   createdAt: string;
   currency: string;
   hostFeePercent: number | null;
   platformContributionAvailable: boolean;
+  useAlternativeHostFeeNaming?: boolean;
+  hostFeeWithDefinedTerm?: boolean;
 };
 
-const labelClassName = 'mb-1 text-xs font-normal leading-[18px] text-neutral-600';
-const valueClassName = 'text-base font-medium leading-6 text-neutral-900';
+const labelClassName = 'mb-1 text-xs font-normal leading-[18px] text-neutral-600 text-center';
+const valueClassName = 'text-base font-medium leading-6 text-neutral-900 text-center';
 
 export default function HostPricingInfoRow({
   createdAt,
   currency,
   hostFeePercent,
   platformContributionAvailable,
+  useAlternativeHostFeeNaming,
 }: HostPricingInfoRowProps) {
+  const hostFeeTerm = useAlternativeHostFeeNaming ? Terms.ADMINISTRATIVE_CONTRIBUTION : Terms.HOST_FEE;
+
   return (
     <div className="flex flex-wrap justify-center gap-8 rounded-md border px-6 py-4">
       <div className="flex flex-col">
@@ -38,40 +42,14 @@ export default function HostPricingInfoRow({
       </div>
       <div className="flex flex-col">
         <p className={labelClassName}>
-          <FormattedMessage id="HostFee" defaultMessage="Host fee" />
+          <DefinedTerm color="black.700" borderColor="#969ba3" fontSize="12px" term={hostFeeTerm} />
         </p>
         <p className={valueClassName}>{Number.isFinite(hostFeePercent) ? `${hostFeePercent}%` : '—'}</p>
       </div>
       {platformContributionAvailable && (
         <div className="flex flex-col">
           <p className={labelClassName}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="inline-flex cursor-help items-center gap-1 underline decoration-slate-300 decoration-dashed underline-offset-2 transition-colors hover:decoration-slate-400">
-                  <FormattedMessage defaultMessage="Platform Tips" id="ApplyToHostCard.platformTips" />
-                  <Info size={12} className="shrink-0 text-slate-500" aria-hidden />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <FormattedMessage
-                  defaultMessage="Contributors to Collectives hosted by this Fiscal Host are invited to add an optional tip to the Open Collective platform during checkout. The default tip is <b>15%</b> of the contribution amount; on average, contributors give about <b>6%</b>. <LearnMoreLink>Learn more ↗</LearnMoreLink>"
-                  id="ApplyToHostCard.platformTips.tooltip"
-                  values={{
-                    b: chunks => <strong>{chunks}</strong>,
-                    LearnMoreLink: chunks => (
-                      <a
-                        href="https://documentation.opencollective.com/giving-to-collectives/platform-tips"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline"
-                      >
-                        {chunks}
-                      </a>
-                    ),
-                  }}
-                />
-              </TooltipContent>
-            </Tooltip>
+            <DefinedTerm term={Terms.PLATFORM_TIPS} color="black.700" borderColor="#969ba3" fontSize="12px" />
           </p>
           <p className={valueClassName}>
             <FormattedMessage id="a5msuh" defaultMessage="Yes" />

@@ -26,7 +26,13 @@ export default function OtherFiscalHostResults({
 }: {
   hosts: Pick<
     Host,
-    'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent' | 'platformContributionAvailable'
+    | 'slug'
+    | 'totalHostedCollectives'
+    | 'description'
+    | 'currency'
+    | 'hostFeePercent'
+    | 'platformContributionAvailable'
+    | 'settings'
   >[];
   totalCount: number;
   collective: Pick<Account, 'slug'>;
