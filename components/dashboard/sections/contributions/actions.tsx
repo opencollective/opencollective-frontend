@@ -1,23 +1,24 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, LinkIcon, Pencil } from 'lucide-react';
+import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, CircleX, LinkIcon, Pencil } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { getPermalinkUrl } from '../../../../lib/url-helpers';
+import { getDashboardRoute, getPermalinkUrl } from '../../../../lib/url-helpers';
 import useClipboard from '@/lib/hooks/useClipboard';
 
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
-import { getTransactionsUrl } from '../../../contributions/ContributionTimeline';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
 import { useModal } from '../../../ModalContext';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
+import { HostCancelContributionModal } from './HostCancelContributionModal';
 
 const expireOrderMutation = gql`
   mutation ContributionsExpireOrder($orderId: Int) {
@@ -54,6 +55,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
   const { showModal, showConfirmationModal } = useModal();
   const { LoggedInUser } = useLoggedInUser();
   const { copy } = useClipboard();
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
 
   const [expireOrder] = useMutation(expireOrderMutation);
 
@@ -71,8 +73,10 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       refetch?.();
     };
 
-    const transactionsUrl = getTransactionsUrl(LoggedInUser, order);
-    transactionsUrl.searchParams.set('orderId', order.legacyId.toString());
+    const transactionsUrl = getDashboardRoute(
+      dashboardAccount,
+      `${dashboardAccount.hasHosting ? 'host-transactions' : 'transactions'}?orderId=${order.legacyId.toString()}`,
+    );
 
     const actions: ReturnType<GetActions<ManagedOrderFieldsFragment>> = {
       primary: [],
@@ -80,6 +84,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     };
 
     const isAdminOfOrder = LoggedInUser.isAdminOfCollective(order.fromAccount);
+    const isHostAdminOfToAccount = LoggedInUser?.isHostAdmin(order.toAccount);
     const canUpdateActiveOrder =
       order.frequency !== ContributionFrequency.ONETIME &&
       ![
@@ -93,10 +98,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       isAdminOfOrder;
 
     const canResume = order.status === OrderStatus.PAUSED && order.permissions.canResume;
-    const canCancel =
-      isAdminOfOrder &&
-      ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status) &&
-      order.frequency !== ContributionFrequency.ONETIME;
+    const canCancel = order.permissions.canCancel;
     const canMarkAsCompleted =
       [OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status) && order.permissions.canMarkAsPaid;
     const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
@@ -238,11 +240,23 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     if (canCancel) {
       actions.secondary.push({
         key: 'cancel-contribution',
+        Icon: CircleX,
         label: intl.formatMessage({
           defaultMessage: 'Cancel contribution',
           id: 'subscription.menu.cancelContribution',
         }),
-        onClick: () => showEditOrderModal('cancel'),
+        onClick: () =>
+          isHostAdminOfToAccount
+            ? showModal(
+                HostCancelContributionModal,
+                {
+                  order: { id: order.id, legacyId: order.legacyId },
+                  onSuccess: onMutationSuccess,
+                  onCloseFocusRef,
+                },
+                `host-cancel-contribution-${order.id}`,
+              )
+            : showEditOrderModal('cancel'),
         'data-cy': 'recurring-contribution-menu-cancel-option',
       });
     }

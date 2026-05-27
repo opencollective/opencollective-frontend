@@ -1,6 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
-
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+import React, { useRef } from 'react';
 import { Markup } from 'interweave';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getLuminance } from 'polished';
@@ -8,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
+import { useIsomorphicLayoutEffect } from '../lib/hooks/useIsomorphicLayoutEffect';
 import { defaultShouldForwardProp } from '../lib/styled_components_utils';
 
 import { Button } from './ui/Button';

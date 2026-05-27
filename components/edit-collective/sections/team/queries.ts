@@ -27,6 +27,7 @@ export const teamSectionQuery = gql`
       id
       legacyId
       slug
+      name
       isFrozen
       isPrivate
       type
@@ -36,6 +37,23 @@ export const teamSectionQuery = gql`
           id
           slug
           type
+          name
+        }
+      }
+      connectedAccounts {
+        id
+        legacyId
+        service
+        createdAt
+        createdByAccount {
+          id
+          legacyId
+          name
+          slug
+        }
+        accountsMirrored {
+          id
+          slug
           name
         }
       }

@@ -623,6 +623,7 @@ const searchPageQuery = gql`
         backgroundImageUrl(height: 208)
         description
         website
+        settings
         currency
         stats {
           id
