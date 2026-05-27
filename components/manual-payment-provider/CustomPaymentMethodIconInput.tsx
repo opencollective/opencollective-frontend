@@ -1,5 +1,5 @@
 import React from 'react';
-import { startCase } from 'lodash';
+import { startCase } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { Button } from '../ui/Button';

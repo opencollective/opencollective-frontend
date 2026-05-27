@@ -1,7 +1,7 @@
 import React from 'react';
 import { ErrorBoundary } from '@sentry/nextjs';
 import type { ApexOptions } from 'apexcharts';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import dynamic from 'next/dynamic';
 import { useIntl } from 'react-intl';
 

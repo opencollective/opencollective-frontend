@@ -10,7 +10,7 @@ import DashboardHeader from '../../DashboardHeader';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import type { DashboardSectionProps } from '../../types';
 
-import ContributionsTable from './ContributionsTable';
+import ContributionsTable, { defaultVisibility } from './ContributionsTable';
 import type { FilterMeta } from './filters';
 import { ContributionAccountingCategoryKinds, filters, schema as baseSchema, toVariables } from './filters';
 import { dashboardOrdersQuery } from './queries';
@@ -173,7 +173,7 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
         nbPlaceholders={queryFilter.values.limit}
         error={error}
         refetch={handleRefetch}
-        columnVisibility={{ lastChargedAt: false, createdAt: true, expectedAt: false }}
+        columnVisibility={{ ...defaultVisibility, lastChargedAt: false, createdAt: true, expectedAt: false }}
       />
     </div>
   );

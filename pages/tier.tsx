@@ -1,5 +1,5 @@
 import React from 'react';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 

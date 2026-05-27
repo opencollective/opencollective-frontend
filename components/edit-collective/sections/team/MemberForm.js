@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
-import { get, omit } from 'lodash';
+import { get, omit } from 'lodash-es';
 import { defineMessages, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 

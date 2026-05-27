@@ -1,6 +1,6 @@
 import React from 'react';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import type { PayoutMethod } from '../lib/graphql/types/v2/graphql';

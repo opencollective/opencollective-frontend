@@ -1,5 +1,5 @@
 import getSymbolFromCurrency from 'currency-symbol-map';
-import { isNil, round } from 'lodash';
+import { isNil, round } from 'lodash-es';
 
 import { CurrencyToCountry, ZERO_DECIMAL_CURRENCIES } from './constants/currency';
 import { CurrencyPrecision } from './constants/currency-precision';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { isEmpty, startCase } from 'lodash';
+import { isEmpty, startCase } from 'lodash-es';
 import { AlertTriangle } from 'lucide-react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 

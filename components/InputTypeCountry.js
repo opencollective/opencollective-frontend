@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
-import { isUndefined, orderBy } from 'lodash';
+import { isUndefined, orderBy } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 

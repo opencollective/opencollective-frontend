@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
-import { orderBy } from 'lodash';
+import { orderBy } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import type { Location } from '../lib/graphql/types/v2/graphql';

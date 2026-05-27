@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
-import { groupBy, isNil, mapValues, toPairs } from 'lodash';
+import { groupBy, isNil, mapValues, toPairs } from 'lodash-es';
 import {
   Banknote,
   Eye,

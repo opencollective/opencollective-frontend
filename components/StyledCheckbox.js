@@ -1,6 +1,6 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import styled, { css } from 'styled-components';
 import { size, typography } from 'styled-system';
 

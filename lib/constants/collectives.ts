@@ -1,4 +1,4 @@
-import { invert, omit } from 'lodash';
+import { invert, omit } from 'lodash-es';
 
 import { AccountType } from '../graphql/types/v2/graphql';
 

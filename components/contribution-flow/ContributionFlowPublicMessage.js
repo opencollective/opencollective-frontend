@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 

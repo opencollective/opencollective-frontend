@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../../../lib/graphql/helpers';

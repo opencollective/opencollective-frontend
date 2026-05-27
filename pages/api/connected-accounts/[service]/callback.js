@@ -1,6 +1,6 @@
 import { URL } from 'url';
 
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 
 import { oauthServiceAllowlist } from '@/lib/constants/oauth';
 
@@ -16,7 +16,6 @@ export default async function handle(req, res) {
   apiUrl.searchParams.set('api_key', process.env.API_KEY);
   apiUrl.searchParams.set('code', req.query.code);
   apiUrl.searchParams.set('context', req.query.context);
-  apiUrl.searchParams.set('access_token', req.query.access_token);
   apiUrl.searchParams.set('CollectiveId', req.query.CollectiveId);
   apiUrl.searchParams.set('state', req.query.state);
 

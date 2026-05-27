@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { isEmpty, isNil, omit, omitBy, pick, remove } from 'lodash';
+import { isEmpty, isNil, omit, omitBy, pick, remove } from 'lodash-es';
 import { FileText } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import type { z } from 'zod';

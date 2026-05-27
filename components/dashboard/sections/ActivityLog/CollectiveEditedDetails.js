@@ -1,6 +1,6 @@
 import React from 'react';
 import { diffArrays, diffChars, diffJson } from 'diff';
-import { has, isEmpty, pickBy, startCase } from 'lodash';
+import { has, isEmpty, pickBy, startCase } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 

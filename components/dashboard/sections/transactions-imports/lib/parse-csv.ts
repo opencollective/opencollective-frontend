@@ -1,5 +1,5 @@
 import { parse as parseCSV } from 'csv-parse/sync';
-import { deburr, uniq, words } from 'lodash';
+import { deburr, uniq, words } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 
 import dayjs from '../../../../../lib/dayjs';

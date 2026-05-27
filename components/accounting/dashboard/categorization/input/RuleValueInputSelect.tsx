@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { CheckIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

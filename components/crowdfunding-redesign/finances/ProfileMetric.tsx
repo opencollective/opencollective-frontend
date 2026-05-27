@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import type { BaseMetricProps } from '../../dashboard/sections/overview/Metric';

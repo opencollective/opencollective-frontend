@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Path } from 'dot-path-value';
-import { get, isEmpty, pick } from 'lodash';
+import { get, isEmpty, pick } from 'lodash-es';
 
 import { StepHeader, StepItem, StepValues as ExpenseFormStepValues } from '../submit-expense/SubmitExpenseFlowSteps';
 import type { ExpenseForm, ExpenseFormValues } from '../submit-expense/useExpenseForm';

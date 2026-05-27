@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar } from '@styled-icons/feather/Calendar';
 import { Clock } from '@styled-icons/feather/Clock';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';

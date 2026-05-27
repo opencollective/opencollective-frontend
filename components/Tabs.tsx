@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import { useWindowResize, VIEWPORTS } from '../lib/hooks/useWindowResize';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { Paypal } from '@styled-icons/fa-brands/Paypal';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';

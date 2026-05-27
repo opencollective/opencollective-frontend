@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil, omit } from 'lodash';
+import { isNil, omit } from 'lodash-es';
 import { ArrowUp10, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/router';
 

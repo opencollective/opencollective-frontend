@@ -71,6 +71,7 @@ export const managedOrderFragment = gql`
       canResume
       canMarkAsExpired
       canMarkAsPaid
+      canCancel
       canEdit
       canComment
       canSeePrivateActivities
@@ -87,6 +88,14 @@ export const managedOrderFragment = gql`
         isGuest
       }
       ...AccountHoverCardFields
+      mainProfile {
+        id
+        name
+        slug
+        imageUrl
+        type
+        ...AccountHoverCardFields
+      }
     }
     createdByAccount {
       id

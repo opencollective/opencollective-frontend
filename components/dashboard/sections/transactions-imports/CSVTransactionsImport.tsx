@@ -1,7 +1,9 @@
 import React from 'react';
 import { gql, useApolloClient, useQuery } from '@apollo/client';
-import { truncate } from 'lodash';
-import Lottie from 'lottie-react';
+import { truncate } from 'lodash-es';
+import dynamic from 'next/dynamic';
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import {
   Calendar,
   CalendarClock,

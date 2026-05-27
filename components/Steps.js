@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { findLastIndex } from 'lodash';
+import { findLastIndex } from 'lodash-es';
 
 /**
  * A stepper component to manage state and validations for multi-steps processes.

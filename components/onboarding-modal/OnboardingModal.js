@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
-import { map, omit } from 'lodash';
+import { map, omit } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';

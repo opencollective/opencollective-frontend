@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import type { Content } from '@radix-ui/react-hover-card';
 import { clsx } from 'clsx';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import type { LucideIcon } from 'lucide-react';
 import { BadgeCheck, Banknote, Building, Calendar, FileText, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
@@ -338,6 +338,7 @@ export const AccountHoverCard = ({
   const infoItems = getInfoItems(account);
   const asyncInfoItems = getInfoItemsFromMembershipData(data);
   const accountUrl = context?.getProfileUrl?.(account) || getCollectivePageRoute(account);
+  const legalName = account.legalName !== account.name && account.legalName;
   return (
     // HoverCard currently disabled for Vendors (need to fix styling, appropriate links, etc)
     <HoverCard open={open && !isVendor} onOpenChange={setOpen}>
@@ -363,9 +364,12 @@ export const AccountHoverCard = ({
             </div>
 
             <div className="overflow-hidden">
-              <div className="flex items-center gap-1">
-                <Link href={accountUrl}>
-                  <span className="block truncate font-medium hover:underline">{account.name}</span>
+              <div className="flex items-start gap-1">
+                <Link href={accountUrl} className="min-w-0 break-words">
+                  <span className="font-medium hover:underline">
+                    {account.name}
+                    {legalName && <span className="font-normal text-muted-foreground">{` (${legalName})`}</span>}
+                  </span>
                 </Link>
                 <AccountTrustBadge account={account} />
               </div>

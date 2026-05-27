@@ -1,4 +1,4 @@
-import { isNil, round, sumBy } from 'lodash';
+import { isNil, round, sumBy } from 'lodash-es';
 
 import { diffExchangeRates } from '../../../lib/currency-utils';
 

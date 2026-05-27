@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil, isString, omit } from 'lodash';
+import { isNil, isString, omit } from 'lodash-es';
 import { CircleAlert, Upload } from 'lucide-react';
 import type { Accept, FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
