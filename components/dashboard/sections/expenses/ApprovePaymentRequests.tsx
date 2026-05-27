@@ -126,12 +126,16 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
     },
     views,
     lockViewFilters: true,
-    skipFiltersOnReset: ['hostContext'],
+    ...(account.hasHosting ? { skipFiltersOnReset: ['hostContext'] } : {}),
   });
+
+  const expenseFilterVariables = account.hasHosting
+    ? queryFilter.variables
+    : omit(queryFilter.variables, 'hostContext');
 
   const variables = {
     hostSlug,
-    ...queryFilter.variables,
+    ...expenseFilterVariables,
     status: [ExpenseStatusFilter.PENDING, ExpenseStatusFilter.UNVERIFIED],
     fetchGrantHistory: false,
   };
@@ -154,11 +158,13 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="Approve Payment Requests" id="ApprovePaymentRequests" />
-            <HostContextFilter
-              value={queryFilter.values.hostContext}
-              onChange={val => queryFilter.setFilter('hostContext', val)}
-              intl={intl}
-            />
+            {account.hasHosting && (
+              <HostContextFilter
+                value={queryFilter.values.hostContext}
+                onChange={val => queryFilter.setFilter('hostContext', val)}
+                intl={intl}
+              />
+            )}
           </div>
         }
         description={<FormattedMessage defaultMessage="Approve payment requests" id="DKcbG3" />}

@@ -335,12 +335,16 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       hideExpensesMetaStatuses: true,
     },
     views,
-    skipFiltersOnReset: ['hostContext'],
+    ...(account.hasHosting ? { skipFiltersOnReset: ['hostContext'] } : {}),
   });
+
+  const expenseFilterVariables = account.hasHosting
+    ? queryFilter.variables
+    : omit(queryFilter.variables, 'hostContext');
 
   const variables = {
     hostSlug,
-    ...queryFilter.variables,
+    ...expenseFilterVariables,
     fetchGrantHistory: false,
   };
 
@@ -351,7 +355,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const { data: metaData } = useQuery(hostPaymentRequestsMetadataQuery, {
     variables: {
       hostSlug,
-      hostContext: queryFilter.values.hostContext,
+      ...(account.hasHosting ? { hostContext: queryFilter.values.hostContext } : {}),
     },
   });
 
@@ -388,11 +392,13 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="All Payment Requests" id="HostPaymentRequests" />
-            <HostContextFilter
-              value={queryFilter.values.hostContext}
-              onChange={val => queryFilter.setFilter('hostContext', val)}
-              intl={intl}
-            />
+            {account.hasHosting && (
+              <HostContextFilter
+                value={queryFilter.values.hostContext}
+                onChange={val => queryFilter.setFilter('hostContext', val)}
+                intl={intl}
+              />
+            )}
           </div>
         }
         description={<FormattedMessage defaultMessage="All submitted payment requests" id="vpLBRJ" />}

@@ -5,6 +5,7 @@ import { ArrowRight, Award, Building, HandCoins, MailOpen, Receipt } from 'lucid
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '../../../../lib/collective';
+import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { gql } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
@@ -306,8 +307,13 @@ type AccountTodoItem = {
 // For Hosted Collectives and Orgs with money management (but without hosting)
 export const AccountTodoList = () => {
   const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
 
   const isOrgWithMoneyManagment = account?.type === 'ORGANIZATION' && hasAccountMoneyManagement(account);
+  const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
+  );
+  const useDisbursementWorkflowLinks = isOrgWithMoneyManagment && !account?.hasHosting && hasIncomingOutgoingReorg;
 
   // Additional query for orgs with money management
   const { data } = useQuery(moneyManagingOrgTodoQuery, {
@@ -327,6 +333,12 @@ export const AccountTodoList = () => {
   const toPayExpenseCount = data?.toPayExpenses?.totalCount || 0;
 
   const expensesHref = getDashboardRoute(account, ALL_SECTIONS.PAYMENT_REQUESTS);
+  const pendingExpensesHref = useDisbursementWorkflowLinks
+    ? getDashboardRoute(account, ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS)
+    : expensesHref;
+  const toPayExpensesHref = useDisbursementWorkflowLinks
+    ? getDashboardRoute(account, ALL_SECTIONS.PAY_DISBURSEMENTS)
+    : expensesHref;
 
   const createLink = (href: string) => (chunks: React.ReactNode) => (
     <Link className="font-medium text-primary hover:underline" href={href}>
@@ -344,7 +356,7 @@ export const AccountTodoList = () => {
           defaultMessage="{pendingExpenseCount, plural, one {<Link>{pendingExpenseCount} expense</Link> has} other {<Link>{pendingExpenseCount} expenses</Link> have}} not been reviewed"
           id="PcyeDN"
           values={{
-            Link: createLink(`${expensesHref}?status=PENDING`),
+            Link: createLink(`${pendingExpensesHref}?status=PENDING`),
             pendingExpenseCount,
           }}
         />
@@ -359,7 +371,7 @@ export const AccountTodoList = () => {
           defaultMessage="{toPayExpenseCount, plural, one {<Link>{toPayExpenseCount} expense</Link> is} other {<Link>{toPayExpenseCount} expenses</Link> are}} ready to pay"
           id="SelfHostedTodo.ExpensesToPay"
           values={{
-            Link: createLink(`${expensesHref}?status=READY_TO_PAY`),
+            Link: createLink(`${toPayExpensesHref}?status=READY_TO_PAY`),
             toPayExpenseCount,
           }}
         />

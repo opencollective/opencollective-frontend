@@ -198,8 +198,12 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       accountingCategoryKinds: ExpenseAccountingCategoryKinds,
     },
     views,
-    skipFiltersOnReset: ['hostContext'],
+    ...(account.hasHosting ? { skipFiltersOnReset: ['hostContext'] } : {}),
   });
+
+  const expenseFilterVariables = account.hasHosting
+    ? queryFilter.variables
+    : omit(queryFilter.variables, 'hostContext');
 
   const {
     data: metaData,
@@ -208,7 +212,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   } = useQuery(hostDashboardMetadataQuery, {
     variables: {
       hostSlug,
-      hostContext: queryFilter.values.hostContext,
+      ...(account.hasHosting ? { hostContext: queryFilter.values.hostContext } : {}),
     },
   });
 
@@ -223,7 +227,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const variables = {
     hostSlug,
-    ...queryFilter.variables,
+    ...expenseFilterVariables,
     fetchGrantHistory: false,
   };
 
@@ -244,11 +248,13 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="Pay Disbursements" id="El6h63" />
-            <HostContextFilter
-              value={queryFilter.values.hostContext}
-              onChange={val => queryFilter.setFilter('hostContext', val)}
-              intl={intl}
-            />
+            {account.hasHosting && (
+              <HostContextFilter
+                value={queryFilter.values.hostContext}
+                onChange={val => queryFilter.setFilter('hostContext', val)}
+                intl={intl}
+              />
+            )}
           </div>
         }
         description={
