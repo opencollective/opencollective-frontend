@@ -13,11 +13,11 @@ const messages = defineMessages({
   activeCollectivesLabel: { defaultMessage: 'Active Collectives', id: 'b4gw3f' },
   inactiveCollectivesLabel: { defaultMessage: 'Inactive Collectives', id: 'TWl0xA' },
   newCollectivesLabel: { defaultMessage: 'Newly Hosted Collectives', id: 'RoCcqv' },
-  unhostedCollectivesLabel: { defaultMessage: 'Un-hosted Collectives', id: 'pMLohW' },
+  unhostedCollectivesLabel: { defaultMessage: 'Unhosted Collectives', id: 'MF9M1y' },
   activeFundsLabel: { defaultMessage: 'Active Funds', id: 'xO/R/W' },
   inactiveFundsLabel: { defaultMessage: 'Inactive Funds', id: 'fjC4jU' },
   newFundsLabel: { defaultMessage: 'Newly Hosted Funds', id: 'f/8mAY' },
-  unhostedFundsLabel: { defaultMessage: 'Un-hosted Funds', id: 'MOdEme' },
+  unhostedFundsLabel: { defaultMessage: 'Unhosted Funds', id: '5TUPXo' },
   activeCollectivesBody: {
     defaultMessage: 'Collectives with at least one ledger transaction recorded this month.',
     id: 'OP0hZZ',

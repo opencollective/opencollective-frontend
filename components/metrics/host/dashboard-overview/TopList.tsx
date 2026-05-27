@@ -1,7 +1,7 @@
 import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
@@ -33,6 +33,7 @@ type TopListProps = {
 };
 
 export function TopList({ hostSlug, category, title, rows, loading }: TopListProps) {
+  const intl = useIntl();
   const router = useRouter();
   const topAmount = React.useMemo(() => {
     if (!rows?.length) {
@@ -100,7 +101,10 @@ export function TopList({ hostSlug, category, title, rows, loading }: TopListPro
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                        aria-label="Actions"
+                        aria-label={intl.formatMessage({
+                          defaultMessage: 'Actions',
+                          id: 'CollectivePage.NavBar.ActionMenu.Actions',
+                        })}
                       >
                         <MoreHorizontal size={16} />
                       </DropdownMenuTrigger>
