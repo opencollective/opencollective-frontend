@@ -17924,7 +17924,7 @@ type Vendor implements Account & AccountWithContributions {
   hasPayoutMethod: Boolean
 
   """
-  The account who created this order
+  The account who created this vendor
   """
   createdByAccount: Account
 

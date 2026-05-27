@@ -9,7 +9,7 @@ import { injectIntl } from 'react-intl';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
-import { FEATURES } from '@/lib/allowed-features';
+import { isHiddenAccount } from '@/lib/collective';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
@@ -25,7 +25,8 @@ import { Box } from '../../components/Grid';
 import Loading from '../../components/Loading';
 import { withStripeLoader } from '../../components/StripeProvider';
 import { withUser } from '../../components/UserProvider';
-import FeatureNotSupported from '@/components/FeatureNotSupported';
+
+import Custom404 from '../404';
 
 class EmbedContributionFlowPage extends React.Component<{
   router: Router;
@@ -175,12 +176,8 @@ class EmbedContributionFlowPage extends React.Component<{
         : generateNotFoundError(this.props.collectiveSlug);
 
       return <ErrorPage error={error} />;
-    } else if (
-      !data.loading &&
-      data.account &&
-      data.account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] === 'UNSUPPORTED'
-    ) {
-      return <FeatureNotSupported />;
+    } else if (!data.loading && data.account && isHiddenAccount(data.account)) {
+      return <Custom404 />;
     } else {
       return (
         <CollectiveThemeProvider collective={queryParams.useTheme ? data.account : null}>

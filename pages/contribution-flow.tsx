@@ -9,7 +9,7 @@ import { injectIntl } from 'react-intl';
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
-import { FEATURES } from '@/lib/allowed-features';
+import { isHiddenAccount } from '@/lib/collective';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import Container from '../components/Container';
@@ -26,7 +26,8 @@ import Page from '../components/Page';
 import Redirect from '../components/Redirect';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
-import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
+
+import Custom404 from './404';
 
 class NewContributionFlowPage extends React.Component<{
   router: Router;
@@ -128,12 +129,8 @@ class NewContributionFlowPage extends React.Component<{
         : generateNotFoundError(this.props.collectiveSlug);
 
       return <ErrorPage error={error} />;
-    } else if (
-      !data.loading &&
-      data.account &&
-      data.account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] === 'UNSUPPORTED'
-    ) {
-      return <PageFeatureNotSupported />;
+    } else if (!data.loading && data.account && isHiddenAccount(data.account)) {
+      return <Custom404 />;
     }
 
     return (
