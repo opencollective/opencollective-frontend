@@ -71,9 +71,10 @@ export const getCollectiveTypeIcon = (
 type TaxFormBadgeProps = {
   taxForms: CommunityAccountDetailQuery['host']['hostedLegalDocuments'];
   host?: CommunityAccountDetailQuery['host'];
+  onClick?: () => void;
 };
 
-export function TaxFormBadge({ taxForms }: TaxFormBadgeProps) {
+export function TaxFormBadge({ taxForms, onClick }: TaxFormBadgeProps) {
   const intl = useIntl();
   const taxForm = taxForms?.nodes?.[0];
   if (!taxForm) {
@@ -86,6 +87,7 @@ export function TaxFormBadge({ taxForms }: TaxFormBadgeProps) {
           size="sm"
           status={taxForm.status}
           className="cursor-pointer"
+          onClick={onClick}
           label={
             <React.Fragment>
               <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />{' '}
