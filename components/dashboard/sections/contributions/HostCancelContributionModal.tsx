@@ -62,18 +62,24 @@ const ToggleOptionSection: React.FC<{
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
   children?: React.ReactNode;
-}> = ({ title, description, checked, onCheckedChange, disabled, children }) => (
-  <Section>
-    <div className="flex items-start justify-between gap-4">
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <div className="text-sm font-semibold">{title}</div>
-        {description && <div className="text-sm text-muted-foreground">{description}</div>}
+}> = ({ title, description, checked, onCheckedChange, disabled, children }) => {
+  const titleId = React.useId();
+
+  return (
+    <Section>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div id={titleId} className="text-sm font-semibold">
+            {title}
+          </div>
+          {description && <div className="text-sm text-muted-foreground">{description}</div>}
+        </div>
+        <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} aria-labelledby={titleId} />
       </div>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} />
-    </div>
-    {children}
-  </Section>
-);
+      {children}
+    </Section>
+  );
+};
 
 const AccountSummary: React.FC<{
   account: NonNullable<OrderData['fromAccount'] | OrderData['toAccount']>;
@@ -191,7 +197,7 @@ const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
             <FormattedMessage
               defaultMessage="Remove contributor from {accountType}"
               id="7xqR2m"
-              values={{ accountType: formatCollectiveType(intl, order.toAccount?.type) }}
+              values={{ accountType: formatCollectiveType(intl, order.toAccount?.type ?? 'COLLECTIVE') }}
             />
           }
           description={

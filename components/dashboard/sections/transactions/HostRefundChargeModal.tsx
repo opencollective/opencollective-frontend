@@ -218,18 +218,24 @@ const ToggleOptionSection: React.FC<{
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
   children?: React.ReactNode;
-}> = ({ title, description, checked, onCheckedChange, disabled, children }) => (
-  <Section>
-    <div className="flex items-start justify-between gap-4">
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <div className="text-sm font-semibold">{title}</div>
-        {description && <div className="text-sm text-muted-foreground">{description}</div>}
+}> = ({ title, description, checked, onCheckedChange, disabled, children }) => {
+  const titleId = React.useId();
+
+  return (
+    <Section>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div id={titleId} className="text-sm font-semibold">
+            {title}
+          </div>
+          {description && <div className="text-sm text-muted-foreground">{description}</div>}
+        </div>
+        <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} aria-labelledby={titleId} />
       </div>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} />
-    </div>
-    {children}
-  </Section>
-);
+      {children}
+    </Section>
+  );
+};
 
 type AllocationAccount = React.ComponentProps<typeof AccountHoverCard>['account'];
 type AllocationRole = 'contributor' | 'collective' | 'host' | 'platform' | 'other';
@@ -713,71 +719,74 @@ const HostRefundChargeForm: React.FC<HostRefundChargeFormProps> = ({ transaction
             {allocationGroups.map(group => (
               <div key={group.key} className="py-3 first:pt-0 last:pb-0">
                 <AllocationGroup group={group} currency={currency} />
+                {group.role === 'collective' && isInsufficientBalance && principalBalanceCurrency && (
+                  <MessageBox type="warning" withIcon px={3} py={2} className="mt-4">
+                    <div className="flex flex-col gap-3">
+                      <span>
+                        <FormattedMessage
+                          defaultMessage="{collective}'s balance ({balance}) won't cover the {amount} that would be deducted to process this refund."
+                          id="RB/W6s"
+                          values={{
+                            collective: (
+                              <span className="font-medium">{principalAccount?.name || principalAccount?.slug}</span>
+                            ),
+                            balance: (
+                              <span className="font-medium tabular-nums">
+                                <FormattedMoneyAmount
+                                  amount={principalBalanceInCents}
+                                  currency={principalBalanceCurrency}
+                                  showCurrencyCode={false}
+                                />
+                              </span>
+                            ),
+                            amount: (
+                              <span className="font-medium tabular-nums">
+                                <FormattedMoneyAmount
+                                  amount={principalOutflowAmount}
+                                  currency={principalBalanceCurrency}
+                                  showCurrencyCode={false}
+                                />
+                              </span>
+                            ),
+                          }}
+                        />
+                      </span>
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <label className="flex cursor-pointer items-center gap-2">
+                          <Checkbox
+                            checked={values.ignoreBalanceCheck}
+                            onCheckedChange={checked => setFieldValue('ignoreBalanceCheck', checked === true)}
+                            disabled={isSubmitting}
+                          />
+                          <span className="font-medium">
+                            <FormattedMessage defaultMessage="Allow negative balance" id="CcDFSI" />
+                          </span>
+                        </label>
+                        <Tooltip>
+                          <TooltipTrigger
+                            className="inline-flex text-muted-foreground hover:text-foreground"
+                            tabIndex={-1}
+                          >
+                            <Info className="size-3.5" aria-hidden />
+                            <span className="sr-only">
+                              <FormattedMessage defaultMessage="More info" id="moreInfo" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <FormattedMessage
+                              defaultMessage="Process the refund and ignore the balance. The {accountType}'s balance will go negative until additional contributions are received."
+                              id="+vpPIw"
+                              values={{ accountType: formatCollectiveType(intl, principalAccount?.type) }}
+                            />
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </MessageBox>
+                )}
               </div>
             ))}
           </div>
-          {isInsufficientBalance && principalBalanceCurrency && (
-            <MessageBox type="warning" withIcon px={3} py={2} className="mt-4">
-              <div className="flex flex-col gap-3">
-                <span>
-                  <FormattedMessage
-                    defaultMessage="{collective}'s balance ({balance}) won't cover the {amount} that would be deducted to process this refund."
-                    id="RB/W6s"
-                    values={{
-                      collective: (
-                        <span className="font-medium">{principalAccount?.name || principalAccount?.slug}</span>
-                      ),
-                      balance: (
-                        <span className="font-medium tabular-nums">
-                          <FormattedMoneyAmount
-                            amount={principalBalanceInCents}
-                            currency={principalBalanceCurrency}
-                            showCurrencyCode={false}
-                          />
-                        </span>
-                      ),
-                      amount: (
-                        <span className="font-medium tabular-nums">
-                          <FormattedMoneyAmount
-                            amount={principalOutflowAmount}
-                            currency={principalBalanceCurrency}
-                            showCurrencyCode={false}
-                          />
-                        </span>
-                      ),
-                    }}
-                  />
-                </span>
-                <div className="flex items-center gap-1.5 text-sm">
-                  <label className="flex cursor-pointer items-center gap-2">
-                    <Checkbox
-                      checked={values.ignoreBalanceCheck}
-                      onCheckedChange={checked => setFieldValue('ignoreBalanceCheck', checked === true)}
-                      disabled={isSubmitting}
-                    />
-                    <span className="font-medium">
-                      <FormattedMessage defaultMessage="Allow negative balance" id="CcDFSI" />
-                    </span>
-                  </label>
-                  <Tooltip>
-                    <TooltipTrigger className="inline-flex text-muted-foreground hover:text-foreground" tabIndex={-1}>
-                      <Info className="size-3.5" aria-hidden />
-                      <span className="sr-only">
-                        <FormattedMessage defaultMessage="More info" id="moreInfo" />
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <FormattedMessage
-                        defaultMessage="Process the refund and ignore the balance. The {accountType}'s balance will go negative until additional contributions are received."
-                        id="+vpPIw"
-                        values={{ accountType: formatCollectiveType(intl, principalAccount?.type) }}
-                      />
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
-            </MessageBox>
-          )}
         </Section>
       )}
 
