@@ -13,6 +13,7 @@ export const adminPanelQuery = gql`
       name
       legalName
       isHost
+      isPrivate
       type
       supportedExpenseTypes
       settings

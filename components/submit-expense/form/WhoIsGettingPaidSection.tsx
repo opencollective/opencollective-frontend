@@ -25,7 +25,8 @@ import LoginBtn from '@/components/LoginBtn';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
-import VendorForm from '@/components/vendors/VendorForm';
+import { quickCreateVendorCollectivePickerOptions } from '@/components/vendors/QuickCreateVendorCollectiveOption';
+import { useQuickCreateVendor } from '@/components/vendors/useQuickCreateVendor';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -390,7 +391,6 @@ function VendorOptionWrapper() {
         vendorsForAccount={form.options.vendorsForAccount || []}
         account={form.options.account}
         host={form.options.host}
-        refresh={form.refresh}
         expenseTypeOption={form.values.expenseTypeOption}
       />
     );
@@ -406,11 +406,11 @@ const VendorOption = React.memo(function VendorOption(props: {
   vendorsForAccount: ExpenseForm['options']['vendorsForAccount'];
   account: ExpenseForm['options']['account'];
   host: ExpenseForm['options']['host'];
-  refresh: ExpenseForm['refresh'];
   expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
 }) {
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(props.host);
+  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({ host: props.host });
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendor, setSelectedVendor] = React.useState(undefined);
   const isVendorSelected =
@@ -434,6 +434,7 @@ const VendorOption = React.memo(function VendorOption(props: {
             inputId={PAYEE_SLUG_VENDOR}
             useBeneficiaryForVendor={isBeneficiary}
             isSearchable
+            loading={isCreatingVendor}
             types={['VENDOR']}
             creatable={isHostAdmin ? ['VENDOR'] : false}
             includeVendorsForHostId={props.host.legacyId}
@@ -444,11 +445,7 @@ const VendorOption = React.memo(function VendorOption(props: {
                 ? null
                 : selectedVendor || props.payee
             }
-            handleCreateForm
-            onCreateClick={() => {
-              props.setFieldValue('payeeSlug', PAYEE_SLUG_NEW_VENDOR);
-              setSelectedVendor(null);
-            }}
+            {...(isHostAdmin ? quickCreateVendorCollectivePickerOptions(createVendorFromSearch) : {})}
             onChange={e => {
               const selected = e.value;
               const slug = selected?.slug;
@@ -457,28 +454,6 @@ const VendorOption = React.memo(function VendorOption(props: {
             }}
             vendorVisibleToAccountIds={props.account.legacyId}
           />
-          {props.payeeSlug === PAYEE_SLUG_NEW_VENDOR && (
-            <React.Fragment>
-              <Separator className="mt-3" />
-              <div className="mt-3">
-                <VendorForm
-                  isBeneficiary={isBeneficiary}
-                  limitVisibilityOptionToAccount={props.account}
-                  onSuccess={selected => {
-                    props.setFieldValue('payeeSlug', selected?.slug);
-                    setSelectedVendor(selected);
-                  }}
-                  hidePayoutMethod
-                  host={props.host}
-                  supportsTaxForm={false}
-                  onCancel={() => {
-                    props.setFieldValue('payeeSlug', PAYEE_SLUG_VENDOR);
-                    setSelectedVendor(null);
-                  }}
-                />
-              </div>
-            </React.Fragment>
-          )}
         </div>
       }
     >

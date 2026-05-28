@@ -1,7 +1,6 @@
 # Open Collective Frontend
 
 ![GitHub](https://img.shields.io/github/license/opencollective/opencollective-frontend)
-[![Crowdin](https://d322cqt584bo4o.cloudfront.net/opencollective/localized.svg)](https://crowdin.com/project/opencollective)
 ![React Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/react)
 ![Next.JS Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/next)
 [![Discord](https://discordapp.com/api/guilds/1241017531318276158/widget.png)](https://discord.opencollective.com)
@@ -72,20 +71,6 @@ To update:
 - Jest snapshots: run `npm run test:update`
 - Translation files: run `npm run langs:update`
 - GraphQL schema for ESLint: run `npm run graphql:update`
-
-## Localization
-
-Translating the interface doesn't require any technical skill, you can go on
-https://crowdin.com/project/opencollective and start translating right away!
-
-We're currently looking for contributions for the following languages:
-
-- French
-- Spanish
-- Japanese
-
-Want to add a new language for Open Collective? [Contact us](https://discord.opencollective.com) and
-we'll be happy to help you to set it up!
 
 ## Contributing
 

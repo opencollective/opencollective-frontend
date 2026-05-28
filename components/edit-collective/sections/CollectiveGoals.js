@@ -6,8 +6,11 @@ import { Plus, Trash } from 'lucide-react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
+import { FEATURES } from '@/lib/allowed-features';
 import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
+
+import FeatureNotSupported from '@/components/FeatureNotSupported';
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
@@ -253,6 +256,10 @@ class CollectiveGoals extends React.Component {
   render() {
     const { intl, collective } = this.props;
     const { goals, goalsInterpolation, collectivePage, isSubmitting, submitted, isTouched, error } = this.state;
+
+    if (collective.features[FEATURES.COLLECTIVE_GOALS] === 'UNSUPPORTED') {
+      return <FeatureNotSupported />;
+    }
 
     return (
       <Container>

@@ -57,7 +57,7 @@ const CollectiveContact = () => {
     if (error) {
       return <ErrorPage data={error} />;
     } else if (isHiddenAccount(data?.account)) {
-      return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
+      return <ErrorPage error={generateNotFoundError()} log={false} />;
     }
   }
 

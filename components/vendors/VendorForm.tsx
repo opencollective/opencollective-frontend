@@ -41,19 +41,9 @@ import { useToast } from '../ui/useToast';
 
 import { getUseVendorPolicyLabel } from './common';
 import type { VendorFieldsFragment } from './queries';
-import { vendorFieldFragment } from './queries';
+import { createVendorMutation, vendorFieldFragment } from './queries';
 
 const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
-
-const createVendorMutation = gql`
-  mutation CreateVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
-    createVendor(host: $host, vendor: $vendor) {
-      id
-      ...VendorFields
-    }
-  }
-  ${vendorFieldFragment}
-`;
 
 const editVendorMutation = gql`
   mutation EditVendor($vendor: VendorEditInput!) {

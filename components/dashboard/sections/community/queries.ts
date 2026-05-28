@@ -85,15 +85,39 @@ const communityAccountDetailActivityFields = gql`
     account {
       id
       ...AccountHoverCardFields
+      mainProfile {
+        id
+        name
+        slug
+        type
+        imageUrl
+        ...AccountHoverCardFields
+      }
     }
     fromAccount {
       id
       ...AccountHoverCardFields
+      mainProfile {
+        id
+        name
+        slug
+        type
+        imageUrl
+        ...AccountHoverCardFields
+      }
     }
     individual {
       id
       isIncognito
       ...AccountHoverCardFields
+      mainProfile {
+        id
+        name
+        slug
+        type
+        imageUrl
+        ...AccountHoverCardFields
+      }
     }
     expense {
       id

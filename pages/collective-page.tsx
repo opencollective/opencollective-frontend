@@ -106,7 +106,7 @@ export const getServerSideProps = async (context: Context) => {
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function CollectivePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { slug, status, step, mode, action, [APOLLO_ERROR_PROP_NAME]: ssrError } = props;
+  const { status, step, mode, action, [APOLLO_ERROR_PROP_NAME]: ssrError } = props;
   const [showOnboardingModal, setShowOnboardingModal] = React.useState(mode === 'onboarding');
   const router = useRouter();
   const intl = useIntl();
@@ -127,7 +127,7 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
     if (!data || queryResult.error) {
       return <ErrorPage data={data} />;
     } else if (!collective || isHiddenAccount(collective)) {
-      return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
+      return <ErrorPage error={generateNotFoundError()} log={false} />;
     } else if (collective.isIncognito) {
       return <IncognitoUserCollective collective={collective} />;
     } else if (collective.isGuest) {

@@ -78,9 +78,21 @@ interface MembershipLineProps {
 }
 
 const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) => {
+  const canSeeDashboard = user.canSeeDashboard(membership.collective);
+
+  // Not supposed to happen since already filtered in `filterMemberships`
+  if (!canSeeDashboard && membership.collective.isPrivate) {
+    return null;
+  }
+
   return (
     <CollectiveListItem className="group h-9">
-      <MenuLink href={`/${membership.collective.slug}`} onClick={closeDrawer}>
+      <MenuLink
+        href={
+          membership.collective.isPrivate ? getDashboardRoute(membership.collective) : `/${membership.collective.slug}`
+        }
+        onClick={closeDrawer}
+      >
         <Avatar collective={membership.collective} radius={16} />
         <P
           fontSize="inherit"
@@ -94,7 +106,7 @@ const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) 
         </P>
       </MenuLink>
 
-      {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
+      {canSeeDashboard && (
         <div className="absolute top-1 right-1 bottom-1">
           <Tooltip>
             <TooltipTrigger>
@@ -136,6 +148,8 @@ const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
     if (!['ADMIN', 'ACCOUNTANT', 'HOST', 'COMMUNITY_MANAGER'].includes(m.role) || m.collective.isArchived) {
       return false;
     } else if (['EVENT', 'PROJECT'].includes(m.collective.type)) {
+      return false;
+    } else if (!['ADMIN', 'ACCOUNTANT'].includes(m.role) && m.collective.isPrivate) {
       return false;
     } else {
       return Boolean(m.collective);
