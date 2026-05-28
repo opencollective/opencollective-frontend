@@ -32,6 +32,8 @@ export const hostCancelContributionModalQuery = gql`
         id
         slug
         name
+        imageUrl
+        type
         ... on AccountWithHost {
           host {
             id
