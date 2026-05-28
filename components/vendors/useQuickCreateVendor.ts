@@ -50,7 +50,7 @@ export function useQuickCreateVendor({ host, visibleToAccounts, isBeneficiary }:
         toast({
           variant: 'success',
           message: isBeneficiary
-            ? intl.formatMessage({ defaultMessage: 'Beneficiary created', id: 'gGYap6',  })
+            ? intl.formatMessage({ defaultMessage: 'Beneficiary created', id: 'gGYap6' })
             : intl.formatMessage({ defaultMessage: 'Vendor created', id: 'Ra9inC' }),
         });
         onSuccess(vendor);

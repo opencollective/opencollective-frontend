@@ -42,7 +42,8 @@ function QuickCreateVendorCollectiveOption({ searchText, isBeneficiary }: QuickC
           <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
             {isBeneficiary ? (
               <FormattedMessage
-                defaultMessage="Create beneficiary: <b>{vendorName}</b>" id="QFO4ll"
+                defaultMessage="Create beneficiary: <b>{vendorName}</b>"
+                id="QFO4ll"
                 values={{ vendorName: trimmed, b: I18nBold }}
               />
             ) : (
@@ -62,9 +63,7 @@ function QuickCreateVendorCollectiveOption({ searchText, isBeneficiary }: QuickC
     <Flex alignItems="center">
       <Span fontSize="12px" lineHeight="18px" color="black.500">
         {isBeneficiary ? (
-          <FormattedMessage
-            defaultMessage="Begin typing to create a beneficiary" id="skcLyR"
-          />
+          <FormattedMessage defaultMessage="Begin typing to create a beneficiary" id="skcLyR" />
         ) : (
           <FormattedMessage defaultMessage="Begin typing to create a vendor" id="Jx28lM" />
         )}
