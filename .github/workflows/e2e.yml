@@ -44,8 +44,6 @@ env:
 
 jobs:
   e2e:
-    if: github.ref_name != 'i18n/crowdin'
-
     runs-on: ubuntu-24.04
 
     timeout-minutes: 30

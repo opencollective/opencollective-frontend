@@ -178,7 +178,7 @@
     "langs:check": "cross-env scripts/i18n/check-translations.sh",
     "langs:translate": "tsx scripts/i18n/translate.js",
     "langs:update": "npm-run-all langs:build langs:translate",
-    "langs:update-progress": "tsx scripts/update-translation-progress.js && prettier --write lib/constants/locales.js",
+    "langs:update-progress": "tsx scripts/i18n/update-translation-progress.ts && prettier --write lib/constants/locales.js",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
