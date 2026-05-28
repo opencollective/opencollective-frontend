@@ -311,6 +311,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 disableWarningMessages={
                   payeeIsCollectiveFamilyType && !LoggedInUser.isAdminOfCollective(props.payee['host'])
                 }
+                disableNameMismatchWarning={payeeIsCollectiveFamilyType && !payeeIsSameHost}
                 isPaypalConnectEnabled={props['isPaypalConnectEnabled']}
               />
             ))}
@@ -668,6 +669,8 @@ type PayoutMethodRadioGroupItemProps = {
   archived?: boolean;
   /** Hide quick actions to correct missing currency or mismatch name */
   disableWarningMessages?: boolean;
+  /** Hide the legal name mismatch warning (e.g. cross-host payments where the payout method belongs to the recipient Host, not the payee) */
+  disableNameMismatchWarning?: boolean;
   onPaymentMethodDeleted: (deletedPayoutMethodId) => void;
   onPaymentMethodEdited: (newPayoutMethodId: string) => void;
   setNameMismatchReason?: (reason: string) => void;
@@ -1030,7 +1033,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                     </MessageBox>
                   </div>
                 )}
-                {hasLegalNameMismatch && !props.disableWarningMessages && (
+                {hasLegalNameMismatch && !props.disableWarningMessages && !props.disableNameMismatchWarning && (
                   <MessageBox type="warning">
                     <div className="mb-2 font-bold">
                       <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />
