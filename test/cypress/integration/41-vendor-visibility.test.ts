@@ -459,9 +459,9 @@ describe('vendor visibility', () => {
   });
 
   describe('inline vendor creation defaults', () => {
-    const aliasPickerSearch = (alias: string) =>
+    const aliasPickerSearch = (alias: string, term: string) =>
       cy.intercept('POST', '/api/graphql/v1', req => {
-        if (req.body?.operationName === 'CollectivePickerSearch') {
+        if (req.body?.operationName === 'CollectivePickerSearch' && req.body?.variables?.term?.includes(term)) {
           req.alias = alias;
         }
       });
@@ -475,8 +475,8 @@ describe('vendor visibility', () => {
         });
         cy.getByDataCy('actions-add-funds').click();
 
-        aliasPickerSearch('addFundsPickerSearch');
         const name = NEW_VENDOR_NAME('addfunds');
+        aliasPickerSearch('addFundsPickerSearch', name);
         cy.get('#addFunds-fromAccount').click();
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(150);
@@ -497,9 +497,9 @@ describe('vendor visibility', () => {
           cy.get('[role="combobox"]').first().click();
         });
 
-        aliasPickerSearch('expensePickerSearch');
         const name = NEW_VENDOR_NAME('expense-inline');
-        cy.focused().type(name, { delay: 50 });
+        aliasPickerSearch('expensePickerSearch', name);
+        cy.get('#__vendor').type(name, { delay: 50 });
         cy.wait('@expensePickerSearch');
         cy.root().closest('html').contains(`Create vendor: ${name}`).click();
 
@@ -544,9 +544,9 @@ describe('vendor visibility', () => {
           cy.get('[role="combobox"]').first().click();
         });
 
-        aliasPickerSearch('grantPickerSearch');
         const name = NEW_VENDOR_NAME('grant-inline');
-        cy.focused().type(name, { delay: 50 });
+        aliasPickerSearch('grantPickerSearch', name);
+        cy.get('#__vendor').type(name, { delay: 50 });
         cy.wait('@grantPickerSearch');
         cy.root().closest('html').contains(`Create beneficiary: ${name}`).click();
 
