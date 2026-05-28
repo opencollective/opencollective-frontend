@@ -29,7 +29,7 @@ import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Switch } from '@/components/ui/Switch';
-import { quickCreateVendorRenderOption } from '@/components/vendors/QuickCreateVendorCollectiveOption';
+import { quickCreateVendorCollectivePickerOptions } from '@/components/vendors/QuickCreateVendorCollectiveOption';
 import { useQuickCreateVendor } from '@/components/vendors/useQuickCreateVendor';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
@@ -768,10 +768,7 @@ const AddFundsModalContentWithCollective = ({
                           includeVendorsForHostId={host?.legacyId || undefined}
                           creatable={['VENDOR']}
                           HostCollectiveId={host?.legacyId}
-                          renderNewCollectiveOption={quickCreateVendorRenderOption(
-                            createVendorFromSearch,
-                            isCreatingVendor,
-                          )}
+                          {...quickCreateVendorCollectivePickerOptions(createVendorFromSearch)}
                           formatOptionLabel={(option, context) => {
                             if (context.context === 'value') {
                               return (

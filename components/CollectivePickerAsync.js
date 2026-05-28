@@ -75,6 +75,16 @@ const throttledSearch = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
+const isSameCollective = (a, b) => {
+  if (a?.id && b?.id && a.id === b.id) {
+    return true;
+  }
+  if (a?.slug && b?.slug && a.slug === b.slug) {
+    return true;
+  }
+  return false;
+};
+
 const Messages = defineMessages({
   searchForType: {
     id: 'SearchFor',
@@ -182,10 +192,8 @@ const CollectivePickerAsync = ({
 
       // When loading is complete, we only need unique collectives
       if (!loading && filteredDefaultCollectives.length > 0) {
-        const apiResultIds = new Set(apiResults.map(c => c.id));
-        // Add default collectives that aren't already in the results
         filteredDefaultCollectives.forEach(c => {
-          if (!apiResultIds.has(c.id)) {
+          if (!apiResults.some(r => isSameCollective(r, c))) {
             apiResults.push(c);
           }
         });

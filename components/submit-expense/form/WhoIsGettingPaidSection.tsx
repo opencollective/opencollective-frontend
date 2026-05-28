@@ -25,7 +25,7 @@ import LoginBtn from '@/components/LoginBtn';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
-import { quickCreateVendorRenderOption } from '@/components/vendors/QuickCreateVendorCollectiveOption';
+import { quickCreateVendorCollectivePickerOptions } from '@/components/vendors/QuickCreateVendorCollectiveOption';
 import { useQuickCreateVendor } from '@/components/vendors/useQuickCreateVendor';
 
 import CollectivePicker from '../../CollectivePicker';
@@ -445,9 +445,7 @@ const VendorOption = React.memo(function VendorOption(props: {
                 ? null
                 : selectedVendor || props.payee
             }
-            renderNewCollectiveOption={
-              isHostAdmin ? quickCreateVendorRenderOption(createVendorFromSearch, isCreatingVendor) : undefined
-            }
+            {...(isHostAdmin ? quickCreateVendorCollectivePickerOptions(createVendorFromSearch) : {})}
             onChange={e => {
               const selected = e.value;
               const slug = selected?.slug;

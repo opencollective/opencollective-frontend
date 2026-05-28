@@ -6,72 +6,83 @@ import type { VendorFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 
 import { I18nBold } from '@/components/I18nFormatters';
 
-import { Button } from '../ui/Button';
+import { Flex } from '../Grid';
+import { Span } from '../Text';
 
 import type { QuickCreateVendorCallbacks } from './useQuickCreateVendor';
 
 type QuickCreateVendorCollectiveOptionProps = {
   searchText: string;
-  onCreatedCollective: (collective: VendorFieldsFragment) => void;
-  loading?: boolean;
-  createVendorFromSearch: (searchText: string, callbacks: QuickCreateVendorCallbacks) => void | Promise<void>;
 };
 
-function QuickCreateVendorCollectiveOption({
-  searchText,
-  onCreatedCollective,
-  loading,
-  createVendorFromSearch,
-}: QuickCreateVendorCollectiveOptionProps) {
+type QuickCreateVendorSelectArgs = {
+  searchText: string;
+  onCreatedCollective: (collective: VendorFieldsFragment) => void;
+};
+
+function QuickCreateVendorCollectiveOption({ searchText }: QuickCreateVendorCollectiveOptionProps) {
   const trimmed = searchText.trim();
 
   if (trimmed.length > 0) {
     return (
-      <Button
-        type="button"
-        variant="ghost"
-        loading={loading}
-        className="flex w-full items-center justify-between gap-2 text-sm text-gray-500"
-        onClick={() => createVendorFromSearch(trimmed, { onSuccess: onCreatedCollective })}
-      >
-        <span>
-          <FormattedMessage
-            defaultMessage="Create vendor: <b>{vendorName}</b>"
-            id="buY7Uz"
-            values={{ vendorName: trimmed, b: I18nBold }}
-          />
-        </span>
-        <PlusCircle size={16} />
-      </Button>
+      <Flex alignItems="center">
+        <Flex
+          alignItems="center"
+          justifyContent="center"
+          color="#999"
+          width="16px"
+          minWidth="16px"
+          height="16px"
+          flexShrink={0}
+        >
+          <PlusCircle size={14} strokeWidth={2} />
+        </Flex>
+        <Flex flexDirection="column" ml="8px" textAlign="left">
+          <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
+            <FormattedMessage
+              defaultMessage="Create vendor: <b>{vendorName}</b>"
+              id="buY7Uz"
+              values={{ vendorName: trimmed, b: I18nBold }}
+            />
+          </Span>
+        </Flex>
+      </Flex>
     );
   }
 
   return (
-    <div>
-      <FormattedMessage defaultMessage="Begin typing to create a vendor" id="Jx28lM" />
-    </div>
+    <Flex alignItems="center">
+      <Span fontSize="12px" lineHeight="18px" color="black.500">
+        <FormattedMessage defaultMessage="Begin typing to create a vendor" id="Jx28lM" />
+      </Span>
+    </Flex>
   );
 }
 
 /** `renderNewCollectiveOption` callback for `CollectivePicker` / `CollectivePickerAsync`. */
-export function quickCreateVendorRenderOption(
-  createVendorFromSearch: QuickCreateVendorCollectiveOptionProps['createVendorFromSearch'],
-  loading?: boolean,
+export function quickCreateVendorRenderOption() {
+  return function renderQuickCreateVendorOption({ searchText }: { searchText: string }) {
+    return <QuickCreateVendorCollectiveOption searchText={searchText} />;
+  };
+}
+
+/** `onSelectNewCollectiveOption` callback for `CollectivePicker` / `CollectivePickerAsync`. */
+export function quickCreateVendorOnSelect(
+  createVendorFromSearch: (searchText: string, callbacks: QuickCreateVendorCallbacks) => void | Promise<void>,
 ) {
-  return function renderQuickCreateVendorOption({
-    searchText,
-    onCreatedCollective,
-  }: {
-    searchText: string;
-    onCreatedCollective: (collective: VendorFieldsFragment) => void;
-  }) {
-    return (
-      <QuickCreateVendorCollectiveOption
-        searchText={searchText}
-        onCreatedCollective={onCreatedCollective}
-        loading={loading}
-        createVendorFromSearch={createVendorFromSearch}
-      />
-    );
+  return function onSelectQuickCreateVendorOption({ searchText, onCreatedCollective }: QuickCreateVendorSelectArgs) {
+    const trimmed = searchText.trim();
+    if (trimmed) {
+      createVendorFromSearch(trimmed, { onSuccess: onCreatedCollective });
+    }
+  };
+}
+
+export function quickCreateVendorCollectivePickerOptions(
+  createVendorFromSearch: (searchText: string, callbacks: QuickCreateVendorCallbacks) => void | Promise<void>,
+) {
+  return {
+    renderNewCollectiveOption: quickCreateVendorRenderOption(),
+    onSelectNewCollectiveOption: quickCreateVendorOnSelect(createVendorFromSearch),
   };
 }
