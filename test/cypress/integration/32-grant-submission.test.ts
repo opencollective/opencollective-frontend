@@ -99,13 +99,16 @@ describe('Grant Submission Flow', () => {
     cy.contains('button', 'Proceed').click();
     cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
       cy.contains('A beneficiary').click();
-      cy.contains('A beneficiary').parent().get('[role="combobox"]').click();
-      cy.root().closest('html').contains('Create Beneficiary').click();
-
-      cy.contains('label', "Beneficiary's name").click();
-      cy.focused().type('A beneficiary name');
-
-      cy.contains('button', 'Create beneficiary').click();
+      const beneficiaryName = 'A beneficiary name';
+      cy.intercept('POST', '/api/graphql/v1', req => {
+        if (req.body?.operationName === 'CollectivePickerSearch' && req.body?.variables?.term === beneficiaryName) {
+          req.alias = 'collectivePickerSearch';
+        }
+      });
+      cy.contains('A beneficiary').parent().get('[role="combobox"]').click().type(beneficiaryName);
+      cy.wait('@collectivePickerSearch');
+      cy.root().closest('html').contains(`Create vendor: ${beneficiaryName}`).click();
+      cy.root().closest('html').contains('Vendor created', { timeout: 20000 }).should('be.visible');
     });
 
     cy.get('#PAYOUT_METHOD').within(() => {

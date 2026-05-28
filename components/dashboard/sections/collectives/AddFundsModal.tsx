@@ -4,7 +4,7 @@ import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
 import { get, isEmpty } from 'lodash-es';
-import { ArrowLeft, Lock, PlusCircle, Unlock } from 'lucide-react';
+import { ArrowLeft, Lock, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -20,21 +20,18 @@ import type {
   Tier,
   TierReferenceInput,
   TransactionReferenceInput,
-  VendorFieldsFragment,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
-import { i18nGraphqlException } from '@/lib/errors';
 
-import { I18nBold } from '@/components/I18nFormatters';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { FormSectionTitle } from '@/components/ui/FormSectionTitle';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Switch } from '@/components/ui/Switch';
-import { toast } from '@/components/ui/useToast';
-import { vendorFieldFragment } from '@/components/vendors/queries';
+import { quickCreateVendorCollectivePickerOptions } from '@/components/vendors/QuickCreateVendorCollectiveOption';
+import { useQuickCreateVendor } from '@/components/vendors/useQuickCreateVendor';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
@@ -507,46 +504,7 @@ const AddFundsModalContentWithCollective = ({
   const applicableTax = getApplicableTaxType(account, host);
   const isEdit = Boolean(editOrderId);
 
-  const [createVendor, { loading: isCreatingVendor }] = useMutation(gql`
-    mutation CreateAddFundsVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
-      createVendor(host: $host, vendor: $vendor) {
-        id
-        ...VendorFields
-      }
-    }
-    ${vendorFieldFragment}
-  `);
-
-  const onCreateVendorClick = React.useCallback(
-    async (
-      searchText: string,
-      { onSuccess, onError }: { onSuccess: (vendor: VendorFieldsFragment) => void; onError: (error: Error) => void },
-    ) => {
-      try {
-        const result = await createVendor({
-          variables: {
-            vendor: {
-              name: searchText,
-            },
-            host: { id: host.id },
-          },
-        });
-
-        toast({
-          variant: 'success',
-          message: intl.formatMessage({ defaultMessage: 'Vendor created', id: 'Ra9inC' }),
-        });
-        onSuccess(result.data.createVendor);
-      } catch (error) {
-        toast({
-          variant: 'error',
-          message: i18nGraphqlException(intl, error),
-        });
-        onError(error);
-      }
-    },
-    [createVendor, host?.id, intl],
-  );
+  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({ host });
 
   const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
     isEdit ? editAddedFundsMutation : addFundsMutation,
@@ -811,41 +769,7 @@ const AddFundsModalContentWithCollective = ({
                           includeVendorsForHostId={host?.legacyId || undefined}
                           creatable={['VENDOR']}
                           HostCollectiveId={host?.legacyId}
-                          renderNewCollectiveOption={({ searchText, onCreatedCollective }) => {
-                            if (searchText.length > 0) {
-                              return (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  loading={isCreatingVendor}
-                                  className="flex w-full items-center justify-between gap-2 text-sm text-gray-500"
-                                  onClick={() =>
-                                    onCreateVendorClick(searchText, {
-                                      onSuccess: vendor => {
-                                        onCreatedCollective(vendor);
-                                      },
-                                      onError: () => {},
-                                    })
-                                  }
-                                >
-                                  <span>
-                                    <FormattedMessage
-                                      defaultMessage="Create vendor: <b>{vendorName}</b>"
-                                      id="buY7Uz"
-                                      values={{ vendorName: searchText, b: I18nBold }}
-                                    />
-                                  </span>
-                                  <PlusCircle size={16} />
-                                </Button>
-                              );
-                            }
-
-                            return (
-                              <div>
-                                <FormattedMessage defaultMessage="Begin typing to create a vendor" id="Jx28lM" />
-                              </div>
-                            );
-                          }}
+                          {...quickCreateVendorCollectivePickerOptions(createVendorFromSearch)}
                           formatOptionLabel={(option, context) => {
                             if (context.context === 'value') {
                               return (

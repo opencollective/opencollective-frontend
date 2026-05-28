@@ -94,6 +94,34 @@ const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, VENDOR } = Collect
 
 const sortedAccountTypes = [VENDOR, 'INDIVIDUAL', USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT];
 
+const isSameCollective = (a, b) => {
+  if (a?.id && b?.id && a.id === b.id) {
+    return true;
+  }
+  if (a?.slug && b?.slug && a.slug === b.slug) {
+    return true;
+  }
+  return false;
+};
+
+const getCollectivesFromOptions = options => {
+  const collectives = [];
+  options.forEach(option => {
+    if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
+      collectives.push(option.value);
+    } else if (option.options) {
+      option.options.forEach(subOption => {
+        if (subOption[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
+          collectives.push(subOption.value);
+        }
+      });
+    }
+  });
+  return collectives;
+};
+
+const isCollectiveInList = (collective, collectives) => collectives.some(c => isSameCollective(collective, c));
+
 /**
  * An overset og `StyledSelect` specialized to display, filter and pick a collective from a given list.
  * Accepts all the props from [StyledSelect](#!/StyledSelect).
@@ -159,64 +187,96 @@ class CollectivePicker extends React.PureComponent {
     });
   });
 
-  getAllOptions = memoizeOne((collectivesOptions, customOptions, createdCollectives) => {
-    const { creatable, invitable, intl, customOptionsPosition } = this.props;
-    let options = collectivesOptions;
+  getAllOptions = memoizeOne(
+    (collectivesOptions, customOptions, createdCollectives, searchText, loading, isLoading) => {
+      const {
+        creatable,
+        invitable,
+        intl,
+        customOptionsPosition,
+        renderNewCollectiveOption,
+        onSelectNewCollectiveOption,
+      } = this.props;
+      const isSelectableNewCollectiveOption = Boolean(renderNewCollectiveOption && onSelectNewCollectiveOption);
+      const isNewCollectiveOptionDisabled =
+        !isSelectableNewCollectiveOption || !searchText.trim() || Boolean(loading || isLoading);
+      let options = collectivesOptions;
 
-    if (createdCollectives.length > 0) {
-      options = [...createdCollectives.map(this.buildCollectiveOption), ...options];
+      if (createdCollectives.length > 0) {
+        const existingCollectives = getCollectivesFromOptions(collectivesOptions);
+        const newCreatedCollectives = createdCollectives.filter(c => !isCollectiveInList(c, existingCollectives));
+        if (newCreatedCollectives.length > 0) {
+          options = [...newCreatedCollectives.map(this.buildCollectiveOption), ...options];
+        }
+      }
+
+      if (customOptions && customOptions.length > 0) {
+        options =
+          customOptionsPosition === CUSTOM_OPTIONS_POSITION.TOP
+            ? [...customOptions, ...options]
+            : [...options, ...customOptions];
+      }
+
+      if (invitable) {
+        options = [
+          ...options,
+          {
+            label: intl.formatMessage(Messages.inviteNew).toUpperCase(),
+            options: [
+              {
+                label: null,
+                value: null,
+                isDisabled: true,
+                [FLAG_INVITE_NEW]: true,
+                __background__: 'white',
+              },
+            ],
+          },
+        ];
+      }
+      if (creatable) {
+        const isOnlyForUser = isEqual(this.props.types, [CollectiveType.USER]);
+        options = [
+          ...options,
+          {
+            label: isOnlyForUser
+              ? intl.formatMessage(Messages.inviteNew).toUpperCase()
+              : intl.formatMessage(Messages.createNew).toUpperCase(),
+            options: [
+              {
+                label: null,
+                value: null,
+                isDisabled: isNewCollectiveOptionDisabled,
+                [FLAG_NEW_COLLECTIVE]: true,
+                ...(isSelectableNewCollectiveOption
+                  ? isNewCollectiveOptionDisabled
+                    ? { __background__: 'white' }
+                    : {}
+                  : { __background__: 'white' }),
+              },
+            ],
+          },
+        ];
+      }
+
+      return options;
+    },
+  );
+
+  onChange = option => {
+    if (option?.[FLAG_NEW_COLLECTIVE] && this.props.onSelectNewCollectiveOption && this.state.searchText.trim()) {
+      if (this.props.loading || this.props.isLoading) {
+        return;
+      }
+
+      this.props.onSelectNewCollectiveOption({
+        searchText: this.state.searchText,
+        onCreatedCollective: this.onNewCollectiveOptionCreated,
+      });
+      return;
     }
 
-    if (customOptions && customOptions.length > 0) {
-      options =
-        customOptionsPosition === CUSTOM_OPTIONS_POSITION.TOP
-          ? [...customOptions, ...options]
-          : [...options, ...customOptions];
-    }
-
-    if (invitable) {
-      options = [
-        ...options,
-        {
-          label: intl.formatMessage(Messages.inviteNew).toUpperCase(),
-          options: [
-            {
-              label: null,
-              value: null,
-              isDisabled: true,
-              [FLAG_INVITE_NEW]: true,
-              __background__: 'white',
-            },
-          ],
-        },
-      ];
-    }
-    if (creatable) {
-      const isOnlyForUser = isEqual(this.props.types, [CollectiveType.USER]);
-      options = [
-        ...options,
-        {
-          label: isOnlyForUser
-            ? intl.formatMessage(Messages.inviteNew).toUpperCase()
-            : intl.formatMessage(Messages.createNew).toUpperCase(),
-          options: [
-            {
-              label: null,
-              value: null,
-              isDisabled: true,
-              [FLAG_NEW_COLLECTIVE]: true,
-              __background__: 'white',
-            },
-          ],
-        },
-      ];
-    }
-
-    return options;
-  });
-
-  onChange = (...args) => {
-    this.props.onChange(...args);
+    this.props.onChange?.(option);
     if (this.state.showCreatedCollective) {
       this.setState({ showCreatedCollective: false });
     }
@@ -281,7 +341,9 @@ class CollectivePicker extends React.PureComponent {
     this.setState(state => ({
       menuIsOpen: false,
       createFormCollectiveType: null,
-      createdCollectives: [...state.createdCollectives, collective],
+      createdCollectives: isCollectiveInList(collective, state.createdCollectives)
+        ? state.createdCollectives
+        : [...state.createdCollectives, collective],
       showCreatedCollective: true,
     }));
   };
@@ -314,7 +376,14 @@ class CollectivePicker extends React.PureComponent {
     } = this.props;
     const { createFormCollectiveType, createdCollectives, displayInviteMenu, searchText } = this.state;
     const collectiveOptions = this.getOptionsFromCollectives(collectives, groupByType, sortFunc, intl);
-    const allOptions = this.getAllOptions(collectiveOptions, customOptions, createdCollectives);
+    const allOptions = this.getAllOptions(
+      collectiveOptions,
+      customOptions,
+      createdCollectives,
+      searchText,
+      this.props.loading,
+      this.props.isLoading,
+    );
     const prefillValue = isEmail(searchText) ? { email: searchText } : { name: searchText };
 
     return (
@@ -395,7 +464,9 @@ class CollectivePicker extends React.PureComponent {
                   this.setState(state => ({
                     menuIsOpen: false,
                     createFormCollectiveType: null,
-                    createdCollectives: [...state.createdCollectives, collective],
+                    createdCollectives: isCollectiveInList(collective, state.createdCollectives)
+                      ? state.createdCollectives
+                      : [...state.createdCollectives, collective],
                     showCreatedCollective: true,
                   }));
                 }}

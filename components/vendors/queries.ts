@@ -73,6 +73,16 @@ export const vendorFieldFragment = gql`
   ${accountHoverCardFields}
 `;
 
+export const createVendorMutation = gql`
+  mutation CreateVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
+    createVendor(host: $host, vendor: $vendor) {
+      id
+      ...VendorFields
+    }
+  }
+  ${vendorFieldFragment}
+`;
+
 export const setVendorArchiveMutation = gql`
   mutation SetVendorArchive($vendor: VendorEditInput!, $archive: Boolean!) {
     editVendor(archive: $archive, vendor: $vendor) {
