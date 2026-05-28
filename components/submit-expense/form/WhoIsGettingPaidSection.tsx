@@ -410,7 +410,12 @@ const VendorOption = React.memo(function VendorOption(props: {
 }) {
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(props.host);
-  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({ host: props.host });
+  const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
+  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({
+    host: props.host,
+    visibleToAccounts: props.account?.id ? [pick(props.account, 'id')] : [],
+    isBeneficiary,
+  });
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendor, setSelectedVendor] = React.useState(undefined);
   const isVendorSelected =
@@ -418,8 +423,6 @@ const VendorOption = React.memo(function VendorOption(props: {
     props.payeeSlug === PAYEE_SLUG_NEW_VENDOR ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
     selectedVendor?.slug === props.payeeSlug;
-
-  const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
 
   return (
     <RadioGroupCard
@@ -445,7 +448,9 @@ const VendorOption = React.memo(function VendorOption(props: {
                 ? null
                 : selectedVendor || props.payee
             }
-            {...(isHostAdmin ? quickCreateVendorCollectivePickerOptions(createVendorFromSearch) : {})}
+            {...(isHostAdmin
+              ? quickCreateVendorCollectivePickerOptions(createVendorFromSearch, { isBeneficiary })
+              : {})}
             onChange={e => {
               const selected = e.value;
               const slug = selected?.slug;

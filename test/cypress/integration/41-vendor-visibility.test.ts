@@ -459,6 +459,13 @@ describe('vendor visibility', () => {
   });
 
   describe('inline vendor creation defaults', () => {
+    const aliasPickerSearch = (alias: string) =>
+      cy.intercept('POST', '/api/graphql/v1', req => {
+        if (req.body?.operationName === 'CollectivePickerSearch') {
+          req.alias = alias;
+        }
+      });
+
     it('Add Funds modal: created vendor is scoped to the paying collective', function () {
       setupHostAndCollective().then(({ host, hostAdmin, collective }) => {
         cy.login({ email: hostAdmin.email, redirect: `/dashboard/${host.slug}/hosted-collectives` });
@@ -468,11 +475,13 @@ describe('vendor visibility', () => {
         });
         cy.getByDataCy('actions-add-funds').click();
 
+        aliasPickerSearch('addFundsPickerSearch');
         const name = NEW_VENDOR_NAME('addfunds');
         cy.get('#addFunds-fromAccount').click();
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(150);
         cy.get('#addFunds-fromAccount').type(name, { delay: 50 });
+        cy.wait('@addFundsPickerSearch');
         cy.contains(`Create vendor: ${name}`).click();
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
@@ -487,12 +496,12 @@ describe('vendor visibility', () => {
           cy.contains('A vendor').click();
           cy.get('[role="combobox"]').first().click();
         });
-        cy.root().closest('html').contains('Create Vendor').click();
 
+        aliasPickerSearch('expensePickerSearch');
         const name = NEW_VENDOR_NAME('expense-inline');
-        cy.contains('label', "Vendor's name").click();
-        cy.focused().type(name);
-        cy.contains('button', 'Create vendor').click();
+        cy.focused().type(name, { delay: 50 });
+        cy.wait('@expensePickerSearch');
+        cy.root().closest('html').contains(`Create vendor: ${name}`).click();
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
         assertVendorScopedTo(collective.name);
@@ -526,7 +535,7 @@ describe('vendor visibility', () => {
       });
     });
 
-    it('Grant flow: inline-created beneficiary is scoped to the paying collective and visibility section is hidden', function () {
+    it('Grant flow: inline-created beneficiary is scoped to the paying collective', function () {
       setupHostAndCollective({ enableGrants: true }).then(({ host, hostAdmin, collective }) => {
         cy.login({ email: hostAdmin.email, redirect: `/${collective.slug}/grants/new` });
         cy.contains('button', 'Proceed').click();
@@ -534,16 +543,12 @@ describe('vendor visibility', () => {
           cy.contains('A beneficiary').click();
           cy.get('[role="combobox"]').first().click();
         });
-        cy.root().closest('html').contains('Create Beneficiary').click();
 
-        cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
-          cy.contains('Visible to all collectives and funds').should('not.exist');
-        });
-
+        aliasPickerSearch('grantPickerSearch');
         const name = NEW_VENDOR_NAME('grant-inline');
-        cy.contains('label', "Beneficiary's name").click();
-        cy.focused().type(name);
-        cy.contains('button', 'Create beneficiary').click();
+        cy.focused().type(name, { delay: 50 });
+        cy.wait('@grantPickerSearch');
+        cy.root().closest('html').contains(`Create beneficiary: ${name}`).click();
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
         assertVendorScopedTo(collective.name);
