@@ -24,7 +24,7 @@ import PaymentMethodsTable from './PaymentMethodsTable';
 import PayoutMethodsTable from './PayoutMethodsTable';
 
 type ManagePaymentMethodsProps = {
-  account: Pick<Account, 'slug' | 'type'>;
+  account: Pick<Account, 'slug' | 'type' | 'isPrivate'>;
 };
 
 enum Modals {
@@ -64,7 +64,7 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
           <div className="mb-1 flex w-full items-center gap-2 text-lg font-semibold">
             <div className="shrink-0">
               {props.account.type === 'ORGANIZATION' ? (
-                <FormattedMessage defaultMessage="Receiving Money" id="editCollective.receivingMoney" />
+                <FormattedMessage defaultMessage="Sending Money" id="editCollective.sendingMoney" />
               ) : (
                 <FormattedMessage defaultMessage="For Contributions" id="xf7EPu" />
               )}
@@ -82,8 +82,9 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
           </div>
           <p className="text-sm leading-none text-muted-foreground">
             <FormattedMessage
-              defaultMessage="Account details that can be used to contribute and acquire tickets."
-              id="t9ur/I"
+              defaultMessage="Payment details that can be used to {isPrivate,select,false{contribute, acquire tickets, or} other {}} pay your platform bills."
+              id="TvyzUg"
+              values={{ isPrivate: props.account.isPrivate }}
             />
           </p>
         </div>
@@ -113,7 +114,7 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
           <div className="mb-1 flex items-center gap-2 text-lg font-semibold">
             <div className="shrink-0">
               {props.account.type === 'ORGANIZATION' ? (
-                <FormattedMessage defaultMessage="Sending Money" id="editCollective.sendingMoney" />
+                <FormattedMessage defaultMessage="Receiving Money" id="editCollective.receivingMoney" />
               ) : (
                 <FormattedMessage defaultMessage="For Expenses" id="RF+AgF" />
               )}

@@ -5,7 +5,7 @@ import { styled } from 'styled-components';
 import type { z } from 'zod';
 
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
-import { isIndividualAccount, loggedInUserCanAccessFinancialData } from '../lib/collective';
+import { isHiddenAccount, isIndividualAccount, loggedInUserCanAccessFinancialData } from '../lib/collective';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import type { TransactionsPageQuery } from '@/lib/graphql/types/v2/graphql';
@@ -24,6 +24,8 @@ import Transactions, {
   toVariables,
   transactionsPageQuery,
 } from '../components/transactions/TransactionsPageContent';
+
+import Custom404 from './404';
 
 const TransactionPageWrapper = styled.div`
   display: flex;
@@ -70,6 +72,8 @@ export default function TransactionsPage(props: InferGetServerSidePropsType<type
 
   if (!account) {
     return <ErrorPage data={data} error={error || transactionsPageQueryHelper.getSSRErrorFromPageProps(props)} />;
+  } else if (isHiddenAccount(account)) {
+    return <Custom404 />;
   } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, account)) {
     // Hack for funds that want to keep their budget "private"
     return <PageFeatureNotSupported showContactSupportLink={false} />;

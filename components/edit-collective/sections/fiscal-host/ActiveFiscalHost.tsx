@@ -36,6 +36,7 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
           legacyId
           type
           slug
+          isPrivate
           name
           currency
           members {
@@ -179,33 +180,37 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
             />
           </p>
         )}
-        {collective?.stats?.consolidatedBalance.valueInCents > 0 && (
-          <p>
-            <FormattedMessage
-              id="editCollective.host.change.balanceNotEmpty"
-              defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {your balance}}. You can do this by <SubmitExpenseLink>submitting expenses</SubmitExpenseLink>, making financial contributions, or sending the balance to your Fiscal Host using the <EmptyBalanceLink>Empty Balance</EmptyBalanceLink> feature."
-              values={{
-                type: collective.type,
-                SubmitExpenseLink: getI18nLink({
-                  as: Link,
-                  href: `/${collective.slug}/expenses/new`,
-                }),
-                EmptyBalanceLink: getI18nLink({
-                  as: Link,
-                  href: getDashboardRoute(collective, 'advanced'),
-                }),
-              }}
-            />
-          </p>
-        )}
-        {collective?.stats?.consolidatedBalance.valueInCents === 0 && (
-          <div className="mt-2 flex">
-            <div>
-              <Button variant="outline" size="lg" onClick={() => setIsConfirmingLeaveHost(true)}>
-                <FormattedMessage id="editCollective.host.leave" defaultMessage="Leave Host" />
-              </Button>
-            </div>
-          </div>
+        {!collective?.isPrivate && (
+          <React.Fragment>
+            {collective?.stats?.consolidatedBalance.valueInCents > 0 && (
+              <p>
+                <FormattedMessage
+                  id="editCollective.host.change.balanceNotEmpty"
+                  defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {your balance}}. You can do this by <SubmitExpenseLink>submitting expenses</SubmitExpenseLink>, making financial contributions, or sending the balance to your Fiscal Host using the <EmptyBalanceLink>Empty Balance</EmptyBalanceLink> feature."
+                  values={{
+                    type: collective.type,
+                    SubmitExpenseLink: getI18nLink({
+                      as: Link,
+                      href: `/${collective.slug}/expenses/new`,
+                    }),
+                    EmptyBalanceLink: getI18nLink({
+                      as: Link,
+                      href: getDashboardRoute(collective, 'advanced'),
+                    }),
+                  }}
+                />
+              </p>
+            )}
+            {collective?.stats?.consolidatedBalance.valueInCents === 0 && !collective.isPrivate && (
+              <div className="mt-2 flex">
+                <div>
+                  <Button variant="outline" size="lg" onClick={() => setIsConfirmingLeaveHost(true)}>
+                    <FormattedMessage id="editCollective.host.leave" defaultMessage="Leave Host" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </React.Fragment>
         )}
         {props.showLegalNameInfoBox && (
           <Container mt={4}>
@@ -225,11 +230,15 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
           <LeaveHostModal account={collective} host={host} onClose={() => setIsConfirmingLeaveHost(false)} />
         )}
       </div>
-      <StyledHr my={4} />
-      <h2 className="mb-3 font-bold">
-        <FormattedMessage defaultMessage="Applications" id="DqD1yK" />
-      </h2>
-      <HostApplicationRequests accountSlug={collective?.slug} />
+      {!collective.isPrivate && (
+        <React.Fragment>
+          <StyledHr my={4} />
+          <h2 className="mb-3 font-bold">
+            <FormattedMessage defaultMessage="Applications" id="DqD1yK" />
+          </h2>
+          <HostApplicationRequests accountSlug={collective?.slug} />
+        </React.Fragment>
+      )}
     </div>
   );
 }

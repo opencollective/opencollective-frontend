@@ -237,6 +237,11 @@ interface Account {
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -3069,6 +3074,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
 
   """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
@@ -7475,6 +7485,7 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
+  PUBLIC_PROFILE: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -10181,6 +10192,11 @@ type Bot implements Account {
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -11258,6 +11274,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
 
   """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
@@ -12919,6 +12940,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -14295,6 +14321,11 @@ type Individual implements Account {
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
 
   """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
@@ -15699,6 +15730,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
 
   """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
@@ -17199,6 +17235,11 @@ type Vendor implements Account & AccountWithContributions {
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -18317,7 +18358,7 @@ type Vendor implements Account & AccountWithContributions {
   hasPayoutMethod: Boolean
 
   """
-  The account who created this order
+  The account who created this vendor
   """
   createdByAccount: Account
 
@@ -21533,6 +21574,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isIncognito: Boolean!
 
   """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
+
+  """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".
   """
   mainProfile: Account
@@ -22767,6 +22813,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Defines if the contributors wants to be incognito (name not displayed)
   """
   isIncognito: Boolean!
+
+  """
+  Whether the account is private
+  """
+  isPrivate: Boolean!
 
   """
   For an incognito account, returns the main profile. Only visible to users with the right permissions. Scope: "account".

@@ -6,7 +6,7 @@ import type { z } from 'zod';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective';
+import { getCollectivePageMetadata, isHiddenAccount, loggedInUserCanAccessFinancialData } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { generateNotFoundError } from '../lib/errors';
@@ -112,6 +112,8 @@ export default function ExpensesPage(props: InferGetServerSidePropsType<typeof g
     return <ErrorPage data={data} error={error} />;
   } else if (!account || !expenses?.nodes) {
     return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
+  } else if (isHiddenAccount(data.account)) {
+    return <ErrorPage error={generateNotFoundError()} log={false} />;
   } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
     return <PageFeatureNotSupported showContactSupportLink />;
   } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {

@@ -36,6 +36,8 @@ describe('edit collective', () => {
     });
     cy.wait(200);
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
+    cy.get('#memberForm-role').click({ force: true });
+    cy.contains('[data-cy=select-option]', 'Admin').click();
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('exist');
     cy.mailpitHasEmailsBySubject('[TESTING] Invitation to join CollectiveToEdit').then(result => {

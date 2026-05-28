@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { FEATURES, getFeatureStatus, isFeatureSupported } from '../lib/allowed-features';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { shouldIndexAccountOnSearchEngines } from '../lib/collective';
+import { isHiddenAccount, shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { ERROR } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
@@ -164,7 +164,7 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
           error={queryResult.error || updatesPageQueryHelper.getSSRErrorFromPageProps(props)}
         />
       );
-    } else if (!isFeatureSupported(collective, FEATURES.UPDATES)) {
+    } else if (!isFeatureSupported(collective, FEATURES.UPDATES) || isHiddenAccount(collective)) {
       return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
     }
   }

@@ -29,6 +29,7 @@ export const teamSectionQuery = gql`
       slug
       name
       isFrozen
+      isPrivate
       type
       imageUrl(height: 256)
       ... on AccountWithParent {

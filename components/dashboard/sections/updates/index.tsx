@@ -9,8 +9,13 @@ import { integer } from '../../../../lib/filters/schemas';
 import type { Account, UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { FEATURES } from '@/lib/allowed-features';
+import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/schema';
+
+import NotFound from '@/components/NotFound';
 
 import EmojiReactions from '../../../conversations/EmojiReactions';
+import FeatureNotSupported from '../../../FeatureNotSupported';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -146,6 +151,14 @@ const UpdatesList = () => {
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
   const updates = data?.account?.updates;
+
+  if (!loading) {
+    if (!account) {
+      return <NotFound />;
+    } else if (account.features[FEATURES.UPDATES] === CollectiveFeatureStatus.UNSUPPORTED) {
+      return <FeatureNotSupported />;
+    }
+  }
 
   return (
     <div className="flex flex-col-reverse xl:flex-row">
