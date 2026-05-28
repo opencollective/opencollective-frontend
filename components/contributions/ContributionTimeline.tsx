@@ -226,9 +226,17 @@ function ContributionTimeline(props: OrderTimelineProps) {
         a.data?.previousData &&
         formatSimpleDiff(a.data.previousData, a.data.newData, { currency: props.order.totalAmount.currency });
 
+      const normalizedActivity = {
+        ...a,
+        individual: a.individual?.mainProfile ?? a.individual,
+        fromAccount: a.fromAccount?.mainProfile ?? a.fromAccount,
+        account: a.account?.mainProfile ?? a.account,
+        host: a.host?.mainProfile ?? a.host,
+      };
+
       return {
         id: a.id,
-        title: <ActivityDescription activity={a} />,
+        title: <ActivityDescription activity={normalizedActivity} />,
         collapsable: [ActivityType.PAYMENT_FAILED, ActivityType.ADDED_FUNDS_EDITED].includes(a.type),
         icon: getIcon(a.type),
         date: a.createdAt,
