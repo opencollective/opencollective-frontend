@@ -60,14 +60,14 @@ function QuickCreateVendorCollectiveOption({ searchText }: QuickCreateVendorColl
 }
 
 /** `renderNewCollectiveOption` callback for `CollectivePicker` / `CollectivePickerAsync`. */
-export function quickCreateVendorRenderOption() {
+function quickCreateVendorRenderOption() {
   return function renderQuickCreateVendorOption({ searchText }: { searchText: string }) {
     return <QuickCreateVendorCollectiveOption searchText={searchText} />;
   };
 }
 
 /** `onSelectNewCollectiveOption` callback for `CollectivePicker` / `CollectivePickerAsync`. */
-export function quickCreateVendorOnSelect(
+function quickCreateVendorOnSelect(
   createVendorFromSearch: (searchText: string, callbacks: QuickCreateVendorCallbacks) => void | Promise<void>,
 ) {
   return function onSelectQuickCreateVendorOption({ searchText, onCreatedCollective }: QuickCreateVendorSelectArgs) {

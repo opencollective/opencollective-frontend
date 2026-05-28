@@ -369,7 +369,6 @@ class CollectivePicker extends React.PureComponent {
       width,
       addLoggedInUserAsAdmin,
       renderNewCollectiveOption,
-      onSelectNewCollectiveOption,
       isSearchable,
       expenseType,
       useBeneficiaryForVendor,
