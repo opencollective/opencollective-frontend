@@ -35,7 +35,12 @@ export function ActivitiesTab({ account, host, setOpenExpenseId }) {
     return <MessageBoxGraphqlError error={error} />;
   }
 
-  const activities = data?.account?.communityStats?.activities.nodes || [];
+  const activities = (data?.account?.communityStats?.activities.nodes || []).map(activity => ({
+    ...activity,
+    individual: activity.individual?.mainProfile ?? activity.individual,
+    fromAccount: activity.fromAccount?.mainProfile ?? activity.fromAccount,
+    account: activity.account?.mainProfile ?? activity.account,
+  }));
   const total = data?.account?.communityStats?.activities.totalCount;
   return (
     <div className="flex flex-col gap-4">
