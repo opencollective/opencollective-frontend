@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { FEATURES, isFeatureEnabled, requiresUpgrade } from '@/lib/allowed-features';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { i18nGraphqlException } from '@/lib/errors';
 import { gql } from '@/lib/graphql/helpers';
@@ -38,6 +38,8 @@ import type { DashboardContextType } from '../../DashboardContext';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { makeReplaceSubpath } from '../../utils';
+import { useLegalDocumentActions } from '../legal-documents/actions';
+import LegalDocumentDrawer from '../legal-documents/LegalDocumentDrawer';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 
 import { ActivitiesTab } from './AccountDetailActivitiesTab';
@@ -84,6 +86,7 @@ export function AccountDetails(props: AccountDetailsProps) {
   const [openContributionId, setOpenContributionId] = React.useState(null);
   const [editVendor, setEditVendor] = React.useState<VendorFieldsFragment>(null);
   const [displayConvertToVendor, setDisplayConvertToVendor] = React.useState(false);
+  const [openLegalDocument, setOpenLegalDocument] = React.useState(false);
 
   const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
     variables: {
@@ -97,6 +100,8 @@ export function AccountDetails(props: AccountDetailsProps) {
   const taxForms = query.data?.host?.hostedLegalDocuments;
   const [archiveVendor] = useMutation(setVendorArchiveMutation);
   const [convertOrganizationToVendor] = useMutation(convertOrganizationMutation);
+  const isUpgradeRequired = requiresUpgrade(dashboardAccount, FEATURES.TAX_FORMS);
+  const getLegalDocumentActions = useLegalDocumentActions(query.data?.host, query.refetch, isUpgradeRequired);
 
   const handleSetArchive = React.useCallback(
     async vendor => {
@@ -222,7 +227,11 @@ export function AccountDetails(props: AccountDetailsProps) {
                           }
                         />
                       )}
-                    <TaxFormBadge taxForms={taxForms} host={query.data?.host} />
+                    <TaxFormBadge
+                      taxForms={taxForms}
+                      host={query.data?.host}
+                      onClick={() => setOpenLegalDocument(true)}
+                    />
                     {rejectedExpensesCount > 0 && (
                       <Badge size="sm" type={'error'}>
                         <FormattedMessage
@@ -391,6 +400,15 @@ export function AccountDetails(props: AccountDetailsProps) {
             />
           </p>
         </ConfirmationModal>
+      )}
+      {query.data?.host && taxForms?.nodes?.[0] && (
+        <LegalDocumentDrawer
+          open={openLegalDocument}
+          onClose={() => setOpenLegalDocument(false)}
+          host={query.data.host}
+          document={taxForms.nodes[0]}
+          getActions={getLegalDocumentActions}
+        />
       )}
     </div>
   );
