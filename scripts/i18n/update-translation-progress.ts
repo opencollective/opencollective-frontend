@@ -32,6 +32,10 @@ function main() {
   const filePath = path.join(__dirname, '../../lib/constants/locales.js');
   const fileContent = fs.readFileSync(filePath, 'utf8');
   const contentStart = fileContent.indexOf('export default');
+  if (contentStart === -1) {
+    console.error(`[Error] Could not find "export default" in ${filePath}, aborting to avoid corrupting the file.`);
+    process.exit(1);
+  }
   const newContent = fileContent.slice(0, contentStart) + generateLocalesForJsFile(newLocales);
 
   fs.writeFileSync(filePath, newContent);

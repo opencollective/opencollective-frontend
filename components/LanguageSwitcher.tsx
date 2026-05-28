@@ -32,7 +32,7 @@ export function LanguageSwitcher() {
           <FormattedMessage id="footer.changeLanguage" defaultMessage="Change language" />
         </label>
 
-        <SelectTrigger data-cy="language-switcher">
+        <SelectTrigger id="language-options" data-cy="language-switcher">
           <div className="flex items-center gap-2 overflow-hidden">
             <LanguagesIcon className="shrink-0" size={16} />
             <span className="truncate">

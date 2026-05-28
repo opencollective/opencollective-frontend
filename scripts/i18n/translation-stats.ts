@@ -71,13 +71,16 @@ export function getUntranslatedEntries(
   return entries;
 }
 
-function getTranslationStats(
-  en: Record<string, string>,
-  translated: Record<string, string>,
-  locale: string,
-): TranslationStats {
+function getTranslationStats(en: Record<string, string>, translated: Record<string, string>): TranslationStats {
   const total = Object.keys(en).length;
-  const untranslated = getUntranslatedEntries(en, translated, locale).length;
+  let untranslated = 0;
+
+  for (const key of Object.keys(en)) {
+    if (!(key in translated) || translated[key] === en[key]) {
+      untranslated++;
+    }
+  }
+
   const translatedCount = total - untranslated;
   const completionPercent = total === 0 ? 100 : Math.round((translatedCount / total) * 100);
 
@@ -103,15 +106,16 @@ export function loadLocaleMessages(locale: string): Record<string, string> | nul
 }
 
 export function getLocaleTranslationStats(locale: string): TranslationStats | null {
+  const en = loadEnglishMessages();
   if (locale === 'en') {
-    return { total: 0, translated: 0, untranslated: 0, completionPercent: 100 };
+    const total = Object.keys(en).length;
+    return { total, translated: total, untranslated: 0, completionPercent: 100 };
   }
 
-  const en = loadEnglishMessages();
   const translated = loadLocaleMessages(locale);
   if (!translated) {
     return null;
   }
 
-  return getTranslationStats(en, translated, locale);
+  return getTranslationStats(en, translated);
 }
