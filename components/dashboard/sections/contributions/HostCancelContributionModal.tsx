@@ -1,7 +1,6 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form, useFormikContext } from 'formik';
-import { Info } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -13,6 +12,8 @@ import type {
   HostCancelOrderMutationVariables,
   TierFrequency,
 } from '../../../../lib/graphql/types/v2/graphql';
+import formatCollectiveType from '../../../../lib/i18n/collective-type';
+import { cn } from '../../../../lib/utils';
 
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -23,11 +24,11 @@ import MessageBox from '../../../MessageBox';
 import type { BaseModalProps } from '../../../ModalContext';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
 import { Button } from '../../../ui/Button';
-import { Checkbox } from '../../../ui/Checkbox';
+import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../../../ui/DataList';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../ui/Dialog';
+import { FormSectionTitle } from '../../../ui/FormSectionTitle';
 import { Switch } from '../../../ui/Switch';
 import { Textarea } from '../../../ui/Textarea';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { useToast } from '../../../ui/useToast';
 
 import { hostCancelContributionModalQuery, hostCancelOrderMutation } from './queries';
@@ -51,24 +52,110 @@ const Section: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ children, className }) => (
-  <div className={`rounded-lg border border-border bg-background p-4 ${className ?? ''}`}>{children}</div>
+  <div className={cn('rounded-lg border border-gray-200 bg-white p-4', className)}>{children}</div>
 );
 
-const SectionTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
-  <div className={`text-xs font-semibold tracking-wide text-muted-foreground uppercase ${className ?? ''}`}>
+const ToggleOptionSection: React.FC<{
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}> = ({ title, description, checked, onCheckedChange, disabled, children }) => (
+  <Section>
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="text-sm font-semibold">{title}</div>
+        {description && <div className="text-sm text-muted-foreground">{description}</div>}
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} />
+    </div>
     {children}
-  </div>
+  </Section>
 );
 
-const DetailRow: React.FC<{
-  label: React.ReactNode;
-  value: React.ReactNode;
-}> = ({ label, value }) => (
-  <div className="flex items-center justify-between text-sm text-muted-foreground">
-    <span>{label}</span>
-    <span className="text-foreground">{value}</span>
-  </div>
+const AccountSummary: React.FC<{
+  account: NonNullable<OrderData['fromAccount'] | OrderData['toAccount']>;
+  name: string | undefined;
+}> = ({ account, name }) => (
+  <span className="flex min-w-0 items-center gap-2">
+    <Avatar size={20} collective={account} displayTitle={false} />
+    <span className="truncate text-sm font-medium">{name}</span>
+  </span>
 );
+
+const ContributionDetail: React.FC<{
+  order: OrderData;
+  currency?: string;
+  summaryAmount: number;
+}> = ({ order, currency, summaryAmount }) => {
+  const fromAccountName = order.fromAccount?.name || order.fromAccount?.slug;
+  const toAccountName = order.toAccount?.name || order.toAccount?.slug;
+
+  return (
+    <Section>
+      <FormSectionTitle>
+        <FormattedMessage defaultMessage="Contribution detail" id="oJIBP2" />
+      </FormSectionTitle>
+      <DataList className="text-sm">
+        {order.description && (
+          <DataListItem>
+            <DataListItemLabel>
+              <FormattedMessage defaultMessage="Description" id="Fields.description" />
+            </DataListItemLabel>
+            <DataListItemValue>{order.description}</DataListItemValue>
+          </DataListItem>
+        )}
+        {order.status && (
+          <DataListItem>
+            <DataListItemLabel>
+              <FormattedMessage defaultMessage="Status" id="order.status" />
+            </DataListItemLabel>
+            <DataListItemValue>
+              <OrderStatusTag status={order.status} />
+            </DataListItemValue>
+          </DataListItem>
+        )}
+        {currency && (
+          <DataListItem>
+            <DataListItemLabel>
+              <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
+            </DataListItemLabel>
+            <DataListItemValue className="tabular-nums">
+              <FormattedMoneyAmount
+                amount={summaryAmount}
+                currency={currency}
+                frequency={order.frequency as unknown as TierFrequency}
+                showCurrencyCode
+              />
+            </DataListItemValue>
+          </DataListItem>
+        )}
+        {order.fromAccount && (
+          <DataListItem>
+            <DataListItemLabel>
+              <FormattedMessage defaultMessage="Contributed by" id="DdgpvU" />
+            </DataListItemLabel>
+            <DataListItemValue>
+              <AccountSummary account={order.fromAccount} name={fromAccountName} />
+            </DataListItemValue>
+          </DataListItem>
+        )}
+        {order.toAccount && (
+          <DataListItem>
+            <DataListItemLabel>
+              <FormattedMessage defaultMessage="Contribution to" id="kQwHjA" />
+            </DataListItemLabel>
+            <DataListItemValue>
+              <AccountSummary account={order.toAccount} name={toAccountName} />
+            </DataListItemValue>
+          </DataListItem>
+        )}
+      </DataList>
+    </Section>
+  );
+};
 
 type HostCancelContributionFormProps = {
   order: OrderData;
@@ -87,8 +174,6 @@ const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
   const { values, setFieldValue, isSubmitting } = useFormikContext<HostCancelContributionFormValues>();
 
   const summaryAmount = order.totalAmount?.valueInCents ?? order.amount?.valueInCents ?? 0;
-  const fromAccountName = order.fromAccount?.name || order.fromAccount?.slug;
-  const toAccountName = order.toAccount?.name || order.toAccount?.slug;
   const submitLabel =
     showRemoveAsContributor && values.removeAsContributor ? (
       <FormattedMessage defaultMessage="Cancel & remove contributor" id="ssPeBO" />
@@ -98,101 +183,35 @@ const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
 
   return (
     <Form className="flex flex-col gap-4">
-      <Section>
-        <div className="flex flex-col gap-3">
-          {order.description && <div className="text-sm font-semibold">{order.description}</div>}
-          {order.status && (
-            <DetailRow
-              label={<FormattedMessage defaultMessage="Status" id="order.status" />}
-              value={<OrderStatusTag status={order.status} />}
-            />
-          )}
-          {currency && (
-            <DetailRow
-              label={<FormattedMessage defaultMessage="Amount" id="Fields.amount" />}
-              value={
-                <FormattedMoneyAmount
-                  amount={summaryAmount}
-                  currency={currency}
-                  frequency={order.frequency as unknown as TierFrequency}
-                  showCurrencyCode
-                  amountClassName="font-semibold"
-                />
-              }
-            />
-          )}
-          {order.fromAccount && (
-            <DetailRow
-              label={<FormattedMessage defaultMessage="From" id="dM+p3/" />}
-              value={
-                <span className="flex min-w-0 items-center gap-2">
-                  <Avatar size={20} collective={order.fromAccount} displayTitle={false} />
-                  <span className="truncate">{fromAccountName}</span>
-                </span>
-              }
-            />
-          )}
-          {order.toAccount && (
-            <DetailRow
-              label={<FormattedMessage defaultMessage="To" id="To" />}
-              value={
-                <span className="flex min-w-0 items-center gap-2">
-                  <Avatar size={20} collective={order.toAccount} displayTitle={false} />
-                  <span className="truncate">{toAccountName}</span>
-                </span>
-              }
-            />
-          )}
-        </div>
-      </Section>
+      <ContributionDetail order={order} currency={currency} summaryAmount={summaryAmount} />
 
       {showRemoveAsContributor && (
-        <Section>
-          <SectionTitle className="mb-3">
-            <FormattedMessage defaultMessage="Additional actions" id="vCd8DW" />
-          </SectionTitle>
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-1.5 text-sm">
-              <label className="flex cursor-pointer items-center gap-2">
-                <Checkbox
-                  checked={values.removeAsContributor}
-                  onCheckedChange={checked => setFieldValue('removeAsContributor', checked === true)}
-                  disabled={isSubmitting}
-                />
-                <span className="font-medium">
-                  <FormattedMessage defaultMessage="Remove contributor from Collective" id="BkIpny" />
-                </span>
-              </label>
-              <Tooltip>
-                <TooltipTrigger className="inline-flex text-muted-foreground hover:text-foreground" tabIndex={-1}>
-                  <Info className="size-3.5" aria-hidden />
-                  <span className="sr-only">
-                    <FormattedMessage defaultMessage="More info" id="moreInfo" />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <FormattedMessage
-                    defaultMessage="The contributor will be hidden from public profile and exports, but the contribution stays in the ledger."
-                    id="qGlrSx"
-                  />
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-        </Section>
+        <ToggleOptionSection
+          title={
+            <FormattedMessage
+              defaultMessage="Remove contributor from {accountType}"
+              id="7xqR2m"
+              values={{ accountType: formatCollectiveType(intl, order.toAccount?.type) }}
+            />
+          }
+          description={
+            <FormattedMessage
+              defaultMessage="The contributor will be hidden from public profile and exports, but the contribution stays in the ledger."
+              id="qGlrSx"
+            />
+          }
+          checked={values.removeAsContributor}
+          onCheckedChange={checked => setFieldValue('removeAsContributor', checked === true)}
+          disabled={isSubmitting}
+        />
       )}
 
-      <Section>
-        <div className="flex items-center justify-between gap-4">
-          <SectionTitle>
-            <FormattedMessage defaultMessage="Send custom message to contributor" id="tLNi3x" />
-          </SectionTitle>
-          <Switch
-            checked={values.sendMessage}
-            onCheckedChange={checked => setFieldValue('sendMessage', checked === true)}
-            disabled={isSubmitting}
-          />
-        </div>
+      <ToggleOptionSection
+        title={<FormattedMessage defaultMessage="Send custom message to contributor" id="tLNi3x" />}
+        checked={values.sendMessage}
+        onCheckedChange={checked => setFieldValue('sendMessage', checked === true)}
+        disabled={isSubmitting}
+      >
         {values.sendMessage && (
           <FormField name="message" className="mt-4">
             {({ field }) => (
@@ -210,7 +229,7 @@ const HostCancelContributionForm: React.FC<HostCancelContributionFormProps> = ({
             )}
           </FormField>
         )}
-      </Section>
+      </ToggleOptionSection>
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
@@ -298,7 +317,6 @@ export const HostCancelContributionModal = ({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-md"
         onCloseAutoFocus={e => {
           if (onCloseFocusRef?.current) {
             e.preventDefault();

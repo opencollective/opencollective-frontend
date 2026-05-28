@@ -30,6 +30,7 @@ import { i18nGraphqlException } from '@/lib/errors';
 
 import { I18nBold } from '@/components/I18nFormatters';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { FormSectionTitle } from '@/components/ui/FormSectionTitle';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Switch } from '@/components/ui/Switch';
 import { toast } from '@/components/ui/useToast';
@@ -1575,10 +1576,7 @@ type AddFundsFormSectionProps = React.PropsWithChildren & {
 function AddFundsFormSection({ title, children }: AddFundsFormSectionProps) {
   return (
     <div className="rounded-lg">
-      <div className="mb-3 flex items-center gap-3">
-        <p className="leading-[17px] font-bold whitespace-nowrap text-[#0F1729]">{title}</p>
-        <div className="h-px flex-1 bg-gray-200" />
-      </div>
+      <FormSectionTitle>{title}</FormSectionTitle>
       <div className="space-y-4">{children}</div>
     </div>
   );

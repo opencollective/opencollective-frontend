@@ -17,6 +17,7 @@ import { AccountType, TransactionKind, TransactionType } from '../../../../lib/g
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
+import { cn } from '../../../../lib/utils';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -28,7 +29,9 @@ import MessageBox from '../../../MessageBox';
 import type { BaseModalProps } from '../../../ModalContext';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
+import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../../../ui/DataList';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../ui/Dialog';
+import { FormSectionTitle } from '../../../ui/FormSectionTitle';
 import { Switch } from '../../../ui/Switch';
 import { Textarea } from '../../../ui/Textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
@@ -205,7 +208,27 @@ const Section: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ children, className }) => (
-  <div className={`rounded-lg border border-border bg-background p-4 ${className ?? ''}`}>{children}</div>
+  <div className={cn('rounded-lg border border-gray-200 bg-white p-4', className)}>{children}</div>
+);
+
+const ToggleOptionSection: React.FC<{
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}> = ({ title, description, checked, onCheckedChange, disabled, children }) => (
+  <Section>
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="text-sm font-semibold">{title}</div>
+        {description && <div className="text-sm text-muted-foreground">{description}</div>}
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} />
+    </div>
+    {children}
+  </Section>
 );
 
 type AllocationAccount = React.ComponentProps<typeof AccountHoverCard>['account'];
@@ -493,12 +516,6 @@ const buildRefundAllocation = (transaction: TransactionData, intl: IntlShape): R
   };
 };
 
-const SectionTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
-  <div className={`text-xs font-semibold tracking-wide text-muted-foreground uppercase ${className ?? ''}`}>
-    {children}
-  </div>
-);
-
 const AccountSummary: React.FC<{ account: AllocationAccount | null | undefined }> = ({ account }) => {
   const accountTrigger = (
     <div className="flex min-w-0 cursor-default items-center gap-2">
@@ -519,44 +536,48 @@ const ContributionDetail: React.FC<{ transaction: TransactionData; amount: numbe
 
   return (
     <Section>
-      <SectionTitle className="mb-4">
+      <FormSectionTitle>
         <FormattedMessage defaultMessage="Contribution detail" id="oJIBP2" />
-      </SectionTitle>
-      <div className="flex flex-col gap-3 text-sm">
-        <div className="flex items-center justify-between gap-4">
-          <div className="text-muted-foreground">
+      </FormSectionTitle>
+      <DataList className="text-sm">
+        <DataListItem>
+          <DataListItemLabel>
             <FormattedMessage defaultMessage="Contributed by" id="DdgpvU" />
-          </div>
-          <AccountSummary account={contributorAccount} />
-        </div>
+          </DataListItemLabel>
+          <DataListItemValue>
+            <AccountSummary account={contributorAccount} />
+          </DataListItemValue>
+        </DataListItem>
 
-        <div className="flex items-center justify-between gap-4">
-          <div className="text-muted-foreground">
+        <DataListItem>
+          <DataListItemLabel>
             <FormattedMessage defaultMessage="Contribution to" id="kQwHjA" />
-          </div>
-          <AccountSummary account={principalAccount} />
-        </div>
+          </DataListItemLabel>
+          <DataListItemValue>
+            <AccountSummary account={principalAccount} />
+          </DataListItemValue>
+        </DataListItem>
 
         {currency && (
-          <div className="flex items-center justify-between gap-4">
-            <div className="text-muted-foreground">
+          <DataListItem>
+            <DataListItemLabel>
               <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
-            </div>
-            <div className="text-right font-medium tabular-nums">
+            </DataListItemLabel>
+            <DataListItemValue className="tabular-nums">
               <FormattedMoneyAmount amount={amount} currency={currency} showCurrencyCode />
-            </div>
-          </div>
+            </DataListItemValue>
+          </DataListItem>
         )}
 
-        <div className="flex items-center justify-between gap-4">
-          <div className="text-muted-foreground">
+        <DataListItem>
+          <DataListItemLabel>
             <FormattedMessage defaultMessage="Date" id="expense.incurredAt" />
-          </div>
-          <div className="text-right font-medium">
+          </DataListItemLabel>
+          <DataListItemValue>
             <FormattedDate value={transaction.createdAt} day="numeric" month="long" year="numeric" />
-          </div>
-        </div>
-      </div>
+          </DataListItemValue>
+        </DataListItem>
+      </DataList>
     </Section>
   );
 };
@@ -685,101 +706,57 @@ const HostRefundChargeForm: React.FC<HostRefundChargeFormProps> = ({ transaction
 
       {currency && allocationGroups.length > 0 && (
         <Section>
-          <div className="flex flex-col gap-4">
-            <SectionTitle>
-              <FormattedMessage defaultMessage="Refund allocation" id="UfZM5J" />
-            </SectionTitle>
+          <FormSectionTitle>
+            <FormattedMessage defaultMessage="Refund allocation" id="UfZM5J" />
+          </FormSectionTitle>
+          <div className="flex flex-col divide-y divide-gray-200">
             {allocationGroups.map(group => (
-              <React.Fragment key={group.key}>
+              <div key={group.key} className="py-3 first:pt-0 last:pb-0">
                 <AllocationGroup group={group} currency={currency} />
-                {group.role === 'collective' && isInsufficientBalance && principalBalanceCurrency && (
-                  <MessageBox type="warning" withIcon px={3} py={2}>
-                    <div className="flex flex-col gap-3">
-                      <span>
-                        <FormattedMessage
-                          defaultMessage="{collective}'s balance ({balance}) won't cover the {amount} that would be deducted to process this refund."
-                          id="RB/W6s"
-                          values={{
-                            collective: (
-                              <span className="font-medium">{principalAccount?.name || principalAccount?.slug}</span>
-                            ),
-                            balance: (
-                              <span className="font-medium tabular-nums">
-                                <FormattedMoneyAmount
-                                  amount={principalBalanceInCents}
-                                  currency={principalBalanceCurrency}
-                                  showCurrencyCode={false}
-                                />
-                              </span>
-                            ),
-                            amount: (
-                              <span className="font-medium tabular-nums">
-                                <FormattedMoneyAmount
-                                  amount={principalOutflowAmount}
-                                  currency={principalBalanceCurrency}
-                                  showCurrencyCode={false}
-                                />
-                              </span>
-                            ),
-                          }}
-                        />
-                      </span>
-                      <div className="flex items-center gap-1.5 text-sm">
-                        <label className="flex cursor-pointer items-center gap-2">
-                          <Checkbox
-                            checked={values.ignoreBalanceCheck}
-                            onCheckedChange={checked => setFieldValue('ignoreBalanceCheck', checked === true)}
-                            disabled={isSubmitting}
-                          />
-                          <span className="font-medium">
-                            <FormattedMessage defaultMessage="Allow negative balance" id="CcDFSI" />
-                          </span>
-                        </label>
-                        <Tooltip>
-                          <TooltipTrigger
-                            className="inline-flex text-muted-foreground hover:text-foreground"
-                            tabIndex={-1}
-                          >
-                            <Info className="size-3.5" aria-hidden />
-                            <span className="sr-only">
-                              <FormattedMessage defaultMessage="More info" id="moreInfo" />
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <FormattedMessage
-                              defaultMessage="Process the refund and ignore the balance. The {accountType}'s balance will go negative until additional contributions are received."
-                              id="+vpPIw"
-                              values={{ accountType: formatCollectiveType(intl, principalAccount?.type) }}
-                            />
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </div>
-                  </MessageBox>
-                )}
-              </React.Fragment>
+              </div>
             ))}
           </div>
-        </Section>
-      )}
-
-      {(options.showCancelRecurring || options.showRemoveAsContributor) && (
-        <Section>
-          <SectionTitle className="mb-3">
-            <FormattedMessage defaultMessage="Additional actions" id="vCd8DW" />
-          </SectionTitle>
-          {(options.showCancelRecurring || options.showRemoveAsContributor) && (
-            <div className="flex flex-col gap-2">
-              {options.showCancelRecurring && (
+          {isInsufficientBalance && principalBalanceCurrency && (
+            <MessageBox type="warning" withIcon px={3} py={2} className="mt-4">
+              <div className="flex flex-col gap-3">
+                <span>
+                  <FormattedMessage
+                    defaultMessage="{collective}'s balance ({balance}) won't cover the {amount} that would be deducted to process this refund."
+                    id="RB/W6s"
+                    values={{
+                      collective: (
+                        <span className="font-medium">{principalAccount?.name || principalAccount?.slug}</span>
+                      ),
+                      balance: (
+                        <span className="font-medium tabular-nums">
+                          <FormattedMoneyAmount
+                            amount={principalBalanceInCents}
+                            currency={principalBalanceCurrency}
+                            showCurrencyCode={false}
+                          />
+                        </span>
+                      ),
+                      amount: (
+                        <span className="font-medium tabular-nums">
+                          <FormattedMoneyAmount
+                            amount={principalOutflowAmount}
+                            currency={principalBalanceCurrency}
+                            showCurrencyCode={false}
+                          />
+                        </span>
+                      ),
+                    }}
+                  />
+                </span>
                 <div className="flex items-center gap-1.5 text-sm">
                   <label className="flex cursor-pointer items-center gap-2">
                     <Checkbox
-                      checked={values.cancelRecurringContribution}
-                      onCheckedChange={checked => setFieldValue('cancelRecurringContribution', checked === true)}
+                      checked={values.ignoreBalanceCheck}
+                      onCheckedChange={checked => setFieldValue('ignoreBalanceCheck', checked === true)}
                       disabled={isSubmitting}
                     />
                     <span className="font-medium">
-                      <FormattedMessage defaultMessage="Cancel recurring contribution" id="rvR3Fm" />
+                      <FormattedMessage defaultMessage="Allow negative balance" id="CcDFSI" />
                     </span>
                   </label>
                   <Tooltip>
@@ -791,63 +768,59 @@ const HostRefundChargeForm: React.FC<HostRefundChargeFormProps> = ({ transaction
                     </TooltipTrigger>
                     <TooltipContent>
                       <FormattedMessage
-                        defaultMessage="No future charges will be made for this contribution."
-                        id="pB1jn6"
-                      />
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              )}
-
-              {options.showRemoveAsContributor && (
-                <div className="flex items-center gap-1.5 text-sm">
-                  <label className="flex cursor-pointer items-center gap-2">
-                    <Checkbox
-                      checked={values.removeAsContributor}
-                      onCheckedChange={checked => setFieldValue('removeAsContributor', checked === true)}
-                      disabled={isSubmitting}
-                    />
-                    <span className="font-medium">
-                      <FormattedMessage
-                        defaultMessage="Remove contributor from {accountType}"
-                        id="7xqR2m"
+                        defaultMessage="Process the refund and ignore the balance. The {accountType}'s balance will go negative until additional contributions are received."
+                        id="+vpPIw"
                         values={{ accountType: formatCollectiveType(intl, principalAccount?.type) }}
                       />
-                    </span>
-                  </label>
-                  <Tooltip>
-                    <TooltipTrigger className="inline-flex text-muted-foreground hover:text-foreground" tabIndex={-1}>
-                      <Info className="size-3.5" aria-hidden />
-                      <span className="sr-only">
-                        <FormattedMessage defaultMessage="More info" id="moreInfo" />
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <FormattedMessage
-                        defaultMessage="The contributor will be hidden from public profile and exports, but the contribution stays in the ledger."
-                        id="qGlrSx"
-                      />
                     </TooltipContent>
                   </Tooltip>
                 </div>
-              )}
-            </div>
+              </div>
+            </MessageBox>
           )}
         </Section>
       )}
 
-      {options.showHostMessage && (
-        <Section>
-          <div className="flex items-center justify-between gap-4">
-            <SectionTitle>
-              <FormattedMessage defaultMessage="Send custom message to contributor" id="tLNi3x" />
-            </SectionTitle>
-            <Switch
-              checked={values.sendMessage}
-              onCheckedChange={checked => setFieldValue('sendMessage', checked === true)}
-              disabled={isSubmitting}
+      {options.showCancelRecurring && (
+        <ToggleOptionSection
+          title={<FormattedMessage defaultMessage="Cancel recurring contribution" id="rvR3Fm" />}
+          description={
+            <FormattedMessage defaultMessage="No future charges will be made for this contribution." id="pB1jn6" />
+          }
+          checked={values.cancelRecurringContribution}
+          onCheckedChange={checked => setFieldValue('cancelRecurringContribution', checked === true)}
+          disabled={isSubmitting}
+        />
+      )}
+
+      {options.showRemoveAsContributor && (
+        <ToggleOptionSection
+          title={
+            <FormattedMessage
+              defaultMessage="Remove contributor from {accountType}"
+              id="7xqR2m"
+              values={{ accountType: formatCollectiveType(intl, principalAccount?.type) }}
             />
-          </div>
+          }
+          description={
+            <FormattedMessage
+              defaultMessage="The contributor will be hidden from public profile and exports, but the contribution stays in the ledger."
+              id="qGlrSx"
+            />
+          }
+          checked={values.removeAsContributor}
+          onCheckedChange={checked => setFieldValue('removeAsContributor', checked === true)}
+          disabled={isSubmitting}
+        />
+      )}
+
+      {options.showHostMessage && (
+        <ToggleOptionSection
+          title={<FormattedMessage defaultMessage="Send custom message to contributor" id="tLNi3x" />}
+          checked={values.sendMessage}
+          onCheckedChange={checked => setFieldValue('sendMessage', checked === true)}
+          disabled={isSubmitting}
+        >
           {values.sendMessage && (
             <FormField name="message" className="mt-4">
               {({ field }) => (
@@ -865,7 +838,7 @@ const HostRefundChargeForm: React.FC<HostRefundChargeFormProps> = ({ transaction
               )}
             </FormField>
           )}
-        </Section>
+        </ToggleOptionSection>
       )}
 
       <DialogFooter>
