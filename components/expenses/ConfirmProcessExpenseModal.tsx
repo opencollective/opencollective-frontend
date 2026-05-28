@@ -187,6 +187,7 @@ export type ConfirmProcessExpenseModalType =
 type ConfirmProcessExpenseModalProps = BaseModalProps & {
   type: ConfirmProcessExpenseModalType;
   expense: Pick<Expense, 'id' | 'legacyId'>;
+  onSuccess?: (action: ConfirmProcessExpenseModalType, updatedExpense?: Expense) => void;
 };
 
 export default function ConfirmProcessExpenseModal({
@@ -195,6 +196,7 @@ export default function ConfirmProcessExpenseModal({
   setOpen,
   expense,
   onCloseFocusRef,
+  onSuccess,
 }: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
 
@@ -207,61 +209,65 @@ export default function ConfirmProcessExpenseModal({
 
   const onConfirm = React.useCallback(async () => {
     try {
+      let updatedExpense: Expense | undefined;
+
       switch (type) {
         case 'MARK_AS_INCOMPLETE': {
-          await processExpense.markAsIncomplete({
+          updatedExpense = await processExpense.markAsIncomplete({
             message,
           });
           break;
         }
         case 'REQUEST_RE_APPROVAL': {
-          await processExpense.requestReApproval({
+          updatedExpense = await processExpense.requestReApproval({
             message,
           });
           break;
         }
         case 'APPROVE': {
-          await processExpense.approve({
+          updatedExpense = await processExpense.approve({
             message,
           });
           break;
         }
         case 'UNAPPROVE': {
-          await processExpense.unapprove({
+          updatedExpense = await processExpense.unapprove({
             message,
           });
           break;
         }
         case 'REJECT': {
-          await processExpense.reject({
+          updatedExpense = await processExpense.reject({
             message,
           });
           break;
         }
         case 'HOLD': {
-          await processExpense.hold({
+          updatedExpense = await processExpense.hold({
             message,
           });
           break;
         }
         case 'RELEASE': {
-          await processExpense.release({
+          updatedExpense = await processExpense.release({
             message,
           });
           break;
         }
         case 'MARK_AS_SPAM': {
-          await processExpense.markAsSpam({
+          updatedExpense = await processExpense.markAsSpam({
             message,
           });
           break;
         }
       }
+
       setOpen(false);
+      onSuccess?.(type, updatedExpense);
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
     }
-  }, [type, message, intl, processExpense, setOpen]);
+  }, [type, message, intl, onSuccess, processExpense, setOpen]);
 
   const onCloseAutoFocus = (e: Event) => {
     if (onCloseFocusRef?.current) {

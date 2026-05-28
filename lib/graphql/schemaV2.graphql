@@ -29409,6 +29409,9 @@ input PersonalTokenCreateInput {
   The account to use as the owner of the application. Defaults to currently logged in user.
   """
   account: AccountReferenceInput
+    @deprecated(
+      reason: "2026-06-03: This field is ignored, the account will always default to the currently logged in user."
+    )
 }
 
 """

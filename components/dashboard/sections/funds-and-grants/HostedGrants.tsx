@@ -38,7 +38,7 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from '../expenses/filters';
-import { hostDashboardExpensesQuery, hostInfoCardFields } from '../expenses/queries';
+import { hostDashboardExpensesQuery } from '../expenses/queries';
 
 import type { GrantsTableMeta } from './common';
 import { grantColumns } from './common';
@@ -92,18 +92,6 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
   const { data: metaData } = useQuery(
     gql`
       query HostedGrantsMetadata($hostSlug: String!) {
-        host(slug: $hostSlug) {
-          id
-          ...HostInfoCardFields
-          transferwise {
-            id
-            availableCurrencies
-            amountBatched {
-              valueInCents
-              currency
-            }
-          }
-        }
         pending: expenses(host: { slug: $hostSlug }, status: [PENDING], type: GRANT) {
           totalCount
         }
@@ -123,7 +111,6 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
       }
 
       ${accountHoverCardFields}
-      ${hostInfoCardFields}
     `,
     {
       variables: { hostSlug, withHoverCard: true },
@@ -162,7 +149,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
   ];
 
   const meta: FilterMeta = {
-    currency: metaData?.host?.currency,
+    currency: account.currency,
     hostSlug: hostSlug,
     hostedAccounts: metaData?.hostedAccounts.nodes,
     includeUncategorized: true,

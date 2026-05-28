@@ -245,53 +245,8 @@ export const hostDashboardExpensesQuery = gql`
   ${expenseHostFields}
 `;
 
-export const hostInfoCardFields = gql`
-  fragment HostInfoCardFields on Host {
-    id
-    legacyId
-    slug
-    currency
-    location {
-      id
-      address
-      country
-    }
-    transferwise {
-      id
-      balances {
-        valueInCents
-        currency
-      }
-    }
-    stripe {
-      issuingBalance {
-        valueInCents
-        currency
-      }
-    }
-    stats {
-      id
-      balance {
-        valueInCents
-      }
-    }
-  }
-`;
-
 export const hostDashboardMetadataQuery = gql`
   query HostDashboardMetadata($hostSlug: String!, $hostContext: HostContext) {
-    host(slug: $hostSlug) {
-      id
-      ...HostInfoCardFields
-      transferwise {
-        id
-        availableCurrencies
-        amountBatched {
-          valueInCents
-          currency
-        }
-      }
-    }
     unreplied: expenses(
       host: { slug: $hostSlug }
       hostContext: $hostContext
@@ -320,11 +275,10 @@ export const hostDashboardMetadataQuery = gql`
       totalCount
     }
   }
-  ${hostInfoCardFields}
 `;
 
 /**
- * Query for the Payment Requests page - fetches counts for all, pending, paid, and rejected expenses
+ * Query for the Payment Requests page - fetches counts for all, pending, approved, paid, and rejected expenses
  */
 export const paymentRequestsMetadataQuery = gql`
   query PaymentRequestsMetadata($accountSlug: String!) {
@@ -365,16 +319,13 @@ export const paymentRequestsMetadataQuery = gql`
         }
       }
     }
-    expenseTagStats(account: { slug: $accountSlug }) {
-      nodes {
-        id
-        tag
-      }
-    }
     all: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true) {
       totalCount
     }
     pending: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [PENDING]) {
+      totalCount
+    }
+    approved: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [APPROVED]) {
       totalCount
     }
     paid: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [PAID]) {

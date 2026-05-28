@@ -53,6 +53,7 @@ import { toast } from '../../../ui/useToast';
 import { ALL_SECTIONS } from '../../constants';
 import { DashboardContext } from '../../DashboardContext';
 
+import { getExpensePipelineOverviewRefetchQueries, shouldRefetchExpensePipeline } from './ExpensePipelineOverview';
 import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from './ScheduledExpensesBanner';
 
 /**
@@ -344,8 +345,11 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
     };
 
     const handleProcessExpense = async (action: string, message?: string) => {
+      const refetchQueries = shouldRefetchExpensePipeline(action) ? getExpensePipelineOverviewRefetchQueries(host) : [];
+
       await processExpense({
         variables: { id: expense.id, legacyId: expense.legacyId, action, message },
+        refetchQueries,
       });
       onMutationSuccess();
     };
@@ -356,6 +360,9 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         {
           type,
           expense,
+          onSuccess: () => {
+            onMutationSuccess();
+          },
         },
         `confirm-expense-${expense.id}-${type}`,
       );
@@ -396,6 +403,9 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
           query: scheduledExpensesQuery,
           variables: getScheduledExpensesQueryVariables(host.slug),
         });
+      }
+      if (shouldRefetchExpensePipeline(action)) {
+        refetchQueries.push(...getExpensePipelineOverviewRefetchQueries(host));
       }
 
       try {

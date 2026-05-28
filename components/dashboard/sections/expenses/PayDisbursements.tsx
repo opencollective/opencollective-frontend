@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { useQuery } from '@apollo/client';
+import React, { useCallback, useMemo } from 'react';
+import { useApolloClient, useQuery } from '@apollo/client';
 import { omit, omitBy } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -25,7 +25,6 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 
 import ExpensesList from '../../../expenses/ExpensesList';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import { DashboardContext } from '../../DashboardContext';
@@ -40,7 +39,10 @@ import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 import { DefinitionTooltip } from '../reports/DefinitionTooltip';
 
-import ExpensePipelineOverview from './ExpensePipelineOverview';
+import ExpensePipelineOverview, {
+  refetchExpensePipelineOverview,
+  shouldRefetchExpensePipeline,
+} from './ExpensePipelineOverview';
 import type { FilterMeta as CommonFilterMeta } from './filters';
 import {
   ExpenseAccountingCategoryKinds,
@@ -83,8 +85,11 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
  */
-const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchMetaData }) => {
+const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchMetaData, refetchPipeline, action }) => {
   refetchMetaData(); // Refetch the metadata to update the view counts
+  if (shouldRefetchExpensePipeline(action)) {
+    refetchPipeline?.();
+  }
   if (variables.status && updatedExpense.status !== variables.status) {
     cache.updateQuery({ query: hostDashboardExpensesQuery, variables }, data => {
       return {
@@ -104,6 +109,7 @@ const ROUTE_PARAMS = ['slug', 'section'];
 const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
+  const client = useApolloClient();
   const query = router.query;
   const { account } = React.useContext(DashboardContext);
 
@@ -201,11 +207,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     skipFiltersOnReset: ['hostContext'],
   });
 
-  const {
-    data: metaData,
-    error: errorMetaData,
-    refetch: refetchMetaData,
-  } = useQuery(hostDashboardMetadataQuery, {
+  const { data: metaData, refetch: refetchMetaData } = useQuery(hostDashboardMetadataQuery, {
     variables: {
       hostSlug,
       hostContext: queryFilter.values.hostContext,
@@ -233,6 +235,16 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   const { data, error, loading } = expenses;
+
+  const refetchPipeline = useCallback(() => {
+    refetchExpensePipelineOverview(client, { slug: hostSlug, currency: account?.currency });
+  }, [client, hostSlug, account?.currency]);
+
+  const refetchAfterExpenseChange = useCallback(() => {
+    void expenses.refetch();
+    void refetchMetaData();
+    refetchPipeline();
+  }, [expenses, refetchMetaData, refetchPipeline]);
 
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
@@ -273,19 +285,13 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
           />
         }
       />
-      {!metaData?.host ? (
-        <LoadingPlaceholder height={150} />
-      ) : errorMetaData ? (
-        <MessageBoxGraphqlError error={errorMetaData} />
-      ) : (
-        <ExpensePipelineOverview className="pt-4" host={metaData.host} />
-      )}
+      <ExpensePipelineOverview
+        host={{ id: account.id, slug: hostSlug, currency: account.currency }}
+        onBatchPaySuccess={refetchAfterExpenseChange}
+      />
       <ScheduledExpensesBanner
         hostSlug={hostSlug}
-        onSubmit={() => {
-          expenses.refetch();
-          refetchMetaData();
-        }}
+        onSubmit={refetchAfterExpenseChange}
         secondButton={
           !(
             queryFilter.values.status?.includes(ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT) &&
@@ -325,8 +331,8 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
             view="admin"
-            onProcess={(expense, cache) => {
-              onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
+            onProcess={(expense, cache, action) => {
+              onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData, refetchPipeline, action });
             }}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
