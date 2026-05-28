@@ -466,6 +466,14 @@ describe('vendor visibility', () => {
         }
       });
 
+    const clickCreateOption = (optionText: string) =>
+      cy
+        .root()
+        .closest('html')
+        .contains('[role="option"]', optionText)
+        .should('not.have.attr', 'aria-disabled', 'true')
+        .click();
+
     it('Add Funds modal: created vendor is scoped to the paying collective', function () {
       setupHostAndCollective().then(({ host, hostAdmin, collective }) => {
         cy.login({ email: hostAdmin.email, redirect: `/dashboard/${host.slug}/hosted-collectives` });
@@ -482,7 +490,7 @@ describe('vendor visibility', () => {
         cy.wait(150);
         cy.get('#addFunds-fromAccount').type(name, { delay: 50 });
         cy.wait('@addFundsPickerSearch');
-        cy.contains(`Create vendor: ${name}`).click();
+        clickCreateOption(`Create vendor: ${name}`);
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
         assertVendorScopedTo(collective.name);
@@ -501,7 +509,7 @@ describe('vendor visibility', () => {
         aliasPickerSearch('expensePickerSearch', name);
         cy.get('#__vendor').type(name, { delay: 50 });
         cy.wait('@expensePickerSearch');
-        cy.root().closest('html').contains(`Create vendor: ${name}`).click();
+        clickCreateOption(`Create vendor: ${name}`);
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
         assertVendorScopedTo(collective.name);
@@ -548,7 +556,7 @@ describe('vendor visibility', () => {
         aliasPickerSearch('grantPickerSearch', name);
         cy.get('#__vendor').type(name, { delay: 50 });
         cy.wait('@grantPickerSearch');
-        cy.root().closest('html').contains(`Create beneficiary: ${name}`).click();
+        clickCreateOption(`Create beneficiary: ${name}`);
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
         assertVendorScopedTo(collective.name);
