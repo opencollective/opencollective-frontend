@@ -39,6 +39,11 @@ const nextConfig = {
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
     config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
+    if (typeof config.cache !== 'boolean') {
+      config.cache = {};
+    }
+    config.cache.type = 'filesystem';
+    config.cache.compression = 'brotli';
 
     config.plugins.push(
       // Ignore __tests__
