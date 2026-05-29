@@ -107,8 +107,8 @@ describe('Grant Submission Flow', () => {
       });
       cy.contains('A beneficiary').parent().get('[role="combobox"]').click().type(beneficiaryName);
       cy.wait('@collectivePickerSearch');
-      cy.root().closest('html').contains(`Create vendor: ${beneficiaryName}`).click();
-      cy.root().closest('html').contains('Vendor created', { timeout: 20000 }).should('be.visible');
+      cy.root().closest('html').contains(`Create beneficiary: ${beneficiaryName}`).click();
+      cy.root().closest('html').contains('Beneficiary created', { timeout: 20000 }).should('be.visible');
     });
 
     cy.get('#PAYOUT_METHOD').within(() => {

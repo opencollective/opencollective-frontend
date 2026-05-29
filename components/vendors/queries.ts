@@ -69,6 +69,8 @@ export const vendorFieldFragment = gql`
       name
       imageUrl
     }
+
+    useVendorPolicy
   }
   ${accountHoverCardFields}
 `;

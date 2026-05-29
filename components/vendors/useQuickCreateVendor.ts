@@ -18,9 +18,11 @@ export type QuickCreateVendorCallbacks = {
 
 type UseQuickCreateVendorOptions = {
   host: HostReference;
+  visibleToAccounts?: AccountReferenceInput[];
+  isBeneficiary?: boolean;
 };
 
-export function useQuickCreateVendor({ host }: UseQuickCreateVendorOptions) {
+export function useQuickCreateVendor({ host, visibleToAccounts, isBeneficiary }: UseQuickCreateVendorOptions) {
   const intl = useIntl();
   const { toast } = useToast();
   const [createVendor, { loading: isCreatingVendor }] = useMutation(createVendorMutation);
@@ -35,7 +37,7 @@ export function useQuickCreateVendor({ host }: UseQuickCreateVendorOptions) {
       try {
         const result = await createVendor({
           variables: {
-            vendor: { name },
+            vendor: { name, visibleToAccounts },
             host: pick(host, ['id', 'slug']),
           },
         });
@@ -47,7 +49,9 @@ export function useQuickCreateVendor({ host }: UseQuickCreateVendorOptions) {
 
         toast({
           variant: 'success',
-          message: intl.formatMessage({ defaultMessage: 'Vendor created', id: 'Ra9inC' }),
+          message: isBeneficiary
+            ? intl.formatMessage({ defaultMessage: 'Beneficiary created', id: 'gGYap6' })
+            : intl.formatMessage({ defaultMessage: 'Vendor created', id: 'Ra9inC' }),
         });
         onSuccess(vendor);
       } catch (error) {
@@ -57,7 +61,7 @@ export function useQuickCreateVendor({ host }: UseQuickCreateVendorOptions) {
         });
       }
     },
-    [createVendor, host, intl, toast],
+    [createVendor, host, visibleToAccounts, isBeneficiary, intl, toast],
   );
 
   return { createVendorFromSearch, isCreatingVendor };

@@ -747,6 +747,7 @@ export function signinRequestAndReturnToken(user, redirect) {
 }
 
 function graphqlQuery(token, body) {
+  body.operationName && cy.log(`GraphQL: ${body.operationName}`);
   return cy.request({
     url: '/api/graphql/v1',
     method: 'POST',
@@ -760,6 +761,7 @@ function graphqlQuery(token, body) {
 }
 
 export function graphqlQueryV2(token, body) {
+  body.operationName && cy.log(`GraphQL: ${body.operationName}`);
   return cy.request({
     url: '/api/graphql/v2',
     method: 'POST',
