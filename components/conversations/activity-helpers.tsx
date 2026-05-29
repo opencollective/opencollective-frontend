@@ -123,15 +123,34 @@ export const ACTIVITIES_INFO = {
       id: 'Expense.Activity.Processing',
       defaultMessage: 'Expense processing',
     }),
-    renderDetails: ({ estimatedDelivery, reference }) =>
-      estimatedDelivery &&
-      reference && (
-        <FormattedMessage
-          defaultMessage="Estimated delivery: {estimatedDelivery, date, medium} {estimatedDelivery, time, short}. Reference: {reference}."
-          id="xqDu0y"
-          values={{ estimatedDelivery: new Date(estimatedDelivery), reference }}
-        />
-      ),
+    renderDetails: ({ estimatedDelivery, reference, payoutResponse }) => {
+      const batchId = payoutResponse?.payout_batch_id;
+      if (!estimatedDelivery && !reference && !batchId) {
+        return null;
+      }
+      return (
+        <React.Fragment>
+          {estimatedDelivery && reference && (
+            <p>
+              <FormattedMessage
+                defaultMessage="Estimated delivery: {estimatedDelivery, date, medium} {estimatedDelivery, time, short}. Reference: {reference}."
+                id="xqDu0y"
+                values={{ estimatedDelivery: new Date(estimatedDelivery), reference }}
+              />
+            </p>
+          )}
+          {batchId && (
+            <p>
+              <FormattedMessage
+                defaultMessage="PayPal payout batch ID: {batchId}"
+                id="Expense.Activity.PaypalBatchId"
+                values={{ batchId }}
+              />
+            </p>
+          )}
+        </React.Fragment>
+      );
+    },
   },
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
     type: 'info',
