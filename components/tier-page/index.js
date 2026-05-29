@@ -32,7 +32,7 @@ import TierContributors from './TierContributors';
 import TierLongDescription from './TierLongDescription';
 import TierVideo from './TierVideo';
 
-import BubblesSVG from './Bubbles.svg';
+const BubblesSVG = '/static/images/tier-page/Bubbles.svg';
 
 const generateBackground = (theme, image) => {
   const color = theme.colors.primary[300];

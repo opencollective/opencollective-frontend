@@ -1,7 +1,7 @@
 import React from 'react';
 import { createIntl, RawIntlProvider } from 'react-intl';
 
-import { getLocaleMessages, getPreloadedLocaleMessages } from '../../lib/i18n/request';
+import { getInitialLocaleMessages, getLocaleMessages } from '../../lib/i18n/request';
 
 import { useSSRIntlContext } from './SSRIntlProvider';
 
@@ -16,13 +16,19 @@ export function useLocaleContext() {
 
 export default function IntlProvider({ children, locale }) {
   const [selectedLocale, setSelectedLocale] = React.useState(locale);
-  const [messages, setMessages] = React.useState(getPreloadedLocaleMessages(locale));
+  const [messages, setMessages] = React.useState(getInitialLocaleMessages(locale));
   // SSR only: contains the messages used during this render
   const ssrContext = useSSRIntlContext();
 
   // Client only: fetches messages for the rest of the app async
   React.useEffect(() => {
     async function loadLocaleMessages() {
+      const initialMessages = getInitialLocaleMessages(selectedLocale);
+      if (initialMessages) {
+        setMessages(initialMessages);
+        return;
+      }
+
       setMessages(await getLocaleMessages(selectedLocale));
     }
     loadLocaleMessages();

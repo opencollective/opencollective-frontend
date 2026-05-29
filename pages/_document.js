@@ -1,10 +1,6 @@
 import '../env';
 
-import fs from 'fs';
-import path from 'path';
-
 import React from 'react';
-import * as Sentry from '@sentry/nextjs';
 import { pick } from 'lodash-es';
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 import { createIntl, createIntlCache } from 'react-intl';
@@ -18,15 +14,6 @@ import { parseToBoolean } from '../lib/utils';
 import { getCSPHeader } from '../server/content-security-policy';
 
 import { SSRIntlProvider } from '../components/intl/SSRIntlProvider';
-
-// map of language key to module chunk url
-let languageManifest = {};
-try {
-  const languageManifestPath = path.join(process.cwd(), '.next', 'language-manifest.json');
-  languageManifest = JSON.parse(fs.readFileSync(languageManifestPath, 'utf-8'));
-} catch (e) {
-  Sentry.captureException(e);
-}
 
 const cspHeader = getCSPHeader();
 
@@ -113,6 +100,7 @@ export default class IntlDocument extends Document {
         clientAnalytics,
         cspNonce: requestNonce,
         preconnectOrigins,
+        messages,
         ...intlProps,
         styles: (
           <React.Fragment>
@@ -135,6 +123,7 @@ export default class IntlDocument extends Document {
 
     props.__NEXT_DATA__.props.locale = props.locale;
     props.__NEXT_DATA__.props.language = props.language;
+    props.__NEXT_DATA__.props.messages = props.messages;
     props.__NEXT_DATA__.props[APOLLO_STATE_PROP_NAME] = props[APOLLO_STATE_PROP_NAME];
 
     // We pick the environment variables that we want to access from the client
@@ -173,7 +162,6 @@ export default class IntlDocument extends Document {
               <link rel="dns-prefetch" href={origin} />
             </React.Fragment>
           ))}
-          <script nonce={this.props.cspNonce} defer src={languageManifest[this.props.locale]} />
           <link rel="icon" href="/static/images/favicon.ico.png" />
         </Head>
         <body>

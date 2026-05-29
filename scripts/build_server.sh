@@ -18,4 +18,7 @@ cp -R $SRC/public/static/icons $DIST/public/static
 cp -R $SRC/public/static/images $DIST/public/static
 cp -R $SRC/public/static/styles $DIST/public/static
 cp -R $SRC/public/static/scripts $DIST/public/static
+if [ -d "$SRC/public/static/cmaps" ]; then
+  cp -R $SRC/public/static/cmaps $DIST/public/static
+fi
 cp -R $SRC/public/robots-production.txt $DIST/public

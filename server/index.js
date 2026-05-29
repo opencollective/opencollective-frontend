@@ -24,8 +24,15 @@ app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflar
 const dev = process.env.NODE_ENV === 'development';
 const port = process.env.PORT;
 const hostname = process.env.HOSTNAME;
+
 // Next.js 16 defaults to Turbopack; keep webpack for our custom next.config.js plugins.
-const nextApp = next({ dev, hostname, port, webpack: true });
+const useTurbopack =
+  process.env.USE_WEBPACK !== '1' &&
+  process.env.USE_WEBPACK !== 'true' &&
+  (process.env.TURBOPACK === '1' || process.env.TURBOPACK === 'true' || dev);
+
+const nextApp = next({ dev, hostname, port, webpack: !useTurbopack });
+
 const nextRequestHandler = nextApp.getRequestHandler();
 
 const workers = process.env.WEB_CONCURRENCY || 1;
@@ -35,7 +42,7 @@ const desiredServiceLevel = Number(process.env.SERVICE_LEVEL) || 100;
 const start = id =>
   nextApp.prepare().then(async () => {
     logger.info(
-      `Starting with NODE_ENV=${process.env.NODE_ENV} OC_ENV=${process.env.OC_ENV} API_URL=${process.env.API_URL}`,
+      `Starting with NODE_ENV=${process.env.NODE_ENV} OC_ENV=${process.env.OC_ENV} API_URL=${process.env.API_URL} TURBOPACK=${useTurbopack}`,
     );
 
     app.all('/_next/webpack-hmr', (req, res) => {

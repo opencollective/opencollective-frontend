@@ -9,6 +9,12 @@ type IntlProps = {
   locale: string;
 };
 
+type NextDataProps = {
+  locale?: string;
+  language?: string;
+  messages?: Record<string, string>;
+};
+
 export function getIntlProps(ctx: NextPageContext): IntlProps {
   if (!ctx?.req) {
     return pick(window.__NEXT_DATA__.props, 'language', 'locale');
@@ -63,30 +69,19 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
 
 /** Fetches the i18n messages for the given locale, async */
 export function getLocaleMessages(locale: string): Promise<Record<string, string>> {
-  // creates a async split chunks of the available languages.
-  return import(
-    /* webpackInclude: /\.json$/i */
-    /* webpackChunkName: "i18n-messages-[request]" */
-    /* webpackMode: "lazy" */
-    `../../lang/${locale}.json`
-  );
+  return import(`../../lang/${locale}.json`);
 }
 
-/** Client only. The message chunk (i18n-messages-${locale}) created from getLocaleMessages is injected as a script by _document,
- * making it available for a sync require during hydration.
- */
-export function getPreloadedLocaleMessages(locale: string) {
+/** Client only. Returns messages serialized in __NEXT_DATA__ during SSR. */
+export function getInitialLocaleMessages(locale: string): Record<string, string> | undefined {
   if (typeof window === 'undefined') {
-    return;
-  }
-  // checks if the module is loaded using a weak require (does not include the dependency in this bundle)
-  const moduleId = require.resolveWeak(`../../lang/${locale}.json`);
-  // eslint-disable-next-line camelcase
-  if (moduleId && __webpack_modules__[moduleId]) {
-    // if the module is loaded, require it using the webpack raw require to avoid adding it to this bundle as a dependency.
-
-    return __webpack_require__(moduleId);
+    return undefined;
   }
 
-  return;
+  const nextData = (window as Window & { __NEXT_DATA__?: { props?: NextDataProps } }).__NEXT_DATA__?.props;
+  if (nextData?.locale === locale && nextData?.messages) {
+    return nextData.messages;
+  }
+
+  return undefined;
 }

@@ -5,7 +5,6 @@ import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
 import { initClient } from '../lib/apollo-client';
-import { getLocaleMessages } from '../lib/i18n/request';
 import theme from '../lib/theme';
 
 import { TooltipProvider } from '../components/ui/Tooltip';
@@ -22,8 +21,9 @@ const apolloClient = initClient();
  */
 export const withRequiredProviders = (component, providersParams = {}) => {
   const locale = get(providersParams, 'IntlProvider.locale', 'en');
+  const messages = locale === 'en' ? undefined : require(`../lang/${locale}.json`);
   return (
-    <IntlProvider locale={locale} messages={locale === 'en' ? undefined : getLocaleMessages(locale)}>
+    <IntlProvider locale={locale} messages={messages}>
       <ApolloProvider client={get(providersParams, 'ApolloProvider.client', apolloClient)}>
         <TooltipProvider delayDuration={0} skipDelayDuration={0}>
           <ThemeProvider theme={get(providersParams, 'ThemeProvider.theme', theme)}>{component}</ThemeProvider>

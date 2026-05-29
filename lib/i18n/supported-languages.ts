@@ -1,12 +1,5 @@
-const supportedLanguages = ['en'];
+import locales from '../constants/locales';
 
-const languages = require.context('../../lang', false, /\.json$/i, 'weak');
-
-languages.keys().forEach(element => {
-  const match = element.match(/\.?\/?([^.]+)\.json$/);
-  if (match) {
-    supportedLanguages.push(match[1]);
-  }
-});
+const supportedLanguages = Object.keys(locales);
 
 export default supportedLanguages;

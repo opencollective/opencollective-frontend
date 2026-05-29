@@ -4,11 +4,42 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 const { withSentryConfig } = require('@sentry/nextjs');
 const CopyPlugin = require('copy-webpack-plugin');
-const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const path = require('path');
 require('./env');
 const { REWRITES } = require('./rewrites');
 
+const useWebpack = process.env.USE_WEBPACK === '1' || process.env.USE_WEBPACK === 'true';
+const emptyModule = path.join(__dirname, 'lib/stubs/empty-module.js');
+
+const clientEnv = {
+  OC_ENV: process.env.OC_ENV ?? '',
+  API_KEY: process.env.API_KEY ?? '',
+  API_URL: process.env.API_URL ?? '',
+  PDF_SERVICE_URL: process.env.PDF_SERVICE_URL ?? '',
+  ML_SERVICE_URL: process.env.ML_SERVICE_URL ?? '',
+  DISABLE_MOCK_UPLOADS: String(process.env.DISABLE_MOCK_UPLOADS ?? false),
+  DYNAMIC_IMPORT: String(process.env.DYNAMIC_IMPORT ?? true),
+  WEBSITE_URL: process.env.WEBSITE_URL ?? '',
+  NEXT_IMAGES_URL: process.env.NEXT_IMAGES_URL ?? '',
+  REST_URL: process.env.REST_URL ?? '',
+  SENTRY_DSN: process.env.SENTRY_DSN ?? '',
+  WISE_PLATFORM_COLLECTIVE_SLUG: process.env.WISE_PLATFORM_COLLECTIVE_SLUG ?? '',
+  WISE_ENVIRONMENT: process.env.WISE_ENVIRONMENT ?? 'sandbox',
+  HCAPTCHA_SITEKEY: String(process.env.HCAPTCHA_SITEKEY ?? false),
+  TURNSTILE_SITEKEY: String(process.env.TURNSTILE_SITEKEY ?? false),
+  CAPTCHA_ENABLED: String(process.env.CAPTCHA_ENABLED ?? false),
+  CAPTCHA_PROVIDER: process.env.CAPTCHA_PROVIDER ?? 'HCAPTCHA',
+  SENTRY_TRACES_SAMPLE_RATE: process.env.SENTRY_TRACES_SAMPLE_RATE ?? '',
+  OC_APPLICATION: process.env.OC_APPLICATION ?? '',
+  HEROKU_SLUG_COMMIT: process.env.HEROKU_SLUG_COMMIT ?? '',
+  LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: String(
+    process.env.LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES ?? false,
+  ),
+  DISABLE_CONTACT_FORM: String(process.env.DISABLE_CONTACT_FORM ?? false),
+  NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: String(process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE ?? 0),
+};
+
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
@@ -16,6 +47,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  env: clientEnv,
   compiler: {
     styledComponents: {
       displayName: ['ci', 'test', 'development', 'e2e'].includes(process.env.OC_ENV),
@@ -24,8 +56,21 @@ const nextConfig = {
   images: {
     disableStaticImages: true,
   },
-  outputFileTracingIncludes: {
-    '/_document': ['./.next/language-manifest.json'],
+  experimental: {
+    turbopackMinify: !['ci', 'e2e'].includes(process.env.OC_ENV),
+    turbopackSourceMaps: true,
+  },
+  turbopack: {
+    resolveAlias: {
+      '@sentry/replay': emptyModule,
+      canvas: emptyModule,
+    },
+    rules: {
+      '*.md': {
+        loaders: ['raw-loader', 'markdown-loader'],
+        as: '*.js',
+      },
+    },
   },
   outputFileTracingExcludes: {
     '*': [
@@ -36,6 +81,10 @@ const nextConfig = {
   },
   allowedDevOrigins: ['localhost', '127.0.0.1', '::1', '*.ngrok-free.dev'],
   webpack: (config, { webpack, isServer, dev }) => {
+    if (!useWebpack) {
+      return config;
+    }
+
     config.resolve.alias['@sentry/replay'] = false;
     config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
     if (typeof config.cache !== 'boolean') {
@@ -47,35 +96,9 @@ const nextConfig = {
     config.plugins.push(
       // Ignore __tests__
       new webpack.IgnorePlugin({ resourceRegExp: /[\\/]__tests__[\\/]/ }),
-      // Only include our supported locales
-      new webpack.ContextReplacementPlugin(/moment[\\/]locale$/, /en|fr|es|ja/),
       // Set extra environment variables accessible through process.env.*
       // Will be replaced by webpack by their values!
-      new webpack.EnvironmentPlugin({
-        OC_ENV: null,
-        API_KEY: null,
-        API_URL: null,
-        PDF_SERVICE_URL: null,
-        ML_SERVICE_URL: null,
-        DISABLE_MOCK_UPLOADS: false,
-        DYNAMIC_IMPORT: true,
-        WEBSITE_URL: null,
-        NEXT_IMAGES_URL: null,
-        REST_URL: null,
-        SENTRY_DSN: null,
-        WISE_PLATFORM_COLLECTIVE_SLUG: null,
-        WISE_ENVIRONMENT: 'sandbox',
-        HCAPTCHA_SITEKEY: false,
-        TURNSTILE_SITEKEY: false,
-        CAPTCHA_ENABLED: false,
-        CAPTCHA_PROVIDER: 'HCAPTCHA',
-        SENTRY_TRACES_SAMPLE_RATE: null,
-        OC_APPLICATION: null,
-        HEROKU_SLUG_COMMIT: null,
-        LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
-        DISABLE_CONTACT_FORM: false,
-        NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: 0,
-      }),
+      new webpack.EnvironmentPlugin(clientEnv),
     );
 
     if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
@@ -117,25 +140,6 @@ const nextConfig = {
       }),
     );
 
-    // generates a manifest of languages and the respective webpack chunk url
-    config.plugins.push(
-      new WebpackManifestPlugin({
-        fileName: 'language-manifest.json',
-        generate(seed, files) {
-          return files.reduce((manifest, file) => {
-            const match = file.name.match(/i18n-messages-(.*)-json.js$/);
-            if (match) {
-              manifest[match[1]] = file.path;
-            }
-            return manifest;
-          }, seed);
-        },
-        filter(file) {
-          return file.isChunk && file.name.match(/^i18n-messages-.*/);
-        },
-      }),
-    );
-
     // Put the Codecov webpack plugin after all other plugins
     if (['ci', 'e2e'].includes(process.env.OC_ENV)) {
       const { codecovWebpackPlugin } = require('@codecov/webpack-plugin');
@@ -166,27 +170,6 @@ const nextConfig = {
         },
       },
       include: [path.resolve(__dirname, 'public')],
-    });
-
-    // Configuration for static/marketing pages
-    config.module.rules.unshift({
-      test: /public[\\/].*\.(html)$/,
-      loader: 'html-loader',
-      options: {
-        esModule: false,
-      },
-    });
-
-    // Load images in base64 (only for very small assets; larger files become URLs)
-    config.module.rules.push({
-      test: /\.(svg|png|jpg|gif)$/,
-      use: {
-        loader: 'url-loader',
-        options: {
-          limit: 8192,
-        },
-      },
-      include: [path.resolve(__dirname, 'components')],
     });
 
     if (['ci', 'e2e'].includes(process.env.OC_ENV)) {
@@ -369,10 +352,15 @@ if (process.env.SENTRY_AUTH_TOKEN) {
 }
 
 if (process.env.ANALYZE) {
-  const withBundleAnalyzer = require('@next/bundle-analyzer')({
-    enabled: true,
-  });
-  exportedConfig = withBundleAnalyzer(exportedConfig);
+  if (useWebpack) {
+    const withBundleAnalyzer = require('@next/bundle-analyzer')({
+      enabled: true,
+    });
+    exportedConfig = withBundleAnalyzer(exportedConfig);
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn('[ANALYZE] Bundle analyzer requires USE_WEBPACK=1.');
+  }
 }
 
 module.exports = exportedConfig;

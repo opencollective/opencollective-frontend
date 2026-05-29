@@ -2,7 +2,7 @@ import React from 'react';
 import { get, has } from 'lodash-es';
 import styled, { css } from 'styled-components';
 
-import HeroBackgroundMask from '../../../public/static/images/collective-page/HeroBackgroundMask.svg';
+const HeroBackgroundMask = '/static/images/collective-page/HeroBackgroundMask.svg';
 
 export const BASE_HERO_WIDTH = 1368;
 export const BASE_HERO_HEIGHT = 325;
