@@ -32,6 +32,7 @@ const personalTokenQuery = gql`
         totalCount
         nodes {
           id
+          publicId
           name
         }
       }

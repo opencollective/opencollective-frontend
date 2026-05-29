@@ -1,7 +1,7 @@
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { z } from 'zod';
 
-import type { Account } from '../../lib/graphql/types/v2/schema';
+import type { Account } from '../../lib/graphql/types/v2/graphql';
 
 import { toast } from '../ui/useToast';
 

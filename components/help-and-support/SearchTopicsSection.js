@@ -1,6 +1,6 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
-import { debounce, isEmpty, truncate } from 'lodash';
+import { debounce, isEmpty, truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { usePopper } from 'react-popper';
 import { styled } from 'styled-components';

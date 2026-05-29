@@ -1,26 +1,26 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import type {
+  AccountingCategory,
   AdminAccountingCategoriesQuery,
   AdminAccountingCategoriesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema';
-import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
-import { hasAccountHosting } from '@/lib/collective.js';
+import { FEATURES, isFeatureEnabled, requiresUpgrade } from '@/lib/allowed-features';
 
+import { AccountingCategorizationRulesDashboard } from '@/components/accounting/dashboard/categorization/AccountingCategorizationRulesDashboard.tsx';
 import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect.tsx';
+import Tabs from '@/components/Tabs';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../../ConfirmationModal';
-import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { UpgradePlanCTA } from '../../../platform-subscriptions/UpgradePlanCTA.tsx';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
@@ -132,7 +132,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const [isCreateCategoryModalOpen, setIsCreateCategoryModalOpen] = React.useState(false);
   const [deleteCategoryConfirmation, setDeleteCategoryConfirmation] = React.useState(null);
 
-  const hasHosting = hasAccountHosting(account);
+  const hasHosting = account.hasHosting;
 
   const queryFilter = useQueryFilter({
     schema: React.useMemo(
@@ -264,6 +264,32 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     [updateCategories, categories],
   );
 
+  const isContributionCategorizationRulesEnabled = isFeatureEnabled(account, FEATURES.ACCOUNTING_CATEGORIZATION_RULES);
+
+  const tabs = React.useMemo(
+    () => [
+      {
+        id: 'categories',
+        label: intl.formatMessage({ defaultMessage: 'Chart of Accounts', id: 'IzFWHI' }),
+      },
+      ...(isContributionCategorizationRulesEnabled
+        ? [
+            {
+              id: 'rules',
+              label: intl.formatMessage({ defaultMessage: 'Contribution Categorization Rules', id: 'gTCN6X' }),
+            },
+          ]
+        : []),
+    ],
+    [intl, isContributionCategorizationRulesEnabled],
+  );
+
+  const [selectedTab, setSelectedTab] = React.useState('categories');
+
+  const handleTabChange = React.useCallback((tab: string) => {
+    setSelectedTab(tab);
+  }, []);
+
   return (
     <React.Fragment>
       <div className="flex flex-col gap-4">
@@ -295,20 +321,29 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           <UpgradePlanCTA featureKey="CHART_OF_ACCOUNTS" className="mt-4" />
         ) : (
           <React.Fragment>
-            <Filterbar {...queryFilter} />
+            {tabs.length > 1 && <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />}
 
-            {query.error && <MessageBoxGraphqlError error={query.error} />}
+            {selectedTab === 'categories' && (
+              <React.Fragment>
+                <Filterbar {...queryFilter} hideSeparator={tabs.length > 1} />
 
-            <AccountingCategoriesTable
-              hostSlug={accountSlug}
-              accountingCategories={filteredCategories}
-              isAdmin={isAdmin}
-              loading={query.loading}
-              isFiltered={!!queryFilter.values.searchTerm}
-              onDelete={onDelete}
-              onEdit={onEdit}
-              hasHosting={hasHosting}
-            />
+                <AccountingCategoriesTable
+                  hostSlug={accountSlug}
+                  accountingCategories={filteredCategories}
+                  isAdmin={isAdmin}
+                  loading={query.loading}
+                  isFiltered={!!queryFilter.values.searchTerm}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  hasHosting={hasHosting}
+                />
+              </React.Fragment>
+            )}
+            {selectedTab === 'rules' && (
+              <React.Fragment>
+                <AccountingCategorizationRulesDashboard />
+              </React.Fragment>
+            )}
           </React.Fragment>
         )}
       </div>

@@ -1,14 +1,13 @@
 import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
-import { includes } from 'lodash';
+import { includes } from 'lodash-es';
 import { Check, Copy, Filter, MinusCircle, MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { hasAccountHosting } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import useProcessExpense from '@/lib/expenses/useProcessExpense';
-import { type Expense, ExpenseStatus } from '@/lib/graphql/types/v2/schema';
+import { type Expense, ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
@@ -139,13 +138,9 @@ type MoreActionsMenuProps = {
 function MoreActionsMenu(props: MoreActionsMenuProps) {
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
+  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType | null>(null);
   const [isGrantFlowOpen, setIsGrantFlowOpen] = React.useState(false);
-
-  const hasHosting = hasAccountHosting(account);
-
   const permissions = props.grant?.permissions;
-
-  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType>(null);
   const processExpense = useProcessExpense({
     expense: props.grant,
   });
@@ -173,7 +168,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
                   router.push(
                     getDashboardRoute(
                       account,
-                      `${hasHosting ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}${hasHosting ? '&sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL' : ''}`,
+                      `${account.hasHosting ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}${account.hasHosting ? '&sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL' : ''}`,
                     ),
                   )
                 }
@@ -210,7 +205,16 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
         </DropdownMenuContent>
       </DropdownMenu>
       {processModal && (
-        <ConfirmProcessExpenseModal type={processModal} expense={props.grant} onClose={() => setProcessModal(null)} />
+        <ConfirmProcessExpenseModal
+          type={processModal}
+          open={!!processModal}
+          setOpen={open => {
+            if (!open) {
+              setProcessModal(null);
+            }
+          }}
+          expense={props.grant}
+        />
       )}
       {isGrantFlowOpen && (
         <SubmitGrantFlow
@@ -231,7 +235,6 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
 
 function BeneficiaryCell({ grant }) {
   const { account: dashboardAccount } = React.useContext(DashboardContext);
-  const hasDashboardAccountHosting = hasAccountHosting(dashboardAccount);
 
   const intl = useIntl();
 
@@ -242,7 +245,7 @@ function BeneficiaryCell({ grant }) {
 
   const previousGrantsLink = getDashboardRoute(
     dashboardAccount,
-    `${hasDashboardAccountHosting ? 'hosted-grants' : 'grants'}?sort[field]=CREATED_AT&sort[direction]=DESC&fromAccount=${beneficiary.slug}${hasDashboardAccountHosting ? `&status=ALL` : ''}`,
+    `${dashboardAccount.hasHosting ? 'hosted-grants' : 'grants'}?sort[field]=CREATED_AT&sort[direction]=DESC&fromAccount=${beneficiary.slug}${dashboardAccount.hasHosting ? `&status=ALL` : ''}`,
   );
 
   return (

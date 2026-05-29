@@ -58,7 +58,7 @@ const messages = defineMessages({
   },
   'home.solutions.unincorporated.button': {
     id: 'home.solutions.unincorporated.button',
-    defaultMessage: 'Join As A Collective',
+    defaultMessage: 'Explore Collective Features',
   },
 });
 
@@ -72,7 +72,6 @@ const Solutions = () => {
           height={820}
           src="/static/images/blue-watercolor-bg.png"
           alt=""
-          priority
           className="h-full w-auto object-cover opacity-80"
         />
       </div>
@@ -185,8 +184,8 @@ const Solutions = () => {
               </div>
             </div>
 
-            <Button asChild variant="outline" className="h-12 w-full rounded-full text-base" size="lg">
-              <Link href="/create" className="flex items-center justify-center gap-2">
+            <Button asChild variant="marketing" className="h-12 w-full rounded-full text-base" size="lg">
+              <Link href="/collectives" className="flex items-center justify-center gap-2">
                 <FormattedMessage {...messages['home.solutions.unincorporated.button']} />
                 <ArrowRight size={16} />
               </Link>

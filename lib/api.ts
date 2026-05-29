@@ -3,7 +3,7 @@ import { downloadBlob, exportFile } from './export_file';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from './local-storage';
 import { TwoFactorAuthenticationHeader } from './two-factor-authentication';
 import { isRelativeHref, PDF_SERVICE_URL } from './url-helpers';
-import { isValidEmail, parseToBoolean, repeatWithInterval } from './utils';
+import { getApiUrl, isValidEmail, parseToBoolean, repeatWithInterval } from './utils';
 
 const queryString = params => {
   return Object.keys(params)
@@ -67,7 +67,7 @@ export function upload(file, kind) {
   const reader = new FileReader();
   reader.readAsDataURL(file);
   const formData = getFormDataForFile(file, kind);
-  return fetch(`${process.env.API_URL}/images`, {
+  return fetch(`${getApiUrl()}/images`, {
     method: 'post',
     headers: addAuthTokenToHeader(),
     body: formData,
@@ -147,7 +147,7 @@ export function uploadImageWithXHR(file, kind, { onProgress, onSuccess, onFailur
 
     // Build request
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${process.env.API_URL}/images`, true);
+    xhr.open('POST', `${getApiUrl()}/images`, true);
     xhr.setRequestHeader('Authorization', addAuthTokenToHeader().Authorization);
 
     if (onProgress) {
@@ -196,7 +196,7 @@ export function connectAccount(CollectiveId, service, options: { redirect?: stri
     ...options,
   };
 
-  return fetch(`${process.env.API_URL}/connected-accounts/${service}/oauthUrl?${queryString(params)}`, {
+  return fetch(`${getApiUrl()}/connected-accounts/${service}/oauthUrl?${queryString(params)}`, {
     method: 'get',
     headers: addAuthTokenToHeader(),
   }).then(checkResponseStatus);
@@ -209,30 +209,45 @@ export function connectAccountCallback(CollectiveId, service, options: { redirec
     ...options,
   };
 
-  return fetch(`${process.env.API_URL}/connected-accounts/${service}/callback?${queryString(params)}`, {
+  return fetch(`${getApiUrl()}/connected-accounts/${service}/callback?${queryString(params)}`, {
     method: 'get',
     headers: addAuthTokenToHeader(),
   }).then(response => response.status === 200 || response.status === 302);
 }
 
 export function disconnectAccount(collectiveId, service) {
-  return fetch(`${process.env.API_URL}/connected-accounts/${service}/disconnect/${collectiveId}`, {
+  return fetch(`${getApiUrl()}/connected-accounts/${service}/disconnect/${collectiveId}`, {
     method: 'delete',
     headers: addAuthTokenToHeader(),
   }).then(checkResponseStatus);
+}
+
+/**
+ * Returns the PayPal Connect public client ID from the platform backend.
+ * Returns null if PayPal Connect is not configured
+ */
+export function getPaypalConnectConfig(accountId: string): Promise<{
+  clientId: string;
+  redirectUri: string;
+  authorizeUrl: string;
+} | null> {
+  const url = new URL(`${getApiUrl()}/connected-accounts/paypal/connect-config`);
+  url.searchParams.set('accountId', accountId);
+  url.searchParams.set('redirect', window.location.href.replace(/\?.*/, ''));
+  return fetch(url.toString()).then(response => (response.ok ? response.json() : null));
 }
 
 export function checkUserExistence(email) {
   if (!isValidEmail(email)) {
     return Promise.resolve(false);
   }
-  return fetch(`${process.env.API_URL}/users/exists?email=${encodeURIComponent(email)}`)
+  return fetch(`${getApiUrl()}/users/exists?email=${encodeURIComponent(email)}`)
     .then(checkResponseStatus)
     .then(json => Boolean(json.exists));
 }
 
 export function signin(parameters) {
-  return fetch(`${process.env.API_URL}/users/signin`, {
+  return fetch(`${getApiUrl()}/users/signin`, {
     method: 'POST',
     headers: {
       ...addAuthTokenToHeader(),
@@ -245,7 +260,7 @@ export function signin(parameters) {
 
 /* Exchange signin token against session token */
 export async function exchangeLoginToken(currentToken) {
-  const response = await fetch(`${process.env.API_URL}/users/exchange-login-token`, {
+  const response = await fetch(`${getApiUrl()}/users/exchange-login-token`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${currentToken}` },
   });
@@ -258,7 +273,7 @@ export async function exchangeLoginToken(currentToken) {
 
 /* Exchange session token against newer session token */
 export async function refreshToken(currentToken) {
-  const response = await fetch(`${process.env.API_URL}/users/refresh-token`, {
+  const response = await fetch(`${getApiUrl()}/users/refresh-token`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${currentToken}` },
   });
@@ -274,7 +289,7 @@ export async function signup(body: {
   password?: string;
   captcha?: { token?: string; provider?: string };
 }): Promise<{ success?: true; sessionId?: string; error?: any }> {
-  const response = await fetch(`${process.env.API_URL}/users/signup`, {
+  const response = await fetch(`${getApiUrl()}/users/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -287,7 +302,7 @@ export async function signup(body: {
 }
 
 export async function resendOTP(body: { email: string; sessionId: string }) {
-  const response = await fetch(`${process.env.API_URL}/users/resend-otp`, {
+  const response = await fetch(`${getApiUrl()}/users/resend-otp`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -300,7 +315,7 @@ export async function resendOTP(body: { email: string; sessionId: string }) {
 }
 
 export async function verifyEmail(body: { email: string; otp: string; sessionId: string }) {
-  const response = await fetch(`${process.env.API_URL}/users/verify-email`, {
+  const response = await fetch(`${getApiUrl()}/users/verify-email`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -316,7 +331,7 @@ export async function refreshTokenWithTwoFactorCode(
   currentToken,
   { twoFactorAuthenticatorCode, twoFactorAuthenticationType },
 ) {
-  return fetch(`${process.env.API_URL}/users/two-factor-auth`, {
+  return fetch(`${getApiUrl()}/users/two-factor-auth`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${currentToken}`,
@@ -387,7 +402,7 @@ export async function fetchFromPDFService(url) {
 export async function downloadLegalDocument(legalDocument, account, prompt2fa) {
   const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
   const headers = { Authorization: `Bearer ${accessToken}` };
-  const legalDocumentUrl = `${process.env.API_URL}/legal-documents/${legalDocument.id}/download`;
+  const legalDocumentUrl = `${getApiUrl()}/legal-documents/${legalDocument.id}/download`;
 
   // A helper to fetch the legal document
   const fetchLegalDocument = async () => {
@@ -458,14 +473,14 @@ export async function fetchCSVFileFromRESTService(url, filename, { isAuthenticat
   return exportFile('text/csv;charset=utf-8', `${filename}.csv`, content);
 }
 
-export function getGithubRepos(accessToken) {
-  // NOTE: it's tempting to move the access token to the Authorization HTTP header
-  // But we need to make sure it works well with Cypress ci.intercept
-  return fetch(`${process.env.API_URL}/github-repositories?access_token=${accessToken}`).then(checkResponseStatus);
+export function getGithubRepos(accessToken: string) {
+  return fetch(`${getApiUrl()}/github-repositories`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  }).then(checkResponseStatus);
 }
 
 export function sendContactMessage(body) {
-  return fetch(`${process.env.API_URL}/contact/send-message`, {
+  return fetch(`${getApiUrl()}/contact/send-message`, {
     method: 'POST',
     headers: {
       ...addAuthTokenToHeader(),

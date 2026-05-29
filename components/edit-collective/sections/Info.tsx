@@ -1,9 +1,9 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { get, isEqual, isNil, isUndefined, pick } from 'lodash';
+import { compact, get, isEqual, isNil, isUndefined, pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -13,8 +13,8 @@ import { Currency as CurrencyOptions } from '@/lib/constants/currency';
 import { VAT_OPTIONS } from '@/lib/constants/vat';
 import dayjs from '@/lib/dayjs';
 import { loadGoogleMaps } from '@/lib/google-maps';
-import type { Account, AccountUpdateInput, Currency } from '@/lib/graphql/types/v2/schema';
-import { AccountType } from '@/lib/graphql/types/v2/schema';
+import type { Account, AccountUpdateInput, Currency } from '@/lib/graphql/types/v2/graphql';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { cn, omitDeepBy } from '@/lib/utils';
@@ -52,8 +52,13 @@ const editAccountFragment = gql`
     description
     longDescription
     isActive
+    isPrivate
     isHost
     tags
+    features {
+      id
+      PUBLIC_PROFILE
+    }
     location {
       name
       address
@@ -204,9 +209,10 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   });
 
   const account = data?.account;
+  const exampleBaseUrl = account?.isPrivate ? `${process.env.WEBSITE_URL}/dashboard` : process.env.WEBSITE_URL;
 
   // Load Google Maps for address autocomplete. Individuals use a simplified location input.
-  React.useEffect(() => {
+  useEffect(() => {
     if (account && account.type !== INDIVIDUAL) {
       loadGoogleMaps().finally(() => setIsLoadingGoogleMaps(false));
     }
@@ -279,7 +285,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
               values={{
                 previousHandle: account.slug,
                 newHandle: variables.account.slug,
-                exampleUrl: `https://opencollective.com/${account.slug}`,
+                exampleUrl: `${exampleBaseUrl}/${variables.account.slug}`,
               }}
             />
           ),
@@ -352,10 +358,12 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 account.type === INDIVIDUAL ? 'e.g. Miles, John, Ella' : 'e.g. OFiCo, Open Collective, Sentry'
               }
               hint={
-                <FormattedMessage
-                  defaultMessage="Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc."
-                  id="Fields.name.description"
-                />
+                account.isPrivate ? null : (
+                  <FormattedMessage
+                    defaultMessage="Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc."
+                    id="Fields.name.description"
+                  />
+                )
               }
             />
             {([ORGANIZATION, INDIVIDUAL].includes(account.type) || account.isHost) && (
@@ -389,56 +397,62 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
             )}
             {account.type !== EVENT && (
               <FormField name="slug" label={<FormattedMessage id="account.slug.label" defaultMessage="Handle" />}>
-                {({ field }) => <InputGroup className="w-full" prepend="opencollective.com/" {...field} />}
+                {({ field }) => <InputGroup className="w-full" prepend={`${exampleBaseUrl}/`} {...field} />}
               </FormField>
             )}
-            <FormField
-              name="tags"
-              label={<FormattedMessage defaultMessage="Tags" id="Tags" />}
-              hint={
-                <FormattedMessage
-                  defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
-                  id="collective.tags.info"
-                />
-              }
-            >
-              {({ field }) => (
-                <EditTags
-                  {...field}
-                  onChange={entries =>
-                    setFieldValue(
-                      field.name,
-                      entries.map(e => e.value),
-                    )
-                  }
-                />
-              )}
-            </FormField>
-            <FormField
-              name="description"
-              label={<FormattedMessage defaultMessage="Short description" id="collective.description.label" />}
-            />
-            <FormField
-              name="longDescription"
-              label={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
-            >
-              {({ field }) => (
-                <RichTextEditor
-                  kind="ACCOUNT_LONG_DESCRIPTION"
-                  {...field}
-                  withStickyToolbar
-                  toolbarOffsetY={0}
-                  defaultValue={field.value}
-                  onChange={e => setFieldValue('longDescription', e.target.value)}
-                  videoEmbedEnabled
-                  withBorders
-                  placeholder={intl.formatMessage({
-                    defaultMessage: 'Tell your story and explain your purpose.',
-                    id: 'SectionAbout.Why',
-                  })}
-                />
-              )}
-            </FormField>
+            {!account.isPrivate && (
+              <FormField
+                name="tags"
+                label={<FormattedMessage defaultMessage="Tags" id="Tags" />}
+                hint={
+                  <FormattedMessage
+                    defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
+                    id="collective.tags.info"
+                  />
+                }
+              >
+                {({ field }) => (
+                  <EditTags
+                    {...field}
+                    onChange={entries =>
+                      setFieldValue(
+                        field.name,
+                        entries.map(e => e.value),
+                      )
+                    }
+                  />
+                )}
+              </FormField>
+            )}
+            {(!account.isPrivate || !account.isHost) && (
+              <FormField
+                name="description"
+                label={<FormattedMessage defaultMessage="Short description" id="collective.description.label" />}
+              />
+            )}
+            {!account.isPrivate && (
+              <FormField
+                name="longDescription"
+                label={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
+              >
+                {({ field }) => (
+                  <RichTextEditor
+                    kind="ACCOUNT_LONG_DESCRIPTION"
+                    {...field}
+                    withStickyToolbar
+                    toolbarOffsetY={0}
+                    defaultValue={field.value}
+                    onChange={e => setFieldValue('longDescription', e.target.value)}
+                    videoEmbedEnabled
+                    withBorders
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Tell your story and explain your purpose.',
+                      id: 'SectionAbout.Why',
+                    })}
+                  />
+                )}
+              </FormField>
+            )}
             {account.type === EVENT && (
               <React.Fragment>
                 <FormField
@@ -551,22 +565,13 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 )}
               </FormField>
             )}
-            <FormField name="socialLinks" label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}>
-              {({ field }) => (
-                <SocialLinksFormField
-                  value={field.value || field.defaultValue}
-                  onChange={event => setFieldValue(field.name, event)}
-                  touched={field.formModified}
-                  useLegacyInput={false}
-                />
-              )}
-            </FormField>
             {taxes.includes(TaxType.VAT) && (
               <React.Fragment>
                 <FormField
                   name="settings.VAT"
                   label={<FormattedMessage defaultMessage="VAT settings" id="EditCollective.VAT" />}
                   hint={
+                    account.type !== ORGANIZATION &&
                     values.settings?.VAT?.disabled && (
                       <FormattedMessage
                         id="EditCollective.VAT.Disabled.Warning"
@@ -578,10 +583,11 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   {({ field }) => {
                     const isDisabled = field.value?.disabled;
                     const currentType = isDisabled ? 'DISABLED' : field.value?.type;
-                    // Use 'HOST' to represent using host VAT settings (null in the form field)
-                    const displayType = currentType === null ? 'HOST' : currentType;
-                    const options = [
-                      {
+                    const displayType =
+                      currentType ?? (account.type === ORGANIZATION ? VAT_OPTIONS.DISABLED : VAT_OPTIONS.HOST);
+
+                    const options = compact([
+                      account.type !== ORGANIZATION && {
                         value: VAT_OPTIONS.HOST,
                         label: (
                           <FormattedMessage defaultMessage="Use the host VAT settings" id="EditCollective.VAT.Host" />
@@ -589,18 +595,22 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                       },
                       {
                         value: VAT_OPTIONS.OWN,
-                        label: (
-                          <FormattedMessage
-                            defaultMessage="Use my own VAT number"
-                            id="EditCollective.VAT.OwnSettings"
-                          />
-                        ),
+                        label:
+                          account.type === ORGANIZATION ? (
+                            <FormattedMessage defaultMessage="Enable VAT" id="EditCollective.VAT.Enabled" />
+                          ) : (
+                            <FormattedMessage
+                              defaultMessage="Use my own VAT number"
+                              id="EditCollective.VAT.OwnSettings"
+                            />
+                          ),
                       },
                       {
                         value: 'DISABLED',
                         label: <FormattedMessage defaultMessage="Disable VAT" id="EditCollective.VAT.Disabled" />,
                       },
-                    ];
+                    ]);
+
                     return (
                       <Select
                         name="settings.VAT.type"
@@ -657,6 +667,18 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 label={<FormattedMessage defaultMessage="GST number" id="EditCollective.GSTNumber" />}
                 placeholder="9429037631147"
               />
+            )}
+            {!account.isPrivate && (
+              <FormField name="socialLinks" label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}>
+                {({ field }) => (
+                  <SocialLinksFormField
+                    value={field.value || field.defaultValue}
+                    onChange={event => setFieldValue(field.name, event)}
+                    touched={field.formModified}
+                    useLegacyInput={false}
+                  />
+                )}
+              </FormField>
             )}
             <div className="mt-4 flex flex-col gap-2 sm:justify-stretch">
               <Button data-cy="save" className="grow" type="submit" loading={submitting} disabled={!dirty}>

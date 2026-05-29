@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { clsx } from 'clsx';
-import { clamp, cloneDeep, groupBy, isEmpty, isEqual, isNaN, round } from 'lodash';
+import { clamp, cloneDeep, groupBy, isEmpty, isEqual, isNaN, round } from 'lodash-es';
 import { AlertTriangle, ArrowLeft, ArrowRight, ChevronDown, FileText, Undo } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
@@ -11,8 +11,11 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
-import type { HostedCollectiveFieldsFragment, HostedCollectivesQuery } from '../../../../lib/graphql/types/v2/graphql';
-import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
+import type {
+  AccountWithHost,
+  HostedCollectiveFieldsFragment,
+  HostedCollectivesQuery,
+} from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
@@ -604,6 +607,27 @@ const CollectiveDetails = ({
               }
             />
             <InfoListItem title={<FormattedMessage id="Balance" defaultMessage="Balance" />} value={displayBalance} />
+            {collective?.type === CollectiveType.EVENT && (
+              <InfoListItem
+                className="col-span-2"
+                title={<FormattedMessage id="startsAt" defaultMessage="Event Starts At" />}
+                value={
+                  <div className="flex items-center gap-2">
+                    {collective.startsAt ? (
+                      <FormattedDate value={collective.startsAt} day="numeric" month="long" year="numeric" />
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                    {collective.endsAt && collective.endsAt !== collective.startsAt && (
+                      <React.Fragment>
+                        <span>&rarr;</span>
+                        <FormattedDate value={collective.endsAt} day="numeric" month="long" year="numeric" />
+                      </React.Fragment>
+                    )}
+                  </div>
+                }
+              />
+            )}
             {isHostedCollective && (
               <React.Fragment>
                 {!isUpgradeRequiredForSettingHostFee && (

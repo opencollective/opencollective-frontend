@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
-import { capitalize, isNil, omit } from 'lodash';
+import { capitalize, isNil, omit } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -42,9 +42,17 @@ const { FUND, PROJECT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
 
-function getTierTypeOptions(intl, collectiveType) {
-  const simplifiedTierTypes = [
-    { value: TIER, label: capitalize(intl.formatMessage({ id: 'tier.type.tier', defaultMessage: 'generic tier' })) },
+/**
+ * Returns tier type options for the type select. Filters by supportedTierTypes when provided.
+ * @param supportedTierTypes - Optional array of tier types the account supports (from API supportedTierTypes field).
+ *        When null/undefined, all types are shown.
+ */
+export function getTierTypeOptions(intl, collectiveType, supportedTierTypes: string[] | null = null) {
+  const allSimplifiedTierTypes = [
+    {
+      value: TIER,
+      label: capitalize(intl.formatMessage({ id: 'tier.type.tier', defaultMessage: 'generic tier' })),
+    },
     {
       value: SERVICE,
       label: capitalize(intl.formatMessage({ id: 'tier.type.service', defaultMessage: 'service (e.g., support)' })),
@@ -59,16 +67,23 @@ function getTierTypeOptions(intl, collectiveType) {
     },
   ];
 
-  const membershipTierType = {
-    value: MEMBERSHIP,
-    label: capitalize(intl.formatMessage({ id: 'tier.type.membership', defaultMessage: 'membership (recurring)' })),
-  };
+  // Filter out unsupported
+  const tierTypes = isNil(supportedTierTypes)
+    ? allSimplifiedTierTypes
+    : allSimplifiedTierTypes.filter(opt => supportedTierTypes.includes(opt.value));
 
   if (collectiveType === PROJECT) {
-    return simplifiedTierTypes;
+    return tierTypes;
   }
 
-  return [...simplifiedTierTypes, membershipTierType];
+  if (isNil(supportedTierTypes) || supportedTierTypes.includes(MEMBERSHIP)) {
+    tierTypes.push({
+      value: MEMBERSHIP,
+      label: capitalize(intl.formatMessage({ id: 'tier.type.membership', defaultMessage: 'membership (recurring)' })),
+    });
+  }
+
+  return tierTypes;
 }
 
 function getReceiptTemplates(intl, host) {
@@ -94,9 +109,12 @@ const collectiveSupportsInterval = collective => {
   return collective.type !== CollectiveType.EVENT;
 };
 
-function FormFields({ collective, values, hideTypeSelect }) {
+function FormFields({ collective, values, hideTypeSelect, supportedTierTypes }) {
   const intl = useIntl();
-  const tierTypeOptions = React.useMemo(() => getTierTypeOptions(intl, collective.type), [intl, collective.type]);
+  const tierTypeOptions = React.useMemo(
+    () => getTierTypeOptions(intl, collective.type, supportedTierTypes),
+    [intl, collective.type, supportedTierTypes],
+  );
   const intervalOptions = React.useMemo(() => {
     if (!collectiveSupportsInterval(collective)) {
       return [{ value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) }];
@@ -167,23 +185,19 @@ function FormFields({ collective, values, hideTypeSelect }) {
               />
             )}
           </StyledInputFormikField>
-          {taxes.map(({ type, percentage }) => (
-            <Flex key={`${type}-${percentage}`} mt={3}>
-              <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
-                <Span fontWeight="bold">
-                  <FormattedMessage
-                    id="withColon"
-                    defaultMessage="{item}:"
-                    values={{ item: i18nTaxType(intl, type) }}
-                  />{' '}
-                  {percentage}%
-                </Span>
-                <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
-              </MessageBox>
-            </Flex>
-          ))}
         </React.Fragment>
       )}
+      {taxes.map(({ type, percentage }) => (
+        <Flex key={`${type}-${percentage}`} mt={3}>
+          <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
+            <Span fontWeight="bold">
+              <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: i18nTaxType(intl, type) }} />{' '}
+              {percentage}%
+            </Span>
+            <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
+          </MessageBox>
+        </Flex>
+      ))}
       <StyledInputFormikField
         name="name"
         label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
@@ -553,21 +567,16 @@ function FormFields({ collective, values, hideTypeSelect }) {
 }
 
 const EditSectionContainer = styled(Flex)`
-  overflow-y: scroll;
   flex-grow: 1;
   min-height: 200px;
   flex-direction: column;
   padding-right: 0.65rem;
   min-width: 250px;
-
-  @media (min-width: 700px) {
-    max-height: 400px;
-  }
+  padding-bottom: 1rem;
 `;
 
 const PreviewSectionContainer = styled(Flex)`
   overflow: hidden;
-  max-height: 400px;
   flex-grow: 1;
   min-width: 300px;
   justify-content: center;
@@ -611,7 +620,7 @@ const ContributeCardPreviewContainer = styled.div`
   }
 `;
 
-export default function EditTierModal({ tier, collective, onClose, onUpdate, forcedType }) {
+export default function EditTierModal({ tier, collective, onClose, onUpdate, forcedType, supportedTierTypes }) {
   const [formDirty, setFormDirty] = React.useState(false);
   const intl = useIntl();
 
@@ -660,6 +669,7 @@ export default function EditTierModal({ tier, collective, onClose, onUpdate, for
           forcedType={forcedType}
           onUpdate={onUpdate}
           setFormDirty={setFormDirty}
+          supportedTierTypes={supportedTierTypes}
         />
       </DialogContent>
     </Dialog>
@@ -725,11 +735,12 @@ const editTiersFieldsFragment = gql`
 `;
 
 export const listTierQuery = gql`
-  query AccountTiers($accountSlug: String!) {
+  query AccountTiers($accountSlug: String!, $tiersOnlyValid: Boolean) {
     account(slug: $accountSlug) {
       id
       ... on AccountWithContributions {
-        tiers {
+        supportedTierTypes
+        tiers(onlyValid: $tiersOnlyValid) {
           nodes {
             id
             ...EditTiersFields
@@ -737,7 +748,7 @@ export const listTierQuery = gql`
         }
       }
       ... on Organization {
-        tiers {
+        tiers(onlyValid: $tiersOnlyValid) {
           nodes {
             id
             ...EditTiersFields
@@ -800,6 +811,7 @@ function EditTierFormInner({
   isDeleting,
   isConfirmingDelete,
   setFormDirty,
+  supportedTierTypes,
 }) {
   const intl = useIntl();
   const { values, isSubmitting, dirty } = formik;
@@ -823,10 +835,17 @@ function EditTierFormInner({
       <div className="flex-1">
         <ModalSectionContainer>
           <EditSectionContainer>
-            <FormFields collective={collective} values={values} hideTypeSelect={Boolean(forcedType)} />
+            <FormFields
+              collective={collective}
+              values={values}
+              hideTypeSelect={Boolean(forcedType)}
+              supportedTierTypes={supportedTierTypes}
+            />
           </EditSectionContainer>
           <PreviewSectionContainer>
-            <ContributeCardPreview collective={collective} tier={values} />
+            <div className="block">
+              <ContributeCardPreview collective={collective} tier={values} />
+            </div>
           </PreviewSectionContainer>
         </ModalSectionContainer>
       </div>
@@ -875,7 +894,7 @@ function EditTierFormInner({
   );
 }
 
-function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setFormDirty }) {
+function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setFormDirty, supportedTierTypes }) {
   const intl = useIntl();
   const isEditing = Boolean(tier?.id);
   const initialValues = React.useMemo(() => {
@@ -1013,6 +1032,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setForm
               isDeleting={isDeleting}
               isConfirmingDelete={isConfirmingDelete}
               setFormDirty={setFormDirty}
+              supportedTierTypes={supportedTierTypes}
             />
           );
         }}

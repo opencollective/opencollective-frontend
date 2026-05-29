@@ -1,4 +1,4 @@
-import { MemberRole as GraphQLV2MemberRole } from '../graphql/types/v2/schema';
+import { MemberRole as GraphQLV2MemberRole } from '../graphql/types/v2/graphql';
 
 enum GraphQLV1MemberRole {
   HOST = 'HOST', // holds money on behalf of the collective

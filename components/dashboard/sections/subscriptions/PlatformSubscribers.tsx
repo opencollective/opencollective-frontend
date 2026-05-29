@@ -12,6 +12,7 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import { DateFilterType, Period } from '../../filters/DateFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 
@@ -29,21 +30,29 @@ const PlatformSubscribers = () => {
     schema,
     toVariables,
     meta: { currency: 'USD' },
+    defaultFilterValues: {
+      lastTransactionDateFilter: { type: DateFilterType.IN_LAST_PERIOD, number: 12, period: Period.MONTHS },
+    },
   });
 
   const { data, error, loading } = useQuery(subscribersQuery, {
     variables: { ...queryFilter.variables, isPlatformSubscriber: true },
-
     fetchPolicy: 'network-only',
   });
 
   const [showPlanModal, setShowPlanModal] = React.useState<SubscriberFieldsFragment>(null);
   const subscriberDrawer = router.query?.subpath?.[0];
   const openDrawer = React.useCallback(
-    id => router.push(`${PAGE_ROUTE}/${id}`, undefined, { shallow: true }),
+    id => {
+      const qs = router.asPath.split('?')[1];
+      router.push(`${PAGE_ROUTE}/${id}${qs ? `?${qs}` : ''}`, undefined, { shallow: true });
+    },
     [router],
   );
-  const closeDrawer = React.useCallback(() => router.push(`${PAGE_ROUTE}`, undefined, { shallow: true }), [router]);
+  const closeDrawer = React.useCallback(() => {
+    const qs = router.asPath.split('?')[1];
+    router.push(`${PAGE_ROUTE}${qs ? `?${qs}` : ''}`, undefined, { shallow: true });
+  }, [router]);
 
   return (
     <div className="flex flex-col gap-4">

@@ -6,22 +6,13 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
     <div
       data-cy="InputField-myAttribute"
     >
-      <div
-        flexdirection="column"
-        justifycontent="flex-end"
-      >
+      <div>
         <input
-          border="1px solid"
-          bordercolor="black.300"
-          borderradius="4px"
           font-size="14px"
           id="input-myAttribute"
-          lineheight="1.5"
           maxlength="100"
           minlength="10"
           name="myAttribute"
-          px="3"
-          py="2"
           required=""
           type="text"
         />
@@ -37,22 +28,13 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
     <div
       data-cy="InputField-my.nested.attribute"
     >
-      <div
-        flexdirection="column"
-        justifycontent="flex-end"
-      >
+      <div>
         <input
-          border="1px solid"
-          bordercolor="black.300"
-          borderradius="4px"
           font-size="14px"
           id="input-my.nested.attribute"
-          lineheight="1.5"
           maxlength="100"
           minlength="10"
           name="my.nested.attribute"
-          px="3"
-          py="2"
           required=""
           type="text"
         />
@@ -68,20 +50,11 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
     <div
       data-cy="InputField-myAttribute"
     >
-      <div
-        flexdirection="column"
-        justifycontent="flex-end"
-      >
+      <div>
         <input
-          border="1px solid"
-          bordercolor="black.300"
-          borderradius="4px"
           font-size="14px"
           id="input-myAttribute"
-          lineheight="1.5"
           name="myAttribute"
-          px="3"
-          py="2"
           type="text"
         />
       </div>
@@ -96,22 +69,13 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
     <div
       data-cy="InputField-myAttribute"
     >
-      <div
-        flexdirection="column"
-        justifycontent="flex-end"
-      >
+      <div>
         <input
-          border="1px solid"
-          bordercolor="black.300"
-          borderradius="4px"
           font-size="14px"
           id="input-myAttribute"
-          lineheight="1.5"
           max="100"
           min="10"
           name="myAttribute"
-          px="3"
-          py="2"
           required=""
           type="number"
         />
@@ -127,20 +91,11 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
     <div
       data-cy="InputField-myAttribute"
     >
-      <div
-        flexdirection="column"
-        justifycontent="flex-end"
-      >
+      <div>
         <input
-          border="1px solid"
-          bordercolor="black.300"
-          borderradius="4px"
           font-size="14px"
           id="input-myAttribute"
-          lineheight="1.5"
           name="myAttribute"
-          px="3"
-          py="2"
           type="text"
         />
       </div>
@@ -155,20 +110,11 @@ exports[`StyledInputFormikField renders default options 1`] = `
     <div
       data-cy="InputField-myAttribute"
     >
-      <div
-        flexdirection="column"
-        justifycontent="flex-end"
-      >
+      <div>
         <input
-          border="1px solid"
-          bordercolor="black.300"
-          borderradius="4px"
           font-size="14px"
           id="input-myAttribute"
-          lineheight="1.5"
           name="myAttribute"
-          px="3"
-          py="2"
         />
       </div>
     </div>

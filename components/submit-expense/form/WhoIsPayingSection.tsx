@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FieldMetaProps } from 'formik';
 import { Field } from 'formik';
-import { pick, uniqBy } from 'lodash';
+import { pick, uniqBy } from 'lodash-es';
 import { AlertCircle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

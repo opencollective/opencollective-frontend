@@ -4,7 +4,7 @@ import { BarChart } from '@styled-icons/material/BarChart';
 import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
 import { PieChart } from '@styled-icons/material/PieChart';
 import { Timeline } from '@styled-icons/material/Timeline';
-import { capitalize, sumBy } from 'lodash';
+import { capitalize, sumBy } from 'lodash-es';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -93,7 +93,7 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
 
   return (
     <Flex {...props}>
-      <Flex justifyContent="space-between" alignItems="center" flexGrow={1}>
+      <Flex justifyContent="space-between" alignItems="center" flexGrow={1} gap="8px" flexWrap="wrap">
         <P fontSize="20px" lineHeight="20px" fontWeight="500">
           <FormattedMessage id="Contributions" defaultMessage="Contributions" />
         </P>

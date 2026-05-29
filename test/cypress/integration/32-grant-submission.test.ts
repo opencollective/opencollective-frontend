@@ -1,3 +1,5 @@
+import { getApiUrl } from '../../../lib/utils';
+
 describe('Grant Submission Flow', () => {
   beforeEach(() => {
     cy.signup()
@@ -22,7 +24,7 @@ describe('Grant Submission Flow', () => {
 
   it('should allow users to submit a grant application', function () {
     // Go to the grant submission page with the new flow enabled
-    cy.visit(`/${this.collective.slug}/grants/new?newGrantFlowEnabled=true`);
+    cy.visit(`/${this.collective.slug}/grants/new`);
 
     // Verify the page header shows the correct collective name
     cy.contains(`Grant request to ${this.collective.name}`).should('be.visible');
@@ -95,17 +97,20 @@ describe('Grant Submission Flow', () => {
   });
 
   it('should allow host admin to create beneficiary', function () {
-    cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new?newGrantFlowEnabled=true` });
+    cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new` });
     cy.contains('button', 'Proceed').click();
     cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
       cy.contains('A beneficiary').click();
-      cy.contains('A beneficiary').parent().get('[role="combobox"]').click();
-      cy.root().closest('html').contains('Create Beneficiary').click();
-
-      cy.contains('label', "Beneficiary's name").click();
-      cy.focused().type('A beneficiary name');
-
-      cy.contains('button', 'Create beneficiary').click();
+      const beneficiaryName = 'A beneficiary name';
+      cy.intercept('POST', `${getApiUrl()}/graphql/v1`, req => {
+        if (req.body?.operationName === 'CollectivePickerSearch' && req.body?.variables?.term === beneficiaryName) {
+          req.alias = 'collectivePickerSearch';
+        }
+      });
+      cy.contains('A beneficiary').parent().get('[role="combobox"]').click().type(beneficiaryName);
+      cy.wait('@collectivePickerSearch');
+      cy.root().closest('html').contains(`Create vendor: ${beneficiaryName}`).click();
+      cy.root().closest('html').contains('Vendor created', { timeout: 20000 }).should('be.visible');
     });
 
     cy.get('#PAYOUT_METHOD').within(() => {
@@ -157,7 +162,7 @@ describe('Grant Submission Flow', () => {
       this.hostAdmin.email,
     );
 
-    cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new?newGrantFlowEnabled=true` });
+    cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new` });
     cy.contains('button', 'Proceed').click();
     cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
       cy.contains('A beneficiary').click();
@@ -222,7 +227,7 @@ describe('Grant Submission Flow', () => {
       this.hostAdmin.email,
     );
 
-    cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new?newGrantFlowEnabled=true` });
+    cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new` });
     cy.contains('button', 'Proceed').click();
     cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
       cy.contains('A beneficiary').click();

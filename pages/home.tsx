@@ -3,20 +3,11 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { getRequestIntl } from '../lib/i18n/request';
 import { getWhitelabelProps } from '../lib/whitelabel';
-import { getEnvVar } from '@/lib/env-utils';
-import { parseToBoolean } from '@/lib/utils';
 
-import JoinUsSection from '../components/collectives/sections/JoinUs';
-import CollaborateWithMoney from '../components/home/CollaborateWithMoneySection';
-import DedicatedTeam from '../components/home/DedicatedTeamSection';
-import GetToKnowUs from '../components/home/GetToKnowUsSection';
 import Hero from '../components/home/Hero';
 import OficoMembers from '../components/home/OficoMembers';
-import OpenCollectiveIs from '../components/home/OpenCollectiveIsSection';
-import RaiseMoney from '../components/home/RaiseMoneySection';
 import Solutions from '../components/home/Solutions';
 import Stats from '../components/home/Stats';
-import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
 
 const messages = defineMessages({
@@ -40,24 +31,10 @@ export const HomePage = () => {
       title={formatMessage(messages.defaultTitle)}
       description={formatMessage(messages.defaultDescription)}
     >
-      {parseToBoolean(getEnvVar('NEW_PRICING')) ? (
-        <React.Fragment>
-          <Hero />
-          <Solutions />
-          <OficoMembers />
-          <Stats />
-        </React.Fragment>
-      ) : (
-        <React.Fragment>
-          <TheFutureIsCollective />
-          <RaiseMoney />
-          <OpenCollectiveIs />
-          <CollaborateWithMoney />
-          <DedicatedTeam />
-          <GetToKnowUs />
-          <JoinUsSection />
-        </React.Fragment>
-      )}
+      <Hero />
+      <Solutions />
+      <OficoMembers />
+      <Stats />
     </Page>
   );
 };

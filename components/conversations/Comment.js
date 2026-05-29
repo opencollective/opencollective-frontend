@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CommentType } from '../../lib/graphql/types/v2/schema';
+import { CommentType } from '../../lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';

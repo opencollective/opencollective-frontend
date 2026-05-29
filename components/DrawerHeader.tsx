@@ -10,6 +10,7 @@ import { DropdownActionItem } from './table/RowActionsMenu';
 import { Button } from './ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/DropdownMenu';
 import { SheetClose } from './ui/Sheet';
+import Link from './Link';
 
 type DrawerHeaderProps = {
   actions?: {
@@ -68,6 +69,7 @@ export default function DrawerHeader({
               {primary?.map(action => (
                 <Button
                   key={action.key}
+                  asChild={Boolean(action.href)}
                   variant="outline"
                   size="xs"
                   className="gap-1.5"
@@ -75,8 +77,17 @@ export default function DrawerHeader({
                   disabled={action.disabled}
                   data-cy={action['data-cy']}
                 >
-                  {action.Icon && <action.Icon size={16} />}
-                  <span>{action.label}</span>
+                  {action.href ? (
+                    <Link href={action.href} target={action.target}>
+                      {action.Icon && <action.Icon size={16} />}
+                      <span>{action.label}</span>
+                    </Link>
+                  ) : (
+                    <React.Fragment>
+                      {action.Icon && <action.Icon size={16} />}
+                      <span>{action.label}</span>
+                    </React.Fragment>
+                  )}
                 </Button>
               ))}
             </div>

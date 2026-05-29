@@ -7,7 +7,7 @@ import React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { clsx } from 'clsx';
 import type { Dayjs } from 'dayjs';
-import { isEqual, omit } from 'lodash';
+import { isEqual, omit } from 'lodash-es';
 import { ArrowRight, CalendarIcon, ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
@@ -15,7 +15,7 @@ import type { z } from 'zod';
 import { getDayjsIsoUnit, getDayjsOpUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
-import { TimeUnit } from '../../../../lib/graphql/types/v2/schema';
+import { TimeUnit } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nPeriodFilterType } from '../../../../lib/i18n/period-compare-filter';
 
 import { Button } from '../../../ui/Button';

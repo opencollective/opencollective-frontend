@@ -1,10 +1,15 @@
-import { get, uniqBy } from 'lodash';
+import { get, uniqBy } from 'lodash-es';
 
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
-import { type CommentFieldsFragment } from './graphql/types/v2/graphql';
-import { type Account, type AccountWithParent, MemberRole, type Update } from './graphql/types/v2/schema';
+import {
+  type Account,
+  type AccountWithParent,
+  type CommentFieldsFragment,
+  MemberRole,
+  type Update,
+} from './graphql/types/v2/graphql';
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
 
@@ -100,7 +105,7 @@ class LoggedInUser {
   /**
    * Has access to admin panel if admin or accountant
    */
-  canSeeAdminPanel(collective: Parameters<typeof LoggedInUser.prototype.hasRole>[1]) {
+  canSeeDashboard(collective: Parameters<typeof LoggedInUser.prototype.hasRole>[1]) {
     return this.hasRole([MemberRole.ADMIN, MemberRole.ACCOUNTANT], collective);
   }
 
@@ -282,14 +287,15 @@ class LoggedInUser {
         (['development', 'staging'].includes(process.env.NODE_ENV) || ['e2e'].includes(process.env.OC_ENV));
       const hasAccess = feature.hasAccess?.(this);
       return (
-        feature.isEnabled?.() || // Always show enabled custom features
-        (isEnabledInEnv &&
-          (isEnabledByDevEnv ||
-            feature.publicBeta ||
-            userHaveSetting ||
-            hasClosedBetaAccess ||
-            enabledByDefault ||
-            hasAccess))
+        feature.hide?.(this) !== true &&
+        (feature.isEnabled?.() || // Always show enabled custom features
+          (isEnabledInEnv &&
+            (isEnabledByDevEnv ||
+              feature.publicBeta ||
+              userHaveSetting ||
+              hasClosedBetaAccess ||
+              enabledByDefault ||
+              hasAccess)))
       );
     });
 

@@ -7,7 +7,7 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { gql } from '../../../../lib/graphql/helpers';
 import type { HostTaxFormsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/schema';
+import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -32,6 +32,28 @@ import type { DashboardSectionProps } from '../../types';
 import { useLegalDocumentActions } from './actions';
 import LegalDocumentDrawer from './LegalDocumentDrawer';
 import LegalDocumentsTable from './LegalDocumentsTable';
+
+export const legalDocumentFields = gql`
+  fragment LegalDocumentFields on LegalDocument {
+    id
+    publicId
+    year
+    type
+    status
+    service
+    requestedAt
+    updatedAt
+    documentLink
+    isExpired
+    account {
+      id
+      name
+      slug
+      type
+      imageUrl(height: 128)
+    }
+  }
+`;
 
 const hostDashboardTaxFormsQuery = gql`
   query HostTaxForms(
@@ -62,26 +84,12 @@ const hostDashboardTaxFormsQuery = gql`
       ) {
         totalCount
         nodes {
-          id
-          year
-          type
-          status
-          service
-          requestedAt
-          updatedAt
-          documentLink
-          isExpired
-          account {
-            id
-            name
-            slug
-            type
-            imageUrl(height: 128)
-          }
+          ...LegalDocumentFields
         }
       }
     }
   }
+  ${legalDocumentFields}
 `;
 
 const NB_LEGAL_DOCUMENTS_DISPLAYED = 10;
@@ -171,14 +179,14 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
             nbPlaceholders={NB_LEGAL_DOCUMENTS_DISPLAYED}
             resetFilters={() => queryFilter.resetFilters({})}
             getActions={getActions}
-            onOpen={document => setFocusedLegalDocumentId(document.id)}
+            onOpen={document => setFocusedLegalDocumentId(document.publicId)}
           />
           <Pagination queryFilter={queryFilter} total={data?.host?.taxForms?.totalCount} />
           {data?.host && (
             <LegalDocumentDrawer
               open={Boolean(focusedLegalDocumentId)}
               host={data.host}
-              document={data.host.taxForms.nodes.find(d => d.id === focusedLegalDocumentId)}
+              document={data.host.taxForms.nodes.find(d => d.publicId === focusedLegalDocumentId)}
               onClose={() => setFocusedLegalDocumentId(null)}
               getActions={getActions}
             />

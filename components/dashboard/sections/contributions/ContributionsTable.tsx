@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ApolloError } from '@apollo/client';
-import type { VisibilityState } from '@tanstack/react-table';
+import type { ColumnDef, VisibilityState } from '@tanstack/react-table';
 import { useRouter } from 'next/router';
 
 import type {
@@ -19,7 +19,7 @@ import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 
 import { useContributionActions } from './actions';
-import { columns } from './columns';
+import { columns as defaultColumns } from './columns';
 import type { FilterMeta, schema } from './filters';
 
 type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
@@ -33,12 +33,17 @@ type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
   refetch?: () => void;
   onlyExpectedFunds?: boolean;
   hostSlug?: string;
+  columns?: ColumnDef<ManagedOrderFieldsFragment>[];
   columnVisibility?: VisibilityState;
+  showChargesSection?: boolean;
 };
 
-const defaultVisibility: VisibilityState = {
+export const defaultVisibility: VisibilityState = {
   legacyId: false,
   expectedAt: false,
+  createdAt: false,
+  createdByAccount: false,
+  accountingCategory: false,
 };
 
 export default function ContributionsTable<FilterValues extends Record<string, unknown>>({
@@ -51,7 +56,9 @@ export default function ContributionsTable<FilterValues extends Record<string, u
   error,
   refetch,
   hostSlug,
+  columns = defaultColumns,
   columnVisibility = defaultVisibility,
+  showChargesSection = false,
 }: ContributionsTableProps<FilterValues>) {
   const router = useRouter();
 
@@ -102,7 +109,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
 
   return (
     <React.Fragment>
-      <Filterbar {...queryFilter} views={views} />
+      <Filterbar {...queryFilter} {...(views && { views })} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
@@ -143,6 +150,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
         onClose={() => onToggleOrderDrawer(null)}
         orderId={selectedContributionId}
         getActions={getActions}
+        showChargesSection={showChargesSection}
       />
     </React.Fragment>
   );

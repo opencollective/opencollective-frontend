@@ -5,6 +5,7 @@ import { accountHoverCardFields } from '../AccountHoverCard';
 export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
   fragment AgreementViewFields on Agreement {
     id
+    publicId
     title
     createdAt
     expiresAt

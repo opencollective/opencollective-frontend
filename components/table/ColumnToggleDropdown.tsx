@@ -19,9 +19,6 @@ export function ColumnToggleDropdown<TData>({ table }: { table: Table<TData> }) 
   const { hasDefaultColumnVisibility, setColumnVisibility, defaultColumnVisibility } = table.options.meta;
   const intl = useIntl();
 
-  if (!defaultColumnVisibility) {
-    return null;
-  }
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>

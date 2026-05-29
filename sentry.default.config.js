@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/nextjs';
 
 // Default scope
-Sentry.configureScope(scope => {
-  scope.setTag('nodejs', process.version);
-  scope.setTag('runtimeEngine', typeof window !== 'undefined' ? 'browser' : 'server');
-});
+/** @type {(import('@sentry/browser').Scope} */
+const scope = Sentry.getCurrentScope();
+scope.setTag('nodejs', process.version);
+scope.setTag('runtimeEngine', typeof window !== 'undefined' ? 'browser' : 'server');
 
 /** @type {import('@sentry/browser/types/client').BrowserClientOptions} */
 export default {

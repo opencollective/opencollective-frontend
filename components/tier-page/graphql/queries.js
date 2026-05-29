@@ -50,7 +50,7 @@ export const tierPageQuery = gqlV1 /* GraphQL */ `
         }
         features {
           id
-          ...NavbarFields
+          ...NavbarFieldsV1
         }
         admins: members(role: "ADMIN") {
           id

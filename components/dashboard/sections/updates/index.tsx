@@ -1,17 +1,21 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { uniqBy } from 'lodash';
+import { uniqBy } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import type { UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { FEATURES } from '@/lib/allowed-features';
+import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/schema';
+
+import NotFound from '@/components/NotFound';
 
 import EmojiReactions from '../../../conversations/EmojiReactions';
+import FeatureNotSupported from '../../../FeatureNotSupported';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -47,7 +51,7 @@ const UpdatePost = ({ update, account }) => {
     <div className="flex flex-col gap-4 rounded-2xl border p-4">
       <div>
         <div className="flex justify-between">
-          <Link href={getDashboardRoute(account, `updates/${update.id}`)} className="text-xl font-medium">
+          <Link href={getDashboardRoute(account, `updates/${update.publicId}`)} className="text-xl font-medium">
             {update.title}
           </Link>
           <UpdateStatus update={update} />
@@ -148,6 +152,14 @@ const UpdatesList = () => {
   const error = metadataError || queryError;
   const updates = data?.account?.updates;
 
+  if (!loading) {
+    if (!account) {
+      return <NotFound />;
+    } else if (account.features[FEATURES.UPDATES] === CollectiveFeatureStatus.UNSUPPORTED) {
+      return <FeatureNotSupported />;
+    }
+  }
+
   return (
     <div className="flex flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-6">
@@ -184,7 +196,7 @@ const UpdatesList = () => {
           ) : (
             <React.Fragment>
               {updates?.nodes?.map(update => (
-                <UpdatePost key={update.id} update={update} account={account} />
+                <UpdatePost key={update.publicId} update={update} account={account} />
               ))}
               <Pagination total={(data || previousData)?.account?.updates?.totalCount} queryFilter={queryFilter} />
             </React.Fragment>

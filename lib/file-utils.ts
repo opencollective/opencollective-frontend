@@ -1,11 +1,11 @@
-import { round } from 'lodash';
-
-export const formatFileSize = (sizeInBytes: number) => {
-  if (sizeInBytes < 1000) {
-    return `${sizeInBytes} B`;
-  } else if (sizeInBytes < 1000e3) {
-    return `${round(sizeInBytes / 1000, 2)} KB`;
-  } else {
-    return `${round(sizeInBytes / 1000e3, 2)} MB`;
+export const formatFileSize = (bytes: number): string => {
+  if (bytes === null || bytes === undefined) {
+    return '—';
+  } else if (bytes === 0) {
+    return '0 B';
   }
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };

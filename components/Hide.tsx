@@ -2,6 +2,7 @@ import { styled } from 'styled-components';
 import { bottom, flex, height, left, position, right, top } from 'styled-system';
 
 import { pointerEvents } from '../lib/styled-system-custom-properties';
+import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 
 import { Box } from './Grid';
 
@@ -26,7 +27,11 @@ const sm = hidden('sm');
 const md = hidden('md');
 const lg = hidden('lg');
 
-const Hide = styled(Box)<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean }>`
+const FILTERED_PROPS = new Set(['xs', 'sm', 'md', 'lg']);
+
+const Hide = styled(Box).withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+})<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean }>`
   ${xs}
   ${sm}
   ${md}

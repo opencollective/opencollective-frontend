@@ -3,12 +3,10 @@ import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '@/lib/collective';
-import { CollectiveType } from '@/lib/constants/collectives';
 import { getErrorFromGraphqlException } from '@/lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
 import { adminPanelQuery } from '../../dashboard/queries';
-import { getI18nLink } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
@@ -131,19 +129,11 @@ const ArchiveCollective = ({ collective }) => {
       )}
       {!isArchived && !hasBalance && hasMoneyManagement && (
         <MessageBox type="warning">
-          {collective.type === CollectiveType.COLLECTIVE ? (
-            <FormattedMessage
-              id="collective.archive.selfHosted"
-              defaultMessage={`To archive this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
-              values={{ SettingsLink: getI18nLink({ href: `/dashboard/${collective.host?.slug}/host` }) }}
-            />
-          ) : (
-            <FormattedMessage
-              id="collective.archive.balance.warning"
-              defaultMessage="You can't archive {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
-              values={{ type: collective.type }}
-            />
-          )}
+          <FormattedMessage
+            id="collective.archive.balance.warning"
+            defaultMessage="You can't archive {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
+            values={{ type: collective.type }}
+          />
         </MessageBox>
       )}
       {isArchived && confirmationMsg && (

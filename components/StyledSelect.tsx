@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil, omitBy, truncate } from 'lodash';
+import { isNil, omitBy, truncate } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import type {
@@ -253,17 +253,23 @@ export const makeStyledSelect = (SelectComponent, { alwaysSearchable = false } =
           }
         },
         option: (baseStyles, state) => {
-          const customStyles: Record<string, unknown> = { cursor: 'pointer' };
+          const customStyles: Record<string, unknown> = { cursor: state.isDisabled ? 'default' : 'pointer' };
 
           if (state.data.__background__) {
             // Ability to force background by setting a special option prop
             customStyles.background = state.data.__background__;
-          } else if (state.isSelected) {
+            // Interactive content (e.g. create buttons) uses isDisabled to prevent selection
+            // but should not inherit react-select's greyed-out disabled styling
+            if (state.isDisabled) {
+              customStyles.opacity = 1;
+              customStyles.color = 'inherit';
+            }
+          } else if (!state.isDisabled && state.isSelected) {
             customStyles.backgroundColor = theme.colors.primary[200];
             customStyles.color = undefined;
-          } else if (state.isFocused) {
+          } else if (!state.isDisabled && state.isFocused) {
             customStyles.backgroundColor = theme.colors.primary[100];
-          } else {
+          } else if (!state.isDisabled) {
             customStyles['&:hover'] = { backgroundColor: theme.colors.primary[100] };
           }
 
@@ -352,4 +358,4 @@ const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 /**
  * @deprecated Use `ui/Select` instead
  */
-export default injectIntl(StyledSelect) as undefined as StyledSelectCustomComponent;
+export default injectIntl(StyledSelect, { forwardRef: true }) as undefined as StyledSelectCustomComponent;

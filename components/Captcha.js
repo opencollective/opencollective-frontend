@@ -1,7 +1,7 @@
 import React from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import * as Sentry from '@sentry/browser';
-import { toUpper } from 'lodash';
+import { toUpper } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import Turnstile from 'react-turnstile';
 
@@ -61,6 +61,13 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
       disabled={verified}
     />
   );
+};
+
+export const resetCaptcha = () => {
+  if (typeof window !== 'undefined') {
+    window.grecaptcha?.reset(); // grecaptcha is compatible with both HCaptcha and ReCaptcha
+    window.turnstile?.reset();
+  }
 };
 
 /**

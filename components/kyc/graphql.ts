@@ -33,6 +33,52 @@ export const kycVerificationFields = gql`
     requestedAt
     verifiedAt
     revokedAt
+    createdByUser {
+      id
+      publicId
+      name
+      legalName
+      slug
+      type
+      description
+      imageUrl
+      isHost
+      isArchived
+      isVerified
+      ... on Individual {
+        id
+        isGuest
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          type
+          isTrustedHost
+          isFirstPartyHost
+          isVerified
+        }
+        approvedAt
+      }
+
+      ... on Organization {
+        host {
+          id
+          slug
+          type
+          isTrustedHost
+          isFirstPartyHost
+          isVerified
+        }
+      }
+
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
+    }
     verifiedData {
       legalName
       legalAddress

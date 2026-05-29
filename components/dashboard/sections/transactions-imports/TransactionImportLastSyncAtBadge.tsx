@@ -2,7 +2,7 @@ import React from 'react';
 import { RefreshCw } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { TransactionsImport } from '@/lib/graphql/types/v2/schema';
+import type { TransactionsImport } from '@/lib/graphql/types/v2/graphql';
 
 import DateTime from '@/components/DateTime';
 import { Badge } from '@/components/ui/Badge';

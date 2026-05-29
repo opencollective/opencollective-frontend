@@ -4,11 +4,10 @@ const path = require('path');
 
 const debug = require('debug');
 const dotenv = require('dotenv');
-const lodash = require('lodash');
 
 // Load extra env file on demand
 // e.g. `npm run dev production` -> `.env.production`
-const extraEnv = process.env.EXTRA_ENV || lodash.last(process.argv);
+const extraEnv = process.env.EXTRA_ENV || process.argv.at(-1);
 const extraEnvPath = path.join(__dirname, `.env.${extraEnv}`);
 if (fs.existsSync(extraEnvPath)) {
   dotenv.config({ path: extraEnvPath });
@@ -45,11 +44,11 @@ const defaults = {
   OC_ENV: process.env.NODE_ENV || 'development',
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
   WISE_ENVIRONMENT: 'sandbox',
-  API_PROXY: true,
   SENTRY_TRACES_SAMPLE_RATE: null,
   LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
   DISABLE_CONTACT_FORM: false,
   NEW_PRICING: false,
+  NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: 0,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {
@@ -62,7 +61,6 @@ if ((process.env.OC_ENV || process.env.NODE_ENV || 'development') === 'developme
 }
 
 if (['production', 'staging'].includes(process.env.OC_ENV)) {
-  defaults.API_PROXY = false;
   defaults.WISE_PLATFORM_COLLECTIVE_SLUG = 'opencollective';
 }
 

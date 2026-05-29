@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -51,6 +51,7 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
       ) {
         createTransactionsImport(account: $account, source: $source, name: $name, type: $type) {
           id
+          publicId
           account {
             id
             ... on Host {
@@ -89,7 +90,9 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
               const { data } = await createImport({ variables: { account: { slug: accountSlug }, ...values } });
               onSuccess?.();
               props.onOpenChange(false);
-              router.push(`${getCSVTransactionsImportRoute(accountSlug, data.createTransactionsImport.id)}?step=last`);
+              router.push(
+                `${getCSVTransactionsImportRoute(accountSlug, data.createTransactionsImport.publicId)}?step=last`,
+              );
             } catch (e) {
               toast({
                 variant: 'error',

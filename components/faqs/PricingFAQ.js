@@ -39,14 +39,14 @@ const PricingFAQ = props => (
     <Entry>
       <Title>
         <H4 fontWeight="500" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em">
-          <FormattedMessage id="pricing.faq.fiscalHost.title" defaultMessage="What is a Fiscal Host?" />
+          <FormattedMessage id="pricing.faq.organization.title" defaultMessage="What is an Organization?" />
         </H4>
       </Title>
       <Content>
         <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
           <FormattedMessage
-            id="OCFHostApplication.faq.fiscalHost.content"
-            defaultMessage="A Fiscal Host holds funds on behalf of Collectives, enabling them to operate using the Host's bank account and legal entity."
+            id="OCFHostApplication.faq.organization.content"
+            defaultMessage="An Organization is a legal entity, such as a non-profit, cooperative, or company, that can manage funds for itself and/or act as a Fiscal Host by receiving and holding contributions on behalf of Collectives using its legal entity and bank account."
           />
         </P>
       </Content>

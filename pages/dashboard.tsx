@@ -1,5 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import dayjs from 'dayjs';
+import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -7,11 +9,9 @@ import roles from '../lib/constants/roles';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
-import { hasAccountHosting } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
@@ -37,6 +37,7 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
 import ErrorPage from '@/components/ErrorPage';
 import Header from '@/components/Header';
+import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
 import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 
 const messages = defineMessages({
@@ -63,8 +64,8 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (loggedInUser?.isAccountantOnly(account) && hasAccountHosting(account)) {
-    return ALL_SECTIONS.HOST_EXPENSES;
+  } else if (loggedInUser?.isAccountantOnly(account) && account.hasHosting) {
+    return ALL_SECTIONS.PAY_DISBURSEMENTS;
   } else if (loggedInUser?.isAccountantOnly(account)) {
     return ALL_SECTIONS.PAYMENT_RECEIPTS;
   } else {
@@ -72,7 +73,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   }
 };
 
-const getNotification = (intl, account) => {
+const getNotification = (intl, account): React.ComponentProps<typeof NotificationBar> => {
   if (account?.isArchived) {
     if (account.type === 'USER') {
       return {
@@ -89,6 +90,79 @@ const getNotification = (intl, account) => {
         }),
       };
     }
+  } else if (account?.type === CollectiveType.COLLECTIVE) {
+    if (!account?.host) {
+      return {
+        type: 'error',
+        inline: true,
+        title: (
+          <React.Fragment>
+            <FormattedMessage
+              defaultMessage="You have not applied to any fiscal host. You can not raise funds without a fiscal host."
+              id="Dashboard.NoHostNotification"
+            />
+            <Link
+              href={`/${account.slug}/accept-financial-contributions/host`}
+              className="ml-1 inline-flex items-center underline hover:no-underline"
+            >
+              <FormattedMessage defaultMessage="Find a Fiscal Host" id="join.findAFiscalHost" />
+              <ArrowRight className="ml-1 inline h-4 w-4" />
+            </Link>
+          </React.Fragment>
+        ),
+      };
+    }
+    if (account?.hostApplication?.status === 'PENDING') {
+      return {
+        type: 'info',
+        inline: true,
+        title: (
+          <React.Fragment>
+            <span className="font-normal">
+              <FormattedMessage
+                defaultMessage="You applied to be hosted by <strong>{hostName}</strong> on <strong>{applicationData, date, medium}</strong>. Your application is being reviewed."
+                id="Dashboard.PendingHostApplicationNotification"
+                values={{
+                  ...I18nFormatters,
+                  hostName: account?.host.name,
+                  applicationData: new Date(account?.hostApplication.createdAt),
+                }}
+              />
+            </span>
+            <Link
+              href={getDashboardRoute(account, `/host?hostApplicationId=${account.hostApplication.id}`)}
+              className="ml-1 inline-flex items-center underline hover:no-underline"
+            >
+              <FormattedMessage
+                defaultMessage="See Application"
+                id="Dashboard.PendingHostApplicationNotificationLink"
+              />
+              <ArrowRight className="ml-1 inline h-4 w-4" />
+            </Link>
+          </React.Fragment>
+        ),
+      };
+    }
+  } else if (
+    account?.isHost &&
+    account?.settings?.automaticBillingMigration &&
+    dayjs().diff(dayjs(account?.settings?.automaticBillingMigration), 'week') < 8
+  ) {
+    return {
+      type: 'info',
+      title: <FormattedMessage defaultMessage="New platform pricing" id="rLJm+c" />,
+      description: (
+        <FormattedMessage
+          defaultMessage="Your account has been migrated to the <PricingLink>new pricing</PricingLink>. The <BillinkLink>Platform Billing</BillinkLink> section of your dashboard will let you review your current usage and update your plan. Contact our <ContactLink>support team</ContactLink> if you have any questions."
+          id="automaticBillingMigrationDescription"
+          values={{
+            PricingLink: getI18nLink({ as: Link, href: '/pricing' }),
+            BillinkLink: getI18nLink({ as: Link, href: getDashboardRoute(account, 'platform-subscription') }),
+            ContactLink: getI18nLink({ as: Link, href: '/contact' }),
+          }}
+        />
+      ),
+    };
   }
 };
 
@@ -99,7 +173,7 @@ const getNotification = (intl, account) => {
 const getProfileUrl = (
   loggedInUser: LoggedInUser,
   contextAccount: DashboardQuery['account'],
-  account: { id: string; slug: string; type: string },
+  account: { id: string; slug: string; type: string; publicId?: string },
 ) => {
   if (!contextAccount) {
     return null;
@@ -111,12 +185,14 @@ const getProfileUrl = (
         ? contextAccount
         : null;
 
-  return context &&
-    loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD) &&
-    account?.type === CollectiveType.INDIVIDUAL &&
-    typeof account?.id === 'string'
-    ? getDashboardRoute({ slug: context.slug }, `people/${account?.id}`)
-    : null;
+  if (context && (typeof account?.id === 'string' || (account?.publicId && typeof account.publicId === 'string'))) {
+    if (account?.type === CollectiveType.INDIVIDUAL) {
+      return getDashboardRoute({ slug: context.slug }, `people/${account?.publicId || account?.id}`);
+    } else if ([CollectiveType.VENDOR, CollectiveType.ORGANIZATION].includes(account?.type as any)) {
+      return getDashboardRoute({ slug: context.slug }, `vendors/${account?.publicId || account?.id}`);
+    }
+  }
+  return null;
 };
 
 function getBlocker(LoggedInUser, account, section) {
@@ -285,9 +361,8 @@ const DashboardPage = () => {
           <DashboardSidebar isLoading={isLoading} />
           <SidebarInset className="min-w-0">
             <DashboardTopbar />
+            {Boolean(notification) && <NotificationBar {...notification} />}
             <div className="flex-1 px-3 md:px-6">
-              {Boolean(notification) && <NotificationBar {...notification} />}
-
               <div
                 className="flex min-h-[600px] flex-1 flex-col justify-center gap-6 pt-6 pb-12 md:flex-row lg:gap-12 lg:pt-8"
                 data-cy="admin-panel-container"

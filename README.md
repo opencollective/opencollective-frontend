@@ -1,7 +1,6 @@
 # Open Collective Frontend
 
 ![GitHub](https://img.shields.io/github/license/opencollective/opencollective-frontend)
-[![Crowdin](https://d322cqt584bo4o.cloudfront.net/opencollective/localized.svg)](https://crowdin.com/project/opencollective)
 ![React Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/react)
 ![Next.JS Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/next)
 [![Discord](https://discordapp.com/api/guilds/1241017531318276158/widget.png)](https://discord.opencollective.com)
@@ -17,6 +16,8 @@
 If you see a step below that could be improved (or is outdated), please update the instructions. We rarely go through this process ourselves, so your fresh pair of eyes and your recent experience with it, makes you the best candidate to improve them for other users. Thank you!
 
 ## Development
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=76222279)
 
 ### Prerequisite
 
@@ -39,6 +40,8 @@ npm install
 This project requires an access to the Open Collective API.
 
 By default, it will try to connect to the Open Collective staging API, **you don't have to change anything**.
+
+**Logging in with staging:** Because captcha is not configured by default in local development, you need to create an account on [staging.opencollective.com](https://staging.opencollective.com/) first. You can then use this account to log in on your local frontend.
 
 In case you want to connect to the Open Collective API running locally:
 
@@ -68,20 +71,6 @@ To update:
 - Jest snapshots: run `npm run test:update`
 - Translation files: run `npm run langs:update`
 - GraphQL schema for ESLint: run `npm run graphql:update`
-
-## Localization
-
-Translating the interface doesn't require any technical skill, you can go on
-https://crowdin.com/project/opencollective and start translating right away!
-
-We're currently looking for contributions for the following languages:
-
-- French
-- Spanish
-- Japanese
-
-Want to add a new language for Open Collective? [Contact us](https://discord.opencollective.com) and
-we'll be happy to help you to set it up!
 
 ## Contributing
 

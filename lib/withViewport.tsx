@@ -1,5 +1,5 @@
 import React from 'react';
-import { debounce, findIndex, findLastIndex, isEqual, zipObject } from 'lodash';
+import { debounce, findIndex, findLastIndex, isEqual, zipObject } from 'lodash-es';
 
 import breakpoints from './theme/breakpoints';
 import { emToPx } from './theme/helpers';

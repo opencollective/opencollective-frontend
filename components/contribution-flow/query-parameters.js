@@ -1,4 +1,4 @@
-import { assign, pick } from 'lodash';
+import { assign, pick } from 'lodash-es';
 
 import UrlQueryHelper from '../../lib/UrlQueryHelper';
 

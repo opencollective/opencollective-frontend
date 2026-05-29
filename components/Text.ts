@@ -27,11 +27,18 @@ type TextProps = ColorProps &
     css?: CSSProp;
   };
 
-const CUSTOM_TEXT_PROPS = new Set(['fontSize', 'letterSpacing', 'textDecoration', 'whiteSpace']);
+const CUSTOM_TEXT_PROPS = new Set([
+  'fontSize',
+  'letterSpacing',
+  'textDecoration',
+  'whiteSpace',
+  'textAlign',
+  'wordBreak',
+]);
 
 export const P = styled.p
   .withConfig({
-    shouldForwardProp: prop => defaultShouldForwardProp(prop) && !CUSTOM_TEXT_PROPS.has(prop),
+    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !CUSTOM_TEXT_PROPS.has(prop),
   })
   .attrs<TextProps>(props => ({
     // Overrides default margin Y to avoid global styles

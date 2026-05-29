@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import { Field, Form, Formik } from 'formik';
-import { compact, isEmpty, pick, toString } from 'lodash';
+import { compact, isEmpty, pick, toString } from 'lodash-es';
 import { ArrowLeft, BookCheck, BookDashed } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -243,7 +243,10 @@ const FormBody = ({ update, accountSlug }) => {
 
   const handleStatePersistence = React.useMemo(
     () => values => {
-      formPersister.saveValues(values);
+      const hasChanged = Object.keys(values).some(key => values[key] !== initialValues[key]);
+      if (hasChanged) {
+        formPersister.saveValues(values);
+      }
       const errors = requireFields(values, ['title', 'html']);
       return errors;
     },

@@ -2,20 +2,23 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import type { Content } from '@radix-ui/react-hover-card';
 import { clsx } from 'clsx';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import type { LucideIcon } from 'lucide-react';
 import { BadgeCheck, Banknote, Building, Calendar, FileText, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../lib/collective';
 import { gql } from '../lib/graphql/helpers';
-import type { AccountHoverCardFieldsFragment, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
+import type {
+  AccountHoverCardFieldsFragment,
+  Amount,
+  UserContextualMembershipsQuery,
+} from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
-import { type Amount, KycVerificationStatus } from '@/lib/graphql/types/v2/schema';
+import { KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { DashboardContext } from './dashboard/DashboardContext';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
-import { kycStatusFields } from './kyc/graphql';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
 import { AccountTrustBadge } from './AccountTrustBadge';
@@ -25,10 +28,17 @@ import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Link from './Link';
 import Spinner from './Spinner';
 
+// account kyc badge might display an account hover card, so we need to lazy load it to avoid circular dependencies
+const AccountKYCStatusBadge = React.lazy(() =>
+  import('./kyc/components/AccountKYCStatusBadge').then(mod => ({ default: mod.AccountKYCStatusBadge })),
+);
+
 export const accountHoverCardFields = gql`
   fragment AccountHoverCardFields on Account {
     id
+    publicId
     name
+    legalName
     slug
     type
     description
@@ -96,8 +106,6 @@ const userContextualMembershipsQuery = gql`
     $hostSlug: String
     $getHostAdmin: Boolean!
     $getAccountAdmin: Boolean!
-    $dashboardAccountSlug: String
-    $hasDashboardAccountSlug: Boolean!
   ) {
     account(slug: $userSlug) {
       id
@@ -125,14 +133,8 @@ const userContextualMembershipsQuery = gql`
           }
         }
       }
-      ... on Individual {
-        kycStatus(requestedByAccount: { slug: $dashboardAccountSlug }) @include(if: $hasDashboardAccountSlug) {
-          ...KYCStatusFields
-        }
-      }
     }
   }
-  ${kycStatusFields}
 `;
 
 const getInfoItems = (account): InfoItemProps[] => {
@@ -233,6 +235,9 @@ const getInfoItems = (account): InfoItemProps[] => {
 };
 
 const getInfoItemsFromMembershipData = (data: UserContextualMembershipsQuery): InfoItemProps[] => {
+  const hasKycVerification = Object.values(
+    (data?.account && 'kycStatus' in data.account && data.account.kycStatus) || {},
+  ).some(kyc => kyc?.['status'] === KycVerificationStatus.VERIFIED);
   return [
     ...(data?.account?.hostAdminMemberships?.nodes?.map(membership => ({
       Icon: Building,
@@ -260,7 +265,7 @@ const getInfoItemsFromMembershipData = (data: UserContextualMembershipsQuery): I
         />
       ),
     })) || []),
-    data?.account?.['kycStatus']?.manual?.status === KycVerificationStatus.VERIFIED && {
+    hasKycVerification && {
       Icon: BadgeCheck,
       info: 'KYC Verified',
     },
@@ -307,8 +312,6 @@ export const AccountHoverCard = ({
       hostSlug,
       getHostAdmin: !!hostSlug,
       getAccountAdmin: !!accountSlug && accountSlug !== hostSlug, // Don't fetch account admin membership if the account is also the host
-      dashboardAccountSlug: dashboardAccount?.slug,
-      hasDashboardAccountSlug: !!dashboardAccount?.slug,
     },
     // Skip query if account is not an individual, if there no accountSlug or hostSlug in `includeAdminMembership`, or if the hover card is not open or hovered
     skip: !isIndividual || !account?.slug || !(accountSlug || hostSlug) || !(open || hasBeenHovered),
@@ -335,6 +338,7 @@ export const AccountHoverCard = ({
   const infoItems = getInfoItems(account);
   const asyncInfoItems = getInfoItemsFromMembershipData(data);
   const accountUrl = context?.getProfileUrl?.(account) || getCollectivePageRoute(account);
+  const legalName = account.legalName !== account.name && account.legalName;
   return (
     // HoverCard currently disabled for Vendors (need to fix styling, appropriate links, etc)
     <HoverCard open={open && !isVendor} onOpenChange={setOpen}>
@@ -347,6 +351,9 @@ export const AccountHoverCard = ({
         {...hoverCardContentProps}
       >
         <div className="relative flex flex-col gap-4 text-sm">
+          <div className="absolute top-0 right-0">
+            {open && <AccountKYCStatusBadge account={account} host={dashboardAccount} />}
+          </div>
           <div className="flex flex-col gap-3 overflow-hidden break-words">
             <div className="flex justify-between">
               <Link href={accountUrl}>
@@ -357,9 +364,12 @@ export const AccountHoverCard = ({
             </div>
 
             <div className="overflow-hidden">
-              <div className="flex items-center gap-1">
-                <Link href={accountUrl}>
-                  <span className="block truncate font-medium hover:underline">{account.name}</span>
+              <div className="flex items-start gap-1">
+                <Link href={accountUrl} className="min-w-0 break-words">
+                  <span className="font-medium hover:underline">
+                    {account.name}
+                    {legalName && <span className="font-normal text-muted-foreground">{` (${legalName})`}</span>}
+                  </span>
                 </Link>
                 <AccountTrustBadge account={account} />
               </div>

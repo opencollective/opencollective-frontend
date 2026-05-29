@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
+import { hasAccountMoneyManagement } from '@/lib/collective';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
@@ -16,7 +16,7 @@ const getBlockReason = (account, collective): 'MONEY_MANAGEMENT' | 'HOSTING' | '
     return 'ZERO_BALANCE';
   } else if (hasAccountMoneyManagement(account)) {
     return 'MONEY_MANAGEMENT';
-  } else if (hasAccountHosting(account)) {
+  } else if (account.hasHosting) {
     return 'HOSTING';
   }
   return null;

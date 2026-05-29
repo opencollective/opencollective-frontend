@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { themeGet } from '@styled-system/theme-get';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { styled } from 'styled-components';
 
 import Container from './Container';

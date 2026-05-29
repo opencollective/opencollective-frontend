@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { get, pick, startCase } from 'lodash';
+import { get, pick, startCase } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -10,8 +10,12 @@ import { formatCurrency } from '../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
 import { getErrorFromGraphqlException, i18nGraphqlException } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
-import type { EditPaymentMethodModalQuery } from '../lib/graphql/types/v2/graphql';
-import type { AccountReferenceInput, PaymentMethod, SetupIntentInput } from '../lib/graphql/types/v2/schema';
+import type {
+  AccountReferenceInput,
+  EditPaymentMethodModalQuery,
+  PaymentMethod,
+  SetupIntentInput,
+} from '../lib/graphql/types/v2/graphql';
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
 import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';

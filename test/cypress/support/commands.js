@@ -2,6 +2,7 @@ import 'cypress-mailpit';
 
 import { API_V1_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
+import { getApiUrl } from '../../../lib/utils';
 
 import { CreditCards } from '../../stripe-helpers';
 
@@ -119,31 +120,36 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 });
 
 /**
- * Calls the mutation to edit the settings of an account
+ * Edit account fields via GraphQL v2 `editAccount`.
  */
-Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserEmail) => {
+Cypress.Commands.add('editAccount', (account, userEmail = defaultTestUserEmail) => {
   return signinRequestAndReturnToken({ email: userEmail }).then(token => {
-    return graphqlQuery(token, {
-      operationName: 'EditCollective',
-      query: gqlV1 /* GraphQL */ `
-        mutation EditCollective($collective: CollectiveInputType!) {
-          editCollective(collective: $collective) {
-            id
-            slug
-            name
-            settings
-            location {
-              id
-              country
+    return getIdV2FromReferenceInput(account, token)
+      .then(id => {
+        return graphqlQueryV2(token, {
+          operationName: 'EditAccount',
+          query: gql`
+            mutation EditAccount($account: AccountUpdateInput!) {
+              editAccount(account: $account) {
+                id
+                slug
+                name
+                settings
+                location {
+                  id
+                  country
+                }
+              }
             }
-          }
-        }
-      `,
-      context: API_V1_CONTEXT,
-      variables: { collective },
-    }).then(({ body }) => {
-      return body.data.createCollective;
-    });
+          `,
+          variables: {
+            account: { ...account, id },
+          },
+        });
+      })
+      .then(({ body }) => {
+        return body.data.editAccount;
+      });
   });
 });
 
@@ -177,7 +183,7 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
   const expense = {
     tags: ['Engineering'],
     type: 'INVOICE',
-    payoutMethod: { type: 'PAYPAL', data: { email: userEmail || randomEmail() } },
+    payoutMethod: { type: 'PAYPAL', data: { email: userEmail || randomEmail(), currency: 'USD' } },
     description: 'Expense 1',
     items: [{ description: 'Some stuff', amount: 1000 }],
     ...params,
@@ -579,11 +585,11 @@ Cypress.Commands.add('getStripePaymentElement', getStripePaymentElement);
 
 Cypress.Commands.add('fillStripePaymentElementInput', () => {
   cy.getStripePaymentElement().within(() => {
-    cy.get('#Field-numberInput').type('4242424242424242');
-    cy.get('#Field-expiryInput').type('1235');
-    cy.get('#Field-cvcInput').type('123');
-    cy.get('#Field-countryInput').select('US');
-    cy.get('#Field-postalCodeInput').type('90210');
+    cy.get('#payment-numberInput').type('4242424242424242');
+    cy.get('#payment-expiryInput').type('1235');
+    cy.get('#payment-cvcInput').type('123');
+    cy.get('#payment-countryInput').select('US');
+    cy.get('#payment-postalCodeInput').type('90210');
   });
 });
 
@@ -687,11 +693,39 @@ Cypress.Commands.add('getOrderIdFromContributionSuccessPage', () => {
 // ---- Private ----
 
 /**
+ * `editA
+ */
+function getIdV2FromReferenceInput(account, token) {
+  const { id, slug } = account;
+  if (typeof id === 'string') {
+    return account;
+  } else if (!slug) {
+    throw new Error(
+      'cy.editCollective: pass a GraphQL v2 account id string, or `slug` (with a legacy id) so the account can be resolved',
+    );
+  }
+
+  return graphqlQueryV2(token, {
+    operationName: 'CypressResolveCollectiveId',
+    query: gql`
+      query CypressResolveCollectiveId($slug: String!) {
+        account(slug: $slug) {
+          id
+        }
+      }
+    `,
+    variables: { slug },
+  }).then(({ body }) => {
+    return body.data.account.id;
+  });
+}
+
+/**
  * @param {object} user - should have `email` and `id` set
  */
 function signinRequest(user, redirect, sendLink) {
   return cy.request({
-    url: '/api/users/signin',
+    url: `${getApiUrl()}/users/signin`,
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -715,7 +749,7 @@ export function signinRequestAndReturnToken(user, redirect) {
 
 function graphqlQuery(token, body) {
   return cy.request({
-    url: '/api/graphql/v1',
+    url: `${getApiUrl()}/graphql/v1`,
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -728,7 +762,7 @@ function graphqlQuery(token, body) {
 
 export function graphqlQueryV2(token, body) {
   return cy.request({
-    url: '/api/graphql/v2',
+    url: `${getApiUrl()}/graphql/v2`,
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -757,25 +791,29 @@ function getLoggedInUserFromToken(token) {
 function fillStripeInput(params) {
   const { container, card } = params || {};
   const stripeIframeSelector = '.__PrivateStripeElement iframe';
-  const iframePromise = container ? container.find(stripeIframeSelector) : cy.get(stripeIframeSelector);
-  const cardParams = card || CreditCards.CARD_DEFAULT;
+  const { creditCardNumber, expirationDate, cvcCode, postalCode } = card || CreditCards.CARD_DEFAULT;
 
-  return iframePromise.then(iframe => {
-    const { creditCardNumber, expirationDate, cvcCode, postalCode } = cardParams;
-    const body = iframe.contents().find('body');
-    const fillInput = (index, value) => {
-      if (value === undefined) {
-        return;
-      }
+  // Re-query the iframe body on every input fill so Cypress can retry through
+  // Stripe iframe re-renders (otherwise a cached `body` reference gets detached
+  // from the DOM and fails the chain with "subject is no longer attached").
+  const getIframeBody = () =>
+    (container ? cy.wrap(container).find(stripeIframeSelector) : cy.get(stripeIframeSelector))
+      .its('0.contentDocument.body')
+      .should('not.be.empty')
+      .then(cy.wrap);
 
-      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`, { force: true });
-    };
+  const fillInput = (index, value) => {
+    if (value === undefined) {
+      return;
+    }
 
-    fillInput(1, creditCardNumber);
-    fillInput(2, expirationDate);
-    fillInput(3, cvcCode);
-    fillInput(4, postalCode);
-  });
+    return getIframeBody().find(`input:eq(${index})`).type(`{selectall}${value}`, { force: true });
+  };
+
+  fillInput(1, creditCardNumber);
+  fillInput(2, expirationDate);
+  fillInput(3, cvcCode);
+  fillInput(4, postalCode);
 }
 
 function getEmail(emailMatcher, timeout = 8000) {

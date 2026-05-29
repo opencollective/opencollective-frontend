@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
-import { orderBy } from 'lodash';
+import { orderBy } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
-import type { Location } from '../lib/graphql/types/v2/schema';
-import { CountryIso } from '../lib/graphql/types/v2/schema';
+import type { Location } from '../lib/graphql/types/v2/graphql';
+import { CountryIso } from '../lib/graphql/types/v2/graphql';
 import { getIntlDisplayNames } from '../lib/i18n';
 
 import { ComboSelect } from './ComboSelect';

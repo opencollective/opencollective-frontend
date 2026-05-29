@@ -1,4 +1,4 @@
-import { ExpenseStatusFilter } from './graphql/types/v2/schema';
+import { ExpenseStatusFilter } from './graphql/types/v2/graphql';
 
 /**
  * Meta expense statuses, that do not have a corresponding `ExpenseStatus` and are only used for filtering.

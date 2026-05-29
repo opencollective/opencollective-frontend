@@ -1,13 +1,12 @@
 /* eslint-disable prefer-arrow-callback */
 import React from 'react';
 import { useFormikContext } from 'formik';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
+import { ExpenseLockableFields, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
-import { ExpenseLockableFields } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { FormField } from '@/components/FormField';
@@ -112,6 +111,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
             {showHostInstructions && props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
+                  data-cy="host-invoice-policy"
                   title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
                   checked={props.acknowledgedHostInvoiceExpensePolicy}
@@ -128,6 +128,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
             {showCollectiveInstructions && props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
+                  data-cy="collective-invoice-policy"
                   title={<FormattedMessage defaultMessage="Collective instructions to submit an invoice" id="NeQw7m" />}
                   policy={props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
                   checked={props.acknowledgedCollectiveInvoiceExpensePolicy}
@@ -143,7 +144,8 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
             {showHostInstructions && props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
-                  title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
+                  data-cy="host-receipt-policy"
+                  title={<FormattedMessage defaultMessage="Host instructions to submit a reimbursement" id="TVWH39" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                   checked={props.acknowledgedHostReceiptExpensePolicy}
                   onAcknowledgedChanged={v => {
@@ -159,7 +161,10 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
             {showCollectiveInstructions && props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
-                  title={<FormattedMessage defaultMessage="Collective instructions to submit a receipt" id="cP95i8" />}
+                  data-cy="collective-receipt-policy"
+                  title={
+                    <FormattedMessage defaultMessage="Collective instructions to submit a reimbursement" id="HU0N8f" />
+                  }
                   policy={props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                   checked={props.acknowledgedCollectiveReceiptExpensePolicy}
                   onAcknowledgedChanged={v => props.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v)}

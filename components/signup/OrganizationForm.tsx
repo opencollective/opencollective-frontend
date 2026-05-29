@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { omit, orderBy, pick } from 'lodash';
-import { Plus, X } from 'lucide-react';
+import { omit, orderBy, pick } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -20,15 +19,16 @@ import { cn, parseToBoolean } from '@/lib/utils';
 import Captcha, { isCaptchaEnabled } from '../Captcha';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
+import I18nFormatters, { getI18nLink } from '../I18nFormatters';
 import Image from '../Image';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/Command';
-import { Input, InputGroup } from '../ui/Input';
+import { InputGroup } from '../ui/Input';
 import { Select, SelectContent, SelectTrigger } from '../ui/Select';
 import { toast } from '../ui/useToast';
 
-import type { SignupStepProps } from './common';
+import { type SignupStepProps } from './common';
 
 const createOrganizationMutation = gql`
   mutation OrganizationSignup(
@@ -53,16 +53,7 @@ const createOrganizationMutation = gql`
       description
       website
       legacyId
-    }
-  }
-`;
-
-const inviteOrganizationAdminsMutation = gql`
-  mutation InviteOrganizationAdmins($organization: AccountReferenceInput!, $inviteMembers: [InviteMemberInput!]!) {
-    inviteOrganizationAdmins(organization: $organization, inviteMembers: $inviteMembers) {
-      id
-      slug
-      name
+      type
     }
   }
 `;
@@ -73,8 +64,8 @@ const createOrganizationSchema = z.object({
     name: z.string().min(5).max(255),
     slug: z.string().min(5).max(255),
     legalName: z.string().min(5).max(255),
-    description: z.string().max(255).optional(),
-    website: z.string().url().optional(),
+    description: z.preprocess(val => (val === '' ? undefined : val), z.string().max(255).optional()),
+    website: z.preprocess(val => (val === '' ? undefined : val), z.string().url().optional()),
     currency: z.string().length(3),
   }),
   individual: z.object({ id: z.number() }),
@@ -83,34 +74,33 @@ const createOrganizationSchema = z.object({
 
 type CreateOrganizationValuesSchema = z.infer<typeof createOrganizationSchema>;
 
-export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupStepProps) {
+export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProps) {
   const intl = useIntl();
   const formikRef = useRef<FormikProps<CreateOrganizationValuesSchema>>(undefined);
   const countryInputRef = useRef<HTMLInputElement>(null);
   const currencyInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [createOrganization] = useMutation(createOrganizationMutation);
   const [showCountrySelect, setShowCountrySelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [captchaResult, setCaptchaResult] = useState(null);
-  const getCountryLabel = useCallback(
-    (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`,
-    [intl],
-  );
-  const countryOptions = useMemo(
-    () =>
-      orderBy(
-        Object.keys(CountryIso).map(code => ({
-          value: code,
-          label: getCountryLabel(code),
-        })),
-        ['label'],
-        ['asc'],
-      ),
-    [getCountryLabel],
-  );
+  const getCountryLabel = (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`;
+
+  const countryOptions = useMemo(() => {
+    const entries = Object.keys(CountryIso).map(code => ({
+      code,
+      emoji: getFlagEmoji(code),
+      name: i18nCountryName(intl, code),
+    }));
+
+    return orderBy(entries, ['name'], ['asc']).map(({ code, emoji, name }) => ({
+      value: code,
+      label: `${emoji} ${name}`,
+    }));
+  }, [intl]);
+
   const currencyOptions = useMemo(
     () =>
       Object.keys(Currency).map(code => ({
@@ -165,14 +155,14 @@ export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupSte
     }
   }, [formikRef]);
 
-  const onSubmit = async (values: CreateOrganizationValuesSchema) => {
-    const { individual, roleDescription, organization } = values;
+  const onSubmit = async (values: z.input<typeof createOrganizationSchema>) => {
+    const { individual, roleDescription, organization } = createOrganizationSchema.parse(values);
     try {
       setLoading(true);
       const result = await createOrganization({
         variables: {
           individual: 'id' in individual ? null : omit(individual, ['passwordConfirmation']),
-          organization: organization,
+          organization,
           captcha: captchaResult,
           roleDescription,
           hasMoneyManagement: parseToBoolean(router.query?.active) || parseToBoolean(router.query?.hasMoneyManagement),
@@ -180,11 +170,11 @@ export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupSte
         },
       });
 
-      setCreatedOrganization(result.data.createOrganization);
+      setCreatedAccount(result.data.createOrganization);
       toast({
         variant: 'success',
         message: intl.formatMessage({
-          id: 'createCollective.form.success',
+          id: 'createOrganization.form.success',
           defaultMessage: 'Organization created successfully!',
         }),
       });
@@ -402,183 +392,26 @@ export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupSte
               <FormattedMessage defaultMessage="Create Organization" id="organization.create" />
             </Button>
           </div>
-        </Form>
-      )}
-    </FormikZod>
-  );
-}
-
-const inviteAdminsSchema = z.object({
-  invitedAdmins: z
-    .array(
-      z.object({
-        email: z.string().email(),
-        name: z.string().min(1),
-      }),
-    )
-    .optional(),
-});
-
-type InviteAdminsValuesSchema = z.infer<typeof inviteAdminsSchema>;
-
-const invitedAdminToMember = ({ email, name }) => {
-  return { memberInfo: { email, name }, role: 'ADMIN' };
-};
-
-export function InviteAdminForm({ nextStep, createdOrganization }: SignupStepProps) {
-  const intl = useIntl();
-  const formikRef = useRef<FormikProps<InviteAdminsValuesSchema>>(undefined);
-  const [inviteFieldsCount, setInviteFieldsCount] = useState(0);
-  const [inviteOrganizationAdmins] = useMutation(inviteOrganizationAdminsMutation);
-  const [loading, setLoading] = React.useState(false);
-
-  const onSubmit = async (values: InviteAdminsValuesSchema) => {
-    const { invitedAdmins } = values;
-    try {
-      if (!createdOrganization) {
-        throw new Error('Organization not found');
-      }
-      setLoading(true);
-      const inviteMembers = (invitedAdmins || []).map(invitedAdminToMember);
-      await inviteOrganizationAdmins({
-        variables: {
-          organization: { slug: createdOrganization.slug },
-          inviteMembers,
-        },
-      });
-      toast({
-        variant: 'success',
-        message: <FormattedMessage id="signup.inviteAdmins.success" defaultMessage="Invites sent!" />,
-      });
-      nextStep();
-    } catch (error) {
-      setLoading(false);
-      const gqlError = getErrorFromGraphqlException(error);
-      if (gqlError?.payload?.code?.includes('SLUG')) {
-        formikRef.current?.setFieldError('organization.slug', formatErrorMessage(intl, gqlError));
-      }
-      toast({
-        variant: 'error',
-        message: formatErrorMessage(intl, gqlError) || (
-          <FormattedMessage
-            id="signup.inviteAdmins.error"
-            defaultMessage="An error occurred while inviting your team"
-          />
-        ),
-      });
-    }
-  };
-
-  return (
-    <FormikZod<InviteAdminsValuesSchema>
-      schema={inviteAdminsSchema}
-      onSubmit={onSubmit}
-      initialValues={{}}
-      innerRef={formikRef}
-    >
-      {({ values, setFieldValue, isValid }) => (
-        <Form
-          className="mb-6 flex max-w-xl grow flex-col items-center gap-8 px-6 sm:mb-20 sm:px-0"
-          data-cy="invite-admins-form"
-        >
-          <Image width={80} height={62} src="/static/images/signup/invite.png" alt="Stars" />
-          <div className="flex flex-col gap-2 px-3 text-center">
-            <React.Fragment>
-              <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
-                <FormattedMessage id="signup.inviteAdmins.title" defaultMessage="Invite your team" />
-              </h1>
-              <p className="text-sm break-words text-slate-700 sm:text-base">
-                <FormattedMessage
-                  defaultMessage="Having your team helps you share the work, adds accountability to manage finances transparently."
-                  id="signup.inviteAdmins.description"
-                />
-              </p>
-            </React.Fragment>
-          </div>
-          <Card className="w-full max-w-lg">
-            <CardContent className="flex flex-col gap-4">
-              {inviteFieldsCount > 0 && (
-                <div className="flex flex-col gap-4">
-                  {Array.from({ length: inviteFieldsCount }).map((_, index) => (
-                    <div
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={`invitedAdmin-${index}`}
-                      className="flex items-start gap-2"
-                    >
-                      <div className="flex flex-1 flex-col gap-4 rounded-lg border border-border p-4">
-                        <FormField
-                          name={`invitedAdmins.${index}.name`}
-                          label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
-                        >
-                          {({ field }) => <Input {...field} placeholder="e.g. Jane Smith" />}
-                        </FormField>
-                        <FormField
-                          name={`invitedAdmins.${index}.email`}
-                          label={<FormattedMessage id="Email" defaultMessage="Email" />}
-                          type="email"
-                        >
-                          {({ field }) => <Input {...field} placeholder="e.g. jane@example.com" />}
-                        </FormField>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          const newInvitedAdmins = [...(values.invitedAdmins || [])];
-                          newInvitedAdmins.splice(index, 1);
-                          setFieldValue('invitedAdmins', newInvitedAdmins);
-                          setInviteFieldsCount(inviteFieldsCount - 1);
-                        }}
-                        className="mt-1 h-8 w-8 p-0"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  if (inviteFieldsCount < 5) {
-                    setInviteFieldsCount(inviteFieldsCount + 1);
-                    const newInvitedAdmins = [...(values.invitedAdmins || [])];
-                    newInvitedAdmins.push({ name: '', email: '' });
-                    setFieldValue('invitedAdmins', newInvitedAdmins);
-                  }
+          <div className="grow text-center text-sm text-muted-foreground sm:order-none sm:flex sm:items-end sm:justify-center">
+            <p>
+              <FormattedMessage
+                defaultMessage="By creating an account, you agree to our{newLine}<TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
+                id="signup.individual.tosAgreement"
+                values={{
+                  ...I18nFormatters,
+                  TOSLink: getI18nLink({
+                    href: '/tos',
+                    openInNewTab: true,
+                    className: 'underline',
+                  }),
+                  PrivacyPolicyLink: getI18nLink({
+                    href: '/privacypolicy',
+                    openInNewTab: true,
+                    className: 'underline',
+                  }),
                 }}
-                disabled={inviteFieldsCount >= 5 || loading}
-                className="w-full"
-                data-cy="add-team-member"
-              >
-                <Plus className="h-4 w-4" />
-                <FormattedMessage defaultMessage="Add Team Member" id="InviteTeamMember.add" />
-              </Button>
-            </CardContent>
-          </Card>
-          <div className="grow sm:hidden" />
-          <div className="flex w-full max-w-lg flex-col-reverse gap-4 sm:flex-row sm:justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              className="grow"
-              disabled={loading}
-              onClick={() => nextStep()}
-              data-cy="skip-to-dashboard"
-            >
-              <FormattedMessage defaultMessage="Skip to Dashboard" id="SkipToDashboard" />
-            </Button>
-            <Button
-              type="submit"
-              disabled={!isValid}
-              loading={loading}
-              className="grow aria-hidden:hidden"
-              aria-hidden={inviteFieldsCount === 0}
-            >
-              <FormattedMessage defaultMessage="Send Invite" id="Expense.SendInvite" />
-            </Button>
+              />
+            </p>
           </div>
         </Form>
       )}

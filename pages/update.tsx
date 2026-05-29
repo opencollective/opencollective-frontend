@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { get, pick } from 'lodash';
+import { get, pick } from 'lodash-es';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { shouldIndexAccountOnSearchEngines } from '../lib/collective';
+import { isHiddenAccount, shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { ERROR } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
@@ -174,7 +174,7 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
 
   if (!account) {
     return <ErrorPage data={props} />;
-  } else if (!update) {
+  } else if (!update || isHiddenAccount(account)) {
     return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
   }
 

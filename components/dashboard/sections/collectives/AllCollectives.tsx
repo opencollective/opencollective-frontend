@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, isEmpty, isString, omit } from 'lodash';
+import { compact, isEmpty, isString, omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -12,7 +12,7 @@ import type {
   HostedCollectiveFieldsFragment,
   HostedCollectivesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
+import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 

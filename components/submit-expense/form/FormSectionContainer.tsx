@@ -29,7 +29,7 @@ export function FormSectionContainer(props: FormSectionContainerProps) {
       <div className="rounded-lg border border-white bg-white p-4 sm:p-6">
         {!props.hideTitle && (
           <div className="mb-4">
-            <div className="text-xl font-bold text-[#0F1729]">{props.title || <FormattedMessage {...stepTitle} />}</div>
+            <h2 className="text-xl font-bold text-[#0F1729]">{props.title || <FormattedMessage {...stepTitle} />}</h2>
             {props.subtitle ||
               (stepSubtitle && !props.hideSubtitle && (
                 <div className="text-sm text-muted-foreground">

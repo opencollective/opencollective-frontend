@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -9,12 +9,16 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
 import { sortTiersForCollective, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
+import { FEATURES } from '@/lib/allowed-features';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
+import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/graphql';
+
+import FeatureNotSupported from '@/components/FeatureNotSupported';
 
 import AdminContributeCardsContainer from '../../contribute-cards/AdminContributeCardsContainer';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
-import { Box, Grid } from '../../Grid';
+import { Box, Flex, Grid } from '../../Grid';
 import Image from '../../Image';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
@@ -25,7 +29,7 @@ import { P, Span, Strong } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 import { listTierQuery } from '../tiers/EditTierModal';
 
-const getSortedContributeCards = (collective, tiers, intl) => {
+const getSortedContributeCards = (collective, tiers, supportedTierTypes, intl) => {
   const sortedTiers = sortTiersForCollective(collective, tiers);
   return sortedTiers.map(tier => {
     if (tier === 'custom') {
@@ -51,20 +55,23 @@ const getSortedContributeCards = (collective, tiers, intl) => {
           tier,
           hideContributors: true,
           hideCTA: true,
+          supportedTierTypes,
+          isAdmin: true,
         },
       };
     }
   });
 };
 
-const CardsContainer = styled(Grid).attrs({
-  justifyItems: 'center',
-  gridGap: '30px',
-  gridTemplateColumns: ['repeat(auto-fit, minmax(280px, 1fr))'],
-  gridAutoRows: ['1fr'],
+const CardsContainer = styled(Flex).attrs({
+  flexWrap: 'wrap',
+  gap: '40px',
+  justifyContent: 'flex-start',
 })`
   & > * {
     padding: 0;
+    min-width: 280px;
+    flex: 0 1 auto;
   }
 `;
 
@@ -76,14 +83,15 @@ const Tiers = ({ collective }) => {
   const [draggingId, setDraggingId] = React.useState(null);
   const [error, setError] = React.useState(null);
 
-  const variables = { accountSlug: collective.slug };
+  const variables = { accountSlug: collective.slug, tiersOnlyValid: false };
   const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables });
   const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation);
   const intl = useIntl();
   const tiers = get(data, 'account.tiers.nodes', EMPTY_ARRAY);
+  const supportedTierTypes = get(data, 'account.supportedTierTypes', EMPTY_ARRAY);
   const contributeCards = React.useMemo(
-    () => getSortedContributeCards(collective, tiers, intl),
-    [collective, tiers, intl],
+    () => getSortedContributeCards(collective, tiers, supportedTierTypes, intl),
+    [collective, tiers, supportedTierTypes, intl],
   );
 
   const onTiersReorder = async cards => {
@@ -102,6 +110,10 @@ const Tiers = ({ collective }) => {
       setError(getErrorFromGraphqlException(e));
     }
   };
+
+  if (collective.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] === CollectiveFeatureStatus.UNSUPPORTED) {
+    return <FeatureNotSupported />;
+  }
 
   return (
     <div>
@@ -192,6 +204,7 @@ const Tiers = ({ collective }) => {
               setDraggingId={setDraggingId}
               isSaving={isSubmitting}
               canEdit
+              supportedTierTypes={supportedTierTypes}
             />
           </div>
         )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { compact, flatten, get, isNil, isPlainObject, omitBy, set, startCase } from 'lodash';
+import { compact, flatten, get, isNil, isPlainObject, omitBy, set, startCase } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -218,7 +218,7 @@ const SubscriberForm = (props: SubscriberFormProps) => {
                           {PlatformSubscriptionFeatureTitles[feature] ? (
                             <FormattedMessage {...PlatformSubscriptionFeatureTitles[feature]} />
                           ) : (
-                            startCase(feature)
+                            startCase(feature.toLowerCase())
                           )}
                         </Label>
                       </div>

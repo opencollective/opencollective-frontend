@@ -1,13 +1,13 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { compact, flatten, orderBy } from 'lodash';
+import { compact, flatten, orderBy } from 'lodash-es';
 import { Mail, MoreHorizontal, Pencil, PlusIcon } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import roles from '../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { AccountType } from '../../../lib/graphql/types/v2/schema';
+import { AccountType } from '../../../lib/graphql/types/v2/graphql';
 import formatMemberRole from '../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import type { MemberFieldsFragment, TeamSectionQuery } from '@/lib/graphql/types/v2/graphql';

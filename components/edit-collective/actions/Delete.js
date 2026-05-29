@@ -10,7 +10,6 @@ import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
 import MessageBox from '@/components/MessageBox';
 
-import { getI18nLink } from '../../I18nFormatters';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
 import { Button } from '../../ui/Button';
@@ -33,7 +32,7 @@ const deleteUserCollectiveMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const { COLLECTIVE, PROJECT, EVENT } = CollectiveType;
+const { PROJECT, EVENT } = CollectiveType;
 
 const DeleteCollective = ({ collective, ...props }) => {
   const [showModal, setShowModal] = useState(false);
@@ -89,19 +88,11 @@ const DeleteCollective = ({ collective, ...props }) => {
         </MessageBox>
       ) : hasMoneyManagement ? (
         <MessageBox type="warning">
-          {collective.type === COLLECTIVE ? (
-            <FormattedMessage
-              id="collective.delete.selfHost"
-              defaultMessage={`To delete this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
-              values={{ SettingsLink: getI18nLink({ href: `/dashboard/${collective.host?.slug}/host` }) }}
-            />
-          ) : (
-            <FormattedMessage
-              id="collective.delete.balance.warning"
-              defaultMessage="You can't delete {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
-              values={{ type: collective.type }}
-            />
-          )}
+          <FormattedMessage
+            id="collective.delete.balance.warning"
+            defaultMessage="You can't delete {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
+            values={{ type: collective.type }}
+          />
         </MessageBox>
       ) : !collective.isDeletable && [EVENT, PROJECT].includes(collective.type) ? (
         <MessageBox type="warning">

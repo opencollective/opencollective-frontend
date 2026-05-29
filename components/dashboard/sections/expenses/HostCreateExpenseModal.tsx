@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { groupBy, map, omit, pick } from 'lodash';
+import { groupBy, map, omit, pick } from 'lodash-es';
 import { Lock, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -11,18 +11,18 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { standardizeExpenseItemIncurredAt } from '../../../../lib/expenses';
 import type {
   Account,
+  AccountingCategory,
   Host,
   TransactionsImport,
   TransactionsImportRow,
   TransactionsImportStats,
-} from '../../../../lib/graphql/types/v2/schema';
-import { Currency, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
+} from '../../../../lib/graphql/types/v2/graphql';
+import { Currency, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { isValidUrl } from '../../../../lib/utils';
 import { attachmentDropzoneParams } from '../../../expenses/lib/attachments';
 import { formatCurrency } from '@/lib/currency-utils';
-import type { AccountingCategory } from '@/lib/graphql/types/v2/graphql';
 import type { PossiblyArray } from '@/lib/types';
 
 import AccountingCategorySelect from '@/components/AccountingCategorySelect';
@@ -277,8 +277,8 @@ export const HostCreateExpenseModal = ({
           {({ isSubmitting, setFieldValue, setFieldTouched, values }) => {
             const hasChangedAmount = Boolean(
               transactionsImportRow?.amount?.valueInCents &&
-                (Math.abs(transactionsImportRow.amount.valueInCents) !== values.amount.valueInCents ||
-                  transactionsImportRow.amount.currency !== values.amount.currency),
+              (Math.abs(transactionsImportRow.amount.valueInCents) !== values.amount.valueInCents ||
+                transactionsImportRow.amount.currency !== values.amount.currency),
             );
 
             return (

@@ -1,12 +1,12 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { cloneDeep, isNil, set } from 'lodash';
+import { cloneDeep, isNil, set } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
-import { type Amount, Currency, type TransactionsImportRowCreateInput } from '../../../../lib/graphql/types/v2/schema';
+import { type Amount, Currency, type TransactionsImportRowCreateInput } from '../../../../lib/graphql/types/v2/graphql';
 import { applyCSVConfig, getDefaultCSVConfig, guessCSVColumnsConfig, parseTransactionsCSVFile } from './lib/parse-csv';
 import type { CSVConfig } from './lib/types';
 import { ACCEPTED_DATE_FORMATS, ACCEPTED_NUMBER_FORMATS } from './lib/types';

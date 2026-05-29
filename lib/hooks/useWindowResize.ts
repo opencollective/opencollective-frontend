@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { throttle } from 'lodash';
+import { throttle } from 'lodash-es';
 
 import { BREAKPOINTS, getViewportFromMaxWidth, getViewportFromMinWidth, VIEWPORTS } from '../withViewport';
 

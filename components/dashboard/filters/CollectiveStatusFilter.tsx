@@ -14,8 +14,8 @@ export enum COLLECTIVE_STATUS {
 
 export const CollectiveStatusMessages = defineMessages({
   [COLLECTIVE_STATUS.ACTIVE]: {
-    id: 'Subscriptions.Active',
-    defaultMessage: 'Active',
+    id: 'HostContextFilter.Hosted',
+    defaultMessage: 'Hosted',
   },
   [COLLECTIVE_STATUS.FROZEN]: {
     id: 'CollectiveStatus.Frozen',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { defineMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 

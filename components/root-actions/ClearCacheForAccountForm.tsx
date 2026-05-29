@@ -1,12 +1,12 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { startCase, uniq } from 'lodash';
+import { startCase, uniq } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
 import type { ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/graphql/types/v2/graphql';
-import { AccountCacheType } from '../../lib/graphql/types/v2/schema';
+import { AccountCacheType } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import DashboardHeader from '../dashboard/DashboardHeader';

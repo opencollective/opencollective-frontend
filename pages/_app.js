@@ -9,6 +9,7 @@ import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import '../lib/analytics/plausible';
+import { ApplyDocumentFont, inter } from '../lib/fonts';
 import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import { getIntlProps } from '../lib/i18n/request';
 import theme from '../lib/theme';
@@ -21,8 +22,6 @@ import { Toaster } from '../components/ui/Toaster';
 import UserProvider from '../components/UserProvider';
 import { WorkspaceProvider } from '../components/WorkspaceProvider';
 
-import 'react-pdf/dist/esm/Page/TextLayer.css';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
@@ -192,40 +191,46 @@ class OpenCollectiveFrontendApp extends App {
 
     return (
       <Fragment>
-        <ApolloProvider
-          client={
-            this.props.apolloClient ||
-            this.getApolloClient(
-              typeof window !== 'undefined' ? window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME] : {},
-              pageProps?.[APOLLO_STATE_PROP_NAME],
-            )
-          }
-        >
-          <StyleSheetManager shouldForwardProp={defaultShouldForwardProp}>
-            <ThemeProvider theme={theme}>
-              <StripeProviderSSR>
-                <IntlProvider locale={locale}>
-                  <TooltipProvider delayDuration={500} skipDelayDuration={100}>
-                    <UserProvider initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}>
-                      <WhitelabelProviderContext.Provider value={pageProps?.whitelabel?.provider}>
-                        <WorkspaceProvider>
-                          <ModalProvider>
-                            <NewsAndUpdatesProvider>
-                              <Component {...pageProps} />
-                              <Toaster />
-                              <GlobalNewsAndUpdates />
-                              <TwoFactorAuthenticationModal />
-                            </NewsAndUpdatesProvider>
-                          </ModalProvider>
-                        </WorkspaceProvider>
-                      </WhitelabelProviderContext.Provider>
-                    </UserProvider>
-                  </TooltipProvider>
-                </IntlProvider>
-              </StripeProviderSSR>
-            </ThemeProvider>
-          </StyleSheetManager>
-        </ApolloProvider>
+        <ApplyDocumentFont>
+          <div className={`${inter.variable} ${inter.className}`}>
+            <ApolloProvider
+              client={
+                this.props.apolloClient ||
+                this.getApolloClient(
+                  typeof window !== 'undefined' ? window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME] : {},
+                  pageProps?.[APOLLO_STATE_PROP_NAME],
+                )
+              }
+            >
+              <StyleSheetManager shouldForwardProp={defaultShouldForwardProp}>
+                <ThemeProvider theme={theme}>
+                  <StripeProviderSSR>
+                    <IntlProvider locale={locale}>
+                      <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                        <UserProvider
+                          initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}
+                        >
+                          <WhitelabelProviderContext.Provider value={pageProps?.whitelabel?.provider}>
+                            <WorkspaceProvider>
+                              <ModalProvider>
+                                <NewsAndUpdatesProvider>
+                                  <Component {...pageProps} />
+                                  <Toaster />
+                                  <GlobalNewsAndUpdates />
+                                  <TwoFactorAuthenticationModal />
+                                </NewsAndUpdatesProvider>
+                              </ModalProvider>
+                            </WorkspaceProvider>
+                          </WhitelabelProviderContext.Provider>
+                        </UserProvider>
+                      </TooltipProvider>
+                    </IntlProvider>
+                  </StripeProviderSSR>
+                </ThemeProvider>
+              </StyleSheetManager>
+            </ApolloProvider>
+          </div>
+        </ApplyDocumentFont>
         <DefaultPaletteStyle palette={defaultColors.primary} />
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />

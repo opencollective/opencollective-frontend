@@ -1,7 +1,7 @@
 import React from 'react';
 import { Mutation } from '@apollo/client/react/components';
 import { Check } from '@styled-icons/fa-solid/Check';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep, set } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { isHexColor } from 'validator';

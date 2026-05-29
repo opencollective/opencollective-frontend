@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
-import { cloneDeep, pick } from 'lodash';
+import { cloneDeep, pick } from 'lodash-es';
 import { Download, Pencil, Trash, Upload, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import type { FileRejection } from 'react-dropzone';
@@ -12,7 +12,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { gql } from '../../lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
-import { UploadedFileKind } from '../../lib/graphql/types/v2/schema';
+import { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';
 import { cn, omitDeep } from '../../lib/utils';
@@ -40,19 +40,9 @@ import { Switch } from '../ui/Switch';
 import { useToast } from '../ui/useToast';
 
 import type { VendorFieldsFragment } from './queries';
-import { vendorFieldFragment } from './queries';
+import { createVendorMutation, vendorFieldFragment } from './queries';
 
 const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
-
-const createVendorMutation = gql`
-  mutation CreateVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
-    createVendor(host: $host, vendor: $vendor) {
-      id
-      ...VendorFields
-    }
-  }
-  ${vendorFieldFragment}
-`;
 
 const editVendorMutation = gql`
   mutation EditVendor($vendor: VendorEditInput!) {
@@ -88,7 +78,7 @@ type VendorFormProps = {
   isModal?: boolean;
   supportsTaxForm: boolean;
   hidePayoutMethod?: boolean;
-  limitVisibilityOptionToAccount?: AccountHoverCardFieldsFragment;
+  limitVisibilityOptionToAccount?: AccountHoverCardFieldsFragment & { hasHosting?: boolean };
   isBeneficiary?: boolean;
 };
 
@@ -572,6 +562,8 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                             payoutMethod={field.value}
                             host={host}
                             required={Boolean(formik.values.payoutMethod)}
+                            alwaysSave
+                            onlyDataFields
                           />
                         </div>
                       )}
@@ -580,71 +572,75 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 </React.Fragment>
               )}
 
-              {props.limitVisibilityOptionToAccount && !props.isBeneficiary && (
-                <StyledInputFormikField
-                  name="accountVisibility"
-                  label={intl.formatMessage({ defaultMessage: 'Visibility', id: 'JAkIqb' })}
-                  labelProps={FIELD_LABEL_PROPS}
-                  required={true}
-                  mt={3}
-                >
-                  {({ field, form }) => (
-                    <div className="flex items-center gap-2">
-                      <RadioGroup
-                        id={field.name}
-                        value={field.value}
-                        onValueChange={value => form.setFieldValue('accountVisibility', value)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="limit-visibility" id="limit-visibility" />
-                          <Label htmlFor="limit-visibility">
-                            <FormattedMessage
-                              defaultMessage="Visible to {account} only"
-                              id="q02wF4"
-                              values={{
-                                account: (
-                                  <AccountHoverCard
-                                    account={props.limitVisibilityOptionToAccount}
-                                    trigger={
-                                      <span>
-                                        <span className="rounded border">
-                                          {props.limitVisibilityOptionToAccount.name}
+              {props.limitVisibilityOptionToAccount &&
+                !props.isBeneficiary &&
+                props.limitVisibilityOptionToAccount.hasHosting && (
+                  <StyledInputFormikField
+                    name="accountVisibility"
+                    label={intl.formatMessage({ defaultMessage: 'Visibility', id: 'JAkIqb' })}
+                    labelProps={FIELD_LABEL_PROPS}
+                    required={true}
+                    mt={3}
+                  >
+                    {({ field, form }) => (
+                      <div className="flex items-center gap-2">
+                        <RadioGroup
+                          id={field.name}
+                          value={field.value}
+                          onValueChange={value => form.setFieldValue('accountVisibility', value)}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="limit-visibility" id="limit-visibility" />
+                            <Label htmlFor="limit-visibility">
+                              <FormattedMessage
+                                defaultMessage="Visible to {account} only"
+                                id="q02wF4"
+                                values={{
+                                  account: (
+                                    <AccountHoverCard
+                                      account={props.limitVisibilityOptionToAccount}
+                                      trigger={
+                                        <span>
+                                          <span className="rounded border">
+                                            {props.limitVisibilityOptionToAccount.name}
+                                          </span>
                                         </span>
-                                      </span>
-                                    }
-                                  />
-                                ),
-                              }}
-                            />
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="visible-to-all" id="visible-to-all" />
-                          <Label htmlFor="visible-to-all">
-                            <FormattedMessage defaultMessage="Visible to all collectives and funds" id="DN5I4w" />
-                          </Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                  )}
-                </StyledInputFormikField>
-              )}
+                                      }
+                                    />
+                                  ),
+                                }}
+                              />
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="visible-to-all" id="visible-to-all" />
+                            <Label htmlFor="visible-to-all">
+                              <FormattedMessage defaultMessage="Visible to all collectives and funds" id="DN5I4w" />
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    )}
+                  </StyledInputFormikField>
+                )}
 
-              {props.limitVisibilityOptionToAccount && formik.values.accountVisibility === 'limit-visibility' && (
-                <MessageBox type="info" className="mt-3">
-                  {props.isBeneficiary ? (
-                    <FormattedMessage
-                      defaultMessage="This beneficiary will only be visible within this fund. To change the visibility, you can edit this beneficiary at vendors settings in your dashboard."
-                      id="lk4zhJ"
-                    />
-                  ) : (
-                    <FormattedMessage
-                      defaultMessage="The above specified visibility settings will be applied to this vendor. To customise the visibility, you can edit this vendor's settings from your dashboard."
-                      id="Mr88Jf"
-                    />
-                  )}
-                </MessageBox>
-              )}
+              {props.limitVisibilityOptionToAccount &&
+                formik.values.accountVisibility === 'limit-visibility' &&
+                props.limitVisibilityOptionToAccount.hasHosting && (
+                  <MessageBox type="info" className="mt-3">
+                    {props.isBeneficiary ? (
+                      <FormattedMessage
+                        defaultMessage="This beneficiary will only be visible within this fund. To change the visibility, you can edit this beneficiary at vendors settings in your dashboard."
+                        id="lk4zhJ"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        defaultMessage="The above specified visibility settings will be applied to this vendor. To customise the visibility, you can edit this vendor's settings from your dashboard."
+                        id="Mr88Jf"
+                      />
+                    )}
+                  </MessageBox>
+                )}
 
               <StyledInputFormikField
                 name="vendorInfo.notes"

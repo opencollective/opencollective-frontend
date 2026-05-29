@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -25,7 +25,6 @@ import Delete from './actions/Delete';
 import EmptyBalance from './actions/EmptyBalance';
 // Sections
 import CollectiveGoals from './sections/CollectiveGoals';
-import ConnectedAccounts from './sections/ConnectedAccounts';
 import CustomMessage from './sections/CustomMessage';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
@@ -78,10 +77,7 @@ class EditCollectiveForm extends React.Component {
       case ALL_SECTIONS.COLLECTIVE_PAGE:
         return <EditCollectivePage collective={collective} />;
 
-      case ALL_SECTIONS.CONNECTED_ACCOUNTS:
-        return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
-
-      case ALL_SECTIONS.EXPORT:
+      case ALL_SECTIONS.WIDGETS:
         return <Export collective={collective} />;
 
       case ALL_SECTIONS.HOST:
@@ -93,7 +89,7 @@ class EditCollectiveForm extends React.Component {
         return <PaymentInformation account={collective} />;
 
       case ALL_SECTIONS.TIERS:
-        return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
+        return <Tiers collective={collective} />;
 
       case ALL_SECTIONS.TICKETS:
         return <Tickets collective={collective} />;
@@ -162,8 +158,12 @@ class EditCollectiveForm extends React.Component {
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
             <Archive collective={collective} />
-            {[COLLECTIVE].includes(collective.type) && <ConvertToOrganization collective={collective} />}
-            {collective.type === ORGANIZATION && <ConvertToCollective collective={collective} />}
+            {!collective.isPrivate && collective.type === COLLECTIVE && (
+              <ConvertToOrganization collective={collective} />
+            )}
+            {!collective.isPrivate && collective.type === ORGANIZATION && (
+              <ConvertToCollective collective={collective} />
+            )}
             <Delete collective={collective} />
           </div>
         );

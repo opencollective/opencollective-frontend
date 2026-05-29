@@ -1,29 +1,79 @@
-import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { hasAccountHosting } from '@/lib/collective';
 import type {
   PlatformBillingOverviewCardQuery,
   PlatformBillingOverviewCardQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
+import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import Link from '@/components/Link';
 import MessageBox from '@/components/MessageBox';
 import { Button } from '@/components/ui/Button';
+import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 import { Skeleton } from '@/components/ui/Skeleton';
 
+import { DashboardContext } from '../../DashboardContext';
 import { platformSubscriptionFragment } from '../platform-subscription/fragments';
 import { PlatformSubscriptionDetails } from '../platform-subscription/PlatformSubscriptionCard';
+
+import { editAccountSettingMutation } from './queries';
+
+export function PlatformBillingCollapsibleCard() {
+  const { account } = useContext(DashboardContext);
+  const [showSubscriptionCard, setShowSubscriptionCard] = useState(undefined);
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
+
+  useEffect(() => {
+    if (!LoggedInUser || !account) {
+      return;
+    }
+
+    if (showSubscriptionCard === undefined) {
+      const showSubscriptionCardKey = `id${account.legacyId}`;
+      const showSubscriptionCardSetting =
+        LoggedInUser.collective.settings?.showInitialOverviewSubscriptionCard?.[showSubscriptionCardKey];
+
+      setShowSubscriptionCard(showSubscriptionCardSetting !== false ? true : false);
+    }
+  }, [LoggedInUser, account, showSubscriptionCard]);
+
+  const handleSubscriptionCardToggle = useCallback(
+    async (open: boolean) => {
+      setShowSubscriptionCard(open);
+
+      await editAccountSetting({
+        variables: {
+          account: { legacyId: LoggedInUser.collective.id },
+          key: `showInitialOverviewSubscriptionCard.id${account.legacyId}`,
+          value: open,
+        },
+      }).catch(() => {});
+      await refetchLoggedInUser();
+    },
+    [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
+  );
+
+  return (
+    <Collapsible open={showSubscriptionCard}>
+      <CollapsibleContent>
+        <PlatformBillingOverviewCard accountSlug={account.slug} onDismiss={() => handleSubscriptionCardToggle(false)} />
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
 
 type PlatformBillingOverviewCardProps = {
   accountSlug: string;
   onDismiss?: () => void;
 };
 
-export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardProps) {
+function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardProps) {
   const query = useQuery<PlatformBillingOverviewCardQuery, PlatformBillingOverviewCardQueryVariables>(
     gql`
       query PlatformBillingOverviewCard($slug: String!) {
@@ -31,6 +81,9 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
           isHost
           type
           settings
+          ... on Organization {
+            hasHosting
+          }
           ... on AccountWithPlatformSubscription {
             platformSubscription {
               ...PlatformSubscriptionFields
@@ -55,8 +108,9 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
     return null;
   }
 
-  const hasHosting = hasAccountHosting(query.data.account);
-
+  const hasHosting = Boolean(query.data.account?.['hasHosting']);
+  const subscription = query.data.account.platformSubscription;
+  const isFreeTier = subscription.plan.pricing.pricePerMonth.valueInCents === 0;
   return (
     <MessageBox className="relative" type="info">
       <Button onClick={props.onDismiss ?? (() => {})} className="absolute top-0 right-0" variant="ghost" size="icon">
@@ -67,9 +121,30 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
           defaultMessage={`You're on the "{planTitle}" plan`}
           id="Fw/mF9"
           values={{
-            planTitle: query.data.account.platformSubscription.plan.title,
+            planTitle: subscription.plan.title,
           }}
         />
+        <span className="text-sm font-normal text-gray-500 lowercase italic">
+          {` (`}
+          {isFreeTier ? (
+            <FormattedMessage defaultMessage="Free subscription" id="CGUb/o" />
+          ) : (
+            <FormattedMessage
+              defaultMessage="{perMonth} / Month"
+              id="+2hntI"
+              values={{
+                perMonth: (
+                  <FormattedMoneyAmount
+                    amount={subscription.plan.pricing.pricePerMonth.valueInCents}
+                    currency={subscription.plan.pricing.pricePerMonth.currency}
+                    showCurrencyCode={false}
+                  />
+                ),
+              }}
+            />
+          )}
+          {`)`}
+        </span>
       </div>
       <div className="text-sm">
         <FormattedMessage

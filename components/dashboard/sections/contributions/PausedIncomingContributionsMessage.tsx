@@ -143,8 +143,8 @@ export const PausedIncomingContributionsMessage = ({ accountSlug }: PausedIncomi
       ) : !account.canStartResumeContributionsProcess ? (
         <p>
           <FormattedMessage
-            defaultMessage="These contributions can't be resumed yet. You need to either find a Fiscal Host or become an Independent Collective. <LearnMoreLink>Learn more</LearnMoreLink>"
-            id="BCdRHe"
+            defaultMessage="These contributions can't be resumed yet. You need to either find a Fiscal Host or become an Organization. <LearnMoreLink>Learn more</LearnMoreLink>"
+            id="XI1j5d"
             values={{ LearnMoreLink: getI18nLink({ as: Link, href: getDashboardRoute(account, 'host') }) }}
           />
         </p>

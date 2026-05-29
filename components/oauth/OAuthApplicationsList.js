@@ -32,6 +32,7 @@ const applicationsQuery = gql`
         totalCount
         nodes {
           id
+          publicId
           name
         }
       }

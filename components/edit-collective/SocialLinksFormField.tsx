@@ -3,12 +3,12 @@ import { closestCenter, DndContext } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Plus } from '@styled-icons/fa-solid/Plus';
-import { sortBy } from 'lodash';
+import { sortBy } from 'lodash-es';
 import { GripVertical, X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/schema';
-import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
+import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/graphql';
+import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { SocialLinkLabel } from '../../lib/social-links';
 import { isValidUrl } from '../../lib/utils';
 

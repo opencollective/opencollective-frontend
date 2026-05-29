@@ -1,5 +1,5 @@
 import React from 'react';
-import { size } from 'lodash';
+import { size } from 'lodash-es';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -121,9 +121,10 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                     id="TotalDonatedSince"
                     defaultMessage="{totalDonated} since {date}"
                     values={{
-                      date: <FormattedDate value={contributor.since} month="short" year="numeric" />,
+                      date: <FormattedDate key="date" value={contributor.since} month="short" year="numeric" />,
                       totalDonated: (
                         <FormattedMoneyAmount
+                          key="total-donated"
                           amount={contributor.totalAmountDonated}
                           currency={currency}
                           precision={0}

@@ -1,5 +1,4 @@
 import React from 'react';
-import { isEmpty, omit } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -7,28 +6,23 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { boolean, isMulti, limit, offset } from '../../../../lib/filters/schemas';
 import type {
   AccountExpensesQueryVariables,
+  Currency,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Currency } from '../../../../lib/graphql/types/v2/schema';
-import {
-  AccountingCategoryKind,
-  ExpenseStatusFilter,
-  ExpenseType,
-  LastCommentBy,
-  PayoutMethodType,
-} from '../../../../lib/graphql/types/v2/schema';
-import { i18nExpenseStatus, i18nExpenseType } from '../../../../lib/i18n/expense';
+import { AccountingCategoryKind, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { i18nChargeHasReceipts } from '../../../../lib/i18n/receipts-filter';
-import { sortSelectOptions } from '../../../../lib/utils';
-import { ExpenseMetaStatuses } from '@/lib/expense';
 
+import { accountFilter } from '../../filters/AccountFilter';
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
+import { expensePayeeFilter, type ExpensePayeeFilterMeta } from '../../filters/ExpensePayeeFilter';
+import { expenseStatusFilter, type ExpenseStatusFilterMeta } from '../../filters/ExpenseStatusFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
+import { expenseTypeFilter, type ExpenseTypeFilterMeta } from '../../filters/ExpenseTypeFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
@@ -39,6 +33,9 @@ const sortFilter = buildSortFilter({
     field: 'CREATED_AT',
     direction: 'DESC',
   },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({ defaultMessage: 'Date Submitted', id: 'jS+tfC' }),
+  },
 });
 
 export const schema = z.object({
@@ -48,8 +45,8 @@ export const schema = z.object({
   searchTerm: searchFilter.schema,
   date: dateFilter.schema,
   amount: amountFilter.schema,
-  status: isMulti(z.nativeEnum(ExpenseStatusFilter)).optional(),
-  type: z.nativeEnum(ExpenseType).optional(),
+  status: expenseStatusFilter.schema,
+  type: expenseTypeFilter.schema,
   payout: z.nativeEnum(PayoutMethodType).optional(),
   lastCommentBy: isMulti(z.nativeEnum(LastCommentBy)).optional(),
   tag: expenseTagFilter.schema,
@@ -57,17 +54,22 @@ export const schema = z.object({
   virtualCard: isMulti(z.string()).optional(),
   accountingCategory: accountingCategoryFilter.schema,
   payoutMethodId: z.string().optional(),
+  fromAccounts: expensePayeeFilter.schema,
+  approvedByAccount: accountFilter.schema,
+  paidByAccount: accountFilter.schema,
+  rejectedByAccount: accountFilter.schema,
 });
 
 export type FilterValues = z.infer<typeof schema>;
 
 export const ExpenseAccountingCategoryKinds = [AccountingCategoryKind.EXPENSE] as const;
 
-export type FilterMeta = {
-  currency?: Currency;
-  hideExpensesMetaStatuses?: boolean;
-  accountingCategoryKinds?: readonly AccountingCategoryKind[];
-};
+export type FilterMeta = ExpensePayeeFilterMeta &
+  ExpenseTypeFilterMeta &
+  ExpenseStatusFilterMeta & {
+    currency?: Currency;
+    accountingCategoryKinds?: readonly AccountingCategoryKind[];
+  };
 
 // Only needed when either the key or the expected query variables are different
 export const toVariables: FiltersToVariables<
@@ -77,49 +79,26 @@ export const toVariables: FiltersToVariables<
   date: dateFilter.toVariables,
   amount: amountFilter.toVariables,
   payout: value => ({ payoutMethodType: value }),
-  tag: value => ({ tags: value.includes('untagged') ? null : value }),
+  tag: expenseTagFilter.toVariables,
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
   payoutMethodId: id => ({ payoutMethod: { id } }),
-  status: value => (isEmpty(value) ? undefined : { status: value }),
+  type: expenseTypeFilter.toVariables,
+  status: expenseStatusFilter.toVariables,
+  fromAccounts: expensePayeeFilter.toVariables,
+  approvedByAccount: accountFilter.toVariables,
+  paidByAccount: accountFilter.toVariables,
+  rejectedByAccount: accountFilter.toVariables,
 };
 
 // The filters config is used to populate the Filters component.
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
-  date: dateFilter.filter,
+  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Date Submitted', id: 'jS+tfC' }) },
   amount: amountFilter.filter,
   accountingCategory: accountingCategoryFilter.filter,
-  status: {
-    static: true,
-    labelMsg: defineMessage({ id: 'expense.status', defaultMessage: 'Status' }),
-    Component: ({ valueRenderer, intl, ...props }) => (
-      <ComboSelectFilter
-        options={Object.values(ExpenseStatusFilter)
-          .filter(
-            value =>
-              !props.meta?.hideExpensesMetaStatuses || !(ExpenseMetaStatuses as readonly string[]).includes(value),
-          )
-          .map(value => ({ label: valueRenderer({ intl, value }), value }))
-          .sort(sortSelectOptions)}
-        isMulti
-        {...props}
-      />
-    ),
-    valueRenderer: ({ intl, value }) => i18nExpenseStatus(intl, value),
-  },
-  type: {
-    labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
-    Component: ({ valueRenderer, intl, ...props }) => (
-      <ComboSelectFilter
-        options={Object.values(omit(ExpenseType, ExpenseType.FUNDING_REQUEST))
-          .map(value => ({ label: valueRenderer({ value, intl }), value }))
-          .sort(sortSelectOptions)}
-        {...props}
-      />
-    ),
-    valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
-  },
+  status: expenseStatusFilter.filter,
+  type: expenseTypeFilter.filter,
   payout: {
     labelMsg: defineMessage({ id: 'ExpenseForm.PayoutOptionLabel', defaultMessage: 'Payout method' }),
     Component: ({ valueRenderer, intl, ...props }) => (
@@ -133,6 +112,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     ),
     valueRenderer: ({ value, intl }) => i18nPayoutMethodType(intl, value),
   },
+  tag: expenseTagFilter.filter,
   chargeHasReceipts: {
     labelMsg: defineMessage({ id: 'expenses.chargeHasReceiptsFilter', defaultMessage: 'Virtual Card Charge Receipts' }),
     Component: ({ valueRenderer, intl, ...props }) => (
@@ -157,6 +137,19 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
       return <ComboSelectFilter options={options} isMulti {...props} />;
     },
     valueRenderer: ({ value, intl }) => intl.formatMessage(LastCommentByFilterLabels[value]),
+  },
+  fromAccounts: expensePayeeFilter.filter,
+  approvedByAccount: {
+    ...accountFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Approved by', id: 'ApprovedBy' }),
+  },
+  paidByAccount: {
+    ...accountFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Paid by', id: 'PaidBy' }),
+  },
+  rejectedByAccount: {
+    ...accountFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Rejected by', id: 'RejectedBy' }),
   },
   virtualCard: {
     labelMsg: defineMessage({ id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' }),

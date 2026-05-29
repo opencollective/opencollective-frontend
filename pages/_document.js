@@ -5,7 +5,7 @@ import path from 'path';
 
 import React from 'react';
 import * as Sentry from '@sentry/nextjs';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 import { createIntl, createIntlCache } from 'react-intl';
 import { ServerStyleSheet } from 'styled-components';
@@ -14,7 +14,7 @@ import { v4 as uuid } from 'uuid';
 import { APOLLO_STATE_PROP_NAME } from '../lib/apollo-client';
 import { getTokenFromCookie } from '../lib/auth';
 import { getIntlProps, getLocaleMessages } from '../lib/i18n/request';
-import { parseToBoolean } from '../lib/utils';
+import { getApiUrl, parseToBoolean } from '../lib/utils';
 import { getCSPHeader } from '../server/content-security-policy';
 
 import { SSRIntlProvider } from '../components/intl/SSRIntlProvider';
@@ -95,10 +95,24 @@ export default class IntlDocument extends Document {
 
       const initialProps = await Document.getInitialProps(ctx);
 
+      const preconnectOrigins = [getApiUrl(), process.env.IMAGES_URL]
+        .filter(Boolean)
+        .map(url => {
+          try {
+            const { origin } = new URL(url);
+            // Skip localhost / loopback origins - preconnect is only useful for remote hosts
+            return origin.includes('localhost') || origin.includes('127.0.0.1') ? null : origin;
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+
       return {
         ...initialProps,
         clientAnalytics,
         cspNonce: requestNonce,
+        preconnectOrigins,
         ...intlProps,
         styles: (
           <React.Fragment>
@@ -140,6 +154,7 @@ export default class IntlDocument extends Document {
       'TURNSTILE_SITEKEY',
       'DISABLE_CONTACT_FORM',
       'NEW_PRICING',
+      'NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE',
       'CAPTCHA_ENABLED',
       'CAPTCHA_PROVIDER',
       'DISABLE_MOCK_UPLOADS',
@@ -152,6 +167,12 @@ export default class IntlDocument extends Document {
     return (
       <Html lang={this.props.locale}>
         <Head nonce={this.props.cspNonce}>
+          {this.props.preconnectOrigins.map(origin => (
+            <React.Fragment key={origin}>
+              <link rel="preconnect" href={origin} />
+              <link rel="dns-prefetch" href={origin} />
+            </React.Fragment>
+          ))}
           <script nonce={this.props.cspNonce} defer src={languageManifest[this.props.locale]} />
           <link rel="icon" href="/static/images/favicon.ico.png" />
         </Head>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -8,12 +8,15 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { isMulti, limit, offset } from '../../../../lib/filters/schemas';
 import type { HostApplicationsQuery, HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { HostApplicationStatus, LastCommentBy } from '../../../../lib/graphql/types/v2/schema';
+import { HostApplicationStatus, LastCommentBy } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nHostApplicationStatus from '../../../../lib/i18n/host-application-status';
 import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';
 import { sortSelectOptions } from '../../../../lib/utils';
 
+import NotFound from '@/components/NotFound';
+
+import FeatureNotSupported from '../../../FeatureNotSupported';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
@@ -149,6 +152,17 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
+  if (!loading) {
+    if (!data?.host) {
+      return <NotFound />;
+    } else if (
+      data?.host?.features?.RECEIVE_HOST_APPLICATIONS === 'UNSUPPORTED' ||
+      metadata?.host?.features?.RECEIVE_HOST_APPLICATIONS === 'UNSUPPORTED'
+    ) {
+      return <FeatureNotSupported />;
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />} />
@@ -169,7 +183,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             hostApplications={hostApplications?.nodes}
             nbPlaceholders={nbPlaceholders}
             loading={loading}
-            openApplication={application => queryFilter.setFilter('hostApplicationId', application.id, false)}
+            openApplication={application => queryFilter.setFilter('hostApplicationId', application.publicId, false)}
           />
           <Pagination queryFilter={queryFilter} total={hostApplications?.totalCount} />
         </React.Fragment>

@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -46,7 +46,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -62,7 +62,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -78,7 +78,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -94,7 +94,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -110,7 +110,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -118,7 +118,7 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - name: Restore NextJS build cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .next/cache
           # Generate a new cache whenever packages or source files change
@@ -133,7 +133,7 @@ jobs:
         run: PRESERVE_NEXT_CACHE=true npm run build
 
       - name: Save NextJS build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .next
           key: ${{ runner.os }}-next-build-${{ github.sha }}
@@ -145,7 +145,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -156,7 +156,7 @@ jobs:
 
       - name: Report coverage
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: GraphQL
@@ -172,7 +172,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -182,7 +182,6 @@ jobs:
       - run: npm run type:check
 
   e2e:
-    if: github.ref_name != 'i18n/crowdin'
     needs: build
     uses: ./.github/workflows/e2e.yml
     secrets: inherit

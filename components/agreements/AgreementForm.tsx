@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { cloneDeep, omit, pick } from 'lodash';
+import { cloneDeep, omit, pick } from 'lodash-es';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -10,7 +10,7 @@ import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';
 import { gql } from '../../lib/graphql/helpers';
-import type { Account, Agreement } from '../../lib/graphql/types/v2/schema';
+import type { Account, Agreement } from '../../lib/graphql/types/v2/graphql';
 
 import AttachedFilesForm from '../attached-files/AttachedFilesForm';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -190,7 +190,7 @@ const AgreementForm = ({
             <Form data-cy="agreement-form">
               <StyledInputFormikField
                 name="account"
-                label={intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' })}
+                label={intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' })}
                 labelProps={FIELD_LABEL_PROPS}
                 mt={3}
               >

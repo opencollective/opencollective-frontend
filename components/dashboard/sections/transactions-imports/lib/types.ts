@@ -1,4 +1,4 @@
-import type { Currency } from '../../../../../lib/graphql/types/v2/schema';
+import type { Currency } from '../../../../../lib/graphql/types/v2/graphql';
 
 export const ACCEPTED_DATE_FORMATS = [
   undefined, // ISO 8601

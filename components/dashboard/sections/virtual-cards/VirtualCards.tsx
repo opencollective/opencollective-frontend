@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -8,7 +8,7 @@ import { CollectiveType } from '../../../../lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import type { AccountVirtualCardsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { VirtualCardStatus } from '../../../../lib/graphql/types/v2/schema';
+import { VirtualCardStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { sortSelectOptions } from '../../../../lib/utils';
 import { VirtualCardStatusI18n } from '../../../../lib/virtual-cards/constants';

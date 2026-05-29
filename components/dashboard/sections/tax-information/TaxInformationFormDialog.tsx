@@ -41,7 +41,7 @@ export const TaxInformationFormDialog = ({ account, open, onOpenChange, onSucces
           <DialogTitle>
             <FormattedMessage defaultMessage="Update Tax Information" id="sVea7o" />
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription asChild>
             <div className="flex items-center gap-1">
               <FormattedMessage
                 defaultMessage="for {account}"

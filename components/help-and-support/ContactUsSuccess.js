@@ -38,6 +38,7 @@ const ContactUsSuccess = () => (
           src="/static/images/help-and-support/success-illustration.png"
           width={96}
           height={96}
+          loading="eager"
         />
       </Box>
       <Box ml={['4px', 3]}>

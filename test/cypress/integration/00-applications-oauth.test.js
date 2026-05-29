@@ -1,4 +1,6 @@
-import speakeasy from 'speakeasy';
+import { generateSecret, generateSync } from 'otplib';
+
+import { getApiUrl } from '../../../lib/utils';
 
 describe('OAuth Applications', () => {
   let user, clientId, clientSecret;
@@ -68,11 +70,11 @@ describe('OAuth Applications', () => {
     cy.signup({ user: { name: 'OAuth tester', settings: { features: { adminPanel: true } } } }).then(user => {
       cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
-      const secret = speakeasy.generateSecret({ length: 64 });
+      const secret = generateSecret({ length: 64 });
       cy.enableTwoFactorAuth({
         userEmail: user.email,
         userSlug: user.collective.slug,
-        secret: secret.base32,
+        secret: secret,
       });
 
       cy.getByDataCy('create-app-link').click();
@@ -81,13 +83,7 @@ describe('OAuth Applications', () => {
       cy.get('input[name=redirectUri]').type('https://example.com/callback');
       cy.get('[data-cy="create-oauth-app-modal"] button[type=submit]').click();
 
-      cy.complete2FAPrompt(
-        speakeasy.totp({
-          algorithm: 'SHA1',
-          encoding: 'base32',
-          secret: secret.base32,
-        }),
-      );
+      cy.complete2FAPrompt(generateSync({ secret, algorithm: 'sha1', strategy: 'totp' }));
 
       cy.contains('[data-cy=toast-notification]:last', 'Application "My App created with 2FA enabled" created');
 
@@ -120,7 +116,7 @@ describe('OAuth Applications', () => {
 
       cy.log('Exchange code for token');
       cy.request({
-        url: `${Cypress.config('baseUrl')}/api/oauth/token`,
+        url: `${getApiUrl()}/oauth/token`,
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: {

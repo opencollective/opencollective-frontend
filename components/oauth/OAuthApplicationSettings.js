@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -32,6 +32,7 @@ import { validateOauthApplicationValues } from './lib';
 const applicationSettingsFragment = gql`
   fragment ApplicationSettings on Application {
     id
+    publicId
     name
     description
     preAuthorize2FA

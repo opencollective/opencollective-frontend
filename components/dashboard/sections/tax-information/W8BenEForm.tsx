@@ -1,10 +1,10 @@
 import React from 'react';
 import type { FormikProps } from 'formik';
-import { merge, pick } from 'lodash';
+import { merge, pick } from 'lodash-es';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
-import type { CountryIso } from '../../../../lib/graphql/types/v2/schema';
+import type { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { cn } from '../../../../lib/utils';
 

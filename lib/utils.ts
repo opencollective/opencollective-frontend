@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
-import { isArray, isEmpty, isObject, omit, omitBy } from 'lodash';
+import { isArray, isEmpty, isObject, omit, omitBy } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { twMerge } from 'tailwind-merge';
 
@@ -214,6 +214,14 @@ export const getWebsiteUrl = () => {
   } else {
     return process.env.WEBSITE_URL;
   }
+};
+
+export const getApiUrl = (): string => {
+  if (!process.env.API_URL) {
+    throw new Error('API_URL is not set');
+  }
+
+  return process.env.API_URL;
 };
 
 // https://medium.com/@akhilanand.ak01/function-composition-in-javascript-exploring-the-power-of-compose-4114da8b9875

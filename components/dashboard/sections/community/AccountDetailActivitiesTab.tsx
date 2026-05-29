@@ -3,10 +3,12 @@ import { useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
+import { getAccountReferenceInput } from '@/lib/collective';
 import { integer } from '@/lib/filters/schemas';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { InfoTooltipIcon } from '@/components/InfoTooltipIcon';
+import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
 import { Pagination } from '../../filters/Pagination';
 import TimelineItem from '../overview/TimelineItem';
@@ -20,15 +22,25 @@ export function ActivitiesTab({ account, host, setOpenExpenseId }) {
     skipRouter: true,
   });
 
-  const { data, loading } = useQuery(communityAccountActivitiesQuery, {
+  const { data, loading, error } = useQuery(communityAccountActivitiesQuery, {
     variables: {
-      accountId: account.id,
-      host: host,
+      accountId: account?.id,
+      host: getAccountReferenceInput(host),
       ...pagination.variables,
     },
+    skip: !account || !host,
   });
 
-  const activities = data?.account?.communityStats?.activities.nodes || [];
+  if (error) {
+    return <MessageBoxGraphqlError error={error} />;
+  }
+
+  const activities = (data?.account?.communityStats?.activities.nodes || []).map(activity => ({
+    ...activity,
+    individual: activity.individual?.mainProfile ?? activity.individual,
+    fromAccount: activity.fromAccount?.mainProfile ?? activity.fromAccount,
+    account: activity.account?.mainProfile ?? activity.account,
+  }));
   const total = data?.account?.communityStats?.activities.totalCount;
   return (
     <div className="flex flex-col gap-4">

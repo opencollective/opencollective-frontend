@@ -20,6 +20,7 @@ const HowCanWeHelp = () => {
           src="/static/images/help-and-support/top-illustration.png"
           width={286}
           height={200}
+          loading="eager"
         />
       </Box>
       <Flex

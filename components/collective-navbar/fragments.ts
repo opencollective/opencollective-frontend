@@ -14,6 +14,7 @@ export const accountNavbarFieldsFragment = gql`
     PROJECTS
     USE_EXPENSES
     RECEIVE_EXPENSES
+    RECEIVE_GRANTS
     COLLECTIVE_GOALS
     TOP_FINANCIAL_CONTRIBUTORS
     CONVERSATIONS
@@ -24,5 +25,6 @@ export const accountNavbarFieldsFragment = gql`
     HOST_DASHBOARD
     TRANSACTIONS
     REQUEST_VIRTUAL_CARDS
+    PUBLIC_PROFILE
   }
 `;

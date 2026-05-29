@@ -1,10 +1,10 @@
-import { find, isEmpty, isUndefined, mapValues, omit, pickBy } from 'lodash';
+import { find, isEmpty, isUndefined, mapValues, omit, pickBy } from 'lodash-es';
 
 import type { TaxFormType } from '../components/dashboard/sections/tax-information/common';
 
 import { CollectiveType } from './constants/collectives';
 import { TransactionTypes } from './constants/transactions';
-import type { Comment, Conversation, Expense, HostApplication, Order, Update } from './graphql/types/v2/schema';
+import type { Comment, Conversation, Expense, HostApplication, Order, Update } from './graphql/types/v2/graphql';
 import type LoggedInUser from './LoggedInUser';
 import { getWebsiteUrl } from './utils';
 import { getWindowLocation } from './window';
@@ -166,11 +166,11 @@ export const getHostDashboardTransactionsRoute = (
 };
 
 export const getOauthAppSettingsRoute = (account, app) => {
-  return getDashboardRoute(account, `for-developers/oauth/${app.id}`);
+  return getDashboardRoute(account, `for-developers/oauth/${app.publicId}`);
 };
 
 export const getPersonalTokenSettingsRoute = (account, token) => {
-  return getDashboardRoute(account, `for-developers/personal-tokens/${token.id}`);
+  return getDashboardRoute(account, `for-developers/personal-tokens/${token.publicId}`);
 };
 
 export const getOffPlatformTransactionsRoute = (hostSlug: string, importId = null) => {
@@ -216,16 +216,51 @@ export const getCollectivePageRoute = (account: {
   }
 };
 
+const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'oscollective.org'];
 const TRUSTED_DOMAINS = [
   'octobox.io',
   'dotnetfoundation.org',
   'hopin.com',
   'app.papertree.earth',
   'sharedground.co',
-  'gatherfor.org',
   'funds.ecosyste.ms',
+  // Trusted organizations
+  'kiakotahi.org',
+  'raft.foundation',
+  'oceurope.org',
+  'oscollective.org',
+  'xwiki.com',
+  'platform6.coop',
+  'ferrous-systems.com',
+  'compassionate-revolution.net',
+  'e-nable.org',
+  'womenwhocode.com',
+  'codeforscience.org',
+  'allforclimate.earth',
+  'permaculture.org.uk',
+  'fission.codes',
+  'schumacherinstitute.org.uk',
+  'numfocus.org',
+  'piratpartiet.se',
+  'reparations.org',
+  'fya.org.au',
+  'huddlecraft.com',
+  'muslimbenefits.org',
+  'themuseumofhumanachievement.com',
+  'oceurope.org',
+  'gatherfor.org',
+  'massvis.se',
+  'coopcloud.tech',
+  'opencollective.com',
+  'pactcollective.xyz',
+  'citizenspring.earth',
+  'thesocialchangenest.org',
+  'thesocialchangenest.org',
+  'protozoa.nz',
+  'oficonsortium.org',
+  'giftcollective.nz',
+  'metagov.org',
 ];
-const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'oscollective.org'];
 
 export const isTrustedRedirectURL = (url: URL) => {
   if (url.protocol !== 'https:') {
@@ -234,7 +269,7 @@ export const isTrustedRedirectURL = (url: URL) => {
     return false;
   }
 
-  const host = url.host;
+  const host = url.host.replace(/^www\./, '');
   if (TRUSTED_DOMAINS.includes(host)) {
     return true;
   }
@@ -408,3 +443,7 @@ export const getCommentUrl = (comment: Comment, loggedInUser: LoggedInUser) => {
     return getCollectivePageRoute(comment.account);
   }
 };
+
+export function getPermalinkUrl(publicId: string): string {
+  return `${getWebsiteUrl()}/permalink/${publicId}`;
+}

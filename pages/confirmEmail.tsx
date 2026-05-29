@@ -2,12 +2,12 @@ import React from 'react';
 import type { MutationFunction } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Email } from '@styled-icons/material/Email';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { ArrowLeft } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../lib/graphql/helpers';
-import type { Mutation, MutationConfirmEmailArgs } from '../lib/graphql/types/v2/schema';
+import type { Mutation, MutationConfirmEmailArgs } from '../lib/graphql/types/v2/graphql';
 import type { UserContextProps } from '../lib/hooks/useLoggedInUser';
 
 import Container from '../components/Container';

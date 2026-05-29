@@ -1,20 +1,24 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import type { Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
-import { OrderStatus } from '../../../../lib/graphql/types/v2/schema';
+import { OppositeAccountScope, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { hasAccountHosting } from '@/lib/collective';
+import { isMulti } from '@/lib/filters/schemas';
+import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
+import { hostedAccountsFilter } from '../../filters/HostedAccountFilter';
 import type { DashboardSectionProps } from '../../types';
 
-import ContributionsTable from './ContributionsTable';
+import ContributionsTable, { defaultVisibility } from './ContributionsTable';
 import type { FilterMeta } from './filters';
 import { ContributionAccountingCategoryKinds, filters, schema as baseSchema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
@@ -29,7 +33,11 @@ enum ContributionsTab {
 }
 
 const hostFinancialContributionsMetadataQuery = gql`
-  query HostFinancialContributionsMetadata($slug: String!, $hostContext: HostContext) {
+  query HostFinancialContributionsMetadata(
+    $slug: String!
+    $hostContext: HostContext
+    $oppositeAccountScope: OppositeAccountScope
+  ) {
     account(slug: $slug) {
       id
       slug
@@ -48,27 +56,58 @@ const hostFinancialContributionsMetadataQuery = gql`
           hostFeePercent
         }
       }
-      DISPUTED: orders(filter: INCOMING, status: [DISPUTED], includeIncognito: true, hostContext: $hostContext) {
+      DISPUTED: orders(
+        filter: INCOMING
+        status: [DISPUTED]
+        includeIncognito: true
+        hostContext: $hostContext
+        oppositeAccountScope: $oppositeAccountScope
+      ) {
         totalCount
       }
-      IN_REVIEW: orders(filter: INCOMING, status: [IN_REVIEW], includeIncognito: true, hostContext: $hostContext) {
+      IN_REVIEW: orders(
+        filter: INCOMING
+        status: [IN_REVIEW]
+        includeIncognito: true
+        hostContext: $hostContext
+        oppositeAccountScope: $oppositeAccountScope
+      ) {
         totalCount
       }
-      ERROR: orders(filter: INCOMING, status: [ERROR], includeIncognito: true, hostContext: $hostContext) {
+      ERROR: orders(
+        filter: INCOMING
+        status: [ERROR]
+        includeIncognito: true
+        hostContext: $hostContext
+        oppositeAccountScope: $oppositeAccountScope
+      ) {
         totalCount
       }
-      PAUSED: orders(filter: INCOMING, status: [PAUSED], includeIncognito: true, hostContext: $hostContext) {
+      PAUSED: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        hostContext: $hostContext
+        oppositeAccountScope: $oppositeAccountScope
+      ) {
         totalCount
       }
     }
   }
 `;
 
-const schema = baseSchema.extend({ hostContext: hostContextFilter.schema });
+const schema = baseSchema.extend({
+  hostContext: hostContextFilter.schema,
+  hostedAccounts: isMulti(z.string()).optional(),
+});
 
 export default function IncomingContributionsForOrganizations({ accountSlug }: DashboardSectionProps) {
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
+  const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
+  );
 
   const views: Views<z.infer<typeof schema>> = [
     {
@@ -106,28 +145,34 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
     },
   ];
 
-  const filterMeta: FilterMeta = {
+  const filterMeta: FilterMeta & {
+    hostedAccounts?: Array<AccountHoverCardFieldsFragment>;
+  } = {
     currency: account.currency,
     accountSlug: account.slug,
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
+    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({
     schema,
-    toVariables,
+    toVariables: {
+      ...toVariables,
+      hostedAccounts: hostedAccountsFilter.toVariables,
+    },
     meta: filterMeta,
     views,
-    filters,
+    filters: { ...filters, hostedAccounts: hostedAccountsFilter.filter },
     skipFiltersOnReset: ['hostContext'],
   });
 
-  const hasHosting = hasAccountHosting(account);
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostFinancialContributionsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      hostContext: hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+      ...(hasIncomingOutgoingReorg && { oppositeAccountScope: OppositeAccountScope.EXTERNAL }),
     },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -137,6 +182,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
     variables: {
       slug: accountSlug,
       filter: 'INCOMING',
+      ...(hasIncomingOutgoingReorg && { oppositeAccountScope: OppositeAccountScope.EXTERNAL }),
       includeIncognito: true,
       ...queryFilter.variables,
     },
@@ -164,7 +210,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
-            {hasHosting && (
+            {account.hasHosting && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}
@@ -174,7 +220,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
           </div>
         }
         description={
-          hasHosting ? (
+          account.hasHosting ? (
             <FormattedMessage
               defaultMessage="Contributions made to your Organization and Collectives you host."
               id="To33FZ"
@@ -196,6 +242,8 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
         nbPlaceholders={nbPlaceholders}
         error={error}
         refetch={handleRefetch}
+        columnVisibility={{ ...defaultVisibility, accountingCategory: true }}
+        showChargesSection
       />
     </div>
   );

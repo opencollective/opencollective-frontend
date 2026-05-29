@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { defineMessages, useIntl } from 'react-intl';
 
 export enum ReceiptTemplate {

@@ -5,10 +5,10 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import type {
+  Account,
   ManagePaymentMethodsQuery,
   ManagePaymentMethodsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
 
 import { Button } from '@/components/ui/Button';
 import { Separator } from '@/components/ui/Separator';
@@ -24,7 +24,7 @@ import PaymentMethodsTable from './PaymentMethodsTable';
 import PayoutMethodsTable from './PayoutMethodsTable';
 
 type ManagePaymentMethodsProps = {
-  account: Pick<Account, 'slug'>;
+  account: Pick<Account, 'slug' | 'type' | 'isPrivate'>;
 };
 
 enum Modals {
@@ -63,7 +63,11 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
         <div>
           <div className="mb-1 flex w-full items-center gap-2 text-lg font-semibold">
             <div className="shrink-0">
-              <FormattedMessage defaultMessage="For Contributions" id="xf7EPu" />
+              {props.account.type === 'ORGANIZATION' ? (
+                <FormattedMessage defaultMessage="Sending Money" id="editCollective.sendingMoney" />
+              ) : (
+                <FormattedMessage defaultMessage="For Contributions" id="xf7EPu" />
+              )}
             </div>
             <Separator className="shrink" />
             <Button
@@ -78,8 +82,9 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
           </div>
           <p className="text-sm leading-none text-muted-foreground">
             <FormattedMessage
-              defaultMessage="Account details that can be used to contribute and acquire tickets."
-              id="t9ur/I"
+              defaultMessage="Payment details that can be used to {isPrivate,select,false{contribute, acquire tickets, or} other {}} pay your platform bills."
+              id="TvyzUg"
+              values={{ isPrivate: props.account.isPrivate }}
             />
           </p>
         </div>
@@ -108,7 +113,11 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
         <div>
           <div className="mb-1 flex items-center gap-2 text-lg font-semibold">
             <div className="shrink-0">
-              <FormattedMessage defaultMessage="For Expenses" id="RF+AgF" />
+              {props.account.type === 'ORGANIZATION' ? (
+                <FormattedMessage defaultMessage="Receiving Money" id="editCollective.receivingMoney" />
+              ) : (
+                <FormattedMessage defaultMessage="For Expenses" id="RF+AgF" />
+              )}
             </div>
             <Separator className="shrink" />
             <Button
@@ -136,11 +145,11 @@ export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
       </div>
       {activeModal === Modals.CREATE_PAYOUT_METHOD && (
         <CreatePayoutMethodModal
-          account={props.account}
+          account={query.data.account}
           open
           onOpenChange={open => setActiveModal(open ? Modals.CREATE_PAYOUT_METHOD : null)}
-          onUpdate={() => {
-            query.refetch();
+          onUpdate={async () => {
+            await query.refetch();
             setActiveModal(null);
           }}
         />

@@ -5,6 +5,7 @@ import { accountHoverCardFields } from '../../../AccountHoverCard';
 export const HostApplicationFields = gql`
   fragment HostApplicationFields on HostApplication {
     id
+    publicId
     message
     customData
     status
@@ -93,6 +94,9 @@ export const hostApplicationsMetadataQuery = gql`
       name
       type
       settings
+      features {
+        RECEIVE_HOST_APPLICATIONS
+      }
       policies {
         id
         COLLECTIVE_MINIMUM_ADMINS {
@@ -128,7 +132,9 @@ export const hostApplicationsQuery = gql`
   ) {
     host(slug: $hostSlug) {
       id
-
+      features {
+        RECEIVE_HOST_APPLICATIONS
+      }
       hostApplications(
         limit: $limit
         offset: $offset
@@ -195,6 +201,7 @@ const hostedCollectiveFields = gql`
     imageUrl(height: 96)
     isFrozen
     isHost
+    isPrivate
     tags
     settings
     createdAt
@@ -260,6 +267,10 @@ const hostedCollectiveFields = gql`
     }
     ... on AccountWithContributions {
       totalFinancialContributors
+    }
+    ... on Event {
+      startsAt
+      endsAt
     }
     childrenAccounts {
       nodes {
@@ -352,6 +363,12 @@ export const hostedCollectivesQuery = gql`
     $balance: AmountRangeInput
     $consolidatedBalance: AmountRangeInput
     $currencies: [String]
+    $startsAtFrom: DateTime
+    $startsAtTo: DateTime
+    $joinedBetween: MetricsDateRangeInput
+    $unhostedBetween: MetricsDateRangeInput
+    $hadActivityBetween: MetricsDateRangeInput
+    $noActivityBetween: MetricsDateRangeInput
   ) {
     host(slug: $hostSlug) {
       id
@@ -360,6 +377,7 @@ export const hostedCollectivesQuery = gql`
       name
       currency
       isHost
+      isPrivate
       type
       settings
       hostFeePercent
@@ -381,6 +399,12 @@ export const hostedCollectivesQuery = gql`
         balance: $balance
         consolidatedBalance: $consolidatedBalance
         currencies: $currencies
+        startsAtFrom: $startsAtFrom
+        startsAtTo: $startsAtTo
+        joinedBetween: $joinedBetween
+        unhostedBetween: $unhostedBetween
+        hadActivityBetween: $hadActivityBetween
+        noActivityBetween: $noActivityBetween
       ) {
         offset
         limit

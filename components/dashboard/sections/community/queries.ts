@@ -2,6 +2,9 @@ import { gql } from '@apollo/client';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
 import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
+import { vendorFieldFragment } from '@/components/vendors/queries';
+
+import { legalDocumentFields } from '../legal-documents/HostDashboardTaxForms';
 
 export const peopleHostDashboardQuery = gql`
   query PeopleHostDashboard(
@@ -11,6 +14,9 @@ export const peopleHostDashboardQuery = gql`
     $relation: [CommunityRelationType!]
     $searchTerm: String
     $account: AccountReferenceInput
+    $totalContributed: AmountRangeInput
+    $totalExpended: AmountRangeInput
+    $orderBy: OrderByInput
   ) {
     community(
       host: { slug: $slug }
@@ -18,15 +24,18 @@ export const peopleHostDashboardQuery = gql`
       account: $account
       type: [INDIVIDUAL]
       searchTerm: $searchTerm
+      totalContributed: $totalContributed
+      totalExpended: $totalExpended
       offset: $offset
       limit: $limit
+      orderBy: $orderBy
     ) {
-      totalCount
       limit
       offset
       nodes {
         id
         legacyId
+        publicId
         slug
         name
         legalName
@@ -47,17 +56,17 @@ export const peopleHostDashboardQuery = gql`
         communityStats(host: { slug: $slug }) {
           relations
           transactionSummary {
-            year
-            expenseTotalAcc {
+            kind
+            debitTotal {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCount
+            creditTotal {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCount
           }
         }
       }
@@ -66,10 +75,116 @@ export const peopleHostDashboardQuery = gql`
   ${kycStatusFields}
 `;
 
+const communityAccountDetailActivityFields = gql`
+  fragment CommunityAccountDetailActivityFields on Activity {
+    id
+    type
+    createdAt
+    data
+    isSystem
+    account {
+      id
+      ...AccountHoverCardFields
+      mainProfile {
+        id
+        name
+        slug
+        type
+        imageUrl
+        ...AccountHoverCardFields
+      }
+    }
+    fromAccount {
+      id
+      ...AccountHoverCardFields
+      mainProfile {
+        id
+        name
+        slug
+        type
+        imageUrl
+        ...AccountHoverCardFields
+      }
+    }
+    individual {
+      id
+      isIncognito
+      ...AccountHoverCardFields
+      mainProfile {
+        id
+        name
+        slug
+        type
+        imageUrl
+        ...AccountHoverCardFields
+      }
+    }
+    expense {
+      id
+      legacyId
+      description
+      amountV2 {
+        valueInCents
+        currency
+      }
+      payee {
+        id
+        name
+        slug
+        imageUrl
+        ...AccountHoverCardFields
+      }
+      account {
+        id
+        name
+        type
+        slug
+        ...AccountHoverCardFields
+        ... on AccountWithParent {
+          parent {
+            id
+            slug
+          }
+        }
+      }
+    }
+    order {
+      id
+      legacyId
+      description
+      toAccount {
+        id
+        name
+        slug
+        ... on AccountWithParent {
+          parent {
+            id
+            slug
+          }
+        }
+      }
+    }
+    update {
+      id
+      legacyId
+      title
+      summary
+      slug
+    }
+    conversation {
+      id
+      title
+      summary
+      slug
+    }
+  }
+`;
+
 export const communityAccountDetailQuery = gql`
-  query CommunityAccountDetail($accountId: String!, $host: AccountReferenceInput!) {
+  query CommunityAccountDetail($accountId: String!, $hostSlug: String!, $isIndividual: Boolean!) {
     account(id: $accountId) {
       id
+      publicId
       legacyId
       slug
       name
@@ -77,6 +192,9 @@ export const communityAccountDetailQuery = gql`
       type
       createdAt
       imageUrl
+      ... on Organization {
+        canBeVendorOf(host: { slug: $hostSlug })
+      }
       socialLinks {
         type
         url
@@ -87,11 +205,70 @@ export const communityAccountDetailQuery = gql`
         address
       }
       isVerified
+      pendingExpenses: expenses(
+        status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
+        direction: SUBMITTED
+        host: { slug: $hostSlug }
+      ) {
+        totalCount
+      }
+      spamExpenses: expenses(status: [SPAM], direction: SUBMITTED, host: { slug: $hostSlug }) {
+        totalCount
+      }
+      rejectedExpenses: expenses(status: [REJECTED], direction: SUBMITTED, host: { slug: $hostSlug }) {
+        totalCount
+      }
+      communityStats(host: { slug: $hostSlug }) {
+        id
+        relations
+        transactionSummary {
+          kind
+          debitCount
+          creditCount
+          debitTotal {
+            valueInCents
+            currency
+          }
+          creditTotal {
+            valueInCents
+            currency
+          }
+        }
+      }
       ... on Individual {
         email
-        kycStatus(requestedByAccount: $host) {
+        kycStatus(requestedByAccount: { slug: $hostSlug }) {
           manual {
             ...KYCVerificationFields
+          }
+        }
+        adminOf: memberOf(role: [ADMIN], accountType: [ORGANIZATION, VENDOR, COLLECTIVE, FUND]) {
+          nodes {
+            id
+            role
+            createdAt
+            account {
+              id
+              slug
+              name
+              type
+              ...AccountHoverCardFields
+            }
+          }
+        }
+      }
+      ... on Vendor {
+        ...VendorFields
+      }
+      admins: members(role: [ADMIN]) {
+        nodes {
+          id
+          role
+          description
+          createdAt
+          account {
+            id
+            ...AccountHoverCardFields
           }
         }
       }
@@ -115,28 +292,117 @@ export const communityAccountDetailQuery = gql`
           }
         }
       }
-      communityStats(host: $host) {
-        associatedCollectives {
-          account {
-            id
-            isFrozen
-            ...AccountHoverCardFields
-          }
-          relations
+    }
+    host(slug: $hostSlug) {
+      id
+      publicId
+      legacyId
+      slug
+      hostedLegalDocuments(
+        type: US_TAX_FORM
+        account: { id: $accountId }
+        limit: 1
+        orderBy: { field: CREATED_AT, direction: DESC }
+      ) {
+        totalCount
+        nodes {
+          ...LegalDocumentFields
         }
+      }
+      features {
+        id
+        MULTI_CURRENCY_EXPENSES
+      }
+      requiredLegalDocuments
+      currency
+      transferwise {
+        id
+        availableCurrencies
+      }
+      supportedPayoutMethods
+      isTrustedHost
+    }
+
+    firstActivity: activities(
+      host: { slug: $hostSlug }
+      individual: { id: $accountId }
+      orderBy: { field: CREATED_AT, direction: ASC }
+      limit: 1
+    ) @include(if: $isIndividual) {
+      nodes {
+        ...CommunityAccountDetailActivityFields
+      }
+    }
+
+    lastActivity: activities(
+      host: { slug: $hostSlug }
+      individual: { id: $accountId }
+      orderBy: { field: CREATED_AT, direction: DESC }
+      limit: 1
+    ) @include(if: $isIndividual) {
+      nodes {
+        ...CommunityAccountDetailActivityFields
+      }
+    }
+  }
+  ${accountHoverCardFields}
+  ${kycVerificationFields}
+  ${legalDocumentFields}
+  ${communityAccountDetailActivityFields}
+  ${vendorFieldFragment}
+`;
+
+export const communityAccountOverviewQuery = gql`
+  query CommunityAccountOverview($accountId: String!, $hostSlug: String!) {
+    account(id: $accountId) {
+      id
+      communityStats(host: { slug: $hostSlug }) {
+        id
         relations
         transactionSummary {
-          year
-          expenseCountAcc
-          contributionCountAcc
+          kind
+          debitCount
+          creditCount
+          debitTotal {
+            valueInCents
+            currency
+          }
+          creditTotal {
+            valueInCents
+            currency
+          }
+        }
+        creditTimeSeries: transactionSummaryTimeSeries(type: CREDIT) {
+          dateFrom
+          dateTo
+          timeUnit
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+            count
+          }
+        }
+        debitTimeSeries: transactionSummaryTimeSeries(type: DEBIT) {
+          dateFrom
+          dateTo
+          timeUnit
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+            count
+          }
         }
         lastInteractionAt
         firstInteractionAt
       }
     }
   }
-  ${accountHoverCardFields}
-  ${kycVerificationFields}
 `;
 
 export const communityAccountActivitiesQuery = gql`
@@ -148,195 +414,12 @@ export const communityAccountActivitiesQuery = gql`
           limit
           offset
           nodes {
-            id
-            type
-            createdAt
-            data
-            isSystem
-            account {
-              id
-              ...AccountHoverCardFields
-            }
-            fromAccount {
-              id
-              ...AccountHoverCardFields
-            }
-            individual {
-              id
-              isIncognito
-              ...AccountHoverCardFields
-            }
-            expense {
-              id
-              legacyId
-              description
-              amountV2 {
-                valueInCents
-                currency
-              }
-              payee {
-                id
-                name
-                slug
-                imageUrl
-                ...AccountHoverCardFields
-              }
-              account {
-                id
-                name
-                type
-                slug
-                ...AccountHoverCardFields
-                ... on AccountWithParent {
-                  parent {
-                    id
-                    slug
-                  }
-                }
-              }
-            }
-            order {
-              id
-              legacyId
-              description
-              toAccount {
-                id
-                name
-                slug
-                ... on AccountWithParent {
-                  parent {
-                    id
-                    slug
-                  }
-                }
-              }
-            }
-            update {
-              id
-              legacyId
-              title
-              summary
-              slug
-            }
-            conversation {
-              id
-              title
-              summary
-              slug
-            }
+            ...CommunityAccountDetailActivityFields
           }
         }
       }
     }
   }
   ${accountHoverCardFields}
-`;
-
-export const communityAccountExpensesDetailQuery = gql`
-  query CommunityAccountExpensesDetail(
-    $accountId: String!
-    $host: AccountReferenceInput!
-    $limit: Int!
-    $offset: Int!
-  ) {
-    account(id: $accountId) {
-      id
-      legacyId
-      communityStats(host: $host) {
-        transactionSummary {
-          year
-          expenseTotal {
-            valueInCents
-            currency
-          }
-          expenseCount
-          expenseTotalAcc {
-            valueInCents
-            currency
-          }
-          expenseCountAcc
-        }
-      }
-      expenses(direction: SUBMITTED, host: $host, limit: $limit, offset: $offset) {
-        totalCount
-        nodes {
-          id
-          legacyId
-          description
-          status
-          type
-          tags
-          accountingCategory {
-            id
-            name
-            code
-          }
-          amount: amountV2(currencySource: HOST) {
-            valueInCents
-            currency
-          }
-          createdAt
-          account {
-            id
-            ...AccountHoverCardFields
-          }
-        }
-      }
-    }
-  }
-  ${accountHoverCardFields}
-`;
-
-export const communityAccountContributionsDetailQuery = gql`
-  query CommunityAccountContributionsDetail(
-    $accountId: String!
-    $host: AccountReferenceInput!
-    $limit: Int!
-    $offset: Int!
-  ) {
-    account(id: $accountId) {
-      id
-      legacyId
-      communityStats(host: $host) {
-        transactionSummary {
-          year
-          contributionTotal {
-            valueInCents
-            currency
-          }
-          contributionCount
-          contributionTotalAcc {
-            valueInCents
-            currency
-          }
-          contributionCountAcc
-        }
-      }
-      orders(host: $host, limit: $limit, offset: $offset) {
-        totalCount
-        nodes {
-          id
-          legacyId
-          description
-          status
-          tags
-          accountingCategory {
-            id
-            name
-            code
-          }
-          totalContributed {
-            valueInCents
-            currency
-          }
-          createdAt
-          toAccount {
-            id
-            ...AccountHoverCardFields
-          }
-        }
-      }
-    }
-  }
-  ${accountHoverCardFields}
+  ${communityAccountDetailActivityFields}
 `;

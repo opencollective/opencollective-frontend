@@ -3,6 +3,8 @@ import styled, { keyframes } from 'styled-components';
 import type { BorderProps, LayoutProps, SpaceProps } from 'styled-system';
 import { border, layout, space } from 'styled-system';
 
+import { defaultShouldForwardProp } from '../lib/styled_components_utils';
+
 import { flicker } from './StyledKeyframes';
 
 type LoadingPlaceholderProps = LayoutProps & BorderProps & SpaceProps & React.HTMLProps<HTMLDivElement>;
@@ -12,13 +14,19 @@ const AnimateBackground = keyframes`
   100%{ background-position: 100% 0; }
 `;
 
+const FILTERED_PROPS = new Set(['display', 'width', 'height', 'borderRadius']);
+
 /**
  * A loading container that will show an animated block instead of a blank space.
  */
-const LoadingPlaceholder = styled.div.attrs<LoadingPlaceholderProps>(props => ({
-  height: props.height ?? '100%',
-  borderRadius: props.borderRadius ?? '2%',
-}))<LoadingPlaceholderProps>`
+const LoadingPlaceholder = styled.div
+  .withConfig({
+    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+  })
+  .attrs<LoadingPlaceholderProps>(props => ({
+    height: props.height ?? '100%',
+    borderRadius: props.borderRadius ?? '2%',
+  }))<LoadingPlaceholderProps>`
   animation:
     ${AnimateBackground} 1s linear infinite,
     ${flicker({ minOpacity: 0.8 })} 1s linear infinite;

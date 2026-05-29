@@ -1,8 +1,8 @@
 import React from 'react';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
+import { ExpenseLockableFields } from '@/lib/graphql/types/v2/graphql';
 
 import { FormField } from '@/components/FormField';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -142,6 +142,7 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
                 defaultValue={props.privateMessage}
                 fontSize="13px"
                 data-cy="ExpenseNotesEditor"
+                aria-label={intl.formatMessage({ defaultMessage: 'Additional notes', id: 'xqG0ln' })}
               />
             )
           }

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { sum } from 'lodash';
+import { sum } from 'lodash-es';
 import { Info, TriangleAlert } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V1_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
+import type { Account } from '../../../../lib/graphql/types/v2/graphql';
 
 import { collectivePageQuery } from '../../../collective-page/graphql/queries';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';

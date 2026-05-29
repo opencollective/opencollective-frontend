@@ -21,14 +21,18 @@ const PrivateInfoIcon = ({
   ...props
 }: PrivateInfoIconProps) => {
   const { formatMessage } = useIntl();
+  const defaultLabel = formatMessage({ id: 'Tooltip.PrivateInfo', defaultMessage: 'This info is private' });
   const icon = <Lock size={size} className={className} {...props} />;
 
   return (
     <Tooltip>
-      <TooltipTrigger className="cursor-help align-middle">{icon}</TooltipTrigger>
-      <TooltipContent className="font-normal">
-        {children || formatMessage({ id: 'Tooltip.PrivateInfo', defaultMessage: 'This info is private' })}
-      </TooltipContent>
+      <TooltipTrigger
+        className="cursor-help align-middle"
+        aria-label={typeof children === 'string' ? children : defaultLabel}
+      >
+        {icon}
+      </TooltipTrigger>
+      <TooltipContent className="font-normal">{children || defaultLabel}</TooltipContent>
     </Tooltip>
   );
 };

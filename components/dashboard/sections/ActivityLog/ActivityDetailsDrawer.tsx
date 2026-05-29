@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import type { Activity } from '../../../../lib/graphql/types/v2/schema';
+import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -51,7 +51,7 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
                 values={{
                   ActivityId: () => (
                     <StyledTag display="inline-block" verticalAlign="middle" ml={2} fontSize="12px">
-                      #{activity.id.split('-')[0]}
+                      #{activity.publicId}
                     </StyledTag>
                   ),
                 }}
@@ -59,9 +59,9 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
             }
             onClose={onClose}
           />
-
           <InfoList className="sm:grid-cols-2">
             <InfoListItem
+              className="sm:col-span-2"
               title={<FormattedMessage id="Tags.USER" defaultMessage="User" />}
               value={<ActivityUser activity={activity} />}
             />

@@ -32,6 +32,7 @@ export const TransactionsImportAssignmentFieldsFragment = gql`
 export const TransactionImportListFieldsFragment = gql`
   fragment TransactionImportListFields on TransactionsImport {
     id
+    publicId
     source
     name
     type
@@ -68,6 +69,7 @@ export const TransactionImportListFieldsFragment = gql`
 export const TransactionsImportRowFieldsFragment = gql`
   fragment TransactionsImportRowFields on TransactionsImportRow {
     id
+    publicId
     sourceId
     status
     description

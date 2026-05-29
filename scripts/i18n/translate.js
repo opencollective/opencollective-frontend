@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import lodash from 'lodash';
+import lodash from 'lodash-es';
 import { sync as mkdirpSync } from 'mkdirp';
 
 import locales from '../../lib/constants/locales';
@@ -33,6 +33,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
   'created on', // Can have different masculine/feminine for some languages based on the context
   'on hold',
   'discover',
+  'manual',
 ]);
 
 /**

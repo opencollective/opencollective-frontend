@@ -1,4 +1,4 @@
-import { get, set } from 'lodash';
+import { get, set } from 'lodash-es';
 import { defineMessages } from 'react-intl';
 import { isEmail, isURL } from 'validator';
 

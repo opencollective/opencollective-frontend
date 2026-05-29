@@ -3,14 +3,14 @@ import { useQuery } from '@apollo/client';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { themeGet } from '@styled-system/theme-get';
-import { get, isEmpty, pick, set } from 'lodash';
+import { get, isEmpty, pick, set } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { gql } from '../../lib/graphql/helpers';
-import type { Account, CaptchaInput, Host, Individual } from '../../lib/graphql/types/v2/schema';
-import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/schema';
+import type { Account, CaptchaInput, Host, Individual } from '../../lib/graphql/types/v2/graphql';
+import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';
 import usePaymentIntent from '../../lib/stripe/usePaymentIntent';

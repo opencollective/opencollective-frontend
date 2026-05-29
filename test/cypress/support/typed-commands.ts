@@ -4,7 +4,7 @@
 import type { Message, MessageSummary } from 'cypress-mailpit/src/types';
 
 import { fakeTag as gql } from '../../../lib/graphql/helpers';
-import type { AmountInput } from '@/lib/graphql/types/v2/schema';
+import type { AmountInput, ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
 
@@ -33,6 +33,16 @@ declare global {
         type?: string;
       }): Chainable<{ slug: string }>;
 
+      createHostedCollective(params?: { userEmail?: string }): Chainable<{ slug: string }>;
+
+      createProject(params: {
+        userEmail?: string;
+        collective?: { slug: string };
+        name?: string;
+        description?: string;
+        type?: string;
+      }): Chainable<{ slug: string }>;
+
       createCollectiveV2(params: {
         email?: string;
         skipApproval?: boolean;
@@ -56,10 +66,12 @@ declare global {
 
       createExpense(params: {
         userEmail?: string;
-        account: { slug: string };
-        payee: { slug: string };
+        type?: ExpenseType | `${ExpenseType}`;
+        description?: string;
+        account: { slug?: string; legacyId?: number };
+        payee: { slug?: string; legacyId?: number };
         items?: { description: string; amountV2: AmountInput }[];
-        payoutMethod: {
+        payoutMethod?: {
           type: string;
           name: string;
           data: Record<string, unknown>;
@@ -80,6 +92,8 @@ declare global {
       getAccount: typeof getAccount;
 
       checkToast(params: { variant: 'success' | 'error' | 'warning' | 'info'; message: string }): Chainable<void>;
+
+      getDownloadedPDFContent(filename: string): Chainable<string>;
     }
   }
 }

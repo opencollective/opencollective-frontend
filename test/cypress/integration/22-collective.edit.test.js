@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import speakeasy from 'speakeasy';
+import { generateSync } from 'otplib';
 
 import { randomEmail, randomSlug } from '../support/faker';
 
@@ -36,6 +36,8 @@ describe('edit collective', () => {
     });
     cy.wait(200);
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
+    cy.get('#memberForm-role').click({ force: true });
+    cy.contains('[data-cy=select-option]', 'Admin').click();
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('exist');
     cy.mailpitHasEmailsBySubject('[TESTING] Invitation to join CollectiveToEdit').then(result => {
@@ -191,11 +193,7 @@ describe('edit user collective', () => {
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
         cy.getByDataCy('InputField-twoFactorAuthenticatorCode').contains('Invalid code');
         // typing the right code passes
-        const TOTPCode = speakeasy.totp({
-          algorithm: 'SHA1',
-          encoding: 'base32',
-          secret,
-        });
+        const TOTPCode = generateSync({ secret, algorithm: 'sha1', strategy: 'totp' });
         cy.getByDataCy('add-two-factor-auth-totp-code-field').clear().type(TOTPCode);
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
         cy.getByDataCy('recovery-codes-container').should('exist');

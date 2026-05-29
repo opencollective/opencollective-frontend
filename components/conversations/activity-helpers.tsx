@@ -12,12 +12,12 @@ import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
 import { SyncAlt as MoveIcon } from '@styled-icons/material/SyncAlt';
 import { Update as UpdateIcon } from '@styled-icons/material/Update';
+import { AlertCircleIcon, AlertOctagonIcon, InfoIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { renderDetailsString } from '../../lib/transactions';
-import { ExpenseStatus, type Transaction } from '@/lib/graphql/types/v2/schema';
+import { ExpenseStatus, type Transaction } from '@/lib/graphql/types/v2/graphql';
 
-import { Box as Container } from '../Grid';
 /**
  * Defines activities display metadata.
  * **All** keys must have a matching entry in `MESSAGES` below.
@@ -189,6 +189,38 @@ export const ACTIVITIES_INFO = {
       defaultMessage: 'Expense invite declined',
     }),
   },
+  COLLECTIVE_EXPENSE_KYC_REQUESTED: {
+    type: 'info',
+    icon: InfoIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.KYCRequested',
+      defaultMessage: 'Payee KYC requested',
+    }),
+  },
+  COLLECTIVE_EXPENSE_KYC_VERIFIED: {
+    type: 'success',
+    icon: CheckIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.KYCVerified',
+      defaultMessage: 'Payee KYC verified',
+    }),
+  },
+  COLLECTIVE_EXPENSE_KYC_REVOKED: {
+    type: 'warning',
+    icon: AlertOctagonIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.KYCRevoked',
+      defaultMessage: 'Payee KYC revoked',
+    }),
+  },
+  COLLECTIVE_EXPENSE_KYC_PAYOUT_METHOD_CHANGED: {
+    type: 'warning',
+    icon: AlertCircleIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.KYCPayoutMethodChanged',
+      defaultMessage: 'Payee KYC payout method changed',
+    }),
+  },
 };
 
 export const getActivityColors = (activityType, theme) => {
@@ -227,12 +259,12 @@ function ExpenseTransactionRenderer({ activity }: ExpenseTransactionRendererProp
   }
 
   return (
-    <Container fontSize="12px" mt={2}>
+    <div className="mt-1 flex flex-col gap-1 text-xs">
       {renderDetailsString({
         ...activity.transaction,
         isCredit: activity.transaction.type === 'CREDIT',
         intl,
       })}
-    </Container>
+    </div>
   );
 }

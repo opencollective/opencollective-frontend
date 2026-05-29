@@ -12,6 +12,7 @@ import type {
 import { background, border, color, flexbox, layout, space, typography } from 'styled-system';
 
 import { overflow } from '../lib/styled-system-custom-properties';
+import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 
 const getBorderColor = ({ error = undefined, success = undefined }) => {
   if (error) {
@@ -52,15 +53,19 @@ export type StyledInputProps = BackgroundProps &
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  * @deprecated Use `ui/Input` instead
  */
-const StyledInput = styled.input.attrs<StyledInputProps>(props => ({
-  border: props.border ?? '1px solid',
-  borderColor: props.borderColor ?? 'black.300',
-  borderRadius: props.borderRadius ?? '4px',
-  px: props.px ?? 3,
-  py: props.py ?? 2,
-  lineHeight: props.lineHeight ?? '1.5',
-  fontSize: props.fontSize ?? '14px',
-}))<StyledInputProps>`
+const StyledInput = styled.input
+  .withConfig({
+    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+  })
+  .attrs<StyledInputProps>(props => ({
+    border: props.border ?? '1px solid',
+    borderColor: props.borderColor ?? 'black.300',
+    borderRadius: props.borderRadius ?? '4px',
+    px: props.px ?? 3,
+    py: props.py ?? 2,
+    lineHeight: props.lineHeight ?? '1.5',
+    fontSize: props.fontSize ?? '14px',
+  }))<StyledInputProps>`
   &:not([type='checkbox']):not([type='radio']):not([type='range']) {
     min-height: ${props => props.minHeight || '36px'};
   }

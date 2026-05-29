@@ -1,24 +1,24 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { ArrowLeftRightIcon, LinkIcon, Pencil } from 'lucide-react';
+import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, CircleX, LinkIcon, Pencil } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
+import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { getWebsiteUrl } from '../../../../lib/utils';
+import { getDashboardRoute, getPermalinkUrl } from '../../../../lib/url-helpers';
+import useClipboard from '@/lib/hooks/useClipboard';
 
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
-import { getTransactionsUrl } from '../../../contributions/ContributionTimeline';
-import { CopyID } from '../../../CopyId';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
-import Link from '../../../Link';
 import { useModal } from '../../../ModalContext';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
+import { HostCancelContributionModal } from './HostCancelContributionModal';
 
 const expireOrderMutation = gql`
   mutation ContributionsExpireOrder($orderId: Int) {
@@ -54,6 +54,8 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
   const { toast } = useToast();
   const { showModal, showConfirmationModal } = useModal();
   const { LoggedInUser } = useLoggedInUser();
+  const { copy } = useClipboard();
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
 
   const [expireOrder] = useMutation(expireOrderMutation);
 
@@ -71,26 +73,18 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       refetch?.();
     };
 
-    const transactionsUrl = getTransactionsUrl(LoggedInUser, order);
-    transactionsUrl.searchParams.set('orderId', order.legacyId.toString());
+    const transactionsUrl = getDashboardRoute(
+      dashboardAccount,
+      `${dashboardAccount.hasHosting ? 'host-transactions' : 'transactions'}?orderId=${order.legacyId.toString()}`,
+    );
 
-    const actions: ReturnType<GetActions<any>> = {
-      primary: [
-        {
-          key: 'view-transactions',
-          label: (
-            <Link href={transactionsUrl.toString()} className="flex flex-row items-center gap-2.5">
-              <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
-              <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
-            </Link>
-          ),
-          onClick: () => {},
-        },
-      ],
+    const actions: ReturnType<GetActions<ManagedOrderFieldsFragment>> = {
+      primary: [],
       secondary: [],
     };
 
     const isAdminOfOrder = LoggedInUser.isAdminOfCollective(order.fromAccount);
+    const isHostAdminOfToAccount = LoggedInUser?.isHostAdmin(order.toAccount);
     const canUpdateActiveOrder =
       order.frequency !== ContributionFrequency.ONETIME &&
       ![
@@ -104,10 +98,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       isAdminOfOrder;
 
     const canResume = order.status === OrderStatus.PAUSED && order.permissions.canResume;
-    const canCancel =
-      isAdminOfOrder &&
-      ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status) &&
-      order.frequency !== ContributionFrequency.ONETIME;
+    const canCancel = order.permissions.canCancel;
     const canMarkAsCompleted =
       [OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status) && order.permissions.canMarkAsPaid;
     const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
@@ -126,6 +117,16 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
         `edit-order-${order.id}-${action}`,
       );
     };
+
+    if (![OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status)) {
+      actions.secondary.push({
+        key: 'view-transactions',
+        Icon: ArrowLeftRightIcon,
+        href: transactionsUrl.toString(),
+        label: intl.formatMessage({ defaultMessage: 'View transactions', id: 'DfQJQ6' }),
+        onClick: () => {},
+      });
+    }
 
     if (canUpdateActiveOrder) {
       actions.primary.push({
@@ -155,8 +156,9 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     }
 
     if (isExpectedFunds && (canMarkAsExpired || canMarkAsCompleted)) {
-      actions.primary.push({
+      actions.secondary.push({
         label: intl.formatMessage({ defaultMessage: 'Edit expected funds', id: 'hQAJH9' }),
+        Icon: Pencil,
         onClick: () => {
           showModal(
             CreatePendingContributionModal,
@@ -175,7 +177,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     if (canMarkAsCompleted) {
       actions.primary.push({
-        label: intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
+        label: intl.formatMessage({ defaultMessage: 'Add received funds', id: 'order.addReceivedFunds' }),
         onClick: () => {
           showModal(
             ContributionConfirmationModal,
@@ -187,6 +189,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
             `confirm-contribution-${order.id}`,
           );
         },
+        Icon: CircleCheckBig,
         'data-cy': 'MARK_AS_PAID-button',
         key: 'mark-as-paid',
       });
@@ -194,7 +197,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     if (canMarkAsExpired) {
       actions.primary.push({
-        label: intl.formatMessage({ defaultMessage: 'Mark as expired', id: 'order.markAsExpired' }),
+        label: intl.formatMessage({ defaultMessage: 'Expire', id: 'order.expire' }),
         onClick: () => {
           showConfirmationModal(
             {
@@ -228,6 +231,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
             `mark-as-expired-${order.id}`,
           );
         },
+        Icon: AlarmClockOff,
         'data-cy': 'MARK_AS_EXPIRED-button',
         key: 'mark-as-expired',
       });
@@ -236,11 +240,23 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     if (canCancel) {
       actions.secondary.push({
         key: 'cancel-contribution',
+        Icon: CircleX,
         label: intl.formatMessage({
           defaultMessage: 'Cancel contribution',
           id: 'subscription.menu.cancelContribution',
         }),
-        onClick: () => showEditOrderModal('cancel'),
+        onClick: () =>
+          isHostAdminOfToAccount
+            ? showModal(
+                HostCancelContributionModal,
+                {
+                  order: { id: order.id, legacyId: order.legacyId },
+                  onSuccess: onMutationSuccess,
+                  onCloseFocusRef,
+                },
+                `host-cancel-contribution-${order.id}`,
+              )
+            : showEditOrderModal('cancel'),
         'data-cy': 'recurring-contribution-menu-cancel-option',
       });
     }
@@ -248,36 +264,24 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     if (order.paymentMethod?.type === PaymentMethodType.HOST) {
       actions.primary.push({
         key: 'edit-funds',
-        label: (
-          <React.Fragment>
-            <Pencil size={16} className="text-muted-foreground" />
-            {intl.formatMessage({ defaultMessage: 'Edit funds', id: 'Kbjd3f' })}
-          </React.Fragment>
-        ),
+        Icon: Pencil,
+        label: intl.formatMessage({ defaultMessage: 'Edit funds', id: 'Kbjd3f' }),
         onClick: () => showEditOrderModal('editAddedFunds'),
       });
     }
 
-    const toAccount = order.toAccount;
-    const legacyId = order.legacyId;
-    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, getWebsiteUrl());
-
     actions.secondary.push({
       key: 'copy-link',
-      label: (
-        <CopyID
-          Icon={null}
-          value={orderUrl}
-          tooltipLabel={<FormattedMessage defaultMessage="Copy link" id="CopyLink" />}
-          className=""
-        >
-          <div className="flex flex-row items-center gap-2.5">
-            <LinkIcon size={16} className="text-muted-foreground" />
-            <FormattedMessage defaultMessage="Copy link" id="CopyLink" />
-          </div>
-        </CopyID>
-      ),
-      onClick: () => {},
+      Icon: LinkIcon,
+      label: intl.formatMessage({ defaultMessage: 'Copy link', id: 'CopyLink' }),
+      onClick: e => {
+        e.preventDefault();
+        copy(getPermalinkUrl(order.publicId));
+        toast({
+          message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
+          variant: 'success',
+        });
+      },
     });
 
     return actions;

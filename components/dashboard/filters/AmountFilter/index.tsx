@@ -1,6 +1,6 @@
 import React from 'react';
 import { CornerDownRight } from 'lucide-react';
-import { defineMessage, useIntl } from 'react-intl';
+import { defineMessage, type MessageDescriptor, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
@@ -152,4 +152,18 @@ export const amountFilter: FilterConfig<z.infer<typeof amountFilterSchema>> = {
     Component: AmountFilter,
     valueRenderer: ({ value, meta }) => <AmountFilterValue value={value} currency={meta?.currency} />,
   },
+};
+
+export const makeAmountFilter = (
+  variableKey: string,
+  labelMsg: MessageDescriptor,
+): FilterConfig<z.infer<typeof amountFilterSchema>> => {
+  return {
+    ...amountFilter,
+    toVariables: value => ({ [variableKey]: amountToVariables(value).amount }),
+    filter: {
+      ...amountFilter.filter,
+      labelMsg,
+    },
+  };
 };

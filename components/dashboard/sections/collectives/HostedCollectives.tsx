@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, isString, omit } from 'lodash';
+import { compact, isString, omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -8,17 +8,18 @@ import { z } from 'zod';
 import { CollectiveType, HostedCollectiveTypes } from '../../../../lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import type { HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Collective } from '../../../../lib/graphql/types/v2/schema';
-import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Collective, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 
 import { Drawer } from '../../../Drawer';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportHostedCollectivesCSVModal from '../../ExportHostedCollectivesCSVModal';
@@ -30,6 +31,8 @@ import {
 } from '../../filters/CollectiveStatusFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { currencyFilter } from '../../filters/CurrencyFilter';
+import { dateFilter } from '../../filters/DateFilter';
+import { dateToVariables } from '../../filters/DateFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
@@ -40,10 +43,11 @@ import { makePushSubpath } from '../../utils';
 import CollectiveDetails from './CollectiveDetails';
 import type { HostedCollectivesDataTableMeta } from './common';
 import { cols } from './common';
+import { metricFilterConfigs, metricFilterSchema, metricFilterToVariables } from './metric-filters';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME', 'UNHOSTED_AT']),
+  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME', 'UNHOSTED_AT', 'STARTS_AT']),
   defaultValue: {
     field: 'CREATED_AT',
     direction: 'DESC',
@@ -58,26 +62,43 @@ const sortFilter = buildSortFilter({
 
 const COLLECTIVES_PER_PAGE = 20;
 
-const schema = z.object({
-  limit: integer.default(COLLECTIVES_PER_PAGE),
-  offset: integer.default(0),
-  searchTerm: searchFilter.schema,
-  sort: sortFilter.schema,
-  hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
-  type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
-  status: collectiveStatusFilter.schema,
-  consolidatedBalance: consolidatedBalanceFilter.schema,
-  currencies: currencyFilter.schema,
-});
-
-const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
-  status: collectiveStatusFilter.toVariables,
-  consolidatedBalance: consolidatedBalanceFilter.toVariables,
+const startsAtDateFilter = {
+  ...dateFilter,
+  toVariables: value => dateToVariables(value, 'startsAt'),
+  filter: {
+    ...dateFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Event Starts Date', id: 'EventStartsDate' }),
+  },
 };
 
-const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
+const buildSchema = (hasMetrics: boolean) =>
+  z.object({
+    limit: integer.default(COLLECTIVES_PER_PAGE),
+    offset: integer.default(0),
+    searchTerm: searchFilter.schema,
+    sort: sortFilter.schema,
+    hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
+    type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
+    status: collectiveStatusFilter.schema,
+    consolidatedBalance: consolidatedBalanceFilter.schema,
+    currencies: currencyFilter.schema,
+    startsAt: startsAtDateFilter.schema,
+    ...(hasMetrics ? metricFilterSchema : {}),
+  });
+
+type Schema = z.infer<ReturnType<typeof buildSchema>>;
+
+const buildToVariables = (hasMetrics: boolean): FiltersToVariables<Schema, HostedCollectivesQueryVariables> => ({
+  status: collectiveStatusFilter.toVariables,
+  consolidatedBalance: consolidatedBalanceFilter.toVariables,
+  startsAt: startsAtDateFilter.toVariables,
+  ...(hasMetrics ? metricFilterToVariables : {}),
+});
+
+const buildFilters = (hasMetrics: boolean): FilterComponentConfigs<Schema> => ({
   sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
+  ...(hasMetrics ? metricFilterConfigs : {}),
   hostFeesStructure: {
     labelMsg: defineMessage({ id: 'FeeStructure', defaultMessage: 'Fee structure' }),
     Component: ({ intl, ...props }) => {
@@ -113,11 +134,17 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   currencies: currencyFilter.filter,
   status: collectiveStatusFilter.filter,
   consolidatedBalance: consolidatedBalanceFilter.filter,
-};
+  startsAt: startsAtDateFilter.filter,
+});
 
 const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
+  const { account } = React.useContext(DashboardContext);
+  const hasMetrics = isFeatureEnabled(account, FEATURES.HOST_METRICS);
+  const schema = useMemo(() => buildSchema(hasMetrics), [hasMetrics]);
+  const toVariables = useMemo(() => buildToVariables(hasMetrics), [hasMetrics]);
+  const filters = useMemo(() => buildFilters(hasMetrics), [hasMetrics]);
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
   const accountTypes = [CollectiveType.COLLECTIVE];
@@ -180,7 +207,6 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
 
   const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
     variables: { hostSlug, ...queryFilter.variables },
-
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
@@ -209,7 +235,11 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />}
+        title={<FormattedMessage id="Collectives" defaultMessage="Collectives" />}
+        className="mb-6"
+        description={
+          <FormattedMessage defaultMessage="Collectives you currently host or have hosted in the past." id="nTMHB4" />
+        }
         actions={
           <ExportHostedCollectivesCSVModal
             open={displayExportCSVModal}

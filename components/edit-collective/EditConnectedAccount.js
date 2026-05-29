@@ -2,12 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import * as Sentry from '@sentry/browser';
-import { capitalize, pick } from 'lodash';
+import { capitalize, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { isValidUrl, parseToBoolean } from '../../lib/utils';
 
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
@@ -102,19 +101,6 @@ class EditConnectedAccount extends React.Component {
   connect = async service => {
     const { collective, options } = this.props;
     this.setState({ isConnecting: true });
-
-    // Redirect to OAuth flow
-    if (service === 'github') {
-      const redirectUrl = `${process.env.API_URL}/connected-accounts/${service}/oauthUrl`;
-      const redirectUrlParams = new URLSearchParams({ CollectiveId: collective.id });
-      const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-      if (accessToken) {
-        redirectUrlParams.set('access_token', accessToken);
-      }
-
-      window.location.href = `${redirectUrl}?${redirectUrlParams.toString()}`;
-      return;
-    }
 
     try {
       const json = await connectAccount(collective.id, service, options);

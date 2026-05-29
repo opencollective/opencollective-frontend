@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES, requiresUpgrade } from '../../../lib/allowed-features';
 
@@ -24,9 +23,7 @@ const SendingMoney = ({ collective }) => {
     <div className="flex flex-col gap-8">
       {hasFeature(account, FEATURES.PAYPAL_PAYOUTS) && (
         <div>
-          <SettingsSectionTitle>
-            <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />
-          </SettingsSectionTitle>
+          <SettingsSectionTitle>PayPal</SettingsSectionTitle>
           <EditPayPalAccount collective={collective} connectedAccount={paypalAccount} variation="SENDING" />
         </div>
       )}

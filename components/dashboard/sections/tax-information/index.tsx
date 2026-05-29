@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { max } from 'lodash';
+import { max } from 'lodash-es';
 import { FilePenLine } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

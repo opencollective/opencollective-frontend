@@ -1,11 +1,15 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { OppositeAccountScope } from '../../../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { AccountOrdersFilter } from '@/lib/graphql/types/v2/schema';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -23,7 +27,7 @@ import {
 } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 import { dashboardOrdersQuery } from './queries';
-import { useIncomingOutgoingContributionViews } from './views';
+import { getContributionViews, useFetchContributionViewCounts } from './views';
 
 const schema = baseSchema.extend({ tier: tierFilter.schema, account: childAccountFilter.schema });
 
@@ -54,9 +58,14 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 };
 
 const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) => {
+  const intl = useIntl();
   const { account } = useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
+  const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
+  );
 
-  const { views, refetch: refetchViews } = useIncomingOutgoingContributionViews(accountSlug, 'INCOMING');
+  const views = React.useMemo(() => getContributionViews(intl), [intl]);
 
   const filterMeta: FilterMeta = {
     currency: account.currency,
@@ -65,6 +74,7 @@ const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) 
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
+    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({
@@ -75,10 +85,26 @@ const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) 
     filters,
   });
 
+  const { viewCounts, refetch: refetchViews } = useFetchContributionViewCounts({
+    slug: accountSlug,
+    filter: AccountOrdersFilter.INCOMING,
+    ...(hasIncomingOutgoingReorg && { oppositeAccountScope: OppositeAccountScope.EXTERNAL }),
+  });
+
+  const viewsWithCount = React.useMemo(
+    () =>
+      views.map(v => ({
+        ...v,
+        count: viewCounts[v.id as keyof typeof viewCounts],
+      })),
+    [views, viewCounts],
+  );
+
   const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
     variables: {
       slug: accountSlug,
       filter: 'INCOMING',
+      ...(hasIncomingOutgoingReorg && { oppositeAccountScope: OppositeAccountScope.EXTERNAL }),
       includeIncognito: true,
       includeChildrenAccounts: true,
       ...queryFilter.variables,
@@ -97,8 +123,9 @@ const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) 
     refetchViews();
   }, [refetch, refetchViews]);
 
-  const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
-  const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+  const currentViewCount = viewsWithCount.find(v => v.id === queryFilter.activeViewId)?.count;
+  const nbPlaceholders =
+    (currentViewCount ?? 0) < queryFilter.values.limit ? (currentViewCount ?? 0) : queryFilter.values.limit;
 
   const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
 
@@ -116,12 +143,13 @@ const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) 
       <ContributionsTable
         accountSlug={accountSlug}
         queryFilter={queryFilter}
-        views={views}
+        views={viewsWithCount}
         orders={orders}
         loading={loading}
         nbPlaceholders={nbPlaceholders}
         error={error}
         refetch={handleRefetch}
+        showChargesSection
       />
     </div>
   );

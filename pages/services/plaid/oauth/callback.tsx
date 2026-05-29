@@ -1,6 +1,8 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import Lottie from 'lottie-react';
+import dynamic from 'next/dynamic';
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';

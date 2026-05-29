@@ -4,7 +4,7 @@ import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import type { Account } from '../../../lib/graphql/types/v2/schema';
+import type { Account } from '../../../lib/graphql/types/v2/graphql';
 import { isMulti } from '@/lib/filters/schemas';
 
 import ComboSelectFilter from './ComboSelectFilter';

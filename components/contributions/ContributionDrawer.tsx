@@ -1,43 +1,42 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { isEmpty } from 'lodash';
-import { ArrowLeftRightIcon } from 'lucide-react';
+import { isEmpty } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
-import { CopyID } from '../CopyId';
+import { CopyIDDropdown } from '../CopyId';
 import DateTime from '../DateTime';
 import DrawerHeader from '../DrawerHeader';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import Tags from '../Tags';
-import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../ui/DataList';
 import { InfoList, InfoListItem } from '../ui/InfoList';
 import { Sheet, SheetContent } from '../ui/Sheet';
 import { Skeleton } from '../ui/Skeleton';
 
-import ContributionTimeline, { getTransactionsUrl } from './ContributionTimeline';
+import { ContributionCharges } from './ContributionCharges';
+import ContributionTimeline from './ContributionTimeline';
 
 const contributionDrawerQuery = gql`
   query ContributionDrawer($orderId: Int!) {
     order(order: { legacyId: $orderId }) {
       id
       legacyId
+      publicId
       nextChargeDate
       lastChargedAt
       amount {
@@ -54,6 +53,11 @@ const contributionDrawerQuery = gql`
         id
         type
       }
+      manualPaymentProvider {
+        id
+        type
+        name
+      }
       status
       description
       createdAt
@@ -64,11 +68,8 @@ const contributionDrawerQuery = gql`
         name
         description
       }
-      createdByAccount {
-        ...ContributionDrawerAccountFields
-      }
       individual: createdByAccount {
-        ...ContributionDrawerAccountFields
+        ...AccountHoverCardFields
       }
       fromAccount {
         ...ContributionDrawerAccountFields
@@ -108,16 +109,16 @@ const contributionDrawerQuery = gql`
           type
           createdAt
           fromAccount {
-            ...ContributionDrawerAccountFields
+            ...ActivityAccountFields
           }
           account {
-            ...ContributionDrawerAccountFields
+            ...ActivityAccountFields
           }
           host {
-            ...ContributionDrawerAccountFields
+            ...ActivityAccountFields
           }
           individual {
-            ...ContributionDrawerAccountFields
+            ...ActivityAccountFields
           }
           data
           transaction {
@@ -146,6 +147,7 @@ const contributionDrawerQuery = gql`
         canResume
         canMarkAsExpired
         canMarkAsPaid
+        canCancel
         canEdit
         canComment
         canSeePrivateActivities
@@ -165,6 +167,16 @@ const contributionDrawerQuery = gql`
     isHost
     isArchived
     ...AccountHoverCardFields
+    mainProfile {
+      id
+      name
+      slug
+      type
+      imageUrl
+      isHost
+      isArchived
+      ...AccountHoverCardFields
+    }
     ... on Individual {
       isGuest
     }
@@ -202,6 +214,19 @@ const contributionDrawerQuery = gql`
     }
   }
 
+  fragment ActivityAccountFields on Account {
+    ...AccountHoverCardFields
+    isIncognito
+    mainProfile {
+      id
+      name
+      slug
+      type
+      imageUrl
+      ...AccountHoverCardFields
+    }
+  }
+
   fragment ContributionDrawerTransactionFields on Transaction {
     id
     legacyId
@@ -222,15 +247,32 @@ const contributionDrawerQuery = gql`
     isRefunded
     isRefund
     isOrderRejected
+    host {
+      id
+      slug
+      legacyId
+      type
+    }
     account {
-      ...ContributionDrawerAccountFields
+      ...AccountHoverCardFields
+      isIncognito
     }
     oppositeAccount {
-      ...ContributionDrawerAccountFields
+      ...AccountHoverCardFields
+      isIncognito
     }
     expense {
       id
       type
+      legacyId
+    }
+    order {
+      id
+      legacyId
+    }
+    paymentMethod {
+      id
+      service
     }
     permissions {
       id
@@ -239,6 +281,13 @@ const contributionDrawerQuery = gql`
       canReject
     }
     paymentProcessorUrl
+    refundTransaction {
+      id
+      group
+    }
+    oppositeTransaction {
+      id
+    }
   }
   ${accountHoverCardFields}
   ${AccountingCategorySelectFieldsFragment}
@@ -249,37 +298,40 @@ type ContributionDrawerProps = {
   onClose: () => void;
   orderId?: number;
   getActions: GetActions<ContributionDrawerQuery['order']>;
+  showChargesSection?: boolean;
 };
 
-export function ContributionDrawer(props: ContributionDrawerProps) {
+export function ContributionDrawer({
+  open,
+  onClose,
+  orderId,
+  getActions,
+  showChargesSection = false,
+}: ContributionDrawerProps) {
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
 
   const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
     variables: {
-      orderId: props.orderId,
+      orderId,
     },
-    skip: !props.open || !props.orderId,
+    skip: !open || !orderId,
   });
 
-  const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== props.orderId;
+  const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== orderId;
   const dropdownTriggerRef = React.useRef(undefined);
   const order = query.data?.order;
+  const contributorAccount = order?.fromAccount?.mainProfile ?? order?.fromAccount;
+  const contributorLegalName =
+    contributorAccount?.legalName !== contributorAccount?.name && contributorAccount?.legalName;
+
   const actions = React.useMemo(
-    () => (order ? props.getActions(order, dropdownTriggerRef) : null),
-    [order, props.getActions, dropdownTriggerRef],
+    () => (order ? getActions(order, dropdownTriggerRef) : null),
+    [order, getActions, dropdownTriggerRef],
   );
-  const transactionsUrl = React.useMemo(() => {
-    const url = order && getTransactionsUrl(LoggedInUser, order);
-    if (url) {
-      url.searchParams?.set('orderId', order.legacyId.toString());
-    }
-    return url;
-  }, [LoggedInUser, order]);
 
   return (
-    <Sheet open={props.open} onOpenChange={isOpen => !isOpen && props.onClose()}>
-      <SheetContent className="flex max-w-xl flex-col overflow-hidden">
+    <Sheet open={open} onOpenChange={isOpen => !isOpen && onClose()}>
+      <SheetContent className="flex max-w-2xl flex-col overflow-hidden">
         <DrawerHeader
           actions={actions}
           dropdownTriggerRef={dropdownTriggerRef}
@@ -291,12 +343,29 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           }
           forceMoreActions
           entityIdentifier={
-            <CopyID
-              value={props.orderId}
-              tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
-            >
-              #{props.orderId}
-            </CopyID>
+            <div className="flex items-center gap-1">
+              <CopyIDDropdown
+                tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
+                ids={[
+                  {
+                    name: <FormattedMessage defaultMessage="Order ID" id="GfBSPQ" />,
+                    label: `#${orderId}`,
+                    value: `${orderId}`,
+                    tooltipLabel: <FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />,
+                  },
+                  ...(order?.publicId
+                    ? [
+                        {
+                          name: <FormattedMessage defaultMessage="Order Public ID" id="Y0PZn+" />,
+                          label: order.publicId,
+                          value: order.publicId,
+                          tooltipLabel: <FormattedMessage defaultMessage="Copy contribution public ID" id="G4u5yE" />,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            </div>
           }
           entityLabel={
             isLoading ? (
@@ -335,7 +404,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 </div>
               </div>
               <div className="text-sm">
-                <InfoList className="mb-6 sm:grid-cols-2">
+                <InfoList className="mt-4 mb-6 sm:grid-cols-2">
                   <InfoListItem
                     className="border-t-0 border-b"
                     title={<FormattedMessage defaultMessage="Contributor" id="Contributor" />}
@@ -344,13 +413,18 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                         <Skeleton className="h-6 w-48" />
                       ) : (
                         <LinkCollective
-                          collective={query.data.order.fromAccount}
-                          className="hover:text-primary hover:underline"
+                          collective={contributorAccount}
+                          className="group hover:text-primary hover:underline"
                           withHoverCard
                         >
-                          <div className="flex items-center gap-1">
-                            <Avatar radius={20} collective={query.data.order.fromAccount} />
-                            {query.data.order.fromAccount.name}
+                          <div className="flex min-w-0 items-center gap-1">
+                            <Avatar radius={24} collective={query.data.order.fromAccount} />
+                            <span className="min-w-0">
+                              {contributorAccount.name}
+                              {contributorLegalName && (
+                                <span className="text-muted-foreground group-hover:text-primary">{` (${contributorLegalName})`}</span>
+                              )}
+                            </span>
                           </div>
                         </LinkCollective>
                       )
@@ -370,7 +444,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                           withHoverCard
                         >
                           <div className="flex items-center gap-1">
-                            <Avatar radius={20} collective={query.data.order.toAccount} />
+                            <Avatar radius={24} collective={query.data.order.toAccount} />
                             {query.data.order.toAccount.name}
                           </div>
                         </LinkCollective>
@@ -496,11 +570,18 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                     <DataListItemValue>
                       {isLoading ? (
                         <Skeleton className="h-5 w-44" />
+                      ) : query.data.order.paymentMethod?.type ? (
+                        <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
+                      ) : query.data.order.manualPaymentProvider ? (
+                        <div className="flex items-center gap-1">
+                          <Badge size="xs" type="neutral">
+                            <FormattedMessage defaultMessage="Manual" id="PaymentMethod.Manual" />
+                          </Badge>
+                          <span>{query.data.order.manualPaymentProvider.name}</span>
+                        </div>
                       ) : query.data.order.status === OrderStatus.PENDING ? (
                         i18nPaymentMethodProviderType(intl, query.data.order.pendingContributionData.paymentMethod)
-                      ) : (
-                        <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
-                      )}
+                      ) : null}
                     </DataListItemValue>
                   </DataListItem>
                   {query.data?.order?.status === OrderStatus.PENDING && (
@@ -560,25 +641,14 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   )}
                 </DataList>
 
+                {showChargesSection && <ContributionCharges isLoading={isLoading} order={query.data?.order} />}
+
                 <div>
                   <div className="flex items-center justify-between gap-2 py-4">
                     <div className="text-slate-80 w-fit text-base leading-6 font-bold">
                       <FormattedMessage defaultMessage="Related Activity" id="LP8cIK" />
                     </div>
                     <hr className="grow border-neutral-300" />
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="xs"
-                      disabled={isLoading}
-                      loading={isLoading}
-                      data-cy="view-transactions-button"
-                    >
-                      <Link href={transactionsUrl?.toString() || '#'} className="flex flex-row items-center gap-2.5">
-                        <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
-                        <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
-                      </Link>
-                    </Button>
                   </div>
 
                   {isLoading ? (

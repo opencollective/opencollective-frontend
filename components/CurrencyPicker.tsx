@@ -1,6 +1,6 @@
 import React from 'react';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import { Currency } from '../lib/constants/currency';
@@ -57,6 +57,7 @@ const CurrencyPicker = React.memo(
         data-cy={props['data-cy'] || 'currency-picker'}
         error={!value}
         isSearchable={availableCurrencies.length > 10}
+        aria-label={intl.formatMessage({ defaultMessage: 'Currency', id: 'Currency' })}
         options={currencyOptions}
         value={value}
         onChange={onChange}

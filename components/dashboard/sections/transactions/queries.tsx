@@ -49,6 +49,14 @@ export const transactionsTableQueryCollectionFragment = gql`
         imageUrl
         type
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
       oppositeAccount {
         id
@@ -58,6 +66,14 @@ export const transactionsTableQueryCollectionFragment = gql`
         imageUrl
         type
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
       toAccount {
         id
@@ -66,6 +82,11 @@ export const transactionsTableQueryCollectionFragment = gql`
       expense {
         id
         type
+        legacyId
+      }
+      order {
+        id
+        legacyId
       }
       permissions {
         id
@@ -77,6 +98,7 @@ export const transactionsTableQueryCollectionFragment = gql`
         id
         service
       }
+      paymentProcessorUrl
     }
   }
   ${accountHoverCardFields}
@@ -86,12 +108,14 @@ export const transactionsTableQuery = gql`
   query TransactionsTable(
     $hostAccount: AccountReferenceInput
     $account: [AccountReferenceInput!]
+    $fromAccount: AccountReferenceInput
     $excludeAccount: [AccountReferenceInput!]
     $limit: Int!
     $offset: Int!
     $type: TransactionType
     $paymentMethodType: [PaymentMethodType]
     $paymentMethodService: [PaymentMethodService]
+    $manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
     $amount: AmountRangeInput
     $minAmount: Int
     $maxAmount: Int
@@ -117,16 +141,19 @@ export const transactionsTableQuery = gql`
     $accountingCategory: [String]
     $paymentMethod: [PaymentMethodReferenceInput]
     $payoutMethod: PayoutMethodReferenceInput
+    $includeEditedReversedTransactions: Boolean
   ) {
     transactions(
       host: $hostAccount
       account: $account
+      fromAccount: $fromAccount
       excludeAccount: $excludeAccount
       limit: $limit
       offset: $offset
       type: $type
       paymentMethodType: $paymentMethodType
       paymentMethodService: $paymentMethodService
+      manualPaymentProvider: $manualPaymentProvider
       amount: $amount
       minAmount: $minAmount
       maxAmount: $maxAmount
@@ -153,6 +180,7 @@ export const transactionsTableQuery = gql`
       accountingCategory: $accountingCategory
       paymentMethod: $paymentMethod
       payoutMethod: $payoutMethod
+      includeEditedReversedTransactions: $includeEditedReversedTransactions
     ) {
       ...TransactionsTableQueryCollectionFragment
     }

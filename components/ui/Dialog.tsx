@@ -70,6 +70,15 @@ const DialogContent = React.forwardRef<
         ref={ref}
         className={cn(dialogVariants({ size: props.size, className }))}
         onInteractOutside={props.ignoreOutsideInteraction ? e => e.preventDefault() : props.onInteractOutside}
+        onPointerDownOutside={e => {
+          // Prevent closing the dialog when clicking on the scrollbar
+          const currentTarget = e.currentTarget as HTMLElement;
+          if (e.detail.originalEvent.offsetX > currentTarget.clientWidth) {
+            e.preventDefault();
+          } else {
+            props.onPointerDownOutside?.(e);
+          }
+        }}
         {...props}
       >
         {children}

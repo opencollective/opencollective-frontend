@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from 'react';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
-import { first } from 'lodash';
+import { first } from 'lodash-es';
 import { Image, Palette, Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -11,7 +11,6 @@ import { styled } from 'styled-components';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { twitterProfileUrl } from '../../../lib/url-helpers';
-import { hasAccountHosting } from '@/lib/collective';
 
 import { AccountTrustBadge } from '@/components/AccountTrustBadge';
 
@@ -20,8 +19,8 @@ import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import EditTagsModal from '../../EditTagsModal';
-import FollowButton from '../../FollowButton';
 import { Box, Flex } from '../../Grid';
+import HostInfoDialog from '../../HostInformationDialog';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
@@ -125,7 +124,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const displayedTags = collective.tags?.slice(0, 3);
   const hiddenTags = collective.tags?.slice(3);
   const numberOfHiddenTags = hiddenTags?.length;
-  const hasHosting = hasAccountHosting(collective);
+  const hasHosting = collective.hasHosting;
 
   // Cancel edit mode when user navigates out to another collective
   useEffect(() => {
@@ -177,7 +176,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
             />
           </Container>
         )}
-        <ContainerSectionContent pt={40} display="flex" flexDirection="column">
+        <ContainerSectionContent pt={40} display="flex" flexDirection="column" alignItems={['center', 'flex-start']}>
           {/* Collective presentation (name, logo, description...) */}
           <Container position="relative" mb={2} width={128}>
             <HeroAvatar collective={collective} isAdmin={isAdmin} />
@@ -190,6 +189,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               textAlign="left"
               data-cy="collective-title"
               wordBreak="normal"
+              textAlign={['center', 'left']}
             >
               {collective.name || collective.slug}
               <AccountTrustBadge account={collective} size={24} className="ml-3 inline-block" />
@@ -201,14 +201,13 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 <StyledLink key={company} as={UserCompany} mr={1} fontSize="20px" fontWeight={600} company={company} />
               ))}
           </Flex>
-          <div className="mt-2 flex">
-            <FollowButton buttonProps={{ buttonSize: 'tiny' }} account={collective} />
-          </div>
-
           {!isEvent && (
             <Fragment>
               {(isCollective || isOrganization || isFund || isProject) && (
-                <div className="my-7 mb-2 flex flex-wrap items-center gap-2" data-cy="collective-tags">
+                <div
+                  className="my-7 mb-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start"
+                  data-cy="collective-tags"
+                >
                   <StyledTag
                     textTransform="uppercase"
                     variant="rounded-left"
@@ -283,7 +282,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 </div>
               )}
               <Flex alignItems="center" flexWrap="wrap" fontSize="14px" gap="16px" mt={2}>
-                <Flex gap="16px" flexWrap="wrap">
+                <Flex gap="16px" flexWrap="wrap" m="0 auto">
                   {collective.canContact && (
                     <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
                       {btnProps => (
@@ -334,7 +333,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       defaultMessage="Part of: {parentName}"
                       values={{
                         parentName: (
-                          <StyledLink as={LinkCollective} collective={collective.parentCollective} noTitle>
+                          <StyledLink
+                            key="parent-name"
+                            as={LinkCollective}
+                            collective={collective.parentCollective}
+                            noTitle
+                          >
                             <TruncatedTextWithTooltip value={collective.parentCollective.name} cursor="pointer" />
                           </StyledLink>
                         ),
@@ -349,9 +353,19 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                         id="Collective.Hero.Host"
                         defaultMessage="{FiscalHost}: {hostName}"
                         values={{
-                          FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
+                          FiscalHost: host.hasHosting ? (
+                            <DefinedTerm
+                              key="fiscal-host"
+                              term={Terms.FISCAL_HOST}
+                              color="black.700"
+                              borderColor="#969ba3"
+                            />
+                          ) : (
+                            <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
+                          ),
                           hostName: (
                             <StyledLink
+                              key="host-name"
                               as={LinkCollective}
                               collective={host}
                               data-cy="fiscalHostName"
@@ -372,6 +386,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           values={{
                             parentName: (
                               <StyledLink
+                                key="parent-name"
                                 as={LinkCollective}
                                 collective={displayedConnectedAccount.collective}
                                 noTitle
@@ -389,53 +404,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     )}
                   </Fragment>
                 )}
-                {hasHosting && (
-                  <Fragment>
-                    {collective.type !== CollectiveType.COLLECTIVE && (
-                      <Fragment>
-                        {collective.settings?.tos && (
-                          <StyledLink
-                            openInNewTab
-                            href={collective.settings.tos}
-                            borderBottom="2px dotted #969ba3"
-                            color="black.700"
-                            textDecoration="none"
-                            fontSize="12px"
-                          >
-                            <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal hosting" />
-                          </StyledLink>
-                        )}
-                        <Container color="black.700" fontSize="12px">
-                          <FormattedMessage
-                            id="Hero.HostFee"
-                            defaultMessage="Host fee: {fee}"
-                            values={{
-                              fee: (
-                                <DefinedTerm term={Terms.HOST_FEE} color="black.700">
-                                  {collective.hostFeePercent || 0}%
-                                </DefinedTerm>
-                              ),
-                            }}
-                          />
-                        </Container>
-                      </Fragment>
-                    )}
-                    {collective.platformFeePercent > 0 && (
-                      <Container color="black.700" fontSize="12px">
-                        <FormattedMessage
-                          id="Hero.PlatformFee"
-                          defaultMessage="Platform fee: {fee}"
-                          values={{
-                            fee: (
-                              <DefinedTerm term={Terms.PLATFORM_FEE} color="black.700">
-                                {collective.platformFeePercent}%
-                              </DefinedTerm>
-                            ),
-                          }}
-                        />
-                      </Container>
-                    )}
-                  </Fragment>
+                {hasHosting && collective.type !== CollectiveType.COLLECTIVE && (
+                  <HostInfoDialog collective={collective} />
                 )}
               </Flex>
             </Fragment>

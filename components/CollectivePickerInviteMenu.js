@@ -2,7 +2,7 @@ import React from 'react';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { FormattedMessage } from 'react-intl';
 
-import { ExpenseType } from '@/lib/graphql/types/v2/schema';
+import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from './Grid';
 import Image from './Image';

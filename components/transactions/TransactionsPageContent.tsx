@@ -7,8 +7,9 @@ import { isIndividualAccount } from '../../lib/collective';
 import roles from '../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { usePrevious } from '../../lib/hooks/usePrevious';
-import type { Account, PaymentMethod, PaymentMethodType, Transaction } from '@/lib/graphql/types/v2/schema';
-import { TransactionKind } from '@/lib/graphql/types/v2/schema';
+import { boolean } from '@/lib/filters/schemas';
+import type { Account, PaymentMethod, PaymentMethodType, Transaction } from '@/lib/graphql/types/v2/graphql';
+import { TransactionKind } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { cn } from '@/lib/utils';
@@ -149,6 +150,7 @@ export const transactionsPageQuery = gql`
     $accountingCategory: [String]
     $paymentMethod: [PaymentMethodReferenceInput]
     $payoutMethod: PayoutMethodReferenceInput
+    $includeEditedReversedTransactions: Boolean
   ) {
     account(slug: $slug) {
       id
@@ -227,6 +229,7 @@ export const transactionsPageQuery = gql`
       accountingCategory: $accountingCategory
       paymentMethod: $paymentMethod
       payoutMethod: $payoutMethod
+      includeEditedReversedTransactions: $includeEditedReversedTransactions
     ) {
       ...TransactionsQueryCollectionFragment
       kinds
@@ -241,6 +244,7 @@ export const transactionsPageQuery = gql`
 
 export const schema = commonSchema.extend({
   account: childAccountFilter.schema,
+  includeEditedReversedTransactions: boolean.optional(),
 });
 
 interface TransactionsProps {
@@ -349,6 +353,7 @@ const Transactions = ({ LoggedInUser, account, ...props }: TransactionsProps) =>
       slug: account.slug,
       includeIncognitoTransactions: true,
       includeChildrenTransactions: true,
+      includeEditedReversedTransactions: false,
       ...queryFilter.variables,
     },
     fetchPolicy: 'cache-first',

@@ -9,17 +9,17 @@
  * field to know which features user has access to.
  */
 
-import { cloneDeep, flatten, get } from 'lodash';
+import { cloneDeep, flatten, get } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections, SectionsValues } from '../components/collective-page/_constants';
 
 import { CollectiveType } from './constants/collectives';
-import type { AccountType } from './graphql/types/v2/schema';
+import type { AccountType } from './graphql/types/v2/graphql';
 import i18nNavbarCategory from './i18n/navbar-categories';
 import { FEATURES, isFeatureEnabled } from './allowed-features';
-import { hasAccountHosting, hasAccountMoneyManagement, isEmptyCollectiveLocation } from './collective';
+import { hasAccountMoneyManagement, isEmptyCollectiveLocation } from './collective';
 
 const RichCollectiveType = {
   ...CollectiveType,
@@ -246,7 +246,11 @@ const getSectionsToRemoveForUser = (collective, isAdmin) => {
     toRemove.add(Sections.CONTRIBUTORS);
   }
 
-  if (features[FEATURES.TRANSACTIONS] !== 'ACTIVE' && features[FEATURES.RECEIVE_EXPENSES] !== 'ACTIVE') {
+  if (
+    features[FEATURES.TRANSACTIONS] !== 'ACTIVE' &&
+    features[FEATURES.RECEIVE_EXPENSES] !== 'ACTIVE' &&
+    features[FEATURES.RECEIVE_GRANTS] !== 'ACTIVE'
+  ) {
     toRemove.add(Sections.BUDGET);
   }
 
@@ -410,7 +414,7 @@ export const addDefaultSections = (collective, sections) => {
 
   const newSections = cloneDeep(sections || []);
   const hasMoneyManagement = hasAccountMoneyManagement(collective);
-  const hasHosting = hasAccountHosting(collective);
+  const hasHosting = collective.hasHosting;
   const defaultSections = getDefaultSectionsForCollectiveType(collective.type, hasMoneyManagement, hasHosting);
 
   Object.entries(defaultSections).forEach(([section, defaultIsEnabled]) => {

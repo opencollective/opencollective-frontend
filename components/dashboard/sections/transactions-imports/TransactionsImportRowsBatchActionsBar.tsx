@@ -1,10 +1,10 @@
 import React from 'react';
-import { size } from 'lodash';
+import { size } from 'lodash-es';
 import { PauseCircle, SquareSlashIcon, UndoDot } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { getPossibleActionsForSelectedRows } from './lib/table-selection';
-import { TransactionsImportRowStatus } from '@/lib/graphql/types/v2/schema';
+import { TransactionsImportRowStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { Button } from '@/components/ui/Button';
 

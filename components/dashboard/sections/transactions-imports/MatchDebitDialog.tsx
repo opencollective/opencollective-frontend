@@ -1,22 +1,25 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { ceil, floor, omit, pick } from 'lodash';
+import { ceil, floor, omit, pick } from 'lodash-es';
 import { Ban, ExternalLink, Save } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import type { Account, Host, TransactionsImport, TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
+import type {
+  Account,
+  FindContributionsMatchForOffPlatformDebitQueryVariables,
+  FindExpenseMatchForOffPlatformDebitQueryVariables,
+  Host,
+  TransactionsImport,
+  TransactionsImportRow,
+} from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { updateTransactionsImportRows } from './lib/graphql';
 import { getMatchInfo } from './lib/match';
 import { ExpenseMetaStatuses } from '@/lib/expense';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
-import type {
-  FindContributionsMatchForOffPlatformDebitQueryVariables,
-  FindExpenseMatchForOffPlatformDebitQueryVariables,
-} from '@/lib/graphql/types/v2/graphql';
 import {
   ExpenseStatus,
   ExpenseStatusFilter,
@@ -462,6 +465,7 @@ export const MatchDebitDialog = ({
               });
             }}
             activeViewId={activeViewId}
+            hideCounts
             resetFilters={filter => {
               queryFilter.resetFilters({
                 ...getDefaultFilterValues(row, accounts, activeViewId, host),
@@ -715,14 +719,14 @@ export const MatchDebitDialog = ({
 
               {Boolean(
                 selectedExpense &&
-                  [
-                    ExpenseStatus.PENDING,
-                    ExpenseStatus.DRAFT,
-                    ExpenseStatus.INVITE_DECLINED,
-                    ExpenseStatus.REJECTED,
-                    ExpenseStatus.SPAM,
-                    ExpenseStatus.UNVERIFIED,
-                  ].includes(selectedExpense.status),
+                [
+                  ExpenseStatus.PENDING,
+                  ExpenseStatus.DRAFT,
+                  ExpenseStatus.INVITE_DECLINED,
+                  ExpenseStatus.REJECTED,
+                  ExpenseStatus.SPAM,
+                  ExpenseStatus.UNVERIFIED,
+                ].includes(selectedExpense.status),
               ) && (
                 <MessageBox type="warning" className="mt-4">
                   <strong>

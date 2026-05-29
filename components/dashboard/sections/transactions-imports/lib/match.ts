@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import type { Expense, Order, TransactionsImportRow } from '@/lib/graphql/types/v2/schema';
+import type { Expense, Order, TransactionsImportRow } from '@/lib/graphql/types/v2/graphql';
 
 export const getMatchInfo = (
   row: Pick<TransactionsImportRow, 'date' | 'amount'>,

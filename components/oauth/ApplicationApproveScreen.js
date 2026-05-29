@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check } from '@styled-icons/fa-solid/Check';
-import { difference, has } from 'lodash';
+import { difference, has } from 'lodash-es';
 import {
   AlertTriangle,
   ArrowRightLeft,
@@ -22,6 +22,7 @@ import { addAuthTokenToHeader } from '../../lib/api';
 import { ERROR, formatErrorType } from '../../lib/errors';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getApiUrl } from '@/lib/utils';
 
 import Avatar, { IncognitoAvatar } from '../Avatar';
 import Container from '../Container';
@@ -91,6 +92,10 @@ const SCOPES_INFO = {
     label: <FormattedMessage defaultMessage="Administrate fiscal hosts." id="iHkkt+" />,
     icon: <Network size={16} />,
   },
+  exportRequests: {
+    label: <FormattedMessage defaultMessage="Manage export requests." id="exportRequests" />,
+    icon: <Receipt size={16} />,
+  },
   /* We disable those scopes for now */
   /*
   applications: {
@@ -137,7 +142,7 @@ const fetchAuthorize = (
     }
   }
 
-  return fetch(`${process.env.API_URL}/oauth/authorize?${authorizeParams.toString()}`, {
+  return fetch(`${getApiUrl()}/oauth/authorize?${authorizeParams.toString()}`, {
     method: 'POST',
     redirect: 'manual',
     headers: {

@@ -1,10 +1,10 @@
 import type { OpUnitType, UnitType } from 'dayjs';
-import { padStart } from 'lodash';
+import { padStart } from 'lodash-es';
 
 import INTERVALS from './constants/intervals';
 import { PAYMENT_METHOD_SERVICE } from './constants/payment-methods';
-import type { TierFrequency } from './graphql/types/v2/schema';
-import { TimeUnit } from './graphql/types/v2/schema';
+import type { TierFrequency } from './graphql/types/v2/graphql';
+import { TimeUnit } from './graphql/types/v2/graphql';
 import dayjs from './dayjs';
 
 /**

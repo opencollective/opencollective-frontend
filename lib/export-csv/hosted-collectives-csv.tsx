@@ -25,6 +25,8 @@ type Fields =
   | 'dateApplied'
   | 'unhostedAt'
   | 'unfrozenAt'
+  | 'startsAt'
+  | 'endsAt'
   | 'numberOfExpensesYear'
   | 'valueOfExpensesYear'
   | 'maxExpenseValueYear'
@@ -188,6 +190,8 @@ export const FIELDS: Array<{
   { id: 'dateApplied', group: 'about', label: <FormattedMessage defaultMessage="Date Applied" id="dateApplied" /> },
   { id: 'unhostedAt', group: 'about', label: <FormattedMessage defaultMessage="Unhosted At" id="unhostedAt" /> },
   { id: 'unfrozenAt', group: 'about', label: <FormattedMessage defaultMessage="Unfrozen At" id="unfrozenAt" /> },
+  { id: 'startsAt', group: 'about', label: <FormattedMessage defaultMessage="Event Starts At" id="startsAt" /> },
+  { id: 'endsAt', group: 'about', label: <FormattedMessage defaultMessage="Event Ends At" id="endsAt" /> },
   {
     id: 'numberOfExpensesYear',
     group: 'expenses',

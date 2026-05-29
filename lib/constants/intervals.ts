@@ -1,4 +1,5 @@
-import { TierFrequency } from '../graphql/types/v2/schema';
+import type { ContributionFrequency } from '../graphql/types/v2/graphql';
+import { TierFrequency } from '../graphql/types/v2/graphql';
 
 const INTERVALS = {
   oneTime: 'oneTime',
@@ -20,7 +21,7 @@ export const getGQLV2FrequencyFromInterval = (interval: (typeof INTERVALS)[keyof
   }
 };
 
-export function getIntervalFromGQLV2Frequency(frequency: TierFrequency) {
+export function getIntervalFromGQLV2Frequency(frequency: TierFrequency | ContributionFrequency) {
   switch (frequency) {
     case TierFrequency.MONTHLY:
       return INTERVALS.month;

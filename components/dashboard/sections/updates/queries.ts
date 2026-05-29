@@ -3,6 +3,7 @@ import { gql } from '@apollo/client';
 export const updateFieldsFragment = gql`
   fragment UpdateFields on Update {
     id
+    publicId
     title
     slug
     isPrivate
@@ -62,6 +63,7 @@ export const updatesDashboardQuery = gql`
             totalCount
             nodes {
               id
+              publicId
               createdAt
               fromAccount {
                 id
@@ -100,12 +102,14 @@ export const updatesViewQuery = gql`
   query UpdateView($id: String!, $commentOffset: Int) {
     update(id: $id) {
       id
+      publicId
       html
       ...UpdateFields
       comments(limit: 20, offset: $commentOffset) {
         totalCount
         nodes {
           id
+          publicId
           createdAt
           fromAccount {
             id

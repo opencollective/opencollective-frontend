@@ -1,20 +1,25 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-export const PayoutMethodFragment = gql`
+const PayoutMethodFragment = gql`
   fragment PayoutMethodFields on PayoutMethod {
     id
+    publicId
     type
     name
     isSaved
     data
     canBeEdited
     canBeDeleted
+    createdAt
+    updatedAt
+    isVerified
   }
 `;
 
 const PaymentMethodFragment = gql`
   fragment PaymentMethodFields on PaymentMethod {
     id
+    publicId
     legacyId
     name
     data

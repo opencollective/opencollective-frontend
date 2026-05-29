@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import { HostApplicationStatus } from '../graphql/types/v2/schema';
+import { HostApplicationStatus } from '../graphql/types/v2/graphql';
 
 const MESSAGES = defineMessages({
   [HostApplicationStatus.APPROVED]: {

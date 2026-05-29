@@ -1,8 +1,8 @@
-import { isNil, isUndefined } from 'lodash';
+import { isNil, isUndefined } from 'lodash-es';
 
 import { getDayjsIsoUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';
-import type { TimeUnit } from '../../../../lib/graphql/types/v2/schema';
+import type { TimeUnit } from '../../../../lib/graphql/types/v2/graphql';
 
 import { DateFilterType } from '../../filters/DateFilter/schema';
 import type { FilterValues as HostTransactionsFilterValues } from '../transactions/HostTransactions';

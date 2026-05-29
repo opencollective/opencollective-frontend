@@ -3,11 +3,14 @@ Collective interface
 """
 interface CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean
+  hasMoneyManagement: Boolean
   name: String
   legalName: String
   company: String
@@ -46,6 +49,7 @@ interface CollectiveInterface {
   isFirstPartyHost: Boolean!
   isVerified: Boolean!
   isIncognito: Boolean
+  isPrivate: Boolean!
 
   """
   Whether this account is frozen
@@ -134,7 +138,21 @@ interface CollectiveInterface {
   List of all notifications for this collective
   """
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  tiers(id: Int, slug: String, slugs: [String]): [Tier]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  tiers(
+    id: Int
+    slug: String
+    slugs: [String]
+
+    """
+    When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
+  ): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   stats: CollectiveStatsType
@@ -1078,6 +1096,7 @@ type CollectiveFeatures {
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
+  RECEIVE_GRANTS: CollectiveFeatureStatus
   MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
@@ -1103,7 +1122,10 @@ type CollectiveFeatures {
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
+  PAYPAL_CONNECT: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
+  ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
+  HOST_METRICS: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
@@ -1113,6 +1135,7 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
+  PUBLIC_PROFILE: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -1160,6 +1183,11 @@ type PlanType {
 
 type Policies {
   id: String
+
+  """
+  The resource public id (ie: acc_xxxxxxxx)
+  """
+  publicId: String!
   EXPENSE_POLICIES: EXPENSE_POLICIES
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
@@ -1450,6 +1478,11 @@ enum Currency {
   Lari
   """
   GEL
+
+  """
+  Ghana Cedi
+  """
+  GHS
 
   """
   Gibraltar Pound
@@ -2057,11 +2090,14 @@ This represents a Collective
 """
 type Collective implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2135,6 +2171,11 @@ type Collective implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -2229,8 +2270,21 @@ type Collective implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  tiers(id: Int, slug: String, slugs: [String]): [Tier]
-    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  tiers(
+    id: Int
+    slug: String
+    slugs: [String]
+
+    """
+    When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
+  ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -2321,7 +2375,7 @@ type Collective implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -2343,11 +2397,14 @@ This represents an Event
 """
 type Event implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2421,6 +2478,11 @@ type Event implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -2515,8 +2577,21 @@ type Event implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  tiers(id: Int, slug: String, slugs: [String]): [Tier]
-    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  tiers(
+    id: Int
+    slug: String
+    slugs: [String]
+
+    """
+    When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
+  ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -2607,7 +2682,7 @@ type Event implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -2629,11 +2704,14 @@ This represents a Fund
 """
 type Fund implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2707,6 +2785,11 @@ type Fund implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -2801,8 +2884,21 @@ type Fund implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  tiers(id: Int, slug: String, slugs: [String]): [Tier]
-    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  tiers(
+    id: Int
+    slug: String
+    slugs: [String]
+
+    """
+    When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
+  ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -2893,7 +2989,7 @@ type Fund implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -2915,11 +3011,14 @@ This represents a Organization Collective
 """
 type Organization implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2993,6 +3092,11 @@ type Organization implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -3087,8 +3191,21 @@ type Organization implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  tiers(id: Int, slug: String, slugs: [String]): [Tier]
-    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  tiers(
+    id: Int
+    slug: String
+    slugs: [String]
+
+    """
+    When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
+  ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -3179,7 +3296,7 @@ type Organization implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -3201,11 +3318,14 @@ This represents a Project
 """
 type Project implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -3279,6 +3399,11 @@ type Project implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -3373,8 +3498,21 @@ type Project implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  tiers(id: Int, slug: String, slugs: [String]): [Tier]
-    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  tiers(
+    id: Int
+    slug: String
+    slugs: [String]
+
+    """
+    When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
+  ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -3465,7 +3603,7 @@ type Project implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -3782,11 +3920,14 @@ This represents a User Collective
 """
 type User implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -3860,6 +4001,11 @@ type User implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -3954,8 +4100,21 @@ type User implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  tiers(id: Int, slug: String, slugs: [String]): [Tier]
-    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  tiers(
+    id: Int
+    slug: String
+    slugs: [String]
+
+    """
+    When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
+  ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -4046,7 +4205,7 @@ type User implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -4070,11 +4229,14 @@ This represents a Vendor
 """
 type Vendor implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -4148,6 +4310,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -4242,8 +4409,21 @@ type Vendor implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  tiers(id: Int, slug: String, slugs: [String]): [Tier]
-    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  tiers(
+    id: Int
+    slug: String
+    slugs: [String]
+
+    """
+    When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
+  ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -4334,7 +4514,7 @@ type Vendor implements CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
@@ -4480,6 +4660,11 @@ type Query {
     Only return vendors visible to given account ids
     """
     vendorVisibleToAccountIds: [Int]
+
+    """
+    Include all vendors. Cannot be used together with includeVendorsForHostId. Must be root.
+    """
+    includeAllVendors: Boolean! = false
 
     """
     Whether to skip recent accounts (48h)

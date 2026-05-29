@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import copy from 'copy-to-clipboard';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { CircleHelp, RefreshCw } from 'lucide-react';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';

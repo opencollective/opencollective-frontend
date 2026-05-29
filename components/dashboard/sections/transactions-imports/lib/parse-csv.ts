@@ -1,9 +1,9 @@
 import { parse as parseCSV } from 'csv-parse/sync';
-import { deburr, uniq, words } from 'lodash';
+import { deburr, uniq, words } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 
 import dayjs from '../../../../../lib/dayjs';
-import type { Currency, TransactionsImportRowCreateInput } from '../../../../../lib/graphql/types/v2/schema';
+import type { Currency, TransactionsImportRowCreateInput } from '../../../../../lib/graphql/types/v2/graphql';
 import { toNegative } from '../../../../../lib/math';
 
 import type { CSVConfig } from './types';

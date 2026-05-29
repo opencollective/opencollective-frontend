@@ -1,9 +1,13 @@
 import React from 'react';
-import { clamp } from 'lodash';
+import { clamp } from 'lodash-es';
 import { styled } from 'styled-components';
 import { border, color, layout } from 'styled-system';
 
-const BackgroundBar = styled.div`
+import { defaultShouldForwardProp } from '../lib/styled_components_utils';
+
+const BackgroundBar = styled.div.withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+})`
   position: relative;
 
   ${layout}
@@ -11,7 +15,9 @@ const BackgroundBar = styled.div`
   ${border}
 `;
 
-const ProgressBar = styled.div`
+const ProgressBar = styled.div.withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+})`
   position: absolute;
 
   ${layout}

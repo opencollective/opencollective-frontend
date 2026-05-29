@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { ArrowRight, Check, ChevronDown, ChevronUp, ListCheck, LockKeyhole } from 'lucide-react';
+import { omitBy } from 'lodash-es';
+import { ArrowRight, Check, ChevronDown, ChevronUp, ListCheck, LockKeyhole, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { WelcomeOrganizationQuery } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { cn } from '@/lib/utils';
 import type { Category, Step } from '@/lib/welcome';
-import { INDIVIDUAL_CATEGORIES, ORG_CATEGORIES, sortSteps } from '@/lib/welcome';
+import { COLLECTIVE_CATEGORIES, INDIVIDUAL_CATEGORIES, ORGANIZATION_CATEGORIES, sortSteps } from '@/lib/welcome';
 
 import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import { Drawer } from '@/components/Drawer';
 import { DocumentationLink } from '@/components/Link';
 import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
@@ -28,11 +30,18 @@ const welcomeOrganizationQuery = gql`
       slug
       description
       currency
+      type
       legacyId
+      isPrivate
       longDescription
       isHost
       tags
       settings
+      features {
+        id
+        RECEIVE_FINANCIAL_CONTRIBUTIONS
+        PUBLIC_PROFILE
+      }
       location {
         id
         name
@@ -57,6 +66,28 @@ const welcomeOrganizationQuery = gql`
         id
         type
       }
+      updates(limit: 1) {
+        nodes {
+          id
+        }
+      }
+      projects: childrenAccounts(accountType: [PROJECT], limit: 1) {
+        nodes {
+          id
+        }
+      }
+      approvedExpenses: expenses(status: APPROVED, direction: RECEIVED, limit: 1) {
+        nodes {
+          id
+        }
+      }
+      policies {
+        id
+        EXPENSE_POLICIES {
+          invoicePolicy
+          receiptPolicy
+        }
+      }
       ... on AccountWithPlatformSubscription {
         platformSubscription {
           isCurrent
@@ -70,6 +101,21 @@ const welcomeOrganizationQuery = gql`
       }
       ... on AccountWithContributions {
         contributionPolicy
+        tiers(limit: 1) {
+          nodes {
+            id
+          }
+        }
+      }
+      ... on AccountWithHost {
+        hostFeePercent
+        isApproved
+        approvedAt
+        hostApplication {
+          id
+          createdAt
+          status
+        }
       }
       ... on Organization {
         hasHosting
@@ -79,6 +125,7 @@ const welcomeOrganizationQuery = gql`
           slug
           hostFeePercent
           policies {
+            id
             REQUIRE_2FA_FOR_ADMINS
             EXPENSE_POLICIES {
               invoicePolicy
@@ -98,6 +145,19 @@ const welcomeOrganizationQuery = gql`
   ${planFeatures}
   ${AccountingCategorySelectFieldsFragment}
 `;
+
+function filterCategories<T extends Record<string, Pick<Category, 'if'>>>(
+  categories: T,
+  account: WelcomeOrganizationQuery['account'],
+): Partial<T> {
+  return omitBy(categories, category => {
+    if (category.if) {
+      return !category.if(account);
+    } else {
+      return false;
+    }
+  }) as Partial<T>;
+}
 
 const ActionStep = (props: Step) => {
   const [isExpanded, setIsExpanded] = useState(!props.completed);
@@ -181,18 +241,23 @@ const WelcomeDrawer = ({
 }) => {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
-  const steps = category?.steps ? sortSteps(category.steps.map(step => step({ account, router, LoggedInUser }))) : [];
-  const completedSteps = steps.filter(step => step.completed && !step.requiresUpgrade).length;
-  const isCompleted = completedSteps === steps.length;
+  if (!category) {
+    return null;
+  }
+
+  const allSteps = category.steps ? sortSteps(category.steps.map(step => step({ account, router, LoggedInUser }))) : [];
+  const filteredSteps = allSteps.filter(step => (step.if ? step.if(account) : true));
+  const completedSteps = filteredSteps.filter(step => step.completed && !step.requiresUpgrade).length;
+  const isCompleted = completedSteps === filteredSteps.length;
 
   return (
     <Drawer open={open} onClose={onClose} className="w-full max-w-xl" showCloseButton>
       <header className="mb-6 flex items-start justify-between">
         <div className="flex w-full flex-col gap-2">
-          {category?.image || <Skeleton className="size-10" />}
+          {category.image || <Skeleton className="size-10" />}
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-bold">{category?.title || <Skeleton className="h-6 w-64" />}</h1>
-            {category?.steps ? (
+            <h1 className="text-2xl font-bold">{category.title || <Skeleton className="h-6 w-64" />}</h1>
+            {category.steps ? (
               <div
                 className="flex gap-1 rounded-full bg-slate-100 px-4 py-2 text-sm data-completed:bg-green-100 data-completed:text-green-800"
                 data-completed={isCompleted ? true : undefined}
@@ -200,7 +265,7 @@ const WelcomeDrawer = ({
                 <FormattedMessage
                   defaultMessage="{completed}/{total} completed"
                   id="SetupGuide.StepsCompleted"
-                  values={{ completed: completedSteps, total: steps.length }}
+                  values={{ completed: completedSteps, total: filteredSteps.length }}
                 />
               </div>
             ) : (
@@ -208,14 +273,14 @@ const WelcomeDrawer = ({
             )}
           </div>
           <p className="text-sm text-slate-700">
-            {category?.longDescription || category?.description || <Skeleton className="h-4 w-80" />}
+            {category.longDescription || category.description || <Skeleton className="h-4 w-80" />}
           </p>
         </div>
       </header>
       <div className="flex grow flex-col justify-between gap-6">
-        {steps.length > 0 && (
+        {filteredSteps.length > 0 && (
           <div className="flex flex-col gap-4">
-            {steps.map(step => (
+            {filteredSteps.map(step => (
               <ActionStep key={step.id} {...step} />
             ))}
           </div>
@@ -239,7 +304,9 @@ const WelcomeCategoryButton = ({
 }) => {
   const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
-  const steps = account && _steps?.map(step => step({ account, LoggedInUser, router }));
+  const steps =
+    account &&
+    _steps?.map(step => step({ account, LoggedInUser, router })).filter(step => (step.if ? step.if(account) : true));
   const completedSteps = steps?.filter(step => step.completed && !step.requiresUpgrade)?.length || 0;
   const isCompleted = completedSteps === steps?.length;
 
@@ -275,23 +342,17 @@ const WelcomeCategoryButton = ({
 };
 
 export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
+  const intl = useIntl();
   const { data } = useQuery<WelcomeOrganizationQuery>(welcomeOrganizationQuery, {
     variables: { accountSlug: _account?.slug },
     skip: !_account,
 
     fetchPolicy: 'cache-and-network',
   });
-  const { LoggedInUser } = useLoggedInUser();
   // Undefined here means the initial state, after that we can set to null or a specific category ID
   const [expandedCategory, setExpandedCategory] = useState<null | string>(null);
 
-  useEffect(() => {
-    if (LoggedInUser && open === undefined && data?.account) {
-      const showGuide = LoggedInUser?.shouldDisplaySetupGuide(data.account);
-      setOpen(showGuide !== false ? true : false);
-    }
-  }, [data?.account, open, setOpen, LoggedInUser]);
-
+  const filteredCategories = !data?.account ? {} : filterCategories(ORGANIZATION_CATEGORIES, data.account);
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleContent>
@@ -309,9 +370,19 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
                 id="Welcome.Organization.Description"
               />
             </CardDescription>
+            <CardAction>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => setOpen(false)}
+                aria-label={intl.formatMessage({ defaultMessage: 'Hide setup guide', id: 'SetupGuide.HideSetupGuide' })}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardAction>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Object.entries(ORG_CATEGORIES).map(([key, category]) => (
+            {Object.entries(filteredCategories).map(([key, category]) => (
               <WelcomeCategoryButton
                 key={key}
                 {...category}
@@ -321,7 +392,7 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
             ))}
           </CardContent>
           <WelcomeDrawer
-            category={ORG_CATEGORIES[expandedCategory]}
+            category={filteredCategories[expandedCategory]}
             account={data?.account}
             onClose={() => setExpandedCategory(null)}
             open={expandedCategory !== null}
@@ -332,10 +403,78 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
   );
 };
 
-export const WelcomeIndividual = ({ open, setOpen }) => {
+export const WelcomeCollective = ({ account: _account, setOpen, open }) => {
+  const intl = useIntl();
+  const { data } = useQuery<WelcomeOrganizationQuery>(welcomeOrganizationQuery, {
+    variables: { accountSlug: _account?.slug },
+    skip: !_account,
+
+    fetchPolicy: 'cache-and-network',
+  });
+  // Undefined here means the initial state, after that we can set to null or a specific category ID
+  const [expandedCategory, setExpandedCategory] = useState<null | string>(null);
+
+  if (_account?.parent) {
+    return null;
+  }
+
+  const filteredCategories = !data?.account ? {} : filterCategories(COLLECTIVE_CATEGORIES, data.account);
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleContent>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">
+              <FormattedMessage
+                defaultMessage="What would like to do with the platform?"
+                id="Welcome.Organization.Title"
+              />
+            </CardTitle>
+            <CardDescription>
+              <FormattedMessage
+                defaultMessage="Get started with the basics or set up additional functionalities."
+                id="Welcome.Collective.Description"
+              />
+            </CardDescription>
+            <CardAction>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => setOpen(false)}
+                aria-label={intl.formatMessage({ defaultMessage: 'Hide setup guide', id: 'SetupGuide.HideSetupGuide' })}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Object.entries(filteredCategories).map(([key, category]) => (
+              <WelcomeCategoryButton
+                key={key}
+                {...category}
+                account={data?.account}
+                onClick={() => setExpandedCategory(key)}
+              />
+            ))}
+          </CardContent>
+          <WelcomeDrawer
+            category={filteredCategories[expandedCategory]}
+            account={data?.account}
+            onClose={() => setExpandedCategory(null)}
+            open={expandedCategory !== null}
+          />
+        </Card>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+};
+
+export const WelcomeIndividual = ({ open, setOpen, account }) => {
   const router = useRouter();
+  const intl = useIntl();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = useState(false);
 
+  const filteredCategories = !account ? {} : filterCategories(INDIVIDUAL_CATEGORIES, account);
   return (
     <React.Fragment>
       <Collapsible open={open} onOpenChange={setOpen}>
@@ -354,21 +493,42 @@ export const WelcomeIndividual = ({ open, setOpen }) => {
                   id="Welcome.Organization.Description"
                 />
               </CardDescription>
+              <CardAction>
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={() => setOpen(false)}
+                  aria-label={intl.formatMessage({
+                    defaultMessage: 'Hide setup guide',
+                    id: 'SetupGuide.HideSetupGuide',
+                  })}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </CardAction>
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <WelcomeCategoryButton
-                {...INDIVIDUAL_CATEGORIES.submitExpense}
-                onClick={() => setIsExpenseFlowOpen(true)}
-              />
-              <WelcomeCategoryButton {...INDIVIDUAL_CATEGORIES.contribute} onClick={() => router.push('/search')} />
-              <WelcomeCategoryButton
-                {...INDIVIDUAL_CATEGORIES.createOrg}
-                onClick={() => router.push('/signup/organization')}
-              />
-              <WelcomeCategoryButton
-                {...INDIVIDUAL_CATEGORIES.createCollective}
-                onClick={() => router.push('/create')}
-              />
+              {filteredCategories.submitExpense && (
+                <WelcomeCategoryButton
+                  {...filteredCategories.submitExpense}
+                  onClick={() => setIsExpenseFlowOpen(true)}
+                />
+              )}
+              {filteredCategories.contribute && (
+                <WelcomeCategoryButton {...filteredCategories.contribute} onClick={() => router.push('/search')} />
+              )}
+              {filteredCategories.createOrg && (
+                <WelcomeCategoryButton
+                  {...filteredCategories.createOrg}
+                  onClick={() => router.push('/signup/organization')}
+                />
+              )}
+              {filteredCategories.createCollective && (
+                <WelcomeCategoryButton
+                  {...filteredCategories.createCollective}
+                  onClick={() => router.push('/create')}
+                />
+              )}
             </CardContent>
           </Card>
         </CollapsibleContent>

@@ -60,7 +60,7 @@ export type ContainerProps = FlexboxProps &
 const FILTERED_PROPS = new Set(['display', 'width', 'height', 'overflow']);
 
 const Container = styled.div.withConfig({
-  shouldForwardProp: prop => defaultShouldForwardProp(prop) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
 })<ContainerProps>`
   box-sizing: border-box;
 

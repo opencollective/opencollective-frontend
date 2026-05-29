@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import { VirtualCardLimitInterval, VirtualCardStatus } from '../graphql/types/v2/schema';
+import { VirtualCardLimitInterval, VirtualCardStatus } from '../graphql/types/v2/graphql';
 
 export const VirtualCardLimitIntervalDescriptionsI18n = defineMessages({
   [VirtualCardLimitInterval.ALL_TIME]: {

@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { addAuthTokenToHeader } from '../../../../lib/api';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { gql } from '../../../../lib/graphql/helpers';
+import { getApiUrl } from '@/lib/utils';
 
 import ConfirmationModal from '../../../ConfirmationModal';
 import { Box } from '../../../Grid';
@@ -75,7 +76,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }: Scheduled
   const handlePayBatch = async () => {
     const expenseIds = scheduledExpenses.data.expenses.nodes.map(e => e.id);
     try {
-      await request(`${process.env.API_URL}/services/transferwise/pay-batch`, {
+      await request(`${getApiUrl()}/services/transferwise/pay-batch`, {
         method: 'POST',
         body: JSON.stringify({ expenseIds, hostId: scheduledExpenses.data.host.id }),
         headers: addAuthTokenToHeader(),

@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { omit, pick } from 'lodash';
+import { omit, pick } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -12,16 +12,14 @@ import { formatErrorMessage, i18nGraphqlException } from '@/lib/errors';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { cn } from '@/lib/utils';
 
-import I18nFormatters from '@/components/I18nFormatters';
+import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
 import Image from '@/components/Image';
 import { Card, CardContent } from '@/components/ui/Card';
 
 import { EditAvatar } from '../Avatar';
-import Captcha, { isCaptchaEnabled } from '../Captcha';
+import Captcha, { isCaptchaEnabled, resetCaptcha } from '../Captcha';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
-import type { LinkProps } from '../Link';
-import Link from '../Link';
 import { PasswordInput } from '../PasswordInput';
 import { PasswordStrengthBar } from '../PasswordStrengthBar';
 import { Button } from '../ui/Button';
@@ -31,19 +29,15 @@ import { useToast } from '../ui/useToast';
 import type { SignupStepProps } from './common';
 import { SignupSteps } from './common';
 
-const makeLink = (props: Omit<LinkProps, 'children'>) => (children: React.ReactNode) => (
-  <Link {...props}>{children}</Link>
-);
-
 const emailVerificationFormSchema = z.union([
   z.object({
-    email: z.string().email().min(5).max(64),
+    email: z.string().email().min(5).max(128),
     captcha: isCaptchaEnabled()
       ? z.object({ token: z.string().nonempty(), provider: z.string().nonempty() })
       : z.undefined(),
   }),
   z.object({
-    email: z.string().email().min(5).max(64),
+    email: z.string().email().min(5).max(128),
     otp: z.string().min(6).max(6).toUpperCase(),
   }),
 ]);
@@ -94,7 +88,7 @@ const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
   );
 };
 
-export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow }: SignupStepProps) {
+export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: SignupStepProps) {
   const router = useRouter();
   const intl = useIntl();
   const { toast } = useToast();
@@ -113,7 +107,12 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
             session: response.sessionId,
           });
         } else {
-          toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
+          resetCaptcha();
+          const message =
+            formatErrorMessage(intl, response.error) ||
+            response.error?.message ||
+            'An error occurred while signing up, please try again.';
+          toast({ variant: 'error', message });
         }
       } else if (step === SignupSteps.VERIFY_OTP) {
         const sessionId = router.query?.session as string;
@@ -188,18 +187,18 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
             ) : (
               <React.Fragment>
                 <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
-                  {includeOrganizationFlow ? (
+                  {nextActionFlow ? (
                     <FormattedMessage defaultMessage="Create your personal account" id="OkoBON" />
                   ) : (
                     <FormattedMessage defaultMessage="Create your account" id="signup.individual.title" />
                   )}
                 </h1>
                 <p className="text-sm break-words text-slate-700 sm:text-base">
-                  {includeOrganizationFlow ? (
+                  {nextActionFlow ? (
                     <FormattedMessage
-                      defaultMessage="You need a personal account to create an organization. {newLine}Sign in or create one to continue."
+                      defaultMessage="You need a personal account to create {type, select, organization {an organization} other {a collective}}. {newLine}Sign in or create one to continue."
                       id="signup.individual.orgFlow.description"
-                      values={I18nFormatters}
+                      values={{ ...I18nFormatters, type: nextActionFlow }}
                     />
                   ) : (
                     <FormattedMessage
@@ -297,7 +296,7 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
                     defaultMessage="Already have an account? <SignInLink>Sign in</SignInLink>"
                     id="signup.alreadyHaveAccount"
                     values={{
-                      SignInLink: makeLink({
+                      SignInLink: getI18nLink({
                         href: '/signin',
                         className: 'text-primary hover:underline',
                       }),
@@ -311,12 +310,12 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
                       id="signup.individual.tosAgreement"
                       values={{
                         ...I18nFormatters,
-                        TOSLink: makeLink({
+                        TOSLink: getI18nLink({
                           href: '/tos',
                           openInNewTab: true,
                           className: 'underline',
                         }),
-                        PrivacyPolicyLink: makeLink({
+                        PrivacyPolicyLink: getI18nLink({
                           href: '/privacypolicy',
                           openInNewTab: true,
                           className: 'underline',
@@ -408,7 +407,6 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
         nextStep();
       } catch (e) {
         setLoading(false);
-        toast({ variant: 'error', title: 'Error', message: e.message });
         toast({
           variant: 'error',
           title: <FormattedMessage id="signup.completeProfile.error" defaultMessage="Error completing profile" />,
@@ -425,6 +423,9 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
     }
     if (data?.me && !formikRef.current?.values?.id) {
       formikRef.current?.setFieldValue('id', data.me.id);
+      if (!formikRef.current?.values?.name && data.me.name) {
+        formikRef.current?.setFieldValue('name', data.me.name);
+      }
     }
   }, [data, LoggedInUser, refetchMe]);
 

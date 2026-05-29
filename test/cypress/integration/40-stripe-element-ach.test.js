@@ -7,9 +7,9 @@ function contributeWithNewUsBankAccount({ name } = {}) {
   cy.getStripePaymentElement().within(() => {
     cy.get('#us_bank_account-tab').click();
     if (name) {
-      cy.get('#Field-nameInput').type(name);
+      cy.get('#payment-nameInput').type(name);
     }
-    cy.contains('Test Institution').click();
+    cy.contains('Test (Non-OAuth)').click();
   });
   cy.wait(2000);
 

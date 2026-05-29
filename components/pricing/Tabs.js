@@ -51,7 +51,7 @@ const Tabs = ({ activeTab }) => (
     </Link>
     <Link href="#fiscalHost">
       <Tab active={activeTab === 'fiscalHost'}>
-        <FormattedMessage id="pricing.forFiscalHost" defaultMessage="For fiscal hosts" />
+        <FormattedMessage defaultMessage="For Organizations" id="X7kjxh" />
       </Tab>
     </Link>
     <Link href="#faq">

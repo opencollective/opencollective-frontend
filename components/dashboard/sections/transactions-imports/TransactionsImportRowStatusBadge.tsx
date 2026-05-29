@@ -1,8 +1,8 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
-import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
+import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
+import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 
 import { Badge } from '../../../ui/Badge';
