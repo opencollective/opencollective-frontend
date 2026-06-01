@@ -64,6 +64,11 @@ const updateOrderMutation = gql`
         value
         currency
       }
+      totalAmount {
+        value
+        valueInCents
+        currency
+      }
       platformTipAmount {
         value
         valueInCents
