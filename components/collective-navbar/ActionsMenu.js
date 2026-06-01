@@ -24,6 +24,7 @@ import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
+import { SubmitExpenseLink } from '../SubmitExpenseBtn';
 import { Span } from '../Text';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
@@ -212,12 +213,17 @@ const CollectiveNavbarActionsMenu = ({
                   <Box as="ul" p={0} m={0} minWidth={184}>
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink onClick={onOpenSubmitExpenseModalClick}>
+                        <SubmitExpenseLink
+                          collective={collective}
+                          LoggedInUser={LoggedInUser}
+                          onOpenSubmitExpenseModalClick={onOpenSubmitExpenseModalClick}
+                          linkComponent={StyledLink}
+                        >
                           <Container p={ITEM_PADDING}>
                             <Receipt size="20px" />
                             <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
                           </Container>
-                        </StyledLink>
+                        </SubmitExpenseLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
