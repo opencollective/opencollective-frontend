@@ -213,7 +213,8 @@ describe('Recurring contributions: update platform tip', () => {
         // Details step: pick monthly, keep the default 15% platform tip
         cy.get('#interval > :nth-child(2)').click();
         cy.contains('Your info').click();
-        // Profile step: keep the preselected personal profile
+        // Profile step: keep the preselected personal profile, fill the required legal name
+        cy.getByDataCy('input-legalName').type('Test Legal Name');
         cy.get('button[data-cy="cf-next-step"]').click();
         // Payment step: pay with a new card
         cy.contains('New payment method').click();
