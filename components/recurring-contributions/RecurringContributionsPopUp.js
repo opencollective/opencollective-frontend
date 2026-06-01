@@ -23,7 +23,7 @@ import { P, Span } from '../Text';
 import { useToast } from '../ui/useToast';
 import { withUser } from '../UserProvider';
 
-import UpdateOrderPopUp from './UpdateOrderPopUp';
+import UpdateOrderPopUp, { UpdatePlatformTipPopUp } from './UpdateOrderPopUp';
 import UpdatePaymentMethodPopUp from './UpdatePaymentMethodPopUp';
 
 //  Styled components
@@ -97,7 +97,9 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
       status === ORDER_STATUS.NEW);
   const cancelMenu = menuState === 'cancelMenu';
   const updateOrderMenu = menuState === 'updateOrderMenu';
+  const updatePlatformTipMenu = menuState === 'updatePlatformTipMenu';
   const paymentMethodMenu = menuState === 'paymentMethodMenu';
+  const canUpdatePlatformTip = Boolean(contribution.platformTipEligible);
 
   return (
     <PopUpMenu data-cy="recurring-contribution-menu">
@@ -149,10 +151,31 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             </Flex>
             <Flex flexGrow={1}>
               <P fontSize="14px" fontWeight="400">
-                <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
+                <FormattedMessage defaultMessage="Update contribution amount" id="HpWk9J" />
               </P>
             </Flex>
           </MenuItem>
+          {canUpdatePlatformTip && (
+            <MenuItem
+              flexGrow={1 / 4}
+              width={1}
+              alignItems="center"
+              justifyContent="space-between"
+              onClick={() => {
+                setMenuState('updatePlatformTipMenu');
+              }}
+              data-cy="recurring-contribution-menu-platform-tip-option"
+            >
+              <Flex width={1 / 6}>
+                <Dollar size={20} />
+              </Flex>
+              <Flex flexGrow={1}>
+                <P fontSize="14px" fontWeight="400">
+                  <FormattedMessage defaultMessage="Update platform tip amount" id="rU2A5H" />
+                </P>
+              </Flex>
+            </MenuItem>
+          )}
           <MenuItem
             flexGrow={1 / 4}
             width={1}
@@ -286,6 +309,12 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
       {updateOrderMenu && (
         <MenuSection data-cy="recurring-contribution-order-menu">
           <UpdateOrderPopUp setMenuState={setMenuState} contribution={contribution} onCloseEdit={onCloseEdit} />
+        </MenuSection>
+      )}
+
+      {updatePlatformTipMenu && (
+        <MenuSection data-cy="recurring-contribution-platform-tip-menu">
+          <UpdatePlatformTipPopUp contribution={contribution} onCloseEdit={onCloseEdit} />
         </MenuSection>
       )}
     </PopUpMenu>

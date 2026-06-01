@@ -158,7 +158,9 @@ export const managedOrderFragment = gql`
     platformTipAmount {
       value
       valueInCents
+      currency
     }
+    platformTipEligible
     paymentProcessorFee {
       valueInCents
       currency
