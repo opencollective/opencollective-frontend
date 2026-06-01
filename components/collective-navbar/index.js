@@ -37,6 +37,7 @@ import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { fadeIn } from '../StyledKeyframes';
+import SubmitExpenseBtn from '../SubmitExpenseBtn';
 import { Span } from '../Text';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
@@ -310,9 +311,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, i
     hasContact: !isAdmin && (isHostAdmin || isFeatureAvailable(collective, 'CONTACT_FORM')),
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
     hasSubmitExpense:
-      Boolean(LoggedInUser) &&
-      isFeatureAvailable(collective, 'RECEIVE_EXPENSES') &&
-      expenseSubmissionAllowed(collective, LoggedInUser),
+      isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
     hasManageSubscriptions:
       isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE' && isIndividualAccount(collective),
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
@@ -368,12 +367,28 @@ const getMainAction = (collective, callsToAction, LoggedInUser, onOpenSubmitExpe
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
-        <ActionButton tabIndex="-1" onClick={onOpenSubmitExpenseModalClick} data-cy="submit-expense-button">
-          <Receipt size="1em" />
-          <Span ml={2}>
-            <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-          </Span>
-        </ActionButton>
+        <SubmitExpenseBtn
+          collective={collective}
+          LoggedInUser={LoggedInUser}
+          onOpenSubmitExpenseModalClick={onOpenSubmitExpenseModalClick}
+        >
+          {btnProps => {
+            const button = (
+              <ActionButton
+                tabIndex="-1"
+                {...(btnProps.onClick ? { onClick: btnProps.onClick } : {})}
+                data-cy="submit-expense-button"
+              >
+                <Receipt size="1em" />
+                <Span ml={2}>
+                  <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+                </Span>
+              </ActionButton>
+            );
+
+            return btnProps.href ? <Link href={btnProps.href}>{button}</Link> : button;
+          }}
+        </SubmitExpenseBtn>
       ),
     };
   } else if (callsToAction.includes('hasManageSubscriptions')) {
