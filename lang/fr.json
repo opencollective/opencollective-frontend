@@ -1622,6 +1622,7 @@
   "Expense.Activity.MarkedAsSpam": "Dépense marquée comme spam",
   "Expense.Activity.MarkedAsUnpaid": "Dépense marquée comme impayée",
   "Expense.Activity.Paid": "Dépense payée",
+  "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "Dépense en cours de traitement",
   "Expense.Activity.PutOnHold": "La dépense a été mise en attente",
   "Expense.Activity.ReApprovalRequested": "Ré-approbation demandée",

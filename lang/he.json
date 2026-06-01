@@ -1622,6 +1622,7 @@
   "Expense.Activity.MarkedAsSpam": "הוצאה סומנה כספאם",
   "Expense.Activity.MarkedAsUnpaid": "ההוצאה סומנה שלא שולמה",
   "Expense.Activity.Paid": "ההוצאה שולמה",
+  "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "ההוצאה מעובדת",
   "Expense.Activity.PutOnHold": "Expense was put on hold",
   "Expense.Activity.ReApprovalRequested": "Re-approval requested",

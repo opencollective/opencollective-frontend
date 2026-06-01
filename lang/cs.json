@@ -1622,6 +1622,7 @@
   "Expense.Activity.MarkedAsSpam": "Expense marked as spam",
   "Expense.Activity.MarkedAsUnpaid": "Výdaj označen jako nezaplacený",
   "Expense.Activity.Paid": "Výdaj uhrazen",
+  "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "Výdaj se zpracovává",
   "Expense.Activity.PutOnHold": "Expense was put on hold",
   "Expense.Activity.ReApprovalRequested": "Re-approval requested",
