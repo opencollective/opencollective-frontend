@@ -1622,6 +1622,7 @@
   "Expense.Activity.MarkedAsSpam": "支出标记为垃圾邮件",
   "Expense.Activity.MarkedAsUnpaid": "支出标记为未支付",
   "Expense.Activity.Paid": "已付支出",
+  "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "支出处理中",
   "Expense.Activity.PutOnHold": "支出标记为已暂停",
   "Expense.Activity.ReApprovalRequested": "申请重新批准",
