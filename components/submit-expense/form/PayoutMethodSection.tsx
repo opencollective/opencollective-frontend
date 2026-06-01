@@ -63,6 +63,7 @@ function getFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
+    ...pick(form.startOptions, ['isInlineEdit']),
     ...pick(form.options, [
       'account',
       'host',
@@ -134,13 +135,20 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       setLastUsedPayoutMethod(null);
     }
 
-    if (!props.payoutMethodId && lastUsed) {
-      setFieldValue('payoutMethodId', lastUsed?.id);
-    } else if (
-      props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
-      (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
-    ) {
-      setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
+    const expensePayoutMethodId = props.expense?.payoutMethod?.id;
+    const isEditingExistingExpensePayoutMethod =
+      expensePayoutMethodId &&
+      (props.payeeSlug === props.expense?.payee?.slug || (props.isInlineEdit && !props.payeeSlug));
+
+    if (!isEditingExistingExpensePayoutMethod) {
+      if (!props.payoutMethodId && lastUsed) {
+        setFieldValue('payoutMethodId', lastUsed?.id);
+      } else if (
+        props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
+        (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
+      ) {
+        setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
+      }
     }
 
     if (!props.initialLoading) {
@@ -148,8 +156,11 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     }
   }, [
     props.initialLoading,
+    props.isInlineEdit,
     props.payeeSlug,
     props.recentlySubmittedExpenses,
+    props.expense?.payee?.slug,
+    props.expense?.payoutMethod?.id,
     setFieldValue,
     props.payoutMethodId,
     props.payoutMethods,
