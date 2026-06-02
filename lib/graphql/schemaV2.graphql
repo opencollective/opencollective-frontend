@@ -2625,9 +2625,14 @@ type TaxInfo {
   rate: Float!
 
   """
-  Tax ID number of the 3rd party receiving/paying the tax
+  Tax ID number of the 3rd party receiving/paying the tax. Will be null if not allowed to see it.
   """
   idNumber: String
+
+  """
+  Whether the tax ID number is available. Contrary to `idNumber`, this field is public.
+  """
+  hasTaxIdNumber: Boolean!
 }
 
 """
@@ -6036,6 +6041,7 @@ enum ActivityType {
   USER_CREATED
   USER_NEW_TOKEN
   USER_SIGNIN
+  USER_NEW_PASSWORD_SIGNIN
   USER_RESET_PASSWORD
   USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
@@ -7481,7 +7487,6 @@ type CollectiveFeatures {
   PAYPAL_CONNECT: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
   ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
-  HOST_METRICS: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
@@ -8173,51 +8178,81 @@ type HostMetrics {
   Amount collected in host fees for given period
   """
   hostFees: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount collected in platform fees for given period
   """
   platformFees: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount collected in platform fees requiring settlement
   """
   pendingPlatformFees: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount collected in platform tips for given period
   """
   platformTips: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount collected in platform tips requiring settlement
   """
   pendingPlatformTips: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount in host fee shared with the platform
   """
   hostFeeShare: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount in host fee shared  requiring settlement
   """
   pendingHostFeeShare: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount in host fee shared not requiring settlement
   """
   settledHostFeeShare: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Total amount managed on behalf of hosted collectives
   """
   totalMoneyManaged: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Host fee sharing percent
   """
   hostFeeSharePercent: Float
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 }
 
 """
@@ -8243,6 +8278,9 @@ type HostMetricsTimeSeries {
   History of the collected platform tips
   """
   platformTips: TimeSeriesAmount!
+    @deprecated(
+      reason: "2026-05-15: Unused by the frontend; the platform-tips ledger is now opt-in per host (NEW_PLATFORM_TIPS_LEDGER) and this aggregated series is no longer maintained. Always returns an empty series."
+    )
 
   """
   History of the host fees collected
@@ -21344,6 +21382,7 @@ enum ActivityAndClassesType {
   USER_CREATED
   USER_NEW_TOKEN
   USER_SIGNIN
+  USER_NEW_PASSWORD_SIGNIN
   USER_RESET_PASSWORD
   USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
@@ -25670,9 +25709,14 @@ type Mutation {
     tier: TierReferenceInput
 
     """
-    An Amount to update the order to
+    New amount to charge the contributor, excluding the platform tip. Includes taxes if any.
     """
     amount: AmountInput
+
+    """
+    Platform tip for this order. Omit or pass null to keep the current tip; provide a value (including zero) to update it.
+    """
+    platformTipAmount: AmountInput
   ): Order
 
   """
