@@ -326,7 +326,7 @@ const CreateCollectiveMiniForm = ({
           vendor: {
             name: formValues.name,
             legalName: formValues.legalName || undefined,
-            visibleToAccounts: vendorVisibleToAccountIds.map(legacyId => ({ legacyId })),
+            canBeUsedWithAccounts: vendorVisibleToAccountIds.map(legacyId => ({ legacyId })),
           },
         },
       }).then(({ data }) => onSuccess(data.createVendor));

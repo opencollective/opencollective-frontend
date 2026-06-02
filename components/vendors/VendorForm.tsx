@@ -222,22 +222,22 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
     );
 
     if (props.limitVisibilityOptionToAccount && values.accountVisibility === 'limit-visibility') {
-      data.visibleToAccounts = [
+      data.canBeUsedWithAccounts = [
         {
           slug: props.limitVisibilityOptionToAccount.slug,
         },
       ];
     } else if (!props.limitVisibilityOptionToAccount) {
       if (values.whereScope === 'host-only') {
-        data.visibleToAccounts = [{ slug: host.slug }];
+        data.canBeUsedWithAccounts = [{ slug: host.slug }];
       } else if (values.whereScope === 'specific') {
-        data.visibleToAccounts = (values.visibleToAccounts ?? []).map(acc => ({ slug: acc.slug }));
+        data.canBeUsedWithAccounts = (values.canBeUsedWithAccounts ?? []).map(acc => ({ slug: acc.slug }));
       } else {
-        data.visibleToAccounts = [];
+        data.canBeUsedWithAccounts = [];
       }
       data.useVendorPolicy = values.useVendorPolicy ?? null;
     } else {
-      data.visibleToAccounts = (values.visibleToAccounts ?? []).map(acc => ({
+      data.canBeUsedWithAccounts = (values.canBeUsedWithAccounts ?? []).map(acc => ({
         slug: acc.slug,
       }));
     }
@@ -288,8 +288,8 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
   if (vendor?.payoutMethods?.length > 0) {
     initialValues['payoutMethod'] = vendor.payoutMethods[0];
   }
-  if (vendor?.visibleToAccounts?.length > 0) {
-    initialValues['visibleToAccounts'] = vendor.visibleToAccounts;
+  if (vendor?.canBeUsedWithAccounts?.length > 0) {
+    initialValues['canBeUsedWithAccounts'] = vendor.canBeUsedWithAccounts;
   }
 
   if (props.limitVisibilityOptionToAccount) {
@@ -297,10 +297,10 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
   }
 
   if (!props.limitVisibilityOptionToAccount) {
-    const visible = vendor?.visibleToAccounts ?? [];
+    const visible = vendor?.canBeUsedWithAccounts ?? [];
     if (visible.length === 1 && host?.slug && visible[0].slug === host.slug) {
       initialValues['whereScope'] = 'host-only';
-      initialValues['visibleToAccounts'] = [];
+      initialValues['canBeUsedWithAccounts'] = [];
     } else if (visible.length > 0) {
       initialValues['whereScope'] = 'specific';
     } else {
@@ -448,15 +448,17 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                     {formik.values.whereScope === 'specific' && (
                       <div className="mt-2 ml-6">
                         <CollectivePickerAsync
-                          inputId="visibleToAccountsInput"
+                          inputId="canBeUsedWithAccountsInput"
                           isMulti
-                          collective={formik.values.visibleToAccounts}
+                          collective={formik.values.canBeUsedWithAccounts}
                           hostCollectiveIds={host?.legacyId}
                           filterResults={results =>
-                            results.filter(r => !(formik.values.visibleToAccounts ?? []).some(v => v.slug === r.slug))
+                            results.filter(
+                              r => !(formik.values.canBeUsedWithAccounts ?? []).some(v => v.slug === r.slug),
+                            )
                           }
                           onChange={selection => {
-                            formik.setFieldValue('visibleToAccounts', [...(selection ?? []).map(sel => sel.value)]);
+                            formik.setFieldValue('canBeUsedWithAccounts', [...(selection ?? []).map(sel => sel.value)]);
                           }}
                         />
                       </div>

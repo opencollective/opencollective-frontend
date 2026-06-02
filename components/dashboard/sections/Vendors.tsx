@@ -231,11 +231,11 @@ const getColumns = ({ isVendor, host }) => {
     },
     isVendor && {
       header: () => <FormattedMessage defaultMessage="Visible to" id="zJePa1" />,
-      accessorKey: 'visibleToAccounts',
+      accessorKey: 'canBeUsedWithAccounts',
       cell: ({ cell }) => {
-        const visibleToAccounts = cell.getValue();
+        const canBeUsedWithAccounts = cell.getValue();
 
-        if (!visibleToAccounts?.length) {
+        if (!canBeUsedWithAccounts?.length) {
           return (
             <span className="text-muted-foreground">
               <FormattedMessage defaultMessage="All hosted accounts" id="M7USSD" />
@@ -245,7 +245,7 @@ const getColumns = ({ isVendor, host }) => {
 
         return (
           <StackedAvatars
-            accounts={visibleToAccounts}
+            accounts={canBeUsedWithAccounts}
             imageSize={24}
             withHoverCard={{ includeAdminMembership: true }}
           />

@@ -506,7 +506,7 @@ const AddFundsModalContentWithCollective = ({
 
   const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({
     host,
-    visibleToAccounts: collective?.slug ? [{ slug: collective.slug }] : [],
+    canBeUsedWithAccounts: collective?.slug ? [{ slug: collective.slug }] : [],
   });
 
   const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
