@@ -205,6 +205,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
           setAgreementInDrawer(updatedAgreement);
           setIsEditingAgreement(false);
         }}
+        onCancelEdit={() => setIsEditingAgreement(false)}
         onDelete={() => {
           setAgreementDrawerOpen(false);
           setIsEditingAgreement(false);
