@@ -74,36 +74,38 @@ function setupHostAndCollective(
 
 describe('vendor visibility', () => {
   describe('vendor picker on expense submission', () => {
-    it('shows the usable vendor and hides one scoped to a different collective in the same picker', function () {
-      setupHostAndCollective().then(({ host, hostAdmin, collective }) => {
-        cy.createCollectiveV2({
-          email: hostAdmin.email,
-          skipApproval: true,
-          host: { slug: host.slug },
-          collective: { name: 'Other Collective' },
-        }).then(otherCollective => {
-          const usableName = NEW_VENDOR_NAME('usable-here');
-          const nonApplicableName = NEW_VENDOR_NAME('scoped-elsewhere');
-          cy.createVendor(
-            host.slug,
-            { name: usableName, canBeUsedWithAccounts: [{ slug: collective.slug }] },
-            hostAdmin.email,
-          );
-          cy.createVendor(
-            host.slug,
-            { name: nonApplicableName, canBeUsedWithAccounts: [{ slug: otherCollective.slug }] },
-            hostAdmin.email,
-          );
+    it('non-admin: shows the usable vendor and hides one scoped to a different collective in the same picker', function () {
+      setupHostAndCollective({ policy: 'HOST_AND_COLLECTIVE_ADMINS' }).then(
+        ({ host, hostAdmin, collective, collectiveAdmin }) => {
+          cy.createCollectiveV2({
+            email: hostAdmin.email,
+            skipApproval: true,
+            host: { slug: host.slug },
+            collective: { name: 'Other Collective' },
+          }).then(otherCollective => {
+            const usableName = NEW_VENDOR_NAME('usable-here');
+            const nonApplicableName = NEW_VENDOR_NAME('scoped-elsewhere');
+            cy.createVendor(
+              host.slug,
+              { name: usableName, canBeUsedWithAccounts: [{ slug: collective.slug }] },
+              hostAdmin.email,
+            );
+            cy.createVendor(
+              host.slug,
+              { name: nonApplicableName, canBeUsedWithAccounts: [{ slug: otherCollective.slug }] },
+              hostAdmin.email,
+            );
 
-          cy.login({ email: hostAdmin.email, redirect: `/${collective.slug}/expenses/new` });
-          cy.get('#WHO_IS_GETTING_PAID').within(() => {
-            cy.contains('A vendor').click();
-            cy.get('[role="combobox"]').first().click();
+            cy.login({ email: collectiveAdmin.email, redirect: `/${collective.slug}/expenses/new` });
+            cy.get('#WHO_IS_GETTING_PAID').within(() => {
+              cy.contains('A vendor').click();
+              cy.get('[role="combobox"]').first().click();
+            });
+            cy.root().closest('html').contains(usableName).should('exist');
+            cy.root().closest('html').contains(nonApplicableName).should('not.exist');
           });
-          cy.root().closest('html').contains(usableName).should('exist');
-          cy.root().closest('html').contains(nonApplicableName).should('not.exist');
-        });
-      });
+        },
+      );
     });
 
     it('shows a vendor that can be used on any hosted collective', function () {
@@ -127,9 +129,38 @@ describe('vendor visibility', () => {
       });
     });
 
-    it('show host scoped vendor on host expense form, hidden on hosted collective expense', function () {
+    it('non-admin: host-scoped vendor is hidden on a hosted collective expense form', function () {
+      setupHostAndCollective({ policy: 'HOST_AND_COLLECTIVE_ADMINS' }).then(
+        ({ host, hostAdmin, collective, collectiveAdmin }) => {
+          const hostOnlyName = NEW_VENDOR_NAME('host-only');
+          const inScopeName = NEW_VENDOR_NAME('collective-scoped');
+          cy.createVendor(
+            host.slug,
+            { name: hostOnlyName, canBeUsedWithAccounts: [{ slug: host.slug }] },
+            hostAdmin.email,
+          );
+          cy.createVendor(
+            host.slug,
+            { name: inScopeName, canBeUsedWithAccounts: [{ slug: collective.slug }] },
+            hostAdmin.email,
+          ).then(() => {
+            cy.login({ email: collectiveAdmin.email, redirect: `/${collective.slug}/expenses/new` });
+            cy.get('#WHO_IS_GETTING_PAID').within(() => {
+              cy.contains('A vendor').click();
+              cy.get('[role="combobox"]').first().click();
+            });
+            cy.root().closest('html').contains(inScopeName).should('exist');
+            cy.root().closest('html').contains(hostOnlyName).should('not.exist');
+          });
+        },
+      );
+    });
+
+    it('host admin: sees host-scoped vendor on every expense form', function () {
+      // Host admins bypass the WHERE-scope filter, so a vendor scoped to the host shows up on
+      // both the host's own expense form and any hosted collective's expense form.
       setupHostAndCollective().then(({ host, hostAdmin, collective }) => {
-        const name = NEW_VENDOR_NAME('host-only');
+        const name = NEW_VENDOR_NAME('host-only-admin-bypass');
         cy.createVendor(host.slug, { name, canBeUsedWithAccounts: [{ slug: host.slug }] }, hostAdmin.email).then(() => {
           cy.login({ email: hostAdmin.email, redirect: `/${host.slug}/expenses/new` });
           cy.get('#WHO_IS_GETTING_PAID').within(() => {
@@ -143,7 +174,7 @@ describe('vendor visibility', () => {
             cy.contains('A vendor').click();
             cy.get('[role="combobox"]').first().click();
           });
-          cy.root().closest('html').contains(name).should('not.exist');
+          cy.root().closest('html').contains(name).should('exist');
         });
       });
     });
