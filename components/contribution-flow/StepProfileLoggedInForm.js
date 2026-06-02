@@ -18,8 +18,6 @@ import { P, Span } from '../Text';
 import ContributeProfilePicker from './ContributeProfilePicker';
 import { getRequiredInformation } from './utils';
 
-export const NEW_ORGANIZATION_KEY = 'newOrg';
-
 const getProfileInfo = (stepProfile, profiles) => {
   if (stepProfile?.isIncognito) {
     const profileLocation = stepProfile.location || {};

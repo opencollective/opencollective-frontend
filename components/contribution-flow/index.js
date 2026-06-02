@@ -8,7 +8,6 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
-import { isURL } from 'validator';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
@@ -25,7 +24,6 @@ import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled, isOpenSourceCollectiveHost } from '../../lib/experiments/experiments';
 import { gql } from '../../lib/graphql/helpers';
 import { AccountType } from '../../lib/graphql/types/v2/graphql';
-import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
@@ -62,7 +60,6 @@ import {
 import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
-import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import {
   getGQLV2AmountInput,
   getGuestInfoFromStepProfile,
@@ -113,16 +110,6 @@ const OTHER_MESSAGES = defineMessages({
   },
 });
 
-const validateNewOrg = values => {
-  if (!values.name) {
-    return false;
-  } else if (values.website && !isURL(values.website)) {
-    return false;
-  }
-
-  return true;
-};
-
 class ContributionFlow extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
@@ -152,7 +139,6 @@ class ContributionFlow extends React.Component {
     refetchLoggedInUser: PropTypes.func,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
-    createCollective: PropTypes.func.isRequired, // from v1 mutation (used for new org creation)
     createIncognitoProfile: PropTypes.func.isRequired, // from mutation
     router: PropTypes.object,
     onStepChange: PropTypes.func,
@@ -607,26 +593,12 @@ class ContributionFlow extends React.Component {
     }
 
     // Check if we're creating a new profile
-    if (stepProfile.id === 'incognito' || stepProfile.id === NEW_ORGANIZATION_KEY) {
-      if (stepProfile.type === 'ORGANIZATION' && !validateNewOrg(stepProfile)) {
-        return false;
-      }
-
+    if (stepProfile.id === 'incognito') {
       this.setState({ isSubmitting: true });
 
       try {
-        let createdProfile;
-        if (stepProfile.id === 'incognito') {
-          const { data: result } = await this.props.createIncognitoProfile();
-          createdProfile = result.createIncognitoProfile;
-        } else {
-          const collectiveData = {
-            ...stepProfile,
-            type: stepProfile.type === 'INDIVIDUAL' ? 'USER' : stepProfile.type,
-          };
-          const { data: result } = await this.props.createCollective(collectiveData);
-          createdProfile = result.createCollective;
-        }
+        const { data: result } = await this.props.createIncognitoProfile();
+        const createdProfile = result.createIncognitoProfile;
         await this.props.refetchLoggedInUser();
         this.setState({ stepProfile: createdProfile, isSubmitting: false });
       } catch (error) {
@@ -1145,10 +1117,6 @@ const addConfirmOrderMutation = graphql(
 
 export default injectIntl(
   withUser(
-    addConfirmOrderMutation(
-      addCreateOrderMutation(
-        addCreateIncognitoProfileMutation(addCreateCollectiveMutation(withRouter(ContributionFlow))),
-      ),
-    ),
+    addConfirmOrderMutation(addCreateOrderMutation(addCreateIncognitoProfileMutation(withRouter(ContributionFlow)))),
   ),
 );
