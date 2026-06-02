@@ -413,7 +413,7 @@ const VendorOption = React.memo(function VendorOption(props: {
   const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
   const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({
     host: props.host,
-    visibleToAccounts: props.account?.id ? [pick(props.account, 'id')] : [],
+    canBeUsedWithAccounts: props.account?.id ? [pick(props.account, 'id')] : [],
     isBeneficiary,
   });
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected

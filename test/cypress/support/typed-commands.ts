@@ -131,7 +131,7 @@ function createVendor(
   vendor: {
     name: string;
     payoutMethod?: unknown;
-    visibleToAccounts?: AccountReferenceInput[];
+    canBeUsedWithAccounts?: AccountReferenceInput[];
     useVendorPolicy?: UseVendorPolicy | `${UseVendorPolicy}`;
   },
   userEmail: string,
@@ -148,7 +148,7 @@ function createVendor(
             slug
             hasPayoutMethod
             useVendorPolicy
-            visibleToAccounts {
+            canBeUsedWithAccounts {
               id
               legacyId
               slug

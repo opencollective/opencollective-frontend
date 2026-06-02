@@ -44,7 +44,7 @@ const hostCreateExpenseModalPayeeSelectQuery = gql`
   query HostCreateExpenseModalPayeeSelect(
     $hostId: String!
     $forAccount: AccountReferenceInput
-    $visibleToAccounts: [AccountReferenceInput]
+    $canBeUsedWithAccounts: [AccountReferenceInput]
   ) {
     host(id: $hostId) {
       id
@@ -54,7 +54,7 @@ const hostCreateExpenseModalPayeeSelectQuery = gql`
       description
       isHost
       imageUrl(height: 64)
-      vendors(forAccount: $forAccount, visibleToAccounts: $visibleToAccounts) {
+      vendors(forAccount: $forAccount, canBeUsedWithAccounts: $canBeUsedWithAccounts) {
         nodes {
           id
           slug
@@ -81,7 +81,7 @@ const PayeeSelect = ({
     variables: {
       hostId: host.id,
       forAccount: getAccountReferenceInput(forAccount),
-      visibleToAccounts: forAccount?.slug ? [{ slug: forAccount.slug }] : null,
+      canBeUsedWithAccounts: forAccount?.slug ? [{ slug: forAccount.slug }] : null,
     },
   });
   const recommendedVendors = data?.host?.vendors?.nodes || [];

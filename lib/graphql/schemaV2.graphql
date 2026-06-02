@@ -4654,9 +4654,10 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     forAccount: AccountReferenceInput
 
     """
-    Only returns vendors that are visible to the given accounts
+    Only return vendors that can be used with the given accounts
     """
-    visibleToAccounts: [AccountReferenceInput]
+    canBeUsedWithAccounts: [AccountReferenceInput]
+    visibleToAccounts: [AccountReferenceInput] @deprecated(reason: "Use canBeUsedWithAccounts instead.")
 
     """
     Filter on archived vendors
@@ -6400,6 +6401,11 @@ type PayoutMethod {
   type: PayoutMethodType
 
   """
+  The currency of this payout method
+  """
+  currency: Currency
+
+  """
   A friendly name for users to easily find their payout methods
   """
   name: String
@@ -7543,7 +7549,6 @@ type Policies {
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
-  EXPENSE_PUBLIC_VENDORS: Boolean @deprecated(reason: "Use USE_VENDOR_POLICY instead.")
 
   """
   Default rule for who can attribute financial activities to vendors under this host.
@@ -16924,9 +16929,10 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     forAccount: AccountReferenceInput
 
     """
-    Only returns vendors that are visible to the given accounts
+    Only return vendors that can be used with the given accounts
     """
-    visibleToAccounts: [AccountReferenceInput]
+    canBeUsedWithAccounts: [AccountReferenceInput]
+    visibleToAccounts: [AccountReferenceInput] @deprecated(reason: "Use canBeUsedWithAccounts instead.")
 
     """
     Filter on archived vendors
@@ -18388,9 +18394,10 @@ type Vendor implements Account & AccountWithContributions {
   createdByAccount: Account
 
   """
-  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  The accounts this vendor can be used with. If empty, the vendor can be used with any collective under the vendor host.
   """
-  visibleToAccounts: [Account]!
+  canBeUsedWithAccounts: [Account]!
+  visibleToAccounts: [Account]! @deprecated(reason: "Use canBeUsedWithAccounts instead.")
 
   """
   Per-vendor override for who can attribute financial activities to this vendor. Null means inherit from host.
@@ -27075,7 +27082,6 @@ input PoliciesInput {
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
   EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
-  EXPENSE_PUBLIC_VENDORS: Boolean @deprecated(reason: "Use USE_VENDOR_POLICY instead.")
   USE_VENDOR_POLICY: UseVendorPolicy
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
   CONTRIBUTOR_INFO_THRESHOLDS: PoliciesContributorInfoThresholdsInput
@@ -27579,6 +27585,11 @@ input PayoutMethodInput {
   The type of payout method (e.g., PayPal, bank transfer)
   """
   type: PayoutMethodType
+
+  """
+  The currency for this payout method
+  """
+  currency: Currency
 }
 
 input ExpenseItemCreateInput {
@@ -29416,7 +29427,12 @@ input VendorCreateInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
-  visibleToAccounts: [AccountReferenceInput]
+
+  """
+  Restrict this vendor to specific accounts under the host. If empty/omitted, the vendor can be used with any hosted account.
+  """
+  canBeUsedWithAccounts: [AccountReferenceInput]
+  visibleToAccounts: [AccountReferenceInput] @deprecated(reason: "Use canBeUsedWithAccounts instead.")
 
   """
   Per-vendor override for who can attribute financial activities. Null means inherit from host.
@@ -29476,7 +29492,12 @@ input VendorEditInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
-  visibleToAccounts: [AccountReferenceInput]
+
+  """
+  Restrict this vendor to specific accounts under the host. If empty/omitted, the vendor can be used with any hosted account.
+  """
+  canBeUsedWithAccounts: [AccountReferenceInput]
+  visibleToAccounts: [AccountReferenceInput] @deprecated(reason: "Use canBeUsedWithAccounts instead.")
 
   """
   Per-vendor override for who can attribute financial activities. Null means inherit from host.

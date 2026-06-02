@@ -86,12 +86,12 @@ describe('vendor visibility', () => {
           const nonApplicableName = NEW_VENDOR_NAME('scoped-elsewhere');
           cy.createVendor(
             host.slug,
-            { name: usableName, visibleToAccounts: [{ slug: collective.slug }] },
+            { name: usableName, canBeUsedWithAccounts: [{ slug: collective.slug }] },
             hostAdmin.email,
           );
           cy.createVendor(
             host.slug,
-            { name: nonApplicableName, visibleToAccounts: [{ slug: otherCollective.slug }] },
+            { name: nonApplicableName, canBeUsedWithAccounts: [{ slug: otherCollective.slug }] },
             hostAdmin.email,
           );
 
@@ -130,7 +130,7 @@ describe('vendor visibility', () => {
     it('show host scoped vendor on host expense form, hidden on hosted collective expense', function () {
       setupHostAndCollective().then(({ host, hostAdmin, collective }) => {
         const name = NEW_VENDOR_NAME('host-only');
-        cy.createVendor(host.slug, { name, visibleToAccounts: [{ slug: host.slug }] }, hostAdmin.email).then(() => {
+        cy.createVendor(host.slug, { name, canBeUsedWithAccounts: [{ slug: host.slug }] }, hostAdmin.email).then(() => {
           cy.login({ email: hostAdmin.email, redirect: `/${host.slug}/expenses/new` });
           cy.get('#WHO_IS_GETTING_PAID').within(() => {
             cy.contains('A vendor').click();
@@ -152,16 +152,18 @@ describe('vendor visibility', () => {
       setupHostAndCollective().then(({ host, hostAdmin, collective, collectiveAdmin }) => {
         cy.createProject({ userEmail: collectiveAdmin.email, collective: { slug: collective.slug } }).then(project => {
           const name = NEW_VENDOR_NAME('parent-scoped');
-          cy.createVendor(host.slug, { name, visibleToAccounts: [{ slug: collective.slug }] }, hostAdmin.email).then(
-            () => {
-              cy.login({ email: hostAdmin.email, redirect: `/${project.slug}/expenses/new` });
-              cy.get('#WHO_IS_GETTING_PAID').within(() => {
-                cy.contains('A vendor').click();
-                cy.get('[role="combobox"]').first().click();
-              });
-              cy.root().closest('html').contains(name).should('exist');
-            },
-          );
+          cy.createVendor(
+            host.slug,
+            { name, canBeUsedWithAccounts: [{ slug: collective.slug }] },
+            hostAdmin.email,
+          ).then(() => {
+            cy.login({ email: hostAdmin.email, redirect: `/${project.slug}/expenses/new` });
+            cy.get('#WHO_IS_GETTING_PAID').within(() => {
+              cy.contains('A vendor').click();
+              cy.get('[role="combobox"]').first().click();
+            });
+            cy.root().closest('html').contains(name).should('exist');
+          });
         });
       });
     });
@@ -175,12 +177,12 @@ describe('vendor visibility', () => {
               const childScoped = NEW_VENDOR_NAME('child-vendor');
               cy.createVendor(
                 host.slug,
-                { name: parentScoped, visibleToAccounts: [{ slug: collective.slug }] },
+                { name: parentScoped, canBeUsedWithAccounts: [{ slug: collective.slug }] },
                 hostAdmin.email,
               );
               cy.createVendor(
                 host.slug,
-                { name: childScoped, visibleToAccounts: [{ slug: project.slug }] },
+                { name: childScoped, canBeUsedWithAccounts: [{ slug: project.slug }] },
                 hostAdmin.email,
               );
 
@@ -280,12 +282,12 @@ describe('vendor visibility', () => {
             const bName = NEW_VENDOR_NAME('b-vendor');
             cy.createVendor(
               host.slug,
-              { name: aName, visibleToAccounts: [{ slug: collective.slug }] },
+              { name: aName, canBeUsedWithAccounts: [{ slug: collective.slug }] },
               hostAdmin.email,
             );
             cy.createVendor(
               host.slug,
-              { name: bName, visibleToAccounts: [{ slug: otherCollective.slug }] },
+              { name: bName, canBeUsedWithAccounts: [{ slug: otherCollective.slug }] },
               hostAdmin.email,
             );
 
@@ -327,13 +329,13 @@ describe('vendor visibility', () => {
           {
             name: overrideName,
             useVendorPolicy: 'ALL_SUBMITTERS',
-            visibleToAccounts: [{ slug: collective.slug }],
+            canBeUsedWithAccounts: [{ slug: collective.slug }],
           },
           hostAdmin.email,
         );
         cy.createVendor(
           host.slug,
-          { name: restrictedName, visibleToAccounts: [{ slug: collective.slug }] },
+          { name: restrictedName, canBeUsedWithAccounts: [{ slug: collective.slug }] },
           hostAdmin.email,
         );
 
@@ -378,7 +380,7 @@ describe('vendor visibility', () => {
     it('grant beneficiary picker shows a vendor scoped to the paying collective', function () {
       setupHostAndCollective({ enableGrants: true }).then(({ host, hostAdmin, collective }) => {
         const name = NEW_VENDOR_NAME('grant-scoped-here');
-        cy.createVendor(host.slug, { name, visibleToAccounts: [{ slug: collective.slug }] }, hostAdmin.email);
+        cy.createVendor(host.slug, { name, canBeUsedWithAccounts: [{ slug: collective.slug }] }, hostAdmin.email);
         cy.login({ email: hostAdmin.email, redirect: `/${collective.slug}/grants/new` });
         cy.contains('button', 'Proceed').click();
         cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
@@ -397,7 +399,7 @@ describe('vendor visibility', () => {
             host.slug,
             {
               name,
-              visibleToAccounts: [{ slug: collective.slug }],
+              canBeUsedWithAccounts: [{ slug: collective.slug }],
               payoutMethod: { type: 'OTHER', name: 'Bank', data: { content: 'Bank details', currency: 'USD' } },
             },
             hostAdmin.email,
@@ -433,12 +435,12 @@ describe('vendor visibility', () => {
           const elsewhereName = NEW_VENDOR_NAME('add-funds-elsewhere');
           cy.createVendor(
             host.slug,
-            { name: usableName, visibleToAccounts: [{ slug: collective.slug }] },
+            { name: usableName, canBeUsedWithAccounts: [{ slug: collective.slug }] },
             hostAdmin.email,
           );
           cy.createVendor(
             host.slug,
-            { name: elsewhereName, visibleToAccounts: [{ slug: otherCollective.slug }] },
+            { name: elsewhereName, canBeUsedWithAccounts: [{ slug: otherCollective.slug }] },
             hostAdmin.email,
           );
 
@@ -576,7 +578,7 @@ describe('vendor visibility', () => {
           cy.contains('button', 'Edit').click();
 
           cy.get('#whereScope-specific').click();
-          cy.get('#visibleToAccountsInput').type(collective.name);
+          cy.get('#canBeUsedWithAccountsInput').type(collective.name);
           cy.root().closest('html').contains('[role="option"]', collective.name).click();
           // eslint-disable-next-line cypress/no-unnecessary-waiting
           cy.wait(150);

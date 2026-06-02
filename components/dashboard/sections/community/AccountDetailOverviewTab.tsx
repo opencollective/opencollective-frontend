@@ -209,9 +209,9 @@ export const AccountDetailsOverviewTab = ({
                 <DataListItem
                   label={<FormattedMessage defaultMessage="Visible to" id="zJePa1" />}
                   value={
-                    'visibleToAccounts' in account && account.visibleToAccounts.length > 0 ? (
+                    'canBeUsedWithAccounts' in account && account.canBeUsedWithAccounts.length > 0 ? (
                       <StackedAvatars
-                        accounts={account.visibleToAccounts}
+                        accounts={account.canBeUsedWithAccounts}
                         imageSize={24}
                         withHoverCard={{ includeAdminMembership: true }}
                       />

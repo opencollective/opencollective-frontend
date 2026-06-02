@@ -217,12 +217,12 @@ const expenseFormSchemaQuery = gql`
 
       ... on AccountWithHost {
         host {
-          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
+          vendorsForAccount: vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
+          vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -230,12 +230,12 @@ const expenseFormSchemaQuery = gql`
 
       ... on Organization {
         host {
-          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
+          vendorsForAccount: vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
+          vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -478,7 +478,7 @@ const expenseFormSchemaQuery = gql`
     payoutMethods {
       ...ExpenseFormPayoutMethods
     }
-    visibleToAccounts {
+    canBeUsedWithAccounts {
       id
       legacyId
       slug
