@@ -637,6 +637,7 @@ const searchPageQuery = gql`
           }
         }
         ... on Organization {
+          hasHosting
           host {
             id
             hostFeePercent

@@ -12,6 +12,18 @@ import { Span } from '../Text';
 
 import StyledCollectiveCard from './StyledCollectiveCard';
 
+const shouldShowHostInfo = collective => {
+  if (!collective.isHost || !collective.host) {
+    return false;
+  }
+
+  if (collective.type === CollectiveType.ORGANIZATION) {
+    return collective.hasHosting;
+  }
+
+  return true;
+};
+
 /**
  * A card to show a collective on the search page.
  */
@@ -20,7 +32,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
     <StyledCollectiveCard collective={collective} position="relative" {...props} data-cy="collective-card">
       <Container p={3}>
         <Box data-cy="caption" mb={2}>
-          {collective.isHost && collective.host ? (
+          {shouldShowHostInfo(collective) ? (
             <React.Fragment>
               {collective.host?.totalHostedCollectives > 0 && (
                 <Box pb="6px">
