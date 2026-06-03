@@ -496,7 +496,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
               includeVendorsForHostId={collective?.host?.legacyId}
-              vendorVisibleToAccountIds={collective?.legacyId ? [collective.legacyId] : []}
               menuPortalTarget={null}
               creatable={['USER', 'VENDOR']}
               HostCollectiveId={host?.legacyId}

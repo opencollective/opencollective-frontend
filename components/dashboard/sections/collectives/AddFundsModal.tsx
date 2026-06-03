@@ -504,10 +504,7 @@ const AddFundsModalContentWithCollective = ({
   const applicableTax = getApplicableTaxType(account, host);
   const isEdit = Boolean(editOrderId);
 
-  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({
-    host,
-    canBeUsedWithAccounts: collective?.slug ? [{ slug: collective.slug }] : [],
-  });
+  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({ host });
 
   const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
     isEdit ? editAddedFundsMutation : addFundsMutation,
@@ -770,7 +767,6 @@ const AddFundsModalContentWithCollective = ({
                           collective={values.fromAccount}
                           menuPortalTarget={null}
                           includeVendorsForHostId={host?.legacyId || undefined}
-                          vendorVisibleToAccountIds={account?.legacyId ? [account.legacyId] : undefined}
                           creatable={['VENDOR']}
                           HostCollectiveId={host?.legacyId}
                           {...quickCreateVendorCollectivePickerOptions(createVendorFromSearch)}

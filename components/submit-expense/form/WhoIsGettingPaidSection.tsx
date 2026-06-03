@@ -413,7 +413,6 @@ const VendorOption = React.memo(function VendorOption(props: {
   const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
   const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({
     host: props.host,
-    canBeUsedWithAccounts: props.account?.id ? [pick(props.account, 'id')] : [],
     isBeneficiary,
   });
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
@@ -457,7 +456,7 @@ const VendorOption = React.memo(function VendorOption(props: {
               setSelectedVendor(selected);
               props.setFieldValue('payeeSlug', !slug ? PAYEE_SLUG_VENDOR : slug);
             }}
-            vendorVisibleToAccountIds={props.account.legacyId}
+            vendorVisibleToAccountIds={isHostAdmin ? undefined : props.account.legacyId}
           />
         </div>
       }

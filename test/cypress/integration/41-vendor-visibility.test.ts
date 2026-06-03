@@ -20,6 +20,12 @@ function assertVendorScopedTo(expectedAccountName: string) {
   });
 }
 
+function assertVendorVisibleToAllHostedCollectives() {
+  cy.get('[data-cy="vendor-form"]').within(() => {
+    cy.get('#whereScope-all-hosted').should('have.attr', 'data-state', 'checked');
+  });
+}
+
 function setUseVendorPolicy(
   hostSlug: string,
   policy: UseVendorPolicy | `${UseVendorPolicy}`,
@@ -453,8 +459,8 @@ describe('vendor visibility', () => {
     });
   });
 
-  describe('Add Funds source picker', () => {
-    it('shows the usable vendor and hides one scoped to a different collective in the source dropdown', function () {
+  describe('Add Funds source picker (host admin)', () => {
+    it('shows vendors scoped to other collectives when adding funds', function () {
       setupHostAndCollective().then(({ host, hostAdmin, collective }) => {
         cy.createCollectiveV2({
           email: hostAdmin.email,
@@ -462,16 +468,16 @@ describe('vendor visibility', () => {
           host: { slug: host.slug },
           collective: { name: 'Add Funds Other Collective' },
         }).then(otherCollective => {
-          const usableName = NEW_VENDOR_NAME('add-funds-usable');
-          const elsewhereName = NEW_VENDOR_NAME('add-funds-elsewhere');
+          const scopedToRecipient = NEW_VENDOR_NAME('add-funds-recipient');
+          const scopedElsewhere = NEW_VENDOR_NAME('add-funds-elsewhere');
           cy.createVendor(
             host.slug,
-            { name: usableName, canBeUsedWithAccounts: [{ slug: collective.slug }] },
+            { name: scopedToRecipient, canBeUsedWithAccounts: [{ slug: collective.slug }] },
             hostAdmin.email,
           );
           cy.createVendor(
             host.slug,
-            { name: elsewhereName, canBeUsedWithAccounts: [{ slug: otherCollective.slug }] },
+            { name: scopedElsewhere, canBeUsedWithAccounts: [{ slug: otherCollective.slug }] },
             hostAdmin.email,
           );
 
@@ -483,9 +489,9 @@ describe('vendor visibility', () => {
           cy.get('#addFunds-fromAccount').click();
           // eslint-disable-next-line cypress/no-unnecessary-waiting
           cy.wait(150);
-          cy.get('#addFunds-fromAccount').type(usableName, { delay: 50 });
-          cy.root().closest('html').contains(usableName).should('exist');
-          cy.root().closest('html').contains(elsewhereName).should('not.exist');
+          cy.get('#addFunds-fromAccount').type(scopedElsewhere, { delay: 50 });
+          cy.root().closest('html').contains(scopedToRecipient).should('exist');
+          cy.root().closest('html').contains(scopedElsewhere).should('exist');
         });
       });
     });
@@ -507,7 +513,7 @@ describe('vendor visibility', () => {
         .should('not.have.attr', 'aria-disabled', 'true')
         .click();
 
-    it('Add Funds modal: created vendor is scoped to the paying collective', function () {
+    it('Add Funds modal: host-created vendor is visible to all hosted collectives', function () {
       setupHostAndCollective().then(({ host, hostAdmin, collective }) => {
         cy.login({ email: hostAdmin.email, redirect: `/dashboard/${host.slug}/hosted-collectives` });
 
@@ -526,11 +532,11 @@ describe('vendor visibility', () => {
         clickCreateOption(`Create vendor: ${name}`);
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
-        assertVendorScopedTo(collective.name);
+        assertVendorVisibleToAllHostedCollectives();
       });
     });
 
-    it('Expense flow: inline-created vendor is scoped to the paying collective', function () {
+    it('Expense flow (host admin): inline-created vendor is visible to all hosted collectives', function () {
       setupHostAndCollective().then(({ host, hostAdmin, collective }) => {
         cy.login({ email: hostAdmin.email, redirect: `/${collective.slug}/expenses/new` });
         cy.get('#WHO_IS_GETTING_PAID').within(() => {
@@ -545,11 +551,11 @@ describe('vendor visibility', () => {
         clickCreateOption(`Create vendor: ${name}`);
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
-        assertVendorScopedTo(collective.name);
+        assertVendorVisibleToAllHostedCollectives();
       });
     });
 
-    it('Pending contribution modal: inline-created vendor is scoped to the receiving collective', function () {
+    it('Pending contribution modal: host-created vendor is visible to all hosted collectives', function () {
       setupHostAndCollective().then(({ host, hostAdmin, collective }) => {
         cy.login({ email: hostAdmin.email, redirect: `/dashboard/${host.slug}/expected-funds` });
         cy.getByDataCy('create-pending-contribution').click();
@@ -572,11 +578,11 @@ describe('vendor visibility', () => {
         cy.contains('button', /Create vendor/i).click();
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
-        assertVendorScopedTo(collective.name);
+        assertVendorVisibleToAllHostedCollectives();
       });
     });
 
-    it('Grant flow: inline-created beneficiary is scoped to the paying collective', function () {
+    it('Grant flow (host admin): inline-created beneficiary is visible to all hosted collectives', function () {
       setupHostAndCollective({ enableGrants: true }).then(({ host, hostAdmin, collective }) => {
         cy.login({ email: hostAdmin.email, redirect: `/${collective.slug}/grants/new` });
         cy.contains('button', 'Proceed').click();
@@ -592,7 +598,7 @@ describe('vendor visibility', () => {
         clickCreateOption(`Create beneficiary: ${name}`);
 
         openVendorEditForm(host.slug, hostAdmin.email, name);
-        assertVendorScopedTo(collective.name);
+        assertVendorVisibleToAllHostedCollectives();
       });
     });
   });

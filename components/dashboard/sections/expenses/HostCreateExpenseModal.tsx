@@ -41,11 +41,7 @@ import { useToast } from '../../../ui/useToast';
 import { TransactionsImportRowDetails } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
 const hostCreateExpenseModalPayeeSelectQuery = gql`
-  query HostCreateExpenseModalPayeeSelect(
-    $hostId: String!
-    $forAccount: AccountReferenceInput
-    $canBeUsedWithAccounts: [AccountReferenceInput]
-  ) {
+  query HostCreateExpenseModalPayeeSelect($hostId: String!, $forAccount: AccountReferenceInput) {
     host(id: $hostId) {
       id
       slug
@@ -54,7 +50,7 @@ const hostCreateExpenseModalPayeeSelectQuery = gql`
       description
       isHost
       imageUrl(height: 64)
-      vendors(forAccount: $forAccount, canBeUsedWithAccounts: $canBeUsedWithAccounts) {
+      vendors(forAccount: $forAccount) {
         nodes {
           id
           slug
@@ -81,7 +77,6 @@ const PayeeSelect = ({
     variables: {
       hostId: host.id,
       forAccount: getAccountReferenceInput(forAccount),
-      canBeUsedWithAccounts: forAccount?.slug ? [{ slug: forAccount.slug }] : null,
     },
   });
   const recommendedVendors = data?.host?.vendors?.nodes || [];
@@ -104,7 +99,6 @@ const PayeeSelect = ({
       customOptions={defaultSourcesOptions}
       menuPortalTarget={null}
       includeVendorsForHostId={host.legacyId}
-      vendorVisibleToAccountIds={forAccount?.legacyId ? [forAccount.legacyId] : undefined}
       creatable={['USER', 'VENDOR']}
       HostCollectiveId={host.legacyId}
       isLoading={loading}
