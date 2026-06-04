@@ -38,6 +38,7 @@ import type { DashboardContextType } from '../../DashboardContext';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { makeReplaceSubpath } from '../../utils';
+import { useContributionActions } from '../contributions/actions';
 import { useLegalDocumentActions } from '../legal-documents/actions';
 import LegalDocumentDrawer from '../legal-documents/LegalDocumentDrawer';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
@@ -102,6 +103,11 @@ export function AccountDetails(props: AccountDetailsProps) {
   const [convertOrganizationToVendor] = useMutation(convertOrganizationMutation);
   const isUpgradeRequired = requiresUpgrade(dashboardAccount, FEATURES.TAX_FORMS);
   const getLegalDocumentActions = useLegalDocumentActions(query.data?.host, query.refetch, isUpgradeRequired);
+  const getContributionActions = useContributionActions({
+    accountSlug: account?.slug ?? '',
+    hostSlug: dashboardAccount.slug,
+    refetchList: query.refetch,
+  });
 
   const handleSetArchive = React.useCallback(
     async vendor => {
@@ -355,12 +361,13 @@ export function AccountDetails(props: AccountDetailsProps) {
       {openExpenseId && (
         <ExpenseDrawer openExpenseLegacyId={openExpenseId} handleClose={() => setOpenExpenseId(null)} />
       )}
-      {openContributionId && (
+      {openContributionId && account?.slug && (
         <ContributionDrawer
           open
           onClose={() => setOpenContributionId(null)}
           orderId={openContributionId}
-          getActions={() => ({})}
+          getActions={getContributionActions}
+          showChargesSection
         />
       )}
       {editVendor && query.data?.host && (
