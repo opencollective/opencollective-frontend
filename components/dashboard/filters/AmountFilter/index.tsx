@@ -13,11 +13,16 @@ import { AmountFilterValue } from './AmountFilterValue';
 import type { AmountFilterValueType } from './schema';
 import { amountFilterSchema, AmountFilterType } from './schema';
 
-function amountToVariables(value: z.infer<typeof amountFilterSchema>) {
+function amountToVariables(
+  value: z.infer<typeof amountFilterSchema>,
+  _key?: string,
+  meta?: { currency?: string },
+) {
+  const currency = value.currency || meta?.currency || undefined;
   return {
     amount: {
-      gte: 'gte' in value ? { valueInCents: value.gte, currency: value.currency || undefined } : undefined,
-      lte: 'lte' in value ? { valueInCents: value.lte, currency: value.currency || undefined } : undefined,
+      gte: 'gte' in value ? { valueInCents: value.gte, currency } : undefined,
+      lte: 'lte' in value ? { valueInCents: value.lte, currency } : undefined,
     },
   };
 }
@@ -160,7 +165,7 @@ export const makeAmountFilter = (
 ): FilterConfig<z.infer<typeof amountFilterSchema>> => {
   return {
     ...amountFilter,
-    toVariables: value => ({ [variableKey]: amountToVariables(value).amount }),
+    toVariables: (value, key, meta) => ({ [variableKey]: amountToVariables(value, key, meta).amount }),
     filter: {
       ...amountFilter.filter,
       labelMsg,
