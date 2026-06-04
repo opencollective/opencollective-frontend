@@ -26041,6 +26041,26 @@ type Mutation {
   ): PlaidConnectAccountResponse!
 
   """
+  Complete the Wise (TransferWise) OAuth flow and connect the account to the host. Scope: "connectedAccounts".
+  """
+  connectTransferwiseAccount(
+    """
+    The authorization code returned by Wise in the OAuth callback
+    """
+    code: String!
+
+    """
+    The Wise profile id returned in the OAuth callback
+    """
+    profileId: String!
+
+    """
+    The OAuth state token that was generated when initiating the connection
+    """
+    state: String!
+  ): TransferwiseConnectAccountResponse!
+
+  """
   Generate a GoCardless link for bank account data access
   """
   generateGoCardlessLink(
@@ -28929,6 +28949,18 @@ type PlaidConnectAccountResponse {
   The transactions import that was created
   """
   transactionsImport: TransactionsImport!
+}
+
+type TransferwiseConnectAccountResponse {
+  """
+  The connected account that was created
+  """
+  connectedAccount: ConnectedAccount!
+
+  """
+  The URL to redirect the user to once the connection is complete
+  """
+  redirectUrl: String
 }
 
 """
