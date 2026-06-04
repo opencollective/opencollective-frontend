@@ -4,6 +4,9 @@ import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { gql } from '../../../lib/graphql/helpers';
+import { FEATURES } from '@/lib/allowed-features';
+
+import FeatureNotSupported from '@/components/FeatureNotSupported';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -72,6 +75,10 @@ const CustomMessage = ({ collective }) => {
     setCustomMessage(value);
     setIsModified(true);
   };
+
+  if (collective.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] === 'UNSUPPORTED') {
+    return <FeatureNotSupported />;
+  }
 
   return (
     <Container>
@@ -142,8 +149,8 @@ const CustomMessage = ({ collective }) => {
           }
           onClose={() => setShowPreview(false)}
           previewImage="/static/images/custom-email-preview.png"
-          imgHeight="715px"
-          imgWidth="809px"
+          imgHeight="715"
+          imgWidth="809"
         />
       )}
     </Container>

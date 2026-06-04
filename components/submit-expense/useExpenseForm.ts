@@ -217,12 +217,12 @@ const expenseFormSchemaQuery = gql`
 
       ... on AccountWithHost {
         host {
-          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
+          vendorsForAccount: vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
+          vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -230,12 +230,12 @@ const expenseFormSchemaQuery = gql`
 
       ... on Organization {
         host {
-          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
+          vendorsForAccount: vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
+          vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -402,6 +402,7 @@ const expenseFormSchemaQuery = gql`
         titlePolicy
         grantPolicy
       }
+      USE_VENDOR_POLICY
     }
   }
 
@@ -477,7 +478,7 @@ const expenseFormSchemaQuery = gql`
     payoutMethods {
       ...ExpenseFormPayoutMethods
     }
-    visibleToAccounts {
+    canBeUsedWithAccounts {
       id
       legacyId
       slug
@@ -1490,9 +1491,9 @@ async function buildFormOptions(
       options.vendorsForAccount =
         'vendorsForAccount' in host ? (host.vendorsForAccount?.['nodes'] as ExpenseVendorFieldsFragment[]) || [] : [];
       const isInviteePayeeFlow = options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount;
-      options.showVendorsOption = isInviteePayeeFlow
-        ? false
-        : options.isHostAdmin || ('vendors' in host ? host.vendors?.['totalCount'] > 0 : false);
+
+      const userCanUseVendors = options.isHostAdmin || ('vendors' in host && host.vendors?.['totalCount'] > 0);
+      options.showVendorsOption = isInviteePayeeFlow ? false : userCanUseVendors;
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
@@ -2498,11 +2499,12 @@ export function useExpenseForm(opts: {
   }, [formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue, expenseLoaded]);
 
   React.useEffect(() => {
-    // Reset selection if the payout method is not supported
+    // Reset selection if the payout method is not supported (only once payout methods have loaded)
     if (
       expenseForm.values.payoutMethodId &&
       !expenseForm.values.payoutMethodId.startsWith('__') &&
-      !formOptions.payoutMethods?.some(p => p.id === expenseForm.values.payoutMethodId)
+      formOptions.payoutMethods !== undefined &&
+      !formOptions.payoutMethods.some(p => p.id === expenseForm.values.payoutMethodId)
     ) {
       setFieldValue('payoutMethodId', null);
     }

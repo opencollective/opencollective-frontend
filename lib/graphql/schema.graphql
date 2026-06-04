@@ -49,6 +49,7 @@ interface CollectiveInterface {
   isFirstPartyHost: Boolean!
   isVerified: Boolean!
   isIncognito: Boolean
+  isPrivate: Boolean!
 
   """
   Whether this account is frozen
@@ -1124,7 +1125,6 @@ type CollectiveFeatures {
   PAYPAL_CONNECT: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
   ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
-  HOST_METRICS: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
@@ -1134,6 +1134,7 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
+  PUBLIC_PROFILE: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -1193,7 +1194,11 @@ type Policies {
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
-  EXPENSE_PUBLIC_VENDORS: Boolean
+
+  """
+  Default rule for who can attribute financial activities to vendors under this host.
+  """
+  USE_VENDOR_POLICY: UseVendorPolicy
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
 
   """
@@ -1990,6 +1995,26 @@ type EXPENSE_CATEGORIZATION {
   requiredForCollectiveAdmins: Boolean
 }
 
+"""
+Who can attribute financial activities to a vendor
+"""
+enum UseVendorPolicy {
+  """
+  Only host admins can use this vendor.
+  """
+  HOST_ADMINS
+
+  """
+  Host admins and admins of hosted collectives.
+  """
+  HOST_AND_COLLECTIVE_ADMINS
+
+  """
+  Anyone who can submit an expense.
+  """
+  ALL_SUBMITTERS
+}
+
 type CONTRIBUTOR_INFO_THRESHOLDS {
   legalName: Int
   address: Int
@@ -2169,6 +2194,11 @@ type Collective implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -2473,6 +2503,11 @@ type Event implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
+
+  """
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
@@ -2773,6 +2808,11 @@ type Fund implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -3077,6 +3117,11 @@ type Organization implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
+
+  """
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
@@ -3377,6 +3422,11 @@ type Project implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -3711,9 +3761,14 @@ type TaxInfo {
   rate: Float!
 
   """
-  Tax ID number of the 3rd party receiving/paying the tax
+  Tax ID number of the 3rd party receiving/paying the tax. Will be null if not allowed to see it.
   """
   idNumber: String
+
+  """
+  Whether the tax ID number is available. Contrary to `idNumber`, this field is public.
+  """
+  hasTaxIdNumber: Boolean!
 }
 
 """
@@ -3974,6 +4029,11 @@ type User implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile
@@ -4278,6 +4338,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
 
   """
   Returns whether this collective is a guest profile

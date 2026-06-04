@@ -7,7 +7,8 @@ shx rm -rf $DIST
 shx mkdir -p $DIST
 
 echo "> Building next"
-NODE_OPTIONS="--max-old-space-size=4096" next build || exit 1
+
+NODE_OPTIONS="--max-old-space-size=8192" next build --webpack || exit 1
 
 echo "> Copying .next to dist folder"
 

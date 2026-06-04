@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { useQuery } from '@apollo/client';
+import React, { useContext, useEffect } from 'react';
+import { gql, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -36,7 +36,7 @@ import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
-import { makePushSubpath } from '../../utils';
+import { makePushSubpath, makeReplaceSubpath } from '../../utils';
 
 import { AccountDetails } from './AccountDetail';
 import { usePersonActions } from './common';
@@ -400,11 +400,36 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
   );
 };
 
+const peopleRouterAccountQuery = gql`
+  query PeopleRouterAccount($id: String!) {
+    account(id: $id) {
+      id
+      mainProfile {
+        id
+        publicId
+      }
+    }
+  }
+`;
+
 const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
   const router = useRouter();
   const pushSubpath = makePushSubpath(router);
+  const replaceSubpath = makeReplaceSubpath(router);
   const id = subpath[0];
   const { account } = useContext(DashboardContext);
+
+  const { data: accountData } = useQuery(peopleRouterAccountQuery, {
+    variables: { id },
+    skip: isEmpty(id),
+  });
+
+  useEffect(() => {
+    const mainProfilePublicId = accountData?.account?.mainProfile?.publicId;
+    if (mainProfilePublicId && mainProfilePublicId !== id) {
+      replaceSubpath(mainProfilePublicId);
+    }
+  }, [accountData, replaceSubpath, id]);
 
   if (!isEmpty(id)) {
     return (

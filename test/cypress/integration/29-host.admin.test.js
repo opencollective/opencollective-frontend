@@ -101,7 +101,13 @@ describe('host dashboard', () => {
       cy.get('[data-cy="add-funds-amount"]').type('{selectall}20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       const vendorName = randStr();
+      cy.intercept('POST', '/api/graphql/v1', req => {
+        if (req.body?.operationName === 'CollectivePickerSearch' && req.body?.variables?.term === vendorName) {
+          req.alias = 'collectivePickerSearch';
+        }
+      });
       cy.get('[data-cy="add-funds-source"]').type(vendorName);
+      cy.wait('@collectivePickerSearch');
       cy.contains(`Create vendor: ${vendorName}`).click();
       cy.contains(`I confirm that`).click();
       cy.get('[data-cy="add-funds-submit-btn"]').click();

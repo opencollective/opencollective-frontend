@@ -1,15 +1,21 @@
 import React from 'react';
 
 import { getWebsiteUrl } from '../../../lib/utils';
+import { FEATURES } from '@/lib/allowed-features';
+
+import FeatureNotSupported from '@/components/FeatureNotSupported';
 
 import Container from '../../Container';
 import ExportImages from '../../ExportImages';
 import { Box } from '../../Grid';
 
 const Export = ({ collective }) => {
+  if (collective.features[FEATURES.PUBLIC_PROFILE] === 'UNSUPPORTED') {
+    return <FeatureNotSupported />;
+  }
+
   const websiteUrl = getWebsiteUrl();
   const widgetCode = `<script src="${websiteUrl}/${collective.slug}/banner.js"></script>`;
-
   return (
     <div>
       <Container as="pre" fontSize="11px" whiteSpace="pre-wrap" mb={4}>

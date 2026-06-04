@@ -61,7 +61,7 @@ export const vendorFieldFragment = gql`
       totalCount
     }
 
-    visibleToAccounts {
+    canBeUsedWithAccounts {
       id
       type
       legacyId
@@ -69,8 +69,20 @@ export const vendorFieldFragment = gql`
       name
       imageUrl
     }
+
+    useVendorPolicy
   }
   ${accountHoverCardFields}
+`;
+
+export const createVendorMutation = gql`
+  mutation CreateVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
+    createVendor(host: $host, vendor: $vendor) {
+      id
+      ...VendorFields
+    }
+  }
+  ${vendorFieldFragment}
 `;
 
 export const setVendorArchiveMutation = gql`

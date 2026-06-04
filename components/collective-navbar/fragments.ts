@@ -25,5 +25,6 @@ export const accountNavbarFieldsFragment = gql`
     HOST_DASHBOARD
     TRANSACTIONS
     REQUEST_VIRTUAL_CARDS
+    PUBLIC_PROFILE
   }
 `;
