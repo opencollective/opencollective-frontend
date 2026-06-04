@@ -35,11 +35,11 @@ import { toast, useToast } from './ui/useToast';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
 import I18nFormatters from './I18nFormatters';
+import InputAmount from './InputAmount';
 import Loading from './Loading';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import type { BaseModalProps } from './ModalContext';
 import PayWithPaypalButton from './PayWithPaypalButton';
-import StyledInputAmount from './StyledInputAmount';
 import StyledRadioList from './StyledRadioList';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
@@ -283,14 +283,13 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
                             <FormattedMessage id="RecurringContributions.customAmount" defaultMessage="Custom amount" />
                           </P>
                           <Box>
-                            <StyledInputAmount
+                            <InputAmount
                               type="number"
                               data-cy="recurring-contribution-custom-amount-input"
                               currency={currency}
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
                               min={DEFAULT_MINIMUM_AMOUNT}
-                              px="2px"
                             />
                           </Box>
                           <P fontSize="12px" fontWeight="600" my={2}>

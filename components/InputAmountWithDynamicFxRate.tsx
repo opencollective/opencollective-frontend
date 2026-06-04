@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../lib/errors';
 
 import { useToast } from './ui/useToast';
-import StyledInputAmount from './StyledInputAmount';
+import InputAmount from './InputAmount';
 
 const currencyExchangeRateQuery = gql`
   query HostExpenseModalCurrencyExchangeRate($requests: [CurrencyExchangeRateRequest!]!) {
@@ -20,14 +20,14 @@ const currencyExchangeRateQuery = gql`
   }
 `;
 
-export const StyledInputAmountWithDynamicFxRate = ({
+export const InputAmountWithDynamicFxRate = ({
   fromCurrency,
   toCurrency,
   date,
   value,
   onChange,
   ...props
-}: Omit<React.ComponentProps<typeof StyledInputAmount>, 'currency' | 'loadingExchangeRate' | 'hasCurrencyPicker'>) => {
+}: Omit<React.ComponentProps<typeof InputAmount>, 'currency' | 'loadingExchangeRate' | 'hasCurrencyPicker'>) => {
   const intl = useIntl();
   const { toast } = useToast();
   const { loading } = useQuery(currencyExchangeRateQuery, {
@@ -53,7 +53,7 @@ export const StyledInputAmountWithDynamicFxRate = ({
   }, [fromCurrency, toCurrency, date]);
 
   return (
-    <StyledInputAmount
+    <InputAmount
       value={value}
       onChange={onChange}
       hasCurrencyPicker

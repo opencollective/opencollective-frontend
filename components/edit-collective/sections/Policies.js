@@ -20,13 +20,13 @@ import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanC
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
+import InputAmount from '../../InputAmount';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
 import StyledCheckbox from '../../StyledCheckbox';
-import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
@@ -454,9 +454,8 @@ const Policies = ({ collective }) => {
                             id="MKoNvi"
                           />
                         </p>
-                        <StyledInputAmount
-                          className="mt-2 sm:max-w-1/3"
-                          maxWidth="11em"
+                        <InputAmount
+                          className="mt-2 max-w-[11em] sm:max-w-1/3"
                           suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
                           disabled={isSettingPolicies}
                           currency={data?.account?.currency}
@@ -505,10 +504,9 @@ const Policies = ({ collective }) => {
                             id="pKF7TO"
                           />
                         </p>
-                        <StyledInputAmount
-                          className="mt-2 sm:max-w-1/3"
+                        <InputAmount
+                          className="mt-2 max-w-[11em] sm:max-w-1/3"
                           suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
-                          maxWidth="11em"
                           disabled={
                             isSettingPolicies || isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)
                           }
@@ -835,8 +833,8 @@ const Policies = ({ collective }) => {
             <P mr="1.25rem">
               <FormattedMessage defaultMessage="Enforce for expenses above:" id="8bP95s" />
             </P>
-            <StyledInputAmount
-              maxWidth="11em"
+            <InputAmount
+              className="max-w-[11em]"
               disabled={
                 isSettingPolicies ||
                 authorCannotApproveExpenseEnforcedByHost ||

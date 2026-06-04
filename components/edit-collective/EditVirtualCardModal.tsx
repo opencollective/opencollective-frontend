@@ -20,12 +20,12 @@ import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../Collecti
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
+import InputAmount from '../InputAmount';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
@@ -509,7 +509,7 @@ export default function EditVirtualCardModal({
                     htmlFor="limitAmount"
                   >
                     {inputProps => (
-                      <StyledInputAmount
+                      <InputAmount
                         {...inputProps}
                         id="limitAmount"
                         error={formik.touched.limitAmount && Boolean(formik.errors.limitAmount)}

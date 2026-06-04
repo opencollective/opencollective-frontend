@@ -6,10 +6,10 @@ import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
 import type { Currency } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
+import InputAmount from '../InputAmount';
 import StyledButtonSet from '../StyledButtonSet';
 import StyledCard from '../StyledCard';
 import StyledCheckbox from '../StyledCheckbox';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledLinkButton from '../StyledLinkButton';
 import { P, Span } from '../Text';
 
@@ -203,7 +203,7 @@ export function NewPlatformTipContainer(props: NewPlatformTipContainerProps) {
 
         {(selectedOption === PlatformTipOption.OTHER || selectedOption === PlatformTipOption.NONE) && (
           <Flex justifyContent="space-between" alignItems="center" mt={2}>
-            <StyledInputAmount
+            <InputAmount
               id="feesOnTop"
               name="platformTip"
               aria-label="Custom platform contribution amount"
@@ -213,8 +213,7 @@ export function NewPlatformTipContainer(props: NewPlatformTipContainerProps) {
               currencyDisplay="full"
               onChange={onOtherChange}
               value={value}
-              width={1}
-              fontSize="14px"
+              className="w-full text-sm"
             />
           </Flex>
         )}
