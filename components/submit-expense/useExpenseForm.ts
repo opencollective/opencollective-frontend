@@ -2499,11 +2499,12 @@ export function useExpenseForm(opts: {
   }, [formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue, expenseLoaded]);
 
   React.useEffect(() => {
-    // Reset selection if the payout method is not supported
+    // Reset selection if the payout method is not supported (only once payout methods have loaded)
     if (
       expenseForm.values.payoutMethodId &&
       !expenseForm.values.payoutMethodId.startsWith('__') &&
-      !formOptions.payoutMethods?.some(p => p.id === expenseForm.values.payoutMethodId)
+      formOptions.payoutMethods !== undefined &&
+      !formOptions.payoutMethods.some(p => p.id === expenseForm.values.payoutMethodId)
     ) {
       setFieldValue('payoutMethodId', null);
     }
