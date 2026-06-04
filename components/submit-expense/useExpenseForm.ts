@@ -634,6 +634,7 @@ type ExpenseFormOptions = {
   account?: ExpenseFormSchemaQuery['account'] | ExpenseFormSchemaQuery['expense']['account'];
   payee?: ExpenseFormSchemaQuery['payee'];
   isAdminOfPayee?: boolean;
+  isAdminOfPayeeHost?: boolean;
   isHostAdmin?: boolean;
   submitter?: ExpenseFormSchemaQuery['submitter'];
   loggedInAccount?: ExpenseFormSchemaQuery['loggedInAccount'];
@@ -1530,7 +1531,13 @@ async function buildFormOptions(
       options.isAdminOfPayee =
         options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
         [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(values.payeeSlug);
-      if (payee && payee.type !== CollectiveType.VENDOR && options.isAdminOfPayee) {
+      // Cross-host only: the submitter administers the recipient host (e.g. a host admin completing
+      // an invited draft on behalf of a collective they don't directly administer).
+      const isAdminOfPayeeHost = Boolean(
+        payeeHost && host && payeeHost.id !== host.id && options.payoutProfiles.some(p => p.slug === payeeHost.slug),
+      );
+      options.isAdminOfPayeeHost = isAdminOfPayeeHost;
+      if (payee && payee.type !== CollectiveType.VENDOR && (options.isAdminOfPayee || isAdminOfPayeeHost)) {
         // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
         if (payee['host'] && host && payee['host'].id !== host.id) {
           options.payoutMethods = payee['host'].payoutMethods?.filter(p =>
@@ -1578,7 +1585,9 @@ async function buildFormOptions(
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
       } else if (
         values.payoutMethodId === NEW_PAYOUT_METHOD_ID &&
-        ((options.payee?.type === CollectiveType.VENDOR && options.isHostAdmin) || options.isAdminOfPayee)
+        ((options.payee?.type === CollectiveType.VENDOR && options.isHostAdmin) ||
+          options.isAdminOfPayee ||
+          isAdminOfPayeeHost)
       ) {
         options.payoutMethod = values.newPayoutMethod;
       }
