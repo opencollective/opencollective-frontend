@@ -2520,11 +2520,17 @@ export function useExpenseForm(opts: {
 
     // Set all items to payout method currency if not set
     const selectedPayoutMethod = formOptions.payoutMethods?.find(p => p.id === expenseForm.values.payoutMethodId);
+    // When completing a draft that already carries an explicit currency (e.g. a recurring
+    // expense draft), keep that currency instead of coercing it to the payout method's.
+    const isCompletingDraftWithCurrency =
+      formOptions.expense?.status === ExpenseStatus.DRAFT &&
+      formOptions.expense.draft?.items?.some(i => i.amountV2?.currency ?? i.currency);
     if (
       selectedPayoutMethod &&
       selectedPayoutMethod.data?.currency &&
       formOptions.allowDifferentItemCurrency &&
       !expenseForm.touched.expenseItems &&
+      !isCompletingDraftWithCurrency &&
       expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency &&
       !startOptions.current.isInlineEdit // expenseItems will not be touched when editing the payout method, we don't want to update the expense items currency then
     ) {
@@ -2547,6 +2553,9 @@ export function useExpenseForm(opts: {
     setFormOptions,
     expenseForm.touched.expenseItems,
     expenseForm.values.expenseItems,
+    formOptions.expense?.status,
+    formOptions.expense?.draft?.items,
+    formOptions.loggedInAccount,
   ]);
 
   const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
