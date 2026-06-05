@@ -78,11 +78,15 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
   );
 
   const handleConnect = async () => {
-    const redirect = window.location.href.replace(/\?.*/, '');
-    const { data } = await getTransferwiseOAuthUrl({
-      variables: { account: { legacyId: collective.id }, redirect },
-    });
-    window.location.href = data.getTransferwiseOAuthUrl;
+    try {
+      const redirect = window.location.href.replace(/\?.*/, '');
+      const { data } = await getTransferwiseOAuthUrl({
+        variables: { account: { legacyId: collective.id }, redirect },
+      });
+      window.location.href = data.getTransferwiseOAuthUrl;
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    }
   };
   const handleDisconnect = async (connectedAccount: Partial<ConnectedAccount>) => {
     const action = async () => {
