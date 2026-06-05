@@ -21,7 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
 
 const connectTransferwiseAccountMutation = gql`
-  mutation ConnectTransferwiseAccount($code: String!, $profileId: String!, $state: String!) {
+  mutation ConnectTransferwiseAccount($code: NonEmptyString!, $profileId: NonEmptyString!, $state: NonEmptyString!) {
     connectTransferwiseAccount(code: $code, profileId: $profileId, state: $state) {
       connectedAccount {
         id
