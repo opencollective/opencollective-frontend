@@ -115,14 +115,22 @@ const TransferwiseOAuthCallbackPage = () => {
                 <React.Fragment>
                   <Loader2 size={18} className="animate-spin" />
                   <AlertTitle className="animate-pulse">
-                    <FormattedMessage defaultMessage="Connecting your Wise account..." id="vZ/6uw" />
+                    <FormattedMessage
+                      defaultMessage="Connecting your {service} account..."
+                      id="5yLP1a"
+                      values={{ service: 'Wise' }}
+                    />
                   </AlertTitle>
                 </React.Fragment>
               ) : (
                 <React.Fragment>
                   <CheckCircle size={18} className="mr-2 inline" />
                   <AlertTitle>
-                    <FormattedMessage defaultMessage="Wise account connected!" id="cirTrV" />
+                    <FormattedMessage
+                      defaultMessage="Successfully connected {service} account"
+                      id="p63wXt"
+                      values={{ service: 'Wise' }}
+                    />
                   </AlertTitle>
                   <AlertDescription className="animate-pulse">
                     <FormattedMessage defaultMessage="You'll be redirected shortly." id="j0+O6x" />
