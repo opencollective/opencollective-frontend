@@ -81,7 +81,7 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
     try {
       const redirect = window.location.href.replace(/\?.*/, '');
       const { data } = await getTransferwiseOAuthUrl({
-        variables: { account: { legacyId: collective.id }, redirect },
+        variables: { account: { slug: collective.slug }, redirect },
       });
       window.location.href = data.getTransferwiseOAuthUrl;
     } catch (e) {
