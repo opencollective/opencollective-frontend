@@ -107,11 +107,11 @@
     "otplib": "13.4.0",
     "polished": "4.3.1",
     "qrcode.react": "4.2.0",
-    "react": "19.2.5",
+    "react": "19.2.7",
     "react-animate-height": "3.2.3",
     "react-apexcharts": "2.1.0",
     "react-day-picker": "9.9.0",
-    "react-dom": "19.2.5",
+    "react-dom": "19.2.7",
     "react-dropzone": "14.4.1",
     "react-easy-crop": "5.5.0",
     "react-flip-move": "3.0.5",
@@ -221,7 +221,7 @@
     "@types/jest": "^30.0.0",
     "@types/jscodeshift": "^17.3.0",
     "@types/lodash-es": "^4.17.12",
-    "@types/react": "19.2.14",
+    "@types/react": "19.2.16",
     "@types/react-dom": "19.2.3",
     "@types/styled-system": "^5.1.22",
     "@types/webpack-env": "^1.18.5",
@@ -327,7 +327,7 @@
     ]
   },
   "overrides": {
-    "@types/react": "19.2.14",
+    "@types/react": "19.2.16",
     "@types/react-dom": "19.2.3"
   }
 }
