@@ -213,6 +213,33 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 });
 
 /**
+ * Persist an expense as a draft and invite someone to edit and submit it. In E2E the
+ * draft key is always `draft-key`, so the draft can be opened at
+ * `/{collectiveSlug}/expenses/{legacyId}?key=draft-key`.
+ */
+Cypress.Commands.add('draftExpenseAndInviteUser', ({ userEmail = defaultTestUserEmail, account, expense } = {}) => {
+  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+    return graphqlQueryV2(token, {
+      operationName: 'DraftExpenseAndInviteUser',
+      query: gql`
+        mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
+          draftExpenseAndInviteUser(expense: $expense, account: $account) {
+            id
+            legacyId
+            status
+            currency
+          }
+        }
+      `,
+      variables: { expense, account },
+      failOnStatusCode: false,
+    }).then(({ body }) => {
+      return body.data.draftExpenseAndInviteUser;
+    });
+  });
+});
+
+/**
  * Create a collective hosted by the open source collective.
  * TODO: Migrate this to GQLV2 -> `createCollective` with `__skipApprovalTestOnly` set to true
  */

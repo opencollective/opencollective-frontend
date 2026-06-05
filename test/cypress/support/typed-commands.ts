@@ -31,7 +31,7 @@ declare global {
         slug?: string;
         name?: string;
         type?: string;
-      }): Chainable<{ slug: string }>;
+      }): Chainable<{ id: number; slug: string }>;
 
       createHostedCollective(params?: { userEmail?: string }): Chainable<{ slug: string }>;
 
@@ -77,6 +77,19 @@ declare global {
           data: Record<string, unknown>;
         };
       }): Chainable<{ legacyId: number }>;
+
+      draftExpenseAndInviteUser(params: {
+        userEmail?: string;
+        account: { slug?: string; legacyId?: number };
+        expense: {
+          type: ExpenseType | `${ExpenseType}`;
+          description?: string;
+          currency?: string;
+          items?: Record<string, unknown>[];
+          payee: { slug?: string; legacyId?: number; name?: string; email?: string };
+          [key: string]: unknown;
+        };
+      }): Chainable<{ id: string; legacyId: number; status: string; currency: string }>;
 
       openEmail(matcher: (summary: MessageSummary) => boolean): Chainable<Message>;
 
