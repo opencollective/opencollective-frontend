@@ -26041,26 +26041,6 @@ type Mutation {
   ): PlaidConnectAccountResponse!
 
   """
-  Complete the Wise (TransferWise) OAuth flow and connect the account to the host. Scope: "connectedAccounts".
-  """
-  connectTransferwiseAccount(
-    """
-    The authorization code returned by Wise in the OAuth callback
-    """
-    code: String!
-
-    """
-    The Wise profile id returned in the OAuth callback
-    """
-    profileId: String!
-
-    """
-    The OAuth state token that was generated when initiating the connection
-    """
-    state: String!
-  ): TransferwiseConnectAccountResponse!
-
-  """
   Generate a GoCardless link for bank account data access
   """
   generateGoCardlessLink(
@@ -26104,6 +26084,41 @@ type Mutation {
     """
     transactionImport: TransactionsImportReferenceInput
   ): GoCardlessConnectAccountResponse!
+
+  """
+  Get the Wise (TransferWise) OAuth URL to initiate the account connection flow for a host. Scope: "connectedAccounts".
+  """
+  getTransferwiseOAuthUrl(
+    """
+    The host account to connect Wise to
+    """
+    account: AccountReferenceInput!
+
+    """
+    The URL or path to redirect the user to once the OAuth flow is complete
+    """
+    redirect: String
+  ): URL!
+
+  """
+  Complete the Wise (TransferWise) OAuth flow and connect the account to the host. Scope: "connectedAccounts".
+  """
+  connectTransferwiseAccount(
+    """
+    The authorization code returned by Wise in the OAuth callback
+    """
+    code: NonEmptyString!
+
+    """
+    The Wise profile id returned in the OAuth callback
+    """
+    profileId: NonEmptyString!
+
+    """
+    The OAuth state token that was generated when initiating the connection
+    """
+    state: NonEmptyString!
+  ): TransferwiseConnectAccountResponse!
 
   """
   [Root only] Edits account flags (deleted, banned, archived, trusted host)
@@ -28951,18 +28966,6 @@ type PlaidConnectAccountResponse {
   transactionsImport: TransactionsImport!
 }
 
-type TransferwiseConnectAccountResponse {
-  """
-  The connected account that was created
-  """
-  connectedAccount: ConnectedAccount!
-
-  """
-  The URL to redirect the user to once the connection is complete
-  """
-  redirectUrl: String
-}
-
 """
 A GoCardless link for bank account data access
 """
@@ -29043,6 +29046,18 @@ type GoCardlessConnectAccountResponse {
   The transactions import that was created
   """
   transactionsImport: TransactionsImport!
+}
+
+type TransferwiseConnectAccountResponse {
+  """
+  The connected account that was created
+  """
+  connectedAccount: ConnectedAccount!
+
+  """
+  The URL to redirect the user to once the connection is complete
+  """
+  redirectUrl: URL
 }
 
 enum AccountCacheType {
