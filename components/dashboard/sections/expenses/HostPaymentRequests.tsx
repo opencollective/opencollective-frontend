@@ -348,7 +348,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
     variables,
   });
 
-  const { data: metaData } = useQuery(hostPaymentRequestsMetadataQuery, {
+  const { data: metaData, refetch: refetchMetadata } = useQuery(hostPaymentRequestsMetadataQuery, {
     variables: {
       hostSlug,
       hostContext: queryFilter.values.hostContext,
@@ -366,7 +366,8 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
 
   const getExpenseActions = useExpenseActions({
     refetchList: () => {
-      refetch();
+      void refetch();
+      void refetchMetadata();
     },
     host: data?.host,
   });

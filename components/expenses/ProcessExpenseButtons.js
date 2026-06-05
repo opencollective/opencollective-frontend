@@ -18,6 +18,10 @@ import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
 import {
+  getExpensePipelineOverviewRefetchQueries,
+  shouldRefetchExpensePipeline,
+} from '../dashboard/sections/expenses/ExpensePipelineOverview';
+import {
   getScheduledExpensesQueryVariables,
   scheduledExpensesQuery,
 } from '../dashboard/sections/expenses/ScheduledExpensesBanner';
@@ -215,6 +219,9 @@ const ProcessExpenseButtons = ({
           variables: getScheduledExpensesQueryVariables(host.slug),
         });
       }
+      if (shouldRefetchExpensePipeline(action)) {
+        refetchQueries.push(...getExpensePipelineOverviewRefetchQueries(host));
+      }
 
       await processExpense({ variables, refetchQueries });
 
@@ -395,6 +402,7 @@ const ProcessExpenseButtons = ({
             }
           }}
           expense={expense}
+          onSuccess={(action, updatedExpense) => onSuccess?.(updatedExpense ?? expense, null, action)}
         />
       )}
       {showApproveExpenseModal && (

@@ -10,7 +10,7 @@ type ProcessExpenseAction = (params?: {
   paymentParams?: ProcessExpensePaymentParams;
   message?: string;
   draftKey?: string;
-}) => Promise<void>;
+}) => Promise<Expense | undefined>;
 type ProcessExpenseActionName =
   | 'APPROVE'
   | 'REJECT'
@@ -94,7 +94,8 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
           draftKey,
         };
         try {
-          await processExpense({ variables });
+          const result = await processExpense({ variables });
+          return result.data?.processExpense;
         } finally {
           setCurrentAction(null);
         }
