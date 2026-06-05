@@ -434,6 +434,10 @@ exports.REWRITES = [
     source: '/services/gocardless/callback',
     destination: '/services/gocardless/callback',
   },
+  {
+    source: '/services/transferwise/oauth/callback',
+    destination: '/services/transferwise/oauth/callback',
+  },
   // Robots.txt
   {
     source: '/robots.txt',
