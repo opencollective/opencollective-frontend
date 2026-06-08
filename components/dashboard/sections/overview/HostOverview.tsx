@@ -171,7 +171,7 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
 
       <HostTodoList />
 
-      <Card className="pb-3">
+      <Card className="pb-3 shadow-none">
         <CardHeader>
           <CardTitle className="text-xl">
             <FormattedMessage defaultMessage="Recent Financial Activity" id="BAvsQv" />
