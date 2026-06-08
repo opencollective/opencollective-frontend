@@ -263,7 +263,7 @@
     "jscodeshift": "^17.3.0",
     "jsdoc-api": "^9.0.0",
     "jsqr": "^1.4.0",
-    "lint-staged": "^16.0.0",
+    "lint-staged": "^17.0.0",
     "markdown-loader": "^8.0.0",
     "mkdirp": "^3.0.1",
     "mocha-junit-reporter": "^2.2.1",
