@@ -28,6 +28,21 @@ const IGNORED: Record<string, readonly string[]> = {
     'AccountingCategory.code', // "Code" - identique
     'AddFundsModal.source', // "Source" - identique
     'AdminPanel.button', // "Admin" - libellé court conservé
+    'Amount', // "{amount} {currencyCode}" - format identique
+    'Avatar', // "Avatar" - terme identique
+    'asqGnV', // "Solutions" - identique en français
+    'collective.category.association', // "Association" - identique
+    'collective.category.meetup', // "Meetup" - nom propre courant
+    'CollectivePage.NavBar.ActionMenu.Actions', // "Actions" - identique
+    'CollectivePage.NavBar.Participants', // "Participants" - identique
+    'community.openSource', // "Open Source" - terme standard conservé
+    'company.blog', // "Blog" - identique
+    'Contact', // "Contact" - identique
+    'Contact.Message', // "Message" - identique
+    'Contributions', // "Contributions" - identique
+    'contributions.id', // "#" - identique
+    'ContributionType.Ticket', // "Ticket" - identique (billet)
+    'conversations', // "Conversations" - identique
   ],
 };
 
