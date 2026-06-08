@@ -2,10 +2,11 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
-import { get, isNil, map, pick } from 'lodash';
+import { get, isNil, map, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { checkUseAlternativeHostFeeNaming } from '../lib/collective';
 import { OPENSOURCE_COLLECTIVE_ID } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { requireFields } from '../lib/form-utils';
@@ -17,6 +18,7 @@ import Avatar from './Avatar';
 import CollectivePicker from './CollectivePicker';
 import CollectivePickerAsync from './CollectivePickerAsync';
 import { Box, Flex } from './Grid';
+import HostPricingInfoRow from './HostPricingInfoRow';
 import HTMLContent from './HTMLContent';
 import { getI18nLink } from './I18nFormatters';
 import Link from './Link';
@@ -52,6 +54,7 @@ const hostFields = gql`
     termsUrl
     longDescription
     hostFeePercent
+    platformContributionAvailable
     settings
     policies {
       id
@@ -264,7 +267,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   }, [useTwoSteps]);
 
   return (
-    <StyledModal onClose={onClose} {...props}>
+    <StyledModal onClose={onClose} maxWidth="550px" {...props}>
       {loading ? (
         <React.Fragment>
           <ModalHeader hideCloseIcon>
@@ -337,35 +340,16 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                 ) : host ? (
                   <Flex flexDirection="column" alignItems="center" width="100%">
                     <Avatar collective={host} type={host.type} radius={64} />
-                    <H1 fontSize="20px" lineHeight="28px" color="black.900" mt={3} mb={3}>
+                    <H1 fontSize="20px" lineHeight="28px" color="black.900" mt={3} mb={3} textAlign="center">
                       {host.name}
                     </H1>
-                    <Flex justifyContent="center" width="100%" gap="32px" flexWrap="wrap">
-                      <Flex flexDirection="column">
-                        <P fontWeight="400" fontSize="12px" lineHeight="18px" color="black.600" mb={1}>
-                          <FormattedMessage id="HostSince" defaultMessage="Host since" />
-                        </P>
-                        <P fontSize="16px" fontWeight="500" lineHeight="24px">
-                          <FormattedDate value={host.createdAt} month="short" year="numeric" />
-                        </P>
-                      </Flex>
-                      <Flex flexDirection="column">
-                        <P fontWeight="400" fontSize="12px" lineHeight="18px" color="black.600" mb={1}>
-                          <FormattedMessage id="Currency" defaultMessage="Currency" />
-                        </P>
-                        <P fontSize="16px" fontWeight="500" lineHeight="24px">
-                          {host.currency}
-                        </P>
-                      </Flex>
-                      <Flex flexDirection="column">
-                        <P fontWeight="400" fontSize="12px" lineHeight="18px" color="black.600" mb={1}>
-                          <FormattedMessage id="HostFee" defaultMessage="Host fee" />
-                        </P>
-                        <P fontSize="16px" fontWeight="500" lineHeight="24px">
-                          {host.hostFeePercent}%
-                        </P>
-                      </Flex>
-                    </Flex>
+                    <HostPricingInfoRow
+                      createdAt={host.createdAt}
+                      currency={host.currency}
+                      hostFeePercent={host.hostFeePercent}
+                      platformContributionAvailable={host.platformContributionAvailable}
+                      useAlternativeHostFeeNaming={checkUseAlternativeHostFeeNaming(host)}
+                    />
                     <Box my={3}>
                       {useTwoSteps && (
                         <StepsProgress steps={Object.values(STEPS)} focus={step} onStepSelect={setStep}>

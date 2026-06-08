@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
-import { get, omit } from 'lodash';
+import { get, omit } from 'lodash-es';
 import { defineMessages, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -33,15 +33,18 @@ const memberFormMessages = defineMessages({
 });
 
 const MemberForm = props => {
-  const { intl, member, collectiveImg, bindSubmitForm, triggerSubmit } = props;
-
-  const [memberRole, setMemberRole] = React.useState(member?.role || roles.ADMIN);
+  const { intl, member, collectiveImg, bindSubmitForm, triggerSubmit, isPrivateAccount } = props;
 
   const memberCollective = member && (member.account || member.memberAccount);
 
+  const supportedRoles = isPrivateAccount
+    ? [roles.ADMIN, roles.ACCOUNTANT]
+    : [roles.ADMIN, roles.MEMBER, roles.COMMUNITY_MANAGER, roles.ACCOUNTANT];
+
+  const providedMemberRole = get(member, 'role');
   const initialValues = {
     description: get(member, 'description') || '',
-    role: get(member, 'role') || roles.ADMIN,
+    role: providedMemberRole && supportedRoles.includes(providedMemberRole) ? providedMemberRole : null,
     since: get(member, 'since')
       ? dayjs(get(member, 'since')).format('YYYY-MM-DD')
       : dayjs(new Date()).format('YYYY-MM-DD'),
@@ -64,6 +67,9 @@ const MemberForm = props => {
     const errors = {};
     if (!dayjs(values.since).isValid()) {
       errors.since = intl.formatMessage(memberFormMessages.inValidDateError);
+    } else if (!values.role || !supportedRoles.includes(values.role)) {
+      // "Error.FieldRequired": "This field is required",
+      errors.role = intl.formatMessage({ defaultMessage: 'This field is required', id: 'Error.FieldRequired' });
     }
     return errors;
   };
@@ -95,7 +101,8 @@ const MemberForm = props => {
           const { submitForm } = formik;
 
           bindSubmitForm(submitForm);
-
+          const allRoleOptions = getOptions(Object.values(roles));
+          const filteredRoleOptions = allRoleOptions.filter(option => supportedRoles.includes(option.value));
           return (
             <Form className="flex flex-col gap-2">
               <StyledInputFormikField
@@ -108,17 +115,16 @@ const MemberForm = props => {
                     <StyledSelect
                       inputId={field.id}
                       error={field.error}
-                      defaultValue={getOptions([memberRole])[0]}
+                      value={field.value ? allRoleOptions.find(option => option.value === field.value) : null}
                       onBlur={() => form.setFieldTouched(field.name, true)}
                       onChange={({ value }) => {
                         form.setFieldValue(field.name, value);
-                        setMemberRole(value);
                       }}
-                      options={getOptions([roles.ADMIN, roles.MEMBER, roles.COMMUNITY_MANAGER, roles.ACCOUNTANT])}
+                      options={filteredRoleOptions}
                     />
-                    {hasRoleDescription(memberRole) && (
+                    {Boolean(field.value && hasRoleDescription(field.value)) && (
                       <div className="mt-2 gap-1 text-xs text-muted-foreground">
-                        <MemberRoleDescription role={memberRole} />
+                        <MemberRoleDescription role={field.value} />
                       </div>
                     )}
                   </React.Fragment>

@@ -13,6 +13,7 @@ export const adminPanelQuery = gql`
       name
       legalName
       isHost
+      isPrivate
       type
       supportedExpenseTypes
       settings
@@ -102,11 +103,13 @@ export const adminPanelQuery = gql`
         EXPECTED_FUNDS
         CHARGE_HOSTING_FEES
         KYC
+        ACCOUNTING_CATEGORIZATION_RULES
       }
       policies {
         id
         publicId
         REQUIRE_2FA_FOR_ADMINS
+        USE_VENDOR_POLICY
       }
       ... on Organization {
         hasHosting

@@ -6,8 +6,10 @@ const dashboardAccountsQueryFields = gql`
   fragment DashboardAccountsQueryFields on Account {
     id
     legacyId
+    publicId
     name
     slug
+    isPrivate
     type
     currency
     imageUrl(height: 96)
@@ -18,6 +20,10 @@ const dashboardAccountsQueryFields = gql`
     tags
     settings
     createdAt
+    features {
+      id
+      PUBLIC_PROFILE
+    }
     stats {
       id
       balance {

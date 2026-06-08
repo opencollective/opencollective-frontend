@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { capitalize } from 'lodash';
+import { capitalize } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
@@ -234,7 +234,7 @@ const ActivityDescription = ({ activity }: ActivityDescriptionProps) => {
   const intl = useIntl();
 
   if (!ActivityDescriptionI18n[activity.type]) {
-    return capitalize(activity.type.replace('_', ' '));
+    return capitalize(activity.type.replaceAll('_', ' '));
   }
 
   return intl.formatMessage(ActivityDescriptionI18n[activity.type], getActivityVariables(intl, activity));

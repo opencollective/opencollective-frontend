@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';

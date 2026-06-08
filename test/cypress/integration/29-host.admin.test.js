@@ -101,7 +101,13 @@ describe('host dashboard', () => {
       cy.get('[data-cy="add-funds-amount"]').type('{selectall}20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       const vendorName = randStr();
+      cy.intercept('POST', '/api/graphql/v1', req => {
+        if (req.body?.operationName === 'CollectivePickerSearch' && req.body?.variables?.term === vendorName) {
+          req.alias = 'collectivePickerSearch';
+        }
+      });
       cy.get('[data-cy="add-funds-source"]').type(vendorName);
+      cy.wait('@collectivePickerSearch');
       cy.contains(`Create vendor: ${vendorName}`).click();
       cy.contains(`I confirm that`).click();
       cy.get('[data-cy="add-funds-submit-btn"]').click();
@@ -184,7 +190,8 @@ describe('host dashboard', () => {
       cy.getByDataCy('order-confirmation-modal-submit').click();
       cy.contains('Paid').should('exist');
 
-      cy.getByDataCy('view-transactions-button').click();
+      cy.contains('More actions').click();
+      cy.contains('View transactions').click();
       cy.contains('Contribution').should('exist');
       cy.contains('€500.00').should('exist');
       cy.contains('Host fee').should('exist');
@@ -232,7 +239,8 @@ describe('host dashboard', () => {
 
       // Verify transaction amounts: contribution 504 (514 - 10), platform tip 10, processor fee 4, host fee 9% of 504 = 45.36
       // Note: Platform tip (€10) is recorded in the Platform's ledger, not visible in the host's transaction view.
-      cy.getByDataCy('view-transactions-button').click();
+      cy.contains('More actions').click();
+      cy.contains('View transactions').click();
       cy.get('[data-cy="transactions-table"]').should('be.visible');
       cy.contains('Contribution').should('exist');
       cy.contains('Host fee').should('exist');
@@ -296,7 +304,7 @@ describe('host dashboard', () => {
       // Pay
       cy.getByDataCy('pay-expense-modal').as('payExpenseModal');
       cy.get('@payExpenseModal').find('[data-cy="pay-type-MANUAL"]').click();
-      cy.get('@payExpenseModal').find('[data-cy="expense-amount-paid"]').type('10.00');
+      cy.get('@payExpenseModal').find('[data-cy="expense-amount-paid"]').type('{selectall}10.00');
       cy.get('@payExpenseModal').find('[data-cy="mark-as-paid-button"]').click();
       cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Paid');
 

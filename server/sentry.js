@@ -28,7 +28,10 @@ const updateScopeWithNextContext = (scope, ctx) => {
   }
 };
 
-const updateScopeWithWindowContext = scope => {
+const updateScopeWithWindowContext = (
+  /** @type {(import('@sentry/browser').Scope} */
+  scope,
+) => {
   if (typeof window !== 'undefined') {
     scope.setTag('ssr', false);
     scope.setExtra('url', window.location?.href);
@@ -39,20 +42,20 @@ const updateScopeWithWindowContext = scope => {
  * Helper to extract Sentry tags from an error
  */
 const captureException = (err, ctx) => {
-  Sentry.configureScope(scope => {
-    if (err.message) {
-      // De-duplication currently doesn't work correctly for SSR / browser errors
-      // so we force deduplication by error message if it is present
-      scope.setFingerprint([err.message]);
-    }
+  /** @type {(import('@sentry/browser').Scope} */
+  const scope = Sentry.getCurrentScope();
+  if (err.message) {
+    // De-duplication currently doesn't work correctly for SSR / browser errors
+    // so we force deduplication by error message if it is present
+    scope.setFingerprint([err.message]);
+  }
 
-    if (err.statusCode) {
-      scope.setExtra('statusCode', err.statusCode);
-    }
+  if (err.statusCode) {
+    scope.setExtra('statusCode', err.statusCode);
+  }
 
-    updateScopeWithWindowContext(scope);
-    updateScopeWithNextContext(scope, ctx);
-  });
+  updateScopeWithWindowContext(scope);
+  updateScopeWithNextContext(scope, ctx);
 
   if (process.env.SENTRY_DSN) {
     return Sentry.captureException(err);
@@ -63,10 +66,10 @@ const captureException = (err, ctx) => {
 };
 
 const captureMessage = (message, opts, ctx) => {
-  Sentry.configureScope(scope => {
-    updateScopeWithWindowContext(scope);
-    updateScopeWithNextContext(scope, ctx);
-  });
+  /** @type {import('@sentry/browser').Scope} */
+  const scope = Sentry.getCurrentScope();
+  updateScopeWithWindowContext(scope);
+  updateScopeWithNextContext(scope, ctx);
 
   if (process.env.SENTRY_DSN) {
     return Sentry.captureMessage(message, opts);

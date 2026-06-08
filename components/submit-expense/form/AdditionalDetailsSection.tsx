@@ -1,5 +1,5 @@
 import React from 'react';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpenseLockableFields } from '@/lib/graphql/types/v2/graphql';

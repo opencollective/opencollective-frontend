@@ -1,5 +1,5 @@
 import React from 'react';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 
 import { cn, truncateMiddle } from '../lib/utils';
 

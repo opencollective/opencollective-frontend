@@ -1,4 +1,4 @@
-import { find, isEmpty, isUndefined, mapValues, omit, pickBy } from 'lodash';
+import { find, isEmpty, isUndefined, mapValues, omit, pickBy } from 'lodash-es';
 
 import type { TaxFormType } from '../components/dashboard/sections/tax-information/common';
 
@@ -443,3 +443,7 @@ export const getCommentUrl = (comment: Comment, loggedInUser: LoggedInUser) => {
     return getCollectivePageRoute(comment.account);
   }
 };
+
+export function getPermalinkUrl(publicId: string): string {
+  return `${getWebsiteUrl()}/permalink/${publicId}`;
+}

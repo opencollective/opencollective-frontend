@@ -9,6 +9,7 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import { KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
 
+import { KYCVerificationProviderBadge } from '../components/KYCVerificationProviderBadge';
 import { AccountHoverCard } from '@/components/AccountHoverCard';
 import Avatar from '@/components/Avatar';
 import DateTime from '@/components/DateTime';
@@ -16,7 +17,6 @@ import { actionsColumn, DataTable } from '@/components/table/DataTable';
 
 import { useKYCVerificationActions } from '../actions/useKYCVerificationActions';
 import { KYCVerificationDrawer } from '../drawer/KYCVerificationDrawer';
-import { KYCVerificationProviderBadge } from '../drawer/KYCVerificationProviderBadge';
 import { KYCVerificationStatusBadge } from '../KYCVerificationStatusBadge';
 
 export type KYCVerificationRow = KycVerificationCollectionFieldsFragment['nodes'][number] & {

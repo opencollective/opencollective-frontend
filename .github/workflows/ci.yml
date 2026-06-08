@@ -156,7 +156,7 @@ jobs:
 
       - name: Report coverage
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: GraphQL
@@ -182,7 +182,6 @@ jobs:
       - run: npm run type:check
 
   e2e:
-    if: github.ref_name != 'i18n/crowdin'
     needs: build
     uses: ./.github/workflows/e2e.yml
     secrets: inherit

@@ -5,7 +5,7 @@
  */
 
 import jsdoc from 'jsdoc-api';
-import { partition, repeat } from 'lodash';
+import { partition, repeat } from 'lodash-es';
 
 const main = async () => {
   const data = await jsdoc.explain({

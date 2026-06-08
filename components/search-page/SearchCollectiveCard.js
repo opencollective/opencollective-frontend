@@ -2,9 +2,11 @@ import React from 'react';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import { checkUseAlternativeHostFeeNaming } from '@/lib/collective';
 
 import Container from '../Container';
 import Currency from '../Currency';
+import DefinedTerm, { Terms } from '../DefinedTerm';
 import { Box } from '../Grid';
 import { Span } from '../Text';
 
@@ -44,13 +46,30 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                   <FormattedMessage id="Currency" defaultMessage="Currency" />
                 </Span>
               </Box>
-              <Box>
-                <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.host.hostFeePercent}%`}</Span>
-                {` `}
-                <Span fontSize="12px" fontWeight={400} color="black.700">
-                  <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
-                </Span>
-              </Box>
+              <div className="text-xs text-slate-700">
+                <span>
+                  <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.host.hostFeePercent}%`}</Span>
+                  {` `}
+                  <Span fontSize="12px" fontWeight={400}>
+                    <DefinedTerm
+                      color="black.700"
+                      borderColor="#969ba3"
+                      fontSize="12px"
+                      term={
+                        checkUseAlternativeHostFeeNaming(collective)
+                          ? Terms.ADMINISTRATIVE_CONTRIBUTION
+                          : Terms.HOST_FEE
+                      }
+                    />
+                  </Span>
+                </span>
+                {collective.host.platformContributionAvailable && (
+                  <React.Fragment>
+                    {' + '}
+                    <DefinedTerm color="black.700" borderColor="#969ba3" fontSize="12px" term={Terms.PLATFORM_TIPS} />
+                  </React.Fragment>
+                )}
+              </div>
             </React.Fragment>
           ) : (
             <React.Fragment>

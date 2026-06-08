@@ -20,10 +20,10 @@ import CollectivePickerAsync from '@/components/CollectivePickerAsync';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { FormField } from '../../../FormField';
 import { FormikZod } from '../../../FormikZod';
+import InputAmount from '../../../InputAmount';
 import type { BaseModalProps } from '../../../ModalContext';
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../ui/Dialog';
-import { InputGroup } from '../../../ui/Input';
 import { toast } from '../../../ui/useToast';
 
 import { accountsQuery } from './queries';
@@ -232,14 +232,12 @@ export default function InternalTransferModal({
                     {({ field }) => {
                       return (
                         <div className="flex items-center gap-2">
-                          <InputGroup
-                            prepend={values.amount?.currency}
-                            value={field.value ? field.value / 100 : ''}
-                            type="number"
-                            inputMode="numeric"
-                            onChange={e =>
+                          <InputAmount
+                            currency={values.amount?.currency}
+                            value={field.value}
+                            onChange={valueInCents =>
                               setFieldValue('amount', {
-                                valueInCents: e.target.value ? Math.round(parseFloat(e.target.value) * 100) : '',
+                                valueInCents,
                                 currency: data.account.currency,
                               })
                             }

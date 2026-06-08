@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { groupBy, map, omit, pick } from 'lodash';
+import { groupBy, map, omit, pick } from 'lodash-es';
 import { Lock, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -32,8 +32,8 @@ import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePic
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Dropzone from '../../../Dropzone';
 import { FormikZod } from '../../../FormikZod';
+import { InputAmountWithDynamicFxRate } from '../../../InputAmountWithDynamicFxRate';
 import type { BaseModalProps } from '../../../ModalContext';
-import { StyledInputAmountWithDynamicFxRate } from '../../../StyledInputAmountWithDynamicFxRate';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledSelect from '../../../StyledSelect';
 import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
@@ -41,7 +41,11 @@ import { useToast } from '../../../ui/useToast';
 import { TransactionsImportRowDetails } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
 const hostCreateExpenseModalPayeeSelectQuery = gql`
-  query HostCreateExpenseModalPayeeSelect($hostId: String!, $forAccount: AccountReferenceInput) {
+  query HostCreateExpenseModalPayeeSelect(
+    $hostId: String!
+    $forAccount: AccountReferenceInput
+    $canBeUsedWithAccounts: [AccountReferenceInput]
+  ) {
     host(id: $hostId) {
       id
       slug
@@ -50,7 +54,7 @@ const hostCreateExpenseModalPayeeSelectQuery = gql`
       description
       isHost
       imageUrl(height: 64)
-      vendors(forAccount: $forAccount) {
+      vendors(forAccount: $forAccount, canBeUsedWithAccounts: $canBeUsedWithAccounts) {
         nodes {
           id
           slug
@@ -74,7 +78,11 @@ const PayeeSelect = ({
 } & React.ComponentProps<typeof CollectivePickerAsync>) => {
   const intl = useIntl();
   const { data, loading } = useQuery(hostCreateExpenseModalPayeeSelectQuery, {
-    variables: { hostId: host.id, forAccount: getAccountReferenceInput(forAccount) },
+    variables: {
+      hostId: host.id,
+      forAccount: getAccountReferenceInput(forAccount),
+      canBeUsedWithAccounts: forAccount?.slug ? [{ slug: forAccount.slug }] : null,
+    },
   });
   const recommendedVendors = data?.host?.vendors?.nodes || [];
   const defaultSources = [...recommendedVendors, host];
@@ -96,6 +104,7 @@ const PayeeSelect = ({
       customOptions={defaultSourcesOptions}
       menuPortalTarget={null}
       includeVendorsForHostId={host.legacyId}
+      vendorVisibleToAccountIds={forAccount?.legacyId ? [forAccount.legacyId] : undefined}
       creatable={['USER', 'VENDOR']}
       HostCollectiveId={host.legacyId}
       isLoading={loading}
@@ -303,7 +312,7 @@ export const HostCreateExpenseModal = ({
                       {({ field }) => (
                         <div>
                           <div className="flex justify-between gap-2 [&>div]:w-full">
-                            <StyledInputAmountWithDynamicFxRate
+                            <InputAmountWithDynamicFxRate
                               onChange={valueInCents => setFieldValue('amount', { ...values.amount, valueInCents })}
                               onCurrencyChange={currency => setFieldValue('amount', { ...values.amount, currency })}
                               onExchangeRateChange={exchangeRate =>

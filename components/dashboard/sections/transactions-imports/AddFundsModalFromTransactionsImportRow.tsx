@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApolloClient } from '@apollo/client';
-import { isEmpty, startCase } from 'lodash';
+import { isEmpty, startCase } from 'lodash-es';
 
 import type {
   TransactionsImport,

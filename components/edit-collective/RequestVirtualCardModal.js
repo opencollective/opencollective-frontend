@@ -15,13 +15,13 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import { getI18nLink } from '../I18nFormatters';
+import InputAmount from '../InputAmount';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
@@ -226,7 +226,7 @@ const RequestVirtualCardModal = props => {
               htmlFor="spendingLimitAmount"
             >
               {inputProps => (
-                <StyledInputAmount
+                <InputAmount
                   {...inputProps}
                   id="spendingLimitAmount"
                   error={formik.touched.spendingLimitAmount && Boolean(formik.errors.spendingLimitAmount)}

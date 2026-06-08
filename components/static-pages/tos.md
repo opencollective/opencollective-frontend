@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Last Updated: November 13th 2025**
+**Last Updated: April 1st 2026**
 
 These Terms of Service ("**Terms**") apply to your access to and use of the **Open Collective Platform**, accessible through **opencollective.com** and related domains, as well as other websites, applications, and online services (collectively, "**the Platform**" or "**the Services**"). The Platform is provided and operated by **OFi Technologies LLC** ("**OFiTech**", "**we**", "**us**", or "**our**"), a company 100% owned and controlled by **Open Finance Consortium Inc.**, a Delaware **501(c)(6)** nonprofit corporation ("**OFi Consortium**" or "**OFiCo**"). **By creating an account or otherwise accessing the Platform, you agree to these Terms. If you do not agree to these Terms, including the mandatory arbitration provision and class action waiver in Section 18 that applies to residents of the United States, do not access or use our Platform.**
 
@@ -8,19 +8,19 @@ If you have any questions about these Terms, you may contact us at [support@open
 
 ## 1. Overview of Our Platform
 
-(a) Our Platform provides a system that may be used by individuals ("Individuals"), by legal entities ("Organizations" or "Independent Collectives"), and by groups with a shared purpose ("Collectives") to create accounts and collaborate around shared financial activity.
+(a) Our Platform provides a system that may be used by individuals ("Individuals"), by legal entities ("Organizations"), and by groups with a shared purpose ("Collectives") to create accounts and collaborate around shared financial activity.
 
-Individuals, and Organizations (and Independent Collectives) can participate directly on the Platform, for example by contributing funds to Collectives or by submitting and receiving payment for expenses. Collectives use a Host to collect and disburse funds that support their activities.
+Individuals and Organizations can participate directly on the Platform, for example by contributing funds to Collectives or by submitting and receiving payment for expenses. Collectives use a Host to collect and disburse funds that support their activities.
 
-The goal of the Platform is to promote transparency and make it easier to track incoming and outgoing funds for the benefit of Individuals, Collectives, and Organizations (and Independent Collectives).
+The goal of the Platform is to promote transparency and make it easier to track incoming and outgoing funds for the benefit of Individuals, Collectives, and Organizations.
 
-Below is a list of the main roles that may be associated with each Collective, Organization (and Independent Collective):
+Below is a list of the main roles that may be associated with each Collective and Organization:
 
 - **"Host"** - an Organization that receives and holds funds contributed by Financial Contributors via the Platform on behalf of one or more Collectives. Hosts may also be referred to as "Fiscal Hosts". Additional terms for Hosts are included in Section 7 below.
 
 - **"Contributor"** - a Contributor is an individual or entity that participates in the Collective in some way, such as by acting as a Collective Admin, Financial Contributor, or Expense Submitter, or by participating in any other way.
 
-- **"Admin"** - an Admin is a Contributor that has administrator responsibilities for a Collective or an Organization (or an Independent Collective), including editing its content and the ability to approve expense payments associated with the Collective or Organization (or Independent Collective). Additional terms for Collective Admins are included in Section 5 below.
+- **"Admin"** - an Admin is a Contributor that has administrator responsibilities for a Collective or an Organization, including editing its content and the ability to approve expense payments associated with the Collective or Organization. Additional terms for Collective Admins are included in Section 5 below.
 
 - **"Financial Contributor"** - a Financial Contributor is a Contributor that uses the Platform to contribute funds to a Host that are intended to support a particular Collective. Additional terms for Financial Contributors are included in Section 4 below.
 
@@ -50,7 +50,7 @@ This Section applies to you if you use the Platform as a Financial Contributor.
 
 (a) **Responsibility.** Before committing to make any contribution via the Platform, each Financial Contributor must (i) read the full description of the Collective and its mission, and (ii) review the criteria and process requirements specified by the Collective and its Host (if any) for receiving expense payments. By contributing to the Host for designation to a Collective, you agree to look solely to the applicable Contributors or Host of the applicable Collective to resolve any questions or disputes regarding contributions or expected payments.
 
-(b) **Contributions.** Each contribution you make is paid directly to an Organization (or Independent Collective) that receives and holds funds. When a contribution is intended for a Collective, it is received and held by the Organization acting as its Host and must be used (less any applicable fees) in support of the designated Collective. When a contribution is intended for an Organization (or Independent Collective), it is held and used in accordance with that Organization’s stated purpose and terms.
+(b) **Contributions.** Each contribution you make is paid directly to an Organization that receives and holds funds. When a contribution is intended for a Collective, it is received and held by the Organization acting as its Host and must be used (less any applicable fees) in support of the designated Collective. When a contribution is intended for an Organization, it is held and used in accordance with that Organization’s stated purpose and terms.
 
 When making a contribution, you may be offered the option to include a voluntary Platform Tip to support the operation of the Platform, as described in Section 9(a).
 
@@ -81,7 +81,7 @@ This Section applies to you if you use the Platform as a Collective Admin.
 
 This Section applies to you if you use the Platform as a Host.
 
-(a) **Set-Up.** Any person or entity seeking to serve as Host for a Collective must be approved via the Platform. Hosts must remit any Platform Tips collected through the Platform to OFiTech as described in Section 9(a). Hosts are also subject to the plan terms and usage allowances described in Section 9(e).
+(a) **Set-Up.** Any person or entity seeking to serve as Host for a Collective must be approved via the Platform. Hosts must remit any Platform Tips collected through the Platform to OFiTech as described in Section 9(a). Organizations acting as Hosts are also subject to the plan terms and usage allowances described in Section 9(e).
 
 (b) **Contributions.** You agree to accept contributions of funds from Financial Contributors for designation to a specific Collective ("**Collective Funds**"). You must take accounting measures to segregate Collective Funds from your other funds, and maintain and use the Collective Funds solely for the benefit of the designated Collective and in accordance with these Terms. The Platform is designed to assist you in satisfying these responsibilities, by enabling you to export the global ledger and helping you to track the budget of each Collective to determine whether the Collective is operating as intended.
 
@@ -109,13 +109,23 @@ The Host is responsible for remitting Platform Tips to OFiTech (or its affiliate
 a. automatically through the payment processor’s integrated "application fee" mechanism (for example, Stripe); or
 b. periodically through invoicing or reconciliation when automatic transfer is not available.
 
-In cases where Platform Tips where not enabled or available for a Contribution, OFiTech may apply a Platform Fee charged to the Host (as defined in Section 9(e)).
+In cases where Platform Tips are not enabled or available for a Contribution, OFiTech may apply a Crowdfunding Fee of 5% charged to the Host.
 
 (c) **Payment Processor Fees**. If you use a Payment Processor (as defined in Section 1(b)) to collect contributions or disburse expense payments, that third-party service may charge additional fees ("Payment Processor Fees"). These fees are charged directly by the Payment Processor, and OFiTech is not responsible for them or for any actions, omissions, or errors by the Payment Processor.
 
 (d) **Taxes.** It is the Host’s responsibility to determine what, if any taxes apply to collection of contributions and disbursement of expense payments, including, for example, sales, use, value added, and similar taxes. It is also the Host’s responsibility to withhold, collect, report and remit the correct taxes to the appropriate tax authorities. OFiTech is not responsible for withholding, collecting, reporting, or remitting any sales, use, value added, or similar tax arising from any transaction completed via the Platform.
 
-(e) **Platform Fees.** For Contribution not subject to Platform Tips, the Platform applies a 15% "Platform Share (or "Host Fee Share"). If your Host Fee is 10% and your Collectives bring in $1,000, the Host gets $100 and $15 (15%) is the "Platform Share".
+(e) **Organization Plans.** OFi Technologies provides a range of plans for Organizations using the Platform.
+
+Organization pricing is based on two factors: the features needed and the volume of activity managed on the Platform. Each plan has two parts: a tier (Discover, Basic, or Pro) based on the features needed, and a package within that tier based on the amount of monthly activity. Activity is measured by the number of Active Collectives or Funds managed during the month and the number of Expenses paid through the Platform in the same period. A Collective or Fund is considered "Active" if it has at least one financial transaction in the month.
+
+The Discover Plan is the base plan available to all Organizations. It includes a free allowance of up to one Active Collective and ten Paid Expenses per billing period. Additional usage beyond these included amounts is billed at the applicable per-unit rates.
+
+Paid plans, such as Basic and Pro, provide higher included allowances and access to additional features. The current scope, allowances, and pricing of all Organization Plans are published on our [Pricing page](https://opencollective.com/pricing) and may be updated from time to time.
+
+Organizations are billed monthly at the end of each calendar billing period for any plan fees and usage-based charges. Payment may be processed automatically through the designated payment processor or by invoice, as determined by OFiTech. Payment is due upon receipt unless otherwise specified in writing.
+
+Organization Plans are separate from and in addition to any Host Fees or Platform Tips described elsewhere in these Terms.
 
 ## 10. User Content
 

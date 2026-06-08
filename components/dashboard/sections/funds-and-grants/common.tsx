@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
-import { includes } from 'lodash';
+import { includes } from 'lodash-es';
 import { Check, Copy, Filter, MinusCircle, MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';

@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { compact, concat, isEmpty, throttle } from 'lodash';
+import { compact, concat, isEmpty, throttle } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 
 import { getFilteredSectionsForCollective } from '../../lib/collective-sections';

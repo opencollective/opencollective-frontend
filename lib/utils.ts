@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
-import { isArray, isEmpty, isObject, omit, omitBy } from 'lodash';
+import { isArray, isEmpty, isObject, omit, omitBy } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { twMerge } from 'tailwind-merge';
 

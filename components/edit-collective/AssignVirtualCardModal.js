@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { compact, isEmpty, pick } from 'lodash';
+import { compact, isEmpty, pick } from 'lodash-es';
 import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -24,7 +24,7 @@ import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledModal from '../../StyledModal';
 import { actionsColumn, DataTable } from '../../table/DataTable';
 import { Button } from '../../ui/Button';
-import { VendorContactTag } from '../../vendors/common';
+import { getEffectiveVendorPolicyLabel, VendorContactTag } from '../../vendors/common';
 import type { VendorFieldsFragment } from '../../vendors/queries';
 import { setVendorArchiveMutation, vendorFieldFragment } from '../../vendors/queries';
 import VendorForm from '../../vendors/VendorForm';
@@ -38,7 +38,7 @@ import { buildSortFilter } from '../filters/SortFilter';
 import type { DashboardSectionProps } from '../types';
 import { makePushSubpath } from '../utils';
 
-import { ContributorDetails } from './community/AccountDetail';
+import { AccountDetails } from './community/AccountDetail';
 import { usePersonActions } from './community/common';
 
 enum VendorsTab {
@@ -60,6 +60,10 @@ const dashboardVendorsQuery = gql`
     settings
     currency
     requiredLegalDocuments
+    policies {
+      id
+      USE_VENDOR_POLICY
+    }
     features {
       id
       MULTI_CURRENCY_EXPENSES
@@ -93,17 +97,17 @@ const dashboardVendorsQuery = gql`
         communityStats(host: { slug: $slug }) {
           relations
           transactionSummary {
-            year
-            expenseTotalAcc {
+            kind
+            debitTotal {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCount
+            creditTotal {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCount
           }
         }
       }
@@ -163,17 +167,17 @@ const dashboardVendorsQuery = gql`
         communityStats(host: { slug: $slug }) {
           relations
           transactionSummary {
-            year
-            expenseTotalAcc {
+            kind
+            debitTotal {
               valueInCents
               currency
             }
-            expenseCountAcc
-            contributionTotalAcc {
+            debitCount
+            creditTotal {
               valueInCents
               currency
             }
-            contributionCountAcc
+            creditCount
           }
         }
       }
@@ -183,14 +187,20 @@ const dashboardVendorsQuery = gql`
 `;
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  fieldSchema: z.enum(['NAME', 'CREATED_AT', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
   defaultValue: {
     field: 'NAME',
     direction: 'ASC',
   },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({
+      defaultMessage: 'Created',
+      id: 'created',
+    }),
+  },
 });
 
-const getColumns = ({ isVendor }) => {
+const getColumns = ({ isVendor, host }) => {
   return [
     {
       header: () => <FormattedMessage defaultMessage="Vendor" id="dU1t5Z" />,
@@ -221,11 +231,11 @@ const getColumns = ({ isVendor }) => {
     },
     isVendor && {
       header: () => <FormattedMessage defaultMessage="Visible to" id="zJePa1" />,
-      accessorKey: 'visibleToAccounts',
+      accessorKey: 'canBeUsedWithAccounts',
       cell: ({ cell }) => {
-        const visibleToAccounts = cell.getValue();
+        const canBeUsedWithAccounts = cell.getValue();
 
-        if (!visibleToAccounts?.length) {
+        if (!canBeUsedWithAccounts?.length) {
           return (
             <span className="text-muted-foreground">
               <FormattedMessage defaultMessage="All hosted accounts" id="M7USSD" />
@@ -235,10 +245,29 @@ const getColumns = ({ isVendor }) => {
 
         return (
           <StackedAvatars
-            accounts={visibleToAccounts}
+            accounts={canBeUsedWithAccounts}
             imageSize={24}
             withHoverCard={{ includeAdminMembership: true }}
           />
+        );
+      },
+    },
+    isVendor && {
+      header: () => <FormattedMessage defaultMessage="Who can use" id="56SUDL" />,
+      accessorKey: 'useVendorPolicy',
+      cell: ({ row, table }) => {
+        const { intl } = table.options.meta;
+        const vendor = row.original;
+        const { label, isInherited } = getEffectiveVendorPolicyLabel(vendor, host, intl);
+        return (
+          <div className="text-sm">
+            {label}
+            {isInherited && (
+              <span className="ml-1 text-xs text-muted-foreground">
+                <FormattedMessage defaultMessage="(host default)" id="wGmb1I" />
+              </span>
+            )}
+          </div>
         );
       },
     },
@@ -271,9 +300,9 @@ const getColumns = ({ isVendor }) => {
       header: () => <FormattedMessage defaultMessage="Total Expenses" id="TotalExpenses" />,
       cell: ({ row }) => {
         const account = row.original;
-        const summary = account.communityStats?.transactionSummary?.[0];
-        const total = summary?.expenseTotalAcc;
-        const count = summary?.expenseCountAcc || 0;
+        const summary = account.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+        const total = summary?.debitTotal;
+        const count = summary?.debitCount || 0;
 
         if (!total || count === 0) {
           return <span className="text-muted-foreground">—</span>;
@@ -292,9 +321,9 @@ const getColumns = ({ isVendor }) => {
       header: () => <FormattedMessage defaultMessage="Total Contributions" id="TotalContributions" />,
       cell: ({ row }) => {
         const account = row.original;
-        const summary = account.communityStats?.transactionSummary?.[0];
-        const total = summary?.contributionTotalAcc;
-        const count = summary?.contributionCountAcc || 0;
+        const summary = account.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+        const total = summary?.creditTotal;
+        const count = summary?.creditCount || 0;
 
         if (!total || count === 0) {
           return <span className="text-muted-foreground">—</span>;
@@ -443,9 +472,10 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
     () => (queryFilter.variables?.onlyVendors ? AccountType.VENDOR : AccountType.ORGANIZATION),
     [queryFilter.variables],
   );
+  const host = (data || previousData)?.account?.['host'];
   const columns = React.useMemo(
-    () => getColumns({ isVendor: expectedAccountType === AccountType.VENDOR }),
-    [expectedAccountType],
+    () => getColumns({ isVendor: expectedAccountType === AccountType.VENDOR, host }),
+    [expectedAccountType, host],
   );
   const tableData = React.useMemo(
     () =>
@@ -454,14 +484,13 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
         : (data || previousData)?.community,
     [expectedAccountType, data, previousData],
   );
-  const host = (data || previousData)?.account?.['host'];
   const loading = queryLoading;
   const error = queryError;
 
   if (!isEmpty(id)) {
     return (
       <div className="h-full">
-        <ContributorDetails
+        <AccountDetails
           account={{ id: subpath[0] }}
           host={account}
           onClose={() => pushSubpath('')}

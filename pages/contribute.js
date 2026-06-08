@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 
-import { getCollectivePageMetadata, sortConnectedCollectives, sortProjects } from '../lib/collective';
+import { getCollectivePageMetadata, isHiddenAccount, sortConnectedCollectives, sortProjects } from '../lib/collective';
 import { CONNECTED_COLLECTIVES_ORDER_KEY, PROJECTS_ORDER_KEY } from '../lib/constants/collectives';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { EMPTY_ARRAY } from '../lib/constants/utils';
@@ -34,6 +34,8 @@ import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
 import StyledButton from '../components/StyledButton';
 import { withUser } from '../components/UserProvider';
+
+import Custom404 from './404';
 
 class ContributePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, verb } }) {
@@ -258,6 +260,8 @@ class ContributePage extends React.Component {
 
     if (!data || !data.Collective) {
       return <ErrorPage data={data} />;
+    } else if (isHiddenAccount(data.Collective)) {
+      return <Custom404 />;
     }
 
     const collective = data.Collective;

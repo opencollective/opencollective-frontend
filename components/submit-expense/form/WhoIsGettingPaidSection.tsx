@@ -1,14 +1,17 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { useFormikContext } from 'formik';
-import { isEmpty, pick } from 'lodash';
-import { Lock } from 'lucide-react';
+import type { FieldMetaProps } from 'formik';
+import { Field, useFormikContext } from 'formik';
+import { isEmpty, pick } from 'lodash-es';
+import { AlertCircle, Lock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { AccountType, ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import {
+  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
+  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
   PAYEE_SLUG_INVITE,
   PAYEE_SLUG_INVITE_EXISTING_USER,
   PAYEE_SLUG_INVITE_SOMEONE,
@@ -19,9 +22,11 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { FormField } from '@/components/FormField';
 import LoginBtn from '@/components/LoginBtn';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
-import VendorForm from '@/components/vendors/VendorForm';
+import { quickCreateVendorCollectivePickerOptions } from '@/components/vendors/QuickCreateVendorCollectiveOption';
+import { useQuickCreateVendor } from '@/components/vendors/useQuickCreateVendor';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -35,6 +40,7 @@ import { useToast } from '../../ui/useToast';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
+import { CreateLegalEntityPayeeForm } from './CreateLegalEntityPayeeForm';
 import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
@@ -84,12 +90,18 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
 
   const myProfiles = React.useMemo(() => props.payoutProfiles || [], [props.payoutProfiles]);
   const personalProfile = React.useMemo(() => myProfiles.find(p => p.type === AccountType.INDIVIDUAL), [myProfiles]);
+  const administeredProfiles = React.useMemo(
+    () => myProfiles.filter(p => p.slug !== personalProfile?.slug),
+    [myProfiles, personalProfile?.slug],
+  );
 
   const otherProfiles = React.useMemo(
     () => myProfiles.filter(p => p.slug !== personalProfile?.slug && p.slug !== lastUsedProfile?.slug),
     [lastUsedProfile?.slug, myProfiles, personalProfile?.slug],
   );
-  const hasOtherProfiles = otherProfiles.length > 0;
+  const singleOtherProfile = administeredProfiles.length === 1 ? otherProfiles[0] : null;
+  const hasMultipleOtherProfiles = administeredProfiles.length > 1 && otherProfiles.length > 0;
+  const hasAdministeredProfiles = administeredProfiles.length > 0;
   const isInvite = [PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
     props.payeeSlug,
   );
@@ -123,7 +135,8 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
 
     const otherProfileSelection = otherProfiles.find(p => p.slug === newPayeeSlug);
     const isMyOtherProfilesSelected =
-      hasOtherProfiles && (!newPayeeSlug || newPayeeSlug === '__findAccountIAdminister' || !!otherProfileSelection);
+      hasMultipleOtherProfiles &&
+      (!newPayeeSlug || newPayeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER || !!otherProfileSelection);
     setIsMyOtherProfilesSelected(isMyOtherProfilesSelected);
 
     if (!props.initialLoading) {
@@ -137,178 +150,231 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
     props.payeeSlug,
     personalProfile,
     otherProfiles,
-    hasOtherProfiles,
+    hasMultipleOtherProfiles,
     lastUsedProfile?.slug,
     props.initialLoading,
   ]);
 
   return (
-    <RadioGroup
-      id="payeeSlug"
-      name="payeeSlug"
-      data-cy="payee-selector"
-      disabled={props.isSubmitting}
-      value={props.payeeSlug}
-      onValueChange={payeeSlug => {
-        setFieldValue('payeeSlug', payeeSlug);
-        setFieldTouched('payeeSlug', true);
-      }}
-    >
-      {!isLoading && lastUsedProfile && lastUsedProfile?.slug !== personalProfile?.slug && (
-        <RadioGroupCard
-          disabled={props.isSubmitting}
-          value={lastUsedProfile.slug}
-          showSubcontent={props.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName)}
-          subContent={<LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.refresh} />}
-          className="min-w-0"
-        >
-          <ExpenseAccountItem account={lastUsedProfile} />
-        </RadioGroupCard>
-      )}
+    <React.Fragment>
+      <RadioGroup
+        id="payeeSlug"
+        name="payeeSlug"
+        data-cy="payee-selector"
+        disabled={props.isSubmitting}
+        value={props.payeeSlug}
+        onValueChange={payeeSlug => {
+          setFieldValue('payeeSlug', payeeSlug);
+          setFieldTouched('payeeSlug', true);
+        }}
+      >
+        {!isLoading && lastUsedProfile && lastUsedProfile?.slug !== personalProfile?.slug && (
+          <RadioGroupCard
+            disabled={props.isSubmitting}
+            value={lastUsedProfile.slug}
+            showSubcontent={props.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName)}
+            subContent={<LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.refresh} />}
+            className="min-w-0"
+          >
+            <ExpenseAccountItem account={lastUsedProfile} />
+          </RadioGroupCard>
+        )}
 
-      {(personalProfile || isLoading) && (
-        <RadioGroupCard
-          data-cy="payee-myself-option"
-          value={!isLoading ? personalProfile.slug : ''}
-          disabled={isLoading || props.isSubmitting}
-          checked={isLoading ? false : props.payeeSlug === personalProfile.slug}
-          showSubcontent={!isLoading && props.payeeSlug === personalProfile.slug && isEmpty(personalProfile.legalName)}
-          subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />}
-          className="min-w-0"
-        >
-          {isLoading ? <Skeleton className="h-6 w-full" /> : <ExpenseAccountItem account={personalProfile} />}
-        </RadioGroupCard>
-      )}
+        {(personalProfile || isLoading) && (
+          <RadioGroupCard
+            data-cy="payee-myself-option"
+            value={!isLoading ? personalProfile.slug : ''}
+            disabled={isLoading || props.isSubmitting}
+            checked={isLoading ? false : props.payeeSlug === personalProfile.slug}
+            showSubcontent={
+              !isLoading && props.payeeSlug === personalProfile.slug && isEmpty(personalProfile.legalName)
+            }
+            subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />}
+            className="min-w-0"
+          >
+            {isLoading ? <Skeleton className="h-6 w-full" /> : <ExpenseAccountItem account={personalProfile} />}
+          </RadioGroupCard>
+        )}
 
-      {!isLoading && hasOtherProfiles && (
-        <RadioGroupCard
-          value="__findAccountIAdminister"
-          checked={isMyOtherProfilesSelected}
-          showSubcontent={isMyOtherProfilesSelected}
-          disabled={props.isSubmitting}
-          className="min-w-0"
-          subContent={
-            <div>
-              <CollectivePicker
-                disabled={props.isSubmitting}
-                collectives={otherProfiles}
-                collective={props.payeeSlug === '__findAccountIAdminister' ? null : props.payee}
-                onChange={e => {
-                  const slug = e.value.slug;
-                  setFieldValue('payeeSlug', !slug ? '__findAccountIAdminister' : slug);
-                }}
-              />
-            </div>
-          }
-        >
-          <FormattedMessage defaultMessage="An account I administer" id="ZRMBXB" />
-        </RadioGroupCard>
-      )}
+        {!isLoading && singleOtherProfile && (
+          <RadioGroupCard
+            disabled={props.isSubmitting}
+            value={singleOtherProfile.slug}
+            showSubcontent={props.payeeSlug === singleOtherProfile.slug && isEmpty(singleOtherProfile.legalName)}
+            subContent={<LegalNameWarning account={singleOtherProfile} onLegalNameUpdate={props.refresh} />}
+            className="min-w-0"
+          >
+            <ExpenseAccountItem account={singleOtherProfile} />
+          </RadioGroupCard>
+        )}
 
-      {!isLoading && props.allowInvite && (
-        <RadioGroupCard
-          value="__inviteSomeone"
-          checked={isInvite}
-          showSubcontent={isInvite}
-          disabled={props.initialLoading || props.isSubmitting}
-          className="min-w-0"
-          subContent={
-            <div>
-              <CollectivePickerAsync
-                inputId="payee-invite-picker"
-                disabled={props.isSubmitting}
-                onFocus={() => props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE_SOMEONE)}
-                invitable
-                expenseType={props.expenseTypeOption}
-                collective={props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER ? props.payee : null}
-                types={[
-                  CollectiveType.COLLECTIVE,
-                  CollectiveType.EVENT,
-                  CollectiveType.FUND,
-                  CollectiveType.ORGANIZATION,
-                  CollectiveType.PROJECT,
-                  CollectiveType.USER,
-                ]}
-                onChange={option => {
-                  if (option?.value?.id) {
-                    props.setFieldValue('inviteeExistingAccount', option.value.slug);
-                    props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE_EXISTING_USER);
-                  }
-                }}
-                onInvite={() => {
-                  props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE);
-                }}
-              />
-
-              {props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER && props.payee && (
-                <React.Fragment>
-                  <Separator className="mt-3" />
-                  <div className="mt-3">
-                    <FormField
-                      disabled={props.isSubmitting}
-                      isFastField
-                      label={intl.formatMessage({ defaultMessage: 'Notes for the recipient', id: '1Wu0qx' })}
-                      required={false}
-                      name="inviteNote"
-                    >
-                      {({ field }) => <Textarea className="w-full" {...field} />}
-                    </FormField>
-                  </div>
-                </React.Fragment>
-              )}
-
-              {props.payeeSlug === PAYEE_SLUG_INVITE && (
-                <React.Fragment>
-                  <Separator className="mt-3" />
-                  <div className="mt-3">
-                    <InviteUserOption
-                      isSubmitting={props.isSubmitting}
-                      inviteeAccountType={props.inviteeAccountType}
-                      setFieldValue={props.setFieldValue}
-                      lockedFields={props.lockedFields}
-                    />
-                  </div>
-                </React.Fragment>
-              )}
-            </div>
-          }
-        >
-          <FormattedMessage defaultMessage="Invite someone" id="SMZ/xh" />
-        </RadioGroupCard>
-      )}
-
-      {!isLoading && props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount && (
-        <RadioGroupCard
-          value=""
-          checked
-          showSubcontent
-          disabled={props.initialLoading || props.isSubmitting}
-          className="min-w-0"
-          subContent={
-            <div>
-              <InviteUserOption
-                hideNotesField
-                isSubmitting={props.isSubmitting}
-                setFieldValue={setFieldValue}
-                inviteeAccountType={props.inviteeAccountType}
-                lockedFields={props.lockedFields}
-              />
-              <div className="mt-4">
-                <FormattedMessage
-                  id="ExpenseForm.SignUp.SignIn"
-                  defaultMessage="We will use this email to create your account. If you already have an account, {loginLink}."
-                  values={{ loginLink: <LoginBtn className="p-0" asLink /> }}
+        {!isLoading && hasMultipleOtherProfiles && (
+          <RadioGroupCard
+            value={PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER}
+            checked={isMyOtherProfilesSelected}
+            showSubcontent={isMyOtherProfilesSelected}
+            disabled={props.isSubmitting}
+            className="min-w-0"
+            subContent={
+              <div>
+                <CollectivePicker
+                  disabled={props.isSubmitting}
+                  collectives={otherProfiles}
+                  collective={props.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER ? null : props.payee}
+                  onChange={e => {
+                    const slug = e.value.slug;
+                    setFieldValue('payeeSlug', !slug ? PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER : slug);
+                  }}
                 />
               </div>
-            </div>
-          }
-        >
-          <FormattedMessage defaultMessage="New Profile" id="xBIExU" />
-        </RadioGroupCard>
-      )}
+            }
+          >
+            <FormattedMessage defaultMessage="An account I administer" id="ZRMBXB" />
+          </RadioGroupCard>
+        )}
 
-      <VendorOptionWrapper />
-    </RadioGroup>
+        {!isLoading && !hasAdministeredProfiles && props.loggedInAccount && (
+          <RadioGroupCard
+            value={PAYEE_SLUG_CREATE_LEGAL_ENTITY}
+            checked={props.payeeSlug === PAYEE_SLUG_CREATE_LEGAL_ENTITY}
+            showSubcontent={props.payeeSlug === PAYEE_SLUG_CREATE_LEGAL_ENTITY}
+            disabled={props.isSubmitting}
+            className="min-w-0"
+            subContent={
+              <CreateLegalEntityPayeeForm
+                isSubmitting={props.isSubmitting}
+                refresh={props.refresh}
+                setFieldValue={props.setFieldValue}
+                setFieldTouched={props.setFieldTouched}
+              />
+            }
+          >
+            <FormattedMessage
+              defaultMessage="I would like to get paid through a legal entity"
+              id="SubmitExpense.payee.createLegalEntity"
+            />
+          </RadioGroupCard>
+        )}
+
+        {!isLoading && props.allowInvite && (
+          <RadioGroupCard
+            value="__inviteSomeone"
+            checked={isInvite}
+            showSubcontent={isInvite}
+            disabled={props.initialLoading || props.isSubmitting}
+            className="min-w-0"
+            subContent={
+              <div>
+                <CollectivePickerAsync
+                  inputId="payee-invite-picker"
+                  disabled={props.isSubmitting}
+                  onFocus={() => props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE_SOMEONE)}
+                  invitable
+                  expenseType={props.expenseTypeOption}
+                  collective={props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER ? props.payee : null}
+                  types={[
+                    CollectiveType.COLLECTIVE,
+                    CollectiveType.EVENT,
+                    CollectiveType.FUND,
+                    CollectiveType.ORGANIZATION,
+                    CollectiveType.PROJECT,
+                    CollectiveType.USER,
+                  ]}
+                  onChange={option => {
+                    if (option?.value?.id) {
+                      props.setFieldValue('inviteeExistingAccount', option.value.slug);
+                      props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE_EXISTING_USER);
+                    }
+                  }}
+                  onInvite={() => {
+                    props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE);
+                  }}
+                />
+
+                {props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER && props.payee && (
+                  <React.Fragment>
+                    <Separator className="mt-3" />
+                    <div className="mt-3">
+                      <FormField
+                        disabled={props.isSubmitting}
+                        isFastField
+                        label={intl.formatMessage({ defaultMessage: 'Notes for the recipient', id: '1Wu0qx' })}
+                        required={false}
+                        name="inviteNote"
+                      >
+                        {({ field }) => <Textarea className="w-full" {...field} />}
+                      </FormField>
+                    </div>
+                  </React.Fragment>
+                )}
+
+                {props.payeeSlug === PAYEE_SLUG_INVITE && (
+                  <React.Fragment>
+                    <Separator className="mt-3" />
+                    <div className="mt-3">
+                      <InviteUserOption
+                        isSubmitting={props.isSubmitting}
+                        inviteeAccountType={props.inviteeAccountType}
+                        setFieldValue={props.setFieldValue}
+                        lockedFields={props.lockedFields}
+                      />
+                    </div>
+                  </React.Fragment>
+                )}
+              </div>
+            }
+          >
+            <FormattedMessage defaultMessage="Invite someone" id="SMZ/xh" />
+          </RadioGroupCard>
+        )}
+
+        {!isLoading && props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount && (
+          <RadioGroupCard
+            value=""
+            checked
+            showSubcontent
+            disabled={props.initialLoading || props.isSubmitting}
+            className="min-w-0"
+            subContent={
+              <div>
+                <InviteUserOption
+                  hideNotesField
+                  isSubmitting={props.isSubmitting}
+                  setFieldValue={setFieldValue}
+                  inviteeAccountType={props.inviteeAccountType}
+                  lockedFields={props.lockedFields}
+                />
+                <div className="mt-4">
+                  <FormattedMessage
+                    id="ExpenseForm.SignUp.SignIn"
+                    defaultMessage="We will use this email to create your account. If you already have an account, {loginLink}."
+                    values={{ loginLink: <LoginBtn className="p-0" asLink /> }}
+                  />
+                </div>
+              </div>
+            }
+          >
+            <FormattedMessage defaultMessage="New Profile" id="xBIExU" />
+          </RadioGroupCard>
+        )}
+
+        <VendorOptionWrapper />
+      </RadioGroup>
+      <Field name="payeeSlug">
+        {({ meta }: { meta: FieldMetaProps<string> }) => {
+          if (!meta.error || !meta.value || meta.value.startsWith('__')) {
+            return null;
+          }
+          return (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>
+                <AlertCircle className="inline-block align-text-bottom" size={16} /> {meta.error}
+              </AlertDescription>
+            </Alert>
+          );
+        }}
+      </Field>
+    </React.Fragment>
   );
 }, getFormProps);
 
@@ -325,7 +391,6 @@ function VendorOptionWrapper() {
         vendorsForAccount={form.options.vendorsForAccount || []}
         account={form.options.account}
         host={form.options.host}
-        refresh={form.refresh}
         expenseTypeOption={form.values.expenseTypeOption}
       />
     );
@@ -341,11 +406,16 @@ const VendorOption = React.memo(function VendorOption(props: {
   vendorsForAccount: ExpenseForm['options']['vendorsForAccount'];
   account: ExpenseForm['options']['account'];
   host: ExpenseForm['options']['host'];
-  refresh: ExpenseForm['refresh'];
   expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
 }) {
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(props.host);
+  const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
+  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({
+    host: props.host,
+    canBeUsedWithAccounts: props.account?.id ? [pick(props.account, 'id')] : [],
+    isBeneficiary,
+  });
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendor, setSelectedVendor] = React.useState(undefined);
   const isVendorSelected =
@@ -353,8 +423,6 @@ const VendorOption = React.memo(function VendorOption(props: {
     props.payeeSlug === PAYEE_SLUG_NEW_VENDOR ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
     selectedVendor?.slug === props.payeeSlug;
-
-  const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
 
   return (
     <RadioGroupCard
@@ -369,6 +437,7 @@ const VendorOption = React.memo(function VendorOption(props: {
             inputId={PAYEE_SLUG_VENDOR}
             useBeneficiaryForVendor={isBeneficiary}
             isSearchable
+            loading={isCreatingVendor}
             types={['VENDOR']}
             creatable={isHostAdmin ? ['VENDOR'] : false}
             includeVendorsForHostId={props.host.legacyId}
@@ -379,11 +448,9 @@ const VendorOption = React.memo(function VendorOption(props: {
                 ? null
                 : selectedVendor || props.payee
             }
-            handleCreateForm
-            onCreateClick={() => {
-              props.setFieldValue('payeeSlug', PAYEE_SLUG_NEW_VENDOR);
-              setSelectedVendor(null);
-            }}
+            {...(isHostAdmin
+              ? quickCreateVendorCollectivePickerOptions(createVendorFromSearch, { isBeneficiary })
+              : {})}
             onChange={e => {
               const selected = e.value;
               const slug = selected?.slug;
@@ -392,28 +459,6 @@ const VendorOption = React.memo(function VendorOption(props: {
             }}
             vendorVisibleToAccountIds={props.account.legacyId}
           />
-          {props.payeeSlug === PAYEE_SLUG_NEW_VENDOR && (
-            <React.Fragment>
-              <Separator className="mt-3" />
-              <div className="mt-3">
-                <VendorForm
-                  isBeneficiary={isBeneficiary}
-                  limitVisibilityOptionToAccount={props.account}
-                  onSuccess={selected => {
-                    props.setFieldValue('payeeSlug', selected?.slug);
-                    setSelectedVendor(selected);
-                  }}
-                  hidePayoutMethod
-                  host={props.host}
-                  supportsTaxForm={false}
-                  onCancel={() => {
-                    props.setFieldValue('payeeSlug', PAYEE_SLUG_VENDOR);
-                    setSelectedVendor(null);
-                  }}
-                />
-              </div>
-            </React.Fragment>
-          )}
         </div>
       }
     >

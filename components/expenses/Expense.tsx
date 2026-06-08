@@ -3,7 +3,7 @@ import type { ApolloClient } from '@apollo/client';
 import type { FetchMoreFunction } from '@apollo/client/react/hooks/useSuspenseQuery';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
-import { cloneDeep, get, includes, orderBy, uniqBy, update } from 'lodash';
+import { cloneDeep, get, includes, orderBy, uniqBy, update } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -22,6 +22,7 @@ import { getCollectivePageRoute } from '@/lib/url-helpers';
 
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
+import { CopyID } from '../CopyId';
 import { useDrawerActionsContainer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
@@ -265,26 +266,33 @@ function Expense(props: ExpenseProps) {
     <Box ref={expenseTopRef}>
       <ExpenseHeader inDrawer={inDrawer}>
         {expense?.type && expense?.account ? (
-          <FormattedMessage
-            id="ExpenseTitle"
-            defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} PLATFORM_BILLING {Platform bill} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
-            values={{
-              type: expense?.type,
-              id: expense?.legacyId,
-              LinkExpense: text => {
-                if (inDrawer) {
-                  return (
-                    <Link href={`/${expense?.account.slug}/expenses/${expense?.legacyId}`}>
-                      <span>#{text}</span>
-                    </Link>
-                  );
-                }
-                return <span>#{text}</span>;
-              },
-              collectiveName: expense?.account.name,
-              LinkCollective: text => <LinkCollective collective={expense?.account}>{text}</LinkCollective>,
-            }}
-          />
+          <React.Fragment>
+            <FormattedMessage
+              id="ExpenseTitle"
+              defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} PLATFORM_BILLING {Platform bill} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
+              values={{
+                type: expense?.type,
+                id: expense?.legacyId,
+                LinkExpense: text => {
+                  if (inDrawer) {
+                    return (
+                      <Link href={`/${expense?.account.slug}/expenses/${expense?.legacyId}`}>
+                        <span>#{text}</span>
+                      </Link>
+                    );
+                  }
+                  return <span>#{text}</span>;
+                },
+                collectiveName: expense?.account.name,
+                LinkCollective: text => <LinkCollective collective={expense?.account}>{text}</LinkCollective>,
+              }}
+            />
+            {expense?.publicId && (
+              <span className="ml-1 inline-flex align-middle text-sm">
+                <CopyID value={expense?.publicId}>{expense?.publicId?.substring(0, 8)}...</CopyID>
+              </span>
+            )}
+          </React.Fragment>
         ) : (
           <LoadingPlaceholder height={32} maxWidth={'200px'} />
         )}

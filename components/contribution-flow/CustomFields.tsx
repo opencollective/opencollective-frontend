@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, merge, pick } from 'lodash';
+import { get, merge, pick } from 'lodash-es';
 import type { HTMLInputTypeAttribute } from 'react';
 import { useIntl } from 'react-intl';
 

@@ -122,7 +122,7 @@ describe('Contribution Flow: Guest contributions', () => {
     it('Make a medium contribution ($500)', () => {
       cy.visit('/apex/donate');
       cy.get('[data-cy="amount-picker-btn-other"]').click();
-      cy.get('input[type=number][name=custom-amount]').type('{selectall}500');
+      cy.get('input[name=custom-amount]').type('{selectall}500');
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('Contribute as a guest');
 
@@ -154,7 +154,7 @@ describe('Contribution Flow: Guest contributions', () => {
     it('Make a large contribution ($5000)', () => {
       cy.visit('/apex/donate');
       cy.get('[data-cy="amount-picker-btn-other"]').click();
-      cy.get('input[type=number][name=custom-amount]').type('{selectall}5000');
+      cy.get('input[name=custom-amount]').type('{selectall}5000');
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('Contribute as a guest');
 
@@ -173,7 +173,8 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name="city"]:invalid').should('have.length', 1); // Empty
 
       // Fill profile info
-      cy.get('input[name=name]').type('Rick Astley');
+      cy.get('input[name=name]').type('Rick');
+      cy.getByDataCy('input-legalName').type('Rick Astley');
       cy.get('input[name=email]').type(`{selectall}${secondEmail}`);
       cy.get('input[name="address1"]').type('323 Logic Street');
       cy.get('input[name="postalCode"]').type('83740');

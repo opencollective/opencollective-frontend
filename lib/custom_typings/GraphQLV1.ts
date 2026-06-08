@@ -5,10 +5,16 @@ export type GraphQLV1Collective = {
   id: number;
   slug: string;
   name: string;
+  description?: string;
+  longDescription?: string;
+  createdAt?: string;
+  hostFeePercent?: number | null;
   legalName: string;
   imageUrl: string;
+  platformContributionAvailable?: boolean;
   type: keyof typeof CollectiveType;
   isArchived?: boolean;
+  isPrivate?: boolean;
   parentCollective?: GraphQLV1Collective;
   isFirstPartyHost?: boolean;
   isTrustedHost?: boolean;

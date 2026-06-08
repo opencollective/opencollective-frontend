@@ -19,7 +19,7 @@ describe('Contribution Flow: Donate', () => {
 
     // Change amount
     cy.getByDataCy('amount-picker-btn-other').click();
-    cy.get('input[type=number][name=custom-amount]').type('{selectall}1337');
+    cy.get('input[name=custom-amount]').type('{selectall}1337');
     cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
     cy.contains('[data-cy="progress-step-details"]', '$1,337.00');
 
@@ -27,7 +27,7 @@ describe('Contribution Flow: Donate', () => {
     cy.contains('#interval button', 'Monthly').click();
     cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
     cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / mo.');
-    cy.contains("Today's charge");
+    cy.contains('Monthly charge');
     // next charge in 2 months time, first day, because it was made on or after 15th.
     cy.contains('the next charge will be on July 1, 2042');
 
@@ -35,7 +35,7 @@ describe('Contribution Flow: Donate', () => {
     cy.contains('#interval button', 'Yearly').click();
     cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
     cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / yr.');
-    cy.contains("Today's charge");
+    cy.contains('Yearly charge');
     cy.contains('the next charge will be on May 1, 2043');
 
     cy.get('button[data-cy="cf-next-step"]').click();

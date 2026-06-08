@@ -1,6 +1,6 @@
 import React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { uniq } from 'lodash';
+import { isNil, uniq } from 'lodash-es';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -21,6 +21,10 @@ import {
   PaginationPrevious,
 } from '../../ui/Pagination';
 import { Select, SelectContent, SelectItem } from '../../ui/Select';
+
+type PaginationProps =
+  | { total: number; hasMore?: never; queryFilter: any; className?: string }
+  | { total?: never; hasMore: boolean; queryFilter: any; className?: string };
 
 function SelectLimit({ limit, setLimit, defaultLimit }) {
   const options = uniq([20, 40, 60, 80, 100, limit, defaultLimit].filter(Boolean)).sort((a, b) => a - b);
@@ -47,7 +51,7 @@ function SelectLimit({ limit, setLimit, defaultLimit }) {
   );
 }
 
-export function Pagination({ total, queryFilter, className = '' }) {
+export function Pagination({ total, hasMore, queryFilter, className = '' }: PaginationProps) {
   const { LoggedInUser } = useLoggedInUser();
   const { offset, limit } = queryFilter.values;
   const defaultLimit = queryFilter.defaultSchemaValues.limit;
@@ -56,9 +60,13 @@ export function Pagination({ total, queryFilter, className = '' }) {
   const currentPage = offset / limit + 1;
   const totalPages = Math.ceil((total || 1) / limit);
   const hasPrevious = currentPage > 1;
-  const hasNext = currentPage < totalPages;
+  const hasTotal = !isNil(total);
+  const hasNext = hasMore || currentPage < totalPages;
   const goToPage = page => {
-    if (page < 1 || page > totalPages) {
+    if (hasTotal && (page < 1 || page > totalPages)) {
+      return;
+    }
+    if (!hasTotal && (page < 1 || (!hasMore && page > currentPage))) {
       return;
     }
     const offset = (page - 1) * limit;
@@ -86,7 +94,7 @@ export function Pagination({ total, queryFilter, className = '' }) {
   });
 
   // Show pagination if there is more than 1 page or limit is not default (i.e. the user has changed it)
-  const showPagination = totalPages > 1 || limit !== defaultLimit;
+  const showPagination = hasTotal ? totalPages > 1 || limit !== defaultLimit : hasPrevious || hasMore;
   if (!showPagination) {
     return null;
   }
@@ -170,18 +178,20 @@ export function Pagination({ total, queryFilter, className = '' }) {
           <SelectLimit limit={limit} defaultLimit={defaultLimit} setLimit={l => queryFilter.setFilter('limit', l)} />
         </div>
 
-        <div className="block text-sm font-medium text-muted-foreground lg:hidden">
-          <FormattedMessage
-            id="Pagination.Count"
-            defaultMessage="Page {current} of {total}"
-            values={{
-              current: currentPage,
-              total: totalPages,
-            }}
-          />
-        </div>
+        {hasTotal && (
+          <div className="block text-sm font-medium text-muted-foreground lg:hidden">
+            <FormattedMessage
+              id="Pagination.Count"
+              defaultMessage="Page {current} of {total}"
+              values={{
+                current: currentPage,
+                total: totalPages,
+              }}
+            />
+          </div>
+        )}
 
-        <PaginationContent className="hidden lg:flex">{renderPageNumbers()}</PaginationContent>
+        {hasTotal && <PaginationContent className="hidden lg:flex">{renderPageNumbers()}</PaginationContent>}
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious

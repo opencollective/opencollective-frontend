@@ -2,7 +2,7 @@ import React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { clsx } from 'clsx';
 import type { Dayjs } from 'dayjs';
-import { isEqual, omit } from 'lodash';
+import { isEqual, omit } from 'lodash-es';
 import { ArrowRight, CalendarIcon, ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
@@ -144,7 +144,6 @@ function getPeriodDates(value: PeriodCompareFilterValueType): {
     dateTo = dayjs.utc(value.lte).endOf(IsoTimeUnit);
   }
 
-  // Adjust dateFrom to closest period start
   dateFrom = getClosestPeriodStart(dateFrom, value.timeUnit);
 
   let compareFrom, compareTo;

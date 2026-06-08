@@ -85,6 +85,7 @@ const columns: ColumnDef<Agreement>[] = [
         <div className="flex justify-end">
           <UploadedFilePreview
             url={attachment?.url}
+            fileType={attachment?.type}
             size={32}
             borderRadius="8px"
             openFileViewer={() => meta?.onFilePreview(agreement)}

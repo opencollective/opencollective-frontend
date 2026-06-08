@@ -12,6 +12,7 @@ import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
 import { SyncAlt as MoveIcon } from '@styled-icons/material/SyncAlt';
 import { Update as UpdateIcon } from '@styled-icons/material/Update';
+import { AlertCircleIcon, AlertOctagonIcon, InfoIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { renderDetailsString } from '../../lib/transactions';
@@ -122,15 +123,34 @@ export const ACTIVITIES_INFO = {
       id: 'Expense.Activity.Processing',
       defaultMessage: 'Expense processing',
     }),
-    renderDetails: ({ estimatedDelivery, reference }) =>
-      estimatedDelivery &&
-      reference && (
-        <FormattedMessage
-          defaultMessage="Estimated delivery: {estimatedDelivery, date, medium} {estimatedDelivery, time, short}. Reference: {reference}."
-          id="xqDu0y"
-          values={{ estimatedDelivery: new Date(estimatedDelivery), reference }}
-        />
-      ),
+    renderDetails: ({ estimatedDelivery, reference, payoutResponse }) => {
+      const batchId = payoutResponse?.payout_batch_id;
+      if (!estimatedDelivery && !reference && !batchId) {
+        return null;
+      }
+      return (
+        <React.Fragment>
+          {estimatedDelivery && reference && (
+            <p>
+              <FormattedMessage
+                defaultMessage="Estimated delivery: {estimatedDelivery, date, medium} {estimatedDelivery, time, short}. Reference: {reference}."
+                id="xqDu0y"
+                values={{ estimatedDelivery: new Date(estimatedDelivery), reference }}
+              />
+            </p>
+          )}
+          {batchId && (
+            <p>
+              <FormattedMessage
+                defaultMessage="PayPal payout batch ID: {batchId}"
+                id="Expense.Activity.PaypalBatchId"
+                values={{ batchId }}
+              />
+            </p>
+          )}
+        </React.Fragment>
+      );
+    },
   },
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
     type: 'info',
@@ -186,6 +206,38 @@ export const ACTIVITIES_INFO = {
     message: defineMessage({
       id: 'Expense.Activity.Invite.Declined',
       defaultMessage: 'Expense invite declined',
+    }),
+  },
+  COLLECTIVE_EXPENSE_KYC_REQUESTED: {
+    type: 'info',
+    icon: InfoIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.KYCRequested',
+      defaultMessage: 'Payee KYC requested',
+    }),
+  },
+  COLLECTIVE_EXPENSE_KYC_VERIFIED: {
+    type: 'success',
+    icon: CheckIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.KYCVerified',
+      defaultMessage: 'Payee KYC verified',
+    }),
+  },
+  COLLECTIVE_EXPENSE_KYC_REVOKED: {
+    type: 'warning',
+    icon: AlertOctagonIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.KYCRevoked',
+      defaultMessage: 'Payee KYC revoked',
+    }),
+  },
+  COLLECTIVE_EXPENSE_KYC_PAYOUT_METHOD_CHANGED: {
+    type: 'warning',
+    icon: AlertCircleIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.KYCPayoutMethodChanged',
+      defaultMessage: 'Payee KYC payout method changed',
     }),
   },
 };

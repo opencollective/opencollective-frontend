@@ -141,6 +141,7 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
       showCurrencyCode: true,
       isSnapshot: true,
       showTimeSeries: true,
+      noTimeseriesLabel: <FormattedMessage defaultMessage="No data for selected period" id="Metric.NoDataForperiod" />,
     },
     {
       id: 'received',

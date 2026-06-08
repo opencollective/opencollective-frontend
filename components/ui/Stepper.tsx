@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { cva } from 'class-variance-authority';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import type { LucideIcon } from 'lucide-react';
 import { CheckIcon, Loader2, X } from 'lucide-react';
 

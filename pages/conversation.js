@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
-import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
+import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -322,7 +322,7 @@ class ConversationPage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account || isHiddenAccount(data.account)) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError()} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }

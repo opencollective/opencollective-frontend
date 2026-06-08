@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { shuffle, take } from 'lodash';
+import { shuffle, take } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';
@@ -66,6 +66,7 @@ const findAFiscalHostQuery = gql`
         currency
         totalHostedCollectives
         hostFeePercent
+        platformContributionAvailable
         isTrustedHost
         isFirstPartyHost
         isVerified

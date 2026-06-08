@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { omit, orderBy, pick } from 'lodash';
+import { omit, orderBy, pick } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -86,22 +86,21 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
   const [showCountrySelect, setShowCountrySelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [captchaResult, setCaptchaResult] = useState(null);
-  const getCountryLabel = useCallback(
-    (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`,
-    [intl],
-  );
-  const countryOptions = useMemo(
-    () =>
-      orderBy(
-        Object.keys(CountryIso).map(code => ({
-          value: code,
-          label: getCountryLabel(code),
-        })),
-        ['label'],
-        ['asc'],
-      ),
-    [getCountryLabel],
-  );
+  const getCountryLabel = (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`;
+
+  const countryOptions = useMemo(() => {
+    const entries = Object.keys(CountryIso).map(code => ({
+      code,
+      emoji: getFlagEmoji(code),
+      name: i18nCountryName(intl, code),
+    }));
+
+    return orderBy(entries, ['name'], ['asc']).map(({ code, emoji, name }) => ({
+      value: code,
+      label: `${emoji} ${name}`,
+    }));
+  }, [intl]);
+
   const currencyOptions = useMemo(
     () =>
       Object.keys(Currency).map(code => ({

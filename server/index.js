@@ -5,7 +5,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const cloudflareIps = require('cloudflare-ip/ips.json');
-const { isEmpty } = require('lodash');
+const isEmpty = require('lodash-es/isEmpty').default;
 const throng = require('throng');
 
 const logger = require('./logger');
@@ -24,7 +24,8 @@ app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflar
 const dev = process.env.NODE_ENV === 'development';
 const port = process.env.PORT;
 const hostname = process.env.HOSTNAME;
-const nextApp = next({ dev, hostname, port });
+// Next.js 16 defaults to Turbopack; keep webpack for our custom next.config.js plugins.
+const nextApp = next({ dev, hostname, port, webpack: true });
 const nextRequestHandler = nextApp.getRequestHandler();
 
 const workers = process.env.WEB_CONCURRENCY || 1;

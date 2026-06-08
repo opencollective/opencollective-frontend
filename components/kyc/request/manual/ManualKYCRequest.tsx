@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormikContext } from 'formik';
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'lodash-es';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import z from 'zod';

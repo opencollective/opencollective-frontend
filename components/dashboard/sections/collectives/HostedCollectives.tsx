@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, isString, omit } from 'lodash';
+import { compact, isString, omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -41,6 +41,7 @@ import { makePushSubpath } from '../../utils';
 import CollectiveDetails from './CollectiveDetails';
 import type { HostedCollectivesDataTableMeta } from './common';
 import { cols } from './common';
+import { metricFilterConfigs, metricFilterSchema, metricFilterToVariables } from './metric-filters';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
 
 const sortFilter = buildSortFilter({
@@ -79,17 +80,22 @@ const schema = z.object({
   consolidatedBalance: consolidatedBalanceFilter.schema,
   currencies: currencyFilter.schema,
   startsAt: startsAtDateFilter.schema,
+  ...metricFilterSchema,
 });
 
-const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
+type Schema = z.infer<typeof schema>;
+
+const toVariables: FiltersToVariables<Schema, HostedCollectivesQueryVariables> = {
   status: collectiveStatusFilter.toVariables,
   consolidatedBalance: consolidatedBalanceFilter.toVariables,
   startsAt: startsAtDateFilter.toVariables,
+  ...metricFilterToVariables,
 };
 
-const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
+const filters: FilterComponentConfigs<Schema> = {
   sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
+  ...metricFilterConfigs,
   hostFeesStructure: {
     labelMsg: defineMessage({ id: 'FeeStructure', defaultMessage: 'Fee structure' }),
     Component: ({ intl, ...props }) => {

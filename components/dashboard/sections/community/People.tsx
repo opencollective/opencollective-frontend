@@ -1,14 +1,16 @@
-import React, { useContext } from 'react';
-import { useQuery } from '@apollo/client';
-import { isEmpty } from 'lodash';
+import React, { useContext, useEffect } from 'react';
+import { gql, useQuery } from '@apollo/client';
+import { isEmpty } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { hasAccountMoneyManagement } from '@/lib/collective';
 import type { FilterConfig } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
-import { AccountType, CommunityRelationType, type PeopleHostDashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type { PeopleHostDashboardQuery, PeopleHostDashboardQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
@@ -25,6 +27,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import ExportContributorsCSVButton from '../../ExportContributorsCSVButton';
 import { makeAmountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
@@ -33,9 +36,9 @@ import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
-import { makePushSubpath } from '../../utils';
+import { makePushSubpath, makeReplaceSubpath } from '../../utils';
 
-import { ContributorDetails } from './AccountDetail';
+import { AccountDetails } from './AccountDetail';
 import { usePersonActions } from './common';
 import { peopleHostDashboardQuery } from './queries';
 
@@ -170,9 +173,9 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
     cell: ({ row }) => {
       const account = row.original;
-      const summary = account?.communityStats?.transactionSummary?.[0];
-      const total = summary?.expenseTotalAcc;
-      const count = summary?.expenseCountAcc || 0;
+      const summary = account?.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+      const total = summary?.debitTotal;
+      const count = summary?.debitCount || 0;
 
       if (!total || count === 0) {
         return <span className="text-muted-foreground">—</span>;
@@ -196,9 +199,9 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
     cell: ({ row }) => {
       const account = row.original;
-      const summary = account?.communityStats?.transactionSummary?.[0];
-      const total = summary?.contributionTotalAcc;
-      const count = summary?.contributionCountAcc || 0;
+      const summary = account?.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+      const total = summary?.creditTotal;
+      const count = summary?.creditCount || 0;
 
       if (!total || count === 0) {
         return <span className="text-muted-foreground">—</span>;
@@ -242,10 +245,16 @@ enum ContributorsTab {
 const PAGE_SIZE = 20;
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['NAME', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  fieldSchema: z.enum(['NAME', 'CREATED_AT', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
   defaultValue: {
     field: 'NAME',
     direction: 'ASC',
+  },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({
+      defaultMessage: 'Created',
+      id: 'created',
+    }),
   },
 });
 
@@ -288,7 +297,6 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
       label: intl.formatMessage({ defaultMessage: 'All', id: 'All' }),
       filter: {},
     },
-
     {
       id: ContributorsTab.ADMINS,
       label: intl.formatMessage({ defaultMessage: 'Collective Admins', id: 'Update.notify.hostedCollectiveAdmins' }),
@@ -297,7 +305,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
     {
       id: ContributorsTab.CONTRIBUTORS,
       label: intl.formatMessage({ defaultMessage: 'Financial Contributors', id: 'FinancialContributors' }),
-      filter: { relation: [CommunityRelationType.CONTRIBUTOR, CommunityRelationType.ATTENDEE] },
+      filter: { relation: [CommunityRelationType.CONTRIBUTOR] },
     },
     {
       id: ContributorsTab.EXPENSE_SUBMITTERS,
@@ -323,7 +331,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
     data,
     loading: queryLoading,
     error: queryError,
-  } = useQuery<PeopleHostDashboardQuery>(peopleHostDashboardQuery, {
+  } = useQuery<PeopleHostDashboardQuery, PeopleHostDashboardQueryVariables>(peopleHostDashboardQuery, {
     variables: {
       slug: accountSlug,
       ...queryFilter.variables,
@@ -335,6 +343,8 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
   const error = queryError;
 
   const { account: dashboardAccount } = useContext(DashboardContext);
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const hasHosting = account.hasHosting;
 
   const hasKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.KYC);
 
@@ -351,6 +361,15 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
         title={<FormattedMessage id="People" defaultMessage="People" />}
         description={
           <FormattedMessage id="People.Description" defaultMessage="People that interacted with your organization." />
+        }
+        actions={
+          hasMoneyManagement &&
+          !hasHosting && (
+            <ExportContributorsCSVButton
+              accountSlug={accountSlug}
+              label={<FormattedMessage id="People.ExportCSV" defaultMessage="Export Contributors" />}
+            />
+          )
         }
       />
       <Filterbar {...queryFilter} hideCounts />
@@ -374,23 +393,48 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
             mobileTableView
             getActions={getActions}
           />
-          <Pagination queryFilter={queryFilter} total={data?.community?.totalCount} />
+          <Pagination queryFilter={queryFilter} hasMore={contributors.length === queryFilter.values?.limit} />
         </div>
       )}
     </div>
   );
 };
 
+const peopleRouterAccountQuery = gql`
+  query PeopleRouterAccount($id: String!) {
+    account(id: $id) {
+      id
+      mainProfile {
+        id
+        publicId
+      }
+    }
+  }
+`;
+
 const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
   const router = useRouter();
   const pushSubpath = makePushSubpath(router);
+  const replaceSubpath = makeReplaceSubpath(router);
   const id = subpath[0];
   const { account } = useContext(DashboardContext);
+
+  const { data: accountData } = useQuery(peopleRouterAccountQuery, {
+    variables: { id },
+    skip: isEmpty(id),
+  });
+
+  useEffect(() => {
+    const mainProfilePublicId = accountData?.account?.mainProfile?.publicId;
+    if (mainProfilePublicId && mainProfilePublicId !== id) {
+      replaceSubpath(mainProfilePublicId);
+    }
+  }, [accountData, replaceSubpath, id]);
 
   if (!isEmpty(id)) {
     return (
       <div className="h-full">
-        <ContributorDetails
+        <AccountDetails
           account={{ id: subpath[0] }}
           host={account}
           onClose={() => pushSubpath('')}

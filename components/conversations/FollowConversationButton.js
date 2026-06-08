@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Bell } from '@styled-icons/feather/Bell';
 import { BellOff } from '@styled-icons/feather/BellOff';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import Router from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';

@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata } from '../lib/collective';
+import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -106,7 +106,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
   if (!queryResult.loading) {
     if (!data || error) {
       return <ErrorPage data={data} />;
-    } else if (!data.expense) {
+    } else if (!data.expense || isHiddenAccount(data.expense.account)) {
       return <ErrorPage error={generateNotFoundError(null)} log={false} />;
     } else if (!data.expense.account || !isValidCollectiveSlug(collectiveSlug, data.expense)) {
       return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;

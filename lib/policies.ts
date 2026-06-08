@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
 import type { Account, Policies } from './graphql/types/v2/graphql';

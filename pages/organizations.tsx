@@ -7,7 +7,8 @@ import Page from '../components/Page';
 import type { IFeatureSection } from '@/components/home/solutions/Features';
 import Features from '@/components/home/solutions/Features';
 import { JoinCTAButtons } from '@/components/home/solutions/JoinCTAButtons';
-import Testimonials, { Testimonial } from '@/components/home/solutions/Testimonials';
+import type { Testimonial } from '@/components/home/solutions/Testimonials';
+import Testimonials from '@/components/home/solutions/Testimonials';
 import Image from '@/components/Image';
 
 const featureHighlights = [

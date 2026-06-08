@@ -23,6 +23,7 @@ import {
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { HostMetricsOverview } from '../../../metrics/host/dashboard-overview';
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -247,6 +248,8 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
           ) : null}
         </CardContent>
       </Card>
+
+      <HostMetricsOverview hostSlug={account.slug} />
 
       <div className="grid grid-cols-1 gap-6">
         <div className="order-1 space-y-6 xl:order-none">

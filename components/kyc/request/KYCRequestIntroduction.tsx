@@ -3,6 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { CheckCircle2, Shield } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
+import { getAccountReferenceInput } from '@/lib/collective';
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/graphql';
 
 import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
@@ -29,7 +30,7 @@ export function KYCRequestIntroduction(props: KYCRequestIntroductionProps) {
     `,
     {
       variables: {
-        account: props.requestedByAccount,
+        account: getAccountReferenceInput(props.requestedByAccount),
       },
     },
   );

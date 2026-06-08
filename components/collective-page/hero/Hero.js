@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from 'react';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
-import { first } from 'lodash';
+import { first } from 'lodash-es';
 import { Image, Palette, Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -20,6 +20,7 @@ import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import EditTagsModal from '../../EditTagsModal';
 import { Box, Flex } from '../../Grid';
+import HostInfoDialog from '../../HostInformationDialog';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
@@ -380,7 +381,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                         defaultMessage="{FiscalHost}: {hostName}"
                         values={{
                           FiscalHost: host.hasHosting ? (
-                            <DefinedTerm key="fiscal-host" term={Terms.FISCAL_HOST} color="black.700" />
+                            <DefinedTerm
+                              key="fiscal-host"
+                              term={Terms.FISCAL_HOST}
+                              color="black.700"
+                              borderColor="#969ba3"
+                            />
                           ) : (
                             <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
                           ),
@@ -425,53 +431,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     )}
                   </Fragment>
                 )}
-                {hasHosting && (
-                  <Fragment>
-                    {collective.type !== CollectiveType.COLLECTIVE && (
-                      <Fragment>
-                        {collective.settings?.tos && (
-                          <StyledLink
-                            openInNewTab
-                            href={collective.settings.tos}
-                            borderBottom="2px dotted #969ba3"
-                            color="black.700"
-                            textDecoration="none"
-                            fontSize="12px"
-                          >
-                            <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal hosting" />
-                          </StyledLink>
-                        )}
-                        <Container color="black.700" fontSize="12px">
-                          <FormattedMessage
-                            id="Hero.HostFee"
-                            defaultMessage="Host fee: {fee}"
-                            values={{
-                              fee: (
-                                <DefinedTerm key="host-fee" term={Terms.HOST_FEE} color="black.700">
-                                  {collective.hostFeePercent || 0}%
-                                </DefinedTerm>
-                              ),
-                            }}
-                          />
-                        </Container>
-                      </Fragment>
-                    )}
-                    {collective.platformFeePercent > 0 && (
-                      <Container color="black.700" fontSize="12px">
-                        <FormattedMessage
-                          id="Hero.PlatformFee"
-                          defaultMessage="Platform fee: {fee}"
-                          values={{
-                            fee: (
-                              <DefinedTerm key="platform-fee" term={Terms.PLATFORM_FEE} color="black.700">
-                                {collective.platformFeePercent}%
-                              </DefinedTerm>
-                            ),
-                          }}
-                        />
-                      </Container>
-                    )}
-                  </Fragment>
+                {hasHosting && collective.type !== CollectiveType.COLLECTIVE && (
+                  <HostInfoDialog collective={collective} />
                 )}
               </Flex>
             </Fragment>

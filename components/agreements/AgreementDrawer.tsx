@@ -1,12 +1,13 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { FormattedMessage } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import type { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
 
+import { Drawer } from '../Drawer';
 import DrawerHeader from '../DrawerHeader';
 import FilesViewerModal from '../FilesViewerModal';
-import { Sheet, SheetBody, SheetContent } from '../ui/Sheet';
 
 import AgreementDetails from './AgreementDetails';
 import AgreementForm from './AgreementForm';
@@ -17,6 +18,7 @@ type AgreementDrawerProps = {
   onClose: () => void;
   onCreate: (GraphQLAgreement) => void;
   onEdit: (GraphQLAgreement) => void;
+  onCancelEdit?: () => void;
   onDelete: (GraphQLAgreement) => void;
   agreement?: GraphQLAgreement;
   hostLegacyId: number;
@@ -29,6 +31,7 @@ export default function AgreementDrawer({
   onClose,
   onCreate,
   onEdit,
+  onCancelEdit,
   agreement,
   hostLegacyId,
   isEditing: initialIsEditing = false,
@@ -50,49 +53,71 @@ export default function AgreementDrawer({
     onClose();
   }, [onClose]);
 
-  const actions = getActions && agreement && !isEditing ? getActions(agreement) : undefined;
   const dropdownTriggerRef = React.useRef<HTMLButtonElement>(null);
+  const isFormMode = isEditing || !agreement;
+
+  const actions = React.useMemo(() => {
+    if (!getActions || !agreement || isEditing) {
+      return undefined;
+    }
+
+    const baseActions = getActions(agreement);
+    return {
+      ...baseActions,
+      primary: baseActions.primary.map(action =>
+        action.key === 'edit' ? { ...action, onClick: () => setEditing(true) } : action,
+      ),
+    };
+  }, [getActions, agreement, isEditing]);
+
+  const cancelEdit = React.useCallback(() => {
+    setEditing(false);
+    onCancelEdit?.();
+  }, [onCancelEdit]);
 
   return (
-    <Sheet open={open} onOpenChange={open => !open && closeDrawer()}>
-      <SheetContent data-cy="agreement-drawer">
+    <React.Fragment>
+      <Drawer open={open} onClose={closeDrawer} showActionsContainer={isFormMode} data-cy="agreement-drawer">
         {agreement && (
-          <DrawerHeader
-            actions={actions}
-            entityName={<FormattedMessage defaultMessage="Agreement" id="J3yqC3" />}
-            entityIdentifier={agreement.publicId}
-            entityLabel={agreement.title}
-            dropdownTriggerRef={dropdownTriggerRef}
-          />
+          <div className="-mx-4 -mt-6 mb-8 sm:-mx-6">
+            <DrawerHeader
+              actions={actions}
+              entityName={<FormattedMessage defaultMessage="Agreement" id="J3yqC3" />}
+              entityIdentifier={agreement.publicId}
+              entityLabel={agreement.title}
+              dropdownTriggerRef={dropdownTriggerRef}
+            />
+          </div>
         )}
 
-        <SheetBody>
-          {isEditing || !agreement ? (
-            <AgreementForm
-              hostLegacyId={hostLegacyId}
-              agreement={agreement}
-              onCreate={onCreate}
-              onCancel={() => (isEditing ? setEditing(false) : closeDrawer())}
-              openFileViewer={() => setFilesViewerOpen(true)}
-              onEdit={agreement => {
-                onEdit?.(agreement);
-              }}
-            />
-          ) : (
-            <AgreementDetails agreement={agreement} openFileViewer={() => setFilesViewerOpen(true)} />
-          )}
-        </SheetBody>
-      </SheetContent>
+        {isFormMode ? (
+          <AgreementForm
+            hostLegacyId={hostLegacyId}
+            agreement={agreement}
+            onCreate={onCreate}
+            onCancel={() => (isEditing ? cancelEdit() : closeDrawer())}
+            openFileViewer={() => setFilesViewerOpen(true)}
+            onEdit={agreement => {
+              onEdit?.(agreement);
+            }}
+          />
+        ) : (
+          <AgreementDetails agreement={agreement} openFileViewer={() => setFilesViewerOpen(true)} />
+        )}
+      </Drawer>
 
-      {filesViewerOpen && (
-        <FilesViewerModal
-          files={[agreement.attachment]}
-          openFileUrl={agreement.attachment.url}
-          onClose={() => setFilesViewerOpen(false)}
-          parentTitle={`${agreement.account.name} / ${agreement.title}`}
-          allowOutsideInteraction
-        />
-      )}
-    </Sheet>
+      {filesViewerOpen &&
+        agreement?.attachment &&
+        createPortal(
+          <FilesViewerModal
+            files={[agreement.attachment]}
+            openFileUrl={agreement.attachment.url}
+            onClose={() => setFilesViewerOpen(false)}
+            parentTitle={`${agreement.account.name} / ${agreement.title}`}
+            allowOutsideInteraction
+          />,
+          document.body,
+        )}
+    </React.Fragment>
   );
 }

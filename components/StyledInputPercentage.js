@@ -1,5 +1,5 @@
 import React from 'react';
-import { clamp as lodashClamp, round } from 'lodash';
+import { clamp as lodashClamp, round } from 'lodash-es';
 
 import StyledInputGroup from './StyledInputGroup';
 

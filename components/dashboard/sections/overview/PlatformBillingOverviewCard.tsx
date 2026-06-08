@@ -10,6 +10,7 @@ import type {
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
+import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import Link from '@/components/Link';
 import MessageBox from '@/components/MessageBox';
 import { Button } from '@/components/ui/Button';
@@ -108,6 +109,8 @@ function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardProps) {
   }
 
   const hasHosting = Boolean(query.data.account?.['hasHosting']);
+  const subscription = query.data.account.platformSubscription;
+  const isFreeTier = subscription.plan.pricing.pricePerMonth.valueInCents === 0;
   return (
     <MessageBox className="relative" type="info">
       <Button onClick={props.onDismiss ?? (() => {})} className="absolute top-0 right-0" variant="ghost" size="icon">
@@ -118,9 +121,30 @@ function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardProps) {
           defaultMessage={`You're on the "{planTitle}" plan`}
           id="Fw/mF9"
           values={{
-            planTitle: query.data.account.platformSubscription.plan.title,
+            planTitle: subscription.plan.title,
           }}
         />
+        <span className="text-sm font-normal text-gray-500 lowercase italic">
+          {` (`}
+          {isFreeTier ? (
+            <FormattedMessage defaultMessage="Free subscription" id="CGUb/o" />
+          ) : (
+            <FormattedMessage
+              defaultMessage="{perMonth} / Month"
+              id="+2hntI"
+              values={{
+                perMonth: (
+                  <FormattedMoneyAmount
+                    amount={subscription.plan.pricing.pricePerMonth.valueInCents}
+                    currency={subscription.plan.pricing.pricePerMonth.currency}
+                    showCurrencyCode={false}
+                  />
+                ),
+              }}
+            />
+          )}
+          {`)`}
+        </span>
       </div>
       <div className="text-sm">
         <FormattedMessage

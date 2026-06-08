@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FetchResult } from '@apollo/client';
 import { Field, FormikProvider, useFormikContext } from 'formik';
-import { isEmpty, pick } from 'lodash';
+import { isEmpty, pick } from 'lodash-es';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useInView } from 'react-intersection-observer';

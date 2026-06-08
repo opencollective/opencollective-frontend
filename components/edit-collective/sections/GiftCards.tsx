@@ -1,16 +1,19 @@
 import React, { useCallback } from 'react';
 import { useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
-import { get, last, omitBy } from 'lodash';
+import { get, last, omitBy } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { FEATURES } from '@/lib/allowed-features';
 import type { GraphQLV1PaymentMethod } from '@/lib/custom_typings/GraphQLV1';
 import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
+import FeatureNotSupported from '@/components/FeatureNotSupported';
 import { getI18nLink } from '@/components/I18nFormatters';
+import NotFound from '@/components/NotFound';
 
 import { ALL_SECTIONS, SECTION_LABELS } from '../../dashboard/constants';
 import DashboardHeader from '../../dashboard/DashboardHeader';
@@ -48,6 +51,7 @@ interface QueryResult {
     id: number;
     giftCardsBatches: GiftCardBatch[];
     createdGiftCards: GiftCardsQueryData;
+    features: Record<string, string>;
   };
 }
 
@@ -86,6 +90,9 @@ const giftCardsQuery = gqlV1 /* GraphQL */ `
   query EditCollectiveGiftCards($collectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int, $batch: String) {
     Collective(id: $collectiveId) {
       id
+      features {
+        EMIT_GIFT_CARDS
+      }
       giftCardsBatches {
         id
         name
@@ -308,6 +315,14 @@ const GiftCards: React.FC<GiftCardsProps> = ({ collectiveId, collectiveSlug, lim
     },
     [collectiveSlug, getQueryParams, router],
   );
+
+  if (!loading) {
+    if (!data || !data.Collective) {
+      return <NotFound />;
+    } else if (data.Collective.features[FEATURES.EMIT_GIFT_CARDS] === 'UNSUPPORTED') {
+      return <FeatureNotSupported />;
+    }
+  }
 
   return (
     <div>

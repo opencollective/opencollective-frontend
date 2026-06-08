@@ -2,6 +2,76 @@ import { gql } from '@apollo/client/core';
 
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 
+export const hostCancelContributionModalQuery = gql`
+  query HostCancelContributionModal($order: OrderReferenceInput!) {
+    order(order: $order) {
+      id
+      status
+      frequency
+      description
+      permissions {
+        id
+        canRemoveAsContributor
+      }
+      amount {
+        valueInCents
+        currency
+      }
+      totalAmount {
+        valueInCents
+        currency
+      }
+      fromAccount {
+        id
+        slug
+        name
+        imageUrl
+        type
+      }
+      toAccount {
+        id
+        slug
+        name
+        imageUrl
+        type
+        ... on AccountWithHost {
+          host {
+            id
+            slug
+            name
+          }
+        }
+        ... on Organization {
+          host {
+            id
+            slug
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const hostCancelOrderMutation = gql`
+  mutation HostCancelOrder(
+    $order: OrderReferenceInput!
+    $removeAsContributor: Boolean
+    $messageForContributor: String
+  ) {
+    cancelOrder(
+      order: $order
+      removeAsContributor: $removeAsContributor
+      messageForContributor: $messageForContributor
+    ) {
+      id
+      status
+      ...ManagedOrderFields
+    }
+  }
+  ${managedOrderFragment}
+`;
+
 export const dashboardOrdersQuery = gql`
   query DashboardOrders(
     $slug: String!
@@ -31,6 +101,7 @@ export const dashboardOrdersQuery = gql`
     $tier: [TierReferenceInput!]
     $hostedAccounts: [AccountReferenceInput!]
     $createdBy: [AccountReferenceInput]
+    $oppositeAccountScope: OppositeAccountScope
   ) {
     account(slug: $slug) {
       id
@@ -61,6 +132,7 @@ export const dashboardOrdersQuery = gql`
         tier: $tier
         hostedAccounts: $hostedAccounts
         createdBy: $createdBy
+        oppositeAccountScope: $oppositeAccountScope
       ) {
         totalCount
         nodes {

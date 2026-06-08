@@ -1,5 +1,5 @@
 import React from 'react';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { getCollectivePageRoute } from '../../lib/url-helpers';

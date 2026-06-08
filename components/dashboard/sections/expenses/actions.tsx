@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { compact, pick } from 'lodash';
+import { compact, pick } from 'lodash-es';
 import {
   Check,
   Copy,
@@ -31,10 +31,8 @@ import { ExpenseStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { getCollectivePageCanonicalURL, getDashboardRoute } from '../../../../lib/url-helpers';
+import { getDashboardRoute, getPermalinkUrl } from '../../../../lib/url-helpers';
 import { collectiveAdminsMustConfirmAccountingCategory } from '@/components/expenses/lib/accounting-categories';
-import type LoggedInUser from '@/lib/LoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { shouldShowDuplicateExpenseButton } from '@/components/expenses/ExpenseMoreActionsButton';
 import { getDisabledMessage } from '@/components/expenses/PayExpenseButton';
@@ -64,7 +62,6 @@ const getErrorContent = (
   intl: ReturnType<typeof useIntl>,
   error: Error | { message?: string },
   host?: ExpenseHostFieldsFragment | null,
-  LoggedInUser?: LoggedInUser,
 ): { title?: string; message: React.ReactNode } => {
   const message = error?.message;
   if (message) {
@@ -72,13 +69,7 @@ const getErrorContent = (
       return {
         title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance', id: 'BmZrOu' }),
         message: (
-          <Link
-            href={
-              LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-                ? `/dashboard/${host.slug}/${ALL_SECTIONS.PAY_DISBURSEMENTS}`
-                : `/dashboard/${host.slug}/${ALL_SECTIONS.HOST_EXPENSES}`
-            }
-          >
+          <Link href={`/dashboard/${host.slug}/${ALL_SECTIONS.PAY_DISBURSEMENTS}`}>
             <FormattedMessage
               id="PayExpenseModal.RefillBalanceError"
               defaultMessage="Refill your balance from the Host dashboard"
@@ -371,7 +362,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
     };
 
     const handleCopyLink = () => {
-      copy(`${getCollectivePageCanonicalURL(expense.account)}/expenses/${expense.legacyId}`);
+      copy(getPermalinkUrl(expense.publicId));
     };
 
     const handleDownloadInvoice = () => {
@@ -421,7 +412,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         onMutationSuccess();
         return true;
       } catch (e) {
-        const errorContent = getErrorContent(intl, e, host, LoggedInUser);
+        const errorContent = getErrorContent(intl, e, host);
         toast({ variant: 'error', title: errorContent.title, message: errorContent.message });
         return false;
       }

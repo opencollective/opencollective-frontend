@@ -1,4 +1,4 @@
-import { isUndefined } from 'lodash';
+import { isUndefined } from 'lodash-es';
 import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
@@ -18,6 +18,7 @@ import {
   Receipt,
   Search,
   Settings,
+  Shuffle,
   Signature,
   Store,
   Ticket,
@@ -75,7 +76,7 @@ const ROOT_MENU = [
   },
   {
     type: 'group',
-    label: 'Subscriptions',
+    label: 'Platform Subscriptions',
     Icon: HandCoins,
     subMenu: [
       { label: 'Manage Subscriptions', section: ROOT_SECTIONS.SUBSCRIBERS },
@@ -144,6 +145,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const showReceivedGrantRequests =
     hasReceivedGrantRequests ||
     (!isIndividual && !hasMoneyManagement && Boolean(account.supportedExpenseTypes?.includes?.(ExpenseType.GRANT)));
+  const isReceiveContributionsSupported = account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED';
 
   const items: MenuItem[] = [
     {
@@ -182,49 +184,30 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Receipt,
       subMenu: [
         {
-          if: hasHosting && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
-          section: ALL_SECTIONS.HOST_EXPENSES,
-          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
-        },
-        {
-          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          if: hasHosting,
           section: ALL_SECTIONS.PAY_DISBURSEMENTS,
           label: intl.formatMessage({ defaultMessage: 'Pay Disbursements', id: 'El6h63' }),
         },
         {
           section: ALL_SECTIONS.PAID_DISBURSEMENTS,
-          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          if: hasHosting,
           label: intl.formatMessage({
             defaultMessage: 'Paid Disbursements',
             id: 'rwMrEx',
           }),
         },
         {
-          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          if: hasHosting,
           section: ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS,
           label: intl.formatMessage({ defaultMessage: 'Approve Payment Requests', id: 'ApprovePaymentRequests' }),
         },
         {
-          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          if: hasHosting,
           section: ALL_SECTIONS.HOST_PAYMENT_REQUESTS,
           label: intl.formatMessage({ defaultMessage: 'All Payment Requests', id: 'HostPaymentRequests' }),
         },
         {
-          if: !isIndividual && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
-          section: ALL_SECTIONS.EXPENSES,
-          label: intl.formatMessage(
-            {
-              id: 'hZhgoW',
-              defaultMessage: 'To {accountName}',
-            },
-            { accountName: account.name },
-          ),
-        },
-        {
-          if:
-            !isIndividual &&
-            !hasHosting &&
-            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          if: !isIndividual && !hasHosting,
           section: ALL_SECTIONS.PAYMENT_REQUESTS,
           label: intl.formatMessage({ defaultMessage: 'Payment Requests', id: 'PaymentRequests' }),
         },
@@ -272,7 +255,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
         },
         {
-          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
+          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly && !account.isPrivate,
           label: intl.formatMessage({ defaultMessage: 'Incomplete Contributions', id: 'IncompleteContributions' }),
           section: ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
         },
@@ -293,6 +276,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           label: intl.formatMessage({ defaultMessage: 'Issued Payment Requests', id: 'IssuedPaymentRequests' }),
         },
       ],
+    },
+    {
+      if: hasIncomingOutgoingReorg && !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
+      section: ALL_SECTIONS.INTERNAL_TRANSFERS,
+      Icon: Shuffle,
     },
     {
       if: isIndividual && hasIssuedGrantRequests,
@@ -333,6 +321,41 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
+      if: !hasMoneyManagement && !isCommunityManagerOnly,
+      section: ALL_SECTIONS.TRANSACTIONS,
+      Icon: ArrowRightLeft,
+    },
+    {
+      if: hasMoneyManagement && !isCommunityManagerOnly,
+      type: 'group',
+      label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
+      Icon: ArrowRightLeft,
+      subMenu: [
+        {
+          section: hasHosting ? ALL_SECTIONS.HOST_TRANSACTIONS : ALL_SECTIONS.TRANSACTIONS,
+          label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+        },
+        {
+          section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
+          label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
+          if: shouldIncludeMenuItemWithLegacyFallback(
+            account,
+            FEATURES.OFF_PLATFORM_TRANSACTIONS,
+            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+          ),
+        },
+        {
+          section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
+          label: intl.formatMessage({ defaultMessage: 'CSV Imports', id: 'd3jA/o' }),
+          if: shouldIncludeMenuItemWithLegacyFallback(
+            account,
+            FEATURES.OFF_PLATFORM_TRANSACTIONS,
+            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+          ),
+        },
+      ],
+    },
+    {
       if: !isIndividual && isHostedType && !isCommunityManagerOnly,
       section: ALL_SECTIONS.CONTRIBUTORS,
       label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
@@ -350,6 +373,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           label: intl.formatMessage({ id: 'HostApplications.Applications', defaultMessage: 'Applications' }),
           section: ALL_SECTIONS.HOST_APPLICATIONS,
+          if: account.features[FEATURES.RECEIVE_HOST_APPLICATIONS] !== 'UNSUPPORTED',
         },
       ],
     },
@@ -441,59 +465,25 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
 
     {
-      if: isType(account, EVENT) && !isCommunityManagerOnly,
+      if: isType(account, EVENT) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TICKETS,
       label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
       Icon: Ticket,
     },
     {
-      if: isType(account, EVENT) && !isCommunityManagerOnly,
+      if: isType(account, EVENT) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TIERS,
       label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
       Icon: HeartHandshake,
     },
     {
-      if: !hasMoneyManagement && !isCommunityManagerOnly,
-      section: ALL_SECTIONS.TRANSACTIONS,
-      Icon: ArrowRightLeft,
-    },
-    {
-      if: hasMoneyManagement && !isCommunityManagerOnly,
-      type: 'group',
-      label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
-      Icon: ArrowRightLeft,
-      subMenu: [
-        {
-          section: hasHosting ? ALL_SECTIONS.HOST_TRANSACTIONS : ALL_SECTIONS.TRANSACTIONS,
-          label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
-        },
-        {
-          section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
-          label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
-          if: shouldIncludeMenuItemWithLegacyFallback(
-            account,
-            FEATURES.OFF_PLATFORM_TRANSACTIONS,
-            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
-          ),
-        },
-        {
-          section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
-          label: intl.formatMessage({ defaultMessage: 'CSV Imports', id: 'd3jA/o' }),
-          if: shouldIncludeMenuItemWithLegacyFallback(
-            account,
-            FEATURES.OFF_PLATFORM_TRANSACTIONS,
-            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
-          ),
-        },
-      ],
-    },
-    {
-      if: !isIndividual && !isAccountantOnly,
+      if: !isIndividual && !isAccountantOnly && account.features[FEATURES.UPDATES] !== 'UNSUPPORTED',
       section: ALL_SECTIONS.UPDATES,
       Icon: Megaphone,
     },
     {
       if:
+        isReceiveContributionsSupported &&
         !isIndividual &&
         !isEvent &&
         (!isOrganization || hasMoneyManagement) &&
@@ -533,7 +523,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.COLLECTIVE_PAGE,
-          if: !isAccountantOnly,
+          if: !isAccountantOnly && account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
         },
         // Host sections
         ...(hasMoneyManagement
@@ -553,7 +543,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.RECEIVING_MONEY,
-                if: !isAccountantOnly,
+                if: !isAccountantOnly && isReceiveContributionsSupported,
               },
               {
                 section: ALL_SECTIONS.SENDING_MONEY,
@@ -602,11 +592,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.PAYMENT_RECEIPTS,
-          if: isIndividual || isOrganization,
+          if: (isIndividual || isOrganization) && !account.isPrivate,
         },
         {
           section: ALL_SECTIONS.GIFT_CARDS,
-          if: ['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS) && !isAccountantOnly,
+          if: isFeatureEnabled(account, FEATURES.EMIT_GIFT_CARDS) && !isAccountantOnly,
         },
         // Sections for individual accounts
         {
@@ -626,6 +616,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.COLLECTIVE_GOALS,
           if:
             !isAccountantOnly &&
+            account.features[FEATURES.COLLECTIVE_GOALS] !== 'UNSUPPORTED' &&
             (!isUndefined(account.settings?.collectivePage?.showGoals) ||
               isOneOfTypes(account, [COLLECTIVE, PROJECT]) ||
               (isOrganization && hasMoneyManagement && !hasHosting)),
@@ -637,11 +628,15 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.CUSTOM_EMAIL,
-          if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) && !isAccountantOnly,
+          if:
+            isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) && !isAccountantOnly && isReceiveContributionsSupported,
         },
         {
           section: ALL_SECTIONS.WIDGETS,
-          if: isOneOfTypes(account, [COLLECTIVE, PROJECT, FUND]) && !isAccountantOnly,
+          if:
+            isOneOfTypes(account, [COLLECTIVE, PROJECT, FUND]) &&
+            !isAccountantOnly &&
+            account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
         },
         {
           section: ALL_SECTIONS.EXPORTS,

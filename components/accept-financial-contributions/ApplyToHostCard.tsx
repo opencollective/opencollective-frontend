@@ -3,10 +3,12 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
+import { checkUseAlternativeHostFeeNaming } from '../../lib/collective';
 import { confettiFireworks } from '../../lib/confettis';
 import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
 import ApplyToHostModal from '../ApplyToHostModal';
+import DefinedTerm, { Terms } from '../DefinedTerm';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCollectiveCard from '../StyledCollectiveCard';
@@ -20,7 +22,16 @@ const StyledCollectiveCardWrapper = styled(StyledCollectiveCard)`
 `;
 
 export default function ApplyToHostCard(props: {
-  host: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>;
+  host: Pick<
+    Host,
+    | 'slug'
+    | 'totalHostedCollectives'
+    | 'description'
+    | 'currency'
+    | 'hostFeePercent'
+    | 'platformContributionAvailable'
+    | 'settings'
+  >;
   collective: Pick<Account, 'slug'>;
 }) {
   const [showApplyToHostModal, setShowApplyToHostModal] = React.useState(false);
@@ -60,17 +71,33 @@ export default function ApplyToHostCard(props: {
                 }}
               />
             </P>
-            {props.host.hostFeePercent !== null && (
-              <P mt={2}>
-                <FormattedMessage
-                  defaultMessage="<b>{ hostFeePercent }%</b> Host fee"
-                  id="URR2Ki"
-                  values={{
-                    hostFeePercent: props.host.hostFeePercent,
-                    b: chunks => <strong>{chunks}</strong>,
-                  }}
-                />
-              </P>
+            {(props.host.hostFeePercent !== null || props.host.platformContributionAvailable) && (
+              <div className="mt-2 text-xs text-slate-700">
+                {props.host.hostFeePercent !== null && (
+                  <span>
+                    <Span fontSize="14px" fontWeight={700} color="black.900">{`${props.host.hostFeePercent}%`}</Span>
+                    {` `}
+                    <Span fontSize="12px" fontWeight={400}>
+                      <DefinedTerm
+                        color="black.700"
+                        borderColor="#969ba3"
+                        fontSize="12px"
+                        term={
+                          checkUseAlternativeHostFeeNaming(props.host)
+                            ? Terms.ADMINISTRATIVE_CONTRIBUTION
+                            : Terms.HOST_FEE
+                        }
+                      />
+                    </Span>
+                  </span>
+                )}
+                {props.host.platformContributionAvailable && (
+                  <React.Fragment>
+                    {props.host.hostFeePercent !== null && ' + '}
+                    <DefinedTerm color="black.700" borderColor="#969ba3" fontSize="12px" term={Terms.PLATFORM_TIPS} />
+                  </React.Fragment>
+                )}
+              </div>
             )}
           </Box>
           {props.host.description !== null && props.host.description.length !== 0 && (

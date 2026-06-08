@@ -1,4 +1,4 @@
-import { get, uniqBy } from 'lodash';
+import { get, uniqBy } from 'lodash-es';
 
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
@@ -105,7 +105,7 @@ class LoggedInUser {
   /**
    * Has access to admin panel if admin or accountant
    */
-  canSeeAdminPanel(collective: Parameters<typeof LoggedInUser.prototype.hasRole>[1]) {
+  canSeeDashboard(collective: Parameters<typeof LoggedInUser.prototype.hasRole>[1]) {
     return this.hasRole([MemberRole.ADMIN, MemberRole.ACCOUNTANT], collective);
   }
 

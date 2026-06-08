@@ -10,7 +10,7 @@ import { MinusCircle } from '@styled-icons/feather/MinusCircle';
 import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
 import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { ArrowRightLeft, Copy, FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -23,7 +23,7 @@ import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useKeyboardKey, { H, I } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute, getPermalinkUrl } from '../../lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { FullscreenFlowLoadingPlaceholder } from '../FullscreenFlowLoadingPlaceholder';
@@ -332,7 +332,7 @@ const ExpenseMoreActionsButton = ({
               onClick={() =>
                 linkAction === 'link'
                   ? router.push(`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`)
-                  : copy(`${getCollectivePageCanonicalURL(expense.account)}/expenses/${expense.legacyId}`)
+                  : copy(getPermalinkUrl(expense.publicId))
               }
               disabled={processExpense.loading || isDisabled}
             >

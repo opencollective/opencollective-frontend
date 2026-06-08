@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Formik, useFormikContext } from 'formik';
-import { get, isEmpty, omit, pick, truncate } from 'lodash';
+import { get, isEmpty, omit, pick, truncate } from 'lodash-es';
 import { BadgeCheck, Pencil, ShieldAlert, Trash2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -16,7 +16,13 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
-import { NEW_PAYOUT_METHOD_ID, PAYEE_SLUG_NEW_VENDOR, PAYEE_SLUG_VENDOR } from '@/components/expenses/lib/constants';
+import {
+  NEW_PAYOUT_METHOD_ID,
+  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
+  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
+  PAYEE_SLUG_NEW_VENDOR,
+  PAYEE_SLUG_VENDOR,
+} from '@/components/expenses/lib/constants';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
@@ -57,6 +63,7 @@ function getFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
+    ...pick(form.startOptions, ['isInlineEdit']),
     ...pick(form.options, [
       'account',
       'host',
@@ -98,7 +105,9 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   const { LoggedInUser } = useLoggedInUser();
 
   const isLoadingPayee = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
-  const isPickingProfileAdministered = props.payeeSlug === '__findAccountIAdminister';
+  const isPickingProfileAdministered = [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(
+    props.payeeSlug,
+  );
 
   const payoutMethods = React.useMemo(() => {
     if (!props.payoutMethods) {
@@ -126,13 +135,20 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       setLastUsedPayoutMethod(null);
     }
 
-    if (!props.payoutMethodId && lastUsed) {
-      setFieldValue('payoutMethodId', lastUsed?.id);
-    } else if (
-      props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
-      (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
-    ) {
-      setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
+    const expensePayoutMethodId = props.expense?.payoutMethod?.id;
+    const isEditingExistingExpensePayoutMethod =
+      expensePayoutMethodId &&
+      (props.payeeSlug === props.expense?.payee?.slug || (props.isInlineEdit && !props.payeeSlug));
+
+    if (!isEditingExistingExpensePayoutMethod) {
+      if (!props.payoutMethodId && lastUsed) {
+        setFieldValue('payoutMethodId', lastUsed?.id);
+      } else if (
+        props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
+        (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
+      ) {
+        setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
+      }
     }
 
     if (!props.initialLoading) {
@@ -140,8 +156,11 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     }
   }, [
     props.initialLoading,
+    props.isInlineEdit,
     props.payeeSlug,
     props.recentlySubmittedExpenses,
+    props.expense?.payee?.slug,
+    props.expense?.payoutMethod?.id,
     setFieldValue,
     props.payoutMethodId,
     props.payoutMethods,
@@ -303,6 +322,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 disableWarningMessages={
                   payeeIsCollectiveFamilyType && !LoggedInUser.isAdminOfCollective(props.payee['host'])
                 }
+                disableNameMismatchWarning={payeeIsCollectiveFamilyType && !payeeIsSameHost}
                 isPaypalConnectEnabled={props['isPaypalConnectEnabled']}
               />
             ))}
@@ -660,6 +680,8 @@ type PayoutMethodRadioGroupItemProps = {
   archived?: boolean;
   /** Hide quick actions to correct missing currency or mismatch name */
   disableWarningMessages?: boolean;
+  /** Hide the legal name mismatch warning (e.g. cross-host payments where the payout method belongs to the recipient Host, not the payee) */
+  disableNameMismatchWarning?: boolean;
   onPaymentMethodDeleted: (deletedPayoutMethodId) => void;
   onPaymentMethodEdited: (newPayoutMethodId: string) => void;
   setNameMismatchReason?: (reason: string) => void;
@@ -1022,7 +1044,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                     </MessageBox>
                   </div>
                 )}
-                {hasLegalNameMismatch && !props.disableWarningMessages && (
+                {hasLegalNameMismatch && !props.disableWarningMessages && !props.disableNameMismatchWarning && (
                   <MessageBox type="warning">
                     <div className="mb-2 font-bold">
                       <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />

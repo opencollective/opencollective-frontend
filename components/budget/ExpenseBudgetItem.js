@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
-import { get, includes, truncate } from 'lodash';
+import { get, includes, truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space } from 'styled-system';
@@ -15,6 +15,8 @@ import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 import { isFeatureEnabled } from '@/lib/allowed-features';
+
+import { ExpenseKYCStatusBadge } from '../kyc/components/ExpenseKYCStatusBadge';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -142,7 +144,6 @@ const ExpenseBudgetItem = ({
   const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
   const lastComment = expense?.lastComment?.nodes?.[0];
   const approvedBy = expense?.approvedBy?.length > 0 ? expense.approvedBy : null;
-
   return (
     <ExpenseContainer
       px={[3, '24px']}
@@ -394,6 +395,9 @@ const ExpenseBudgetItem = ({
                   showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
                   payee={expense.payee}
                 />
+              )}
+              {isLoggedInUserExpenseHostAdmin && expense.kycStatus?.payee?.status && (
+                <ExpenseKYCStatusBadge className="ml-1" status={expense.kycStatus?.payee?.status} />
               )}
             </Flex>
           )}

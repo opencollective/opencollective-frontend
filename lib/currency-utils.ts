@@ -1,5 +1,5 @@
 import getSymbolFromCurrency from 'currency-symbol-map';
-import { isNil, round } from 'lodash';
+import { isNil, round } from 'lodash-es';
 
 import { CurrencyToCountry, ZERO_DECIMAL_CURRENCIES } from './constants/currency';
 import { CurrencyPrecision } from './constants/currency-precision';
@@ -54,6 +54,18 @@ export function graphqlAmountValueInCents(amount: Amount | number | null): numbe
 
 export const getDefaultCurrencyPrecision = (currency: Currency): number => {
   return (ZERO_DECIMAL_CURRENCIES as readonly string[]).includes(currency) ? 0 : 2;
+};
+
+/**
+ * Rounds a cents amount to the nearest unit. Useful when calculating percentage-based amounts,
+ * to make sure that zero-decimal currencies are rounded to the nearest 100.
+ *
+ * @example roundCentsAmount(1234, 'USD') => 1234
+ * @example roundCentsAmount(1234, 'JPY') => 1200
+ */
+export const roundCentsAmount = (amountInCents: number, currency: Currency | string): number => {
+  const roundDigits = (ZERO_DECIMAL_CURRENCIES as readonly string[]).includes(currency) ? -2 : 0;
+  return round(amountInCents, roundDigits);
 };
 
 export function formatCurrency(

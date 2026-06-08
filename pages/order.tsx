@@ -1,10 +1,10 @@
 import React from 'react';
-import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
+import { isEmpty, orderBy, partition, round, toNumber } from 'lodash-es';
 import type { GetServerSideProps } from 'next';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata } from '../lib/collective';
+import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import dayjs from '../lib/dayjs';
 import { gql } from '../lib/graphql/helpers';
 import type { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
@@ -303,6 +303,8 @@ export default function OrderPage(props) {
   if (!order && error) {
     return <ErrorPage loading={queryResult.loading} data={queryResult.data} error={error} />;
   } else if (!queryResult.loading && (!order || order.toAccount?.slug !== variables.collectiveSlug)) {
+    return <Custom404 />;
+  } else if (account && isHiddenAccount(account)) {
     return <Custom404 />;
   }
 

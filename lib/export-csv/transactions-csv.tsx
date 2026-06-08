@@ -13,6 +13,7 @@ export type CSVField =
   | 'datetime'
   | 'effectiveDate'
   | 'id'
+  | 'publicId'
   | 'legacyId'
   | 'shortId'
   | 'shortGroup'
@@ -53,6 +54,7 @@ export type CSVField =
   | 'hostName'
   | 'hostType'
   | 'orderId'
+  | 'orderPublicId'
   | 'orderLegacyId'
   | 'orderFrequency'
   | 'orderProcessedDate'
@@ -60,6 +62,7 @@ export type CSVField =
   | 'paymentMethodService'
   | 'paymentMethodType'
   | 'expenseId'
+  | 'expensePublicId'
   | 'expenseLegacyId'
   | 'expenseType'
   | 'expenseTags'
@@ -102,6 +105,7 @@ export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   datetime: 'Date & Time',
   effectiveDate: 'Effective Date',
   id: 'Transaction ID',
+  publicId: 'Public Transaction ID',
   legacyId: 'Legacy Transaction ID',
   shortId: 'Short Transaction ID',
   shortGroup: 'Short Group ID',
@@ -142,6 +146,7 @@ export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   hostName: 'Host Name',
   hostType: 'Host Type',
   orderId: 'Contribution ID',
+  orderPublicId: 'Contribution Public ID',
   orderLegacyId: 'Legacy Contribution ID',
   orderFrequency: 'Contribution Frequency',
   orderMemo: 'Contribution Memo',
@@ -150,6 +155,7 @@ export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   paymentMethodService: 'Payment Method Service',
   paymentMethodType: 'Payment Method Type',
   expenseId: 'Expense ID',
+  expensePublicId: 'Expense Public ID',
   expenseLegacyId: 'Legacy Expense ID',
   expenseType: 'Expense Type',
   expenseTags: 'Expense Tags',
@@ -218,6 +224,12 @@ export const FIELDS: Array<{
     group: 'transaction',
     tooltip: <FormattedMessage defaultMessage="A unique serial transaction identifier." id="ufJYd0" />,
     label: 'Transaction ID',
+  },
+  {
+    id: 'publicId',
+    group: 'transaction',
+    tooltip: <FormattedMessage defaultMessage="A unique public transaction identifier." id="HqK6q0" />,
+    label: 'Public Transaction ID',
   },
   {
     id: 'group',
@@ -530,6 +542,12 @@ export const FIELDS: Array<{
     label: 'Contribution ID',
   },
   {
+    id: 'orderPublicId',
+    group: 'order',
+    tooltip: <FormattedMessage defaultMessage="A unique public contribution identifier." id="6Ectq+" />,
+    label: 'Contribution Public ID',
+  },
+  {
     id: 'orderMemo',
     group: 'order',
     tooltip: (
@@ -572,6 +590,12 @@ export const FIELDS: Array<{
     group: 'expense',
     tooltip: <FormattedMessage defaultMessage="A unique platform identifier for an expense." id="ndQbVX" />,
     label: 'Expense ID',
+  },
+  {
+    id: 'expensePublicId',
+    group: 'expense',
+    tooltip: <FormattedMessage defaultMessage="A unique public expense identifier." id="M9Rxft" />,
+    label: 'Expense Public ID',
   },
   {
     id: 'expenseType',

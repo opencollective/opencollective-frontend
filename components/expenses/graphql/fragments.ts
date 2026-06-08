@@ -249,6 +249,7 @@ export const expensePageExpenseFieldsFragment = gql`
   fragment ExpensePageExpenseFields on Expense {
     id
     legacyId
+    publicId
     description
     longDescription
     currency
@@ -670,6 +671,11 @@ export const expensePageExpenseFieldsFragment = gql`
       scope
       details
     }
+    kycStatus {
+      payee {
+        status
+      }
+    }
   }
 
   ${expenseHostFields}
@@ -684,6 +690,7 @@ export const expensesListFieldsFragment = gql`
   fragment ExpensesListFieldsFragment on Expense {
     id
     legacyId
+    publicId
     description
     reference
     status
@@ -791,6 +798,7 @@ export const expensesListFieldsFragment = gql`
       name
       data
       isSaved
+      isVerified
     }
     payee {
       id
@@ -861,6 +869,7 @@ export const expensesListAdminFieldsFragment = gql`
       type
       name
       data
+      isVerified
     }
     items {
       id
@@ -921,6 +930,12 @@ export const expensesListAdminFieldsFragment = gql`
           name
           imageUrl
         }
+      }
+    }
+
+    kycStatus {
+      payee {
+        status
       }
     }
   }

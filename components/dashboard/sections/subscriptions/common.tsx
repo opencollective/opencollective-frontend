@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
-import { groupBy, mapValues, pick, toPairs } from 'lodash';
+import { groupBy, mapValues, pick, toPairs } from 'lodash-es';
 import { Pencil } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedDate, FormattedMessage } from 'react-intl';

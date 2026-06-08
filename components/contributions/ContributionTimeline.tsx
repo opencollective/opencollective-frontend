@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { clsx } from 'clsx';
 import dayjs from 'dayjs';
-import { flatten, groupBy, sortBy, startCase, uniq } from 'lodash';
+import { flatten, groupBy, sortBy, startCase, uniq } from 'lodash-es';
 import {
   Calendar,
   ChevronDown,
@@ -21,7 +21,7 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../lib/graphql/types/v2/graphql';
-import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } from '../../lib/graphql/types/v2/graphql';
+import { ActivityType, ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
@@ -34,6 +34,8 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
 import { Button } from '../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
+
+import { getPrimaryContributionTransaction } from './transactionUtils';
 
 type OrderTimelineProps = {
   order: ContributionDrawerQuery['order'];
@@ -55,7 +57,7 @@ type OrderTimelineItem = {
 
 type TransactionGroup = {
   group: string;
-  transactions: ContributionDrawerQuery['order']['transactions'];
+  primaryTransaction: ContributionDrawerQuery['order']['transactions'][number];
 };
 
 function buildTransactionGroups(order: ContributionDrawerQuery['order']): TransactionGroup[] {
@@ -67,30 +69,22 @@ function buildTransactionGroups(order: ContributionDrawerQuery['order']): Transa
   const groups = uniq(transactions.map(txn => txn.group));
   const byGroup = groupBy(transactions, txn => txn.group);
 
-  const KIND_PRIORITY = [TransactionKind.CONTRIBUTION, TransactionKind.ADDED_FUNDS, TransactionKind.BALANCE_TRANSFER];
   return groups.map(group => ({
     group,
-    transactions: byGroup[group].sort((a, b) => {
-      if (KIND_PRIORITY.includes(a.kind) && !KIND_PRIORITY.includes(b.kind)) {
-        return -1;
-      } else if (!KIND_PRIORITY.includes(a.kind) && KIND_PRIORITY.includes(b.kind)) {
-        return 1;
-      }
-      return a.createdAt - b.createdAt;
-    }),
+    primaryTransaction: getPrimaryContributionTransaction(byGroup[group]),
   }));
 }
 
-export function getTransactionsUrl(
+function getTransactionsUrl(
   LoggedInUser: LoggedInUser,
   order: ContributionDrawerQuery['order'] | ManagedOrderFieldsFragment,
 ): URL {
   let route = `/${order.toAccount.slug}/transactions`;
   if (LoggedInUser.isSelf(order.fromAccount)) {
     route = getDashboardRoute(order.fromAccount, 'transactions');
-  } else if ('host' in order.toAccount && LoggedInUser.canSeeAdminPanel(order.toAccount.host)) {
+  } else if ('host' in order.toAccount && LoggedInUser.canSeeDashboard(order.toAccount.host)) {
     route = getDashboardRoute(order.toAccount.host, 'host-transactions');
-  } else if (LoggedInUser.canSeeAdminPanel(order.toAccount)) {
+  } else if (LoggedInUser.canSeeDashboard(order.toAccount)) {
     route = getDashboardRoute(order.toAccount, 'transactions');
   }
 
@@ -224,6 +218,7 @@ function ContributionTimeline(props: OrderTimelineProps) {
         ActivityType.ORDER_PENDING_RECEIVED,
         ActivityType.ORDER_PENDING,
         ActivityType.ORDER_PROCESSED, // Covered by manually looking at the transactions below
+        ActivityType.CONTRIBUTION_REFUNDED, // Covered by manually looking at the transactions below
       ]),
     )
     .map(a => {
@@ -231,9 +226,17 @@ function ContributionTimeline(props: OrderTimelineProps) {
         a.data?.previousData &&
         formatSimpleDiff(a.data.previousData, a.data.newData, { currency: props.order.totalAmount.currency });
 
+      const normalizedActivity = {
+        ...a,
+        individual: a.individual?.mainProfile ?? a.individual,
+        fromAccount: a.fromAccount?.mainProfile ?? a.fromAccount,
+        account: a.account?.mainProfile ?? a.account,
+        host: a.host?.mainProfile ?? a.host,
+      };
+
       return {
         id: a.id,
-        title: <ActivityDescription activity={a} />,
+        title: <ActivityDescription activity={normalizedActivity} />,
         collapsable: [ActivityType.PAYMENT_FAILED, ActivityType.ADDED_FUNDS_EDITED].includes(a.type),
         icon: getIcon(a.type),
         date: a.createdAt,
@@ -255,11 +258,11 @@ function ContributionTimeline(props: OrderTimelineProps) {
 
   const transactions: OrderTimelineItem[] = sortBy(
     buildTransactionGroups(props.order),
-    txn => txn.transactions.at(0).createdAt,
+    txn => txn.primaryTransaction.createdAt,
   )
     .reverse()
     .map((txn, i) => {
-      const primaryTxn = txn.transactions.at(0);
+      const primaryTxn = txn.primaryTransaction;
       const actions = getTransactionActions(primaryTxn);
       const title = primaryTxn.isRefund ? (
         <FormattedMessage

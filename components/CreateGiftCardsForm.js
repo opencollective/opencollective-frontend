@@ -5,7 +5,7 @@ import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
-import { get, truncate } from 'lodash';
+import { get, truncate } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -20,13 +20,13 @@ import Container from './Container';
 import CreateGiftCardsSuccess from './CreateGiftCardsSuccess';
 import { Box, Flex } from './Grid';
 import { I18nSupportLink } from './I18nFormatters';
+import InputAmount from './InputAmount';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import PaymentMethodSelect from './PaymentMethodSelect';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInput from './StyledInput';
-import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
 
@@ -477,7 +477,7 @@ class CreateGiftCardsForm extends Component {
         </MessageBox>
         <Flex flexDirection="column">
           <InlineField name="amount" label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}>
-            <StyledInputAmount
+            <InputAmount
               id="giftcard-amount"
               currency={currency}
               prepend={currency}

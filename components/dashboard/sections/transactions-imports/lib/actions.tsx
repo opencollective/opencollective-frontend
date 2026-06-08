@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { cloneDeep, pick, uniq, update } from 'lodash';
+import { cloneDeep, pick, uniq, update } from 'lodash-es';
 import { ArchiveRestore, Banknote, Merge, PauseCircle, Receipt, SquareSlashIcon, Unlink } from 'lucide-react';
 import { useIntl } from 'react-intl';
 

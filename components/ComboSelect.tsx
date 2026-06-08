@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { isString } from 'lodash';
+import { isString } from 'lodash-es';
 import { Check, ChevronDown } from 'lucide-react';
 import { defineMessages, useIntl } from 'react-intl';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { cx } from 'class-variance-authority';
-import { flatten, groupBy, uniqBy } from 'lodash';
+import { flatten, groupBy, uniqBy } from 'lodash-es';
 import { ChevronDown, ChevronsUpDown, ChevronUp, Plus, UserCog } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import type { ReactElement } from 'react';

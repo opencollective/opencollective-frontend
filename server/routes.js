@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const express = require('express');
 const proxy = require('express-http-proxy');
-const { trim } = require('lodash');
+const trim = require('lodash-es/trim').default;
 
 const downloadFileHandler = require('./download-file');
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;

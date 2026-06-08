@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { isNil } from 'lodash';
+import { isNil } from 'lodash-es';
 import { AlertTriangle, ArrowLeft, ArrowRight, InfoIcon, Undo } from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, which is required when used 'asChild' of HoverCardTrigger
 import Link from 'next/link';
@@ -10,8 +10,6 @@ import type { GetActions } from '../../../../lib/actions/types';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -84,6 +82,12 @@ const transactionQuery = gql`
       isDisputed
       isOrderRejected
       merchantId
+      host {
+        id
+        slug
+        legacyId
+        type
+      }
       account {
         id
         name
@@ -107,6 +111,14 @@ const transactionQuery = gql`
           }
         }
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
       fromAccount {
         id
@@ -129,8 +141,17 @@ const transactionQuery = gql`
         name
         slug
         imageUrl
+        isIncognito
         type
         ...AccountHoverCardFields
+        mainProfile {
+          id
+          name
+          slug
+          imageUrl
+          type
+          ...AccountHoverCardFields
+        }
       }
 
       permissions {
@@ -216,6 +237,7 @@ const transactionQuery = gql`
         group
         createdAt
       }
+      paymentProcessorUrl
     }
   }
   ${accountHoverCardFields}
@@ -236,14 +258,9 @@ interface TransactionDetailsProps {
   getActions: GetActions<TransactionDetailsQueryNode>;
 }
 
-const getExpenseUrl = (dashboardAccount, expense, LoggedInUser) => {
+const getExpenseUrl = (dashboardAccount, expense) => {
   if (dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id) {
-    return getDashboardRoute(
-      expense.host,
-      LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-        ? `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`
-        : `${ALL_SECTIONS.HOST_EXPENSES}?openExpenseId=${expense.legacyId}`,
-    );
+    return getDashboardRoute(expense.host, `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`);
   } else if (dashboardAccount?.id === expense.account.id) {
     return getDashboardRoute(expense.account, `expenses?openExpenseId=${expense.legacyId}`);
   }
@@ -252,7 +269,6 @@ const getExpenseUrl = (dashboardAccount, expense, LoggedInUser) => {
 
 function TransactionDetails({ transactionId, getActions }: TransactionDetailsProps) {
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
   const prevTransactionId = usePrevious(transactionId);
   const id = transactionId || prevTransactionId;
   const { data, refetch, loading, error } = useQuery(transactionQuery, {
@@ -267,7 +283,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   let expenseUrl;
 
   if (transaction?.expense) {
-    expenseUrl = getExpenseUrl(account, transaction.expense, LoggedInUser);
+    expenseUrl = getExpenseUrl(account, transaction.expense);
   }
   return (
     <React.Fragment>
@@ -368,12 +384,12 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                     value={
                       <LinkCollective
                         className="font-medium hover:text-primary"
-                        collective={transaction?.account}
+                        collective={transaction?.account?.mainProfile ?? transaction?.account}
                         withHoverCard
                       >
                         <div className="flex items-center gap-1">
-                          <Avatar radius={20} collective={transaction?.account} />
-                          {transaction?.account.name}
+                          <Avatar radius={24} collective={transaction?.account} />
+                          {(transaction?.account?.mainProfile ?? transaction?.account)?.name}
                         </div>
                       </LinkCollective>
                     }
@@ -391,7 +407,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                     value={
                       <LinkCollective
                         className="font-medium hover:text-primary"
-                        collective={transaction?.oppositeAccount}
+                        collective={transaction?.oppositeAccount?.mainProfile ?? transaction?.oppositeAccount}
                         withHoverCard
                       >
                         <div className="flex items-center gap-1">
@@ -400,8 +416,8 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                           ) : (
                             <ArrowRight className="inline-block shrink-0" size={16} />
                           )}
-                          <Avatar radius={20} collective={transaction?.oppositeAccount} />
-                          {transaction?.oppositeAccount?.name}
+                          <Avatar radius={24} collective={transaction?.oppositeAccount} />
+                          {(transaction?.oppositeAccount?.mainProfile ?? transaction?.oppositeAccount)?.name}
                         </div>
                       </LinkCollective>
                     }

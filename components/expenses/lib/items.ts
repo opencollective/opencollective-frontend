@@ -1,4 +1,4 @@
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
 import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';

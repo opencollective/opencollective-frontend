@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, isNil } from 'lodash';
+import { get, isNil } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -125,7 +125,7 @@ const HelpBlock = styled(Box)`
 
 /**
  * @deprecated InputField is deprecated and should be avoided for new developments.
- * Please use the `Styled*` equivalents: `StyledInput`, `StyledInputAmount`, etc.
+ * Please use the newer equivalents: `StyledInput`, `InputAmount`, etc.
  */
 class InputField extends React.Component {
   static propTypes = {

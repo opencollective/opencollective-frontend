@@ -10,7 +10,6 @@ require('./env');
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
-  eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
@@ -39,6 +38,11 @@ const nextConfig = {
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
     config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
+    if (typeof config.cache !== 'boolean') {
+      config.cache = {};
+    }
+    config.cache.type = 'filesystem';
+    config.cache.compression = 'brotli';
 
     config.plugins.push(
       // Ignore __tests__
@@ -70,6 +74,7 @@ const nextConfig = {
         HEROKU_SLUG_COMMIT: null,
         LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
         DISABLE_CONTACT_FORM: false,
+        NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: 0,
       }),
     );
 
@@ -172,13 +177,13 @@ const nextConfig = {
       },
     });
 
-    // Load images in base64
+    // Load images in base64 (only for very small assets; larger files become URLs)
     config.module.rules.push({
       test: /\.(svg|png|jpg|gif)$/,
       use: {
         loader: 'url-loader',
         options: {
-          limit: 1000000,
+          limit: 8192,
         },
       },
       include: [path.resolve(__dirname, 'components')],

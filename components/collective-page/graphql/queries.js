@@ -32,6 +32,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       company
       type
       currency
+      createdAt
       settings
       isActive
       isApproved
@@ -46,6 +47,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       isFirstPartyHost
       hostFeePercent
       platformFeePercent
+      platformContributionAvailable
       image
       imageUrl(height: 256)
       canApply

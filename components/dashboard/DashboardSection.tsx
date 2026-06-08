@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { values } from 'lodash';
+import { values } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -34,10 +34,10 @@ import PeopleRouter from './sections/community/People';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import IncompleteContributions from './sections/contributions/IncompleteContributions';
+import InternalTransfers from './sections/contributions/InternalTransfers';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
 import ApprovePaymentRequests from './sections/expenses/ApprovePaymentRequests';
-import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import HostPaymentRequests from './sections/expenses/HostPaymentRequests';
 import IssuedPaymentRequests from './sections/expenses/IssuedPaymentRequests';
 import { PaidDisbursements } from './sections/expenses/PaidDisbursements';
@@ -94,7 +94,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
   [SECTIONS.OFF_PLATFORM_TRANSACTIONS]: OffPlatformTransactions,
   [SECTIONS.LEDGER_CSV_IMPORTS]: CSVTransactionsImports,
-  [SECTIONS.HOST_EXPENSES]: HostExpenses,
+  [SECTIONS.HOST_EXPENSES]: PayDisbursements,
   [SECTIONS.PAY_DISBURSEMENTS]: PayDisbursements,
   [SECTIONS.PAID_DISBURSEMENTS]: PaidDisbursements,
   [SECTIONS.APPROVE_PAYMENT_REQUESTS]: ApprovePaymentRequests,
@@ -120,6 +120,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.KYC]: KYCRequests,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
+  [SECTIONS.INTERNAL_TRANSFERS]: InternalTransfers,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
   [SECTIONS.INCOMPLETE_CONTRIBUTIONS]: IncompleteContributions,
   [SECTIONS.TRANSACTIONS]: AccountTransactions,

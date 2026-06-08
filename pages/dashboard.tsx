@@ -65,7 +65,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
   } else if (loggedInUser?.isAccountantOnly(account) && account.hasHosting) {
-    return ALL_SECTIONS.HOST_EXPENSES;
+    return ALL_SECTIONS.PAY_DISBURSEMENTS;
   } else if (loggedInUser?.isAccountantOnly(account)) {
     return ALL_SECTIONS.PAYMENT_RECEIPTS;
   } else {
@@ -173,7 +173,7 @@ const getNotification = (intl, account): React.ComponentProps<typeof Notificatio
 const getProfileUrl = (
   loggedInUser: LoggedInUser,
   contextAccount: DashboardQuery['account'],
-  account: { id: string; slug: string; type: string },
+  account: { id: string; slug: string; type: string; publicId?: string },
 ) => {
   if (!contextAccount) {
     return null;
@@ -185,11 +185,11 @@ const getProfileUrl = (
         ? contextAccount
         : null;
 
-  if (context && typeof account?.id === 'string') {
+  if (context && (typeof account?.id === 'string' || (account?.publicId && typeof account.publicId === 'string'))) {
     if (account?.type === CollectiveType.INDIVIDUAL) {
-      return getDashboardRoute({ slug: context.slug }, `people/${account?.id}`);
+      return getDashboardRoute({ slug: context.slug }, `people/${account?.publicId || account?.id}`);
     } else if ([CollectiveType.VENDOR, CollectiveType.ORGANIZATION].includes(account?.type as any)) {
-      return getDashboardRoute({ slug: context.slug }, `vendors/${account?.id}`);
+      return getDashboardRoute({ slug: context.slug }, `vendors/${account?.publicId || account?.id}`);
     }
   }
   return null;
