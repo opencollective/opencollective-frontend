@@ -188,7 +188,7 @@ export default function FilesViewerModal({
   const contentWrapperRef = React.useRef(null);
 
   const renderFile = ({ url, name }: { url: string; name?: string; info?: { width: number } }, contentWrapperRef) => {
-    let content = null;
+    let content: React.ReactNode;
 
     const isText = ['text/csv', 'text/plain'].includes(selectedItemContentType);
     const isPdf = 'application/pdf' === selectedItemContentType;

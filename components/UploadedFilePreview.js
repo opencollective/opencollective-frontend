@@ -91,7 +91,7 @@ const UploadedFilePreview = ({
   openFileViewer = undefined,
   ...props
 }) => {
-  let content = null;
+  let content;
   const fileExtension = getFileExtensionFromUrl(url);
   const isText = ['csv', 'txt'].includes(fileExtension) || fileType === 'text/csv' || fileType === 'text/plain';
   const isPdf = fileExtension === 'pdf' || fileType === 'application/pdf';

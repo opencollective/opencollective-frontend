@@ -177,7 +177,7 @@ class OnboardingModal extends React.Component {
       });
     } catch (e) {
       const errorMsg = getErrorFromGraphqlException(e).message;
-      throw new Error(errorMsg);
+      throw new Error(errorMsg, { cause: e });
     }
   };
 
@@ -191,7 +191,7 @@ class OnboardingModal extends React.Component {
       await this.props.editCollectiveContact({ variables: { collective } });
     } catch (e) {
       const errorMsg = getErrorFromGraphqlException(e).message;
-      throw new Error(errorMsg);
+      throw new Error(errorMsg, { cause: e });
     }
   };
 
