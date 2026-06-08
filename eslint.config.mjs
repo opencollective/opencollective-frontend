@@ -1,4 +1,4 @@
-import { includeIgnoreFile } from '@eslint/compat';
+import { fixupConfigRules, includeIgnoreFile } from '@eslint/compat';
 import graphqlPlugin from '@graphql-eslint/eslint-plugin'; // eslint-disable-line import/no-unresolved
 import tsParser from '@typescript-eslint/parser'; // eslint-disable-line import/no-unresolved
 import { defineConfig, globalIgnores } from 'eslint/config'; // eslint-disable-line import/no-unresolved
@@ -18,7 +18,7 @@ const gitignorePath = fileURLToPath(new URL('.gitignore', import.meta.url));
 
 // ts-unused-exports:disable-next-line
 export default defineConfig([
-  ...openCollectiveConfig,
+  ...fixupConfigRules(openCollectiveConfig),
   pluginCypress.configs.recommended,
   jsxA11y.flatConfigs.recommended,
   styledA11y.flatConfigs.recommended,
@@ -195,6 +195,15 @@ export default defineConfig([
     rules: {
       'no-console': 'off',
       'n/no-process-exit': 'off',
+      'n/no-unpublished-import': 'off',
+    },
+  },
+
+  // Test files config
+  {
+    files: ['test/**/*.+(js|ts|jsx|tsx)', 'components/__tests__/**/*.+(js|ts|jsx|tsx)'],
+    rules: {
+      'n/no-unpublished-import': 'off',
     },
   },
 
