@@ -28,6 +28,76 @@ const IGNORED: Record<string, readonly string[]> = {
     'AccountingCategory.code', // "Code" - identique
     'AddFundsModal.source', // "Source" - identique
     'AdminPanel.button', // "Admin" - libellé court conservé
+    'Amount', // placeholders only: {amount} {currencyCode}
+    'Avatar', // loanword identique en français
+    'asqGnV', // "Solutions" - même mot en français
+    'collective.category.association', // "Association" - identique
+    'collective.category.meetup', // "Meetup" - emprunt courant
+    'CollectivePage.NavBar.Participants', // "Participants" - identique
+    'CollectivePage.NavBar.ActionMenu.Actions', // "Actions" - identique
+    'community.openSource', // "Open Source" - terme standard
+    'community.support', // "Support" - terme courant en UI
+    'company.blog', // "Blog" - identique
+    'Contact', // identique
+    'Contact.Message', // "Message" - identique
+    'Contributions', // identique
+    'contributions.id', // "#" - identique
+    'ContributionType.Ticket', // "Ticket" - usage produit cohérent
+    'conversations', // "Conversations" - identique
+    'DZ2Koj', // "Direction" - identique
+    'E80WrK', // "Information" - identique
+    'editCollective.menu.webhooks', // "Webhooks" - emprunt courant
+    'Email', // "Email" - usage produit
+    'event.sponsors.title', // "Sponsors" - identique
+    'expense.incurredAt', // "Date" - identique
+    'expense.notes', // "Notes" - identique
+    'expense.type', // "Type" - identique
+    'Expense.type', // "Type" - identique
+    'Exports', // "Exports" - terme technique courant
+    'FAQ', // identique
+    'Fields.description', // "Description" - identique
+    'Fields.id', // "ID" - identique
+    'Fields.slug', // "Slug" - terme technique
+    'Fields.type', // "Type" - identique
+    'gegfoA', // "Conversation" - identique
+    'giftCards.description', // "DESCRIPTION" - libellé technique
+    'GM/hd6', // "Invitation" - identique
+    'goal.type.label', // "Type" - identique
+    'header.options', // "Options" - identique
+    'HostApplication.ProjectTypeSelect.code', // "Code" - identique
+    'Hv0XJn', // "Suggestions" - identique
+    'KYC', // acronyme identique
+    'menu.documentation', // "Documentation" - identique
+    'menu.transactions', // "Transactions" - identique
+    'MJ2jZQ', // "Total" - identique
+    'n7yYXG', // "Service" - identique
+    'NewContributionFlow.CollectiveAndTier', // placeholders only
+    'OrderPage.title', // "Contribution" - terme produit identique
+    'paymentMethods.labelCreditCard', // placeholders only
+    'paymentReceipt.transaction', // "Transaction(s)" - identique
+    'Public', // identique
+    'Q0lxqm', // "CVV/CVC" - identique
+    'r+dgiv', // "Taxes" - identique
+    'section.budget.title', // "Budget" - identique
+    'section.tickets.title', // "Tickets" - usage produit
+    'Siv4wU', // "Contribution" - terme produit
+    'Stripe.PaymentMethod.Label.bancontact', // marque Bancontact
+    'Stripe.PaymentMethod.Label.link', // marque Link
+    'Stripe.PaymentMethod.Label.swish', // marque Swish
+    'sV2v5L', // "Instructions" - identique
+    'Tags', // identique
+    'Tags.OPEN_SOURCE', // "Open source" - terme standard
+    'tax.gstShort', // "GST" - acronyme
+    'tier.name.sponsor', // "sponsor" - emprunt courant
+    'tier.Pro.title', // "Pro" - nom de forfait
+    'tier.type.label', // "Type" - identique
+    'Timezone.UTC', // "UTC" - identique
+    'total', // identique
+    'tZEZGT', // "contribution(s)" - terme produit identique
+    'VirtualCards.CVV', // "CVV" - identique
+    'Warning.Important', // "Important" - identique
+    'webhook.index', // "Webhook" - emprunt courant
+    'X3AIiK', // "Europe" - identique
   ],
 };
 
