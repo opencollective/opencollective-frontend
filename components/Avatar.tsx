@@ -18,7 +18,7 @@ import { DROPZONE_ACCEPT_IMAGES } from './Dropzone';
 import type { FlexProps } from './Grid';
 import { Flex } from './Grid';
 
-const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
+const getInitials = name => name.split(' ').reduce((result, value) => result + value.slice(0, 1).toUpperCase(), '');
 
 const COLLECTIVE_TYPE_ICON = {
   [CollectiveType.EVENT]: Calendar,
@@ -126,7 +126,6 @@ const Avatar = ({
     type = collective.type;
     name = collective.name;
     if (collective.isIncognito) {
-      useIcon = true;
       child = <EyeOff size={typeof radius === 'number' ? (radius <= 24 ? radius * 0.5 : radius * 0.4) : 16} />;
       Object.assign(styleProps, { backgroundColor: 'black.900', color: 'white' });
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
@@ -175,14 +174,11 @@ export const ContributorAvatar = ({
   };
   radius: string | number | (string | number)[];
 }) => {
-  let image = null;
-  if (contributor.isIncognito) {
-    image = defaultImage.ANONYMOUS;
-  } else if (contributor.isGuest && shouldUseDefaultGuestAvatar(contributor.name)) {
-    image = defaultImage.GUEST;
-  } else {
-    image = getCollectiveImage({ slug: contributor.collectiveSlug, imageUrl: contributor.image });
-  }
+  const image = contributor.isIncognito
+    ? defaultImage.ANONYMOUS
+    : contributor.isGuest && shouldUseDefaultGuestAvatar(contributor.name)
+      ? defaultImage.GUEST
+      : getCollectiveImage({ slug: contributor.collectiveSlug, imageUrl: contributor.image });
 
   return <StyledAvatar size={radius} type={contributor.type} src={image} title={contributor.name} {...styleProps} />;
 };

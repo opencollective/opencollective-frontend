@@ -13,10 +13,9 @@ export const buildReport = (report: TransactionReport, { showCreditDebit, filter
     return null;
   }
   let remainingNodes = transactionsReportResultGroups;
-  let reportRows = [];
   const reportGroups = useComputationalLayout ? computationalGroups : predefinedGroups;
 
-  reportRows = reportGroups.map(reportGroup => {
+  const reportRows = reportGroups.map(reportGroup => {
     const rowFilter = { ...reportGroup.filter, ...filter };
 
     const matchingResultNodes = remainingNodes.filter(node => {
