@@ -258,7 +258,7 @@
     "husky": "^4.3.8",
     "jest": "^30.0.0",
     "jest-environment-jsdom": "^30.0.5",
-    "jest-junit": "^16.0.0",
+    "jest-junit": "^17.0.0",
     "jest-styled-components": "^7.2.0",
     "jscodeshift": "^17.3.0",
     "jsdoc-api": "^9.0.0",
