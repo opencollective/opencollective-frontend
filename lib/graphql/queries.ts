@@ -13,6 +13,7 @@ const workspaceSubFieldsFragment = gql`
     currency
     isHost
     isIncognito
+    isPrivate
     isArchived
     isActive
     settings
@@ -28,6 +29,11 @@ const workspaceSubFieldsFragment = gql`
       USE_PAYMENT_METHODS
       EMIT_GIFT_CARDS
       RECEIVE_GRANTS
+      RECEIVE_FINANCIAL_CONTRIBUTIONS
+      RECEIVE_HOST_APPLICATIONS
+      UPDATES
+      COLLECTIVE_GOALS
+      PUBLIC_PROFILE
     }
 
     ... on AccountWithParent {

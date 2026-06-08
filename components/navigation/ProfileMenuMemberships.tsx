@@ -5,6 +5,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import { MemberRole } from '../../lib/graphql/types/v2/graphql';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import type { WorkspaceAccount } from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
@@ -78,9 +79,14 @@ interface WorkspaceLineProps {
 const WorkspaceLine = ({ user, workspace, closeDrawer }: WorkspaceLineProps) => {
   const canSeeDashboard = user.canSeeDashboard(workspace);
 
+  // Not supposed to happen since already filtered in `filterActiveWorkspaces`
+  if (!canSeeDashboard && workspace.isPrivate) {
+    return null;
+  }
+
   return (
     <CollectiveListItem className="group h-9">
-      <MenuLink href={`/${workspace.slug}`} onClick={closeDrawer}>
+      <MenuLink href={workspace.isPrivate ? getDashboardRoute(workspace) : `/${workspace.slug}`} onClick={closeDrawer}>
         <Avatar collective={workspace} radius={16} />
         <P
           fontSize="inherit"
@@ -124,12 +130,15 @@ const sortWorkspaces = (workspaces: WorkspaceAccount[]) => {
 };
 
 /** Filter workspaces to active, non-event/project accounts (workspaces resolver already filters by role) */
-const filterActiveWorkspaces = (workspaces: WorkspaceAccount[]) => {
+const filterActiveWorkspaces = (workspaces: WorkspaceAccount[], user?: LoggedInUser) => {
   return workspaces.filter(w => {
     if (w.isArchived) {
       return false;
     }
     if (['EVENT', 'PROJECT', 'USER', 'INDIVIDUAL'].includes(w.type)) {
+      return false;
+    }
+    if (w.isPrivate && user && !user.hasRole([MemberRole.ADMIN, MemberRole.ACCOUNTANT], w)) {
       return false;
     }
     return true;
@@ -237,7 +246,7 @@ type ProfileMenuMembershipsProps = {
 const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsProps) => {
   const intl = useIntl();
   const workspaces = user.workspaces || [];
-  const activeWorkspaces = filterActiveWorkspaces(workspaces);
+  const activeWorkspaces = filterActiveWorkspaces(workspaces, user);
   const archivedWorkspaces = filterArchivedWorkspaces(workspaces);
   const groupedWorkspaces: Record<string, WorkspaceAccount[]> = {
     ...groupBy(activeWorkspaces, w => w.type),

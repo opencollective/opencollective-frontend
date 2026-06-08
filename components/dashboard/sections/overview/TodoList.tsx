@@ -368,12 +368,7 @@ export const AccountTodoList = () => {
   const canActOnPausedIncomingContributions =
     pausedIncomingContributionsCount > 0 && canStartResumeContributionsProcess;
 
-  const expensesHref = getDashboardRoute(
-    account,
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-      ? ALL_SECTIONS.PAYMENT_REQUESTS
-      : ALL_SECTIONS.EXPENSES,
-  );
+  const expensesHref = getDashboardRoute(account, ALL_SECTIONS.PAYMENT_REQUESTS);
 
   const createLink = (href: string) => (chunks: React.ReactNode) => (
     <Link className="font-medium text-primary hover:underline" href={href}>

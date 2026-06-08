@@ -152,11 +152,6 @@ export const getMenuItems = ({
     PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
   );
 
-  const hasPlatformBillingEnabled = Boolean(
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) ||
-      ('platformSubscription' in account && account.platformSubscription),
-  );
-
   const hasIssuedGrantRequests = true; // account.issuedGrantRequests?.totalCount > 0;
   const hasReceivedGrantRequests = true; // account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
