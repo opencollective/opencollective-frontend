@@ -43,6 +43,21 @@ const IGNORED: Record<string, readonly string[]> = {
     'contributions.id', // "#" - identique
     'ContributionType.Ticket', // "Ticket" - identique (billet)
     'conversations', // "Conversations" - identique
+    'Email', // "Email" - identique
+    'expense.incurredAt', // "Date" - identique
+    'expense.notes', // "Notes" - identique
+    'Expense.type', // "Type" - identique
+    'expense.type', // "Type" - identique
+    'event.sponsors.title', // "Sponsors" - identique
+    'editCollective.menu.webhooks', // "Webhooks" - terme technique courant
+    'E80WrK', // "Information" - identique
+    'DZ2Koj', // "Direction" - identique
+    'Exports', // "Exports" - identique
+    'FAQ', // "FAQ" - acronyme identique
+    'Fields.description', // "Description" - identique
+    'Fields.id', // "ID" - identique
+    'Fields.slug', // "Slug" - terme technique identique
+    'Fields.type', // "Type" - identique
   ],
 };
 
