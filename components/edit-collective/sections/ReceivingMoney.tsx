@@ -15,8 +15,8 @@ import Stripe from '@/components/icons/Stripe';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 import Loading from '../../Loading';
-import EditConnectedAccount from '../EditConnectedAccount';
 import EditPayPalAccount from '../EditPayPalAccount';
+import EditStripeAccount from '../EditStripeAccount';
 
 import BankTransferMethods from './receive-money/BankTransferMethods';
 import CustomPaymentMethods from './receive-money/CustomPaymentMethods';
@@ -66,13 +66,7 @@ const ReceivingMoney = ({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <EditConnectedAccount
-                // @ts-expect-error EditConnectedAccount is not typed yet
-                collective={collective}
-                service="stripe"
-                variation="RECEIVING"
-                connectedAccount={collective.connectedAccounts?.find(c => c.service === 'stripe')}
-              />
+              <EditStripeAccount collective={collective} />
             </CardContent>
           </Card>
           {hasFeature(collective, FEATURES.PAYPAL_DONATIONS) && (
