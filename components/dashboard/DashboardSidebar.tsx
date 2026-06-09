@@ -34,7 +34,6 @@ import {
   SidebarRail,
   useSidebar,
 } from '../ui/Sidebar';
-import { useWorkspace } from '../WorkspaceProvider';
 
 import AccountSwitcher from './AccountSwitcher';
 import { ROOT_PROFILE_ACCOUNT } from './constants';
@@ -42,9 +41,7 @@ import { DashboardContext } from './DashboardContext';
 import { getMenuItems } from './menu-items';
 
 export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
-  const { workspace: savedWorkspace } = useWorkspace();
-  const { account, selectedSection, subpath, isRootDashboard } = React.useContext(DashboardContext);
-  const activeSlug = savedWorkspace?.slug;
+  const { account, selectedSection, subpath, isRootDashboard, activeSlug } = React.useContext(DashboardContext);
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const { setOpenMobile, isMobile } = useSidebar();
