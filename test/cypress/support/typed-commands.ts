@@ -1,7 +1,7 @@
 // eslint-disable-next-line spaced-comment
 /// <reference types="cypress" />
 
-import type { Message, MessageSummary } from 'cypress-mailpit/src/types';
+import type { Message, MessageSummary } from 'cypress-mailpit/dist/src/types';
 
 import { fakeTag as gql } from '../../../lib/graphql/helpers';
 import type { AccountReferenceInput, AmountInput, ExpenseType, UseVendorPolicy } from '@/lib/graphql/types/v2/graphql';
