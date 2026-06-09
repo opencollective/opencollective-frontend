@@ -198,6 +198,81 @@ describe('Expense flow', () => {
     commonScenarios('reimbursement');
     commonEditScenario('reimbursement');
   });
+
+  describe('Submitting a draft keeps the requested currency', () => {
+    it('keeps the expense in USD when the selected payout method is in EUR', () => {
+      const drafterSlug = randomSlug();
+      const drafterEmail = `oc-test-${drafterSlug}@opencollective.com`;
+      const collectiveSlug = randomSlug();
+      cy.createCollectiveV2({
+        email: drafterEmail,
+        skipApproval: true,
+        host: { slug: 'e2e-host' },
+        collective: { slug: collectiveSlug, name: `${collectiveSlug} - e2eHostedCollective` },
+      });
+
+      const orgSlug = randomSlug();
+      const orgEmail = `oc-test-${orgSlug}@opencollective.com`;
+      cy.createCollective({
+        email: orgEmail,
+        slug: orgSlug,
+        name: `${orgSlug} - organization`,
+        type: 'ORGANIZATION',
+      }).then(org => {
+        // Drafter invites the organization to submit a USD invoice with a $125.00 item.
+        cy.draftExpenseAndInviteUser({
+          userEmail: drafterEmail,
+          account: { slug: collectiveSlug },
+          expense: {
+            type: 'INVOICE',
+            description: 'Recurring-like USD draft',
+            currency: 'USD',
+            items: [{ description: 'Consulting', amount: 12500 }],
+            payee: { legacyId: org.id },
+          },
+        }).then(draft => {
+          cy.wrap(draft.status).should('equal', 'DRAFT');
+          cy.wrap(draft.currency).should('equal', 'USD');
+          const draftLink = `/${collectiveSlug}/expenses/${draft.legacyId}?key=draft-key`;
+          cy.login({ email: orgEmail, redirect: encodeURIComponent(draftLink) });
+        });
+      });
+
+      cy.contains('You have been invited to submit an expense').should('exist');
+      cy.contains('Continue submission').click();
+
+      // Add a EUR payout method (e.g. a euro bank account) and save it so it becomes the
+      // selected payout method
+      fillNewPayoutMethod({
+        type: 'OTHER',
+        slug: randomSlug(),
+        save: true,
+        data: {
+          currency: 'EUR',
+          content: 'A euro bank account',
+        },
+      });
+
+      fillTypeOfExpense({ expenseType: 'invoice', hasInvoice: true });
+
+      // The item currency must remain USD even though the payout method is in EUR.
+      cy.get('#EXPENSE_ITEMS').within(() => {
+        cy.root().scrollIntoView();
+        cy.get('[data-cy="input-expenseItems.0.amount.valueInCents-currency-picker"]')
+          .should('contain', 'USD')
+          .should('not.contain', 'EUR');
+        cy.get('input[name="expenseItems.0.incurredAt"]').type('2025-09-29');
+      });
+
+      cy.get('#SUMMARY').within(() => {
+        cy.root().scrollIntoView();
+        cy.contains('$125.00 USD').should('exist');
+      });
+
+      cy.get('form').contains('button', 'Submit Expense').scrollIntoView().click();
+      cy.contains('has been submitted successfully!').should('exist');
+    });
+  });
 });
 
 function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
