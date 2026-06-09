@@ -3,14 +3,10 @@ import { uniqBy } from 'lodash-es';
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
-import {
-  type CommentFieldsFragment,
-  MemberRole,
-  type Update,
-} from './graphql/types/v2/graphql';
+import { type CommentFieldsFragment, MemberRole, type Update } from './graphql/types/v2/graphql';
+import type { WorkspaceAccount } from './account';
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
-import type { WorkspaceAccount } from './account';
 
 /** Common type for collective/account parameters that works with both v1 and v2 data */
 type CollectiveParam = {

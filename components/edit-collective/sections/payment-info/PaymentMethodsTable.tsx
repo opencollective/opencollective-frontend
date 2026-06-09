@@ -6,7 +6,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { gql } from '../../../../lib/graphql/helpers';
-import type { ConfirmPaymentMethodOrderMutation, ManagePaymentMethodsQuery } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  ConfirmPaymentMethodOrderMutation,
+  ManagePaymentMethodsQuery,
+} from '../../../../lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '../../../../lib/payment_method_label';
 import { getPaymentMethodIcon } from '../../../../lib/payment-method-utils';
 import { getStripe } from '../../../../lib/stripe';

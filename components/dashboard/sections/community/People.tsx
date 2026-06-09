@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { isOrganizationAccount } from '@/lib/account';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import type { FilterConfig } from '@/lib/filters/filter-types';
@@ -15,7 +16,6 @@ import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { sortSelectOptions } from '@/lib/utils';
-import { isOrganizationAccount } from '@/lib/account';
 
 import { IndividualKYCStatus } from '@/components/kyc/IndividualKYCStatus';
 

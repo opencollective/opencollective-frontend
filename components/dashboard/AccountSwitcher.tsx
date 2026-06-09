@@ -8,8 +8,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import type LoggedInUser from '@/lib/LoggedInUser';
 import type { WorkspaceAccount } from '@/lib/account';
+import type LoggedInUser from '@/lib/LoggedInUser';
 import { cn } from '@/lib/utils';
 
 import Avatar from '../Avatar';

@@ -4,10 +4,10 @@ import { LayoutDashboard, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
+import type { WorkspaceAccount } from '../../lib/account';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { MemberRole } from '../../lib/graphql/types/v2/graphql';
 import type LoggedInUser from '../../lib/LoggedInUser';
-import type { WorkspaceAccount } from '../../lib/account';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';

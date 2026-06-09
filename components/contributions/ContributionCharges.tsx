@@ -8,8 +8,8 @@ import type { ContributionDrawerQuery, TransactionsTableQueryVariables } from '.
 import { TransactionType } from '../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { i18nTransactionKind } from '../../lib/i18n/transaction';
-import { getDashboardRoute } from '@/lib/url-helpers';
 import { getTransactionsSection } from '@/lib/account';
+import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { useTransactionActions } from '../dashboard/sections/transactions/actions';

@@ -14,8 +14,8 @@ import {
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { isHostableAccount, isOrganizationAccount } from '@/lib/account';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 

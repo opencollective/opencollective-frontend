@@ -17,10 +17,10 @@ import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
+import { isOrganizationAccount } from '@/lib/account';
 import { limit } from '@/lib/filters/schemas';
 import { useDrawer } from '@/lib/hooks/useDrawer';
 import { i18nExpenseType } from '@/lib/i18n/expense';
-import { isOrganizationAccount } from '@/lib/account';
 
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 

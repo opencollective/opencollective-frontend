@@ -669,12 +669,13 @@ const ContributionFlow = ({
   );
 
   const handleStripeErrorRef = useRef<
-    ((
-      order: OrderSuccessFragmentFragment,
-      stripeError: StripeError,
-      email: string,
-      guestToken?: string,
-    ) => Promise<void>) | null
+    | ((
+        order: OrderSuccessFragmentFragment,
+        stripeError: StripeError,
+        email: string,
+        guestToken?: string,
+      ) => Promise<void>)
+    | null
   >(null);
 
   const handleOrderResponse = useCallback(
@@ -1094,8 +1095,7 @@ const ContributionFlow = ({
       // Show the summary step only if the order has tax
       if (
         !noPaymentRequired &&
-        (memoizedGetApplicableTaxes(collective as never, host as never, tier?.type as never).length ||
-          forceSummaryStep)
+        (memoizedGetApplicableTaxes(collective as never, host as never, tier?.type as never).length || forceSummaryStep)
       ) {
         steps.push({
           name: 'summary',

@@ -4,9 +4,9 @@ import dayjs from 'dayjs';
 import { ArrowRight } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { isCollectiveAccount, type WorkspaceAccount } from '@/lib/account';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { getDashboardRoute } from '@/lib/url-helpers';
-import { isCollectiveAccount, type WorkspaceAccount } from '@/lib/account';
 
 import { DashboardContext } from '@/components/dashboard/DashboardContext';
 import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';

@@ -49,6 +49,20 @@ export function isCollectiveAccount<T extends { type: AccountType }>(
   return account.type === 'COLLECTIVE';
 }
 
+/** Narrows any account union to its Fund members */
+export function isFundAccount<T extends { type: AccountType }>(
+  account: T,
+): account is Extract<T, { __typename?: 'Fund' }> {
+  return account.type === 'FUND';
+}
+
+/** Narrows any account union to Collective or Fund members */
+export function isCollectiveOrFundAccount<T extends { type: AccountType }>(
+  account: T,
+): account is Extract<T, { __typename?: 'Collective' | 'Fund' }> {
+  return isCollectiveAccount(account) || isFundAccount(account);
+}
+
 /** Narrows any account union to its Vendor members */
 export function isVendorAccount<T extends { type: AccountType }>(
   account: T,

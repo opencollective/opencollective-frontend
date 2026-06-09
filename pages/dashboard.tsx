@@ -5,13 +5,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import roles from '../lib/constants/roles';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
+import type { WorkspaceAccount } from '@/lib/account';
+import { isOrganizationAccount } from '@/lib/account';
 import type { Context } from '@/lib/apollo-client';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
-import type { WorkspaceAccount } from '@/lib/account';
-import { isOrganizationAccount } from '@/lib/account';
 
 import {
   ALL_SECTIONS,
