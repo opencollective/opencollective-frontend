@@ -225,7 +225,7 @@ export const HostTodoList = () => {
   );
 
   return (
-    <Card className="overflow-hidden pb-0">
+    <Card className="overflow-hidden pb-0 shadow-none">
       <CardHeader>
         <CardTitle className="text-xl">
           <FormattedMessage defaultMessage="To do" id="vwqEeH" />

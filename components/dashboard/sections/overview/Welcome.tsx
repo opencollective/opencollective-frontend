@@ -356,7 +356,7 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleContent>
-        <Card>
+        <Card className="shadow-none">
           <CardHeader>
             <CardTitle className="text-xl">
               <FormattedMessage
@@ -422,7 +422,7 @@ export const WelcomeCollective = ({ account: _account, setOpen, open }) => {
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleContent>
-        <Card>
+        <Card className="shadow-none">
           <CardHeader>
             <CardTitle className="text-xl">
               <FormattedMessage
@@ -479,7 +479,7 @@ export const WelcomeIndividual = ({ open, setOpen, account }) => {
     <React.Fragment>
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleContent>
-          <Card>
+          <Card className="shadow-none">
             <CardHeader>
               <CardTitle className="text-xl">
                 <FormattedMessage

@@ -7,6 +7,8 @@ import type {
   HostMetricsOverviewSectionQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
 
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 
 import { type HostedAccountType, type MonthPeriod, previousPeriod } from './helpers';
@@ -91,38 +93,44 @@ export function HostMetricsOverviewSection({
   const titleMessage = category === 'FUND' ? messages.hostedFunds : messages.hostedCollectives;
 
   return (
-    <div className="rounded-xl border bg-card p-4 sm:p-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold">
+    <Card className="gap-4 shadow-none">
+      <CardHeader className="flex flex-wrap items-center justify-between gap-3">
+        <CardTitle className="text-lg">
           <FormattedMessage {...titleMessage} />
-        </h2>
-        <MonthPicker value={period} onChange={onPeriodChange} />
-      </div>
+        </CardTitle>
+        <CardAction>
+          <MonthPicker value={period} onChange={onPeriodChange} />
+        </CardAction>
+      </CardHeader>
 
-      <MetricCards hostSlug={hostSlug} category={category} period={period} loading={loading} values={values} />
+      <CardContent className="space-y-4">
+        <MetricCards hostSlug={hostSlug} category={category} period={period} loading={loading} values={values} />
 
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <TopList
-          hostSlug={hostSlug}
-          category={category}
-          title={
-            <FormattedMessage
-              {...(category === 'FUND' ? messages.topFundsByReceived : messages.topCollectivesByReceived)}
-            />
-          }
-          rows={topByIncome}
-          loading={loading}
-        />
-        <TopList
-          hostSlug={hostSlug}
-          category={category}
-          title={
-            <FormattedMessage {...(category === 'FUND' ? messages.topFundsBySpent : messages.topCollectivesBySpent)} />
-          }
-          rows={topBySpending}
-          loading={loading}
-        />
-      </div>
-    </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <TopList
+            hostSlug={hostSlug}
+            category={category}
+            title={
+              <FormattedMessage
+                {...(category === 'FUND' ? messages.topFundsByReceived : messages.topCollectivesByReceived)}
+              />
+            }
+            rows={topByIncome}
+            loading={loading}
+          />
+          <TopList
+            hostSlug={hostSlug}
+            category={category}
+            title={
+              <FormattedMessage
+                {...(category === 'FUND' ? messages.topFundsBySpent : messages.topCollectivesBySpent)}
+              />
+            }
+            rows={topBySpending}
+            loading={loading}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 }
