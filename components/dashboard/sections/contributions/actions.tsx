@@ -274,9 +274,13 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       key: 'copy-link',
       Icon: LinkIcon,
       label: intl.formatMessage({ defaultMessage: 'Copy link', id: 'CopyLink' }),
-      onClick: e => {
+      onClick: async e => {
         e.preventDefault();
-        copy(getPermalinkUrl(order.publicId));
+        const success = await copy(getPermalinkUrl(order.publicId));
+        if (!success) {
+          return;
+        }
+
         toast({
           message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
           variant: 'success',
