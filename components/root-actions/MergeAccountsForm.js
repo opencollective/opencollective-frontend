@@ -9,9 +9,11 @@ import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
 import DashboardHeader from '../dashboard/DashboardHeader';
 import { Flex } from '../Grid';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
+import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
-import { P } from '../Text';
+import { P, Span } from '../Text';
 import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
 import { useToast } from '../ui/useToast';
 
@@ -35,6 +37,8 @@ const mergeAccountsMutation = gql`
 const MergeAccountsForm = () => {
   const [submitMergeAccounts, { loading }] = useMutation(mergeAccountsMutation);
   const [mergeSummary, setMergeSummary] = React.useState(false);
+  const [hasConfirmedOwnership, setHasConfirmedOwnership] = React.useState(false);
+  const [hasConfirmedRisk, setHasConfirmedRisk] = React.useState(false);
   const [fromAccount, setFromAccount] = React.useState(null);
   const [toAccount, setToAccount] = React.useState(null);
   const { toast } = useToast();
@@ -54,6 +58,8 @@ const MergeAccountsForm = () => {
 
       const resultMessage = result.data.mergeAccounts.message;
       if (dryRun) {
+        setHasConfirmedOwnership(false);
+        setHasConfirmedRisk(false);
         setMergeSummary(resultMessage);
       } else {
         const successMessage = `@${fromAccount.slug} has been merged into @${toAccount.slug}`;
@@ -64,6 +70,8 @@ const MergeAccountsForm = () => {
 
         // Reset the form
         setMergeSummary(null);
+        setHasConfirmedOwnership(false);
+        setHasConfirmedRisk(false);
         setFromAccount(null);
         setToAccount(null);
       }
@@ -79,7 +87,7 @@ const MergeAccountsForm = () => {
     <div>
       <DashboardHeader
         title="Merge Accounts"
-        description="Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation. A simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code."
+        description="⚠️⚠️⚠️ Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation. A simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code. ⚠️⚠️⚠️"
         className="mb-10"
       />
       <Alert className="relative mb-8 flex items-center gap-2 bg-destructive/5 fade-in" variant="destructive">
@@ -136,11 +144,41 @@ const MergeAccountsForm = () => {
           continueLabel="Merge profiles"
           header={mergeCTA}
           continueHandler={() => mergeAccounts(false)}
-          onClose={() => setMergeSummary(false)}
+          disableSubmit={!hasConfirmedOwnership || !hasConfirmedRisk}
+          onClose={() => {
+            setMergeSummary(false);
+            setHasConfirmedOwnership(false);
+            setHasConfirmedRisk(false);
+          }}
         >
           <P whiteSpace="pre-wrap" lineHeight="24px">
             {mergeSummary}
           </P>
+          <MessageBox type="warning" mt={3}>
+            <StyledCheckbox
+              name="has-confirmed-ownership"
+              checked={hasConfirmedOwnership}
+              onChange={({ checked }) => setHasConfirmedOwnership(checked)}
+              label={
+                <Span>
+                  I have verified that the person who requested this merge owns both accounts (for example, by sending a
+                  unique verification code to each email).
+                </Span>
+              }
+            />
+            <StyledCheckbox
+              name="has-confirmed-risk"
+              checked={hasConfirmedRisk}
+              onChange={({ checked }) => setHasConfirmedRisk(checked)}
+              mt={2}
+              label={
+                <Span>
+                  I understand that payment methods and other profile data will be merged, and that this action cannot
+                  be easily undone.
+                </Span>
+              }
+            />
+          </MessageBox>
         </ConfirmationModal>
       )}
     </div>
