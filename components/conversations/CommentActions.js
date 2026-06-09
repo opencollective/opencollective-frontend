@@ -164,10 +164,14 @@ const CommentActions = ({
     modifiers: REACT_POPPER_MODIFIERS,
   });
 
-  const copyLinkToClipboard = () => {
+  const copyLinkToClipboard = async () => {
     const [baseLink] = window.location.href.split('#');
     const linkWithAnchorHash = `${baseLink}#${anchorHash}`;
-    copy(linkWithAnchorHash);
+    const success = await copy(linkWithAnchorHash);
+    if (!success) {
+      return;
+    }
+
     toast({ variant: 'success', message: intl.formatMessage({ id: 'Clipboard.Copied', defaultMessage: 'Copied!' }) });
   };
 
