@@ -94,7 +94,7 @@
     "input-otp": "1.4.2",
     "interweave": "13.1.1",
     "interweave-ssr": "2.0.0",
-    "jose": "6.2.2",
+    "jose": "6.2.3",
     "lib-address": "0.7.0",
     "load-script": "2.0.0",
     "lodash-es": "4.18.1",
