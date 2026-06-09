@@ -9,7 +9,8 @@ import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { hasAccountMoneyManagement } from '@/lib/collective';
-import { isChildAccount, isOrganization } from '@/lib/LoggedInUser';
+import { isChildAccount } from '@/lib/LoggedInUser';
+import { isOrganization } from '@/lib/workspace';
 
 import DismissibleMessage from '../../../DismissibleMessage';
 import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';

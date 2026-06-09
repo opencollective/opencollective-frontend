@@ -4,7 +4,10 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  DashboardOrdersQueryVariables,
+  WorkspaceSubFieldsFragment,
+} from '../../../../lib/graphql/types/v2/graphql';
 import { OppositeAccountScope } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { AccountOrdersFilter } from '@/lib/graphql/types/v2/schema';
@@ -14,6 +17,7 @@ import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
+import { useManualPaymentProviders } from '../../filters/PaymentMethodFilter';
 import type { DashboardSectionProps } from '../../types';
 import InternalTransferModal from '../accounts/InternalTransferModal';
 
@@ -32,7 +36,7 @@ const schema = baseSchema.extend({ account: childAccountFilter.schema });
 
 type FilterValues = z.infer<typeof schema>;
 type FilterMeta = BaseFilterMeta & {
-  childrenAccounts?: Account[];
+  childrenAccounts?: WorkspaceSubFieldsFragment[];
 };
 
 const toVariables: FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta> = {
@@ -66,21 +70,34 @@ const internalTransferColumns = columns.map(col => {
 const InternalTransfers = ({ accountSlug }: DashboardSectionProps) => {
   const { account } = useContext(DashboardContext);
   const { showModal } = useModal();
+  const { manualPaymentProviders } = useManualPaymentProviders(accountSlug);
 
   const activeAccounts = React.useMemo(
-    () => [account, ...(account.childrenAccounts?.nodes?.filter(a => a.isActive) || [])],
+    () => (account ? [account, ...(account.childrenAccounts?.nodes?.filter(a => a.isActive) || [])] : []),
     [account],
   );
 
-  const filterMeta: FilterMeta = {
-    currency: account.currency,
-    accountSlug: account.slug,
-    childrenAccounts: account.childrenAccounts?.nodes ?? [],
-    hostSlug: account.isHost ? account.slug : undefined,
-    includeUncategorized: true,
-    accountingCategoryKinds: ContributionAccountingCategoryKinds,
-    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
-  };
+  const filterMeta: FilterMeta = React.useMemo(
+    () =>
+      account
+        ? {
+            currency: account.currency,
+            accountSlug: account.slug,
+            childrenAccounts: account.childrenAccounts?.nodes ?? [],
+            hostSlug: account.isHost ? account.slug : undefined,
+            includeUncategorized: true,
+            accountingCategoryKinds: ContributionAccountingCategoryKinds,
+            manualPaymentProviders,
+          }
+        : {
+            accountSlug,
+            childrenAccounts: [],
+            includeUncategorized: true,
+            accountingCategoryKinds: ContributionAccountingCategoryKinds,
+            manualPaymentProviders,
+          },
+    [account, accountSlug, manualPaymentProviders],
+  );
 
   const queryFilter = useQueryFilter({
     schema,
@@ -115,6 +132,10 @@ const InternalTransfers = ({ accountSlug }: DashboardSectionProps) => {
       : queryFilter.values.limit;
 
   const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
+
+  if (!account) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-4">

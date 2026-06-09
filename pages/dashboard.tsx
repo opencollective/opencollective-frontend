@@ -10,6 +10,7 @@ import { CollectiveType } from '@/lib/constants/collectives';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
+import { isOrganization } from '@/lib/workspace';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
@@ -38,7 +39,7 @@ const getDefaultSectionForAccount = (account, loggedInUser, isRootDashboard) => 
     return ROOT_SECTIONS.ALL_COLLECTIVES;
   } else if (!account) {
     return null;
-  } else if (loggedInUser?.isAccountantOnly(account) && account.hasHosting) {
+  } else if (loggedInUser?.isAccountantOnly(account) && isOrganization(account) && account.hasHosting) {
     return ALL_SECTIONS.PAY_DISBURSEMENTS;
   } else if (loggedInUser?.isAccountantOnly(account)) {
     return ALL_SECTIONS.PAYMENT_RECEIPTS;
@@ -208,7 +209,7 @@ const DashboardPage = () => {
   const isLoading = loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection, isRootDashboard);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
-  const accountIdentifier = account && (account.name || `@${account.slug}`);
+  const accountIdentifier = isRootDashboard ? 'Platform Admin' : account && (account.name || `@${account.slug}`);
 
   // if (!accountLoading && !account && error) {
   //   return <ErrorPage error={error} />;
@@ -253,7 +254,7 @@ const DashboardPage = () => {
           <DashboardSidebar isLoading={isLoading} />
           <SidebarInset className="min-w-0">
             <DashboardTopbar />
-            <DashboardNotificationBar account={account} />
+            <DashboardNotificationBar />
             <div className="flex-1 px-3 md:px-6">
               <div
                 className="flex min-h-[600px] flex-1 flex-col justify-center gap-6 pt-6 pb-12 md:flex-row lg:gap-12 lg:pt-8"

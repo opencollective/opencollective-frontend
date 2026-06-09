@@ -13,6 +13,7 @@ import type {
 import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '@/lib/url-helpers';
+import { getTransactionsSection } from '@/lib/workspace';
 
 import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
@@ -120,7 +121,7 @@ export function AccountDetailTransactionsTab({
 
   const redirectRelatedTransactionsTo = getDashboardRoute(
     dashboardAccount,
-    dashboardAccount.hasHosting ? 'host-transactions' : 'transactions',
+    dashboardAccount ? getTransactionsSection(dashboardAccount) : 'transactions',
   );
 
   const views = React.useMemo(

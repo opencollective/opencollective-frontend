@@ -23,6 +23,7 @@ const workspaceSubFieldsFragment = gql`
     policies {
       id
       REQUIRE_2FA_FOR_ADMINS
+      USE_VENDOR_POLICY
     }
     features {
       id
@@ -34,8 +35,8 @@ const workspaceSubFieldsFragment = gql`
       UPDATES
       COLLECTIVE_GOALS
       PUBLIC_PROFILE
+      VIRTUAL_CARDS
     }
-
     ... on AccountWithParent {
       parent {
         id
@@ -47,32 +48,8 @@ const workspaceSubFieldsFragment = gql`
         }
       }
     }
-    ... on AccountWithHost {
-      ... on Collective {
-        features {
-          id
-          VIRTUAL_CARDS
-        }
-      }
-      ... on Event {
-        features {
-          id
-          VIRTUAL_CARDS
-        }
-      }
-      ... on Project {
-        features {
-          id
-          VIRTUAL_CARDS
-        }
-      }
-      ... on Fund {
-        features {
-          id
-          VIRTUAL_CARDS
-        }
-      }
 
+    ... on AccountWithHost {
       isApproved
       host {
         id
@@ -97,7 +74,6 @@ const workspaceSubFieldsFragment = gql`
       }
       features {
         id
-        VIRTUAL_CARDS
         OFF_PLATFORM_TRANSACTIONS
         TAX_FORMS
         AGREEMENTS

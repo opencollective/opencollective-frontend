@@ -9,6 +9,7 @@ import { TransactionType } from '../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { i18nTransactionKind } from '../../lib/i18n/transaction';
 import { getDashboardRoute } from '@/lib/url-helpers';
+import { getTransactionsSection } from '@/lib/workspace';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { useTransactionActions } from '../dashboard/sections/transactions/actions';
@@ -167,7 +168,7 @@ export function ContributionCharges({
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const redirectRelatedTransactionsTo = getDashboardRoute(
     dashboardAccount,
-    dashboardAccount.hasHosting ? 'host-transactions' : 'transactions',
+    dashboardAccount ? getTransactionsSection(dashboardAccount) : 'transactions',
   );
 
   const transactionsUrl = `${redirectRelatedTransactionsTo}?orderId=${order?.legacyId.toString()}`;

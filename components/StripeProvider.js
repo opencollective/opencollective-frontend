@@ -60,6 +60,8 @@ class StripeProvider extends React.Component {
 
 const { Consumer: StripeConsumer } = StripeLoaderContext;
 
+export const useStripeLoader = () => React.useContext(StripeLoaderContext);
+
 export const withStripeLoader = WrappedComponent => {
   const withStripeLoader = props => (
     <StripeConsumer>{context => <WrappedComponent {...context} {...props} />}</StripeConsumer>

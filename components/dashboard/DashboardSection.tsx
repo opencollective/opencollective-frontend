@@ -172,7 +172,7 @@ interface DashboardSectionProps {
 
 const DashboardSection = ({ isLoading, section, subpath }: DashboardSectionProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  const { activeSlug, account } = useContext(DashboardContext);
+  const { activeSlug, account, isRootDashboard } = useContext(DashboardContext);
 
   const { formatMessage } = useIntl();
 
@@ -197,6 +197,14 @@ const DashboardSection = ({ isLoading, section, subpath }: DashboardSectionProps
           <RootComponent subpath={subpath} isDashboard />
         </DashboardErrorBoundary>
       </div>
+    );
+  }
+
+  if (isRootDashboard) {
+    return (
+      <Container display="flex" justifyContent="center" alignItems="center">
+        <NotFound />
+      </Container>
     );
   }
 

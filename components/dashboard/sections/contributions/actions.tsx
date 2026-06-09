@@ -8,6 +8,7 @@ import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../
 import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { getDashboardRoute, getPermalinkUrl } from '../../../../lib/url-helpers';
+import { getTransactionsSection } from '@/lib/workspace';
 import useClipboard from '@/lib/hooks/useClipboard';
 
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
@@ -75,7 +76,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     const transactionsUrl = getDashboardRoute(
       dashboardAccount,
-      `${dashboardAccount.hasHosting ? 'host-transactions' : 'transactions'}?orderId=${order.legacyId.toString()}`,
+      `${dashboardAccount ? getTransactionsSection(dashboardAccount) : 'transactions'}?orderId=${order.legacyId.toString()}`,
     );
 
     const actions: ReturnType<GetActions<ManagedOrderFieldsFragment>> = {

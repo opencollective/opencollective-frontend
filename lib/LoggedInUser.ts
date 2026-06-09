@@ -24,22 +24,13 @@ type CollectiveParam = {
   policies?: Record<string, unknown>;
 };
 
-/** A workspace account returned by the individual.workspaces resolver, enriched with dashboard-relevant fields */
-export type WorkspaceAccount = LoggedInUserWorkspaceFieldsFragment;
+/**
+ * A workspace account returned by the individual.workspaces resolver, enriched with dashboard-relevant fields.
+ * Bot and Vendor are excluded: they cannot be dashboard workspaces (no memberOf admin role).
+ */
+export type WorkspaceAccount = Exclude<LoggedInUserWorkspaceFieldsFragment, { __typename?: 'Bot' | 'Vendor' }>;
 
-/** Narrows any account union to its Organization/Host members */
-export function isOrganization<T extends { type: AccountType }>(
-  account: T,
-): account is Extract<T, { __typename?: 'Organization' }> {
-  return account.type === 'ORGANIZATION';
-}
-
-/** Narrows any account union to its child account members (Event, Project — implement AccountWithParent) */
-export function isChildAccount<T extends { type: AccountType }>(
-  account: T,
-): account is Extract<T, { __typename?: 'Event' | 'Project' }> {
-  return account.type === 'EVENT' || account.type === 'PROJECT';
-}
+export { isChild as isChildAccount, isOrganization } from './workspace';
 
 /**
  * Represent the current logged in user. Includes methods to check permissions.

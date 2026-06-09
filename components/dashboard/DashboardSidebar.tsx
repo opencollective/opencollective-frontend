@@ -36,7 +36,7 @@ import {
 } from '../ui/Sidebar';
 
 import AccountSwitcher from './AccountSwitcher';
-import { ROOT_PROFILE_ACCOUNT } from './constants';
+import { ROOT_PROFILE_KEY } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { getMenuItems } from './menu-items';
 
@@ -50,7 +50,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
     () => getMenuItems({ intl, account, LoggedInUser, isRootDashboard }),
     [account, intl, LoggedInUser, isRootDashboard],
   );
-  const effectiveAccount = isRootDashboard ? ROOT_PROFILE_ACCOUNT : account;
+  const effectiveAccount = isRootDashboard ? { slug: ROOT_PROFILE_KEY } : account;
 
   const isSectionActive = (section: string) => {
     const sectionAndSubpath = subpath?.length > 0 ? `${selectedSection}/${subpath[0]}` : selectedSection;
@@ -90,6 +90,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                               item={item}
                               isSectionActive={isSectionActive}
                               onNavigate={closeMobileMenu}
+                              account={effectiveAccount}
                             />
                           );
                         }
@@ -118,25 +119,23 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
-            {effectiveAccount &&
-              effectiveAccount.type !== 'ROOT' &&
-              effectiveAccount.features?.[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED' && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
-                  >
-                    <SidebarLink
-                      href={getCollectivePageRoute(effectiveAccount)}
-                      Icon={Globe2}
-                      label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
-                      data-cy="public-profile-link"
-                      external
-                      onClick={closeMobileMenu}
-                    />
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
+            {!isRootDashboard && account?.features?.[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED' && (
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+                >
+                  <SidebarLink
+                    href={getCollectivePageRoute(account)}
+                    Icon={Globe2}
+                    label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+                    data-cy="public-profile-link"
+                    external
+                    onClick={closeMobileMenu}
+                  />
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={intl.formatMessage({ defaultMessage: 'Explore', id: 'Explore' })}>
                 <SidebarLink
@@ -197,10 +196,7 @@ const SidebarLink = React.forwardRef<
   );
 });
 
-function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
-  const { account, isRootDashboard } = React.useContext(DashboardContext);
-  const effectiveAccount = isRootDashboard ? { slug: 'root-actions', type: 'ROOT' } : account;
-
+function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate, account }) {
   const { isMobile, state } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
@@ -243,7 +239,7 @@ function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
                     asChild
                     className={cx(isSectionActive(subItem.section) && 'font-medium text-sidebar-accent-foreground')}
                   >
-                    <Link href={getDashboardRoute(effectiveAccount, subItem.section)} shallow onClick={onNavigate}>
+                    <Link href={getDashboardRoute(account, subItem.section)} shallow onClick={onNavigate}>
                       {subItem.label}
                     </Link>
                   </DropdownMenuItem>
@@ -260,7 +256,7 @@ function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
               <SidebarMenuSubItem key={subItem.section}>
                 <SidebarMenuSubButton asChild isActive={isSectionActive(subItem.section)}>
                   <Link
-                    href={getDashboardRoute(effectiveAccount, subItem.section)}
+                    href={getDashboardRoute(account, subItem.section)}
                     shallow
                     data-cy={`menu-item-${subItem.section}`}
                     onClick={onNavigate}

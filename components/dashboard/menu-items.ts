@@ -31,14 +31,13 @@ import {
 import type { IntlShape } from 'react-intl';
 
 import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
-import { hasAccountMoneyManagement, isIndividualAccount, isOrganizationAccount } from '../../lib/collective';
-import { isOneOfTypes, isType } from '../../lib/collective-sections';
+import { isOneOfTypes } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { LegalDocumentType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import type LoggedInUser from '@/lib/LoggedInUser';
-import { isOrganization as isOrgWorkspace } from '@/lib/LoggedInUser';
+import type { WorkspaceAccount } from '@/lib/workspace';
+import { hasPlatformSubscription, isEvent, isIndividual, isOrganization } from '@/lib/workspace';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 
@@ -115,9 +114,7 @@ function shouldIncludeMenuItemWithLegacyFallback(
   featureKey: (typeof FEATURES)[keyof typeof FEATURES],
   fallback: boolean,
 ) {
-  return 'platformSubscription' in account && account.platformSubscription
-    ? isFeatureSupported(account, featureKey)
-    : fallback;
+  return hasPlatformSubscription(account) ? isFeatureSupported(account, featureKey) : fallback;
 }
 
 export const getMenuItems = ({
@@ -127,7 +124,7 @@ export const getMenuItems = ({
   isRootDashboard,
 }: {
   intl: IntlShape;
-  account: WorkspaceAccount;
+  account: WorkspaceAccount | null;
   LoggedInUser: LoggedInUser;
   isRootDashboard: boolean;
 }): MenuItem[] => {
@@ -138,15 +135,14 @@ export const getMenuItems = ({
     return null;
   }
 
-  const isIndividual = isIndividualAccount(account);
-  const isOrganization = isOrganizationAccount(account);
-  const isEvent = account.type === EVENT;
+  const isInd = isIndividual(account);
+  const isOrg = isOrganization(account);
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
-  const hasMoneyManagement = hasAccountMoneyManagement(account);
-  const hasHosting = 'hasHosting' in account && account.hasHosting;
-  const isSimpleIndividual = isIndividual && !hasHosting;
-  const isSimpleOrganization = isOrganization && !hasMoneyManagement;
+  const hasMoneyManagement = isOrganization(account) && account.hasMoneyManagement;
+  const hasHosting = isOrg && account.hasHosting;
+  const isSimpleIndividual = isInd && !hasHosting;
+  const isSimpleOrganization = isOrg && !hasMoneyManagement;
   const isHostedType = isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]);
   const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
     PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
@@ -155,7 +151,7 @@ export const getMenuItems = ({
   const hasIssuedGrantRequests = true; // account.issuedGrantRequests?.totalCount > 0;
   const hasReceivedGrantRequests = true; // account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
-    hasReceivedGrantRequests || (!isIndividual && !hasMoneyManagement && hasFeature(account, FEATURES.RECEIVE_GRANTS));
+    hasReceivedGrantRequests || (!isInd && !hasMoneyManagement && hasFeature(account, FEATURES.RECEIVE_GRANTS));
   const isReceiveContributionsSupported = account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED';
 
   const items: MenuItem[] = [
@@ -171,9 +167,7 @@ export const getMenuItems = ({
       if: LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE),
     },
     {
-      if:
-        (isOneOfTypes(account, [COLLECTIVE, FUND]) || (isOrganization && hasMoneyManagement)) &&
-        !isCommunityManagerOnly,
+      if: (isOneOfTypes(account, [COLLECTIVE, FUND]) || (isOrg && hasMoneyManagement)) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.ACCOUNTS,
       Icon: Wallet,
       label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
@@ -218,7 +212,7 @@ export const getMenuItems = ({
           label: intl.formatMessage({ defaultMessage: 'All Payment Requests', id: 'HostPaymentRequests' }),
         },
         {
-          if: !isIndividual && !hasHosting,
+          if: !isInd && !hasHosting,
           section: ALL_SECTIONS.PAYMENT_REQUESTS,
           label: intl.formatMessage({ defaultMessage: 'Payment Requests', id: 'PaymentRequests' }),
         },
@@ -256,17 +250,17 @@ export const getMenuItems = ({
       Icon: Coins,
       subMenu: [
         {
-          if: !isIndividual,
+          if: !isInd,
           label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'IncomingContributions' }),
           section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
         },
         {
-          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
+          if: !isInd && hasMoneyManagement && !isCommunityManagerOnly,
           label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
           section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
         },
         {
-          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly && !account.isPrivate,
+          if: !isInd && hasMoneyManagement && !isCommunityManagerOnly && !account.isPrivate,
           label: intl.formatMessage({ defaultMessage: 'Incomplete Contributions', id: 'IncompleteContributions' }),
           section: ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
         },
@@ -294,13 +288,13 @@ export const getMenuItems = ({
       Icon: Shuffle,
     },
     {
-      if: isIndividual && hasIssuedGrantRequests,
+      if: isInd && hasIssuedGrantRequests,
       Icon: Award,
       label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
       section: ALL_SECTIONS.SUBMITTED_GRANTS,
     },
     {
-      if: !isIndividual,
+      if: !isInd,
       type: 'group',
       Icon: Award,
       label: hasMoneyManagement
@@ -367,7 +361,7 @@ export const getMenuItems = ({
       ],
     },
     {
-      if: !isIndividual && isHostedType && !isCommunityManagerOnly,
+      if: !isInd && isHostedType && !isCommunityManagerOnly,
       section: ALL_SECTIONS.CONTRIBUTORS,
       label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
       Icon: BookUserIcon,
@@ -390,7 +384,7 @@ export const getMenuItems = ({
     },
     {
       section: ALL_SECTIONS.HOST_AGREEMENTS,
-      if: shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, hasHosting && !isIndividual),
+      if: shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, hasHosting && !isInd),
       Icon: Signature,
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
@@ -400,7 +394,7 @@ export const getMenuItems = ({
       Icon: Store,
     },
     {
-      if: !isIndividual && !isAccountantOnly && hasMoneyManagement,
+      if: !isInd && !isAccountantOnly && hasMoneyManagement,
       label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
       section: ALL_SECTIONS.PEOPLE,
       Icon: Users2,
@@ -426,14 +420,14 @@ export const getMenuItems = ({
         FEATURES.TAX_FORMS,
         hasMoneyManagement &&
           Boolean(
-            isOrgWorkspace(account) && account.host?.requiredLegalDocuments?.includes(LegalDocumentType.US_TAX_FORM),
+            isOrganization(account) && account.host?.requiredLegalDocuments?.includes(LegalDocumentType.US_TAX_FORM),
           ),
       ),
     },
     {
       if:
         hasMoneyManagement &&
-        isOrganization && //
+        isOrg && //
         hasFeature(account, FEATURES.VIRTUAL_CARDS) &&
         !isAccountantOnly &&
         !isCommunityManagerOnly,
@@ -479,35 +473,35 @@ export const getMenuItems = ({
     },
 
     {
-      if: isType(account, EVENT) && !isCommunityManagerOnly && isReceiveContributionsSupported,
+      if: isEvent(account) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TICKETS,
       label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
       Icon: Ticket,
     },
     {
-      if: isType(account, EVENT) && !isCommunityManagerOnly && isReceiveContributionsSupported,
+      if: isEvent(account) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TIERS,
       label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
       Icon: HeartHandshake,
     },
     {
-      if: !isIndividual && !isAccountantOnly && account.features[FEATURES.UPDATES] !== 'UNSUPPORTED',
+      if: !isInd && !isAccountantOnly && account.features[FEATURES.UPDATES] !== 'UNSUPPORTED',
       section: ALL_SECTIONS.UPDATES,
       Icon: Megaphone,
     },
     {
       if:
         isReceiveContributionsSupported &&
-        !isIndividual &&
-        !isEvent &&
-        (!isOrganization || hasMoneyManagement) &&
+        !isInd &&
+        !isEvent(account) &&
+        (!isOrg || hasMoneyManagement) &&
         !isAccountantOnly &&
         !isCommunityManagerOnly,
       section: ALL_SECTIONS.TIERS,
       Icon: HeartHandshake,
     },
     {
-      if: !isIndividual && !isAccountantOnly && !isCommunityManagerOnly,
+      if: !isInd && !isAccountantOnly && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TEAM,
       Icon: UserStar,
     },
@@ -546,7 +540,7 @@ export const getMenuItems = ({
               {
                 section: ALL_SECTIONS.PLATFORM_SUBSCRIPTION,
                 label: intl.formatMessage({ defaultMessage: 'Platform Billing', id: 'beRXFK' }),
-                if: hasMoneyManagement || account.platformSubscription,
+                if: hasMoneyManagement || hasPlatformSubscription(account),
               },
               {
                 section: ALL_SECTIONS.FISCAL_HOSTING,
@@ -554,7 +548,7 @@ export const getMenuItems = ({
               },
               {
                 section: ALL_SECTIONS.POLICIES,
-                if: (isIndividual || isOneOfTypes(account, [ORGANIZATION, COLLECTIVE])) && !isAccountantOnly,
+                if: (isInd || isOneOfTypes(account, [ORGANIZATION, COLLECTIVE])) && !isAccountantOnly,
               },
               {
                 section: ALL_SECTIONS.RECEIVING_MONEY,
@@ -583,7 +577,7 @@ export const getMenuItems = ({
               },
               {
                 section: ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS,
-                if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && isOrganization && !isAccountantOnly,
+                if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && isOrg && !isAccountantOnly,
               },
             ]
           : []),
@@ -594,7 +588,7 @@ export const getMenuItems = ({
         },
         {
           section: ALL_SECTIONS.USER_SECURITY,
-          if: isIndividualAccount(account),
+          if: isIndividual(account),
         },
         {
           section: ALL_SECTIONS.ACTIVITY_LOG,
@@ -607,7 +601,7 @@ export const getMenuItems = ({
         },
         {
           section: ALL_SECTIONS.PAYMENT_RECEIPTS,
-          if: (isIndividual || isOrganization) && !account.isPrivate,
+          if: (isInd || isOrg) && !account.isPrivate,
         },
         {
           section: ALL_SECTIONS.GIFT_CARDS,
@@ -616,11 +610,11 @@ export const getMenuItems = ({
         // Sections for individual accounts
         {
           section: ALL_SECTIONS.NOTIFICATIONS,
-          if: isIndividualAccount(account),
+          if: isIndividual(account),
         },
         {
           section: ALL_SECTIONS.AUTHORIZED_APPS,
-          if: isIndividualAccount(account),
+          if: isIndividual(account),
         },
         // Collective sections
         {
@@ -634,7 +628,7 @@ export const getMenuItems = ({
             account.features[FEATURES.COLLECTIVE_GOALS] !== 'UNSUPPORTED' &&
             (!isUndefined(account.settings?.collectivePage?.showGoals) ||
               isOneOfTypes(account, [COLLECTIVE, PROJECT]) ||
-              (isOrganization && hasMoneyManagement && !hasHosting)),
+              (isOrg && hasMoneyManagement && !hasHosting)),
         },
         {
           // POLICIES also available for Fiscal hosts further up in this list
@@ -662,7 +656,7 @@ export const getMenuItems = ({
         },
         {
           section: ALL_SECTIONS.FOR_DEVELOPERS,
-          if: (isIndividual || isOneOfTypes(account, [COLLECTIVE, ORGANIZATION])) && !isAccountantOnly,
+          if: (isInd || isOneOfTypes(account, [COLLECTIVE, ORGANIZATION])) && !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.WEBHOOKS,

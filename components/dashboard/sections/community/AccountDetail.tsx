@@ -18,7 +18,6 @@ import { AccountType, LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
-import { isOrganization } from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
@@ -370,11 +369,8 @@ export function AccountDetails(props: AccountDetailsProps) {
       {editVendor && query.data?.host && (
         <StyledModal onClose={() => setEditVendor(null)}>
           <VendorForm
-            host={dashboardAccount}
-            supportsTaxForm={
-              isOrganization(dashboardAccount) &&
-              dashboardAccount.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)
-            }
+            host={query.data.host}
+            supportsTaxForm={query.data.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)}
             vendor={editVendor}
             onSuccess={() => {
               setEditVendor(null);

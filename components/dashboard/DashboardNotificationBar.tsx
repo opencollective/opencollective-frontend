@@ -5,17 +5,13 @@ import { ArrowRight } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
+import { isCollective, type WorkspaceAccount } from '@/lib/workspace';
 
+import { DashboardContext } from '@/components/dashboard/DashboardContext';
 import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
 import Link from '@/components/Link';
 import NotificationBar from '@/components/NotificationBar';
-
-type CollectiveWorkspaceAccount = Extract<WorkspaceAccount, { __typename?: 'Collective' }>;
-
-const isCollectiveWorkspace = (account: WorkspaceAccount | null): account is CollectiveWorkspaceAccount =>
-  account?.__typename === 'Collective';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -66,7 +62,11 @@ const getNotification = (
   account: WorkspaceAccount | null,
   hostApplication?: HostApplicationNotification | null,
 ): React.ComponentProps<typeof NotificationBar> | undefined => {
-  if (account?.isArchived) {
+  if (!account) {
+    return undefined;
+  }
+
+  if (account.isArchived) {
     if (account.type === CollectiveType.INDIVIDUAL) {
       return {
         type: 'warning',
@@ -82,7 +82,7 @@ const getNotification = (
         }),
       };
     }
-  } else if (isCollectiveWorkspace(account)) {
+  } else if (isCollective(account)) {
     if (!account.host) {
       return {
         type: 'error',
@@ -136,9 +136,9 @@ const getNotification = (
       };
     }
   } else if (
-    account?.isHost &&
-    account?.settings?.automaticBillingMigration &&
-    dayjs().diff(dayjs(account?.settings?.automaticBillingMigration), 'week') < 8
+    account.isHost &&
+    account.settings?.automaticBillingMigration &&
+    dayjs().diff(dayjs(account.settings.automaticBillingMigration), 'week') < 8
   ) {
     return {
       type: 'info',
@@ -158,13 +158,14 @@ const getNotification = (
   }
 };
 
-export const DashboardNotificationBar = ({ account }: { account: WorkspaceAccount | null }) => {
+export const DashboardNotificationBar = () => {
   const intl = useIntl();
+  const { account } = React.useContext(DashboardContext);
 
   // Only fetch host application details for unapproved hosted collectives (pending application banner).
   const needsHostApplicationNotification =
     Boolean(account?.slug) &&
-    isCollectiveWorkspace(account) &&
+    isCollective(account) &&
     !account.isArchived &&
     Boolean(account.host) &&
     account.isApproved === false;
