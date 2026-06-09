@@ -43,10 +43,14 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('apply-filter').should('not.be.disabled');
       cy.getByDataCy('apply-filter').click();
       cy.getByDataCy('filter-frequency').should('exist');
-      cy.get('[data-cy^="datatable-row"]').should('have.length', 0);
+      // Wait for the filtered query to finish loading. While loading, the table shows skeleton
+      // rows without data-cy attributes; when loading completes with no results, the table is
+      // replaced by EmptyResults, which can close an open filter popover.
+      cy.getByDataCy('zero-results-message').should('exist');
 
       // Filter by Monthly frequency
       cy.getByDataCy('filter-frequency').click();
+      cy.getByDataCy('combo-select-input').should('be.visible');
       cy.contains('[data-cy="combo-select-option"]', 'Monthly').click();
       cy.getByDataCy('apply-filter').should('not.be.disabled');
       cy.getByDataCy('apply-filter').click();
