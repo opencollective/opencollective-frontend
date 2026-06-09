@@ -202,10 +202,14 @@ class ErrorPage extends React.Component {
                         <Button
                           size="xs"
                           variant="outline"
-                          onClick={() => {
+                          onClick={async () => {
                             const formattedMessage = `Error: ${message || ''}`;
                             const formattedDetails = `Details: ${formatStacktrace()}`;
-                            copy(`${formattedMessage}\n${formattedDetails}`);
+                            const success = await copy(`${formattedMessage}\n${formattedDetails}`);
+                            if (!success) {
+                              return;
+                            }
+
                             this.setState({ copiedErrorMessage: true });
                             setTimeout(() => this.setState({ copiedErrorMessage: false }), 2000);
                           }}

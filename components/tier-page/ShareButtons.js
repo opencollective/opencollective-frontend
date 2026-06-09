@@ -71,8 +71,12 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
       >
         <StyledRoundButton
           size={40}
-          onClick={() => {
-            copy(pageUrl);
+          onClick={async () => {
+            const success = await copy(pageUrl);
+            if (!success) {
+              return;
+            }
+
             setCopied(true);
             if (updateCopyBtnTimeout) {
               clearTimeout(updateCopyBtnTimeout);

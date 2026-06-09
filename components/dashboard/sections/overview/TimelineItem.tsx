@@ -72,12 +72,9 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
   const timelineMessage = ActivityTimelineMessageI18n[activity?.type];
   const i18nMsg = timelineMessage || ActivityDescriptionI18n[activity?.type];
   const hasTimeLineMessage = Boolean(timelineMessage);
-  let description = null;
-  if (i18nMsg) {
-    description = intl.formatMessage(i18nMsg, getActivityVariables(intl, activity, { onClickExpense: openExpense }));
-  } else {
-    description = capitalize(activity?.type.replace('_', ' '));
-  }
+  const description = i18nMsg
+    ? intl.formatMessage(i18nMsg, getActivityVariables(intl, activity, { onClickExpense: openExpense }))
+    : capitalize(activity?.type.replace('_', ' '));
 
   // Pick which account to use as the avatar
   let avatar = 'individual';

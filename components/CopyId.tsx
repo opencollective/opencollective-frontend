@@ -36,9 +36,13 @@ export const CopyID = ({
       <TooltipTrigger asChild>
         <button
           tabIndex={-1}
-          onClick={e => {
+          onClick={async e => {
             e.preventDefault(); // Prevent tooltip from closing when copying
-            copy(value ?? children);
+            const success = await copy(value ?? children);
+            if (!success) {
+              return;
+            }
+
             if (toastOnCopy) {
               toast({
                 title: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,

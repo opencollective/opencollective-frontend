@@ -21,12 +21,10 @@ const useKeyboardKey = ({ callback, keyMatch, disableOnInput }: UseKeyboardKeyPr
         return;
       }
 
-      let isRecognizedKey = false;
-      if ('key' in event) {
-        isRecognizedKey = event.key === keyMatch.key || event.key === keyMatch.keyName;
-      } else {
-        isRecognizedKey = event.keyCode === keyMatch.keyCode;
-      }
+      const isRecognizedKey =
+        'key' in event
+          ? event.key === keyMatch.key || event.key === keyMatch.keyName
+          : event.keyCode === keyMatch.keyCode;
 
       if (isRecognizedKey) {
         callback(event);
