@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { hasAccountMoneyManagement } from '@/lib/collective';
-import { isOrganization } from '@/lib/workspace';
 import type { FilterConfig } from '@/lib/filters/filter-types';
 import { integer, isMulti } from '@/lib/filters/schemas';
 import type { PeopleHostDashboardQuery, PeopleHostDashboardQueryVariables } from '@/lib/graphql/types/v2/graphql';
@@ -16,6 +15,7 @@ import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { sortSelectOptions } from '@/lib/utils';
+import { isOrganizationAccount } from '@/lib/account';
 
 import { IndividualKYCStatus } from '@/components/kyc/IndividualKYCStatus';
 
@@ -345,7 +345,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
 
   const { account: dashboardAccount } = useContext(DashboardContext);
   const hasMoneyManagement = hasAccountMoneyManagement(account);
-  const hasHosting = isOrganization(account) && account.hasHosting;
+  const hasHosting = isOrganizationAccount(account) && account.hasHosting;
 
   const hasKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.KYC);
 

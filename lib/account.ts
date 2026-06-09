@@ -1,46 +1,59 @@
-import type { AccountType } from './graphql/types/v2/graphql';
-import type { WorkspaceAccount } from './LoggedInUser';
+import type { AccountType, LoggedInUserWorkspaceFieldsFragment } from './graphql/types/v2/graphql';
 
-export type { WorkspaceAccount } from './LoggedInUser';
+/**
+ * A workspace account returned by the individual.workspaces resolver, enriched with dashboard-relevant fields.
+ * Bot and Vendor are excluded: they cannot be dashboard workspaces (no memberOf admin role).
+ */
+export type WorkspaceAccount = Exclude<LoggedInUserWorkspaceFieldsFragment, { __typename?: 'Bot' | 'Vendor' }>;
 
 /** Narrows any account union to its Individual members */
-export function isIndividual<T extends { type: AccountType }>(
+export function isIndividualAccount<T extends { type: AccountType }>(
   account: T,
 ): account is Extract<T, { __typename?: 'Individual' }> {
   return account.type === 'INDIVIDUAL';
 }
 
 /** Narrows any account union to its Organization members */
-export function isOrganization<T extends { type: AccountType }>(
+export function isOrganizationAccount<T extends { type: AccountType }>(
   account: T,
 ): account is Extract<T, { __typename?: 'Organization' }> {
   return account.type === 'ORGANIZATION';
 }
 
 /** Narrows any account union to its Event members */
-export function isEvent<T extends { type: AccountType }>(account: T): account is Extract<T, { __typename?: 'Event' }> {
+export function isEventAccount<T extends { type: AccountType }>(
+  account: T,
+): account is Extract<T, { __typename?: 'Event' }> {
   return account.type === 'EVENT';
 }
 
 /** Narrows any account union to its Project members */
-export function isProject<T extends { type: AccountType }>(
+// ts-unused-exports:disable-next-line
+export function isProjectAccount<T extends { type: AccountType }>(
   account: T,
 ): account is Extract<T, { __typename?: 'Project' }> {
   return account.type === 'PROJECT';
 }
 
 /** Narrows any account union to child accounts (Event, Project) */
-export function isChild<T extends { type: AccountType }>(
+export function isChildAccount<T extends { type: AccountType }>(
   account: T,
 ): account is Extract<T, { __typename?: 'Event' | 'Project' }> {
   return account.type === 'EVENT' || account.type === 'PROJECT';
 }
 
 /** Narrows any account union to its Collective members */
-export function isCollective<T extends { type: AccountType }>(
+export function isCollectiveAccount<T extends { type: AccountType }>(
   account: T,
 ): account is Extract<T, { __typename?: 'Collective' }> {
   return account.type === 'COLLECTIVE';
+}
+
+/** Narrows any account union to its Vendor members */
+export function isVendorAccount<T extends { type: AccountType }>(
+  account: T,
+): account is Extract<T, { __typename?: 'Vendor' }> {
+  return account.type === 'VENDOR';
 }
 
 // Matching the AccountWithHost GraphQL interface
@@ -64,4 +77,4 @@ export function hasPlatformSubscription<T extends object>(
 }
 
 export const getTransactionsSection = (account: WorkspaceAccount) =>
-  isOrganization(account) && account.hasHosting ? 'host-transactions' : 'transactions';
+  isOrganizationAccount(account) && account.hasHosting ? 'host-transactions' : 'transactions';

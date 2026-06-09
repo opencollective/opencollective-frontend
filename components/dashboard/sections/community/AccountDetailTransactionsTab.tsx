@@ -13,7 +13,7 @@ import type {
 import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '@/lib/url-helpers';
-import { getTransactionsSection } from '@/lib/workspace';
+import { getTransactionsSection } from '@/lib/account';
 
 import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';

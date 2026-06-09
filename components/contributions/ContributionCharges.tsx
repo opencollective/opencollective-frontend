@@ -9,7 +9,7 @@ import { TransactionType } from '../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { i18nTransactionKind } from '../../lib/i18n/transaction';
 import { getDashboardRoute } from '@/lib/url-helpers';
-import { getTransactionsSection } from '@/lib/workspace';
+import { getTransactionsSection } from '@/lib/account';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { useTransactionActions } from '../dashboard/sections/transactions/actions';

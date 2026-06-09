@@ -7,7 +7,7 @@ import { styled } from 'styled-components';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { MemberRole } from '../../lib/graphql/types/v2/graphql';
 import type LoggedInUser from '../../lib/LoggedInUser';
-import type { WorkspaceAccount } from '../../lib/LoggedInUser';
+import type { WorkspaceAccount } from '../../lib/account';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';

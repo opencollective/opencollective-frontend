@@ -4,10 +4,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type { DashboardOrdersQueryVariables, WorkspaceSubFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { OppositeAccountScope } from '@/lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { AccountOrdersFilter } from '@/lib/graphql/types/v2/schema';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { WorkspaceAccount } from '@/lib/LoggedInUser';
+import type { WorkspaceAccount } from '@/lib/account';
 
 import { ALL_SECTIONS } from './constants';
 

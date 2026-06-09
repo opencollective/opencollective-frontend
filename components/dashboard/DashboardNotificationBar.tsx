@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '@/lib/constants/collectives';
 import { getDashboardRoute } from '@/lib/url-helpers';
-import { isCollective, type WorkspaceAccount } from '@/lib/workspace';
+import { isCollectiveAccount, type WorkspaceAccount } from '@/lib/account';
 
 import { DashboardContext } from '@/components/dashboard/DashboardContext';
 import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
@@ -82,7 +82,7 @@ const getNotification = (
         }),
       };
     }
-  } else if (isCollective(account)) {
+  } else if (isCollectiveAccount(account)) {
     if (!account.host) {
       return {
         type: 'error',
@@ -165,7 +165,7 @@ export const DashboardNotificationBar = () => {
   // Only fetch host application details for unapproved hosted collectives (pending application banner).
   const needsHostApplicationNotification =
     Boolean(account?.slug) &&
-    isCollective(account) &&
+    isCollectiveAccount(account) &&
     !account.isArchived &&
     Boolean(account.host) &&
     account.isApproved === false;

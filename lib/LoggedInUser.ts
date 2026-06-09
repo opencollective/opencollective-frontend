@@ -4,14 +4,13 @@ import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
 import {
-  type AccountType,
   type CommentFieldsFragment,
-  type LoggedInUserWorkspaceFieldsFragment,
   MemberRole,
   type Update,
 } from './graphql/types/v2/graphql';
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
+import type { WorkspaceAccount } from './account';
 
 /** Common type for collective/account parameters that works with both v1 and v2 data */
 type CollectiveParam = {
@@ -23,14 +22,6 @@ type CollectiveParam = {
   host?: { slug?: string; id?: string } | null;
   policies?: Record<string, unknown>;
 };
-
-/**
- * A workspace account returned by the individual.workspaces resolver, enriched with dashboard-relevant fields.
- * Bot and Vendor are excluded: they cannot be dashboard workspaces (no memberOf admin role).
- */
-export type WorkspaceAccount = Exclude<LoggedInUserWorkspaceFieldsFragment, { __typename?: 'Bot' | 'Vendor' }>;
-
-export { isChild as isChildAccount, isOrganization } from './workspace';
 
 /**
  * Represent the current logged in user. Includes methods to check permissions.

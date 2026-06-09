@@ -438,9 +438,6 @@ export const addDefaultSections = (collective, sections) => {
 };
 
 /** @deprecated This should not be here, and not sure if we need an helper at all */
-export const isType = (c, collectiveType) => c.type === collectiveType;
-
-/** @deprecated This should not be here, and not sure if we need an helper at all */
 export const isOneOfTypes = (c, collectiveTypes) => collectiveTypes.includes(c.type);
 
 export const SECTIONS_CATEGORY_ICON = {

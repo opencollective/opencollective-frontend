@@ -22,6 +22,7 @@ const workspaceSubFieldsFragment = gql`
     canHaveChangelogUpdates
     policies {
       id
+      publicId
       REQUIRE_2FA_FOR_ADMINS
       USE_VENDOR_POLICY
     }
@@ -36,6 +37,7 @@ const workspaceSubFieldsFragment = gql`
       COLLECTIVE_GOALS
       PUBLIC_PROFILE
       VIRTUAL_CARDS
+      ACCOUNTING_CATEGORIZATION_RULES
     }
     ... on AccountWithParent {
       parent {

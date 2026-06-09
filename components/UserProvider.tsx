@@ -218,7 +218,7 @@ class UserProvider extends React.Component<UserProviderProps, UserProviderState>
 
             // Stop loop if user cancelled the prompt
             if (twoFactorError.type === 'TWO_FACTOR_AUTH_CANCELED') {
-              throw new Error(formatErrorMessage(intl, twoFactorError), { cause: twoFactorError });
+              throw new Error(formatErrorMessage(intl, twoFactorError), { cause: e });
             }
 
             // Stop loop if too many requests or token is invalid
@@ -226,7 +226,7 @@ class UserProvider extends React.Component<UserProviderProps, UserProviderState>
               twoFactorError.type === 'too_many_requests' ||
               (twoFactorError.type === 'unauthorized' && twoFactorError.message?.includes('Cannot use this token'))
             ) {
-              throw new Error(twoFactorError.message, { cause: twoFactorError });
+              throw new Error(twoFactorError.message, { cause: e });
             }
 
             // Otherwise, retry 2fa prompt and show error

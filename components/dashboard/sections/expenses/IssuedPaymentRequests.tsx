@@ -18,9 +18,9 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { limit } from '@/lib/filters/schemas';
-import { isOrganization } from '@/lib/workspace';
 import { useDrawer } from '@/lib/hooks/useDrawer';
 import { i18nExpenseType } from '@/lib/i18n/expense';
+import { isOrganizationAccount } from '@/lib/account';
 
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 
@@ -281,11 +281,11 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
       hideExpensesMetaStatuses: true,
     },
     views,
-    ...(isOrganization(account) && account.hasHosting ? { skipFiltersOnReset: ['hostContext'] } : {}),
+    ...(isOrganizationAccount(account) && account.hasHosting ? { skipFiltersOnReset: ['hostContext'] } : {}),
   });
 
   const accountVariables =
-    isOrganization(account) && account.hasHosting
+    isOrganizationAccount(account) && account.hasHosting
       ? {
           fromHost: { slug: accountSlug },
           hostContext: queryFilter.values.hostContext,
@@ -356,7 +356,7 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
           title={
             <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
               <FormattedMessage defaultMessage="Issued Payment Requests" id="IssuedPaymentRequests" />
-              {isOrganization(account) && account.hasHosting && (
+              {isOrganizationAccount(account) && account.hasHosting && (
                 <HostContextFilter
                   value={queryFilter.values.hostContext}
                   onChange={val => queryFilter.setFilter('hostContext', val)}

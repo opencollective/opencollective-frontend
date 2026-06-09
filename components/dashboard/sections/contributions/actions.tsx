@@ -8,8 +8,8 @@ import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../
 import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { getDashboardRoute, getPermalinkUrl } from '../../../../lib/url-helpers';
-import { getTransactionsSection } from '@/lib/workspace';
 import useClipboard from '@/lib/hooks/useClipboard';
+import { getTransactionsSection } from '@/lib/account';
 
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import type { EditOrderActions } from '../../../EditOrderModal';

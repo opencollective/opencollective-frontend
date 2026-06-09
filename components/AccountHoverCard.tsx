@@ -7,7 +7,6 @@ import type { LucideIcon } from 'lucide-react';
 import { BadgeCheck, Banknote, Building, Calendar, FileText, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { isIndividualAccount } from '../lib/collective';
 import { gql } from '../lib/graphql/helpers';
 import type {
   AccountHoverCardFieldsFragment,
@@ -15,6 +14,7 @@ import type {
   UserContextualMembershipsQuery,
 } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
+import { isIndividualAccount, isVendorAccount } from '@/lib/account';
 import { KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { DashboardContext } from './dashboard/DashboardContext';
@@ -295,8 +295,8 @@ export const AccountHoverCard = ({
   const context = React.useContext(DashboardContext);
   const dashboardAccount = context?.account;
 
-  const isIndividual = account ? isIndividualAccount(account) : false;
-  const isVendor = account?.type === 'VENDOR';
+  const isIndividual = isIndividualAccount(account);
+  const isVendor = isVendorAccount(account);
   const hoverTimeoutRef = React.useRef(null);
   const [hasBeenHovered, setHasBeenHovered] = React.useState(false);
 

@@ -36,8 +36,8 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { LegalDocumentType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import type LoggedInUser from '@/lib/LoggedInUser';
-import type { WorkspaceAccount } from '@/lib/workspace';
-import { hasPlatformSubscription, isEvent, isIndividual, isOrganization } from '@/lib/workspace';
+import type { WorkspaceAccount } from '@/lib/account';
+import { hasPlatformSubscription, isEventAccount, isIndividualAccount, isOrganizationAccount } from '@/lib/account';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 
@@ -135,11 +135,11 @@ export const getMenuItems = ({
     return null;
   }
 
-  const isInd = isIndividual(account);
-  const isOrg = isOrganization(account);
+  const isInd = isIndividualAccount(account);
+  const isOrg = isOrganizationAccount(account);
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
-  const hasMoneyManagement = isOrganization(account) && account.hasMoneyManagement;
+  const hasMoneyManagement = isOrganizationAccount(account) && account.hasMoneyManagement;
   const hasHosting = isOrg && account.hasHosting;
   const isSimpleIndividual = isInd && !hasHosting;
   const isSimpleOrganization = isOrg && !hasMoneyManagement;
@@ -420,7 +420,7 @@ export const getMenuItems = ({
         FEATURES.TAX_FORMS,
         hasMoneyManagement &&
           Boolean(
-            isOrganization(account) && account.host?.requiredLegalDocuments?.includes(LegalDocumentType.US_TAX_FORM),
+            isOrganizationAccount(account) && account.host?.requiredLegalDocuments?.includes(LegalDocumentType.US_TAX_FORM),
           ),
       ),
     },
@@ -473,13 +473,13 @@ export const getMenuItems = ({
     },
 
     {
-      if: isEvent(account) && !isCommunityManagerOnly && isReceiveContributionsSupported,
+      if: isEventAccount(account) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TICKETS,
       label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
       Icon: Ticket,
     },
     {
-      if: isEvent(account) && !isCommunityManagerOnly && isReceiveContributionsSupported,
+      if: isEventAccount(account) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TIERS,
       label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
       Icon: HeartHandshake,
@@ -493,7 +493,7 @@ export const getMenuItems = ({
       if:
         isReceiveContributionsSupported &&
         !isInd &&
-        !isEvent(account) &&
+        !isEventAccount(account) &&
         (!isOrg || hasMoneyManagement) &&
         !isAccountantOnly &&
         !isCommunityManagerOnly,
@@ -588,7 +588,7 @@ export const getMenuItems = ({
         },
         {
           section: ALL_SECTIONS.USER_SECURITY,
-          if: isIndividual(account),
+          if: isIndividualAccount(account),
         },
         {
           section: ALL_SECTIONS.ACTIVITY_LOG,
@@ -610,11 +610,11 @@ export const getMenuItems = ({
         // Sections for individual accounts
         {
           section: ALL_SECTIONS.NOTIFICATIONS,
-          if: isIndividual(account),
+          if: isIndividualAccount(account),
         },
         {
           section: ALL_SECTIONS.AUTHORIZED_APPS,
-          if: isIndividual(account),
+          if: isIndividualAccount(account),
         },
         // Collective sections
         {

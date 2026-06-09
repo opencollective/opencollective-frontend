@@ -8,10 +8,10 @@ import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type LoggedInUser from '@/lib/LoggedInUser';
-import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
-import { isOrganization } from '@/lib/workspace';
 import { getWhitelabelProps } from '@/lib/whitelabel';
+import type { WorkspaceAccount } from '@/lib/account';
+import { isOrganizationAccount } from '@/lib/account';
 
 import {
   ALL_SECTIONS,
@@ -39,7 +39,7 @@ const getDefaultSectionForAccount = (account, loggedInUser, isRootDashboard) => 
     return ROOT_SECTIONS.ALL_COLLECTIVES;
   } else if (!account) {
     return null;
-  } else if (loggedInUser?.isAccountantOnly(account) && isOrganization(account) && account.hasHosting) {
+  } else if (loggedInUser?.isAccountantOnly(account) && isOrganizationAccount(account) && account.hasHosting) {
     return ALL_SECTIONS.PAY_DISBURSEMENTS;
   } else if (loggedInUser?.isAccountantOnly(account)) {
     return ALL_SECTIONS.PAYMENT_RECEIPTS;

@@ -16,9 +16,6 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import { AccountType, LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
 import formatCollectiveType from '@/lib/i18n/collective-type';
-import { formatCommunityRelation } from '@/lib/i18n/community-relation';
-import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
-import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';

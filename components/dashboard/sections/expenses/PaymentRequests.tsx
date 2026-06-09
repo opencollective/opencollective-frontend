@@ -15,7 +15,7 @@ import {
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
-import { isHostableAccount, isOrganization } from '@/lib/workspace';
+import { isHostableAccount, isOrganizationAccount } from '@/lib/account';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
@@ -157,7 +157,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     [views, metadata],
   );
 
-  const hasMoneyManagement = isOrganization(account) && account.hasMoneyManagement;
+  const hasMoneyManagement = isOrganizationAccount(account) && account.hasMoneyManagement;
   const hostSlug = hasMoneyManagement
     ? account.slug
     : isHostableAccount(account) && account.host
