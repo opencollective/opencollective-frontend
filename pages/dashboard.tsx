@@ -1,16 +1,14 @@
 import React from 'react';
-import dayjs from 'dayjs';
-import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import type LoggedInUser from '@/lib/LoggedInUser';
+import type { WorkspaceAccount } from '@/lib/LoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
@@ -26,34 +24,14 @@ import DashboardSection from '../components/dashboard/DashboardSection';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
-import NotificationBar from '../components/NotificationBar';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
+import { DashboardNotificationBar } from '@/components/dashboard/DashboardNotificationBar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
 import Header from '@/components/Header';
-import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
 import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
-
-const messages = defineMessages({
-  collectiveIsArchived: {
-    id: 'collective.isArchived',
-    defaultMessage: '{name} has been archived.',
-  },
-  collectiveIsArchivedDescription: {
-    id: 'collective.isArchived.edit.description',
-    defaultMessage: 'This {type} has been archived and is no longer active.',
-  },
-  userIsArchived: {
-    id: 'user.isArchived',
-    defaultMessage: 'Account has been archived.',
-  },
-  userIsArchivedDescription: {
-    id: 'user.isArchived.edit.description',
-    defaultMessage: 'This account has been archived and is no longer active.',
-  },
-});
 
 const getDefaultSectionForAccount = (account, loggedInUser, isRootDashboard) => {
   if (isRootDashboard) {
@@ -66,99 +44,6 @@ const getDefaultSectionForAccount = (account, loggedInUser, isRootDashboard) => 
     return ALL_SECTIONS.PAYMENT_RECEIPTS;
   } else {
     return ALL_SECTIONS.OVERVIEW;
-  }
-};
-
-const getNotification = (intl, account): React.ComponentProps<typeof NotificationBar> => {
-  if (account?.isArchived) {
-    if (account.type === 'USER') {
-      return {
-        type: 'warning',
-        title: intl.formatMessage(messages.userIsArchived),
-        description: intl.formatMessage(messages.userIsArchivedDescription),
-      };
-    } else {
-      return {
-        type: 'warning',
-        title: intl.formatMessage(messages.collectiveIsArchived, { name: account.name }),
-        description: intl.formatMessage(messages.collectiveIsArchivedDescription, {
-          type: account.type.toLowerCase(),
-        }),
-      };
-    }
-  } else if (account?.type === CollectiveType.COLLECTIVE) {
-    if (!account?.host) {
-      return {
-        type: 'error',
-        inline: true,
-        title: (
-          <React.Fragment>
-            <FormattedMessage
-              defaultMessage="You have not applied to any fiscal host. You can not raise funds without a fiscal host."
-              id="Dashboard.NoHostNotification"
-            />
-            <Link
-              href={`/${account.slug}/accept-financial-contributions/host`}
-              className="ml-1 inline-flex items-center underline hover:no-underline"
-            >
-              <FormattedMessage defaultMessage="Find a Fiscal Host" id="join.findAFiscalHost" />
-              <ArrowRight className="ml-1 inline h-4 w-4" />
-            </Link>
-          </React.Fragment>
-        ),
-      };
-    }
-    if (account?.hostApplication?.status === 'PENDING') {
-      return {
-        type: 'info',
-        inline: true,
-        title: (
-          <React.Fragment>
-            <span className="font-normal">
-              <FormattedMessage
-                defaultMessage="You applied to be hosted by <strong>{hostName}</strong> on <strong>{applicationData, date, medium}</strong>. Your application is being reviewed."
-                id="Dashboard.PendingHostApplicationNotification"
-                values={{
-                  ...I18nFormatters,
-                  hostName: account?.host.name,
-                  applicationData: new Date(account?.hostApplication.createdAt),
-                }}
-              />
-            </span>
-            <Link
-              href={getDashboardRoute(account, `/host?hostApplicationId=${account.hostApplication.id}`)}
-              className="ml-1 inline-flex items-center underline hover:no-underline"
-            >
-              <FormattedMessage
-                defaultMessage="See Application"
-                id="Dashboard.PendingHostApplicationNotificationLink"
-              />
-              <ArrowRight className="ml-1 inline h-4 w-4" />
-            </Link>
-          </React.Fragment>
-        ),
-      };
-    }
-  } else if (
-    account?.isHost &&
-    account?.settings?.automaticBillingMigration &&
-    dayjs().diff(dayjs(account?.settings?.automaticBillingMigration), 'week') < 8
-  ) {
-    return {
-      type: 'info',
-      title: <FormattedMessage defaultMessage="New platform pricing" id="rLJm+c" />,
-      description: (
-        <FormattedMessage
-          defaultMessage="Your account has been migrated to the <PricingLink>new pricing</PricingLink>. The <BillinkLink>Platform Billing</BillinkLink> section of your dashboard will let you review your current usage and update your plan. Contact our <ContactLink>support team</ContactLink> if you have any questions."
-          id="automaticBillingMigrationDescription"
-          values={{
-            PricingLink: getI18nLink({ as: Link, href: '/pricing' }),
-            BillinkLink: getI18nLink({ as: Link, href: getDashboardRoute(account, 'platform-subscription') }),
-            ContactLink: getI18nLink({ as: Link, href: '/contact' }),
-          }}
-        />
-      ),
-    };
   }
 };
 
@@ -317,7 +202,6 @@ const DashboardPage = () => {
     }
   }, [account]);
 
-  const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
 
   // Only wait for LoggedInUser to load, not for adminPanelQuery
@@ -369,7 +253,7 @@ const DashboardPage = () => {
           <DashboardSidebar isLoading={isLoading} />
           <SidebarInset className="min-w-0">
             <DashboardTopbar />
-            {Boolean(notification) && <NotificationBar {...notification} />}
+            <DashboardNotificationBar account={account} />
             <div className="flex-1 px-3 md:px-6">
               <div
                 className="flex min-h-[600px] flex-1 flex-col justify-center gap-6 pt-6 pb-12 md:flex-row lg:gap-12 lg:pt-8"
