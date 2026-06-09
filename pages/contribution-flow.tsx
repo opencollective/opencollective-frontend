@@ -1,16 +1,15 @@
 import React from 'react';
-import { graphql } from '@apollo/client/react/hoc';
+import { useQuery } from '@apollo/client';
 import { get, omit } from 'lodash-es';
-import type { Router } from 'next/router';
-import { withRouter } from 'next/router';
-import type { IntlShape } from 'react-intl';
-import { injectIntl } from 'react-intl';
+import type { NextPageContext } from 'next';
+import { useRouter } from 'next/router';
+import { useIntl } from 'react-intl';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
 import { isHiddenAccount } from '@/lib/collective';
-import type LoggedInUser from '@/lib/LoggedInUser';
 
 import Container from '../components/Container';
 import ContributionBlocker, {
@@ -24,69 +23,66 @@ import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import Redirect from '../components/Redirect';
-import { withStripeLoader } from '../components/StripeProvider';
-import { withUser } from '../components/UserProvider';
+import { useStripeLoader } from '../components/StripeProvider';
 
 import Custom404 from './404';
 
-class NewContributionFlowPage extends React.Component<{
-  router: Router;
+type ContributionFlowPageProps = {
   collectiveSlug: string;
-  tierId: number;
+  tierId: number | null;
   error: string;
-  queryParams: Record<string, unknown>;
-  loadStripe: () => void;
-  intl: IntlShape;
-  LoggedInUser: LoggedInUser;
-  data: Record<string, any>;
-}> {
-  static getInitialProps({ query }) {
-    return {
-      // Route parameters
-      collectiveSlug: query.eventSlug || query.collectiveSlug,
-      tierId: parseInt(query.tierId) || null,
-      // Query parameters
-      error: query.error,
-    };
-  }
+};
 
-  componentDidMount() {
-    this.loadExternalScripts();
-    const { router, data } = this.props;
-    const account = data?.account;
+const ContributionFlowPage = ({ collectiveSlug, tierId, error }: ContributionFlowPageProps) => {
+  const router = useRouter();
+  const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
+  const { loadStripe } = useStripeLoader();
+  const {
+    data,
+    loading,
+    error: queryError,
+    refetch,
+  } = useQuery(contributionFlowAccountQuery, {
+    variables: { collectiveSlug, tierId, includeTier: Boolean(tierId) },
+  });
+
+  const account = data?.account;
+  const tier = data?.tier;
+  const me = data?.me;
+
+  React.useEffect(() => {
     const queryParameters = {
       ...omit(router.query, ['verb', 'step', 'collectiveSlug']),
     };
     addParentToURLIfMissing(router, account, `/${router.query.verb}/${router.query.step ?? ''}`, queryParameters);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- preserve componentDidMount behavior
+  }, []);
 
-  componentDidUpdate(prevProps) {
-    const hostPath = 'data.account.host';
-    if (get(this.props, hostPath) !== get(prevProps, hostPath)) {
-      this.loadExternalScripts();
-    }
-    if (this.props.LoggedInUser && !this.props.data.me) {
-      this.props.data.refetch();
-    }
-  }
+  const accountHost = account?.host;
 
-  loadExternalScripts() {
-    const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
+  React.useEffect(() => {
+    const supportedPaymentMethods = get(account, 'host.supportedPaymentMethods', []);
     if (supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
-      this.props.loadStripe();
+      loadStripe();
     }
-  }
+  }, [account, accountHost, loadStripe]);
 
-  getPageMetadata() {
-    const { intl, data } = this.props;
-    return getContributionFlowMetadata(intl, data?.account, data?.tier);
-  }
+  React.useEffect(() => {
+    if (LoggedInUser && !me) {
+      refetch();
+    }
+  }, [LoggedInUser, me, refetch]);
 
-  renderPageContent() {
-    const { data = {}, LoggedInUser, error } = this.props;
-    const { account, tier, me } = data;
+  const pageMetadata = React.useMemo(() => getContributionFlowMetadata(intl, account, tier), [intl, account, tier]);
 
-    if (data.loading) {
+  const noRobots = React.useMemo(() => {
+    const personalInfoFields = ['contributeAs', 'customData', 'redirect', 'email', 'name', 'legalName'];
+    return personalInfoFields.some(field => Boolean(router.query?.[field]));
+  }, [router.query]);
+
+  const renderPageContent = () => {
+    if (loading) {
       return (
         <Container py={[5, 6]}>
           <Loading />
@@ -94,7 +90,7 @@ class NewContributionFlowPage extends React.Component<{
       );
     }
 
-    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(tierId));
 
     if (contributionBlocker) {
       if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
@@ -113,49 +109,40 @@ class NewContributionFlowPage extends React.Component<{
         />
       );
     }
-  }
-
-  getNoRobots = () => {
-    const { router } = this.props;
-    const personalInfoFields = ['contributeAs', 'customData', 'redirect', 'email', 'name', 'legalName'];
-    return personalInfoFields.some(field => Boolean(router.query?.[field]));
   };
 
-  render() {
-    const { data } = this.props;
-    if (!data.loading && !data.account) {
-      const error = data.error
-        ? getErrorFromGraphqlException(data.error)
-        : generateNotFoundError(this.props.collectiveSlug);
+  if (!loading && !account) {
+    const pageError = queryError ? getErrorFromGraphqlException(queryError) : generateNotFoundError(collectiveSlug);
 
-      return <ErrorPage error={error} />;
-    } else if (!data.loading && data.account && isHiddenAccount(data.account)) {
-      return <Custom404 />;
-    }
-
-    return (
-      <Page
-        {...this.getPageMetadata()}
-        showFooter={false}
-        showMenuItems={false}
-        showSearch={false}
-        collective={data.account}
-        noRobots={this.getNoRobots()}
-      >
-        {this.renderPageContent()}
-      </Page>
-    );
+    return <ErrorPage error={pageError} />;
+  } else if (!loading && account && isHiddenAccount(account)) {
+    return <Custom404 />;
   }
-}
 
-const addContributionFlowData = graphql<
-  Pick<React.ComponentProps<typeof NewContributionFlowPage>, 'collectiveSlug' | 'tierId'>
->(contributionFlowAccountQuery, {
-  options: props => ({
-    variables: { collectiveSlug: props.collectiveSlug, tierId: props.tierId, includeTier: Boolean(props.tierId) },
-  }),
-});
+  return (
+    <Page
+      {...pageMetadata}
+      showFooter={false}
+      showMenuItems={false}
+      showSearch={false}
+      collective={account}
+      noRobots={noRobots}
+    >
+      {renderPageContent()}
+    </Page>
+  );
+};
+
+ContributionFlowPage.getInitialProps = ({ query }: NextPageContext) => {
+  return {
+    // Route parameters
+    collectiveSlug: query.eventSlug || query.collectiveSlug,
+    tierId: parseInt(query.tierId as string) || null,
+    // Query parameters
+    error: query.error,
+  };
+};
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default addContributionFlowData(withUser(injectIntl(withStripeLoader(withRouter(NewContributionFlowPage)))));
+export default ContributionFlowPage;

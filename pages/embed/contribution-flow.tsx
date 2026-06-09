@@ -1,16 +1,14 @@
 import React from 'react';
-import { graphql } from '@apollo/client/react/hoc';
+import { useQuery } from '@apollo/client';
 import { get, omit, pick } from 'lodash-es';
-import type { Router } from 'next/router';
-import { withRouter } from 'next/router';
-import type { IntlShape } from 'react-intl';
-import { injectIntl } from 'react-intl';
+import type { NextPageContext } from 'next';
+import { useRouter } from 'next/router';
 
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
 import { isHiddenAccount } from '@/lib/collective';
-import type LoggedInUser from '@/lib/LoggedInUser';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
 import Container from '../../components/Container';
@@ -18,78 +16,47 @@ import ContributionBlocker, { getContributionBlocker } from '../../components/co
 import { contributionFlowAccountQuery } from '../../components/contribution-flow/graphql/queries';
 import ContributionFlowContainer from '../../components/contribution-flow/index';
 import { EmbedContributionFlowUrlQueryHelper } from '../../components/contribution-flow/query-parameters';
-import { getContributionFlowMetadata } from '../../components/contribution-flow/utils';
 import EmbeddedPage from '../../components/EmbeddedPage';
 import ErrorPage from '../../components/ErrorPage';
 import { Box } from '../../components/Grid';
 import Loading from '../../components/Loading';
-import { withStripeLoader } from '../../components/StripeProvider';
-import { withUser } from '../../components/UserProvider';
+import { useStripeLoader } from '../../components/StripeProvider';
 
 import Custom404 from '../404';
 
-class EmbedContributionFlowPage extends React.Component<{
-  router: Router;
+type EmbedContributionFlowPageProps = {
   collectiveSlug: string;
-  tierId: number;
+  tierId: number | null;
   error: string;
   queryParams: Record<string, unknown>;
-  loadStripe: () => void;
-  intl: IntlShape;
-  LoggedInUser: LoggedInUser;
-  data: Record<string, any>;
-}> {
-  static getInitialProps({ query, res }) {
-    if (res) {
-      res.removeHeader('X-Frame-Options');
-    }
+};
 
-    return {
-      // Route parameters
-      collectiveSlug: query.eventSlug || query.collectiveSlug,
-      tierId: parseInt(query.tierId) || null,
-      // Query parameters
-      error: query.error,
-      queryParams: EmbedContributionFlowUrlQueryHelper.decode(query),
-    };
-  }
+const EmbedContributionFlowPage = ({ collectiveSlug, tierId, error, queryParams }: EmbedContributionFlowPageProps) => {
+  const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
+  const { loadStripe } = useStripeLoader();
+  const {
+    data,
+    loading,
+    error: queryError,
+    refetch,
+  } = useQuery(contributionFlowAccountQuery, {
+    variables: { collectiveSlug, tierId, includeTier: Boolean(tierId) },
+  });
 
-  componentDidMount() {
-    this.loadExternalScripts();
-    const { router, data } = this.props;
-    const account = data?.account;
-    const path = router.asPath;
-    const rawPath = path.replace(new RegExp(`^/embed/${account?.slug}/`), '/');
-    addParentToURLIfMissing(router, account, rawPath, undefined, { prefix: '/embed' });
-    this.postMessage('initialized');
-    window.addEventListener('resize', this.onResize);
-  }
+  const account = data?.account;
+  const tier = data?.tier;
+  const me = data?.me;
+  const accountHost = account?.host;
+  const prevLoggedInUserRef = React.useRef(LoggedInUser);
 
-  componentDidUpdate(prevProps) {
-    const hostPath = 'data.account.host';
-    if (get(this.props, hostPath) !== get(prevProps, hostPath)) {
-      this.loadExternalScripts();
-    }
-    if (this.props.LoggedInUser && !prevProps.LoggedInUser) {
-      this.props.data.refetch();
-    }
-  }
-
-  componentWillUnmount(): void {
-    window.removeEventListener('resize', this.onResize);
-  }
-
-  onResize = () => {
-    this.postMessage('resized');
-  };
-
-  postMessage(event, payload = null) {
+  const postMessage = React.useCallback((event: string, payload: unknown = null) => {
     if (window.parent) {
       try {
         const size = { height: document.body.scrollHeight, width: document.body.scrollWidth };
-        const message = { event, size };
+        const message: { event: string; size: typeof size; payload?: unknown } = { event, size };
         if (payload) {
-          message['payload'] = payload;
+          message.payload = payload;
         }
 
         window.parent.postMessage(message, '*');
@@ -98,27 +65,37 @@ class EmbedContributionFlowPage extends React.Component<{
         console.error('Post message failed', e);
       }
     }
-  }
+  }, []);
 
-  loadExternalScripts() {
-    const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
+  const onResize = React.useCallback(() => {
+    postMessage('resized');
+  }, [postMessage]);
+
+  React.useEffect(() => {
+    const path = router.asPath;
+    const rawPath = path.replace(new RegExp(`^/embed/${account?.slug}/`), '/');
+    addParentToURLIfMissing(router, account, rawPath, undefined, { prefix: '/embed' });
+    postMessage('initialized');
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- preserve componentDidMount behavior
+  }, []);
+
+  React.useEffect(() => {
+    const supportedPaymentMethods = get(data, 'account.host.supportedPaymentMethods', []);
     if (supportedPaymentMethods.includes(PaymentMethodLegacyType.CREDIT_CARD)) {
-      this.props.loadStripe();
+      loadStripe();
     }
-  }
+  }, [data, accountHost, loadStripe]);
 
-  getPageMetadata() {
-    const { intl, data } = this.props;
-    return {
-      ...getContributionFlowMetadata(intl, data?.account, data?.tier),
-      canonicalURL: null,
-    };
-  }
+  React.useEffect(() => {
+    if (LoggedInUser && !prevLoggedInUserRef.current) {
+      refetch();
+    }
+    prevLoggedInUserRef.current = LoggedInUser;
+  }, [LoggedInUser, refetch]);
 
-  renderPageContent() {
-    const { data, LoggedInUser } = this.props;
-    const { account, tier, loading, me } = data || {};
-
+  const renderPageContent = () => {
     if (loading) {
       return (
         <Container py={[5, 6]}>
@@ -127,77 +104,88 @@ class EmbedContributionFlowPage extends React.Component<{
       );
     }
 
-    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(tierId));
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else {
       return (
         <Box height="100%" pt={3}>
-          <ContributionFlowContainer //  @ts-expect-error ContributionFlowContainer is a JS component wrapped in multiple HOCs that obscure its prop types
+          <ContributionFlowContainer
             isEmbed
             collective={account}
             host={account.host}
             tier={tier}
-            error={this.props.error}
+            error={error}
             contributorProfiles={me?.contributorProfiles || []}
             onStepChange={step =>
-              this.postMessage('stepChange', {
+              postMessage('stepChange', {
                 step,
                 height: document.body.scrollHeight,
                 width: document.body.scrollWidth,
               })
             }
-            onSuccess={order =>
-              this.postMessage('success', {
+            onSuccess={order => {
+              const successOrder = order as {
+                id: string;
+                legacyId: number;
+                status: string;
+                frequency: string;
+                amount: Record<string, unknown>;
+                platformTipAmount: Record<string, unknown>;
+                tier: { id: string } | null;
+                fromAccount: { id: string };
+                toAccount: { id: string };
+              };
+              postMessage('success', {
                 order: {
-                  id: order.id,
-                  legacyId: order.legacyId,
-                  status: order.status,
-                  frequency: order.frequency,
-                  amount: omit(order.amount, ['__typename']),
-                  platformTipAmount: omit(order.platformTipAmount, ['__typename']),
-                  tier: order.tier ? pick(order.tier, ['id']) : null,
-                  fromAccount: pick(order.fromAccount, ['id']),
-                  toAccount: pick(order.toAccount, ['id']),
+                  id: successOrder.id,
+                  legacyId: successOrder.legacyId,
+                  status: successOrder.status,
+                  frequency: successOrder.frequency,
+                  amount: omit(successOrder.amount, ['__typename']),
+                  platformTipAmount: omit(successOrder.platformTipAmount, ['__typename']),
+                  tier: successOrder.tier ? pick(successOrder.tier, ['id']) : null,
+                  fromAccount: pick(successOrder.fromAccount, ['id']),
+                  toAccount: pick(successOrder.toAccount, ['id']),
                 },
-              })
-            }
+              });
+            }}
           />
         </Box>
       );
     }
+  };
+
+  if (!loading && !account) {
+    const pageError = queryError ? getErrorFromGraphqlException(queryError) : generateNotFoundError(collectiveSlug);
+
+    return <ErrorPage error={pageError} />;
+  } else if (!loading && account && isHiddenAccount(account)) {
+    return <Custom404 />;
+  } else {
+    return (
+      <CollectiveThemeProvider collective={queryParams.useTheme ? account : null}>
+        <EmbeddedPage backgroundColor={queryParams.backgroundColor}>{renderPageContent()}</EmbeddedPage>
+      </CollectiveThemeProvider>
+    );
+  }
+};
+
+EmbedContributionFlowPage.getInitialProps = ({ query, res }: NextPageContext) => {
+  if (res) {
+    res.removeHeader('X-Frame-Options');
   }
 
-  render() {
-    const { data, queryParams } = this.props;
-    if (!data.loading && !data.account) {
-      const error = data.error
-        ? getErrorFromGraphqlException(data.error)
-        : generateNotFoundError(this.props.collectiveSlug);
-
-      return <ErrorPage error={error} />;
-    } else if (!data.loading && data.account && isHiddenAccount(data.account)) {
-      return <Custom404 />;
-    } else {
-      return (
-        <CollectiveThemeProvider collective={queryParams.useTheme ? data.account : null}>
-          <EmbeddedPage backgroundColor={queryParams.backgroundColor}>{this.renderPageContent()}</EmbeddedPage>
-        </CollectiveThemeProvider>
-      );
-    }
-  }
-}
-
-const addContributionFlowData = graphql(contributionFlowAccountQuery, {
-  options: (props: { collectiveSlug: string; tierId: number }) => ({
-    variables: { collectiveSlug: props.collectiveSlug, tierId: props.tierId, includeTier: Boolean(props.tierId) },
-  }),
-});
+  return {
+    // Route parameters
+    collectiveSlug: query.eventSlug || query.collectiveSlug,
+    tierId: parseInt(query.tierId as string) || null,
+    // Query parameters
+    error: query.error,
+    queryParams: EmbedContributionFlowUrlQueryHelper.decode(query),
+  };
+};
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default addContributionFlowData(
-  withUser(injectIntl(withStripeLoader(withRouter(EmbedContributionFlowPage)))) as React.ComponentType<
-    Pick<React.ComponentProps<typeof EmbedContributionFlowPage>, 'collectiveSlug' | 'tierId'>
-  >,
-);
+export default EmbedContributionFlowPage;
