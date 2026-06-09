@@ -13,8 +13,10 @@ module.exports = defineConfig({
   chromeWebSecurity: false,
   scrollBehavior: 'center',
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
-  env: {
+  expose: {
     MAILPIT_URL: 'http://localhost:1080',
+  },
+  env: {
     codeCoverage: {
       url: '/__coverage__',
     },
