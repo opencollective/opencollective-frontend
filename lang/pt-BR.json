@@ -4208,6 +4208,7 @@
   "tier.name.backer": "apoiador",
   "tier.name.sponsor": "patrocinador",
   "Tier.Past": "Este nível não está mais ativo.",
+  "tier.presets.belowMinimum": "Suggested amounts cannot be lower than the minimum amount",
   "tier.presets.label": "Quantidades sugeridas",
   "tier.Pro.title": "Pro",
   "tier.singleTicketDescription": "Permitir que as pessoas comprem apenas um único ingresso por pedido",

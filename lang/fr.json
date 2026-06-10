@@ -4208,6 +4208,7 @@
   "tier.name.backer": "contributeur",
   "tier.name.sponsor": "sponsor",
   "Tier.Past": "Cette formule n'est plus active.",
+  "tier.presets.belowMinimum": "Suggested amounts cannot be lower than the minimum amount",
   "tier.presets.label": "Montants suggérés",
   "tier.Pro.title": "Pro",
   "tier.singleTicketDescription": "Autorisez les personnes à n'acheter qu'un seul billet par commande",

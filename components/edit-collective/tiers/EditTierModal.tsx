@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
-import { capitalize, isNil, omit } from 'lodash-es';
+import { capitalize, isNil, omit, set } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -11,7 +11,7 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getIntervalFromContributionFrequency } from '../../../lib/date-utils';
-import { i18nGraphqlException } from '../../../lib/errors';
+import { createError, ERROR, i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
 import { gql } from '../../../lib/graphql/helpers';
 import { useNavigationWarning } from '../../../lib/hooks/useNavigationWarning';
@@ -801,6 +801,31 @@ const getRequiredFields = values => {
   return fields;
 };
 
+export const validateTierFormValues = (values, intl) => {
+  const errors = requireFields(values, getRequiredFields(values));
+
+  if (values.amountType === FLEXIBLE && !isNil(values.minimumAmount?.valueInCents) && values.presets?.length) {
+    const minimumAmount = values.minimumAmount.valueInCents;
+    const hasInvalidPreset = values.presets.some(preset => !isNil(preset) && preset < minimumAmount);
+
+    if (hasInvalidPreset) {
+      set(
+        errors,
+        'presets',
+        createError(ERROR.FORM_FIELD_MIN, {
+          message: intl.formatMessage({
+            id: 'tier.presets.belowMinimum',
+            defaultMessage: 'Suggested amounts cannot be lower than the minimum amount',
+          }),
+          hasI18nMessage: true,
+        }),
+      );
+    }
+  }
+
+  return errors;
+};
+
 function EditTierFormInner({
   formik,
   tier,
@@ -987,7 +1012,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setForm
     <React.Fragment>
       <Formik
         initialValues={initialValues}
-        validate={values => requireFields(values, getRequiredFields(values))}
+        validate={values => validateTierFormValues(values, intl)}
         onSubmit={async values => {
           const tier = {
             ...omit(values, ['interval', 'legacyId', 'slug']),

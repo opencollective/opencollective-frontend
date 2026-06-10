@@ -4208,6 +4208,7 @@
   "tier.name.backer": "zwolennik",
   "tier.name.sponsor": "sponsor",
   "Tier.Past": "Ten poziom nie jest już aktywny.",
+  "tier.presets.belowMinimum": "Suggested amounts cannot be lower than the minimum amount",
   "tier.presets.label": "Sugerowana kwota",
   "tier.Pro.title": "Pro",
   "tier.singleTicketDescription": "Pozwól ludziom kupić tylko jeden bilet na jedno zamówienie",

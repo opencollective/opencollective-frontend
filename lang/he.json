@@ -4208,6 +4208,7 @@
   "tier.name.backer": "תומך/ת",
   "tier.name.sponsor": "נותן/ת חסות",
   "Tier.Past": "שכבה זו אינה פעילה יותר.",
+  "tier.presets.belowMinimum": "Suggested amounts cannot be lower than the minimum amount",
   "tier.presets.label": "Suggested amounts",
   "tier.Pro.title": "Pro",
   "tier.singleTicketDescription": "Only allow people to buy a single ticket per order",

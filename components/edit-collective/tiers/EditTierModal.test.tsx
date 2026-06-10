@@ -3,7 +3,7 @@ import { createIntl } from 'react-intl';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { TierTypes } from '@/lib/constants/tiers-types';
 
-import { getTierTypeOptions } from './EditTierModal';
+import { getTierTypeOptions, validateTierFormValues } from './EditTierModal';
 
 const intl = createIntl({ locale: 'en', defaultLocale: 'en' });
 
@@ -36,5 +36,37 @@ describe('EditTierModal - getTierTypeOptions', () => {
     const options = getTierTypeOptions(intl, CollectiveType.PROJECT, projectTypes);
     const values = options.map(opt => opt.value);
     expect(values).not.toContain(TierTypes.MEMBERSHIP);
+  });
+});
+
+describe('EditTierModal - validateTierFormValues', () => {
+  it('rejects flexible tiers with presets lower than minimum amount', () => {
+    const errors = validateTierFormValues(
+      {
+        name: 'Supporter',
+        type: TierTypes.TIER,
+        amountType: 'FLEXIBLE',
+        minimumAmount: { valueInCents: 7000, currency: 'USD' },
+        presets: [1000, 2500, 5000],
+      },
+      intl,
+    );
+
+    expect(errors).toHaveProperty('presets');
+  });
+
+  it('accepts flexible tiers when presets meet minimum amount', () => {
+    const errors = validateTierFormValues(
+      {
+        name: 'Supporter',
+        type: TierTypes.TIER,
+        amountType: 'FLEXIBLE',
+        minimumAmount: { valueInCents: 7000, currency: 'USD' },
+        presets: [7000, 10000, 20000],
+      },
+      intl,
+    );
+
+    expect(errors).not.toHaveProperty('presets');
   });
 });

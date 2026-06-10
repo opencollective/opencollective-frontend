@@ -4208,6 +4208,7 @@
   "tier.name.backer": "赞助者",
   "tier.name.sponsor": "赞助",
   "Tier.Past": "此等级不再活跃。",
+  "tier.presets.belowMinimum": "Suggested amounts cannot be lower than the minimum amount",
   "tier.presets.label": "建议金额",
   "tier.Pro.title": "Pro",
   "tier.singleTicketDescription": "每个订单只允许买一张门票",

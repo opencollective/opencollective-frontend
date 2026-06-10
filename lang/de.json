@@ -4208,6 +4208,7 @@
   "tier.name.backer": "Unterstützer/-in",
   "tier.name.sponsor": "Sponsoren",
   "Tier.Past": "Diese Stufe ist nicht mehr aktiviert.",
+  "tier.presets.belowMinimum": "Suggested amounts cannot be lower than the minimum amount",
   "tier.presets.label": "Suggested amounts",
   "tier.Pro.title": "Pro",
   "tier.singleTicketDescription": "Only allow people to buy a single ticket per order",

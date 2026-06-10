@@ -4208,6 +4208,7 @@
   "tier.name.backer": "aportante",
   "tier.name.sponsor": "patrocinador",
   "Tier.Past": "Esta Categoría ya no está disponible.",
+  "tier.presets.belowMinimum": "Suggested amounts cannot be lower than the minimum amount",
   "tier.presets.label": "Cantidades sugeridas",
   "tier.Pro.title": "Pro",
   "tier.singleTicketDescription": "Permitir solo la compra de un boleto por pedido",

@@ -4208,6 +4208,7 @@
   "tier.name.backer": "backer",
   "tier.name.sponsor": "sponsor",
   "Tier.Past": "Dit niveau is niet meer actief.",
+  "tier.presets.belowMinimum": "Suggested amounts cannot be lower than the minimum amount",
   "tier.presets.label": "Voorgestelde bedragen",
   "tier.Pro.title": "Pro",
   "tier.singleTicketDescription": "Only allow people to buy a single ticket per order",
