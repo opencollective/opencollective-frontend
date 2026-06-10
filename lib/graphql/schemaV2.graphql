@@ -25460,6 +25460,31 @@ type Mutation {
   ): MemberInvitation
 
   """
+  Cancel a pending member invitation. Scope: "account".
+  """
+  cancelMemberInvitation(
+    """
+    Reference to the invitation to cancel (by id or legacyId)
+    """
+    invitation: MemberInvitationReferenceInput
+
+    """
+    Reference to the invited account. Must be combined with account (and optionally role).
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    Reference to the collective the invitation belongs to. Must be combined with memberAccount.
+    """
+    account: AccountReferenceInput
+
+    """
+    Role of the invitation to cancel. Used to disambiguate when combined with account and memberAccount.
+    """
+    role: MemberRole
+  ): Boolean!
+
+  """
   Endpoint to accept or reject an invitation to become a member. Scope: "account".
   """
   replyToMemberInvitation(
