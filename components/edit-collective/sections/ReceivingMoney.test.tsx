@@ -29,9 +29,9 @@ jest.mock('./receive-money/CustomPaymentMethods', () => ({
   ),
 }));
 
-jest.mock('../EditConnectedAccount', () => ({
+jest.mock('../EditStripeAccount', () => ({
   __esModule: true,
-  default: ({ service }: any) => <div data-testid={`edit-connected-account-${service}`}>Edit {service}</div>,
+  default: () => <div data-testid={`edit-connected-account-stripe`}>Edit Stripe</div>,
 }));
 
 jest.mock('../EditPayPalAccount', () => ({
