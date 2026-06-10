@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
 import { BREAKPOINTS, useWindowResize } from '../../../../lib/hooks/useWindowResize';
 
+import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
@@ -71,6 +72,25 @@ const tableColumns: ColumnDef<Activity>[] = [
       );
     },
   },
+];
+
+// Optional column showing which account the activity happened on
+const accountColumn: ColumnDef<Activity> = {
+  accessorKey: 'account',
+  header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
+  meta: { className: 'w-40 xl:w-56' },
+  cell: ({ cell }) => {
+    const account = cell.row.original.account;
+    return (
+      <div className="flex items-center gap-2 truncate text-slate-700">
+        <Avatar collective={account} radius={20} />
+        <span className="truncate">{account?.name}</span>
+      </div>
+    );
+  },
+};
+
+const actionsColumn: ColumnDef<Activity>[] = [
   {
     accessorKey: 'actions',
     header: null,
@@ -105,6 +125,7 @@ type ActivitiesTableProps = {
   resetFilters?: () => void;
   loading?: boolean;
   nbPlaceholders?: number;
+  showAccount?: boolean;
 };
 
 export default function ActivitiesTable({
@@ -113,10 +134,13 @@ export default function ActivitiesTable({
   loading,
   nbPlaceholders,
   resetFilters,
+  showAccount,
 }: ActivitiesTableProps) {
   const [isTableView, setIsTableView] = React.useState(true);
   useWindowResize(() => setIsTableView(window.innerWidth > BREAKPOINTS.MEDIUM));
-  const columns = isTableView ? tableColumns : cardColumns;
+  const columns = isTableView
+    ? [...tableColumns.slice(0, 2), ...(showAccount ? [accountColumn] : []), ...tableColumns.slice(2), ...actionsColumn]
+    : cardColumns;
   return (
     <DataTable
       data-cy="activities-table"
