@@ -358,7 +358,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
           );
 
           return (
-            <Form data-cy="vendor-form" className="mt-7">
+            <Form data-cy="vendor-form">
               <div className="flex justify-stretch gap-4">
                 <Field name="imageUrl">
                   {({ field, form }) => (
