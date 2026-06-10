@@ -408,6 +408,8 @@ const EditPlatformTipModal = (props: Omit<EditOrderModalProps, 'action'>) => {
             amount={props.order.amount.valueInCents}
             collectiveName={props.order.toAccount.name}
             currency={props.order.platformTipAmount?.currency || props.order.amount.currency}
+            showHeader={false}
+            showOptOutNudge={false}
             selectedOption={selectedTipOption}
             value={tipAmount}
             onChange={(selectedOption, value) => {

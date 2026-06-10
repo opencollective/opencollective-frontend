@@ -48,7 +48,7 @@ type NewPlatformTipContainerProps = {
 type NewPlatformTipSelectorProps = Omit<NewPlatformTipContainerProps, 'step'>;
 
 export function NewPlatformTipSelector(
-  props: NewPlatformTipSelectorProps & { showHeader?: boolean; showOptOut?: boolean },
+  props: NewPlatformTipSelectorProps & { showHeader?: boolean; showOptOut?: boolean; showOptOutNudge?: boolean },
 ) {
   const {
     amount,
@@ -58,6 +58,7 @@ export function NewPlatformTipSelector(
     selectedOption,
     showHeader = true,
     showOptOut = true,
+    showOptOutNudge = true,
     value,
   } = props;
   const intl = useIntl();
@@ -236,23 +237,24 @@ export function NewPlatformTipSelector(
               data-cy="platform-tip-none"
             />
             <AnimatePresence>
-              {(selectedOption === PlatformTipOption.NONE ||
-                (selectedOption === PlatformTipOption.OTHER && value === 0)) && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <P fontSize="13px" lineHeight="18px" color="black.700" mt={2} ml="26px">
-                    <FormattedMessage
-                      defaultMessage="No worries, we're grateful you're supporting {collectiveName}. If you change your mind, every bit helps our small team keep the platform running. 💙"
-                      id="platformTip.optOutNudge"
-                      values={{ collectiveName }}
-                    />
-                  </P>
-                </motion.div>
-              )}
+              {showOptOutNudge &&
+                (selectedOption === PlatformTipOption.NONE ||
+                  (selectedOption === PlatformTipOption.OTHER && value === 0)) && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <P fontSize="13px" lineHeight="18px" color="black.700" mt={2} ml="26px">
+                      <FormattedMessage
+                        defaultMessage="No worries, we're grateful you're supporting {collectiveName}. If you change your mind, every bit helps our small team keep the platform running. 💙"
+                        id="platformTip.optOutNudge"
+                        values={{ collectiveName }}
+                      />
+                    </P>
+                  </motion.div>
+                )}
             </AnimatePresence>
           </Box>
         )}
