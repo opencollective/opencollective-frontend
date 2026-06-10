@@ -149,9 +149,17 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     if (canUpdateActiveOrder) {
       actions.primary.push({
-        label: intl.formatMessage({ defaultMessage: 'Update amount', id: 'subscription.menu.updateAmount' }),
+        label: intl.formatMessage({ defaultMessage: 'Update contribution amount', id: 'HpWk9J' }),
         onClick: () => showEditOrderModal('editAmount'),
         key: 'update-amount',
+      });
+    }
+
+    if (canUpdateActiveOrder && order.platformTipEligible) {
+      actions.primary.push({
+        label: intl.formatMessage({ defaultMessage: 'Update platform tip amount', id: 'rU2A5H' }),
+        onClick: () => showEditOrderModal('editPlatformTip'),
+        key: 'update-platform-tip',
       });
     }
 

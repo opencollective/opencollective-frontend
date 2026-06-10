@@ -18,15 +18,18 @@ import type {
 } from '../lib/graphql/types/v2/graphql';
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
+import { NewPlatformTipSelector } from './contribution-flow/NewPlatformTipContainer';
 import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';
 import type { PaymentMethodOption } from './orders/PaymentMethodPicker';
 import PaymentMethodPicker from './orders/PaymentMethodPicker';
 import { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
 import {
   ContributionInterval,
+  getPlatformTipOptionFromAmount,
   tiersQuery,
   useContributeOptions,
   useUpdateOrder,
+  useUpdatePlatformTip,
 } from './recurring-contributions/UpdateOrderPopUp';
 import { useUpdatePaymentMethod } from './recurring-contributions/UpdatePaymentMethodPopUp';
 import { Button } from './ui/Button';
@@ -54,7 +57,7 @@ const i18nReasons = defineMessages({
   OTHER: { id: 'subscription.cancel.other', defaultMessage: 'Other' },
 });
 
-export type EditOrderActions = 'cancel' | 'editAmount' | 'editPaymentMethod' | 'editAddedFunds';
+export type EditOrderActions = 'cancel' | 'editAmount' | 'editPlatformTip' | 'editPaymentMethod' | 'editAddedFunds';
 
 type EditOrderModalProps = BaseModalProps & {
   order: any;
@@ -190,6 +193,7 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   const tiers = get(data, 'account.tiers.nodes', null);
   const disableCustomContributions = get(data, 'account.settings.disableCustomContributions', false);
   const contributeOptionsState = useContributeOptions(props.order, tiers, tiersLoading, disableCustomContributions);
+  const hasTierOptions = tiers?.some(tier => tier.interval !== null);
   const {
     amountOptions,
     inputAmountValue,
@@ -201,9 +205,8 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   } = contributeOptionsState;
   const selectedTier = selectedContributeOption?.isCustom ? null : selectedContributeOption;
   const isPaypal = props.order.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
-  const tipAmount = props.order.platformTipAmount?.valueInCents || 0;
   const newAmount = selectedAmountOption?.label === OTHER_LABEL ? inputAmountValue : selectedAmountOption?.value;
-  const newTotalAmount = newAmount + tipAmount; // For now tip can't be updated, we're just carrying it over
+  const newTotalAmount = newAmount + (props.order.platformTipAmount?.valueInCents || 0);
 
   // When we change the amount option (One of the presets or Other)
   const setSelectedAmountOption = ({ label, value }) => {
@@ -228,13 +231,14 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
       >
         <DialogHeader>
           <DialogTitle>
-            <FormattedMessage id="subscription.menu.updateTier" defaultMessage="Update tier" />
+            <FormattedMessage defaultMessage="Update contribution amount" id="HpWk9J" />
           </DialogTitle>
           <DialogDescription>
-            <FormattedMessage
-              id="subscription.updateTier.subheader"
-              defaultMessage="Pick an existing tier or enter a custom amount."
-            />
+            {hasTierOptions ? (
+              <FormattedMessage defaultMessage="Change the tier and recurring contribution amount." id="UNylJ0" />
+            ) : (
+              <FormattedMessage defaultMessage="Change the recurring contribution amount." id="HLCT2z" />
+            )}
           </DialogDescription>
         </DialogHeader>
         {tiersLoading || contributeOptionsState.loading ? (
@@ -347,6 +351,95 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
               loading={isSubmittingOrder}
               data-cy="recurring-contribution-update-order-button"
               onClick={() => updateOrder(selectedTier, selectedAmountOption, inputAmountValue)}
+              className="w-full"
+            >
+              <FormattedMessage id="actions.update" defaultMessage="Update" />
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const EditPlatformTipModal = (props: Omit<EditOrderModalProps, 'action'>) => {
+  const handleSuccess = () => {
+    props.setOpen(false);
+    props.onSuccess?.();
+  };
+  const { toast } = useToast();
+  const [tipAmount, setTipAmount] = React.useState(props.order.platformTipAmount?.valueInCents || 0);
+  const [selectedTipOption, setSelectedTipOption] = React.useState(() =>
+    getPlatformTipOptionFromAmount(
+      props.order.platformTipAmount?.valueInCents || 0,
+      props.order.amount.valueInCents,
+      props.order.amount.currency,
+    ),
+  );
+  const { isSubmittingPlatformTip, updatePlatformTip } = useUpdatePlatformTip({
+    contribution: props.order,
+    onSuccess: handleSuccess,
+  });
+  const isPaypal = props.order.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
+  const currentTipAmount = props.order.platformTipAmount?.valueInCents || 0;
+  const totalAmount = props.order.totalAmount.valueInCents - currentTipAmount + tipAmount;
+
+  return (
+    <Dialog open={props.open} onOpenChange={props.setOpen}>
+      <DialogContent
+        className="max-w-[420px]"
+        onCloseAutoFocus={e => {
+          if (props.onCloseFocusRef?.current) {
+            e.preventDefault();
+            props.onCloseFocusRef.current.focus();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            <FormattedMessage defaultMessage="Update platform tip amount" id="rU2A5H" />
+          </DialogTitle>
+          <DialogDescription>
+            <FormattedMessage defaultMessage="Change the platform tip for this recurring contribution." id="dxvB7P" />
+          </DialogDescription>
+        </DialogHeader>
+        <Box mt={3}>
+          <NewPlatformTipSelector
+            amount={props.order.amount.valueInCents}
+            collectiveName={props.order.toAccount.name}
+            currency={props.order.platformTipAmount?.currency || props.order.amount.currency}
+            showHeader={false}
+            showOptOutNudge={false}
+            selectedOption={selectedTipOption}
+            value={tipAmount}
+            onChange={(selectedOption, value) => {
+              setSelectedTipOption(selectedOption);
+              setTipAmount(Number.isFinite(value) ? value : 0);
+            }}
+          />
+        </Box>
+        <div className="mt-4 flex flex-wrap justify-between">
+          {isPaypal ? (
+            <PayWithPaypalButton
+              isSubmitting={isSubmittingPlatformTip}
+              totalAmount={totalAmount}
+              currency={props.order.amount.currency}
+              interval={getIntervalFromContributionFrequency(props.order.frequency)}
+              order={props.order}
+              host={props.order.toAccount.host}
+              collective={props.order.toAccount}
+              tier={props.order.tier}
+              style={{ height: 47, size: 'responsive' }}
+              subscriptionStartDate={getSubscriptionStartDate(props.order)}
+              onError={e => toast({ variant: 'error', title: e.message })}
+              onSuccess={({ subscriptionId }) => updatePlatformTip(tipAmount, subscriptionId)}
+            />
+          ) : (
+            <Button
+              variant="outline"
+              loading={isSubmittingPlatformTip}
+              data-cy="recurring-contribution-update-platform-tip-button"
+              onClick={() => updatePlatformTip(tipAmount)}
               className="w-full"
             >
               <FormattedMessage id="actions.update" defaultMessage="Update" />
@@ -715,6 +808,8 @@ const EditOrderModal = (props: EditOrderModalProps) => {
     return <CancelModal {...props} />;
   } else if (props.action === 'editAmount') {
     return <EditAmountModal {...props} />;
+  } else if (props.action === 'editPlatformTip') {
+    return <EditPlatformTipModal {...props} />;
   } else if (props.action === 'editPaymentMethod') {
     return <EditPaymentMethodModal {...props} />;
   } else if (props.action === 'editAddedFunds') {

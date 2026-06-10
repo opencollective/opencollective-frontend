@@ -1,5 +1,4 @@
 import React from 'react';
-import { isNil } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
@@ -14,7 +13,8 @@ import StyledButton from '../StyledButton';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
-import { P } from '../Text';
+import { P, Span } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import RecurringContributionsPopUp from './RecurringContributionsPopUp';
 
@@ -116,33 +116,34 @@ const RecurringContributionsCard = ({
                 currency={contribution.totalAmount.currency}
               />
             </P>
-            {!isNil(contribution.platformTipAmount?.valueInCents) && (
-              <StyledTooltip
-                content={() => (
+            {contribution.platformTipAmount?.valueInCents > 0 && (
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Span display="inline-flex" fontSize="12px" lineHeight="20px" color="black.700" cursor="help">
+                    (
+                    <FormattedMoneyAmount
+                      amount={contribution.amount.valueInCents}
+                      currency={contribution.amount.currency}
+                      showCurrencyCode={false}
+                      precision="auto"
+                    />
+                    {' + '}
+                    <FormattedMoneyAmount
+                      amount={contribution.platformTipAmount.valueInCents}
+                      currency={contribution.platformTipAmount.currency || contribution.amount.currency}
+                      showCurrencyCode={false}
+                      precision="auto"
+                    />
+                    )
+                  </Span>
+                </TooltipTrigger>
+                <TooltipContent>
                   <FormattedMessage
                     id="Subscriptions.FeesOnTopTooltip"
                     defaultMessage="Contribution plus Platform Tip"
                   />
-                )}
-              >
-                <P fontSize="12px" lineHeight="20px" color="black.700">
-                  (
-                  <FormattedMoneyAmount
-                    amount={contribution.amount.valueInCents}
-                    currency={contribution.amount.currency}
-                    showCurrencyCode={false}
-                    precision="auto"
-                  />
-                  {' + '}
-                  <FormattedMoneyAmount
-                    amount={contribution.platformTipAmount.valueInCents}
-                    currency={contribution.amount.currency}
-                    showCurrencyCode={false}
-                    precision="auto"
-                  />
-                  )
-                </P>
-              </StyledTooltip>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </Box>
