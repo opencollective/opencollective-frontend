@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, MoreHorizontal } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from '@/components/Avatar';
@@ -67,7 +67,7 @@ const InteractionValue = ({
   const ref = legacyId ? `#${legacyId}` : '';
   const link = (chunks: React.ReactNode) =>
     canOpen ? (
-      <button type="button" className="text-primary underline hover:opacity-80" onClick={() => onOpen(tx)}>
+      <button type="button" className="underline hover:text-primary" onClick={() => onOpen(tx)}>
         {chunks}
       </button>
     ) : (
@@ -151,65 +151,66 @@ const RecentTransactionsCard = ({
     <table className="w-full text-sm">
       <thead>
         <tr className="text-left text-xs text-muted-foreground">
-          <th className="pb-2 font-medium">
+          <th className="pb-2 pr-6 font-medium">
             <FormattedMessage defaultMessage="Date Paid" id="Gh3Obs.date" />
           </th>
-          <th className="pb-2 font-medium">
+          <th className="pb-2 pr-6 font-medium">
             <FormattedMessage defaultMessage="Contribution to" id="kQwHjA" />
           </th>
-          <th className="pb-2 font-medium">
+          <th className="pb-2 pr-6 font-medium">
             <FormattedMessage defaultMessage="Account" id="TwyMau" />
           </th>
           <th className="pb-2 text-right font-medium">
             <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
           </th>
-          <th className="pb-2" />
         </tr>
       </thead>
       <tbody>
         {rows.length === 0 ? (
           <tr>
-            <td colSpan={5} className="py-4 text-center text-muted-foreground">
+            <td colSpan={4} className="py-4 text-center text-muted-foreground">
               <FormattedMessage defaultMessage="No data" id="UG5qoS" />
             </td>
           </tr>
         ) : (
-          rows.map(tx => (
-            <tr key={tx.id} className="border-t border-gray-100">
-              <td className="py-2 whitespace-nowrap text-foreground">
-                <DateTime value={tx.clearedAt || tx.createdAt} dateStyle="medium" />
-              </td>
-              <td className="py-2">
-                {showDescription ? (
-                  <span className="line-clamp-1 text-foreground">{tx.description || '—'}</span>
-                ) : (
+          rows.map(tx => {
+            const canOpen = Boolean(tx.expense || tx.order);
+            return (
+              <tr
+                key={tx.id}
+                className={`border-t border-gray-100 ${canOpen ? 'cursor-pointer hover:bg-muted/50' : ''}`}
+                onClick={canOpen ? () => onRowClick(tx) : undefined}
+              >
+                <td className="py-2.5 pr-6 whitespace-nowrap text-foreground">
+                  <DateTime value={tx.clearedAt || tx.createdAt} dateStyle="medium" />
+                </td>
+                <td className="py-2.5 pr-6">
+                  {showDescription ? (
+                    <span className="line-clamp-1 text-foreground">{tx.description || '—'}</span>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Avatar collective={tx.oppositeAccount} radius={20} />
+                      <span className="line-clamp-1 text-foreground">{tx.oppositeAccount?.name || '—'}</span>
+                    </div>
+                  )}
+                </td>
+                <td className="py-2.5 pr-6">
                   <div className="flex items-center gap-2">
-                    <Avatar collective={tx.oppositeAccount} radius={20} />
-                    <span className="line-clamp-1 text-foreground">{tx.oppositeAccount?.name || '—'}</span>
+                    <Avatar collective={tx.account} radius={20} />
+                    <span className="line-clamp-1 text-foreground">{tx.account?.name || '—'}</span>
                   </div>
-                )}
-              </td>
-              <td className="py-2">
-                <div className="flex items-center gap-2">
-                  <Avatar collective={tx.account} radius={20} />
-                  <span className="line-clamp-1 text-foreground">{tx.account?.name || '—'}</span>
-                </div>
-              </td>
-              <td className="py-2 text-right font-medium whitespace-nowrap text-foreground">
-                <FormattedMoneyAmount
-                  amount={tx.netAmount.valueInCents}
-                  currency={tx.netAmount.currency || currency}
-                  showCurrencyCode
-                  precision={2}
-                />
-              </td>
-              <td className="py-2 text-right">
-                <Button variant="ghost" size="icon-xs" onClick={() => onRowClick(tx)}>
-                  <MoreHorizontal size={16} />
-                </Button>
-              </td>
-            </tr>
-          ))
+                </td>
+                <td className="py-2.5 text-right font-medium whitespace-nowrap text-foreground">
+                  <FormattedMoneyAmount
+                    amount={tx.netAmount.valueInCents}
+                    currency={tx.netAmount.currency || currency}
+                    showCurrencyCode
+                    precision={2}
+                  />
+                </td>
+              </tr>
+            );
+          })
         )}
       </tbody>
     </table>
@@ -270,7 +271,11 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
             {account?.socialLinks?.length > 0 && (
               <DataListItem
                 label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}
-                value={<HeroSocialLinks socialLinks={account.socialLinks} />}
+                value={
+                  <div className="flex flex-wrap items-center gap-2">
+                    <HeroSocialLinks socialLinks={account.socialLinks} />
+                  </div>
+                }
               />
             )}
             {(account?.location?.address || account?.location?.country) && (

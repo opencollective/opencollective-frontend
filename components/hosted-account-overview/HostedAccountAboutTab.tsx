@@ -90,7 +90,11 @@ export function HostedAccountAboutTab({ account }: HostedAccountAboutTabProps) {
           {account?.socialLinks?.length > 0 && (
             <DataListItem
               label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}
-              value={<HeroSocialLinks socialLinks={account.socialLinks} />}
+              value={
+                <div className="flex flex-wrap items-center gap-2">
+                  <HeroSocialLinks socialLinks={account.socialLinks} />
+                </div>
+              }
             />
           )}
           {(account?.location?.address || account?.location?.country) && (
