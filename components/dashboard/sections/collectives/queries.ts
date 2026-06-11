@@ -189,9 +189,10 @@ export const processApplicationMutation = gql`
   ${HostApplicationFields}
 `;
 
-const hostedCollectiveFields = gql`
+export const hostedCollectiveFields = gql`
   fragment HostedCollectiveFields on Account {
     id
+    publicId
     legacyId
     name
     slug
@@ -275,6 +276,7 @@ const hostedCollectiveFields = gql`
     childrenAccounts {
       nodes {
         id
+        publicId
         slug
         name
         type
@@ -315,6 +317,7 @@ const hostedCollectiveFields = gql`
     ... on AccountWithParent {
       parent {
         id
+        publicId
         slug
         name
         ...AccountHoverCardFields
