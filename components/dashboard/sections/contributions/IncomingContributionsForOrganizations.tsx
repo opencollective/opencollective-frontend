@@ -243,7 +243,6 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
         error={error}
         refetch={handleRefetch}
         columnVisibility={{ ...defaultVisibility, accountingCategory: true }}
-        showChargesSection
       />
     </div>
   );

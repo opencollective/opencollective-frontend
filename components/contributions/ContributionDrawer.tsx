@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
+import { ContributionFrequency, OrderStatus, PaymentMethodService } from '../../lib/graphql/types/v2/graphql';
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
@@ -52,6 +52,7 @@ const contributionDrawerQuery = gql`
       paymentMethod {
         id
         type
+        service
       }
       manualPaymentProvider {
         id
@@ -293,21 +294,16 @@ const contributionDrawerQuery = gql`
   ${AccountingCategorySelectFieldsFragment}
 `;
 
+const EXTERNAL_PAYMENT_METHOD_SERVICES = [PaymentMethodService.STRIPE, PaymentMethodService.PAYPAL];
+
 type ContributionDrawerProps = {
   open: boolean;
   onClose: () => void;
   orderId?: number;
   getActions: GetActions<ContributionDrawerQuery['order']>;
-  showChargesSection?: boolean;
 };
 
-export function ContributionDrawer({
-  open,
-  onClose,
-  orderId,
-  getActions,
-  showChargesSection = false,
-}: ContributionDrawerProps) {
+export function ContributionDrawer({ open, onClose, orderId, getActions }: ContributionDrawerProps) {
   const intl = useIntl();
 
   const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
@@ -323,6 +319,11 @@ export function ContributionDrawer({
   const contributorAccount = order?.fromAccount?.mainProfile ?? order?.fromAccount;
   const contributorLegalName =
     contributorAccount?.legalName !== contributorAccount?.name && contributorAccount?.legalName;
+
+  const showChargesSection = React.useMemo(
+    () => !!order?.paymentMethod?.service && EXTERNAL_PAYMENT_METHOD_SERVICES.includes(order.paymentMethod.service),
+    [order],
+  );
 
   const actions = React.useMemo(
     () => (order ? getActions(order, dropdownTriggerRef) : null),
