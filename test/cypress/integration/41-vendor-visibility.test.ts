@@ -443,7 +443,7 @@ describe('vendor visibility', () => {
           cy.get('#__vendor').type(name);
           cy.root().closest('html').contains('[role="option"]', name).click();
           cy.get('[name="title"]').type('Grant submit visibility test');
-          cy.get('[name="expenseItems.0.description"]').type('Grant test item');
+          cy.get('[data-cy="expenseItems.0.description"] trix-editor').type('Grant test item');
           cy.get('[name="expenseItems.0.amount.valueInCents"]').type('{selectall}1000');
           cy.contains('button', 'Proceed to Summary').click();
           cy.contains('button', 'Submit Grant Request').click();

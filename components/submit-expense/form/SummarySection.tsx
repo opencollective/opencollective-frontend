@@ -24,6 +24,7 @@ import { AvatarWithLink } from '../../AvatarWithLink';
 import DateTime from '../../DateTime';
 import ExpenseTypeTag from '../../expenses/ExpenseTypeTag';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import HTMLContent, { isEmptyHTMLValue } from '../../HTMLContent';
 import LinkCollective from '../../LinkCollective';
 import MessageBox from '../../MessageBox';
 import { PayoutMethodLabel } from '../../PayoutMethodLabel';
@@ -238,7 +239,9 @@ const ExpenseItemsSection = React.memo(function ExpenseItemSection(
               )}
               <div className="grow">
                 <div>
-                  {ei.description || (
+                  {!isEmptyHTMLValue(ei.description) ? (
+                    <HTMLContent content={ei.description} fontSize="14px" fontWeight="500" />
+                  ) : (
                     <span className="text-muted-foreground">
                       <FormattedMessage defaultMessage="Item description" id="1TNkWq" />
                     </span>
