@@ -31,7 +31,7 @@ import ChangeTierWarningModal from './ChangeTierWarningModal';
 import CustomFields, { buildCustomFieldsConfig } from './CustomFields';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlatformTip }) => {
+const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlatformTip, isOscTipExperiment }) => {
   const intl = useIntl();
   const amount = stepDetails?.amount;
   const currency = tier?.amount.currency || collective.currency;
@@ -85,10 +85,11 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlat
         [AnalyticsProperty.CONTRIBUTION_STEP]: 'details',
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails.isNewPlatformTip ? 'new' : 'old',
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: showPlatformTip,
+        [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: isOscTipExperiment,
         [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: collective?.host?.slug,
       },
     });
-  }, [stepDetails.isNewPlatformTip, showPlatformTip, collective?.host?.slug]);
+  }, [stepDetails.isNewPlatformTip, showPlatformTip, isOscTipExperiment, collective?.host?.slug]);
 
   return (
     <Box width={1}>
