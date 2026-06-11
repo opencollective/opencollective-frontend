@@ -1,15 +1,21 @@
 import { get } from 'lodash-es';
 
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
-import type { Account, Policies } from './graphql/types/v2/graphql';
+import type { Policies } from './graphql/types/v2/graphql';
 
 type PoliciesUnion = Exclude<keyof Policies, '__typename' | 'id'>;
+
+type AccountWithPolicies = {
+  policies?: { [K in PoliciesUnion]?: Policies[K] } | null;
+  parent?: AccountWithPolicies | null;
+  parentCollective?: Pick<GraphQLV1Collective, 'policies'> | null;
+};
 
 /**
  * Retrieves a policy from the collective or its parent.
  */
 export const getPolicy = <Policy extends PoliciesUnion = PoliciesUnion>(
-  collective,
+  collective: AccountWithPolicies | null | undefined,
   policy: PoliciesUnion,
 ): Policies[Policy] => {
   const parent = collective && (collective.parent || collective.parentCollective);
@@ -22,11 +28,6 @@ export const getPolicy = <Policy extends PoliciesUnion = PoliciesUnion>(
 /**
  * Returns true if the account requires 2FA for admins. Parent must be preloaded.
  */
-export const require2FAForAdmins = (
-  collective: Pick<Account, 'policies'> & {
-    parent?: Pick<Account, 'policies'> | null;
-    parentCollective?: Pick<GraphQLV1Collective, 'policies'> | null;
-  },
-): boolean => {
+export const require2FAForAdmins = (collective: AccountWithPolicies | null | undefined): boolean => {
   return Boolean(getPolicy<'REQUIRE_2FA_FOR_ADMINS'>(collective, 'REQUIRE_2FA_FOR_ADMINS'));
 };

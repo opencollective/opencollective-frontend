@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { getTransactionsSection } from '@/lib/account';
 import type { FiltersToVariables } from '@/lib/filters/filter-types';
 import { limit, offset } from '@/lib/filters/schemas';
 import type {
@@ -120,7 +121,7 @@ export function AccountDetailTransactionsTab({
 
   const redirectRelatedTransactionsTo = getDashboardRoute(
     dashboardAccount,
-    dashboardAccount.hasHosting ? 'host-transactions' : 'transactions',
+    dashboardAccount ? getTransactionsSection(dashboardAccount) : 'transactions',
   );
 
   const views = React.useMemo(

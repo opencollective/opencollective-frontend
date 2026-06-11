@@ -28,14 +28,25 @@ import {
   UserX,
   Wallet,
 } from 'lucide-react';
+import type { IntlShape } from 'react-intl';
 
 import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
-import { hasAccountMoneyManagement, isIndividualAccount, isOrganizationAccount } from '../../lib/collective';
-import { isOneOfTypes, isType } from '../../lib/collective-sections';
+import { isOneOfTypes } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { LegalDocumentType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type { WorkspaceAccount } from '@/lib/account';
+import {
+  hasPlatformSubscription,
+  isChildAccount,
+  isCollectiveAccount,
+  isEventAccount,
+  isFundAccount,
+  isHostableAccount,
+  isIndividualAccount,
+  isOrganizationAccount,
+} from '@/lib/account';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 
@@ -108,43 +119,52 @@ const ROOT_MENU = [
 type MenuItem = PageMenuItem | GroupMenuItem;
 
 function shouldIncludeMenuItemWithLegacyFallback(
-  account: DashboardQuery['account'],
+  account: WorkspaceAccount,
   featureKey: (typeof FEATURES)[keyof typeof FEATURES],
   fallback: boolean,
 ) {
-  return 'platformSubscription' in account && account.platformSubscription
-    ? isFeatureSupported(account, featureKey)
-    : fallback;
+  return hasPlatformSubscription(account) ? isFeatureSupported(account, featureKey) : fallback;
 }
 
-export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+export const getMenuItems = ({
+  intl,
+  account,
+  LoggedInUser,
+  isRootDashboard,
+}: {
+  intl: IntlShape;
+  account: WorkspaceAccount | null;
+  LoggedInUser: LoggedInUser;
+  isRootDashboard: boolean;
+}): MenuItem[] => {
+  if (isRootDashboard) {
+    return ROOT_MENU;
+  }
   if (!account) {
     return null;
-  }
-  const isRootProfile = account.type === 'ROOT' && LoggedInUser?.isRoot;
-  if (isRootProfile) {
-    return ROOT_MENU;
   }
 
   const isIndividual = isIndividualAccount(account);
   const isOrganization = isOrganizationAccount(account);
-  const isEvent = account.type === EVENT;
+  const isCollective = isCollectiveAccount(account);
+  const isFund = isFundAccount(account);
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
-  const hasMoneyManagement = hasAccountMoneyManagement(account);
-  const hasHosting = account.hasHosting;
+  const hasMoneyManagement = isOrganization && account.hasMoneyManagement;
+  const hasHosting = isOrganization && account.hasHosting;
   const isSimpleIndividual = isIndividual && !hasHosting;
   const isSimpleOrganization = isOrganization && !hasMoneyManagement;
-  const isHostedType = isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]);
+  const isHostedType = isHostableAccount(account);
+  const isHostableMain = isHostedType && !isChildAccount(account);
+
   const hasIncomingOutgoingReorg = LoggedInUser?.hasPreviewFeatureEnabled(
     PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_INCOMING_OUTGOING,
   );
 
-  const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
-  const hasReceivedGrantRequests = account.receivedGrantRequests?.totalCount > 0;
+  const hasIssuedGrantRequests = true; // account.issuedGrantRequests?.totalCount > 0;
+  const hasReceivedGrantRequests = true; // account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
-    hasReceivedGrantRequests ||
-    (!isIndividual && !hasMoneyManagement && Boolean(account.supportedExpenseTypes?.includes?.(ExpenseType.GRANT)));
+    hasReceivedGrantRequests || (!isIndividual && !hasMoneyManagement && hasFeature(account, FEATURES.RECEIVE_GRANTS));
   const isReceiveContributionsSupported = account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED';
 
   const items: MenuItem[] = [
@@ -160,9 +180,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE),
     },
     {
-      if:
-        (isOneOfTypes(account, [COLLECTIVE, FUND]) || (isOrganization && hasMoneyManagement)) &&
-        !isCommunityManagerOnly,
+      if: (isCollective || isFund || (isOrganization && hasMoneyManagement)) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.ACCOUNTS,
       Icon: Wallet,
       label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
@@ -413,7 +431,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: shouldIncludeMenuItemWithLegacyFallback(
         account,
         FEATURES.TAX_FORMS,
-        hasMoneyManagement && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+        hasMoneyManagement &&
+          Boolean(
+            isOrganizationAccount(account) &&
+            account.host?.requiredLegalDocuments?.includes(LegalDocumentType.US_TAX_FORM),
+          ),
       ),
     },
     {
@@ -465,13 +487,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
 
     {
-      if: isType(account, EVENT) && !isCommunityManagerOnly && isReceiveContributionsSupported,
+      if: isEventAccount(account) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TICKETS,
       label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
       Icon: Ticket,
     },
     {
-      if: isType(account, EVENT) && !isCommunityManagerOnly && isReceiveContributionsSupported,
+      if: isEventAccount(account) && !isCommunityManagerOnly && isReceiveContributionsSupported,
       section: ALL_SECTIONS.TIERS,
       label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
       Icon: HeartHandshake,
@@ -485,7 +507,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if:
         isReceiveContributionsSupported &&
         !isIndividual &&
-        !isEvent &&
+        !isEventAccount(account) &&
         (!isOrganization || hasMoneyManagement) &&
         !isAccountantOnly &&
         !isCommunityManagerOnly,
@@ -500,7 +522,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       if:
         isHostedType &&
-        hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
+        hasFeature('host' in account && account.host, FEATURES.VIRTUAL_CARDS) &&
+        'isApproved' in account &&
         account.isApproved &&
         !isCommunityManagerOnly,
       section: ALL_SECTIONS.VIRTUAL_CARDS,
@@ -531,7 +554,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               {
                 section: ALL_SECTIONS.PLATFORM_SUBSCRIPTION,
                 label: intl.formatMessage({ defaultMessage: 'Platform Billing', id: 'beRXFK' }),
-                if: hasMoneyManagement || account.platformSubscription,
+                if: hasMoneyManagement || hasPlatformSubscription(account),
               },
               {
                 section: ALL_SECTIONS.FISCAL_HOSTING,
@@ -610,7 +633,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         // Collective sections
         {
           section: ALL_SECTIONS.HOST,
-          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isAccountantOnly,
+          if: isHostableMain && !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.COLLECTIVE_GOALS,
@@ -624,7 +647,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           // POLICIES also available for Fiscal hosts further up in this list
           section: ALL_SECTIONS.POLICIES,
-          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !hasMoneyManagement && !isAccountantOnly,
+          if: isHostableMain && !hasMoneyManagement && !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.CUSTOM_EMAIL,

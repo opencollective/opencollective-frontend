@@ -67,7 +67,7 @@ class MemberInvitationsPage extends React.Component {
         {LoggedInUser => (
           <Query
             query={memberInvitationsPageQuery}
-            variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
+            variables={{ memberAccount: { slug: LoggedInUser.slug } }}
             fetchPolicy="network-only"
           >
             {({ data, error, loading }) => (

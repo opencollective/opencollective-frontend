@@ -69,7 +69,7 @@ declare global {
         type?: ExpenseType | `${ExpenseType}`;
         description?: string;
         account: { slug?: string; legacyId?: number };
-        payee: { slug?: string; legacyId?: number };
+        payee: { id?: string; slug?: string; legacyId?: number };
         items?: { description: string; amountV2: AmountInput }[];
         payoutMethod?: {
           type: string;
