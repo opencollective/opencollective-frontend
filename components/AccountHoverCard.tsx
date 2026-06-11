@@ -82,14 +82,16 @@ export const accountHoverCardFields = gql`
   }
 `;
 
+type AccountHoverCardAccount = AccountHoverCardFieldsFragment & {
+  stats?: {
+    balanceWithBlockedFunds?: Amount;
+    totalPaidExpenses?: Amount;
+  };
+};
+
 type AccountHoverCardProps = {
   trigger: React.ReactNode;
-  account: AccountHoverCardFieldsFragment & {
-    stats?: {
-      balanceWithBlockedFunds?: Amount;
-      totalPaidExpenses?: Amount;
-    };
-  };
+  account?: AccountHoverCardAccount | null;
   includeAdminMembership?: {
     accountSlug?: string;
     hostSlug?: string;
