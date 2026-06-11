@@ -367,7 +367,6 @@ export function AccountDetails(props: AccountDetailsProps) {
           onClose={() => setOpenContributionId(null)}
           orderId={openContributionId}
           getActions={getContributionActions}
-          showChargesSection
         />
       )}
       {editVendor && query.data?.host && (
