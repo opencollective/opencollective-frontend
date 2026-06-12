@@ -10,7 +10,7 @@ describe('passwords', () => {
   });
 
   it('can be set from the settings page', () => {
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/user-security` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/user-security` });
     cy.contains("Setting a password is optional but can be useful if you're using a password manager.");
 
     // Submit disabled because no password set
@@ -52,7 +52,7 @@ describe('passwords', () => {
   });
 
   it('can then be edited', () => {
-    cy.login({ sendLink: true, email: user.email, redirect: `/dashboard/${user.collective.slug}/user-security` });
+    cy.login({ sendLink: true, email: user.email, redirect: `/dashboard/${user.slug}/user-security` });
 
     // Disable button if form is not complete
     cy.contains('button', 'Update Password').should('be.disabled');
@@ -105,8 +105,8 @@ describe('passwords', () => {
     cy.getByDataCy('user-menu-trigger').click();
     cy.getByDataCy('logout').click();
 
-    // Login with password on protected page (`/${user.collective.slug}/dashboard/user-security`)
-    cy.visit(`/dashboard/${user.collective.slug}/user-security`);
+    // Login with password on protected page (`/${user.slug}/dashboard/user-security`)
+    cy.visit(`/dashboard/${user.slug}/user-security`);
     completeSignInForm();
   });
 
@@ -154,10 +154,10 @@ describe('passwords', () => {
   it('can be used in combination with 2FA', () => {
     // Enable 2FA on user
     const secret = generateSecret({ length: 64 });
-    cy.enableTwoFactorAuth({ userEmail: user.email, userSlug: user.collective.slug, secret: secret });
+    cy.enableTwoFactorAuth({ userEmail: user.email, userSlug: user.slug, secret: secret });
 
     // Sign-in flow
-    cy.visit(`/signin?next=/dashboard/${user.collective.slug}/info`);
+    cy.visit(`/signin?next=/dashboard/${user.slug}/info`);
     cy.get('input[name="email"]').type(user.email);
     cy.getByDataCy('signin-btn').click();
     cy.get('input[name="password"]:visible').type('strongNewP@ssword<>?');

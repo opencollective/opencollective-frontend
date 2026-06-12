@@ -77,7 +77,7 @@ export default function SmallThread(props: SmallThreadProps) {
           <div className="relative">
             {props.items?.length > 0 && <div className="absolute -top-4 left-5 h-4 border-l" />}
 
-            <Avatar collective={LoggedInUser.collective} radius={40} />
+            <Avatar collective={LoggedInUser} radius={40} />
           </div>
           <div className="grow">
             <CommentForm

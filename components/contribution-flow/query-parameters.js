@@ -150,7 +150,7 @@ export const stepsDataToUrlParamsData = (
   if (stepProfile.isIncognito) {
     data.contributeAs = INCOGNITO_PROFILE_ALIAS;
   } else if (stepProfile?.slug) {
-    const isPersonalProfile = stepProfile.slug === loggedInUser?.collective?.slug;
+    const isPersonalProfile = stepProfile.slug === loggedInUser?.slug;
     data.contributeAs = isPersonalProfile ? PERSONAL_PROFILE_ALIAS : stepProfile.slug;
   } else {
     assign(data, pick(stepProfile, ['name', 'legalName', 'email']));

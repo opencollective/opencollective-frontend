@@ -261,7 +261,7 @@ describe('host dashboard', () => {
       cy.createExpense({
         userEmail: user.email,
         account: { legacyId: 207 },
-        payee: { legacyId: user.CollectiveId },
+        payee: { id: user.id },
       }).as('expense');
     });
 
