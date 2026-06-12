@@ -200,6 +200,7 @@ const ContributionFlow = ({
   const [confirmOrder] = useMutation(confirmOrderMutation);
   const mainContainerRef = useRef(null);
   const formRef = useRef(null);
+  const stepSummaryRef = useRef(null);
   const getQueryHelper = useCallback(() => {
     return isEmbed ? EmbedContributionFlowUrlQueryHelper : ContributionFlowUrlQueryHelper;
   }, [isEmbed]);
@@ -685,6 +686,17 @@ const ContributionFlow = ({
       return `${window.location.pathname}${window.location.search || ''}`;
     }
   }, []);
+  const validateStepSummary = useCallback(action => {
+    if (action === 'prev') {
+      return true;
+    }
+
+    if (stepSummaryRef.current?.validate) {
+      return stepSummaryRef.current.validate();
+    }
+
+    return get(stateRef.current.stepSummary, 'isReady', false);
+  }, []);
   const getSteps = useCallback(
     /** Returns the steps list */
     () => {
@@ -745,6 +757,7 @@ const ContributionFlow = ({
           name: 'summary',
           label: intl.formatMessage(STEP_LABELS.summary),
           isCompleted: get(stepSummary, 'isReady', false),
+          validate: validateStepSummary,
         });
       }
       // Hide step payment if using a free tier with fixed price
@@ -781,7 +794,17 @@ const ContributionFlow = ({
       }
       return steps;
     },
-    [LoggedInUser, checkFormValidity, collective, host, intl, showError, tier, validateStepProfile],
+    [
+      LoggedInUser,
+      checkFormValidity,
+      collective,
+      host,
+      intl,
+      showError,
+      tier,
+      validateStepProfile,
+      validateStepSummary,
+    ],
   );
   const getPaypalButtonProps = useCallback(
     ({ currency }) => {
@@ -1017,6 +1040,7 @@ const ContributionFlow = ({
                   disabledPaymentMethodTypes={queryParams.disabledPaymentMethodTypes}
                   hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
                   contributorProfiles={contributorProfiles}
+                  stepSummaryRef={stepSummaryRef}
                 />
                 <Box mt={40}>
                   <ContributionFlowButtons
