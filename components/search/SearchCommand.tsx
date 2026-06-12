@@ -7,6 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import useMenuItems from '../../lib/hooks/useMenuItems';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { getCommentUrl, getDashboardRoute } from '../../lib/url-helpers';
 import { i18nSearchEntity } from '@/lib/i18n/search';
@@ -14,7 +15,6 @@ import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
-import { getMenuItems } from '../dashboard/menu-items';
 import Spinner from '../Spinner';
 import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { DialogTitle } from '../ui/Dialog';
@@ -55,6 +55,7 @@ export const SearchCommand = ({ open, setOpen }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const { account } = React.useContext(DashboardContext);
+  const menuItems = useMenuItems();
   const defaultContext = useMemo((): { slug: string; type: 'account' | 'host' } | undefined => {
     return workspace?.isHost
       ? { slug: workspace.slug, type: 'host' }
@@ -223,7 +224,10 @@ export const SearchCommand = ({ open, setOpen }) => {
   const isInitialLoading = isLoading && !hasData && hasSearchTerm;
 
   const flattenedMenuItems: DashboardPage[] = React.useMemo(() => {
-    const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
+    if (!account || !menuItems) {
+      return [];
+    }
+
     return menuItems
       .flatMap(menuItem =>
         'subMenu' in menuItem
@@ -236,7 +240,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           : { ...menuItem, id: menuItem.section },
       )
       .filter(item => item.section !== ALL_SECTIONS.SEARCH);
-  }, [intl, account, LoggedInUser]);
+  }, [account, menuItems]);
 
   const filteredEntityOptions = React.useMemo(() => {
     if (queryFilter.values.workspace) {

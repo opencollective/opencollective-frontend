@@ -165,8 +165,8 @@ describe('edit collective', () => {
     cy.get('input[name="settings.VAT.number"]').type('EU123456789');
     cy.contains('button', 'Save').click();
     cy.contains('[data-cy="toast-notification"]', 'Account updated');
-    cy.visit(`/dashboard/${collectiveSlug}/tiers`);
-    cy.getByDataCy('contribute-card-tier').first().find('button').click();
+    cy.getByDataCy('menu-item-tiers').click();
+    cy.getByDataCy('contribute-card-tier', { timeout: 10000 }).first().find('button').click();
     cy.getByDataCy('select-type').click();
     cy.contains('[data-cy=select-option]', 'Product').click();
     cy.contains('[data-cy="edit-tier-modal-form"]:first', 'Value-added tax (VAT): 21%');

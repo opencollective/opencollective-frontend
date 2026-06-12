@@ -4,9 +4,9 @@ import type { LucideIcon } from 'lucide-react';
 import { ArrowRight, Award, Building, HandCoins, MailOpen, Receipt } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { hasAccountMoneyManagement } from '../../../../lib/collective';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { gql } from '@/lib/graphql/helpers';
+import useAccountTodo from '@/lib/hooks/useAccountTodo';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { Badge } from '@/components/ui/Badge';
@@ -287,15 +287,6 @@ export const HostTodoList = () => {
   );
 };
 
-// Query for self-hosted organization specific todos (READY_TO_PAY, etc.)
-const moneyManagingOrgTodoQuery = gql`
-  query MoneyManagingOrgTodo($slug: String!) {
-    toPayExpenses: expenses(account: { slug: $slug }, status: [READY_TO_PAY], includeChildrenExpenses: true) {
-      totalCount
-    }
-  }
-`;
-
 type AccountTodoItem = {
   id: string;
   show: boolean;
@@ -307,24 +298,20 @@ type AccountTodoItem = {
 export const AccountTodoList = () => {
   const { account } = React.useContext(DashboardContext);
 
-  const isOrgWithMoneyManagment = account?.type === 'ORGANIZATION' && hasAccountMoneyManagement(account);
+  const {
+    counts: {
+      toPayExpenses: toPayExpenseCount,
+      pendingExpenses: pendingExpenseCount,
+      pendingGrants: pendingGrantCount,
+      pausedResumableIncomingContributions: pausedIncomingContributionsCount,
+      pausedOutgoingContributions,
+    },
+    canStartResumeContributionsProcess,
+    isOrgWithMoneyManagment,
+  } = useAccountTodo(account);
 
-  // Additional query for orgs with money management
-  const { data } = useQuery(moneyManagingOrgTodoQuery, {
-    variables: { slug: account?.slug },
-    skip: !isOrgWithMoneyManagment,
-  });
-
-  const pendingExpenseCount = account?.pendingExpenses?.totalCount || 0;
-  const pendingGrantCount = account?.pendingGrants?.totalCount || 0;
-  const pausedIncomingContributionsCount = account?.pausedResumableIncomingContributions?.totalCount || 0;
-  const pausedOutgoingContributions = account?.pausedOutgoingContributions?.totalCount || 0;
-  const canStartResumeContributionsProcess = account?.canStartResumeContributionsProcess;
   const canActOnPausedIncomingContributions =
     pausedIncomingContributionsCount > 0 && canStartResumeContributionsProcess;
-
-  // Expenses to pay, for orgs with money management
-  const toPayExpenseCount = data?.toPayExpenses?.totalCount || 0;
 
   const expensesHref = getDashboardRoute(account, ALL_SECTIONS.PAYMENT_REQUESTS);
 

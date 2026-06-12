@@ -2,8 +2,8 @@ import { graphql } from '@apollo/client/react/hoc';
 
 import { gql } from './helpers';
 
-const loggedInUserMembershipAccountFieldsFragment = gql`
-  fragment LoggedInUserMembershipAccountFields on Account {
+const workspaceSubFieldsFragment = gql`
+  fragment WorkspaceSubFields on Account {
     id
     legacyId
     slug
@@ -11,59 +11,60 @@ const loggedInUserMembershipAccountFieldsFragment = gql`
     name
     imageUrl
     currency
+    supportedExpenseTypes
+    isHost
     isIncognito
     isPrivate
-    isHost
     isArchived
     isActive
-    categories
     settings
-    features {
-      id
-      PUBLIC_PROFILE
-    }
+    categories
+    createdAt
+    canHaveChangelogUpdates
     policies {
       id
+      publicId
       REQUIRE_2FA_FOR_ADMINS
+      USE_VENDOR_POLICY
     }
-    location {
+    features {
       id
-      address
-      country
-      structured
-    }
-    childrenAccounts(limit: 100) {
-      nodes {
-        id
-        legacyId
-        slug
-        type
-        name
-        isActive
-        isArchived
-        imageUrl
-        ... on AccountWithHost {
-          host {
-            id
-            slug
-          }
-        }
-      }
+      USE_PAYMENT_METHODS
+      EMIT_GIFT_CARDS
+      RECEIVE_GRANTS
+      RECEIVE_FINANCIAL_CONTRIBUTIONS
+      RECEIVE_HOST_APPLICATIONS
+      UPDATES
+      COLLECTIVE_GOALS
+      PUBLIC_PROFILE
+      VIRTUAL_CARDS
+      ACCOUNTING_CATEGORIZATION_RULES
     }
     ... on AccountWithParent {
       parent {
         id
         legacyId
+        slug
         policies {
           id
           REQUIRE_2FA_FOR_ADMINS
         }
       }
     }
+
     ... on AccountWithHost {
+      isApproved
       host {
         id
         slug
+      }
+    }
+
+    ... on AccountWithPlatformSubscription {
+      platformSubscription {
+        plan {
+          title
+        }
       }
     }
     ... on Organization {
@@ -72,6 +73,14 @@ const loggedInUserMembershipAccountFieldsFragment = gql`
       host {
         id
         slug
+        requiredLegalDocuments
+      }
+      features {
+        id
+        OFF_PLATFORM_TRANSACTIONS
+        TAX_FORMS
+        AGREEMENTS
+        KYC
       }
     }
     ... on Event {
@@ -80,10 +89,22 @@ const loggedInUserMembershipAccountFieldsFragment = gql`
   }
 `;
 
+const loggedInUserWorkspaceFieldsFragment = gql`
+  fragment LoggedInUserWorkspaceFields on Account {
+    id
+    ...WorkspaceSubFields
+    childrenAccounts {
+      nodes {
+        ...WorkspaceSubFields
+      }
+    }
+  }
+  ${workspaceSubFieldsFragment}
+`;
+
 /**
  * GraphQL v2 query to fetch the currently logged-in user (Individual account).
- * This replaces the v1 `loggedInUserQuery` that used the deprecated `LoggedInUser` root field,
- * fetching the equivalent data (profile + memberships) from the v2 API.
+ * This replaces the v1 `loggedInUserQuery` that used the deprecated `LoggedInUser` root field.
  */
 export const loggedInUserQuery = gql`
   query LoggedInUser {
@@ -111,18 +132,29 @@ export const loggedInUserQuery = gql`
         country
         structured
       }
+      ...WorkspaceSubFields
+      workspaces: memberOf(role: [ADMIN, ACCOUNTANT, COMMUNITY_MANAGER], limit: 1000) {
+        nodes {
+          id
+          role
+          account {
+            ...LoggedInUserWorkspaceFields
+          }
+        }
+      }
       memberOf(limit: 1000) {
         nodes {
           id
           role
           account {
-            ...LoggedInUserMembershipAccountFields
+            id
+            slug
           }
         }
       }
     }
   }
-  ${loggedInUserMembershipAccountFieldsFragment}
+  ${loggedInUserWorkspaceFieldsFragment}
 `;
 
 const collectiveNavbarFieldsFragment = gql`
