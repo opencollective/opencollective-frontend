@@ -103,6 +103,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     refetch: refetchMetadata,
   } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
+    fetchPolicy: 'cache-and-network',
   });
 
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
@@ -137,6 +138,8 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       fetchGrantHistory: false,
       ...queryFilter.variables,
     },
+    // Revalidate on mount so newly submitted expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
 
   const pageRoute = `/dashboard/${accountSlug}/expenses`;
@@ -194,7 +197,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         ) : (
           <React.Fragment>
             <ExpensesList
-              isLoading={loading || loadingMetaData}
+              isLoading={(loading && !data) || (loadingMetaData && !metadata)}
               collective={metadata?.account}
               host={metadata?.account?.host}
               expenses={data?.expenses?.nodes}
