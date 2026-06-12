@@ -27,6 +27,7 @@ import {
   TransactionsImportRowAction,
 } from '@/lib/graphql/types/v2/graphql';
 
+import { AccountNameWithLegalName } from '@/components/AccountNameWithLegalName';
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 import Image from '@/components/Image';
 import MessageBox from '@/components/MessageBox';
@@ -675,9 +676,11 @@ export const MatchDebitDialog = ({
                       value={
                         <LinkCollective
                           collective={selectedContribution.fromAccount}
-                          className="flex items-center gap-2"
+                          className="flex min-w-0 items-center gap-2"
                           openInNewTab
-                        />
+                        >
+                          <AccountNameWithLegalName account={selectedContribution.fromAccount} />
+                        </LinkCollective>
                       }
                       itemClassName="truncate max-w-full"
                       labelClassName="basis-1/3 min-w-auto max-w-auto"
