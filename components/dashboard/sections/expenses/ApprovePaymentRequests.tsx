@@ -69,8 +69,13 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
  */
-const onExpenseUpdate = ({ updatedExpense, cache, variables }) => {
+const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchList }) => {
   if (variables.status && updatedExpense.status !== variables.status) {
+    // Actions that go through the confirmation modal (e.g. unapprove) don't provide a cache; refetch instead
+    if (!cache) {
+      refetchList?.();
+      return;
+    }
     cache.updateQuery({ query: hostDashboardExpensesQuery, variables }, data => {
       return {
         ...data,
@@ -183,7 +188,12 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
             expenses={paginatedExpenses.nodes}
             view="admin"
             onProcess={(expense, cache) => {
-              onExpenseUpdate({ updatedExpense: expense, cache, variables });
+              onExpenseUpdate({
+                updatedExpense: expense,
+                cache,
+                variables,
+                refetchList: () => void expenses.refetch(),
+              });
             }}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
