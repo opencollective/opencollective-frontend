@@ -57,7 +57,7 @@ describe('white-label signin', () => {
         .then(() => {
           return cy.enableTwoFactorAuth({
             userEmail: user.email,
-            userSlug: user.collective.slug,
+            userSlug: user.slug,
             secret: secret,
           });
         });
