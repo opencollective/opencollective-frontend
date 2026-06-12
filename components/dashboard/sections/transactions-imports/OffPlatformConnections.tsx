@@ -68,13 +68,29 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   const isUpgradeRequired = requiresUpgrade(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
   const queryFilter = useQueryFilter({ schema, filters: {} });
   const [importsWithSyncRequest, setImportsWithSyncRequest] = React.useState(new Set());
-  const [selectedImport, setSelectedImport] = React.useState(null);
+  const [selectedImportId, setSelectedImportId] = React.useState(null);
   const [showNewConnectionDialog, setShowNewConnectionDialog] = React.useState(false);
-  const { data, loading, refetch, error } = useQuery(offPlatformConnectionsQuery, {
+  const { data, loading, refetch, error, startPolling, stopPolling } = useQuery(offPlatformConnectionsQuery, {
     variables: { accountSlug, ...queryFilter.variables },
-    pollInterval: importsWithSyncRequest.size ? 5_000 : 0,
     skip: isUpgradeRequired,
   });
+
+  // Derive from query data so the modal reflects updates (e.g. `lastSyncAt`) while polling
+  const selectedImport = React.useMemo(
+    () =>
+      selectedImportId ? data?.host?.transactionsImports?.nodes?.find(node => node.id === selectedImportId) : null,
+    [data, selectedImportId],
+  );
+
+  // Poll while a sync was requested or is still running server-side, so `lastSyncAt`/`isSyncing` stay up to date
+  const hasSyncingImports = Boolean(data?.host?.transactionsImports?.nodes?.some(node => node.isSyncing));
+  const shouldPoll = importsWithSyncRequest.size > 0 || hasSyncingImports;
+  React.useEffect(() => {
+    if (shouldPoll) {
+      startPolling(5_000);
+      return () => stopPolling();
+    }
+  }, [shouldPoll, startPolling, stopPolling]);
   const onPlaidConnectSuccess = React.useCallback(
     async ({ transactionsImport }) => {
       refetch();
@@ -104,7 +120,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
     [intl, toast],
   );
   const onPlaidDialogOpen = React.useCallback(() => {
-    setSelectedImport(null);
+    setSelectedImportId(null);
     setShowNewConnectionDialog(false);
   }, []);
 
@@ -214,7 +230,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="min-w-[180px]" align="end">
-                        <DropdownMenuItem onClick={() => setSelectedImport(row.original)}>
+                        <DropdownMenuItem onClick={() => setSelectedImportId(row.original.id)}>
                           <Settings size={16} />
                           <FormattedMessage defaultMessage="Settings" id="Settings" />
                         </DropdownMenuItem>
@@ -240,7 +256,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
         <TransactionsImportSettingsModal
           hostId={data.host.id}
           transactionsImport={selectedImport}
-          onOpenChange={() => setSelectedImport(null)}
+          onOpenChange={() => setSelectedImportId(null)}
           plaidStatus={plaidConnectDialog.status}
           showPlaidDialog={plaidConnectDialog.show}
           isOpen={true}
@@ -258,14 +274,14 @@ export const OffPlatformConnections = ({ accountSlug }) => {
             });
           }}
           onDelete={() => {
-            setSelectedImport(null);
+            setSelectedImportId(null);
             toast({
               variant: 'success',
               title: intl.formatMessage({ defaultMessage: 'Connection deleted', id: 'BOy+bE' }),
             });
           }}
           onArchived={() => {
-            setSelectedImport(null);
+            setSelectedImportId(null);
             toast({
               variant: 'success',
               title: intl.formatMessage({ defaultMessage: 'Connection archived', id: 'jZM4f3' }),
