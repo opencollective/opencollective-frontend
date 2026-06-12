@@ -66,6 +66,9 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const collective = row.original;
       const children = mapValues(groupBy(collective.childrenAccounts?.nodes, 'type'), 'length');
       const isChild = collective.parent;
+      const admins = collective.members?.nodes || [];
+      const invitedAdmins = collective.memberInvitations || [];
+
       const secondLine = isChild ? (
         <FormattedMessage
           defaultMessage="{childAccountType} by {parentAccount}"
@@ -91,6 +94,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
             {collective.isFrozen && (
               <Badge type="info" size="xs" className="mr-2">
                 <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+              </Badge>
+            )}
+            {admins.length === 0 && invitedAdmins.length > 0 && (
+              <Badge size="xs" className="mr-2 whitespace-nowrap">
+                <FormattedMessage defaultMessage="Invited" id="NmK6zP" />
               </Badge>
             )}
             <div className="flex flex-col items-start">

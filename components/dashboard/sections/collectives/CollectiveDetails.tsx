@@ -681,6 +681,20 @@ const CollectiveDetails = ({
                       </LinkCollective>
                     </div>
                   ))}
+                  {collective.memberInvitations?.map(invitation => (
+                    <div className="flex items-center gap-1.5 whitespace-nowrap" key={invitation.id}>
+                      <LinkCollective
+                        collective={invitation.memberAccount}
+                        className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                        withHoverCard
+                      >
+                        <Avatar collective={invitation.memberAccount} radius={24} /> {invitation.memberAccount.name}
+                      </LinkCollective>
+                      <Badge size="xs">
+                        <FormattedMessage defaultMessage="Invited" id="Invited" />
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
               }
             />
