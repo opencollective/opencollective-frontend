@@ -1,12 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
+
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import { H4 } from '../Text';
-import { withUser } from '../UserProvider';
 
 import { NewPlatformTipContainer } from './NewPlatformTipContainer';
 import { PlatformTipContainer } from './PlatformTipContainer';
@@ -16,110 +16,92 @@ import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
 
-class ContributionFlowStepContainer extends React.Component {
-  static propTypes = {
-    intl: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    collective: PropTypes.object,
-    contributorProfiles: PropTypes.arrayOf(PropTypes.object),
-    tier: PropTypes.object,
-    onChange: PropTypes.func,
-    showPlatformTip: PropTypes.bool,
-    isOscTipExperiment: PropTypes.bool,
-    onNewCardFormReady: PropTypes.func,
-    onSignInClick: PropTypes.func,
-    isEmbed: PropTypes.bool,
-    disabledPaymentMethodTypes: PropTypes.array,
-    isSubmitting: PropTypes.bool,
-    hideCreditCardPostalCode: PropTypes.bool,
-    taxes: PropTypes.array,
-    step: PropTypes.shape({
-      name: PropTypes.string,
-    }),
-    mainState: PropTypes.shape({
-      stepDetails: PropTypes.object,
-      stepProfile: PropTypes.shape({
-        contributorRejectedCategories: PropTypes.array,
-      }),
-      stepSummary: PropTypes.object,
-      stepPayment: PropTypes.object,
-    }),
-  };
+const headerMessages = defineMessages({
+  details: { id: 'NewContributionFlow.ContributionDetailsTitle', defaultMessage: 'Contribution details' },
+  profile: { id: 'contribute.step.contributeAs', defaultMessage: 'Contribute as' },
+  'profile.guest': { id: 'NewContributionFlow.step.contributeAsGuest', defaultMessage: 'Contribute as a guest' },
+  payment: { id: 'NewContributionFlow.ChoosePaymentMethod', defaultMessage: 'Choose payment method' },
+  summary: { id: 'Summary', defaultMessage: 'Summary' },
+  blockedContributor: {
+    id: 'NewContributionFlow.BlockedContributor.Header',
+    defaultMessage: 'Unable to contribute',
+  },
+});
 
-  constructor(props) {
-    super(props);
-    this.headerMessages = defineMessages({
-      details: { id: 'NewContributionFlow.ContributionDetailsTitle', defaultMessage: 'Contribution details' },
-      profile: { id: 'contribute.step.contributeAs', defaultMessage: 'Contribute as' },
-      'profile.guest': { id: 'NewContributionFlow.step.contributeAsGuest', defaultMessage: 'Contribute as a guest' },
-      payment: { id: 'NewContributionFlow.ChoosePaymentMethod', defaultMessage: 'Choose payment method' },
-      summary: { id: 'Summary', defaultMessage: 'Summary' },
-      blockedContributor: {
-        id: 'NewContributionFlow.BlockedContributor.Header',
-        defaultMessage: 'Unable to contribute',
-      },
-    });
-  }
+const ContributionFlowStepContainer = ({
+  collective,
+  contributorProfiles,
+  tier,
+  onChange,
+  showPlatformTip,
+  isOscTipExperiment,
+  onNewCardFormReady,
+  onSignInClick,
+  isEmbed,
+  disabledPaymentMethodTypes,
+  isSubmitting,
+  hideCreditCardPostalCode,
+  taxes,
+  step,
+  mainState,
+}) => {
+  const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
+  const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
 
-  renderHeader = (step, LoggedInUser) => {
-    const { intl } = this.props;
-    if (step === 'profile' && !LoggedInUser) {
-      return intl.formatMessage(this.headerMessages[`profile.guest`]);
-    } else if (step === 'payment' && this.props.mainState.stepProfile.contributorRejectedCategories) {
-      return intl.formatMessage(this.headerMessages.blockedContributor);
-    } else if (this.headerMessages[step]) {
-      return intl.formatMessage(this.headerMessages[step]);
+  const renderHeader = stepName => {
+    if (stepName === 'profile' && !LoggedInUser) {
+      return intl.formatMessage(headerMessages['profile.guest']);
+    } else if (stepName === 'payment' && stepProfile.contributorRejectedCategories) {
+      return intl.formatMessage(headerMessages.blockedContributor);
+    } else if (headerMessages[stepName]) {
+      return intl.formatMessage(headerMessages[stepName]);
     } else {
-      return step;
+      return stepName;
     }
   };
 
-  renderStep = step => {
-    const { collective, mainState, tier, isEmbed, showPlatformTip, isOscTipExperiment } = this.props;
-    const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
-    switch (step) {
+  const renderStep = stepName => {
+    switch (stepName) {
       case 'details':
         return (
           <StepDetails
             collective={collective}
             tier={tier}
-            onChange={this.props.onChange}
+            onChange={onChange}
             stepDetails={stepDetails}
-            stepPayment={stepPayment}
             showPlatformTip={showPlatformTip}
             isOscTipExperiment={isOscTipExperiment}
           />
         );
-
-      case 'profile': {
+      case 'profile':
         return (
           <StepProfile
-            profiles={this.props.contributorProfiles}
+            profiles={contributorProfiles}
             collective={collective}
             tier={tier}
             stepDetails={stepDetails}
-            onChange={this.props.onChange}
+            onChange={onChange}
             data={stepProfile}
-            onSignInClick={this.props.onSignInClick}
+            onSignInClick={onSignInClick}
             isEmbed={isEmbed}
           />
         );
-      }
       case 'payment':
         return (
           <StepPayment
-            collective={this.props.collective}
-            stepDetails={this.props.mainState.stepDetails}
-            stepProfile={this.props.mainState.stepProfile}
-            stepSummary={this.props.mainState.stepSummary}
-            onChange={this.props.onChange}
+            collective={collective}
+            stepDetails={stepDetails}
+            stepProfile={stepProfile}
+            stepSummary={stepSummary}
+            onChange={onChange}
             stepPayment={stepPayment}
-            onNewCardFormReady={this.props.onNewCardFormReady}
-            isSubmitting={this.props.isSubmitting}
+            onNewCardFormReady={onNewCardFormReady}
+            isSubmitting={isSubmitting}
             isEmbed={isEmbed}
-            disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
+            disabledPaymentMethodTypes={disabledPaymentMethodTypes}
             hideCreditCardPostalCode={
-              this.props.hideCreditCardPostalCode || Boolean(collective.settings?.hideCreditCardPostalCode)
+              hideCreditCardPostalCode || Boolean(collective.settings?.hideCreditCardPostalCode)
             }
           />
         );
@@ -132,8 +114,8 @@ class ContributionFlowStepContainer extends React.Component {
             stepDetails={stepDetails}
             stepPayment={stepPayment}
             data={stepSummary}
-            onChange={this.props.onChange}
-            taxes={this.props.taxes}
+            onChange={onChange}
+            taxes={taxes}
             applyTaxes
           />
         );
@@ -142,80 +124,72 @@ class ContributionFlowStepContainer extends React.Component {
     }
   };
 
-  render() {
-    const { LoggedInUser, step, isEmbed, showPlatformTip } = this.props;
+  const currency = tier?.amount?.currency || collective.currency;
+  const platformTipBaseAmount = (stepDetails.amount || 0) * (stepDetails.quantity || 1);
 
-    const { tier, collective, mainState } = this.props;
-    const { stepDetails } = mainState;
-
-    const currency = tier?.amount.currency || collective.currency;
-    // Review needed: preserve the old platform tip behavior, where percentages were based on amount * quantity.
-    const platformTipBaseAmount = (stepDetails.amount || 0) * (stepDetails.quantity || 1);
-
-    return (
-      <Box>
-        <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
-          <Flex flexDirection="column" alignItems="center">
-            {step.name !== 'checkout' && (
-              <Flex width="100%" mb={3} alignItems="center">
-                <Flex alignItems="center">
-                  <H4 fontSize={['20px', '24px']} fontWeight={500} py={2}>
-                    {this.renderHeader(step.name, LoggedInUser)}
-                  </H4>
-                </Flex>
-                <Flex flexGrow={1} alignItems="center" justifyContent="center">
-                  <StyledHr width="100%" ml={3} borderColor="black.300" />
-                </Flex>
-                {!isEmbed && (
-                  <Box ml={2}>
-                    <ShareButton />
-                  </Box>
-                )}
+  return (
+    <Box>
+      <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
+        <Flex flexDirection="column" alignItems="center">
+          {step.name !== 'checkout' && (
+            <Flex width="100%" mb={3} alignItems="center">
+              <Flex alignItems="center">
+                <H4 fontSize={['20px', '24px']} fontWeight={500} py={2}>
+                  {renderHeader(step.name)}
+                </H4>
               </Flex>
-            )}
-            {this.renderStep(step.name)}
-          </Flex>
-        </StyledCard>
-        {showPlatformTip &&
-          (stepDetails.isNewPlatformTip ? (
-            <NewPlatformTipContainer
-              step={step.name}
-              collectiveName={collective.name}
-              amount={platformTipBaseAmount}
-              currency={currency}
-              selectedOption={stepDetails.platformTipOption}
-              value={stepDetails.platformTip}
-              onChange={(option, value) => {
-                this.props.onChange({
-                  stepDetails: {
-                    ...stepDetails,
-                    platformTip: value,
-                    platformTipOption: option,
-                  },
-                });
-              }}
-            />
-          ) : (
-            <PlatformTipContainer
-              step={step.name}
-              amount={platformTipBaseAmount}
-              currency={currency}
-              selectedOption={stepDetails.platformTipOption}
-              value={stepDetails.platformTip}
-              onChange={(option, value) => {
-                this.props.onChange({
-                  stepDetails: {
-                    ...stepDetails,
-                    platformTip: value,
-                    platformTipOption: option,
-                  },
-                });
-              }}
-            />
-          ))}
-      </Box>
-    );
-  }
-}
+              <Flex flexGrow={1} alignItems="center" justifyContent="center">
+                <StyledHr width="100%" ml={3} borderColor="black.300" />
+              </Flex>
+              {!isEmbed && (
+                <Box ml={2}>
+                  <ShareButton />
+                </Box>
+              )}
+            </Flex>
+          )}
+          {renderStep(step.name)}
+        </Flex>
+      </StyledCard>
+      {showPlatformTip &&
+        (stepDetails.isNewPlatformTip ? (
+          <NewPlatformTipContainer
+            step={step.name}
+            collectiveName={collective.name}
+            amount={platformTipBaseAmount}
+            currency={currency}
+            selectedOption={stepDetails.platformTipOption}
+            value={stepDetails.platformTip}
+            onChange={(option, value) => {
+              onChange({
+                stepDetails: {
+                  ...stepDetails,
+                  platformTip: value,
+                  platformTipOption: option,
+                },
+              });
+            }}
+          />
+        ) : (
+          <PlatformTipContainer
+            step={step.name}
+            amount={platformTipBaseAmount}
+            currency={currency}
+            selectedOption={stepDetails.platformTipOption}
+            value={stepDetails.platformTip}
+            onChange={(option, value) => {
+              onChange({
+                stepDetails: {
+                  ...stepDetails,
+                  platformTip: value,
+                  platformTipOption: option,
+                },
+              });
+            }}
+          />
+        ))}
+    </Box>
+  );
+};
 
-export default injectIntl(withUser(ContributionFlowStepContainer));
+export default ContributionFlowStepContainer;
