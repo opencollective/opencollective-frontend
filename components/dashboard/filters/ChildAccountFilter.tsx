@@ -3,7 +3,7 @@ import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import type { Account } from '../../../lib/graphql/types/v2/graphql';
+import type { WorkspaceSubFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import ComboSelectFilter from './ComboSelectFilter';
 import { AccountRenderer } from './HostedAccountFilter';
@@ -14,7 +14,10 @@ function ChildAccountFilter({
   meta,
   intl,
   ...props
-}: FilterComponentProps<z.infer<typeof schema>, { accountSlug: string; childrenAccounts?: Account[] }>) {
+}: FilterComponentProps<
+  z.infer<typeof schema>,
+  { accountSlug: string; childrenAccounts?: WorkspaceSubFieldsFragment[] }
+>) {
   const groupedOptions = React.useMemo(
     () => [
       {
