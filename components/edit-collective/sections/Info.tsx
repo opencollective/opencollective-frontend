@@ -60,6 +60,7 @@ const editAccountFragment = gql`
       PUBLIC_PROFILE
     }
     location {
+      id
       name
       address
       country

@@ -24,7 +24,7 @@ import { withUser } from './UserProvider';
  * <AuthenticatedPage>
  *   {(LoggedInUser) => (
  *     <div>
- *       Hello {LoggedInUser.collective.name}!
+ *       Hello {LoggedInUser.name}!
  *     </div>
  *   )}
  * </AuthenticatedPage>

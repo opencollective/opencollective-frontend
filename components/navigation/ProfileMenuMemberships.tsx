@@ -7,7 +7,6 @@ import { styled } from 'styled-components';
 import { CollectiveType } from '../../lib/constants/collectives';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
-import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import Avatar from '../Avatar';
 import Collapse from '../Collapse';
@@ -72,28 +71,24 @@ const CollectiveListItem = styled.div`
 interface MembershipLineProps {
   user?: LoggedInUser;
   closeDrawer?(...args: unknown[]): unknown;
-  membership?: {
-    collective: GraphQLV1Collective;
-  };
+  membership?: LoggedInUser['memberOf'][number];
 }
 
 const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) => {
-  const canSeeDashboard = user.canSeeDashboard(membership.collective);
+  const canSeeDashboard = user.canSeeDashboard(membership.account);
 
   // Not supposed to happen since already filtered in `filterMemberships`
-  if (!canSeeDashboard && membership.collective.isPrivate) {
+  if (!canSeeDashboard && membership.account.isPrivate) {
     return null;
   }
 
   return (
     <CollectiveListItem className="group h-9">
       <MenuLink
-        href={
-          membership.collective.isPrivate ? getDashboardRoute(membership.collective) : `/${membership.collective.slug}`
-        }
+        href={membership.account.isPrivate ? getDashboardRoute(membership.account) : `/${membership.account.slug}`}
         onClick={closeDrawer}
       >
-        <Avatar collective={membership.collective} radius={16} />
+        <Avatar collective={membership.account} radius={16} />
         <P
           fontSize="inherit"
           fontWeight="inherit"
@@ -102,7 +97,7 @@ const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) 
           letterSpacing={0}
           truncateOverflow
         >
-          {membership.collective.name}
+          {membership.account.name}
         </P>
       </MenuLink>
 
@@ -112,7 +107,7 @@ const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) 
             <TooltipTrigger>
               <Link
                 className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all group-hover:opacity-100 hover:border-white hover:bg-slate-900 hover:text-white"
-                href={getDashboardRoute(membership.collective)}
+                href={getDashboardRoute(membership.account)}
                 onClick={closeDrawer}
               >
                 <LayoutDashboard size="14px" strokeWidth={1.5} />
@@ -133,30 +128,30 @@ const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
     return [];
   } else {
     return memberships.sort((a, b) => {
-      return a.collective.slug.localeCompare(b.collective.slug);
+      return a.account.slug.localeCompare(b.account.slug);
     });
   }
 };
 
 const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
-  const archivedMemberships = memberships.filter(m => Boolean(m.collective.isArchived));
-  return uniqBy(archivedMemberships, m => m.collective.id);
+  const archivedMemberships = memberships.filter(m => Boolean(m.account.isArchived));
+  return uniqBy(archivedMemberships, m => m.account.id);
 };
 
 const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   const filteredMemberships = memberships.filter(m => {
-    if (!['ADMIN', 'ACCOUNTANT', 'HOST', 'COMMUNITY_MANAGER'].includes(m.role) || m.collective.isArchived) {
+    if (!['ADMIN', 'ACCOUNTANT', 'HOST', 'COMMUNITY_MANAGER'].includes(m.role) || m.account.isArchived) {
       return false;
-    } else if (['EVENT', 'PROJECT'].includes(m.collective.type)) {
+    } else if (['EVENT', 'PROJECT'].includes(m.account.type)) {
       return false;
-    } else if (!['ADMIN', 'ACCOUNTANT'].includes(m.role) && m.collective.isPrivate) {
+    } else if (!['ADMIN', 'ACCOUNTANT'].includes(m.role) && m.account.isPrivate) {
       return false;
     } else {
-      return Boolean(m.collective);
+      return Boolean(m.account);
     }
   });
 
-  return uniqBy(filteredMemberships, m => m.collective.id);
+  return uniqBy(filteredMemberships, m => m.account.id);
 };
 
 interface MembershipsListProps {
@@ -257,7 +252,7 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
   const intl = useIntl();
   const memberships = filterMemberships(user.memberOf);
   const archivedMemberships = filterArchivedMemberships(user.memberOf);
-  const groupedMemberships = groupBy(memberships, m => m.collective.type);
+  const groupedMemberships = groupBy(memberships, m => m.account.type);
   groupedMemberships.ARCHIVED = archivedMemberships;
   const shouldDisplaySection = section => {
     return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);

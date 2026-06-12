@@ -1,52 +1,107 @@
-import { get, uniqBy } from 'lodash-es';
+import { uniqBy } from 'lodash-es';
 
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
 import {
-  type Account,
-  type AccountWithParent,
   type CommentFieldsFragment,
+  type LoggedInUserMembershipAccountFieldsFragment,
   MemberRole,
   type Update,
 } from './graphql/types/v2/graphql';
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
 
+/** Common type for collective/account parameters that works with both v1 and v2 data */
+type CollectiveParam = {
+  slug: string;
+  type?: string;
+  id?: string | number;
+  parent?: { slug?: string; id?: string | number; policies?: Record<string, unknown> } | null;
+  parentCollective?: { slug?: string; id?: string | number; policies?: Record<string, unknown> } | null;
+  host?: { slug?: string; id?: string } | null;
+  policies?: Record<string, unknown>;
+};
+
+/** An account the logged-in user is a member of, as returned by the v2 loggedInUserQuery */
+type LoggedInUserMembershipAccount = LoggedInUserMembershipAccountFieldsFragment;
+
 /**
  * Represent the current logged in user. Includes methods to check permissions.
+ * Accepts the v2 `loggedInAccount` (Individual) response directly.
  */
 class LoggedInUser {
-  private roles: Record<number, ReverseCompatibleMemberRole[]>;
-  public CollectiveId: number;
-  public collective: GraphQLV1Collective;
-  public isRoot: boolean;
-  public requiresProfileCompletion: boolean;
-  public id: number;
-  public image: string;
-  public hasTwoFactorAuth: boolean;
+  private roles: Record<string, ReverseCompatibleMemberRole[]>;
+
+  // v2 Individual fields (set via Object.assign in constructor)
+  public id: string;
+  public legacyId: number;
+  public slug: string;
+  public name: string;
+  public legalName: string;
+  public type: string;
+  public imageUrl: string;
   public email: string;
-  public memberOf: Array<{ id: number; role: ReverseCompatibleMemberRole; collective: GraphQLV1Collective }>;
+  public isLimited: boolean;
+  public isRoot: boolean;
+  public hasSeenLatestChangelogEntry: boolean;
+  public hasTwoFactorAuth: boolean;
+  public hasPassword: boolean;
+  public requiresProfileCompletion: boolean;
+  public settings: Record<string, any>;
+  public currency: string;
+  public categories: string[];
+  public location: { id?: string; address?: string; country?: string; structured?: any };
+
+  // Memberships with the v2 shape ({ account } instead of v1's { collective })
+  public memberOf: Array<{
+    id: string;
+    role: ReverseCompatibleMemberRole;
+    account: LoggedInUserMembershipAccount;
+  }>;
 
   constructor(data) {
-    Object.assign(this, data);
-    if (this.memberOf) {
-      // Build a map of roles like { [collectiveSlug]: [ADMIN, BACKER...] }
-      this.roles = this.memberOf.reduce((roles, member) => {
-        if (member.collective) {
-          roles[member.collective.slug] = roles[member.collective.slug] || [];
-          roles[member.collective.slug].push(member.role);
-        }
-
-        return roles;
-      }, {});
+    // Flatten the memberOf collection (v2 returns { nodes })
+    if (data?.memberOf?.nodes) {
+      data = { ...data, memberOf: data.memberOf.nodes };
     }
+    Object.assign(this, data);
+    // Build a map of roles like { [accountSlug]: [ADMIN, BACKER...] }
+    this.roles = (this.memberOf ?? []).reduce(
+      (roles, member) => {
+        const account = member.account;
+        if (account?.slug) {
+          roles[account.slug] = roles[account.slug] || [];
+          roles[account.slug].push(member.role);
+        }
+        return roles;
+      },
+      {} as Record<string, ReverseCompatibleMemberRole[]>,
+    );
+  }
+
+  /**
+   * Constructs a v1-compatible collective object from this user's fields.
+   * Only needed for components deeply entangled with v1 mutations/queries.
+   */
+  toV1Collective(): GraphQLV1Collective {
+    return {
+      id: this.legacyId,
+      slug: this.slug,
+      name: this.name,
+      legalName: this.legalName,
+      imageUrl: this.imageUrl,
+      type: this.type as GraphQLV1Collective['type'],
+      settings: this.settings,
+      currency: this.currency,
+      policies: undefined,
+    };
   }
 
   /**
    * hasRole if LoggedInUser has one of the roles for the given collective
    */
-  hasRole(roles: ReverseCompatibleMemberRole | ReverseCompatibleMemberRole[], collective: { slug: string }) {
+  hasRole(roles: ReverseCompatibleMemberRole | ReverseCompatibleMemberRole[], collective: { slug?: string }) {
     if (!collective || !this.roles[collective.slug]) {
       return false;
     } else if (typeof roles === 'string') {
@@ -56,17 +111,18 @@ class LoggedInUser {
     }
   }
 
+  /** True if the user has any role (e.g. BACKER, FOLLOWER) for the collective — used for expense submission when public submission is disabled. */
+  hasMemberOf(collective: { slug?: string } | null): boolean {
+    return Boolean(collective?.slug && this.roles[collective.slug]?.length > 0);
+  }
+
   /**
    * isAdminOfCollective if LoggedInUser is
    * - its own USER collective
    * - is admin of the collective
    * - is host of the collective
    */
-  isAdminOfCollective(
-    collective:
-      | Pick<GraphQLV1Collective, 'id' | 'slug' | 'type' | 'parentCollective'>
-      | (Pick<Account, 'slug' | 'type'> & { id?: Account['id']; parent?: Pick<AccountWithParent['parent'], 'slug'> }),
-  ) {
+  isAdminOfCollective(collective: CollectiveParam) {
     if (!collective) {
       return false;
     } else if (collective.type === CollectiveType.EVENT) {
@@ -75,8 +131,8 @@ class LoggedInUser {
       return this.canEditProject(collective);
     } else {
       return (
-        (collective['id'] && collective['id'] === this.CollectiveId) ||
-        collective.slug === get(this, 'collective.slug') ||
+        (collective['id'] && collective['id'] === this.legacyId) ||
+        collective.slug === this.slug ||
         this.hasRole(MemberRole.ADMIN, collective)
       );
     }
@@ -88,11 +144,7 @@ class LoggedInUser {
    * - is admin of the collective
    * - is host of the collective
    */
-  isAdminOfCollectiveOrHost(
-    collective: Parameters<typeof LoggedInUser.prototype.isAdminOfCollective>[0] &
-      Parameters<typeof LoggedInUser.prototype.hasRole>[1] &
-      Parameters<typeof LoggedInUser.prototype.isHostAdmin>[0],
-  ) {
+  isAdminOfCollectiveOrHost(collective: CollectiveParam) {
     if (!collective) {
       return false;
     } else if (this.isAdminOfCollective(collective)) {
@@ -105,7 +157,7 @@ class LoggedInUser {
   /**
    * Has access to admin panel if admin or accountant
    */
-  canSeeDashboard(collective: Parameters<typeof LoggedInUser.prototype.hasRole>[1]) {
+  canSeeDashboard(collective: CollectiveParam) {
     return this.hasRole([MemberRole.ADMIN, MemberRole.ACCOUNTANT], collective);
   }
 
@@ -130,13 +182,13 @@ class LoggedInUser {
   /**
    * Returns true if passed collective is the user collective
    */
-  isSelf(collective: Pick<GraphQLV1Collective, 'id' | 'slug'> | Pick<Account, 'slug'>) {
+  isSelf(collective: CollectiveParam) {
     if (!collective) {
       return false;
     } else if (typeof collective['id'] === 'number') {
-      return collective['id'] === this.CollectiveId;
+      return collective['id'] === this.legacyId;
     } else {
-      return collective.slug === this.collective.slug;
+      return collective.slug === this.slug;
     }
   }
 
@@ -145,11 +197,7 @@ class LoggedInUser {
    * - admin of the event
    * - admin of the parent collective
    */
-  canEditEvent(
-    event:
-      | Pick<GraphQLV1Collective, 'slug' | 'type' | 'parentCollective'>
-      | (Pick<Account & AccountWithParent, 'slug' | 'type'> & { parent?: Pick<AccountWithParent['parent'], 'slug'> }),
-  ) {
+  canEditEvent(event: CollectiveParam) {
     if (!event) {
       return false;
     } else if (event.type !== CollectiveType.EVENT) {
@@ -165,11 +213,7 @@ class LoggedInUser {
    * - admin of the project
    * - admin of the parent collective
    */
-  canEditProject(
-    project:
-      | Pick<GraphQLV1Collective, 'slug' | 'type' | 'parentCollective'>
-      | (Pick<Account & AccountWithParent, 'slug' | 'type'> & { parent?: Pick<AccountWithParent['parent'], 'slug'> }),
-  ) {
+  canEditProject(project: CollectiveParam) {
     if (!project) {
       return false;
     } else if (project.type !== CollectiveType.PROJECT) {
@@ -198,20 +242,16 @@ class LoggedInUser {
   /**
    * List all the hosts this user belongs to and is admin of
    */
-  hostsUserIsAdminOf(): GraphQLV1Collective[] {
-    const collectives = this.memberOf
-      .filter(m => m.collective.isHost)
-      .filter(m => this.hasRole(MemberRole.ADMIN, m.collective))
-      .map(m => m.collective);
+  hostsUserIsAdminOf(): LoggedInUserMembershipAccount[] {
+    const accounts = (this.memberOf ?? [])
+      .filter(m => m.account?.isHost)
+      .filter(m => this.hasRole(MemberRole.ADMIN, m.account))
+      .map(m => m.account);
 
-    return uniqBy(collectives, 'id');
+    return uniqBy(accounts, 'id');
   }
 
-  isHostAdmin(
-    collective: Parameters<typeof LoggedInUser.prototype.hasRole>[1] & {
-      host?: Parameters<typeof LoggedInUser.prototype.hasRole>[1];
-    },
-  ) {
+  isHostAdmin(collective: CollectiveParam) {
     if (!collective || !collective.host) {
       return false;
     } else {
@@ -234,7 +274,7 @@ class LoggedInUser {
   }
 
   hasPreviewFeatureEnabled(featureKey: PREVIEW_FEATURE_KEYS | `${PREVIEW_FEATURE_KEYS}`) {
-    const { earlyAccess = {} } = this.collective.settings;
+    const { earlyAccess = {} } = this.settings || {};
     const feature = previewFeatures.find(f => f.key === featureKey);
     if (!feature) {
       // eslint-disable-next-line no-console
@@ -265,7 +305,7 @@ class LoggedInUser {
   }
 
   getAvailablePreviewFeatures(): PreviewFeature[] {
-    const { earlyAccess = {} } = this.collective.settings;
+    const { earlyAccess = {} } = this.settings || {};
 
     /**
      * Include preview features when
@@ -276,7 +316,7 @@ class LoggedInUser {
     const availablePreviewFeatures = previewFeatures.filter(feature => {
       const userHaveSetting = typeof earlyAccess[feature.key] !== 'undefined';
       const hasClosedBetaAccess = feature.closedBetaAccessFor?.some(
-        slug => slug === this.collective.slug || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
+        slug => slug === this.slug || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
       );
       const enabledByDefault = feature.enabledByDefaultFor?.some(
         slug => slug === '*' || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
@@ -303,11 +343,11 @@ class LoggedInUser {
   }
 
   shouldDisplaySetupGuide(account: { legacyId: number } | { id: number }) {
-    if (!account || !this.collective) {
+    if (!account || !this.settings) {
       return false;
     }
 
-    return this.collective.settings?.showSetupGuide?.[`id${'legacyId' in account ? account.legacyId : account.id}`];
+    return this.settings?.showSetupGuide?.[`id${'legacyId' in account ? account.legacyId : account.id}`];
   }
 }
 
