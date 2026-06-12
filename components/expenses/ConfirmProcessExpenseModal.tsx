@@ -187,7 +187,7 @@ export type ConfirmProcessExpenseModalType =
 type ConfirmProcessExpenseModalProps = BaseModalProps & {
   type: ConfirmProcessExpenseModalType;
   expense: Pick<Expense, 'id' | 'legacyId'>;
-  onSuccess?: (action: ConfirmProcessExpenseModalType, updatedExpense?: Expense) => void;
+  onSuccess?: (action: ConfirmProcessExpenseModalType) => void;
 };
 
 export default function ConfirmProcessExpenseModal({
@@ -209,64 +209,49 @@ export default function ConfirmProcessExpenseModal({
 
   const onConfirm = React.useCallback(async () => {
     try {
-      let updatedExpense: Expense | undefined;
-
       switch (type) {
         case 'MARK_AS_INCOMPLETE': {
-          updatedExpense = await processExpense.markAsIncomplete({
-            message,
-          });
+          await processExpense.markAsIncomplete({ message });
           break;
         }
         case 'REQUEST_RE_APPROVAL': {
-          updatedExpense = await processExpense.requestReApproval({
-            message,
-          });
+          await processExpense.requestReApproval({ message });
           break;
         }
         case 'APPROVE': {
-          updatedExpense = await processExpense.approve({
-            message,
-          });
+          await processExpense.approve({ message });
           break;
         }
         case 'UNAPPROVE': {
-          updatedExpense = await processExpense.unapprove({
-            message,
-          });
+          await processExpense.unapprove({ message });
           break;
         }
         case 'REJECT': {
-          updatedExpense = await processExpense.reject({
-            message,
-          });
+          await processExpense.reject({ message });
           break;
         }
         case 'HOLD': {
-          updatedExpense = await processExpense.hold({
-            message,
-          });
+          await processExpense.hold({ message });
           break;
         }
         case 'RELEASE': {
-          updatedExpense = await processExpense.release({
-            message,
-          });
+          await processExpense.release({ message });
           break;
         }
         case 'MARK_AS_SPAM': {
-          updatedExpense = await processExpense.markAsSpam({
-            message,
-          });
+          await processExpense.markAsSpam({ message });
           break;
         }
       }
-
-      setOpen(false);
-      onSuccess?.(type, updatedExpense);
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
+      return;
     }
+
+    // Called outside the try/catch so errors thrown by consumers (e.g. refetch logic)
+    // don't surface as a misleading "processing failed" toast.
+    setOpen(false);
+    onSuccess?.(type);
   }, [type, message, intl, onSuccess, processExpense, setOpen]);
 
   const onCloseAutoFocus = (e: Event) => {

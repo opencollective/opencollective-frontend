@@ -146,7 +146,7 @@ const ProcessExpenseButtons = ({
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
   const [showApproveExpenseModal, setShowApproveExpenseModal] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
+  const onUpdate = () => onSuccess?.(selectedAction);
   const mutationOptions = { update: onUpdate };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
@@ -402,7 +402,7 @@ const ProcessExpenseButtons = ({
             }
           }}
           expense={expense}
-          onSuccess={(action, updatedExpense) => onSuccess?.(updatedExpense ?? expense, null, action)}
+          onSuccess={action => onSuccess?.(action)}
         />
       )}
       {showApproveExpenseModal && (

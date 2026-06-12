@@ -83,38 +83,16 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 };
 
 /**
- * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
+ * Refetch the list after a process action. We deliberately don't patch the Apollo cache manually:
+ * the status filter can contain meta statuses (e.g. READY_TO_PAY, ON_HOLD) that can't be reliably
+ * evaluated client-side against the expense's new status.
  */
-const onExpenseUpdate = ({
-  updatedExpense,
-  cache,
-  variables,
-  refetchMetaData,
-  refetchPipeline,
-  refetchList,
-  action,
-}) => {
+const onExpenseUpdate = ({ refetchMetaData, refetchPipeline, refetchList, action }) => {
   refetchMetaData(); // Refetch the metadata to update the view counts
   if (shouldRefetchExpensePipeline(action)) {
     refetchPipeline?.();
   }
-  if (variables.status && updatedExpense.status !== variables.status) {
-    // Actions that go through the confirmation modal (e.g. unapprove) don't provide a cache; refetch instead
-    if (!cache) {
-      refetchList?.();
-      return;
-    }
-    cache.updateQuery({ query: hostDashboardExpensesQuery, variables }, data => {
-      return {
-        ...data,
-        expenses: {
-          ...data.expenses,
-          totalCount: data.expenses.totalCount - 1,
-          nodes: data.expenses.nodes?.filter(expense => updatedExpense.id !== expense.id),
-        },
-      };
-    });
-  }
+  refetchList?.();
 };
 
 const ROUTE_PARAMS = ['slug', 'section'];
@@ -344,11 +322,8 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
             view="admin"
-            onProcess={(expense, cache, action) => {
+            onProcess={action => {
               onExpenseUpdate({
-                updatedExpense: expense,
-                cache,
-                variables,
                 refetchMetaData,
                 refetchPipeline,
                 refetchList: () => void expenses.refetch(),

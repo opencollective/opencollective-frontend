@@ -66,29 +66,6 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   kycStatus: expenseKYCStatusFilter.filter,
 };
 
-/**
- * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
- */
-const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchList }) => {
-  if (variables.status && updatedExpense.status !== variables.status) {
-    // Actions that go through the confirmation modal (e.g. unapprove) don't provide a cache; refetch instead
-    if (!cache) {
-      refetchList?.();
-      return;
-    }
-    cache.updateQuery({ query: hostDashboardExpensesQuery, variables }, data => {
-      return {
-        ...data,
-        expenses: {
-          ...data.expenses,
-          totalCount: data.expenses.totalCount - 1,
-          nodes: data.expenses.nodes?.filter(expense => updatedExpense.id !== expense.id),
-        },
-      };
-    });
-  }
-};
-
 const ROUTE_PARAMS = ['slug', 'section'];
 
 const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
@@ -187,14 +164,10 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
             view="admin"
-            onProcess={(expense, cache) => {
-              onExpenseUpdate({
-                updatedExpense: expense,
-                cache,
-                variables,
-                refetchList: () => void expenses.refetch(),
-              });
-            }}
+            // Always refetch after a process action; we don't patch the Apollo cache manually
+            // because status filter values can include meta statuses (e.g. READY_TO_PAY) that
+            // can't be reliably evaluated client-side.
+            onProcess={() => void expenses.refetch()}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
             setOpenExpenseLegacyId={(legacyId, attachmentUrl) => {
