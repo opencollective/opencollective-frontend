@@ -44,6 +44,7 @@ const ContributionFlowStepContainer = ({
   taxes,
   step,
   mainState,
+  stepSummaryRef,
 }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -108,6 +109,7 @@ const ContributionFlowStepContainer = ({
       case 'summary':
         return (
           <StepSummary
+            ref={stepSummaryRef}
             collective={collective}
             tier={tier}
             stepProfile={stepProfile}
