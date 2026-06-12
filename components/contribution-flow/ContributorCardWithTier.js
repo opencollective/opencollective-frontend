@@ -13,7 +13,6 @@ import StyledHr from '../StyledHr';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
-import { withUser } from '../UserProvider';
 
 const ContributorCardWithTier = ({ contribution, ...props }) => {
   const collective = contribution.toAccount;
@@ -133,4 +132,4 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
   );
 };
 
-export default withUser(ContributorCardWithTier);
+export default ContributorCardWithTier;
