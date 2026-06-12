@@ -147,7 +147,7 @@ const ContributorsGrid = ({
   const rowWidth = nbCols * COLLECTIVE_CARD_FULL_WIDTH + COLLECTIVE_CARD_MARGIN_X;
   const paddingLeft = computePaddingLeft(width, rowWidth, nbRows, maxWidthWhenNotFull);
   const hasScroll = rowWidth + paddingLeft > width;
-  const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
+  const loggedUserCollectiveId = get(LoggedInUser, 'legacyId');
   return (
     <FixedSizeGrid
       columnCount={nbCols}

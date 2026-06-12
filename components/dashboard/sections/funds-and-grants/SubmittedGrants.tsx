@@ -39,7 +39,7 @@ export function SubmittedGrants({ accountSlug }: DashboardSectionProps) {
     toVariables,
     filters,
   });
-  const createdByAccount = accountSlug === LoggedInUser?.collective.slug ? { slug: accountSlug } : null;
+  const createdByAccount = accountSlug === LoggedInUser?.slug ? { slug: accountSlug } : null;
   const fromAccount = !createdByAccount ? { slug: accountSlug } : null;
 
   const variables = {

@@ -13,7 +13,7 @@ describe('Personal Token', () => {
   });
 
   it('create and edit personal token', () => {
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/for-developers` });
 
     cy.log('Starts with an empty state');
     cy.contains('[data-cy="personal-tokens-list"]', "You don't have any token yet");
@@ -76,12 +76,12 @@ describe('Personal Token', () => {
   });
 
   it('create application with 2fa enabled', () => {
-    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.slug}/for-developers` });
 
     const secret = generateSecret({ length: 64 });
     cy.enableTwoFactorAuth({
       userEmail: user.email,
-      userSlug: user.collective.slug,
+      userSlug: user.slug,
       secret: secret,
     });
 
