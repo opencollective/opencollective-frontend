@@ -15,8 +15,6 @@ import Container from './Container';
 import { Box, Flex } from './Grid';
 import { HideGlobalScroll } from './HideGlobalScroll';
 import Link from './Link';
-import { withUser } from './UserProvider';
-
 const ListItem = styled.li`
   list-style: none;
   font-family: Inter;
@@ -114,4 +112,4 @@ const TopBarMobileMenu = ({ closeMenu }) => {
   );
 };
 
-export default injectIntl(withUser(TopBarMobileMenu));
+export default TopBarMobileMenu;

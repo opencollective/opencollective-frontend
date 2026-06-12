@@ -8,7 +8,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { cn } from '@/lib/utils';
 
@@ -53,11 +52,13 @@ const EMPTY_GROUP_STATE = {
 
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const isAdministratedAccount = m =>
-    ['ADMIN', 'ACCOUNTANT', 'COMMUNITY_MANAGER'].includes(m.role) && !m.collective.isIncognito;
-  let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.collective) || [];
+    ['ADMIN', 'ACCOUNTANT', 'COMMUNITY_MANAGER'].includes(m.role) && !m.account.isIncognito;
+  let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.account) || [];
 
   // Filter out accounts if the user is also an admin of the parent of that account (since we already show the parent)
-  const childAccountIds = flatten(administratedAccounts.map(a => a.children)).map((a: { id: number }) => a.id);
+  const childAccountIds = flatten(administratedAccounts.map(a => a.childrenAccounts?.nodes || [])).map(
+    (a: { id: string }) => a.id,
+  );
   administratedAccounts = administratedAccounts
     .filter(a => !childAccountIds.includes(a.id))
     .filter(a => a.type !== 'VENDOR');
@@ -78,7 +79,7 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   return groupedAccounts;
 });
 
-const generateOptionDescription = (collective: GraphQLV1Collective, LoggedInUser: LoggedInUser) => {
+const generateOptionDescription = (collective: { slug: string; type?: string }, LoggedInUser: LoggedInUser) => {
   if (LoggedInUser && !LoggedInUser.isAdminOfCollective(collective)) {
     if (LoggedInUser.isAccountantOnly(collective)) {
       return <FormattedMessage id="Member.Role.ACCOUNTANT" defaultMessage="Accountant" />;
@@ -139,7 +140,8 @@ const MenuEntry = ({
   activeSlug: string;
   handleClose: () => void;
 }) => {
-  const hasActiveChild = !!account.children?.some(child => child.slug === activeSlug);
+  const children = account.childrenAccounts?.nodes || [];
+  const hasActiveChild = !!children.some(child => child.slug === activeSlug);
   const [expanded, setExpanded] = React.useState(hasActiveChild);
   const isActive = activeSlug === account.slug || (hasActiveChild && !expanded);
 
@@ -170,7 +172,7 @@ const MenuEntry = ({
         >
           <Option collective={account} className="flex-1" />
         </Link>
-        {account.children?.length > 0 && (
+        {children.length > 0 && (
           <CollapsibleTrigger asChild>
             <Button
               data-expand-button
@@ -184,10 +186,10 @@ const MenuEntry = ({
           </CollapsibleTrigger>
         )}
       </DropdownMenuItem>
-      {account.children?.length > 0 && (
+      {children.length > 0 && (
         <CollapsibleContent className="m-0 p-0">
-          {account.children
-            ?.slice() // Create a copy to that we can sort the otherwise immutable array
+          {children
+            .slice() // Create a copy to that we can sort the otherwise immutable array
             .sort((a, b) => a.name.localeCompare(b.name))
             .map(child => {
               const isChildActive = activeSlug === child.slug;
@@ -210,11 +212,14 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const { LoggedInUser } = useLoggedInUser();
 
   const [open, setOpen] = React.useState(false);
-  const loggedInUserCollective = LoggedInUser?.collective;
+  const loggedInUserCollective = LoggedInUser;
 
   const groupedAccounts = getGroupedAdministratedAccounts(LoggedInUser);
   const rootAccounts = flatten(Object.values(groupedAccounts));
-  const allAdministratedAccounts = [...rootAccounts, ...flatten(rootAccounts.map(a => a.children))];
+  const allAdministratedAccounts = [
+    ...rootAccounts,
+    ...flatten(rootAccounts.map(a => a.childrenAccounts?.nodes || [])),
+  ];
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
   const handleClose = () => setOpen(false);
   const { isMobile, state } = useSidebar();

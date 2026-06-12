@@ -291,10 +291,7 @@ const DashboardPage = () => {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { workspace, setWorkspace } = useWorkspace();
   const isRootUser = LoggedInUser?.isRoot;
-  const hasWorkspaceAccess =
-    workspace.slug &&
-    (workspace.slug === LoggedInUser?.collective.slug || LoggedInUser?.canSeeDashboard({ slug: workspace.slug }));
-  const defaultSlug = hasWorkspaceAccess ? workspace.slug : LoggedInUser?.collective.slug;
+  const defaultSlug = workspace.slug || LoggedInUser?.slug;
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
@@ -309,8 +306,8 @@ const DashboardPage = () => {
   React.useEffect(() => {
     if (activeSlug) {
       if (LoggedInUser) {
-        const membership = LoggedInUser.memberOf.find(val => val.collective.slug === activeSlug);
-        setWorkspace({ slug: activeSlug, isHost: membership?.collective.isHost });
+        const membership = LoggedInUser.memberOf.find(val => val.account.slug === activeSlug);
+        setWorkspace({ slug: activeSlug, isHost: membership?.account.isHost });
       }
     }
     // Redirect users that require profile completion
@@ -318,12 +315,12 @@ const DashboardPage = () => {
       router.replace(getProfileCompletionRoute(router.asPath));
     }
     // Redirect to activeSlug if no slug is provided
-    else if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
+    else if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.slug) {
       router.replace(`/dashboard/${activeSlug}`);
     }
     // If slug is `me` and there is a LoggedInUser, redirect to the user's dashboard
     else if (slug === 'me' && LoggedInUser) {
-      router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
+      router.replace(`/dashboard/${LoggedInUser.slug}${section ? `/${section}` : ''}`);
     }
   }, [activeSlug, LoggedInUser]);
 
@@ -371,7 +368,7 @@ const DashboardPage = () => {
           <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
             <p>{blocker}</p>
             {LoggedInUser && (
-              <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
+              <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.slug}`}>
                 <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
               </Link>
             )}

@@ -1,28 +1,27 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { getFromLocalStorage, setLocalStorage } from '../local-storage';
 
 export default function useLocalStorage<T>(key: string, defaultValue?: T) {
-  const get = useCallback((): T => {
-    const jsonValue = getFromLocalStorage(key);
+  // Always start with defaultValue to match SSR output and avoid hydration mismatch
+  const [value, setValue] = useState<T>(defaultValue);
 
+  useEffect(() => {
+    const jsonValue = getFromLocalStorage(key);
     if (jsonValue !== null) {
-      return JSON.parse(jsonValue) as T;
-    } else {
-      return defaultValue;
+      setValue(JSON.parse(jsonValue) as T);
     }
   }, [key]);
 
-  const [value, setValue] = useState<T>(get);
-
   const set = useCallback(
     (update: T | ((prevValue: T) => T)) => {
-      // Function to determine the next value based on the updater type
-      const nextValue = update instanceof Function ? update(value) : update;
-      setLocalStorage(key, JSON.stringify(nextValue));
-      setValue(nextValue);
+      setValue(prev => {
+        const nextValue = update instanceof Function ? update(prev) : update;
+        setLocalStorage(key, JSON.stringify(nextValue));
+        return nextValue;
+      });
     },
-    [key, value], // Including value as a dependency to ensure correct updater function behavior
+    [key],
   );
 
   return [value, set] as const;

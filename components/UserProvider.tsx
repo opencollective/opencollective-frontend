@@ -1,50 +1,89 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { withApollo } from '@apollo/client/react/hoc';
 import { decodeJwt } from 'jose';
 import { get, isEqual } from 'lodash-es';
+import type { NextRouter } from 'next/router';
 import Router, { withRouter } from 'next/router';
+import type { WrappedComponentProps } from 'react-intl';
 
 import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
-import { API_V1_CONTEXT } from '../lib/graphql/helpers';
-import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
+import type LoggedInUser from '../lib/LoggedInUser';
 import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import { loggedInUserQuery } from '@/lib/graphql/queries';
 import injectIntl from '@/lib/injectIntl';
 
 import { toast } from './ui/useToast';
 
-export const UserContext = React.createContext({
+type TwoFactorAuthPromptResult = { code: string; type: string };
+
+type TwoFactorAuthPrompt = {
+  open: (options?: {
+    supportedMethods?: string[];
+    authenticationOptions?: Record<string, unknown>;
+    allowRecovery?: boolean;
+  }) => Promise<TwoFactorAuthPromptResult | undefined>;
+};
+
+type GetLoggedInUserOptions = {
+  token?: string | null;
+  twoFactorAuthenticatorCode?: string;
+  twoFactorAuthenticationType?: string;
+};
+
+export type UserContextValue = {
+  loadingLoggedInUser: boolean;
+  errorLoggedInUser: string | Error | null;
+  LoggedInUser: LoggedInUser | null;
+  logout: (arg?: { redirect?: string; skipQueryRefetch?: boolean }) => Promise<void>;
+  login: (token?: string) => Promise<LoggedInUser | null>;
+  refetchLoggedInUser: () => Promise<boolean>;
+  updateLoggedInUserFromCache: () => void;
+};
+
+export const UserContext = React.createContext<UserContextValue>({
   loadingLoggedInUser: true,
   errorLoggedInUser: null,
   LoggedInUser: null,
-  logout: async () => null,
+  logout: async () => undefined,
   login: async () => null,
-  async refetchLoggedInUser() {},
+  refetchLoggedInUser: async () => true,
   updateLoggedInUserFromCache: () => {},
 });
 
-class UserProvider extends React.Component {
-  static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired,
-    twoFactorAuthPrompt: PropTypes.object,
-    router: PropTypes.object,
-    client: PropTypes.object,
-    children: PropTypes.node,
-    intl: PropTypes.object,
-    initialLoggedInUser: PropTypes.object,
-  };
+type UserProviderProps = WrappedComponentProps & {
+  getLoggedInUser: (options?: GetLoggedInUserOptions) => Promise<LoggedInUser | null>;
+  getLoggedInUserFromCache: () => LoggedInUser | null;
+  twoFactorAuthPrompt: TwoFactorAuthPrompt;
+  router: NextRouter;
+  client: ApolloClient<NormalizedCacheObject>;
+  children?: React.ReactNode;
+  initialLoggedInUser?: LoggedInUser | null;
+};
 
-  state = {
-    loadingLoggedInUser: this.props.initialLoggedInUser ? false : true,
-    LoggedInUser: this.props.initialLoggedInUser,
-    errorLoggedInUser: null,
-  };
+type UserProviderState = {
+  loadingLoggedInUser: boolean;
+  LoggedInUser: LoggedInUser | null;
+  errorLoggedInUser: string | Error | null;
+};
 
-  async componentDidMount() {
+type TwoFactorAuthError = Error & { type?: string };
+
+class UserProvider extends React.Component<UserProviderProps, UserProviderState> {
+  constructor(props: UserProviderProps) {
+    super(props);
+    this.state = {
+      loadingLoggedInUser: !props.initialLoggedInUser,
+      LoggedInUser: props.initialLoggedInUser ?? null,
+      errorLoggedInUser: null,
+    };
+  }
+
+  override async componentDidMount() {
     window.addEventListener('storage', this.checkLogin);
 
     // Disable auto-login on SignIn page
@@ -53,11 +92,11 @@ class UserProvider extends React.Component {
     }
   }
 
-  componentWillUnmount() {
+  override componentWillUnmount() {
     window.removeEventListener('storage', this.checkLogin);
   }
 
-  checkLogin = event => {
+  checkLogin = (event: StorageEvent) => {
     if (event.key === 'LoggedInUser') {
       if (event.oldValue && !event.newValue) {
         return this.setState({ LoggedInUser: null });
@@ -67,8 +106,8 @@ class UserProvider extends React.Component {
         return this.setState({ LoggedInUser: new UserClass(value) });
       }
 
-      const { value: oldValue } = JSON.parse(event.oldValue);
-      const { value } = JSON.parse(event.newValue);
+      const { value: oldValue } = JSON.parse(event.oldValue!);
+      const { value } = JSON.parse(event.newValue!);
 
       if (!isEqual(oldValue, value)) {
         this.setState({ LoggedInUser: new UserClass(value) });
@@ -76,7 +115,7 @@ class UserProvider extends React.Component {
     }
   };
 
-  logout = async ({ redirect, skipQueryRefetch } = {}) => {
+  logout = async ({ redirect, skipQueryRefetch }: { redirect?: string; skipQueryRefetch?: boolean } = {}) => {
     auth.logout();
 
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
@@ -88,7 +127,7 @@ class UserProvider extends React.Component {
       await this.props.client.reFetchObservableQueries();
     } else {
       // Send any request to API to clear rootRedirectDashboard cookie
-      await this.props.client.query({ query: loggedInUserQuery, context: API_V1_CONTEXT, fetchPolicy: 'network-only' });
+      await this.props.client.query({ query: loggedInUserQuery, fetchPolicy: 'network-only' });
     }
 
     if (redirect) {
@@ -98,7 +137,7 @@ class UserProvider extends React.Component {
     }
   };
 
-  login = async token => {
+  login = async (token?: string): Promise<LoggedInUser | null> => {
     const { getLoggedInUser, twoFactorAuthPrompt, intl } = this.props;
 
     try {
@@ -109,13 +148,14 @@ class UserProvider extends React.Component {
         LoggedInUser,
       });
       return LoggedInUser;
-    } catch (error) {
+    } catch (error: unknown) {
       // Malformed tokens are detected and removed by the frontend in `lib/hooks/withLoggedInUser.js` (search for "malformed")
       // Invalid tokens are ignored in the API, the user is treated as unauthenticated (see `parseJwt` in `server/middleware/authentication.js`)
       // There can therefore only be two types of errors here:
       // - Network/server errors: we'll display a message
       // - Expired tokens: we'll logout the user with a "Your session has expired. Please sign-in again." message
-      const errorType = get(error, 'networkError.result.error.type');
+      const err = error as { networkError?: { result?: { error?: { type?: string } } }; message?: string };
+      const errorType = get(err, 'networkError.result.error.type');
 
       // For expired tokens, we directly logout & show a toast as we want to make sure it gets
       // displayed not matter what page the user is on.
@@ -127,11 +167,14 @@ class UserProvider extends React.Component {
         return null;
       }
 
-      if (error.message.includes('Two-factor authentication is enabled')) {
+      if (err.message?.includes('Two-factor authentication is enabled')) {
         while (true) {
           try {
-            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
-            const decodedToken = decodeJwt(token);
+            const storedToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
+            const decodedToken = decodeJwt(storedToken) as {
+              supported2FAMethods?: string[];
+              authenticationOptions?: Record<string, unknown>;
+            };
 
             const result = await twoFactorAuthPrompt.open({
               supportedMethods: decodedToken.supported2FAMethods,
@@ -143,7 +186,7 @@ class UserProvider extends React.Component {
             // React strict mode calling lifecycle methods twice or a developer mistake. The safest option is to early
             // return and let the other prompt handle the result.
             if (!result) {
-              return;
+              return null;
             }
 
             const LoggedInUser = await getLoggedInUser({
@@ -154,7 +197,7 @@ class UserProvider extends React.Component {
             if (result.type === 'recovery_code') {
               this.props.router.replace({
                 pathname: '/dashboard/[slug]/user-security',
-                query: { slug: LoggedInUser.collective.slug },
+                query: { slug: LoggedInUser?.slug },
               });
             } else {
               this.setState({
@@ -166,31 +209,39 @@ class UserProvider extends React.Component {
             removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
 
             return LoggedInUser;
-          } catch (e) {
-            this.setState({ loadingLoggedInUser: false, errorLoggedInUser: e.message });
+          } catch (e: unknown) {
+            const twoFactorError = e as TwoFactorAuthError;
+            this.setState({
+              loadingLoggedInUser: false,
+              errorLoggedInUser: twoFactorError.message,
+            });
 
             // Stop loop if user cancelled the prompt
-            if (e.type === 'TWO_FACTOR_AUTH_CANCELED') {
-              throw new Error(formatErrorMessage(intl, e), { cause: e });
+            if (twoFactorError.type === 'TWO_FACTOR_AUTH_CANCELED') {
+              throw new Error(formatErrorMessage(intl, twoFactorError), { cause: e });
             }
 
             // Stop loop if too many requests or token is invalid
             if (
-              e.type === 'too_many_requests' ||
-              (e.type === 'unauthorized' && e.message.includes('Cannot use this token'))
+              twoFactorError.type === 'too_many_requests' ||
+              (twoFactorError.type === 'unauthorized' && twoFactorError.message?.includes('Cannot use this token'))
             ) {
-              throw new Error(e.message, { cause: e });
+              throw new Error(twoFactorError.message, { cause: e });
             }
 
             // Otherwise, retry 2fa prompt and show error
-            toast({ variant: 'error', message: e.message });
+            toast({ variant: 'error', message: twoFactorError.message });
           }
         }
       } else {
         // Store the error
-        this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
+        this.setState({
+          loadingLoggedInUser: false,
+          errorLoggedInUser: (error as Error).message,
+        });
       }
     }
+    return null;
   };
 
   /**
@@ -199,7 +250,7 @@ class UserProvider extends React.Component {
    * [refetchQueries](https://www.apollographql.com/docs/react/api/react-apollo.html#graphql-mutation-options-refetchQueries)
    * if you really need to be up-to-date with server.
    */
-  refetchLoggedInUser = async () => {
+  refetchLoggedInUser = async (): Promise<boolean> => {
     const { getLoggedInUser } = this.props;
     try {
       const LoggedInUser = await getLoggedInUser();
@@ -209,7 +260,7 @@ class UserProvider extends React.Component {
         LoggedInUser,
       });
     } catch (error) {
-      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error });
+      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error as Error });
     }
     return true;
   };
@@ -223,7 +274,7 @@ class UserProvider extends React.Component {
     this.setState({ LoggedInUser });
   };
 
-  render() {
+  override render() {
     return (
       <UserContext.Provider
         value={{
@@ -242,18 +293,28 @@ class UserProvider extends React.Component {
 
 const { Consumer: UserConsumer } = UserContext;
 
-const withUser = WrappedComponent => {
-  const WithUser = props => <UserConsumer>{context => <WrappedComponent {...context} {...props} />}</UserConsumer>;
+export function withUser<P extends object>(
+  WrappedComponent: React.ComponentType<P & UserContextValue>,
+): React.ComponentType<P> {
+  const WithUser = (props: P) => <UserConsumer>{context => <WrappedComponent {...context} {...props} />}</UserConsumer>;
 
-  WithUser.getInitialProps = async context => {
-    return WrappedComponent.getInitialProps ? await WrappedComponent.getInitialProps(context) : {};
+  const wrapped = WrappedComponent as React.ComponentType<P & UserContextValue> & {
+    getInitialProps?: (context: unknown) => Promise<object>;
+  };
+  WithUser.getInitialProps = async (context: unknown) => {
+    return wrapped.getInitialProps ? await wrapped.getInitialProps(context) : {};
   };
 
-  return WithUser;
+  return WithUser as React.ComponentType<P>;
+}
+
+type UserProviderPublicProps = {
+  children?: React.ReactNode;
+  initialLoggedInUser?: LoggedInUser | null;
 };
 
 export default injectIntl(
-  withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider))))),
-);
-
-export { withUser };
+  withApollo(
+    withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider)))),
+  ) as React.ComponentType<WrappedComponentProps<'intl'>>,
+) as React.ComponentType<UserProviderPublicProps>;

@@ -37,7 +37,7 @@ export function PlatformBillingCollapsibleCard() {
     if (showSubscriptionCard === undefined) {
       const showSubscriptionCardKey = `id${account.legacyId}`;
       const showSubscriptionCardSetting =
-        LoggedInUser.collective.settings?.showInitialOverviewSubscriptionCard?.[showSubscriptionCardKey];
+        LoggedInUser.settings?.showInitialOverviewSubscriptionCard?.[showSubscriptionCardKey];
 
       setShowSubscriptionCard(showSubscriptionCardSetting !== false ? true : false);
     }
@@ -49,7 +49,7 @@ export function PlatformBillingCollapsibleCard() {
 
       await editAccountSetting({
         variables: {
-          account: { legacyId: LoggedInUser.collective.id },
+          account: { legacyId: LoggedInUser.legacyId },
           key: `showInitialOverviewSubscriptionCard.id${account.legacyId}`,
           value: open,
         },

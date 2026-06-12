@@ -92,7 +92,7 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
 
   const onViewAllGrantRequestsClick = React.useCallback(() => {
     if (LoggedInUser) {
-      router.replace(`/dashboard/${LoggedInUser.collective.slug}/submitted-grants`);
+      router.replace(`/dashboard/${LoggedInUser.slug}/submitted-grants`);
     } else {
       router.replace(`${props.account.slug}/expenses?type=GRANT`);
     }
