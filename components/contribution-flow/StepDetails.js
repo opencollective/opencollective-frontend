@@ -1,6 +1,6 @@
 import React from 'react';
 import { isEmpty, isNil } from 'lodash-es';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
@@ -31,8 +31,9 @@ import ChangeTierWarningModal from './ChangeTierWarningModal';
 import CustomFields, { buildCustomFieldsConfig } from './CustomFields';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlatformTip, isOscTipExperiment }) => {
+const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip, isOscTipExperiment }) => {
   const intl = useIntl();
+  const router = useRouter();
   const amount = stepDetails?.amount;
   const currency = tier?.amount.currency || collective.currency;
   const presets = getTierPresets(tier, collective.type, currency);
@@ -307,4 +308,4 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlat
   );
 };
 
-export default withRouter(StepDetails);
+export default StepDetails;
