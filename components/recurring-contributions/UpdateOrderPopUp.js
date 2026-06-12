@@ -547,18 +547,27 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
 
 export const UpdatePlatformTipPopUp = ({ contribution, onCloseEdit }) => {
   const { toast } = useToast();
-  const [tipAmount, setTipAmount] = useState(contribution.platformTipAmount?.valueInCents || 0);
+  const orderAmount = contribution.amount.valueInCents;
+  const orderCurrency = contribution.amount.currency;
+  const storedTipAmount = contribution.platformTipAmount?.valueInCents || 0;
+  const [tipAmount, setTipAmount] = useState(storedTipAmount);
   const [selectedTipOption, setSelectedTipOption] = useState(() =>
-    getPlatformTipOptionFromAmount(
-      contribution.platformTipAmount?.valueInCents || 0,
-      contribution.amount.valueInCents,
-      contribution.amount.currency,
-    ),
+    getPlatformTipOptionFromAmount(storedTipAmount, orderAmount, orderCurrency),
   );
+  // If the contribution amount changes under the popup (e.g. after editing the amount and
+  // refetching), reset to the freshly-fetched tip so the selected percentage can't stay stale —
+  // otherwise the still-highlighted preset becomes a no-op click that keeps the old tip.
+  const prevOrderAmountRef = React.useRef(orderAmount);
+  useEffect(() => {
+    if (prevOrderAmountRef.current !== orderAmount) {
+      prevOrderAmountRef.current = orderAmount;
+      setTipAmount(storedTipAmount);
+      setSelectedTipOption(getPlatformTipOptionFromAmount(storedTipAmount, orderAmount, orderCurrency));
+    }
+  }, [orderAmount, storedTipAmount, orderCurrency]);
   const { isSubmittingPlatformTip, updatePlatformTip } = useUpdatePlatformTip({ contribution, onSuccess: onCloseEdit });
   const isPaypal = contribution.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
-  const currentTipAmount = contribution.platformTipAmount?.valueInCents || 0;
-  const totalAmount = contribution.totalAmount.valueInCents - currentTipAmount + tipAmount;
+  const totalAmount = contribution.totalAmount.valueInCents - storedTipAmount + tipAmount;
 
   return (
     <Fragment>
@@ -578,6 +587,7 @@ export const UpdatePlatformTipPopUp = ({ contribution, onCloseEdit }) => {
           selectedOption={selectedTipOption}
           showHeader={false}
           showOptOut={false}
+          disableAmountSync
           value={tipAmount}
           onChange={(selectedOption, value) => {
             setSelectedTipOption(selectedOption);

@@ -48,12 +48,18 @@ type NewPlatformTipContainerProps = {
 type NewPlatformTipSelectorProps = Omit<NewPlatformTipContainerProps, 'step'>;
 
 export function NewPlatformTipSelector(
-  props: NewPlatformTipSelectorProps & { showHeader?: boolean; showOptOut?: boolean; showOptOutNudge?: boolean },
+  props: NewPlatformTipSelectorProps & {
+    showHeader?: boolean;
+    showOptOut?: boolean;
+    showOptOutNudge?: boolean;
+    disableAmountSync?: boolean;
+  },
 ) {
   const {
     amount,
     collectiveName,
     currency,
+    disableAmountSync = false,
     onChange,
     selectedOption,
     showHeader = true,
@@ -96,6 +102,12 @@ export function NewPlatformTipSelector(
   );
 
   React.useEffect(() => {
+    // In edit-tip contexts (e.g. updating the tip of an existing recurring contribution) the
+    // contribution amount isn't being edited, so the stored tip must be shown as-is. Re-syncing
+    // it to a percentage of the amount would overwrite the real tip with a wrong value.
+    if (disableAmountSync) {
+      return;
+    }
     if (selectedOption === PlatformTipOption.OTHER || selectedOption === PlatformTipOption.NONE) {
       return;
     }
@@ -103,7 +115,7 @@ export function NewPlatformTipSelector(
     if (nextValue !== value) {
       onChange(selectedOption, nextValue);
     }
-  }, [amount, getTipValueForOption, onChange, selectedOption, value]);
+  }, [amount, disableAmountSync, getTipValueForOption, onChange, selectedOption, value]);
 
   if (amount === 0) {
     return null;
