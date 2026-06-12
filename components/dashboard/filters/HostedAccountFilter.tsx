@@ -5,11 +5,7 @@ import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { gql } from '../../../lib/graphql/helpers';
-import type {
-  Account,
-  AccountFilterQuery,
-  AccountHoverCardFieldsFragment,
-} from '../../../lib/graphql/types/v2/graphql';
+import type { AccountFilterQuery, AccountHoverCardFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
 import { isMulti } from '@/lib/filters/schemas';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
@@ -31,8 +27,14 @@ const hostedAccountFilterSearchQuery = gql`
 `;
 
 export const AccountRenderer = (props: {
-  account: Partial<AccountHoverCardFieldsFragment> & {
-    slug: Account['slug'];
+  account: {
+    slug: string;
+    name?: string | null;
+    description?: string | null;
+    type?: string | null;
+    imageUrl?: string | null;
+    isIncognito?: boolean;
+    isGuest?: boolean;
   };
   inOptionsList?: boolean; // For positioning the HoverCard to the right to prevent blocking options list
 }) => {

@@ -4,7 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 import { ArrowUpRight, ChevronDown, Globe2, LifeBuoy, Telescope } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import useMenuItems from '@/lib/hooks/useMenuItems';
 import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
 import { cn } from '@/lib/utils';
 
@@ -33,20 +33,17 @@ import {
   SidebarRail,
   useSidebar,
 } from '../ui/Sidebar';
-import { useWorkspace } from '../WorkspaceProvider';
 
 import AccountSwitcher from './AccountSwitcher';
+import { ROOT_PROFILE_KEY } from './constants';
 import { DashboardContext } from './DashboardContext';
-import { getMenuItems } from './menu-items';
 
 export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
-  const { workspace } = useWorkspace();
-  const { account, selectedSection, subpath } = React.useContext(DashboardContext);
-  const activeSlug = workspace?.slug;
-  const { LoggedInUser } = useLoggedInUser();
+  const { account, selectedSection, subpath, isRootDashboard, activeSlug } = React.useContext(DashboardContext);
+  const menuItems = useMenuItems();
   const intl = useIntl();
   const { setOpenMobile, isMobile } = useSidebar();
-  const menuItems = React.useMemo(() => getMenuItems({ intl, account, LoggedInUser }), [account, intl, LoggedInUser]);
+  const effectiveAccount = isRootDashboard ? { slug: ROOT_PROFILE_KEY } : account;
 
   const isSectionActive = (section: string) => {
     const sectionAndSubpath = subpath?.length > 0 ? `${selectedSection}/${subpath[0]}` : selectedSection;
@@ -86,6 +83,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                               item={item}
                               isSectionActive={isSectionActive}
                               onNavigate={closeMobileMenu}
+                              account={effectiveAccount}
                             />
                           );
                         }
@@ -95,7 +93,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                           <SidebarMenuItem key={item.section}>
                             <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
                               <Link
-                                href={getDashboardRoute(account, item.section)}
+                                href={getDashboardRoute(effectiveAccount, item.section)}
                                 data-cy={`menu-item-${item.section}`}
                                 shallow
                                 onClick={closeMobileMenu}
@@ -114,7 +112,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
-            {account && account.type !== 'ROOT' && account.hasPublicProfile && (
+            {!isRootDashboard && account?.hasPublicProfile && (
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
@@ -191,8 +189,7 @@ const SidebarLink = React.forwardRef<
   );
 });
 
-function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
-  const { account } = React.useContext(DashboardContext);
+function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate, account }) {
   const { isMobile, state } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
