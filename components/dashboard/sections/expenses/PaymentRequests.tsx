@@ -14,8 +14,8 @@ import {
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { isHostableAccount, isOrganizationAccount } from '@/lib/account';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
-import { hasAccountMoneyManagement } from '@/lib/collective';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
@@ -157,8 +157,12 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     [views, metadata],
   );
 
-  const hasMoneyManagement = hasAccountMoneyManagement(account);
-  const hostSlug = hasMoneyManagement ? (account?.slug ?? account?.host?.slug) : account?.host?.slug;
+  const hasMoneyManagement = isOrganizationAccount(account) && account.hasMoneyManagement;
+  const hostSlug = hasMoneyManagement
+    ? account.slug
+    : isHostableAccount(account) && account.host
+      ? account.host.slug
+      : undefined;
 
   const hasKycFeature = isFeatureEnabled(account, FEATURES.KYC);
 

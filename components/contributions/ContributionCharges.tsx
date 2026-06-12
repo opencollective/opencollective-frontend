@@ -8,6 +8,7 @@ import type { ContributionDrawerQuery, TransactionsTableQueryVariables } from '.
 import { TransactionType } from '../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { i18nTransactionKind } from '../../lib/i18n/transaction';
+import { getTransactionsSection } from '@/lib/account';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
@@ -167,7 +168,7 @@ export function ContributionCharges({
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const redirectRelatedTransactionsTo = getDashboardRoute(
     dashboardAccount,
-    dashboardAccount.hasHosting ? 'host-transactions' : 'transactions',
+    dashboardAccount ? getTransactionsSection(dashboardAccount) : 'transactions',
   );
 
   const transactionsUrl = `${redirectRelatedTransactionsTo}?orderId=${order?.legacyId.toString()}`;
