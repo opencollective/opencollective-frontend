@@ -85,7 +85,7 @@ export default function FollowButton({ className, account, isHoverCard }: Follow
 
   if (
     !LoggedInUser ||
-    LoggedInUser.collective.slug === account.slug ||
+    LoggedInUser.slug === account.slug ||
     !account.type ||
     ([CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.VENDOR, CollectiveType.BOT] as string[]).includes(
       account.type,

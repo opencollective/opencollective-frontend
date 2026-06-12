@@ -16,7 +16,7 @@ const COLLECTIVE_CARD_WIDTH = 144;
  * Our Team section for the About section category
  */
 const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
-  const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
+  const loggedUserCollectiveId = get(LoggedInUser, 'legacyId');
 
   return (
     <ContainerSectionContent py={[3, 4]}>
