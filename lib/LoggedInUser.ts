@@ -3,12 +3,8 @@ import { uniqBy } from 'lodash-es';
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
-import {
-  type CommentFieldsFragment,
-  type LoggedInUserMembershipAccountFieldsFragment,
-  MemberRole,
-  type Update,
-} from './graphql/types/v2/graphql';
+import { type CommentFieldsFragment, MemberRole, type Update } from './graphql/types/v2/graphql';
+import type { WorkspaceAccount } from './account';
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
 
@@ -22,9 +18,6 @@ type CollectiveParam = {
   host?: { slug?: string; id?: string } | null;
   policies?: Record<string, unknown>;
 };
-
-/** An account the logged-in user is a member of, as returned by the v2 loggedInUserQuery */
-type LoggedInUserMembershipAccount = LoggedInUserMembershipAccountFieldsFragment;
 
 /**
  * Represent the current logged in user. Includes methods to check permissions.
@@ -53,20 +46,34 @@ class LoggedInUser {
   public categories: string[];
   public location: { id?: string; address?: string; country?: string; structured?: any };
 
-  // Memberships with the v2 shape ({ account } instead of v1's { collective })
+  // Slim memberOf with v2 shape -- only fields needed for role map + remaining non-dashboard consumers.
+  // Dashboard-related fields (features, policies, childrenAccounts, etc.) come from workspaces instead.
   public memberOf: Array<{
     id: string;
     role: ReverseCompatibleMemberRole;
-    account: LoggedInUserMembershipAccount;
+    account: {
+      id: string;
+      legacyId: number;
+      slug: string;
+      type: string;
+      name: string;
+      isHost?: boolean;
+      hasHosting?: boolean;
+      parent?: { id: string; slug?: string };
+      host?: { id: string };
+    };
   }>;
 
+  // Workspace accounts: derived from memberOf (when query uses memberOf with role filter) or from individual.workspaces resolver
+  public workspaces: WorkspaceAccount[];
+
   constructor(data) {
-    // Flatten the memberOf collection (v2 returns { nodes })
+    // Flatten memberOf (all roles, minimal fields) for role map and hasMemberOf
     if (data?.memberOf?.nodes) {
       data = { ...data, memberOf: data.memberOf.nodes };
     }
     Object.assign(this, data);
-    // Build a map of roles like { [accountSlug]: [ADMIN, BACKER...] }
+    // Build roles from memberOf (any role)
     this.roles = (this.memberOf ?? []).reduce(
       (roles, member) => {
         const account = member.account;
@@ -78,6 +85,25 @@ class LoggedInUser {
       },
       {} as Record<string, ReverseCompatibleMemberRole[]>,
     );
+    // workspaces: memberOf(...) with role filter — flatten nodes to account list,
+    // including the logged-in user's own account (loggedInAccount also has ...LoggedInUserWorkspaceFields)
+    const workspaceNodes = data?.workspaces?.nodes ?? data?.workspaces ?? [];
+    const workspaceList = Array.isArray(workspaceNodes) ? workspaceNodes : [];
+    const workspaceAccounts = workspaceList.map(m => m.account).filter(Boolean);
+    this.workspaces = uniqBy([data, ...workspaceAccounts], 'slug') as WorkspaceAccount[];
+  }
+
+  /**
+   * Look up a workspace account by slug. Returns the enriched workspace data
+   * available immediately from loggedInUserQuery, without needing adminPanelQuery.
+   */
+  getWorkspace(slug: string): WorkspaceAccount | null {
+    // "childrenAccounts are paginated (limit 100 by default)"
+    const allWorkspaces = (this.workspaces ?? []).flatMap(w => [
+      w,
+      ...((w.childrenAccounts?.nodes ?? []) as WorkspaceAccount[]),
+    ]);
+    return allWorkspaces.find(ws => ws.slug === slug) ?? null;
   }
 
   /**
@@ -242,13 +268,17 @@ class LoggedInUser {
   /**
    * List all the hosts this user belongs to and is admin of
    */
-  hostsUserIsAdminOf(): LoggedInUserMembershipAccount[] {
-    const accounts = (this.memberOf ?? [])
+  hostsUserIsAdminOf(): WorkspaceAccount[] {
+    if (this.workspaces) {
+      return this.workspaces.filter(w => w.isHost && this.hasRole(MemberRole.ADMIN, w));
+    }
+    // Fallback to memberOf if workspaces not available
+    const accounts = this.memberOf
       .filter(m => m.account?.isHost)
       .filter(m => this.hasRole(MemberRole.ADMIN, m.account))
       .map(m => m.account);
 
-    return uniqBy(accounts, 'id');
+    return uniqBy(accounts, 'id') as WorkspaceAccount[];
   }
 
   isHostAdmin(collective: CollectiveParam) {

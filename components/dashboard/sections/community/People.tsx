@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { isOrganizationAccount } from '@/lib/account';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import type { FilterConfig } from '@/lib/filters/filter-types';
@@ -344,7 +345,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
 
   const { account: dashboardAccount } = useContext(DashboardContext);
   const hasMoneyManagement = hasAccountMoneyManagement(account);
-  const hasHosting = account.hasHosting;
+  const hasHosting = isOrganizationAccount(account) && account.hasHosting;
 
   const hasKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.KYC);
 

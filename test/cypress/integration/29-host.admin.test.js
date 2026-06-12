@@ -192,7 +192,8 @@ describe('host dashboard', () => {
 
       cy.contains('More actions').click();
       cy.contains('View transactions').click();
-      cy.contains('Contribution').should('exist');
+      cy.get('[data-cy="transactions-table"]').should('be.visible');
+      cy.get('[data-cy="transactions-table"]').contains('tr', 'Contribution').click();
       cy.contains('€500.00').should('exist');
       cy.contains('Host fee').should('exist');
       cy.contains('€45.00').should('exist');
