@@ -531,7 +531,7 @@ export default function EditVirtualCardModal({
                   <Box pt={2}>
                     <ExclamationCircle color="#E03F6A" size={16} />
                     <Span ml={1} color="black.700" fontSize="14px">
-                      {formik.errors.limitAmount}
+                      {formik.errors.limitAmount as string}
                     </Span>
                   </Box>
                 )}
