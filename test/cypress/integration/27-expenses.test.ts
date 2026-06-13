@@ -17,6 +17,14 @@ describe('Expense flow', () => {
         cy.getByDataCy('signIn-form');
       });
     });
+
+    it('shows Submit Expense button on collective page and redirects to login', () => {
+      cy.createHostedCollective().then(collective => {
+        cy.visit(`/${collective.slug}`);
+        cy.getByDataCy('submit-expense-button').click();
+        cy.getByDataCy('signIn-form');
+      });
+    });
   });
 
   describe('Actions on expense', () => {
