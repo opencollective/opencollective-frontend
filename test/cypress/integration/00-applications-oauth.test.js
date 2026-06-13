@@ -1,5 +1,7 @@
 import { generateSecret, generateSync } from 'otplib';
 
+import { getApiUrl } from '../../../lib/utils';
+
 describe('OAuth Applications', () => {
   let user, clientId, clientSecret;
 
@@ -114,7 +116,7 @@ describe('OAuth Applications', () => {
 
       cy.log('Exchange code for token');
       cy.request({
-        url: `${Cypress.config('baseUrl')}/api/oauth/token`,
+        url: `${getApiUrl()}/oauth/token`,
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: {

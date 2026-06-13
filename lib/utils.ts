@@ -216,6 +216,14 @@ export const getWebsiteUrl = () => {
   }
 };
 
+export const getApiUrl = (): string => {
+  if (!process.env.API_URL) {
+    throw new Error('API_URL is not set');
+  }
+
+  return process.env.API_URL;
+};
+
 // https://medium.com/@akhilanand.ak01/function-composition-in-javascript-exploring-the-power-of-compose-4114da8b9875
 export const compose = (...functions) => {
   return input => {

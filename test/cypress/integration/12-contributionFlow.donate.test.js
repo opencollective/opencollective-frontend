@@ -1,3 +1,5 @@
+import { getApiUrl } from '../../../lib/utils';
+
 import { CreditCards } from '../../stripe-helpers';
 import mockRecaptcha from '../mocks/recaptcha';
 
@@ -185,7 +187,7 @@ describe('Contribution Flow: Donate', () => {
     cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE_ALWAYS_AUTHENTICATE });
 
     // Submit the order, intercept the response to get the order ID
-    cy.intercept({ method: 'POST', path: '/api/graphql/v2' }, req => {
+    cy.intercept({ method: 'POST', path: `${getApiUrl()}/graphql/v2` }, req => {
       if (req.body?.operationName === 'CreateOrder') {
         req.alias = 'createOrder';
       }

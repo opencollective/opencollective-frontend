@@ -5,6 +5,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import * as api from '../../lib/api';
+import { getApiUrl } from '../../lib/utils';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import { withRequiredProviders } from '../../test/providers';
 
@@ -227,7 +228,7 @@ describe('PaypalConnectButton', () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
-          '/api/connected-accounts/paypal/connect',
+          `${getApiUrl()}/connected-accounts/paypal/connect`,
           expect.objectContaining({ method: 'POST' }),
         );
         expect(onSuccess).toHaveBeenCalledWith({ connectedAccountId: 'ca-123', payoutMethodId: 'pm-456' });

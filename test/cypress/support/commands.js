@@ -2,6 +2,7 @@ import 'cypress-mailpit';
 
 import { API_V1_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
+import { getApiUrl } from '../../../lib/utils';
 
 import { CreditCards } from '../../stripe-helpers';
 
@@ -751,7 +752,7 @@ function getIdV2FromReferenceInput(account, token) {
  */
 function signinRequest(user, redirect, sendLink) {
   return cy.request({
-    url: '/api/users/signin',
+    url: `${getApiUrl()}/users/signin`,
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -776,7 +777,7 @@ export function signinRequestAndReturnToken(user, redirect) {
 function graphqlQuery(token, body) {
   body.operationName && cy.log(`GraphQL: ${body.operationName}`);
   return cy.request({
-    url: '/api/graphql/v1',
+    url: `${getApiUrl()}/graphql/v1`,
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -790,7 +791,7 @@ function graphqlQuery(token, body) {
 export function graphqlQueryV2(token, body) {
   body.operationName && cy.log(`GraphQL: ${body.operationName}`);
   return cy.request({
-    url: '/api/graphql/v2',
+    url: `${getApiUrl()}/graphql/v2`,
     method: 'POST',
     headers: {
       Accept: 'application/json',

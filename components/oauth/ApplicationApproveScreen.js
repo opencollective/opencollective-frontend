@@ -22,6 +22,7 @@ import { addAuthTokenToHeader } from '../../lib/api';
 import { ERROR, formatErrorType } from '../../lib/errors';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getApiUrl } from '@/lib/utils';
 
 import Avatar, { IncognitoAvatar } from '../Avatar';
 import Container from '../Container';
@@ -141,7 +142,7 @@ const fetchAuthorize = (
     }
   }
 
-  return fetch(`/api/oauth/authorize?${authorizeParams.toString()}`, {
+  return fetch(`${getApiUrl()}/oauth/authorize?${authorizeParams.toString()}`, {
     method: 'POST',
     redirect: 'manual',
     headers: {
