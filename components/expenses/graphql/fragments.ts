@@ -912,6 +912,12 @@ export const expensesListAdminFieldsFragment = gql`
         }
       }
     }
+    paymentInfo {
+      processorFee {
+        valueInCents
+        currency
+      }
+    }
     securityChecks {
       level
       message
