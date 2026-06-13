@@ -13,6 +13,8 @@
     "module": "esnext",
     "isolatedModules": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "types": ["webpack-env"],
     "typeRoots": ["node_modules/@types", "lib/custom_typings"],
     "jsx": "preserve",
     "resolveJsonModule": true,
