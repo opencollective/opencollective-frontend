@@ -305,6 +305,8 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
     refetch: refetchExpenses,
   } = useQuery(dashboardExpensesQuery, {
     variables,
+    // Revalidate on mount so newly submitted expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
 
   const expenses = data?.expenses;
@@ -318,6 +320,7 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
 
   const { data: metaData } = useQuery(issuedPaymentRequestsMetadataQuery, {
     variables: accountVariables,
+    fetchPolicy: 'cache-and-network',
   });
 
   const viewsWithCount: Views<FilterValues> = useMemo(
@@ -399,7 +402,7 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
               onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
               getRowId={row => String(row.legacyId)}
               queryFilter={queryFilter}
-              loading={loading}
+              loading={loading && !data}
               getActions={getExpenseActions}
               nbPlaceholders={queryFilter.values.limit}
             />

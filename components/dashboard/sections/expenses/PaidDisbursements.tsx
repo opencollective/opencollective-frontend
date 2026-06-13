@@ -334,6 +334,8 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
 
   const { data, error, loading, refetch } = useQuery(paidDisbursementsQuery, {
     variables,
+    // Revalidate on mount so recently paid expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
 
   const { data: metaData } = useQuery(paidDisbursementsMetadataQuery, {
@@ -341,6 +343,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
       hostSlug,
       hostContext: queryFilter.values.hostContext,
     },
+    fetchPolicy: 'cache-and-network',
   });
 
   const viewsWithCount: Views<FilterValues> = useMemo(
@@ -402,7 +405,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
             onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
             getRowId={row => String(row.legacyId)}
             queryFilter={queryFilter}
-            loading={loading}
+            loading={loading && !data}
             getActions={getExpenseActions}
           />
           <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
