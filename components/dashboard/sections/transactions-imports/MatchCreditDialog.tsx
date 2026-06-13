@@ -24,6 +24,7 @@ import { getMatchInfo } from './lib/match';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { ExpenseStatusFilter, OrderStatus, TransactionsImportRowAction } from '@/lib/graphql/types/v2/graphql';
 
+import { AccountNameWithLegalName } from '@/components/AccountNameWithLegalName';
 import {
   confirmContributionFieldsFragment,
   ConfirmContributionForm,
@@ -738,9 +739,11 @@ export const MatchCreditDialog = ({
                           value={
                             <LinkCollective
                               collective={selectedContribution.fromAccount}
-                              className="flex items-center gap-2"
+                              className="flex min-w-0 items-center gap-2"
                               openInNewTab
-                            />
+                            >
+                              <AccountNameWithLegalName account={selectedContribution.fromAccount} />
+                            </LinkCollective>
                           }
                           itemClassName="truncate max-w-full"
                           labelClassName="basis-1/3 min-w-auto max-w-auto"
