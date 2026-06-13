@@ -97,6 +97,11 @@ const ResendSignInEmailButton = ({ createdUser }) => {
 
 const ExpenseInviteNotificationBanner = props => {
   const canResendEmail = Boolean(props.expense.permissions?.canVerifyDraftExpense);
+  const slug = props.expense.draft?.payee?.slug ? (
+    <StyledLink href={`/${props.expense.draft?.payee?.slug}`}>@{props.expense.draft?.payee?.slug}</StyledLink>
+  ) : (
+    false
+  );
   return (
     <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'} data-cy="expense-draft-banner">
       <Flex flexDirection={['column', null, 'row']} alignItems="center">
@@ -108,9 +113,9 @@ const ExpenseInviteNotificationBanner = props => {
           <P lineHeight="20px">
             <FormattedMessage
               id="Expense.InviteIsOnItsWay.Description"
-              defaultMessage="An invitation to submit this expense has been sent to {email}. Once they confirm and finish the process, it will appear on the expenses list."
+              defaultMessage="An invitation to submit this expense has been sent to {recipient}. Once they confirm and finish the process, it will appear on the expenses list."
               values={{
-                email: props.expense.draft?.payee?.email || props.expense.draft?.payee?.name,
+                recipient: props.expense.draft?.payee?.email || props.expense.draft?.payee?.name || slug,
               }}
             />
           </P>
