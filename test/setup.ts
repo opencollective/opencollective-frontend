@@ -10,7 +10,27 @@ import { jest } from '@jest/globals';
 // The `supported-languages` file relies on require.context which is not available in Jest
 jest.mock('../lib/i18n/supported-languages', () => ['en']);
 
-// Mock jose package to avoid ES module issues in Jest
+// Mock apollo-upload-client ESM module for Jest
+jest.mock('apollo-upload-client/UploadHttpLink.mjs', () => ({
+  __esModule: true,
+  default: class UploadHttpLink {},
+}));
+
+// Apollo Client v4 moved MockedProvider to @apollo/client/testing/react
+jest.mock('@apollo/client/testing', () => {
+  const testing = jest.requireActual('../node_modules/@apollo/client/__cjs/testing/index.cjs') as Record<
+    string,
+    unknown
+  >;
+  const { MockedProvider } = jest.requireActual('../node_modules/@apollo/client/__cjs/testing/react/index.cjs') as {
+    MockedProvider: unknown;
+  };
+
+  return {
+    ...testing,
+    MockedProvider,
+  };
+});
 jest.mock('jose', () => ({
   decodeJwt: jest.fn(() => ({})),
   SignJWT: jest.fn(() => ({

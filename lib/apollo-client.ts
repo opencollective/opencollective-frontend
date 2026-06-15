@@ -3,14 +3,13 @@
 
 import type { NormalizedCacheObject, QueryOptions } from '@apollo/client';
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, useQuery } from '@apollo/client';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { mergeDeep } from '@apollo/client/utilities/internal';
 import UploadHttpLink from 'apollo-upload-client/UploadHttpLink.mjs';
 import { isUndefined, omitBy, pick } from 'lodash-es';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-
-import { CombinedGraphQLErrors } from '@apollo/client/errors';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
 import type { OCError } from './errors';

@@ -19,18 +19,24 @@ declare module '@apollo/client' {
   // Preserve v3-style generics for gradual migration.
   export class ApolloClient<TCacheShape = any> {
     constructor(options: any);
-    query<TData = any, TVariables = any>(options: any): Promise<{
+    query<TData = any, TVariables = any>(
+      options: any,
+    ): Promise<{
       data: TData;
       error?: any;
       errors?: any[];
       loading?: boolean;
     }>;
-    mutate<TData = any, TVariables = any>(options: any): Promise<{
+
+    mutate<TData = any, TVariables = any>(
+      options: any,
+    ): Promise<{
       data: TData;
       error?: any;
       errors?: any[];
       loading?: boolean;
     }>;
+
     readQuery<T = any>(options: any): T;
     writeQuery<T = any>(options: any): void;
     cache: ApolloCache<TCacheShape>;
@@ -48,7 +54,7 @@ declare module '@apollo/client' {
 
 declare module '@apollo/client/testing' {
   export { MockedProvider } from '@apollo/client/testing/react';
-  export type { MockedResponse } from '@apollo/client/testing/core';
+  export type { MockedResponse } from '@apollo/client/testing';
 }
 
 declare module '@apollo/client/react/hoc' {
@@ -74,19 +80,21 @@ declare module '@apollo/client/react/hoc' {
 declare module '@apollo/client/react/components' {
   import type React from 'react';
 
-  export class Query<TData = unknown, TVariables = Record<string, unknown>> extends React.Component<Record<string, unknown>> {
+  export class Query<TData = unknown, TVariables = Record<string, unknown>> extends React.Component<
+    Record<string, unknown>
+  > {
     render(): React.ReactNode;
   }
 
-  export class Mutation<TData = unknown, TVariables = Record<string, unknown>> extends React.Component<Record<string, unknown>> {
+  export class Mutation<TData = unknown, TVariables = Record<string, unknown>> extends React.Component<
+    Record<string, unknown>
+  > {
     render(): React.ReactNode;
   }
 
-  export class Subscription<TData = unknown, TVariables = Record<string, unknown>> extends React.Component<Record<string, unknown>> {
+  export class Subscription<TData = unknown, TVariables = Record<string, unknown>> extends React.Component<
+    Record<string, unknown>
+  > {
     render(): React.ReactNode;
   }
-}
-
-declare module '@apollo/client/testing' {
-  export * from '@apollo/client/testing/react';
 }

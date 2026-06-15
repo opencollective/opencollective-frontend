@@ -54,7 +54,9 @@ declare module '@apollo/client/react' {
 
   export type QueryResult<TData = any, TVariables = any> = ReturnType<typeof useQuery<TData, TVariables>>;
 
-  export function useFragment<TData = any>(options: Record<string, any>): {
+  export function useFragment<TData = any>(
+    options: Record<string, any>,
+  ): {
     data: TData;
     complete: boolean;
     missing?: any;

@@ -1,6 +1,6 @@
 import React from 'react';
-import type { DocumentNode } from 'graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
+import type { DocumentNode } from 'graphql';
 
 type QueryProps = {
   query: DocumentNode;
@@ -13,7 +13,7 @@ type QueryProps = {
 
 export function Query({ query, variables, children, skip, fetchPolicy, context }: QueryProps) {
   const result = useQuery(query, { variables, skip, fetchPolicy, context });
-  return <>{children(result)}</>;
+  return <React.Fragment>{children(result)}</React.Fragment>;
 }
 
 type MutationProps = {
@@ -26,9 +26,10 @@ type MutationProps = {
 
 export function Mutation({ mutation, children, variables, refetchQueries, awaitRefetchQueries }: MutationProps) {
   const [mutate, result] = useMutation(mutation, { variables, refetchQueries, awaitRefetchQueries });
-  return <>{children(mutate, result)}</>;
+  return <React.Fragment>{children(mutate, result)}</React.Fragment>;
 }
 
+// ts-unused-exports:disable-next-line
 export function Subscription() {
   throw new Error('Subscription component is not implemented in the Apollo compatibility layer.');
 }

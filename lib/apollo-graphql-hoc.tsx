@@ -1,7 +1,7 @@
 import React from 'react';
+import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client/react';
 import type { DocumentNode } from 'graphql';
 import { getOperationAST } from 'graphql';
-import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client/react';
 
 type OperationOptions<TProps> = {
   options?: ((props: TProps) => Record<string, unknown>) | Record<string, unknown>;
@@ -28,6 +28,7 @@ const mapResultToProps = <TProps,>(operationOptions: OperationOptions<TProps>, r
   return { data: result };
 };
 
+// ts-unused-exports:disable-next-line
 export function withQuery<TProps extends object>(
   document: DocumentNode,
   operationOptions: OperationOptions<TProps> = {},
@@ -47,6 +48,7 @@ export function withQuery<TProps extends object>(
   };
 }
 
+// ts-unused-exports:disable-next-line
 export function withMutation<TProps extends object>(
   document: DocumentNode,
   operationOptions: OperationOptions<TProps> = {},
@@ -66,6 +68,7 @@ export function withMutation<TProps extends object>(
   };
 }
 
+// ts-unused-exports:disable-next-line
 export function withSubscription<TProps extends object>(
   document: DocumentNode,
   operationOptions: OperationOptions<TProps> = {},

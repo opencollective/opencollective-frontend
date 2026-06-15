@@ -148,6 +148,16 @@ export default defineConfig([
     },
   },
 
+  // Custom typings config
+  {
+    files: ['lib/custom_typings/apollo-*.d.ts'],
+    rules: {
+      'import/export': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+
   // TS/TSX config
   {
     files: ['**/*.ts', '**/*.tsx'],

@@ -19,7 +19,10 @@
     "allowImportingTsExtensions": true,
     "paths": {
       "@/components/*": ["./components/*"],
-      "@/lib/*": ["./lib/*"]
+      "@/lib/*": ["./lib/*"],
+      "@apollo/client": ["./lib/apollo-client-compat.js"],
+      "@apollo/client/react/hoc": ["./lib/apollo-graphql-hoc.js"],
+      "@apollo/client/react/components": ["./lib/apollo-react-components.js"]
     }
   },
   "include": [
