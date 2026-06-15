@@ -1,10 +1,11 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '@/lib/constants/collectives';
 import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import { editCollectiveLongDescriptionMutation } from '@/lib/graphql/v1/mutations';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';

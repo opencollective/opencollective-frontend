@@ -5,7 +5,7 @@ import { cloneDeep, get, pick } from 'lodash-es';
 import { Info, PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { isURL } from 'validator';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
@@ -16,6 +16,7 @@ import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
 import { compose } from '../../../lib/utils';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
+import injectIntl from '@/lib/injectIntl';
 
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';

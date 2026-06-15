@@ -1,9 +1,10 @@
 import React from 'react';
 import { get } from 'lodash-es';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { moneyCanMoveFromEvent } from '../../lib/events';
+import injectIntl from '@/lib/injectIntl';
 
 import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';

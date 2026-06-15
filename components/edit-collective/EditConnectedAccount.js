@@ -4,10 +4,11 @@ import { withApollo } from '@apollo/client/react/hoc';
 import * as Sentry from '@sentry/browser';
 import { capitalize, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
 import { isValidUrl, parseToBoolean } from '../../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
 import { Box, Flex } from '../Grid';
