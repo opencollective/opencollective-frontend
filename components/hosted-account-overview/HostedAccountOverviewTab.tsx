@@ -82,14 +82,12 @@ const InteractionValue = ({
       {' • '}
       {tx.type === 'CREDIT' ? (
         <FormattedMessage
-          defaultMessage="Made a <link>{amount} contribution {ref}</link>"
-          id="HostedAccount.interaction.contribution"
+          defaultMessage="Made a <link>{amount} contribution {ref}</link>" id="A6QI7z"
           values={{ amount, ref, link }}
         />
       ) : (
         <FormattedMessage
-          defaultMessage="Made a <link>{amount} payout {ref}</link>"
-          id="HostedAccount.interaction.payout"
+          defaultMessage="Made a <link>{amount} payout {ref}</link>" id="BtoPiB"
           values={{ amount, ref, link }}
         />
       )}
@@ -155,7 +153,7 @@ const RecentTransactionsCard = ({
       <thead>
         <tr className="text-left text-xs text-muted-foreground">
           <th className="pr-6 pb-2 font-medium">
-            <FormattedMessage defaultMessage="Date Paid" id="Gh3Obs.date" />
+            <FormattedMessage defaultMessage="Date Paid" id="/SrpzP" />
           </th>
           <th className="pr-6 pb-2 font-medium">
             <FormattedMessage defaultMessage="Contribution to" id="kQwHjA" />
@@ -218,7 +216,7 @@ const RecentTransactionsCard = ({
       </tbody>
     </table>
     <Button variant="ghost" size="sm" className="self-center" onClick={onViewAll}>
-      <FormattedMessage defaultMessage="View all" id="ViewAll" />
+      <FormattedMessage defaultMessage="View all" id="pFK6bJ"/>
       <ArrowRight size={14} />
     </Button>
   </SectionCard>
@@ -358,11 +356,11 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
               }
             />
             <DataListItem
-              label={<FormattedMessage defaultMessage="First Interaction" id="FirstInteraction" />}
+              label={<FormattedMessage defaultMessage="First Interaction" id="/DiN97" />}
               value={<InteractionValue tx={firstInteraction} onOpen={handleRowClick} />}
             />
             <DataListItem
-              label={<FormattedMessage defaultMessage="Latest Interaction" id="LatestInteraction" />}
+              label={<FormattedMessage defaultMessage="Latest Interaction" id="SQ9JvS"  />}
               value={<InteractionValue tx={latestInteraction} onOpen={handleRowClick} />}
             />
           </DataList>
@@ -397,18 +395,18 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
       <SectionCard title={<FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Metric
-            label={<FormattedMessage defaultMessage="Current Balance" id="CurrentBalance" />}
+            label={<FormattedMessage defaultMessage="Current Balance" id="PkACGs" />}
             amount={isChild ? stats?.balance : stats?.consolidatedBalance}
             currency={currency}
           />
           <Metric
-            label={<FormattedMessage defaultMessage="Received by Account (all-time)" id="ReceivedAllTime" />}
+            label={<FormattedMessage defaultMessage="Received by Account (all-time)" id="26sbkf" />}
             amount={stats?.consolidatedTotalNetAmountRaised}
             currency={currency}
             onClick={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'CONTRIBUTIONS')}
           />
           <Metric
-            label={<FormattedMessage defaultMessage="Disbursed by account (all-time)" id="DisbursedAllTime" />}
+            label={<FormattedMessage defaultMessage="Disbursed by account (all-time)" id="3wX8nB"  />}
             amount={stats?.consolidatedTotalAmountSpent}
             currency={currency}
             onClick={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'PAYOUTS')}
@@ -424,7 +422,7 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
                 data: stats?.balanceTimeSeries,
               },
               {
-                name: intl.formatMessage({ defaultMessage: 'Received by account', id: 'ReceivedByAccount' }),
+                name: intl.formatMessage({ defaultMessage: 'Received by account', id: 'C22hxu', }),
                 color: RECEIVED_COLOR,
                 data: stats?.totalAmountReceivedTimeSeries,
               },
@@ -435,14 +433,14 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <RecentTransactionsCard
-          title={<FormattedMessage defaultMessage="Recent Contributions" id="RecentContributions" />}
+          title={<FormattedMessage defaultMessage="Recent Contributions" id="BPg/ek"  />}
           rows={account?.recentContributions?.nodes || []}
           currency={currency}
           onRowClick={handleRowClick}
           onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'CONTRIBUTIONS')}
         />
         <RecentTransactionsCard
-          title={<FormattedMessage defaultMessage="Recent Payouts" id="RecentPayouts" />}
+          title={<FormattedMessage defaultMessage="Recent Payouts" id="aS3BD9"  />}
           rows={account?.recentPayouts?.nodes || []}
           showDescription
           currency={currency}
