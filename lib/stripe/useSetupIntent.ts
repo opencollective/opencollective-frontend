@@ -1,5 +1,5 @@
 import React from 'react';
-import { ApolloError, useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client';
 import type { SetupIntent, Stripe } from '@stripe/stripe-js';
 
 import { gql } from '../graphql/helpers';
@@ -53,7 +53,7 @@ export default function useSetupIntent({
       });
 
       if (createSetupIntentResp.errors?.length > 0) {
-        setError(new ApolloError({ graphQLErrors: createSetupIntentResp.errors }));
+        setError(new Error(createSetupIntentResp.errors.map(error => error.message).join(', ')));
         setLoading(false);
         return;
       }

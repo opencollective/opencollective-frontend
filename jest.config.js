@@ -21,6 +21,9 @@ module.exports = async () => {
     ...nextConfig.moduleNameMapper,
     '^lodash-es$': '<rootDir>/node_modules/lodash',
     '^lodash-es/(.*)$': '<rootDir>/node_modules/lodash/$1',
+    '^@apollo/client$': '<rootDir>/lib/apollo-client-compat.js',
+    '^@apollo/client/react/hoc$': '<rootDir>/lib/apollo-graphql-hoc.js',
+    '^@apollo/client/react/components$': '<rootDir>/lib/apollo-react-components.js',
   };
 
   return nextConfig;

@@ -38,7 +38,7 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getDataFromTree } from '@apollo/client/react/ssr';
-import { mergeDeep } from '@apollo/client/utilities';
+import { mergeDeep } from '@apollo/client';
 import memoizeOne from 'memoize-one';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';

@@ -38,6 +38,9 @@ const nextConfig = {
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
     config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
+    config.resolve.alias['@apollo/client$'] = path.resolve(__dirname, 'lib/apollo-client-compat.js');
+    config.resolve.alias['@apollo/client/react/hoc'] = path.resolve(__dirname, 'lib/apollo-graphql-hoc.js');
+    config.resolve.alias['@apollo/client/react/components'] = path.resolve(__dirname, 'lib/apollo-react-components.js');
     if (typeof config.cache !== 'boolean') {
       config.cache = {};
     }
