@@ -66,6 +66,7 @@ import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySel
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
+import { isEmptyHTMLValue } from '../HTMLContent';
 
 import { supportsBaseExpenseTypes } from './form/helper';
 
@@ -917,7 +918,7 @@ function buildFormSchema(
                 return true;
               }
 
-              return v.length > 0;
+              return !isEmptyHTMLValue(v);
             }, requiredMessage),
           attachment: z
             .union([

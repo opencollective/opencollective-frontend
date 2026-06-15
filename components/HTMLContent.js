@@ -33,6 +33,9 @@ export const isEmptyHTMLValue = value => {
   }
 };
 
+/** Returns '' for empty rich-text scaffold HTML (e.g. Trix/React-Quill), otherwise the original value. */
+export const normalizeRichTextContent = value => (isEmptyHTMLValue(value) ? '' : value);
+
 const InlineDisplayBox = styled.div.withConfig({
   shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
 })`

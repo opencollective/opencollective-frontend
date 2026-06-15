@@ -202,27 +202,26 @@ describe('Recurring contributions: update platform tip', () => {
       });
     });
 
-    cy.createCollectiveV2({
-      skipApproval: true,
-      host: { slug: 'e2e-host' },
-      testPayload: { data: { platformTips: true } },
-    }).then(c => {
+    // Host on the Open Source Collective with platform tips enabled. This host renders the
+    // legacy Stripe card element, so we can reuse the same proven `useAnyPaymentMethod` flow as
+    // the first describe block above instead of the real Stripe Payment Element (which redirects
+    // and can hang the recurring checkout).
+    cy.createHostedCollectiveV2({ skipApproval: true, testPayload: { data: { platformTips: true } } }).then(c => {
       collective = c;
       cy.signup({ redirect: `/${collective.slug}/donate` }).then(u => {
         user = u;
         // Details step: pick monthly, keep the default 15% platform tip
         cy.get('#interval > :nth-child(2)').click();
-        cy.contains('Your info').click();
-        // Profile step: keep the preselected personal profile, fill the required legal name
-        cy.getByDataCy('input-legalName').type('Test Legal Name');
         cy.get('button[data-cy="cf-next-step"]').click();
-        // Payment step: pay with a new card
-        cy.contains('New payment method').click();
-        cy.wait(2000);
-        cy.fillStripePaymentElementInput();
-        cy.wait(2000);
+        // Profile step: keep the preselected personal profile. The legal name is required
+        // because the tip brings the yearly total over the contributor info threshold.
+        cy.contains('Contribute as');
+        cy.getByDataCy('input-legalName').type('Very Legal Name');
         cy.get('button[data-cy="cf-next-step"]').click();
-        cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
+        // Payment step: reuse an existing test payment method (no real Stripe)
+        cy.useAnyPaymentMethod();
+        cy.contains('button', 'Contribute').click();
+        cy.getByDataCy('order-success');
       });
     });
   });

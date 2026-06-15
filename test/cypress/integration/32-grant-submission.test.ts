@@ -58,7 +58,7 @@ describe('Grant Submission Flow', () => {
 
     // Application content section
     cy.contains('Application Content').scrollIntoView().should('be.visible');
-    cy.get('textarea[name="expenseItems.0.description"]').type('Grant application for community project');
+    cy.get('[data-cy="expenseItems.0.description"] trix-editor').type('Grant application for community project');
     cy.get('input[name="expenseItems.0.amount.valueInCents"]').type('{selectall}1000');
 
     // Proceed to summary
@@ -126,7 +126,7 @@ describe('Grant Submission Flow', () => {
     });
 
     cy.contains('Application Content').scrollIntoView();
-    cy.get('textarea[name="expenseItems.0.description"]').type('Grant application for community project');
+    cy.get('[data-cy="expenseItems.0.description"] trix-editor').type('Grant application for community project');
     cy.get('input[name="expenseItems.0.amount.valueInCents"]').type('{selectall}1000');
 
     cy.contains('button', 'Proceed to Summary').click();
@@ -183,7 +183,7 @@ describe('Grant Submission Flow', () => {
     });
 
     cy.contains('Application Content').scrollIntoView();
-    cy.get('textarea[name="expenseItems.0.description"]').type('Grant application for community project');
+    cy.get('[data-cy="expenseItems.0.description"] trix-editor').type('Grant application for community project');
     cy.get('input[name="expenseItems.0.amount.valueInCents"]').type('{selectall}1000');
 
     cy.contains('button', 'Proceed to Summary').click();
@@ -234,7 +234,7 @@ describe('Grant Submission Flow', () => {
     });
 
     cy.contains('Application Content').scrollIntoView();
-    cy.get('textarea[name="expenseItems.0.description"]').type('Grant application for community project');
+    cy.get('[data-cy="expenseItems.0.description"] trix-editor').type('Grant application for community project');
     cy.get('input[name="expenseItems.0.amount.valueInCents"]').type('{selectall}1000');
 
     cy.contains('button', 'Proceed to Summary').click();

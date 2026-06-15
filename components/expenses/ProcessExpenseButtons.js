@@ -146,9 +146,7 @@ const ProcessExpenseButtons = ({
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
   const [showApproveExpenseModal, setShowApproveExpenseModal] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
-  const mutationOptions = { update: onUpdate };
-  const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
+  const [processExpense, { loading, error }] = useMutation(processExpenseMutation);
   const intl = useIntl();
   const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();
@@ -228,12 +226,20 @@ const ProcessExpenseButtons = ({
       if (action === 'MARK_AS_PAID_WITH_STRIPE') {
         await waitExpenseStatus();
       }
-
-      return true;
     } catch (e) {
       toast({ variant: 'error', ...getErrorContent(intl, e, host) });
       return false;
     }
+
+    // Notify the parent after the mutation has resolved, and outside the try/catch:
+    // - calling it from the mutation `update` callback would trigger refetches while the
+    //   mutation result is still being written to the cache, preventing the updated expense
+    //   (e.g. its new status) from being broadcast to the list before the refetch completes;
+    // - calling it inside the try/catch would surface consumer errors (e.g. refetch logic)
+    //   as misleading "processing failed" toasts.
+    onSuccess?.(action);
+
+    return true;
   };
 
   const getButtonProps = action => {
@@ -402,7 +408,7 @@ const ProcessExpenseButtons = ({
             }
           }}
           expense={expense}
-          onSuccess={(action, updatedExpense) => onSuccess?.(updatedExpense ?? expense, null, action)}
+          onSuccess={action => onSuccess?.(action)}
         />
       )}
       {showApproveExpenseModal && (

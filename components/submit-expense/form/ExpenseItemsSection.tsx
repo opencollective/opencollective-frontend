@@ -37,12 +37,13 @@ import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { RadioGroup, RadioGroupCard } from '@/components/ui/RadioGroup';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { Textarea } from '@/components/ui/Textarea';
 
 import Dropzone, { MemoizedDropzone } from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import { normalizeRichTextContent } from '../../HTMLContent';
 import MessageBox from '../../MessageBox';
+import RichTextEditor from '../../RichTextEditor';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
@@ -434,7 +435,26 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
             >
               {({ field }) => {
                 if (props.isLongFormItemDescription) {
-                  return <Textarea {...field} />;
+                  return (
+                    <RichTextEditor
+                      id={field.id}
+                      withBorders
+                      version="simplified"
+                      inputName={field.name}
+                      editorMinHeight={120}
+                      onChange={e =>
+                        setFieldValue(
+                          `expenseItems.${props.index}.description`,
+                          normalizeRichTextContent(e.target.value),
+                        )
+                      }
+                      disabled={props.isDescriptionLocked || props.isSubmitting}
+                      defaultValue={item.description}
+                      fontSize="14px"
+                      data-cy={field.name}
+                      placeholder={field.placeholder}
+                    />
+                  );
                 }
                 return <Input {...field} />;
               }}
