@@ -364,8 +364,6 @@ const signupMutation = gqlV1 /* GraphQL */ `
     ) {
       user {
         id
-        email
-        name
       }
       organization {
         id
