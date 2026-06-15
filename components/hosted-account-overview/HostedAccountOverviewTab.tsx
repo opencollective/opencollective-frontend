@@ -2,6 +2,8 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '@/lib/constants/collectives';
+
 import Avatar from '@/components/Avatar';
 import HeroSocialLinks from '@/components/collective-page/hero/HeroSocialLinks';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
@@ -21,6 +23,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
+import type { MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
 import { HostedAccountOverviewChart } from './HostedAccountOverviewChart';
 import type { HostedAccountProfileData } from './types';
 import { HostedAccountView } from './types';
@@ -33,7 +36,7 @@ type RecentTransaction = NonNullable<HostedAccountProfileData['recentContributio
 type HostedAccountOverviewTabProps = {
   account?: HostedAccountProfileData;
   host?: { id?: string; hostFeePercent?: number | null } | null;
-  openTab: (tab: HostedAccountView) => void;
+  openTab: (tab: HostedAccountView, moneyMovementsView?: MoneyMovementsView) => void;
 };
 
 const SectionCard = ({ title, children }: { title: React.ReactNode; children: React.ReactNode }) => (
@@ -151,13 +154,13 @@ const RecentTransactionsCard = ({
     <table className="w-full text-sm">
       <thead>
         <tr className="text-left text-xs text-muted-foreground">
-          <th className="pb-2 pr-6 font-medium">
+          <th className="pr-6 pb-2 font-medium">
             <FormattedMessage defaultMessage="Date Paid" id="Gh3Obs.date" />
           </th>
-          <th className="pb-2 pr-6 font-medium">
+          <th className="pr-6 pb-2 font-medium">
             <FormattedMessage defaultMessage="Contribution to" id="kQwHjA" />
           </th>
-          <th className="pb-2 pr-6 font-medium">
+          <th className="pr-6 pb-2 font-medium">
             <FormattedMessage defaultMessage="Account" id="TwyMau" />
           </th>
           <th className="pb-2 text-right font-medium">
@@ -297,10 +300,25 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
               </React.Fragment>
             )}
             <DataListItem
-              label={<FormattedMessage defaultMessage="Payout Methods" id="PayoutMethods" />}
+              label={<FormattedMessage defaultMessage="Show payout method details" id="3P4Al8" />}
               value={
                 account?.policies ? (
-                  <AdminsCanSeePayoutMethodsSwitch collective={account as any} />
+                  <div className="flex flex-col gap-1.5">
+                    <AdminsCanSeePayoutMethodsSwitch collective={account as any} />
+                    <p className="text-xs text-muted-foreground">
+                      {account?.type === CollectiveType.FUND ? (
+                        <FormattedMessage
+                          defaultMessage="Allow Fund Admins to view sensitive payout method details of payees"
+                          id="om2juz"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          defaultMessage="Allow Collective Admins to view sensitive payout method details of payees"
+                          id="N+kkx3"
+                        />
+                      )}
+                    </p>
+                  </div>
                 ) : (
                   <span className="text-muted-foreground">—</span>
                 )
@@ -384,16 +402,16 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
             currency={currency}
           />
           <Metric
-            label={<FormattedMessage defaultMessage="Received by Collective (all-time)" id="ReceivedAllTime" />}
+            label={<FormattedMessage defaultMessage="Received by Account (all-time)" id="ReceivedAllTime" />}
             amount={stats?.consolidatedTotalNetAmountRaised}
             currency={currency}
-            onClick={() => openTab(HostedAccountView.MONEY_MOVEMENTS)}
+            onClick={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'CONTRIBUTIONS')}
           />
           <Metric
-            label={<FormattedMessage defaultMessage="Disbursed by collective (all-time)" id="DisbursedAllTime" />}
+            label={<FormattedMessage defaultMessage="Disbursed by account (all-time)" id="DisbursedAllTime" />}
             amount={stats?.consolidatedTotalAmountSpent}
             currency={currency}
-            onClick={() => openTab(HostedAccountView.MONEY_MOVEMENTS)}
+            onClick={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'PAYOUTS')}
           />
         </div>
         <div className="h-72 w-full">
@@ -406,7 +424,7 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
                 data: stats?.balanceTimeSeries,
               },
               {
-                name: intl.formatMessage({ defaultMessage: 'Received by collective', id: 'ReceivedByCollective' }),
+                name: intl.formatMessage({ defaultMessage: 'Received by account', id: 'ReceivedByAccount' }),
                 color: RECEIVED_COLOR,
                 data: stats?.totalAmountReceivedTimeSeries,
               },
@@ -421,7 +439,7 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
           rows={account?.recentContributions?.nodes || []}
           currency={currency}
           onRowClick={handleRowClick}
-          onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS)}
+          onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'CONTRIBUTIONS')}
         />
         <RecentTransactionsCard
           title={<FormattedMessage defaultMessage="Recent Payouts" id="RecentPayouts" />}
@@ -429,7 +447,7 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
           showDescription
           currency={currency}
           onRowClick={handleRowClick}
-          onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS)}
+          onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'PAYOUTS')}
         />
       </div>
 

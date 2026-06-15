@@ -20,9 +20,12 @@ import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
 import type { HostedAccountProfileData } from './types';
 
+export type MoneyMovementsView = 'ALL' | 'CONTRIBUTIONS' | 'PAYOUTS';
+
 type HostedAccountMoneyMovementsTabProps = {
   account?: HostedAccountProfileData;
   hostSlug: string;
+  initialView?: MoneyMovementsView;
 };
 
 const moneyMovementsCountsQuery = gql`
@@ -51,7 +54,11 @@ const moneyMovementsCountsQuery = gql`
   }
 `;
 
-export function HostedAccountMoneyMovementsTab({ account, hostSlug }: HostedAccountMoneyMovementsTabProps) {
+export function HostedAccountMoneyMovementsTab({
+  account,
+  hostSlug,
+  initialView,
+}: HostedAccountMoneyMovementsTabProps) {
   const intl = useIntl();
   const [openExpenseId, setOpenExpenseId] = React.useState<number | null>(null);
   const [openContributionId, setOpenContributionId] = React.useState<number | null>(null);
@@ -73,11 +80,17 @@ export function HostedAccountMoneyMovementsTab({ account, hostSlug }: HostedAcco
     [intl],
   );
 
+  const defaultFilterValues = React.useMemo(
+    () => views.find(view => view.id === initialView)?.filter,
+    [views, initialView],
+  );
+
   const queryFilter = useQueryFilter<typeof schema, TransactionsTableQueryVariables>({
     schema,
     toVariables,
     filters,
     views,
+    defaultFilterValues,
     skipRouter: true,
     meta: { currency: account?.currency },
   });

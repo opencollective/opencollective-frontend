@@ -24,7 +24,7 @@ import { HostedAccountAccountsTab } from './HostedAccountAccountsTab';
 import { HostedAccountActivitiesTab } from './HostedAccountActivitiesTab';
 import { HostedAccountAgreementsTab } from './HostedAccountAgreementsTab';
 import { HostedAccountExpectedFundsTab } from './HostedAccountExpectedFundsTab';
-import { HostedAccountMoneyMovementsTab } from './HostedAccountMoneyMovementsTab';
+import { HostedAccountMoneyMovementsTab, type MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
 import { HostedAccountOverviewTab } from './HostedAccountOverviewTab';
 import { hostedAccountProfileQuery } from './queries';
 import type { HostedAccountProfileData } from './types';
@@ -40,6 +40,8 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
   const router = useRouter();
   const selectedTab = (router.query?.subpath?.[1] as HostedAccountView) || HostedAccountView.OVERVIEW;
 
+  const [moneyMovementsView, setMoneyMovementsView] = React.useState<MoneyMovementsView | undefined>(undefined);
+
   const setSelectedTab = React.useCallback(
     (tab: HostedAccountView) => {
       if (selectedTab !== tab) {
@@ -47,6 +49,14 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
       }
     },
     [router, accountId, selectedTab],
+  );
+
+  const openTab = React.useCallback(
+    (tab: HostedAccountView, view?: MoneyMovementsView) => {
+      setMoneyMovementsView(view);
+      setSelectedTab(tab);
+    },
+    [setSelectedTab],
   );
 
   const query = useQuery<HostedAccountProfileQuery, HostedAccountProfileQueryVariables>(hostedAccountProfileQuery, {
@@ -175,15 +185,15 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
           <MessageBoxGraphqlError error={query.error} />
         ) : (
           <React.Fragment>
-            <Tabs tabs={tabs} selectedId={selectedTab} onChange={setSelectedTab} />
+            <Tabs tabs={tabs} selectedId={selectedTab} onChange={tab => openTab(tab as HostedAccountView)} />
             {selectedTab === HostedAccountView.OVERVIEW && (
-              <HostedAccountOverviewTab account={account} host={host} openTab={setSelectedTab} />
+              <HostedAccountOverviewTab account={account} host={host} openTab={openTab} />
             )}
             {selectedTab === HostedAccountView.ACCOUNTS && (
               <HostedAccountAccountsTab account={account} host={host} loading={isLoading} onEdit={refetch} />
             )}
             {selectedTab === HostedAccountView.MONEY_MOVEMENTS && (
-              <HostedAccountMoneyMovementsTab account={account} hostSlug={hostSlug} />
+              <HostedAccountMoneyMovementsTab account={account} hostSlug={hostSlug} initialView={moneyMovementsView} />
             )}
             {selectedTab === HostedAccountView.EXPECTED_FUNDS && (
               <HostedAccountExpectedFundsTab account={account} hostSlug={hostSlug} />
