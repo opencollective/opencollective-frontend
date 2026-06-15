@@ -43,10 +43,14 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('apply-filter').should('not.be.disabled');
       cy.getByDataCy('apply-filter').click();
       cy.getByDataCy('filter-frequency').should('exist');
-      cy.get('[data-cy^="datatable-row"]').should('have.length', 0);
+      // Wait for the filtered query to finish loading. While loading, the table shows skeleton
+      // rows without data-cy attributes; when loading completes with no results, the table is
+      // replaced by EmptyResults, which can close an open filter popover.
+      cy.getByDataCy('zero-results-message').should('exist');
 
       // Filter by Monthly frequency
       cy.getByDataCy('filter-frequency').click();
+      cy.getByDataCy('combo-select-input').should('be.visible');
       cy.contains('[data-cy="combo-select-option"]', 'Monthly').click();
       cy.getByDataCy('apply-filter').should('not.be.disabled');
       cy.getByDataCy('apply-filter').click();
@@ -80,7 +84,7 @@ describe('Recurring contributions', () => {
   it('Can change the tier and amount of the order', () => {
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
-      cy.contains('Update amount').click();
+      cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Backer').within(() => {
         cy.get('input[type="radio"]').check();
       });
@@ -93,7 +97,7 @@ describe('Recurring contributions', () => {
   it('Can select a fixed recurring contribution tier', () => {
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
-      cy.contains('Update amount').click();
+      cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Recurring Fixed Donation Tier').within(() => {
         cy.get('input[type="radio"]').check();
       });
@@ -106,7 +110,7 @@ describe('Recurring contributions', () => {
   it('Can change the amount in a flexible contribution tier', () => {
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
-      cy.contains('Update amount').click();
+      cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
         cy.get('input[type="radio"]').check();
       });
@@ -123,7 +127,7 @@ describe('Recurring contributions', () => {
   it('Can contribute a custom contribution amount', () => {
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
-      cy.contains('Update amount').click();
+      cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
         cy.get('input[type="radio"]').check();
       });
@@ -143,7 +147,7 @@ describe('Recurring contributions', () => {
   it('Cannot contribute a contribution amount less than the minimum allowable amount', () => {
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
       cy.getByDataCy('actions-menu-trigger').first().click();
-      cy.contains('Update amount').click();
+      cy.contains('Update contribution amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
         cy.get('input[type="radio"]').check();
       });
@@ -184,5 +188,70 @@ describe('Recurring contributions', () => {
         expect(emailBody).to.include('Because I want to');
       });
     });
+  });
+});
+
+describe('Recurring contributions: update platform tip', () => {
+  let user;
+  let collective;
+
+  before(() => {
+    // Host on the Open Source Collective with platform tips enabled. This host renders the
+    // legacy Stripe card element, so we can reuse the same proven `useAnyPaymentMethod` flow as
+    // the first describe block above instead of the real Stripe Payment Element (which redirects
+    // and can hang the recurring checkout).
+    cy.createHostedCollectiveV2({ skipApproval: true, testPayload: { data: { platformTips: true } } }).then(c => {
+      collective = c;
+      cy.signup({ redirect: `/${collective.slug}/donate` }).then(u => {
+        user = u;
+        // Details step: pick monthly, keep the default 15% platform tip
+        cy.get('#interval > :nth-child(2)').click();
+        cy.get('button[data-cy="cf-next-step"]').click();
+        // Profile step: keep the preselected personal profile. The legal name is required
+        // because the tip brings the yearly total over the contributor info threshold.
+        cy.contains('Contribute as');
+        cy.getByDataCy('input-legalName').type('Very Legal Name');
+        cy.get('button[data-cy="cf-next-step"]').click();
+        // Payment step: reuse an existing test payment method (no real Stripe)
+        cy.useAnyPaymentMethod();
+        cy.contains('button', 'Contribute').click();
+        cy.getByDataCy('order-success');
+      });
+    });
+  });
+
+  it('Can switch the tip to a different preset percentage', () => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` });
+    cy.getByDataCy('actions-menu-trigger').first().click();
+    cy.contains('Update platform tip amount').click();
+
+    cy.contains('[data-cy="platform-tip-options"] button', '20%').click();
+    cy.contains('[data-cy="platform-tip-options"] button', '20%').should('have.class', 'selected');
+
+    cy.getByDataCy('recurring-contribution-update-platform-tip-button').click();
+    cy.getByDataCy('toast-notification').contains('Your recurring contribution platform tip has been updated.');
+  });
+
+  it('Can set a custom tip amount', () => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` });
+    cy.getByDataCy('actions-menu-trigger').first().click();
+    cy.contains('Update platform tip amount').click();
+
+    cy.contains('[data-cy="platform-tip-options"] button', 'Custom').click();
+    cy.getByDataCy('platform-tip-other-amount').clear().type('5');
+
+    cy.getByDataCy('recurring-contribution-update-platform-tip-button').click();
+    cy.getByDataCy('toast-notification').contains('Your recurring contribution platform tip has been updated.');
+  });
+
+  it('Can opt out of the platform tip', () => {
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` });
+    cy.getByDataCy('actions-menu-trigger').first().click();
+    cy.contains('Update platform tip amount').click();
+
+    cy.contains(`I don't want to add a contribution to the Open Collective platform`).click();
+
+    cy.getByDataCy('recurring-contribution-update-platform-tip-button').click();
+    cy.getByDataCy('toast-notification').contains('Your recurring contribution platform tip has been updated.');
   });
 });

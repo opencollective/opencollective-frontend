@@ -298,6 +298,7 @@ export const communityAccountDetailQuery = gql`
       publicId
       legacyId
       slug
+      name
       hostedLegalDocuments(
         type: US_TAX_FORM
         account: { id: $accountId }
@@ -321,6 +322,10 @@ export const communityAccountDetailQuery = gql`
       }
       supportedPayoutMethods
       isTrustedHost
+      policies {
+        id
+        USE_VENDOR_POLICY
+      }
     }
 
     firstActivity: activities(

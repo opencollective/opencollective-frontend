@@ -310,8 +310,14 @@ function FilterDropdown<FV, FM>({
   const appliedValue = values[filterKey];
   const [draftValue, setDraftValue] = React.useState(appliedValue);
 
-  // Sync draft value when the applied value changes externally (e.g., URL change)
-  React.useEffect(() => setDraftValue(appliedValue), [appliedValue]);
+  // Sync draft value when the applied value changes externally (e.g., URL change).
+  // Only sync while the popover is closed to avoid resetting in-progress edits when the
+  // parent re-renders (e.g. after a GraphQL refetch).
+  React.useEffect(() => {
+    if (!open) {
+      setDraftValue(appliedValue);
+    }
+  }, [appliedValue, open]);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (locked) {

@@ -8,20 +8,22 @@ import { styled } from 'styled-components';
 import INTERVALS from '../../lib/constants/intervals';
 import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { AmountTypes } from '../../lib/constants/tiers-types';
-import { formatCurrency } from '../../lib/currency-utils';
+import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
 import { DEFAULT_MINIMUM_AMOUNT, DEFAULT_PRESETS } from '../../lib/tier-utils';
 
+import { NewPlatformTipSelector } from '../contribution-flow/NewPlatformTipContainer';
+import { PlatformTipOption } from '../contribution-flow/PlatformTipContainer';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
+import InputAmount from '../InputAmount';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import PayWithPaypalButton from '../PayWithPaypalButton';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledRadioList from '../StyledRadioList';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
@@ -44,15 +46,32 @@ const updateOrderMutation = gql`
   mutation UpdateOrder(
     $order: OrderReferenceInput!
     $amount: AmountInput
+    $platformTipAmount: AmountInput
     $tier: TierReferenceInput
     $paypalSubscriptionId: String
   ) {
-    updateOrder(order: $order, amount: $amount, tier: $tier, paypalSubscriptionId: $paypalSubscriptionId) {
+    updateOrder(
+      order: $order
+      amount: $amount
+      platformTipAmount: $platformTipAmount
+      tier: $tier
+      paypalSubscriptionId: $paypalSubscriptionId
+    ) {
       id
       status
       frequency
       amount {
         value
+        currency
+      }
+      totalAmount {
+        value
+        valueInCents
+        currency
+      }
+      platformTipAmount {
+        value
+        valueInCents
         currency
       }
       tier {
@@ -105,7 +124,13 @@ export const useUpdateOrder = ({ contribution, onSuccess }) => {
   const [submitUpdateOrder, { loading }] = useMutation(updateOrderMutation);
   return {
     isSubmittingOrder: loading,
-    updateOrder: async (selectedTier, selectedAmountOption, inputAmountValue, paypalSubscriptionId = null) => {
+    updateOrder: async (
+      selectedTier,
+      selectedAmountOption,
+      inputAmountValue,
+      paypalSubscriptionId = null,
+      platformTipAmount = null,
+    ) => {
       try {
         await submitUpdateOrder({
           variables: {
@@ -118,6 +143,13 @@ export const useUpdateOrder = ({ contribution, onSuccess }) => {
               id: selectedTier?.id || null,
               isCustom: !selectedTier,
             },
+            platformTipAmount:
+              platformTipAmount === null
+                ? undefined
+                : {
+                    valueInCents: platformTipAmount,
+                    currency: contribution.platformTipAmount?.currency || contribution.amount.currency,
+                  },
           },
         });
         toast({
@@ -138,6 +170,57 @@ export const useUpdateOrder = ({ contribution, onSuccess }) => {
       }
     },
   };
+};
+
+export const useUpdatePlatformTip = ({ contribution, onSuccess }) => {
+  const { toast } = useToast();
+  const [submitUpdateOrder, { loading }] = useMutation(updateOrderMutation);
+  return {
+    isSubmittingPlatformTip: loading,
+    updatePlatformTip: async (platformTipAmount, paypalSubscriptionId = null) => {
+      try {
+        await submitUpdateOrder({
+          variables: {
+            order: { id: contribution.id },
+            paypalSubscriptionId,
+            platformTipAmount: {
+              valueInCents: platformTipAmount,
+              currency: contribution.platformTipAmount?.currency || contribution.amount.currency,
+            },
+          },
+        });
+        toast({
+          variant: 'success',
+          message: (
+            <FormattedMessage
+              defaultMessage="Your recurring contribution platform tip has been <strong>updated</strong>."
+              id="34nbee"
+              values={I18nFormatters}
+            />
+          ),
+        });
+        onSuccess();
+      } catch (error) {
+        const errorMsg = getErrorFromGraphqlException(error).message;
+        toast({ variant: 'error', message: errorMsg });
+        return false;
+      }
+    },
+  };
+};
+
+export const getPlatformTipOptionFromAmount = (value, amount, currency) => {
+  if (!value) {
+    return PlatformTipOption.OTHER;
+  }
+
+  const matchingPreset = [
+    { option: PlatformTipOption.TEN_PERCENT, percent: 0.1 },
+    { option: PlatformTipOption.FIFTEEN_PERCENT, percent: 0.15 },
+    { option: PlatformTipOption.TWENTY_PERCENT, percent: 0.2 },
+  ].find(({ percent }) => value === roundCentsAmount(percent * amount, currency));
+
+  return matchingPreset?.option || PlatformTipOption.OTHER;
 };
 
 const getTierAmountOptions = (selectedTier, contribution, locale) => {
@@ -306,9 +389,8 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   } = contributeOptionsState;
   const selectedTier = selectedContributeOption?.isCustom ? null : selectedContributeOption;
   const isPaypal = contribution.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
-  const tipAmount = contribution.platformTipAmount?.valueInCents || 0;
   const newAmount = selectedAmountOption?.label === OTHER_LABEL ? inputAmountValue : selectedAmountOption?.value;
-  const newTotalAmount = newAmount + tipAmount; // For now tip can't be updated, we're just carrying it over
+  const newTotalAmount = newAmount + (contribution.platformTipAmount?.valueInCents || 0);
 
   // When we change the amount option (One of the presets or Other)
   const setSelectedAmountOption = ({ label, value }) => {
@@ -324,7 +406,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
     <Fragment>
       <Flex width={1} alignItems="center" justifyContent="center" minHeight={50} px={3}>
         <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
-          <FormattedMessage id="subscription.menu.updateTier" defaultMessage="Update tier" />
+          <FormattedMessage defaultMessage="Update contribution amount" id="HpWk9J" />
         </P>
         <Flex flexGrow={1} alignItems="center">
           <StyledHr width="100%" mx={2} />
@@ -377,14 +459,13 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
                             <FormattedMessage id="RecurringContributions.customAmount" defaultMessage="Custom amount" />
                           </P>
                           <Box>
-                            <StyledInputAmount
+                            <InputAmount
                               type="number"
                               data-cy="recurring-contribution-custom-amount-input"
                               currency={currency}
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
                               min={DEFAULT_MINIMUM_AMOUNT}
-                              px="2px"
                             />
                           </Box>
                           <P fontSize="12px" fontWeight="600" my={2}>
@@ -455,6 +536,88 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
             loading={isSubmittingOrder}
             data-cy="recurring-contribution-update-order-button"
             onClick={() => updateOrder(selectedTier, selectedAmountOption, inputAmountValue)}
+          >
+            <FormattedMessage id="actions.update" defaultMessage="Update" />
+          </StyledButton>
+        )}
+      </Flex>
+    </Fragment>
+  );
+};
+
+export const UpdatePlatformTipPopUp = ({ contribution, onCloseEdit }) => {
+  const { toast } = useToast();
+  const [tipAmount, setTipAmount] = useState(contribution.platformTipAmount?.valueInCents || 0);
+  const [selectedTipOption, setSelectedTipOption] = useState(() =>
+    getPlatformTipOptionFromAmount(
+      contribution.platformTipAmount?.valueInCents || 0,
+      contribution.amount.valueInCents,
+      contribution.amount.currency,
+    ),
+  );
+  const { isSubmittingPlatformTip, updatePlatformTip } = useUpdatePlatformTip({ contribution, onSuccess: onCloseEdit });
+  const isPaypal = contribution.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
+  const currentTipAmount = contribution.platformTipAmount?.valueInCents || 0;
+  const totalAmount = contribution.totalAmount.valueInCents - currentTipAmount + tipAmount;
+
+  return (
+    <Fragment>
+      <Flex width={1} alignItems="center" justifyContent="center" minHeight={50} px={3}>
+        <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
+          <FormattedMessage defaultMessage="Update platform tip amount" id="rU2A5H" />
+        </P>
+        <Flex flexGrow={1} alignItems="center">
+          <StyledHr width="100%" mx={2} />
+        </Flex>
+      </Flex>
+      <Box px={3} py={2}>
+        <NewPlatformTipSelector
+          amount={contribution.amount.valueInCents}
+          collectiveName={contribution.toAccount.name}
+          currency={contribution.platformTipAmount?.currency || contribution.amount.currency}
+          selectedOption={selectedTipOption}
+          showHeader={false}
+          showOptOut={false}
+          value={tipAmount}
+          onChange={(selectedOption, value) => {
+            setSelectedTipOption(selectedOption);
+            setTipAmount(Number.isFinite(value) ? value : 0);
+          }}
+        />
+      </Box>
+      <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
+        <Flex flexGrow={1} alignItems="center">
+          <StyledHr width="100%" />
+        </Flex>
+      </Flex>
+      <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" minHeight={50}>
+        <StyledButton buttonSize="tiny" minWidth={75} onClick={onCloseEdit} height={25} mr={2}>
+          <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+        </StyledButton>
+        {isPaypal ? (
+          <PayWithPaypalButton
+            order={contribution}
+            isSubmitting={isSubmittingPlatformTip}
+            totalAmount={totalAmount}
+            currency={contribution.amount.currency}
+            interval={getIntervalFromContributionFrequency(contribution.frequency)}
+            host={contribution.toAccount.host}
+            collective={contribution.toAccount}
+            tier={contribution.tier}
+            style={{ height: 25, size: 'small' }}
+            subscriptionStartDate={getSubscriptionStartDate(contribution)}
+            onError={e => toast({ variant: 'error', title: e.message })}
+            onSuccess={({ subscriptionId }) => updatePlatformTip(tipAmount, subscriptionId)}
+          />
+        ) : (
+          <StyledButton
+            height={25}
+            minWidth={75}
+            buttonSize="tiny"
+            buttonStyle="secondary"
+            loading={isSubmittingPlatformTip}
+            data-cy="recurring-contribution-update-platform-tip-button"
+            onClick={() => updatePlatformTip(tipAmount)}
           >
             <FormattedMessage id="actions.update" defaultMessage="Update" />
           </StyledButton>

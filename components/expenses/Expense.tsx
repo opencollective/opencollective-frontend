@@ -299,7 +299,11 @@ function Expense(props: ExpenseProps) {
       </ExpenseHeader>
 
       {showTaxFormMsg && <TaxFormMessage expense={expense} refetch={refetch} />}
-      {isDraft && !isRecurring && !draftKey && <ExpenseInviteNotificationBanner expense={expense} />}
+      {/* Inviter-only "invite is on its way" banner. Hidden for the invited recipient (who can decline
+          the invite), so a logged-in invitee viewing the draft without a draftKey only sees the welcome banner. */}
+      {isDraft && !isRecurring && !draftKey && !expense?.permissions?.canDeclineExpenseInvite && (
+        <ExpenseInviteNotificationBanner expense={expense} />
+      )}
       {isMissingReceipt && <ExpenseMissingReceiptNotificationBanner expense={expense} />}
 
       <Box mb={3}>

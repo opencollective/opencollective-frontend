@@ -118,10 +118,6 @@ const ButtonLink = styled.a`
   cursor: pointer;
 `;
 
-const StyledImg = styled.img`
-  width: 100%;
-`;
-
 type FilesViewerModalProps = {
   onClose: () => void;
   parentTitle?: string;
@@ -192,7 +188,7 @@ export default function FilesViewerModal({
   const contentWrapperRef = React.useRef(null);
 
   const renderFile = ({ url, name }: { url: string; name?: string; info?: { width: number } }, contentWrapperRef) => {
-    let content = null;
+    let content: React.ReactNode;
 
     const isText = ['text/csv', 'text/plain'].includes(selectedItemContentType);
     const isPdf = 'application/pdf' === selectedItemContentType;
@@ -202,7 +198,9 @@ export default function FilesViewerModal({
     } else if (isPdf) {
       content = <PDFViewer pdfUrl={url} contentWrapperRef={contentWrapperRef} />;
     } else {
-      content = <StyledImg src={url} alt={name} />;
+      content = (
+        <img src={url} alt={name} className="h-auto max-h-[calc(100dvh-74px-10rem)] w-auto max-w-full object-contain" />
+      );
     }
 
     return <Content>{content}</Content>;

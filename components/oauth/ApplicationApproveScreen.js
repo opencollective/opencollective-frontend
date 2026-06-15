@@ -181,7 +181,7 @@ export const ApplicationApproveScreen = ({
     loading,
     error,
   } = useAsyncCall(async (allowed = true) => {
-    let response = null;
+    let response;
     try {
       response = await fetchAuthorize(
         application,

@@ -63,6 +63,7 @@ function getFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
+    ...pick(form.startOptions, ['isInlineEdit']),
     ...pick(form.options, [
       'account',
       'host',
@@ -73,6 +74,7 @@ function getFormProps(form: ExpenseForm) {
       'newPayoutMethodTypes',
       'recentlySubmittedExpenses',
       'isAdminOfPayee',
+      'isAdminOfPayeeHost',
       'loggedInAccount',
       'expense',
       'isPaypalConnectEnabled',
@@ -134,13 +136,20 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       setLastUsedPayoutMethod(null);
     }
 
-    if (!props.payoutMethodId && lastUsed) {
-      setFieldValue('payoutMethodId', lastUsed?.id);
-    } else if (
-      props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
-      (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
-    ) {
-      setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
+    const expensePayoutMethodId = props.expense?.payoutMethod?.id;
+    const isEditingExistingExpensePayoutMethod =
+      expensePayoutMethodId &&
+      (props.payeeSlug === props.expense?.payee?.slug || (props.isInlineEdit && !props.payeeSlug));
+
+    if (!isEditingExistingExpensePayoutMethod) {
+      if (!props.payoutMethodId && lastUsed) {
+        setFieldValue('payoutMethodId', lastUsed?.id);
+      } else if (
+        props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
+        (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
+      ) {
+        setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
+      }
     }
 
     if (!props.initialLoading) {
@@ -148,8 +157,11 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     }
   }, [
     props.initialLoading,
+    props.isInlineEdit,
     props.payeeSlug,
     props.recentlySubmittedExpenses,
+    props.expense?.payee?.slug,
+    props.expense?.payoutMethod?.id,
     setFieldValue,
     props.payoutMethodId,
     props.payoutMethods,
@@ -266,6 +278,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       !isVendor &&
       props.payeeSlug !== PAYEE_SLUG_NEW_VENDOR &&
       !props.isAdminOfPayee &&
+      !props.isAdminOfPayeeHost &&
       !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) ? (
         <MessageBox type="info">
           {props.expenseTypeOption === ExpenseType.GRANT ? (
@@ -311,6 +324,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 disableWarningMessages={
                   payeeIsCollectiveFamilyType && !LoggedInUser.isAdminOfCollective(props.payee['host'])
                 }
+                disableNameMismatchWarning={payeeIsCollectiveFamilyType && !payeeIsSameHost}
                 isPaypalConnectEnabled={props['isPaypalConnectEnabled']}
               />
             ))}
@@ -324,7 +338,9 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
           {!(isLoading || isLoadingPayee) &&
             props.newPayoutMethodTypes?.length > 0 &&
             !(isVendor && payoutMethods.length > 0) &&
-            !payeeIsCollectiveFamilyType && (
+            (!payeeIsCollectiveFamilyType ||
+              // Cross-host: let an admin of the recipient host add a new payout method on the host
+              (!payeeIsSameHost && props.isAdminOfPayeeHost)) && (
               <RadioGroupCard
                 value={NEW_PAYOUT_METHOD_ID}
                 data-cy="add-new-payout-method"
@@ -413,6 +429,12 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
 
   const isNewPaypalConnect = props.isPaypalConnectEnabled && props.newPayoutMethod?.type === PayoutMethodType.PAYPAL;
 
+  // Cross-host: the listed payout methods (and any new one) belong to the recipient host, not the
+  // payee collective, so a host admin completing the draft must create/connect against the host.
+  const payeeHost = props.payee && 'host' in props.payee ? props.payee.host : null;
+  const isCrossHostPayee = Boolean(payeeHost && props.host && payeeHost.id !== props.host.id);
+  const payoutMethodAccount = isCrossHostPayee ? payeeHost : props.payee;
+
   const [createPayoutMethod] = useMutation<SavePayoutMethodMutation, SavePayoutMethodMutationVariables>(
     gql`
       mutation SavePayoutMethod($payoutMethod: PayoutMethodInput!, $payeeSlug: String!) {
@@ -424,7 +446,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     {
       variables: {
         payoutMethod: { ...props.newPayoutMethod },
-        payeeSlug: props.payeeSlug,
+        payeeSlug: isCrossHostPayee ? payeeHost.slug : props.payeeSlug,
       },
     },
   );
@@ -631,7 +653,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
           {isNewPaypalConnect ? (
             <PaypalConnectButton
               className="w-full"
-              accountId={props.payee.id}
+              accountId={payoutMethodAccount.id}
               onSuccess={onPaypalConnectSuccess}
               onError={onPaypalConnectError}
               loading={creatingPayoutMethod}
@@ -668,6 +690,8 @@ type PayoutMethodRadioGroupItemProps = {
   archived?: boolean;
   /** Hide quick actions to correct missing currency or mismatch name */
   disableWarningMessages?: boolean;
+  /** Hide the legal name mismatch warning (e.g. cross-host payments where the payout method belongs to the recipient Host, not the payee) */
+  disableNameMismatchWarning?: boolean;
   onPaymentMethodDeleted: (deletedPayoutMethodId) => void;
   onPaymentMethodEdited: (newPayoutMethodId: string) => void;
   setNameMismatchReason?: (reason: string) => void;
@@ -687,6 +711,13 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const CardComponent = props.Component || RadioGroupCard;
   const intl = useIntl();
   const { toast } = useToast();
+
+  // Cross-host: the listed payout method belongs to the recipient host, not the payee collective,
+  // so edits/reconnects must target the host (matches the create flow in NewPayoutMethodOption).
+  const payeeHost = props.payee && 'host' in props.payee ? props.payee.host : null;
+  const payerHost = props.account && 'host' in props.account ? props.account.host : null;
+  const isCrossHostPayee = Boolean(payeeHost && payerHost && payeeHost.id !== payerHost.id);
+  const payoutMethodAccount = isCrossHostPayee ? payeeHost : props.payee;
 
   const isEditable =
     props.payoutMethod.type !== PayoutMethodType.ACCOUNT_BALANCE &&
@@ -929,7 +960,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                   props.isPaypalConnectEnabled &&
                   !values.editingPayoutMethod.isVerified ? (
                     <PaypalConnectButton
-                      accountId={props.payee.id}
+                      accountId={payoutMethodAccount.id}
                       payoutMethodId={values.editingPayoutMethod.id}
                       onSuccess={async ({ payoutMethodId }) => {
                         try {
@@ -1030,7 +1061,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                     </MessageBox>
                   </div>
                 )}
-                {hasLegalNameMismatch && !props.disableWarningMessages && (
+                {hasLegalNameMismatch && !props.disableWarningMessages && !props.disableNameMismatchWarning && (
                   <MessageBox type="warning">
                     <div className="mb-2 font-bold">
                       <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />

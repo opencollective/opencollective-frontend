@@ -13,8 +13,10 @@ module.exports = defineConfig({
   chromeWebSecurity: false,
   scrollBehavior: 'center',
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
-  env: {
+  expose: {
     MAILPIT_URL: 'http://localhost:1080',
+  },
+  env: {
     codeCoverage: {
       url: '/__coverage__',
     },
@@ -54,7 +56,7 @@ module.exports = defineConfig({
 
       // Delete videos if the test succeeds
       on('after:spec', (spec, results) => {
-        if (results && results.video) {
+        if (results && results.video && !process.env.CYPRESS_KEEP_VIDEOS) {
           // Do we have failures for any retry attempts?
           const failures = results.tests.some(test => test.attempts.some(attempt => attempt.state === 'failed'));
           if (!failures) {

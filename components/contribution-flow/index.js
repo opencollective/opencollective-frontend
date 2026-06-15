@@ -6,9 +6,8 @@ import { CardElement } from '@stripe/react-stripe-js';
 import { get, intersection, isEmpty, isEqual, isNil, omitBy, pick } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
-import { isURL } from 'validator';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
@@ -18,20 +17,25 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
 import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants/payment-methods';
-import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
-import { Experiment, isExperimentEnabled, isOpenSourceCollectiveHost } from '../../lib/experiments/experiments';
+import {
+  Experiment,
+  isExperimentEnabled,
+  isOpenSourceCollectiveHost,
+  isOscTipExperiment,
+  platformTipApplies,
+} from '../../lib/experiments/experiments';
 import { gql } from '../../lib/graphql/helpers';
 import { AccountType } from '../../lib/graphql/types/v2/graphql';
-import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { followOrderRedirectUrl, getCollectivePageRoute } from '../../lib/url-helpers';
 import { getApiUrl, reportValidityHTML5 } from '../../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import { isCaptchaEnabled } from '../Captcha';
@@ -62,7 +66,6 @@ import {
 import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
-import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import {
   getGQLV2AmountInput,
   getGuestInfoFromStepProfile,
@@ -113,16 +116,6 @@ const OTHER_MESSAGES = defineMessages({
   },
 });
 
-const validateNewOrg = values => {
-  if (!values.name) {
-    return false;
-  } else if (values.website && !isURL(values.website)) {
-    return false;
-  }
-
-  return true;
-};
-
 class ContributionFlow extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
@@ -152,7 +145,6 @@ class ContributionFlow extends React.Component {
     refetchLoggedInUser: PropTypes.func,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
-    createCollective: PropTypes.func.isRequired, // from v1 mutation (used for new org creation)
     createIncognitoProfile: PropTypes.func.isRequired, // from mutation
     router: PropTypes.object,
     onStepChange: PropTypes.func,
@@ -223,6 +215,7 @@ class ContributionFlow extends React.Component {
             ? 'new'
             : 'old',
           [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: this.canHavePlatformTips(),
+          [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: this.isOscTipExperiment(),
           [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.collective?.host?.slug,
         },
       });
@@ -326,6 +319,7 @@ class ContributionFlow extends React.Component {
         platformTipBaseAmount && stepDetails.platformTip > 0 ? stepDetails.platformTip / platformTipBaseAmount : 0,
       [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails.isNewPlatformTip ? 'new' : 'old',
       [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: this.canHavePlatformTips(),
+      [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: this.isOscTipExperiment(),
       [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.collective?.host?.slug,
     };
 
@@ -607,26 +601,12 @@ class ContributionFlow extends React.Component {
     }
 
     // Check if we're creating a new profile
-    if (stepProfile.id === 'incognito' || stepProfile.id === NEW_ORGANIZATION_KEY) {
-      if (stepProfile.type === 'ORGANIZATION' && !validateNewOrg(stepProfile)) {
-        return false;
-      }
-
+    if (stepProfile.id === 'incognito') {
       this.setState({ isSubmitting: true });
 
       try {
-        let createdProfile;
-        if (stepProfile.id === 'incognito') {
-          const { data: result } = await this.props.createIncognitoProfile();
-          createdProfile = result.createIncognitoProfile;
-        } else {
-          const collectiveData = {
-            ...stepProfile,
-            type: stepProfile.type === 'INDIVIDUAL' ? 'USER' : stepProfile.type,
-          };
-          const { data: result } = await this.props.createCollective(collectiveData);
-          createdProfile = result.createCollective;
-        }
+        const { data: result } = await this.props.createIncognitoProfile();
+        const createdProfile = result.createIncognitoProfile;
         await this.props.refetchLoggedInUser();
         this.setState({ stepProfile: createdProfile, isSubmitting: false });
       } catch (error) {
@@ -753,20 +733,16 @@ class ContributionFlow extends React.Component {
   getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
   canHavePlatformTips() {
-    const { tier, collective } = this.props;
     if (this.platformTipDisabledByExperiment) {
       return false;
-    } else if (!collective.platformContributionAvailable) {
-      return false;
-    } else if (!tier) {
-      return true;
-    } else if (tier.type === TierTypes.TICKET) {
-      return false;
-    } else if (tier.amountType === 'FIXED' && !tier.amount.valueInCents) {
-      return false; // No platform tips for free tiers
-    } else {
-      return true;
     }
+    return platformTipApplies(this.props.collective, this.props.tier);
+  }
+
+  // Whether this contribution is in the OSC platform tip A/B experiment portion.
+  // The arm is read from contributionPlatformTipEnabled (canHavePlatformTips).
+  isOscTipExperiment() {
+    return isOscTipExperiment(this.props.collective, this.props.tier);
   }
 
   checkFormValidity = () => {
@@ -1029,6 +1005,7 @@ class ContributionFlow extends React.Component {
                     }}
                     step={currentStep}
                     showPlatformTip={this.canHavePlatformTips()}
+                    isOscTipExperiment={this.isOscTipExperiment()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     onSignInClick={() => this.setState({ showSignIn: true })}
@@ -1145,10 +1122,6 @@ const addConfirmOrderMutation = graphql(
 
 export default injectIntl(
   withUser(
-    addConfirmOrderMutation(
-      addCreateOrderMutation(
-        addCreateIncognitoProfileMutation(addCreateCollectiveMutation(withRouter(ContributionFlow))),
-      ),
-    ),
+    addConfirmOrderMutation(addCreateOrderMutation(addCreateIncognitoProfileMutation(withRouter(ContributionFlow)))),
   ),
 );

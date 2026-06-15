@@ -104,12 +104,12 @@ export const adminPanelQuery = gql`
         CHARGE_HOSTING_FEES
         KYC
         ACCOUNTING_CATEGORIZATION_RULES
-        HOST_METRICS
       }
       policies {
         id
         publicId
         REQUIRE_2FA_FOR_ADMINS
+        USE_VENDOR_POLICY
       }
       ... on Organization {
         hasHosting

@@ -2625,9 +2625,14 @@ type TaxInfo {
   rate: Float!
 
   """
-  Tax ID number of the 3rd party receiving/paying the tax
+  Tax ID number of the 3rd party receiving/paying the tax. Will be null if not allowed to see it.
   """
   idNumber: String
+
+  """
+  Whether the tax ID number is available. Contrary to `idNumber`, this field is public.
+  """
+  hasTaxIdNumber: Boolean!
 }
 
 """
@@ -4194,7 +4199,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   Returns the current platform subscription
   """
   platformSubscription: PlatformSubscription
-  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling
   legacyPlan: HostPlan!
   hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
@@ -4654,9 +4659,10 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     forAccount: AccountReferenceInput
 
     """
-    Only returns vendors that are visible to the given accounts
+    Only return vendors that can be used with the given accounts
     """
-    visibleToAccounts: [AccountReferenceInput]
+    canBeUsedWithAccounts: [AccountReferenceInput]
+    visibleToAccounts: [AccountReferenceInput] @deprecated(reason: "Use canBeUsedWithAccounts instead.")
 
     """
     Filter on archived vendors
@@ -5010,7 +5016,7 @@ interface AccountWithPlatformSubscription {
   Returns the current platform subscription
   """
   platformSubscription: PlatformSubscription
-  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling
   legacyPlan: HostPlan!
 }
 
@@ -6035,6 +6041,7 @@ enum ActivityType {
   USER_CREATED
   USER_NEW_TOKEN
   USER_SIGNIN
+  USER_NEW_PASSWORD_SIGNIN
   USER_RESET_PASSWORD
   USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
@@ -6398,6 +6405,11 @@ type PayoutMethod {
   The type of this payout method (usually the payment provider)
   """
   type: PayoutMethodType
+
+  """
+  The currency of this payout method
+  """
+  currency: Currency
 
   """
   A friendly name for users to easily find their payout methods
@@ -7475,7 +7487,6 @@ type CollectiveFeatures {
   PAYPAL_CONNECT: CollectiveFeatureStatus
   CHART_OF_ACCOUNTS: CollectiveFeatureStatus
   ACCOUNTING_CATEGORIZATION_RULES: CollectiveFeatureStatus
-  HOST_METRICS: CollectiveFeatureStatus
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
@@ -7543,7 +7554,11 @@ type Policies {
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
-  EXPENSE_PUBLIC_VENDORS: Boolean
+
+  """
+  Default rule for who can attribute financial activities to vendors under this host.
+  """
+  USE_VENDOR_POLICY: UseVendorPolicy
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
 
   """
@@ -7592,6 +7607,26 @@ type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
 type EXPENSE_CATEGORIZATION {
   requiredForExpenseSubmitters: Boolean
   requiredForCollectiveAdmins: Boolean
+}
+
+"""
+Who can attribute financial activities to a vendor
+"""
+enum UseVendorPolicy {
+  """
+  Only host admins can use this vendor.
+  """
+  HOST_ADMINS
+
+  """
+  Host admins and admins of hosted collectives.
+  """
+  HOST_AND_COLLECTIVE_ADMINS
+
+  """
+  Anyone who can submit an expense.
+  """
+  ALL_SUBMITTERS
 }
 
 type CONTRIBUTOR_INFO_THRESHOLDS {
@@ -8143,51 +8178,81 @@ type HostMetrics {
   Amount collected in host fees for given period
   """
   hostFees: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount collected in platform fees for given period
   """
   platformFees: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount collected in platform fees requiring settlement
   """
   pendingPlatformFees: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount collected in platform tips for given period
   """
   platformTips: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount collected in platform tips requiring settlement
   """
   pendingPlatformTips: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount in host fee shared with the platform
   """
   hostFeeShare: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount in host fee shared  requiring settlement
   """
   pendingHostFeeShare: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Amount in host fee shared not requiring settlement
   """
   settledHostFeeShare: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Total amount managed on behalf of hosted collectives
   """
   totalMoneyManaged: Amount
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 
   """
   Host fee sharing percent
   """
   hostFeeSharePercent: Float
+    @deprecated(
+      reason: "2026-05-15: Host.hostMetrics is deprecated and unused by the frontend; this field is always 0."
+    )
 }
 
 """
@@ -8213,6 +8278,9 @@ type HostMetricsTimeSeries {
   History of the collected platform tips
   """
   platformTips: TimeSeriesAmount!
+    @deprecated(
+      reason: "2026-05-15: Unused by the frontend; the platform-tips ledger is now opt-in per host (NEW_PLATFORM_TIPS_LEDGER) and this aggregated series is no longer maintained. Always returns an empty series."
+    )
 
   """
   History of the host fees collected
@@ -12457,7 +12525,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns the current platform subscription
   """
   platformSubscription: PlatformSubscription
-  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling
   legacyPlan: HostPlan!
 }
 
@@ -16850,7 +16918,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Returns the current platform subscription
   """
   platformSubscription: PlatformSubscription
-  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling
   legacyPlan: HostPlan!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
@@ -16899,9 +16967,10 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     forAccount: AccountReferenceInput
 
     """
-    Only returns vendors that are visible to the given accounts
+    Only return vendors that can be used with the given accounts
     """
-    visibleToAccounts: [AccountReferenceInput]
+    canBeUsedWithAccounts: [AccountReferenceInput]
+    visibleToAccounts: [AccountReferenceInput] @deprecated(reason: "Use canBeUsedWithAccounts instead.")
 
     """
     Filter on archived vendors
@@ -18363,9 +18432,15 @@ type Vendor implements Account & AccountWithContributions {
   createdByAccount: Account
 
   """
-  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  The accounts this vendor can be used with. If empty, the vendor can be used with any collective under the vendor host.
   """
-  visibleToAccounts: [Account]!
+  canBeUsedWithAccounts: [Account]!
+  visibleToAccounts: [Account]! @deprecated(reason: "Use canBeUsedWithAccounts instead.")
+
+  """
+  Per-vendor override for who can attribute financial activities to this vendor. Null means inherit from host.
+  """
+  useVendorPolicy: UseVendorPolicy
 }
 
 """
@@ -21307,6 +21382,7 @@ enum ActivityAndClassesType {
   USER_CREATED
   USER_NEW_TOKEN
   USER_SIGNIN
+  USER_NEW_PASSWORD_SIGNIN
   USER_RESET_PASSWORD
   USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
@@ -25633,9 +25709,14 @@ type Mutation {
     tier: TierReferenceInput
 
     """
-    An Amount to update the order to
+    New amount to charge the contributor, excluding the platform tip. Includes taxes if any.
     """
     amount: AmountInput
+
+    """
+    Platform tip for this order. Omit or pass null to keep the current tip; provide a value (including zero) to update it.
+    """
+    platformTipAmount: AmountInput
   ): Order
 
   """
@@ -26003,6 +26084,41 @@ type Mutation {
     """
     transactionImport: TransactionsImportReferenceInput
   ): GoCardlessConnectAccountResponse!
+
+  """
+  Get the Wise (TransferWise) OAuth URL to initiate the account connection flow for a host. Scope: "connectedAccounts".
+  """
+  getTransferwiseOAuthUrl(
+    """
+    The host account to connect Wise to
+    """
+    account: AccountReferenceInput!
+
+    """
+    The URL or path to redirect the user to once the OAuth flow is complete
+    """
+    redirect: String
+  ): URL!
+
+  """
+  Complete the Wise (TransferWise) OAuth flow and connect the account to the host. Scope: "connectedAccounts".
+  """
+  connectTransferwiseAccount(
+    """
+    The authorization code returned by Wise in the OAuth callback
+    """
+    code: NonEmptyString!
+
+    """
+    The Wise profile id returned in the OAuth callback
+    """
+    profileId: NonEmptyString!
+
+    """
+    The OAuth state token that was generated when initiating the connection
+    """
+    state: NonEmptyString!
+  ): TransferwiseConnectAccountResponse!
 
   """
   [Root only] Edits account flags (deleted, banned, archived, trusted host)
@@ -27045,7 +27161,7 @@ input PoliciesInput {
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
   EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
-  EXPENSE_PUBLIC_VENDORS: Boolean
+  USE_VENDOR_POLICY: UseVendorPolicy
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
   CONTRIBUTOR_INFO_THRESHOLDS: PoliciesContributorInfoThresholdsInput
 }
@@ -27548,6 +27664,11 @@ input PayoutMethodInput {
   The type of payout method (e.g., PayPal, bank transfer)
   """
   type: PayoutMethodType
+
+  """
+  The currency for this payout method
+  """
+  currency: Currency
 }
 
 input ExpenseItemCreateInput {
@@ -28927,6 +29048,18 @@ type GoCardlessConnectAccountResponse {
   transactionsImport: TransactionsImport!
 }
 
+type TransferwiseConnectAccountResponse {
+  """
+  The connected account that was created
+  """
+  connectedAccount: ConnectedAccount!
+
+  """
+  The URL to redirect the user to once the connection is complete
+  """
+  redirectUrl: URL
+}
+
 enum AccountCacheType {
   CLOUDFLARE
   GRAPHQL_QUERIES
@@ -29323,6 +29456,9 @@ input PersonalTokenCreateInput {
   The account to use as the owner of the application. Defaults to currently logged in user.
   """
   account: AccountReferenceInput
+    @deprecated(
+      reason: "2026-06-03: This field is ignored, the account will always default to the currently logged in user."
+    )
 }
 
 """
@@ -29385,7 +29521,17 @@ input VendorCreateInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
-  visibleToAccounts: [AccountReferenceInput]
+
+  """
+  Restrict this vendor to specific accounts under the host. If empty/omitted, the vendor can be used with any hosted account.
+  """
+  canBeUsedWithAccounts: [AccountReferenceInput]
+  visibleToAccounts: [AccountReferenceInput] @deprecated(reason: "Use canBeUsedWithAccounts instead.")
+
+  """
+  Per-vendor override for who can attribute financial activities. Null means inherit from host.
+  """
+  useVendorPolicy: UseVendorPolicy
 
   """
   The profile avatar image
@@ -29440,7 +29586,17 @@ input VendorEditInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
-  visibleToAccounts: [AccountReferenceInput]
+
+  """
+  Restrict this vendor to specific accounts under the host. If empty/omitted, the vendor can be used with any hosted account.
+  """
+  canBeUsedWithAccounts: [AccountReferenceInput]
+  visibleToAccounts: [AccountReferenceInput] @deprecated(reason: "Use canBeUsedWithAccounts instead.")
+
+  """
+  Per-vendor override for who can attribute financial activities. Null means inherit from host.
+  """
+  useVendorPolicy: UseVendorPolicy
 
   """
   The profile avatar image

@@ -310,7 +310,7 @@ const PaymentReceipts = ({ collective }: PaymentReceiptsProps) => {
   const filterValue: FilterValue = activeFilter === PAST_12_MONTHS ? PAST_12_MONTHS : Number(activeFilter);
   const invoices: InvoiceData[] = data ? filterInvoices(data.allInvoices, filterValue) : [];
 
-  let content: React.ReactNode = null;
+  let content: React.ReactNode;
   if (loading) {
     content = <ReceiptsLoadingPlaceholder />;
   } else if (error) {

@@ -28,7 +28,7 @@
     "cypress",
     "*.config.*",
     "lib",
-    "middleware.ts",
+    "proxy.ts",
     "next-env.d.ts",
     "pages",
     "rewrites.js",

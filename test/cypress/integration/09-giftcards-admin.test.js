@@ -21,7 +21,7 @@ describe('Gift cards admin', () => {
     cy.login({ redirect: `/dashboard/${collectiveSlug}/gift-cards-create` });
 
     // Fill form
-    cy.get('#giftcard-amount').type('42');
+    cy.get('#giftcard-amount').type('{selectall}542');
     cy.get('.deliver-type-selector label[data-name="manual"] .radio-btn').click();
     cy.get('#giftcard-numberOfGiftCards').type(`{selectall}${numberOfGiftCards}`);
     cy.getByDataCy('checkbox-accept-payment-method-warning').click();

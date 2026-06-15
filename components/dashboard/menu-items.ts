@@ -128,6 +128,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
 
   const isIndividual = isIndividualAccount(account);
   const isOrganization = isOrganizationAccount(account);
+  const isFund = account.type === FUND;
   const isEvent = account.type === EVENT;
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
@@ -283,7 +284,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Shuffle,
     },
     {
-      if: isIndividual && hasIssuedGrantRequests,
+      if: isIndividual,
       Icon: Award,
       label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
       section: ALL_SECTIONS.SUBMITTED_GRANTS,
@@ -592,7 +593,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.PAYMENT_RECEIPTS,
-          if: (isIndividual || isOrganization) && !account.isPrivate,
+          if: (isIndividual || isOrganization || isFund) && !account.isPrivate,
         },
         {
           section: ALL_SECTIONS.GIFT_CARDS,

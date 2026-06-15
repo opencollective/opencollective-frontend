@@ -19,7 +19,7 @@ import StackedAvatars from '@/components/StackedAvatars';
 import { Badge } from '@/components/ui/Badge';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { VendorContactTag } from '@/components/vendors/common';
+import { getEffectiveVendorPolicyLabel, VendorContactTag } from '@/components/vendors/common';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -36,6 +36,27 @@ const recentTransactionsSchema = z.object({
   offset,
   openTransactionId: z.coerce.string().optional(),
 });
+
+const VendorPolicyValue = ({
+  vendor,
+  host,
+}: {
+  vendor: Parameters<typeof getEffectiveVendorPolicyLabel>[0];
+  host: Parameters<typeof getEffectiveVendorPolicyLabel>[1];
+}) => {
+  const intl = useIntl();
+  const { label, isInherited } = getEffectiveVendorPolicyLabel(vendor, host, intl);
+  return (
+    <span>
+      {label}
+      {isInherited && (
+        <span className="ml-1 text-xs text-muted-foreground">
+          <FormattedMessage defaultMessage="(host default)" id="wGmb1I" />
+        </span>
+      )}
+    </span>
+  );
+};
 
 export const AccountDetailsOverviewTab = ({
   query,
@@ -188,15 +209,24 @@ export const AccountDetailsOverviewTab = ({
                 <DataListItem
                   label={<FormattedMessage defaultMessage="Visible to" id="zJePa1" />}
                   value={
-                    'visibleToAccounts' in account && account.visibleToAccounts.length > 0 ? (
+                    'canBeUsedWithAccounts' in account && account.canBeUsedWithAccounts.length > 0 ? (
                       <StackedAvatars
-                        accounts={account.visibleToAccounts}
+                        accounts={account.canBeUsedWithAccounts}
                         imageSize={24}
                         withHoverCard={{ includeAdminMembership: true }}
                       />
                     ) : (
                       <FormattedMessage defaultMessage="All hosted accounts" id="M7USSD" />
                     )
+                  }
+                />
+                <DataListItem
+                  label={<FormattedMessage defaultMessage="Who can use" id="56SUDL" />}
+                  value={
+                    <VendorPolicyValue
+                      vendor={'useVendorPolicy' in account ? account : { useVendorPolicy: null }}
+                      host={query.data?.host}
+                    />
                   }
                 />
                 {vendorInfo.contact && (

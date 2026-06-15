@@ -1,10 +1,11 @@
 import React from 'react';
 import { get } from 'lodash-es';
-import { injectIntl, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { getCollectiveMainTag } from '../lib/collective';
 import { getCountryDisplayName, getFlagEmoji } from '../lib/i18n/countries';
+import injectIntl from '@/lib/injectIntl';
 
 import { AccountTrustBadge } from './AccountTrustBadge';
 import Avatar from './Avatar';

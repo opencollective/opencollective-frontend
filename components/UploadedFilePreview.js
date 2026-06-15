@@ -85,14 +85,16 @@ const UploadedFilePreview = ({
   alt = 'Uploaded file preview',
   fileName = undefined,
   fileSize = undefined,
+  fileType = undefined,
   showFileName = undefined,
   border = '1px solid #dcdee0',
   openFileViewer = undefined,
   ...props
 }) => {
-  let content = null;
+  let content;
   const fileExtension = getFileExtensionFromUrl(url);
-  const isText = ['csv', 'txt'].includes(fileExtension);
+  const isText = ['csv', 'txt'].includes(fileExtension) || fileType === 'text/csv' || fileType === 'text/plain';
+  const isPdf = fileExtension === 'pdf' || fileType === 'application/pdf';
 
   if (isLoading) {
     content = <LoadingPlaceholder borderRadius={8} />;
@@ -115,6 +117,8 @@ const UploadedFilePreview = ({
     content = <FileText color="#dcdee0" size="60%" />;
   } else if (isText) {
     content = <FileTextIcon color="#dcdee0" size="60%" />;
+  } else if (isPdf) {
+    content = <img src="/static/images/mime-pdf.png" alt={alt || fileName || 'PDF file'} />;
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
     content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;

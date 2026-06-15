@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
+
+import injectIntl from '@/lib/injectIntl';
 
 import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
@@ -25,6 +27,7 @@ class ContributionFlowStepContainer extends React.Component {
     tier: PropTypes.object,
     onChange: PropTypes.func,
     showPlatformTip: PropTypes.bool,
+    isOscTipExperiment: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
     onSignInClick: PropTypes.func,
     isEmbed: PropTypes.bool,
@@ -74,7 +77,7 @@ class ContributionFlowStepContainer extends React.Component {
   };
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed, showPlatformTip } = this.props;
+    const { collective, mainState, tier, isEmbed, showPlatformTip, isOscTipExperiment } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
@@ -86,6 +89,7 @@ class ContributionFlowStepContainer extends React.Component {
             stepDetails={stepDetails}
             stepPayment={stepPayment}
             showPlatformTip={showPlatformTip}
+            isOscTipExperiment={isOscTipExperiment}
           />
         );
 

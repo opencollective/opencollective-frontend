@@ -66,6 +66,7 @@ import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySel
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
+import { isEmptyHTMLValue } from '../HTMLContent';
 
 import { supportsBaseExpenseTypes } from './form/helper';
 
@@ -217,12 +218,12 @@ const expenseFormSchemaQuery = gql`
 
       ... on AccountWithHost {
         host {
-          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
+          vendorsForAccount: vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
+          vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -230,12 +231,12 @@ const expenseFormSchemaQuery = gql`
 
       ... on Organization {
         host {
-          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
+          vendorsForAccount: vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
+          vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -402,6 +403,7 @@ const expenseFormSchemaQuery = gql`
         titlePolicy
         grantPolicy
       }
+      USE_VENDOR_POLICY
     }
   }
 
@@ -477,7 +479,7 @@ const expenseFormSchemaQuery = gql`
     payoutMethods {
       ...ExpenseFormPayoutMethods
     }
-    visibleToAccounts {
+    canBeUsedWithAccounts {
       id
       legacyId
       slug
@@ -633,6 +635,7 @@ type ExpenseFormOptions = {
   account?: ExpenseFormSchemaQuery['account'] | ExpenseFormSchemaQuery['expense']['account'];
   payee?: ExpenseFormSchemaQuery['payee'];
   isAdminOfPayee?: boolean;
+  isAdminOfPayeeHost?: boolean;
   isHostAdmin?: boolean;
   submitter?: ExpenseFormSchemaQuery['submitter'];
   loggedInAccount?: ExpenseFormSchemaQuery['loggedInAccount'];
@@ -915,7 +918,7 @@ function buildFormSchema(
                 return true;
               }
 
-              return v.length > 0;
+              return !isEmptyHTMLValue(v);
             }, requiredMessage),
           attachment: z
             .union([
@@ -1490,9 +1493,9 @@ async function buildFormOptions(
       options.vendorsForAccount =
         'vendorsForAccount' in host ? (host.vendorsForAccount?.['nodes'] as ExpenseVendorFieldsFragment[]) || [] : [];
       const isInviteePayeeFlow = options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount;
-      options.showVendorsOption = isInviteePayeeFlow
-        ? false
-        : options.isHostAdmin || ('vendors' in host ? host.vendors?.['totalCount'] > 0 : false);
+
+      const userCanUseVendors = options.isHostAdmin || ('vendors' in host && host.vendors?.['totalCount'] > 0);
+      options.showVendorsOption = isInviteePayeeFlow ? false : userCanUseVendors;
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
@@ -1529,7 +1532,13 @@ async function buildFormOptions(
       options.isAdminOfPayee =
         options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
         [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(values.payeeSlug);
-      if (payee && payee.type !== CollectiveType.VENDOR && options.isAdminOfPayee) {
+      // Cross-host only: the submitter administers the recipient host (e.g. a host admin completing
+      // an invited draft on behalf of a collective they don't directly administer).
+      const isAdminOfPayeeHost = Boolean(
+        payeeHost && host && payeeHost.id !== host.id && options.payoutProfiles.some(p => p.slug === payeeHost.slug),
+      );
+      options.isAdminOfPayeeHost = isAdminOfPayeeHost;
+      if (payee && payee.type !== CollectiveType.VENDOR && (options.isAdminOfPayee || isAdminOfPayeeHost)) {
         // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
         if (payee['host'] && host && payee['host'].id !== host.id) {
           options.payoutMethods = payee['host'].payoutMethods?.filter(p =>
@@ -1577,7 +1586,9 @@ async function buildFormOptions(
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
       } else if (
         values.payoutMethodId === NEW_PAYOUT_METHOD_ID &&
-        ((options.payee?.type === CollectiveType.VENDOR && options.isHostAdmin) || options.isAdminOfPayee)
+        ((options.payee?.type === CollectiveType.VENDOR && options.isHostAdmin) ||
+          options.isAdminOfPayee ||
+          isAdminOfPayeeHost)
       ) {
         options.payoutMethod = values.newPayoutMethod;
       }
@@ -2498,11 +2509,12 @@ export function useExpenseForm(opts: {
   }, [formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue, expenseLoaded]);
 
   React.useEffect(() => {
-    // Reset selection if the payout method is not supported
+    // Reset selection if the payout method is not supported (only once payout methods have loaded)
     if (
       expenseForm.values.payoutMethodId &&
       !expenseForm.values.payoutMethodId.startsWith('__') &&
-      !formOptions.payoutMethods?.some(p => p.id === expenseForm.values.payoutMethodId)
+      formOptions.payoutMethods !== undefined &&
+      !formOptions.payoutMethods.some(p => p.id === expenseForm.values.payoutMethodId)
     ) {
       setFieldValue('payoutMethodId', null);
     }
@@ -2518,11 +2530,17 @@ export function useExpenseForm(opts: {
 
     // Set all items to payout method currency if not set
     const selectedPayoutMethod = formOptions.payoutMethods?.find(p => p.id === expenseForm.values.payoutMethodId);
+    // When completing a draft that already carries an explicit currency (e.g. a recurring
+    // expense draft), keep that currency instead of coercing it to the payout method's.
+    const isCompletingDraftWithCurrency =
+      formOptions.expense?.status === ExpenseStatus.DRAFT &&
+      formOptions.expense.draft?.items?.some(i => i.amountV2?.currency ?? i.currency);
     if (
       selectedPayoutMethod &&
       selectedPayoutMethod.data?.currency &&
       formOptions.allowDifferentItemCurrency &&
       !expenseForm.touched.expenseItems &&
+      !isCompletingDraftWithCurrency &&
       expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency &&
       !startOptions.current.isInlineEdit // expenseItems will not be touched when editing the payout method, we don't want to update the expense items currency then
     ) {
@@ -2545,6 +2563,9 @@ export function useExpenseForm(opts: {
     setFormOptions,
     expenseForm.touched.expenseItems,
     expenseForm.values.expenseItems,
+    formOptions.expense?.status,
+    formOptions.expense?.draft?.items,
+    formOptions.loggedInAccount,
   ]);
 
   const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);

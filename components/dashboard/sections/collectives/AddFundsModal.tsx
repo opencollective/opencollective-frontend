@@ -43,13 +43,13 @@ import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Container from '../../../Container';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Flex } from '../../../Grid';
+import InputAmount from '../../../InputAmount';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledHr from '../../../StyledHr';
 import StyledInput from '../../../StyledInput';
-import StyledInputAmount from '../../../StyledInputAmount';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledInputPercentage from '../../../StyledInputPercentage';
 import StyledLink from '../../../StyledLink';
@@ -504,7 +504,10 @@ const AddFundsModalContentWithCollective = ({
   const applicableTax = getApplicableTaxType(account, host);
   const isEdit = Boolean(editOrderId);
 
-  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({ host });
+  const { createVendorFromSearch, isCreatingVendor } = useQuickCreateVendor({
+    host,
+    canBeUsedWithAccounts: collective?.slug ? [{ slug: collective.slug }] : [],
+  });
 
   const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
     isEdit ? editAddedFundsMutation : addFundsMutation,
@@ -767,6 +770,7 @@ const AddFundsModalContentWithCollective = ({
                           collective={values.fromAccount}
                           menuPortalTarget={null}
                           includeVendorsForHostId={host?.legacyId || undefined}
+                          vendorVisibleToAccountIds={account?.legacyId ? [account.legacyId] : undefined}
                           creatable={['VENDOR']}
                           HostCollectiveId={host?.legacyId}
                           {...quickCreateVendorCollectivePickerOptions(createVendorFromSearch)}
@@ -810,13 +814,13 @@ const AddFundsModalContentWithCollective = ({
                     {({ form, field }) => (
                       <div>
                         <div className="flex justify-between gap-2 [&>div]:w-full">
-                          <StyledInputAmount
+                          <InputAmount
                             id={field.id}
                             data-cy="add-funds-amount"
+                            className="max-w-full"
                             currency={currency}
                             error={field.error}
                             value={field.value}
-                            maxWidth="100%"
                             onChange={value => form.setFieldValue(field.name, value)}
                             onBlur={() => form.setFieldTouched(field.name, true)}
                             disabled={isAmountLocked}
@@ -958,13 +962,13 @@ const AddFundsModalContentWithCollective = ({
                         required={false}
                       >
                         {({ form, field }) => (
-                          <StyledInputAmount
+                          <InputAmount
                             id={field.id}
                             data-cy="add-funds-paymentProcessorFee"
+                            className="max-w-full"
                             currency={currency}
                             error={field.error}
                             value={field.value}
-                            maxWidth="100%"
                             onChange={value => form.setFieldValue(field.name, value)}
                             onBlur={() => form.setFieldTouched(field.name, true)}
                           />

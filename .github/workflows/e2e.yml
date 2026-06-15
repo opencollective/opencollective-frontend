@@ -1,5 +1,8 @@
 name: E2E
 
+# Security: Do not switch this workflow to `pull_request_target` to run on fork PRs with secrets.
+# Use `pull_request` (secrets blocked for forks by default) or trusted push/workflow_dispatch instead.
+
 on:
   workflow_call:
 
@@ -55,12 +58,12 @@ jobs:
 
     services:
       redis:
-        image: redis
+        image: redis@sha256:aa049e689e141a4358ad1d4562dc49c88a89fbab711fd8fcc33f684c80b26301
         ports:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:16.13
+        image: postgres:16.14@sha256:4b7183ac05f8ef417db21fd72d71047a4238340c261d3cc3ddb6d579ab5071ae
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -70,7 +73,7 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       minio:
-        image: minio/minio:edge-cicd
+        image: minio/minio:edge-cicd@sha256:29e8e51691d11e779468f275002779b221fd3902518d103e35c8a8bb2ef0f3ea
         ports:
           - 9000:9000
         options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
@@ -281,6 +284,6 @@ jobs:
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

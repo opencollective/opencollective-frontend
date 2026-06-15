@@ -16,7 +16,7 @@ import { useToast } from '../../../ui/useToast';
 
 const scheduledExpensesQuery = gql`
   query ExpensesScheduledForPayment($hostSlug: String!) {
-    expenses(host: { slug: $hostSlug }, status: SCHEDULED_FOR_PAYMENT, payoutMethodType: BANK_ACCOUNT) {
+    expenses(host: { slug: $hostSlug }, status: SCHEDULED_FOR_PAYMENT, payoutMethodType: BANK_ACCOUNT, limit: 100) {
       totalCount
       nodes {
         id
@@ -27,7 +27,7 @@ const scheduledExpensesQuery = gql`
 
 type PayExpensesScheduledForPaymentButtonProps = {
   className?: string;
-  host: Pick<Host, 'id' | 'transferwise' | 'slug'>;
+  host: Pick<Host, 'id' | 'slug'>;
   onSubmit?: () => void;
 };
 
@@ -116,6 +116,7 @@ export default function PayExpensesScheduledForPaymentButton(props: PayExpensesS
             />
           }
           continueHandler={handlePayBatch}
+          overlayClassName="z-1000"
         />
       )}
     </React.Fragment>

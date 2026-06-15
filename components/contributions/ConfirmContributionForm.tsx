@@ -13,9 +13,9 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import InputAmount from '../InputAmount';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledInputPercentage from '../StyledInputPercentage';
 import StyledTooltip from '../StyledTooltip';
 import { Label, P, Span } from '../Text';
@@ -245,11 +245,11 @@ export const ConfirmContributionForm = ({
             <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-amountReceived">
               <FormattedMessage defaultMessage="Amount received" id="u6JRVj" />
             </Label>
-            <StyledInputAmount
+            <InputAmount
               id="confirmContribution-amountReceived"
               name="amountReceived"
               data-cy="amount-received"
-              width="142px"
+              className="w-[142px]"
               currency={currency}
               onChange={value => setAmountReceived(value)}
               value={amountReceived}
@@ -263,11 +263,11 @@ export const ConfirmContributionForm = ({
             <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-processorFee">
               <FormattedMessage id="contribution.paymentFee" defaultMessage="Payment processor fee" />
             </Label>
-            <StyledInputAmount
+            <InputAmount
               id="confirmContribution-processorFee"
               name="paymentProcessorFee"
               data-cy="payment-processor-fee"
-              width="142px"
+              className="w-[142px]"
               currency={currency}
               onChange={value => setPaymentProcessorFee(value)}
               value={paymentProcessorFee}
@@ -280,11 +280,11 @@ export const ConfirmContributionForm = ({
             <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-platformTip">
               <FormattedMessage defaultMessage="Platform tip amount" id="Ng5BqM" />
             </Label>
-            <StyledInputAmount
+            <InputAmount
               id="confirmContribution-platformTip"
               name="platformTip"
               data-cy="platform-tip"
-              width="142px"
+              className="w-[142px]"
               currency={currency}
               onChange={value => setPlatformTip(value)}
               value={platformTip}

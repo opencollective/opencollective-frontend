@@ -187,6 +187,7 @@ const InputAmount = ({
   minFxRate = undefined,
   maxFxRate = undefined,
   className = null,
+  suffix = null,
   ...props
 }) => {
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
@@ -227,11 +228,11 @@ const InputAmount = ({
     }
   };
 
-  return (
+  const inputGroup = (
     <InputGroup
       {...props}
       data-testid={props.id ? `${props.id}-input-amount` : undefined}
-      className={cn('w-full overflow-hidden', className)}
+      className={cn('w-full overflow-hidden', suffix ? null : className)}
       disabled={disabled}
       prepend={
         !hasCurrencyPicker ? (
@@ -281,7 +282,7 @@ const InputAmount = ({
       name={name}
       min={minAmount}
       max={max / 100}
-      value={isEditing ? rawValue : !value || isNaN(value) ? rawValue : (value / 100).toFixed(precision)}
+      value={isEditing ? rawValue : isNil(value) || isNaN(value) ? rawValue : (value / 100).toFixed(precision)}
       onWheel={ignoreOnWheel}
       onChange={e => {
         setEditing(true);
@@ -309,6 +310,17 @@ const InputAmount = ({
       }}
     />
   );
+
+  if (suffix) {
+    return (
+      <div className={cn('flex items-center gap-2', className)}>
+        {inputGroup}
+        <div className="pointer-events-none shrink-0 text-xs text-muted-foreground">{suffix}</div>
+      </div>
+    );
+  }
+
+  return inputGroup;
 };
 
 export default InputAmount;

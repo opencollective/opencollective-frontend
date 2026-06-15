@@ -287,6 +287,7 @@ const CollectivePickerAsync = ({
       }}
       customOptions={!term ? emptyCustomOptions : []}
       useBeneficiaryForVendor={useBeneficiaryForVendor}
+      vendorVisibleToAccountIds={vendorVisibleToAccountIds}
       {...props}
     />
   );

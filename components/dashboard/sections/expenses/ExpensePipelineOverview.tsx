@@ -1,17 +1,19 @@
 import React from 'react';
+import type { ApolloClient } from '@apollo/client';
 import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { clsx } from 'clsx';
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../../../../lib/graphql/helpers';
-import type { Amount, ExpenseCollection, Host } from '../../../../lib/graphql/types/v2/graphql';
+import type { ExpensePipelineOverviewQuery, Host } from '../../../../lib/graphql/types/v2/graphql';
 import { getDashboardUrl } from '../../../../lib/stripe/dashboard';
+
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import CcStripe from '../../../icons/Stripe';
 import TransferwiseIcon from '../../../icons/TransferwiseIcon';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import StyledCard from '../../../StyledCard';
@@ -21,8 +23,31 @@ import StyledTooltip from '../../../StyledTooltip';
 import PayExpensesScheduledForPaymentButton from './PayExpensesScheduledForPaymentButton';
 import TransferwiseDetailsIcon, { BalancesBreakdown } from './TransferwiseDetailsIcon';
 
-const ExpensePipelineOverviewQuery = gql`
+const expensePipelineOverviewQuery = gql`
   query ExpensePipelineOverview($hostSlug: String!, $currency: Currency!) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+      transferwise {
+        id
+        amountBatched {
+          valueInCents
+          currency
+        }
+        balances {
+          valueInCents
+          currency
+        }
+      }
+      stripe {
+        issuingBalance {
+          valueInCents
+          currency
+        }
+        username
+      }
+    }
     wiseReadyToPay: expenses(
       host: { slug: $hostSlug }
       limit: 0
@@ -49,10 +74,6 @@ const ExpensePipelineOverviewQuery = gql`
     ) {
       totalCount
       totalAmount {
-        amount(currency: $currency) {
-          valueInCents
-          currency
-        }
         amountsByCurrency {
           valueInCents
           currency
@@ -62,16 +83,58 @@ const ExpensePipelineOverviewQuery = gql`
   }
 `;
 
+/** Expense process actions that change Wise pipeline aggregates or batched amounts. */
+const EXPENSE_PIPELINE_REFETCH_ACTIONS = new Set([
+  'APPROVE',
+  'UNAPPROVE',
+  'REQUEST_RE_APPROVAL',
+  'REJECT',
+  'SCHEDULE_FOR_PAYMENT',
+  'UNSCHEDULE_PAYMENT',
+  'PAY',
+  'MARK_AS_PAID',
+  'MARK_AS_PAID_WITH_STRIPE',
+]);
+
+export function shouldRefetchExpensePipeline(action?: string | null): boolean {
+  return Boolean(action && EXPENSE_PIPELINE_REFETCH_ACTIONS.has(action));
+}
+
+type ExpensePipelineOverviewRefetchHost = Pick<Host, 'slug' | 'currency'>;
+
+export function getExpensePipelineOverviewRefetchQueries(host?: ExpensePipelineOverviewRefetchHost | null) {
+  if (!host?.slug || !host?.currency) {
+    return [];
+  }
+
+  return [{ query: expensePipelineOverviewQuery, variables: { hostSlug: host.slug, currency: host.currency } }];
+}
+
+export function refetchExpensePipelineOverview(
+  client: ApolloClient<object>,
+  host?: ExpensePipelineOverviewRefetchHost | null,
+) {
+  if (!host?.slug || !host?.currency) {
+    return;
+  }
+
+  void client.query({
+    query: expensePipelineOverviewQuery,
+    variables: { hostSlug: host.slug, currency: host.currency },
+    fetchPolicy: 'network-only',
+  });
+}
+
+type ExpensePipelineOverviewHost = NonNullable<ExpensePipelineOverviewQuery['host']>;
+
 type ExpensePipelineOverviewProps = {
   className?: string;
-  host: Pick<Host, 'id' | 'legacyId' | 'currency' | 'transferwise' | 'stripe' | 'slug'>;
+  host: Pick<Host, 'id' | 'currency' | 'slug'>;
+  onBatchPaySuccess?: () => void;
 };
 
 export default function ExpensePipelineOverview(props: ExpensePipelineOverviewProps) {
-  const { data, loading, error } = useQuery<{
-    wiseReadyToPay: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
-    wiseScheduledForPayment: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
-  }>(ExpensePipelineOverviewQuery, {
+  const { data, loading, error, refetch } = useQuery<ExpensePipelineOverviewQuery>(expensePipelineOverviewQuery, {
     variables: {
       hostSlug: props.host.slug,
       currency: props.host.currency,
@@ -79,45 +142,57 @@ export default function ExpensePipelineOverview(props: ExpensePipelineOverviewPr
   });
 
   if (loading) {
-    return <LoadingPlaceholder height={150} />;
+    return <Skeleton className="h-[183.5px]" />;
   }
 
   if (error) {
     return <MessageBoxGraphqlError error={error} />;
   }
 
+  if (!data) {
+    return null;
+  }
+
   return (
     <div className={clsx('flex flex-col gap-4 sm:flex-row', props.className)}>
       <WiseStatus
         className="w-full"
-        host={props.host}
+        host={data.host}
         readyToPayAmount={data.wiseReadyToPay.totalAmount.amount}
         readyToPayCount={data.wiseReadyToPay.totalCount}
         readyToPayAmountByCurrency={data.wiseReadyToPay.totalAmount.amountsByCurrency}
-        scheduledForPaymentAmount={data.wiseScheduledForPayment.totalAmount.amount}
         scheduledForPaymentCount={data.wiseScheduledForPayment.totalCount}
         scheduledForPaymentAmountByCurrency={data.wiseScheduledForPayment.totalAmount.amountsByCurrency}
+        onBatchPaySuccess={props.onBatchPaySuccess ?? refetch}
       />
-      {props.host?.stripe?.issuingBalance && <StripeIssuingStatus className="w-full" host={props.host} />}
+      {data.host?.stripe?.issuingBalance && <StripeIssuingStatus className="w-full" host={data.host} />}
     </div>
   );
 }
 
 type WiseStatusProps = {
   className: string;
-  host: Pick<Host, 'id' | 'transferwise' | 'currency' | 'slug'>;
+  host?: ExpensePipelineOverviewHost | null;
   readyToPayCount?: number;
-  readyToPayAmount?: Amount;
-  readyToPayAmountByCurrency?: Amount[];
+  readyToPayAmount?: NonNullable<ExpensePipelineOverviewQuery['wiseReadyToPay']['totalAmount']>['amount'];
+  readyToPayAmountByCurrency?: NonNullable<
+    NonNullable<ExpensePipelineOverviewQuery['wiseReadyToPay']['totalAmount']>['amountsByCurrency']
+  >;
   scheduledForPaymentCount?: number;
-  scheduledForPaymentAmount?: Amount;
-  scheduledForPaymentAmountByCurrency?: Amount[];
+  scheduledForPaymentAmountByCurrency?: NonNullable<
+    NonNullable<ExpensePipelineOverviewQuery['wiseScheduledForPayment']['totalAmount']>['amountsByCurrency']
+  >;
+  onBatchPaySuccess?: () => void;
 };
 
 function WiseStatus(props: WiseStatusProps) {
+  const amountBatched = props.host?.transferwise?.amountBatched;
+
   const mainBalance = React.useMemo(() => {
     return props.host?.transferwise?.balances?.find(b => b.currency === props.host?.currency);
   }, [props.host?.transferwise?.balances, props.host?.currency]);
+
+  const canPayBatch = amountBatched?.valueInCents > 0 && mainBalance?.valueInCents >= amountBatched?.valueInCents;
 
   const isConnected = props.host?.transferwise?.balances;
 
@@ -172,8 +247,8 @@ function WiseStatus(props: WiseStatusProps) {
           <div className="mt-2 flex gap-2 text-base text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
-              currency={props.host?.currency}
-              amount={props.host?.transferwise?.amountBatched?.valueInCents}
+              currency={amountBatched?.currency}
+              amount={amountBatched?.valueInCents}
             />
 
             {props.scheduledForPaymentAmountByCurrency?.length > 0 && (
@@ -203,10 +278,13 @@ function WiseStatus(props: WiseStatusProps) {
           </StyledButton>
         </StyledLink>
 
-        {props.scheduledForPaymentAmount?.valueInCents > 0 &&
-          mainBalance?.valueInCents >= props.scheduledForPaymentAmount?.valueInCents && (
-            <PayExpensesScheduledForPaymentButton className="w-full" host={props.host} />
-          )}
+        {canPayBatch && (
+          <PayExpensesScheduledForPaymentButton
+            className="w-full"
+            host={props.host}
+            onSubmit={props.onBatchPaySuccess}
+          />
+        )}
       </div>
     </StyledCard>
   );
@@ -214,7 +292,7 @@ function WiseStatus(props: WiseStatusProps) {
 
 type StripeIssuingStatusProps = {
   className: string;
-  host: Pick<Host, 'stripe'>;
+  host: ExpensePipelineOverviewHost;
 };
 
 function StripeIssuingStatus(props: StripeIssuingStatusProps) {

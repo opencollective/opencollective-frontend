@@ -10,7 +10,6 @@ require('./env');
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
-  eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
@@ -39,6 +38,11 @@ const nextConfig = {
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
     config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
+    if (typeof config.cache !== 'boolean') {
+      config.cache = {};
+    }
+    config.cache.type = 'filesystem';
+    config.cache.compression = 'brotli';
 
     config.plugins.push(
       // Ignore __tests__

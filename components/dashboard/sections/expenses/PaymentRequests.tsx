@@ -1,6 +1,6 @@
-import React, { useContext, useMemo } from 'react';
-import { useQuery } from '@apollo/client';
-import { get, omit } from 'lodash-es';
+import React, { useCallback, useContext, useMemo } from 'react';
+import { useApolloClient, useQuery } from '@apollo/client';
+import { omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -15,6 +15,7 @@ import {
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { hasAccountMoneyManagement } from '@/lib/collective';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
@@ -32,6 +33,10 @@ import { AccountRenderer } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
+import ExpensePipelineOverview, {
+  refetchExpensePipelineOverview,
+  shouldRefetchExpensePipeline,
+} from './ExpensePipelineOverview';
 import type { FilterMeta as CommonFilterMeta } from './filters';
 import {
   ExpenseAccountingCategoryKinds,
@@ -100,6 +105,7 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
+  const client = useApolloClient();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const { account } = useContext(DashboardContext);
 
@@ -116,14 +122,19 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
         id: 'pending',
       },
       {
-        label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
-        filter: { status: [ExpenseStatusFilter.PAID] },
-        id: 'paid',
+        label: intl.formatMessage({ id: 'expense.approved', defaultMessage: 'Approved' }),
+        filter: { status: [ExpenseStatusFilter.APPROVED] },
+        id: 'approved',
       },
       {
         label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
         filter: { status: [ExpenseStatusFilter.REJECTED] },
         id: 'rejected',
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+        filter: { status: [ExpenseStatusFilter.PAID] },
+        id: 'paid',
       },
     ],
     [intl],
@@ -146,8 +157,8 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     [views, metadata],
   );
 
-  const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
-  const hostSlug = get(metadata, 'account.host.slug');
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const hostSlug = hasMoneyManagement ? (account?.slug ?? account?.host?.slug) : account?.host?.slug;
 
   const hasKycFeature = isFeatureEnabled(account, FEATURES.KYC);
 
@@ -193,6 +204,24 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     },
   });
 
+  const refetchAfterExpenseChange = useCallback(
+    ({ refetchPipeline = true }: { refetchPipeline?: boolean } = {}) => {
+      void refetch();
+      void refetchMetadata();
+      if (refetchPipeline && hostSlug && account?.currency) {
+        refetchExpensePipelineOverview(client, { slug: hostSlug, currency: account.currency });
+      }
+    },
+    [refetch, refetchMetadata, client, hostSlug, account?.currency],
+  );
+
+  const onExpenseProcess = useCallback(
+    action => {
+      refetchAfterExpenseChange({ refetchPipeline: shouldRefetchExpensePipeline(action) });
+    },
+    [refetchAfterExpenseChange],
+  );
+
   const pageRoute = `/dashboard/${accountSlug}/payment-requests`;
 
   return (
@@ -212,34 +241,35 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
             </Button>
           }
         />
-        {isSelfHosted && (
-          <ScheduledExpensesBanner
-            hostSlug={hostSlug}
-            onSubmit={() => {
-              refetch();
-              refetchMetadata();
-            }}
-            secondButton={
-              !(
-                queryFilter.values.status?.includes(ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT) &&
-                queryFilter.values.payout === PayoutMethodType.BANK_ACCOUNT
-              ) ? (
-                <StyledButton
-                  buttonSize="tiny"
-                  buttonStyle="successSecondary"
-                  onClick={() =>
-                    queryFilter.resetFilters({
-                      status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
-                      payout: PayoutMethodType.BANK_ACCOUNT,
-                    })
-                  }
-                >
-                  <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
-                </StyledButton>
-              ) : null
-            }
-          />
+        {hasMoneyManagement && (
+          <React.Fragment>
+            <ExpensePipelineOverview host={account} onBatchPaySuccess={refetchAfterExpenseChange} />
+            <ScheduledExpensesBanner
+              hostSlug={hostSlug}
+              onSubmit={refetchAfterExpenseChange}
+              secondButton={
+                !(
+                  queryFilter.values.status?.includes(ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT) &&
+                  queryFilter.values.payout === PayoutMethodType.BANK_ACCOUNT
+                ) ? (
+                  <StyledButton
+                    buttonSize="tiny"
+                    buttonStyle="successSecondary"
+                    onClick={() =>
+                      queryFilter.resetFilters({
+                        status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
+                        payout: PayoutMethodType.BANK_ACCOUNT,
+                      })
+                    }
+                  >
+                    <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
+                  </StyledButton>
+                ) : null
+              }
+            />
+          </React.Fragment>
         )}
+
         <Filterbar {...queryFilter} views={viewsWithCount} />
 
         {!loading && error ? (
@@ -257,6 +287,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
               collective={metadata?.account}
               host={metadata?.account?.host}
               expenses={data?.expenses?.nodes}
+              onProcess={onExpenseProcess}
               nbPlaceholders={queryFilter.values.limit}
               useDrawer
               openExpenseLegacyId={Number(router.query.openExpenseId)}
@@ -280,8 +311,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
           onClose={submittedExpense => {
             setIsExpenseFlowOpen(false);
             if (submittedExpense) {
-              refetch();
-              refetchMetadata();
+              refetchAfterExpenseChange();
             }
           }}
           submitExpenseTo={accountSlug}

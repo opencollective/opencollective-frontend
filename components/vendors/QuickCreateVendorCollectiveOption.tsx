@@ -13,6 +13,7 @@ import type { QuickCreateVendorCallbacks } from './useQuickCreateVendor';
 
 type QuickCreateVendorCollectiveOptionProps = {
   searchText: string;
+  isBeneficiary?: boolean;
 };
 
 type QuickCreateVendorSelectArgs = {
@@ -20,7 +21,7 @@ type QuickCreateVendorSelectArgs = {
   onCreatedCollective: (collective: VendorFieldsFragment) => void;
 };
 
-function QuickCreateVendorCollectiveOption({ searchText }: QuickCreateVendorCollectiveOptionProps) {
+function QuickCreateVendorCollectiveOption({ searchText, isBeneficiary }: QuickCreateVendorCollectiveOptionProps) {
   const trimmed = searchText.trim();
 
   if (trimmed.length > 0) {
@@ -39,11 +40,19 @@ function QuickCreateVendorCollectiveOption({ searchText }: QuickCreateVendorColl
         </Flex>
         <Flex flexDirection="column" ml="8px" textAlign="left">
           <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
-            <FormattedMessage
-              defaultMessage="Create vendor: <b>{vendorName}</b>"
-              id="buY7Uz"
-              values={{ vendorName: trimmed, b: I18nBold }}
-            />
+            {isBeneficiary ? (
+              <FormattedMessage
+                defaultMessage="Create beneficiary: <b>{vendorName}</b>"
+                id="QFO4ll"
+                values={{ vendorName: trimmed, b: I18nBold }}
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Create vendor: <b>{vendorName}</b>"
+                id="buY7Uz"
+                values={{ vendorName: trimmed, b: I18nBold }}
+              />
+            )}
           </Span>
         </Flex>
       </Flex>
@@ -53,16 +62,20 @@ function QuickCreateVendorCollectiveOption({ searchText }: QuickCreateVendorColl
   return (
     <Flex alignItems="center">
       <Span fontSize="12px" lineHeight="18px" color="black.500">
-        <FormattedMessage defaultMessage="Begin typing to create a vendor" id="Jx28lM" />
+        {isBeneficiary ? (
+          <FormattedMessage defaultMessage="Begin typing to create a beneficiary" id="skcLyR" />
+        ) : (
+          <FormattedMessage defaultMessage="Begin typing to create a vendor" id="Jx28lM" />
+        )}
       </Span>
     </Flex>
   );
 }
 
 /** `renderNewCollectiveOption` callback for `CollectivePicker` / `CollectivePickerAsync`. */
-function quickCreateVendorRenderOption() {
+function quickCreateVendorRenderOption({ isBeneficiary }: { isBeneficiary?: boolean } = {}) {
   return function renderQuickCreateVendorOption({ searchText }: { searchText: string }) {
-    return <QuickCreateVendorCollectiveOption searchText={searchText} />;
+    return <QuickCreateVendorCollectiveOption searchText={searchText} isBeneficiary={isBeneficiary} />;
   };
 }
 
@@ -80,9 +93,10 @@ function quickCreateVendorOnSelect(
 
 export function quickCreateVendorCollectivePickerOptions(
   createVendorFromSearch: (searchText: string, callbacks: QuickCreateVendorCallbacks) => void | Promise<void>,
+  { isBeneficiary }: { isBeneficiary?: boolean } = {},
 ) {
   return {
-    renderNewCollectiveOption: quickCreateVendorRenderOption(),
+    renderNewCollectiveOption: quickCreateVendorRenderOption({ isBeneficiary }),
     onSelectNewCollectiveOption: quickCreateVendorOnSelect(createVendorFromSearch),
   };
 }

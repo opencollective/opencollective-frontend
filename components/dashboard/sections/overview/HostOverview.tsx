@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { hasAccountMoneyManagement, isHeavyAccount } from '@/lib/collective';
 import dayjs from '@/lib/dayjs';
 import { HostContext, type HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
@@ -172,7 +171,7 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
 
       <HostTodoList />
 
-      <Card className="pb-3">
+      <Card className="pb-3 shadow-none">
         <CardHeader>
           <CardTitle className="text-xl">
             <FormattedMessage defaultMessage="Recent Financial Activity" id="BAvsQv" />
@@ -250,7 +249,7 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
         </CardContent>
       </Card>
 
-      {isFeatureEnabled(account, FEATURES.HOST_METRICS) && <HostMetricsOverview hostSlug={account.slug} />}
+      <HostMetricsOverview hostSlug={account.slug} />
 
       <div className="grid grid-cols-1 gap-6">
         <div className="order-1 space-y-6 xl:order-none">

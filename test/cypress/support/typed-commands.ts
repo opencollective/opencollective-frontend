@@ -1,10 +1,10 @@
 // eslint-disable-next-line spaced-comment
 /// <reference types="cypress" />
 
-import type { Message, MessageSummary } from 'cypress-mailpit/src/types';
+import type { Message, MessageSummary } from 'cypress-mailpit/dist/src/types';
 
 import { fakeTag as gql } from '../../../lib/graphql/helpers';
-import type { AmountInput, ExpenseType } from '@/lib/graphql/types/v2/graphql';
+import type { AccountReferenceInput, AmountInput, ExpenseType, UseVendorPolicy } from '@/lib/graphql/types/v2/graphql';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
 
@@ -31,7 +31,7 @@ declare global {
         slug?: string;
         name?: string;
         type?: string;
-      }): Chainable<{ slug: string }>;
+      }): Chainable<{ id: number; slug: string }>;
 
       createHostedCollective(params?: { userEmail?: string }): Chainable<{ slug: string }>;
 
@@ -78,6 +78,19 @@ declare global {
         };
       }): Chainable<{ legacyId: number }>;
 
+      draftExpenseAndInviteUser(params: {
+        userEmail?: string;
+        account: { slug?: string; legacyId?: number };
+        expense: {
+          type: ExpenseType | `${ExpenseType}`;
+          description?: string;
+          currency?: string;
+          items?: Record<string, unknown>[];
+          payee: { slug?: string; legacyId?: number; name?: string; email?: string };
+          [key: string]: unknown;
+        };
+      }): Chainable<{ id: string; legacyId: number; status: string; currency: string }>;
+
       openEmail(matcher: (summary: MessageSummary) => boolean): Chainable<Message>;
 
       logout();
@@ -88,6 +101,16 @@ declare global {
       ): Chainable<{ id: string; legacyId: number; slug: string }>;
 
       createVendor: typeof createVendor;
+
+      graphqlQueryV2(
+        query: string,
+        options?: { variables?: Record<string, unknown>; token?: string | null },
+      ): Chainable<Record<string, unknown>>;
+
+      editAccount(
+        account: { slug: string; settings?: Record<string, unknown>; [key: string]: unknown },
+        userEmail?: string,
+      ): Chainable<unknown>;
 
       getAccount: typeof getAccount;
 
@@ -118,9 +141,14 @@ Cypress.Commands.add('retryChain', function <
 Cypress.Commands.add('createVendor', createVendor);
 function createVendor(
   hostSlug: string,
-  vendor: { name: string; payoutMethod?: unknown },
+  vendor: {
+    name: string;
+    payoutMethod?: unknown;
+    canBeUsedWithAccounts?: AccountReferenceInput[];
+    useVendorPolicy?: UseVendorPolicy | `${UseVendorPolicy}`;
+  },
   userEmail: string,
-): Cypress.Chainable<{ name: string }> {
+): Cypress.Chainable<{ id: string; legacyId: number; slug: string; name: string }> {
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
     return graphqlQueryV2(token, {
       operationName: 'CreateVendor',
@@ -128,9 +156,16 @@ function createVendor(
         mutation CreateVendor($hostSlug: String!, $vendor: VendorCreateInput!) {
           createVendor(host: { slug: $hostSlug }, vendor: $vendor) {
             id
+            legacyId
             name
             slug
             hasPayoutMethod
+            useVendorPolicy
+            canBeUsedWithAccounts {
+              id
+              legacyId
+              slug
+            }
             __typename
           }
         }

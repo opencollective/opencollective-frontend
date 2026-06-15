@@ -32,10 +32,10 @@ export default function LocalFilePreview({ file, size, alignItems = 'flex-start'
   const linkProps = isLinkable ? { href: URL.createObjectURL(file), openInNewTab: true } : null;
   return (
     <Flex flexDirection="column" alignItems={alignItems}>
-      <Box maxWidth={size} maxHeight={size}>
+      <Box width={size} height={size} overflow="hidden" display="flex" alignItems="center" justifyContent="center">
         <OptionallyLinkable isLinkable={isLinkable} linkProps={linkProps}>
           {isImage ? (
-            <img height="100%" width="100%" src={linkProps.href} alt={file.name} />
+            <img className="max-h-full max-w-full object-contain" src={linkProps.href} alt={file.name} />
           ) : (
             <Box width={size} height={size}>
               <FileText opacity={0.25} />

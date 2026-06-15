@@ -48,7 +48,7 @@ export function Timeline({ accountSlug, withTitle = false }) {
   }, [error, data]);
 
   return (
-    <Card className="pb-3">
+    <Card className="pb-3 shadow-none">
       {withTitle && (
         <CardHeader className="relative">
           <CardTitle className="relative text-xl">

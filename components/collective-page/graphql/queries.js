@@ -184,6 +184,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
         privateInstructions
         orders(status: PAID) {
           id
+          description
           createdAt
           quantity
           publicMessage

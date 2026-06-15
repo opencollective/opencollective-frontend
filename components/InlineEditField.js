@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { get, pick } from 'lodash-es';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
+
+import injectIntl from '@/lib/injectIntl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -239,13 +241,9 @@ class InlineEditField extends Component {
                       data-cy="InlineEditField-Btn-Save"
                       minWidth={buttonsMinWidth}
                       onClick={() => {
-                        let variables = null;
-                        if (prepareVariables) {
-                          variables = prepareVariables(values, draft);
-                        } else {
-                          variables = pick(values, ['id']);
-                          variables[field] = draft;
-                        }
+                        const variables = prepareVariables
+                          ? prepareVariables(values, draft)
+                          : { ...pick(values, ['id']), [field]: draft };
 
                         updateField({ variables }).then(() => this.disableEditor(true));
                       }}

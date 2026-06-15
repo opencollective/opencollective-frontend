@@ -3,7 +3,6 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { connectAccount } from '@/lib/api';
 import { i18nGraphqlException } from '@/lib/errors';
 import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import type { Account, ConnectedAccount, EditTransferWiseAccountQuery } from '@/lib/graphql/types/v2/graphql';
@@ -46,6 +45,12 @@ const editTransferWiseAccountQuery = gql`
   }
 `;
 
+const getTransferwiseOAuthUrlMutation = gql`
+  mutation GetTransferwiseOAuthUrl($account: AccountReferenceInput!, $redirect: String) {
+    getTransferwiseOAuthUrl(account: $account, redirect: $redirect)
+  }
+`;
+
 const deleteTransferWiseAccountMutation = gql`
   mutation DeleteTransferWiseAccount($id: String!) {
     deleteConnectedAccount(connectedAccount: { id: $id }) {
@@ -64,6 +69,7 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
   const { data, loading, refetch } = useQuery<EditTransferWiseAccountQuery>(editTransferWiseAccountQuery, {
     variables: { slug: collective.slug },
   });
+  const [getTransferwiseOAuthUrl] = useMutation(getTransferwiseOAuthUrlMutation);
   const [deleteTransferWiseAccount, { loading: deleting }] = useMutation(deleteTransferWiseAccountMutation);
   const [setSettings, { loading: mutating }] = useMutation(editCollectiveSettingsMutation, { context: API_V1_CONTEXT });
   const connectedAccounts = data?.account?.connectedAccounts;
@@ -72,8 +78,15 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
   );
 
   const handleConnect = async () => {
-    const json = await connectAccount(collective.id, 'transferwise');
-    window.location.href = json.redirectUrl;
+    try {
+      const redirect = window.location.href.replace(/\?.*/, '');
+      const { data } = await getTransferwiseOAuthUrl({
+        variables: { account: { slug: collective.slug }, redirect },
+      });
+      window.location.href = data.getTransferwiseOAuthUrl;
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    }
   };
   const handleDisconnect = async (connectedAccount: Partial<ConnectedAccount>) => {
     const action = async () => {

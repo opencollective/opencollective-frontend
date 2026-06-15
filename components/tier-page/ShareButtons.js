@@ -6,9 +6,10 @@ import { Linkedin } from '@styled-icons/feather/Linkedin';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import copy from 'copy-to-clipboard';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
 import { linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -71,8 +72,12 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
       >
         <StyledRoundButton
           size={40}
-          onClick={() => {
-            copy(pageUrl);
+          onClick={async () => {
+            const success = await copy(pageUrl);
+            if (!success) {
+              return;
+            }
+
             setCopied(true);
             if (updateCopyBtnTimeout) {
               clearTimeout(updateCopyBtnTimeout);

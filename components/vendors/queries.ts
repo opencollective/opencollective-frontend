@@ -61,7 +61,7 @@ export const vendorFieldFragment = gql`
       totalCount
     }
 
-    visibleToAccounts {
+    canBeUsedWithAccounts {
       id
       type
       legacyId
@@ -69,6 +69,8 @@ export const vendorFieldFragment = gql`
       name
       imageUrl
     }
+
+    useVendorPolicy
   }
   ${accountHoverCardFields}
 `;

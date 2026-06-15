@@ -1,3 +1,4 @@
+import { AmountTypes, TierTypes } from '../constants/tiers-types';
 import type LoggedInUser from '../LoggedInUser';
 import { parseToBoolean } from '../utils';
 
@@ -38,6 +39,41 @@ export function isOpenSourceCollectiveHost(host?: { slug?: string; legacyId?: nu
   return (
     host?.slug === OPEN_SOURCE_COLLECTIVE_HOST_SLUG || Number(host?.legacyId) === OPEN_SOURCE_COLLECTIVE_HOST_LEGACY_ID
   );
+}
+
+// Loosely typed so a GraphQL account union (whose members don't all carry these fields) can be passed directly.
+type PlatformTipCollective = {
+  platformContributionAvailable?: boolean | null;
+  host?: { slug?: string; legacyId?: number | string } | null;
+  [key: string]: unknown;
+};
+type PlatformTipTier = {
+  type?: string | null;
+  amountType?: string | null;
+  amount?: { valueInCents?: number | null } | null;
+} | null;
+
+// Whether the platform tip would be offered for this contribution, ignoring the OSC A/B experiment gate.
+// Mirrors the non-experiment branches of the contribution flow's canHavePlatformTips().
+export function platformTipApplies(collective?: PlatformTipCollective | null, tier?: PlatformTipTier): boolean {
+  if (!collective?.platformContributionAvailable) {
+    return false;
+  } else if (!tier) {
+    return true;
+  } else if (tier.type === TierTypes.TICKET) {
+    return false;
+  } else if (tier.amountType === AmountTypes.FIXED && !tier.amount?.valueInCents) {
+    return false;
+  }
+  return true;
+}
+
+// Whether this contribution falls within the OSC platform tip A/B experiment portion: an Open Source
+// Collective host and a contribution where the tip would otherwise be offered. The arm itself is read
+// from contributionPlatformTipEnabled (enabled = tip shown / control, not enabled = tip hidden / test),
+// which is unambiguous once filtered to this portion.
+export function isOscTipExperiment(collective?: PlatformTipCollective | null, tier?: PlatformTipTier): boolean {
+  return isOpenSourceCollectiveHost(collective?.host) && platformTipApplies(collective, tier);
 }
 
 // Reads ?<experiment>=<value> from the current URL to force a variant.

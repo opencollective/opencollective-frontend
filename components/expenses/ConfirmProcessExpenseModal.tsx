@@ -187,6 +187,7 @@ export type ConfirmProcessExpenseModalType =
 type ConfirmProcessExpenseModalProps = BaseModalProps & {
   type: ConfirmProcessExpenseModalType;
   expense: Pick<Expense, 'id' | 'legacyId'>;
+  onSuccess?: (action: ConfirmProcessExpenseModalType) => void;
 };
 
 export default function ConfirmProcessExpenseModal({
@@ -195,6 +196,7 @@ export default function ConfirmProcessExpenseModal({
   setOpen,
   expense,
   onCloseFocusRef,
+  onSuccess,
 }: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
 
@@ -209,59 +211,48 @@ export default function ConfirmProcessExpenseModal({
     try {
       switch (type) {
         case 'MARK_AS_INCOMPLETE': {
-          await processExpense.markAsIncomplete({
-            message,
-          });
+          await processExpense.markAsIncomplete({ message });
           break;
         }
         case 'REQUEST_RE_APPROVAL': {
-          await processExpense.requestReApproval({
-            message,
-          });
+          await processExpense.requestReApproval({ message });
           break;
         }
         case 'APPROVE': {
-          await processExpense.approve({
-            message,
-          });
+          await processExpense.approve({ message });
           break;
         }
         case 'UNAPPROVE': {
-          await processExpense.unapprove({
-            message,
-          });
+          await processExpense.unapprove({ message });
           break;
         }
         case 'REJECT': {
-          await processExpense.reject({
-            message,
-          });
+          await processExpense.reject({ message });
           break;
         }
         case 'HOLD': {
-          await processExpense.hold({
-            message,
-          });
+          await processExpense.hold({ message });
           break;
         }
         case 'RELEASE': {
-          await processExpense.release({
-            message,
-          });
+          await processExpense.release({ message });
           break;
         }
         case 'MARK_AS_SPAM': {
-          await processExpense.markAsSpam({
-            message,
-          });
+          await processExpense.markAsSpam({ message });
           break;
         }
       }
-      setOpen(false);
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
+      return;
     }
-  }, [type, message, intl, processExpense, setOpen]);
+
+    // Called outside the try/catch so errors thrown by consumers (e.g. refetch logic)
+    // don't surface as a misleading "processing failed" toast.
+    setOpen(false);
+    onSuccess?.(type);
+  }, [type, message, intl, onSuccess, processExpense, setOpen]);
 
   const onCloseAutoFocus = (e: Event) => {
     if (onCloseFocusRef?.current) {

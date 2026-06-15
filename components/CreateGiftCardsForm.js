@@ -7,12 +7,13 @@ import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get, truncate } from 'lodash-es';
 import memoizeOne from 'memoize-one';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { isPrepaid } from '../lib/constants/payment-methods';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose, reportValidityHTML5 } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import { Button } from './ui/Button';
 import CollectivePicker from './CollectivePicker';
@@ -20,13 +21,13 @@ import Container from './Container';
 import CreateGiftCardsSuccess from './CreateGiftCardsSuccess';
 import { Box, Flex } from './Grid';
 import { I18nSupportLink } from './I18nFormatters';
+import InputAmount from './InputAmount';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import PaymentMethodSelect from './PaymentMethodSelect';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInput from './StyledInput';
-import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
 
@@ -477,7 +478,7 @@ class CreateGiftCardsForm extends Component {
         </MessageBox>
         <Flex flexDirection="column">
           <InlineField name="amount" label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}>
-            <StyledInputAmount
+            <InputAmount
               id="giftcard-amount"
               currency={currency}
               prepend={currency}

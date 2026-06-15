@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
-import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedDate, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { width } from 'styled-system';
 
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import { imagePreview } from '../lib/image-utils';
 import { firstSentence } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Avatar from './Avatar';
 import Container from './Container';

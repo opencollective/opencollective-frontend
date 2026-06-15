@@ -6,7 +6,7 @@ import { get, uniqBy } from 'lodash-es';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
@@ -14,6 +14,7 @@ import { track } from '../../lib/analytics/plausible';
 import { AnalyticsProperty } from '../../lib/analytics/properties';
 import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
+import { isOscTipExperiment } from '../../lib/experiments/experiments';
 import { gql } from '../../lib/graphql/helpers';
 import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { iconForSocialLinkType } from '../../lib/social-links';
@@ -29,6 +30,7 @@ import {
 } from '../../lib/url-helpers';
 import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
 import type { NewContributionFlowOrderSuccessQuery } from '@/lib/graphql/types/v2/graphql';
+import injectIntl from '@/lib/injectIntl';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import { getI18nLink, I18nBold } from '../../components/I18nFormatters';
@@ -274,7 +276,11 @@ class ContributionFlowSuccess extends React.Component<
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS, {
       props: {
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: order.data?.isNewPlatformTipFlow ? 'new' : 'old',
+        // Within the OSC experiment portion, platformTipEligible IS the arm: true = shown (control),
+        // false = hidden (test). Combine with contributionIsOscTipExperiment to read the experiment.
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(order.platformTipEligible),
+        [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: isOscTipExperiment(order.toAccount, order.tier),
+        [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: get(order, 'toAccount.host.slug'),
       },
     });
     this.setState({ successTracked: true });
