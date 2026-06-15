@@ -196,7 +196,7 @@ describe('Recurring contributions: update platform tip', () => {
   let collective;
 
   before(() => {
-    cy.intercept('GET', 'https://js.stripe.com/v3/', req => {
+    cy.intercept('GET', 'https://js.stripe.com/dahlia/stripe.js', req => {
       req.continue(res => {
         res.body = res.body.replaceAll('window.top.location.href', 'window.location.href');
       });
