@@ -12,9 +12,9 @@
     "esModuleInterop": true,
     "module": "esnext",
     "isolatedModules": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "typeRoots": ["node_modules/@types", "lib/custom_typings"],
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "paths": {
