@@ -1,5 +1,8 @@
 name: E2E
 
+# Security: Do not switch this workflow to `pull_request_target` to run on fork PRs with secrets.
+# Use `pull_request` (secrets blocked for forks by default) or trusted push/workflow_dispatch instead.
+
 on:
   workflow_call:
 

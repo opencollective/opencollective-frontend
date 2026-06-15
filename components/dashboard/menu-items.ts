@@ -283,7 +283,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Shuffle,
     },
     {
-      if: isIndividual && hasIssuedGrantRequests,
+      if: isIndividual,
       Icon: Award,
       label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
       section: ALL_SECTIONS.SUBMITTED_GRANTS,

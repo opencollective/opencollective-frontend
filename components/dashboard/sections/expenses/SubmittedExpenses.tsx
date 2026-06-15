@@ -20,7 +20,7 @@ import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
 import type { FilterMeta } from './filters';
-import { ExpenseAccountingCategoryKinds, filters, schema, toVariables } from './filters';
+import { filters, schema, toVariables } from './filters';
 import { accountExpensesQuery } from './queries';
 
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
@@ -33,10 +33,16 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
 
   const omitExpenseTypes = [ExpenseType.GRANT];
 
-  const queryFilter = useQueryFilter<typeof schema, { type: ExpenseType }>({
+  const filterMeta: FilterMeta = {
+    currency: (LoggedInUser?.collective?.currency || 'USD') as Currency,
+    omitExpenseTypes,
+  };
+
+  const queryFilter = useQueryFilter<typeof schema, { type: ExpenseType }, FilterMeta>({
     schema,
     toVariables,
     filters,
+    meta: filterMeta,
   });
   const createdByAccount = accountSlug === LoggedInUser?.collective.slug ? { slug: accountSlug } : null;
   const fromAccount = !createdByAccount ? { slug: accountSlug } : null;
@@ -59,12 +65,6 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   } = useQuery(accountExpensesQuery, {
     variables,
   });
-
-  const filterMeta: FilterMeta = {
-    currency: (LoggedInUser?.collective?.currency || 'USD') as Currency,
-    omitExpenseTypes,
-    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
-  };
 
   const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
 

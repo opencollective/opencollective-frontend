@@ -216,7 +216,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
   );
 
   const onExpenseProcess = useCallback(
-    (_expense, _cache, action) => {
+    action => {
       refetchAfterExpenseChange({ refetchPipeline: shouldRefetchExpensePipeline(action) });
     },
     [refetchAfterExpenseChange],
