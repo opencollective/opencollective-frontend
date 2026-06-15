@@ -4,11 +4,11 @@ import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { isUndefined, orderBy } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import fetchGeoLocation from '../lib/geolocation_api';
 import { CountryIso } from '../lib/graphql/types/v2/graphql';
 import { getIntlDisplayNames } from '../lib/i18n';
+import injectIntl from '@/lib/injectIntl';
 
 import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';

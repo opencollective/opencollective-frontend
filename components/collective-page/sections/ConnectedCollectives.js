@@ -5,12 +5,12 @@ import { get } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import { CONNECTED_COLLECTIVES_ORDER_KEY } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { sortConnectedCollectives, updateCollectiveInGraphQLV1Cache } from '@/lib/collective';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from '../../Container';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';

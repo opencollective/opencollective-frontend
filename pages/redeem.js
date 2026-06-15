@@ -4,13 +4,13 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose, isValidEmail } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Body from '../components/Body';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';

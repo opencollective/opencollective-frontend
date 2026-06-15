@@ -1,14 +1,13 @@
-import injectIntl from '@/lib/injectIntl';
 import React, { Component } from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import { truncate } from 'lodash-es';
-
 import styled, { css } from 'styled-components';
 
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
 import { getEnvVar } from '../lib/env-utils';
 import { gql } from '../lib/graphql/helpers';
 import { getPaypal } from '../lib/paypal';
+import injectIntl from '@/lib/injectIntl';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
 import StyledButton from './StyledButton';

@@ -1,9 +1,9 @@
 import React from 'react';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import styled, { css } from 'styled-components';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import injectIntl from '@/lib/injectIntl';
 
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';

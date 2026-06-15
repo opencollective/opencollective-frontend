@@ -3,11 +3,11 @@ import { PopoverPortal } from '@radix-ui/react-popover';
 import { groupBy, intersection, isEqual, last, sortBy, truncate } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import injectIntl from '@/lib/injectIntl';
 
 import { Popover, PopoverAnchor, PopoverContent } from './ui/Popover';
 import Avatar from './Avatar';

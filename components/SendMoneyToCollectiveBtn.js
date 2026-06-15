@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { gql } from '../lib/graphql/helpers';
 import { collectiveBalanceFragment } from '../lib/graphql/v1/fragments';
 import { compose } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import { Button } from './ui/Button';
 import { toast } from './ui/useToast';

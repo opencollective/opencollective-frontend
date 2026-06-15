@@ -1,9 +1,9 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { checkUseAlternativeHostFeeNaming } from '@/lib/collective';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from '../Container';
 import Currency from '../Currency';

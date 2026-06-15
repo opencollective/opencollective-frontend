@@ -4,12 +4,12 @@ import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
 import { get, trim } from 'lodash-es';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 
 import { checkUseAlternativeHostFeeNaming, suggestSlug } from '../../lib/collective';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 import withData from '../../lib/withData';
+import injectIntl from '@/lib/injectIntl';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';

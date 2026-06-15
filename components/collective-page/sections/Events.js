@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import { sortEvents } from '../../../lib/events';
+import injectIntl from '@/lib/injectIntl';
 
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';

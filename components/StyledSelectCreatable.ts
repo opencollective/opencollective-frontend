@@ -1,6 +1,6 @@
-import injectIntl from '@/lib/injectIntl';
-
 import SelectCreatable from 'react-select/creatable';
+
+import injectIntl from '@/lib/injectIntl';
 
 import type { StyledSelectCustomComponent } from './StyledSelect';
 import { makeStyledSelect } from './StyledSelect';

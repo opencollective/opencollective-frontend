@@ -1,4 +1,3 @@
-import injectIntl from '@/lib/injectIntl';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
@@ -14,6 +13,7 @@ import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import injectIntl from '@/lib/injectIntl';
 
 import { toast } from './ui/useToast';
 

@@ -6,7 +6,6 @@ import { get, uniqBy } from 'lodash-es';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -31,6 +30,7 @@ import {
 } from '../../lib/url-helpers';
 import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
 import type { NewContributionFlowOrderSuccessQuery } from '@/lib/graphql/types/v2/graphql';
+import injectIntl from '@/lib/injectIntl';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import { getI18nLink, I18nBold } from '../../components/I18nFormatters';

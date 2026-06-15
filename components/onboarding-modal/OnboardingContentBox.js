@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+
 import injectIntl from '@/lib/injectIntl';
 
 import CollectivePickerAsync from '../../components/CollectivePickerAsync';

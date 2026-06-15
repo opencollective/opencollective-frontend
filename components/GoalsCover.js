@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { debounce, get, maxBy, sortBy, truncate } from 'lodash-es';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import { formatCurrency } from '../lib/currency-utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from './Container';
 import { fadeIn } from './StyledKeyframes';

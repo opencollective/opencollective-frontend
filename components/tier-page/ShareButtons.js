@@ -7,9 +7,9 @@ import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import copy from 'copy-to-clipboard';
 import { defineMessages } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import { linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from '../Container';
 import { Flex } from '../Grid';

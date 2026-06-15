@@ -1,12 +1,11 @@
-import injectIntl from '@/lib/injectIntl';
 import React from 'react';
 import { Search, X } from 'lucide-react';
 import { withRouter } from 'next/router';
-
 import { styled } from 'styled-components';
 import { borderColor, borderRadius, height, typography } from 'styled-system';
 
 import { compose } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import { Box, Flex } from './Grid';
 import Spinner from './Spinner';

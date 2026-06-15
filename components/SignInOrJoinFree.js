@@ -4,7 +4,6 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
@@ -12,6 +11,7 @@ import { signin } from '../lib/api';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import { toast } from './ui/useToast';
 import Container from './Container';

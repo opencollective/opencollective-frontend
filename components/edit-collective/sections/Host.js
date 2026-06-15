@@ -4,10 +4,10 @@ import { get } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import injectIntl from '@/lib/injectIntl';
 
 import { Separator } from '@/components/ui/Separator';
 

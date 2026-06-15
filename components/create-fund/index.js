@@ -4,10 +4,10 @@ import { graphql } from '@apollo/client/react/hoc';
 import { omit, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
+import injectIntl from '@/lib/injectIntl';
 
 import { Box, Flex } from '../Grid';
 import SignInOrJoinFree from '../SignInOrJoinFree';

@@ -4,12 +4,12 @@ import { get, omit, pick } from 'lodash-es';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
 import { isHiddenAccount } from '@/lib/collective';
+import injectIntl from '@/lib/injectIntl';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';

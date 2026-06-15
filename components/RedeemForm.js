@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
+
+import injectIntl from '@/lib/injectIntl';
 
 import { Flex } from './Grid';
 import InputField from './InputField';

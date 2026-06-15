@@ -1,10 +1,10 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import { isHeavyAccount } from '../../../lib/collective';
 import { gql } from '../../../lib/graphql/helpers';
+import injectIntl from '@/lib/injectIntl';
 
 import { Box } from '../../Grid';
 import Link from '../../Link';

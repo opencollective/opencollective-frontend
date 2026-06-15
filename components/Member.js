@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
 import { defineMessages } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Avatar from './Avatar';
 import CollectiveCard from './CollectiveCard';

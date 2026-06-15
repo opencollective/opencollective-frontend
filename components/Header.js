@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
 import Head from 'next/head';
 import { defineMessages } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 
 import { getCollectiveImage } from '../lib/image-utils';
 import { truncate } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import GlobalWarnings from './GlobalWarnings';
 import TopBar from './TopBar';

@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { truncate } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
+
 import injectIntl from '@/lib/injectIntl';
 
 import Avatar, { ContributorAvatar } from '../Avatar';

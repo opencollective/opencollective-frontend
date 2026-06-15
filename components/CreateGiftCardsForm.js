@@ -8,12 +8,12 @@ import dayjs from 'dayjs';
 import { get, truncate } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 
 import { isPrepaid } from '../lib/constants/payment-methods';
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose, reportValidityHTML5 } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import { Button } from './ui/Button';
 import CollectivePicker from './CollectivePicker';

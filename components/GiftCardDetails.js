@@ -4,10 +4,10 @@ import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get } from 'lodash-es';
 import { FormattedDate, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import styled, { withTheme } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
+import injectIntl from '@/lib/injectIntl';
 
 import GiftCard from './icons/GiftCard';
 import { Button } from './ui/Button';

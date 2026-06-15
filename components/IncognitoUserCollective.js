@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
+
 import injectIntl from '@/lib/injectIntl';
 
 import Footer from './navigation/Footer';

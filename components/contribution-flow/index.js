@@ -7,7 +7,6 @@ import { get, intersection, isEmpty, isEqual, isNil, omitBy, pick } from 'lodash
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
@@ -36,6 +35,7 @@ import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { followOrderRedirectUrl, getCollectivePageRoute } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import { isCaptchaEnabled } from '../Captcha';

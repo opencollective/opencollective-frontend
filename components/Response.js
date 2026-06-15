@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
+
 import injectIntl from '@/lib/injectIntl';
 
 import Avatar from './Avatar';
