@@ -1,6 +1,7 @@
 import React from 'react';
 import { get } from 'lodash-es';
-import { injectIntl, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 
 import { getCollectiveMainTag } from '../lib/collective';

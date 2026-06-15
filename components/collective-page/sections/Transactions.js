@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 
 import { isHeavyAccount } from '../../../lib/collective';
 import { gql } from '../../../lib/graphql/helpers';

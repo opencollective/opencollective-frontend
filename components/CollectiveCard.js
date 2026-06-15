@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
-import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedDate, FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 import { width } from 'styled-system';
 

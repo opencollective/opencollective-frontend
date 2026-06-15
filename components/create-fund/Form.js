@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';

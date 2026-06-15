@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 
 import { sortEvents } from '../../../lib/events';
 

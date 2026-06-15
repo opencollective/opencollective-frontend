@@ -4,7 +4,8 @@ import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
 import Geosuggest from '@ubilabs/react-geosuggest';
 import { get, isNil, omitBy } from 'lodash-es';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 import { isURL } from 'validator';
 

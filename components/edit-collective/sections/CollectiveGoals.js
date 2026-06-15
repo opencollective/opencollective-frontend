@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get, sortBy, startCase } from 'lodash-es';
 import { Plus, Trash } from 'lucide-react';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 import { v4 as uuid } from 'uuid';
 
 import { FEATURES } from '@/lib/allowed-features';

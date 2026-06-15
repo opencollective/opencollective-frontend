@@ -5,7 +5,8 @@ import { cloneDeep, get, pick } from 'lodash-es';
 import { Info, PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { isURL } from 'validator';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';

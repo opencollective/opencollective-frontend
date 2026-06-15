@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Router from 'next/router';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 
 import { IgnorableError } from '../lib/errors';
 

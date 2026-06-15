@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/feather/CheckCircle';
 import { Clipboard } from '@styled-icons/feather/Clipboard';
 import { Printer } from '@styled-icons/feather/Printer';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 import { styled } from 'styled-components';
 
 import { giftCardsDownloadUrl } from '../lib/url-helpers';

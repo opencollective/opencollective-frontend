@@ -1,5 +1,6 @@
 import React from 'react';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { checkUseAlternativeHostFeeNaming } from '@/lib/collective';

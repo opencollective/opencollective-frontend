@@ -4,7 +4,8 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 
 import { CONNECTED_COLLECTIVES_ORDER_KEY } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';

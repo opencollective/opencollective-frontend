@@ -1,6 +1,6 @@
+import injectIntl from '@/lib/injectIntl';
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl } from 'react-intl';
 
 import languages from '../lib/constants/locales';
 import { loadScriptAsync } from '../lib/utils';

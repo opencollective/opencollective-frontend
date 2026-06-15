@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get } from 'lodash-es';
-import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 import styled, { withTheme } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';

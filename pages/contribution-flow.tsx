@@ -4,7 +4,7 @@ import { get, omit } from 'lodash-es';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { injectIntl } from 'react-intl';
+import injectIntl from '@/lib/injectIntl';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';

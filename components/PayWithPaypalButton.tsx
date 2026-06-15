@@ -1,7 +1,8 @@
+import injectIntl from '@/lib/injectIntl';
 import React, { Component } from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import { truncate } from 'lodash-es';
-import { injectIntl } from 'react-intl';
+
 import styled, { css } from 'styled-components';
 
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
