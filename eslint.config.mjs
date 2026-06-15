@@ -3,7 +3,7 @@ import graphqlPlugin from '@graphql-eslint/eslint-plugin'; // eslint-disable-lin
 import tsParser from '@typescript-eslint/parser'; // eslint-disable-line import/no-unresolved
 import { defineConfig, globalIgnores } from 'eslint/config'; // eslint-disable-line import/no-unresolved
 import openCollectiveConfig from 'eslint-config-opencollective/eslint-react.config.cjs';
-import pluginCypress from 'eslint-plugin-cypress/flat'; // eslint-disable-line import/no-unresolved
+import pluginCypress from 'eslint-plugin-cypress'; // eslint-disable-line import/no-unresolved
 import formatjs from 'eslint-plugin-formatjs';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactHooks from 'eslint-plugin-react-hooks';
