@@ -25,6 +25,8 @@ export const inviteMemberMutation = gql`
     $role: MemberRole!
     $description: String
     $since: DateTime
+    $privateNote: String
+    $isNewUser: Boolean
   ) {
     inviteMember(
       memberAccount: $memberAccount
@@ -32,6 +34,8 @@ export const inviteMemberMutation = gql`
       role: $role
       description: $description
       since: $since
+      privateNote: $privateNote
+      isNewUser: $isNewUser
     ) {
       id
       role
@@ -42,11 +46,12 @@ export const inviteMemberMutation = gql`
 `;
 
 const InviteMemberModal = props => {
-  const { intl, collective, membersIds, cancelHandler } = props;
+  const { intl, collective, membersIds, cancelHandler, fixedRole, showDescription, showSince, showPrivateNote } = props;
 
   const { toast } = useToast();
 
   const [member, setMember] = React.useState(null);
+  const [isNewUser, setIsNewUser] = React.useState();
   const mutationOptions = {
     refetchQueries: [
       {
@@ -73,7 +78,7 @@ const InviteMemberModal = props => {
   };
 
   const handleInviteMemberMutation = async values => {
-    const { description, role, since } = values;
+    const { description, role, since, privateNote } = values;
 
     try {
       await inviteMemberAccount({
@@ -82,10 +87,12 @@ const InviteMemberModal = props => {
             slug: get(member, 'slug'),
           },
           account: { slug: get(collective, 'slug') },
-          description,
-          role,
-          since,
+          description: showDescription === false ? undefined : description,
+          role: fixedRole || role,
+          since: showSince === false ? undefined : since,
+          privateNote: privateNote?.trim() ? privateNote.trim() : undefined,
           isInvitee: true,
+          isNewUser: Boolean(isNewUser),
         },
       });
 
@@ -135,7 +142,10 @@ const InviteMemberModal = props => {
               creatable
               width="100%"
               minWidth={325}
-              onChange={option => setMember(option.value)}
+              onChange={option => {
+                setMember(option.value);
+                setIsNewUser(option.isNew);
+              }}
               isDisabled={Boolean(member)}
               types={[CollectiveType.USER]}
               filterResults={collectives => collectives.filter(c => !membersIds.includes(c.id))}
@@ -149,6 +159,10 @@ const InviteMemberModal = props => {
             bindSubmitForm={bindSubmitForm}
             triggerSubmit={handleInviteMemberMutation}
             isPrivateAccount={collective?.isPrivate}
+            fixedRole={fixedRole}
+            showDescription={showDescription}
+            showSince={showSince}
+            showPrivateNote={showPrivateNote}
           />
           <div className="mt-2 flex justify-between gap-4">
             <Button

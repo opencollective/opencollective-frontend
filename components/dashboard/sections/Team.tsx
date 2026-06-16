@@ -333,6 +333,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
               collective={data?.account}
               membersIds={members.map(m => m.id)}
               cancelHandler={() => setShowInviteModal(false)}
+              showPrivateNote={false}
             />
           )}
           {showEditModal && (
