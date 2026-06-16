@@ -969,14 +969,21 @@ function fillNewPayoutMethod(payoutMethod: {
   cy.get('#PAYOUT_METHOD').within(() => {
     cy.root().scrollIntoView();
 
-    cy.contains('New payout method').click();
-    cy.contains('Choose a payout method').click();
+    // Wait for payee data and payout methods to finish loading before interacting
+    cy.get('[data-cy="add-new-payout-method"]').should('be.visible').should('not.be.disabled').click();
+    cy.get('[data-cy="payout-method-type-select"]').should('be.visible').click();
     cy.root()
       .closest('html')
-      .contains('[role="option"]', payoutMethod.type === 'OTHER' ? 'Other' : 'PayPal')
+      .contains('[data-cy="select-option"]', payoutMethod.type === 'OTHER' ? 'Other' : 'PayPal')
       .click();
     cy.get('[data-cy="currency-picker"]').click();
-    cy.focused().should('have.attr', 'placeholder', 'Search...').type(`${payoutMethod.data.currency}{enter}`);
+    cy.root()
+      .closest('html')
+      .find('[data-cy="select-content"]')
+      .should('be.visible')
+      .contains('[data-cy="select-option"]', payoutMethod.data.currency)
+      .click();
+    cy.get('[data-cy="currency-picker"]').should('contain', payoutMethod.data.currency);
     cy.contains('label', 'Info')
       .should('be.visible')
       .click()
