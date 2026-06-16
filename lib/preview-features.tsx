@@ -290,6 +290,7 @@ export const previewFeatures: PreviewFeature[] = [
     description: <FormattedMessage defaultMessage="Enable a dashboard hosted account profile page" id="cMqa3J" />,
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
+    alwaysEnableInDev: true,
     category: Categories.HOSTING,
   },
 ];
