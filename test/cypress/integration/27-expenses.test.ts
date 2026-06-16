@@ -975,7 +975,7 @@ function fillNewPayoutMethod(payoutMethod: {
       .closest('html')
       .contains('[role="option"]', payoutMethod.type === 'OTHER' ? 'Other' : 'PayPal')
       .click();
-    cy.contains('Currency').click();
+    cy.get('[data-cy="currency-picker"]').click();
     cy.focused().should('have.attr', 'placeholder', 'Search...').type(`${payoutMethod.data.currency}{enter}`);
     cy.contains('label', 'Info')
       .should('be.visible')
