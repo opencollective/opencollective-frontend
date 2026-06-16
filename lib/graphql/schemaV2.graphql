@@ -6720,6 +6720,11 @@ type ConnectedAccount {
   The date on which the ConnectedAccount was last updated
   """
   updatedAt: DateTime!
+
+  """
+  When the bank account authorization expires and needs to be reconnected
+  """
+  authorizationExpiresAt: DateTime
   settings: JSON
   service: ConnectedAccountService!
 

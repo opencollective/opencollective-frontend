@@ -4321,6 +4321,8 @@
   "transactions.import.lastUpdate": "Última atualização",
   "transactions.import.newData": "Novas transações foram sincronizadas.",
   "transactions.import.status": "Status",
+  "transactions.import.status.expired": "Expired",
+  "transactions.import.status.expired.tooltip": "This bank connection authorization has expired. Please reconnect your account from the settings to resume syncing transactions. <Link>Learn more</Link>.",
   "transactions.openCollectiveFee": "Taxa da Open Collective",
   "transactions.viewAll": "Ver Todas as Transações",
   "transactionsImport.creditOrDebitColumnRequired": "A coluna Crédito ou Débito é obrigatória",
