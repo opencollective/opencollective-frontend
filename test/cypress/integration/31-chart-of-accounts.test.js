@@ -59,24 +59,29 @@ describe('Chart of Accounts', () => {
 
     cy.get('[data-cy=admin-panel-container] input').clear();
 
+    const selectOrderBy = optionLabel => {
+      cy.root().closest('html').contains('[role="option"]', optionLabel).should('be.visible').click();
+    };
+
     // Test sorting by code
-    cy.contains('Code ascending').should('exist');
+    cy.contains('button', 'Code ascending').should('exist');
     cy.get('tr:nth-child(1)').contains('007');
     cy.get('tr:nth-child(2)').contains('008');
 
-    cy.contains('Code ascending').click();
-    cy.contains('Code descending').click();
+    cy.contains('button', 'Code ascending').click();
+    selectOrderBy('Code descending');
     cy.get('tr:nth-child(1)').contains('008');
     cy.get('tr:nth-child(2)').contains('007');
 
     // Test sorting by name
-    cy.contains('Code descending').click();
-    cy.contains('Name ascending').click();
+    cy.contains('button', 'Code descending').click();
+    selectOrderBy('Name ascending');
+    cy.url().should('include', 'orderBy=NAME');
     cy.get('tbody tr:nth-child(1)').contains('Contractors');
     cy.get('tbody tr:nth-child(2)').contains('Workspace');
 
-    cy.contains('Name ascending').click();
-    cy.contains('Name descending').click();
+    cy.contains('button', 'Name ascending').click();
+    selectOrderBy('Name descending');
     cy.get('tbody tr:nth-child(1)').contains('Workspace');
     cy.get('tbody tr:nth-child(2)').contains('Contractors');
 
