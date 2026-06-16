@@ -4,7 +4,6 @@ import { withApollo } from '@apollo/client/react/hoc';
 import { decodeJwt } from 'jose';
 import { get, isEqual } from 'lodash-es';
 import Router, { withRouter } from 'next/router';
-import { injectIntl } from 'react-intl';
 
 import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
@@ -14,6 +13,7 @@ import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import injectIntl from '@/lib/injectIntl';
 
 import { toast } from './ui/useToast';
 

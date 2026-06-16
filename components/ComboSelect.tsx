@@ -54,6 +54,7 @@ type ComboSelectProps = {
 // eslint-disable-next-line prefer-arrow-callback
 export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectProps) {
   const [open, setOpen] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const intl = useIntl();
   const isSearchable = props.isSearchable ?? props.options?.length > 8;
   const placeholder = props.loading
@@ -69,6 +70,15 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
     },
     [onChange],
   );
+
+  const onOpenChange = React.useCallback((nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (nextOpen) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, []);
 
   if (!isSearchable) {
     return (
@@ -105,7 +115,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
     );
   }
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <Button
           id={props.id}
@@ -130,7 +140,10 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
       </PopoverTrigger>
       <PopoverContent align="start" className="w-(--radix-popover-trigger-width) min-w-sm p-0" data-cy="select-content">
         <Command>
-          <CommandInput placeholder={props.inputPlaceholder || intl.formatMessage(Messages.inputPlaceholder)} />
+          <CommandInput
+            ref={inputRef}
+            placeholder={props.inputPlaceholder || intl.formatMessage(Messages.inputPlaceholder)}
+          />
           <CommandList>
             <CommandEmpty>{props.noOptions || intl.formatMessage(Messages.noOptions)}</CommandEmpty>
             <CommandGroup>
