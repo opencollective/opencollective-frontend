@@ -310,6 +310,7 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
               bindSubmitForm={bindSubmitForm}
               triggerSubmit={isInvitation ? handleEditMemberInvitationMutation : handleEditMemberMutation}
               isPrivateAccount={collective.isPrivate}
+              showPrivateNote={false}
             />
             <div className="mt-4 flex justify-between gap-2">
               <Button

@@ -66,6 +66,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const collective = row.original;
       const children = mapValues(groupBy(collective.childrenAccounts?.nodes, 'type'), 'length');
       const isChild = collective.parent;
+
       const secondLine = isChild ? (
         <FormattedMessage
           defaultMessage="{childAccountType} by {parentAccount}"
@@ -148,8 +149,16 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const DISPLAYED_TEAM_MEMBERS = 3;
       const account = row.original;
       const admins = account.members?.nodes || [];
+      const invitedAdmins = account.memberInvitations || [];
       const displayed = admins.length > DISPLAYED_TEAM_MEMBERS ? admins.slice(0, DISPLAYED_TEAM_MEMBERS - 1) : admins;
       const left = admins.length - displayed.length;
+      if (admins.length === 0 && invitedAdmins.length > 0) {
+        return (
+          <Badge size="xs" className="whitespace-nowrap">
+            <FormattedMessage defaultMessage="Invited" id="NmK6zP" />
+          </Badge>
+        );
+      }
       return (
         <div className="flex gap-[-4px]">
           {displayed.map(admin => (
