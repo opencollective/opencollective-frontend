@@ -699,7 +699,7 @@ const CollectiveDetails = ({
               className="sm:col-span-2"
               title={<FormattedMessage id="Admins" defaultMessage="Admins" />}
               value={
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2" data-cy="admins-table">
                   <DataTable
                     innerClassName="text-xs text-muted-foreground"
                     mobileTableView

@@ -245,7 +245,7 @@ const CreateHostedCollectiveModal = ({ hostSlug, onClose, onSuccess }: CreateCol
                 {({ field }) => <Textarea {...field} rows={3} className="min-h-20" />}
               </FormField>
 
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-2 text-sm" data-cy="include-self-as-admin">
                 <Checkbox
                   checked={values.includeSelfAsAdmin}
                   onCheckedChange={checked => setFieldValue('includeSelfAsAdmin', checked === true)}
@@ -262,7 +262,13 @@ const CreateHostedCollectiveModal = ({ hostSlug, onClose, onSuccess }: CreateCol
                 <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </Button>
-                <Button type="button" onClick={submitForm} disabled={!isValid} loading={loading}>
+                <Button
+                  type="button"
+                  onClick={submitForm}
+                  disabled={!isValid}
+                  loading={loading}
+                  data-cy="create-collective-submit"
+                >
                   <FormattedMessage defaultMessage="Create collective" id="CreateCollective" />
                 </Button>
               </DialogFooter>

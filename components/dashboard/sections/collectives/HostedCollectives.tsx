@@ -249,7 +249,12 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
                 </Button>
               }
             />
-            <Button size="sm" className="gap-1" onClick={() => setCreateCollective(true)}>
+            <Button
+              size="sm"
+              className="gap-1"
+              onClick={() => setCreateCollective(true)}
+              data-cy="create-collective-btn"
+            >
               <span>
                 <FormattedMessage defaultMessage="Create collective" id="CreateCollective" />
               </span>
