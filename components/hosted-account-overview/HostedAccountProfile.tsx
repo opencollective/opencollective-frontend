@@ -26,6 +26,7 @@ import { HostedAccountAgreementsTab } from './HostedAccountAgreementsTab';
 import { HostedAccountExpectedFundsTab } from './HostedAccountExpectedFundsTab';
 import { HostedAccountMoneyMovementsTab, type MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
 import { HostedAccountOverviewTab } from './HostedAccountOverviewTab';
+import { HostedAccountUpdatesTab } from './HostedAccountUpdatesTab';
 import { hostedAccountProfileQuery } from './queries';
 import type { HostedAccountProfileData } from './types';
 import { HostedAccountView } from './types';
@@ -99,6 +100,12 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
       {
         id: HostedAccountView.AGREEMENTS,
         label: <FormattedMessage defaultMessage="Agreements" id="Agreements" />,
+        count: host?.hostedAccountAgreements?.totalCount,
+      },
+      {
+        id: HostedAccountView.UPDATES,
+        label: <FormattedMessage defaultMessage="Updates" id="updates" />,
+        count: account?.updates?.totalCount,
       },
       {
         id: HostedAccountView.ABOUT,
@@ -106,7 +113,7 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
       },
       { id: HostedAccountView.ACTIVITIES, label: <FormattedMessage defaultMessage="Activities" id="Activities" /> },
     ],
-    [account],
+    [account, host?.hostedAccountAgreements?.totalCount],
   );
 
   // Redirecting a child to its parent
@@ -201,6 +208,7 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
             {selectedTab === HostedAccountView.AGREEMENTS && (
               <HostedAccountAgreementsTab account={account} hostSlug={hostSlug} />
             )}
+            {selectedTab === HostedAccountView.UPDATES && <HostedAccountUpdatesTab account={account} />}
             {selectedTab === HostedAccountView.ABOUT && <HostedAccountAboutTab account={account} />}
             {selectedTab === HostedAccountView.ACTIVITIES && <HostedAccountActivitiesTab account={account} />}
           </React.Fragment>

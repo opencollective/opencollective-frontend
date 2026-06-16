@@ -27,7 +27,7 @@ const hostedAccountAgreementsQuery = gql`
       id
       legacyId
       slug
-      hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account) {
+      hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account, includeChildren: true) {
         totalCount
         nodes {
           id
@@ -63,17 +63,8 @@ export function HostedAccountAgreementsTab({ account, hostSlug }: HostedAccountA
   const [agreementToDelete, setAgreementToDelete] = React.useState<Agreement | null>(null);
   const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION);
 
-  // Include the main account AND each child account (events/projects)
-  const accounts = React.useMemo(() => {
-    if (!account?.slug) {
-      return [];
-    }
-    const childRefs = (account.childrenAccounts?.nodes || []).map(child => ({ slug: child.slug }));
-    return [{ slug: account.slug }, ...childRefs];
-  }, [account]);
-
   const { data, error, loading, variables, refetch } = useQuery(hostedAccountAgreementsQuery, {
-    variables: { hostSlug, account: accounts, limit: NB_AGREEMENTS, offset: 0 },
+    variables: { hostSlug, account: account?.slug ? [{ slug: account.slug }] : [], limit: NB_AGREEMENTS, offset: 0 },
     skip: !account?.slug,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });

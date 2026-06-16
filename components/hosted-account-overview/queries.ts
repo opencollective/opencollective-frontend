@@ -11,11 +11,17 @@ export const hostedAccountProfileQuery = gql`
       currency
       type
       hostFeePercent
+      hostedAccountAgreements(accounts: [{ id: $accountId }], includeChildren: true, limit: 0) {
+        totalCount
+      }
     }
     account(id: $accountId) {
       id
       description
       longDescription
+      updates(includeChildren: true, onlyPublishedUpdates: true, limit: 0) {
+        totalCount
+      }
       socialLinks {
         type
         url
@@ -141,4 +147,30 @@ export const hostedAccountProfileQuery = gql`
   }
 
   ${hostedCollectiveFields}
+`;
+
+export const hostedAccountUpdatesQuery = gql`
+  query HostedAccountUpdates($accountId: String!, $limit: Int!, $offset: Int!) {
+    account(id: $accountId) {
+      id
+      updates(includeChildren: true, onlyPublishedUpdates: true, limit: $limit, offset: $offset) {
+        totalCount
+        limit
+        offset
+        nodes {
+          id
+          slug
+          title
+          publishedAt
+          account {
+            id
+            slug
+            name
+            imageUrl
+            type
+          }
+        }
+      }
+    }
+  }
 `;
