@@ -110,7 +110,8 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       this.setState({ success: true, redirecting: true });
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
-      const redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
+      let redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
+      redirect = redirect && redirect !== '/' ? redirect : '/dashboard';
       // const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(redirect);
       // if (isTrustedWhitelabel) {
       //   const parsedUrl = new URL(redirect);
@@ -119,10 +120,10 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       //   parsedUrl.searchParams.set('token', token);
       //   parsedUrl.searchParams.set('next', parsedUrl.pathname);
       //   parsedUrl.pathname = '/signin';
-      //   redirect = parsedUrl.toString();
+      //   redirect = parsedUrl;
       // }
-      const defaultRedirect = '/dashboard';
-      await this.props.router.replace(redirect && redirect !== '/' ? redirect : defaultRedirect);
+      const nextUrl = new URL(redirect, process.env.WEBSITE_URL);
+      window.location.href = nextUrl.toString();
       window.scroll(0, 0);
     }
   }
