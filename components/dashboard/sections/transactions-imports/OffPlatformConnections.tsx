@@ -20,7 +20,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
-import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 import { DashboardContext } from '../../DashboardContext';
@@ -29,6 +28,7 @@ import { Pagination } from '../../filters/Pagination';
 
 import { NewOffPlatformTransactionsConnection } from './NewOffPlatformTransactionsConnection';
 import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
+import { TransactionImportStatusBadge } from './TransactionImportStatusBadge';
 import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
 
 const NB_IMPORTS_DISPLAYED = 20;
@@ -186,19 +186,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
               {
                 header: intl.formatMessage({ defaultMessage: 'Status', id: 'transactions.import.status' }),
                 accessorKey: 'status',
-                cell: ({ row }) => {
-                  const transactionsImport = row.original;
-                  const isArchived = !transactionsImport.connectedAccount;
-                  return (
-                    <Badge type={isArchived ? 'neutral' : 'info'}>
-                      {!isArchived ? (
-                        <FormattedMessage defaultMessage="Active" id="Subscriptions.Active" />
-                      ) : (
-                        <FormattedMessage defaultMessage="Archived" id="0HT+Ib" />
-                      )}
-                    </Badge>
-                  );
-                },
+                cell: ({ row }) => <TransactionImportStatusBadge transactionsImport={row.original} />,
               },
               {
                 header: intl.formatMessage({
