@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, omit } from 'lodash-es';
+import { compact, isString, omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -137,13 +137,15 @@ const filters: FilterComponentConfigs<Schema> = {
   startsAt: startsAtDateFilter.filter,
 };
 
-const HostedCollectivesList = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+const HostedCollectivesList = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const hasAccountProfile = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOSTED_ACCOUNT_OVERVIEW);
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
-  const [drawerCollective, setDrawerCollective] = React.useState<Account | undefined>(undefined);
+  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(
+    subpath?.[0],
+  );
   const accountTypes = [CollectiveType.COLLECTIVE];
 
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostedCollectivesMetadataQuery, {
@@ -152,6 +154,17 @@ const HostedCollectivesList = ({ accountSlug: hostSlug }: DashboardSectionProps)
   });
 
   const pushSubpath = makePushSubpath(router);
+
+  const handleDrawer = (collective: Account | string | undefined) => {
+    pushSubpath(collective ? (typeof collective === 'string' ? collective : collective.id) : undefined);
+    setShowCollectiveOverview(collective);
+  };
+
+  React.useEffect(() => {
+    if (!hasAccountProfile && subpath?.[0] !== ((showCollectiveOverview as Account)?.id || showCollectiveOverview)) {
+      handleDrawer(subpath?.[0]);
+    }
+  }, [subpath?.[0], hasAccountProfile]);
 
   const views = [
     {
@@ -213,9 +226,7 @@ const HostedCollectivesList = ({ accountSlug: hostSlug }: DashboardSectionProps)
   };
   const isUnhosted = queryFilter.values?.status === COLLECTIVE_STATUS.UNHOSTED;
   const hostedAccounts = data?.host?.hostedAccounts;
-  const onClickRow = hasAccountProfile
-    ? row => pushSubpath(row.original.publicId)
-    : row => setDrawerCollective(row.original);
+  const onClickRow = hasAccountProfile ? row => pushSubpath(row.original.publicId) : row => handleDrawer(row.original);
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
@@ -271,7 +282,7 @@ const HostedCollectivesList = ({ accountSlug: hostSlug }: DashboardSectionProps)
                 onClickRow,
                 onEdit: handleEdit,
                 host: data?.host,
-                openCollectiveDetails: setDrawerCollective,
+                openCollectiveDetails: handleDrawer,
               } as unknown as HostedCollectivesDataTableMeta
             }
             onClickRow={onClickRow}
@@ -282,18 +293,19 @@ const HostedCollectivesList = ({ accountSlug: hostSlug }: DashboardSectionProps)
       )}
 
       <Drawer
-        open={Boolean(drawerCollective)}
-        onClose={() => setDrawerCollective(undefined)}
+        open={Boolean(!hasAccountProfile && showCollectiveOverview)}
+        onClose={() => handleDrawer(undefined)}
         className={'max-w-2xl'}
         showActionsContainer
         showCloseButton
       >
-        {drawerCollective && (
+        {showCollectiveOverview && (
           <CollectiveDetails
-            collective={drawerCollective as any}
+            collective={isString(showCollectiveOverview) ? null : (showCollectiveOverview as any)}
+            collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
             host={data?.host}
-            onCancel={() => setDrawerCollective(undefined)}
-            openCollectiveDetails={setDrawerCollective}
+            onCancel={() => handleDrawer(undefined)}
+            openCollectiveDetails={handleDrawer}
             loading={loading}
             onEdit={handleEdit}
           />

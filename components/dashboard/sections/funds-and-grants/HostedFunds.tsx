@@ -210,10 +210,14 @@ function HostedFundsList({ accountSlug: hostSlug, subpath }: DashboardSectionPro
   });
 
   useEffect(() => {
-    if (subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)) {
+    if (
+      !hasAccountProfile &&
+      subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)
+    ) {
       handleDrawer(subpath[0]);
     }
-  }, [subpath[0]]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subpath[0], hasAccountProfile]);
 
   const handleDrawer = (collective: HostedCollectiveFieldsFragment | string | undefined) => {
     if (collective) {
@@ -321,7 +325,7 @@ function HostedFundsList({ accountSlug: hostSlug, subpath }: DashboardSectionPro
       )}
 
       <Drawer
-        open={Boolean(showCollectiveOverview)}
+        open={Boolean(!hasAccountProfile && showCollectiveOverview)}
         onClose={() => handleDrawer(null)}
         className={'max-w-2xl'}
         showActionsContainer
