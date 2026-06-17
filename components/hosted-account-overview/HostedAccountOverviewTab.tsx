@@ -10,8 +10,8 @@ import { TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '@/components/Avatar';
-import HeroSocialLinks from '@/components/collective-page/hero/HeroSocialLinks';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
+import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import {
   AdminsCanSeePayoutMethodsSwitch,
@@ -84,7 +84,7 @@ const InteractionValue = ({
     );
   return (
     <span>
-      <DateTime value={tx.clearedAt || tx.createdAt} dateStyle="medium" />
+      <DateTime value={tx.clearedAt || tx.createdAt} dateStyle="long" />
       {' • '}
       {tx.type === 'CREDIT' ? (
         <FormattedMessage
@@ -280,11 +280,7 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
             {account?.socialLinks?.length > 0 && (
               <DataListItem
                 label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}
-                value={
-                  <div className="flex flex-wrap items-center gap-2">
-                    <HeroSocialLinks socialLinks={account.socialLinks} />
-                  </div>
-                }
+                value={<HeroSocialLinks className="size-6" socialLinks={account.socialLinks} />}
               />
             )}
             {(account?.location?.address || account?.location?.country) && (
@@ -351,13 +347,13 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
             />
             <DataListItem
               label={<FormattedMessage defaultMessage="Applied On" id="AppliedOn" />}
-              value={account?.createdAt ? <FormattedDate value={account.createdAt} dateStyle="medium" /> : '—'}
+              value={account?.createdAt ? <FormattedDate value={account.createdAt} dateStyle="long" /> : '—'}
             />
             <DataListItem
               label={<FormattedMessage defaultMessage="Accepted On" id="AcceptedOn" />}
               value={
                 account?.approvedAt ? (
-                  <FormattedDate value={account.approvedAt} dateStyle="medium" />
+                  <FormattedDate value={account.approvedAt} dateStyle="long" />
                 ) : (
                   <FormattedMessage defaultMessage="Not Hosted" id="OARQHL" />
                 )

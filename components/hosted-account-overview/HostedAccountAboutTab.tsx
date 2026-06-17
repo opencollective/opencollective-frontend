@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import Avatar from '@/components/Avatar';
-import HeroSocialLinks from '@/components/collective-page/hero/HeroSocialLinks';
+import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import HTMLContent, { isEmptyHTMLValue } from '@/components/HTMLContent';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
@@ -81,11 +81,7 @@ export function HostedAccountAboutTab({ account }: HostedAccountAboutTabProps) {
           {account?.socialLinks?.length > 0 && (
             <DataListItem
               label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}
-              value={
-                <div className="flex flex-wrap items-center gap-2">
-                  <HeroSocialLinks socialLinks={account.socialLinks} />
-                </div>
-              }
+              value={<HeroSocialLinks className="size-6" socialLinks={account.socialLinks} />}
             />
           )}
           {(account?.location?.address || account?.location?.country) && (
