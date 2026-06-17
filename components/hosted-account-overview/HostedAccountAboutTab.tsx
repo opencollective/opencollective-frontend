@@ -3,13 +3,13 @@ import { FormattedMessage } from 'react-intl';
 
 import Avatar from '@/components/Avatar';
 import HeroSocialLinks from '@/components/collective-page/hero/HeroSocialLinks';
+import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import HTMLContent, { isEmptyHTMLValue } from '@/components/HTMLContent';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import StyledLink from '@/components/StyledLink';
 import { Badge } from '@/components/ui/Badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
 import type { HostedAccountProfileData } from './types';
@@ -18,22 +18,13 @@ type HostedAccountAboutTabProps = {
   account?: HostedAccountProfileData;
 };
 
-const SectionCard = ({ title, children }: { title: React.ReactNode; children: React.ReactNode }) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="text-base">{title}</CardTitle>
-    </CardHeader>
-    <CardContent>{children}</CardContent>
-  </Card>
-);
-
 export function HostedAccountAboutTab({ account }: HostedAccountAboutTabProps) {
   const admins = account?.members?.nodes || [];
   const hasLongDescription = !isEmptyHTMLValue(account?.longDescription);
 
   return (
     <div className="flex flex-col gap-4">
-      <SectionCard title={<FormattedMessage defaultMessage="About" id="collective.about.title" />}>
+      <DashboardContentCard title={<FormattedMessage defaultMessage="About" id="collective.about.title" />}>
         {hasLongDescription ? (
           <HTMLContent content={account?.longDescription} />
         ) : account?.description ? (
@@ -43,9 +34,9 @@ export function HostedAccountAboutTab({ account }: HostedAccountAboutTabProps) {
             <FormattedMessage defaultMessage="No description provided" id="NoDescription" />
           </p>
         )}
-      </SectionCard>
+      </DashboardContentCard>
 
-      <SectionCard title={<FormattedMessage defaultMessage="Details" id="Details" />}>
+      <DashboardContentCard title={<FormattedMessage defaultMessage="Details" id="Details" />}>
         <DataList className="text-sm">
           <DataListItem
             label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
@@ -104,10 +95,10 @@ export function HostedAccountAboutTab({ account }: HostedAccountAboutTabProps) {
             />
           )}
         </DataList>
-      </SectionCard>
+      </DashboardContentCard>
 
       {admins.length > 0 && (
-        <SectionCard title={<FormattedMessage defaultMessage="Team" id="Team" />}>
+        <DashboardContentCard title={<FormattedMessage defaultMessage="Team" id="Team" />}>
           <div className="flex flex-wrap gap-4">
             {admins.map(admin => (
               <LinkCollective
@@ -120,7 +111,7 @@ export function HostedAccountAboutTab({ account }: HostedAccountAboutTabProps) {
               </LinkCollective>
             ))}
           </div>
-        </SectionCard>
+        </DashboardContentCard>
       )}
     </div>
   );

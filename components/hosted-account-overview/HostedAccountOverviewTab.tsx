@@ -7,6 +7,7 @@ import { CollectiveType } from '@/lib/constants/collectives';
 import Avatar from '@/components/Avatar';
 import HeroSocialLinks from '@/components/collective-page/hero/HeroSocialLinks';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
+import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import {
   AdminsCanSeePayoutMethodsSwitch,
   ExpenseTypesPicker,
@@ -20,7 +21,6 @@ import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
 import type { MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
@@ -38,15 +38,6 @@ type HostedAccountOverviewTabProps = {
   host?: { id?: string; hostFeePercent?: number | null } | null;
   openTab: (tab: HostedAccountView, moneyMovementsView?: MoneyMovementsView) => void;
 };
-
-const SectionCard = ({ title, children }: { title: React.ReactNode; children: React.ReactNode }) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="text-base">{title}</CardTitle>
-    </CardHeader>
-    <CardContent className="flex flex-col gap-4">{children}</CardContent>
-  </Card>
-);
 
 const InteractionValue = ({
   tx,
@@ -150,7 +141,7 @@ const RecentTransactionsCard = ({
   onRowClick: (tx: RecentTransaction) => void;
   onViewAll: () => void;
 }) => (
-  <SectionCard title={title}>
+  <DashboardContentCard title={title}>
     <table className="w-full text-sm">
       <thead>
         <tr className="text-left text-xs text-muted-foreground">
@@ -221,7 +212,7 @@ const RecentTransactionsCard = ({
       <FormattedMessage defaultMessage="View all" id="pFK6bJ" />
       <ArrowRight size={14} />
     </Button>
-  </SectionCard>
+  </DashboardContentCard>
 );
 
 export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccountOverviewTabProps) {
@@ -251,7 +242,7 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <SectionCard title={<FormattedMessage defaultMessage="Details" id="Details" />}>
+        <DashboardContentCard title={<FormattedMessage defaultMessage="Details" id="Details" />}>
           <DataList className="text-sm">
             <DataListItem
               label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
@@ -325,9 +316,9 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
               }
             />
           </DataList>
-        </SectionCard>
+        </DashboardContentCard>
 
-        <SectionCard title={<FormattedMessage defaultMessage="Platform Activity" id="PlatformActivity" />}>
+        <DashboardContentCard title={<FormattedMessage defaultMessage="Platform Activity" id="PlatformActivity" />}>
           <DataList className="text-sm">
             <DataListItem
               label={<FormattedMessage defaultMessage="Status" id="Status" />}
@@ -366,35 +357,42 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
               value={<InteractionValue tx={latestInteraction} onOpen={handleRowClick} />}
             />
           </DataList>
-        </SectionCard>
+        </DashboardContentCard>
       </div>
 
-      <SectionCard title={<FormattedMessage defaultMessage="About" id="collective.about.title" />}>
-        {account?.description && <p className="text-sm text-foreground">{account.description}</p>}
-        {admins.length > 0 && (
+      <DashboardContentCard title={<FormattedMessage defaultMessage="About" id="collective.about.title" />}>
+        {(account?.description || admins.length > 0) && (
           <DataList className="text-sm">
-            <DataListItem
-              label={<FormattedMessage defaultMessage="Admins" id="Admins" />}
-              value={
-                <div className="flex flex-wrap gap-3">
-                  {admins.map(admin => (
-                    <LinkCollective
-                      key={admin.id}
-                      collective={admin.account}
-                      className="flex items-center gap-1.5 text-sm font-medium text-foreground hover:underline"
-                      withHoverCard
-                    >
-                      <Avatar collective={admin.account} radius={20} /> {admin.account.name}
-                    </LinkCollective>
-                  ))}
-                </div>
-              }
-            />
+            {account?.description && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Description" id="Fields.description" />}
+                value={<span className="text-foreground">{account.description}</span>}
+              />
+            )}
+            {admins.length > 0 && (
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Admins" id="Admins" />}
+                value={
+                  <div className="flex flex-wrap gap-3">
+                    {admins.map(admin => (
+                      <LinkCollective
+                        key={admin.id}
+                        collective={admin.account}
+                        className="flex items-center gap-1.5 text-sm font-medium text-foreground hover:underline"
+                        withHoverCard
+                      >
+                        <Avatar collective={admin.account} radius={20} /> {admin.account.name}
+                      </LinkCollective>
+                    ))}
+                  </div>
+                }
+              />
+            )}
           </DataList>
         )}
-      </SectionCard>
+      </DashboardContentCard>
 
-      <SectionCard title={<FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />}>
+      <DashboardContentCard title={<FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Metric
             label={<FormattedMessage defaultMessage="Current Balance" id="PkACGs" />}
@@ -431,7 +429,7 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
             ]}
           />
         </div>
-      </SectionCard>
+      </DashboardContentCard>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <RecentTransactionsCard

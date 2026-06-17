@@ -90,7 +90,7 @@ export function HostedAccountUpdatesTab({ account }: HostedAccountUpdatesTabProp
   }
 
   return (
-    <div className="flex flex-col gap-4 text-[13px]">
+    <div className="flex flex-col gap-4">
       <DataTable
         data-cy="updates-table"
         columns={columns}

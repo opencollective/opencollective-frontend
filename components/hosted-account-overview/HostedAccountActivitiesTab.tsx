@@ -42,7 +42,7 @@ export function HostedAccountActivitiesTab({ account }: HostedAccountActivitiesT
   }
 
   return (
-    <div className="flex flex-col gap-4 text-[13px]">
+    <div className="flex flex-col gap-4">
       <React.Fragment>
         <ActivitiesTable
           activities={activities}
