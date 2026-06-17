@@ -100,7 +100,7 @@ const EditStripeAccount = ({ collective }: { collective: Pick<Account, 'slug'> }
               defaultMessage="Connect a Stripe account to start accepting financial contributions."
             />
           </div>
-          <Button size="sm" className="w-fit" type="submit" onClick={handleConnect} loading={connecting}>
+          <Button size="sm" className="w-fit" type="button" onClick={handleConnect} loading={connecting}>
             <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'Stripe' }} />
           </Button>
         </React.Fragment>
