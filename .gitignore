@@ -20,6 +20,7 @@ stage
 *.swp
 storybook-static
 .vimrc
+test_results.xml
 
 # VSCode & VSCode's extensions
 .vscode/*
