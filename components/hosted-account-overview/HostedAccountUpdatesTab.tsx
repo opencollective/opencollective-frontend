@@ -1,15 +1,18 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import type { ColumnDef } from '@tanstack/react-table';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
+import { z } from 'zod';
+
+import { integer } from '@/lib/filters/schemas';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '@/components/Avatar';
+import { Pagination } from '@/components/dashboard/filters/Pagination';
 import DateTime from '@/components/DateTime';
 import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { DataTable } from '@/components/table/DataTable';
-import { Button } from '@/components/ui/Button';
 
 import { hostedAccountUpdatesQuery } from './queries';
 import type { HostedAccountProfileData } from './types';
@@ -74,10 +77,14 @@ type HostedAccountUpdatesTabProps = {
 };
 
 export function HostedAccountUpdatesTab({ account }: HostedAccountUpdatesTabProps) {
-  const [offset, setOffset] = React.useState(0);
+  const queryFilter = useQueryFilter({
+    schema: z.object({ limit: integer.default(UPDATES_LIMIT), offset: integer.default(0) }),
+    filters: {},
+    skipRouter: true,
+  });
 
   const { data, loading, error } = useQuery(hostedAccountUpdatesQuery, {
-    variables: { accountId: account?.id, limit: UPDATES_LIMIT, offset },
+    variables: { accountId: account?.id, ...queryFilter.variables },
     skip: !account?.id,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
@@ -99,28 +106,7 @@ export function HostedAccountUpdatesTab({ account }: HostedAccountUpdatesTabProp
         nbPlaceholders={5}
         emptyMessage={() => <FormattedMessage defaultMessage="No Updates" id="updates.empty" />}
       />
-      {totalCount > UPDATES_LIMIT && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={offset === 0}
-            onClick={() => setOffset(Math.max(0, offset - UPDATES_LIMIT))}
-          >
-            <ChevronLeft size={16} />
-            <FormattedMessage defaultMessage="Previous" id="Pagination.Prev" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={offset + UPDATES_LIMIT >= totalCount}
-            onClick={() => setOffset(offset + UPDATES_LIMIT)}
-          >
-            <FormattedMessage defaultMessage="Next" id="Pagination.Next" />
-            <ChevronRight size={16} />
-          </Button>
-        </div>
-      )}
+      <Pagination queryFilter={queryFilter} total={totalCount} />
     </div>
   );
 }
