@@ -1,8 +1,13 @@
 import React from 'react';
+import { useQuery } from '@apollo/client';
 import { ArrowRight } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
 
 import { CollectiveType } from '@/lib/constants/collectives';
+import { limit, offset } from '@/lib/filters/schemas';
+import { TransactionType } from '@/lib/graphql/types/v2/graphql';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '@/components/Avatar';
 import HeroSocialLinks from '@/components/collective-page/hero/HeroSocialLinks';
@@ -13,6 +18,10 @@ import {
   ExpenseTypesPicker,
   HostFeeStructurePicker,
 } from '@/components/dashboard/sections/collectives/CollectiveDetails';
+import { transactionsTableQuery } from '@/components/dashboard/sections/transactions/queries';
+import TransactionsTable, {
+  type TransactionsTableProps,
+} from '@/components/dashboard/sections/transactions/TransactionsTable';
 import DateTime from '@/components/DateTime';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
@@ -20,7 +29,6 @@ import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
 import type { MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
@@ -31,11 +39,18 @@ import { HostedAccountView } from './types';
 const BALANCE_COLOR = '#f59e0b';
 const RECEIVED_COLOR = '#14b8a6';
 
+const recentTransactionsSchema = z.object({
+  limit: limit.default(5),
+  offset,
+  openTransactionId: z.coerce.string().optional(),
+});
+
 type RecentTransaction = NonNullable<HostedAccountProfileData['recentContributions']>['nodes'][number];
 
 type HostedAccountOverviewTabProps = {
   account?: HostedAccountProfileData;
   host?: { id?: string; hostFeePercent?: number | null } | null;
+  hostSlug: string;
   openTab: (tab: HostedAccountView, moneyMovementsView?: MoneyMovementsView) => void;
 };
 
@@ -128,94 +143,51 @@ const Metric = ({
 
 const RecentTransactionsCard = ({
   title,
-  rows,
-  showDescription,
-  currency,
+  transactions,
+  loading,
+  queryFilter,
+  refetch,
   onRowClick,
   onViewAll,
 }: {
   title: React.ReactNode;
-  rows: RecentTransaction[];
-  showDescription?: boolean;
-  currency?: string;
-  onRowClick: (tx: RecentTransaction) => void;
+  transactions: TransactionsTableProps['transactions'];
+  loading?: boolean;
+  queryFilter: TransactionsTableProps['queryFilter'];
+  refetch: TransactionsTableProps['refetchList'];
+  onRowClick: TransactionsTableProps['onClickRow'];
   onViewAll: () => void;
 }) => (
-  <DashboardContentCard title={title}>
-    <table className="w-full text-sm">
-      <thead>
-        <tr className="text-left text-xs text-muted-foreground">
-          <th className="pr-6 pb-2 font-medium">
-            <FormattedMessage defaultMessage="Date Paid" id="/SrpzP" />
-          </th>
-          <th className="pr-6 pb-2 font-medium">
-            <FormattedMessage defaultMessage="Contribution to" id="kQwHjA" />
-          </th>
-          <th className="pr-6 pb-2 font-medium">
-            <FormattedMessage defaultMessage="Account" id="TwyMau" />
-          </th>
-          <th className="pb-2 text-right font-medium">
-            <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.length === 0 ? (
-          <tr>
-            <td colSpan={4} className="py-4 text-center text-muted-foreground">
-              <FormattedMessage defaultMessage="No data" id="UG5qoS" />
-            </td>
-          </tr>
-        ) : (
-          rows.map(tx => {
-            const canOpen = Boolean(tx.expense || tx.order);
-            return (
-              <tr
-                key={tx.id}
-                className={`border-t border-gray-100 ${canOpen ? 'cursor-pointer hover:bg-muted/50' : ''}`}
-                onClick={canOpen ? () => onRowClick(tx) : undefined}
-              >
-                <td className="py-2.5 pr-6 whitespace-nowrap text-foreground">
-                  <DateTime value={tx.clearedAt || tx.createdAt} dateStyle="medium" />
-                </td>
-                <td className="py-2.5 pr-6">
-                  {showDescription ? (
-                    <span className="line-clamp-1 text-foreground">{tx.description || '—'}</span>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Avatar collective={tx.oppositeAccount} radius={20} />
-                      <span className="line-clamp-1 text-foreground">{tx.oppositeAccount?.name || '—'}</span>
-                    </div>
-                  )}
-                </td>
-                <td className="py-2.5 pr-6">
-                  <div className="flex items-center gap-2">
-                    <Avatar collective={tx.account} radius={20} />
-                    <span className="line-clamp-1 text-foreground">{tx.account?.name || '—'}</span>
-                  </div>
-                </td>
-                <td className="py-2.5 text-right font-medium whitespace-nowrap text-foreground">
-                  <FormattedMoneyAmount
-                    amount={tx.netAmount.valueInCents}
-                    currency={tx.netAmount.currency || currency}
-                    showCurrencyCode
-                    precision={2}
-                  />
-                </td>
-              </tr>
-            );
-          })
-        )}
-      </tbody>
-    </table>
-    <Button variant="ghost" size="sm" className="self-center" onClick={onViewAll}>
-      <FormattedMessage defaultMessage="View all" id="pFK6bJ" />
-      <ArrowRight size={14} />
-    </Button>
-  </DashboardContentCard>
+  <div className="flex flex-col gap-2">
+    <h3 className="text-sm font-medium text-slate-800">{title}</h3>
+    <TransactionsTable
+      transactions={transactions}
+      loading={loading}
+      nbPlaceholders={5}
+      queryFilter={queryFilter}
+      refetchList={refetch}
+      hideHeader
+      hidePagination
+      meta={{ timeStyle: null }}
+      onClickRow={onRowClick}
+      columns={['date', 'account', 'amount', 'currency']}
+      footer={
+        transactions?.nodes?.length > 0 && (
+          <div className="flex min-h-[49px] w-full items-center justify-center border-t">
+            <button
+              onClick={onViewAll}
+              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
+            >
+              <FormattedMessage defaultMessage="View all" id="pFK6bJ" />
+            </button>
+          </div>
+        )
+      }
+    />
+  </div>
 );
 
-export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccountOverviewTabProps) {
+export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: HostedAccountOverviewTabProps) {
   const intl = useIntl();
   const [openExpenseId, setOpenExpenseId] = React.useState<number | null>(null);
   const [openContributionId, setOpenContributionId] = React.useState<number | null>(null);
@@ -225,12 +197,55 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
   const isChild = Boolean(account?.parent?.id);
   const isHosted = Boolean(account?.host?.id);
 
+  const recentContributionsFilter = useQueryFilter({ schema: recentTransactionsSchema, filters: {}, skipRouter: true });
+  const recentPayoutsFilter = useQueryFilter({ schema: recentTransactionsSchema, filters: {}, skipRouter: true });
+
+  const recentContributionsQuery = useQuery(transactionsTableQuery, {
+    variables: {
+      account: [{ id: account?.id }],
+      hostAccount: { slug: hostSlug },
+      includeIncognitoTransactions: true,
+      includeChildrenTransactions: true,
+      sort: { field: 'CREATED_AT', direction: 'DESC' },
+      limit: 5,
+      offset: 0,
+      type: TransactionType.CREDIT,
+    },
+    skip: !account?.id,
+    notifyOnNetworkStatusChange: true,
+  });
+  const recentPayoutsQuery = useQuery(transactionsTableQuery, {
+    variables: {
+      account: [{ id: account?.id }],
+      hostAccount: { slug: hostSlug },
+      includeIncognitoTransactions: true,
+      includeChildrenTransactions: true,
+      sort: { field: 'CREATED_AT', direction: 'DESC' },
+      limit: 5,
+      offset: 0,
+      type: TransactionType.DEBIT,
+    },
+    skip: !account?.id,
+    notifyOnNetworkStatusChange: true,
+  });
+
   const handleRowClick = (tx: RecentTransaction) => {
     if (tx.expense) {
       setOpenExpenseId(tx.expense.legacyId);
     } else if (tx.order) {
       setOpenContributionId(tx.order.legacyId);
     }
+  };
+
+  const handleTransactionTableRowClick: TransactionsTableProps['onClickRow'] = row => {
+    if ('expense' in row.original && row.original.expense) {
+      setOpenExpenseId(row.original.expense.legacyId);
+      return true;
+    } else if ('order' in row.original && row.original.order) {
+      setOpenContributionId(row.original.order.legacyId);
+      return true;
+    }
+    return false;
   };
 
   const admins = account?.members?.nodes || [];
@@ -434,17 +449,20 @@ export function HostedAccountOverviewTab({ account, host, openTab }: HostedAccou
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <RecentTransactionsCard
           title={<FormattedMessage defaultMessage="Recent Contributions" id="BPg/ek" />}
-          rows={account?.recentContributions?.nodes || []}
-          currency={currency}
-          onRowClick={handleRowClick}
+          transactions={recentContributionsQuery.data?.transactions}
+          loading={recentContributionsQuery.loading}
+          queryFilter={recentContributionsFilter}
+          refetch={recentContributionsQuery.refetch}
+          onRowClick={handleTransactionTableRowClick}
           onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'CONTRIBUTIONS')}
         />
         <RecentTransactionsCard
           title={<FormattedMessage defaultMessage="Recent Payouts" id="aS3BD9" />}
-          rows={account?.recentPayouts?.nodes || []}
-          showDescription
-          currency={currency}
-          onRowClick={handleRowClick}
+          transactions={recentPayoutsQuery.data?.transactions}
+          loading={recentPayoutsQuery.loading}
+          queryFilter={recentPayoutsFilter}
+          refetch={recentPayoutsQuery.refetch}
+          onRowClick={handleTransactionTableRowClick}
           onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'PAYOUTS')}
         />
       </div>

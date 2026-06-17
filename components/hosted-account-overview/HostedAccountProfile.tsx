@@ -196,7 +196,7 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab} onChange={tab => openTab(tab as HostedAccountView)} />
             {selectedTab === HostedAccountView.OVERVIEW && (
-              <HostedAccountOverviewTab account={account} host={host} openTab={openTab} />
+              <HostedAccountOverviewTab account={account} host={host} hostSlug={hostSlug} openTab={openTab} />
             )}
             {selectedTab === HostedAccountView.ACCOUNTS && (
               <HostedAccountAccountsTab account={account} host={host} loading={isLoading} onEdit={refetch} />
