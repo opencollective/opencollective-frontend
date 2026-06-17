@@ -11,6 +11,7 @@ import Avatar from '@/components/Avatar';
 import { CopyID } from '@/components/CopyId';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { MoreActionsMenu } from '@/components/dashboard/sections/collectives/common';
+import { getCollectiveTypeIcon } from '@/components/dashboard/sections/community/common';
 import { makeReplaceSubpath } from '@/components/dashboard/utils';
 import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
@@ -123,7 +124,7 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
 
   return (
     <div className="flex h-full flex-col">
-      <button className="mb-2 flex w-fit items-center text-xs text-gray-500" onClick={() => history.back()}>
+      <button className="mb-4 flex w-fit items-center text-xs text-gray-500" onClick={() => history.back()}>
         <ArrowLeft size="14px" className="mr-1" />
         <FormattedMessage defaultMessage="Go Back" id="GoBack" />
       </button>
@@ -142,6 +143,7 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
                   <div>{account?.name || account?.slug}</div>
                   <div className="flex flex-wrap items-center gap-1">
                     <Badge size="sm" type="outline" className="gap-1 rounded-full">
+                      {getCollectiveTypeIcon(account?.type, { size: 12 })}
                       {formatCollectiveType(intl, account?.type)}
                     </Badge>
                     {account?.isFrozen && (
