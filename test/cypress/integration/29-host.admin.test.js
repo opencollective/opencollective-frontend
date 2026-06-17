@@ -189,6 +189,8 @@ describe('host dashboard', () => {
       cy.getByDataCy('confirm-contribution-host-fee-percent').clear().type('9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
       cy.contains('Paid').should('exist');
+      // Wait for the confirmation modal to unmount so the drawer is interactive again
+      cy.getByDataCy('order-confirmation-modal-submit').should('not.exist');
 
       cy.contains('More actions').click();
       cy.contains('View transactions').click();
@@ -236,6 +238,8 @@ describe('host dashboard', () => {
       cy.getByDataCy('confirm-contribution-host-fee-percent').type('{selectall}9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
       cy.contains('Paid').should('exist');
+      // Wait for the confirmation modal to unmount so the drawer is interactive again
+      cy.getByDataCy('order-confirmation-modal-submit').should('not.exist');
 
       // Verify transaction amounts: contribution 504 (514 - 10), platform tip 10, processor fee 4, host fee 9% of 504 = 45.36
       // Note: Platform tip (€10) is recorded in the Platform's ledger, not visible in the host's transaction view.
