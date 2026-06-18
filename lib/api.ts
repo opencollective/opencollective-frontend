@@ -492,5 +492,5 @@ export function sendContactMessage(body) {
 }
 
 export function searchDocs(query) {
-  return fetch(`/api/docs/search?query=${query}`).then(checkResponseStatus);
+  return fetch(`${getApiUrl()}/docs/search?query=${query}`).then(checkResponseStatus);
 }

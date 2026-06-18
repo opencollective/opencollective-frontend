@@ -15,6 +15,7 @@ module.exports = defineConfig({
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
   expose: {
     MAILPIT_URL: process.env.MAILPIT_URL || 'http://localhost:1080',
+    API_URL: process.env.API_URL || 'http://localhost:3060',
   },
   env: {
     codeCoverage: {

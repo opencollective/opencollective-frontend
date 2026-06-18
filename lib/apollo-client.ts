@@ -26,7 +26,7 @@ export const APOLLO_QUERY_DATA_PROP_NAME = '__APOLLO_QUERY_DATA__' as const;
 
 /**
  * Returns the GraphQL api url for the appropriate api version and environment.
- * @param {string} version - api version. Defaults to v1.
+ * @param {string} version - api version. Defaults to v2.
  * @returns {string} GraphQL api url.
  */
 const getGraphqlUrl = (apiVersion: 'v1' | 'v2' = 'v2'): string => {
