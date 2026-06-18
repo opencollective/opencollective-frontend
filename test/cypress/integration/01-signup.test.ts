@@ -5,6 +5,30 @@ import { randomGmailEmail, randomSlug } from '../support/faker';
 
 const visitParams = { onBeforeLoad: mockRecaptcha };
 
+/** Select a country in the org signup form and wait until currency is auto-filled. */
+const selectOrganizationCountry = (countryCode: string, searchText: string) => {
+  cy.getByDataCy('organization-country-trigger').click();
+  cy.getByDataCy('organization-country-search').focus().type(searchText);
+  cy.getByDataCy('organization-country-list')
+    .find(`[data-cy="organization-country-${countryCode}"]`)
+    .should('be.visible')
+    .click();
+  cy.getByDataCy('organization-country-trigger').should('not.contain', 'Select Country');
+  cy.getByDataCy('organization-currency-trigger').should('not.contain', 'Select currency');
+};
+
+/** Full page reload: wait for UserProvider before the org form's hidden fields are populated. */
+const visitOrganizationSignupAsLoggedInUser = (query = '') => {
+  cy.intercept('POST', '/api/graphql/v1', req => {
+    if (req.body?.operationName === 'LoggedInUser') {
+      req.alias = 'loggedInUser';
+    }
+  });
+  cy.visit(`/signup/organization${query}`, visitParams);
+  cy.wait('@loggedInUser');
+  cy.getByDataCy('create-organization-form').should('be.visible');
+};
+
 const getEmailToMatcher = (To, email) =>
   To[0].Address.includes(email) || To[0].Address.includes(email.replace(/@/g, '-at-'));
 
@@ -105,18 +129,19 @@ describe('/signup', () => {
         cy.get('@form').find('h1').contains("Let's complete your profile");
         cy.get('@form').find('input[name="name"]').type('John Doe');
         cy.get('@form').find('button[type="submit"]').click();
+        cy.url().should('include', '/signup/organization');
+        cy.getByDataCy('create-organization-form').should('be.visible');
       });
 
       it('should create organization', () => {
         cy.get('[data-cy="create-organization-form"]').as('form');
-        cy.getByDataCy('organization-country-trigger').click();
-        cy.getByDataCy('organization-country-search').focus().type('Puerto');
-        cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
+        selectOrganizationCountry('PR', 'Puerto Rico');
         cy.get('@form').find('input[name="organization.legalName"]').type('Cool Stuff 2 Inc.');
         cy.get('@form').find('input[name="organization.name"]').type('Cool Stuff 2');
         cy.get('@form').find('input[name="organization.description"]').type('We also do super cool stuff');
         cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
-        cy.get('@form').find('button[type="submit"]').click();
+        cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
+        cy.get('[data-cy="invite-admins-form"]').should('be.visible');
       });
 
       it('should allow user to invite more admins', () => {
@@ -141,16 +166,14 @@ describe('/signup', () => {
 
       it('should create active organization', () => {
         const slug = randomSlug();
-        cy.visit('/signup/organization?active=true', visitParams);
+        visitOrganizationSignupAsLoggedInUser('?active=true');
         cy.get('[data-cy="create-organization-form"]').as('form');
-        cy.getByDataCy('organization-country-trigger').click();
-        cy.getByDataCy('organization-country-search').focus().type('Puerto');
-        cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
+        selectOrganizationCountry('PR', 'Puerto Rico');
         cy.get('@form').find('input[name="organization.legalName"]').type('Active Org Inc.');
         cy.get('@form').find('input[name="organization.name"]').type('Active Org');
         cy.get('@form').find('input[name="organization.description"]').type('We manage money and stuff');
         cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
-        cy.get('@form').find('button[type="submit"]').click();
+        cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
         cy.getByDataCy('skip-button').click();
         cy.getByDataCy('menu-item-Settings').click();
         cy.getByDataCy('menu-item-advanced').click();
@@ -161,16 +184,14 @@ describe('/signup', () => {
 
       it('should create active fiscal host', () => {
         const slug = randomSlug();
-        cy.visit('/signup/organization?host=true', visitParams);
+        visitOrganizationSignupAsLoggedInUser('?host=true');
         cy.get('[data-cy="create-organization-form"]').as('form');
-        cy.getByDataCy('organization-country-trigger').click();
-        cy.getByDataCy('organization-country-search').focus().type('Puerto');
-        cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
+        selectOrganizationCountry('PR', 'Puerto Rico');
         cy.get('@form').find('input[name="organization.legalName"]').type('Fiscal Host Inc.');
         cy.get('@form').find('input[name="organization.name"]').type('Fiscal Host');
         cy.get('@form').find('input[name="organization.description"]').type('We fiscally sponsor collectives');
         cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
-        cy.get('@form').find('button[type="submit"]').click();
+        cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
         cy.getByDataCy('skip-button').click();
         cy.getByDataCy('menu-item-Settings').click();
         cy.getByDataCy('menu-item-advanced').click();
