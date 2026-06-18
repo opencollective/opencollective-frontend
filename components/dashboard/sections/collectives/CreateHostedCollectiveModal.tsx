@@ -10,6 +10,7 @@ import { suggestSlug } from '@/lib/collective';
 import roles from '@/lib/constants/roles';
 import { formatErrorMessage, getErrorFromGraphqlException } from '@/lib/errors';
 import { gql } from '@/lib/graphql/helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import Avatar from '../../../Avatar';
 import { FormField } from '../../../FormField';
@@ -75,6 +76,7 @@ type CreateCollectiveModalProps = {
 
 const CreateHostedCollectiveModal = ({ hostSlug, onClose, onSuccess }: CreateCollectiveModalProps) => {
   const intl = useIntl();
+  const { refetchLoggedInUser } = useLoggedInUser();
   const formikRef = useRef<FormikProps<CreateCollectiveValuesSchema>>(undefined);
   const [createCollective, { loading }] = useMutation(createCollectiveFromHostMutation);
 
@@ -99,6 +101,7 @@ const CreateHostedCollectiveModal = ({ hostSlug, onClose, onSuccess }: CreateCol
           defaultMessage: 'Collective created successfully!',
         }),
       });
+      refetchLoggedInUser();
       onSuccess?.();
       onClose();
     } catch (error) {
