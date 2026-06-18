@@ -2819,6 +2819,7 @@
   "Metric.NoDisbursements": "No disbursements to {name}",
   "Metric.NoTimeseries": "No time series data available",
   "MF9M1y": "Unhosted Collectives",
+  "mfS5he": "Your payout will be sent in this currency.",
   "mGnvLd": "Nie je možné odoslať členskú pozvánku",
   "mGSAXe": "Pole {field} má neplatnú hodnotu \"{value}\". Očakávaná hodnota: \"{expected}\"",
   "miGVdq": "Grant application to {account}",

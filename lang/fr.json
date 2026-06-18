@@ -2819,6 +2819,7 @@
   "Metric.NoDisbursements": "Aucun décaissement vers {name}",
   "Metric.NoTimeseries": "Aucune donnée de série temporelle disponible",
   "MF9M1y": "Collectifs non hébergés",
+  "mfS5he": "Your payout will be sent in this currency.",
   "mGnvLd": "Impossible d'envoyer une invitation de membre",
   "mGSAXe": "{field} a une valeur invalide \"{value}\". Requis: \"{expected}\"",
   "miGVdq": "Demande de subvention à {account}",
