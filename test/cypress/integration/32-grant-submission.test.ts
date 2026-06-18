@@ -119,7 +119,7 @@ describe('Grant Submission Flow', () => {
       cy.contains('New payout method').click();
       cy.contains('Choose a payout method').click();
       cy.root().closest('html').contains('[role="option"]', 'Other').click();
-      cy.contains('Currency').click();
+      cy.get('[data-cy="currency-picker"]').click();
       cy.focused().should('have.attr', 'placeholder', 'Search...').type('USD{enter}');
       cy.contains('label', 'Info').should('be.visible').click();
       cy.focused().type('Please send the funds to my bank account: xxxxxxxxxxx');
@@ -176,7 +176,7 @@ describe('Grant Submission Flow', () => {
       cy.contains('New payout method').click();
       cy.contains('Choose a payout method').click();
       cy.root().closest('html').contains('[role="option"]', 'Other').click();
-      cy.contains('Currency').click();
+      cy.get('[data-cy="currency-picker"]').click();
       cy.focused().should('have.attr', 'placeholder', 'Search...').type('USD{enter}');
       cy.contains('label', 'Info').should('be.visible').click();
       cy.focused().type('Please send the funds to my bank account: xxxxxxxxxxx');

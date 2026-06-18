@@ -60,6 +60,7 @@ export const TransactionImportListFieldsFragment = gql`
     }
     connectedAccount {
       id
+      authorizationExpiresAt
     }
   }
   ${TransactionsImportStatsFragment}
