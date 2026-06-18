@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
-import { Form } from 'formik';
+import { Form, useFormikContext } from 'formik';
 import { omit, orderBy, pick } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -74,6 +74,21 @@ const createOrganizationSchema = z.object({
 
 type CreateOrganizationValuesSchema = z.infer<typeof createOrganizationSchema>;
 
+/** Keeps the hidden `individual.id` field in sync once the session is available. */
+function SyncLoggedInIndividual({
+  loggedInUser,
+}: {
+  loggedInUser: ReturnType<typeof useLoggedInUser>['LoggedInUser'];
+}) {
+  const { setFieldValue, values } = useFormikContext<CreateOrganizationValuesSchema>();
+  useEffect(() => {
+    if (loggedInUser?.id && !values.individual?.id) {
+      setFieldValue('individual', pick(loggedInUser, ['id']));
+    }
+  }, [loggedInUser, setFieldValue, values.individual?.id]);
+  return null;
+}
+
 export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProps) {
   const intl = useIntl();
   const formikRef = useRef<FormikProps<CreateOrganizationValuesSchema>>(undefined);
@@ -131,15 +146,6 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
     },
     [currencyInputRef],
   );
-
-  useEffect(() => {
-    if (formikRef.current) {
-      const formik = formikRef.current;
-      if (LoggedInUser) {
-        formik.setFieldValue('individual', pick(LoggedInUser, ['id']));
-      }
-    }
-  }, [LoggedInUser]);
 
   useEffect(() => {
     if (formikRef.current) {
@@ -206,6 +212,7 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
           className="mb-6 flex max-w-xl grow flex-col items-center gap-8 px-6 sm:mb-20 sm:px-0"
           data-cy="create-organization-form"
         >
+          <SyncLoggedInIndividual loggedInUser={LoggedInUser} />
           <Image width={100} height={104} src="/static/images/signup/org.png" alt="Organization" />
           <div className="flex flex-col gap-2 px-3 text-center">
             <React.Fragment>
