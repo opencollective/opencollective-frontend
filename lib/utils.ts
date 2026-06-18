@@ -220,7 +220,11 @@ export const getWebsiteUrl = () => {
 export const getApiUrl = (): string => {
   const result = getEnvVar('API_URL');
   if (!result) {
-    throw new Error('API_URL is not set');
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('API_URL is not set');
+    }
+
+    return 'http://localhost:3060';
   }
 
   return result;
