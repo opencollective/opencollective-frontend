@@ -38,7 +38,11 @@ export const SubmitExpenseLink = ({
     );
   }
 
-  return <LinkComponent onClick={onOpenSubmitExpenseModalClick}>{children}</LinkComponent>;
+  return (
+    <LinkComponent as="button" type="button" onClick={onOpenSubmitExpenseModalClick}>
+      {children}
+    </LinkComponent>
+  );
 };
 
 export default SubmitExpenseBtn;
