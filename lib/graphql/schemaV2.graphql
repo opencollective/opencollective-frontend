@@ -26129,6 +26129,11 @@ type Mutation {
     inviteMembers: [InviteMemberInput]
 
     """
+    Optional private note included in the invitation email sent to invited members.
+    """
+    privateNote: String
+
+    """
     Marks the collective as approved directly. Only available in test/CI environments.
     """
     skipApprovalTestOnly: Boolean = false
@@ -27140,6 +27145,16 @@ type Mutation {
     role: MemberRole!
     description: String
     since: DateTime
+
+    """
+    Optional private note included in the invitation email sent to the invitee.
+    """
+    privateNote: String
+
+    """
+    When true, the invited user account was just created from the invite form. The invitee will be required to complete their profile before accepting the invitation.
+    """
+    isNewUser: Boolean = false
   ): MemberInvitation!
 
   """
