@@ -47,6 +47,7 @@ const updatesPageQuery = gql`
       name
       slug
       type
+      settings
       ... on Event {
         parent {
           id

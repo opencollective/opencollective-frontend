@@ -2,21 +2,31 @@ import React from 'react';
 import { type ApolloClient, gql } from '@apollo/client';
 import type { NextPageContext } from 'next';
 import { useRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '@/lib/apollo-client';
-import { getCollectivePageMetadata, isHiddenAccount } from '@/lib/collective';
+import { expenseSubmissionAllowed, getCollectivePageMetadata, isHiddenAccount } from '@/lib/collective';
 import { generateNotFoundError } from '@/lib/errors';
 import type { CreateGrantPageQuery } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '@/lib/url-helpers';
 
+import CollectiveNavbar from '@/components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '@/components/collective-navbar/constants';
+import { collectiveNavbarFieldsFragment } from '@/components/collective-page/graphql/fragments';
+import Container from '@/components/Container';
+import ContainerOverlay from '@/components/ContainerOverlay';
 import ErrorPage from '@/components/ErrorPage';
+import { Flex } from '@/components/Grid';
 import Loading from '@/components/Loading';
+import MessageBox from '@/components/MessageBox';
 import Page from '@/components/Page';
 import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
+import SignInOrJoinFree, { SignInOverlayBackground } from '@/components/SignInOrJoinFree';
 import SubmitGrantFlow from '@/components/submit-grant/SubmitGrantFlow';
+
+const NAVBAR_CALLS_TO_ACTION = { hasSubmitExpense: false, hasRequestGrant: false };
 
 const CreateGrantPageI18n = defineMessages({
   TITLE: {
@@ -28,7 +38,7 @@ const CreateGrantPageI18n = defineMessages({
 function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getInitialProps>>) {
   const intl = useIntl();
   const router = useRouter();
-  const { loadingLoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const pageMetadata = React.useMemo(() => {
     if (!props.account) {
       return null;
@@ -68,12 +78,58 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
     return <PageFeatureNotSupported />;
   }
 
+  const account = props.account;
+
+  if (!expenseSubmissionAllowed(account, LoggedInUser)) {
+    return (
+      <Page {...pageMetadata} collective={account}>
+        <Flex justifyContent="center" p={5}>
+          <MessageBox type="error" withIcon>
+            <FormattedMessage
+              id="mustBeMemberOfCollective"
+              defaultMessage="You must be a member of the collective to see this page"
+            />
+          </MessageBox>
+        </Flex>
+      </Page>
+    );
+  }
+
+  if (!loadingLoggedInUser && !LoggedInUser) {
+    return (
+      <Page {...pageMetadata} collective={account}>
+        <CollectiveNavbar
+          collective={account}
+          selectedCategory={NAVBAR_CATEGORIES.BUDGET}
+          callsToAction={NAVBAR_CALLS_TO_ACTION}
+        />
+        <Container position="relative" minHeight={[null, 800]}>
+          <ContainerOverlay
+            py={[2, null, 6]}
+            top="0"
+            position={['fixed', null, 'absolute']}
+            justifyContent={['center', null, 'flex-start']}
+          >
+            <SignInOverlayBackground>
+              <SignInOrJoinFree
+                showOCLogo={false}
+                showSubHeading={false}
+                hideFooter
+                routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }}
+              />
+            </SignInOverlayBackground>
+          </ContainerOverlay>
+        </Container>
+      </Page>
+    );
+  }
+
   return (
-    <Page {...pageMetadata} collective={props.account} withTopBar={false} showFooter={false}>
+    <Page {...pageMetadata} collective={account} withTopBar={false} showFooter={false}>
       <SubmitGrantFlow
         expenseId={router.query.expenseId ? parseInt(router.query.expenseId as string, 10) : null}
         draftKey={router.query.draftKey as string}
-        account={props.account}
+        account={account}
         handleOnClose={handleOnClose}
       />
     </Page>
@@ -118,14 +174,20 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
           type
           legacyId
           slug
+          settings
           supportedExpenseTypes
           isSuspended
+          features {
+            id
+            ...NavbarFieldsV1
+          }
 
           ...CollectivePageMetadataFields
         }
       }
 
       ${CollectivePageMetadataFieldsFragment}
+      ${collectiveNavbarFieldsFragment}
     `,
     variables: {
       collectiveSlug,
