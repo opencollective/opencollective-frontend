@@ -498,7 +498,6 @@ const CollectiveDetails = ({
   onEdit,
 }: CollectiveDetailsProps) => {
   const intl = useIntl();
-  const { toast } = useToast();
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
   const drawerActionsContainer = useDrawerActionsContainer();
@@ -723,8 +722,8 @@ const CollectiveDetails = ({
                             >
                               <Avatar collective={entry.account} radius={24} />
                               <span>{entry.account?.name}</span>
-                              {entry.account?.email && (
-                                <span className="text-muted-foreground">{`<${entry.account.email}>`}</span>
+                              {entry.account?.emails?.length && (
+                                <span className="text-muted-foreground">{`<${entry.account.emails[0]}>`}</span>
                               )}
                               {entry.type === 'invitation' && (
                                 <Badge size="xs">
@@ -959,7 +958,7 @@ const CollectiveDetails = ({
                   await refetch();
                   setInvitationToCancel(null);
                 } catch (e) {
-                  toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+                  e.message = i18nGraphqlException(intl, e);
                   throw e;
                 }
               }}
