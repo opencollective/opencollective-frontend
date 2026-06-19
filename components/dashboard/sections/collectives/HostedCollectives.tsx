@@ -308,6 +308,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
       {createCollective && (
         <CreateHostedCollectiveModal
           hostSlug={hostSlug}
+          isPrivate={data?.host?.isPrivate ?? false}
           onClose={() => setCreateCollective(false)}
           onSuccess={() => {
             refetchMetadata();

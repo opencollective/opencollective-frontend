@@ -70,11 +70,12 @@ type CreateCollectiveValuesSchema = z.infer<typeof createCollectiveSchema>;
 
 type CreateCollectiveModalProps = {
   hostSlug: string;
+  isPrivate?: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 };
 
-const CreateHostedCollectiveModal = ({ hostSlug, onClose, onSuccess }: CreateCollectiveModalProps) => {
+const CreateHostedCollectiveModal = ({ hostSlug, isPrivate, onClose, onSuccess }: CreateCollectiveModalProps) => {
   const intl = useIntl();
   const { refetchLoggedInUser } = useLoggedInUser();
   const formikRef = useRef<FormikProps<CreateCollectiveValuesSchema>>(undefined);
@@ -133,7 +134,12 @@ const CreateHostedCollectiveModal = ({ hostSlug, onClose, onSuccess }: CreateCol
           schema={createCollectiveSchema}
           onSubmit={onSubmit}
           initialValues={{
-            collective: { name: '', slug: '', description: '' },
+            collective: {
+              name: '',
+              // If the collective is private, we don't want to suggest a slug because it will be generated automatically by the API
+              slug: isPrivate ? 'to-be-replaced' : '',
+              description: '',
+            },
             invitedAdmins: [],
             includeSelfAsAdmin: false,
             privateNote: '',
@@ -149,17 +155,21 @@ const CreateHostedCollectiveModal = ({ hostSlug, onClose, onSuccess }: CreateCol
                 autoComplete="organization"
                 onChange={e => {
                   setFieldValue('collective.name', e.target.value);
-                  if (!touched.collective?.slug) {
+                  if (!isPrivate && !touched.collective?.slug) {
                     setFieldValue('collective.slug', suggestSlug(e.target.value));
                   }
                 }}
               />
-              <FormField
-                name="collective.slug"
-                label={<FormattedMessage id="createCollective.form.slugLabel" defaultMessage="Set your profile URL" />}
-              >
-                {({ field }) => <InputGroup className="w-full" prepend="opencollective.com/" {...field} />}
-              </FormField>
+              {!isPrivate && (
+                <FormField
+                  name="collective.slug"
+                  label={
+                    <FormattedMessage id="createCollective.form.slugLabel" defaultMessage="Set your profile URL" />
+                  }
+                >
+                  {({ field }) => <InputGroup className="w-full" prepend="opencollective.com/" {...field} />}
+                </FormField>
+              )}
               <FormField
                 name="collective.description"
                 label={<FormattedMessage id="collective.description.label" defaultMessage="Short description" />}
