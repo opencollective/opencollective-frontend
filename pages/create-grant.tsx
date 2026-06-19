@@ -140,31 +140,6 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
   );
 }
 
-const CollectivePageMetadataFieldsFragment = gql`
-  fragment CollectivePageMetadataFields on Account {
-    ... on AccountWithParent {
-      parent {
-        id
-        legacyId
-        slug
-        type
-        backgroundImageUrl
-        imageUrl
-      }
-    }
-
-    id
-    legacyId
-    slug
-    type
-    name
-    description
-    backgroundImageUrl
-    imageUrl
-    isSuspended
-  }
-`;
-
 CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
   const collectiveSlug = ctx.query.collectiveSlug as string;
 
@@ -179,18 +154,29 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
           legacyId
           slug
           settings
+          name
+          description
+          backgroundImageUrl
+          imageUrl
           supportedExpenseTypes
           isSuspended
           features {
             id
             ...NavbarFields
           }
-
-          ...CollectivePageMetadataFields
+          ... on AccountWithParent {
+            parent {
+              id
+              legacyId
+              slug
+              type
+              backgroundImageUrl
+              imageUrl
+            }
+          }
         }
       }
 
-      ${CollectivePageMetadataFieldsFragment}
       ${accountNavbarFieldsFragment}
     `,
     variables: {
