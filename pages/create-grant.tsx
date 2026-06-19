@@ -26,6 +26,8 @@ import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '@/components/SignInOrJoinFree';
 import SubmitGrantFlow from '@/components/submit-grant/SubmitGrantFlow';
 
+import Custom404 from './404';
+
 const NAVBAR_CALLS_TO_ACTION = { hasSubmitExpense: false, hasRequestGrant: false };
 
 const CreateGrantPageI18n = defineMessages({
@@ -62,7 +64,9 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
 
   const { queryResult } = props;
 
-  if (queryResult.loading || loadingLoggedInUser) {
+  if (!queryResult) {
+    return <Custom404 />;
+  } else if (queryResult.loading || loadingLoggedInUser) {
     return (
       <Page {...pageMetadata} collective={props.account} withTopBar={false} showFooter={false}>
         <div className="flex h-screen flex-col items-center justify-center p-12">
