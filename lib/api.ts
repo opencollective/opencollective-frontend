@@ -377,13 +377,17 @@ export function get(path, options: { format?: string; allowExternal?: string } =
  * Fetch a file from PDF service.
  */
 export async function fetchFromPDFService(url) {
+  let parsedUrl;
+  let pdfServiceOrigin;
   try {
-    const parsedUrl = new URL(url);
-    if (parsedUrl.origin !== PDF_SERVICE_URL) {
-      throw new Error('PDF service URL is not properly set');
-    }
+    parsedUrl = new URL(url);
+    pdfServiceOrigin = new URL(PDF_SERVICE_URL).origin;
   } catch {
     throw new Error('Invalid URL provided');
+  }
+
+  if (parsedUrl.origin !== pdfServiceOrigin) {
+    throw new Error('PDF service URL is not properly set');
   }
 
   return fetch(url, { method: 'get', headers: addAuthTokenToHeader() }).then(response => {

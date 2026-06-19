@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 
 import { useToast } from '../../components/ui/useToast';
 
-import { formatErrorMessage } from '../errors';
+import { formatErrorMessage, getErrorFromGraphqlException } from '../errors';
 
 export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
   fn: T,
@@ -36,7 +36,7 @@ export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
         // eslint-disable-next-line no-console
         console.error(e);
         if (useErrorToast) {
-          toast({ variant: 'error', message: formatErrorMessage(intl, e) });
+          toast({ variant: 'error', message: formatErrorMessage(intl, getErrorFromGraphqlException(e)) });
         }
       } finally {
         setLoading(false);
