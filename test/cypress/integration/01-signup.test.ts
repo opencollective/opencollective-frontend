@@ -136,10 +136,13 @@ describe('/signup', () => {
       it('should create organization', () => {
         cy.get('[data-cy="create-organization-form"]').as('form');
         selectOrganizationCountry('PR', 'Puerto Rico');
-        cy.get('@form').find('input[name="organization.legalName"]').type('Cool Stuff 2 Inc.');
-        cy.get('@form').find('input[name="organization.name"]').type('Cool Stuff 2');
-        cy.get('@form').find('input[name="organization.description"]').type('We also do super cool stuff');
-        cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
+        cy.get('@form').find('input[name="organization.legalName"]').should('be.visible').type('Cool Stuff 2 Inc.');
+        cy.get('@form').find('input[name="organization.name"]').should('be.visible').type('Cool Stuff 2');
+        cy.get('@form')
+          .find('input[name="organization.description"]')
+          .should('be.visible')
+          .type('We also do super cool stuff');
+        cy.get('@form').find('input[name="organization.slug"]').should('be.visible').type(`{selectall}${slug}`);
         cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
         cy.get('[data-cy="invite-admins-form"]').should('be.visible');
       });
@@ -169,10 +172,13 @@ describe('/signup', () => {
         visitOrganizationSignupAsLoggedInUser('?active=true');
         cy.get('[data-cy="create-organization-form"]').as('form');
         selectOrganizationCountry('PR', 'Puerto Rico');
-        cy.get('@form').find('input[name="organization.legalName"]').type('Active Org Inc.');
-        cy.get('@form').find('input[name="organization.name"]').type('Active Org');
-        cy.get('@form').find('input[name="organization.description"]').type('We manage money and stuff');
-        cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
+        cy.get('@form').find('input[name="organization.legalName"]').should('be.visible').type('Active Org Inc.');
+        cy.get('@form').find('input[name="organization.name"]').should('be.visible').type('Active Org');
+        cy.get('@form')
+          .find('input[name="organization.description"]')
+          .should('be.visible')
+          .type('We manage money and stuff');
+        cy.get('@form').find('input[name="organization.slug"]').should('be.visible').type(`{selectall}${slug}`);
         cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
         cy.getByDataCy('skip-button').click();
         cy.getByDataCy('menu-item-Settings').click();
@@ -187,10 +193,13 @@ describe('/signup', () => {
         visitOrganizationSignupAsLoggedInUser('?host=true');
         cy.get('[data-cy="create-organization-form"]').as('form');
         selectOrganizationCountry('PR', 'Puerto Rico');
-        cy.get('@form').find('input[name="organization.legalName"]').type('Fiscal Host Inc.');
-        cy.get('@form').find('input[name="organization.name"]').type('Fiscal Host');
-        cy.get('@form').find('input[name="organization.description"]').type('We fiscally sponsor collectives');
-        cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
+        cy.get('@form').find('input[name="organization.legalName"]').should('be.visible').type('Fiscal Host Inc.');
+        cy.get('@form').find('input[name="organization.name"]').should('be.visible').type('Fiscal Host');
+        cy.get('@form')
+          .find('input[name="organization.description"]')
+          .should('be.visible')
+          .type('We fiscally sponsor collectives');
+        cy.get('@form').find('input[name="organization.slug"]').should('be.visible').type(`{selectall}${slug}`);
         cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
         cy.getByDataCy('skip-button').click();
         cy.getByDataCy('menu-item-Settings').click();
