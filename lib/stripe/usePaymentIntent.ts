@@ -1,5 +1,5 @@
 import React from 'react';
-import { ApolloError, useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client';
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 
 import { gql } from '../graphql/helpers';
@@ -92,7 +92,7 @@ export default function usePaymentIntent({
         });
 
         if (!abortController.signal.aborted && createPaymentIntentResp.errors?.length > 0) {
-          setError(new ApolloError({ graphQLErrors: createPaymentIntentResp.errors }));
+          setError(new Error(createPaymentIntentResp.errors.map(error => error.message).join(', ')));
           setLoading(false);
           return;
         }

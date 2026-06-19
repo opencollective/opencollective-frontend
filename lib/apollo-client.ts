@@ -3,10 +3,11 @@
 
 import type { NormalizedCacheObject, QueryOptions } from '@apollo/client';
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, useQuery } from '@apollo/client';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
-import { mergeDeep } from '@apollo/client/utilities';
-import { createUploadLink } from 'apollo-upload-client';
+import { mergeDeep } from '@apollo/client/utilities/internal';
+import UploadHttpLink from 'apollo-upload-client/UploadHttpLink.mjs';
 import { isUndefined, omitBy, pick } from 'lodash-es';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
@@ -150,11 +151,11 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     }
   });
 
-  const errorLink = onError(({ graphQLErrors, networkError }) => {
-    if (graphQLErrors) {
-      graphQLErrors.map(error => {
-        if (error) {
-          const { message, locations, path } = error;
+  const errorLink = onError(({ error }) => {
+    if (CombinedGraphQLErrors.is(error)) {
+      error.errors.map(graphQLError => {
+        if (graphQLError) {
+          const { message, locations, path } = graphQLError;
           // eslint-disable-next-line no-console
           console.error(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`);
           return;
@@ -163,11 +164,9 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
         // eslint-disable-next-line no-console
         console.error('[GraphQL error]: Received null error');
       });
-    }
-
-    if (networkError) {
+    } else if (error) {
       // eslint-disable-next-line no-console
-      console.error(`[Network error]: ${networkError}`);
+      console.error(`[Network error]: ${error}`);
     }
   });
 
@@ -189,7 +188,7 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     'oc-version': process.env.HEROKU_SLUG_COMMIT?.slice(0, 7),
   };
 
-  const apiV1DefaultLink = createUploadLink({
+  const apiV1DefaultLink = new UploadHttpLink({
     uri: getGraphqlUrl('v1'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
@@ -197,7 +196,7 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
       formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
     },
   });
-  const apiV2DefaultLink = createUploadLink({
+  const apiV2DefaultLink = new UploadHttpLink({
     uri: getGraphqlUrl('v2'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
@@ -458,7 +457,7 @@ function createClient({ initialState = null, twoFactorAuthContext = null, access
   return new ApolloClient({
     cache,
     link,
-    connectToDevTools: process.browser,
+    devtools: { enabled: process.browser },
     ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
     ssrForceFetchDelay: 100, // See https://www.apollographql.com/docs/react/performance/server-side-rendering/#store-rehydration
   });
@@ -515,7 +514,8 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>,
   getPropsFromContext = undefined,
   skipClientIfSSRThrows404 = false,
   ...queryOptions
-}: QueryOptions<TVariables> & {
+}: Omit<QueryOptions<TVariables>, 'variables'> & {
+  variables?: TVariables;
   getPropsFromContext?: (context: GetServerSidePropsContext) => TProps;
   getVariablesFromContext?: (context: GetServerSidePropsContext, props: Partial<TProps>) => TVariables;
   skipClientIfSSRThrows404?: boolean;

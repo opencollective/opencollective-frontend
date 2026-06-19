@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import React from 'react';
 import { MockedProvider } from '@apollo/client/testing';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/graphql';
@@ -99,14 +99,20 @@ const buildHostQueryMock = () => ({
   },
 });
 
-const buildCreateMutationMock = (input: any) => ({
+const defaultInstructions =
+  '<div>To complete your contribution, please transfer the amount below using the provided bank details. Include the reference number exactly as shown to ensure your payment is matched correctly.<br><br>Your receipt will be issued automatically once the transfer is confirmed.<br><br><strong>Amount:</strong> {amount}<br><strong>Reference:</strong> {reference}<br><strong>Collective:</strong> {collective}<br><br>{account}</div>';
+
+const buildCreateMutationMock = (input: Partial<Record<string, unknown>>, options: { delay?: number } = {}) => ({
   request: {
     query: createManualPaymentProviderMutation,
     variables: {
       host: { slug: mockAccount.slug },
       manualPaymentProvider: {
         type: ManualPaymentProviderType.BANK_TRANSFER,
-        ...input,
+        name: input.name,
+        instructions: input.instructions ?? defaultInstructions,
+        icon: input.icon ?? 'Landmark',
+        accountDetails: input.accountDetails ?? {},
       },
     },
   },
@@ -115,10 +121,14 @@ const buildCreateMutationMock = (input: any) => ({
       createManualPaymentProvider: {
         id: 'new-provider-id',
         type: ManualPaymentProviderType.BANK_TRANSFER,
-        ...input,
+        name: input.name,
+        instructions: input.instructions ?? defaultInstructions,
+        icon: input.icon ?? 'Landmark',
+        accountDetails: input.accountDetails ?? {},
       },
     },
   },
+  ...(options.delay !== undefined ? { delay: options.delay } : {}),
 });
 
 describe('EditCustomBankPaymentMethodDialog', () => {
@@ -483,15 +493,7 @@ describe('EditCustomBankPaymentMethodDialog', () => {
       render(
         withRequiredProviders(
           <MockedProvider
-            mocks={[
-              buildHostQueryMock(),
-              buildCreateMutationMock({
-                name: 'Test Bank',
-                instructions: expect.any(String),
-                icon: 'Landmark',
-                accountDetails: {},
-              }),
-            ]}
+            mocks={[buildHostQueryMock(), buildCreateMutationMock({ name: 'Test Bank' }, { delay: Infinity })]}
             addTypename={false}
           >
             <EditCustomBankPaymentMethodDialog
@@ -511,7 +513,7 @@ describe('EditCustomBankPaymentMethodDialog', () => {
       await user.click(saveButton);
 
       // Button should be disabled during submission
-      expect(saveButton).toBeDisabled();
+      await waitFor(() => expect(saveButton).toBeDisabled());
     });
 
     it('disables Cancel button while submitting', async () => {
@@ -520,15 +522,7 @@ describe('EditCustomBankPaymentMethodDialog', () => {
       render(
         withRequiredProviders(
           <MockedProvider
-            mocks={[
-              buildHostQueryMock(),
-              buildCreateMutationMock({
-                name: 'Test Bank',
-                instructions: expect.any(String),
-                icon: 'Landmark',
-                accountDetails: {},
-              }),
-            ]}
+            mocks={[buildHostQueryMock(), buildCreateMutationMock({ name: 'Test Bank' }, { delay: Infinity })]}
             addTypename={false}
           >
             <EditCustomBankPaymentMethodDialog
@@ -548,7 +542,7 @@ describe('EditCustomBankPaymentMethodDialog', () => {
       await user.click(saveButton);
 
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
-      expect(cancelButton).toBeDisabled();
+      await waitFor(() => expect(cancelButton).toBeDisabled());
     });
   });
 
