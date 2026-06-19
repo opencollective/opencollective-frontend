@@ -15,6 +15,32 @@ const selectOrganizationCountry = (countryCode: string, searchText: string) => {
     .click();
   cy.getByDataCy('organization-country-trigger').should('not.contain', 'Select Country');
   cy.getByDataCy('organization-currency-trigger').should('not.contain', 'Select currency');
+  cy.getByDataCy('organization-country-trigger').should('not.have.attr', 'aria-expanded', 'true');
+};
+
+/** Type into a Formik-controlled input and wait until the value is committed. */
+const typeFormField = (selector: string, value: string) => {
+  cy.get('@form').find(selector).focus().clear().type(value, { delay: 50 }).should('have.value', value);
+};
+
+/** Fill and submit the org signup form; retries until legal name value is committed to the form. */
+const fillOrganizationForm = ({
+  legalName,
+  name,
+  description,
+  slug,
+}: {
+  legalName: string;
+  name: string;
+  description: string;
+  slug: string;
+}) => {
+  selectOrganizationCountry('PR', 'Puerto Rico');
+  typeFormField('input[name="organization.legalName"]', legalName);
+  typeFormField('input[name="organization.name"]', name);
+  typeFormField('input[name="organization.description"]', description);
+  cy.get('@form').find('input[name="organization.slug"]').focus().clear().type(`{selectall}${slug}`, { delay: 50 });
+  cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
 };
 
 /** Full page reload: wait for UserProvider before the org form's hidden fields are populated. */
@@ -135,12 +161,12 @@ describe('/signup', () => {
 
       it('should create organization', () => {
         cy.get('[data-cy="create-organization-form"]').as('form');
-        selectOrganizationCountry('PR', 'Puerto Rico');
-        cy.get('@form').find('input[name="organization.legalName"]').type('Cool Stuff 2 Inc.');
-        cy.get('@form').find('input[name="organization.name"]').type('Cool Stuff 2');
-        cy.get('@form').find('input[name="organization.description"]').type('We also do super cool stuff');
-        cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
-        cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
+        fillOrganizationForm({
+          legalName: 'Cool Stuff 2 Inc.',
+          name: 'Cool Stuff 2',
+          description: 'We also do super cool stuff',
+          slug,
+        });
         cy.get('[data-cy="invite-admins-form"]').should('be.visible');
       });
 
@@ -168,12 +194,12 @@ describe('/signup', () => {
         const slug = randomSlug();
         visitOrganizationSignupAsLoggedInUser('?active=true');
         cy.get('[data-cy="create-organization-form"]').as('form');
-        selectOrganizationCountry('PR', 'Puerto Rico');
-        cy.get('@form').find('input[name="organization.legalName"]').type('Active Org Inc.');
-        cy.get('@form').find('input[name="organization.name"]').type('Active Org');
-        cy.get('@form').find('input[name="organization.description"]').type('We manage money and stuff');
-        cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
-        cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
+        fillOrganizationForm({
+          legalName: 'Active Org Inc.',
+          name: 'Active Org',
+          description: 'We manage money and stuff',
+          slug,
+        });
         cy.getByDataCy('skip-button').click();
         cy.getByDataCy('menu-item-Settings').click();
         cy.getByDataCy('menu-item-advanced').click();
@@ -186,12 +212,12 @@ describe('/signup', () => {
         const slug = randomSlug();
         visitOrganizationSignupAsLoggedInUser('?host=true');
         cy.get('[data-cy="create-organization-form"]').as('form');
-        selectOrganizationCountry('PR', 'Puerto Rico');
-        cy.get('@form').find('input[name="organization.legalName"]').type('Fiscal Host Inc.');
-        cy.get('@form').find('input[name="organization.name"]').type('Fiscal Host');
-        cy.get('@form').find('input[name="organization.description"]').type('We fiscally sponsor collectives');
-        cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
-        cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
+        fillOrganizationForm({
+          legalName: 'Fiscal Host Inc.',
+          name: 'Fiscal Host',
+          description: 'We fiscally sponsor collectives',
+          slug,
+        });
         cy.getByDataCy('skip-button').click();
         cy.getByDataCy('menu-item-Settings').click();
         cy.getByDataCy('menu-item-advanced').click();
