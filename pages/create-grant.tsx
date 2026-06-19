@@ -14,7 +14,7 @@ import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '@/lib/url
 
 import CollectiveNavbar from '@/components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '@/components/collective-navbar/constants';
-import { collectiveNavbarFieldsFragment } from '@/components/collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '@/components/collective-navbar/fragments';
 import Container from '@/components/Container';
 import ContainerOverlay from '@/components/ContainerOverlay';
 import ErrorPage from '@/components/ErrorPage';
@@ -179,7 +179,7 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
           isSuspended
           features {
             id
-            ...NavbarFieldsV1
+            ...NavbarFields
           }
 
           ...CollectivePageMetadataFields
@@ -187,7 +187,7 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
       }
 
       ${CollectivePageMetadataFieldsFragment}
-      ${collectiveNavbarFieldsFragment}
+      ${accountNavbarFieldsFragment}
     `,
     variables: {
       collectiveSlug,

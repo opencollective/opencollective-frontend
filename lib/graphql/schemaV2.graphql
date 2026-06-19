@@ -1055,6 +1055,11 @@ interface Account {
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
@@ -3916,6 +3921,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
@@ -4395,6 +4405,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter by accounts participating in the agreement
     """
     accounts: [AccountReferenceInput]
+
+    """
+    Include agreements from the children of the provided accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): AgreementCollection!
 
   """
@@ -6722,7 +6737,7 @@ type ConnectedAccount {
   updatedAt: DateTime!
 
   """
-  When the bank account authorization expires and needs to be reconnected
+  For when the authorization expires after a certain time
   """
   authorizationExpiresAt: DateTime
   settings: JSON
@@ -11102,6 +11117,11 @@ type Bot implements Account {
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
@@ -12186,6 +12206,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
@@ -13850,6 +13875,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
@@ -15231,6 +15261,11 @@ type Individual implements Account {
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
@@ -16640,6 +16675,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
@@ -18146,6 +18186,11 @@ type Vendor implements Account & AccountWithContributions {
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
@@ -22492,6 +22537,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
@@ -23733,6 +23783,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
+
+    """
+    Include updates from children accounts (events/projects).
+    """
+    includeChildren: Boolean! = false
   ): UpdateCollection!
 
   """
