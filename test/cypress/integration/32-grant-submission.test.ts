@@ -111,6 +111,7 @@ describe('Grant Submission Flow', () => {
       });
       cy.contains('A beneficiary').parent().get('[role="combobox"]').click().type(beneficiaryName);
       cy.wait('@collectivePickerSearch');
+      cy.wait(50);
       cy.root().closest('html').contains(`Create beneficiary: ${beneficiaryName}`).click();
       cy.root().closest('html').contains('Beneficiary created', { timeout: 20000 }).should('be.visible');
     });

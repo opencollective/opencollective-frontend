@@ -14,7 +14,7 @@ import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '@/lib/url
 
 import CollectiveNavbar from '@/components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '@/components/collective-navbar/constants';
-import { collectiveNavbarFieldsFragment } from '@/components/collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '@/components/collective-navbar/fragments';
 import Container from '@/components/Container';
 import ContainerOverlay from '@/components/ContainerOverlay';
 import ErrorPage from '@/components/ErrorPage';
@@ -25,6 +25,8 @@ import Page from '@/components/Page';
 import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '@/components/SignInOrJoinFree';
 import SubmitGrantFlow from '@/components/submit-grant/SubmitGrantFlow';
+
+import Custom404 from './404';
 
 const NAVBAR_CALLS_TO_ACTION = { hasSubmitExpense: false, hasRequestGrant: false };
 
@@ -62,7 +64,9 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
 
   const { queryResult } = props;
 
-  if (queryResult.loading || loadingLoggedInUser) {
+  if (!queryResult) {
+    return <Custom404 />;
+  } else if (queryResult.loading || loadingLoggedInUser) {
     return (
       <Page {...pageMetadata} collective={props.account} withTopBar={false} showFooter={false}>
         <div className="flex h-screen flex-col items-center justify-center p-12">
@@ -136,31 +140,6 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
   );
 }
 
-const CollectivePageMetadataFieldsFragment = gql`
-  fragment CollectivePageMetadataFields on Account {
-    ... on AccountWithParent {
-      parent {
-        id
-        legacyId
-        slug
-        type
-        backgroundImageUrl
-        imageUrl
-      }
-    }
-
-    id
-    legacyId
-    slug
-    type
-    name
-    description
-    backgroundImageUrl
-    imageUrl
-    isSuspended
-  }
-`;
-
 CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
   const collectiveSlug = ctx.query.collectiveSlug as string;
 
@@ -175,19 +154,30 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
           legacyId
           slug
           settings
+          name
+          description
+          backgroundImageUrl
+          imageUrl
           supportedExpenseTypes
           isSuspended
           features {
             id
-            ...NavbarFieldsV1
+            ...NavbarFields
           }
-
-          ...CollectivePageMetadataFields
+          ... on AccountWithParent {
+            parent {
+              id
+              legacyId
+              slug
+              type
+              backgroundImageUrl
+              imageUrl
+            }
+          }
         }
       }
 
-      ${CollectivePageMetadataFieldsFragment}
-      ${collectiveNavbarFieldsFragment}
+      ${accountNavbarFieldsFragment}
     `,
     variables: {
       collectiveSlug,

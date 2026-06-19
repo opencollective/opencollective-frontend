@@ -4,13 +4,11 @@ Collective interface
 interface CollectiveInterface {
   id: Int
   idV2: String
-  createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   hasHosting: Boolean
-  hasMoneyManagement: Boolean
   name: String
   legalName: String
   company: String
@@ -31,9 +29,9 @@ interface CollectiveInterface {
   platformFeePercent: Float
   currency: String
   image: String
-  imageUrl(height: Int, format: ImageFormat): String
+  imageUrl(height: Int): String
   backgroundImage: String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int): String
   settings: JSON!
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
@@ -41,7 +39,6 @@ interface CollectiveInterface {
   Private instructions related to an event
   """
   privateInstructions: String
-  githubContributors: JSON!
   slug: String
   path: String
   isHost: Boolean
@@ -117,24 +114,6 @@ interface CollectiveInterface {
   contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
 
   """
-  List of all collectives hosted by this collective
-  """
-  collectives(
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    expenseStatus: String = null
-    limit: Int
-    offset: Int
-    isActive: Boolean
-    isArchived: Boolean
-  ): CollectiveSearchResults
-
-  """
-  List of all followers of this collective
-  """
-  followers(limit: Int, offset: Int): [CollectiveInterface]
-
-  """
   List of all notifications for this collective
   """
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
@@ -154,17 +133,12 @@ interface CollectiveInterface {
     onlyValid: Boolean = true
   ): [Tier]
   orders(status: OrderStatus): [OrderType]
-  ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   stats: CollectiveStatsType
-  transactions(type: String, limit: Int, offset: Int, includeExpenseTransactions: Boolean): [Transaction]
-  expenses(type: String, limit: Int, offset: Int, status: String, includeHostedCollectives: Boolean): [ExpenseType]
-    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
   """
   supportedExpenseTypes: [String!]!
-  role: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
@@ -199,11 +173,6 @@ interface CollectiveInterface {
     Filter on given types  (creditcard, giftcard, etc.)
     """
     type: [String]
-
-    """
-    Order entries based on given column. Set to null for no ordering.
-    """
-    orderBy: PaymenMethodOrderField
 
     """
     Defines if the host "collective" payment method should be returned
@@ -243,52 +212,54 @@ interface CollectiveInterface {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
-
-  """
-  If created by duplication, the account from which this one was duplicated
-  """
-  duplicatedFromCollective: CollectiveInterface
-
-  """
-  If this account was duplicated, the accounts that were created from it
-  """
-  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
-This represents the details of a User
+Type for Location
 """
-type UserDetails {
-  id: Int
-  CollectiveId: Int
-  collective: CollectiveInterface
-  name: String @deprecated(reason: "2022-06-02: Please use collective.name")
-  image: String
-  email: String
-  emailWaitingForValidation: String
-  memberOf(
-    roles: [String]
-
-    """
-    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
-    """
-    includeIncognito: Boolean = true
-  ): [Member]
+type LocationType {
+  """
+  Unique identifier for this location
+  """
+  id: String
 
   """
-  Returns true if user account is limited (user can't use any feature)
+  A short name for the location (eg. Open Collective Headquarters)
   """
-  isLimited: Boolean
-  hasSeenLatestChangelogEntry: Boolean
-  hasTwoFactorAuth: Boolean
+  name: String
 
   """
-  Has the account a password set?
+  Two letters country code (eg. FR, BE...etc)
   """
-  hasPassword: Boolean
-  requiresProfileCompletion: Boolean
-  isRoot: Boolean!
+  country: String
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+scalar DateString
 
 """
 This is a Member
@@ -296,7 +267,6 @@ This is a Member
 type Member {
   id: Int
   createdAt: DateString
-  orders(limit: Int, offset: Int): [OrderType]
   transactions(limit: Int, offset: Int): [Transaction]
   collective: CollectiveInterface
   member: CollectiveInterface
@@ -317,14 +287,70 @@ type Member {
   isActive: Boolean!
 }
 
-scalar DateString
+"""
+This represents an Tier
+"""
+type Tier {
+  id: Int
+  idV2: String!
+  slug: String
+  type: String
+  name: String
+  description: String
+
+  """
+  A long, html-formatted description.
+  """
+  longDescription: String
+
+  """
+  Returns true if the tier has its standalone page activated
+  """
+  useStandalonePage: Boolean
+
+  """
+  Link to a video (YouTube, Vimeo).
+  """
+  videoUrl: String
+  button: String
+  amount: Float
+  minimumAmount: Float
+  amountType: String
+  currency: String
+  interval: String
+  presets: [Float]
+  maxQuantity: Int
+  goal: Float
+  endsAt: DateString
+  collective: CollectiveInterface
+  orders(
+    isActive: Boolean
+
+    """
+    only return orders that have been processed (fulfilled)
+    """
+    isProcessed: Boolean
+    limit: Int
+  ): [OrderType]
+
+  """
+  Returns a list of all the contributors for this tier
+  """
+  contributors(
+    """
+    Maximum number of entries to return
+    """
+    limit: Int = 3000
+  ): [Contributor]
+  stats: TierStatsType
+  data: JSON
+}
 
 """
 This is an order (for donations, buying tickets, subscribing to a Tier, pledging to a Collective)
 """
 type OrderType {
   id: Int
-  idV2: String
 
   """
   quantity of items (defined by Tier)
@@ -376,79 +402,28 @@ Subscription model
 """
 type Subscription {
   id: Int
-  amount: Float
-  currency: String
   interval: String
-  stripeSubscriptionId: String
-  isActive: Boolean
 }
 
 """
-This represents an Tier
+Possible statuses for an Order
 """
-type Tier {
-  id: Int
-  idV2: String!
-  slug: String
-  type: String
-  name: String
-  description: String
-
-  """
-  A long, html-formatted description.
-  """
-  longDescription: String
-
-  """
-  Returns true if the tier has its standalone page activated
-  """
-  useStandalonePage: Boolean
-
-  """
-  Link to a video (YouTube, Vimeo).
-  """
-  videoUrl: String
-  button: String
-  amount: Float
-  minimumAmount: Float
-  amountType: String
-  currency: String
-  interval: String
-  presets: [Float]
-  maxQuantity: Int
-  goal: Float
-  customFields: [JSON]
-  startsAt: DateString
-  endsAt: DateString
-  collective: CollectiveInterface
-  event: CollectiveInterface
-  orders(
-    isActive: Boolean
-
-    """
-    only return orders that have been processed (fulfilled)
-    """
-    isProcessed: Boolean
-    limit: Int
-  ): [OrderType]
-
-  """
-  Returns a list of all the contributors for this tier
-  """
-  contributors(
-    """
-    Maximum number of entries to return
-    """
-    limit: Int = 3000
-  ): [Contributor]
-  stats: TierStatsType
-  data: JSON
+enum OrderStatus {
+  NEW
+  REQUIRE_CLIENT_CONFIRMATION
+  PAID
+  ERROR
+  PROCESSING
+  REJECTED
+  ACTIVE
+  CANCELLED
+  PENDING
+  EXPIRED
+  DISPUTED
+  REFUNDED
+  PAUSED
+  IN_REVIEW
 }
-
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
 
 "\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
 type Contributor {
@@ -530,7 +505,7 @@ type Contributor {
   """
   Contributor avatar or logo
   """
-  image(height: Int, format: ImageFormat): String
+  image(height: Int): String
 
   """
   A public message from contributors to describe their contributions
@@ -556,14 +531,6 @@ enum ContributorRole {
 
 scalar IsoDateString
 
-enum ImageFormat {
-  txt
-  png
-  jpg
-  gif
-  svg
-}
-
 """
 Stats about a tier
 """
@@ -574,11 +541,6 @@ type TierStatsType {
   Breakdown of all the contributors that belongs to this tier.
   """
   contributors: ContributorsStats
-
-  """
-  total number of individual orders
-  """
-  totalOrders: Int
 
   """
   Total amount donated for this tier, in cents.
@@ -594,11 +556,6 @@ type TierStatsType {
   total number of people/organizations in this tier
   """
   totalDistinctOrders: Int
-
-  """
-  total number of active people/organizations in this tier
-  """
-  totalActiveDistinctOrders: Int
   availableQuantity: Int
 }
 
@@ -633,35 +590,10 @@ type ContributorsStats {
 }
 
 """
-Possible statuses for an Order
-"""
-enum OrderStatus {
-  NEW
-  REQUIRE_CLIENT_CONFIRMATION
-  PAID
-  ERROR
-  PROCESSING
-  REJECTED
-  ACTIVE
-  CANCELLED
-  PENDING
-  EXPIRED
-  DISPUTED
-  REFUNDED
-  PAUSED
-  IN_REVIEW
-}
-
-"""
 Stats about a membership
 """
 type StatsMemberType {
   id: Int
-
-  """
-  total amount donated directly by this member
-  """
-  directDonations: Float
 
   """
   total amount donated by this member either directly or using a gift card it has emitted
@@ -670,108 +602,10 @@ type StatsMemberType {
 }
 
 """
-Type for Location
-"""
-type LocationType {
-  """
-  Unique identifier for this location
-  """
-  id: String
-
-  """
-  A short name for the location (eg. Open Collective Headquarters)
-  """
-  name: String
-
-  """
-  Two letters country code (eg. FR, BE...etc)
-  """
-  country: String
-
-  """
-  Latitude
-  """
-  lat: Float
-
-  """
-  Longitude
-  """
-  long: Float
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Structured JSON address
-  """
-  structured: JSON
-}
-
-"""
-Properties by which collectives can be ordered.
-"""
-enum CollectiveOrderField {
-  """
-  Order collectives by their average monthly spending (based on last 90 days)
-  """
-  monthlySpending
-
-  """
-  Order collectives by total balance.
-  """
-  balance
-
-  """
-  Order collectives by creation time.
-  """
-  createdAt
-
-  """
-  Order collectives by name.
-  """
-  name
-
-  """
-  Order collectives by slug.
-  """
-  slug
-
-  """
-  Order collectives by updated time.
-  """
-  updatedAt
-
-  """
-  Order collectives by total donations.
-  """
-  totalDonations
-
-  """
-  Order collectives by number of financial contributors (unique members).
-  """
-  financialContributors
-}
-
-"""
-Possible directions in which to order a list of items when provided an orderBy argument.
-"""
-enum OrderDirection {
-  ASC
-  DESC
-}
-
-"""
 This represents a Notification
 """
 type NotificationType {
   id: Int
-
-  """
-  channel to send notification
-  """
-  channel: String
 
   """
   the notification type
@@ -783,63 +617,6 @@ type NotificationType {
   """
   active: Boolean
   webhookUrl: String
-  user: UserDetails
-  collective: CollectiveInterface
-  createdAt: DateString
-  updatedAt: DateString
-}
-
-"""
-This represents an Expense
-"""
-type ExpenseType {
-  id: Int
-  idV2: String
-  amount: Float
-  currency: String
-  createdAt: DateString
-  updatedAt: DateString
-  incurredAt: DateString
-  description: String
-  tags: [String]
-  status: String
-  type: String
-  privateMessage: String
-  items: [ExpenseItem] @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
-  attachedFiles: [ExpenseAttachedFile!]
-  user: UserDetails
-  fromCollective: CollectiveInterface
-  collective: CollectiveInterface
-
-  """
-  Returns the DEBIT transaction to pay out this expense
-  """
-  transaction: Transaction
-}
-
-"""
-Public fields for an expense item
-"""
-type ExpenseItem {
-  id: Int!
-  amount: Int!
-  createdAt: IsoDateString!
-  updatedAt: IsoDateString!
-  incurredAt: IsoDateString!
-  deletedAt: IsoDateString
-  description: String
-  url: String
-}
-
-"""
-Fields for an expense's attached file
-"""
-type ExpenseAttachedFile {
-  """
-  Unique identifier for this file
-  """
-  id: Int!
-  url: String
 }
 
 """
@@ -914,7 +691,6 @@ type PaymentMethodType {
   data: JSON
   name: String
   description: String
-  primary: Boolean
   monthlyLimitPerMember: Float
   initialBalance: Float
 
@@ -924,7 +700,6 @@ type PaymentMethodType {
   balance: Float
   collective: CollectiveInterface
   emitter: CollectiveInterface
-  limitedToTags: JSON
   limitedToHostCollectiveIds: [Int]
   orders(
     """
@@ -932,29 +707,7 @@ type PaymentMethodType {
     """
     hasActiveSubscription: Boolean
   ): [OrderType]
-
-  """
-  Get the list of collectives that used this payment method. Useful to select the list of a backers for which the host has manually added funds.
-  """
-  fromCollectives(limit: Int, offset: Int): CollectiveSearchResults
   currency: String
-  stripeError: StripeError
-}
-
-type StripeError {
-  message: String
-  account: String
-  response: JSON
-}
-
-"""
-Properties by which PaymenMethods can be ordered
-"""
-enum PaymenMethodOrderField {
-  """
-  Order payment methods by type (creditcard, giftcard, etc.)
-  """
-  type
 }
 
 """
@@ -962,9 +715,7 @@ Provides rich information about a payment methods batch
 """
 type PaymentMethodBatchInfo {
   id: String!
-  collectiveId: Int!
   count: Int!
-  type: String!
 
   """
   The batch name, or null for unbatched payment methods
@@ -998,6 +749,40 @@ type ConnectedAccountType {
   The account who connected this account
   """
   createdByUser: UserDetails
+}
+
+"""
+This represents the details of a User
+"""
+type UserDetails {
+  id: Int
+  CollectiveId: Int
+  collective: CollectiveInterface
+  image: String
+  email: String
+  emailWaitingForValidation: String
+  memberOf(
+    roles: [String]
+
+    """
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): [Member]
+
+  """
+  Returns true if user account is limited (user can't use any feature)
+  """
+  isLimited: Boolean
+  hasSeenLatestChangelogEntry: Boolean
+  hasTwoFactorAuth: Boolean
+
+  """
+  Has the account a password set?
+  """
+  hasPassword: Boolean
+  requiresProfileCompletion: Boolean
+  isRoot: Boolean!
 }
 
 """
@@ -1086,18 +871,10 @@ type PlanType {
   id: Int
   name: String
   hostedCollectives: Int
-  hostedCollectivesLimit: Int
-  addedFunds: Int
-  addedFundsLimit: Int
   hostDashboard: Boolean
   manualPayments: Boolean
-  bankTransfers: Int
-  bankTransfersLimit: Int
-  transferwisePayouts: Int
-  transferwisePayoutsLimit: Int
   hostFees: Boolean
   hostFeeSharePercent: Float
-  platformTips: Boolean
 }
 
 type Policies {
@@ -1979,26 +1756,7 @@ type CollectiveStatsType {
   Total amount spent
   """
   totalAmountSpent: Float
-
-  """
-  Total amount received
-  """
-  totalAmountReceived(
-    startDate: DateString
-    endDate: DateString
-
-    """
-    Computes contributions from the last x months. Cannot be used with startDate/endDate
-    """
-    periodInMonths: Int
-  ): Float
-
-  """
-  Total net amount received
-  """
-  totalNetAmountReceived: Float
   yearlyBudget: Float
-  activeRecurringContributions: JSON
 }
 
 """
@@ -2034,13 +1792,11 @@ This represents a Collective
 type Collective implements CollectiveInterface {
   id: Int
   idV2: String
-  createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   hasHosting: Boolean!
-  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2061,9 +1817,9 @@ type Collective implements CollectiveInterface {
   platformFeePercent: Float
   currency: String
   image: String
-  imageUrl(height: Int, format: ImageFormat): String
+  imageUrl(height: Int): String
   backgroundImage: String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int): String
   settings: JSON!
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
@@ -2071,7 +1827,6 @@ type Collective implements CollectiveInterface {
   Private instructions related to an event
   """
   privateInstructions: String
-  githubContributors: JSON!
   slug: String
   path: String
 
@@ -2202,16 +1957,6 @@ type Collective implements CollectiveInterface {
   All the persons and entities that contribute to this organization
   """
   contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
-  collectives(
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    expenseStatus: String = null
-    limit: Int
-    offset: Int
-    isActive: Boolean
-    isArchived: Boolean
-  ): CollectiveSearchResults
-  followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
 
   """
@@ -2229,28 +1974,11 @@ type Collective implements CollectiveInterface {
     onlyValid: Boolean = true
   ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
-  ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
-  transactions(
-    """
-    type of transaction (DEBIT/CREDIT)
-    """
-    type: String
-    limit: Int = 100
-    offset: Int = 0
-
-    """
-    If false, only the transactions not linked to an expense (orders/refunds) will be returned
-    """
-    includeExpenseTransactions: Boolean
-  ): [Transaction]
-  expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
-    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
   """
   supportedExpenseTypes: [String!]!
-  role: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
@@ -2281,7 +2009,6 @@ type Collective implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     type: [String]
-    orderBy: PaymenMethodOrderField = type
 
     """
     Defines if the host "collective" payment method should be returned
@@ -2318,16 +2045,6 @@ type Collective implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
-
-  """
-  If created by duplication, the account from which this one was duplicated
-  """
-  duplicatedFromCollective: CollectiveInterface
-
-  """
-  If this account was duplicated, the accounts that were created from it
-  """
-  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2336,13 +2053,11 @@ This represents an Event
 type Event implements CollectiveInterface {
   id: Int
   idV2: String
-  createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   hasHosting: Boolean!
-  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2363,9 +2078,9 @@ type Event implements CollectiveInterface {
   platformFeePercent: Float
   currency: String
   image: String
-  imageUrl(height: Int, format: ImageFormat): String
+  imageUrl(height: Int): String
   backgroundImage: String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int): String
   settings: JSON!
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
@@ -2373,7 +2088,6 @@ type Event implements CollectiveInterface {
   Private instructions related to an event
   """
   privateInstructions: String
-  githubContributors: JSON!
   slug: String
   path: String
 
@@ -2504,16 +2218,6 @@ type Event implements CollectiveInterface {
   All the persons and entities that contribute to this organization
   """
   contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
-  collectives(
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    expenseStatus: String = null
-    limit: Int
-    offset: Int
-    isActive: Boolean
-    isArchived: Boolean
-  ): CollectiveSearchResults
-  followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
 
   """
@@ -2531,28 +2235,11 @@ type Event implements CollectiveInterface {
     onlyValid: Boolean = true
   ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
-  ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
-  transactions(
-    """
-    type of transaction (DEBIT/CREDIT)
-    """
-    type: String
-    limit: Int = 100
-    offset: Int = 0
-
-    """
-    If false, only the transactions not linked to an expense (orders/refunds) will be returned
-    """
-    includeExpenseTransactions: Boolean
-  ): [Transaction]
-  expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
-    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
   """
   supportedExpenseTypes: [String!]!
-  role: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
@@ -2583,7 +2270,6 @@ type Event implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     type: [String]
-    orderBy: PaymenMethodOrderField = type
 
     """
     Defines if the host "collective" payment method should be returned
@@ -2620,16 +2306,6 @@ type Event implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
-
-  """
-  If created by duplication, the account from which this one was duplicated
-  """
-  duplicatedFromCollective: CollectiveInterface
-
-  """
-  If this account was duplicated, the accounts that were created from it
-  """
-  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2638,13 +2314,11 @@ This represents a Fund
 type Fund implements CollectiveInterface {
   id: Int
   idV2: String
-  createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   hasHosting: Boolean!
-  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2665,9 +2339,9 @@ type Fund implements CollectiveInterface {
   platformFeePercent: Float
   currency: String
   image: String
-  imageUrl(height: Int, format: ImageFormat): String
+  imageUrl(height: Int): String
   backgroundImage: String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int): String
   settings: JSON!
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
@@ -2675,7 +2349,6 @@ type Fund implements CollectiveInterface {
   Private instructions related to an event
   """
   privateInstructions: String
-  githubContributors: JSON!
   slug: String
   path: String
 
@@ -2806,16 +2479,6 @@ type Fund implements CollectiveInterface {
   All the persons and entities that contribute to this organization
   """
   contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
-  collectives(
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    expenseStatus: String = null
-    limit: Int
-    offset: Int
-    isActive: Boolean
-    isArchived: Boolean
-  ): CollectiveSearchResults
-  followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
 
   """
@@ -2833,28 +2496,11 @@ type Fund implements CollectiveInterface {
     onlyValid: Boolean = true
   ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
-  ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
-  transactions(
-    """
-    type of transaction (DEBIT/CREDIT)
-    """
-    type: String
-    limit: Int = 100
-    offset: Int = 0
-
-    """
-    If false, only the transactions not linked to an expense (orders/refunds) will be returned
-    """
-    includeExpenseTransactions: Boolean
-  ): [Transaction]
-  expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
-    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
   """
   supportedExpenseTypes: [String!]!
-  role: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
@@ -2885,7 +2531,6 @@ type Fund implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     type: [String]
-    orderBy: PaymenMethodOrderField = type
 
     """
     Defines if the host "collective" payment method should be returned
@@ -2922,16 +2567,6 @@ type Fund implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
-
-  """
-  If created by duplication, the account from which this one was duplicated
-  """
-  duplicatedFromCollective: CollectiveInterface
-
-  """
-  If this account was duplicated, the accounts that were created from it
-  """
-  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2940,13 +2575,11 @@ This represents a Organization Collective
 type Organization implements CollectiveInterface {
   id: Int
   idV2: String
-  createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   hasHosting: Boolean!
-  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2967,9 +2600,9 @@ type Organization implements CollectiveInterface {
   platformFeePercent: Float
   currency: String
   image: String
-  imageUrl(height: Int, format: ImageFormat): String
+  imageUrl(height: Int): String
   backgroundImage: String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int): String
   settings: JSON!
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
@@ -2977,7 +2610,6 @@ type Organization implements CollectiveInterface {
   Private instructions related to an event
   """
   privateInstructions: String
-  githubContributors: JSON!
   slug: String
   path: String
 
@@ -3108,16 +2740,6 @@ type Organization implements CollectiveInterface {
   All the persons and entities that contribute to this organization
   """
   contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
-  collectives(
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    expenseStatus: String = null
-    limit: Int
-    offset: Int
-    isActive: Boolean
-    isArchived: Boolean
-  ): CollectiveSearchResults
-  followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
 
   """
@@ -3135,28 +2757,11 @@ type Organization implements CollectiveInterface {
     onlyValid: Boolean = true
   ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
-  ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
-  transactions(
-    """
-    type of transaction (DEBIT/CREDIT)
-    """
-    type: String
-    limit: Int = 100
-    offset: Int = 0
-
-    """
-    If false, only the transactions not linked to an expense (orders/refunds) will be returned
-    """
-    includeExpenseTransactions: Boolean
-  ): [Transaction]
-  expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
-    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
   """
   supportedExpenseTypes: [String!]!
-  role: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
@@ -3187,7 +2792,6 @@ type Organization implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     type: [String]
-    orderBy: PaymenMethodOrderField = type
 
     """
     Defines if the host "collective" payment method should be returned
@@ -3224,16 +2828,6 @@ type Organization implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
-
-  """
-  If created by duplication, the account from which this one was duplicated
-  """
-  duplicatedFromCollective: CollectiveInterface
-
-  """
-  If this account was duplicated, the accounts that were created from it
-  """
-  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3242,13 +2836,11 @@ This represents a Project
 type Project implements CollectiveInterface {
   id: Int
   idV2: String
-  createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   hasHosting: Boolean!
-  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -3269,9 +2861,9 @@ type Project implements CollectiveInterface {
   platformFeePercent: Float
   currency: String
   image: String
-  imageUrl(height: Int, format: ImageFormat): String
+  imageUrl(height: Int): String
   backgroundImage: String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int): String
   settings: JSON!
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
@@ -3279,7 +2871,6 @@ type Project implements CollectiveInterface {
   Private instructions related to an event
   """
   privateInstructions: String
-  githubContributors: JSON!
   slug: String
   path: String
 
@@ -3410,16 +3001,6 @@ type Project implements CollectiveInterface {
   All the persons and entities that contribute to this organization
   """
   contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
-  collectives(
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    expenseStatus: String = null
-    limit: Int
-    offset: Int
-    isActive: Boolean
-    isArchived: Boolean
-  ): CollectiveSearchResults
-  followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
 
   """
@@ -3437,28 +3018,11 @@ type Project implements CollectiveInterface {
     onlyValid: Boolean = true
   ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
-  ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
-  transactions(
-    """
-    type of transaction (DEBIT/CREDIT)
-    """
-    type: String
-    limit: Int = 100
-    offset: Int = 0
-
-    """
-    If false, only the transactions not linked to an expense (orders/refunds) will be returned
-    """
-    includeExpenseTransactions: Boolean
-  ): [Transaction]
-  expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
-    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
   """
   supportedExpenseTypes: [String!]!
-  role: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
@@ -3489,7 +3053,6 @@ type Project implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     type: [String]
-    orderBy: PaymenMethodOrderField = type
 
     """
     Defines if the host "collective" payment method should be returned
@@ -3526,16 +3089,6 @@ type Project implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
-
-  """
-  If created by duplication, the account from which this one was duplicated
-  """
-  duplicatedFromCollective: CollectiveInterface
-
-  """
-  If this account was duplicated, the accounts that were created from it
-  """
-  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3628,7 +3181,6 @@ type Expense implements Transaction {
   paymentMethod: PaymentMethodType
   invoiceTemplate: String
   description: String
-  expense: ExpenseType @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 }
 
 """
@@ -3844,13 +3396,11 @@ This represents a User Collective
 type User implements CollectiveInterface {
   id: Int
   idV2: String
-  createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   hasHosting: Boolean!
-  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -3871,9 +3421,9 @@ type User implements CollectiveInterface {
   platformFeePercent: Float
   currency: String
   image: String
-  imageUrl(height: Int, format: ImageFormat): String
+  imageUrl(height: Int): String
   backgroundImage: String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int): String
   settings: JSON!
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
@@ -3881,7 +3431,6 @@ type User implements CollectiveInterface {
   Private instructions related to an event
   """
   privateInstructions: String
-  githubContributors: JSON!
   slug: String
   path: String
 
@@ -4012,16 +3561,6 @@ type User implements CollectiveInterface {
   All the persons and entities that contribute to this organization
   """
   contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
-  collectives(
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    expenseStatus: String = null
-    limit: Int
-    offset: Int
-    isActive: Boolean
-    isArchived: Boolean
-  ): CollectiveSearchResults
-  followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
 
   """
@@ -4039,28 +3578,11 @@ type User implements CollectiveInterface {
     onlyValid: Boolean = true
   ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
-  ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
-  transactions(
-    """
-    type of transaction (DEBIT/CREDIT)
-    """
-    type: String
-    limit: Int = 100
-    offset: Int = 0
-
-    """
-    If false, only the transactions not linked to an expense (orders/refunds) will be returned
-    """
-    includeExpenseTransactions: Boolean
-  ): [Transaction]
-  expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
-    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
   """
   supportedExpenseTypes: [String!]!
-  role: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
@@ -4091,7 +3613,6 @@ type User implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     type: [String]
-    orderBy: PaymenMethodOrderField = type
 
     """
     Defines if the host "collective" payment method should be returned
@@ -4128,16 +3649,6 @@ type User implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
-
-  """
-  If created by duplication, the account from which this one was duplicated
-  """
-  duplicatedFromCollective: CollectiveInterface
-
-  """
-  If this account was duplicated, the accounts that were created from it
-  """
-  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
   email: String
   newsletterOptIn: Boolean
 }
@@ -4148,13 +3659,11 @@ This represents a Vendor
 type Vendor implements CollectiveInterface {
   id: Int
   idV2: String
-  createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   hasHosting: Boolean!
-  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -4175,9 +3684,9 @@ type Vendor implements CollectiveInterface {
   platformFeePercent: Float
   currency: String
   image: String
-  imageUrl(height: Int, format: ImageFormat): String
+  imageUrl(height: Int): String
   backgroundImage: String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int): String
   settings: JSON!
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
@@ -4185,7 +3694,6 @@ type Vendor implements CollectiveInterface {
   Private instructions related to an event
   """
   privateInstructions: String
-  githubContributors: JSON!
   slug: String
   path: String
 
@@ -4316,16 +3824,6 @@ type Vendor implements CollectiveInterface {
   All the persons and entities that contribute to this organization
   """
   contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
-  collectives(
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    expenseStatus: String = null
-    limit: Int
-    offset: Int
-    isActive: Boolean
-    isArchived: Boolean
-  ): CollectiveSearchResults
-  followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
 
   """
@@ -4343,28 +3841,11 @@ type Vendor implements CollectiveInterface {
     onlyValid: Boolean = true
   ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
-  ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
-  transactions(
-    """
-    type of transaction (DEBIT/CREDIT)
-    """
-    type: String
-    limit: Int = 100
-    offset: Int = 0
-
-    """
-    If false, only the transactions not linked to an expense (orders/refunds) will be returned
-    """
-    includeExpenseTransactions: Boolean
-  ): [Transaction]
-  expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
-    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
   """
   supportedExpenseTypes: [String!]!
-  role: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
@@ -4395,7 +3876,6 @@ type Vendor implements CollectiveInterface {
     hasBalanceAboveZero: Boolean
     isConfirmed: Boolean = true
     type: [String]
-    orderBy: PaymenMethodOrderField = type
 
     """
     Defines if the host "collective" payment method should be returned
@@ -4432,16 +3912,6 @@ type Vendor implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
-
-  """
-  If created by duplication, the account from which this one was duplicated
-  """
-  duplicatedFromCollective: CollectiveInterface
-
-  """
-  If this account was duplicated, the accounts that were created from it
-  """
-  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 
   """
   Returns whether this account has any payout methods saved
@@ -4503,8 +3973,6 @@ type Query {
     Filter hosts by currency
     """
     currency: String
-    orderBy: HostCollectiveOrderFieldType = collectives
-    orderDirection: OrderDirection = DESC
     limit: Int = 10
     offset: Int = 0
     onlyOpenHosts: Boolean = true
@@ -4604,60 +4072,19 @@ type InvoiceType {
   slug: String
 
   """
-  dateFrom and dateTo will be set for any invoice over a period of time. They will not be set for an invoice for a single transaction.
-  """
-  dateFrom: IsoDateString
-
-  """
-  dateFrom and dateTo will be set for any invoice over a period of time. They will not be set for an invoice for a single transaction.
-  """
-  dateTo: IsoDateString
-
-  """
   year will be set for an invoice for a single transaction. Otherwise, prefer dateFrom, dateTo
   """
   year: Int
 
   """
-  month will be set for an invoice for a single transaction. Otherwise, prefer dateFrom, dateTo
+  month will be set for an invoice for a single transaction.
   """
   month: Int
-
-  """
-  day will be set for an invoice for a single transaction. Otherwise, prefer dateFrom, dateTo
-  """
-  day: Int
   totalAmount: Int @deprecated(reason: "2021-09-09: Not used, so we stop computing it.")
   totalTransactions: Float
   currency: String @deprecated(reason: "2021-09-09: Not used, so we stop returning it.")
   host: CollectiveInterface
   fromCollective: CollectiveInterface
-  transactions: [Transaction]
-}
-
-"""
-Properties by which hosts can be ordered.
-"""
-enum HostCollectiveOrderFieldType {
-  """
-  Order hosts by creation time.
-  """
-  createdAt
-
-  """
-  Order hosts by name.
-  """
-  name
-
-  """
-  Order hosts by number of collectives it is hosting.
-  """
-  collectives
-
-  """
-  Order hosts by updated time.
-  """
-  updatedAt
 }
 
 enum TypeOfCollective {
