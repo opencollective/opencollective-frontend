@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { compact, isString, omit } from 'lodash-es';
+import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -41,6 +42,7 @@ import { makePushSubpath } from '../../utils';
 import CollectiveDetails from './CollectiveDetails';
 import type { HostedCollectivesDataTableMeta } from './common';
 import { cols } from './common';
+import CreateHostedCollectiveModal from './CreateHostedCollectiveModal';
 import { metricFilterConfigs, metricFilterSchema, metricFilterToVariables } from './metric-filters';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
 
@@ -138,6 +140,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   const intl = useIntl();
   const router = useRouter();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
+  const [createCollective, setCreateCollective] = React.useState(false);
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
   const accountTypes = [CollectiveType.COLLECTIVE];
 
@@ -233,18 +236,31 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
           <FormattedMessage defaultMessage="Collectives you currently host or have hosted in the past." id="nTMHB4" />
         }
         actions={
-          <ExportHostedCollectivesCSVModal
-            open={displayExportCSVModal}
-            setOpen={setDisplayExportCSVModal}
-            queryFilter={queryFilter}
-            account={data?.host}
-            isHostReport
-            trigger={
-              <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
-                <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-              </Button>
-            }
-          />
+          <React.Fragment>
+            <ExportHostedCollectivesCSVModal
+              open={displayExportCSVModal}
+              setOpen={setDisplayExportCSVModal}
+              queryFilter={queryFilter}
+              account={data?.host}
+              isHostReport
+              trigger={
+                <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
+                  <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+                </Button>
+              }
+            />
+            <Button
+              size="sm"
+              className="gap-1"
+              onClick={() => setCreateCollective(true)}
+              data-cy="create-collective-btn"
+            >
+              <span>
+                <FormattedMessage defaultMessage="Create collective" id="CreateCollective" />
+              </span>
+              <PlusIcon size={20} />
+            </Button>
+          </React.Fragment>
         }
       />
       <Filterbar {...queryFilter} />
@@ -287,6 +303,18 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
           />
           <Pagination queryFilter={queryFilter} total={hostedAccounts?.totalCount} />
         </React.Fragment>
+      )}
+
+      {createCollective && (
+        <CreateHostedCollectiveModal
+          hostSlug={hostSlug}
+          isPrivate={data?.host?.isPrivate ?? false}
+          onClose={() => setCreateCollective(false)}
+          onSuccess={() => {
+            refetchMetadata();
+            refetch();
+          }}
+        />
       )}
 
       <Drawer

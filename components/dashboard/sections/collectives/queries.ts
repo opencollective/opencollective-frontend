@@ -302,9 +302,20 @@ const hostedCollectiveFields = gql`
         }
       }
     }
+    memberInvitations(role: [ADMIN]) {
+      id
+      role
+      since
+      memberAccount {
+        id
+        emails
+        ...AccountHoverCardFields
+      }
+    }
     members(role: [ADMIN]) {
       nodes {
         id
+        since
         account {
           id
           ...AccountHoverCardFields
