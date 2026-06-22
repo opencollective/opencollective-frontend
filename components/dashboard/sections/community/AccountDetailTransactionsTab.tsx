@@ -186,9 +186,11 @@ export function AccountDetailTransactionsTab({
 
   const viewsWithCount = React.useMemo(
     () =>
-      views.map(view =>
-        getCountForView(view, 'communityStats' in account && account.communityStats?.transactionSummary),
-      ),
+      views.map(view => {
+        const transactionSummary =
+          account && 'communityStats' in account ? account.communityStats?.transactionSummary : undefined;
+        return getCountForView(view, transactionSummary);
+      }),
     [views, account],
   );
 

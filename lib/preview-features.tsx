@@ -19,6 +19,7 @@ export enum PREVIEW_FEATURE_KEYS {
   SIDEBAR_REORG_INCOMING_OUTGOING = 'SIDEBAR_REORG_INCOMING_OUTGOING',
   ASYNC_EXPORTS = 'ASYNC_EXPORTS',
   TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
+  HOSTED_ACCOUNT_OVERVIEW = 'HOSTED_ACCOUNT_OVERVIEW',
 }
 
 enum Categories {
@@ -283,5 +284,14 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: true,
     alwaysEnableInDev: true,
     category: Categories.GENERAL,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.HOSTED_ACCOUNT_OVERVIEW,
+    title: <FormattedMessage defaultMessage="Dashboard view of a hosted account profile" id="sDvTvc" />,
+    description: <FormattedMessage defaultMessage="Enable a dashboard hosted account profile page" id="cMqa3J" />,
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
+    alwaysEnableInDev: true,
+    category: Categories.HOSTING,
   },
 ];

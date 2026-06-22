@@ -13,6 +13,7 @@ import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
+import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import StackedAvatars from '@/components/StackedAvatars';
@@ -155,10 +156,7 @@ export const AccountDetailsOverviewTab = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-4">
-        <div className="flex grow-1 flex-col gap-3 rounded-lg border p-4">
-          <h2 className="tight text-lg font-bold text-slate-800">
-            <FormattedMessage defaultMessage="Details" id="Details" />
-          </h2>
+        <DashboardContentCard title={<FormattedMessage defaultMessage="Details" id="Details" />} className="grow-1">
           <DataList className="text-sm">
             <DataListItem
               label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
@@ -264,11 +262,11 @@ export const AccountDetailsOverviewTab = ({
               </React.Fragment>
             )}
           </DataList>
-        </div>
-        <div className="flex grow-1 flex-col gap-3 rounded-lg border p-4">
-          <h2 className="tight text-lg font-bold text-slate-800 md:col-span-2 lg:col-span-3 xl:col-span-1">
-            <FormattedMessage defaultMessage="Platform Activity" id="PlatformActivity" />
-          </h2>
+        </DashboardContentCard>
+        <DashboardContentCard
+          title={<FormattedMessage defaultMessage="Platform Activity" id="PlatformActivity" />}
+          className="grow-1"
+        >
           <DataList className="text-sm">
             <DataListItem
               label={
@@ -335,7 +333,7 @@ export const AccountDetailsOverviewTab = ({
               }
             />
           </DataList>
-        </div>
+        </DashboardContentCard>
       </div>
       {adminList.length > 0 && (
         <div className="flex grow-1 flex-row items-center gap-3 rounded-lg border p-4">

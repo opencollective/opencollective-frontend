@@ -12,10 +12,13 @@ import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/f
 import { integer } from '@/lib/filters/schemas';
 import type { HostedCollectiveFieldsFragment, HostedCollectivesQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { HostFeeStructure } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Drawer } from '@/components/Drawer';
+import { HostedAccountProfile } from '@/components/hosted-account-overview/HostedAccountProfile';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { useModal } from '@/components/ModalContext';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
@@ -107,9 +110,11 @@ const filters: FilterComponentConfigs<Schema> = {
   consolidatedBalance: consolidatedBalanceFilter.filter,
 };
 
-export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSectionProps) {
+function HostedFundsList({ accountSlug: hostSlug, subpath }: DashboardSectionProps) {
   const intl = useIntl();
   const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
+  const hasAccountProfile = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOSTED_ACCOUNT_OVERVIEW);
   const { showModal } = useModal();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<
@@ -205,10 +210,14 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
   });
 
   useEffect(() => {
-    if (subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)) {
+    if (
+      !hasAccountProfile &&
+      subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)
+    ) {
       handleDrawer(subpath[0]);
     }
-  }, [subpath[0]]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subpath[0], hasAccountProfile]);
 
   const handleDrawer = (collective: HostedCollectiveFieldsFragment | string | undefined) => {
     if (collective) {
@@ -225,7 +234,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
   };
   const isUnhosted = queryFilter.values?.status === COLLECTIVE_STATUS.UNHOSTED;
   const hostedAccounts = data?.host?.hostedAccounts;
-  const onClickRow = row => handleDrawer(row.original);
+  const onClickRow = hasAccountProfile ? row => pushSubpath(row.original.publicId) : row => handleDrawer(row.original);
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
@@ -316,7 +325,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
       )}
 
       <Drawer
-        open={Boolean(showCollectiveOverview)}
+        open={Boolean(!hasAccountProfile && showCollectiveOverview)}
         onClose={() => handleDrawer(null)}
         className={'max-w-2xl'}
         showActionsContainer
@@ -336,4 +345,14 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
       </Drawer>
     </div>
   );
+}
+
+export function HostedFunds(props: DashboardSectionProps) {
+  const { LoggedInUser } = useLoggedInUser();
+  const hasAccountProfile = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOSTED_ACCOUNT_OVERVIEW);
+  const accountId = props.subpath?.[0];
+  if (hasAccountProfile && accountId) {
+    return <HostedAccountProfile hostSlug={props.accountSlug} accountId={accountId} />;
+  }
+  return <HostedFundsList {...props} />;
 }
