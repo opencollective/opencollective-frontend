@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Validate package-lock.json
         run: npx --yes lockfile-lint@5 --path package-lock.json --type npm --validate-https --allowed-hosts registry.npmjs.org
