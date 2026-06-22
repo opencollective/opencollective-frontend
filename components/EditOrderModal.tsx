@@ -368,21 +368,30 @@ const EditPlatformTipModal = (props: Omit<EditOrderModalProps, 'action'>) => {
     props.onSuccess?.();
   };
   const { toast } = useToast();
-  const [tipAmount, setTipAmount] = React.useState(props.order.platformTipAmount?.valueInCents || 0);
+  const orderAmount = props.order.amount.valueInCents;
+  const orderCurrency = props.order.amount.currency;
+  const storedTipAmount = props.order.platformTipAmount?.valueInCents || 0;
+  const [tipAmount, setTipAmount] = React.useState(storedTipAmount);
   const [selectedTipOption, setSelectedTipOption] = React.useState(() =>
-    getPlatformTipOptionFromAmount(
-      props.order.platformTipAmount?.valueInCents || 0,
-      props.order.amount.valueInCents,
-      props.order.amount.currency,
-    ),
+    getPlatformTipOptionFromAmount(storedTipAmount, orderAmount, orderCurrency),
   );
+  // If the contribution amount changes under the modal (e.g. after editing the amount and
+  // refetching), reset to the freshly-fetched tip so the selected percentage can't stay stale —
+  // otherwise the still-highlighted preset becomes a no-op click that keeps the old tip.
+  const prevOrderAmountRef = React.useRef(orderAmount);
+  React.useEffect(() => {
+    if (prevOrderAmountRef.current !== orderAmount) {
+      prevOrderAmountRef.current = orderAmount;
+      setTipAmount(storedTipAmount);
+      setSelectedTipOption(getPlatformTipOptionFromAmount(storedTipAmount, orderAmount, orderCurrency));
+    }
+  }, [orderAmount, storedTipAmount, orderCurrency]);
   const { isSubmittingPlatformTip, updatePlatformTip } = useUpdatePlatformTip({
     contribution: props.order,
     onSuccess: handleSuccess,
   });
   const isPaypal = props.order.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
-  const currentTipAmount = props.order.platformTipAmount?.valueInCents || 0;
-  const totalAmount = props.order.totalAmount.valueInCents - currentTipAmount + tipAmount;
+  const totalAmount = props.order.totalAmount.valueInCents - storedTipAmount + tipAmount;
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
@@ -410,6 +419,7 @@ const EditPlatformTipModal = (props: Omit<EditOrderModalProps, 'action'>) => {
             currency={props.order.platformTipAmount?.currency || props.order.amount.currency}
             showHeader={false}
             showOptOutNudge={false}
+            disableAmountSync
             selectedOption={selectedTipOption}
             value={tipAmount}
             onChange={(selectedOption, value) => {
