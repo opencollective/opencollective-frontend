@@ -3,50 +3,8 @@
   "extends": ["local>opencollective/renovate-config"],
   "packageRules": [
     {
-      "assignees": ["betree"],
-      "matchPackageNames": [
-        "@opencollective/taxes",
-        "trix",
-        "@sentry/**",
-        "interweave**",
-        "lottie-react",
-        "sanitize-html",
-        "lib-address"
-      ]
-    },
-    {
-      "assignees": ["hdiniz"],
-      "matchPackageNames": ["@simplewebauthn/**"]
-    },
-    {
       "assignees": ["kewitz"],
       "matchPackageNames": ["@transferwise/**"]
-    },
-    {
-      "assignees": ["gustavlrsn"],
-      "matchPackageNames": [
-        "clsx",
-        "cmdk",
-        "tailwind-merge",
-        "@radix-ui/**",
-        "@dnd-kit/**",
-        "@icons-pack/react-simple-icons",
-        "@tanstack/react-table",
-        "apexcharts",
-        "class-variance-authority",
-        "framer-motion",
-        "lucide-react",
-        "react-day-picker",
-        "react-apexcharts",
-        "react-animate-height",
-        "react-pdf",
-        "zod",
-        "react-verification-input",
-        "@formatjs/cli",
-        "tailwindcss",
-        "tailwindcss-animate",
-        "postcss"
-      ]
     }
   ]
 }

@@ -257,6 +257,7 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: true,
     category: Categories.GENERAL,
     alwaysEnableInDev: true,
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS,

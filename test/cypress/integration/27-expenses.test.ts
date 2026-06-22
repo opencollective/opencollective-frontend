@@ -17,6 +17,14 @@ describe('Expense flow', () => {
         cy.getByDataCy('signIn-form');
       });
     });
+
+    it('shows Submit Expense button on collective page and redirects to login', () => {
+      cy.createHostedCollective().then(collective => {
+        cy.visit(`/${collective.slug}`);
+        cy.getByDataCy('submit-expense-button').click();
+        cy.getByDataCy('signIn-form');
+      });
+    });
   });
 
   describe('Actions on expense', () => {
@@ -970,7 +978,11 @@ function fillNewPayoutMethod(payoutMethod: {
     cy.root().scrollIntoView();
 
     // Wait for payee data and payout methods to finish loading before interacting
-    cy.get('[data-cy="add-new-payout-method"]').should('be.visible').should('not.be.disabled').click();
+    cy.get('[data-cy="add-new-payout-method"]')
+      .should('be.visible')
+      .should('not.be.disabled')
+      .click()
+      .should('have.attr', 'data-state', 'checked');
     cy.get('[data-cy="payout-method-type-select"]').should('be.visible').click();
     cy.root()
       .closest('html')

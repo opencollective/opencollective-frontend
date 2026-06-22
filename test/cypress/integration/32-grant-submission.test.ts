@@ -48,8 +48,12 @@ describe('Grant Submission Flow', () => {
     cy.contains('Select a payout method').should('be.visible');
 
     // Add a new payout method
-    cy.get('[data-cy="add-new-payout-method"]').click();
-    cy.get('[data-cy="payout-method-type-select"]').click();
+    cy.get('[data-cy="add-new-payout-method"]')
+      .should('be.visible')
+      .should('not.be.disabled')
+      .click()
+      .should('have.attr', 'data-state', 'checked');
+    cy.get('[data-cy="payout-method-type-select"]').should('be.visible').click();
     cy.contains('[data-cy="select-option"]', 'Bank transfer');
     cy.contains('[data-cy="select-option"]', 'Other').click();
     cy.get('[data-cy="currency-picker"]').click();
@@ -107,6 +111,7 @@ describe('Grant Submission Flow', () => {
       });
       cy.contains('A beneficiary').parent().get('[role="combobox"]').click().type(beneficiaryName);
       cy.wait('@collectivePickerSearch');
+      cy.wait(50);
       cy.root().closest('html').contains(`Create beneficiary: ${beneficiaryName}`).click();
       cy.root().closest('html').contains('Beneficiary created', { timeout: 20000 }).should('be.visible');
     });

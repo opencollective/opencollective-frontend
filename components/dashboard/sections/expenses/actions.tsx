@@ -31,6 +31,7 @@ import { ExpenseStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
+import { saveInvoice } from '../../../../lib/transactions';
 import { getDashboardRoute, getPermalinkUrl } from '../../../../lib/url-helpers';
 import { collectiveAdminsMustConfirmAccountingCategory } from '@/components/expenses/lib/accounting-categories';
 
@@ -306,20 +307,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
     [getExpenseStatus],
   );
 
-  const { callWith: downloadInvoiceWith } = useAsyncCall(
-    async (expense: T) => {
-      const { saveAs } = await import('file-saver');
-      const { fetchFromPDFService } = await import('../../../../lib/api');
-      const { expenseInvoiceUrl } = await import('../../../../lib/url-helpers');
-
-      const invoiceUrl = expenseInvoiceUrl(expense.id);
-      const blob = await fetchFromPDFService(invoiceUrl);
-      const date = new Date().toISOString().split('T')[0];
-      const filename = `Expense-${expense.legacyId}-invoice-${date}.pdf`;
-      return saveAs(blob, filename);
-    },
-    { useErrorToast: true },
-  );
+  const { callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice, { useErrorToast: true });
 
   const getActions: GetActions<T> = (
     expense: T,
@@ -373,11 +361,13 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
     };
 
     const handleDownloadInvoice = () => {
-      return downloadInvoiceWith(expense)();
+      return downloadInvoiceWith({ expenseId: expense.id })();
     };
 
     const invoiceTypes = [expenseTypes.INVOICE, expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING] as string[];
-    const canSeeInvoice = permissions.canSeeInvoiceInfo && invoiceTypes.includes(expense.type);
+    const hasAttachedInvoiceFile = Boolean(expense.invoiceFile?.url);
+    const canSeeInvoice =
+      permissions.canSeeInvoiceInfo && invoiceTypes.includes(expense.type) && !hasAttachedInvoiceFile;
 
     const transactionsUrl =
       dashboardAccount?.isHost && host?.id === dashboardAccount.id

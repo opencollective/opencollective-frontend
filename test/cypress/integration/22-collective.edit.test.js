@@ -159,12 +159,30 @@ describe('edit collective', () => {
   it('enables VAT', () => {
     cy.get('input[id=geosuggest__input]').type('Belgium');
     cy.contains('.geosuggest__suggests > :nth-child(1)', 'Belgium').click();
-    cy.getByDataCy('VAT').click();
+    // VAT fields appear once country is BE; don't wait on the location map iframe (OpenStreetMap
+    // loads asynchronously inside a cross-origin iframe and can shift layout while typing below).
+    cy.getByDataCy('VAT', { timeout: 10000 }).should('be.visible');
 
+    cy.getByDataCy('VAT').click();
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
-    cy.get('input[name="settings.VAT.number"]').type('EU123456789');
-    cy.contains('button', 'Save').click();
-    cy.contains('[data-cy="toast-notification"]', 'Account updated');
+    cy.get('input[name="settings.VAT.number"]').should('be.visible');
+
+    cy.retryChain(
+      () =>
+        cy
+          .get('input[name="settings.VAT.number"]')
+          .scrollIntoView()
+          .clear()
+          .type('EU123456789', { delay: 50 })
+          .invoke('val'),
+      val => {
+        expect(val).to.eq('EU123456789');
+      },
+      { maxAttempts: 5, wait: 500 },
+    );
+
+    cy.getByDataCy('save').click();
+    cy.checkToast({ variant: 'success', message: 'Account updated' });
     cy.visit(`/dashboard/${collectiveSlug}/tiers`);
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();

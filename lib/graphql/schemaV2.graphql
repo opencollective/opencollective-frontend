@@ -6735,6 +6735,11 @@ type ConnectedAccount {
   The date on which the ConnectedAccount was last updated
   """
   updatedAt: DateTime!
+
+  """
+  For when the authorization expires after a certain time
+  """
+  authorizationExpiresAt: DateTime
   settings: JSON
   service: ConnectedAccountService!
 
@@ -26141,6 +26146,36 @@ type Mutation {
   ): GoCardlessConnectAccountResponse!
 
   """
+  Get the Stripe OAuth URL to initiate the account connection flow for a host. Scope: "connectedAccounts".
+  """
+  getStripeOAuthUrl(
+    """
+    The host account to connect Stripe to
+    """
+    account: AccountReferenceInput!
+
+    """
+    The URL or path to redirect the user to once the OAuth flow is complete
+    """
+    redirect: String
+  ): URL!
+
+  """
+  Complete the Stripe OAuth flow and connect the account to the host. Scope: "connectedAccounts".
+  """
+  connectStripeAccount(
+    """
+    The authorization code returned by Stripe in the OAuth callback
+    """
+    code: NonEmptyString!
+
+    """
+    The OAuth state token that was generated when initiating the connection
+    """
+    state: NonEmptyString!
+  ): StripeConnectAccountResponse!
+
+  """
   Get the Wise (TransferWise) OAuth URL to initiate the account connection flow for a host. Scope: "connectedAccounts".
   """
   getTransferwiseOAuthUrl(
@@ -29101,6 +29136,18 @@ type GoCardlessConnectAccountResponse {
   The transactions import that was created
   """
   transactionsImport: TransactionsImport!
+}
+
+type StripeConnectAccountResponse {
+  """
+  The connected account that was created
+  """
+  connectedAccount: ConnectedAccount!
+
+  """
+  The URL to redirect the user to once the connection is complete
+  """
+  redirectUrl: URL
 }
 
 type TransferwiseConnectAccountResponse {
