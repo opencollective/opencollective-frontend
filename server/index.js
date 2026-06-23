@@ -84,7 +84,7 @@ const start = id =>
 
     routes(app);
 
-    app.all('*', (req, res) => {
+    app.all('/{*splat}', (req, res) => {
       return nextRequestHandler(req, res);
     });
 

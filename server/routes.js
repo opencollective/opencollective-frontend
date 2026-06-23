@@ -21,12 +21,12 @@ module.exports = expressApp => {
   // Support older assets from website
   app.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
 
-  app.get('/static/*', maxAge(86400));
+  app.get('/static/*path', maxAge(86400));
 
   // Load the favicon file into memory
   const faviconPath = path.join(__dirname, '../public/static/images/favicon.ico.png');
   const favicon = fs.readFileSync(faviconPath);
-  app.get('/favicon.*', maxAge(300000), (req, res) => {
+  app.get('/favicon.:ext', maxAge(300000), (req, res) => {
     res.type('image/png');
     return res.send(favicon);
   });
