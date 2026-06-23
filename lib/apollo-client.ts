@@ -2,7 +2,7 @@
 // https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/initApollo.js
 
 import type { NormalizedCacheObject, QueryOptions } from '@apollo/client';
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, useQuery } from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache, useQuery } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { mergeDeep } from '@apollo/client/utilities';
@@ -14,14 +14,9 @@ import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFa
 import type { OCError } from './errors';
 import { getErrorFromGraphqlException, isNotFoundGraphQLException } from './errors';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from './local-storage';
-import { parseToBoolean } from './utils';
+import { getApiUrl, parseToBoolean } from './utils';
 
 let apolloClient, customAgent;
-
-const INTERNAL_API_V1_URL = process.env.INTERNAL_API_V1_URL;
-const INTERNAL_API_V2_URL = process.env.INTERNAL_API_V2_URL;
-const INTERNAL_API_V1_OPERATION_NAMES = process.env.INTERNAL_API_V1_OPERATION_NAMES;
-const INTERNAL_API_V2_OPERATION_NAMES = process.env.INTERNAL_API_V2_OPERATION_NAMES;
 
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__' as const;
 // ts-unused-exports:disable-next-line
@@ -29,30 +24,14 @@ export const APOLLO_ERROR_PROP_NAME = '__APOLLO_ERROR__' as const;
 export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
 export const APOLLO_QUERY_DATA_PROP_NAME = '__APOLLO_QUERY_DATA__' as const;
 
-const getBaseApiUrl = (apiVersion, internal = false) => {
-  if (process.browser) {
-    return '/api';
-  }
-
-  if (internal) {
-    if (apiVersion === 'v1' && INTERNAL_API_V1_URL) {
-      return INTERNAL_API_V1_URL;
-    } else if (apiVersion === 'v2' && INTERNAL_API_V2_URL) {
-      return INTERNAL_API_V2_URL;
-    }
-  }
-
-  return process.env.API_URL || 'https://api.opencollective.com';
-};
-
 /**
  * Returns the GraphQL api url for the appropriate api version and environment.
- * @param {string} version - api version. Defaults to v1.
+ * @param {string} version - api version. Defaults to v2.
  * @returns {string} GraphQL api url.
  */
-const getGraphqlUrl = (apiVersion, internal = false) => {
+const getGraphqlUrl = (apiVersion: 'v1' | 'v2' = 'v2'): string => {
   const apiKey = !process.browser ? process.env.API_KEY : null;
-  return `${getBaseApiUrl(apiVersion, internal)}/graphql/${apiVersion}${apiKey ? `?api_key=${apiKey}` : ''}`;
+  return `${getApiUrl()}/graphql/${apiVersion}${apiKey ? `?api_key=${apiKey}` : ''}`;
 };
 
 const getCustomAgent = () => {
@@ -189,7 +168,7 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     'oc-version': process.env.HEROKU_SLUG_COMMIT?.slice(0, 7),
   };
 
-  const apiV1DefaultLink = createUploadLink({
+  const apiV1Link = createUploadLink({
     uri: getGraphqlUrl('v1'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
@@ -197,7 +176,7 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
       formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
     },
   });
-  const apiV2DefaultLink = createUploadLink({
+  const apiV2Link = createUploadLink({
     uri: getGraphqlUrl('v2'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
@@ -205,27 +184,6 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
       formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
     },
   });
-
-  // Setup internal links handling to be able to split traffic to different API servers
-  const apiV1Link =
-    INTERNAL_API_V1_URL && !process.browser
-      ? ApolloLink.split(
-          ({ operationName }) =>
-            !INTERNAL_API_V1_OPERATION_NAMES || INTERNAL_API_V1_OPERATION_NAMES.split(',').includes(operationName),
-          new HttpLink({ uri: getGraphqlUrl('v1', true), fetch: linkFetch, headers: httpHeaders }),
-          apiV1DefaultLink,
-        )
-      : apiV1DefaultLink;
-
-  const apiV2Link =
-    INTERNAL_API_V2_URL && !process.browser
-      ? ApolloLink.split(
-          ({ operationName }) =>
-            !INTERNAL_API_V2_OPERATION_NAMES || INTERNAL_API_V2_OPERATION_NAMES.split(',').includes(operationName),
-          new HttpLink({ uri: getGraphqlUrl('v2', true), fetch: linkFetch, headers: httpHeaders }),
-          apiV2DefaultLink,
-        )
-      : apiV2DefaultLink;
 
   /** Depending on the value of the context.apiVersion we choose to use the link for the api
    * v1 or the api v2.

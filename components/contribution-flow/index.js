@@ -34,7 +34,7 @@ import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { followOrderRedirectUrl, getCollectivePageRoute } from '../../lib/url-helpers';
-import { reportValidityHTML5 } from '../../lib/utils';
+import { getApiUrl, reportValidityHTML5 } from '../../lib/utils';
 import injectIntl from '@/lib/injectIntl';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -446,7 +446,7 @@ class ContributionFlow extends React.Component {
       const result = isAlipay
         ? await stripe.confirmAlipayPayment(response.paymentIntent.client_secret, {
             // eslint-disable-next-line camelcase
-            return_url: `${window.location.origin}/api/services/stripe/alipay/callback?OrderId=${order.id}`,
+            return_url: `${getApiUrl()}/services/stripe/alipay/callback?OrderId=${order.id}`,
           })
         : await stripe.handleCardAction(response.paymentIntent.client_secret);
       if (result.error) {

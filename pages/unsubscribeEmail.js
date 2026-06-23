@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { Email } from '@styled-icons/material/Email';
 import { FormattedMessage } from 'react-intl';
 
+import { getApiUrl } from '@/lib/utils';
+
 import Container from '../components/Container';
 import { Box } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
@@ -37,8 +39,9 @@ class UnsubscribeEmail extends React.Component {
 
   async componentDidMount() {
     let state, errorMessage, response;
+
     await fetch(
-      `/api/services/email/unsubscribe/${this.props.email}/${this.props.slug}/${this.props.type}/${this.props.token}`,
+      `${getApiUrl()}/services/email/unsubscribe/${this.props.email}/${this.props.slug}/${this.props.type}/${this.props.token}`,
     ).then(res => {
       response = res.json();
     });
