@@ -84,7 +84,7 @@ const ActivityAccountFilter = ({ account, value, onChange }) => {
       lineHeight="14px"
       styles={SELECT_STYLES}
       onChange={(options, event) => {
-        if (event.action === 'select-option') {
+        if (event?.action === 'select-option') {
           const selectedOption = isMulti ? event.option : options;
           if (selectedOption.isCustomOption) {
             dispatchOptionsChange(selectedOption); // Switch back to single mode when selecting a custom option

@@ -264,7 +264,7 @@ class CollectivePicker extends React.PureComponent {
     },
   );
 
-  onChange = option => {
+  onChange = (option, actionMeta) => {
     if (option?.[FLAG_NEW_COLLECTIVE] && this.props.onSelectNewCollectiveOption && this.state.searchText.trim()) {
       if (this.props.loading || this.props.isLoading) {
         return;
@@ -277,7 +277,7 @@ class CollectivePicker extends React.PureComponent {
       return;
     }
 
-    this.props.onChange?.(option);
+    this.props.onChange?.(option, actionMeta);
     if (this.state.showCreatedCollective) {
       this.setState({ showCreatedCollective: false });
     }
