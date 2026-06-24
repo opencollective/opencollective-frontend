@@ -9,6 +9,7 @@ import type { Currency } from '@/lib/graphql/types/v2/graphql';
 
 import MessageBox from '@/components/MessageBox';
 
+import { renderChartTooltip } from './chartTooltip';
 import type { HistogramBar } from './financialActivity';
 
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -18,6 +19,7 @@ type AmountBandHistogramProps = {
   bars: HistogramBar[];
   color: string;
   currency?: Currency;
+  kindLabel?: string;
 };
 
 function bandLabel(bar: HistogramBar, currency: Currency | undefined, locale: string): string {
@@ -31,10 +33,11 @@ function bandLabel(bar: HistogramBar, currency: Currency | undefined, locale: st
   return `${fmt(bar.lowerBound)} – ${fmt(bar.upperBound)}`;
 }
 
-function Chart({ bars, color, currency }: AmountBandHistogramProps) {
+function Chart({ bars, color, currency, kindLabel }: AmountBandHistogramProps) {
   const intl = useIntl();
   const countName = intl.formatMessage({ defaultMessage: 'Count', id: 'Count' });
   const amountName = intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' });
+  const totalAmountName = intl.formatMessage({ defaultMessage: 'Total amount', id: 'TotalAmount' });
 
   const options: ApexOptions = {
     chart: {
@@ -83,9 +86,21 @@ function Chart({ bars, color, currency }: AmountBandHistogramProps) {
     tooltip: {
       shared: true,
       intersect: false,
-      y: {
-        formatter: (value, { seriesIndex }) =>
-          seriesIndex === 1 && currency ? formatAmountForLegend(value, currency, intl.locale, false) : String(value),
+      custom: ({ dataPointIndex }) => {
+        const bar = bars[dataPointIndex];
+        return renderChartTooltip({
+          title: bandLabel(bar, currency, intl.locale),
+          subtitle: kindLabel,
+          items: [
+            { label: countName, value: intl.formatNumber(bar.count) },
+            {
+              label: totalAmountName,
+              value: currency
+                ? formatAmountForLegend(bar.amount / 100, currency, intl.locale, false)
+                : String(bar.amount / 100),
+            },
+          ],
+        });
       },
     },
   };

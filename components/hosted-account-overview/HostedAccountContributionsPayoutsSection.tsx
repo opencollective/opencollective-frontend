@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import dayjs from '@/lib/dayjs';
 import type {
@@ -41,6 +41,9 @@ export function HostedAccountContributionsPayoutsSection({
   account,
   hostSlug,
 }: HostedAccountContributionsPayoutsSectionProps) {
+  const intl = useIntl();
+  const contributionsLabel = intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' });
+  const payoutsLabel = intl.formatMessage({ defaultMessage: 'Payouts', id: 'Payouts' });
   const dateRange = React.useMemo(() => ({ from: ALL_TIME_FROM, to: dayjs.utc().toISOString() }), []);
 
   const { data, loading, error } = useQuery<
@@ -133,6 +136,7 @@ export function HostedAccountContributionsPayoutsSection({
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <HostedAccountKindActivityCard
             title={<FormattedMessage defaultMessage="Contributions" id="Contributions" />}
+            kindLabel={contributionsLabel}
             color={CONTRIBUTIONS_COLOR}
             activity={contributions}
             histogram={contributionsHistogram}
@@ -141,6 +145,7 @@ export function HostedAccountContributionsPayoutsSection({
           />
           <HostedAccountKindActivityCard
             title={<FormattedMessage defaultMessage="Payouts" id="Payouts" />}
+            kindLabel={payoutsLabel}
             color={PAYOUTS_COLOR}
             activity={payouts}
             histogram={payoutsHistogram}

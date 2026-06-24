@@ -10,6 +10,7 @@ import type { Currency, TimeSeriesAmount } from '@/lib/graphql/types/v2/graphql'
 
 import MessageBox from '@/components/MessageBox';
 
+import { renderChartTooltip } from './chartTooltip';
 import { toCountSeries } from './financialActivity';
 
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -86,13 +87,20 @@ function Chart({ timeSeries, color, currency }: HostedAccountKindOverTimeChartPr
       },
     ],
     tooltip: {
-      x: { show: false },
-      y: {
-        title: {
-          formatter: (_seriesName, { dataPointIndex }) =>
-            formatDateLabel({ startDate, index: dataPointIndex, timeUnit: ts.timeUnit }),
-        },
-      },
+      custom: ({ dataPointIndex }) =>
+        renderChartTooltip({
+          title: formatDateLabel({ startDate, index: dataPointIndex, timeUnit: ts.timeUnit }),
+          items: [
+            {
+              label: amountName,
+              color,
+              value: currency
+                ? formatAmountForLegend(amountData[dataPointIndex]?.y ?? 0, currency, intl.locale, false)
+                : String(amountData[dataPointIndex]?.y ?? 0),
+            },
+            { label: countName, color: COUNT_COLOR, value: intl.formatNumber(countData[dataPointIndex]?.y ?? 0) },
+          ],
+        }),
     },
   };
 

@@ -11,6 +11,8 @@ import type { Currency, TimeSeriesAmount } from '@/lib/graphql/types/v2/graphql'
 
 import MessageBox from '@/components/MessageBox';
 
+import { renderChartTooltip } from './chartTooltip';
+
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 type OverviewChartSeries = { name: string; color: string; data?: TimeSeriesAmount | null };
@@ -75,14 +77,18 @@ function Chart({ series, currency }: { series: OverviewChartSeries[]; currency?:
       labels: { formatter: value => (currency ? formatAmountForLegend(value, currency, intl.locale) : String(value)) },
     },
     tooltip: {
-      x: { show: false },
-      y: {
-        title: {
-          formatter: (_seriesName, { dataPointIndex }) => {
-            const key = months[dataPointIndex];
-            return key ? monthLabel(key) : '';
-          },
-        },
+      custom: ({ dataPointIndex }) => {
+        const key = months[dataPointIndex];
+        return renderChartTooltip({
+          title: key ? monthLabel(key) : '',
+          items: apexSeries.map(s => ({
+            label: s.name,
+            color: s.color,
+            value: currency
+              ? formatAmountForLegend(s.data[dataPointIndex]?.y ?? 0, currency, intl.locale, false)
+              : String(s.data[dataPointIndex]?.y ?? 0),
+          })),
+        });
       },
     },
   };

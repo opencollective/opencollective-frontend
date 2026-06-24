@@ -13,6 +13,7 @@ type View = 'SIZE' | 'OVERTIME' | 'TYPE';
 
 type HostedAccountKindActivityCardProps = {
   title: React.ReactNode;
+  kindLabel?: string;
   color: string;
   activity: KindActivity;
   histogram: HistogramBar[];
@@ -23,6 +24,7 @@ type HostedAccountKindActivityCardProps = {
 
 export function HostedAccountKindActivityCard({
   title,
+  kindLabel,
   color,
   activity,
   histogram,
@@ -56,7 +58,7 @@ export function HostedAccountKindActivityCard({
         {loading ? null : view === 'TYPE' && typeShares ? (
           <ContributionTypeDonut shares={typeShares} currency={activity.currency} />
         ) : view === 'SIZE' ? (
-          <AmountBandHistogram bars={histogram} color={color} currency={activity.currency} />
+          <AmountBandHistogram bars={histogram} color={color} currency={activity.currency} kindLabel={kindLabel} />
         ) : (
           <HostedAccountKindOverTimeChart timeSeries={activity.timeSeries} color={color} currency={activity.currency} />
         )}
