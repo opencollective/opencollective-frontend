@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 
 import { formatAmountForLegend } from '@/lib/charts';
 import type { Currency } from '@/lib/graphql/types/v2/graphql';
+import { HostedCollectivesFinancialActivityContributionFrequency as ContributionFrequency } from '@/lib/graphql/types/v2/graphql';
 
 import MessageBox from '@/components/MessageBox';
 
@@ -21,9 +22,12 @@ type ContributionTypeDonutProps = {
 function Chart({ shares, currency }: ContributionTypeDonutProps) {
   const intl = useIntl();
   const labels: Record<FrequencyKey, string> = {
-    ONE_TIME: intl.formatMessage({ defaultMessage: 'One time', id: 'Frequency.OneTime' }),
-    RECURRING: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
-    ADDED_FUNDS: intl.formatMessage({ defaultMessage: 'Added funds', id: 'Transaction.kind.ADDED_FUNDS' }),
+    [ContributionFrequency.ONE_TIME]: intl.formatMessage({ defaultMessage: 'One time', id: 'Frequency.OneTime' }),
+    [ContributionFrequency.RECURRING]: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
+    [ContributionFrequency.ADDED_FUNDS]: intl.formatMessage({
+      defaultMessage: 'Added funds',
+      id: 'Transaction.kind.ADDED_FUNDS',
+    }),
   };
 
   const options: ApexOptions = {

@@ -271,13 +271,13 @@ export const hostedAccountTransactionSizesQuery = gql`
             dateRange: $dateRange
             measures: [transactionCount, amount]
             filters: $accountFilter
-            groupBy: [amountBandIndex, kindClass]
+            groupBy: [amountBand, kindClass]
             limit: 100
           }
         ) {
           rows {
             group {
-              amountBandIndex
+              amountBand
               kindClass
             }
             values {

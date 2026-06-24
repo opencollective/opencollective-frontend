@@ -20,6 +20,17 @@ type AmountBandHistogramProps = {
   currency?: Currency;
 };
 
+function bandLabel(bar: HistogramBar, currency: Currency | undefined, locale: string): string {
+  const fmt = (value: number) => (currency ? formatAmountForLegend(value, currency, locale) : String(value));
+  if (!Number.isFinite(bar.upperBound)) {
+    return `> ${fmt(bar.lowerBound)}`;
+  }
+  if (bar.lowerBound === 0) {
+    return `≤ ${fmt(bar.upperBound)}`;
+  }
+  return `${fmt(bar.lowerBound)} – ${fmt(bar.upperBound)}`;
+}
+
 function Chart({ bars, color, currency }: AmountBandHistogramProps) {
   const intl = useIntl();
   const countName = intl.formatMessage({ defaultMessage: 'Count', id: 'Count' });
@@ -41,7 +52,7 @@ function Chart({ bars, color, currency }: AmountBandHistogramProps) {
     dataLabels: { enabled: false },
     grid: { show: true, borderColor: 'hsl(var(--border))', strokeDashArray: 4 },
     xaxis: {
-      categories: bars.map(b => b.band),
+      categories: bars.map(b => bandLabel(b, currency, intl.locale)),
       axisTicks: { show: false },
       tooltip: { enabled: false },
       labels: {

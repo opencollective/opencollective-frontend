@@ -12,6 +12,7 @@ import type {
   HostedAccountTransactionSizesQuery,
   HostedAccountTransactionSizesQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
+import { HostedCollectivesTransactionSizesKindClass as KindClass } from '@/lib/graphql/types/v2/graphql';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
@@ -87,8 +88,8 @@ export function HostedAccountContributionsPayoutsSection({
   const currency = data?.host?.currency as Currency | undefined;
   const rows = React.useMemo(() => metrics?.consolidated?.rows ?? [], [metrics]);
   const sizeRows = React.useMemo(() => sizesQuery.data?.host?.metrics?.transactionSizes?.rows ?? [], [sizesQuery.data]);
-  const contributionsHistogram = React.useMemo(() => bandHistogram(sizeRows, 'CONTRIBUTION'), [sizeRows]);
-  const payoutsHistogram = React.useMemo(() => bandHistogram(sizeRows, 'PAYOUT'), [sizeRows]);
+  const contributionsHistogram = React.useMemo(() => bandHistogram(sizeRows, KindClass.CONTRIBUTION), [sizeRows]);
+  const payoutsHistogram = React.useMemo(() => bandHistogram(sizeRows, KindClass.PAYOUT), [sizeRows]);
   const typeShares = React.useMemo(
     () => contributionTypeShares(typesQuery.data?.host?.metrics?.contributionTypes?.rows ?? []),
     [typesQuery.data],

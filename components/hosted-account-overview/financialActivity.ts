@@ -4,7 +4,12 @@ import type {
   HostedAccountContributionTypesQuery,
   HostedAccountFinancialActivityQuery,
   HostedAccountTransactionSizesQuery,
+  HostedCollectivesTransactionSizesKindClass as KindClass,
   TimeSeriesAmount,
+} from '@/lib/graphql/types/v2/graphql';
+import {
+  HostedCollectivesFinancialActivityContributionFrequency as ContributionFrequency,
+  HostedCollectivesTransactionSizesAmountBand as AmountBand,
 } from '@/lib/graphql/types/v2/graphql';
 
 type Metrics = NonNullable<NonNullable<HostedAccountFinancialActivityQuery['host']>['metrics']>;
@@ -66,53 +71,55 @@ export function toCountSeries(timeSeries: TimeSeriesAmount): TimeSeriesAmount {
   } as unknown as TimeSeriesAmount;
 }
 
-const BAND_LABELS = [
-  '0 – 5',
-  '5 – 10',
-  '10 – 25',
-  '25 – 50',
-  '50 – 75',
-  '75 – 100',
-  '100 – 150',
-  '150 – 200',
-  '200 – 250',
-  '250 – 500',
-  '500 – 1k',
-  '1k – 2k',
-  '2k – 5k',
-  '5k – 10k',
-  '10k – 25k',
-  '25k – 50k',
-  '> 50k',
-];
-
 type SizesMetrics = NonNullable<NonNullable<HostedAccountTransactionSizesQuery['host']>['metrics']>;
 type SizeRow = SizesMetrics['transactionSizes']['rows'][number];
 
-export type HistogramBar = { band: string; count: number; amount: number };
+/**
+ * Parse both of an amount-band token's bounds (currency units). Tokens are fully self-describing:
+ * `GT_<lower>_LTE_<upper>` is a closed band; `GT_<lower>` is the open-ended overflow (upper ∞).
+ */
+function bandBounds(token: AmountBand): { lowerBound: number; upperBound: number } {
+  const closed = /^GT_(\d+)_LTE_(\d+)$/.exec(token);
+  if (closed) {
+    return { lowerBound: Number(closed[1]), upperBound: Number(closed[2]) };
+  }
+  const overflow = /^GT_(\d+)$/.exec(token);
+  return { lowerBound: overflow ? Number(overflow[1]) : 0, upperBound: Number.POSITIVE_INFINITY };
+}
 
-/** Bucket the size rows for one kind into an ordered, gap-free array (one entry per band). */
-export function bandHistogram(rows: ReadonlyArray<SizeRow>, kindClass: 'CONTRIBUTION' | 'PAYOUT'): HistogramBar[] {
-  const counts = new Array(BAND_LABELS.length).fill(0);
-  const amounts = new Array(BAND_LABELS.length).fill(0);
+export const ORDERED_AMOUNT_BANDS: { token: AmountBand; lowerBound: number; upperBound: number }[] = Object.values(
+  AmountBand,
+)
+  .map(token => ({ token, ...bandBounds(token) }))
+  .sort((a, b) => a.upperBound - b.upperBound);
+
+export type HistogramBar = { token: AmountBand; lowerBound: number; upperBound: number; count: number; amount: number };
+
+export function bandHistogram(rows: ReadonlyArray<SizeRow>, kindClass: KindClass): HistogramBar[] {
+  const counts = new Map<string, number>();
+  const amounts = new Map<string, number>();
   for (const row of rows) {
-    const index = row.group?.amountBandIndex;
-    if (row.group?.kindClass !== kindClass || index === null || index === undefined) {
+    const token = row.group?.amountBand;
+    if (!token || row.group?.kindClass !== kindClass) {
       continue;
     }
-    counts[index] += Number(row.values?.transactionCount ?? 0);
-    amounts[index] += Math.abs(row.values?.amount?.valueInCents ?? 0);
+    counts.set(token, (counts.get(token) ?? 0) + Number(row.values?.transactionCount ?? 0));
+    amounts.set(token, (amounts.get(token) ?? 0) + Math.abs(row.values?.amount?.valueInCents ?? 0));
   }
-  return BAND_LABELS.map((band, i) => ({ band, count: counts[i], amount: amounts[i] }));
+  return ORDERED_AMOUNT_BANDS.map(band => ({
+    ...band,
+    count: counts.get(band.token) ?? 0,
+    amount: amounts.get(band.token) ?? 0,
+  }));
 }
 
 type TypesMetrics = NonNullable<NonNullable<HostedAccountContributionTypesQuery['host']>['metrics']>;
 type TypeRow = TypesMetrics['contributionTypes']['rows'][number];
 
 const CONTRIBUTION_FREQUENCIES = [
-  { key: 'ONE_TIME', color: '#14b8a6' },
-  { key: 'RECURRING', color: '#6366f1' },
-  { key: 'ADDED_FUNDS', color: '#f59e0b' },
+  { key: ContributionFrequency.ONE_TIME, color: '#14b8a6' },
+  { key: ContributionFrequency.RECURRING, color: '#6366f1' },
+  { key: ContributionFrequency.ADDED_FUNDS, color: '#f59e0b' },
 ] as const;
 
 export type FrequencyKey = (typeof CONTRIBUTION_FREQUENCIES)[number]['key'];
