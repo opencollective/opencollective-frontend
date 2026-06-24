@@ -5,8 +5,13 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { CollectiveType } from '@/lib/constants/collectives';
+import dayjs from '@/lib/dayjs';
 import { limit, offset } from '@/lib/filters/schemas';
-import { TransactionType } from '@/lib/graphql/types/v2/graphql';
+import type {
+  HostedAccountFinancialActivityQuery,
+  HostedAccountFinancialActivityQueryVariables,
+} from '@/lib/graphql/types/v2/graphql';
+import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '@/components/Avatar';
@@ -31,13 +36,17 @@ import LocationAddress from '@/components/LocationAddress';
 import { Badge } from '@/components/ui/Badge';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
+import { buildKindActivity } from './financialActivity';
+import { HostedAccountContributionsPayoutsSection } from './HostedAccountContributionsPayoutsSection';
 import type { MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
 import { HostedAccountOverviewChart } from './HostedAccountOverviewChart';
+import { hostedAccountFinancialActivityQuery } from './queries';
 import type { HostedAccountProfileData } from './types';
 import { HostedAccountView } from './types';
 
 const BALANCE_COLOR = '#f59e0b';
 const RECEIVED_COLOR = '#14b8a6';
+const SPENT_COLOR = '#dc2626';
 
 const recentTransactionsSchema = z.object({
   limit: limit.default(5),
@@ -210,6 +219,7 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
       limit: 5,
       offset: 0,
       type: TransactionType.CREDIT,
+      kind: [TransactionKind.CONTRIBUTION, TransactionKind.ADDED_FUNDS],
     },
     skip: !account?.id,
     notifyOnNetworkStatusChange: true,
@@ -224,10 +234,60 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
       limit: 5,
       offset: 0,
       type: TransactionType.DEBIT,
+      kind: [TransactionKind.EXPENSE],
     },
     skip: !account?.id,
     notifyOnNetworkStatusChange: true,
   });
+
+  const metricsDateRange = React.useMemo(
+    () => ({ from: '2015-01-01T00:00:00.000Z', to: dayjs.utc().toISOString() }),
+    [],
+  );
+  const financialActivityQuery = useQuery<
+    HostedAccountFinancialActivityQuery,
+    HostedAccountFinancialActivityQueryVariables
+  >(hostedAccountFinancialActivityQuery, {
+    variables: {
+      hostSlug,
+      dateRange: metricsDateRange,
+      timeUnit: 'MONTH' as HostedAccountFinancialActivityQueryVariables['timeUnit'],
+      accountFilter: { mainAccount: { eq: { id: account?.id } } },
+      groupByAccount: false,
+    },
+    skip: !account?.id || !hostSlug,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const metricsRows = React.useMemo(
+    () => financialActivityQuery.data?.host?.metrics?.consolidated?.rows ?? [],
+    [financialActivityQuery.data],
+  );
+  const metricsCurrency = financialActivityQuery.data?.host?.currency ?? currency;
+  const receivedTimeSeries = React.useMemo(
+    () =>
+      buildKindActivity(metricsRows, {
+        amountMeasure: 'amountReceived',
+        countMeasure: 'contributionsCount',
+        timeUnit: 'MONTH',
+        dateFrom: metricsDateRange.from,
+        dateTo: metricsDateRange.to,
+        currency: metricsCurrency,
+      }).timeSeries,
+    [metricsRows, metricsDateRange, metricsCurrency],
+  );
+  const spentTimeSeries = React.useMemo(
+    () =>
+      buildKindActivity(metricsRows, {
+        amountMeasure: 'amountSpent',
+        countMeasure: 'payoutsCount',
+        timeUnit: 'MONTH',
+        dateFrom: metricsDateRange.from,
+        dateTo: metricsDateRange.to,
+        currency: metricsCurrency,
+      }).timeSeries,
+    [metricsRows, metricsDateRange, metricsCurrency],
+  );
 
   const handleRowClick = (tx: RecentTransaction) => {
     if (tx.expense) {
@@ -435,12 +495,19 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
               {
                 name: intl.formatMessage({ defaultMessage: 'Received by account', id: 'C22hxu' }),
                 color: RECEIVED_COLOR,
-                data: stats?.totalAmountReceivedTimeSeries,
+                data: receivedTimeSeries,
+              },
+              {
+                name: intl.formatMessage({ defaultMessage: 'Spent by account', id: 'bXI/iJ' }),
+                color: SPENT_COLOR,
+                data: spentTimeSeries,
               },
             ]}
           />
         </div>
       </DashboardContentCard>
+
+      <HostedAccountContributionsPayoutsSection account={account} hostSlug={hostSlug} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <RecentTransactionsCard
