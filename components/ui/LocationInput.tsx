@@ -193,7 +193,9 @@ export const UserLocationInput = ({
         <Label className="leading-normal">Country</Label>
         <InputCountry
           value={location?.country}
-          onChange={country => onChange(pick({ ...(location || DEFAULT_LOCATION), country }, ['country']))}
+          onChange={country =>
+            onChange(pick({ ...(location || DEFAULT_LOCATION), country }, ['country', 'structured']))
+          }
         />
       </div>
       {hasCountry && !useFallback && !forceLegacyFormat ? (

@@ -382,7 +382,7 @@ export const NewSimpleLocationFieldRenderer: React.FC<FieldRendererProps> = ({
     ...pickBy(
       {
         ...fieldProps,
-        value: value,
+        value: value ?? '',
         name: name || htmlFor,
         id: htmlFor,
         required,
@@ -482,10 +482,30 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
     return convertToLegacyFormat(addressFormFields);
   }, [addressFormFields]);
 
+  // Keep the latest structured values so country changes can normalize them even if the
+  // parent briefly clears `value` when updating the country (e.g. UserLocationInput).
+  const structuredValuesRef = React.useRef<StructuredAddress>(value || {});
+
+  if (value && !isEmpty(value)) {
+    structuredValuesRef.current = value;
+  }
+
+  const getStructuredValues = React.useCallback((): StructuredAddress => {
+    return !isEmpty(value) ? value! : structuredValuesRef.current;
+  }, [value]);
+
+  const updateStructuredValues = React.useCallback(
+    (next: StructuredAddress) => {
+      structuredValuesRef.current = next;
+      onCountryChange(next);
+    },
+    [onCountryChange],
+  );
+
   // Notify parent when country changes and fields are updated
   React.useEffect(() => {
     if (fields && addressFormFields) {
-      onCountryChange(normalizeStructuredZone(value, fields));
+      updateStructuredValues(normalizeStructuredZone(getStructuredValues(), fields));
       try {
         onLoadSuccess?.({ countryInfo: addressFormFields, addressFields: fields });
       } catch (e) {
@@ -513,8 +533,11 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
           error={errors?.[fieldName]}
           fieldProps={fieldProps}
           onChange={({ target: { name, value: fieldValue } }) =>
-            onCountryChange(
-              normalizeStructuredZone(set(cloneDeep(value || {}), name, fieldValue) as StructuredAddress, fields),
+            updateStructuredValues(
+              normalizeStructuredZone(
+                set(cloneDeep(getStructuredValues()), name, fieldValue) as StructuredAddress,
+                fields,
+              ),
             )
           }
         />
