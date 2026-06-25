@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FieldProps } from 'formik';
 import { Field } from 'formik';
-import { cloneDeep, isEmpty, isNil, orderBy, pick, pickBy, set, truncate } from 'lodash-es';
+import { cloneDeep, isEmpty, isNil, omit, orderBy, pick, pickBy, set, truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { AddressFieldConfig, StructuredAddress, Zone } from '@/lib/address';
@@ -73,10 +73,59 @@ const getAddressFieldDifferences = (
 type ZoneOption = {
   value: string;
   label: string;
+  name: string;
 };
 
 const buildZoneOption = (zone: Zone): ZoneOption => {
-  return { value: zone.name, label: `${truncate(zone.name, { length: 30 })} - ${zone.code}` };
+  return {
+    value: zone.code,
+    label: `${truncate(zone.name, { length: 30 })} - ${zone.code}`,
+    name: zone.name,
+  };
+};
+
+/** Match a stored zone (code or legacy name) to a select option. */
+const findZoneOption = (zone: string | null | undefined, zoneOptions: ZoneOption[]): ZoneOption | undefined => {
+  if (!zone) {
+    return undefined;
+  }
+
+  return (
+    zoneOptions.find(option => option.value === zone) ||
+    zoneOptions.find(option => option.name.toLowerCase() === zone.toLowerCase())
+  );
+};
+
+/**
+ * Normalize a zone to a subdivision code, or null when it is not valid for the country.
+ * Accepts ISO codes and legacy full names stored before we switched the dropdown to codes.
+ */
+const normalizeZoneValue = (zone: string, zones: Zone[]): string | null => {
+  const zoneOptions = zones.map(buildZoneOption);
+  return findZoneOption(zone, zoneOptions)?.value ?? null;
+};
+
+const normalizeStructuredZone = (
+  structured: StructuredAddress | undefined,
+  fields: LegacyFieldTuple[],
+): StructuredAddress => {
+  const next = getAddressFieldDifferences(structured, fields);
+  const zones = fields.find(([fieldName]) => fieldName === 'zone')?.[2];
+
+  if (!next.zone || !zones?.length) {
+    return next;
+  }
+
+  const normalizedZone = normalizeZoneValue(next.zone, zones);
+  if (normalizedZone === next.zone) {
+    return next;
+  }
+
+  if (!normalizedZone) {
+    return omit(next, 'zone');
+  }
+
+  return { ...next, zone: normalizedZone };
 };
 
 type ChangeEvent = {
@@ -113,16 +162,20 @@ const ZoneSelect: React.FC<ZoneSelectProps> = ({
   const intl = useIntl();
   const zoneOptions = React.useMemo(() => orderBy((info || []).map(buildZoneOption), 'label'), [info]);
   const hasOptions = zoneOptions.length > 0;
+  const selectedZoneOption = findZoneOption(value, zoneOptions);
 
-  // Reset zone if not supported
+  // Upgrade legacy name values to codes and clear zones invalid for the selected country.
+  // FormikLocationFieldRenderer updates Formik directly, so this effect is still needed there.
   React.useEffect(() => {
-    if (zoneOptions && hasOptions) {
-      const formValueZone = value;
-      if (formValueZone && !zoneOptions.find(option => option.value === formValueZone)) {
-        onChange({ target: { name: name, value: null } });
-      }
+    if (!hasOptions || !value) {
+      return;
     }
-  }, [zoneOptions, hasOptions, name, onChange, value]);
+
+    const normalizedZone = normalizeZoneValue(value, info || []);
+    if (normalizedZone !== value) {
+      onChange({ target: { name, value: normalizedZone } });
+    }
+  }, [hasOptions, info, name, onChange, value]);
 
   // When there are no zone options, show a text input instead of a select
   if (!hasOptions) {
@@ -161,7 +214,7 @@ const ZoneSelect: React.FC<ZoneSelectProps> = ({
         error={Boolean(error)}
         placeholder={placeholder}
         data-cy={`address-${name}`}
-        value={zoneOptions.find(option => option?.value === value) || null}
+        value={selectedZoneOption || null}
         onChange={(v: ZoneOption) => {
           onChange({ target: { name: name, value: v.value } });
         }}
@@ -173,7 +226,7 @@ const ZoneSelect: React.FC<ZoneSelectProps> = ({
         onValueChange={v => {
           onChange({ target: { name: name, value: v } });
         }}
-        value={value || undefined}
+        value={selectedZoneOption?.value || undefined}
       >
         <SelectTrigger data-cy={`address-${name}`}>
           <SelectValue placeholder={placeholder} />
@@ -432,7 +485,7 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
   // Notify parent when country changes and fields are updated
   React.useEffect(() => {
     if (fields && addressFormFields) {
-      onCountryChange(getAddressFieldDifferences(value, fields));
+      onCountryChange(normalizeStructuredZone(value, fields));
       try {
         onLoadSuccess?.({ countryInfo: addressFormFields, addressFields: fields });
       } catch (e) {
@@ -460,7 +513,9 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
           error={errors?.[fieldName]}
           fieldProps={fieldProps}
           onChange={({ target: { name, value: fieldValue } }) =>
-            onCountryChange(set(cloneDeep(value || {}), name, fieldValue) as StructuredAddress)
+            onCountryChange(
+              normalizeStructuredZone(set(cloneDeep(value || {}), name, fieldValue) as StructuredAddress, fields),
+            )
           }
         />
       ))}
