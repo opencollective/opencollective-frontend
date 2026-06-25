@@ -1,5 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 
+import { THIRD_PARTY_SCRIPT_URL_PATTERNS } from './sentry-filters.js';
+
 // Default scope
 /** @type {(import('@sentry/browser').Scope} */
 const scope = Sentry.getCurrentScope();
@@ -25,12 +27,7 @@ export default {
     'globalThis is not defined', // Happens on old browsers, see https://caniuse.com/?search=globalThis
     "Can't find variable: globalThis", // Happens on old browsers, see https://caniuse.com/?search=globalThis
   ],
-  denyUrls: [
-    // Chrome extensions
-    /extensions\//i,
-    /^chrome:\/\//i,
-    /^chrome-extension:\/\//i,
-  ],
+  denyUrls: THIRD_PARTY_SCRIPT_URL_PATTERNS,
   tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE ? parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) : 0.01,
   release: process.env.HEROKU_SLUG_COMMIT?.slice(0, 7),
 };

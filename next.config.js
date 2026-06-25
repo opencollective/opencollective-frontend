@@ -6,6 +6,7 @@ const { withSentryConfig } = require('@sentry/nextjs');
 const CopyPlugin = require('copy-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const path = require('path');
+const { SENTRY_APPLICATION_KEY } = require('./sentry.constants');
 require('./env');
 const { REWRITES } = require('./rewrites');
 
@@ -360,6 +361,7 @@ if (process.env.SENTRY_AUTH_TOKEN) {
       org: 'open-collective',
       project: 'oc-frontend',
       authToken: process.env.SENTRY_AUTH_TOKEN,
+      applicationKey: SENTRY_APPLICATION_KEY,
       silent: true,
     },
   );
