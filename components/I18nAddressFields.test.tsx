@@ -176,6 +176,19 @@ describe('I18nAddressFields', () => {
     });
   });
 
+  describe('zone field', () => {
+    it('stores subdivision codes when zone options are available', () => {
+      const onCountryChange = jest.fn();
+      render(
+        withRequiredProviders(
+          <I18nAddressFields {...defaultProps} onCountryChange={onCountryChange} value={{ zone: 'California' }} />,
+        ),
+      );
+
+      expect(onCountryChange).toHaveBeenCalledWith(expect.objectContaining({ zone: 'CA' }));
+    });
+  });
+
   describe('field errors', () => {
     it('displays field-specific errors', () => {
       const errors = {
