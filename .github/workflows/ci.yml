@@ -122,7 +122,7 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - name: Restore NextJS build cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .next/cache
           # Generate a new cache whenever packages or source files change
@@ -137,7 +137,7 @@ jobs:
         run: PRESERVE_NEXT_CACHE=true npm run build
 
       - name: Save NextJS build
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .next
           key: ${{ runner.os }}-next-build-${{ github.sha }}
