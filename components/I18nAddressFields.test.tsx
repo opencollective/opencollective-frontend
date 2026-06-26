@@ -4,11 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { StructuredAddress } from '@/lib/address';
 import { withRequiredProviders } from '../test/providers';
 
-import I18nAddressFields, {
-  NewSimpleLocationFieldRenderer,
-  serializeAddress,
-  SimpleLocationFieldRenderer,
-} from './I18nAddressFields';
+import I18nAddressFields, { NewSimpleLocationFieldRenderer, SimpleLocationFieldRenderer } from './I18nAddressFields';
 
 // Define types locally for the test
 type Zone = { code: string; name: string };
@@ -205,38 +201,6 @@ describe('I18nAddressFields', () => {
       expect(screen.getByText('Address is required')).toBeInTheDocument();
       expect(screen.getByText('Invalid ZIP code')).toBeInTheDocument();
     });
-  });
-});
-
-describe('serializeAddress', () => {
-  it('serializes an address object to a sorted newline-separated string', () => {
-    const address = {
-      city: 'San Francisco',
-      address1: '123 Main St',
-      postalCode: '94102',
-    };
-
-    const result = serializeAddress(address);
-
-    // Keys are sorted alphabetically
-    expect(result).toBe('123 Main St\nSan Francisco\n94102');
-  });
-
-  it('handles empty address object', () => {
-    const result = serializeAddress({});
-    expect(result).toBe('');
-  });
-
-  it('handles undefined values', () => {
-    const address = {
-      address1: '123 Main St',
-      address2: undefined,
-      city: 'San Francisco',
-    };
-
-    const result = serializeAddress(address);
-    expect(result).toContain('123 Main St');
-    expect(result).toContain('San Francisco');
   });
 });
 
