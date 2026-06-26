@@ -150,7 +150,13 @@ const PayExpenseModalWrapper = ({
       host={host}
       canPayWithAutomaticPayment={canPayWithAutomaticPayment}
       onClose={() => setOpen(false)}
-      onSubmit={onSubmit}
+      onSubmit={async values => {
+        // PayExpenseModal does not close itself; its caller must. The `onSubmit` handler resolves
+        // on success and throws on failure (see the `pay` action), so close the modal once the
+        // payment resolves and let the throw keep it open (with its error toast) on failure.
+        await onSubmit(values as { action: string } & Record<string, unknown>);
+        setOpen(false);
+      }}
     />
   );
 };
