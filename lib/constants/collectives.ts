@@ -12,6 +12,7 @@ export const CollectiveType = {
   PROJECT: 'PROJECT',
   FUND: 'FUND',
   VENDOR: 'VENDOR',
+  PLATFORM: 'PLATFORM',
 } as const;
 
 export const HostedCollectiveTypes = omit(CollectiveType, ['USER', 'INDIVIDUAL', 'ORGANIZATION', 'BOT', 'VENDOR']);

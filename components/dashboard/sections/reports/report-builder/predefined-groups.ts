@@ -129,6 +129,11 @@ export const predefinedGroups: Group[] = [
   },
   {
     section: ReportSection.FEES_TIPS,
+    label: 'Application Fee',
+    filter: { kind: TransactionKind.APPLICATION_FEE },
+  },
+  {
+    section: ReportSection.FEES_TIPS,
     label: 'Lost disputed payment processor fees',
     filter: { kind: TransactionKind.PAYMENT_PROCESSOR_DISPUTE_FEE },
   },

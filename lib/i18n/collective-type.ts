@@ -35,6 +35,10 @@ const TypesI18n = defineMessages({
     id: 'CollectiveType.Vendor',
     defaultMessage: '{count, plural, one {Vendor} other {Vendors}}',
   },
+  [CollectiveType.PLATFORM]: {
+    id: 'CollectiveType.Platform',
+    defaultMessage: '{count, plural, one {Platform} other {Platforms}}',
+  },
   BENEFICIARY: {
     defaultMessage: '{count, plural, one {Beneficiary} other {Beneficiaries}}',
     id: 'thDZ5f',

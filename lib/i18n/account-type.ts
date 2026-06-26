@@ -23,6 +23,10 @@ const TypesI18n = defineMessages({
     id: 'ContributionType.Project',
     defaultMessage: 'Project',
   },
+  [CollectiveType.PLATFORM]: {
+    id: 'AccountType.Platform',
+    defaultMessage: 'Platform',
+  },
 });
 
 /**
