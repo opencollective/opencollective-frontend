@@ -161,6 +161,10 @@ describe('I18nAddressFields', () => {
         city: 'San Francisco',
         postalCode: '94102',
       });
+
+      expect(document.getElementById('address1')).toHaveValue('123 Main St');
+      expect(document.getElementById('city')).toHaveValue('San Francisco');
+      expect(document.getElementById('postalCode')).toHaveValue('94102');
     });
 
     it('drops fields that are not supported by the new country', () => {

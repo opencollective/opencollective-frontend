@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FieldProps } from 'formik';
 import { Field } from 'formik';
-import { cloneDeep, isEmpty, isNil, omit, orderBy, pick, pickBy, set, truncate } from 'lodash-es';
+import { cloneDeep, isEmpty, isEqual, isNil, omit, orderBy, pick, pickBy, set, truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { AddressFieldConfig, StructuredAddress, Zone } from '@/lib/address';
@@ -482,30 +482,44 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
     return convertToLegacyFormat(addressFormFields);
   }, [addressFormFields]);
 
-  // Keep the latest structured values so country changes can normalize them even if the
+  // Keep structured values locally so country changes can normalize them even if the
   // parent briefly clears `value` when updating the country (e.g. UserLocationInput).
-  const structuredValuesRef = React.useRef<StructuredAddress>(value || {});
+  const [structuredValues, setStructuredValues] = React.useState<StructuredAddress>(() => value || {});
+  const structuredValuesRef = React.useRef(structuredValues);
+  structuredValuesRef.current = structuredValues;
+  const lastPropagatedValuesRef = React.useRef<StructuredAddress | undefined>(undefined);
 
-  if (value && !isEmpty(value)) {
-    structuredValuesRef.current = value;
-  }
-
-  const getStructuredValues = React.useCallback((): StructuredAddress => {
-    return !isEmpty(value) ? value! : structuredValuesRef.current;
+  React.useEffect(() => {
+    if (value && !isEmpty(value)) {
+      setStructuredValues(prev => (isEqual(prev, value) ? prev : value!));
+    }
   }, [value]);
+
+  const propagateStructuredValues = React.useCallback(
+    (next: StructuredAddress) => {
+      if (!isEqual(lastPropagatedValuesRef.current, next)) {
+        lastPropagatedValuesRef.current = next;
+        onCountryChange(next);
+      }
+    },
+    [onCountryChange],
+  );
 
   const updateStructuredValues = React.useCallback(
     (next: StructuredAddress) => {
-      structuredValuesRef.current = next;
-      onCountryChange(next);
+      setStructuredValues(prev => (isEqual(prev, next) ? prev : next));
+      propagateStructuredValues(next);
     },
-    [onCountryChange],
+    [propagateStructuredValues],
   );
 
   // Notify parent when country changes and fields are updated
   React.useEffect(() => {
     if (fields && addressFormFields) {
-      updateStructuredValues(normalizeStructuredZone(getStructuredValues(), fields));
+      const normalized = normalizeStructuredZone(structuredValuesRef.current, fields);
+      setStructuredValues(prev => (isEqual(prev, normalized) ? prev : normalized));
+      lastPropagatedValuesRef.current = normalized;
+      onCountryChange(normalized);
       try {
         onLoadSuccess?.({ countryInfo: addressFormFields, addressFields: fields });
       } catch (e) {
@@ -519,25 +533,23 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
   if (!selectedCountry || !fields || !addressFormFields) {
     return null;
   }
+
   return (
     <React.Fragment>
       {fields.map(([fieldName, fieldLabel, fieldInfo]) => (
         <Component
-          key={fieldName}
+          key={`${selectedCountry}-${fieldName}`}
           prefix={prefix}
           name={fieldName}
           label={fieldLabel}
           info={fieldInfo}
-          value={value?.[fieldName as keyof StructuredAddress]}
+          value={structuredValues[fieldName as keyof StructuredAddress]}
           required={required === false ? false : !addressFormFields.optionalFields.includes(fieldName)}
           error={errors?.[fieldName]}
           fieldProps={fieldProps}
           onChange={({ target: { name, value: fieldValue } }) =>
             updateStructuredValues(
-              normalizeStructuredZone(
-                set(cloneDeep(getStructuredValues()), name, fieldValue) as StructuredAddress,
-                fields,
-              ),
+              normalizeStructuredZone(set(cloneDeep(structuredValues), name, fieldValue) as StructuredAddress, fields),
             )
           }
         />
