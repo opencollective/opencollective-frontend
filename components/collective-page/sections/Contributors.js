@@ -60,7 +60,7 @@ export default class SectionContributors extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = { filter: ContributorsFilter.CONTRIBUTOR_FILTERS.ALL };
-    /* reference to the FixedSizedGrid element */
+    /* reference to the ContributorsGrid element */
     this.contributorsGridRef = React.createRef();
   }
 
@@ -70,7 +70,7 @@ export default class SectionContributors extends React.PureComponent {
     this.setState({ filter });
 
     // whenever the filter is changed, scroll is set to point to the initial item
-    this.contributorsGridRef.current.scrollToItem({
+    this.contributorsGridRef.current.scrollToCell({
       columnIndex: 0,
       rowIndex: 0,
     });

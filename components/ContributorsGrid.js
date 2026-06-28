@@ -1,6 +1,6 @@
 import React from 'react';
 import get from 'lodash-es/get';
-import { FixedSizeGrid } from 'react-window';
+import { Grid } from 'react-window';
 import { styled } from 'styled-components';
 
 import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
@@ -18,7 +18,7 @@ const COLLECTIVE_CARD_HEIGHT = 220;
 const COLLECTIVE_CARD_FULL_WIDTH = COLLECTIVE_CARD_WIDTH + COLLECTIVE_CARD_MARGIN_X;
 
 /** Adds custom scrollbar for Chrome */
-const StyledGridContainer = styled.div`
+const StyledContributorsGrid = styled(Grid)`
   ${CustomScrollbarCSS}
 
   /** Hide scrollbar when not hovered */
@@ -32,37 +32,6 @@ const StyledGridContainer = styled.div`
     }
   }
 `;
-
-/**
- * We have to define the outer container here because react-window doesn't
- * let you pass custom props to outer container.
- */
-const getGridContainer = (paddingLeft, hasScroll) => {
-  const GridContainer = ({ style, ...props }, ref) => {
-    return (
-      <StyledGridContainer
-        data-cy="contributors-grid"
-        ref={ref}
-        style={{
-          ...style,
-          width: '100%',
-          paddingLeft,
-          overflowX: hasScroll ? 'auto' : 'hidden',
-        }}
-        {...props}
-      />
-    );
-  };
-
-  return React.forwardRef(GridContainer);
-};
-
-/**
- * Add margin to the inner container width
- */
-const GridInnerContainer = ({ style, ...props }) => {
-  return <div style={{ ...style, position: 'relative', width: style.width + COLLECTIVE_CARD_MARGIN_X }} {...props} />;
-};
 
 /** Cards to show individual contributors */
 const ContributorCardContainer = styled.div`
@@ -117,6 +86,37 @@ const computePaddingLeft = (width, rowWidth, nbRows, maxWidthWhenNotFull) => {
   }
 };
 
+const ContributorCell = ({
+  columnIndex,
+  rowIndex,
+  style,
+  contributors,
+  nbRows,
+  nbCols,
+  hasScroll,
+  currency,
+  collectiveId,
+  loggedUserCollectiveId,
+}) => {
+  const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
+  const contributor = contributors[idx];
+  return !contributor ? null : (
+    <ContributorCardContainer
+      style={{ left: style.left + COLLECTIVE_CARD_MARGIN_X, top: style.top + COLLECTIVE_CARD_MARGIN_Y }}
+    >
+      <ContributorCard
+        data-cy="ContributorsGrid_ContributorCard"
+        width={COLLECTIVE_CARD_WIDTH}
+        height={COLLECTIVE_CARD_HEIGHT}
+        contributor={contributor}
+        currency={currency}
+        collectiveId={collectiveId}
+        isLoggedUser={contributor.collectiveId && loggedUserCollectiveId === contributor.collectiveId}
+      />
+    </ContributorCardContainer>
+  );
+};
+
 const DEFAULT_MAX_NB_ROWS_FOR_VIEWPORTS = {
   [VIEWPORTS.UNKNOWN]: 1,
   [VIEWPORTS.XSMALL]: 1,
@@ -148,43 +148,36 @@ const ContributorsGrid = ({
   const paddingLeft = computePaddingLeft(width, rowWidth, nbRows, maxWidthWhenNotFull);
   const hasScroll = rowWidth + paddingLeft > width;
   const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
+  const gridHeight = (COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y) * nbRows + COLLECTIVE_CARD_MARGIN_Y;
+
   return (
-    <FixedSizeGrid
+    <StyledContributorsGrid
+      data-cy="contributors-grid"
+      cellComponent={ContributorCell}
+      cellProps={{
+        contributors,
+        nbRows,
+        nbCols,
+        hasScroll,
+        currency,
+        collectiveId,
+        loggedUserCollectiveId,
+      }}
       columnCount={nbCols}
       columnWidth={COLLECTIVE_CARD_FULL_WIDTH}
-      height={(COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y) * nbRows + COLLECTIVE_CARD_MARGIN_Y}
       rowCount={nbRows}
       rowHeight={COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y}
-      width={viewWidth}
-      outerElementType={getGridContainer(paddingLeft, hasScroll)}
-      innerElementType={GridInnerContainer}
-      itemKey={({ columnIndex, rowIndex }) => {
-        const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
-        return idx < contributors.length ? contributors[idx].id : `empty-${idx}`;
+      defaultHeight={gridHeight}
+      defaultWidth={viewWidth}
+      style={{
+        height: gridHeight,
+        width: '100%',
+        paddingLeft,
+        paddingRight: COLLECTIVE_CARD_MARGIN_X,
+        overflowX: hasScroll ? 'auto' : 'hidden',
       }}
-      ref={gridRef}
-    >
-      {({ columnIndex, rowIndex, style }) => {
-        const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
-        const contributor = contributors[idx];
-        return !contributor ? null : (
-          <ContributorCardContainer
-            key={contributor.id}
-            style={{ left: style.left + COLLECTIVE_CARD_MARGIN_X, top: style.top + COLLECTIVE_CARD_MARGIN_Y }}
-          >
-            <ContributorCard
-              data-cy="ContributorsGrid_ContributorCard"
-              width={COLLECTIVE_CARD_WIDTH}
-              height={COLLECTIVE_CARD_HEIGHT}
-              contributor={contributor}
-              currency={currency}
-              collectiveId={collectiveId}
-              isLoggedUser={contributor.collectiveId && loggedUserCollectiveId === contributor.collectiveId}
-            />
-          </ContributorCardContainer>
-        );
-      }}
-    </FixedSizeGrid>
+      gridRef={gridRef}
+    />
   );
 };
 
