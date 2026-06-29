@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FieldProps } from 'formik';
 import { Field } from 'formik';
-import { cloneDeep, isEmpty, isNil, orderBy, pick, pickBy, set, truncate } from 'lodash-es';
+import { cloneDeep, isEmpty, isEqual, isNil, omit, orderBy, pick, pickBy, set, truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { AddressFieldConfig, StructuredAddress, Zone } from '@/lib/address';
@@ -38,16 +38,6 @@ const convertToLegacyFormat = (addressFormFields: AddressFormFieldsResult): Lega
 };
 
 /**
- * Serialize an address object to a string
- */
-export const serializeAddress = (address: Record<string, string | undefined>): string => {
-  return Object.keys(address)
-    .sort()
-    .map(k => address[k])
-    .join('\n');
-};
-
-/**
  * Upon changing selectedCountry, if previous address fields are no longer needed,
  * it clears them i.e. changing from Canada to Germany in the Expense form we no
  * longer need 'zone' in our payeeLocation.address object.
@@ -73,10 +63,59 @@ const getAddressFieldDifferences = (
 type ZoneOption = {
   value: string;
   label: string;
+  name: string;
 };
 
 const buildZoneOption = (zone: Zone): ZoneOption => {
-  return { value: zone.name, label: `${truncate(zone.name, { length: 30 })} - ${zone.code}` };
+  return {
+    value: zone.code,
+    label: `${truncate(zone.name, { length: 30 })} - ${zone.code}`,
+    name: zone.name,
+  };
+};
+
+/** Match a stored zone (code or legacy name) to a select option. */
+const findZoneOption = (zone: string | null | undefined, zoneOptions: ZoneOption[]): ZoneOption | undefined => {
+  if (!zone) {
+    return undefined;
+  }
+
+  return (
+    zoneOptions.find(option => option.value === zone) ||
+    zoneOptions.find(option => option.name.toLowerCase() === zone.toLowerCase())
+  );
+};
+
+/**
+ * Normalize a zone to a subdivision code, or null when it is not valid for the country.
+ * Accepts ISO codes and legacy full names stored before we switched the dropdown to codes.
+ */
+const normalizeZoneValue = (zone: string, zones: Zone[]): string | null => {
+  const zoneOptions = zones.map(buildZoneOption);
+  return findZoneOption(zone, zoneOptions)?.value ?? null;
+};
+
+const normalizeStructuredZone = (
+  structured: StructuredAddress | undefined,
+  fields: LegacyFieldTuple[],
+): StructuredAddress => {
+  const next = getAddressFieldDifferences(structured, fields);
+  const zones = fields.find(([fieldName]) => fieldName === 'zone')?.[2];
+
+  if (!next.zone || !zones?.length) {
+    return next;
+  }
+
+  const normalizedZone = normalizeZoneValue(next.zone, zones);
+  if (normalizedZone === next.zone) {
+    return next;
+  }
+
+  if (!normalizedZone) {
+    return omit(next, 'zone');
+  }
+
+  return { ...next, zone: normalizedZone };
 };
 
 type ChangeEvent = {
@@ -113,16 +152,20 @@ const ZoneSelect: React.FC<ZoneSelectProps> = ({
   const intl = useIntl();
   const zoneOptions = React.useMemo(() => orderBy((info || []).map(buildZoneOption), 'label'), [info]);
   const hasOptions = zoneOptions.length > 0;
+  const selectedZoneOption = findZoneOption(value, zoneOptions);
 
-  // Reset zone if not supported
+  // Upgrade legacy name values to codes and clear zones invalid for the selected country.
+  // FormikLocationFieldRenderer updates Formik directly, so this effect is still needed there.
   React.useEffect(() => {
-    if (zoneOptions && hasOptions) {
-      const formValueZone = value;
-      if (formValueZone && !zoneOptions.find(option => option.value === formValueZone)) {
-        onChange({ target: { name: name, value: null } });
-      }
+    if (!hasOptions || !value) {
+      return;
     }
-  }, [zoneOptions, hasOptions, name, onChange, value]);
+
+    const normalizedZone = normalizeZoneValue(value, info || []);
+    if (normalizedZone !== value) {
+      onChange({ target: { name, value: normalizedZone } });
+    }
+  }, [hasOptions, info, name, onChange, value]);
 
   // When there are no zone options, show a text input instead of a select
   if (!hasOptions) {
@@ -161,7 +204,7 @@ const ZoneSelect: React.FC<ZoneSelectProps> = ({
         error={Boolean(error)}
         placeholder={placeholder}
         data-cy={`address-${name}`}
-        value={zoneOptions.find(option => option?.value === value) || null}
+        value={selectedZoneOption || null}
         onChange={(v: ZoneOption) => {
           onChange({ target: { name: name, value: v.value } });
         }}
@@ -173,7 +216,7 @@ const ZoneSelect: React.FC<ZoneSelectProps> = ({
         onValueChange={v => {
           onChange({ target: { name: name, value: v } });
         }}
-        value={value || undefined}
+        value={selectedZoneOption?.value || undefined}
       >
         <SelectTrigger data-cy={`address-${name}`}>
           <SelectValue placeholder={placeholder} />
@@ -329,7 +372,7 @@ export const NewSimpleLocationFieldRenderer: React.FC<FieldRendererProps> = ({
     ...pickBy(
       {
         ...fieldProps,
-        value: value,
+        value: value ?? '',
         name: name || htmlFor,
         id: htmlFor,
         required,
@@ -429,10 +472,44 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
     return convertToLegacyFormat(addressFormFields);
   }, [addressFormFields]);
 
+  // Keep structured values locally so country changes can normalize them even if the
+  // parent briefly clears `value` when updating the country (e.g. UserLocationInput).
+  const [structuredValues, setStructuredValues] = React.useState<StructuredAddress>(() => value || {});
+  const structuredValuesRef = React.useRef(structuredValues);
+  structuredValuesRef.current = structuredValues;
+  const lastPropagatedValuesRef = React.useRef<StructuredAddress | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (value && !isEmpty(value)) {
+      setStructuredValues(prev => (isEqual(prev, value) ? prev : value!));
+    }
+  }, [value]);
+
+  const propagateStructuredValues = React.useCallback(
+    (next: StructuredAddress) => {
+      if (!isEqual(lastPropagatedValuesRef.current, next)) {
+        lastPropagatedValuesRef.current = next;
+        onCountryChange(next);
+      }
+    },
+    [onCountryChange],
+  );
+
+  const updateStructuredValues = React.useCallback(
+    (next: StructuredAddress) => {
+      setStructuredValues(prev => (isEqual(prev, next) ? prev : next));
+      propagateStructuredValues(next);
+    },
+    [propagateStructuredValues],
+  );
+
   // Notify parent when country changes and fields are updated
   React.useEffect(() => {
     if (fields && addressFormFields) {
-      onCountryChange(getAddressFieldDifferences(value, fields));
+      const normalized = normalizeStructuredZone(structuredValuesRef.current, fields);
+      setStructuredValues(prev => (isEqual(prev, normalized) ? prev : normalized));
+      lastPropagatedValuesRef.current = normalized;
+      onCountryChange(normalized);
       try {
         onLoadSuccess?.({ countryInfo: addressFormFields, addressFields: fields });
       } catch (e) {
@@ -446,21 +523,24 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
   if (!selectedCountry || !fields || !addressFormFields) {
     return null;
   }
+
   return (
     <React.Fragment>
       {fields.map(([fieldName, fieldLabel, fieldInfo]) => (
         <Component
-          key={fieldName}
+          key={`${selectedCountry}-${fieldName}`}
           prefix={prefix}
           name={fieldName}
           label={fieldLabel}
           info={fieldInfo}
-          value={value?.[fieldName as keyof StructuredAddress]}
+          value={structuredValues[fieldName as keyof StructuredAddress]}
           required={required === false ? false : !addressFormFields.optionalFields.includes(fieldName)}
           error={errors?.[fieldName]}
           fieldProps={fieldProps}
           onChange={({ target: { name, value: fieldValue } }) =>
-            onCountryChange(set(cloneDeep(value || {}), name, fieldValue) as StructuredAddress)
+            updateStructuredValues(
+              normalizeStructuredZone(set(cloneDeep(structuredValues), name, fieldValue) as StructuredAddress, fields),
+            )
           }
         />
       ))}

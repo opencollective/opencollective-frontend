@@ -18,7 +18,7 @@ import { cn, parseToBoolean } from '@/lib/utils';
 
 import Captcha, { isCaptchaEnabled } from '../Captcha';
 import { FormField } from '../FormField';
-import { FormikZod } from '../FormikZod';
+import { FormikZod, generateInitialValuesFromSchema } from '../FormikZod';
 import I18nFormatters, { getI18nLink } from '../I18nFormatters';
 import Image from '../Image';
 import { Button } from '../ui/Button';
@@ -124,6 +124,13 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
       })),
     [],
   );
+  const initialValues = useMemo(
+    () => ({
+      ...generateInitialValuesFromSchema(createOrganizationSchema),
+      ...(LoggedInUser?.id ? { individual: { id: LoggedInUser.id } } : {}),
+    }),
+    [LoggedInUser?.id],
+  );
   const handleOpenCountrySelect = useCallback(
     open => {
       setShowCountrySelect(open);
@@ -204,7 +211,7 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
     <FormikZod<CreateOrganizationValuesSchema>
       schema={createOrganizationSchema}
       onSubmit={onSubmit}
-      initialValues={{}}
+      initialValues={initialValues}
       innerRef={formikRef}
     >
       {({ touched, setFieldValue, isValid }) => (
@@ -233,7 +240,7 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
                 }
               >
                 {({ field }) => (
-                  <Select value={field.value} open={showCountrySelect} onOpenChange={handleOpenCountrySelect}>
+                  <Select value={field.value ?? ''} open={showCountrySelect} onOpenChange={handleOpenCountrySelect}>
                     <SelectTrigger
                       className={cn(!field.value && 'text-muted-foreground')}
                       data-cy="organization-country-trigger"
@@ -286,7 +293,7 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
               >
                 {({ field }) => (
                   <Select
-                    value={field.value}
+                    value={field.value ?? ''}
                     open={showCurrencySelect}
                     onOpenChange={openCurrencySelect}
                     disabled={field.disabled}
@@ -340,7 +347,6 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
                 }
                 placeholder="e.g. Green Horizon Foundation, Inc."
                 autoComplete="organization"
-                autoFocus
               />
               <FormField
                 name="organization.name"

@@ -215,13 +215,6 @@ export function connectAccountCallback(CollectiveId, service, options: { redirec
   }).then(response => response.status === 200 || response.status === 302);
 }
 
-export function disconnectAccount(collectiveId, service) {
-  return fetch(`/api/connected-accounts/${service}/disconnect/${collectiveId}`, {
-    method: 'delete',
-    headers: addAuthTokenToHeader(),
-  }).then(checkResponseStatus);
-}
-
 /**
  * Returns the PayPal Connect public client ID from the platform backend.
  * Returns null if PayPal Connect is not configured

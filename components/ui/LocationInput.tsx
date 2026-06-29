@@ -185,6 +185,17 @@ export const UserLocationInput = ({
   useStructuredForFallback = false,
 }) => {
   const [useFallback, setUseFallback] = React.useState(false);
+  const locationRef = React.useRef(location);
+  locationRef.current = location;
+
+  const updateLocation = React.useCallback(
+    patch => {
+      const currentLocation = locationRef.current || DEFAULT_LOCATION;
+      onChange(typeof patch === 'function' ? patch(currentLocation) : patch);
+    },
+    [onChange],
+  );
+
   const forceLegacyFormat = Boolean(!location?.structured && location?.address);
   const hasCountry = Boolean(location?.country);
   return (
@@ -193,7 +204,9 @@ export const UserLocationInput = ({
         <Label className="leading-normal">Country</Label>
         <InputCountry
           value={location?.country}
-          onChange={country => onChange(pick({ ...(location || DEFAULT_LOCATION), country }, ['country']))}
+          onChange={country =>
+            updateLocation(currentLocation => pick({ ...currentLocation, country }, ['country', 'structured']))
+          }
         />
       </div>
       {hasCountry && !useFallback && !forceLegacyFormat ? (
@@ -208,7 +221,7 @@ export const UserLocationInput = ({
           prefix=""
           errors={errors?.structured}
           onCountryChange={structured =>
-            onChange(pick({ ...(location || DEFAULT_LOCATION), structured }, ['country', 'structured']))
+            updateLocation(currentLocation => pick({ ...currentLocation, structured }, ['country', 'structured']))
           }
         />
       ) : useFallback ? (
@@ -229,13 +242,10 @@ export const UserLocationInput = ({
             onChange={e => {
               const address = e.target.value;
               if (!useStructuredForFallback) {
-                onChange(pick({ ...(location || DEFAULT_LOCATION), address }, ['country', 'address']));
+                updateLocation(currentLocation => pick({ ...currentLocation, address }, ['country', 'address']));
               } else {
-                onChange(
-                  pick({ ...(location || DEFAULT_LOCATION), structured: { address1: address } }, [
-                    'country',
-                    'structured',
-                  ]),
+                updateLocation(currentLocation =>
+                  pick({ ...currentLocation, structured: { address1: address } }, ['country', 'structured']),
                 );
               }
             }}

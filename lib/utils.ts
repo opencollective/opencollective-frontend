@@ -103,22 +103,6 @@ export function parseToBoolean(value, defaultValue = false) {
   return defaultValue;
 }
 
-export function getQueryParams() {
-  const urlParams = {};
-  let match;
-  const pl = /\+/g, // Regex for replacing addition symbol with a space
-    search = /([^&=]+)=?([^&]*)/g,
-    decode = function (s) {
-      return decodeURIComponent(s.replace(pl, ' '));
-    },
-    query = window.location.search.substring(1);
-
-  while ((match = search.exec(query))) {
-    urlParams[decode(match[1])] = decode(match[2]);
-  }
-  return urlParams;
-}
-
 export function formatDate(
   date,
   options: Intl.DateTimeFormatOptions & { locale?: Intl.LocalesArgument } = { month: 'long', year: 'numeric' },
@@ -254,22 +238,6 @@ export const allSettled = promises => {
     }),
   );
 };
-
-/**
- * Returns flat object containing keys with values that are not empty objects.
- * Ex:
- *    flattenObjectDeep({ b: true, c: { d: {}, e: false }})
- *    // {b: true, e: false}
- *
- *    flattenObjectDeep({ c: { d: {} }})
- *    // {}
- */
-
-export const flattenObjectDeep = obj =>
-  Object.keys(obj).reduce(
-    (acc, k) => (typeof obj[k] === 'object' ? { ...acc, ...flattenObjectDeep(obj[k]) } : { ...acc, [k]: obj[k] }),
-    {},
-  );
 
 export const omitDeep = (obj, keys) =>
   Object.keys(omit(obj, keys)).reduce(

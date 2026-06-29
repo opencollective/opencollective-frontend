@@ -4,11 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { StructuredAddress } from '@/lib/address';
 import { withRequiredProviders } from '../test/providers';
 
-import I18nAddressFields, {
-  NewSimpleLocationFieldRenderer,
-  serializeAddress,
-  SimpleLocationFieldRenderer,
-} from './I18nAddressFields';
+import I18nAddressFields, { NewSimpleLocationFieldRenderer, SimpleLocationFieldRenderer } from './I18nAddressFields';
 
 // Define types locally for the test
 type Zone = { code: string; name: string };
@@ -111,6 +107,110 @@ describe('I18nAddressFields', () => {
 
       expect(mockGetAddressFormFields).toHaveBeenCalledWith('FR', expect.anything());
     });
+
+    it('preserves compatible structured values when country changes', () => {
+      const onCountryChange = jest.fn();
+      const structured: StructuredAddress = {
+        address1: '123 Main St',
+        city: 'San Francisco',
+        postalCode: '94102',
+        zone: 'CA',
+      };
+
+      mockGetAddressFormFields.mockReturnValue({
+        fields: [
+          { name: 'address1', label: 'Address', required: true },
+          { name: 'city', label: 'City', required: true },
+          { name: 'postalCode', label: 'Postal Code', required: true },
+        ],
+        optionalFields: [],
+      });
+
+      const { rerender } = render(
+        withRequiredProviders(
+          <I18nAddressFields
+            {...defaultProps}
+            selectedCountry="US"
+            value={structured}
+            onCountryChange={onCountryChange}
+          />,
+        ),
+      );
+
+      onCountryChange.mockClear();
+
+      // Simulate a parent that clears structured when the country changes (UserLocationInput bug).
+      rerender(
+        withRequiredProviders(
+          <I18nAddressFields
+            {...defaultProps}
+            selectedCountry="FR"
+            value={{}}
+            onCountryChange={onCountryChange}
+            Component={NewSimpleLocationFieldRenderer}
+          />,
+        ),
+      );
+
+      expect(onCountryChange).toHaveBeenCalledWith({
+        address1: '123 Main St',
+        city: 'San Francisco',
+        postalCode: '94102',
+      });
+
+      expect(document.getElementById('address1')).toHaveValue('123 Main St');
+      expect(document.getElementById('city')).toHaveValue('San Francisco');
+      expect(document.getElementById('postalCode')).toHaveValue('94102');
+    });
+
+    it('drops fields that are not supported by the new country', () => {
+      const onCountryChange = jest.fn();
+      const structured: StructuredAddress = {
+        address1: '123 Main St',
+        city: 'San Francisco',
+        postalCode: '94102',
+        zone: 'CA',
+      };
+
+      mockGetAddressFormFields.mockReturnValue({
+        fields: [
+          { name: 'address1', label: 'Address', required: true },
+          { name: 'city', label: 'City', required: true },
+          { name: 'postalCode', label: 'Postal Code', required: true },
+        ],
+        optionalFields: [],
+      });
+
+      const { rerender } = render(
+        withRequiredProviders(
+          <I18nAddressFields
+            {...defaultProps}
+            selectedCountry="US"
+            value={structured}
+            onCountryChange={onCountryChange}
+          />,
+        ),
+      );
+
+      onCountryChange.mockClear();
+
+      rerender(
+        withRequiredProviders(
+          <I18nAddressFields
+            {...defaultProps}
+            selectedCountry="DE"
+            value={structured}
+            onCountryChange={onCountryChange}
+          />,
+        ),
+      );
+
+      expect(onCountryChange).toHaveBeenCalledWith({
+        address1: '123 Main St',
+        city: 'San Francisco',
+        postalCode: '94102',
+      });
+    });
   });
 
   describe('callbacks', () => {
@@ -176,6 +276,19 @@ describe('I18nAddressFields', () => {
     });
   });
 
+  describe('zone field', () => {
+    it('stores subdivision codes when zone options are available', () => {
+      const onCountryChange = jest.fn();
+      render(
+        withRequiredProviders(
+          <I18nAddressFields {...defaultProps} onCountryChange={onCountryChange} value={{ zone: 'California' }} />,
+        ),
+      );
+
+      expect(onCountryChange).toHaveBeenCalledWith(expect.objectContaining({ zone: 'CA' }));
+    });
+  });
+
   describe('field errors', () => {
     it('displays field-specific errors', () => {
       const errors = {
@@ -192,38 +305,6 @@ describe('I18nAddressFields', () => {
       expect(screen.getByText('Address is required')).toBeInTheDocument();
       expect(screen.getByText('Invalid ZIP code')).toBeInTheDocument();
     });
-  });
-});
-
-describe('serializeAddress', () => {
-  it('serializes an address object to a sorted newline-separated string', () => {
-    const address = {
-      city: 'San Francisco',
-      address1: '123 Main St',
-      postalCode: '94102',
-    };
-
-    const result = serializeAddress(address);
-
-    // Keys are sorted alphabetically
-    expect(result).toBe('123 Main St\nSan Francisco\n94102');
-  });
-
-  it('handles empty address object', () => {
-    const result = serializeAddress({});
-    expect(result).toBe('');
-  });
-
-  it('handles undefined values', () => {
-    const address = {
-      address1: '123 Main St',
-      address2: undefined,
-      city: 'San Francisco',
-    };
-
-    const result = serializeAddress(address);
-    expect(result).toContain('123 Main St');
-    expect(result).toContain('San Francisco');
   });
 });
 
@@ -292,5 +373,18 @@ describe('NewSimpleLocationFieldRenderer', () => {
   it('does not show optional indicator for required fields', () => {
     render(withRequiredProviders(<NewSimpleLocationFieldRenderer {...defaultProps} required={true} />));
     expect(screen.queryByText(/optional/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps the input controlled when value is undefined', () => {
+    const { rerender } = render(
+      withRequiredProviders(<NewSimpleLocationFieldRenderer {...defaultProps} value="Paris" />),
+    );
+
+    const input = screen.getByRole('textbox');
+    expect(input).toHaveValue('Paris');
+
+    rerender(withRequiredProviders(<NewSimpleLocationFieldRenderer {...defaultProps} value={undefined} />));
+
+    expect(input).toHaveValue('');
   });
 });
