@@ -107,6 +107,110 @@ describe('I18nAddressFields', () => {
 
       expect(mockGetAddressFormFields).toHaveBeenCalledWith('FR', expect.anything());
     });
+
+    it('preserves compatible structured values when country changes', () => {
+      const onCountryChange = jest.fn();
+      const structured: StructuredAddress = {
+        address1: '123 Main St',
+        city: 'San Francisco',
+        postalCode: '94102',
+        zone: 'CA',
+      };
+
+      mockGetAddressFormFields.mockReturnValue({
+        fields: [
+          { name: 'address1', label: 'Address', required: true },
+          { name: 'city', label: 'City', required: true },
+          { name: 'postalCode', label: 'Postal Code', required: true },
+        ],
+        optionalFields: [],
+      });
+
+      const { rerender } = render(
+        withRequiredProviders(
+          <I18nAddressFields
+            {...defaultProps}
+            selectedCountry="US"
+            value={structured}
+            onCountryChange={onCountryChange}
+          />,
+        ),
+      );
+
+      onCountryChange.mockClear();
+
+      // Simulate a parent that clears structured when the country changes (UserLocationInput bug).
+      rerender(
+        withRequiredProviders(
+          <I18nAddressFields
+            {...defaultProps}
+            selectedCountry="FR"
+            value={{}}
+            onCountryChange={onCountryChange}
+            Component={NewSimpleLocationFieldRenderer}
+          />,
+        ),
+      );
+
+      expect(onCountryChange).toHaveBeenCalledWith({
+        address1: '123 Main St',
+        city: 'San Francisco',
+        postalCode: '94102',
+      });
+
+      expect(document.getElementById('address1')).toHaveValue('123 Main St');
+      expect(document.getElementById('city')).toHaveValue('San Francisco');
+      expect(document.getElementById('postalCode')).toHaveValue('94102');
+    });
+
+    it('drops fields that are not supported by the new country', () => {
+      const onCountryChange = jest.fn();
+      const structured: StructuredAddress = {
+        address1: '123 Main St',
+        city: 'San Francisco',
+        postalCode: '94102',
+        zone: 'CA',
+      };
+
+      mockGetAddressFormFields.mockReturnValue({
+        fields: [
+          { name: 'address1', label: 'Address', required: true },
+          { name: 'city', label: 'City', required: true },
+          { name: 'postalCode', label: 'Postal Code', required: true },
+        ],
+        optionalFields: [],
+      });
+
+      const { rerender } = render(
+        withRequiredProviders(
+          <I18nAddressFields
+            {...defaultProps}
+            selectedCountry="US"
+            value={structured}
+            onCountryChange={onCountryChange}
+          />,
+        ),
+      );
+
+      onCountryChange.mockClear();
+
+      rerender(
+        withRequiredProviders(
+          <I18nAddressFields
+            {...defaultProps}
+            selectedCountry="DE"
+            value={structured}
+            onCountryChange={onCountryChange}
+          />,
+        ),
+      );
+
+      expect(onCountryChange).toHaveBeenCalledWith({
+        address1: '123 Main St',
+        city: 'San Francisco',
+        postalCode: '94102',
+      });
+    });
   });
 
   describe('callbacks', () => {
@@ -269,5 +373,18 @@ describe('NewSimpleLocationFieldRenderer', () => {
   it('does not show optional indicator for required fields', () => {
     render(withRequiredProviders(<NewSimpleLocationFieldRenderer {...defaultProps} required={true} />));
     expect(screen.queryByText(/optional/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps the input controlled when value is undefined', () => {
+    const { rerender } = render(
+      withRequiredProviders(<NewSimpleLocationFieldRenderer {...defaultProps} value="Paris" />),
+    );
+
+    const input = screen.getByRole('textbox');
+    expect(input).toHaveValue('Paris');
+
+    rerender(withRequiredProviders(<NewSimpleLocationFieldRenderer {...defaultProps} value={undefined} />));
+
+    expect(input).toHaveValue('');
   });
 });
