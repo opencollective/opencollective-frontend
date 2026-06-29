@@ -14,6 +14,19 @@ const LANG_DIR = path.resolve(__dirname, '../../lang');
  * exact (full string equals English).
  */
 const IGNORED: Record<string, readonly string[]> = {
+  'pt-BR': [
+    'Amount', // "{amount} {currencyCode}" - formato idêntico
+    'Avatar', // "Avatar" - termo idêntico
+    'Collective.Hero.Host', // "{FiscalHost}: {hostName}" - componente traduz o rótulo
+    'company.blog', // "Blog" - identico
+    'contributions.id', // "#" - identico
+    'ContributeCard.BtnEvent', // "RSVP" - termo comum em eventos
+    'editCollective.menu.webhooks', // "Webhooks" - termo técnico
+    'Exports', // "Exports" - termo técnico comum
+    'Fields.id', // "ID" - identico
+    'Fields.slug', // "Slug" - termo técnico
+    'KYC', // "KYC" - acrônimo
+  ],
   fr: [
     'qMePPG',
     'LseLoM',
