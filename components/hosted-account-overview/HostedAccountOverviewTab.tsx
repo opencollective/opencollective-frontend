@@ -1,10 +1,10 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { ArrowRight } from 'lucide-react';
+import { isEmpty } from 'lodash-es';
+import { ArrowRight, Pencil } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { CollectiveType } from '@/lib/constants/collectives';
 import dayjs from '@/lib/dayjs';
 import { limit, offset } from '@/lib/filters/schemas';
 import type {
@@ -13,16 +13,13 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import { i18nExpenseType } from '@/lib/i18n/expense';
+import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
 
 import Avatar from '@/components/Avatar';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
-import {
-  AdminsCanSeePayoutMethodsSwitch,
-  ExpenseTypesPicker,
-  HostFeeStructurePicker,
-} from '@/components/dashboard/sections/collectives/CollectiveDetails';
 import { transactionsTableQuery } from '@/components/dashboard/sections/transactions/queries';
 import TransactionsTable, {
   type TransactionsTableProps,
@@ -34,8 +31,10 @@ import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
+import { EditCollectiveSettingsModal } from './EditCollectiveSettingsModal';
 import { buildKindActivity } from './financialActivity';
 import { HostedAccountContributionsPayoutsSection } from './HostedAccountContributionsPayoutsSection';
 import type { MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
@@ -200,11 +199,22 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
   const intl = useIntl();
   const [openExpenseId, setOpenExpenseId] = React.useState<number | null>(null);
   const [openContributionId, setOpenContributionId] = React.useState<number | null>(null);
+  const [isEditSettingsOpen, setEditSettingsOpen] = React.useState(false);
 
   const currency = account?.currency;
   const stats = account?.stats;
   const isChild = Boolean(account?.parent?.id);
   const isHosted = Boolean(account?.host?.id);
+
+  const hostFeePercent = account?.hostFeePercent ?? host?.hostFeePercent;
+  const hostFeeStructureLabel = account?.hostFeesStructure
+    ? formatHostFeeStructure(intl, account.hostFeesStructure)
+    : null;
+  const accountExpenseTypes: Record<string, boolean> = account?.settings?.expenseTypes ?? {};
+  const enabledExpenseTypes = Object.keys(accountExpenseTypes)
+    .filter(type => accountExpenseTypes[type])
+    .map(type => i18nExpenseType(intl, type));
+  const adminsCanSeePayoutMethods = Boolean(account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS);
 
   const recentContributionsFilter = useQueryFilter({ schema: recentTransactionsSchema, filters: {}, skipRouter: true });
   const recentPayoutsFilter = useQueryFilter({ schema: recentTransactionsSchema, filters: {}, skipRouter: true });
@@ -317,7 +327,19 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <DashboardContentCard title={<FormattedMessage defaultMessage="Details" id="Details" />}>
+        <DashboardContentCard
+          title={<FormattedMessage defaultMessage="Details" id="Details" />}
+          action={
+            <Button
+              variant="outline"
+              size="icon-xs"
+              aria-label={intl.formatMessage({ defaultMessage: 'Edit', id: 'Edit' })}
+              onClick={() => setEditSettingsOpen(true)}
+            >
+              <Pencil size={16} />
+            </Button>
+          }
+        >
           <DataList className="text-sm">
             <DataListItem
               label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
@@ -353,34 +375,40 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
               <React.Fragment>
                 <DataListItem
                   label={<FormattedMessage defaultMessage="Fee structure" id="FeeStructure" />}
-                  value={<HostFeeStructurePicker collective={account as any} host={host as any} />}
+                  value={
+                    <span className="text-foreground">
+                      {typeof hostFeePercent === 'number' ? `${hostFeePercent}%` : '—'}
+                      {hostFeeStructureLabel ? ` (${hostFeeStructureLabel})` : ''}
+                    </span>
+                  }
                 />
                 <DataListItem
                   label={<FormattedMessage defaultMessage="Expense Types" id="D+aS5Z" />}
-                  value={<ExpenseTypesPicker collective={account as any} host={host as any} />}
+                  value={
+                    <span className="text-foreground">
+                      {isEmpty(accountExpenseTypes) ? (
+                        <FormattedMessage defaultMessage="Use global settings" id="BXVJAo" />
+                      ) : enabledExpenseTypes.length ? (
+                        enabledExpenseTypes.join(', ')
+                      ) : (
+                        <FormattedMessage defaultMessage="Custom" id="Sjo1P4" />
+                      )}
+                    </span>
+                  }
                 />
               </React.Fragment>
             )}
             <DataListItem
-              label={<FormattedMessage defaultMessage="Show payout method details" id="3P4Al8" />}
+              label={<FormattedMessage defaultMessage="Payout Methods" id="1F/08O" />}
               value={
                 account?.policies ? (
-                  <div className="flex flex-col gap-1.5">
-                    <AdminsCanSeePayoutMethodsSwitch collective={account as any} />
-                    <p className="text-xs text-muted-foreground">
-                      {account?.type === CollectiveType.FUND ? (
-                        <FormattedMessage
-                          defaultMessage="Allow Fund Admins to view sensitive payout method details of payees"
-                          id="om2juz"
-                        />
-                      ) : (
-                        <FormattedMessage
-                          defaultMessage="Allow Collective Admins to view sensitive payout method details of payees"
-                          id="N+kkx3"
-                        />
-                      )}
-                    </p>
-                  </div>
+                  <span className="text-foreground">
+                    {adminsCanSeePayoutMethods ? (
+                      <FormattedMessage defaultMessage="Visible" id="/TlAIY" />
+                    ) : (
+                      <FormattedMessage defaultMessage="Hidden" id="ThUvIL" />
+                    )}
+                  </span>
                 ) : (
                   <span className="text-muted-foreground">—</span>
                 )
@@ -529,6 +557,13 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
           onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'PAYOUTS')}
         />
       </div>
+
+      <EditCollectiveSettingsModal
+        open={isEditSettingsOpen}
+        onOpenChange={setEditSettingsOpen}
+        account={account}
+        host={host}
+      />
 
       {openExpenseId && (
         <ExpenseDrawer openExpenseLegacyId={openExpenseId} handleClose={() => setOpenExpenseId(null)} />
