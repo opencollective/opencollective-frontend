@@ -5959,6 +5959,7 @@ enum ActivityType {
   EXPENSE_COMMENT_CREATED
   CONVERSATION_COMMENT_CREATED
   ORDER_COMMENT_CREATED
+  HOST_APPLICATION_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -6015,7 +6016,6 @@ enum ActivityType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   HOST_APPLICATION_CONTACT
-  HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
   CONTRIBUTION_REFUNDED
   CONTRIBUTOR_REMOVED_BY_HOST
@@ -21335,6 +21335,7 @@ enum ActivityAndClassesType {
   EXPENSE_COMMENT_CREATED
   CONVERSATION_COMMENT_CREATED
   ORDER_COMMENT_CREATED
+  HOST_APPLICATION_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -21391,7 +21392,6 @@ enum ActivityAndClassesType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   HOST_APPLICATION_CONTACT
-  HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
   CONTRIBUTION_REFUNDED
   CONTRIBUTOR_REMOVED_BY_HOST
@@ -25233,7 +25233,7 @@ type Mutation {
     Reference of the expense to process
     """
     expense: ExpenseReferenceInput!
-  ): PaymentIntent!
+  ): StripePaymentIntent!
 
   """
   Create a new export request. Scope: "account".
@@ -25849,7 +25849,16 @@ type Mutation {
   """
   Creates a Stripe payment intent
   """
+  createStripePaymentIntent(
+    stripePaymentIntent: StripePaymentIntentInput!
+    guestInfo: GuestInfoInput
+  ): StripePaymentIntent!
+
+  """
+  Creates a Stripe payment intent
+  """
   createPaymentIntent(paymentIntent: PaymentIntentInput!, guestInfo: GuestInfoInput): PaymentIntent!
+    @deprecated(reason: "2026-06-25: Use createStripePaymentIntent instead")
 
   """
   To submit a new order. Scope: "orders".
@@ -28253,7 +28262,7 @@ input ExpenseInviteeOrganizationInput {
 """
 A Stripe payment intent
 """
-type PaymentIntent {
+type StripePaymentIntent {
   id: String!
   paymentIntentClientSecret: String!
   stripeAccount: String!
@@ -28652,9 +28661,14 @@ input PaymentMethodInput {
   paypalInfo: PaypalPaymentInput
 
   """
+  The Stripe Payment Intent ID used in this checkout
+  """
+  stripePaymentIntentId: String
+
+  """
   The Payment Intent ID used in this checkout
   """
-  paymentIntentId: String
+  paymentIntentId: String @deprecated(reason: "2026-06-25: Use stripePaymentIntentId instead")
 
   """
   The Manual Payment Provider ID used in this checkout
@@ -28782,6 +28796,27 @@ enum ProcessOrderAction {
 
 """
 Input to create a Stripe payment intent
+"""
+input StripePaymentIntentInput {
+  amount: AmountInput!
+  fromAccount: AccountReferenceInput
+  toAccount: AccountReferenceInput!
+  frequency: ContributionFrequency
+}
+
+"""
+A Stripe payment intent (deprecated, use StripePaymentIntent)
+"""
+type PaymentIntent {
+  id: String! @deprecated(reason: "2026-06-25: Use StripePaymentIntent instead")
+  paymentIntentClientSecret: String!
+    @deprecated(reason: "2026-06-25: Use StripePaymentIntent instead")
+  stripeAccount: String! @deprecated(reason: "2026-06-25: Use StripePaymentIntent instead")
+  stripeAccountPublishableSecret: String! @deprecated(reason: "2026-06-25: Use StripePaymentIntent instead")
+}
+
+"""
+Input to create a Stripe payment intent (deprecated, use StripePaymentIntentInput)
 """
 input PaymentIntentInput {
   amount: AmountInput!

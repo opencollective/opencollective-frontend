@@ -29,7 +29,7 @@ export function PayWithStripeForm({
   defaultIsSaved,
   hasSaveCheckBox,
   bilingDetails,
-  paymentIntentId,
+  stripePaymentIntentId,
   paymentIntentClientSecret,
   onChange,
 }) {
@@ -45,7 +45,7 @@ export function PayWithStripeForm({
         stepPayment: {
           key: STRIPE_PAYMENT_ELEMENT_KEY,
           paymentMethod: {
-            paymentIntentId,
+            stripePaymentIntentId,
             service: PAYMENT_METHOD_SERVICE.STRIPE,
             type: PAYMENT_METHOD_TYPE.PAYMENT_INTENT,
             isSavedForLater: isReusableStripePaymentMethodType(event.value.type) && isSavePaymentMethod,

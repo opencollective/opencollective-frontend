@@ -11,9 +11,9 @@ import type {
 } from '../graphql/types/v2/graphql';
 import { loadScriptAsync } from '../utils';
 
-const createPaymentIntentMutation = gql`
-  mutation CreatePaymentIntent($paymentIntent: PaymentIntentInput!, $guestInfo: GuestInfoInput) {
-    paymentIntent: createPaymentIntent(paymentIntent: $paymentIntent, guestInfo: $guestInfo) {
+const createStripePaymentIntentMutation = gql`
+  mutation CreateStripePaymentIntent($stripePaymentIntent: StripePaymentIntentInput!, $guestInfo: GuestInfoInput) {
+    stripePaymentIntent: createStripePaymentIntent(stripePaymentIntent: $stripePaymentIntent, guestInfo: $guestInfo) {
       id
       paymentIntentClientSecret
       stripeAccount
@@ -24,7 +24,7 @@ const createPaymentIntentMutation = gql`
 
 const createExpenseStripePaymentIntentMutation = gql`
   mutation CreateExpenseStripePaymentIntent($expense: ExpenseReferenceInput!) {
-    paymentIntent: createExpenseStripePaymentIntent(expense: $expense) {
+    stripePaymentIntent: createExpenseStripePaymentIntent(expense: $expense) {
       id
       paymentIntentClientSecret
       stripeAccount
@@ -73,14 +73,14 @@ export default function usePaymentIntent({
       const abortController = (abort.current = new AbortController());
       try {
         const createPaymentIntentResp = await apolloClient.mutate({
-          mutation: expense ? createExpenseStripePaymentIntentMutation : createPaymentIntentMutation,
+          mutation: expense ? createExpenseStripePaymentIntentMutation : createStripePaymentIntentMutation,
           context: { fetchOptions: { signal: abort.current.signal } },
           variables: expense
             ? {
                 expense,
               }
             : {
-                paymentIntent: {
+                stripePaymentIntent: {
                   amount,
                   fromAccount,
                   toAccount,
@@ -98,7 +98,7 @@ export default function usePaymentIntent({
         }
 
         const { paymentIntentClientSecret, stripeAccountPublishableSecret, stripeAccount } =
-          createPaymentIntentResp.data?.paymentIntent ?? {};
+          createPaymentIntentResp.data?.stripePaymentIntent ?? {};
 
         const stripe = window.Stripe(stripeAccountPublishableSecret, stripeAccount ? { stripeAccount } : {});
         stripe['stripeAccount'] = stripeAccount;

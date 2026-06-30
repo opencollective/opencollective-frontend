@@ -203,7 +203,10 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       const keyToSelect = props.stepPayment?.key;
       const newOption = paymentMethodOptions.find(pm => !pm.disabled && (!keyToSelect || pm.key === keyToSelect));
       if (newOption) {
-        setNewPaymentMethod(newOption.key, { ...newOption.paymentMethod, paymentIntentId: paymentIntent?.id });
+        setNewPaymentMethod(newOption.key, {
+          ...newOption.paymentMethod,
+          stripePaymentIntentId: paymentIntent?.id,
+        });
       } else if (props.stepPayment) {
         props.onChange({ stepPayment: null }); // Make sure we unselect the option if it's not available
       }
@@ -258,7 +261,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       keyGetter="key"
       options={paymentMethodOptions}
       onChange={option =>
-        setNewPaymentMethod(option.key, { ...option.value.paymentMethod, paymentIntentId: paymentIntent?.id })
+        setNewPaymentMethod(option.key, { ...option.value.paymentMethod, stripePaymentIntentId: paymentIntent?.id })
       }
       value={props.stepPayment?.key || null}
       disabled={props.isSubmitting}
@@ -316,7 +319,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
                   name: props.stepProfile?.name,
                   email: LoggedInUser?.email ?? props?.stepProfile?.email,
                 }}
-                paymentIntentId={paymentIntent.id}
+                stripePaymentIntentId={paymentIntent.id}
                 paymentIntentClientSecret={paymentIntent.client_secret}
                 onChange={props.onChange}
                 defaultIsSaved={!props.stepProfile?.isGuest}
