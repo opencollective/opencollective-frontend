@@ -4167,7 +4167,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   ): ContributorCollection!
 
   """
-  [!] Warning: this query is currently in beta and the API might change
+  [!] Warning: this query is currently in beta and the API might change. Does not include private accounts.
   """
   activeContributors(
     """
@@ -4866,7 +4866,7 @@ interface AccountWithContributions {
   ): ContributorCollection!
 
   """
-  [!] Warning: this query is currently in beta and the API might change
+  [!] Warning: this query is currently in beta and the API might change. Does not include private accounts.
   """
   activeContributors(
     """
@@ -5947,6 +5947,7 @@ enum ActivityType {
   COLLECTIVE_CREATED
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
+  COLLECTIVE_ARCHIVED
   COLLECTIVE_UNHOSTED
   COLLECTIVE_BALANCE_TRANSFERRED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
@@ -5959,6 +5960,7 @@ enum ActivityType {
   EXPENSE_COMMENT_CREATED
   CONVERSATION_COMMENT_CREATED
   ORDER_COMMENT_CREATED
+  HOST_APPLICATION_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -6015,7 +6017,6 @@ enum ActivityType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   HOST_APPLICATION_CONTACT
-  HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
   CONTRIBUTION_REFUNDED
   CONTRIBUTOR_REMOVED_BY_HOST
@@ -12518,7 +12519,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   ): ContributorCollection!
 
   """
-  [!] Warning: this query is currently in beta and the API might change
+  [!] Warning: this query is currently in beta and the API might change. Does not include private accounts.
   """
   activeContributors(
     """
@@ -14187,7 +14188,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   ): ContributorCollection!
 
   """
-  [!] Warning: this query is currently in beta and the API might change
+  [!] Warning: this query is currently in beta and the API might change. Does not include private accounts.
   """
   activeContributors(
     """
@@ -16921,7 +16922,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   ): ContributorCollection!
 
   """
-  [!] Warning: this query is currently in beta and the API might change
+  [!] Warning: this query is currently in beta and the API might change. Does not include private accounts.
   """
   activeContributors(
     """
@@ -18432,7 +18433,7 @@ type Vendor implements Account & AccountWithContributions {
   ): ContributorCollection!
 
   """
-  [!] Warning: this query is currently in beta and the API might change
+  [!] Warning: this query is currently in beta and the API might change. Does not include private accounts.
   """
   activeContributors(
     """
@@ -21323,6 +21324,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_CREATED
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
+  COLLECTIVE_ARCHIVED
   COLLECTIVE_UNHOSTED
   COLLECTIVE_BALANCE_TRANSFERRED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
@@ -21335,6 +21337,7 @@ enum ActivityAndClassesType {
   EXPENSE_COMMENT_CREATED
   CONVERSATION_COMMENT_CREATED
   ORDER_COMMENT_CREATED
+  HOST_APPLICATION_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -21391,7 +21394,6 @@ enum ActivityAndClassesType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   HOST_APPLICATION_CONTACT
-  HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
   CONTRIBUTION_REFUNDED
   CONTRIBUTOR_REMOVED_BY_HOST
@@ -22849,7 +22851,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   ): ContributorCollection!
 
   """
-  [!] Warning: this query is currently in beta and the API might change
+  [!] Warning: this query is currently in beta and the API might change. Does not include private accounts.
   """
   activeContributors(
     """
@@ -24095,7 +24097,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   ): ContributorCollection!
 
   """
-  [!] Warning: this query is currently in beta and the API might change
+  [!] Warning: this query is currently in beta and the API might change. Does not include private accounts.
   """
   activeContributors(
     """
@@ -25233,10 +25235,10 @@ type Mutation {
     Reference of the expense to process
     """
     expense: ExpenseReferenceInput!
-  ): PaymentIntent!
+  ): StripePaymentIntent!
 
   """
-  Create a new export request. Scope: "account".
+  Create a new export request. Scopes: "exportRequests" (+ "transactions" for TRANSACTIONS exports, "host" for HOSTED_COLLECTIVES exports).
   """
   createExportRequest(
     """
@@ -25246,7 +25248,7 @@ type Mutation {
   ): ExportRequest!
 
   """
-  Edit an existing export request. Scope: "account".
+  Edit an existing export request. Scopes: "exportRequests".
   """
   editExportRequest(
     """
@@ -25261,7 +25263,7 @@ type Mutation {
   ): ExportRequest!
 
   """
-  Remove an existing export request. Scope: "account".
+  Remove an existing export request. Scope: "exportRequests".
   """
   removeExportRequest(
     """
@@ -25849,7 +25851,10 @@ type Mutation {
   """
   Creates a Stripe payment intent
   """
-  createPaymentIntent(paymentIntent: PaymentIntentInput!, guestInfo: GuestInfoInput): PaymentIntent!
+  createStripePaymentIntent(
+    stripePaymentIntent: StripePaymentIntentInput!
+    guestInfo: GuestInfoInput
+  ): StripePaymentIntent!
 
   """
   To submit a new order. Scope: "orders".
@@ -25875,6 +25880,12 @@ type Mutation {
     """
     message: String
   ): Account!
+
+  """
+  Creates a Stripe payment intent
+  """
+  createPaymentIntent(guestInfo: GuestInfoInput, paymentIntent: PaymentIntentInput!): PaymentIntent!
+    @deprecated(reason: "2026-06-25: Use createStripePaymentIntent instead")
 
   """
   Create an Organization. Scope: "account".
@@ -28253,10 +28264,25 @@ input ExpenseInviteeOrganizationInput {
 """
 A Stripe payment intent
 """
-type PaymentIntent {
+type StripePaymentIntent {
+  """
+  The ID of the Stripe payment intent
+  """
   id: String!
+
+  """
+  The client secret of the Stripe payment intent
+  """
   paymentIntentClientSecret: String!
+
+  """
+  The associated Stripe account ID
+  """
   stripeAccount: String!
+
+  """
+  The publishable secret of the associated Stripe account
+  """
   stripeAccountPublishableSecret: String!
 }
 
@@ -28652,9 +28678,14 @@ input PaymentMethodInput {
   paypalInfo: PaypalPaymentInput
 
   """
+  The Stripe Payment Intent ID used in this checkout
+  """
+  stripePaymentIntentId: String
+
+  """
   The Payment Intent ID used in this checkout
   """
-  paymentIntentId: String
+  paymentIntentId: String @deprecated(reason: "2026-06-25: Use stripePaymentIntentId instead")
 
   """
   The Manual Payment Provider ID used in this checkout
@@ -28783,10 +28814,25 @@ enum ProcessOrderAction {
 """
 Input to create a Stripe payment intent
 """
-input PaymentIntentInput {
+input StripePaymentIntentInput {
+  """
+  The amount to create a Stripe payment intent for
+  """
   amount: AmountInput!
+
+  """
+  The payer account
+  """
   fromAccount: AccountReferenceInput
+
+  """
+  The payee account
+  """
   toAccount: AccountReferenceInput!
+
+  """
+  The frequency of the contribution
+  """
   frequency: ContributionFrequency
 }
 
@@ -28938,6 +28984,56 @@ input PendingOrderEditInput {
   The accounting category of this order
   """
   accountingCategory: AccountingCategoryReferenceInput
+}
+
+"""
+A Stripe payment intent (deprecated, use StripePaymentIntent)
+"""
+type PaymentIntent {
+  """
+  The ID of the Stripe payment intent
+  """
+  id: String!
+
+  """
+  The client secret of the Stripe payment intent
+  """
+  paymentIntentClientSecret: String!
+
+  """
+  The associated Stripe account ID
+  """
+  stripeAccount: String!
+
+  """
+  The publishable secret of the associated Stripe account
+  """
+  stripeAccountPublishableSecret: String!
+}
+
+"""
+Input to create a Stripe payment intent (deprecated, use StripePaymentIntentInput)
+"""
+input PaymentIntentInput {
+  """
+  The amount to create a Stripe payment intent for
+  """
+  amount: AmountInput!
+
+  """
+  The payer account
+  """
+  fromAccount: AccountReferenceInput
+
+  """
+  The payee account
+  """
+  toAccount: AccountReferenceInput!
+
+  """
+  The frequency of the contribution
+  """
+  frequency: ContributionFrequency
 }
 
 input OrganizationCreateInput {
