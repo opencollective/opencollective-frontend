@@ -1,8 +1,5 @@
 import React from 'react';
-import SiOpencollective from '@icons-pack/react-simple-icons/icons/SiOpencollective';
-import SiPaypal from '@icons-pack/react-simple-icons/icons/SiPaypal';
-import SiStripe from '@icons-pack/react-simple-icons/icons/SiStripe';
-import SiWise from '@icons-pack/react-simple-icons/icons/SiWise';
+import { SiOpencollective, SiPaypal, SiStripe, SiWise } from '@icons-pack/react-simple-icons';
 import { clsx } from 'clsx';
 import { useIntl } from 'react-intl';
 

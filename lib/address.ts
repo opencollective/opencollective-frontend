@@ -4,8 +4,6 @@
  * without needing to register individual countries.
  */
 import type { getCountryFields as _typeGetCountryFields } from 'lib-address';
-import type { AddressInput, CountryData } from 'lib-address/dist/types';
-// @ts-expect-error - lib-address/lite types require moduleResolution: "bundler" but the import works at runtime
 import { getCountryData, getCountryFields } from 'lib-address/lite';
 import { startCase } from 'lodash-es';
 import { defineMessages, type IntlShape } from 'react-intl';
@@ -21,10 +19,13 @@ export type StructuredAddress = {
   zone?: string;
 };
 
+type CountryData = NonNullable<ReturnType<typeof getCountryData>>;
+type AddressInputField = 'addressLine1' | 'addressLine2' | 'city' | 'state' | 'zip';
+
 /**
  * Field mapping from Open Collective field names to lib-address field names
  */
-const FIELD_NAME_MAP: Record<keyof StructuredAddress, keyof AddressInput> = {
+const FIELD_NAME_MAP: Record<keyof StructuredAddress, AddressInputField> = {
   address1: 'addressLine1',
   address2: 'addressLine2',
   city: 'city',
