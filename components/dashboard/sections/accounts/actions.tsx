@@ -25,7 +25,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
     const isAllowedAddFunds =
       Boolean(account.permissions?.addFunds?.allowed) && 'parent' in account ? account.parent.isHost : account.isHost;
 
-    const dashboardBaseAccount = 'parent' in account ? account.parent : account;
+    const dashboardBaseAccount = 'parent' in account && account.parent ? account.parent : account;
 
     // The per-host platform-tips account is an internal billing account: money-movement and
     // contribution actions don't apply to it, so hide them.
