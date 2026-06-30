@@ -4,16 +4,23 @@ import { cn } from '@/lib/utils';
 
 export function DashboardContentCard({
   title,
+  action,
   className,
   children,
 }: {
   title?: React.ReactNode;
+  action?: React.ReactNode;
   className?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className={cn('flex flex-col gap-3 rounded-lg border p-4', className)}>
-      {title && <h2 className="tight text-lg font-bold text-slate-800">{title}</h2>}
+      {(title || action) && (
+        <div className="flex items-center justify-between gap-2">
+          {title && <h2 className="tight text-lg font-bold text-slate-800">{title}</h2>}
+          {action}
+        </div>
+      )}
       {children}
     </div>
   );
