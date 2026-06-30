@@ -202,7 +202,8 @@
     "test:jest": "cross-env NODE_ENV=test TZ=UTC jest components lib pages",
     "test:update": "npm run test:jest -- --updateSnapshot",
     "ts-unused-exports": "ts-unused-exports tsconfig.json --ignoreFiles=lib/graphql/types/",
-    "type:check": "tsc",
+    "type:check": "node_modules/typescript/bin/tsc --noEmit",
+    "type:check:7": "node_modules/typescript-7/bin/tsc --noEmit",
     "jest": "cross-env NODE_ENV=test TZ=UTC jest"
   },
   "devDependencies": {
@@ -222,6 +223,7 @@
     "@types/jest": "^30.0.0",
     "@types/jscodeshift": "^17.3.0",
     "@types/lodash-es": "^4.17.12",
+    "@types/node": "^24.0.0",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@types/styled-system": "^5.1.22",
@@ -283,7 +285,8 @@
     "tailwindcss-animate": "1.0.7",
     "ts-unused-exports": "^11.0.0",
     "tsx": "^4.22.4",
-    "typescript": "^5.8.3",
+    "typescript": "npm:@typescript/typescript6@^6.0.3",
+    "typescript-7": "npm:typescript@rc",
     "typescript-eslint": "^8.60.1",
     "url-loader": "^4.1.1",
     "webpack": "^5.91.0"
