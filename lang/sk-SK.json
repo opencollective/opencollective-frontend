@@ -1009,6 +1009,7 @@
   "CollectiveType.Event": "{count, plural, one {Podujatie} few {Podujatia} other {Podujatí}}",
   "CollectiveType.Fund": "{count, plural, one {Fond} few {Fondy} other {Fondov}}",
   "CollectiveType.Organization": "{count, plural, one {organizácia} few {organizácie} other {organizácií}}",
+  "CollectiveType.Platform": "{count, plural, one {Platform} other {Platforms}}",
   "CollectiveType.Project": "{count, plural, one {Projekt} few {Projekty} other {Projektov}}",
   "CollectiveType.User": "{count, plural, one {používateľ} few {používatelia} other {používateľov}}",
   "CollectiveType.Vendor": "{count, plural, one {Poskytovateľ} few {Poskytovatelia} many {Poskytovateľov} other {Poskytovateľov}}",

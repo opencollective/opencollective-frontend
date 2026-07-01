@@ -1009,6 +1009,7 @@
   "CollectiveType.Event": "{count, plural, one {אירוע} two {אירועים} many {אירועים} other {אירועים}}",
   "CollectiveType.Fund": "{count, plural,one {קופה}other {קופות}}",
   "CollectiveType.Organization": "{count, plural, one {ארגון} two {ארגונים} many {ארגונים} other {ארגונים}}",
+  "CollectiveType.Platform": "{count, plural, one {Platform} other {Platforms}}",
   "CollectiveType.Project": "{count, plural,one {פרויקט}other {פרויקטים}}",
   "CollectiveType.User": "{count, plural, one {משתמש/ת} two {משתמשים} many {משתמשים} other {משתמשים}}",
   "CollectiveType.Vendor": "{count, plural, one {Vendor} other {Vendors}}",
