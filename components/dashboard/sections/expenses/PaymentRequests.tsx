@@ -146,6 +146,8 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     refetch: refetchMetadata,
   } = useQuery(paymentRequestsMetadataQuery, {
     variables: { accountSlug },
+    // Revalidate on mount so counts aren't stale when navigating back to this page
+    fetchPolicy: 'cache-and-network',
   });
 
   const viewsWithCount: Views<FilterValues> = useMemo(
@@ -202,6 +204,8 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
       fetchGrantHistory: false,
       ...queryFilter.variables,
     },
+    // Revalidate on mount so newly submitted expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
 
   const refetchAfterExpenseChange = useCallback(
@@ -283,7 +287,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
         ) : (
           <React.Fragment>
             <ExpensesList
-              isLoading={loading || loadingMetaData}
+              isLoading={(loading && !data) || (loadingMetaData && !metadata)}
               collective={metadata?.account}
               host={metadata?.account?.host}
               expenses={data?.expenses?.nodes}

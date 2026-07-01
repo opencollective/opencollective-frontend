@@ -203,6 +203,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       hostSlug,
       hostContext: queryFilter.values.hostContext,
     },
+    fetchPolicy: 'cache-and-network',
   });
 
   const viewsWithCount: Views<FilterValues> = useMemo(
@@ -222,6 +223,8 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables,
+    // Revalidate on mount so newly submitted expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
 
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
@@ -317,7 +320,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       ) : (
         <React.Fragment>
           <ExpensesList
-            isLoading={loading}
+            isLoading={loading && !data}
             host={data?.host}
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}

@@ -81,6 +81,8 @@ export const HostTodoList = () => {
     variables: {
       hostSlug: account.slug,
     },
+    // Revalidate on mount so todo counts reflect recent actions (e.g. paid expenses)
+    fetchPolicy: 'cache-and-network',
   });
 
   const filteredTodoList = React.useMemo(
@@ -233,7 +235,7 @@ export const HostTodoList = () => {
       </CardHeader>
 
       <div className="divide-y border-t">
-        {loading ? (
+        {loading && !data ? (
           <div className="px-6 py-4">
             <Skeleton className="h-6 w-36" />
           </div>
@@ -313,6 +315,8 @@ export const AccountTodoList = () => {
   const { data } = useQuery(moneyManagingOrgTodoQuery, {
     variables: { slug: account?.slug },
     skip: !isOrgWithMoneyManagment,
+    // Revalidate on mount so todo counts reflect recent actions (e.g. paid expenses)
+    fetchPolicy: 'cache-and-network',
   });
 
   const pendingExpenseCount = account?.pendingExpenses?.totalCount || 0;

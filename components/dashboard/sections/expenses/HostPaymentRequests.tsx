@@ -346,6 +346,8 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
 
   const { data, error, loading, refetch } = useQuery(hostDashboardExpensesQuery, {
     variables,
+    // Revalidate on mount so newly submitted expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
 
   const { data: metaData, refetch: refetchMetadata } = useQuery(hostPaymentRequestsMetadataQuery, {
@@ -353,6 +355,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       hostSlug,
       hostContext: queryFilter.values.hostContext,
     },
+    fetchPolicy: 'cache-and-network',
   });
 
   const viewsWithCount: Views<FilterValues> = useMemo(
@@ -418,7 +421,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
             onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
             getRowId={row => String(row.legacyId)}
             queryFilter={queryFilter}
-            loading={loading}
+            loading={loading && !data}
             getActions={getExpenseActions}
             nbPlaceholders={queryFilter.values.limit}
           />
