@@ -6,6 +6,9 @@ const config: CodegenConfig = {
     namingConvention: {
       enumValues: 'keep', // Otherwise we end up with duplicate enum value, e.g. in PaymentMethodType where we have "creditcard" (deprecated) and "CREDITCARD"
     },
+    // Required when regenerating types with graphql-codegen v7 (typescript-operations v6)
+    enumType: 'native',
+    defaultScalarType: 'any',
   },
   generates: {
     './lib/graphql/types/v2/': {
