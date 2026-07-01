@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
-import { capitalize, isNil, omit } from 'lodash-es';
+import { capitalize, isNil, omit, set } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -11,21 +11,22 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getIntervalFromContributionFrequency } from '../../../lib/date-utils';
-import { i18nGraphqlException } from '../../../lib/errors';
+import { createError, ERROR, i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
 import { gql } from '../../../lib/graphql/helpers';
 import { useNavigationWarning } from '../../../lib/hooks/useNavigationWarning';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
+import { getTierPresets } from '../../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import InputAmount from '@/components/InputAmount';
 
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
-import InputFieldPresets from '../../InputFieldPresets';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledInput from '../../StyledInput';
+import StyledInputField from '../../StyledInputField';
 import StyledInputFormikField from '../../StyledInputFormikField';
 import StyledLink from '../../StyledLink';
 import StyledSelect from '../../StyledSelect';
@@ -37,10 +38,44 @@ import { Switch } from '../../ui/Switch';
 import { useToast } from '../../ui/useToast';
 
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
+import TierPresetsEditor, { getDefaultAmountForPresets } from './TierPresetsEditor';
 
 const { FUND, PROJECT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
+
+export const createTierPresets = (collective, minimumAmount = null) => {
+  return getTierPresets(
+    isNil(minimumAmount?.valueInCents) ? null : { minimumAmount },
+    collective.type,
+    collective.currency,
+  );
+};
+
+const createTierDefaultAmount = (collective, presets, minimumAmount = null) => ({
+  currency: collective.currency,
+  valueInCents: getDefaultAmountForPresets(presets, collective, minimumAmount),
+});
+
+export const applyMinimumAmountToFlexibleTierValues = ({
+  minimumAmount,
+  collective,
+}: {
+  minimumAmount: { valueInCents: number; currency?: string } | null;
+  collective: { type: string; currency: string };
+}): { presets: number[]; amount: { currency: string; valueInCents: number } } => {
+  if (isNil(minimumAmount?.valueInCents)) {
+    const presets = createTierPresets(collective);
+    return { presets, amount: createTierDefaultAmount(collective, presets) };
+  }
+
+  const presets = createTierPresets(collective, minimumAmount);
+
+  return {
+    presets,
+    amount: createTierDefaultAmount(collective, presets, minimumAmount),
+  };
+};
 
 /**
  * Returns tier type options for the type select. Filters by supportedTierTypes when provided.
@@ -109,7 +144,7 @@ const collectiveSupportsInterval = collective => {
   return collective.type !== CollectiveType.EVENT;
 };
 
-function FormFields({ collective, values, hideTypeSelect, supportedTierTypes }) {
+function FormFields({ collective, values, hideTypeSelect, supportedTierTypes, isEditing }) {
   const intl = useIntl();
   const tierTypeOptions = React.useMemo(
     () => getTierTypeOptions(intl, collective.type, supportedTierTypes),
@@ -144,6 +179,21 @@ function FormFields({ collective, values, hideTypeSelect, supportedTierTypes }) 
   const taxes = getApplicableTaxes(collective, collective.host, values.type);
 
   const formik = useFormikContext();
+  const { setFieldValue } = formik;
+
+  const handlePresetsChange = React.useCallback(
+    (presets: number[]) => {
+      setFieldValue('presets', presets);
+    },
+    [setFieldValue],
+  );
+
+  const handleDefaultAmountChange = React.useCallback(
+    (valueInCents: number) => {
+      setFieldValue('amount', { currency: collective.currency, valueInCents });
+    },
+    [setFieldValue, collective.currency],
+  );
 
   // Enforce certain rules when updating
   React.useEffect(() => {
@@ -296,56 +346,6 @@ function FormFields({ collective, values, hideTypeSelect, supportedTierTypes }) 
       )}
       {values.amountType === FLEXIBLE && (
         <StyledInputFormikField
-          name="presets"
-          label={intl.formatMessage({
-            id: 'tier.presets.label',
-            defaultMessage: 'Suggested amounts',
-          })}
-          labelFontWeight="bold"
-          mt="3"
-        >
-          {({ field, form }) => (
-            <InputFieldPresets
-              {...field}
-              currency={collective.currency}
-              min={values.minimumAmount?.valueInCents || 0}
-              defaultValue={field.value}
-              onChange={value => form.setFieldValue(field.name, value)}
-            />
-          )}
-        </StyledInputFormikField>
-      )}
-      {values.amountType === FLEXIBLE && (
-        <StyledInputFormikField
-          name="amount"
-          label={intl.formatMessage({ id: 'tier.defaultAmount.label', defaultMessage: 'Default amount' })}
-          labelFontWeight="bold"
-          mt="3"
-        >
-          {({ field, form }) => (
-            <InputAmount
-              id={field.id}
-              data-cy={field.name}
-              currency={field.value?.currency ?? collective.currency}
-              currencyDisplay="CODE"
-              error={field.error}
-              value={field.value?.valueInCents}
-              maxWidth="100%"
-              onChange={value =>
-                form.setFieldValue(
-                  field.name,
-                  !isNil(value) && !isNaN(value)
-                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
-                    : null,
-                )
-              }
-              onBlur={() => form.setFieldTouched(field.name, true)}
-            />
-          )}
-        </StyledInputFormikField>
-      )}
-      {values.amountType === FLEXIBLE && (
-        <StyledInputFormikField
           name="minimumAmount"
           label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' })}
           labelFontWeight="bold"
@@ -361,18 +361,67 @@ function FormFields({ collective, values, hideTypeSelect, supportedTierTypes }) 
               error={field.error}
               value={field.value?.valueInCents}
               maxWidth="100%"
-              onChange={value =>
-                form.setFieldValue(
-                  field.name,
+              onChange={value => {
+                const newMinimumAmount =
                   !isNil(value) && !isNaN(value)
                     ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
-                    : null,
-                )
-              }
-              onBlur={() => form.setFieldTouched(field.name, true)}
+                    : null;
+                form.setFieldValue(field.name, newMinimumAmount);
+
+                if (!isEditing && newMinimumAmount !== null) {
+                  const updates = applyMinimumAmountToFlexibleTierValues({
+                    minimumAmount: newMinimumAmount,
+                    collective,
+                  });
+                  form.setFieldValue('presets', updates.presets);
+                  form.setFieldValue('amount', updates.amount);
+                }
+              }}
+              onBlur={() => {
+                form.setFieldTouched(field.name, true);
+
+                if (!isEditing && isNil(form.values.minimumAmount?.valueInCents)) {
+                  const updates = applyMinimumAmountToFlexibleTierValues({
+                    minimumAmount: null,
+                    collective,
+                  });
+                  form.setFieldValue('presets', updates.presets);
+                  form.setFieldValue('amount', updates.amount);
+                }
+              }}
             />
           )}
         </StyledInputFormikField>
+      )}
+      {values.amountType === FLEXIBLE && (
+        <StyledInputField
+          htmlFor="tier-presets"
+          label={intl.formatMessage({
+            id: 'tier.presets.label',
+            defaultMessage: 'Suggested amounts',
+          })}
+          labelFontWeight="bold"
+          mt="3"
+        >
+          <div className="mb-3">
+            <FieldDescription>
+              {intl.formatMessage({
+                id: 'tier.presets.description',
+                defaultMessage:
+                  'Quick options for contributors. The default amount is pre-selected, but they can choose another or enter their own.',
+              })}
+            </FieldDescription>
+          </div>
+          <TierPresetsEditor
+            presets={values.presets || []}
+            defaultAmountInCents={values.amount?.valueInCents}
+            collective={collective}
+            minimumAmount={values.minimumAmount}
+            minAmountInCents={values.minimumAmount?.valueInCents || 0}
+            onPresetsChange={handlePresetsChange}
+            onDefaultAmountChange={handleDefaultAmountChange}
+          />
+        </StyledInputField>
       )}
       {([TICKET, PRODUCT, MEMBERSHIP].includes(values.type) ||
         (values.type === TIER && ![FUND, PROJECT].includes(collective.type))) && (
@@ -801,6 +850,49 @@ const getRequiredFields = values => {
   return fields;
 };
 
+type TierFormErrors = {
+  minimumAmount?: unknown;
+  presets?: unknown[];
+  [field: string]: unknown;
+};
+
+export const validateTierFormValues = (values, intl): TierFormErrors => {
+  const requiredFields = getRequiredFields(values).filter(
+    field => !(values.amountType === FLEXIBLE && field === 'minimumAmount'),
+  );
+  const errors: TierFormErrors = requireFields(values, requiredFields);
+
+  if (values.amountType === FLEXIBLE && isNil(values.minimumAmount?.valueInCents)) {
+    set(errors, 'minimumAmount', createError(ERROR.FORM_FIELD_REQUIRED));
+  }
+
+  if (values.amountType === FLEXIBLE && !isNil(values.minimumAmount?.valueInCents) && values.presets?.length) {
+    const minimumAmount = values.minimumAmount.valueInCents;
+    const invalidPresetIndices: number[] = [];
+    values.presets.forEach((preset, index) => {
+      if (!isNil(preset) && preset < minimumAmount) {
+        invalidPresetIndices.push(index);
+      }
+    });
+
+    if (invalidPresetIndices.length) {
+      const presetError = createError(ERROR.FORM_FIELD_MIN, {
+        message: intl.formatMessage({
+          id: 'tier.presets.belowMinimum',
+          defaultMessage: 'Suggested amount must be at least the minimum amount',
+        }),
+        hasI18nMessage: true,
+      });
+
+      invalidPresetIndices.forEach(index => {
+        set(errors, `presets.${index}`, presetError);
+      });
+    }
+  }
+
+  return errors;
+};
+
 function EditTierFormInner({
   formik,
   tier,
@@ -840,6 +932,7 @@ function EditTierFormInner({
               values={values}
               hideTypeSelect={Boolean(forcedType)}
               supportedTierTypes={supportedTierTypes}
+              isEditing={Boolean(tier?.id)}
             />
           </EditSectionContainer>
           <PreviewSectionContainer>
@@ -906,9 +999,11 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setForm
         goal: omit(tier.goal, '__typename'),
         minimumAmount: omit(tier.minimumAmount, '__typename'),
         description: tier.description || '',
-        presets: tier.presets || [1000],
+        presets: tier.presets?.length ? tier.presets : createTierPresets(collective, tier.minimumAmount),
       };
     } else {
+      const presets = createTierPresets(collective);
+
       return {
         name: '',
         type: forcedType || TierTypes.TIER,
@@ -917,7 +1012,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setForm
         minimumAmount: null,
         interval: collectiveSupportsInterval(collective) ? INTERVALS.month : null,
         description: '',
-        presets: [1000],
+        presets,
         maxQuantity: null,
         singleTicket: false,
         goal: null,
@@ -987,7 +1082,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setForm
     <React.Fragment>
       <Formik
         initialValues={initialValues}
-        validate={values => requireFields(values, getRequiredFields(values))}
+        validate={values => validateTierFormValues(values, intl)}
         onSubmit={async values => {
           const tier = {
             ...omit(values, ['interval', 'legacyId', 'slug']),

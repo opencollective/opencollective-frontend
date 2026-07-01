@@ -92,7 +92,6 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy=name]').type('Flexible Paying Ticket');
     cy.get('[data-cy=amountType]').click();
     cy.contains('[data-cy=select-option]', 'Flexible').click();
-    cy.get('input[data-cy=amount]').type('10');
     cy.get('input[data-cy=minimumAmount]').type('5');
     cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ variant: 'success', message: 'Ticket created.' });

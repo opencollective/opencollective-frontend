@@ -134,8 +134,7 @@ describe('edit collective', () => {
     cy.get('[data-cy=description]').type('!');
     cy.get('[data-cy=amountType]').click();
     cy.contains('[data-cy=select-option]', 'Flexible').click();
-    cy.get('[data-testid=currency1-input-amount]').type('{selectall}25');
-    cy.get('[data-testid=currency2-input-amount]').type('{selectall}50');
+    cy.get('input[data-cy=minimumAmount]').type('{selectall}0');
     cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ variant: 'success', message: 'Tier updated.' });
     cy.getByDataCy('contribute-card-tier')
@@ -143,7 +142,7 @@ describe('edit collective', () => {
       .should('contain', 'Potatoes')
       .should('contain', 'LIMITED: 100 LEFT OUT OF 100') // FIXME Quantity is missing, see https://github.com/opencollective/opencollective/issues/6332
       .should('contain', 'Made with love!')
-      .should('not.contain', '$25 USD'); // No amount displayed since there's no default nor minimum amounts set
+      .should('not.contain', '$25 USD'); // Flexible tier with $0 minimum does not display a fixed amount
 
     // TODO: Check profile page (need https://github.com/opencollective/opencollective/issues/6331)
 
