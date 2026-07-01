@@ -7,7 +7,7 @@ describe('Stripe Settlement Expense', () => {
   });
 
   beforeEach(() => {
-    cy.intercept('GET', 'https://js.stripe.com/v3/', req => {
+    cy.intercept('GET', 'https://js.stripe.com/dahlia/stripe.js', req => {
       req.continue(res => {
         res.body = res.body.replaceAll('window.top.location.href', 'window.location.href');
       });
