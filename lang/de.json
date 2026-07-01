@@ -1009,6 +1009,7 @@
   "CollectiveType.Event": "{count, plural, one {1 Stummschaltung} other {# Stummschaltungen}}",
   "CollectiveType.Fund": "{count, plural, one {Mittel} other {Mittel}}",
   "CollectiveType.Organization": "{count, plural, one {Organisation} other {Organisationen}}",
+  "CollectiveType.Platform": "{count, plural, one {Platform} other {Platforms}}",
   "CollectiveType.Project": "{count, plural, one {Projekt} other {Projekte}}",
   "CollectiveType.User": "{count, plural, one {Benutzer} other {Benutzer}}",
   "CollectiveType.Vendor": "{count, plural, one {Lieferant} other {Lieferant}}",

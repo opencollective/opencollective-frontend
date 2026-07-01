@@ -24,7 +24,7 @@ const TypesI18n = defineMessages({
     defaultMessage: 'Project',
   },
   [CollectiveType.PLATFORM]: {
-    id: 'AccountType.Platform',
+    id: 'platform',
     defaultMessage: 'Platform',
   },
 });

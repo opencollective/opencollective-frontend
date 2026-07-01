@@ -1009,6 +1009,7 @@
   "CollectiveType.Event": "{count, plural, one {Заходи} other {Заходи}}",
   "CollectiveType.Fund": "{count, plural, one {Fund} other {Funds}}",
   "CollectiveType.Organization": "{count, plural, one {Організація} few {Організації} other {Організацій}}",
+  "CollectiveType.Platform": "{count, plural, one {Platform} other {Platforms}}",
   "CollectiveType.Project": "{count, plural, one {Проєкт} few {Проєкти} many {Проєктів} other {Проєкта}}",
   "CollectiveType.User": "{count, plural, one {Користувач} few {Користувачі} other {Користувачів}}",
   "CollectiveType.Vendor": "{count, plural, one {Vendor} other {Vendors}}",

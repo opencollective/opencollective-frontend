@@ -1009,6 +1009,7 @@
   "CollectiveType.Event": "{count, plural, one {活动} other {活动}}",
   "CollectiveType.Fund": "{count, plural, one {基金} other {基金}}",
   "CollectiveType.Organization": "{count, plural, one {组织} other {组织}}",
+  "CollectiveType.Platform": "{count, plural, one {Platform} other {Platforms}}",
   "CollectiveType.Project": "{count, plural, one {计划} other {计划}}",
   "CollectiveType.User": "{count, plural, one{用户} other {用户}}",
   "CollectiveType.Vendor": "{count, plural, one {Vendor} other {Vendors}}",

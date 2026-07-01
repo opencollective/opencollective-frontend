@@ -1009,6 +1009,7 @@
   "CollectiveType.Event": "{count, plural, one {Evenement} other {Evenementen}}",
   "CollectiveType.Fund": "{count, plural, one {Fund} other {Funds}}",
   "CollectiveType.Organization": "{count, plural, one {Organisatie} other {Organisaties}}",
+  "CollectiveType.Platform": "{count, plural, one {Platform} other {Platforms}}",
   "CollectiveType.Project": "{count, plural, one {Project} other {Projecten}}",
   "CollectiveType.User": "{count, plural, one {Gebruiker} other {Gebruikers}}",
   "CollectiveType.Vendor": "{count, plural, one {Vendor} other {Vendors}}",
