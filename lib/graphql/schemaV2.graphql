@@ -26397,7 +26397,7 @@ type Mutation {
     Reference of the expense to process
     """
     expense: ExpenseReferenceInput!
-  ): PaymentIntent!
+  ): StripePaymentIntent!
 
   """
   Create a new export request. Scopes: "exportRequests" (+ "transactions" for TRANSACTIONS exports, "host" for HOSTED_COLLECTIVES exports).
@@ -27013,7 +27013,10 @@ type Mutation {
   """
   Creates a Stripe payment intent
   """
-  createPaymentIntent(paymentIntent: PaymentIntentInput!, guestInfo: GuestInfoInput): PaymentIntent!
+  createStripePaymentIntent(
+    stripePaymentIntent: StripePaymentIntentInput!
+    guestInfo: GuestInfoInput
+  ): StripePaymentIntent!
 
   """
   To submit a new order. Scope: "orders".
@@ -29417,10 +29420,25 @@ input ExpenseInviteeOrganizationInput {
 """
 A Stripe payment intent
 """
-type PaymentIntent {
+type StripePaymentIntent {
+  """
+  The ID of the Stripe payment intent
+  """
   id: String!
+
+  """
+  The client secret of the Stripe payment intent
+  """
   paymentIntentClientSecret: String!
+
+  """
+  The associated Stripe account ID
+  """
   stripeAccount: String!
+
+  """
+  The publishable secret of the associated Stripe account
+  """
   stripeAccountPublishableSecret: String!
 }
 
@@ -29816,9 +29834,9 @@ input PaymentMethodInput {
   paypalInfo: PaypalPaymentInput
 
   """
-  The Payment Intent ID used in this checkout
+  The Stripe Payment Intent ID used in this checkout
   """
-  paymentIntentId: String
+  stripePaymentIntentId: String
 
   """
   The Manual Payment Provider ID used in this checkout
@@ -29947,10 +29965,25 @@ enum ProcessOrderAction {
 """
 Input to create a Stripe payment intent
 """
-input PaymentIntentInput {
+input StripePaymentIntentInput {
+  """
+  The amount to create a Stripe payment intent for
+  """
   amount: AmountInput!
+
+  """
+  The payer account
+  """
   fromAccount: AccountReferenceInput
+
+  """
+  The payee account
+  """
   toAccount: AccountReferenceInput!
+
+  """
+  The frequency of the contribution
+  """
   frequency: ContributionFrequency
 }
 
