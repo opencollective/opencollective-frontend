@@ -16,6 +16,7 @@ import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { sortSelectOptions } from '@/lib/utils';
 
+import { AccountNameWithLegalName } from '@/components/AccountNameWithLegalName';
 import { IndividualKYCStatus } from '@/components/kyc/IndividualKYCStatus';
 
 import Avatar from '../../../Avatar';
@@ -81,13 +82,10 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     },
     cell: ({ row }) => {
       const account = row.original;
-      const legalName = account.legalName !== account.name && account.legalName;
       return (
         <div className="flex items-center overflow-hidden text-nowrap">
           <Avatar size={24} collective={account} mr={2} />
-          <span className="truncate">{account.name || account.slug}</span>
-
-          {legalName && <span className="ml-1 truncate text-muted-foreground">{`(${legalName})`}</span>}
+          <AccountNameWithLegalName account={account} />
         </div>
       );
     },
