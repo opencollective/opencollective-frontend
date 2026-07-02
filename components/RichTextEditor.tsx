@@ -378,12 +378,37 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     ];
 
     // Monkey patch for configuring HTML sanitization on attachment HTML. See https://github.com/basecamp/trix/issues/1178
+    // Trix strips attributes in sanitizeElement() before DOMPurify runs, using allowedAttributes (default:
+    // style, href, src, width, height, language, class). DOMPurify ADD_ATTR alone is not enough.
     const originalSetHTML = this.Trix.HTMLSanitizer.setHTML;
     const originalDomPurifyConfig = this.Trix.config.dompurify;
     const htmlSanitizer = this.Trix.HTMLSanitizer;
+    const iframeAllowedAttributes = [
+      'dir', // For RTL languages
+      'language',
+      'data-trix-content-type',
+      'data-trix-attachment',
+      // Images
+      'alt',
+      'title',
+      // Links
+      'href',
+      'name',
+      'target',
+      // Iframes
+      'src',
+      'allowfullscreen',
+      'frameborder',
+      'referrerpolicy',
+      'autoplay',
+      'width',
+      'height',
+    ];
+
     this.Trix.HTMLSanitizer.setHTML = function (element, html, options) {
       options = options || {};
       options.forbiddenElements = ['script', 'form', 'noscript']; // explicitly omitting iframe
+      options.allowedAttributes = iframeAllowedAttributes;
       options.purifyOptions = originalDomPurifyConfig;
       originalSetHTML.apply(htmlSanitizer, [element, html, options]);
     };

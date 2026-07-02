@@ -157,5 +157,28 @@ describe('RichTextEditor', () => {
       const Trix = require('trix').default; // eslint-disable-line @typescript-eslint/no-require-imports
       expect(Trix.config.dompurify.ADD_ATTR).toContain('referrerpolicy');
     });
+
+    it('passes iframe attributes through Trix allowedAttributes whitelist', () => {
+      const { ref } = renderEditor();
+      const originalSetHTML = jest.fn();
+      const Trix = require('trix').default; // eslint-disable-line @typescript-eslint/no-require-imports
+      Trix.HTMLSanitizer.setHTML = originalSetHTML;
+
+      ref.current.trixBeforeInitialize();
+
+      Trix.HTMLSanitizer.setHTML(
+        document.createElement('div'),
+        '<iframe referrerpolicy="strict-origin-when-cross-origin"/>',
+      );
+
+      expect(originalSetHTML).toHaveBeenCalledWith(
+        expect.any(HTMLDivElement),
+        '<iframe referrerpolicy="strict-origin-when-cross-origin"/>',
+        expect.objectContaining({
+          allowedAttributes: expect.arrayContaining(['referrerpolicy', 'allowfullscreen', 'frameborder']),
+          forbiddenElements: ['script', 'form', 'noscript'],
+        }),
+      );
+    });
   });
 });
