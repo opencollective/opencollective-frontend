@@ -2831,6 +2831,267 @@ type Organization implements CollectiveInterface {
 }
 
 """
+This represents a Platform account (e.g. a per-host platform-tips account)
+"""
+type Platform implements CollectiveInterface {
+  id: Int
+  idV2: String
+  parentCollective: CollectiveInterface
+  children: [CollectiveInterface]!
+  type: String
+  isActive: Boolean
+  hasHosting: Boolean!
+  name: String
+  legalName: String
+  company: String
+  description: String
+  longDescription: String
+  expensePolicy: String
+  tags: [String]
+
+  """
+  Name, address, lat, long of the location.
+  """
+  location: LocationType
+  createdAt: DateString
+  startsAt: DateString
+  endsAt: DateString
+  timezone: String
+  hostFeePercent: Float
+  platformFeePercent: Float
+  currency: String
+  image: String
+  imageUrl(height: Int): String
+  backgroundImage: String
+  backgroundImageUrl(height: Int): String
+  settings: JSON!
+  data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
+
+  """
+  Private instructions related to an event
+  """
+  privateInstructions: String
+  slug: String
+  path: String
+
+  """
+  Returns whether this collective can host other collectives (ie. has a Stripe Account connected)
+  """
+  isHost: Boolean
+
+  """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
+
+  """
+  Returns whether this host accepts applications for new collectives
+  """
+  canApply: Boolean
+
+  """
+  Returns whether this collectives can be contacted
+  """
+  canContact: Boolean!
+
+  """
+  Returns whether this collective is incognito
+  """
+  isIncognito: Boolean
+
+  """
+  Returns whether this collective is private
+  """
+  isPrivate: Boolean!
+
+  """
+  Returns whether this collective is a guest profile
+  """
+  isGuest: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
+  Returns whether this collective is archived
+  """
+  isArchived: Boolean
+
+  """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
+
+  """
+  Returns whether this collective is deletable
+  """
+  isDeletable: Boolean
+
+  """
+  Get the host collective that is receiving the money on behalf of this collective
+  """
+  host: CollectiveInterface
+
+  """
+  A host might have a collective attached to it
+  """
+  hostCollective: CollectiveInterface
+
+  """
+  Get all the members of this collective (admins, members, backers, followers)
+  """
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    type: String
+    role: String
+    TierId: Int
+    tierSlug: String
+    roles: [String]
+  ): [Member]
+
+  """
+  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  """
+  memberOf(
+    limit: Int
+    offset: Int
+
+    """
+    Type of collective (COLLECTIVE, EVENT, ORGANIZATION)
+    """
+    type: String
+    role: String
+    roles: [String]
+
+    """
+    Only return memberships for active collectives (that have been approved by the host)
+    """
+    onlyActiveCollectives: Boolean = false
+
+    """
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): [Member]
+
+  """
+  All the persons and entities that contribute to this organization
+  """
+  contributors(limit: Int = 1000, roles: [ContributorRole]): [Contributor]
+  notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  tiers(
+    id: Int
+    slug: String
+    slugs: [String]
+
+    """
+    When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
+    """
+    onlyValid: Boolean = true
+  ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
+  orders(status: OrderStatus): [OrderType]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [String!]!
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+
+  """
+  The URL of the repository
+  """
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
+  events(
+    limit: Int
+    offset: Int
+
+    """
+    Include past events
+    """
+    includePastEvents: Boolean = false
+
+    """
+    Include inactive events
+    """
+    includeInactive: Boolean = false
+  ): [Event]
+  projects(limit: Int, offset: Int): [Project]
+  paymentMethods(
+    service: String
+    limit: Int
+    hasBalanceAboveZero: Boolean
+    isConfirmed: Boolean = true
+    type: [String]
+
+    """
+    Defines if the host "collective" payment method should be returned
+    """
+    includeHostCollectivePaymentMethod: Boolean = false
+  ): [PaymentMethodType]
+
+  """
+  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
+  """
+  giftCardsBatches: [PaymentMethodBatchInfo]
+
+  """
+  Get the gift cards created by this collective. RemoteUser must be a collective admin.
+  """
+  createdGiftCards(
+    limit: Int
+    offset: Int
+    batch: String
+
+    """
+    Whether the gift card has been claimed or not
+    """
+    isConfirmed: Boolean
+  ): PaginatedPaymentMethod
+  connectedAccounts: [ConnectedAccountType]
+
+  """
+  Describes the features enabled and available for this collective
+  """
+  features: CollectiveFeatures!
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
+  contributionPolicy: String
+  categories: [String]!
+  policies: Policies!
+}
+
+"""
 This represents a Project
 """
 type Project implements CollectiveInterface {
