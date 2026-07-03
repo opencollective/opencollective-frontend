@@ -10,7 +10,7 @@ import type { Account, UpdatesDashboardQueryVariables } from '../../../../lib/gr
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { FEATURES } from '@/lib/allowed-features';
-import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/schema';
+import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/graphql';
 
 import NotFound from '@/components/NotFound';
 

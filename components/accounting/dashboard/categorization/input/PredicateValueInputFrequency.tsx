@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { TierFrequency } from '@/lib/graphql/types/v2/schema';
+import { TierFrequency } from '@/lib/graphql/types/v2/graphql';
 import { i18nFrequency } from '@/lib/i18n/order';
 
 import { Op } from '../rules';

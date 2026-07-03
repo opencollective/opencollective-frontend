@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TierType } from '@/lib/graphql/types/v2/schema';
+import { TierType } from '@/lib/graphql/types/v2/graphql';
 
 import { Op } from '../rules';
 
