@@ -108,6 +108,45 @@ const IGNORED: Record<string, readonly string[]> = {
     'sV2v5L', // "Instructions" - identique
     'tZEZGT', // "{n, plural, one {1 contribution} other {{n} contributions}}" - identique
   ],
+  es: [
+    '7oFrM6', // "Legal" - mismo término en español
+    'Amount', // "{amount} {currencyCode}" - formato idéntico
+    'Avatar', // "Avatar" - término idéntico
+    'c35gM5', // "Roles" - idéntico en español
+    'Collective.Hero.Host', // "{FiscalHost}: {hostName}" - formato con componentes
+    'company.blog', // "Blog" - préstamo común
+    'contributions.id', // "#" - idéntico
+    'editCollective.menu.webhooks', // "Webhooks" - término técnico
+    'Error', // "Error" - idéntico
+    'Fields.id', // "ID" - idéntico
+    'Fields.slug', // "Slug" - término técnico
+    'jgOqxt', // "Widgets" - préstamo técnico común
+    'KYC', // "KYC" - acrónimo
+    'L8seEc', // "Subtotal" - idéntico
+    'MJ2jZQ', // "Total" - idéntico
+    'NewContributionFlow.CollectiveAndTier', // "{collective} - {tier}" - formato idéntico
+    'oUWADl', // "No" - idéntico
+    'PaymentMethod.Manual', // "Manual" - término usado en la UI
+    'paymentMethods.labelCreditCard', // "{name} {expiration}" - formato idéntico
+    'Payout.Manual', // "Manual" - término usado en la UI
+    'PayoutMethod.New.Alias', // "Alias" - idéntico
+    'Q0lxqm', // "CVV/CVC" - idéntico
+    'ReferenceValue', // "Ref: {reference}" - abreviatura idéntica
+    'settings.general', // "General" - idéntico
+    'Stripe.PaymentMethod.Label.bancontact', // "Bancontact" - marca
+    'Stripe.PaymentMethod.Label.link', // "Link" - marca
+    'Stripe.PaymentMethod.Label.swish', // "Swish" - marca
+    'tier.interval.flexible', // "Flexible" - idéntico
+    'tier.Pro.title', // "Pro" - idéntico
+    'Timezone.Local', // "Local" - idéntico
+    'Timezone.UTC', // "UTC" - idéntico
+    'total', // "total" - idéntico
+    'VirtualCards.CVV', // "CVV" - idéntico
+    'webhook.index', // "Webhook #{index}" - término técnico
+    'webhooks.url.label', // "URL" - idéntico
+    'withColon', // "{item}:" - formato idéntico
+    'WWhVAU', // "Subtotal:" - idéntico
+  ],
 };
 
 function loadJson(filePath: string): Record<string, string> {
