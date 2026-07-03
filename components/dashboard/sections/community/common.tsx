@@ -25,8 +25,7 @@ import type {
   PeopleHostDashboardQuery,
   VendorFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
-import { AccountType } from '@/lib/graphql/types/v2/graphql';
-import { KycProvider } from '@/lib/graphql/types/v2/schema';
+import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
