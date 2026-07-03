@@ -252,6 +252,12 @@ const validate = values => {
 };
 
 const getCanCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount) => {
+  // Platform settlements / billing are paid to the platform: the host always covers the fees, the
+  // payee (platform) never does. So don't allow customizing the fees payer for these.
+  if (['SETTLEMENT', 'PLATFORM_BILLING'].includes(expense.type)) {
+    return false;
+  }
+
   const supportedPayoutMethods = [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.OTHER];
   const isSupportedPayoutMethod = supportedPayoutMethods.includes(expense.payoutMethod?.type);
   const isSameCurrency = expense.currency === collective?.currency;
