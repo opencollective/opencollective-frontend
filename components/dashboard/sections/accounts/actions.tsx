@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import type { DashboardAccountsQueryFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountType } from '../../../../lib/graphql/types/v2/graphql';
 import { FEATURES } from '@/lib/allowed-features';
 import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
 
@@ -29,7 +30,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
 
     // The per-host platform-tips account is an internal billing account: money-movement and
     // contribution actions don't apply to it, so hide them.
-    const isPlatformAccount = (account.type as string) === 'PLATFORM';
+    const isPlatformAccount = account.type === AccountType.PLATFORM;
 
     return {
       primary: [
