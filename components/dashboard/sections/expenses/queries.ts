@@ -400,6 +400,7 @@ export const issuedPaymentRequestsMetadataQuery = gql`
     $hostContext: HostContext
     $fromAccount: AccountReferenceInput
     $includeChildrenExpenses: Boolean
+    $unrepliedStatuses: [ExpenseStatusFilter]
   ) {
     all: expenses(
       hostContext: $hostContext
@@ -424,6 +425,16 @@ export const issuedPaymentRequestsMetadataQuery = gql`
       includeChildrenExpenses: $includeChildrenExpenses
       fromHost: $fromHost
       status: [PAID]
+    ) {
+      totalCount
+    }
+    unreplied: expenses(
+      hostContext: $hostContext
+      fromAccount: $fromAccount
+      includeChildrenExpenses: $includeChildrenExpenses
+      fromHost: $fromHost
+      status: $unrepliedStatuses
+      lastCommentBy: [NON_FROM_ACCOUNT_ADMIN]
     ) {
       totalCount
     }
