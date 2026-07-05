@@ -6,108 +6,48 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const setTranslation = path.join(__dirname, 'set-translation.ts');
 
 const translations: Array<[string, string]> = [
+  ['uYdPRG', '{expenseType} de {payeeName} para {accountName}'],
+  ['UZEPLR', 'Ocorreu um erro desconhecido'],
   [
-    'UpgradePlanCTA.CHART_OF_ACCOUNTS.categorize',
-    'Atribuir despesas e fundos adicionados às categorias contábeis corretas.',
+    'uzfoYE',
+    'Observe que a moeda do seu método de pagamento é {currency}. O valor real que você receberá dependerá das taxas de câmbio e das taxas cobradas por processadores de pagamento e bancos.',
   ],
+  ['v+IOuX', 'Ativou "Gestão de dinheiro" em <Account></Account>'],
+  ['V35NqH', '{includedCount} despesas pagas'],
   [
-    'UpgradePlanCTA.CHART_OF_ACCOUNTS.export',
-    'Incluir as categorias contábeis selecionadas em suas exportações.',
+    'vBQwI8',
+    'Você pode fazer downgrade para nosso plano gratuito "Discover 1" a qualquer momento usando "Modificar assinatura". Se precisar cancelar a renovação da sua assinatura, por favor <SupportLink>entre em contato com o suporte</SupportLink>.',
   ],
+  ['Vendor.ArchiveVendor', 'Arquivar fornecedor'],
+  ['Vendor.UnarchiveVendor', 'Desarquivar fornecedor'],
   [
-    'UpgradePlanCTA.CHART_OF_ACCOUNTS.optimize',
-    'Reduzir custos contábeis, carga de trabalho e risco de erros contábeis.',
+    'VendorsAndOrganizations.Description',
+    'Gerencie todas as organizações externas com as quais você trabalha como fornecedores e visualize rapidamente toda a atividade entre seus Coletivos hospedados e outras Organizações da plataforma.',
   ],
-  ['UpgradePlanCTA.CHART_OF_ACCOUNTS.title', 'Atualize seu plano para habilitar o plano de contas.'],
+  ['Verified', 'Verificado'],
+  ['VErmYl', 'Duplicar concessão'],
+  ['Vf1x2A', 'Entrou em'],
+  ['VICsET', 'Modificar assinatura'],
+  ['ViewAllContributions', 'Ver todas as contribuições'],
+  ['ViewAllExpenses', 'Ver todas as despesas'],
+  ['viewProfile', 'Ver perfil'],
+  ['VirtualCards.Status', 'Situação'],
+  ['VlBhuE', 'Conta não verificada'],
+  ['vNN8Hw', '{amount} / Coletivo depois disso'],
+  ['vpLBRJ', 'Todas as solicitações de pagamento enviadas'],
+  ['VVgt/a', 'Atualizar #{id}'],
+  ['vxQI0/', 'Deduzido da plataforma'],
+  ['vxyyjF', 'Utilização atual do plano'],
+  ['VzPJtr', 'Buscar fusos horários...'],
+  ['w0rsxB', 'Apenas em relação a {orgName}'],
+  ['W3mNpa', 'Deduzido do saldo do Host'],
+  ['w5tdiG', 'Solicitação de concessão não é suportada para esta conta.'],
+  ['Wb0E1r', 'Falha na validação do formulário'],
   [
-    'UpgradePlanCTA.EXPECTED_FUNDS.allocate',
-    'Alocar fundos esperados para Coletivos, projetos, eventos ou níveis específicos.',
+    'wdsjMO',
+    'Buscar contas, despesas, transações, atualizações, comentários e mais',
   ],
-  [
-    'UpgradePlanCTA.EXPECTED_FUNDS.notify',
-    'Notificar automaticamente administradores e financiadores quando os fundos forem recebidos e alocados.',
-  ],
-  [
-    'UpgradePlanCTA.EXPECTED_FUNDS.reconcile',
-    'Conciliar chegadas mais rapidamente com detalhes de contribuição pré-preenchidos e lançamentos no livro razão.',
-  ],
-  [
-    'UpgradePlanCTA.EXPECTED_FUNDS.title',
-    'Atualize seu plano para gerenciar fundos esperados sem esforço.',
-  ],
-  [
-    'UpgradePlanCTA.EXPECTED_FUNDS.track',
-    'Acompanhar transferências bancárias pendentes e promessas de arrecadação antes do dinheiro chegar.',
-  ],
-  [
-    'UpgradePlanCTA.FUNDS_GRANTS_MANAGEMENT.title',
-    'Atualize seu plano para gerenciar fundos e concessões.',
-  ],
-  [
-    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.accounting',
-    'Forneça aos seus contadores exportações consolidadas de transações.',
-  ],
-  [
-    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importCSV',
-    'Importar manualmente transações com arquivos CSV',
-  ],
-  [
-    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importing',
-    'Importar automaticamente transações de bancos e outros serviços financeiros.',
-  ],
-  [
-    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.offPlatformTransactions',
-    'Represente com precisão suas finanças na plataforma importando atividades financeiras fora da plataforma',
-  ],
-  [
-    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.reconcilliation',
-    'Conciliar e corresponder transações importadas com atividades da plataforma.',
-  ],
-  [
-    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.title',
-    'Atualize seu plano para importar transações fora da plataforma.',
-  ],
-  [
-    'UpgradePlanCTA.TAX_FORMS.collect',
-    'Coletar automaticamente formulários fiscais necessários dos beneficiários.',
-  ],
-  [
-    'UpgradePlanCTA.TAX_FORMS.compliance',
-    'Mantenha conformidade com as leis fiscais dos EUA sem acompanhamento manual.',
-  ],
-  [
-    'UpgradePlanCTA.TAX_FORMS.configureThreshold',
-    'Configurar limites de pagamento para controlar quando formulários são necessários.',
-  ],
-  [
-    'UpgradePlanCTA.TAX_FORMS.export',
-    'Exportar todos os formulários fiscais no final do ano para envio rápido.',
-  ],
-  [
-    'UpgradePlanCTA.TAX_FORMS.preventPayouts',
-    'Impedir pagamentos até que todos os formulários necessários sejam enviados.',
-  ],
-  [
-    'UpgradePlanCTA.TAX_FORMS.prompt',
-    'Solicitar que beneficiários enviem formulários antes de receber pagamentos.',
-  ],
-  [
-    'UpgradePlanCTA.TAX_FORMS.protect',
-    'Proteja sua comunidade evitando armazenamento de dados de risco.',
-  ],
-  [
-    'UpgradePlanCTA.TAX_FORMS.sensitiveData',
-    'Mantenha dados fiscais sensíveis seguros e acessíveis apenas a administradores.',
-  ],
-  [
-    'UpgradePlanCTA.TAX_FORMS.title',
-    'Atualize seu plano para coletar formulários fiscais compatíveis com os EUA',
-  ],
-  ['UpgradePlanCTA.title.DISABLED', 'Atualização necessária'],
-  ['UpgradePlanCTA.title.UNSUPPORTED', 'Recurso não suportado para sua conta'],
-  ['UpgradePlanCTA.upgradeButton', 'Atualizar seu plano'],
-  ['us7tE9', 'Principais Fundos por valor gasto'],
-  ['utJA9s', 'Detalhes da conta'],
+  ['wdu2yl', 'Reembolsos'],
 ];
 
 for (const [id, text] of translations) {
