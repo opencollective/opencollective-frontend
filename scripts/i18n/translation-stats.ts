@@ -31,6 +31,11 @@ const IGNORED: Record<string, readonly string[]> = {
     'Stripe.PaymentMethod.Label.link', // "Link" - nome de marca
     'Stripe.PaymentMethod.Label.swish', // "Swish" - nome de marca
     'tax.gstShort', // "GST" - acrônimo
+    'tier.Pro.title', // "Pro" - nome do plano
+    'Timezone.Local', // "Local" - identico
+    'Timezone.UTC', // "UTC" - identico
+    'total', // "total" - identico
+    'Transaction.kind.APPLICATION_FEE', // "Application fee" - termo técnico
   ],
   fr: [
     'qMePPG',
