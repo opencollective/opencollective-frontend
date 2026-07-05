@@ -6,75 +6,108 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const setTranslation = path.join(__dirname, 'set-translation.ts');
 
 const translations: Array<[string, string]> = [
-  ['tt3cH9', 'Contribuição reembolsada'],
-  ['TVWH39', 'Instruções do host para enviar um reembolso'],
   [
-    'TvyzUg',
-    'Detalhes de pagamento que podem ser usados para {isPrivate,select,false{contribuir, adquirir ingressos ou} other {}} pagar suas faturas da plataforma.',
-  ],
-  ['TWl0xA', 'Coletivos inativos'],
-  [
-    'txRdqy',
-    'Opcional. Fornecer esses detalhes permite a validação e o uso da variável de modelo <AccountVariable></AccountVariable> em suas instruções — um texto pré-formatado com todos os dados bancários necessários.',
-  ],
-  ['tZEZGT', '{n, plural, one {1 contribuição} other {{n} contribuições}}'],
-  ['U62c6d', 'Última interação'],
-  ['u8j6vX', 'Ir para'],
-  [
-    'uagR7O',
-    '{entityType, select, expense{A despesa} contribution{A contribuição} other{A entidade}} NÃO será excluída nem modificada.',
-  ],
-  ['UDjr0F', 'Nos detalhes da despesa:'],
-  ['ue3ZR1', 'Deduzir valor da taxa'],
-  ['UfZM5J', 'Alocação de reembolso'],
-  ['UHj+h/', 'Pesquisar em {entity}'],
-  ['ULhK9y', 'Tem certeza de que deseja revogar esta verificação KYC?'],
-  ['UnlinkTransactionImportRowSuccess', 'Linha de importação de transação desvinculada com sucesso'],
-  ['Unschedule', 'Cancelar agendamento'],
-  ['unSvmK', 'Estorno de imposto'],
-  ['UNylJ0', 'Alterar o nível e o valor da contribuição recorrente.'],
-  [
-    'UpgradePlanCTA.AGREEMENTS.compliance',
-    'Acompanhe obrigações legais e contratuais para o processamento adequado de despesas.',
+    'UpgradePlanCTA.CHART_OF_ACCOUNTS.categorize',
+    'Atribuir despesas e fundos adicionados às categorias contábeis corretas.',
   ],
   [
-    'UpgradePlanCTA.AGREEMENTS.documentation',
-    'Armazene todos os documentos de acordo em um local centralizado.',
+    'UpgradePlanCTA.CHART_OF_ACCOUNTS.export',
+    'Incluir as categorias contábeis selecionadas em suas exportações.',
   ],
   [
-    'UpgradePlanCTA.AGREEMENTS.expiration',
-    'Defina datas de expiração para acompanhar as renovações de acordos.',
+    'UpgradePlanCTA.CHART_OF_ACCOUNTS.optimize',
+    'Reduzir custos contábeis, carga de trabalho e risco de erros contábeis.',
+  ],
+  ['UpgradePlanCTA.CHART_OF_ACCOUNTS.title', 'Atualize seu plano para habilitar o plano de contas.'],
+  [
+    'UpgradePlanCTA.EXPECTED_FUNDS.allocate',
+    'Alocar fundos esperados para Coletivos, projetos, eventos ou níveis específicos.',
   ],
   [
-    'UpgradePlanCTA.AGREEMENTS.review',
-    'Acesse acordos relevantes ao revisar despesas.',
-  ],
-  ['UpgradePlanCTA.AGREEMENTS.title', 'Atualize seu plano para enviar acordos'],
-  [
-    'UpgradePlanCTA.AUTOMATED_PAYMENTS.ledger',
-    'Valores de transferência e taxas são registrados automaticamente.',
-  ],
-  ['UpgradePlanCTA.AUTOMATED_PAYMENTS.payOnPlatform', 'Pague com um clique.'],
-  [
-    'UpgradePlanCTA.AUTOMATED_PAYMENTS.reduceErrors',
-    'Reduza erros de entrada manual de dados.',
+    'UpgradePlanCTA.EXPECTED_FUNDS.notify',
+    'Notificar automaticamente administradores e financiadores quando os fundos forem recebidos e alocados.',
   ],
   [
-    'UpgradePlanCTA.AUTOMATED_PAYMENTS.saveTime',
-    'Processe mais despesas em menos tempo.',
+    'UpgradePlanCTA.EXPECTED_FUNDS.reconcile',
+    'Conciliar chegadas mais rapidamente com detalhes de contribuição pré-preenchidos e lançamentos no livro razão.',
   ],
   [
-    'UpgradePlanCTA.AUTOMATED_PAYMENTS.title',
-    'Atualize seu plano para pagamentos automatizados.',
+    'UpgradePlanCTA.EXPECTED_FUNDS.title',
+    'Atualize seu plano para gerenciar fundos esperados sem esforço.',
   ],
   [
-    'UpgradePlanCTA.CHARGE_HOSTING_FEES.title',
-    'Atualize seu plano para habilitar a cobrança de taxas de hospedagem.',
+    'UpgradePlanCTA.EXPECTED_FUNDS.track',
+    'Acompanhar transferências bancárias pendentes e promessas de arrecadação antes do dinheiro chegar.',
   ],
   [
-    'UpgradePlanCTA.CHART_OF_ACCOUNTS.accountingCategories',
-    'Configure suas categorias contábeis de acordo com suas necessidades contábeis.',
+    'UpgradePlanCTA.FUNDS_GRANTS_MANAGEMENT.title',
+    'Atualize seu plano para gerenciar fundos e concessões.',
   ],
+  [
+    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.accounting',
+    'Forneça aos seus contadores exportações consolidadas de transações.',
+  ],
+  [
+    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importCSV',
+    'Importar manualmente transações com arquivos CSV',
+  ],
+  [
+    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importing',
+    'Importar automaticamente transações de bancos e outros serviços financeiros.',
+  ],
+  [
+    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.offPlatformTransactions',
+    'Represente com precisão suas finanças na plataforma importando atividades financeiras fora da plataforma',
+  ],
+  [
+    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.reconcilliation',
+    'Conciliar e corresponder transações importadas com atividades da plataforma.',
+  ],
+  [
+    'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.title',
+    'Atualize seu plano para importar transações fora da plataforma.',
+  ],
+  [
+    'UpgradePlanCTA.TAX_FORMS.collect',
+    'Coletar automaticamente formulários fiscais necessários dos beneficiários.',
+  ],
+  [
+    'UpgradePlanCTA.TAX_FORMS.compliance',
+    'Mantenha conformidade com as leis fiscais dos EUA sem acompanhamento manual.',
+  ],
+  [
+    'UpgradePlanCTA.TAX_FORMS.configureThreshold',
+    'Configurar limites de pagamento para controlar quando formulários são necessários.',
+  ],
+  [
+    'UpgradePlanCTA.TAX_FORMS.export',
+    'Exportar todos os formulários fiscais no final do ano para envio rápido.',
+  ],
+  [
+    'UpgradePlanCTA.TAX_FORMS.preventPayouts',
+    'Impedir pagamentos até que todos os formulários necessários sejam enviados.',
+  ],
+  [
+    'UpgradePlanCTA.TAX_FORMS.prompt',
+    'Solicitar que beneficiários enviem formulários antes de receber pagamentos.',
+  ],
+  [
+    'UpgradePlanCTA.TAX_FORMS.protect',
+    'Proteja sua comunidade evitando armazenamento de dados de risco.',
+  ],
+  [
+    'UpgradePlanCTA.TAX_FORMS.sensitiveData',
+    'Mantenha dados fiscais sensíveis seguros e acessíveis apenas a administradores.',
+  ],
+  [
+    'UpgradePlanCTA.TAX_FORMS.title',
+    'Atualize seu plano para coletar formulários fiscais compatíveis com os EUA',
+  ],
+  ['UpgradePlanCTA.title.DISABLED', 'Atualização necessária'],
+  ['UpgradePlanCTA.title.UNSUPPORTED', 'Recurso não suportado para sua conta'],
+  ['UpgradePlanCTA.upgradeButton', 'Atualizar seu plano'],
+  ['us7tE9', 'Principais Fundos por valor gasto'],
+  ['utJA9s', 'Detalhes da conta'],
 ];
 
 for (const [id, text] of translations) {
