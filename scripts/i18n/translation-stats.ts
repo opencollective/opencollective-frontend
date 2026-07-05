@@ -27,6 +27,10 @@ const IGNORED: Record<string, readonly string[]> = {
     'Fields.slug', // "Slug" - termo técnico
     'KYC', // "KYC" - acrônimo
     'Q0lxqm', // "CVV/CVC" - identico
+    'Stripe.PaymentMethod.Label.bancontact', // "Bancontact" - nome de marca
+    'Stripe.PaymentMethod.Label.link', // "Link" - nome de marca
+    'Stripe.PaymentMethod.Label.swish', // "Swish" - nome de marca
+    'tax.gstShort', // "GST" - acrônimo
   ],
   fr: [
     'qMePPG',
