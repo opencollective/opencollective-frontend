@@ -36,6 +36,10 @@ const IGNORED: Record<string, readonly string[]> = {
     'Timezone.UTC', // "UTC" - identico
     'total', // "total" - identico
     'Transaction.kind.APPLICATION_FEE', // "Application fee" - termo técnico
+    'webhooks.url.label', // "URL" - identico
+    'withColon', // "{item}:" - formato identico
+    'WWhVAU', // "Subtotal:" - identico
+    'X3AIiK', // "Europe" - identico
   ],
   fr: [
     'qMePPG',
