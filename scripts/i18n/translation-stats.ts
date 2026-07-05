@@ -26,6 +26,7 @@ const IGNORED: Record<string, readonly string[]> = {
     'Fields.id', // "ID" - identico
     'Fields.slug', // "Slug" - termo técnico
     'KYC', // "KYC" - acrônimo
+    'Q0lxqm', // "CVV/CVC" - identico
   ],
   fr: [
     'qMePPG',
