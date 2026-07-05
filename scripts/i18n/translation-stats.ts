@@ -108,6 +108,9 @@ const IGNORED: Record<string, readonly string[]> = {
     'sV2v5L', // "Instructions" - identique
     'tZEZGT', // "{n, plural, one {1 contribution} other {{n} contributions}}" - identique
   ],
+  es: [
+    '7oFrM6', // "Legal" - idéntico en español (menú de navegación)
+  ],
 };
 
 function loadJson(filePath: string): Record<string, string> {
