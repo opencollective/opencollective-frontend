@@ -26,6 +26,20 @@ const IGNORED: Record<string, readonly string[]> = {
     'Fields.id', // "ID" - identico
     'Fields.slug', // "Slug" - termo técnico
     'KYC', // "KYC" - acrônimo
+    'Q0lxqm', // "CVV/CVC" - identico
+    'Stripe.PaymentMethod.Label.bancontact', // "Bancontact" - nome de marca
+    'Stripe.PaymentMethod.Label.link', // "Link" - nome de marca
+    'Stripe.PaymentMethod.Label.swish', // "Swish" - nome de marca
+    'tax.gstShort', // "GST" - acrônimo
+    'tier.Pro.title', // "Pro" - nome do plano
+    'Timezone.Local', // "Local" - identico
+    'Timezone.UTC', // "UTC" - identico
+    'total', // "total" - identico
+    'Transaction.kind.APPLICATION_FEE', // "Application fee" - termo técnico
+    'webhooks.url.label', // "URL" - identico
+    'withColon', // "{item}:" - formato identico
+    'WWhVAU', // "Subtotal:" - identico
+    'X3AIiK', // "Europe" - identico
   ],
   fr: [
     'qMePPG',
