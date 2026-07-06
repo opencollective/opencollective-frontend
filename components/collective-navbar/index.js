@@ -347,7 +347,13 @@ const getMainAction = (collective, callsToAction, LoggedInUser, onOpenSubmitExpe
   } else if (callsToAction.includes('hasApply')) {
     return {
       type: NAVBAR_ACTION_TYPE.APPLY,
-      component: <ApplyToHostBtn hostSlug={collective.slug} buttonRenderer={props => <ActionButton {...props} />} />,
+      component: (
+        <ApplyToHostBtn
+          hostSlug={collective.slug}
+          disabled={collective.canApply === false}
+          buttonRenderer={props => <ActionButton {...props} />}
+        />
+      ),
     };
   } else if (callsToAction.includes('hasRequestGrant')) {
     return {

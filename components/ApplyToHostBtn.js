@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import ApplyToHostModal from './ApplyToHostModal';
 import StyledButton from './StyledButton';
+import StyledTooltip from './StyledTooltip';
 
 class ApplyToHostBtn extends React.Component {
   static propTypes = {
@@ -16,6 +17,7 @@ class ApplyToHostBtn extends React.Component {
     buttonRenderer: PropTypes.func,
     router: PropTypes.object,
     isHidden: PropTypes.bool,
+    disabled: PropTypes.bool,
   };
 
   constructor(props) {
@@ -44,11 +46,13 @@ class ApplyToHostBtn extends React.Component {
   }
 
   renderButton() {
-    const { buttonRenderer, withoutIcon, buttonProps, minWidth, hostSlug, router } = this.props;
+    const { buttonRenderer, withoutIcon, buttonProps, minWidth, hostSlug, router, disabled } = this.props;
+    const onClick = disabled ? undefined : () => router.push(`${hostSlug}/apply`);
 
     if (buttonRenderer) {
       return buttonRenderer({
-        onClick: () => router.push(`${hostSlug}/apply`),
+        onClick,
+        disabled,
         'data-cy': 'host-apply-btn',
         ...buttonProps,
         children: (
@@ -67,7 +71,8 @@ class ApplyToHostBtn extends React.Component {
       <StyledButton
         buttonStyle="secondary"
         buttonSize="small"
-        onClick={() => router.push(`${hostSlug}/apply`)}
+        onClick={onClick}
+        disabled={disabled}
         minWidth={minWidth}
         data-cy="host-apply-btn"
         {...buttonProps}
@@ -79,13 +84,21 @@ class ApplyToHostBtn extends React.Component {
   }
 
   render() {
-    const { hostSlug, router, isHidden } = this.props;
+    const { hostSlug, router, isHidden, disabled } = this.props;
 
     return (
       <Fragment>
-        {this.renderButton()}
+        {disabled ? (
+          <StyledTooltip
+            content={<FormattedMessage defaultMessage="This Fiscal Host is not open to applications" id="WMaMh7" />}
+          >
+            {this.renderButton()}
+          </StyledTooltip>
+        ) : (
+          this.renderButton()
+        )}
 
-        {this.state.showModal && !isHidden && (
+        {this.state.showModal && !isHidden && !disabled && (
           <ApplyToHostModal hostSlug={hostSlug} onClose={() => router.push(hostSlug)} />
         )}
       </Fragment>

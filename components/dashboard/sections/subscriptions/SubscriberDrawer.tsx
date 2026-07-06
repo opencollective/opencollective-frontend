@@ -1,10 +1,11 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import dayjs from 'dayjs';
-import { Info, Link as Link2, Pencil } from 'lucide-react';
+import { Ban, Info, Link as Link2, Pencil, ShieldCheck } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
+import { i18nGraphqlException } from '@/lib/errors';
 import { ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/graphql';
 import formatAccountType from '@/lib/i18n/account-type';
 
@@ -16,6 +17,7 @@ import { Button } from '@/components/ui/Button';
 import { SheetBody } from '@/components/ui/Sheet';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent } from '@/components/ui/Tooltip';
+import { useToast } from '@/components/ui/useToast';
 
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -25,7 +27,7 @@ import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { InfoList, InfoListItem } from '../../../ui/InfoList';
 
-import { subscriberDrawerQuery } from './queries';
+import { setSubscriberBlockStatusMutation, subscriberDrawerQuery } from './queries';
 
 const platformBillingsColumns = [
   {
@@ -175,12 +177,37 @@ const platformBillingsColumns = [
 
 const SubscriberDrawer = ({ id, openPlanModal }) => {
   const intl = useIntl();
-  const { data, loading: isLoading } = useQuery(subscriberDrawerQuery, {
+  const { toast } = useToast();
+  const {
+    data,
+    loading: isLoading,
+    refetch,
+  } = useQuery(subscriberDrawerQuery, {
     variables: { id },
 
     fetchPolicy: 'cache-and-network',
   });
   const subscriber = data?.account;
+  const isBlocked = Boolean(subscriber?.isBlockedForUnpaidPlatformBilling);
+  const [setBlockStatus, { loading: settingBlockStatus }] = useMutation(setSubscriberBlockStatusMutation);
+
+  const toggleBlockStatus = async () => {
+    try {
+      await setBlockStatus({ variables: { account: { id }, isBlocked: !isBlocked } });
+      await refetch();
+      toast({
+        variant: 'success',
+        message: isBlocked
+          ? intl.formatMessage({ defaultMessage: 'Account unblocked', id: 'LubhTz' })
+          : intl.formatMessage({
+              defaultMessage: 'Account blocked for unpaid platform billing', id: 'Mk7DRS',
+            }),
+      });
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    }
+  };
+
   const actions = {
     primary: [
       {
@@ -190,6 +217,15 @@ const SubscriberDrawer = ({ id, openPlanModal }) => {
           openPlanModal(subscriber);
         },
         Icon: Pencil,
+      },
+      {
+        key: 'block',
+        label: isBlocked
+          ? intl.formatMessage({ defaultMessage: 'Unblock account', id: 'Subscriber.Unblock' })
+          : intl.formatMessage({ defaultMessage: 'Block for unpaid billing', id: 'Subscriber.Block' }),
+        onClick: toggleBlockStatus,
+        disabled: settingBlockStatus || isLoading,
+        Icon: isBlocked ? ShieldCheck : Ban,
       },
     ],
   };
@@ -220,6 +256,11 @@ const SubscriberDrawer = ({ id, openPlanModal }) => {
                   {subscriber.isFrozen && (
                     <Badge size="sm" type="info">
                       <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+                    </Badge>
+                  )}
+                  {subscriber.isBlockedForUnpaidPlatformBilling && (
+                    <Badge size="sm" type="error">
+                      <FormattedMessage defaultMessage="Blocked due to billing" id="jN20jX" />
                     </Badge>
                   )}
                   {!subscriber.isActive && (

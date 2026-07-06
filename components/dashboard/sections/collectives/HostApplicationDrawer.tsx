@@ -512,6 +512,7 @@ function HostApplication({
             <AcceptRejectButtons
               collective={account}
               isLoading={loading}
+              blockActions={Boolean(host?.isBlockedForUnpaidPlatformBilling)}
               disabled={requiresMinimumNumberOfAdmins && !hasEnoughInvitedAdmins}
               disabledMessage={
                 requiresMinimumNumberOfAdmins &&

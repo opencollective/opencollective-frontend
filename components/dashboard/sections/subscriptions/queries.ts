@@ -34,6 +34,7 @@ const fields = gql`
     currency
     imageUrl(height: 96)
     isFrozen
+    isBlockedForUnpaidPlatformBilling
     isHost
     tags
     settings
@@ -210,6 +211,15 @@ export const updateAccountPlatformSubscriptionMutation = gql`
     }
   }
   ${fields}
+`;
+
+export const setSubscriberBlockStatusMutation = gql`
+  mutation SetSubscriberBlockStatus($account: AccountReferenceInput!, $isBlocked: Boolean!) {
+    editAccountFlags(account: $account, isBlockedForUnpaidPlatformBilling: $isBlocked) {
+      id
+      isBlockedForUnpaidPlatformBilling
+    }
+  }
 `;
 
 export const subscriberDrawerQuery = gql`
