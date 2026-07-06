@@ -71,7 +71,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
     await sendReplyToInvitation({ variables: { invitation: { id: invitation.id }, accept } });
     await refetchLoggedInUser();
     if (accept && redirectOnAccept) {
-      await router.push(`/${invitation.account.slug}`);
+      await router.push(`/dashboard/${invitation.account.slug}`);
     }
     setSubmitting(false);
   };

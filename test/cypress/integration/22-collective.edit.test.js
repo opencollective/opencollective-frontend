@@ -68,7 +68,7 @@ describe('edit collective', () => {
     cy.getByDataCy('member-invitation-accept-btn').click();
 
     // Should be redirected to the collective page and added to the team section
-    cy.url().should('eq', `${Cypress.config().baseUrl}/${collectiveSlug}`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/${collectiveSlug}`);
     cy.contains('#section-our-team', 'AmazingNewUser');
 
     cy.visit(`/dashboard/${collectiveSlug}/team`);
