@@ -90,7 +90,12 @@ class ApplyToHostBtn extends React.Component {
       <Fragment>
         {disabled ? (
           <StyledTooltip
-            content={<FormattedMessage defaultMessage="This Fiscal Host is not open to applications" id="WMaMh7" />}
+            content={
+              <FormattedMessage
+                defaultMessage="This Fiscal Host is not open to applications"
+                id="collectives.create.error.HostNotOpenToApplications"
+              />
+            }
           >
             {this.renderButton()}
           </StyledTooltip>

@@ -20,6 +20,7 @@ import type {
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import { Badge } from '../../../ui/Badge';
 import { TableActionsButton } from '../../../ui/Table';
 import { accountTrustLevelFilter } from '../../filters/AccountTrustLevelFilter';
 import { buildAccountTypeFilter } from '../../filters/AccountTypeFilter';
@@ -118,6 +119,27 @@ export const cols = {
       } else {
         return <FormattedMessage id="NoPlan" defaultMessage="No plan" />;
       }
+    },
+  },
+  status: {
+    accessorKey: 'status',
+    header: () => <FormattedMessage id="Status" defaultMessage="Status" />,
+    cell: ({ row }) => {
+      const account = row.original;
+      return (
+        <div className="flex flex-wrap items-center gap-1">
+          {account.isFrozen && (
+            <Badge size="sm" type="info">
+              <FormattedMessage defaultMessage="Frozen" id="CollectiveStatus.Frozen" />
+            </Badge>
+          )}
+          {account.isBlockedForUnpaidPlatformBilling && (
+            <Badge size="sm" type="error">
+              <FormattedMessage defaultMessage="Blocked due to billing" id="jN20jX" />
+            </Badge>
+          )}
+        </div>
+      );
     },
   },
   legacyPlan: {

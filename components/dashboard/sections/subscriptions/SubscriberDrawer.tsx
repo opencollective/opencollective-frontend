@@ -200,7 +200,8 @@ const SubscriberDrawer = ({ id, openPlanModal }) => {
         message: isBlocked
           ? intl.formatMessage({ defaultMessage: 'Account unblocked', id: 'LubhTz' })
           : intl.formatMessage({
-              defaultMessage: 'Account blocked for unpaid platform billing', id: 'Mk7DRS',
+              defaultMessage: 'Account blocked for unpaid platform billing',
+              id: 'Mk7DRS',
             }),
       });
     } catch (e) {
@@ -221,8 +222,8 @@ const SubscriberDrawer = ({ id, openPlanModal }) => {
       {
         key: 'block',
         label: isBlocked
-          ? intl.formatMessage({ defaultMessage: 'Unblock account', id: 'Subscriber.Unblock' })
-          : intl.formatMessage({ defaultMessage: 'Block for unpaid billing', id: 'Subscriber.Block' }),
+          ? intl.formatMessage({ defaultMessage: 'Unblock account', id: 'wahDRS' })
+          : intl.formatMessage({ defaultMessage: 'Block for unpaid billing', id: 'abH0gX' }),
         onClick: toggleBlockStatus,
         disabled: settingBlockStatus || isLoading,
         Icon: isBlocked ? ShieldCheck : Ban,

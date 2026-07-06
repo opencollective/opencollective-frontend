@@ -69,7 +69,7 @@ const PlatformSubscribers = () => {
         <React.Fragment>
           <DataTable
             innerClassName="text-muted-foreground"
-            columns={[cols.collective, cols.team, cols.moneyManaged, cols.plan, cols.actions]}
+            columns={[cols.collective, cols.team, cols.moneyManaged, cols.plan, cols.status, cols.actions]}
             data={data?.accounts?.nodes || []}
             loading={loading}
             mobileTableView
