@@ -5,7 +5,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { HostContributionCategoryRulesQuery } from '@/lib/graphql/types/v2/graphql';
-import { AccountingCategoryKind } from '@/lib/graphql/types/v2/schema';
+import { AccountingCategoryKind } from '@/lib/graphql/types/v2/graphql';
 
 import type { ContributionPredicate } from '@/components/accounting/dashboard/categorization/contributions';
 import {

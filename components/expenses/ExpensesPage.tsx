@@ -211,6 +211,7 @@ const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) =>
   const meta: FilterMeta = {
     currency: account?.currency,
     accountSlug: account?.slug,
+    isPublicExpensesView: true,
   };
 
   const queryFilter = useQueryFilter<typeof schema, ExpensesPageQueryVariables>({

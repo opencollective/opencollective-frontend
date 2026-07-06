@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PaymentMethodService } from '@/lib/graphql/types/v2/schema';
+import { PaymentMethodService } from '@/lib/graphql/types/v2/graphql';
 
 import { Op } from '../rules';
 

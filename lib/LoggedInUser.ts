@@ -73,6 +73,11 @@ class LoggedInUser {
       return this.canEditEvent(collective);
     } else if (collective.type === CollectiveType.PROJECT) {
       return this.canEditProject(collective);
+    } else if (collective.type === CollectiveType.PLATFORM) {
+      // Per-host platform-tips account: a hosted child of the host, administered by the host's admins
+      // (parent admin is child admin).
+      const parent = collective['parentCollective'] || collective['parent'];
+      return this.hasRole(MemberRole.ADMIN, parent) || this.hasRole(MemberRole.ADMIN, collective);
     } else {
       return (
         (collective['id'] && collective['id'] === this.CollectiveId) ||

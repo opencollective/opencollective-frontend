@@ -176,7 +176,7 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
         name: '',
         email: '',
       }}
-      paymentIntentId={paymentIntent.id}
+      stripePaymentIntentId={paymentIntent.id}
       paymentIntentClientSecret={paymentIntent.client_secret}
     />
   );

@@ -69,6 +69,8 @@ export type FilterMeta = ExpensePayeeFilterMeta &
   ExpenseStatusFilterMeta & {
     currency?: Currency;
     accountingCategoryKinds?: readonly AccountingCategoryKind[];
+    /** When true, hides filters that are only available in the dashboard (e.g. lastCommentBy). */
+    isPublicExpensesView?: boolean;
   };
 
 // Only needed when either the key or the expected query variables are different
@@ -125,6 +127,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   },
   lastCommentBy: {
     labelMsg: defineMessage({ id: 'expenses.lastCommentByFilter', defaultMessage: 'Last Comment By' }),
+    hide: ({ meta }) => Boolean(meta?.isPublicExpensesView),
     Component: ({ valueRenderer, intl, ...props }) => {
       const options = React.useMemo(
         () =>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AccountType } from '@/lib/graphql/types/v2/schema';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
 
 import { Op } from '../rules';
 
