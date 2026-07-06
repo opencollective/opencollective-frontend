@@ -80,7 +80,8 @@ const getNotification = (intl, account): React.ComponentProps<typeof Notificatio
       title: <FormattedMessage defaultMessage="Some features are currently unavailable" id="QDq3UK" />,
       description: (
         <FormattedMessage
-          defaultMessage="Your account has outstanding platform bills. Some features have been restricted until your balance is settled. Please review and pay from the <BillingLink>Platform Billing</BillingLink> section to restore full functionality, or <ContactLink>contact us</ContactLink> if you have any questions." id="VNMs7D"
+          defaultMessage="Your account has outstanding platform bills. Some features have been restricted until your balance is settled. Please review and pay from the <BillingLink>Platform Billing</BillingLink> section to restore full functionality, or <ContactLink>contact us</ContactLink> if you have any questions."
+          id="VNMs7D"
           values={{
             BillingLink: getI18nLink({ as: Link, href: getDashboardRoute(account, 'platform-subscription') }),
             ContactLink: getI18nLink({ as: Link, href: '/contact' }),
