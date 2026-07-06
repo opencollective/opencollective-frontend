@@ -7,6 +7,7 @@ import { i18nGraphqlException } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
 import formatMemberRole from '../lib/i18n/member-role';
 import { formatDate } from '../lib/utils';
+import roles from '@/lib/constants/roles';
 
 import Avatar from './Avatar';
 import { Box, Flex } from './Grid';
@@ -71,7 +72,8 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
     await sendReplyToInvitation({ variables: { invitation: { id: invitation.id }, accept } });
     await refetchLoggedInUser();
     if (accept && redirectOnAccept) {
-      await router.push(`/dashboard/${invitation.account.slug}`);
+      const redirectToDashboard = [roles.ADMIN, roles.ACCOUNTANT].includes(invitation.role);
+      await router.push(redirectToDashboard ? `/dashboard/${invitation.account.slug}` : `/${invitation.account.slug}`);
     }
     setSubmitting(false);
   };
