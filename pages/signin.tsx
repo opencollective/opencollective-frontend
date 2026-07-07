@@ -123,7 +123,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       //   redirect = parsedUrl;
       // }
       const nextUrl = new URL(redirect, process.env.WEBSITE_URL);
-      window.location.href = nextUrl.toString();
+      await this.props.router.replace(nextUrl.toString());
       window.scroll(0, 0);
     }
   }
