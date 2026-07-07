@@ -78,7 +78,7 @@ export default function DrawerHeader({
                   data-cy={action['data-cy']}
                 >
                   {action.href ? (
-                    <Link href={action.href} target={action.target}>
+                    <Link href={action.href} openInNewTab={action.openInNewTab}>
                       {action.Icon && <action.Icon size={16} />}
                       <span>{action.label}</span>
                     </Link>
