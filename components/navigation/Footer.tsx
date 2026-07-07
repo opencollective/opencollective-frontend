@@ -3,7 +3,7 @@ import { Discord } from '@styled-icons/fa-brands/Discord';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Linkedin } from '@styled-icons/fa-brands/Linkedin';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
-import { FaXTwitter } from 'react-icons/fa6';
+import { SiX } from '@icons-pack/react-simple-icons';
 import { ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -37,7 +37,7 @@ const SocialLinks = ({ className, iconSize = 16 }: { className?: string; iconSiz
         <Linkedin size={iconSize} />
       </SocialLink>
       <SocialLink href="https://x.com/opencollect" rel="me" title="Open Collective X link">
-        <FaXTwitter size={iconSize} />
+        <SiX size={iconSize} />
       </SocialLink>
       <SocialLink
         href="https://mastodon.opencollective.com/@opencollective"
