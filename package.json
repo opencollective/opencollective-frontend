@@ -273,7 +273,7 @@
     "npm-run-all2": "^9.0.0",
     "nyc": "^18.0.0",
     "pdf-parse": "^1.1.1",
-    "postcss": "8.5.15",
+    "postcss": "8.5.16",
     "prettier": "3.8.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "prop-types": "^15.8.1",
