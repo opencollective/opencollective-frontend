@@ -4,7 +4,7 @@ describe('event.createOrder page', () => {
   let collective = null;
 
   const createEvent = name => {
-    cy.login({ redirect: `${collective.slug}/events/new` });
+    cy.login({ redirect: `${collective.slug}/events/create` });
     cy.get('input[name="name"]').type(name);
     cy.get('input[name="startsAt"]')
       .clear()
@@ -20,10 +20,6 @@ describe('event.createOrder page', () => {
 
   before(() => {
     cy.createHostedCollective().then(c => (collective = c));
-  });
-
-  beforeEach(() => {
-    cy.login({ redirect: `/${collective.slug}/events/create` });
   });
 
   it('makes an order for a free ticket', () => {
