@@ -83,7 +83,7 @@ type CollectiveDetailsProps = {
 const SectionTitle = elementFromClass('div', 'text-md font-bold text-slate-800 mb-2 flex gap-4 items-center');
 const PopoverRadioWrapper = elementFromClass('div', 'flex flex-col');
 
-export const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsProps>) => {
+const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsProps>) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [isOpen, setOpen] = useState(false);
@@ -183,7 +183,7 @@ export const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveD
   );
 };
 
-export const AdminsCanSeePayoutMethodsSwitch = ({ collective }: Partial<CollectiveDetailsProps>) => {
+const AdminsCanSeePayoutMethodsSwitch = ({ collective }: Partial<CollectiveDetailsProps>) => {
   const { toast } = useToast();
   const [submitSetPolicy, { loading }] = useMutation(
     gql`
@@ -231,7 +231,7 @@ const editAccountSettingsMutation = gql`
 
 const DISPLAYED_EXPENSE_TYPES = [EXPENSE_TYPE.INVOICE, EXPENSE_TYPE.RECEIPT, EXPENSE_TYPE.GRANT];
 
-export const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => {
+const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [isOpen, setOpen] = useState(false);

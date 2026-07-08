@@ -1,29 +1,50 @@
 import React from 'react';
 import { ErrorBoundary } from '@sentry/nextjs';
 import type { ApexOptions } from 'apexcharts';
+import { flatten, uniq } from 'lodash-es';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { formatAmountForLegend, formatDateLabel, formatSeriesData, setDatesIfMissing } from '@/lib/charts';
+import { formatAmountForLegend } from '@/lib/charts';
+import dayjs from '@/lib/dayjs';
 import type { Currency, TimeSeriesAmount } from '@/lib/graphql/types/v2/graphql';
 
 import MessageBox from '@/components/MessageBox';
+
+import { renderChartTooltip } from './chartTooltip';
 
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 type OverviewChartSeries = { name: string; color: string; data?: TimeSeriesAmount | null };
 
+const monthKey = (date: string) => dayjs.utc(date).format('YYYY-MM');
+const monthLabel = (key: string) => dayjs.utc(`${key}-01`).format('MMM YYYY');
+
 function Chart({ series, currency }: { series: OverviewChartSeries[]; currency?: Currency }) {
   const intl = useIntl();
 
-  const withData = series.filter(s => s.data?.nodes?.length);
-  const normalized = withData.map(s => ({ ...s, data: setDatesIfMissing(s.data) }));
-  const timeUnit = normalized[0]?.data?.timeUnit;
+  const indexed = series
+    .filter(s => s.data?.nodes?.length)
+    .map(s => {
+      const byMonth = new Map<string, number>();
+      for (const node of s.data.nodes) {
+        byMonth.set(monthKey(node.date), Math.abs((node.amount?.valueInCents ?? 0) / 100));
+      }
+      return { name: s.name, color: s.color, byMonth };
+    });
 
-  const apexSeries = normalized.map(s => ({
+  let months = uniq(flatten(indexed.map(s => Array.from(s.byMonth.keys())))).sort();
+  // Trim leading months where every series is empty, so an all-time window starts at first activity.
+  let start = 0;
+  while (start < months.length - 1 && indexed.every(s => (s.byMonth.get(months[start]) ?? 0) === 0)) {
+    start++;
+  }
+  months = months.slice(start);
+
+  const apexSeries = indexed.map(s => ({
     name: s.name,
     color: s.color,
-    data: formatSeriesData(s.data),
+    data: months.map((key, i) => ({ x: i, y: s.byMonth.get(key) ?? 0 })),
   }));
 
   const options: ApexOptions = {
@@ -45,8 +66,10 @@ function Chart({ series, currency }: { series: OverviewChartSeries[]; currency?:
       labels: {
         rotate: 0,
         hideOverlappingLabels: true,
-        formatter: value =>
-          formatDateLabel({ startDate: normalized[0]?.data?.dateFrom, index: Number(value), timeUnit }),
+        formatter: value => {
+          const key = months[Math.round(Number(value))];
+          return key ? monthLabel(key) : '';
+        },
       },
     },
     yaxis: {
@@ -54,18 +77,18 @@ function Chart({ series, currency }: { series: OverviewChartSeries[]; currency?:
       labels: { formatter: value => (currency ? formatAmountForLegend(value, currency, intl.locale) : String(value)) },
     },
     tooltip: {
-      x: { show: false },
-      y: {
-        title: {
-          formatter: (seriesName, { dataPointIndex }) => {
-            const s = normalized.find(x => x.name === seriesName);
-            return formatDateLabel({
-              startDate: s?.data?.dateFrom,
-              index: dataPointIndex,
-              timeUnit: s?.data?.timeUnit,
-            });
-          },
-        },
+      custom: ({ dataPointIndex }) => {
+        const key = months[dataPointIndex];
+        return renderChartTooltip({
+          title: key ? monthLabel(key) : '',
+          items: apexSeries.map(s => ({
+            label: s.name,
+            color: s.color,
+            value: currency
+              ? formatAmountForLegend(s.data[dataPointIndex]?.y ?? 0, currency, intl.locale, false)
+              : String(s.data[dataPointIndex]?.y ?? 0),
+          })),
+        });
       },
     },
   };
