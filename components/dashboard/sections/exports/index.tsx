@@ -367,7 +367,7 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
           label: intl.formatMessage({ defaultMessage: 'Download', id: 'Download' }),
           Icon: Download,
           href: exportRequest.file.url,
-          target: '_blank',
+          openInNewTab: true,
         });
       }
 
