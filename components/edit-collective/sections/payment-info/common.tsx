@@ -42,8 +42,7 @@ export const MethodCard = ({ children, showSubcontent, subContent, ...props }: M
 export const moreActionsThunk = (account: ManagePaymentMethodsQuery['account']) =>
   function MoreActions(
     paymentInfo:
-      | ManagePaymentMethodsQuery['account']['payoutMethods'][0]
-      | ManagePaymentMethodsQuery['account']['paymentMethods'],
+      ManagePaymentMethodsQuery['account']['payoutMethods'][0] | ManagePaymentMethodsQuery['account']['paymentMethods'],
   ) {
     const isPaymentMethodList = Array.isArray(paymentInfo);
     const transactionsLink = getDashboardRoute(

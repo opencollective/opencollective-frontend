@@ -60,14 +60,7 @@ type FormValues = {
 };
 
 export type EditableAccountingCategoryFields =
-  | 'kind'
-  | 'hostOnly'
-  | 'instructions'
-  | 'name'
-  | 'friendlyName'
-  | 'code'
-  | 'expensesTypes'
-  | 'appliesTo';
+  'kind' | 'hostOnly' | 'instructions' | 'name' | 'friendlyName' | 'code' | 'expensesTypes' | 'appliesTo';
 
 type useAccountingCategoryFormikOptions = {
   onSubmit: (values) => void | Promise<void>;
