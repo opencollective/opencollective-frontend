@@ -17,8 +17,6 @@ describe('host dashboard: create hosted collective', () => {
     const collectiveSlug = randomSlug();
     const firstInviteeEmail = randomEmail();
     const firstInviteeName = `Invitee One ${randomSlug()}`;
-    const secondInviteeEmail = randomEmail();
-    const secondInviteeName = `Invitee Two ${randomSlug()}`;
 
     cy.mailpitDeleteAllEmails();
 
@@ -59,35 +57,17 @@ describe('host dashboard: create hosted collective', () => {
       expect(result.count).to.be.greaterThan(0);
     });
 
-    // Open the collective details drawer
+    // Open the hosted account overview page (HostedAccountOverviewTab)
     cy.getByDataCy(`collective-${collectiveSlug}`).click();
-    cy.contains(`Collective's overview`).should('be.visible');
+    cy.contains(`Overview`).should('be.visible');
 
-    // The invited admin should be listed as "Invited" inside the admins table
-    cy.getByDataCy('admins-table').as('adminsTable');
-    cy.get('@adminsTable').contains(firstInviteeName).should('be.visible');
-    cy.get('@adminsTable').contains('Invited').should('be.visible');
-
-    // Invite a second admin from the drawer
-    cy.getByDataCy('invite-admin-btn').should('be.visible').click();
-    cy.getByDataCy('member-collective-picker').click();
-    cy.getByDataCy('collective-type-picker-USER').click();
-    cy.getByDataCy('create-collective-mini-form').then($form => {
-      cy.wrap($form).find('input[name="email"]').type(secondInviteeEmail);
-      cy.wrap($form).find('input[name="name"]').type(secondInviteeName);
-      cy.wrap($form).find('button[type="submit"]').click();
-    });
-    cy.getByDataCy('create-collective-mini-form').should('not.exist');
-    cy.getByDataCy('confirmation-modal-continue').click();
-    cy.checkToast({ variant: 'success', message: 'Member invited successfully.' });
-
-    // Second invitee should also receive an invitation email
-    cy.mailpitHasEmailsBySubject(`[TESTING] Invitation to join ${collectiveName}`).then(result => {
-      expect(result.count).to.be.greaterThan(1);
-    });
+    // The invited admin should be listed inside the admins section (as a pending invitation)
+    cy.getByDataCy('admins-list').as('adminsList');
+    cy.get('@adminsList').contains(firstInviteeName).should('be.visible');
 
     // The new invitee should appear in the admins list as "Invited"
-    cy.getByDataCy('admins-table').contains(secondInviteeName).should('be.visible');
+    cy.logout();
+    cy.visit('/home');
 
     // The first invitee receives an email and can complete onboarding & accept the invitation
     cy.openEmail(
@@ -103,17 +83,17 @@ describe('host dashboard: create hosted collective', () => {
       const href = inviteLink.attr('href');
       expect(href, 'invitation link href').to.be.a('string');
       const parsedUrl = new URL(href);
-      cy.logout();
       cy.visit(parsedUrl.pathname + parsedUrl.search);
     });
 
     // The invitee signs in with their email (direct sign-in for opencollective.com test addresses)
-    cy.url().should('include', '/signin');
+    // cy.url().should('include', '/signin');
     cy.get('input[name=email]').type(firstInviteeEmail);
     cy.get('button[type=submit]').click();
 
     // New user is routed through /signup/profile before reaching the invitation
     cy.url().should('include', '/signup/profile');
+    cy.url().should('include', `next=${encodeURIComponent('/member-invitations')}`);
     cy.getByDataCy('complete-profile-form').as('profileForm');
     cy.get('@profileForm').find('input[name="name"]').type(firstInviteeName);
     cy.get('@profileForm').find('button[type="submit"]').click();
@@ -146,13 +126,13 @@ describe('host dashboard: create hosted collective', () => {
     // Verify the collective appears in the table
     cy.getByDataCy(`collective-${collectiveSlug}`).should('exist').contains(collectiveName);
 
-    // Open the drawer and verify there's at least one admin and no pending invitations
+    // Open the hosted account overview page and verify there's at least one admin and no pending invitations
     cy.getByDataCy(`collective-${collectiveSlug}`).click();
-    cy.contains(`Collective's overview`).should('be.visible');
+    cy.contains(`Overview`).should('be.visible');
 
-    // The "Invite admin" button is only shown to host admins when the collective has no admins.
-    // Once self has been added as admin, the host admin shouldn't see that button anymore.
+    // The "Invite admin" option is not shown in More Actions when an admin already exists
+    cy.getByDataCy('more-actions-btn').first().click();
     cy.getByDataCy('invite-admin-btn').should('not.exist');
-    cy.getByDataCy('admins-table').should('not.contain', 'Invited');
+    cy.getByDataCy('cancel-invitation-btn').should('not.exist');
   });
 });

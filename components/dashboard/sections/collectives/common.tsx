@@ -13,6 +13,7 @@ import {
   ReceiptText,
   SquareSigma,
   Unlink,
+  UserPlus,
   View,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -21,11 +22,13 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
 import type { AccountWithHost, HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import { MemberRole } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { CollectiveType } from '@/lib/constants/collectives';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
+import InviteMemberModal from '@/components/edit-collective/sections/team/InviteMemberModal';
 import { useModal } from '@/components/ModalContext';
 import { SubmitGrantFlowModal } from '@/components/submit-grant/SubmitGrantFlow';
 
@@ -63,9 +66,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const { intl } = table.options.meta as {
         intl: IntlShape;
       };
-      const collective = row.original;
-      const children = mapValues(groupBy(collective.childrenAccounts?.nodes, 'type'), 'length');
-      const isChild = collective.parent;
+      const account = row.original;
+      const children = mapValues(groupBy(account.childrenAccounts?.nodes, 'type'), 'length');
+      const isChild = account.parent;
+      const admins = account.members?.nodes || [];
+      const invitedAdmins = account.memberInvitations || [];
 
       const secondLine = isChild ? (
         <FormattedMessage
@@ -74,10 +79,10 @@ export const cols: Record<string, ColumnDef<any, any>> = {
           values={{
             childAccountType: (
               <Badge size="xs" type="outline">
-                {formatCollectiveType(intl, collective.type)}
+                {formatCollectiveType(intl, account.type)}
               </Badge>
             ),
-            parentAccount: collective.parent.name,
+            parentAccount: account.parent.name,
           }}
         />
       ) : (
@@ -88,18 +93,23 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       return (
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center">
-            <Avatar collective={collective} className="mr-4" radius={48} />
-            {collective.isFrozen && (
+            <Avatar collective={account} className="mr-4" radius={48} />
+            {account.isFrozen && (
               <Badge type="info" size="xs" className="mr-2">
                 <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
               </Badge>
             )}
+            {admins.length === 0 && invitedAdmins.length > 0 && (
+              <Badge size="xs" className="mr-2 whitespace-nowrap">
+                <FormattedMessage defaultMessage="Invited" id="NmK6zP" />
+              </Badge>
+            )}
             <div className="flex flex-col items-start">
-              <div className="flex items-center text-sm">{collective.name}</div>
+              <div className="flex items-center text-sm">{account.name}</div>
               <div className="text-xs">{secondLine}</div>
             </div>
           </div>
-          {Boolean(collective.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS) && (
+          {Boolean(account.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS) && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <View className="cursor-help" size="16" />
@@ -150,15 +160,14 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const account = row.original;
       const admins = account.members?.nodes || [];
       const invitedAdmins = account.memberInvitations || [];
-      const displayed = admins.length > DISPLAYED_TEAM_MEMBERS ? admins.slice(0, DISPLAYED_TEAM_MEMBERS - 1) : admins;
-      const left = admins.length - displayed.length;
-      if (admins.length === 0 && invitedAdmins.length > 0) {
-        return (
-          <Badge size="xs" className="whitespace-nowrap">
-            <FormattedMessage defaultMessage="Invited" id="NmK6zP" />
-          </Badge>
-        );
-      }
+      const displayed =
+        admins.length > DISPLAYED_TEAM_MEMBERS
+          ? admins.slice(0, DISPLAYED_TEAM_MEMBERS - 1)
+          : admins.length === 0
+            ? invitedAdmins
+            : admins;
+      const left = admins.length > 0 && admins.length - displayed.length;
+
       return (
         <div className="flex gap-[-4px]">
           {displayed.map(admin => (
@@ -437,12 +446,16 @@ export const MoreActionsMenu = ({
   const { showModal } = useModal();
   const { account } = React.useContext(DashboardContext);
   const [openModal, setOpenModal] = React.useState<
-    null | 'ADD_FUNDS' | 'ADD_EXPENSE' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT'
+    null | 'ADD_FUNDS' | 'ADD_EXPENSE' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT' | 'INVITE_ADMIN'
   >(null);
 
   const { LoggedInUser } = useLoggedInUser();
 
   const isCollectiveAdmin = LoggedInUser.isAdminOfCollective(collective);
+  const adminMembers = collective?.members?.nodes || [];
+  const canInviteAdmin = Boolean(
+    adminMembers.length === 0 && LoggedInUser?.isHostAdmin(collective) && !isCollectiveAdmin,
+  );
 
   return (
     <React.Fragment>
@@ -497,6 +510,19 @@ export const MoreActionsMenu = ({
               <ReceiptText className="mr-2" size="16" />
               <FormattedMessage defaultMessage="View grant requests" id="HABa5r" />
             </DropdownMenuItem>
+          )}
+          {canInviteAdmin && (
+            <React.Fragment>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="cursor-pointer"
+                data-cy="invite-admin-btn"
+                onClick={() => setOpenModal('INVITE_ADMIN')}
+              >
+                <UserPlus className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="Invite admin" id="collective.invite.admin" />
+              </DropdownMenuItem>
+            </React.Fragment>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -616,6 +642,23 @@ export const MoreActionsMenu = ({
             <ContactCollectiveModal
               collective={{ ...collective, id: collective.legacyId }}
               onClose={() => setOpenModal(null)}
+            />
+          )}
+          {openModal === 'INVITE_ADMIN' && (
+            <InviteMemberModal
+              intl={undefined}
+              collective={collective as any}
+              membersIds={[
+                ...adminMembers.map(m => m.account?.id),
+                ...((collective as any).memberInvitations?.map(i => i.memberAccount?.id) ?? []),
+              ]}
+              cancelHandler={() => {
+                setOpenModal(null);
+                onEdit?.();
+              }}
+              fixedRole={MemberRole.ADMIN}
+              showDescription={false}
+              showSince={false}
             />
           )}
         </React.Fragment>
