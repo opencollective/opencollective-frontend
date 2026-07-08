@@ -125,7 +125,11 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
   const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
 
   React.useLayoutEffect(() => {
-    if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
+    if (
+      !router.route.includes('/signin') &&
+      !router.route.includes('/signup') &&
+      LoggedInUser?.requiresProfileCompletion
+    ) {
       router.push('/signup/profile');
     }
   }, [LoggedInUser, router]);
