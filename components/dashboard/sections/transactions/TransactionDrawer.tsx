@@ -9,7 +9,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '../../../../lib/actions/types';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
-import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { getPermalinkPath } from '../../../../lib/url-helpers';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -31,8 +32,6 @@ import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 import { Skeleton } from '../../../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
-import { ALL_SECTIONS } from '../../constants';
-import { DashboardContext } from '../../DashboardContext';
 
 import type { TransactionDetailsQueryNode } from './types';
 
@@ -40,6 +39,7 @@ const transactionQuery = gql`
   query TransactionDetails($transaction: TransactionReferenceInput!) {
     transaction(transaction: $transaction) {
       id
+      publicId
       legacyId
       group
       amount {
@@ -162,6 +162,7 @@ const transactionQuery = gql`
       }
       order {
         id
+        publicId
         legacyId
         status
         description
@@ -188,6 +189,7 @@ const transactionQuery = gql`
       }
       expense {
         id
+        publicId
         status
         tags
         type
@@ -258,15 +260,6 @@ interface TransactionDetailsProps {
   getActions: GetActions<TransactionDetailsQueryNode>;
 }
 
-const getExpenseUrl = (dashboardAccount, expense) => {
-  if (dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id) {
-    return getDashboardRoute(expense.host, `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`);
-  } else if (dashboardAccount?.id === expense.account.id) {
-    return getDashboardRoute(expense.account, `expenses?openExpenseId=${expense.legacyId}`);
-  }
-  return `/${expense.account.slug}/expenses/${expense.legacyId}`;
-};
-
 function TransactionDetails({ transactionId, getActions }: TransactionDetailsProps) {
   const intl = useIntl();
   const prevTransactionId = usePrevious(transactionId);
@@ -274,17 +267,13 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   const { data, refetch, loading, error } = useQuery(transactionQuery, {
     variables: { transaction: { legacyId: Number(id) } },
   });
-  const { account } = React.useContext(DashboardContext);
   const { transaction } = data || { transaction: null };
   const dropdownTriggerRef = React.useRef(undefined);
   const actions = getActions(transaction, dropdownTriggerRef, refetch);
   const accountingCategory = transaction?.expense?.accountingCategory || transaction?.order?.accountingCategory;
 
-  let expenseUrl;
+  usePermalinkBrowserUrl(transaction?.publicId);
 
-  if (transaction?.expense) {
-    expenseUrl = getExpenseUrl(account, transaction.expense);
-  }
   return (
     <React.Fragment>
       <DrawerHeader
@@ -634,7 +623,10 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                       value={
                         <HoverCard>
                           <HoverCardTrigger asChild>
-                            <Link href={expenseUrl} className="underline hover:text-primary">
+                            <Link
+                              href={getPermalinkPath(transaction.expense.publicId)}
+                              className="underline hover:text-primary"
+                            >
                               {transaction?.expense.description}
                             </Link>
                           </HoverCardTrigger>
@@ -652,7 +644,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                         <HoverCard>
                           <HoverCardTrigger asChild>
                             <Link
-                              href={`/${transaction?.order.toAccount.slug}/contributions/${transaction?.order.legacyId}`}
+                              href={getPermalinkPath(transaction.order.publicId)}
                               className="underline hover:text-primary"
                             >
                               {transaction?.order.description}

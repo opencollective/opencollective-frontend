@@ -444,6 +444,12 @@ export const getCommentUrl = (comment: Comment, loggedInUser: LoggedInUser) => {
   }
 };
 
+/** Relative permalink path for a public id, e.g. `/permalink/{publicId}` — for in-app links. */
+export function getPermalinkPath(publicId: string): string {
+  return `/permalink/${publicId}`;
+}
+
+/** Absolute permalink URL for a public id — for sharing/copying outside the app. */
 export function getPermalinkUrl(publicId: string): string {
-  return `${getWebsiteUrl()}/permalink/${publicId}`;
+  return `${getWebsiteUrl()}${getPermalinkPath(publicId)}`;
 }

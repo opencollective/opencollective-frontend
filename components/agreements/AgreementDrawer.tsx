@@ -4,10 +4,13 @@ import { FormattedMessage } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import type { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
+import { getPermalinkPath } from '../../lib/url-helpers';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import { Drawer } from '../Drawer';
 import DrawerHeader from '../DrawerHeader';
 import FilesViewerModal from '../FilesViewerModal';
+import Link from '../Link';
 
 import AgreementDetails from './AgreementDetails';
 import AgreementForm from './AgreementForm';
@@ -39,6 +42,8 @@ export default function AgreementDrawer({
 }: AgreementDrawerProps) {
   const [isEditing, setEditing] = React.useState<boolean>(initialIsEditing);
   const [filesViewerOpen, setFilesViewerOpen] = React.useState<boolean>(false);
+
+  usePermalinkBrowserUrl(open && agreement?.publicId ? agreement.publicId : null);
 
   // Reset editing state when drawer opens/closes or agreement changes
   React.useEffect(() => {
@@ -83,7 +88,14 @@ export default function AgreementDrawer({
             <DrawerHeader
               actions={actions}
               entityName={<FormattedMessage defaultMessage="Agreement" id="J3yqC3" />}
-              entityIdentifier={agreement.publicId}
+              entityIdentifier={
+                <Link
+                  href={getPermalinkPath(agreement.publicId)}
+                  className="font-mono text-muted-foreground hover:text-foreground hover:underline"
+                >
+                  {agreement.publicId}
+                </Link>
+              }
               entityLabel={agreement.title}
               dropdownTriggerRef={dropdownTriggerRef}
             />

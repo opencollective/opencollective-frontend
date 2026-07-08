@@ -2,6 +2,7 @@ import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -39,6 +40,8 @@ const AccountKeysI18n = defineMessages({
 
 export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDrawerProps) {
   const intl = useIntl();
+
+  usePermalinkBrowserUrl(activity?.publicId ? activity.publicId : null);
   return (
     <Drawer open={Boolean(activity)} onClose={onClose} data-cy="activity-drawer">
       {Boolean(activity) && (

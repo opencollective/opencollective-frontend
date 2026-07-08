@@ -21,6 +21,7 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import { ExportRequestStatus, ExportRequestType } from '@/lib/graphql/types/v2/graphql';
 import useClipboard from '@/lib/hooks/useClipboard';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import EditValueDialog from '@/components/EditValueDialog';
 import { PaymentMethodLabel } from '@/components/PaymentMethodLabel';
@@ -50,6 +51,7 @@ const editExportRequestMutation = gql`
 const exportRequestFieldsFragment = gql`
   fragment ExportRequestDetailsFields on ExportRequest {
     id
+    publicId
     legacyId
     name
     type
@@ -406,6 +408,8 @@ export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete 
 
     return { primary, secondary };
   }, [exportRequest, intl, onDelete, copy, isCopied]);
+
+  usePermalinkBrowserUrl(open && exportRequest?.publicId ? exportRequest.publicId : null);
 
   if (!exportRequestId) {
     return null;

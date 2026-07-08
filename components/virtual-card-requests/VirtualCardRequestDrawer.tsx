@@ -8,6 +8,7 @@ import type { VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
 import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import Avatar from '../Avatar';
@@ -27,6 +28,7 @@ const virtualCardRequestQuery = gql`
   query VirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
     virtualCardRequest(virtualCardRequest: $virtualCardRequest) {
       id
+      publicId
       purpose
       notes
       status
@@ -154,6 +156,8 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
 
   const { loading, error, data } = query;
   const virtualCardRequest = data?.virtualCardRequest;
+
+  usePermalinkBrowserUrl(open && virtualCardRequest ? virtualCardRequest.publicId : null);
 
   return (
     <Drawer

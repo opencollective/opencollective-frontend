@@ -7,7 +7,8 @@ import type { GetActions } from '../../../../lib/actions/types';
 import type { Account, LegalDocumentFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
-import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute, getPermalinkPath } from '../../../../lib/url-helpers';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -47,6 +48,7 @@ const legalDocumentDrawerQuery = gql`
       totalCount
       nodes {
         id
+        publicId
         legacyId
         type
         description
@@ -77,6 +79,8 @@ export default function LegalDocumentDrawer({
     variables: { hostId: host.id, accountId: get(document, 'account.id') },
     skip: !document,
   });
+
+  usePermalinkBrowserUrl(open && document?.publicId ? document.publicId : null);
 
   return (
     <Sheet open={open} onOpenChange={onClose} data-cy="legal-document-drawer">
@@ -149,7 +153,7 @@ export default function LegalDocumentDrawer({
                           values={{
                             date: <DateTime dateStyle="medium" value={expense.createdAt} />,
                             ExpenseLink: getI18nLink({
-                              href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                              href: getPermalinkPath(expense.publicId),
                               title: expense.description,
                               textDecoration: 'underline',
                               color: 'black.900',

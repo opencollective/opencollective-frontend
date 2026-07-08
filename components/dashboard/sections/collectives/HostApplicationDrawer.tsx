@@ -13,6 +13,7 @@ import type {
 import { HostApplicationStatus, ProcessHostApplicationAction } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nCustomApplicationFormLabel } from '../../../../lib/i18n/custom-application-form';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -209,6 +210,8 @@ function HostApplication({
   const application = applicationQuery.data?.hostApplication;
   const account = application?.account;
   const host = application?.host;
+
+  usePermalinkBrowserUrl(open && application?.publicId ? application.publicId : null);
 
   const isHostAdmin = LoggedInUser.isAdminOfCollective(host);
 

@@ -150,7 +150,7 @@ const columns = [
 
 type AccountingCategoriesTableProps = {
   hostSlug: string;
-  accountingCategories: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>[];
+  accountingCategories: Pick<AccountingCategory, 'id' | 'publicId' | EditableAccountingCategoryFields>[];
   loading?: boolean;
   isFiltered?: boolean;
   isAdmin?: boolean;

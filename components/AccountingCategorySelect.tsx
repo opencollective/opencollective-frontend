@@ -21,6 +21,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 export const AccountingCategorySelectFieldsFragment = gql`
   fragment AccountingCategorySelectFields on AccountingCategory {
     id
+    publicId
     kind
     code
     hostOnly

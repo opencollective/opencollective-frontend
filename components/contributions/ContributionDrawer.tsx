@@ -8,6 +8,7 @@ import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '
 import { ContributionFrequency, OrderStatus, PaymentMethodService } from '../../lib/graphql/types/v2/graphql';
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
@@ -329,6 +330,8 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
     () => (order ? getActions(order, dropdownTriggerRef) : null),
     [order, getActions, dropdownTriggerRef],
   );
+
+  usePermalinkBrowserUrl(open && orderId && order ? order.publicId : null);
 
   return (
     <Sheet open={open} onOpenChange={isOpen => !isOpen && onClose()}>

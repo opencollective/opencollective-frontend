@@ -41,6 +41,7 @@ const accountingCategoriesQuery = gql`
   query AdminAccountingCategories($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
+      publicId
       type
       slug
       accountingCategories {

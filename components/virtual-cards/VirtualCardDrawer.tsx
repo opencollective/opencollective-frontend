@@ -7,6 +7,7 @@ import { gql } from '../../lib/graphql/helpers';
 import type { VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/graphql';
 import { VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import Avatar from '../Avatar';
@@ -39,6 +40,7 @@ const virtualCardQuery = gql`
   query VirtualCardDrawer($virtualCard: VirtualCardReferenceInput!) {
     virtualCard(virtualCard: $virtualCard) {
       id
+      publicId
       name
       last4
       data
@@ -53,6 +55,7 @@ const virtualCardQuery = gql`
       status
       account {
         id
+        publicId
         name
         slug
         imageUrl
@@ -68,6 +71,7 @@ const virtualCardQuery = gql`
       }
       host {
         id
+        publicId
         slug
         stripe {
           username
@@ -106,6 +110,8 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
 
   const { loading, data, error } = query;
   const virtualCard = data?.virtualCard;
+
+  usePermalinkBrowserUrl(open && virtualCard ? virtualCard.publicId : null);
 
   return (
     <Drawer

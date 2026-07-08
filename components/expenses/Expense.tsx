@@ -276,7 +276,7 @@ function Expense(props: ExpenseProps) {
                 LinkExpense: text => {
                   if (inDrawer) {
                     return (
-                      <Link href={`/${expense?.account.slug}/expenses/${expense?.legacyId}`}>
+                      <Link href={`/id/${expense?.publicId}`}>
                         <span>#{text}</span>
                       </Link>
                     );

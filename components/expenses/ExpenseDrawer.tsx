@@ -2,6 +2,7 @@ import React from 'react';
 import { useApolloClient, useQuery } from '@apollo/client';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { usePermalinkBrowserUrl } from '../../lib/hooks/usePermalinkBrowserUrl';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
@@ -43,6 +44,11 @@ export default function ExpenseDrawer({
 
     fetchPolicy: 'cache-and-network',
   });
+
+  const expense = data?.expense;
+  usePermalinkBrowserUrl(
+    openExpenseLegacyId && expense?.legacyId === openExpenseLegacyId ? expense.publicId : undefined,
+  );
   const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
   const passesValidations = React.useMemo(() => {
     if (!validate || (!data?.expense && !loading && !error)) {

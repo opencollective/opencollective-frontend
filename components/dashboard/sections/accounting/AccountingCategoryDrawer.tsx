@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { AccountingCategory } from '../../../../lib/graphql/types/v2/graphql';
 import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
+import { usePermalinkBrowserUrl } from '@/lib/hooks/usePermalinkBrowserUrl';
 
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '@/components/ui/DataList';
 import { Separator } from '@/components/ui/Separator';
@@ -26,7 +27,7 @@ type AccountingCategoryDrawerProps = {
   onClose: () => void;
   onEdit: (category: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => void;
   onDelete: (category: Pick<AccountingCategory, 'id'>) => void;
-  accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
+  accountingCategory?: Pick<AccountingCategory, 'id' | 'publicId' | EditableAccountingCategoryFields>;
   hasHosting: boolean;
   isInitiallyEditing?: boolean;
 };
@@ -43,6 +44,8 @@ export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
   React.useEffect(() => {
     setIsEditing(props.isInitiallyEditing || false);
   }, [props.isInitiallyEditing]);
+
+  usePermalinkBrowserUrl(props.open && props.accountingCategory?.publicId ? props.accountingCategory.publicId : null);
 
   return (
     <Drawer maxWidth="512px" open={props.open} onClose={props.onClose} showActionsContainer>
