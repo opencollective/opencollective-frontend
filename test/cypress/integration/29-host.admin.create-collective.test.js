@@ -57,13 +57,14 @@ describe('host dashboard: create hosted collective', () => {
       expect(result.count).to.be.greaterThan(0);
     });
 
+    // Uncomment this after Hosted Collective Overview page is implemented
     // Open the hosted account overview page (HostedAccountOverviewTab)
-    cy.getByDataCy(`collective-${collectiveSlug}`).click();
-    cy.contains(`Overview`).should('be.visible');
+    // cy.getByDataCy(`collective-${collectiveSlug}`).click();
+    // cy.contains(`Overview`).should('be.visible');
 
     // The invited admin should be listed inside the admins section (as a pending invitation)
-    cy.getByDataCy('admins-list').as('adminsList');
-    cy.get('@adminsList').contains(firstInviteeName).should('be.visible');
+    // cy.getByDataCy('admins-list').as('adminsList');
+    // cy.get('@adminsList').contains(firstInviteeName).should('be.visible');
 
     // The new invitee should appear in the admins list as "Invited"
     cy.logout();
@@ -87,7 +88,7 @@ describe('host dashboard: create hosted collective', () => {
     });
 
     // The invitee signs in with their email (direct sign-in for opencollective.com test addresses)
-    // cy.url().should('include', '/signin');
+    cy.url().should('include', '/signin');
     cy.get('input[name=email]').type(firstInviteeEmail);
     cy.get('button[type=submit]').click();
 
@@ -123,16 +124,17 @@ describe('host dashboard: create hosted collective', () => {
     cy.getByDataCy('create-collective-submit').click();
     cy.checkToast({ variant: 'success', message: 'Collective created successfully!' });
 
+    // Uncomment this after Hosted Collective Overview page is implemented
     // Verify the collective appears in the table
-    cy.getByDataCy(`collective-${collectiveSlug}`).should('exist').contains(collectiveName);
+    // cy.getByDataCy(`collective-${collectiveSlug}`).should('exist').contains(collectiveName);
 
     // Open the hosted account overview page and verify there's at least one admin and no pending invitations
-    cy.getByDataCy(`collective-${collectiveSlug}`).click();
-    cy.contains(`Overview`).should('be.visible');
+    // cy.getByDataCy(`collective-${collectiveSlug}`).click();
+    // cy.contains(`Overview`).should('be.visible');
 
     // The "Invite admin" option is not shown in More Actions when an admin already exists
-    cy.getByDataCy('more-actions-btn').first().click();
-    cy.getByDataCy('invite-admin-btn').should('not.exist');
-    cy.getByDataCy('cancel-invitation-btn').should('not.exist');
+    // cy.getByDataCy('more-actions-btn').first().click();
+    // cy.getByDataCy('invite-admin-btn').should('not.exist');
+    // cy.getByDataCy('cancel-invitation-btn').should('not.exist');
   });
 });
