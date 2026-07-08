@@ -815,7 +815,7 @@ const ExportTransactionsCSVModal = ({
                   </div>
                   <div className="flex flex-col gap-3 sm:flex-row">
                     <Button variant="outline" asChild>
-                      <Link href={`/dashboard/${account?.slug}/exports`}>
+                      <Link href={`/dashboard/${account?.slug}/exports`} shallow>
                         <FormattedMessage id="GoToExports" defaultMessage="Go to Exports" />
                       </Link>
                     </Button>
