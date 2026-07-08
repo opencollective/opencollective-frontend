@@ -18,7 +18,7 @@ export function renderChartTooltip(opts: { title: string; subtitle?: string; ite
     )
     .join('');
   return `
-    <div style="font-family:Inter,sans-serif;min-width:168px;">
+    <div style="font-family:Inter,sans-serif;min-width:168px;border-radius:5px;overflow:hidden;">
       <div style="padding:8px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
         <span style="font-weight:700;color:#1e293b;">${opts.title}</span>${subtitle}
       </div>
