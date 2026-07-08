@@ -33,7 +33,7 @@ function DropdownActionItemContent({ action }: { action: Action }) {
 export function DropdownActionItem({ action }: { action: Action }) {
   const item = action.href ? (
     <DropdownMenuItem asChild className="gap-2.5" disabled={action.disabled} data-cy={action['data-cy']}>
-      <Link href={action.href} target={action.target} onClick={action.onClick}>
+      <Link href={action.href} openInNewTab={action.openInNewTab} onClick={action.onClick}>
         <DropdownActionItemContent action={action} />
       </Link>
     </DropdownMenuItem>
@@ -110,7 +110,7 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
                 onClick={action.onClick}
               >
                 {action.href ? (
-                  <Link href={action.href} target={action.target}>
+                  <Link href={action.href} openInNewTab={action.openInNewTab}>
                     <action.Icon size={16} />
                   </Link>
                 ) : (

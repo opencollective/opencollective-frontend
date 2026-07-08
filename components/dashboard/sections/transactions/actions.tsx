@@ -182,6 +182,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
           key: 'view-payment-processor',
           label: intl.formatMessage({ defaultMessage: 'View in payment processor', id: 'NgSLbI' }),
           href: transaction.paymentProcessorUrl,
+          openInNewTab: true,
           Icon: ExternalLink,
           if: Boolean(transaction.paymentProcessorUrl),
         },
