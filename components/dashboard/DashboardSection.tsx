@@ -58,6 +58,7 @@ import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
+import HostPaymentIntents from './sections/payment-intents/HostPaymentIntents';
 import { DashboardPlatformSubscription } from './sections/platform-subscription/DashboardPlatformSubscription';
 import Reports from './sections/reports/Reports';
 import Search from './sections/search/Search';
@@ -125,6 +126,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.INCOMPLETE_CONTRIBUTIONS]: IncompleteContributions,
   [SECTIONS.TRANSACTIONS]: AccountTransactions,
   [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
+  [SECTIONS.HOST_PAYMENT_INTENTS]: HostPaymentIntents,
   [SECTIONS.UPDATES]: Updates,
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,

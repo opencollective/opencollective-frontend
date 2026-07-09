@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
   Award,
+  Banknote,
   BarChart2,
   BookOpenCheck,
   BookUserIcon,
@@ -355,6 +356,16 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           ),
         },
       ],
+    },
+    {
+      if:
+        hasHosting &&
+        hasMoneyManagement &&
+        !isCommunityManagerOnly &&
+        LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_PAYMENT_INTENTS),
+      section: ALL_SECTIONS.HOST_PAYMENT_INTENTS,
+      label: intl.formatMessage({ defaultMessage: 'Payment Intents', id: 'PaymentIntents' }),
+      Icon: Banknote,
     },
     {
       if: !isIndividual && isHostedType && !isCommunityManagerOnly,

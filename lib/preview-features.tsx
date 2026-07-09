@@ -20,11 +20,13 @@ export enum PREVIEW_FEATURE_KEYS {
   ASYNC_EXPORTS = 'ASYNC_EXPORTS',
   TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
   HOSTED_ACCOUNT_OVERVIEW = 'HOSTED_ACCOUNT_OVERVIEW',
+  HOST_PAYMENT_INTENTS = 'HOST_PAYMENT_INTENTS',
 }
 
-enum Categories {
-  HOSTING = 'Hosting',
+export enum Categories {
   GENERAL = 'General Platform',
+  HOSTING = 'Hosting',
+  ACCOUNTING = 'Accounting',
   FOR_NERDS = 'For Nerds',
 }
 
@@ -293,5 +295,19 @@ export const previewFeatures: PreviewFeature[] = [
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     alwaysEnableInDev: true,
     category: Categories.HOSTING,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.HOST_PAYMENT_INTENTS,
+    title: <FormattedMessage defaultMessage="Payment Intents Dashboard" id="PreviewFeatures.hostPaymentIntentsTitle" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="List and inspect payment intents flowing through your fiscal host, including related transactions, expenses, and contributions."
+        id="PreviewFeatures.hostPaymentIntentsDescription"
+      />
+    ),
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
+    alwaysEnableInDev: true,
+    category: Categories.ACCOUNTING,
   },
 ];
