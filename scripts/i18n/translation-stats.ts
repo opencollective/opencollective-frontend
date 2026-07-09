@@ -107,6 +107,7 @@ const IGNORED: Record<string, readonly string[]> = {
     'X3AIiK', // "Europe" - identique
     'sV2v5L', // "Instructions" - identique
     'tZEZGT', // "{n, plural, one {1 contribution} other {{n} contributions}}" - identique
+    '/TlAIY', // "Visible" - même terme en français
   ],
 };
 
