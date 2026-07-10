@@ -2482,6 +2482,8 @@
   "InIncognito": "En mode incognito",
   "initiate-kyc": "Initier le KYC",
   "InputTypeCountry.placeholder": "Veuillez sélectionner votre pays",
+  "Interactions": "Interactions",
+  "Interactions.Description": "{comments, plural, one {# comment} other {# comments}} and {reactions, plural, one {# reaction} other {# reactions}}",
   "InternalTransfers": "Transferts internes",
   "InternalTransfers.description": "Argent transféré (via des contributions) au sein de votre organisation.",
   "InvalidURL": "URL invalide. Elle doit commencer par http:// ou https://.",
