@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Update } from '../../../../lib/graphql/types/v2/graphql';
+import type { Update, UpdateFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { UpdateAudience } from '../../../../lib/graphql/types/v2/graphql';
 import { elementFromClass } from '../../../../lib/react-utils';
 import { formatDate } from '../../../../lib/utils';
@@ -12,9 +12,9 @@ import LinkCollective from '../../../LinkCollective';
 import { Badge } from '../../../ui/Badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
-export const TwoColumnContainer = elementFromClass('div', 'flex flex-col gap-6 lg:flex-row lg:gap-10');
-export const MainColumn = elementFromClass('div', 'flex w-full max-w-3xl flex-col gap-6');
-const SideColumnWrapper = elementFromClass('div', 'w-full lg:max-w-56');
+export const TwoColumnContainer = elementFromClass('div', 'flex flex-col gap-6 xl:flex-row xl:gap-10');
+export const MainColumn = elementFromClass('div', 'flex w-full xl:max-w-3xl flex-col gap-6');
+const SideColumnWrapper = elementFromClass('div', 'w-full xl:max-w-56');
 export const SideColumn = ({ children }) => (
   <SideColumnWrapper>
     <div className="sticky top-10 flex flex-col gap-6">{children}</div>
@@ -31,7 +31,7 @@ export const SideColumnItem = ({ children }) => {
   );
 };
 
-export const UpdateStatus = ({ update }: { update: Partial<Update> }) => {
+export const UpdateStatus = ({ update }: { update: UpdateFieldsFragment }) => {
   let type, message, tooltip;
   if (update.publishedAt) {
     type = 'info';
@@ -104,11 +104,11 @@ export const UpdateStatus = ({ update }: { update: Partial<Update> }) => {
   );
 };
 
-export const UpdateDate = ({ update }: { update: Partial<Update> }) => {
+export const UpdateDate = ({ update }: { update: UpdateFieldsFragment }) => {
   const author = (
     <AccountHoverCard
       key={update.fromAccount.id}
-      account={update.fromAccount}
+      account={update.fromAccount as Update['fromAccount']}
       includeAdminMembership={{ accountSlug: update.account.slug }}
       trigger={
         <div className="mx-1 inline-flex flex-row items-baseline gap-1">
