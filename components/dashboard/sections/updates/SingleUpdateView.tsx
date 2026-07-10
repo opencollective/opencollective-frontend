@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
+import { sum } from 'lodash-es';
 import { ArrowLeft, Eye, Pencil, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -9,11 +10,8 @@ import { getDateFromValue, toIsoDateStr } from '../../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 import { formatDate } from '../../../../lib/utils';
+import type { UpdateViewQuery, UpdateViewQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
-import CommentForm from '../../../conversations/CommentForm';
-import EmojiReactionPicker from '../../../conversations/EmojiReactionPicker';
-import EmojiReactions from '../../../conversations/EmojiReactions';
-import Thread from '../../../conversations/Thread';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -49,8 +47,7 @@ const SingleUpdateView = ({ updateId }) => {
   const { toast } = useToast();
   const { showConfirmationModal } = useModal();
   const { account } = React.useContext(DashboardContext);
-  const [replyingToComment, setReplyingToComment] = React.useState(null);
-  const { data, loading, refetch, error, fetchMore } = useQuery(updatesViewQuery, {
+  const { data, loading, error } = useQuery<UpdateViewQuery, UpdateViewQueryVariables>(updatesViewQuery, {
     variables: {
       id: updateId,
     },
@@ -62,8 +59,7 @@ const SingleUpdateView = ({ updateId }) => {
   const update = data?.update;
   const isDraft = !update?.publishedAt;
   const comments = update?.comments;
-
-  const refetchUpdate = useCallback(() => refetch({ id: updateId }), [refetch, updateId]);
+  const reactionCount = update?.reactions ? sum(Object.values(update.reactions)) : 0;
 
   const handleDelete = useCallback(
     async () =>
@@ -98,29 +94,6 @@ const SingleUpdateView = ({ updateId }) => {
     [updateId, deleteUpdate, account, router, refetchQueries, intl, showConfirmationModal, toast],
   );
 
-  const handleFetchMoreComments = useCallback(
-    () =>
-      fetchMore({
-        variables: { id: updateId, commentOffset: comments?.nodes?.length },
-        updateQuery: (prev, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return prev;
-          }
-          const newValues = {};
-          newValues['update'] = {
-            ...prev.update,
-            comments: {
-              ...fetchMoreResult.update.comments,
-              nodes: [...prev.update.comments.nodes, ...fetchMoreResult.update.comments.nodes],
-            },
-          };
-
-          return Object.assign({}, prev, newValues);
-        },
-      }),
-    [comments, fetchMore, updateId],
-  );
-
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col-reverse lg:flex-row">
       <div className="flex flex-1 flex-col gap-6">
@@ -148,54 +121,28 @@ const SingleUpdateView = ({ updateId }) => {
                       </div>
                     </header>
                     <HTMLContent content={update.html} />
-                    {!isDraft && (
-                      <div className="flex">
-                        <EmojiReactions reactions={update.reactions} />
-                        <EmojiReactionPicker update={update} />
-                      </div>
-                    )}
-                    <hr />
-                    {update.userCanSeeUpdate && (
-                      <footer>
-                        {comments?.nodes?.length > 0 && (
-                          <Thread
-                            collective={account}
-                            hasMore={comments?.nodes?.length < comments?.totalCount}
-                            fetchMore={handleFetchMoreComments}
-                            items={comments?.nodes}
-                            onCommentDeleted={refetchUpdate}
-                            getClickedComment={setReplyingToComment}
-                          />
-                        )}
-                        {!isDraft && (
-                          <div className="flex justify-center">
-                            <CommentForm
-                              id="new-update"
-                              UpdateId={update.id}
-                              onSuccess={refetchUpdate}
-                              replyingToComment={replyingToComment}
-                            />
-                          </div>
-                        )}
-                      </footer>
-                    )}
                   </article>
                 </MainColumn>
                 <SideColumn>
-                  <div className="flex gap-2 lg:flex-col lg:justify-stretch">
+                  <div className="flex flex-col gap-2 md:flex-row xl:flex-col">
                     <Link className="w-full" href={`${getCollectivePageRoute(account)}/updates/${update.slug}`}>
-                      <Button size="sm" variant="outline" className="w-full gap-1.5">
+                      <Button size="sm" variant="outline" className="w-full gap-1.5 text-nowrap">
                         <Eye size="16px" />
                         <FormattedMessage defaultMessage="View Update Page" id="6nTLxY" />
                       </Button>
                     </Link>
                     <Link className="w-full" href={getDashboardRoute(account, `updates/edit/${updateId}`)}>
-                      <Button size="sm" variant="outline" className="w-full gap-1.5" data-cy="update-edit-btn">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full gap-1.5 text-nowrap"
+                        data-cy="update-edit-btn"
+                      >
                         <Pencil size="16px" />
                         <FormattedMessage defaultMessage="Edit Update" id="wEQDC6" />
                       </Button>
                     </Link>
-                    <Button size="sm" variant="outline" className="w-full gap-1.5" onClick={handleDelete}>
+                    <Button size="sm" variant="outline" className="w-full gap-1.5 text-nowrap" onClick={handleDelete}>
                       <Trash size="16px" />
                       <FormattedMessage defaultMessage="Delete Update" id="Update.Delete.Title" />
                     </Button>
@@ -220,6 +167,19 @@ const SingleUpdateView = ({ updateId }) => {
                           month: 'long',
                           year: 'numeric',
                         })}
+                      </SideColumnItem>
+                    )}
+                    {!isDraft && (
+                      <SideColumnItem>
+                        <FormattedMessage id="Interactions" defaultMessage="Interactions" />
+                        <FormattedMessage
+                          id="Interactions.Description"
+                          defaultMessage="{comments, plural, one {# comment} other {# comments}} and {reactions, plural, one {# reaction} other {# reactions}}"
+                          values={{
+                            reactions: reactionCount,
+                            comments: comments?.totalCount || 0,
+                          }}
+                        />
                       </SideColumnItem>
                     )}
                     {update.makePublicOn && (
