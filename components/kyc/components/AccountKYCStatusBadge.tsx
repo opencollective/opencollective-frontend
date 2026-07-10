@@ -138,8 +138,7 @@ export function AccountKYCStatusBadge(props: AccountKYCStatusBadgeProps) {
   );
 
   const account = kycStatusQuery.data?.account as
-    | (AccountKycStatusBadgeIndividualQuery['account'] & { __typename: 'Individual' })
-    | null;
+    (AccountKycStatusBadgeIndividualQuery['account'] & { __typename: 'Individual' }) | null;
 
   const kycVerification = account?.kycVerifications?.nodes?.[0];
 

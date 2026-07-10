@@ -619,8 +619,7 @@ type ExpenseFormOptions = {
     MakeOptional<ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number], 'createdAt' | 'updatedAt'>
   >;
   payoutMethod?:
-    | ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]
-    | ExpenseFormValues['newPayoutMethod'];
+    ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number] | ExpenseFormValues['newPayoutMethod'];
   supportedPayoutMethods?: PayoutMethodType[];
   newPayoutMethodTypes?: PayoutMethodType[];
   expenseTags?: ExpenseFormSchemaHostFieldsFragment['expensesTags'];

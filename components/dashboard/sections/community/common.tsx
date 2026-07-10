@@ -213,8 +213,7 @@ export enum AccountDetailView {
 }
 
 type CommunityAccount =
-  | PeopleHostDashboardQuery['community']['nodes'][number]
-  | DashboardVendorsQuery['community']['nodes'][number];
+  PeopleHostDashboardQuery['community']['nodes'][number] | DashboardVendorsQuery['community']['nodes'][number];
 
 export function usePersonActions(opts: UsePersonActionsOptions) {
   const intl = useIntl();
