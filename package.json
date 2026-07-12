@@ -112,7 +112,7 @@
     "react-apexcharts": "2.1.1",
     "react-day-picker": "10.0.1",
     "react-dom": "19.2.7",
-    "react-dropzone": "14.4.1",
+    "react-dropzone": "15.0.0",
     "react-easy-crop": "5.5.7",
     "react-flip-move": "3.0.5",
     "react-intersection-observer": "10.0.3",
