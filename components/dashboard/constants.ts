@@ -29,6 +29,7 @@ export const SECTIONS = {
   TRANSACTIONS: 'transactions',
   UPDATES: 'updates',
   HOST_TRANSACTIONS: 'host-transactions',
+  HOST_PAYMENT_INTENTS: 'host-payment-intents',
   OFF_PLATFORM_TRANSACTIONS: 'off-platform-transactions',
   LEDGER_CSV_IMPORTS: 'ledger-csv-imports',
   VIRTUAL_CARDS: 'virtual-cards',
@@ -134,6 +135,7 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.SUBMITTED_EXPENSES,
   ALL_SECTIONS.CHART_OF_ACCOUNTS,
   ALL_SECTIONS.HOST_TRANSACTIONS,
+  ALL_SECTIONS.HOST_PAYMENT_INTENTS,
   ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
   ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
   ALL_SECTIONS.INTERNAL_TRANSFERS,
@@ -154,6 +156,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.TRANSACTIONS]: {
     id: 'menu.transactions',
     defaultMessage: 'Transactions',
+  },
+  [ALL_SECTIONS.HOST_PAYMENT_INTENTS]: {
+    id: 'PaymentIntents',
+    defaultMessage: 'Payment Intents',
   },
   [ALL_SECTIONS.ACTIVITY_LOG]: {
     id: 't0lUqz',

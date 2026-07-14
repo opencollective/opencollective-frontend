@@ -15,7 +15,7 @@
     "moduleResolution": "bundler",
     "typeRoots": ["node_modules/@types", "lib/custom_typings"],
     "types": ["node", "jest", "webpack-env"],
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "paths": {

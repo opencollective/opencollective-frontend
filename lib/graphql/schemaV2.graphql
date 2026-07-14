@@ -21523,6 +21523,16 @@ type Query {
   me: Individual
 
   """
+  Returns a single payment intent identified by its public id
+  """
+  paymentIntent(
+    """
+    The public id identifying the payment intent (ie: pi_xxxxxxxx)
+    """
+    publicId: String!
+  ): PaymentIntent
+
+  """
   Returns a list of payment intents
   """
   paymentIntents(
@@ -21545,6 +21555,11 @@ type Query {
     Only return payment intents for this host
     """
     host: AccountReferenceInput
+
+    """
+    When `host` is provided, select whether to include ALL payment intents, only those involving the host organization internal accounts (INTERNAL) or only those involving hosted collectives (HOSTED)
+    """
+    hostContext: HostContext
 
     """
     Filter by direction relative to the account (INCOMING = payee, OUTGOING = payer)

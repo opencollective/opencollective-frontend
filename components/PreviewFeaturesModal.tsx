@@ -1,10 +1,11 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
+import { groupBy } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import type { PreviewFeature } from '../lib/preview-features';
+import { Categories, type PreviewFeature } from '../lib/preview-features';
 
 import CommentIcon from './icons/CommentIcon';
 import { Badge } from './ui/Badge';
@@ -162,23 +163,27 @@ const FeatureDetailsPanel = ({
   );
 };
 
+/** Sort categories according to their place in the original enum */
+const sortGroupedCategories = (
+  featuresByCategory: Record<string, PreviewFeature[]>,
+): Record<string, PreviewFeature[]> => {
+  const result = {};
+  Object.values(Categories).forEach(category => {
+    if (featuresByCategory[category]) {
+      result[category] = featuresByCategory[category];
+    }
+  });
+
+  return result;
+};
+
 const PreviewFeaturesModal = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) => {
   const { LoggedInUser } = useLoggedInUser();
   const previewFeatures = LoggedInUser?.getAvailablePreviewFeatures() || [];
   const [, setUpdateCount] = React.useState(0); // Force a re-render of the component (since setIsEnabled can trigger updates outside of React)
 
   // Group features by category
-  const featuresByCategory = previewFeatures.reduce(
-    (acc, feature) => {
-      const category = feature.category;
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(feature);
-      return acc;
-    },
-    {} as Record<string, PreviewFeature[]>,
-  );
+  const featuresByCategory = sortGroupedCategories(groupBy(previewFeatures, 'category'));
 
   // Flat list for selection
   const flatFeatures = Object.values(featuresByCategory)
