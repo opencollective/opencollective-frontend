@@ -328,5 +328,15 @@
   "overrides": {
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3"
+  },
+  "allowScripts": {
+    "@tailwindcss/oxide@4.1.14": true,
+    "cypress@15.16.0": true,
+    "esbuild@0.28.1": true,
+    "sharp@0.34.5": true,
+    "@sentry/cli@2.58.5": true,
+    "canvas@3.2.0": true,
+    "husky@4.3.8": true,
+    "unrs-resolver@1.11.1": true
   }
 }
