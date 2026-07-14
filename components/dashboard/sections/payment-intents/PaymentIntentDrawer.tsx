@@ -86,7 +86,7 @@ function PaymentIntentDetails({ publicId }: { publicId?: string }) {
   return (
     <React.Fragment>
       <DrawerHeader
-        entityName={<FormattedMessage defaultMessage="Payment Intent" id="PaymentIntent" />}
+        entityName={<FormattedMessage defaultMessage="Payment Intent" id="PxYRJh" />}
         entityIdentifier={<CopyID value={paymentIntent.publicId}>{paymentIntent.publicId}</CopyID>}
         entityLabel={
           <div className="flex items-center gap-2">
@@ -113,7 +113,7 @@ function PaymentIntentDetails({ publicId }: { publicId?: string }) {
           </DataListItem>
           <DataListItem>
             <DataListItemLabel>
-              <FormattedMessage defaultMessage="Payer" id="PaymentIntent.Payer" />
+              <FormattedMessage defaultMessage="Payer" id="noTqHQ" />
             </DataListItemLabel>
             <DataListItemValue>
               <AccountLink account={paymentIntent.payer} />
@@ -121,7 +121,7 @@ function PaymentIntentDetails({ publicId }: { publicId?: string }) {
           </DataListItem>
           <DataListItem>
             <DataListItemLabel>
-              <FormattedMessage defaultMessage="Payee" id="PaymentIntent.Payee" />
+              <FormattedMessage defaultMessage="Payee" id="SecurityScope.Payee" />
             </DataListItemLabel>
             <DataListItemValue>
               <AccountLink account={paymentIntent.payee} />

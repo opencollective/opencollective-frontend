@@ -75,7 +75,7 @@ const columns: ColumnDef<PaymentIntentsTableQueryNode>[] = [
     cell: ({ row }) => <DescriptionCell paymentIntent={row.original} />,
   }),
   columnHelper.accessor('payer', {
-    meta: { className: 'max-w-40', labelMsg: defineMessage({ defaultMessage: 'Payer', id: 'PaymentIntent.Payer' }) },
+    meta: { className: 'max-w-40', labelMsg: defineMessage({ defaultMessage: 'Payer', id: 'noTqHQ' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ row }) => <AccountCell account={row.original.payer} />,
   }),
@@ -85,7 +85,7 @@ const columns: ColumnDef<PaymentIntentsTableQueryNode>[] = [
     cell: () => <ArrowRight size={14} className="text-muted-foreground" />,
   }),
   columnHelper.accessor('payee', {
-    meta: { className: 'max-w-40', labelMsg: defineMessage({ defaultMessage: 'Payee', id: 'PaymentIntent.Payee' }) },
+    meta: { className: 'max-w-40', labelMsg: defineMessage({ defaultMessage: 'Payee', id: 'SecurityScope.Payee' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ row }) => <AccountCell account={row.original.payee} />,
   }),

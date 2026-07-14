@@ -6,12 +6,12 @@ const STATUS_MESSAGES = defineMessages({
   [PaymentIntentStatus.PENDING]: { defaultMessage: 'Pending', id: 'PaymentIntent.Status.Pending' },
   [PaymentIntentStatus.PAID]: { defaultMessage: 'Paid', id: 'PaymentIntent.Status.Paid' },
   [PaymentIntentStatus.REVERSED]: { defaultMessage: 'Reversed', id: 'PaymentIntent.Status.Reversed' },
-  [PaymentIntentStatus.ERROR]: { defaultMessage: 'Error', id: 'PaymentIntent.Status.Error' },
+  [PaymentIntentStatus.ERROR]: { defaultMessage: 'Error', id: 'Error' },
   CANCELED: { defaultMessage: 'Canceled', id: 'PaymentIntent.Status.Canceled' },
 });
 
 const TYPE_MESSAGES = defineMessages({
-  [PaymentIntentType.PlatformBilling]: { defaultMessage: 'Platform Billing', id: 'PaymentIntent.Type.PlatformBilling' },
+  [PaymentIntentType.PlatformBilling]: { defaultMessage: 'Platform Billing', id: 'beRXFK' },
   [PaymentIntentType.PlatformBillingTipSettlement]: {
     defaultMessage: 'Platform Tip Settlement',
     id: 'PaymentIntent.Type.PlatformBillingTipSettlement',
@@ -19,7 +19,7 @@ const TYPE_MESSAGES = defineMessages({
   [PaymentIntentType.GrantRequest]: { defaultMessage: 'Grant Request', id: 'PaymentIntent.Type.GrantRequest' },
   [PaymentIntentType.PaymentRequest]: { defaultMessage: 'Payment Request', id: 'PaymentIntent.Type.PaymentRequest' },
   [PaymentIntentType.CardCharge]: { defaultMessage: 'Card Charge', id: 'PaymentIntent.Type.CardCharge' },
-  [PaymentIntentType.Contribution]: { defaultMessage: 'Contribution', id: 'PaymentIntent.Type.Contribution' },
+  [PaymentIntentType.Contribution]: { defaultMessage: 'Contribution', id: '0LK5eg' },
   [PaymentIntentType.AddedMoney]: { defaultMessage: 'Added Money', id: 'PaymentIntent.Type.AddedMoney' },
   [PaymentIntentType.BalanceTransfer]: { defaultMessage: 'Balance Transfer', id: 'PaymentIntent.Type.BalanceTransfer' },
   [PaymentIntentType.InternalTransfer]: {
