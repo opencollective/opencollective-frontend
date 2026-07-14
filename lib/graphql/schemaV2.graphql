@@ -284,11 +284,6 @@ interface Account {
   isSuspended: Boolean!
 
   """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
-
-  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -3136,11 +3131,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   isSuspended: Boolean!
 
   """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
-
-  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -5058,6 +5048,11 @@ type PlatformSubscription {
   """
   endDate: DateTime
   isCurrent: Boolean!
+
+  """
+  Whether the subscription account is on hold.
+  """
+  isAccountOnHold: Boolean
   plan: PlatformSubscriptionTier!
 }
 
@@ -10645,11 +10640,6 @@ type Bot implements Account {
   isSuspended: Boolean!
 
   """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
-
-  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -11737,11 +11727,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Whether this account is suspended
   """
   isSuspended: Boolean!
-
-  """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
 
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
@@ -13413,11 +13398,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   isSuspended: Boolean!
 
   """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
-
-  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -14804,11 +14784,6 @@ type Individual implements Account {
   Whether this account is suspended
   """
   isSuspended: Boolean!
-
-  """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
 
   """
   Returns whether the account accepts financial contributions.
@@ -16223,11 +16198,6 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Whether this account is suspended
   """
   isSuspended: Boolean!
-
-  """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
 
   """
   Returns whether the account accepts financial contributions.
@@ -17701,11 +17671,6 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
   isSuspended: Boolean!
 
   """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
-
-  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -18902,11 +18867,6 @@ type Vendor implements Account & AccountWithContributions {
   Whether this account is suspended
   """
   isSuspended: Boolean!
-
-  """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
 
   """
   Returns whether the account accepts financial contributions.
@@ -23336,11 +23296,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isSuspended: Boolean!
 
   """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
-
-  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -24585,11 +24540,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Whether this account is suspended
   """
   isSuspended: Boolean!
-
-  """
-  Whether this account has been blocked due to unpaid platform billing.
-  """
-  isBlockedForUnpaidPlatformBilling: Boolean
 
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
