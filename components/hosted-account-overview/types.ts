@@ -17,6 +17,7 @@ export enum HostedAccountView {
   OVERVIEW = 'overview',
   ACCOUNTS = 'accounts',
   MONEY_MOVEMENTS = 'money-movements',
+  PAYMENT_INTENTS = 'payment-intents',
   EXPECTED_FUNDS = 'expected-funds',
   AGREEMENTS = 'agreements',
   UPDATES = 'updates',

@@ -3,27 +3,22 @@ import { useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash-es';
 import { ArrowRight, Pencil } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import { z } from 'zod';
 
 import dayjs from '@/lib/dayjs';
-import { limit, offset } from '@/lib/filters/schemas';
 import type {
   HostedAccountFinancialActivityQuery,
   HostedAccountFinancialActivityQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
-import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nExpenseType } from '@/lib/i18n/expense';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import Avatar from '@/components/Avatar';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
-import { transactionsTableQuery } from '@/components/dashboard/sections/transactions/queries';
-import TransactionsTable, {
-  type TransactionsTableProps,
-} from '@/components/dashboard/sections/transactions/TransactionsTable';
+import type { TransactionsTableProps } from '@/components/dashboard/sections/transactions/TransactionsTable';
 import DateTime from '@/components/DateTime';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
@@ -40,18 +35,14 @@ import { HostedAccountContributionsPayoutsSection } from './HostedAccountContrib
 import type { MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
 import { HostedAccountOverviewChart } from './HostedAccountOverviewChart';
 import { hostedAccountFinancialActivityQuery } from './queries';
+import { RecentContributionsCard } from './RecentContributionsCard';
+import { RecentPayoutsCard } from './RecentPayoutsCard';
 import type { HostedAccountProfileData } from './types';
 import { HostedAccountView } from './types';
 
 const BALANCE_COLOR = '#f59e0b';
 const RECEIVED_COLOR = '#14b8a6';
 const SPENT_COLOR = '#dc2626';
-
-const recentTransactionsSchema = z.object({
-  limit: limit.default(5),
-  offset,
-  openTransactionId: z.coerce.string().optional(),
-});
 
 type RecentTransaction = NonNullable<HostedAccountProfileData['recentContributions']>['nodes'][number];
 
@@ -149,54 +140,14 @@ const Metric = ({
   </div>
 );
 
-const RecentTransactionsCard = ({
-  title,
-  transactions,
-  loading,
-  queryFilter,
-  refetch,
-  onRowClick,
-  onViewAll,
-}: {
-  title: React.ReactNode;
-  transactions: TransactionsTableProps['transactions'];
-  loading?: boolean;
-  queryFilter: TransactionsTableProps['queryFilter'];
-  refetch: TransactionsTableProps['refetchList'];
-  onRowClick: TransactionsTableProps['onClickRow'];
-  onViewAll: () => void;
-}) => (
-  <div className="flex flex-col gap-2">
-    <h3 className="text-sm font-medium text-slate-800">{title}</h3>
-    <TransactionsTable
-      transactions={transactions}
-      loading={loading}
-      nbPlaceholders={5}
-      queryFilter={queryFilter}
-      refetchList={refetch}
-      hideHeader
-      hidePagination
-      meta={{ timeStyle: null }}
-      onClickRow={onRowClick}
-      columns={['date', 'account', 'amount', 'currency']}
-      footer={
-        transactions?.nodes?.length > 0 && (
-          <div className="flex min-h-[49px] w-full items-center justify-center border-t">
-            <button
-              onClick={onViewAll}
-              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
-            >
-              <FormattedMessage defaultMessage="View all" id="pFK6bJ" />
-            </button>
-          </div>
-        )
-      }
-    />
-  </div>
-);
-
 export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: HostedAccountOverviewTabProps) {
   const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
+  const hasPaymentIntents = Boolean(
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PAYMENT_INTENT_IN_HOSTED_ACCOUNT_OVERVIEW),
+  );
+  const openMoneyView = (view: MoneyMovementsView) =>
+    openTab(hasPaymentIntents ? HostedAccountView.PAYMENT_INTENTS : HostedAccountView.MONEY_MOVEMENTS, view);
   const [openExpenseId, setOpenExpenseId] = React.useState<number | null>(null);
   const [openContributionId, setOpenContributionId] = React.useState<number | null>(null);
   const [isEditSettingsOpen, setEditSettingsOpen] = React.useState(false);
@@ -215,40 +166,6 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
     .filter(type => accountExpenseTypes[type])
     .map(type => i18nExpenseType(intl, type));
   const adminsCanSeePayoutMethods = Boolean(account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS);
-
-  const recentContributionsFilter = useQueryFilter({ schema: recentTransactionsSchema, filters: {}, skipRouter: true });
-  const recentPayoutsFilter = useQueryFilter({ schema: recentTransactionsSchema, filters: {}, skipRouter: true });
-
-  const recentContributionsQuery = useQuery(transactionsTableQuery, {
-    variables: {
-      account: [{ id: account?.id }],
-      hostAccount: { slug: hostSlug },
-      includeIncognitoTransactions: true,
-      includeChildrenTransactions: true,
-      sort: { field: 'CREATED_AT', direction: 'DESC' },
-      limit: 5,
-      offset: 0,
-      type: TransactionType.CREDIT,
-      kind: [TransactionKind.CONTRIBUTION, TransactionKind.ADDED_FUNDS],
-    },
-    skip: !account?.id,
-    notifyOnNetworkStatusChange: true,
-  });
-  const recentPayoutsQuery = useQuery(transactionsTableQuery, {
-    variables: {
-      account: [{ id: account?.id }],
-      hostAccount: { slug: hostSlug },
-      includeIncognitoTransactions: true,
-      includeChildrenTransactions: true,
-      sort: { field: 'CREATED_AT', direction: 'DESC' },
-      limit: 5,
-      offset: 0,
-      type: TransactionType.DEBIT,
-      kind: [TransactionKind.EXPENSE],
-    },
-    skip: !account?.id,
-    notifyOnNetworkStatusChange: true,
-  });
 
   const metricsDateRange = React.useMemo(
     () => ({ from: '2015-01-01T00:00:00.000Z', to: dayjs.utc().toISOString() }),
@@ -502,13 +419,13 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
             label={<FormattedMessage defaultMessage="Received by Account (all-time)" id="26sbkf" />}
             amount={stats?.consolidatedTotalNetAmountRaised}
             currency={currency}
-            onClick={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'CONTRIBUTIONS')}
+            onClick={() => openMoneyView('CONTRIBUTIONS')}
           />
           <Metric
             label={<FormattedMessage defaultMessage="Disbursed by account (all-time)" id="3wX8nB" />}
             amount={stats?.consolidatedTotalAmountSpent}
             currency={currency}
-            onClick={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'PAYOUTS')}
+            onClick={() => openMoneyView('PAYOUTS')}
           />
         </div>
         <div className="h-72 w-full">
@@ -538,23 +455,17 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
       <HostedAccountContributionsPayoutsSection account={account} hostSlug={hostSlug} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <RecentTransactionsCard
-          title={<FormattedMessage defaultMessage="Recent Contributions" id="BPg/ek" />}
-          transactions={recentContributionsQuery.data?.transactions}
-          loading={recentContributionsQuery.loading}
-          queryFilter={recentContributionsFilter}
-          refetch={recentContributionsQuery.refetch}
+        <RecentContributionsCard
+          account={account}
+          hostSlug={hostSlug}
           onRowClick={handleTransactionTableRowClick}
-          onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'CONTRIBUTIONS')}
+          onViewAll={() => openMoneyView('CONTRIBUTIONS')}
         />
-        <RecentTransactionsCard
-          title={<FormattedMessage defaultMessage="Recent Payouts" id="aS3BD9" />}
-          transactions={recentPayoutsQuery.data?.transactions}
-          loading={recentPayoutsQuery.loading}
-          queryFilter={recentPayoutsFilter}
-          refetch={recentPayoutsQuery.refetch}
+        <RecentPayoutsCard
+          account={account}
+          hostSlug={hostSlug}
           onRowClick={handleTransactionTableRowClick}
-          onViewAll={() => openTab(HostedAccountView.MONEY_MOVEMENTS, 'PAYOUTS')}
+          onViewAll={() => openMoneyView('PAYOUTS')}
         />
       </div>
 

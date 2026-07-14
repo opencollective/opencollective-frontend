@@ -2,6 +2,34 @@ import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 
+export const accountPaymentIntentsCountsQuery = gql`
+  query AccountPaymentIntentsCounts($account: AccountReferenceInput!, $host: AccountReferenceInput!) {
+    all: paymentIntents(account: $account, host: $host, includeChildrenPaymentIntents: true, limit: 0) {
+      totalCount
+    }
+    contributions: paymentIntents(
+      account: $account
+      host: $host
+      includeChildrenPaymentIntents: true
+      direction: INCOMING
+      type: [Contribution, AddedMoney]
+      limit: 0
+    ) {
+      totalCount
+    }
+    payouts: paymentIntents(
+      account: $account
+      host: $host
+      includeChildrenPaymentIntents: true
+      direction: OUTGOING
+      type: [PaymentRequest, GrantRequest, CardCharge]
+      limit: 0
+    ) {
+      totalCount
+    }
+  }
+`;
+
 export const accountPaymentIntentsQuery = gql`
   query AccountPaymentIntents(
     $account: AccountReferenceInput!

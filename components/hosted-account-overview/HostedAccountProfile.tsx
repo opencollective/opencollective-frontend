@@ -5,7 +5,9 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { HostedAccountProfileQuery, HostedAccountProfileQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import formatCollectiveType from '@/lib/i18n/collective-type';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import Avatar from '@/components/Avatar';
 import { CopyID } from '@/components/CopyId';
@@ -27,6 +29,7 @@ import { HostedAccountAgreementsTab } from './HostedAccountAgreementsTab';
 import { HostedAccountExpectedFundsTab } from './HostedAccountExpectedFundsTab';
 import { HostedAccountMoneyMovementsTab, type MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
 import { HostedAccountOverviewTab } from './HostedAccountOverviewTab';
+import { HostedAccountPaymentIntentsTab } from './HostedAccountPaymentIntentsTab';
 import { HostedAccountUpdatesTab } from './HostedAccountUpdatesTab';
 import { hostedAccountProfileQuery } from './queries';
 import type { HostedAccountProfileData } from './types';
@@ -40,6 +43,10 @@ type HostedAccountProfileProps = {
 export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfileProps) {
   const intl = useIntl();
   const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
+  const hasPaymentIntents = Boolean(
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PAYMENT_INTENT_IN_HOSTED_ACCOUNT_OVERVIEW),
+  );
   const selectedTab = (router.query?.subpath?.[1] as HostedAccountView) || HostedAccountView.OVERVIEW;
 
   const [moneyMovementsView, setMoneyMovementsView] = React.useState<MoneyMovementsView | undefined>(undefined);
@@ -90,10 +97,19 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
         // +1 for the synthetic "main account" row shown alongside children.
         count: account ? (account.childrenAccounts?.nodes?.length || 0) + 1 : undefined,
       },
-      {
-        id: HostedAccountView.MONEY_MOVEMENTS,
-        label: <FormattedMessage defaultMessage="Money Movements" id="MoneyMovements" />,
-      },
+      ...(hasPaymentIntents
+        ? [
+            {
+              id: HostedAccountView.PAYMENT_INTENTS,
+              label: <FormattedMessage defaultMessage="Payment Intents" id="3nKAfb" />,
+            },
+          ]
+        : [
+            {
+              id: HostedAccountView.MONEY_MOVEMENTS,
+              label: <FormattedMessage defaultMessage="Money Movements" id="MoneyMovements" />,
+            },
+          ]),
       {
         id: HostedAccountView.EXPECTED_FUNDS,
         label: <FormattedMessage defaultMessage="Expected Funds" id="ExpectedFunds" />,
@@ -114,7 +130,7 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
       },
       { id: HostedAccountView.ACTIVITIES, label: <FormattedMessage defaultMessage="Activities" id="Activities" /> },
     ],
-    [account, host?.hostedAccountAgreements?.totalCount],
+    [account, host?.hostedAccountAgreements?.totalCount, hasPaymentIntents],
   );
 
   // Redirecting a child to its parent
@@ -203,6 +219,9 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
             )}
             {selectedTab === HostedAccountView.MONEY_MOVEMENTS && (
               <HostedAccountMoneyMovementsTab account={account} hostSlug={hostSlug} initialView={moneyMovementsView} />
+            )}
+            {selectedTab === HostedAccountView.PAYMENT_INTENTS && (
+              <HostedAccountPaymentIntentsTab account={account} hostSlug={hostSlug} initialView={moneyMovementsView} />
             )}
             {selectedTab === HostedAccountView.EXPECTED_FUNDS && (
               <HostedAccountExpectedFundsTab account={account} hostSlug={hostSlug} />
