@@ -51,7 +51,14 @@ enum NEXT_ACTION_FLOWS {
 }
 
 // ts-unused-exports:disable-next-line
-export default function SignupPage() {
+export const getServerSideProps = async ({ query }) => {
+  return {
+    props: { query: pick(query, ['next']) },
+  };
+};
+
+// ts-unused-exports:disable-next-line
+export default function SignupPage(props) {
   const router = useRouter();
   const [nextActionFlow, setNextActionFlow] = React.useState<NEXT_ACTION_FLOWS>(
     findKey(NEXT_ACTION_FLOWS, f => f === router.query?.step) || router.query?.organization === 'true'
@@ -86,7 +93,10 @@ export default function SignupPage() {
           return prev;
         } else {
           const step = requestedStep || nextStep;
-          const newQuery = omit({ ...pick(router.query, ['next', 'session', 'active', 'host']), ...query }, ['step']);
+          const newQuery = omit(
+            { ...props.query, ...pick(router.query, ['next', 'session', 'active', 'host']), ...query },
+            ['step'],
+          );
           if (
             nextActionFlow &&
             [SignupSteps.EMAIL_INPUT, SignupSteps.COMPLETE_PROFILE, SignupSteps.VERIFY_OTP].includes(step)
@@ -97,7 +107,6 @@ export default function SignupPage() {
               newQuery.collective = 'true';
             }
           }
-
           if (STEP_URLS[step]) {
             router.replace({ pathname: STEP_URLS[step], query: newQuery }, undefined, { shallow: true });
           } else {

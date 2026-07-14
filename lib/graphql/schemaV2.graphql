@@ -26149,6 +26149,11 @@ type Mutation {
     inviteMembers: [InviteMemberInput]
 
     """
+    Optional private note included in the invitation email sent to invited members.
+    """
+    privateNote: String
+
+    """
     Marks the collective as approved directly. Only available in test/CI environments.
     """
     skipApprovalTestOnly: Boolean = false
@@ -27160,6 +27165,16 @@ type Mutation {
     role: MemberRole!
     description: String
     since: DateTime
+
+    """
+    Optional private note included in the invitation email sent to the invitee.
+    """
+    privateNote: String
+
+    """
+    When true, the invited user account was just created from the invite form. The invitee will be required to complete their profile before accepting the invitation.
+    """
+    isNewUser: Boolean = false
   ): MemberInvitation!
 
   """
@@ -27198,6 +27213,31 @@ type Mutation {
     description: String
     since: DateTime
   ): MemberInvitation
+
+  """
+  Cancel a pending member invitation. Scope: "account".
+  """
+  cancelMemberInvitation(
+    """
+    Reference to the invitation to cancel (by id or legacyId)
+    """
+    invitation: MemberInvitationReferenceInput
+
+    """
+    Reference to the invited account. Must be combined with account (and optionally role).
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    Reference to the collective the invitation belongs to. Must be combined with memberAccount.
+    """
+    account: AccountReferenceInput
+
+    """
+    Role of the invitation to cancel. Used to disambiguate when combined with account and memberAccount.
+    """
+    role: MemberRole
+  ): Boolean!
 
   """
   Endpoint to accept or reject an invitation to become a member. Scope: "account".

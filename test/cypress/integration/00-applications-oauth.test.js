@@ -5,6 +5,8 @@ describe('OAuth Applications', () => {
 
   before(() => {
     cy.signup({ user: { name: 'OAuth tester', settings: { features: { adminPanel: true } } } }).then(u => (user = u));
+    cy.logout();
+    cy.visit('/home');
   });
 
   it('create and edit applications', () => {
@@ -66,6 +68,8 @@ describe('OAuth Applications', () => {
 
   it('create application with 2fa enabled', () => {
     cy.signup({ user: { name: 'OAuth tester', settings: { features: { adminPanel: true } } } }).then(user => {
+      cy.logout();
+      cy.visit('/home');
       cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
       const secret = generateSecret({ length: 64 });
