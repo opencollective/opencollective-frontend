@@ -173,11 +173,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
           {displayed.map(admin => (
             <AccountHoverCard
               key={admin.id}
-              account={admin.account}
+              account={admin.account || admin.memberAccount}
               includeAdminMembership={{ accountSlug: account.slug }}
               trigger={
                 <div className="ml-[-8px] flex items-center first:ml-0">
-                  <Avatar collective={admin.account} radius={24} displayTitle={false} />
+                  <Avatar collective={admin.account || admin.memberAccount} radius={24} displayTitle={false} />
                 </div>
               }
             />
