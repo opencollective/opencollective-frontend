@@ -291,11 +291,6 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.91.0"
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
