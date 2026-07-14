@@ -240,7 +240,6 @@
     "cypress-multi-reporters": "^2.0.5",
     "cypress-real-events": "^1.12.0",
     "cypress-terminal-report": "^7.3.3",
-    "cz-conventional-changelog": "^3.3.0",
     "dot-path-value": "^0.0.12",
     "esbuild": "0.28.1",
     "eslint": "^10.0.0",
@@ -258,7 +257,7 @@
     "file-loader": "^6.2.0",
     "globals": "^17.0.0",
     "html-loader": "^5.0.0",
-    "husky": "^4.3.8",
+    "husky": "4.3.8",
     "jest": "^30.0.0",
     "jest-environment-jsdom": "^30.0.5",
     "jest-junit": "^17.0.0",
@@ -290,11 +289,6 @@
     "typescript-eslint": "^8.60.1",
     "url-loader": "^4.1.1",
     "webpack": "^5.91.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   },
   "husky": {
     "hooks": {
@@ -333,5 +327,15 @@
   "overrides": {
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3"
+  },
+  "allowScripts": {
+    "@tailwindcss/oxide@4.1.14": true,
+    "cypress@15.16.0": true,
+    "esbuild@0.28.1": true,
+    "sharp@0.34.5": true,
+    "@sentry/cli@2.58.5": true,
+    "canvas@3.2.0": true,
+    "husky@4.3.8": true,
+    "unrs-resolver@1.11.1": true
   }
 }
