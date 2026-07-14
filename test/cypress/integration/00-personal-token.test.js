@@ -4,10 +4,12 @@ import { generateSecret, generateSync } from 'otplib';
 describe('Personal Token', () => {
   let user;
 
-  before(() => {
+  beforeEach(() => {
     cy.signup({ user: { name: 'Personal token tester', settings: { features: { adminPanel: true } } } }).then(
       u => (user = u),
     );
+    cy.logout();
+    cy.visit('/home');
   });
 
   it('create and edit personal token', () => {
@@ -74,31 +76,29 @@ describe('Personal Token', () => {
   });
 
   it('create application with 2fa enabled', () => {
-    cy.signup({ user: { name: 'Personal token tester', settings: { features: { adminPanel: true } } } }).then(user => {
-      cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
-      const secret = generateSecret({ length: 64 });
-      cy.enableTwoFactorAuth({
-        userEmail: user.email,
-        userSlug: user.collective.slug,
-        secret: secret,
-      });
-
-      cy.getByDataCy('create-token-link').click();
-      cy.get('input[name=name]').type('My first token with 2fa');
-      cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('transactions{enter}');
-      cy.get('input[name=expiresAt]').type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}`);
-      cy.get('[data-cy="create-personal-token-modal"] button[type=submit]').click();
-
-      cy.complete2FAPrompt(generateSync({ secret, algorithm: 'sha1', strategy: 'totp' }));
-
-      cy.contains('[data-cy=toast-notification]:last', 'Personal token "My first token with 2fa" created');
-      cy.getByDataCy('personalToken-token').should('exist');
-      cy.contains('[data-cy="personal-token-settings"] h3', 'My first token with 2fa');
-
-      cy.log('Returns to the tokens list to make sure it is there');
-      cy.getByDataCy('go-back-link').click();
-      cy.contains('[data-cy="personal-tokens-list"]', 'My first token with 2fa');
+    const secret = generateSecret({ length: 64 });
+    cy.enableTwoFactorAuth({
+      userEmail: user.email,
+      userSlug: user.collective.slug,
+      secret: secret,
     });
+
+    cy.getByDataCy('create-token-link').click();
+    cy.get('input[name=name]').type('My first token with 2fa');
+    cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('transactions{enter}');
+    cy.get('input[name=expiresAt]').type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}`);
+    cy.get('[data-cy="create-personal-token-modal"] button[type=submit]').click();
+
+    cy.complete2FAPrompt(generateSync({ secret, algorithm: 'sha1', strategy: 'totp' }));
+
+    cy.contains('[data-cy=toast-notification]:last', 'Personal token "My first token with 2fa" created');
+    cy.getByDataCy('personalToken-token').should('exist');
+    cy.contains('[data-cy="personal-token-settings"] h3', 'My first token with 2fa');
+
+    cy.log('Returns to the tokens list to make sure it is there');
+    cy.getByDataCy('go-back-link').click();
+    cy.contains('[data-cy="personal-tokens-list"]', 'My first token with 2fa');
   });
 });

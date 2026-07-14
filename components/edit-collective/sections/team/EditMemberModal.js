@@ -80,6 +80,12 @@ const removeMemberMutation = gql`
   }
 `;
 
+const cancelMemberInvitationMutation = gql`
+  mutation CancelMemberInvitation($invitation: MemberInvitationReferenceInput!) {
+    cancelMemberInvitation(invitation: $invitation)
+  }
+`;
+
 const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAdmin, cancelHandler, onEdit }) => {
   const router = useRouter();
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
@@ -119,6 +125,22 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
     ],
     awaitRefetchQueries: true,
   });
+
+  const [cancelMemberInvitationAccount, { loading: isCancellingInvitation }] = useMutation(
+    cancelMemberInvitationMutation,
+    {
+      refetchQueries: [
+        {
+          query: teamSectionQuery,
+          variables: {
+            collectiveSlug: get(collective, 'slug'),
+            account: { slug: get(collective, 'slug') },
+          },
+        },
+      ],
+      awaitRefetchQueries: true,
+    },
+  );
 
   const [showRemoveConfirmation, setShowRemoveConfirmation] = React.useState(false);
 
@@ -206,16 +228,23 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
 
   const handleRemoveMemberMutation = async () => {
     try {
-      await removeMemberAccount({
-        variables: {
-          memberAccount: {
-            slug: get(member, 'account.slug') || get(member, 'memberAccount.slug'),
+      if (isInvitation) {
+        await cancelMemberInvitationAccount({
+          variables: {
+            invitation: { id: member.id },
           },
-          account: { slug: get(collective, 'slug') },
-          role: get(member, 'role'),
-          isInvitation,
-        },
-      });
+        });
+      } else {
+        await removeMemberAccount({
+          variables: {
+            memberAccount: {
+              slug: get(member, 'account.slug'),
+            },
+            account: { slug: get(collective, 'slug') },
+            role: get(member, 'role'),
+          },
+        });
+      }
 
       toast({
         variant: 'success',
@@ -281,12 +310,13 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
               bindSubmitForm={bindSubmitForm}
               triggerSubmit={isInvitation ? handleEditMemberInvitationMutation : handleEditMemberMutation}
               isPrivateAccount={collective.isPrivate}
+              showPrivateNote={false}
             />
             <div className="mt-4 flex justify-between gap-2">
               <Button
                 autoFocus
                 onClick={cancelHandler}
-                disabled={isEditingMember || isEditingMemberInvitation || isRemovingMember}
+                disabled={isEditingMember || isEditingMemberInvitation || isRemovingMember || isCancellingInvitation}
                 data-cy="confirmation-modal-cancel"
                 variant="outline"
               >
@@ -322,7 +352,7 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
                 <Button
                   data-cy="confirmation-modal-continue"
                   loading={isEditingMember || isEditingMemberInvitation}
-                  disabled={isRemovingMember}
+                  disabled={isRemovingMember || isCancellingInvitation}
                   onClick={handleSubmitForm}
                   className="w-32"
                 >

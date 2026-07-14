@@ -3,7 +3,7 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { clsx } from 'clsx';
 import { clamp, cloneDeep, groupBy, isEmpty, isEqual, isNaN, round } from 'lodash-es';
-import { AlertTriangle, ArrowLeft, ArrowRight, ChevronDown, FileText, Undo } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, ChevronDown, FileText, Undo, UserPlus, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -11,10 +11,12 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
-import type {
-  AccountWithHost,
-  HostedCollectiveFieldsFragment,
-  HostedCollectivesQuery,
+import { i18nGraphqlException } from '../../../../lib/errors';
+import {
+  type AccountWithHost,
+  type HostedCollectiveFieldsFragment,
+  type HostedCollectivesQuery,
+  MemberRole,
 } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
@@ -23,14 +25,17 @@ import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 import { elementFromClass } from '../../../../lib/react-utils';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import { useDrawerActionsContainer } from '../../../Drawer';
+import InviteMemberModal from '../../../edit-collective/sections/team/InviteMemberModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LinkCollective from '../../../LinkCollective';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import ConfirmationModal from '../../../NewConfirmationModal';
 import { DataTable } from '../../../table/DataTable';
 import { H4 } from '../../../Text';
 import { Badge } from '../../../ui/Badge';
@@ -48,6 +53,12 @@ import { ActivityUser } from '../ActivityLog/ActivityUser';
 import type { HostedCollectivesDataTableMeta } from './common';
 import { cols, MoreActionsMenu } from './common';
 import { hostedCollectiveDetailQuery } from './queries';
+
+const cancelMemberInvitationMutation = gql`
+  mutation CancelMemberInvitation($invitation: MemberInvitationReferenceInput!) {
+    cancelMemberInvitation(invitation: $invitation)
+  }
+`;
 
 const editAccountHostFee = gql`
   mutation EditAccountFee($account: AccountReferenceInput!, $hostFeePercent: Float!, $isCustomFee: Boolean!) {
@@ -490,7 +501,12 @@ const CollectiveDetails = ({
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
   const drawerActionsContainer = useDrawerActionsContainer();
-  const { data, loading: loadingCollectiveInfo } = useQuery(hostedCollectiveDetailQuery, {
+  const { LoggedInUser } = useLoggedInUser();
+  const {
+    data,
+    loading: loadingCollectiveInfo,
+    refetch,
+  } = useQuery(hostedCollectiveDetailQuery, {
     variables: { id: collectiveId || c?.id },
 
     fetchPolicy: 'cache-and-network',
@@ -500,6 +516,20 @@ const CollectiveDetails = ({
   const isHostedCollective = host && collective?.host?.id === host?.id;
   const isLoading = loading || loadingCollectiveInfo;
   const isChild = !!collective?.parent?.id;
+
+  const adminMembers = collective?.members?.nodes || [];
+  const pendingInvitations = collective?.memberInvitations || [];
+  // Match the API condition (see API commit 5cdd8c74b): host admins may manage
+  // invitations only while the hosted collective has no admin members yet.
+  const canManageInvitationsAsHostAdmin = Boolean(
+    isHostedCollective &&
+    adminMembers.length === 0 &&
+    LoggedInUser?.isHostAdmin(collective) &&
+    !LoggedInUser?.isAdminOfCollective(collective),
+  );
+  const [showInviteAdminModal, setShowInviteAdminModal] = React.useState(false);
+  const [invitationToCancel, setInvitationToCancel] = React.useState(null);
+  const [cancelMemberInvitation] = useMutation(cancelMemberInvitationMutation);
 
   const isUpgradeRequiredForSettingHostFee = requiresUpgrade(account, FEATURES.CHARGE_HOSTING_FEES);
 
@@ -666,21 +696,111 @@ const CollectiveDetails = ({
             )}
             <InfoListItem
               className="sm:col-span-2"
-              title={<FormattedMessage id="Team" defaultMessage="Team" />}
+              title={<FormattedMessage id="Admins" defaultMessage="Admins" />}
               value={
-                <div className="flex flex-wrap gap-4">
-                  {collective.members?.nodes?.map(admin => (
-                    <div className="flex items-center whitespace-nowrap" key={admin.id}>
-                      <LinkCollective
-                        collective={admin.account}
-                        className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
-                        withHoverCard
-                        hoverCardProps={{ includeAdminMembership: { accountSlug: collective.slug } }}
-                      >
-                        <Avatar collective={admin.account} radius={24} /> {admin.account.name}
-                      </LinkCollective>
-                    </div>
-                  ))}
+                <div className="flex flex-col gap-2" data-cy="admins-table">
+                  <DataTable
+                    innerClassName="text-xs text-muted-foreground"
+                    mobileTableView
+                    compact
+                    columns={[
+                      {
+                        accessorKey: 'member',
+                        header: () => <FormattedMessage defaultMessage="Member" id="7L86Z5" />,
+                        cell: ({ row }) => {
+                          const entry = row.original;
+                          return (
+                            <LinkCollective
+                              collective={entry.account}
+                              className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                              withHoverCard
+                              hoverCardProps={
+                                entry.type === 'member'
+                                  ? { includeAdminMembership: { accountSlug: collective.slug } }
+                                  : undefined
+                              }
+                            >
+                              <Avatar collective={entry.account} radius={24} />
+                              <span>{entry.account?.name}</span>
+                              {entry.account?.emails?.length && (
+                                <span className="text-muted-foreground">{`<${entry.account.emails[0]}>`}</span>
+                              )}
+                              {entry.type === 'invitation' && (
+                                <Badge size="xs">
+                                  <FormattedMessage defaultMessage="Invited" id="Invited" />
+                                </Badge>
+                              )}
+                            </LinkCollective>
+                          );
+                        },
+                      },
+                      {
+                        accessorKey: 'since',
+                        header: () => <FormattedMessage defaultMessage="Member since" id="Member.Since" />,
+                        cell: ({ row }) =>
+                          row.original.since ? (
+                            <span suppressHydrationWarning className="whitespace-nowrap">
+                              <FormattedDate value={row.original.since} day="numeric" month="long" year="numeric" />
+                            </span>
+                          ) : null,
+                      },
+                      {
+                        accessorKey: 'actions',
+                        header: '',
+                        meta: { className: 'flex justify-end items-center' },
+                        cell: ({ row }) => {
+                          const entry = row.original;
+                          if (entry.type !== 'invitation' || !canManageInvitationsAsHostAdmin) {
+                            return null;
+                          }
+                          return (
+                            <Button
+                              variant="ghost"
+                              size="icon-xs"
+                              className="text-muted-foreground hover:text-red-600"
+                              onClick={() => setInvitationToCancel(entry.raw)}
+                              data-cy="cancel-invitation-btn"
+                              aria-label={intl.formatMessage({
+                                defaultMessage: 'Cancel invitation',
+                                id: 'CancelInvitation',
+                              })}
+                            >
+                              <X size={14} />
+                            </Button>
+                          );
+                        },
+                      },
+                    ]}
+                    data={[
+                      ...adminMembers.map(m => ({
+                        id: `member-${m.id}`,
+                        type: 'member' as const,
+                        account: m.account,
+                        since: m.since,
+                        raw: m,
+                      })),
+                      ...pendingInvitations.map(i => ({
+                        id: `invitation-${i.id}`,
+                        type: 'invitation' as const,
+                        account: i.memberAccount,
+                        since: i.since,
+                        raw: i,
+                      })),
+                    ]}
+                    meta={{ intl }}
+                  />
+                  {canManageInvitationsAsHostAdmin && (
+                    <Button
+                      className="sm:self-end"
+                      variant="outline"
+                      size="xs"
+                      onClick={() => setShowInviteAdminModal(true)}
+                      data-cy="invite-admin-btn"
+                    >
+                      <UserPlus size={14} className="mr-1" />
+                      <FormattedMessage defaultMessage="Invite admin" id="collective.invite.admin" />
+                    </Button>
+                  )}
                 </div>
               }
             />
@@ -794,6 +914,56 @@ const CollectiveDetails = ({
               </div>,
               drawerActionsContainer,
             )}
+          {showInviteAdminModal && (
+            <InviteMemberModal
+              intl={intl}
+              collective={collective}
+              membersIds={[
+                ...adminMembers.map(m => m.account?.id),
+                ...pendingInvitations.map(i => i.memberAccount?.id),
+              ]}
+              cancelHandler={() => {
+                setShowInviteAdminModal(false);
+                refetch();
+              }}
+              fixedRole={MemberRole.ADMIN}
+              showDescription={false}
+              showSince={false}
+            />
+          )}
+          {invitationToCancel && (
+            <ConfirmationModal
+              open={Boolean(invitationToCancel)}
+              setOpen={open => !open && setInvitationToCancel(null)}
+              type="delete"
+              variant="destructive"
+              title={
+                <FormattedMessage
+                  defaultMessage="Cancel invitation for {name}?"
+                  id="CancelInvitation.title"
+                  values={{ name: invitationToCancel.memberAccount?.name }}
+                />
+              }
+              description={
+                <FormattedMessage
+                  defaultMessage="The pending invitation will be removed. You can invite this user again later."
+                  id="CancelInvitation.description"
+                />
+              }
+              onConfirm={async () => {
+                try {
+                  await cancelMemberInvitation({
+                    variables: { invitation: { id: invitationToCancel.id } },
+                  });
+                  await refetch();
+                  setInvitationToCancel(null);
+                } catch (e) {
+                  e.message = i18nGraphqlException(intl, e);
+                  throw e;
+                }
+              }}
+            />
+          )}
         </React.Fragment>
       )}
     </div>
