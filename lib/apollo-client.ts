@@ -278,6 +278,13 @@ function createInMemoryCache() {
           },
         },
       },
+      Host: {
+        fields: {
+          metrics: {
+            merge: true,
+          },
+        },
+      },
       // Add this for search results pagination
       SearchResults: {
         fields: {

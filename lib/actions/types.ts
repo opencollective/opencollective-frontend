@@ -5,7 +5,7 @@ export type Action = {
   label: string;
   onClick?: (e: React.MouseEvent) => void;
   href?: string; // used for links
-  target?: string; // used for links
+  openInNewTab?: boolean; // used for links
   Icon?: LucideIcon;
   isLoading?: boolean;
   disabled?: boolean;

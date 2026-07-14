@@ -246,7 +246,7 @@ function ContributionTimeline(props: OrderTimelineProps) {
           <React.Fragment>
             <DropdownMenuItem asChild>
               <Button size="xs" variant="ghost" asChild className="w-full">
-                <Link href={a.data?.paymentProcessorUrl} className="justify-start">
+                <Link href={a.data?.paymentProcessorUrl} openInNewTab className="justify-start">
                   <FormattedMessage defaultMessage="View in payment processor" id="NgSLbI" />
                 </Link>
               </Button>
@@ -298,7 +298,7 @@ function ContributionTimeline(props: OrderTimelineProps) {
             {primaryTxn.paymentProcessorUrl && (
               <DropdownMenuItem asChild>
                 <Button size="xs" variant="ghost" asChild className="w-full justify-start">
-                  <Link href={primaryTxn.paymentProcessorUrl}>
+                  <Link href={primaryTxn.paymentProcessorUrl} openInNewTab>
                     <FormattedMessage defaultMessage="View in payment processor" id="NgSLbI" />
                   </Link>
                 </Button>

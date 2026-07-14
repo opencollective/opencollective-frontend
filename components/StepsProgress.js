@@ -34,12 +34,12 @@ const Circle = styled.svg`
       `}
 
   ${props =>
-      props.checked &&
-      (props.disabled
-        ? css`
-            fill: ${themeGet('colors.black.500')};
-          `
-        : css`
+    props.checked &&
+    (props.disabled
+      ? css`
+          fill: ${themeGet('colors.black.500')};
+        `
+      : css`
         fill: ${themeGet('colors.primary.600')};
         &:hover {
           fill: ${themeGet('colors.primary.400')};

@@ -12,12 +12,14 @@ import { formatCurrency } from '../../../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../../../lib/form-utils';
 import { gql } from '../../../../lib/graphql/helpers';
 import type { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nPendingOrderPaymentMethodTypes } from '../../../../lib/i18n/pending-order-payment-method-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { omitDeep } from '../../../../lib/utils';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
 import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePicker';
@@ -83,17 +85,22 @@ const AmountDetailsLine = ({ label, value, currency, isLargeAmount }: AmountDeta
 );
 
 const createPendingContributionModalQuery = gql`
-  query CreatePendingContributionModal($slug: String!) {
-    host(slug: $slug) {
+  query CreatePendingContributionModal($hostSlug: String!) {
+    organization(slug: $hostSlug) {
       id
       legacyId
       type
-      isHost
       name
       slug
       currency
       settings
-      hostFeePercent
+      host {
+        hostFeePercent
+      }
+      features {
+        CHARGE_HOSTING_FEES
+      }
+
       orderAccountingCategories: accountingCategories(kind: [CONTRIBUTION, ADDED_FUNDS]) {
         nodes {
           id
@@ -104,16 +111,13 @@ const createPendingContributionModalQuery = gql`
           appliesTo
         }
       }
-      plan {
-        id
-        hostFees
-      }
+
       policies {
         id
         publicId
         REQUIRE_2FA_FOR_ADMINS
       }
-      isTrustedHost
+
       vendors {
         totalCount
         nodes {
@@ -128,8 +132,8 @@ const createPendingContributionModalQuery = gql`
 `;
 
 const createPendingContributionModalCollectiveQuery = gql`
-  query CreatePendingContributionCollective($slug: String!) {
-    account(slug: $slug) {
+  query CreatePendingContributionCollective($hostSlug: String!) {
+    account(slug: $hostSlug) {
       id
       legacyId
       type
@@ -162,7 +166,7 @@ const createPendingContributionModalCollectiveQuery = gql`
         host {
           id
           legacyId
-          vendors(forAccount: { slug: $slug }, limit: 5) {
+          vendors(forAccount: { slug: $hostSlug }, limit: 5) {
             nodes {
               id
               slug
@@ -277,7 +281,7 @@ const getAmountsFromValues = values => {
 };
 
 type CreatePendingContributionFormProps = {
-  host: CreatePendingContributionModalQuery['host'];
+  organization: CreatePendingContributionModalQuery['organization'];
   edit?: Partial<OrderPageQuery['order']>;
   onClose: () => void;
   onSuccess?: () => void;
@@ -285,34 +289,50 @@ type CreatePendingContributionFormProps = {
   error?: any;
 };
 
-const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePendingContributionFormProps) => {
+const CreatePendingContributionForm = ({ organization, onClose, error, edit }: CreatePendingContributionFormProps) => {
   const formik = useFormikContext<any>();
   const { values, isSubmitting, setFieldValue } = formik;
   const intl = useIntl();
+  const hostHasHostFee = isFeatureEnabled(organization, FEATURES.CHARGE_HOSTING_FEES);
+  const canAddHostFee = hostHasHostFee && values.toAccount?.type !== AccountType.ORGANIZATION;
   const [getCollectiveInfo, { data, loading: collectiveLoading }] = useLazyQuery(
     createPendingContributionModalCollectiveQuery,
     {
-      variables: { slug: host.slug },
+      variables: { hostSlug: organization.slug },
     },
   );
 
   React.useEffect(() => {
+    // Remove or set default host fee when switching between accounts.
+    // Examples:
+    // - switching from host account to collective => set default host fee
+    // - switching from collective to host account => remove host fee
+    if (canAddHostFee) {
+      setFieldValue('hostFeePercent', organization.host?.hostFeePercent || 0);
+    } else {
+      setFieldValue('hostFeePercent', 0);
+    }
+  }, [setFieldValue, canAddHostFee, organization.host?.hostFeePercent]);
+
+  React.useEffect(() => {
     if (values.toAccount?.slug) {
-      debouncedLazyQuery(getCollectiveInfo, { slug: values.toAccount.slug });
+      debouncedLazyQuery(getCollectiveInfo, { hostSlug: values.toAccount.slug });
     }
     setFieldValue('accountingCategory', null);
   }, [values.toAccount]);
 
   React.useEffect(() => {
-    setFieldValue('amount.currency', data?.account?.currency || host.currency);
+    setFieldValue('amount.currency', data?.account?.currency || organization.currency);
     if (formik.touched.hostFeePercent !== true) {
-      setFieldValue('hostFeePercent', data?.account?.bankTransfersHostFeePercent || host.hostFeePercent);
+      setFieldValue('hostFeePercent', data?.account?.bankTransfersHostFeePercent ?? organization.host?.hostFeePercent);
     }
   }, [data?.account]);
 
   React.useEffect(() => {
     if (values.fromAccount?.type === 'VENDOR') {
-      const vendorInfo = host?.vendors?.nodes?.find(vendor => vendor.id === formik.values?.fromAccount?.id)?.vendorInfo;
+      const vendorInfo = organization?.vendors?.nodes?.find(
+        vendor => vendor.id === formik.values?.fromAccount?.id,
+      )?.vendorInfo;
       if (vendorInfo?.contact) {
         if (formik.touched.fromAccountInfo?.['name'] !== true) {
           setFieldValue('fromAccountInfo.name', vendorInfo.contact.name);
@@ -332,18 +352,18 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   }, [values.fromAccount]);
 
   const collective = data?.account;
-  const currency = collective?.currency || host.currency;
+  const currency = collective?.currency || organization.currency;
   const childrenOptions = collective?.childrenAccounts?.nodes || [];
   const childAccount = values.childAccount?.id && childrenOptions.find(option => option.id === values.childAccount?.id);
-  const canAddHostFee = host?.plan?.hostFees;
-  const hostFeePercent = host.hostFeePercent;
-  const applicableTax = getApplicableTaxType(collective, host);
+
+  const hostFeePercent = organization?.host?.hostFeePercent || 0;
+  const applicableTax = getApplicableTaxType(collective, organization);
   const tiersOptions = childAccount
     ? getTiersOptions(intl, childAccount?.tiers?.nodes || [])
     : getTiersOptions(intl, collective?.tiers?.nodes || []);
 
   const recommendedVendors = collective?.host?.vendors?.nodes || [];
-  const defaultSources = [...recommendedVendors, host];
+  const defaultSources = [...recommendedVendors, organization];
   const defaultSourcesOptions = map(groupBy(defaultSources, 'type'), (accounts, type) => {
     return {
       label: formatCollectiveType(intl, type, accounts.length),
@@ -415,7 +435,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               data-cy="create-pending-contribution-to"
               types={['COLLECTIVE', 'ORGANIZATION', 'FUND']}
               error={field.error}
-              hostCollectiveIds={[host.legacyId]}
+              hostCollectiveIds={[organization.legacyId]}
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
@@ -499,7 +519,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               vendorVisibleToAccountIds={collective?.legacyId ? [collective.legacyId] : []}
               menuPortalTarget={null}
               creatable={['USER', 'VENDOR']}
-              HostCollectiveId={host?.legacyId}
+              HostCollectiveId={organization?.legacyId}
             />
           )}
         </Field>
@@ -536,7 +556,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         </Field>
 
         {/* Contribution */}
-        {host.orderAccountingCategories?.nodes?.length > 0 && (
+        {organization.orderAccountingCategories?.nodes?.length > 0 && (
           <Field
             name="accountingCategory"
             htmlFor="addFunds-accountingCategory"
@@ -551,7 +571,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 id={field.id}
                 kind="CONTRIBUTION"
                 onChange={value => form.setFieldValue(field.name, value)}
-                host={host}
+                host={organization}
                 account={collective}
                 selectedCategory={field.value}
                 allowNone={true}
@@ -855,10 +875,10 @@ const CreatePendingContributionModal = ({
   const { toast } = useToast();
 
   const { data, loading } = useQuery<CreatePendingContributionModalQuery>(createPendingContributionModalQuery, {
-    variables: { slug: hostSlug },
+    variables: { hostSlug },
   });
 
-  const host = data?.host;
+  const organization = data?.organization;
   const [createPendingOrder, { error: createOrderError }] = useMutation(createPendingContributionMutation);
   const [editPendingOrder, { error: editOrderError }] = useMutation(editPendingContributionMutation);
 
@@ -887,7 +907,7 @@ const CreatePendingContributionModal = ({
         paymentMethod: edit.pendingContributionData?.paymentMethod,
         tax: edit.tax && omit(edit.tax, ['id']),
       }
-    : { hostFeePercent: host?.hostFeePercent || 0 };
+    : {};
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -911,7 +931,7 @@ const CreatePendingContributionModal = ({
         </DialogHeader>
         {loading ? (
           <LoadingPlaceholder mt={2} height={200} />
-        ) : require2FAForAdmins(host) && !LoggedInUser.hasTwoFactorAuth ? (
+        ) : require2FAForAdmins(organization) && !LoggedInUser.hasTwoFactorAuth ? (
           <TwoFactorAuthRequiredMessage borderWidth={0} noTitle />
         ) : (
           <Formik
@@ -986,7 +1006,7 @@ const CreatePendingContributionModal = ({
             }}
           >
             <CreatePendingContributionForm
-              host={host}
+              organization={organization}
               onClose={handleClose}
               loading={loading}
               error={error}

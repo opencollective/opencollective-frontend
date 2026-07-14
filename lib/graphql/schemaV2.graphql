@@ -5131,7 +5131,6 @@ type PlatformSubscriptionFeatures {
   UPDATES: Boolean!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
-  RECEIVE_GRANTS: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
 }
@@ -7496,7 +7495,6 @@ type CollectiveFeatures {
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
-  RECEIVE_GRANTS: CollectiveFeatureStatus
   MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
@@ -8436,6 +8434,13 @@ type HostMetricsNamespace {
   Distinct collectives hosted by this host in a period.
   """
   hostedCollectivesHosting(input: HostedCollectivesHostingMetricsInput!): HostedCollectivesHostingMetricsResult!
+
+  """
+  Contribution/payout transactions bucketed by amount band, for size-distribution histograms.
+  """
+  hostedCollectivesTransactionSizes(
+    input: HostedCollectivesTransactionSizesMetricsInput!
+  ): HostedCollectivesTransactionSizesMetricsResult!
 }
 
 type HostedCollectivesFinancialActivityMetricsResult implements MetricsResult {
@@ -8468,7 +8473,30 @@ type HostedCollectivesFinancialActivityMetricsGroup {
   mainAccountType: String
   isArchived: Boolean
   mainAccountIsArchived: Boolean
+  contributionFrequency: HostedCollectivesFinancialActivityContributionFrequency
   hostCurrency: String
+}
+
+enum HostedCollectivesFinancialActivityContributionFrequency {
+  """
+  One-time contribution (no recurring order).
+  """
+  ONE_TIME
+
+  """
+  Recurring contribution (the order has a monthly/yearly interval).
+  """
+  RECURRING
+
+  """
+  Funds added by the host.
+  """
+  ADDED_FUNDS
+
+  """
+  Everything else.
+  """
+  OTHER
 }
 
 type HostedCollectivesFinancialActivityMetricsValues {
@@ -8498,6 +8526,18 @@ type HostedCollectivesFinancialActivityMetricsValues {
   Total number of transactions in the queried scope.
   """
   transactionCount: Int
+
+  """
+  Number of contribution (CREDIT) transactions, excluding refunds, refunded transactions and internal transfers.
+  Matches the count behind `amountReceived`.
+  """
+  contributionsCount: Int
+
+  """
+  Number of payout (DEBIT) transactions, excluding host/processor fees, refunds, refunded transactions and internal transfers.
+  Matches the count behind `amountSpent`.
+  """
+  payoutsCount: Int
 
   """
   Distinct main accounts with at least one transaction of any kind. Child events/projects roll up to their parent.
@@ -8572,6 +8612,18 @@ enum HostedCollectivesFinancialActivityMetricsMeasure {
   transactionCount
 
   """
+  Number of contribution (CREDIT) transactions, excluding refunds, refunded transactions and internal transfers.
+  Matches the count behind `amountReceived`.
+  """
+  contributionsCount
+
+  """
+  Number of payout (DEBIT) transactions, excluding host/processor fees, refunds, refunded transactions and internal transfers.
+  Matches the count behind `amountSpent`.
+  """
+  payoutsCount
+
+  """
   Distinct main accounts with at least one transaction of any kind. Child events/projects roll up to their parent.
   """
   activeCollectives
@@ -8591,6 +8643,7 @@ input HostedCollectivesFinancialActivityMetricsFiltersAllOf {
   mainAccountType: MetricsStringFilter
   isArchived: Boolean
   mainAccountIsArchived: Boolean
+  contributionFrequency: HostedCollectivesFinancialActivityContributionFrequencyFilter
   hostCurrency: MetricsStringFilter
 }
 
@@ -8609,6 +8662,12 @@ input MetricsStringFilter {
   isNull: Boolean
 }
 
+input HostedCollectivesFinancialActivityContributionFrequencyFilter {
+  eq: HostedCollectivesFinancialActivityContributionFrequency
+  in: [HostedCollectivesFinancialActivityContributionFrequency!]
+  isNull: Boolean
+}
+
 enum HostedCollectivesFinancialActivityMetricsDimension {
   account
   parent
@@ -8618,6 +8677,7 @@ enum HostedCollectivesFinancialActivityMetricsDimension {
   mainAccountType
   isArchived
   mainAccountIsArchived
+  contributionFrequency
   hostCurrency
 }
 
@@ -8835,6 +8895,250 @@ input HostedCollectivesHostingMetricsHavingInput {
 
 input HostedCollectivesHostingMetricsOrderByInput {
   measure: HostedCollectivesHostingMetricsMeasure!
+  direction: MetricsOrderByDirection!
+}
+
+type HostedCollectivesTransactionSizesMetricsResult implements MetricsResult {
+  dateFrom: DateTime!
+  dateTo: DateTime!
+  bucket: TimeUnit
+  groupBy: [String!]
+  rows: [HostedCollectivesTransactionSizesMetricsRow!]!
+}
+
+type HostedCollectivesTransactionSizesMetricsRow {
+  bucket: String
+  group: HostedCollectivesTransactionSizesMetricsGroup
+  values: HostedCollectivesTransactionSizesMetricsValues!
+}
+
+type HostedCollectivesTransactionSizesMetricsGroup {
+  account: Account
+  parent: Account
+  mainAccount: Account
+  isMainAccount: Boolean
+  accountType: String
+  kindClass: HostedCollectivesTransactionSizesKindClass
+  contributionFrequency: HostedCollectivesTransactionSizesContributionFrequency
+  amountBand: HostedCollectivesTransactionSizesAmountBand
+  hostCurrency: String
+}
+
+enum HostedCollectivesTransactionSizesKindClass {
+  """
+  Incoming contribution (credit).
+  """
+  CONTRIBUTION
+
+  """
+  Outgoing payout / expense (debit).
+  """
+  PAYOUT
+}
+
+enum HostedCollectivesTransactionSizesContributionFrequency {
+  """
+  One-time contribution (no recurring order).
+  """
+  ONE_TIME
+
+  """
+  Recurring contribution (the order has a monthly/yearly interval).
+  """
+  RECURRING
+
+  """
+  Funds added by the host.
+  """
+  ADDED_FUNDS
+
+  """
+  Everything else.
+  """
+  OTHER
+}
+
+enum HostedCollectivesTransactionSizesAmountBand {
+  """
+  Up to and including 5.
+  """
+  GT_0_LTE_5
+
+  """
+  Over 5, up to and including 10.
+  """
+  GT_5_LTE_10
+
+  """
+  Over 10, up to and including 25.
+  """
+  GT_10_LTE_25
+
+  """
+  Over 25, up to and including 50.
+  """
+  GT_25_LTE_50
+
+  """
+  Over 50, up to and including 75.
+  """
+  GT_50_LTE_75
+
+  """
+  Over 75, up to and including 100.
+  """
+  GT_75_LTE_100
+
+  """
+  Over 100, up to and including 150.
+  """
+  GT_100_LTE_150
+
+  """
+  Over 150, up to and including 200.
+  """
+  GT_150_LTE_200
+
+  """
+  Over 200, up to and including 250.
+  """
+  GT_200_LTE_250
+
+  """
+  Over 250, up to and including 500.
+  """
+  GT_250_LTE_500
+
+  """
+  Over 500, up to and including 1,000.
+  """
+  GT_500_LTE_1000
+
+  """
+  Over 1,000, up to and including 2,000.
+  """
+  GT_1000_LTE_2000
+
+  """
+  Over 2,000, up to and including 5,000.
+  """
+  GT_2000_LTE_5000
+
+  """
+  Over 5,000, up to and including 10,000.
+  """
+  GT_5000_LTE_10000
+
+  """
+  Over 10,000, up to and including 25,000.
+  """
+  GT_10000_LTE_25000
+
+  """
+  Over 25,000, up to and including 50,000.
+  """
+  GT_25000_LTE_50000
+
+  """
+  Over 50,000.
+  """
+  GT_50000
+}
+
+type HostedCollectivesTransactionSizesMetricsValues {
+  """
+  Number of contribution/payout transactions in the band.
+  """
+  transactionCount: Int
+
+  """
+  Total absolute amount (host currency) of the transactions in the band.
+  """
+  amount: Amount
+}
+
+input HostedCollectivesTransactionSizesMetricsInput {
+  dateRange: MetricsDateRangeInput!
+  measures: [HostedCollectivesTransactionSizesMetricsMeasure!]!
+  filters: HostedCollectivesTransactionSizesMetricsFiltersAllOf
+
+  """
+  Time grain. Omit for a single aggregate over the whole range.
+  """
+  bucket: TimeUnit
+  groupBy: [HostedCollectivesTransactionSizesMetricsDimension!]
+  having: [HostedCollectivesTransactionSizesMetricsHavingInput!]
+  orderBy: [HostedCollectivesTransactionSizesMetricsOrderByInput!]
+  limit: Int
+
+  """
+  IANA timezone applied to `DATE_TRUNC` when bucketing — determines where each month/week/day boundary falls. Independent of `dateRange` (which already carries the absolute window via ISO offsets): two queries with the same dateRange but different timezones can produce different bucket boundaries.
+  """
+  timezone: String = "UTC"
+}
+
+enum HostedCollectivesTransactionSizesMetricsMeasure {
+  """
+  Number of contribution/payout transactions in the band.
+  """
+  transactionCount
+
+  """
+  Total absolute amount (host currency) of the transactions in the band.
+  """
+  amount
+}
+
+input HostedCollectivesTransactionSizesMetricsFiltersAllOf {
+  account: MetricsAccountReferenceFilter
+  parent: MetricsAccountReferenceFilter
+  mainAccount: MetricsAccountReferenceFilter
+  isMainAccount: Boolean
+  accountType: MetricsStringFilter
+  kindClass: HostedCollectivesTransactionSizesKindClassFilter
+  contributionFrequency: HostedCollectivesTransactionSizesContributionFrequencyFilter
+  amountBand: HostedCollectivesTransactionSizesAmountBandFilter
+  hostCurrency: MetricsStringFilter
+}
+
+input HostedCollectivesTransactionSizesKindClassFilter {
+  eq: HostedCollectivesTransactionSizesKindClass
+  in: [HostedCollectivesTransactionSizesKindClass!]
+  isNull: Boolean
+}
+
+input HostedCollectivesTransactionSizesContributionFrequencyFilter {
+  eq: HostedCollectivesTransactionSizesContributionFrequency
+  in: [HostedCollectivesTransactionSizesContributionFrequency!]
+  isNull: Boolean
+}
+
+input HostedCollectivesTransactionSizesAmountBandFilter {
+  eq: HostedCollectivesTransactionSizesAmountBand
+  in: [HostedCollectivesTransactionSizesAmountBand!]
+  isNull: Boolean
+}
+
+enum HostedCollectivesTransactionSizesMetricsDimension {
+  account
+  parent
+  mainAccount
+  isMainAccount
+  accountType
+  kindClass
+  contributionFrequency
+  amountBand
+  hostCurrency
+}
+
+input HostedCollectivesTransactionSizesMetricsHavingInput {
+  measure: HostedCollectivesTransactionSizesMetricsMeasure!
+  op: MetricsHavingOp!
+  value: Float!
+}
+
+input HostedCollectivesTransactionSizesMetricsOrderByInput {
+  measure: HostedCollectivesTransactionSizesMetricsMeasure!
   direction: MetricsOrderByDirection!
 }
 
@@ -21264,6 +21568,16 @@ type Query {
   me: Individual
 
   """
+  Returns a single payment intent identified by its public id
+  """
+  paymentIntent(
+    """
+    The public id identifying the payment intent (ie: pi_xxxxxxxx)
+    """
+    publicId: String!
+  ): PaymentIntent
+
+  """
   Returns a list of payment intents
   """
   paymentIntents(
@@ -21286,6 +21600,11 @@ type Query {
     Only return payment intents for this host
     """
     host: AccountReferenceInput
+
+    """
+    When `host` is provided, select whether to include ALL payment intents, only those involving the host organization internal accounts (INTERNAL) or only those involving hosted collectives (HOSTED)
+    """
+    hostContext: HostContext
 
     """
     Filter by direction relative to the account (INCOMING = payee, OUTGOING = payer)
@@ -25705,16 +26024,6 @@ enum OffPlatformTransactionsProvider {
 }
 
 """
-A collection of Payment Intents
-"""
-type PaymentIntentCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [PaymentIntent!]!
-}
-
-"""
 A payment intent representing a charge, transfer, or pending payment
 """
 type PaymentIntent {
@@ -25800,6 +26109,7 @@ enum PaymentIntentStatus {
   PAID
   REVERSED
   ERROR
+  CANCELED
 }
 
 """
@@ -25820,6 +26130,16 @@ enum PaymentIntentAccountRole {
   The account that is receiving the money
   """
   PAYEE
+}
+
+"""
+A collection of Payment Intents
+"""
+type PaymentIntentCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [PaymentIntent!]!
 }
 
 """
@@ -31214,7 +31534,6 @@ input PlatformSubscriptionFeaturesFeatures {
   UPDATES: Boolean!
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
-  RECEIVE_GRANTS: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
 }

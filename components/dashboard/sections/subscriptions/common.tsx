@@ -280,13 +280,15 @@ export const AVAILABLE_FEATURES = [
   'UPDATES',
   'RECEIVE_FINANCIAL_CONTRIBUTIONS',
   'RECEIVE_EXPENSES',
-  'RECEIVE_GRANTS',
   'ACCOUNT_MANAGEMENT',
 ] as const satisfies readonly PlanFeatureKey[];
 
 // Compile-time check: all PlanFeaturesFragment keys must be in AVAILABLE_FEATURES
 type Assert<T extends true> = T;
+type MissingPlanFeatureKeys = Exclude<PlanFeatureKey, (typeof AVAILABLE_FEATURES)[number]>;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- type exists for compile-time validation only
 type _AssertAllPlanFeaturesPresent = Assert<
-  Exclude<PlanFeatureKey, (typeof AVAILABLE_FEATURES)[number]> extends never ? true : false
+  [MissingPlanFeatureKeys] extends [never]
+    ? true
+    : `Add missing keys to AVAILABLE_FEATURES: ${MissingPlanFeatureKeys & string}`
 >;

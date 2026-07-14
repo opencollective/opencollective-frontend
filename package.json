@@ -23,25 +23,25 @@
     "@icons-pack/react-simple-icons": "^13.0.0",
     "@opencollective/taxes": "5.5.0",
     "@popperjs/core": "2.11.8",
-    "@radix-ui/react-accordion": "1.2.14",
-    "@radix-ui/react-alert-dialog": "1.1.17",
-    "@radix-ui/react-checkbox": "1.3.5",
-    "@radix-ui/react-collapsible": "1.1.14",
-    "@radix-ui/react-dialog": "1.1.17",
-    "@radix-ui/react-dropdown-menu": "2.1.18",
-    "@radix-ui/react-focus-scope": "1.1.10",
-    "@radix-ui/react-hover-card": "1.1.17",
-    "@radix-ui/react-label": "2.1.10",
-    "@radix-ui/react-popover": "1.1.17",
+    "@radix-ui/react-accordion": "1.2.16",
+    "@radix-ui/react-alert-dialog": "1.1.19",
+    "@radix-ui/react-checkbox": "1.3.7",
+    "@radix-ui/react-collapsible": "1.1.16",
+    "@radix-ui/react-dialog": "1.1.19",
+    "@radix-ui/react-dropdown-menu": "2.1.20",
+    "@radix-ui/react-focus-scope": "1.1.12",
+    "@radix-ui/react-hover-card": "1.1.19",
+    "@radix-ui/react-label": "2.1.11",
+    "@radix-ui/react-popover": "1.1.19",
     "@radix-ui/react-progress": "^1.0.3",
-    "@radix-ui/react-radio-group": "1.4.1",
-    "@radix-ui/react-select": "2.3.1",
-    "@radix-ui/react-separator": "1.1.10",
+    "@radix-ui/react-radio-group": "1.4.3",
+    "@radix-ui/react-select": "2.3.3",
+    "@radix-ui/react-separator": "1.1.11",
     "@radix-ui/react-slot": "1.3.0",
-    "@radix-ui/react-switch": "1.3.1",
-    "@radix-ui/react-tabs": "1.1.15",
-    "@radix-ui/react-toast": "1.2.17",
-    "@radix-ui/react-tooltip": "1.2.10",
+    "@radix-ui/react-switch": "1.3.3",
+    "@radix-ui/react-tabs": "1.1.17",
+    "@radix-ui/react-toast": "1.2.19",
+    "@radix-ui/react-tooltip": "1.2.12",
     "@sentry/browser": "10.62.0",
     "@sentry/nextjs": "10.62.0",
     "@simplewebauthn/browser": "13.3.0",
@@ -74,7 +74,7 @@
     "copy-to-clipboard": "4.0.2",
     "copy-webpack-plugin": "14.0.0",
     "country-currency-emoji-flags": "1.1.1",
-    "csv-parse": "7.0.0",
+    "csv-parse": "7.0.1",
     "currency-symbol-map": "5.1.0",
     "dayjs": "1.11.21",
     "debug": "4.4.3",
@@ -99,9 +99,9 @@
     "load-script": "2.0.0",
     "lodash-es": "4.18.1",
     "lottie-react": "2.4.1",
-    "lucide-react": "1.21.0",
+    "lucide-react": "1.23.0",
     "memoize-one": "6.0.0",
-    "next": "16.2.9",
+    "next": "16.2.10",
     "node-fetch": "^2.7.0",
     "nprogress": "0.2.0",
     "otplib": "13.4.1",
@@ -146,7 +146,7 @@
   },
   "resolutions": {
     "@radix-ui/react-dismissable-layer": "^1.0.5",
-    "@radix-ui/react-focus-scope": "1.1.10"
+    "@radix-ui/react-focus-scope": "1.1.12"
   },
   "scripts": {
     "build": "npm-run-all build:updates build:next build:server",
@@ -213,7 +213,7 @@
     "@formatjs/cli": "^6.2.12",
     "@graphql-codegen/cli": "6.3.1",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
-    "@next/bundle-analyzer": "16.2.9",
+    "@next/bundle-analyzer": "16.2.10",
     "@tailwindcss/typography": "^0.5.13",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.4",
@@ -240,7 +240,6 @@
     "cypress-multi-reporters": "^2.0.5",
     "cypress-real-events": "^1.12.0",
     "cypress-terminal-report": "^7.3.3",
-    "cz-conventional-changelog": "^3.3.0",
     "dot-path-value": "^0.0.12",
     "esbuild": "0.28.1",
     "eslint": "^10.0.0",
@@ -258,7 +257,7 @@
     "file-loader": "^6.2.0",
     "globals": "^17.0.0",
     "html-loader": "^5.0.0",
-    "husky": "^4.3.8",
+    "husky": "4.3.8",
     "jest": "^30.0.0",
     "jest-environment-jsdom": "^30.0.5",
     "jest-junit": "^17.0.0",
@@ -273,8 +272,8 @@
     "npm-run-all2": "^9.0.0",
     "nyc": "^18.0.0",
     "pdf-parse": "^1.1.1",
-    "postcss": "8.5.15",
-    "prettier": "3.8.4",
+    "postcss": "8.5.16",
+    "prettier": "3.9.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "prop-types": "^15.8.1",
     "raf": "^3.4.1",
@@ -290,11 +289,6 @@
     "typescript-eslint": "^8.60.1",
     "url-loader": "^4.1.1",
     "webpack": "^5.91.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   },
   "husky": {
     "hooks": {
@@ -333,5 +327,15 @@
   "overrides": {
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3"
+  },
+  "allowScripts": {
+    "@tailwindcss/oxide@4.1.14": true,
+    "cypress@15.16.0": true,
+    "esbuild@0.28.1": true,
+    "sharp@0.34.5": true,
+    "@sentry/cli@2.58.5": true,
+    "canvas@3.2.0": true,
+    "husky@4.3.8": true,
+    "unrs-resolver@1.11.1": true
   }
 }

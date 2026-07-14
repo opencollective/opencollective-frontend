@@ -32,8 +32,7 @@ type InputAttributesFromZodSchema =
  * A Zod schema that can be used in a Formik form. It can be a plain Zod object or a Zod effect that wraps a Zod object.
  */
 type SupportedZodSchema<Values = any> =
-  | z.ZodType<Values, z.ZodTypeDef, any>
-  | ZodEffects<z.ZodType<Values, z.ZodTypeDef, any>>;
+  z.ZodType<Values, z.ZodTypeDef, any> | ZodEffects<z.ZodType<Values, z.ZodTypeDef, any>>;
 
 /**
  * Some global configuration for the FormikZod component.
