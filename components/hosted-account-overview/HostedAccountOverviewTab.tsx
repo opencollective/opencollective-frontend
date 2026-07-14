@@ -1,7 +1,7 @@
 import React from 'react';
-import { gql, useMutation,useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash-es';
-import { ArrowRight, Mail, MailMinus,Pencil  } from 'lucide-react';
+import { ArrowRight, Mail, MailMinus, Pencil } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
