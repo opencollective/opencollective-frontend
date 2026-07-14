@@ -33,7 +33,6 @@ const fields = gql`
     currency
     imageUrl(height: 96)
     isFrozen
-    isBlockedForUnpaidPlatformBilling
     isHost
     tags
     settings
@@ -91,6 +90,7 @@ const fields = gql`
         name
       }
       platformSubscription {
+        isAccountOnHold
         startDate
         plan {
           title
@@ -216,7 +216,11 @@ export const setSubscriberBlockStatusMutation = gql`
   mutation SetSubscriberBlockStatus($account: AccountReferenceInput!, $isBlocked: Boolean!) {
     editAccountFlags(account: $account, isBlockedForUnpaidPlatformBilling: $isBlocked) {
       id
-      isBlockedForUnpaidPlatformBilling
+      ... on AccountWithPlatformSubscription {
+        platformSubscription {
+          isAccountOnHold
+        }
+      }
     }
   }
 `;

@@ -20,7 +20,6 @@ export const adminPanelQuery = gql`
       isArchived
       isActive
       isIncognito
-      isBlockedForUnpaidPlatformBilling
       imageUrl(height: 256)
       canHaveChangelogUpdates
       connectedAccounts {
@@ -74,6 +73,7 @@ export const adminPanelQuery = gql`
       }
       ... on AccountWithPlatformSubscription {
         platformSubscription {
+          isAccountOnHold
           plan {
             title
           }

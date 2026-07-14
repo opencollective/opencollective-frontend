@@ -20,7 +20,6 @@ import type {
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import { Badge } from '../../../ui/Badge';
 import { TableActionsButton } from '../../../ui/Table';
 import { accountTrustLevelFilter } from '../../filters/AccountTrustLevelFilter';
 import { buildAccountTypeFilter } from '../../filters/AccountTypeFilter';
@@ -28,6 +27,8 @@ import { dateFilter } from '../../filters/DateFilter';
 import { dateToVariables } from '../../filters/DateFilter/schema';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
+
+import { AccountStatusBadges } from './AccountStatusBadges';
 
 export const cols = {
   collective: {
@@ -128,16 +129,7 @@ export const cols = {
       const account = row.original;
       return (
         <div className="flex flex-wrap items-center gap-1">
-          {account.isFrozen && (
-            <Badge size="sm" type="info">
-              <FormattedMessage defaultMessage="Frozen" id="CollectiveStatus.Frozen" />
-            </Badge>
-          )}
-          {account.isBlockedForUnpaidPlatformBilling && (
-            <Badge size="sm" type="error">
-              <FormattedMessage defaultMessage="Blocked due to billing" id="jN20jX" />
-            </Badge>
-          )}
+          <AccountStatusBadges account={account} />
         </div>
       );
     },

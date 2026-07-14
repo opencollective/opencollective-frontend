@@ -24,7 +24,11 @@ export const HostApplicationFields = gql`
       type
       imageUrl
       createdAt
-      isBlockedForUnpaidPlatformBilling
+      ... on AccountWithPlatformSubscription {
+        platformSubscription {
+          isAccountOnHold
+        }
+      }
       policies {
         id
         COLLECTIVE_MINIMUM_ADMINS {

@@ -74,7 +74,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
 };
 
 const getNotification = (intl, account): React.ComponentProps<typeof NotificationBar> => {
-  if (account?.isBlockedForUnpaidPlatformBilling) {
+  if (account?.platformSubscription?.isAccountOnHold) {
     return {
       type: 'error',
       title: <FormattedMessage defaultMessage="Some features are currently unavailable" id="QDq3UK" />,

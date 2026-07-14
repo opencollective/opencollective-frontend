@@ -13,6 +13,7 @@ import { CopyID } from '@/components/CopyId';
 import DrawerHeader from '@/components/DrawerHeader';
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 import Link from '@/components/Link';
+import { useModal } from '@/components/ModalContext';
 import { Button } from '@/components/ui/Button';
 import { SheetBody } from '@/components/ui/Sheet';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -27,6 +28,7 @@ import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { InfoList, InfoListItem } from '../../../ui/InfoList';
 
+import { AccountStatusBadges } from './AccountStatusBadges';
 import { setSubscriberBlockStatusMutation, subscriberDrawerQuery } from './queries';
 
 const platformBillingsColumns = [
@@ -178,6 +180,7 @@ const platformBillingsColumns = [
 const SubscriberDrawer = ({ id, openPlanModal }) => {
   const intl = useIntl();
   const { toast } = useToast();
+  const { showConfirmationModal } = useModal();
   const {
     data,
     loading: isLoading,
@@ -188,25 +191,48 @@ const SubscriberDrawer = ({ id, openPlanModal }) => {
     fetchPolicy: 'cache-and-network',
   });
   const subscriber = data?.account;
-  const isBlocked = Boolean(subscriber?.isBlockedForUnpaidPlatformBilling);
+  const isBlocked = Boolean(
+    subscriber && 'platformSubscription' in subscriber && subscriber.platformSubscription?.isAccountOnHold,
+  );
   const [setBlockStatus, { loading: settingBlockStatus }] = useMutation(setSubscriberBlockStatusMutation);
 
-  const toggleBlockStatus = async () => {
-    try {
-      await setBlockStatus({ variables: { account: { id }, isBlocked: !isBlocked } });
-      await refetch();
-      toast({
-        variant: 'success',
-        message: isBlocked
-          ? intl.formatMessage({ defaultMessage: 'Account unblocked', id: 'LubhTz' })
-          : intl.formatMessage({
-              defaultMessage: 'Account blocked for unpaid platform billing',
-              id: 'Mk7DRS',
-            }),
-      });
-    } catch (e) {
-      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
-    }
+  const toggleBlockStatus = () => {
+    showConfirmationModal({
+      title: isBlocked
+        ? intl.formatMessage({ defaultMessage: 'Unblock this account?', id: 'e/R8uq' })
+        : intl.formatMessage({ defaultMessage: 'Block this account for unpaid billing?', id: 'GobD20' }),
+      description: isBlocked
+        ? intl.formatMessage({
+            defaultMessage: 'This will restore the account’s access to restricted features.',
+            id: 'Tbtew1',
+          })
+        : intl.formatMessage({
+            defaultMessage:
+              'This restricts host actions (e.g. approving applications and paying expenses) until the account is unblocked.',
+            id: '/m71yT',
+          }),
+      variant: isBlocked ? 'default' : 'destructive',
+      confirmLabel: isBlocked
+        ? intl.formatMessage({ defaultMessage: 'Unblock account', id: 'wahDRS' })
+        : intl.formatMessage({ defaultMessage: 'Block for unpaid billing', id: 'abH0gX' }),
+      onConfirm: async () => {
+        try {
+          await setBlockStatus({ variables: { account: { id }, isBlocked: !isBlocked } });
+          await refetch();
+          toast({
+            variant: 'success',
+            message: isBlocked
+              ? intl.formatMessage({ defaultMessage: 'Account unblocked', id: 'LubhTz' })
+              : intl.formatMessage({
+                  defaultMessage: 'Account blocked for unpaid platform billing',
+                  id: 'Mk7DRS',
+                }),
+          });
+        } catch (e) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+        }
+      },
+    });
   };
 
   const actions = {
@@ -254,16 +280,7 @@ const SubscriberDrawer = ({ id, openPlanModal }) => {
                   <Badge size="sm" type="outline">
                     {formatAccountType(intl, subscriber.type)}
                   </Badge>
-                  {subscriber.isFrozen && (
-                    <Badge size="sm" type="info">
-                      <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
-                    </Badge>
-                  )}
-                  {subscriber.isBlockedForUnpaidPlatformBilling && (
-                    <Badge size="sm" type="error">
-                      <FormattedMessage defaultMessage="Blocked due to billing" id="jN20jX" />
-                    </Badge>
-                  )}
+                  <AccountStatusBadges account={subscriber} />
                   {!subscriber.isActive && (
                     <Badge size="sm">
                       <FormattedMessage id="Archived" defaultMessage="Archived" />
