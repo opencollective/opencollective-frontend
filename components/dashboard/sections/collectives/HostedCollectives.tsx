@@ -275,9 +275,7 @@ const HostedCollectivesList = ({ accountSlug: hostSlug, subpath }: DashboardSect
               </TooltipTrigger>
               {isBlockedForUnpaidBilling && (
                 <TooltipContent>
-                  <FormattedMessage
-                    defaultMessage="This action is currently not available" id="kl8uy/"
-                  />
+                  <FormattedMessage defaultMessage="This action is currently not available" id="kl8uy/" />
                 </TooltipContent>
               )}
             </Tooltip>
