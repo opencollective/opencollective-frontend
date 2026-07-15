@@ -5,22 +5,12 @@ import { ArrowRight, Mail, MailMinus, Pencil } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import dayjs from '@/lib/dayjs';
-<<<<<<< HEAD
-=======
 import { i18nGraphqlException } from '@/lib/errors';
-import { limit, offset } from '@/lib/filters/schemas';
->>>>>>> origin/main
 import type {
   HostedAccountFinancialActivityQuery,
   HostedAccountFinancialActivityQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-<<<<<<< HEAD
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-=======
-import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import useQueryFilter from '@/lib/hooks/useQueryFilter';
->>>>>>> origin/main
 import { i18nExpenseType } from '@/lib/i18n/expense';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
@@ -160,8 +150,7 @@ const Metric = ({
   </div>
 );
 
-<<<<<<< HEAD
-export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: HostedAccountOverviewTabProps) {
+export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, refetch }: HostedAccountOverviewTabProps) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const hasPaymentIntents = Boolean(
@@ -169,57 +158,6 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
   );
   const openMoneyView = (view: MoneyMovementsView) =>
     openTab(hasPaymentIntents ? HostedAccountView.PAYMENT_INTENTS : HostedAccountView.MONEY_MOVEMENTS, view);
-=======
-const RecentTransactionsCard = ({
-  title,
-  transactions,
-  loading,
-  queryFilter,
-  refetch,
-  onRowClick,
-  onViewAll,
-}: {
-  title: React.ReactNode;
-  transactions: TransactionsTableProps['transactions'];
-  loading?: boolean;
-  queryFilter: TransactionsTableProps['queryFilter'];
-  refetch: TransactionsTableProps['refetchList'];
-  onRowClick: TransactionsTableProps['onClickRow'];
-  onViewAll: () => void;
-}) => (
-  <div className="flex flex-col gap-2">
-    <h3 className="text-sm font-medium text-slate-800">{title}</h3>
-    <TransactionsTable
-      transactions={transactions}
-      loading={loading}
-      nbPlaceholders={5}
-      queryFilter={queryFilter}
-      refetchList={refetch}
-      hideHeader
-      hidePagination
-      meta={{ timeStyle: null }}
-      onClickRow={onRowClick}
-      columns={['date', 'account', 'amount', 'currency']}
-      footer={
-        transactions?.nodes?.length > 0 && (
-          <div className="flex min-h-[49px] w-full items-center justify-center border-t">
-            <button
-              onClick={onViewAll}
-              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
-            >
-              <FormattedMessage defaultMessage="View all" id="pFK6bJ" />
-            </button>
-          </div>
-        )
-      }
-    />
-  </div>
-);
-
-export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, refetch }: HostedAccountOverviewTabProps) {
-  const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
->>>>>>> origin/main
   const [openExpenseId, setOpenExpenseId] = React.useState<number | null>(null);
   const [openContributionId, setOpenContributionId] = React.useState<number | null>(null);
   const [isEditSettingsOpen, setEditSettingsOpen] = React.useState(false);
