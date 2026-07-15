@@ -1,27 +1,10 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
-import { z } from 'zod';
-
-import { limit as limitFilter, offset } from '@/lib/filters/schemas';
-import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import useQueryFilter from '@/lib/hooks/useQueryFilter';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-
-import { transactionsTableQuery } from '@/components/dashboard/sections/transactions/queries';
-import type { TransactionsTableProps } from '@/components/dashboard/sections/transactions/TransactionsTable';
 
 import { type RecentPaymentIntentRow, RecentPaymentIntentsCard } from './RecentPaymentIntentsCard';
-import { RecentTransactionsCard } from './RecentTransactionsCard';
 
 const RECENT_LIMIT = 5;
-
-const recentTransactionsSchema = z.object({
-  limit: limitFilter.default(RECENT_LIMIT),
-  offset,
-  openTransactionId: z.coerce.string().optional(),
-});
 
 const recentPayoutsPaymentIntentsQuery = gql`
   query RecentPayoutsPaymentIntents($account: AccountReferenceInput!, $host: AccountReferenceInput!, $limit: Int!) {
@@ -43,6 +26,7 @@ const recentPayoutsPaymentIntentsQuery = gql`
         description
         payer {
           id
+          publicId
           slug
           name
           type
@@ -64,16 +48,6 @@ const recentPayoutsPaymentIntentsQuery = gql`
           valueInCents
           currency
         }
-        order {
-          id
-          publicId
-          legacyId
-        }
-        expense {
-          id
-          publicId
-          legacyId
-        }
       }
     }
   }
@@ -82,67 +56,34 @@ const recentPayoutsPaymentIntentsQuery = gql`
 type RecentPayoutsCardProps = {
   account?: { id?: string } | null;
   hostSlug: string;
-  onRowClick: TransactionsTableProps['onClickRow'];
   onViewAll: () => void;
 };
 
-export function RecentPayoutsCard({ account, hostSlug, onRowClick, onViewAll }: RecentPayoutsCardProps) {
-  const { LoggedInUser } = useLoggedInUser();
-  const usePaymentIntents = Boolean(
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PAYMENT_INTENT_IN_HOSTED_ACCOUNT_OVERVIEW),
-  );
-  const queryFilter = useQueryFilter({ schema: recentTransactionsSchema, filters: {}, skipRouter: true });
-
-  const transactionsQuery = useQuery(transactionsTableQuery, {
-    variables: {
-      account: [{ id: account?.id }],
-      hostAccount: { slug: hostSlug },
-      includeIncognitoTransactions: true,
-      includeChildrenTransactions: true,
-      sort: { field: 'CREATED_AT', direction: 'DESC' },
-      limit: RECENT_LIMIT,
-      offset: 0,
-      type: TransactionType.DEBIT,
-      kind: [TransactionKind.EXPENSE],
-    },
-    skip: !account?.id || usePaymentIntents,
-    notifyOnNetworkStatusChange: true,
-  });
-
+export function RecentPayoutsCard({ account, hostSlug, onViewAll }: RecentPayoutsCardProps) {
   const paymentIntentsQuery = useQuery(recentPayoutsPaymentIntentsQuery, {
     variables: {
       account: { id: account?.id },
       host: { slug: hostSlug },
       limit: RECENT_LIMIT,
     },
-    skip: !account?.id || !usePaymentIntents,
+    skip: !account?.id,
     notifyOnNetworkStatusChange: true,
   });
 
-  const title = <FormattedMessage defaultMessage="Recent Payouts" id="aS3BD9" />;
-
-  if (usePaymentIntents) {
-    const rows: RecentPaymentIntentRow[] = (paymentIntentsQuery.data?.paymentIntents?.nodes ?? []).map((pi: any) => ({
-      id: pi.id,
-      date: pi.paidAt || pi.createdAt,
-      from: pi.payer,
-      to: pi.payee,
-      status: pi.status,
-      amount: pi.amountSent ?? pi.amountPledged ?? null,
-    }));
-    return (
-      <RecentPaymentIntentsCard title={title} rows={rows} loading={paymentIntentsQuery.loading} onViewAll={onViewAll} />
-    );
-  }
+  const rows: RecentPaymentIntentRow[] = (paymentIntentsQuery.data?.paymentIntents?.nodes ?? []).map((pi: any) => ({
+    id: pi.id,
+    date: pi.paidAt || pi.createdAt,
+    from: pi.payer,
+    to: pi.payee,
+    status: pi.status,
+    amount: pi.amountSent ?? pi.amountPledged ?? null,
+  }));
 
   return (
-    <RecentTransactionsCard
-      title={title}
-      transactions={transactionsQuery.data?.transactions}
-      loading={transactionsQuery.loading}
-      queryFilter={queryFilter}
-      refetch={transactionsQuery.refetch}
-      onRowClick={onRowClick}
+    <RecentPaymentIntentsCard
+      title={<FormattedMessage defaultMessage="Recent Payouts" id="aS3BD9" />}
+      rows={rows}
+      loading={paymentIntentsQuery.loading}
       onViewAll={onViewAll}
     />
   );

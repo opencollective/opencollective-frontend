@@ -13,13 +13,11 @@ import type {
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nExpenseType } from '@/lib/i18n/expense';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import Avatar from '@/components/Avatar';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
-import type { TransactionsTableProps } from '@/components/dashboard/sections/transactions/TransactionsTable';
 import DateTime from '@/components/DateTime';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
@@ -35,12 +33,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip
 import { EditCollectiveSettingsModal } from './EditCollectiveSettingsModal';
 import { buildKindActivity } from './financialActivity';
 import { HostedAccountContributionsPayoutsSection } from './HostedAccountContributionsPayoutsSection';
-import type { MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
 import { HostedAccountOverviewChart } from './HostedAccountOverviewChart';
 import { hostedAccountFinancialActivityQuery } from './queries';
 import { RecentContributionsCard } from './RecentContributionsCard';
 import { RecentPayoutsCard } from './RecentPayoutsCard';
-import type { HostedAccountProfileData } from './types';
+import type { HostedAccountProfileData, MoneyMovementsView } from './types';
 import { HostedAccountView } from './types';
 
 const BALANCE_COLOR = '#f59e0b';
@@ -153,11 +150,7 @@ const Metric = ({
 export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, refetch }: HostedAccountOverviewTabProps) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
-  const hasPaymentIntents = Boolean(
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PAYMENT_INTENT_IN_HOSTED_ACCOUNT_OVERVIEW),
-  );
-  const openMoneyView = (view: MoneyMovementsView) =>
-    openTab(hasPaymentIntents ? HostedAccountView.PAYMENT_INTENTS : HostedAccountView.MONEY_MOVEMENTS, view);
+  const openMoneyView = (view: MoneyMovementsView) => openTab(HostedAccountView.PAYMENT_INTENTS, view);
   const [openExpenseId, setOpenExpenseId] = React.useState<number | null>(null);
   const [openContributionId, setOpenContributionId] = React.useState<number | null>(null);
   const [isEditSettingsOpen, setEditSettingsOpen] = React.useState(false);
@@ -234,17 +227,6 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, ref
     } else if (tx.order) {
       setOpenContributionId(tx.order.legacyId);
     }
-  };
-
-  const handleTransactionTableRowClick: TransactionsTableProps['onClickRow'] = row => {
-    if ('expense' in row.original && row.original.expense) {
-      setOpenExpenseId(row.original.expense.legacyId);
-      return true;
-    } else if ('order' in row.original && row.original.order) {
-      setOpenContributionId(row.original.order.legacyId);
-      return true;
-    }
-    return false;
   };
 
   const adminMembers = account?.members?.nodes || [];
@@ -515,15 +497,9 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, ref
         <RecentContributionsCard
           account={account}
           hostSlug={hostSlug}
-          onRowClick={handleTransactionTableRowClick}
           onViewAll={() => openMoneyView('CONTRIBUTIONS')}
         />
-        <RecentPayoutsCard
-          account={account}
-          hostSlug={hostSlug}
-          onRowClick={handleTransactionTableRowClick}
-          onViewAll={() => openMoneyView('PAYOUTS')}
-        />
+        <RecentPayoutsCard account={account} hostSlug={hostSlug} onViewAll={() => openMoneyView('PAYOUTS')} />
       </div>
 
       <EditCollectiveSettingsModal

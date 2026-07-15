@@ -20,7 +20,6 @@ export enum PREVIEW_FEATURE_KEYS {
   ASYNC_EXPORTS = 'ASYNC_EXPORTS',
   TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
   HOSTED_ACCOUNT_OVERVIEW = 'HOSTED_ACCOUNT_OVERVIEW',
-  PAYMENT_INTENT_IN_HOSTED_ACCOUNT_OVERVIEW = 'PAYMENT_INTENT_IN_HOSTED_ACCOUNT_OVERVIEW',
 }
 
 enum Categories {
@@ -292,26 +291,6 @@ export const previewFeatures: PreviewFeature[] = [
     description: <FormattedMessage defaultMessage="Enable a dashboard hosted account profile page" id="cMqa3J" />,
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
-    alwaysEnableInDev: true,
-    category: Categories.HOSTING,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.PAYMENT_INTENT_IN_HOSTED_ACCOUNT_OVERVIEW,
-    title: (
-      <FormattedMessage
-        defaultMessage="Payment Intents in hosted account overview"
-        id="PreviewFeatures.paymentIntentsTitle"
-      />
-    ),
-    description: (
-      <FormattedMessage
-        defaultMessage="Experiment with Payment intents in the hosted account overview."
-        id="PreviewFeatures.paymentIntentsDescription"
-      />
-    ),
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
-    dependsOn: PREVIEW_FEATURE_KEYS.HOSTED_ACCOUNT_OVERVIEW,
     alwaysEnableInDev: true,
     category: Categories.HOSTING,
   },

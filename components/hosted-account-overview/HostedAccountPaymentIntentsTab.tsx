@@ -16,8 +16,7 @@ import {
 } from '@/components/dashboard/sections/payment-intents/queries';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
-import type { MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
-import type { HostedAccountProfileData } from './types';
+import type { HostedAccountProfileData, MoneyMovementsView } from './types';
 
 type HostedAccountPaymentIntentsTabProps = {
   account?: HostedAccountProfileData;
