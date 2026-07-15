@@ -22,6 +22,7 @@ import { HostedAccountProfile } from '../../../hosted-account-overview/HostedAcc
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportHostedCollectivesCSVModal from '../../ExportHostedCollectivesCSVModal';
@@ -229,6 +230,9 @@ const HostedCollectivesList = ({ accountSlug: hostSlug, subpath }: DashboardSect
   };
   const isUnhosted = queryFilter.values?.status === COLLECTIVE_STATUS.UNHOSTED;
   const hostedAccounts = data?.host?.hostedAccounts;
+  const isBlockedForUnpaidBilling = Boolean(
+    data?.host && 'platformSubscription' in data.host && data.host.platformSubscription?.isAccountOnHold,
+  );
   const onClickRow = hasAccountProfile ? row => pushSubpath(row.original.publicId) : row => handleDrawer(row.original);
   return (
     <div className="flex flex-col gap-4">
@@ -252,17 +256,31 @@ const HostedCollectivesList = ({ accountSlug: hostSlug, subpath }: DashboardSect
                 </Button>
               }
             />
-            <Button
-              size="sm"
-              className="gap-1"
-              onClick={() => setCreateCollective(true)}
-              data-cy="create-collective-btn"
-            >
-              <span>
-                <FormattedMessage defaultMessage="Create collective" id="CreateCollective" />
-              </span>
-              <PlusIcon size={20} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button
+                    size="sm"
+                    className="gap-1"
+                    onClick={() => setCreateCollective(true)}
+                    disabled={isBlockedForUnpaidBilling}
+                    data-cy="create-collective-btn"
+                  >
+                    <span>
+                      <FormattedMessage defaultMessage="Create collective" id="CreateCollective" />
+                    </span>
+                    <PlusIcon size={20} />
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {isBlockedForUnpaidBilling && (
+                <TooltipContent>
+                  <FormattedMessage
+                    defaultMessage="This action is currently not available" id="kl8uy/"
+                  />
+                </TooltipContent>
+              )}
+            </Tooltip>
           </React.Fragment>
         }
       />

@@ -400,6 +400,11 @@ export const hostedCollectivesQuery = gql`
       type
       settings
       hostFeePercent
+      ... on AccountWithPlatformSubscription {
+        platformSubscription {
+          isAccountOnHold
+        }
+      }
       plan {
         id
         hostFees
