@@ -197,7 +197,7 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
             </CopyID>
             {account && host?.id === account.host?.id && (
               <MoreActionsMenu collective={account} onEdit={refetch}>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" data-cy="more-actions-btn">
                   <FormattedMessage defaultMessage="More Actions" id="A7ugfn" />
                 </Button>
               </MoreActionsMenu>
@@ -212,7 +212,13 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab} onChange={tab => openTab(tab as HostedAccountView)} />
             {selectedTab === HostedAccountView.OVERVIEW && (
-              <HostedAccountOverviewTab account={account} host={host} hostSlug={hostSlug} openTab={openTab} />
+              <HostedAccountOverviewTab
+                account={account}
+                host={host}
+                hostSlug={hostSlug}
+                openTab={openTab}
+                refetch={refetch}
+              />
             )}
             {selectedTab === HostedAccountView.ACCOUNTS && (
               <HostedAccountAccountsTab account={account} host={host} loading={isLoading} onEdit={refetch} />

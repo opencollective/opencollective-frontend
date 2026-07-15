@@ -1,15 +1,26 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash-es';
-import { ArrowRight, Pencil } from 'lucide-react';
+import { ArrowRight, Mail, MailMinus, Pencil } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import dayjs from '@/lib/dayjs';
+<<<<<<< HEAD
+=======
+import { i18nGraphqlException } from '@/lib/errors';
+import { limit, offset } from '@/lib/filters/schemas';
+>>>>>>> origin/main
 import type {
   HostedAccountFinancialActivityQuery,
   HostedAccountFinancialActivityQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
+<<<<<<< HEAD
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+=======
+import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
+>>>>>>> origin/main
 import { i18nExpenseType } from '@/lib/i18n/expense';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
@@ -25,9 +36,11 @@ import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
+import ConfirmationModal from '@/components/NewConfirmationModal';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { DataList, DataListItem } from '@/components/ui/DataList';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import { EditCollectiveSettingsModal } from './EditCollectiveSettingsModal';
 import { buildKindActivity } from './financialActivity';
@@ -46,11 +59,18 @@ const SPENT_COLOR = '#dc2626';
 
 type RecentTransaction = NonNullable<HostedAccountProfileData['recentContributions']>['nodes'][number];
 
+const cancelMemberInvitationMutation = gql`
+  mutation CancelMemberInvitationInOverview($invitation: MemberInvitationReferenceInput!) {
+    cancelMemberInvitation(invitation: $invitation)
+  }
+`;
+
 type HostedAccountOverviewTabProps = {
   account?: HostedAccountProfileData;
   host?: { id?: string; hostFeePercent?: number | null } | null;
   hostSlug: string;
   openTab: (tab: HostedAccountView, moneyMovementsView?: MoneyMovementsView) => void;
+  refetch?: () => void;
 };
 
 const InteractionValue = ({
@@ -140,6 +160,7 @@ const Metric = ({
   </div>
 );
 
+<<<<<<< HEAD
 export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: HostedAccountOverviewTabProps) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -148,9 +169,62 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
   );
   const openMoneyView = (view: MoneyMovementsView) =>
     openTab(hasPaymentIntents ? HostedAccountView.PAYMENT_INTENTS : HostedAccountView.MONEY_MOVEMENTS, view);
+=======
+const RecentTransactionsCard = ({
+  title,
+  transactions,
+  loading,
+  queryFilter,
+  refetch,
+  onRowClick,
+  onViewAll,
+}: {
+  title: React.ReactNode;
+  transactions: TransactionsTableProps['transactions'];
+  loading?: boolean;
+  queryFilter: TransactionsTableProps['queryFilter'];
+  refetch: TransactionsTableProps['refetchList'];
+  onRowClick: TransactionsTableProps['onClickRow'];
+  onViewAll: () => void;
+}) => (
+  <div className="flex flex-col gap-2">
+    <h3 className="text-sm font-medium text-slate-800">{title}</h3>
+    <TransactionsTable
+      transactions={transactions}
+      loading={loading}
+      nbPlaceholders={5}
+      queryFilter={queryFilter}
+      refetchList={refetch}
+      hideHeader
+      hidePagination
+      meta={{ timeStyle: null }}
+      onClickRow={onRowClick}
+      columns={['date', 'account', 'amount', 'currency']}
+      footer={
+        transactions?.nodes?.length > 0 && (
+          <div className="flex min-h-[49px] w-full items-center justify-center border-t">
+            <button
+              onClick={onViewAll}
+              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
+            >
+              <FormattedMessage defaultMessage="View all" id="pFK6bJ" />
+            </button>
+          </div>
+        )
+      }
+    />
+  </div>
+);
+
+export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, refetch }: HostedAccountOverviewTabProps) {
+  const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
+>>>>>>> origin/main
   const [openExpenseId, setOpenExpenseId] = React.useState<number | null>(null);
   const [openContributionId, setOpenContributionId] = React.useState<number | null>(null);
   const [isEditSettingsOpen, setEditSettingsOpen] = React.useState(false);
+  const [invitationToCancel, setInvitationToCancel] = React.useState(null);
+  const [cancelMemberInvitation] = useMutation(cancelMemberInvitationMutation);
 
   const currency = account?.currency;
   const stats = account?.stats;
@@ -235,7 +309,16 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
     return false;
   };
 
-  const admins = account?.members?.nodes || [];
+  const adminMembers = account?.members?.nodes || [];
+  const pendingInvitations = (account as any)?.memberInvitations || [];
+  const isHostedCollective = Boolean(host?.id && account?.host?.id === host?.id);
+  const canManageInvitationsAsHostAdmin = Boolean(
+    isHostedCollective &&
+    adminMembers.length === 0 &&
+    LoggedInUser?.isHostAdmin(account) &&
+    !LoggedInUser?.isAdminOfCollective(account),
+  );
+  const admins = adminMembers;
   const firstInteraction = account?.firstTransaction?.nodes?.[0];
   const latestInteraction = [account?.recentContributions?.nodes?.[0], account?.recentPayouts?.nodes?.[0]]
     .filter(Boolean)
@@ -377,7 +460,7 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
       </div>
 
       <DashboardContentCard title={<FormattedMessage defaultMessage="About" id="collective.about.title" />}>
-        {(account?.description || admins.length > 0) && (
+        {(account?.description || admins.length > 0 || pendingInvitations.length > 0) && (
           <DataList className="text-sm">
             {account?.description && (
               <DataListItem
@@ -385,20 +468,56 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
                 value={<span className="text-foreground">{account.description}</span>}
               />
             )}
-            {admins.length > 0 && (
+            {(admins.length > 0 || pendingInvitations.length > 0) && (
               <DataListItem
                 label={<FormattedMessage defaultMessage="Admins" id="Admins" />}
                 value={
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap items-baseline gap-2" data-cy="admins-list">
                     {admins.map(admin => (
-                      <LinkCollective
-                        key={admin.id}
-                        collective={admin.account}
-                        className="flex items-center gap-1.5 text-sm font-medium text-foreground hover:underline"
-                        withHoverCard
-                      >
-                        <Avatar collective={admin.account} radius={20} /> {admin.account.name}
-                      </LinkCollective>
+                      <Badge key={admin.id} size="sm" type="outline" className="truncate text-nowrap">
+                        <LinkCollective
+                          collective={admin.account}
+                          withHoverCard
+                          className="flex items-center gap-1 text-nowrap"
+                        >
+                          <Avatar collective={admin.account} size={16} />
+                          <span className="truncate">{admin.account.name || admin.account.slug}</span>
+                        </LinkCollective>
+                      </Badge>
+                    ))}
+                    {pendingInvitations.map(invitation => (
+                      <Tooltip key={invitation.id}>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="group ml-1 flex items-center text-muted-foreground"
+                            onClick={() => setInvitationToCancel(invitation)}
+                            data-cy="cancel-invitation-btn"
+                            aria-label={intl.formatMessage({
+                              defaultMessage: 'Cancel invitation',
+                              id: 'CancelInvitation',
+                            })}
+                          >
+                            <Badge size="sm" type="outline" className="truncate text-nowrap">
+                              <div className="flex items-center gap-1 text-nowrap">
+                                <Avatar collective={invitation.memberAccount} size={16} />
+                                <span className="truncate">
+                                  {invitation.memberAccount?.name || invitation.memberAccount?.slug}
+                                </span>
+
+                                {canManageInvitationsAsHostAdmin && (
+                                  <div className="flex items-center">
+                                    <MailMinus className="hidden text-red-600 group-hover:inline" size={14} />
+                                    <Mail className="group-hover:hidden" size={14} />
+                                  </div>
+                                )}
+                              </div>
+                            </Badge>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <FormattedMessage defaultMessage="Cancel invitation" id="CancelInvitation" />
+                        </TooltipContent>
+                      </Tooltip>
                     ))}
                   </div>
                 }
@@ -476,6 +595,39 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab }: H
         host={host}
       />
 
+      {invitationToCancel && (
+        <ConfirmationModal
+          open={Boolean(invitationToCancel)}
+          setOpen={open => !open && setInvitationToCancel(null)}
+          type="delete"
+          variant="destructive"
+          title={
+            <FormattedMessage
+              defaultMessage="Cancel invitation for {name}?"
+              id="CancelInvitation.title"
+              values={{ name: invitationToCancel.memberAccount?.name }}
+            />
+          }
+          description={
+            <FormattedMessage
+              defaultMessage="The pending invitation will be removed. You can invite this user again later."
+              id="CancelInvitation.description"
+            />
+          }
+          onConfirm={async () => {
+            try {
+              await cancelMemberInvitation({
+                variables: { invitation: { id: invitationToCancel.id } },
+              });
+              await refetch?.();
+              setInvitationToCancel(null);
+            } catch (e) {
+              e.message = i18nGraphqlException(intl, e);
+              throw e;
+            }
+          }}
+        />
+      )}
       {openExpenseId && (
         <ExpenseDrawer openExpenseLegacyId={openExpenseId} handleClose={() => setOpenExpenseId(null)} />
       )}

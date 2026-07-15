@@ -73,13 +73,13 @@ describe('Accept financial contributions flow', () => {
     let collectiveSlug;
 
     beforeEach(() => {
-      cy.login();
-      return cy.createHostedCollective({ type: 'COLLECTIVE' }).then(collective => {
+      cy.createHostedCollective({ type: 'COLLECTIVE' }).then(collective => {
         collectiveSlug = collective.slug;
       });
     });
+
     it('Successfully applies to a host', () => {
-      cy.visit(`/${collectiveSlug}/accept-financial-contributions/host`);
+      cy.login({ redirect: `/${collectiveSlug}/accept-financial-contributions/host` });
       cy.getByDataCy('brusselstogetherasbl-collective-card').within(() => {
         cy.contains('Learn more').click({ force: true });
       });

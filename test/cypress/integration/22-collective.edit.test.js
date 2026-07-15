@@ -53,25 +53,40 @@ describe('edit collective', () => {
       .click({ force: true });
     cy.getByDataCy('resend-invite-btn').should('exist').click({ force: true });
 
-    // Check invitation email
+    // Check invitation email, logout and visit the invitation link
     cy.openEmail(({ Subject }) => Subject.includes('Invitation to join CollectiveToEdit')).then(email => {
       const $html = cheerio.load(email.HTML);
       const emailBody = $html('body').text();
       expect(emailBody).to.include(
         'Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective',
       );
+      const inviteLink = $html('a:contains("Sign up and view invitation"), a:contains("View invitation")').first();
+      const href = inviteLink.attr('href');
+      expect(href, 'invitation link href').to.be.a('string');
+      const parsedUrl = new URL(href);
+      cy.logout();
+      cy.log(`Visiting invitation link: ${parsedUrl.pathname}${parsedUrl.search}`);
+      cy.visit(parsedUrl.pathname + parsedUrl.search);
     });
 
+    // Sign in as the invited user
+    cy.url().should('include', '/signin');
+    cy.get('input[name=email]').type(invitedUserEmail);
+    cy.get('button[type=submit]').click();
+
+    // Complete profile
+    cy.url().should('include', '/signup/profile');
+    cy.getByDataCy('complete-profile-form').as('profileForm');
+    cy.get('@profileForm').find('input[name="name"]').type('AmazingNewUser');
+    cy.get('@profileForm').find('button[type="submit"]').click();
+
     // Accept invitation as new user
-    cy.login({ email: invitedUserEmail, redirect: `/member-invitations` });
     cy.getByDataCy('member-invitation-card').contains('CollectiveToEdit');
     cy.getByDataCy('member-invitation-accept-btn').click();
 
     // Should be redirected to the collective page and added to the team section
-    cy.url().should('eq', `${Cypress.config().baseUrl}/${collectiveSlug}`);
-    cy.contains('#section-our-team', 'AmazingNewUser');
-
-    cy.visit(`/dashboard/${collectiveSlug}/team`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/${collectiveSlug}`);
+    cy.getByDataCy('menu-item-team').click();
     cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('not.exist');
     cy.getByDataCy('resend-invite-btn').should('not.exist');
   });

@@ -21523,11 +21523,11 @@ type Query {
   me: Individual
 
   """
-  Get a payment intent by its public id
+  Returns a single payment intent identified by its public id
   """
   paymentIntent(
     """
-    The public id identifying the payment intent (starts with pi_)
+    The public id identifying the payment intent (ie: pi_xxxxxxxx)
     """
     publicId: String!
   ): PaymentIntent
@@ -21555,6 +21555,11 @@ type Query {
     Only return payment intents for this host
     """
     host: AccountReferenceInput
+
+    """
+    When `host` is provided, select whether to include ALL payment intents, only those involving the host organization internal accounts (INTERNAL) or only those involving hosted collectives (HOSTED)
+    """
+    hostContext: HostContext
 
     """
     Filter by direction relative to the account (INCOMING = payee, OUTGOING = payer)
@@ -26139,6 +26144,11 @@ type Mutation {
     inviteMembers: [InviteMemberInput]
 
     """
+    Optional private note included in the invitation email sent to invited members.
+    """
+    privateNote: String
+
+    """
     Marks the collective as approved directly. Only available in test/CI environments.
     """
     skipApprovalTestOnly: Boolean = false
@@ -27150,6 +27160,16 @@ type Mutation {
     role: MemberRole!
     description: String
     since: DateTime
+
+    """
+    Optional private note included in the invitation email sent to the invitee.
+    """
+    privateNote: String
+
+    """
+    When true, the invited user account was just created from the invite form. The invitee will be required to complete their profile before accepting the invitation.
+    """
+    isNewUser: Boolean = false
   ): MemberInvitation!
 
   """
@@ -27188,6 +27208,31 @@ type Mutation {
     description: String
     since: DateTime
   ): MemberInvitation
+
+  """
+  Cancel a pending member invitation. Scope: "account".
+  """
+  cancelMemberInvitation(
+    """
+    Reference to the invitation to cancel (by id or legacyId)
+    """
+    invitation: MemberInvitationReferenceInput
+
+    """
+    Reference to the invited account. Must be combined with account (and optionally role).
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    Reference to the collective the invitation belongs to. Must be combined with memberAccount.
+    """
+    account: AccountReferenceInput
+
+    """
+    Role of the invitation to cancel. Used to disambiguate when combined with account and memberAccount.
+    """
+    role: MemberRole
+  ): Boolean!
 
   """
   Endpoint to accept or reject an invitation to become a member. Scope: "account".
