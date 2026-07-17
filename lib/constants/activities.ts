@@ -32,6 +32,7 @@ export const ActivityTypes = {
   COLLECTIVE_EXPENSE_CREATED: 'collective.expense.created',
   COLLECTIVE_EXPENSE_DELETED: 'collective.expense.deleted',
   COLLECTIVE_EXPENSE_ERROR: 'collective.expense.error',
+  COLLECTIVE_EXPENSE_PAYMENT_ERROR: 'collective.expense.payment.error',
   COLLECTIVE_EXPENSE_INVITE_DRAFTED: 'collective.expense.invite.drafted',
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: 'collective.expense.incomplete',
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM: 'collective.expense.spam',
