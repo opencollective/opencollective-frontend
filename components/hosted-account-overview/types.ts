@@ -16,10 +16,12 @@ export type HostedAccountProfileData = NonNullable<HostedAccountProfileQuery['ac
 export enum HostedAccountView {
   OVERVIEW = 'overview',
   ACCOUNTS = 'accounts',
-  MONEY_MOVEMENTS = 'money-movements',
+  PAYMENT_INTENTS = 'payment-intents',
   EXPECTED_FUNDS = 'expected-funds',
   AGREEMENTS = 'agreements',
   UPDATES = 'updates',
   ABOUT = 'about',
   ACTIVITIES = 'activities',
 }
+
+export type MoneyMovementsView = 'ALL' | 'CONTRIBUTIONS' | 'PAYOUTS';

@@ -25,11 +25,11 @@ import { HostedAccountAccountsTab } from './HostedAccountAccountsTab';
 import { HostedAccountActivitiesTab } from './HostedAccountActivitiesTab';
 import { HostedAccountAgreementsTab } from './HostedAccountAgreementsTab';
 import { HostedAccountExpectedFundsTab } from './HostedAccountExpectedFundsTab';
-import { HostedAccountMoneyMovementsTab, type MoneyMovementsView } from './HostedAccountMoneyMovementsTab';
 import { HostedAccountOverviewTab } from './HostedAccountOverviewTab';
+import { HostedAccountPaymentIntentsTab } from './HostedAccountPaymentIntentsTab';
 import { HostedAccountUpdatesTab } from './HostedAccountUpdatesTab';
 import { hostedAccountProfileQuery } from './queries';
-import type { HostedAccountProfileData } from './types';
+import type { HostedAccountProfileData, MoneyMovementsView } from './types';
 import { HostedAccountView } from './types';
 
 type HostedAccountProfileProps = {
@@ -91,7 +91,7 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
         count: account ? (account.childrenAccounts?.nodes?.length || 0) + 1 : undefined,
       },
       {
-        id: HostedAccountView.MONEY_MOVEMENTS,
+        id: HostedAccountView.PAYMENT_INTENTS,
         label: <FormattedMessage defaultMessage="Money Movements" id="MoneyMovements" />,
       },
       {
@@ -207,8 +207,8 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
             {selectedTab === HostedAccountView.ACCOUNTS && (
               <HostedAccountAccountsTab account={account} host={host} loading={isLoading} onEdit={refetch} />
             )}
-            {selectedTab === HostedAccountView.MONEY_MOVEMENTS && (
-              <HostedAccountMoneyMovementsTab account={account} hostSlug={hostSlug} initialView={moneyMovementsView} />
+            {selectedTab === HostedAccountView.PAYMENT_INTENTS && (
+              <HostedAccountPaymentIntentsTab account={account} hostSlug={hostSlug} initialView={moneyMovementsView} />
             )}
             {selectedTab === HostedAccountView.EXPECTED_FUNDS && (
               <HostedAccountExpectedFundsTab account={account} hostSlug={hostSlug} />
