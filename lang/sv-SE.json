@@ -1657,6 +1657,8 @@
   "Expense.Activity.MarkedAsSpam": "Utgift markerat som spam",
   "Expense.Activity.MarkedAsUnpaid": "Utgift markerad som obetald",
   "Expense.Activity.Paid": "Utgift betald",
+  "Expense.Activity.PaymentError": "Expense payment error",
+  "Expense.Activity.PaymentError.PrivateNotice": "Only visible to host admins",
   "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "Utlägg bearbetas",
   "Expense.Activity.PutOnHold": "Expense was put on hold",

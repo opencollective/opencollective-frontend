@@ -1657,6 +1657,8 @@
   "Expense.Activity.MarkedAsSpam": "この申請をスパムと判定しました",
   "Expense.Activity.MarkedAsUnpaid": "支払われていない経費としてマークしました",
   "Expense.Activity.Paid": "経費を支払いました",
+  "Expense.Activity.PaymentError": "Expense payment error",
+  "Expense.Activity.PaymentError.PrivateNotice": "Only visible to host admins",
   "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "経費の支払い手続きを開始しました",
   "Expense.Activity.PutOnHold": "Expense was put on hold",

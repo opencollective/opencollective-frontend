@@ -12,7 +12,7 @@ import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
 import { SyncAlt as MoveIcon } from '@styled-icons/material/SyncAlt';
 import { Update as UpdateIcon } from '@styled-icons/material/Update';
-import { AlertCircleIcon, AlertOctagonIcon, InfoIcon } from 'lucide-react';
+import { AlertCircleIcon, AlertOctagonIcon, InfoIcon, Lock as LockIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { renderDetailsString } from '../../lib/transactions';
@@ -167,6 +167,26 @@ export const ACTIVITIES_INFO = {
       id: 'Expense.Activity.Error',
       defaultMessage: 'Expense error',
     }),
+  },
+  COLLECTIVE_EXPENSE_PAYMENT_ERROR: {
+    type: 'error',
+    icon: ErrorIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.PaymentError',
+      defaultMessage: 'Expense payment error',
+    }),
+    renderDetails: ({ error }: { error?: { message?: string } } = {}) => (
+      <div className="mt-1 flex flex-col gap-2 text-sm">
+        {error?.message && <p>{error.message}</p>}
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <LockIcon size={12} />
+          <FormattedMessage
+            defaultMessage="Only visible to host admins"
+            id="Expense.Activity.PaymentError.PrivateNotice"
+          />
+        </div>
+      </div>
+    ),
   },
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
     type: 'error',

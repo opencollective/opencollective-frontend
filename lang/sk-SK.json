@@ -1657,6 +1657,8 @@
   "Expense.Activity.MarkedAsSpam": "Výdavok označený ako spam",
   "Expense.Activity.MarkedAsUnpaid": "Výdavok označený ako nezaplatený",
   "Expense.Activity.Paid": "Výdavok uhradený",
+  "Expense.Activity.PaymentError": "Expense payment error",
+  "Expense.Activity.PaymentError.PrivateNotice": "Only visible to host admins",
   "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "Výdavok sa spracováva",
   "Expense.Activity.PutOnHold": "Expense was put on hold",
