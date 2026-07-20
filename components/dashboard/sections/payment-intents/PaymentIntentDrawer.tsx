@@ -96,7 +96,7 @@ function PaymentIntentDetails({ publicId }: { publicId?: string }) {
         }
       />
       <SheetBody>
-        <DataList className="mb-6">
+        <DataList className="mb-6 text-sm">
           <DataListItem>
             <DataListItemLabel>
               <FormattedMessage defaultMessage="Type" id="+U6ozc" />

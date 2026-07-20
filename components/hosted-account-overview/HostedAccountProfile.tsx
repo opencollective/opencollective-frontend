@@ -92,7 +92,7 @@ export function HostedAccountProfile({ hostSlug, accountId }: HostedAccountProfi
       },
       {
         id: HostedAccountView.PAYMENT_INTENTS,
-        label: <FormattedMessage defaultMessage="Payment Intents" id="3nKAfb" />,
+        label: <FormattedMessage defaultMessage="Money Movements" id="MoneyMovements" />,
       },
       {
         id: HostedAccountView.EXPECTED_FUNDS,

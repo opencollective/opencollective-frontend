@@ -164,6 +164,7 @@ export const paymentIntentDetailsQuery = gql`
           slug
           name
           imageUrl
+          ...AccountHoverCardFields
         }
         oppositeAccount {
           id
@@ -171,6 +172,7 @@ export const paymentIntentDetailsQuery = gql`
           slug
           name
           imageUrl
+          ...AccountHoverCardFields
         }
       }
       expense {
@@ -189,12 +191,14 @@ export const paymentIntentDetailsQuery = gql`
           publicId
           slug
           name
+          ...AccountHoverCardFields
         }
         payee {
           id
           publicId
           slug
           name
+          ...AccountHoverCardFields
         }
       }
       order {
@@ -212,12 +216,14 @@ export const paymentIntentDetailsQuery = gql`
           publicId
           slug
           name
+          ...AccountHoverCardFields
         }
         toAccount {
           id
           publicId
           slug
           name
+          ...AccountHoverCardFields
         }
       }
     }

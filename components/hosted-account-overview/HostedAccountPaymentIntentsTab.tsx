@@ -68,7 +68,6 @@ export function HostedAccountPaymentIntentsTab({
     views,
     defaultFilterValues,
     meta: { accountSlug: account?.slug },
-    skipRouter: true,
   });
 
   const { data, error, loading } = useQuery(accountPaymentIntentsQuery, {
