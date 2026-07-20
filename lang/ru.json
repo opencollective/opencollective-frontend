@@ -1657,6 +1657,8 @@
   "Expense.Activity.MarkedAsSpam": "Expense marked as spam",
   "Expense.Activity.MarkedAsUnpaid": "Расходы, помеченные как неоплаченные",
   "Expense.Activity.Paid": "Расход выплачен",
+  "Expense.Activity.PaymentError": "Expense payment error",
+  "Expense.Activity.PaymentError.PrivateNotice": "Only visible to host admins",
   "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "Обработка расхода",
   "Expense.Activity.PutOnHold": "Expense was put on hold",

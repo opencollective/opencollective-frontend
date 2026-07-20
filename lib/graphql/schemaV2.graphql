@@ -5985,6 +5985,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_EXPENSE_PAYMENT_ERROR
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
   COLLECTIVE_EXPENSE_INVITE_DECLINED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
@@ -21523,6 +21524,16 @@ type Query {
   me: Individual
 
   """
+  Returns a single payment intent identified by its public id
+  """
+  paymentIntent(
+    """
+    The public id identifying the payment intent (ie: pi_xxxxxxxx)
+    """
+    publicId: String!
+  ): PaymentIntent
+
+  """
   Returns a list of payment intents
   """
   paymentIntents(
@@ -21545,6 +21556,11 @@ type Query {
     Only return payment intents for this host
     """
     host: AccountReferenceInput
+
+    """
+    When `host` is provided, select whether to include ALL payment intents, only those involving the host organization internal accounts (INTERNAL) or only those involving hosted collectives (HOSTED)
+    """
+    hostContext: HostContext
 
     """
     Filter by direction relative to the account (INCOMING = payee, OUTGOING = payer)
@@ -22887,6 +22903,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_EXPENSE_PAYMENT_ERROR
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
   COLLECTIVE_EXPENSE_INVITE_DECLINED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
@@ -25954,16 +25971,6 @@ enum OffPlatformTransactionsProvider {
 }
 
 """
-A collection of Payment Intents
-"""
-type PaymentIntentCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [PaymentIntent!]!
-}
-
-"""
 A payment intent representing a charge, transfer, or pending payment
 """
 type PaymentIntent {
@@ -26070,6 +26077,16 @@ enum PaymentIntentAccountRole {
   The account that is receiving the money
   """
   PAYEE
+}
+
+"""
+A collection of Payment Intents
+"""
+type PaymentIntentCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [PaymentIntent!]!
 }
 
 """

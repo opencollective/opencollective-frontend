@@ -1657,6 +1657,8 @@
   "Expense.Activity.MarkedAsSpam": "Dépense marquée comme spam",
   "Expense.Activity.MarkedAsUnpaid": "Dépense marquée comme impayée",
   "Expense.Activity.Paid": "Dépense payée",
+  "Expense.Activity.PaymentError": "Expense payment error",
+  "Expense.Activity.PaymentError.PrivateNotice": "Only visible to host admins",
   "Expense.Activity.PaypalBatchId": "ID de lot de paiement PayPal : {batchId}",
   "Expense.Activity.Processing": "Dépense en cours de traitement",
   "Expense.Activity.PutOnHold": "La dépense a été mise en attente",

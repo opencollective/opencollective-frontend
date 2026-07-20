@@ -1657,6 +1657,8 @@
   "Expense.Activity.MarkedAsSpam": "Gasto marcado como spam",
   "Expense.Activity.MarkedAsUnpaid": "Gasto marcado como no pagado",
   "Expense.Activity.Paid": "Gasto pagado",
+  "Expense.Activity.PaymentError": "Expense payment error",
+  "Expense.Activity.PaymentError.PrivateNotice": "Only visible to host admins",
   "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "Procesamiento de gasto",
   "Expense.Activity.PutOnHold": "El gasto se suspendió",

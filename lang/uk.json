@@ -1657,6 +1657,8 @@
   "Expense.Activity.MarkedAsSpam": "Витрати позначено спамом",
   "Expense.Activity.MarkedAsUnpaid": "Витрати позначено не сплаченими",
   "Expense.Activity.Paid": "Витрати сплачено",
+  "Expense.Activity.PaymentError": "Expense payment error",
+  "Expense.Activity.PaymentError.PrivateNotice": "Only visible to host admins",
   "Expense.Activity.PaypalBatchId": "PayPal payout batch ID: {batchId}",
   "Expense.Activity.Processing": "Обробка витрат",
   "Expense.Activity.PutOnHold": "Expense was put on hold",
