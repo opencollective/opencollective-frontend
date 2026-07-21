@@ -205,6 +205,12 @@ const getProfileUrl = (
       return getDashboardRoute({ slug: context.slug }, `people/${account?.publicId || account?.id}`);
     } else if ([CollectiveType.VENDOR, CollectiveType.ORGANIZATION].includes(account?.type as any)) {
       return getDashboardRoute({ slug: context.slug }, `vendors/${account?.publicId || account?.id}`);
+    } else if (
+      [CollectiveType.COLLECTIVE, CollectiveType.PROJECT, CollectiveType.EVENT].includes(account?.type as any)
+    ) {
+      return getDashboardRoute({ slug: context.slug }, `hosted-collectives/${account?.publicId || account?.id}`);
+    } else if ([CollectiveType.FUND].includes(account?.type as any)) {
+      return getDashboardRoute({ slug: context.slug }, `hosted-funds/${account?.publicId || account?.id}`);
     }
   }
   return null;
