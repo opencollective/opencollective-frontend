@@ -295,7 +295,6 @@ const CollectiveNavbarActionsMenu = ({
                         <ApplyToHostBtn
                           hostSlug={collective.slug}
                           isHidden={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}
-                          disabled={collective.canApply === false}
                           buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
                         />
                       </MenuItem>

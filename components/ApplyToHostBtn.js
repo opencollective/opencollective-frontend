@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 
 import ApplyToHostModal from './ApplyToHostModal';
 import StyledButton from './StyledButton';
-import StyledTooltip from './StyledTooltip';
 
 class ApplyToHostBtn extends React.Component {
   static propTypes = {
@@ -17,7 +16,6 @@ class ApplyToHostBtn extends React.Component {
     buttonRenderer: PropTypes.func,
     router: PropTypes.object,
     isHidden: PropTypes.bool,
-    disabled: PropTypes.bool,
   };
 
   constructor(props) {
@@ -46,13 +44,11 @@ class ApplyToHostBtn extends React.Component {
   }
 
   renderButton() {
-    const { buttonRenderer, withoutIcon, buttonProps, minWidth, hostSlug, router, disabled } = this.props;
-    const onClick = disabled ? undefined : () => router.push(`${hostSlug}/apply`);
+    const { buttonRenderer, withoutIcon, buttonProps, minWidth, hostSlug, router } = this.props;
 
     if (buttonRenderer) {
       return buttonRenderer({
-        onClick,
-        disabled,
+        onClick: () => router.push(`${hostSlug}/apply`),
         'data-cy': 'host-apply-btn',
         ...buttonProps,
         children: (
@@ -71,8 +67,7 @@ class ApplyToHostBtn extends React.Component {
       <StyledButton
         buttonStyle="secondary"
         buttonSize="small"
-        onClick={onClick}
-        disabled={disabled}
+        onClick={() => router.push(`${hostSlug}/apply`)}
         minWidth={minWidth}
         data-cy="host-apply-btn"
         {...buttonProps}
@@ -84,26 +79,13 @@ class ApplyToHostBtn extends React.Component {
   }
 
   render() {
-    const { hostSlug, router, isHidden, disabled } = this.props;
+    const { hostSlug, router, isHidden } = this.props;
 
     return (
       <Fragment>
-        {disabled ? (
-          <StyledTooltip
-            content={
-              <FormattedMessage
-                defaultMessage="This Fiscal Host is not open to applications"
-                id="collectives.create.error.HostNotOpenToApplications"
-              />
-            }
-          >
-            {this.renderButton()}
-          </StyledTooltip>
-        ) : (
-          this.renderButton()
-        )}
+        {this.renderButton()}
 
-        {this.state.showModal && !isHidden && !disabled && (
+        {this.state.showModal && !isHidden && (
           <ApplyToHostModal hostSlug={hostSlug} onClose={() => router.push(hostSlug)} />
         )}
       </Fragment>
