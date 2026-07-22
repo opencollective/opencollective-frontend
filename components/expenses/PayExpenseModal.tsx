@@ -325,6 +325,7 @@ const getInitialValues = (expense, host, blockAutomaticPayment = false) => {
   return {
     ...DEFAULT_VALUES,
     ...getPayoutOptionValue(expense.payoutMethod, !blockAutomaticPayment, host),
+    clearedAt: new Date().toISOString().split('T')[0],
     feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
     expenseAmountInHostCurrency:
       expense.currency === host.currency ? expense.amount : expense.amountInHostCurrency?.valueInCents,
@@ -400,7 +401,11 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
     return;
   }
 
-  return onSubmit({ ...omit(values, 'expenseAmountInHostCurrency'), totalAmountPaidInHostCurrency });
+  return onSubmit({
+    ...omit(values, 'expenseAmountInHostCurrency'),
+    totalAmountPaidInHostCurrency,
+    clearedAt: new Date(values.clearedAt),
+  });
 };
 
 /** Expense fields needed by PayExpenseModal - combines list and admin fragments */
@@ -660,7 +665,7 @@ const PayExpenseModal = ({
                   name="clearedAt"
                   htmlFor="clearedAt"
                   error={formik.errors.clearedAt}
-                  required={false}
+                  required={true}
                   mt={3}
                   label={<FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />}
                   hint={
@@ -677,7 +682,7 @@ const PayExpenseModal = ({
                       name="clearedAt"
                       type="date"
                       data-cy="clearedAt"
-                      defaultValue={formik.values.clearedAt}
+                      value={formik.values.clearedAt}
                       onChange={e => formik.setFieldValue('clearedAt', new Date(e.target.value))}
                     />
                   )}
