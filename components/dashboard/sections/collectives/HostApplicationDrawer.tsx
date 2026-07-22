@@ -512,6 +512,9 @@ function HostApplication({
             <AcceptRejectButtons
               collective={account}
               isLoading={loading}
+              blockActions={Boolean(
+                host && 'platformSubscription' in host && host.platformSubscription?.isAccountOnHold,
+              )}
               disabled={requiresMinimumNumberOfAdmins && !hasEnoughInvitedAdmins}
               disabledMessage={
                 requiresMinimumNumberOfAdmins &&

@@ -73,6 +73,7 @@ export const adminPanelQuery = gql`
       }
       ... on AccountWithPlatformSubscription {
         platformSubscription {
+          isAccountOnHold
           plan {
             title
           }

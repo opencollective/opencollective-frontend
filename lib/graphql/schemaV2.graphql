@@ -5048,6 +5048,11 @@ type PlatformSubscription {
   """
   endDate: DateTime
   isCurrent: Boolean!
+
+  """
+  Whether the subscription account is on hold.
+  """
+  isAccountOnHold: Boolean
   plan: PlatformSubscriptionTier!
 }
 
@@ -27951,6 +27956,11 @@ type Mutation {
     Set this to false to disable 2FA. Other values have no effect.
     """
     isTwoFactorAuthEnabled: Boolean
+
+    """
+    Specify whether the account is blocked due to unpaid platform billing
+    """
+    isBlockedForUnpaidPlatformBilling: Boolean
   ): Account!
 
   """

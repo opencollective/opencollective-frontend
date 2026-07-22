@@ -28,6 +28,8 @@ import { dateToVariables } from '../../filters/DateFilter/schema';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 
+import { AccountStatusBadges } from './AccountStatusBadges';
+
 export const cols = {
   collective: {
     accessorKey: 'collective',
@@ -118,6 +120,18 @@ export const cols = {
       } else {
         return <FormattedMessage id="NoPlan" defaultMessage="No plan" />;
       }
+    },
+  },
+  status: {
+    accessorKey: 'status',
+    header: () => <FormattedMessage id="Status" defaultMessage="Status" />,
+    cell: ({ row }) => {
+      const account = row.original;
+      return (
+        <div className="flex flex-wrap items-center gap-1">
+          <AccountStatusBadges account={account} />
+        </div>
+      );
     },
   },
   legacyPlan: {

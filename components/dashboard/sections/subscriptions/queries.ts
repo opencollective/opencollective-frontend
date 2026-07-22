@@ -90,6 +90,7 @@ const fields = gql`
         name
       }
       platformSubscription {
+        isAccountOnHold
         startDate
         plan {
           title
@@ -209,6 +210,19 @@ export const updateAccountPlatformSubscriptionMutation = gql`
     }
   }
   ${fields}
+`;
+
+export const setSubscriberBlockStatusMutation = gql`
+  mutation SetSubscriberBlockStatus($account: AccountReferenceInput!, $isBlocked: Boolean!) {
+    editAccountFlags(account: $account, isBlockedForUnpaidPlatformBilling: $isBlocked) {
+      id
+      ... on AccountWithPlatformSubscription {
+        platformSubscription {
+          isAccountOnHold
+        }
+      }
+    }
+  }
 `;
 
 export const subscriberDrawerQuery = gql`

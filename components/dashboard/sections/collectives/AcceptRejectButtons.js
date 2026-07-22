@@ -19,6 +19,7 @@ const AcceptRejectButtons = ({
   onReject,
   disabled = false,
   disabledMessage = undefined,
+  blockActions = false,
   customButton = undefined,
   editCollectiveMutation = undefined,
 }) => {
@@ -59,7 +60,7 @@ const AcceptRejectButtons = ({
                 setAction('APPROVE');
                 onApprove();
               },
-              disabled: disabled || isLoading,
+              disabled: disabled || blockActions || isLoading,
               loading: isLoading && action === 'APPROVE',
               children: <FormattedMessage id="actions.approve" defaultMessage="Approve" />,
             })
@@ -67,7 +68,7 @@ const AcceptRejectButtons = ({
             <Button
               minWidth={100}
               variant="outline"
-              disabled={disabled || isLoading}
+              disabled={disabled || blockActions || isLoading}
               loading={isLoading && action === 'APPROVE'}
               data-cy={`${collective.slug}-approve`}
               onClick={() => {
@@ -84,7 +85,7 @@ const AcceptRejectButtons = ({
           {customButton ? (
             customButton({
               onClick: () => setShowRejectModal(true),
-              disabled: isLoading,
+              disabled: blockActions || isLoading,
               loading: isLoading && action === 'REJECT',
               children: <FormattedMessage id="actions.reject" defaultMessage="Reject" />,
             })
@@ -93,7 +94,7 @@ const AcceptRejectButtons = ({
               minWidth={100}
               variant="outlineDestructive"
               onClick={() => setShowRejectModal(true)}
-              disabled={isLoading}
+              disabled={blockActions || isLoading}
               loading={isLoading && action === 'REJECT'}
               data-cy={`${collective.slug}-reject`}
             >

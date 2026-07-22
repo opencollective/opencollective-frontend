@@ -24,6 +24,11 @@ export const HostApplicationFields = gql`
       type
       imageUrl
       createdAt
+      ... on AccountWithPlatformSubscription {
+        platformSubscription {
+          isAccountOnHold
+        }
+      }
       policies {
         id
         COLLECTIVE_MINIMUM_ADMINS {
@@ -395,6 +400,11 @@ export const hostedCollectivesQuery = gql`
       type
       settings
       hostFeePercent
+      ... on AccountWithPlatformSubscription {
+        platformSubscription {
+          isAccountOnHold
+        }
+      }
       plan {
         id
         hostFees
