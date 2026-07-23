@@ -33,26 +33,12 @@ import { InputGroup } from '@/components/ui/Input';
 import LocationInput, { UserLocationInput } from '@/components/ui/LocationInput';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 
 import { Button } from '../../ui/Button';
 import { useToast } from '../../ui/useToast';
 import SocialLinksFormField from '../SocialLinksFormField';
-
-const editAccountSettingMutation = gql`
-  mutation EditAccountSetting($collectiveId: Int!, $key: AccountSettingsKey!, $value: JSON!) {
-    editAccountSetting(account: { legacyId: $collectiveId }, key: $key, value: $value) {
-      id
-      settings
-      features {
-        id
-        PUBLIC_PROFILE
-      }
-    }
-  }
-`;
-
-const PUBLIC_PROFILE_SETTING_KEY = 'features.publicProfile';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, INDIVIDUAL } = AccountType;
 
@@ -172,6 +158,11 @@ const baseInfo = z.object({
           number: z.string().max(255).optional(),
         })
         .optional(),
+      features: z
+        .object({
+          publicProfile: z.boolean().optional().nullable(),
+        })
+        .optional(),
     })
     .optional()
     .nullable(),
@@ -225,8 +216,6 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
 
   const account = data?.account;
   const exampleBaseUrl = account?.isPrivate ? `${process.env.WEBSITE_URL}/dashboard` : process.env.WEBSITE_URL;
-  const [editAccountSetting, { loading: isTogglingPublicProfile }] = useMutation(editAccountSettingMutation);
-  const isPublicProfileEnabled = get(account, 'settings.features.publicProfile', true);
 
   // Load Google Maps for address autocomplete. Individuals use a simplified location input.
   useEffect(() => {
@@ -257,7 +246,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   const onSubmit = async (values: FormValuesSchema) => {
     const diff = omitDeepBy(values, (value, key) => isEqual(value, get(account, key)) || isUndefined(value));
     if (diff.settings) {
-      diff.settings = pick(diff.settings, ['VAT', 'GST']);
+      diff.settings = pick(diff.settings, ['VAT', 'GST', 'features.publicProfile']);
     }
 
     try {
@@ -411,6 +400,31 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   />
                 }
               />
+            )}
+            {account.type === INDIVIDUAL && (
+              <FormField
+                name="settings.features.publicProfile"
+                label={<FormattedMessage defaultMessage="Public profile" id="Info.PublicProfile" />}
+              >
+                {() => (
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs text-muted-foreground">
+                      <FormattedMessage
+                        id="Info.PublicProfile.description"
+                        defaultMessage="The public profile is a public page that showcases your activity on the platform. Disabling it will hide this page, but your activity will still be visible throughout the platform as a contributor of collectives or as a core member of an organization."
+                      />
+                    </p>
+                    <Switch
+                      name="publicProfile"
+                      data-cy="toggle-public-profile"
+                      checked={values.settings?.features?.publicProfile !== false}
+                      onCheckedChange={checked => {
+                        setFieldValue('settings.features.publicProfile', checked);
+                      }}
+                    />
+                  </div>
+                )}
+              </FormField>
             )}
             {account.type !== EVENT && (
               <FormField name="slug" label={<FormattedMessage id="account.slug.label" defaultMessage="Handle" />}>
@@ -686,7 +700,11 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
               />
             )}
             {!account.isPrivate && (
-              <FormField name="socialLinks" label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}>
+              <FormField
+                name="socialLinks"
+                label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}
+                showError={false} // We can hide errors here because SocialLinksFormField proactively validates the URLs
+              >
                 {({ field }) => (
                   <SocialLinksFormField
                     value={field.value || field.defaultValue}
@@ -696,67 +714,6 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   />
                 )}
               </FormField>
-            )}
-            {account.type === INDIVIDUAL && (
-              <div
-                className="flex items-center gap-4 rounded-lg border border-border px-6 py-4"
-                data-cy="money-management-section"
-              >
-                <div className="grow">
-                  <h1 className="mb-2 font-bold">
-                    <FormattedMessage defaultMessage="Public profile" id="Info.PublicProfile" />
-                  </h1>
-                  <p className="text-sm text-gray-700">
-                    <FormattedMessage
-                      id="Info.PublicProfile.description"
-                      defaultMessage="The public profile is a public page that showcases your activity on the platform. Disabling it will hide this page, but your activity will still be visible throughout the platform as a contributor of collectives or as a core member of an organization."
-                    />
-                  </p>
-                </div>
-                <Button
-                  data-cy="toggle-public-profile"
-                  variant={isPublicProfileEnabled ? 'outline' : 'default'}
-                  size="sm"
-                  className="my-2 w-fit text-nowrap"
-                  disabled={isTogglingPublicProfile}
-                  onClick={async () => {
-                    try {
-                      await editAccountSetting({
-                        variables: {
-                          collectiveId: account.legacyId,
-                          key: PUBLIC_PROFILE_SETTING_KEY,
-                          value: !isPublicProfileEnabled,
-                        },
-                        update: (cache, { data: mutationData }) => {
-                          cache.modify({
-                            id: cache.identify(account),
-                            fields: {
-                              settings: () => mutationData.editAccountSetting.settings,
-                            },
-                          });
-                        },
-                      });
-                      await refetchLoggedInUser();
-                      toast({
-                        variant: 'success',
-                        message: <FormattedMessage id="Account.Updated" defaultMessage="Account updated." />,
-                      });
-                    } catch (error) {
-                      toast({
-                        variant: 'error',
-                        title: <FormattedMessage id="Settings.Updated.Fail" defaultMessage="Update failed." />,
-                        message: i18nGraphqlException(intl, error),
-                      });
-                    }
-                  }}
-                >
-                  {isPublicProfileEnabled ? (
-                    <FormattedMessage defaultMessage="Disable" id="Disable" />
-                  ) : (
-                    <FormattedMessage defaultMessage="Enable" id="Enable" />
-                  )}
-                </Button>
-              </div>
             )}
             <div className="mt-4 flex flex-col gap-2 sm:justify-stretch">
               <Button data-cy="save" className="grow" type="submit" loading={submitting} disabled={!dirty}>
