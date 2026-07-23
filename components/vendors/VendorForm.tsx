@@ -274,7 +274,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
   };
 
   const taxOptions = [
-    { label: <FormattedMessage id="Account.None" defaultMessage="None" />, value: undefined },
+    { label: <FormattedMessage id="Account.None" defaultMessage="None" />, value: null },
     { label: 'EIN', value: 'EIN' },
     { label: 'VAT', value: 'VAT' },
     { label: 'GST', value: 'GST' },
