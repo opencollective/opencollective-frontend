@@ -115,7 +115,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
-            {account && account.type !== 'ROOT' && account.features?.[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED' && (
+            {account && account.type !== 'ROOT' && account.features?.[FEATURES.PUBLIC_PROFILE] === 'ACTIVE' && (
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild

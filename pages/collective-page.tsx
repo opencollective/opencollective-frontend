@@ -93,6 +93,13 @@ export const getServerSideProps = async (context: Context) => {
     };
   }
 
+  // Force 404 for accounts with public profile disabled
+  if (data?.Collective?.settings?.features?.publicProfile === false) {
+    return {
+      notFound: true,
+    };
+  }
+
   if (context.res && context.req) {
     const { locale } = getRequestIntl(context.req);
     if (locale === 'en') {
