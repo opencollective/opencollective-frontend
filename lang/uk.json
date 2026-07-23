@@ -2495,6 +2495,8 @@
   "InIncognito": "In Incognito",
   "initiate-kyc": "Initiate KYC",
   "InputTypeCountry.placeholder": "Виберіть свою країну",
+  "Interactions": "Interactions",
+  "Interactions.Description": "{comments, plural, one {# comment} other {# comments}} and {reactions, plural, one {# reaction} other {# reactions}}",
   "InternalTransfers": "Internal Transfers",
   "InternalTransfers.description": "Money moved (using contributions) within your organization.",
   "InvalidURL": "Неприпустима URL-адреса. Вона має починатися з http:// або https://.",

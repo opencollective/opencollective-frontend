@@ -59,23 +59,8 @@ export const updatesDashboardQuery = gql`
         nodes {
           id
           ...UpdateFields
-          comments(limit: 10) {
+          comments(limit: 0) {
             totalCount
-            nodes {
-              id
-              publicId
-              createdAt
-              fromAccount {
-                id
-                slug
-                name
-                imageUrl
-                type
-              }
-              reactions
-              userReactions
-              html
-            }
           }
         }
       }
@@ -99,29 +84,14 @@ export const updatesDashboardMetadataQuery = gql`
 `;
 
 export const updatesViewQuery = gql`
-  query UpdateView($id: String!, $commentOffset: Int) {
+  query UpdateView($id: String!) {
     update(id: $id) {
       id
       publicId
       html
       ...UpdateFields
-      comments(limit: 20, offset: $commentOffset) {
+      comments(limit: 0) {
         totalCount
-        nodes {
-          id
-          publicId
-          createdAt
-          fromAccount {
-            id
-            slug
-            name
-            imageUrl
-            type
-          }
-          reactions
-          userReactions
-          html
-        }
       }
     }
   }
