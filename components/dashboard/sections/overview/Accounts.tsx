@@ -5,6 +5,7 @@ import { ChevronDown, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link'; // eslint-disable-line no-restricted-imports
 import { FormattedMessage } from 'react-intl';
 
+import { FEATURES } from '../../../../lib/allowed-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
@@ -177,11 +178,13 @@ const AccountBalanceRow = ({ account, className = undefined, showDashboardLink =
                 </Link>
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem asChild>
-              <Link href={getCollectivePageRoute(account)}>
-                <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
-              </Link>
-            </DropdownMenuItem>
+            {account.features?.[FEATURES.PUBLIC_PROFILE] === 'ACTIVE' && (
+              <DropdownMenuItem asChild>
+                <Link href={getCollectivePageRoute(account)}>
+                  <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
+                </Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem asChild>
               <Link href={getDashboardRoute(account, 'info')}>
                 <FormattedMessage id="Settings" defaultMessage="Settings" />

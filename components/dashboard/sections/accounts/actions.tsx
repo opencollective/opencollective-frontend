@@ -86,7 +86,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
           label: intl.formatMessage({ defaultMessage: 'Go to Public Profile', id: 'lfSm7/' }),
           Icon: Globe2,
           onClick: () => router.push(getCollectivePageRoute(account)),
-          if: account.features?.[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
+          if: account.features?.[FEATURES.PUBLIC_PROFILE] === 'ACTIVE',
         },
         {
           key: 'transactions',
