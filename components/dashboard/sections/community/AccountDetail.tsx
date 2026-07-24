@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { pick } from 'lodash-es';
-import { ArrowLeft } from 'lucide-react';
+import { Archive, ArrowLeft, Pencil } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -32,6 +32,13 @@ import { CopyID } from '../../../CopyId';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../../../ui/DropdownMenu';
 import { Skeleton } from '../../../ui/Skeleton';
 import { useToast } from '../../../ui/useToast';
 import type { DashboardContextType } from '../../DashboardContext';
@@ -88,6 +95,7 @@ export function AccountDetails(props: AccountDetailsProps) {
   const [editVendor, setEditVendor] = React.useState<VendorFieldsFragment>(null);
   const [displayConvertToVendor, setDisplayConvertToVendor] = React.useState(false);
   const [openLegalDocument, setOpenLegalDocument] = React.useState(false);
+  const [displayArchiveConfirmation, setDisplayArchiveConfirmation] = React.useState(false);
 
   const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
     variables: {
@@ -225,6 +233,11 @@ export function AccountDetails(props: AccountDetailsProps) {
                       {getCollectiveTypeIcon(account?.type || props.expectedAccountType, { size: 12 })}
                       {formatCollectiveType(intl, account?.type || props.expectedAccountType)}
                     </Badge>
+                    {'isArchived' in account && account.isArchived && (
+                      <Badge size="sm" type="neutral" className="gap-1 rounded-full">
+                        <FormattedMessage defaultMessage="Archived" id="AccountStatus.Archived" />
+                      </Badge>
+                    )}
                     {account?.type === CollectiveType.INDIVIDUAL &&
                       isFeatureEnabled(dashboardAccount, FEATURES.KYC) && (
                         <KYCStatusBadge
@@ -282,31 +295,41 @@ export function AccountDetails(props: AccountDetailsProps) {
               <FormattedMessage defaultMessage="Copy URL" id="P8QaSQ" />
             </CopyID>
             {account?.type === CollectiveType.VENDOR && (
-              <React.Fragment>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setEditVendor(account as unknown as VendorFieldsFragment);
-                  }}
-                  disabled={!query.data?.host}
-                >
-                  <FormattedMessage id="Edit" defaultMessage="Edit" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    handleSetArchive(account as unknown as VendorFieldsFragment);
-                  }}
-                >
-                  {(account as unknown as VendorFieldsFragment).isArchived ? (
-                    <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage="Unarchive" />
-                  ) : (
-                    <FormattedMessage id="collective.archive.confirm.btn" defaultMessage="Archive" />
-                  )}
-                </Button>
-              </React.Fragment>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" data-cy="more-actions-btn">
+                    <FormattedMessage defaultMessage="More Actions" id="A7ugfn" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    data-cy="actions-edit-vendor"
+                    onClick={() => {
+                      setEditVendor(account as unknown as VendorFieldsFragment);
+                    }}
+                    disabled={!query.data?.host}
+                  >
+                    <Pencil className="mr-2" size="16" />
+                    <FormattedMessage id="Edit" defaultMessage="Edit" />
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    data-cy="actions-archive-vendor"
+                    onClick={() => {
+                      setDisplayArchiveConfirmation(true);
+                    }}
+                  >
+                    <Archive className="mr-2" size="16" />
+                    {(account as unknown as VendorFieldsFragment).isArchived ? (
+                      <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage="Unarchive" />
+                    ) : (
+                      <FormattedMessage id="collective.archive.confirm.btn" defaultMessage="Archive" />
+                    )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             {canBeConvertedToVendor && (
               <Button
@@ -333,6 +356,7 @@ export function AccountDetails(props: AccountDetailsProps) {
                 expectedAccountType={props.expectedAccountType}
                 handleTransactionTableRowClick={handleTransactionTableRowClick}
                 handleTabChange={handleTabChange}
+                onEditVendor={() => setEditVendor(account as unknown as VendorFieldsFragment)}
               />
             )}
             {selectedTab === AccountDetailView.TRANSACTIONS && account && (
@@ -404,6 +428,22 @@ export function AccountDetails(props: AccountDetailsProps) {
               id="Ai2X+o"
               values={{ br: <br /> }}
             />
+          </p>
+        </ConfirmationModal>
+      )}
+      {displayArchiveConfirmation && (
+        <ConfirmationModal
+          width="100%"
+          maxWidth="570px"
+          onClose={() => setDisplayArchiveConfirmation(false)}
+          header={<FormattedMessage defaultMessage="Are you sure?" id="AreYouSure" />}
+          continueHandler={async () => {
+            await handleSetArchive(account as unknown as VendorFieldsFragment);
+            setDisplayArchiveConfirmation(false);
+          }}
+        >
+          <p>
+            <FormattedMessage defaultMessage="This action can be reverted at any time." id="YgQ5Yy" />
           </p>
         </ConfirmationModal>
       )}

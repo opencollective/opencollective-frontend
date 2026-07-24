@@ -77,12 +77,7 @@ export function SaveRecoveryCodesModal(props: SaveRecoveryCodesModalProps) {
             type="confirm"
             onClose={() => setShowRecoveryCodesConfirmationModal(false)}
             continueHandler={() => props.onClose()}
-            header={
-              <FormattedMessage
-                id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Header"
-                defaultMessage="Are you sure?"
-              />
-            }
+            header={<FormattedMessage id="AreYouSure" defaultMessage="Are you sure?" />}
           >
             <FormattedMessage
               id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body"

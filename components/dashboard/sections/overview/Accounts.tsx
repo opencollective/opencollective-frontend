@@ -181,7 +181,7 @@ const AccountBalanceRow = ({ account, className = undefined, showDashboardLink =
             {account.features?.[FEATURES.PUBLIC_PROFILE] === 'ACTIVE' && (
               <DropdownMenuItem asChild>
                 <Link href={getCollectivePageRoute(account)}>
-                  <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
+                  <FormattedMessage id="Info.PublicProfile" defaultMessage="Public profile" />
                 </Link>
               </DropdownMenuItem>
             )}

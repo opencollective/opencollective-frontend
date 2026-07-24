@@ -119,12 +119,12 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  tooltip={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+                  tooltip={intl.formatMessage({ id: 'Info.PublicProfile', defaultMessage: 'Public profile' })}
                 >
                   <SidebarLink
                     href={getCollectivePageRoute(account)}
                     Icon={Globe2}
-                    label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+                    label={intl.formatMessage({ id: 'Info.PublicProfile', defaultMessage: 'Public profile' })}
                     data-cy="public-profile-link"
                     external
                     onClick={closeMobileMenu}

@@ -205,6 +205,7 @@ export const communityAccountDetailQuery = gql`
         address
       }
       isVerified
+      isArchived
       pendingExpenses: expenses(
         status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
         direction: SUBMITTED

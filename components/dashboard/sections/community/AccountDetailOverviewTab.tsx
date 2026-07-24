@@ -2,6 +2,7 @@ import React from 'react';
 import type { QueryResult } from '@apollo/client';
 import { useQuery } from '@apollo/client';
 import { compact } from 'lodash-es';
+import { Pencil } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -18,6 +19,7 @@ import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import StackedAvatars from '@/components/StackedAvatars';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { getEffectiveVendorPolicyLabel, VendorContactTag } from '@/components/vendors/common';
@@ -64,11 +66,13 @@ export const AccountDetailsOverviewTab = ({
   expectedAccountType,
   handleTabChange,
   handleTransactionTableRowClick,
+  onEditVendor,
 }: {
   query: QueryResult<CommunityAccountDetailQuery>;
   expectedAccountType: AccountType;
   handleTabChange: (tab: string) => void;
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
+  onEditVendor?: () => void;
 }) => {
   const intl = useIntl();
 
@@ -156,7 +160,22 @@ export const AccountDetailsOverviewTab = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-4">
-        <DashboardContentCard title={<FormattedMessage defaultMessage="Details" id="Details" />} className="grow-1">
+        <DashboardContentCard
+          title={<FormattedMessage defaultMessage="Details" id="Details" />}
+          action={
+            account?.type === 'VENDOR' && onEditVendor ? (
+              <Button
+                variant="outline"
+                size="icon-xs"
+                aria-label={intl.formatMessage({ defaultMessage: 'Edit', id: 'Edit' })}
+                onClick={onEditVendor}
+              >
+                <Pencil size={16} />
+              </Button>
+            ) : null
+          }
+          className="grow-1"
+        >
           <DataList className="text-sm">
             <DataListItem
               label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
