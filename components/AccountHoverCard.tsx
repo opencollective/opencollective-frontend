@@ -21,6 +21,7 @@ import { DashboardContext } from './dashboard/DashboardContext';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
+import { AccountNameWithLegalName } from './AccountNameWithLegalName';
 import { AccountTrustBadge } from './AccountTrustBadge';
 import Avatar from './Avatar';
 import FollowButton from './FollowButton';
@@ -338,7 +339,6 @@ export const AccountHoverCard = ({
   const infoItems = getInfoItems(account);
   const asyncInfoItems = getInfoItemsFromMembershipData(data);
   const accountUrl = context?.getProfileUrl?.(account) || getCollectivePageRoute(account);
-  const legalName = account.legalName !== account.name && account.legalName;
   return (
     // HoverCard currently disabled for Vendors (need to fix styling, appropriate links, etc)
     <HoverCard open={open && !isVendor} onOpenChange={setOpen}>
@@ -366,10 +366,12 @@ export const AccountHoverCard = ({
             <div className="overflow-hidden">
               <div className="flex items-start gap-1">
                 <Link href={accountUrl} className="min-w-0 break-words">
-                  <span className="font-medium hover:underline">
-                    {account.name}
-                    {legalName && <span className="font-normal text-muted-foreground">{` (${legalName})`}</span>}
-                  </span>
+                  <AccountNameWithLegalName
+                    account={account}
+                    className="font-medium hover:underline"
+                    legalNameClassName="font-normal"
+                    fallbackToSlug={false}
+                  />
                 </Link>
                 <AccountTrustBadge account={account} />
               </div>
