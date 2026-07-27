@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, isEmpty, pick } from 'lodash-es';
-import { PlusIcon } from 'lucide-react';
+import { AlertTriangle, PlusIcon, User } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -17,6 +17,7 @@ import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import StackedAvatars from '@/components/StackedAvatars';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import Avatar from '../../Avatar';
 import { i18nWithColon } from '../../I18nFormatters';
@@ -24,7 +25,7 @@ import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledModal from '../../StyledModal';
 import { actionsColumn, DataTable } from '../../table/DataTable';
 import { Button } from '../../ui/Button';
-import { getEffectiveVendorPolicyLabel, VendorContactTag } from '../../vendors/common';
+import { getEffectiveVendorPolicyLabel } from '../../vendors/common';
 import type { VendorFieldsFragment } from '../../vendors/queries';
 import { setVendorArchiveMutation, vendorFieldFragment } from '../../vendors/queries';
 import VendorForm from '../../vendors/VendorForm';
@@ -209,21 +210,33 @@ const getColumns = ({ isVendor, host }) => {
         const vendor = row.original;
         const contact = vendor.vendorInfo?.contact;
         return (
-          <div className="flex items-center">
-            <Avatar collective={vendor} size={24} className="mr-2" />
+          <div className="flex items-center gap-1">
+            <Avatar collective={vendor} size={24} className="mr-1" />
             {vendor.name}
             {contact && (
-              <VendorContactTag className="ml-3">
-                <span className="font-normal">
-                  {i18nWithColon(<FormattedMessage id="Contact" defaultMessage="Contact" />)}
-                </span>
-                <a href={`mailto:${contact.email}`}>{contact.name}</a>
-              </VendorContactTag>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex text-muted-foreground">
+                    <User size={16} />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {i18nWithColon(<FormattedMessage id="Contact" defaultMessage="Contact" />)}{' '}
+                  <a href={`mailto:${contact.email}`}>{contact.name}</a>
+                </TooltipContent>
+              </Tooltip>
             )}
             {vendor.vendorInfo?.taxFormRequired && isEmpty(vendor.vendorInfo?.taxFormUrl) && (
-              <span className="mr-2 rounded-sm bg-yellow-300 px-2 py-1 text-xs font-bold text-slate-800">
-                <FormattedMessage defaultMessage="Pending tax form" id="P6R0T+" />
-              </span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex text-yellow-600">
+                    <AlertTriangle size={16} />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <FormattedMessage defaultMessage="Pending tax form" id="P6R0T+" />
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         );

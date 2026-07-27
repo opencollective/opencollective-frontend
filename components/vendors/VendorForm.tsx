@@ -43,7 +43,7 @@ import { getUseVendorPolicyLabel } from './common';
 import type { VendorFieldsFragment } from './queries';
 import { createVendorMutation, vendorFieldFragment } from './queries';
 
-const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
+const FIELD_LABEL_PROPS = { fontSize: 14, fontWeight: 700 };
 
 const editVendorMutation = gql`
   mutation EditVendor($vendor: VendorEditInput!) {
@@ -408,7 +408,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
               {!props.limitVisibilityOptionToAccount && (
                 <React.Fragment>
                   <div className="mt-3">
-                    <div className="mb-2 text-base font-bold">
+                    <div className="mb-2 text-sm font-bold">
                       <FormattedMessage defaultMessage="Where can this vendor be used?" id="gwRGM1" />
                     </div>
                     <RadioGroup
@@ -466,7 +466,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   </div>
 
                   <div className="mt-3">
-                    <div className="mb-2 text-base font-bold">
+                    <div className="mb-2 text-sm font-bold">
                       <FormattedMessage
                         defaultMessage="Who can attribute financial activities to this vendor?"
                         id="XcSJPs"
@@ -527,7 +527,9 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   </div>
                 </React.Fragment>
               )}
-
+              <p className="mt-4 mb-3 text-base font-bold">
+                <FormattedMessage defaultMessage="Tax" id="AwzkSM" />
+              </p>
               {supportsTaxForm && (
                 <React.Fragment>
                   <StyledInputFormikField
@@ -538,7 +540,13 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                     mt={3}
                   >
                     {({ field, form }) => (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
+                        <label htmlFor="taxRequired" className="text-sm">
+                          <FormattedMessage
+                            defaultMessage="This vendor requires a tax form, and a URL to the form can be provided below"
+                            id="Vendor.RequiresTaxFormDescription"
+                          />
+                        </label>
                         <Switch
                           {...field}
                           checked={field.value}
@@ -549,9 +557,6 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                             }
                           }}
                         />
-                        <label htmlFor="taxRequired" className="font-normal">
-                          <FormattedMessage defaultMessage="Requires tax form" id="oKmsSw" />
-                        </label>
                       </div>
                     )}
                   </StyledInputFormikField>
@@ -570,13 +575,11 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   )}
                 </React.Fragment>
               )}
-              <p className="mt-4 mb-3 text-base font-bold">
-                <FormattedMessage defaultMessage="Tax identification" id="YQKRUh" />
-              </p>
+
               <StyledInputFormikField
                 name="vendorInfo.taxType"
                 label={intl.formatMessage({ defaultMessage: 'Identification system', id: '6MC5jw' })}
-                labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
+                labelProps={FIELD_LABEL_PROPS}
                 required={false}
                 mt={3}
               >
@@ -594,7 +597,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 <StyledInputFormikField
                   name="vendorInfo.otherTaxType"
                   label={intl.formatMessage({ defaultMessage: 'Identification system', id: '6MC5jw' })}
-                  labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
+                  labelProps={FIELD_LABEL_PROPS}
                   required={true}
                   mt={3}
                 >
@@ -604,7 +607,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
               <StyledInputFormikField
                 name="vendorInfo.taxId"
                 label={intl.formatMessage({ defaultMessage: 'ID Number', id: 'lSvafT' })}
-                labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
+                labelProps={FIELD_LABEL_PROPS}
                 required={formik.values.vendorInfo?.taxType !== undefined}
                 mt={3}
               >
@@ -612,17 +615,8 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
               </StyledInputFormikField>
 
               <p className="mt-4 mb-3 text-base font-bold">
-                <FormattedMessage defaultMessage="Mailing address" id="yrKCq7" />
+                <FormattedMessage defaultMessage="Contact information" id="ContactInformation" />
               </p>
-              <StyledInputLocation
-                name="vendorInfo.location"
-                onChange={values => {
-                  formik.setFieldValue('location', values);
-                }}
-                location={formik.values.location}
-                errors={formik.errors.location as object}
-                required={false}
-              />
               <StyledInputFormikField
                 name="vendorInfo.contact.name"
                 label={intl.formatMessage({ id: 'ContactName', defaultMessage: 'Contact name' })}
@@ -638,6 +632,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 labelProps={FIELD_LABEL_PROPS}
                 required={false}
                 mt={3}
+                mb={3}
               >
                 {({ field }) => (
                   <StyledInput
@@ -650,6 +645,15 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   />
                 )}
               </StyledInputFormikField>
+              <StyledInputLocation
+                name="vendorInfo.location"
+                onChange={values => {
+                  formik.setFieldValue('location', values);
+                }}
+                location={formik.values.location}
+                errors={formik.errors.location as object}
+                required={false}
+              />
               {!props.hidePayoutMethod && (
                 <React.Fragment>
                   <div className="mt-3 grow">
