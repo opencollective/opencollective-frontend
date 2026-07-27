@@ -69,6 +69,7 @@ const EDITABLE_FIELDS = [
   'vendorInfo.contact.email',
   'payoutMethod',
   'vendorInfo.notes',
+  'hasPublicProfile',
 ];
 
 type VendorHostProp = {
@@ -291,6 +292,9 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
   if (vendor?.canBeUsedWithAccounts?.length > 0) {
     initialValues['canBeUsedWithAccounts'] = vendor.canBeUsedWithAccounts;
   }
+  if (vendor?.settings?.features?.publicProfile === true) {
+    initialValues['hasPublicProfile'] = true;
+  }
 
   if (props.limitVisibilityOptionToAccount) {
     initialValues['accountVisibility'] = 'limit-visibility';
@@ -404,6 +408,38 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} placeholder={formik.values.name} />
                 )}
               </StyledInputFormikField>
+              <StyledInputFormikField
+                name="hasPublicProfile"
+                label={intl.formatMessage({ id: 'Info.PublicProfile', defaultMessage: 'Public profile' })}
+                labelProps={FIELD_LABEL_PROPS}
+                required={false}
+                mt={3}
+              >
+                {({ field, form }) => (
+                  <div className="flex items-center gap-3">
+                    <label htmlFor="hasPublicProfile" className="text-sm">
+                      <FormattedMessage
+                        defaultMessage="Enable a simplified public profile that showcases this vendor's contributions and can be publicly accessed"
+                        id="Vendor.EnablePublicProfile"
+                      />
+                    </label>
+                    <Switch
+                      {...field}
+                      checked={field.value}
+                      onCheckedChange={checked => {
+                        form.setFieldValue(field.name, checked);
+                        if (!checked) {
+                          form.setFieldValue(field.name, null);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+              </StyledInputFormikField>
+
+              <p className="mt-4 mb-3 text-base font-bold">
+                <FormattedMessage defaultMessage="Visibility" id="JAkIqb" />
+              </p>
 
               {!props.limitVisibilityOptionToAccount && (
                 <React.Fragment>

@@ -17,6 +17,10 @@ export const vendorFieldFragment = gql`
     imageUrl
     isArchived
     createdAt
+    features {
+      PUBLIC_PROFILE
+    }
+    settings
 
     location {
       id
