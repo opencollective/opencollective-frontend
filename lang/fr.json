@@ -4517,7 +4517,6 @@
   "UNylJ0": "Modifier le palier et le montant de la contribution récurrente.",
   "UoQDcG": "Votre organisation exige que vous ayez activé l'authentification à deux facteurs pour continuer",
   "Update.Body": "Corps",
-  "update.comments": "{count, plural, =0 {Aucun commentaire} one {# commentaire} other {# commentaires}}",
   "update.createdAtBy": "Créée le {date} (brouillon) par {author}",
   "update.delete.confirmation": "Cette action est irréversible. La suppression de cette mise à jour la supprimera de la page du Collectif.",
   "Update.Delete.Title": "Supprimer la mise à jour",

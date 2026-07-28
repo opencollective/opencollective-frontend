@@ -4517,7 +4517,6 @@
   "UNylJ0": "Change the tier and recurring contribution amount.",
   "UoQDcG": "Your organization requires you to have two-factor authentication activated to continue",
   "Update.Body": "Body",
-  "update.comments": "{count, plural,=0 {No comments} one {# comment} other {# comments}}",
   "update.createdAtBy": "Создано {date} (черновик) пользователем {author}",
   "update.delete.confirmation": "This action is irreversible. Deleting this update will remove it from the collective page.",
   "Update.Delete.Title": "Delete Update",

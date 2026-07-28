@@ -4517,7 +4517,6 @@
   "UNylJ0": "Change the tier and recurring contribution amount.",
   "UoQDcG": "Din organisation kräver att du har tvåfaktorsautentisering aktiverat för att fortsätta",
   "Update.Body": "Body",
-  "update.comments": "{count, plural,=0 {Inga kommentarer} one {# kommentar} other {# kommentarer}}",
   "update.createdAtBy": "Skapad den {date} (utkast) av {author}",
   "update.delete.confirmation": "This action is irreversible. Deleting this update will remove it from the collective page.",
   "Update.Delete.Title": "Ta bort uppdatering",
