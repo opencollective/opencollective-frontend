@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { NotepadText } from 'lucide-react';
+import { LockIcon, NotepadText } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import commentTypes from '../../lib/constants/commentTypes';
@@ -92,6 +92,13 @@ export default function SmallComment(props: CommentProps) {
                   )
                 }
               </InlineEditField>
+            </div>
+            <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+              <LockIcon size={12} />
+              <FormattedMessage
+                defaultMessage="Only visible to host admins"
+                id="Expense.Activity.PaymentError.PrivateNotice"
+              />
             </div>
           </div>
         </div>
