@@ -1,12 +1,12 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { uniqBy } from 'lodash-es';
+import { sum } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import type { Account, UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { FEATURES } from '@/lib/allowed-features';
@@ -14,12 +14,10 @@ import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/graphql';
 
 import NotFound from '@/components/NotFound';
 
-import EmojiReactions from '../../../conversations/EmojiReactions';
 import FeatureNotSupported from '../../../FeatureNotSupported';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import StackedAvatars from '../../../StackedAvatars';
 import { Button } from '../../../ui/Button';
 import { Skeleton } from '../../../ui/Skeleton';
 import { DashboardContext } from '../../DashboardContext';
@@ -47,6 +45,9 @@ const schema = z.object({
 });
 
 const UpdatePost = ({ update, account }) => {
+  const reactionCount = update.reactions ? sum(Object.values(update.reactions)) : 0;
+  const commentsCount = update.comments?.totalCount || 0;
+
   return (
     <div className="flex flex-col gap-4 rounded-2xl border p-4">
       <div>
@@ -61,27 +62,15 @@ const UpdatePost = ({ update, account }) => {
         </div>
       </div>
       {update.summary && <HTMLContent content={update.summary} />}
-      <div className="flex grow justify-between">
-        <div>
-          <EmojiReactions reactions={update.reactions} />
-        </div>
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <StackedAvatars
-            accounts={
-              uniqBy(
-                update.comments?.nodes?.map(comment => comment.fromAccount),
-                'id',
-              ) as Partial<Account>[]
-            }
-            maxDisplayedAvatars={5}
-            imageSize={24}
-          />
-          <FormattedMessage
-            id="update.comments"
-            defaultMessage="{count, plural,=0 {No comments} one {# comment} other {# comments}}"
-            values={{ count: update.comments?.totalCount }}
-          />
-        </div>
+      <div className="flex items-center gap-2 text-xs text-gray-500">
+        <FormattedMessage
+          id="Interactions.Description"
+          defaultMessage="{comments, plural, one {# comment} other {# comments}} and {reactions, plural, one {# reaction} other {# reactions}}"
+          values={{
+            reactions: reactionCount,
+            comments: commentsCount,
+          }}
+        />
       </div>
     </div>
   );

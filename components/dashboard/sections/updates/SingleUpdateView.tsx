@@ -58,7 +58,7 @@ const SingleUpdateView = ({ updateId }) => {
   const refetchQueries = getRefetchQueries(account);
   const update = data?.update;
   const isDraft = !update?.publishedAt;
-  const comments = update?.comments;
+  const commentsCount = update?.comments?.totalCount || 0;
   const reactionCount = update?.reactions ? sum(Object.values(update.reactions)) : 0;
 
   const handleDelete = useCallback(
@@ -177,7 +177,7 @@ const SingleUpdateView = ({ updateId }) => {
                           defaultMessage="{comments, plural, one {# comment} other {# comments}} and {reactions, plural, one {# reaction} other {# reactions}}"
                           values={{
                             reactions: reactionCount,
-                            comments: comments?.totalCount || 0,
+                            comments: commentsCount,
                           }}
                         />
                       </SideColumnItem>
