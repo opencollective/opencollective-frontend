@@ -276,7 +276,7 @@ const FormBody = ({ update, accountSlug }) => {
                 <Field name="html">
                   {({ field, meta }) => (
                     <div>
-                      <label htmlFor={field.id} className="mb-2 font-bold">
+                      <label htmlFor={field.id} className="mb-2 flex font-bold">
                         <FormattedMessage id="Update.Body" defaultMessage="Body" />
                       </label>
                       <RichTextEditor
@@ -309,12 +309,12 @@ const FormBody = ({ update, accountSlug }) => {
                 </Field>
               </MainColumn>
               <SideColumn>
-                <div className="flex gap-2 lg:flex-col lg:justify-stretch">
+                <div className="flex flex-col gap-2 md:flex-row xl:flex-col">
                   {isDraft ? (
                     <React.Fragment>
                       <Button
                         size="sm"
-                        className="gap-1.5"
+                        className="gap-1.5 text-nowrap"
                         onClick={() => handlePublish(formik)}
                         loading={audienceLoading}
                         data-cy="update-publish-btn"
@@ -327,7 +327,7 @@ const FormBody = ({ update, accountSlug }) => {
                         type="submit"
                         size="sm"
                         variant="outline"
-                        className="w-full gap-1.5"
+                        className="w-full gap-1.5 text-nowrap"
                         data-cy="update-save-draft-btn"
                         disabled={!formik.isValid}
                         loading={formik.isSubmitting}
@@ -341,7 +341,7 @@ const FormBody = ({ update, accountSlug }) => {
                       <Button
                         type="submit"
                         size="sm"
-                        className="w-full gap-1.5"
+                        className="w-full gap-1.5 text-nowrap"
                         data-cy="update-save-btn"
                         loading={formik.isSubmitting}
                       >
@@ -351,7 +351,7 @@ const FormBody = ({ update, accountSlug }) => {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="w-full gap-1.5"
+                        className="w-full gap-1.5 text-nowrap"
                         onClick={handleUnpublish}
                         disabled={formik.isSubmitting}
                       >
