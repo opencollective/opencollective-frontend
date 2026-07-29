@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, truncate } from 'lodash-es';
+import { truncate } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../lib/utils';
@@ -28,6 +28,7 @@ const LinkCollective = ({
   const context = React.useContext(DashboardContext);
   const peoplesDashboardURL = context?.getProfileUrl?.(collective);
   const formatName = name => (truncateNameLength ? truncate(name, { length: truncateNameLength }) : name);
+  const route = peoplesDashboardURL || getCollectivePageRoute(collective);
 
   // We do handle incognito and guest accounts if we have a contextual dashboard profile URL
   if (!peoplesDashboardURL) {
@@ -45,9 +46,8 @@ const LinkCollective = ({
       } else {
         return collective.name;
       }
-    } else if (!collective.slug || collective.type === 'VENDOR') {
-      return children || formatName(collective.name);
-    } else if (collective.isPrivate || get(collective, 'features.PUBLIC_PROFILE') === 'UNSUPPORTED') {
+    } else if (!route) {
+      // No route means the collective has no public profile (hidden, private, vendor, missing slug, etc.)
       return children || formatName(collective.name);
     }
   }
@@ -55,7 +55,7 @@ const LinkCollective = ({
   const { slug, name } = collective;
   const link = (
     <Link
-      href={peoplesDashboardURL || getCollectivePageRoute(collective)}
+      href={route}
       title={noTitle || withHoverCard ? null : title || name}
       target={target}
       className={cn('hover:underline', className)}

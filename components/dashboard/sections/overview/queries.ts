@@ -143,6 +143,7 @@ export const collectiveBalanceQuery = gql`
       slug
       ...AccountHoverCardFields
       type
+      hasPublicProfile
 
       stats {
         id
@@ -160,6 +161,7 @@ export const collectiveBalanceQuery = gql`
           slug
           imageUrl
           isArchived
+          hasPublicProfile
           ...AccountHoverCardFields
           ... on Event {
             startsAt

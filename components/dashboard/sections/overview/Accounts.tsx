@@ -5,7 +5,6 @@ import { ChevronDown, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link'; // eslint-disable-line no-restricted-imports
 import { FormattedMessage } from 'react-intl';
 
-import { FEATURES } from '../../../../lib/allowed-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
@@ -141,14 +140,20 @@ const AccountBalanceRow = ({ account, className = undefined, showDashboardLink =
       <AccountHoverCard
         account={account}
         trigger={
-          <Link
-            className="flex items-center gap-2 overflow-hidden text-muted-foreground hover:underline"
-            href={getCollectivePageRoute(account)}
-          >
-            <Avatar radius={24} collective={account} />
-
-            <span className="truncate">{account.name}</span>
-          </Link>
+          account.hasPublicProfile ? (
+            <Link
+              className="flex items-center gap-2 overflow-hidden text-muted-foreground hover:underline"
+              href={getCollectivePageRoute(account)}
+            >
+              <Avatar radius={24} collective={account} />
+              <span className="truncate">{account.name}</span>
+            </Link>
+          ) : (
+            <span className="flex items-center gap-2 overflow-hidden text-muted-foreground">
+              <Avatar radius={24} collective={account} />
+              <span className="truncate">{account.name}</span>
+            </span>
+          )
         }
       />
 
@@ -178,7 +183,7 @@ const AccountBalanceRow = ({ account, className = undefined, showDashboardLink =
                 </Link>
               </DropdownMenuItem>
             )}
-            {account.features?.[FEATURES.PUBLIC_PROFILE] === 'ACTIVE' && (
+            {account.hasPublicProfile && (
               <DropdownMenuItem asChild>
                 <Link href={getCollectivePageRoute(account)}>
                   <FormattedMessage id="Info.PublicProfile" defaultMessage="Public profile" />

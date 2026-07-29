@@ -17,6 +17,7 @@ const dashboardAccountsQueryFields = gql`
     isActive
     isArchived
     isHost
+    hasPublicProfile
     tags
     settings
     createdAt

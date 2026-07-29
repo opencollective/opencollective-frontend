@@ -148,12 +148,14 @@ export default function LegalDocumentDrawer({
                           id="VGuckw"
                           values={{
                             date: <DateTime dateStyle="medium" value={expense.createdAt} />,
-                            ExpenseLink: getI18nLink({
-                              href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
-                              title: expense.description,
-                              textDecoration: 'underline',
-                              color: 'black.900',
-                            }),
+                            ExpenseLink: getCollectivePageRoute(expense.account)
+                              ? getI18nLink({
+                                  href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                                  title: expense.description,
+                                  textDecoration: 'underline',
+                                  color: 'black.900',
+                                })
+                              : chunks => chunks,
                             amount: (
                               <FormattedMoneyAmount
                                 amount={expense.amountV2.valueInCents}
@@ -165,12 +167,16 @@ export default function LegalDocumentDrawer({
                               <AccountHoverCard
                                 account={expense.account}
                                 trigger={
-                                  <Link
-                                    className="font-medium hover:text-primary hover:underline"
-                                    href={getCollectivePageRoute(expense.account)}
-                                  >
-                                    {expense.account.name}
-                                  </Link>
+                                  getCollectivePageRoute(expense.account) ? (
+                                    <Link
+                                      className="font-medium hover:text-primary hover:underline"
+                                      href={getCollectivePageRoute(expense.account)}
+                                    >
+                                      {expense.account.name}
+                                    </Link>
+                                  ) : (
+                                    <span className="font-medium">{expense.account.name}</span>
+                                  )
                                 }
                               />
                             ),

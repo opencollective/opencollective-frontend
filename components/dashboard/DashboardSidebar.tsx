@@ -4,7 +4,6 @@ import type { LucideIcon } from 'lucide-react';
 import { ArrowUpRight, ChevronDown, Globe2, LifeBuoy, Telescope } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
-import { FEATURES } from '@/lib/allowed-features';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
 import { cn } from '@/lib/utils';
@@ -115,7 +114,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
-            {account && account.type !== 'ROOT' && account.features?.[FEATURES.PUBLIC_PROFILE] === 'ACTIVE' && (
+            {account && account.type !== 'ROOT' && account.hasPublicProfile && (
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild

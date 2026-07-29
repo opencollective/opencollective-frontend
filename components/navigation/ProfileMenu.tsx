@@ -147,11 +147,13 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
               </div>
             </div>
             <Separator className="my-1" />
-            <MenuItem
-              Icon={User}
-              href={`/${LoggedInUser.collective.slug}`}
-              label={intl.formatMessage({ id: 'menu.profile', defaultMessage: 'Profile' })}
-            />
+            {LoggedInUser.hasPublicProfile() && (
+              <MenuItem
+                Icon={User}
+                href={`/${LoggedInUser.collective.slug}`}
+                label={intl.formatMessage({ id: 'menu.profile', defaultMessage: 'Profile' })}
+              />
+            )}
             <MenuItem
               Icon={LayoutDashboard}
               href={`/dashboard/${LoggedInUser.collective.slug}`}

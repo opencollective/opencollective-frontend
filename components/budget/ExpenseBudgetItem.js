@@ -120,6 +120,7 @@ const ExpenseBudgetItem = ({
   const { LoggedInUser } = useLoggedInUser();
   const [showFilesViewerModal, setShowFilesViewerModal] = React.useState(null);
   const featuredProfile = isInverted ? expense?.account : expense?.payee;
+  const expenseAccountRoute = expense?.account && getCollectivePageRoute(expense.account);
   const isAdminView = view === 'admin';
   const isSubmitterView = view === 'submitter';
   const isCharge = expense?.type === expenseTypes.CHARGE;
@@ -194,16 +195,18 @@ const ExpenseBudgetItem = ({
                   <span>
                     <StyledLink
                       $underlineOnHover
-                      {...(useDrawer
-                        ? {
-                            as: Link,
-                            href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
-                            onClick: expandExpense,
-                          }
-                        : {
-                            as: Link,
-                            href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
-                          })}
+                      {...(expenseAccountRoute
+                        ? useDrawer
+                          ? {
+                              as: Link,
+                              href: `${expenseAccountRoute}/expenses/${expense.legacyId}`,
+                              onClick: expandExpense,
+                            }
+                          : {
+                              as: Link,
+                              href: `${expenseAccountRoute}/expenses/${expense.legacyId}`,
+                            }
+                        : {})}
                     >
                       <AutosizeText
                         value={expense.description}

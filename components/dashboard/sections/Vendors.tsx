@@ -206,7 +206,8 @@ const getColumns = ({ isVendor, host }) => {
     {
       header: () => <FormattedMessage defaultMessage="Vendor" id="dU1t5Z" />,
       accessorKey: 'vendor',
-      cell: ({ row }) => {
+      cell: ({ row, table }) => {
+        const { intl } = table.options.meta;
         const vendor = row.original;
         const contact = vendor.vendorInfo?.contact;
         return (
@@ -216,22 +217,33 @@ const getColumns = ({ isVendor, host }) => {
             {contact && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="inline-flex text-muted-foreground">
-                    <User size={16} />
-                  </span>
+                  <a
+                    href={`mailto:${contact.email}`}
+                    aria-label={contact.name}
+                    className="inline-flex text-muted-foreground"
+                    onClick={event => event.stopPropagation()}
+                  >
+                    <User size={16} aria-hidden="true" />
+                  </a>
                 </TooltipTrigger>
                 <TooltipContent>
                   {i18nWithColon(<FormattedMessage id="Contact" defaultMessage="Contact" />)}{' '}
-                  <a href={`mailto:${contact.email}`}>{contact.name}</a>
+                  <a href={`mailto:${contact.email}`} onClick={event => event.stopPropagation()}>
+                    {contact.name}
+                  </a>
                 </TooltipContent>
               </Tooltip>
             )}
             {vendor.vendorInfo?.taxFormRequired && isEmpty(vendor.vendorInfo?.taxFormUrl) && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="inline-flex text-yellow-600">
-                    <AlertTriangle size={16} />
-                  </span>
+                  <button
+                    type="button"
+                    className="inline-flex text-yellow-600"
+                    aria-label={intl.formatMessage({ defaultMessage: 'Pending tax form', id: 'P6R0T+' })}
+                  >
+                    <AlertTriangle size={16} aria-hidden="true" />
+                  </button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <FormattedMessage defaultMessage="Pending tax form" id="P6R0T+" />

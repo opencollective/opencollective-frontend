@@ -5,7 +5,6 @@ import { useIntl } from 'react-intl';
 import type { GetActions } from '../../../../lib/actions/types';
 import type { DashboardAccountsQueryFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { AccountType } from '../../../../lib/graphql/types/v2/graphql';
-import { FEATURES } from '@/lib/allowed-features';
 import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
 
 import { useModal } from '../../../ModalContext';
@@ -86,7 +85,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
           label: intl.formatMessage({ defaultMessage: 'Go to Public Profile', id: 'lfSm7/' }),
           Icon: Globe2,
           onClick: () => router.push(getCollectivePageRoute(account)),
-          if: account.features?.[FEATURES.PUBLIC_PROFILE] === 'ACTIVE',
+          if: account.hasPublicProfile,
         },
         {
           key: 'transactions',
