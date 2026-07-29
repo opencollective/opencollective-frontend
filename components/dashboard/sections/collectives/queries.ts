@@ -208,6 +208,10 @@ export const hostedCollectiveFields = gql`
     isFrozen
     isHost
     isPrivate
+    features {
+      id
+      PUBLIC_PROFILE
+    }
     tags
     settings
     createdAt
