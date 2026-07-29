@@ -15,6 +15,8 @@ export type GraphQLV1Collective = {
   type: keyof typeof CollectiveType;
   isArchived?: boolean;
   isPrivate?: boolean;
+  isSuspended?: boolean;
+  features?: Record<string, string>;
   parentCollective?: GraphQLV1Collective;
   isFirstPartyHost?: boolean;
   isTrustedHost?: boolean;
