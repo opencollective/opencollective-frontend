@@ -23,7 +23,7 @@ import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 import { elementFromClass } from '../../../../lib/react-utils';
-import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
@@ -33,6 +33,7 @@ import DateTime from '../../../DateTime';
 import { useDrawerActionsContainer } from '../../../Drawer';
 import InviteMemberModal from '../../../edit-collective/sections/team/InviteMemberModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import ConfirmationModal from '../../../NewConfirmationModal';
@@ -592,12 +593,16 @@ const CollectiveDetails = ({
             <Avatar collective={collective} radius={48} />
             <div>
               <div className="flex flex-row">
-                <LinkCollective
-                  collective={collective}
-                  className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
-                >
-                  {collective.name}
-                </LinkCollective>
+                {collective.isPrivate ? (
+                  <span className="flex items-center gap-2 font-medium text-slate-700">{collective.name}</span>
+                ) : (
+                  <Link
+                    href={getCollectivePageRoute(collective)}
+                    className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                  >
+                    {collective.name}
+                  </Link>
+                )}
                 {collective.isFrozen && (
                   <Badge type="info" size="xs" className="ml-2">
                     <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
