@@ -75,6 +75,19 @@ export const getServerSideProps = async (context: Context) => {
   const data = props[APOLLO_QUERY_DATA_PROP_NAME];
   const notFound = !error && !data?.Collective;
 
+  if (notFound) {
+    return {
+      notFound: true,
+    };
+  }
+
+  // Force 404 for accounts with a hidden or disabled public profile
+  if (isHiddenAccount(data?.Collective)) {
+    return {
+      notFound: true,
+    };
+  }
+
   // Deals with whitelabel redirection from and to the platform
   const redirect = getWhitelabelRedirection(context, data?.Collective);
   if (redirect) {
@@ -84,19 +97,6 @@ export const getServerSideProps = async (context: Context) => {
         destination: redirect,
         permanent: false,
       },
-    };
-  }
-
-  if (notFound) {
-    return {
-      notFound: true,
-    };
-  }
-
-  // Force 404 for accounts with public profile disabled
-  if (data?.Collective?.settings?.features?.publicProfile === false) {
-    return {
-      notFound: true,
     };
   }
 

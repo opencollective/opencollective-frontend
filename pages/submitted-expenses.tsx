@@ -5,7 +5,7 @@ import { defineMessages, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata, isIndividualAccount } from '../lib/collective';
+import { getCollectivePageMetadata, isHiddenAccount, isIndividualAccount } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { generateNotFoundError } from '../lib/errors';
@@ -109,6 +109,8 @@ export default function SubmittedExpensesPage(props: InferGetServerSidePropsType
     return <ErrorPage data={data} error={error} />;
   } else if (!account || !expenses?.nodes) {
     return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
+  } else if (isHiddenAccount(data.account)) {
+    return <ErrorPage error={generateNotFoundError()} log={false} />;
   } else if (!isIndividualAccount(data.account)) {
     // Hack for funds that want to keep their budget "private"
     return <PageFeatureNotSupported showContactSupportLink={false} />;
