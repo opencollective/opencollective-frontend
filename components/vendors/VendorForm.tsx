@@ -410,7 +410,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
               </StyledInputFormikField>
               <StyledInputFormikField
                 name="hasPublicProfile"
-                label={intl.formatMessage({ id: 'Info.PublicProfile', defaultMessage: 'Public profile' })}
+                label={intl.formatMessage({ id: 'ContributorProfile', defaultMessage: 'Contributor Profile' })}
                 labelProps={FIELD_LABEL_PROPS}
                 required={false}
                 mt={3}
@@ -419,8 +419,8 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   <div className="flex items-center gap-3">
                     <label htmlFor="hasPublicProfile" className="text-sm">
                       <FormattedMessage
-                        defaultMessage="Enable a simplified public profile that showcases this vendor's contributions and can be publicly accessed"
-                        id="Vendor.EnablePublicProfile"
+                        defaultMessage="Enable public contributor profile"
+                        id="Vendor.EnableContributorProfile"
                       />
                     </label>
                     <Switch

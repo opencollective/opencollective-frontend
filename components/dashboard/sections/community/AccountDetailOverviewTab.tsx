@@ -12,7 +12,9 @@ import { AccountType, CommunityRelationType, TransactionType } from '@/lib/graph
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
+import { getCollectivePageCanonicalURL } from '@/lib/url-helpers';
 
+import { CopyID } from '@/components/CopyId';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import LinkCollective from '@/components/LinkCollective';
@@ -221,8 +223,26 @@ export const AccountDetailsOverviewTab = ({
                 value={<HeroSocialLinks className="size-6" socialLinks={account.socialLinks} />}
               />
             )}
-            {account?.type === 'VENDOR' && vendorInfo && (
+            {account?.type === AccountType.VENDOR && vendorInfo && (
               <React.Fragment>
+                <DataListItem
+                  label={<FormattedMessage id="ContributorProfile" defaultMessage="Contributor Profile" />}
+                  value={
+                    'hasPublicProfile' in account && account.hasPublicProfile ? (
+                      <CopyID
+                        tooltipLabel={<FormattedMessage defaultMessage="Copy URL" id="P8QaSQ" />}
+                        value={getCollectivePageCanonicalURL(account)}
+                        className="flex items-center gap-1"
+                      >
+                        <span className="truncate">{getCollectivePageCanonicalURL(account)}</span>
+                      </CopyID>
+                    ) : (
+                      <span className="text-muted-foreground">
+                        <FormattedMessage defaultMessage="Disabled" id="tthToS" />
+                      </span>
+                    )
+                  }
+                />
                 <DataListItem
                   label={<FormattedMessage defaultMessage="Visible to" id="zJePa1" />}
                   value={

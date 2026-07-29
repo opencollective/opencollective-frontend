@@ -287,6 +287,7 @@ export function AccountDetails(props: AccountDetailsProps) {
               </Link>
             </Button>
             <CopyID
+              tooltipLabel={<FormattedMessage defaultMessage="Copy URL" id="P8QaSQ" />}
               value={typeof window !== 'undefined' && window.location.href}
               className="relative inline-flex h-9 items-center justify-center gap-1 rounded-md border border-input bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
               Icon={null}

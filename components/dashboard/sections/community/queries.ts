@@ -192,6 +192,7 @@ export const communityAccountDetailQuery = gql`
       type
       createdAt
       imageUrl
+      hasPublicProfile
       ... on Organization {
         canBeVendorOf(host: { slug: $hostSlug })
       }
@@ -362,6 +363,9 @@ export const communityAccountOverviewQuery = gql`
   query CommunityAccountOverview($accountId: String!, $hostSlug: String!) {
     account(id: $accountId) {
       id
+      slug
+      name
+      hasPublicProfile
       communityStats(host: { slug: $hostSlug }) {
         id
         relations
