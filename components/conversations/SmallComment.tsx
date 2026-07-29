@@ -93,13 +93,15 @@ export default function SmallComment(props: CommentProps) {
                 }
               </InlineEditField>
             </div>
-            <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-              <LockIcon size={12} />
-              <FormattedMessage
-                defaultMessage="Only visible to host admins"
-                id="Expense.Activity.PaymentError.PrivateNotice"
-              />
-            </div>
+            {isPrivateNote && (
+              <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+                <LockIcon size={12} />
+                <FormattedMessage
+                  defaultMessage="Only visible to host admins"
+                  id="Expense.Activity.PaymentError.PrivateNotice"
+                />
+              </div>
+            )}
           </div>
         </div>
         {hasActions && (
