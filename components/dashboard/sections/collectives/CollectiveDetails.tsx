@@ -593,7 +593,7 @@ const CollectiveDetails = ({
             <Avatar collective={collective} radius={48} />
             <div>
               <div className="flex flex-row">
-                {collective.isPrivate ? (
+                {collective.isPrivate || collective.features?.PUBLIC_PROFILE === 'UNSUPPORTED' ? (
                   <span className="flex items-center gap-2 font-medium text-slate-700">{collective.name}</span>
                 ) : (
                   <Link
