@@ -335,6 +335,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         const taxes = getApplicableTaxesForCountry(
           values.location?.country || get(account, 'location.country') || get(account, 'host.location.country'),
         );
+        const isPublicProfileEnabled = values.settings?.features?.publicProfile !== false;
         return (
           <Form className="flex flex-col gap-4">
             <FormField
@@ -427,12 +428,12 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 )}
               </FormField>
             )}
-            {account.type !== EVENT && (
+            {account.type !== EVENT && isPublicProfileEnabled && (
               <FormField name="slug" label={<FormattedMessage id="account.slug.label" defaultMessage="Handle" />}>
                 {({ field }) => <InputGroup className="w-full" prepend={`${exampleBaseUrl}/`} {...field} />}
               </FormField>
             )}
-            {!account.isPrivate && (
+            {!account.isPrivate && isPublicProfileEnabled && (
               <FormField
                 name="tags"
                 label={<FormattedMessage defaultMessage="Tags" id="Tags" />}
@@ -462,7 +463,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 label={<FormattedMessage defaultMessage="Short description" id="collective.description.label" />}
               />
             )}
-            {!account.isPrivate && (
+            {!account.isPrivate && isPublicProfileEnabled && (
               <FormField
                 name="longDescription"
                 label={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
@@ -561,7 +562,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 )
               }
             </FormField>
-            {![EVENT, PROJECT].includes(account.type) && (
+            {![EVENT, PROJECT].includes(account.type) && isPublicProfileEnabled && (
               <FormField
                 name="currency"
                 disabled={
@@ -700,7 +701,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 placeholder="9429037631147"
               />
             )}
-            {!account.isPrivate && (
+            {!account.isPrivate && isPublicProfileEnabled && (
               <FormField
                 name="socialLinks"
                 label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}
