@@ -59,6 +59,7 @@ export const accountHoverCardFields = gql`
         isTrustedHost
         isFirstPartyHost
         isVerified
+        hasPublicProfile
       }
       approvedAt
     }
@@ -71,6 +72,7 @@ export const accountHoverCardFields = gql`
         isTrustedHost
         isFirstPartyHost
         isVerified
+        hasPublicProfile
       }
     }
 
@@ -78,6 +80,7 @@ export const accountHoverCardFields = gql`
       parent {
         id
         slug
+        hasPublicProfile
       }
     }
   }
