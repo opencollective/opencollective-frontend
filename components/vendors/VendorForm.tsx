@@ -644,7 +644,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 name="vendorInfo.taxId"
                 label={intl.formatMessage({ defaultMessage: 'ID Number', id: 'lSvafT' })}
                 labelProps={FIELD_LABEL_PROPS}
-                required={formik.values.vendorInfo?.taxType !== undefined}
+                required={!!formik.values.vendorInfo?.taxType}
                 mt={3}
               >
                 {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
@@ -682,7 +682,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 )}
               </StyledInputFormikField>
               <StyledInputLocation
-                name="vendorInfo.location"
+                name="location"
                 onChange={values => {
                   formik.setFieldValue('location', values);
                 }}
