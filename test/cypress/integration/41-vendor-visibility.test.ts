@@ -606,7 +606,7 @@ describe('vendor visibility', () => {
           cy.login({ email: hostAdmin.email, redirect: `/dashboard/${host.slug}/vendors` });
 
           cy.contains(name).click();
-          cy.contains('button', 'Edit').click();
+          cy.getByDataCy('edit-vendor-button').click();
 
           cy.get('#whereScope-specific').click();
           cy.get('#canBeUsedWithAccountsInput').type(collective.name);
