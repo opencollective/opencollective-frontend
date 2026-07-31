@@ -469,6 +469,7 @@ const expenseFormSchemaQuery = gql`
     slug
     name
     type
+    hasPublicProfile
     description
     imageUrl(height: 64)
     hasPayoutMethod

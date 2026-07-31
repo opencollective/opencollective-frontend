@@ -12,6 +12,7 @@ export const vendorFieldFragment = gql`
     name
     legalName
     type
+    hasPublicProfile
     description
     tags
     imageUrl
