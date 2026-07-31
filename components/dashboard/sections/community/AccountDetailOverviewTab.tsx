@@ -171,6 +171,7 @@ export const AccountDetailsOverviewTab = ({
                 size="icon-xs"
                 aria-label={intl.formatMessage({ defaultMessage: 'Edit', id: 'Edit' })}
                 onClick={onEditVendor}
+                data-cy="edit-vendor-button"
               >
                 <Pencil size={16} />
               </Button>

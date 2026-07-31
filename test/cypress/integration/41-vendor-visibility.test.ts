@@ -10,7 +10,7 @@ const NEW_VENDOR_NAME = (prefix: string) => `${prefix}-${Math.random().toString(
 function openVendorEditForm(hostSlug: string, hostAdminEmail: string, vendorName: string) {
   cy.login({ email: hostAdminEmail, redirect: `/dashboard/${hostSlug}/vendors` });
   cy.contains(vendorName).click();
-  cy.contains('button', 'Edit').click();
+  cy.getByDataCy('edit-vendor-button').click();
 }
 
 function assertVendorScopedTo(expectedAccountName: string) {
