@@ -4,6 +4,8 @@ import { FormattedMessage } from 'react-intl';
 
 import type { Account, Amount, Order, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 
+import { AccountNameWithLegalName } from '@/components/AccountNameWithLegalName';
+
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -87,12 +89,13 @@ export const SuggestedContributionsTable = ({
             id: 'from',
             header: () => <FormattedMessage defaultMessage="From" id="dM+p3/" />,
             accessorKey: 'fromAccount',
+            meta: { className: 'max-w-[300px] overflow-hidden' },
             cell: ({ cell }) => {
               const account = cell.getValue() as Account;
               return (
-                <div className="flex items-center gap-1">
+                <div className="flex min-w-0 items-center gap-1">
                   <Avatar account={account} size={24} />
-                  {account.name}
+                  <AccountNameWithLegalName account={account} className="min-w-0 flex-1" />
                 </div>
               );
             },

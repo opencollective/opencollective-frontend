@@ -17,6 +17,7 @@ import type {
 import { AccountType, LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 
+import { AccountNameWithLegalName } from '@/components/AccountNameWithLegalName';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import { KYCTabPeopleDashboard } from '@/components/kyc/dashboard/KYCTabPeopleDashboard';
@@ -192,7 +193,6 @@ export function AccountDetails(props: AccountDetailsProps) {
     [setSelectedTab],
   );
 
-  const legalName = account?.legalName !== account?.name && account?.legalName;
   const canBeConvertedToVendor = account?.type === 'ORGANIZATION' ? account['canBeVendorOf'] : false;
 
   const rejectedExpensesCount = account?.rejectedExpenses?.totalCount || 0;
@@ -216,10 +216,7 @@ export function AccountDetails(props: AccountDetailsProps) {
               <React.Fragment>
                 <Avatar collective={account} size={60} />
                 <div className="flex flex-col">
-                  <div>
-                    {account.name || account.slug}
-                    {legalName && <span className="ml-1 font-semibold text-muted-foreground">{`(${legalName})`}</span>}
-                  </div>
+                  <AccountNameWithLegalName account={account} legalNameClassName="font-semibold" />
                   <div className="flex flex-wrap items-center gap-1">
                     <Badge size="sm" type="outline" className="gap-1 rounded-full">
                       {getCollectiveTypeIcon(account?.type || props.expectedAccountType, { size: 12 })}

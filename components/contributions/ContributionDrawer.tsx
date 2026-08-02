@@ -11,6 +11,7 @@ import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-pro
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
+import { AccountNameWithLegalName } from '../AccountNameWithLegalName';
 import Avatar from '../Avatar';
 import { CopyIDDropdown } from '../CopyId';
 import DateTime from '../DateTime';
@@ -317,8 +318,6 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
   const dropdownTriggerRef = React.useRef(undefined);
   const order = query.data?.order;
   const contributorAccount = order?.fromAccount?.mainProfile ?? order?.fromAccount;
-  const contributorLegalName =
-    contributorAccount?.legalName !== contributorAccount?.name && contributorAccount?.legalName;
 
   const showChargesSection = React.useMemo(
     () => !!order?.paymentMethod?.service && EXTERNAL_PAYMENT_METHOD_SERVICES.includes(order.paymentMethod.service),
@@ -420,12 +419,11 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
                         >
                           <div className="flex min-w-0 items-center gap-1">
                             <Avatar radius={24} collective={query.data.order.fromAccount} />
-                            <span className="min-w-0">
-                              {contributorAccount.name}
-                              {contributorLegalName && (
-                                <span className="text-muted-foreground group-hover:text-primary">{` (${contributorLegalName})`}</span>
-                              )}
-                            </span>
+                            <AccountNameWithLegalName
+                              account={contributorAccount}
+                              legalNameClassName="group-hover:text-primary"
+                              fallbackToSlug={false}
+                            />
                           </div>
                         </LinkCollective>
                       )

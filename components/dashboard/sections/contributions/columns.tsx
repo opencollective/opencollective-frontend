@@ -10,6 +10,7 @@ import { i18nFrequency } from '@/lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '@/lib/i18n/payment-method-provider-type';
 
 import { AccountHoverCard } from '@/components/AccountHoverCard';
+import { AccountNameWithLegalName } from '@/components/AccountNameWithLegalName';
 import Avatar from '@/components/Avatar';
 import { CopyID } from '@/components/CopyId';
 import DateTime from '@/components/DateTime';
@@ -48,7 +49,6 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
       const fromAccount = row.original.fromAccount;
       const displayAccount = fromAccount.mainProfile ?? fromAccount;
       const createdBy = fromAccount.type !== AccountType.INDIVIDUAL && row.original.createdByAccount;
-      const legalName = displayAccount.legalName !== displayAccount.name && displayAccount.legalName;
 
       return (
         <div className="flex min-w-0 items-center gap-5">
@@ -77,12 +77,7 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
             )}
           </div>
           <div className="min-w-0 flex-1 overflow-hidden">
-            <div className="flex min-w-0 overflow-hidden text-sm leading-5">
-              <span className="min-w-0 shrink truncate">{displayAccount.name || displayAccount.slug}</span>
-              {legalName && (
-                <span className="ml-1 max-w-[45%] shrink-0 truncate text-muted-foreground">{` (${legalName})`}</span>
-              )}
-            </div>
+            <AccountNameWithLegalName account={displayAccount} className="text-sm leading-5" />
 
             <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
               {createdBy ? (
