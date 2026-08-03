@@ -109,6 +109,46 @@ const IGNORED: Record<string, readonly string[]> = {
     'tZEZGT', // "{n, plural, one {1 contribution} other {{n} contributions}}" - identique
     '/TlAIY', // "Visible" - même terme en français
   ],
+  es: [
+    '/TlAIY', // "Visible" - idéntico en español
+    'Amount', // "{amount} {currencyCode}" - formato idéntico
+    'Avatar', // "Avatar" - idéntico
+    'Collective.Hero.Host', // "{FiscalHost}: {hostName}" - formato idéntico
+    'company.blog', // "Blog" - idéntico
+    'contributions.id', // "#" - idéntico
+    'editCollective.menu.info', // "Info" - idéntico
+    'editCollective.menu.webhooks', // "Webhooks" - término técnico
+    'Error', // "Error" - idéntico
+    'Fields.id', // "ID" - idéntico
+    'Fields.slug', // "Slug" - término técnico
+    'KYC', // "KYC" - acrónimo
+    'MJ2jZQ', // "Total" - idéntico
+    'NewContributionFlow.CollectiveAndTier', // "{collective} - {tier}" - formato idéntico
+    'paymentMethods.labelCreditCard', // "{name} {expiration}" - formato idéntico
+    'Q0lxqm', // "CVV/CVC" - idéntico
+    'Stripe.PaymentMethod.Label.bancontact', // "Bancontact" - marca
+    'Stripe.PaymentMethod.Label.link', // "Link" - marca
+    'Stripe.PaymentMethod.Label.swish', // "Swish" - marca
+    'tier.interval.flexible', // "Flexible" - idéntico
+    'tier.Pro.title', // "Pro" - idéntico
+    'Timezone.Local', // "Local" - idéntico
+    'Timezone.UTC', // "UTC" - idéntico
+    'total', // "total" - idéntico
+    'VirtualCards.CVV', // "CVV" - idéntico
+    '7oFrM6', // "Legal" - idéntico
+    'L8seEc', // "Subtotal" - idéntico
+    'PaymentMethod.Manual', // "Manual" - idéntico
+    'Payout.Manual', // "Manual" - idéntico
+    'PayoutMethod.New.Alias', // "Alias" - idéntico
+    'WWhVAU', // "Subtotal:" - idéntico
+    'c35gM5', // "Roles" - idéntico
+    'jgOqxt', // "Widgets" - idéntico
+    'oUWADl', // "No" - idéntico
+    'settings.general', // "General" - idéntico
+    'webhook.index', // "Webhook #{index}" - término técnico
+    'webhooks.url.label', // "URL" - idéntico
+    'withColon', // "{item}:" - formato idéntico
+  ],
 };
 
 function loadJson(filePath: string): Record<string, string> {
