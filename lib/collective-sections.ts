@@ -103,7 +103,6 @@ const DEFAULT_SECTIONS = {
   },
   [CollectiveType.VENDOR]: {
     [Sections.CONTRIBUTIONS]: true,
-    [Sections.TRANSACTIONS]: true,
   },
   [CollectiveType.EVENT]: {
     [Sections.CONTRIBUTE]: true,
