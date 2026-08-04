@@ -5,6 +5,7 @@ import { isIndividualAccount } from '../../lib/collective';
 import { hasSection } from '../../lib/collective-sections';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { CollectiveType } from '@/lib/constants/collectives';
 
 import { Sections } from '../collective-page/_constants';
 
@@ -131,7 +132,7 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
         route: `${collectivePageRoute}/submitted-expenses`,
         title: intl.formatMessage(titles.SUBMITTED_EXPENSES),
       });
-    } else {
+    } else if (collective.type !== CollectiveType.VENDOR) {
       links.push({
         route: `${collectivePageRoute}/expenses`,
         title: intl.formatMessage(titles.EXPENSES),

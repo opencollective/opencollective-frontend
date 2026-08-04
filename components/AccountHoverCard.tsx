@@ -46,6 +46,7 @@ export const accountHoverCardFields = gql`
     isHost
     isArchived
     isVerified
+    hasPublicProfile
     ... on Individual {
       id
       isGuest
@@ -58,6 +59,7 @@ export const accountHoverCardFields = gql`
         isTrustedHost
         isFirstPartyHost
         isVerified
+        hasPublicProfile
       }
       approvedAt
     }
@@ -70,6 +72,7 @@ export const accountHoverCardFields = gql`
         isTrustedHost
         isFirstPartyHost
         isVerified
+        hasPublicProfile
       }
     }
 
@@ -77,6 +80,7 @@ export const accountHoverCardFields = gql`
       parent {
         id
         slug
+        hasPublicProfile
       }
     }
   }
@@ -138,6 +142,8 @@ const userContextualMembershipsQuery = gql`
 `;
 
 const getInfoItems = (account): InfoItemProps[] => {
+  const parentRoute = account.parent && getCollectivePageRoute(account.parent);
+  const hostRoute = account.host && getCollectivePageRoute(account.host);
   return [
     ...(account?.emails?.map(email => ({
       Icon: Mail,
@@ -155,7 +161,11 @@ const getInfoItems = (account): InfoItemProps[] => {
           id="bZC/zt"
           values={{
             childAccountType: account.type,
-            parentAccount: <Link href={getCollectivePageRoute(account.parent)}>@{account.parent.slug}</Link>,
+            parentAccount: parentRoute ? (
+              <Link href={parentRoute}>@{account.parent.slug}</Link>
+            ) : (
+              `@${account.parent.slug}`
+            ),
           }}
         />
       ),
@@ -170,7 +180,7 @@ const getInfoItems = (account): InfoItemProps[] => {
             id="PAGBSx"
             values={{
               childAccountType: account.type,
-              host: <Link href={getCollectivePageRoute(account.host)}>@{account.host.slug}</Link>,
+              host: hostRoute ? <Link href={hostRoute}>@{account.host.slug}</Link> : `@${account.host.slug}`,
               approvedAt: <FormattedDate dateStyle="medium" value={account.approvedAt} />,
             }}
           />
@@ -356,21 +366,34 @@ export const AccountHoverCard = ({
           </div>
           <div className="flex flex-col gap-3 overflow-hidden break-words">
             <div className="flex justify-between">
-              <Link href={accountUrl}>
+              {accountUrl ? (
+                <Link href={accountUrl}>
+                  <Avatar collective={account} radius={64} />
+                </Link>
+              ) : (
                 <Avatar collective={account} radius={64} />
-              </Link>
+              )}
 
               {displayFollowButton && <FollowButton account={account} isHoverCard />}
             </div>
 
             <div className="overflow-hidden">
               <div className="flex items-start gap-1">
-                <Link href={accountUrl} className="min-w-0 break-words">
-                  <span className="font-medium hover:underline">
-                    {account.name}
-                    {legalName && <span className="font-normal text-muted-foreground">{` (${legalName})`}</span>}
+                {accountUrl ? (
+                  <Link href={accountUrl} className="min-w-0 break-words">
+                    <span className="font-medium hover:underline">
+                      {account.name}
+                      {legalName && <span className="font-normal text-muted-foreground">{` (${legalName})`}</span>}
+                    </span>
+                  </Link>
+                ) : (
+                  <span className="min-w-0 break-words">
+                    <span className="font-medium">
+                      {account.name}
+                      {legalName && <span className="font-normal text-muted-foreground">{` (${legalName})`}</span>}
+                    </span>
                   </span>
-                </Link>
+                )}
                 <AccountTrustBadge account={account} />
               </div>
               <span className="truncate text-muted-foreground">@{account.slug}</span>

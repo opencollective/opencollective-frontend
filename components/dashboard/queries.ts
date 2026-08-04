@@ -20,6 +20,7 @@ export const adminPanelQuery = gql`
       isArchived
       isActive
       isIncognito
+      hasPublicProfile
       imageUrl(height: 256)
       canHaveChangelogUpdates
       connectedAccounts {

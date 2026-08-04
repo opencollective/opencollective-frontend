@@ -10,6 +10,7 @@ import {
   MemberRole,
   type Update,
 } from './graphql/types/v2/graphql';
+import { isHiddenAccount } from './collective';
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
 
@@ -313,6 +314,14 @@ class LoggedInUser {
     }
 
     return this.collective.settings?.showSetupGuide?.[`id${'legacyId' in account ? account.legacyId : account.id}`];
+  }
+
+  /**
+   * Returns true unless the user's account is hidden (see `isHiddenAccount`), e.g. because
+   * they've explicitly disabled their public profile (`settings.features.publicProfile === false`).
+   */
+  hasPublicProfile(): boolean {
+    return !isHiddenAccount(this.collective);
   }
 }
 

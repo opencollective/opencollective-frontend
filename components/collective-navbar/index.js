@@ -301,7 +301,7 @@ const getHasContribute = (collective, sections, isAdmin) => {
 };
 
 const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, isAllowedAddFunds, isHostAdmin) => {
-  if (!collective) {
+  if (!collective || collective.type === CollectiveType.VENDOR) {
     return {};
   }
 

@@ -16,6 +16,7 @@ import { loadGoogleMaps } from '@/lib/google-maps';
 import type { Account, AccountUpdateInput, Currency } from '@/lib/graphql/types/v2/graphql';
 import { AccountType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import formatCollectiveType from '@/lib/i18n/collective-type';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { cn, omitDeepBy } from '@/lib/utils';
 
@@ -32,7 +33,9 @@ import { TimezonePicker } from '@/components/TimezonePicker';
 import { InputGroup } from '@/components/ui/Input';
 import LocationInput, { UserLocationInput } from '@/components/ui/LocationInput';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/Select';
+import { Separator } from '@/components/ui/Separator';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 
 import { Button } from '../../ui/Button';
@@ -55,6 +58,7 @@ const editAccountFragment = gql`
     isPrivate
     isHost
     tags
+    hasPublicProfile
     features {
       id
       PUBLIC_PROFILE
@@ -157,6 +161,11 @@ const baseInfo = z.object({
           number: z.string().max(255).optional(),
         })
         .optional(),
+      features: z
+        .object({
+          publicProfile: z.boolean().optional().nullable(),
+        })
+        .optional(),
     })
     .optional()
     .nullable(),
@@ -240,7 +249,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   const onSubmit = async (values: FormValuesSchema) => {
     const diff = omitDeepBy(values, (value, key) => isEqual(value, get(account, key)) || isUndefined(value));
     if (diff.settings) {
-      diff.settings = pick(diff.settings, ['VAT', 'GST']);
+      diff.settings = pick(diff.settings, ['VAT', 'GST', 'features.publicProfile']);
     }
 
     try {
@@ -328,8 +337,21 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         const taxes = getApplicableTaxesForCountry(
           values.location?.country || get(account, 'location.country') || get(account, 'host.location.country'),
         );
+        const isPublicProfileEnabled = values.settings?.features?.publicProfile !== false;
         return (
           <Form className="flex flex-col gap-4">
+            <div className="flex w-full items-center gap-2 text-lg font-semibold">
+              <div className="shrink-0">
+                <FormattedMessage
+                  defaultMessage="{accountType} Details"
+                  id="mYx8sv"
+                  values={{
+                    accountType: formatCollectiveType(intl, account.type),
+                  }}
+                />
+              </div>
+              <Separator className="shrink" />
+            </div>
             <FormField
               name="image"
               label={
@@ -395,64 +417,40 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 }
               />
             )}
-            {account.type !== EVENT && (
-              <FormField name="slug" label={<FormattedMessage id="account.slug.label" defaultMessage="Handle" />}>
-                {({ field }) => <InputGroup className="w-full" prepend={`${exampleBaseUrl}/`} {...field} />}
-              </FormField>
-            )}
-            {!account.isPrivate && (
-              <FormField
-                name="tags"
-                label={<FormattedMessage defaultMessage="Tags" id="Tags" />}
-                hint={
-                  <FormattedMessage
-                    defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
-                    id="collective.tags.info"
-                  />
-                }
-              >
-                {({ field }) => (
-                  <EditTags
-                    {...field}
-                    onChange={entries =>
-                      setFieldValue(
-                        field.name,
-                        entries.map(e => e.value),
-                      )
-                    }
-                  />
-                )}
-              </FormField>
-            )}
             {(!account.isPrivate || !account.isHost) && (
               <FormField
                 name="description"
                 label={<FormattedMessage defaultMessage="Short description" id="collective.description.label" />}
               />
             )}
-            {!account.isPrivate && (
-              <FormField
-                name="longDescription"
-                label={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
-              >
-                {({ field }) => (
-                  <RichTextEditor
-                    kind="ACCOUNT_LONG_DESCRIPTION"
+            <FormField
+              name="location"
+              label={
+                account.type !== INDIVIDUAL ? (
+                  <FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />
+                ) : null
+              }
+            >
+              {({ field }) =>
+                account.type !== INDIVIDUAL ? (
+                  isLoadingGoogleMaps ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <LocationInput
+                      className="w-full"
+                      {...field}
+                      onChange={location => setFieldValue(field.name, location)}
+                    />
+                  )
+                ) : (
+                  <UserLocationInput
                     {...field}
-                    withStickyToolbar
-                    toolbarOffsetY={0}
-                    defaultValue={field.value}
-                    onChange={e => setFieldValue('longDescription', e.target.value)}
-                    videoEmbedEnabled
-                    withBorders
-                    placeholder={intl.formatMessage({
-                      defaultMessage: 'Tell your story and explain your purpose.',
-                      id: 'SectionAbout.Why',
-                    })}
+                    location={field.value}
+                    onChange={location => setFieldValue(field.name, location)}
                   />
-                )}
-              </FormField>
-            )}
+                )
+              }
+            </FormField>
             {account.type === EVENT && (
               <React.Fragment>
                 <FormField
@@ -500,70 +498,6 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   {({ field }) => <Textarea maxLength={10000} className="min-h-20" {...field} />}
                 </FormField>
               </React.Fragment>
-            )}
-            <FormField
-              name="location"
-              label={
-                account.type !== INDIVIDUAL ? (
-                  <FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />
-                ) : null
-              }
-            >
-              {({ field }) =>
-                account.type !== INDIVIDUAL ? (
-                  isLoadingGoogleMaps ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <LocationInput
-                      className="w-full"
-                      {...field}
-                      onChange={location => setFieldValue(field.name, location)}
-                    />
-                  )
-                ) : (
-                  <UserLocationInput
-                    {...field}
-                    location={field.value}
-                    onChange={location => setFieldValue(field.name, location)}
-                  />
-                )
-              }
-            </FormField>
-            {![EVENT, PROJECT].includes(account.type) && (
-              <FormField
-                name="currency"
-                disabled={
-                  ([COLLECTIVE, FUND].includes(account.type) && account.isActive) || account.isHost ? true : false
-                }
-                label={<FormattedMessage id="Currency" defaultMessage="Currency" />}
-                hint={
-                  ([COLLECTIVE, FUND].includes(account.type) && account.isActive) || account.isHost ? (
-                    <FormattedMessage
-                      id="collective.currency.warning"
-                      defaultMessage="Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact <SupportLink>support</SupportLink> if this is an issue."
-                      values={{ SupportLink: I18nSupportLink }}
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="collective.currency.info"
-                      defaultMessage="Select the preferred currency used in your profile page."
-                    />
-                  )
-                }
-              >
-                {({ field }) => (
-                  <CurrencyPicker
-                    data-cy="organization-currency-trigger"
-                    disabled={field.disabled}
-                    availableCurrencies={CurrencyOptions}
-                    value={field.value}
-                    // deepscan-disable-next-line
-                    onChange={value => {
-                      setFieldValue(field.name, value as Currency);
-                    }}
-                  />
-                )}
-              </FormField>
             )}
             {taxes.includes(TaxType.VAT) && (
               <React.Fragment>
@@ -668,8 +602,131 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 placeholder="9429037631147"
               />
             )}
-            {!account.isPrivate && (
-              <FormField name="socialLinks" label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}>
+            <div className="mt-2 flex w-full items-center gap-2 text-lg font-semibold">
+              <div className="shrink-0">
+                <FormattedMessage defaultMessage="Profile Details" id="xKCHPI" />
+              </div>
+              <Separator className="shrink" />
+            </div>
+            {account.type === INDIVIDUAL && (
+              <FormField
+                name="settings.features.publicProfile"
+                label={<FormattedMessage defaultMessage="Public profile" id="Info.PublicProfile" />}
+              >
+                {() => (
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs text-muted-foreground">
+                      <FormattedMessage
+                        id="Info.PublicProfile.description"
+                        defaultMessage="The public profile is a public page that showcases your activity on the platform. Disabling it will hide this page, but your activity will still be visible throughout the platform as a contributor of collectives or as a core member of an organization."
+                      />
+                    </p>
+                    <Switch
+                      name="publicProfile"
+                      data-cy="toggle-public-profile"
+                      checked={values.settings?.features?.publicProfile !== false}
+                      onCheckedChange={checked => {
+                        setFieldValue('settings.features.publicProfile', checked);
+                      }}
+                    />
+                  </div>
+                )}
+              </FormField>
+            )}
+            {account.type !== EVENT && isPublicProfileEnabled && (
+              <FormField name="slug" label={<FormattedMessage id="account.slug.label" defaultMessage="Handle" />}>
+                {({ field }) => <InputGroup className="w-full" prepend={`${exampleBaseUrl}/`} {...field} />}
+              </FormField>
+            )}
+            {![EVENT, PROJECT].includes(account.type) && isPublicProfileEnabled && (
+              <FormField
+                name="currency"
+                disabled={
+                  ([COLLECTIVE, FUND].includes(account.type) && account.isActive) || account.isHost ? true : false
+                }
+                label={<FormattedMessage id="Currency" defaultMessage="Currency" />}
+                hint={
+                  ([COLLECTIVE, FUND].includes(account.type) && account.isActive) || account.isHost ? (
+                    <FormattedMessage
+                      id="collective.currency.warning"
+                      defaultMessage="Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact <SupportLink>support</SupportLink> if this is an issue."
+                      values={{ SupportLink: I18nSupportLink }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="collective.currency.info"
+                      defaultMessage="Select the preferred currency used in your profile page."
+                    />
+                  )
+                }
+              >
+                {({ field }) => (
+                  <CurrencyPicker
+                    data-cy="organization-currency-trigger"
+                    disabled={field.disabled}
+                    availableCurrencies={CurrencyOptions}
+                    value={field.value}
+                    // deepscan-disable-next-line
+                    onChange={value => {
+                      setFieldValue(field.name, value as Currency);
+                    }}
+                  />
+                )}
+              </FormField>
+            )}
+            {!account.isPrivate && isPublicProfileEnabled && (
+              <FormField
+                name="tags"
+                label={<FormattedMessage defaultMessage="Tags" id="Tags" />}
+                hint={
+                  <FormattedMessage
+                    defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
+                    id="collective.tags.info"
+                  />
+                }
+              >
+                {({ field }) => (
+                  <EditTags
+                    {...field}
+                    onChange={entries =>
+                      setFieldValue(
+                        field.name,
+                        entries.map(e => e.value),
+                      )
+                    }
+                  />
+                )}
+              </FormField>
+            )}
+            {!account.isPrivate && isPublicProfileEnabled && (
+              <FormField
+                name="longDescription"
+                label={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
+              >
+                {({ field }) => (
+                  <RichTextEditor
+                    kind="ACCOUNT_LONG_DESCRIPTION"
+                    {...field}
+                    withStickyToolbar
+                    toolbarOffsetY={0}
+                    defaultValue={field.value}
+                    onChange={e => setFieldValue('longDescription', e.target.value)}
+                    videoEmbedEnabled
+                    withBorders
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Tell your story and explain your purpose.',
+                      id: 'SectionAbout.Why',
+                    })}
+                  />
+                )}
+              </FormField>
+            )}
+            {!account.isPrivate && isPublicProfileEnabled && (
+              <FormField
+                name="socialLinks"
+                label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}
+                showError={false} // We can hide errors here because SocialLinksFormField proactively validates the URLs
+              >
                 {({ field }) => (
                   <SocialLinksFormField
                     value={field.value || field.defaultValue}

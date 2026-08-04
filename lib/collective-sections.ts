@@ -101,6 +101,9 @@ const DEFAULT_SECTIONS = {
     [Sections.BUDGET]: true,
     [Sections.ABOUT]: true,
   },
+  [CollectiveType.VENDOR]: {
+    [Sections.CONTRIBUTIONS]: true,
+  },
   [CollectiveType.EVENT]: {
     [Sections.CONTRIBUTE]: true,
     [Sections.PARTICIPANTS]: true,

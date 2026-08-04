@@ -5,6 +5,7 @@ import type { TaxFormType } from '../components/dashboard/sections/tax-informati
 import { CollectiveType } from './constants/collectives';
 import { TransactionTypes } from './constants/transactions';
 import type { Comment, Conversation, Expense, HostApplication, Order, Update } from './graphql/types/v2/graphql';
+import { isHiddenAccount } from './collective';
 import type LoggedInUser from './LoggedInUser';
 import { getWebsiteUrl } from './utils';
 import { getWindowLocation } from './window';
@@ -203,7 +204,7 @@ export const getCollectivePageRoute = (account: {
   parentCollective?: { slug?: string };
   parent?: { slug?: string };
 }) => {
-  if (!account) {
+  if (!account || !account.slug || isHiddenAccount(account)) {
     return '';
   } else if (account.type === CollectiveType.EVENT) {
     const parent = account.parentCollective || account.parent;

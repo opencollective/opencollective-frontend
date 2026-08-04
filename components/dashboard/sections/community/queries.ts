@@ -192,6 +192,7 @@ export const communityAccountDetailQuery = gql`
       type
       createdAt
       imageUrl
+      hasPublicProfile
       ... on Organization {
         canBeVendorOf(host: { slug: $hostSlug })
       }
@@ -205,6 +206,7 @@ export const communityAccountDetailQuery = gql`
         address
       }
       isVerified
+      isArchived
       pendingExpenses: expenses(
         status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
         direction: SUBMITTED
@@ -361,6 +363,9 @@ export const communityAccountOverviewQuery = gql`
   query CommunityAccountOverview($accountId: String!, $hostSlug: String!) {
     account(id: $accountId) {
       id
+      slug
+      name
+      hasPublicProfile
       communityStats(host: { slug: $hostSlug }) {
         id
         relations

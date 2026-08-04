@@ -524,7 +524,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.COLLECTIVE_PAGE,
-          if: !isAccountantOnly && account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
+          if: !isAccountantOnly && account.features[FEATURES.PUBLIC_PROFILE] === 'ACTIVE',
         },
         // Host sections
         ...(hasMoneyManagement
@@ -637,7 +637,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           if:
             isOneOfTypes(account, [COLLECTIVE, PROJECT, FUND]) &&
             !isAccountantOnly &&
-            account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
+            account.features[FEATURES.PUBLIC_PROFILE] === 'ACTIVE',
         },
         {
           section: ALL_SECTIONS.EXPORTS,

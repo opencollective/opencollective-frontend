@@ -270,7 +270,7 @@ const ALL_STEPS = {
     id: 'profile-page',
     title: <FormattedMessage defaultMessage="Create your public profile page" id="SetupGuide.PublicProfile" />,
     if: (account: WelcomeOrganizationQuery['account']) =>
-      !account.isPrivate && account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
+      !account.isPrivate && account.features[FEATURES.PUBLIC_PROFILE] === 'ACTIVE',
     description: (
       <FormattedMessage
         defaultMessage="Your public profile lets the world know you are active on the platform. It tells your story with a written description of your {type, select, ORGANIZATION {Organization} COLLECTIVE {Collective} other {Account}}, your mission and what are your goals using the platform."
@@ -722,7 +722,7 @@ export const COLLECTIVE_CATEGORIES: Record<string, Category> = {
   setupProfile: {
     image: <Image src="/static/images/welcome/eye.png" alt="SetupProfile" width={40} height={40} />,
     title: <FormattedMessage defaultMessage="Setup Public Profile" id="Welcome.Collective.SetupProfile" />,
-    if: (account: WelcomeOrganizationQuery['account']) => account.features[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED',
+    if: (account: WelcomeOrganizationQuery['account']) => account.features[FEATURES.PUBLIC_PROFILE] === 'ACTIVE',
     description: (
       <FormattedMessage
         defaultMessage="Customise your public profile and increase discoverability"

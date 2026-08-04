@@ -34,6 +34,7 @@ const fields = gql`
     imageUrl(height: 96)
     isFrozen
     isHost
+    hasPublicProfile
     tags
     settings
     createdAt

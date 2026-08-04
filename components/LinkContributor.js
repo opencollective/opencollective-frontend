@@ -1,8 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../lib/constants/collectives';
-
 import Link from './Link';
 
 /**
@@ -18,7 +16,7 @@ const LinkContributor = ({ contributor, children }) => {
     return children || <FormattedMessage id="profile.guest" defaultMessage="Guest" />;
   } else if (contributor.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
-  } else if (contributor.collectiveSlug && contributor.type !== CollectiveType.VENDOR) {
+  } else if (contributor.collectiveSlug && contributor.hasPublicProfile) {
     return <Link href={`/${contributor.collectiveSlug}`}>{children || contributor.name}</Link>;
   } else {
     return children || <span>{contributor.name}</span>;

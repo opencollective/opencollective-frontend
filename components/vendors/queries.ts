@@ -12,11 +12,16 @@ export const vendorFieldFragment = gql`
     name
     legalName
     type
+    hasPublicProfile
     description
     tags
     imageUrl
     isArchived
     createdAt
+    features {
+      PUBLIC_PROFILE
+    }
+    settings
 
     location {
       id

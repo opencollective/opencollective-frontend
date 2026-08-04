@@ -2,6 +2,7 @@ import React from 'react';
 import type { QueryResult } from '@apollo/client';
 import { useQuery } from '@apollo/client';
 import { compact } from 'lodash-es';
+import { Pencil } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -11,13 +12,16 @@ import { AccountType, CommunityRelationType, TransactionType } from '@/lib/graph
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
+import { getCollectivePageCanonicalURL } from '@/lib/url-helpers';
 
+import { CopyID } from '@/components/CopyId';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import StackedAvatars from '@/components/StackedAvatars';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { getEffectiveVendorPolicyLabel, VendorContactTag } from '@/components/vendors/common';
@@ -64,11 +68,13 @@ export const AccountDetailsOverviewTab = ({
   expectedAccountType,
   handleTabChange,
   handleTransactionTableRowClick,
+  onEditVendor,
 }: {
   query: QueryResult<CommunityAccountDetailQuery>;
   expectedAccountType: AccountType;
   handleTabChange: (tab: string) => void;
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
+  onEditVendor?: () => void;
 }) => {
   const intl = useIntl();
 
@@ -156,7 +162,23 @@ export const AccountDetailsOverviewTab = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-4">
-        <DashboardContentCard title={<FormattedMessage defaultMessage="Details" id="Details" />} className="grow-1">
+        <DashboardContentCard
+          title={<FormattedMessage defaultMessage="Details" id="Details" />}
+          action={
+            account?.type === 'VENDOR' && onEditVendor ? (
+              <Button
+                variant="outline"
+                size="icon-xs"
+                aria-label={intl.formatMessage({ defaultMessage: 'Edit', id: 'Edit' })}
+                onClick={onEditVendor}
+                data-cy="edit-vendor-button"
+              >
+                <Pencil size={16} />
+              </Button>
+            ) : null
+          }
+          className="grow-1"
+        >
           <DataList className="text-sm">
             <DataListItem
               label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
@@ -202,8 +224,26 @@ export const AccountDetailsOverviewTab = ({
                 value={<HeroSocialLinks className="size-6" socialLinks={account.socialLinks} />}
               />
             )}
-            {account?.type === 'VENDOR' && vendorInfo && (
+            {account?.type === AccountType.VENDOR && vendorInfo && (
               <React.Fragment>
+                <DataListItem
+                  label={<FormattedMessage id="ContributorProfile" defaultMessage="Contributor Profile" />}
+                  value={
+                    'hasPublicProfile' in account && account.hasPublicProfile ? (
+                      <CopyID
+                        tooltipLabel={<FormattedMessage defaultMessage="Copy URL" id="P8QaSQ" />}
+                        value={getCollectivePageCanonicalURL(account)}
+                        className="flex items-center gap-1"
+                      >
+                        <span className="truncate">{getCollectivePageCanonicalURL(account)}</span>
+                      </CopyID>
+                    ) : (
+                      <span className="text-muted-foreground">
+                        <FormattedMessage defaultMessage="Disabled" id="tthToS" />
+                      </span>
+                    )
+                  }
+                />
                 <DataListItem
                   label={<FormattedMessage defaultMessage="Visible to" id="zJePa1" />}
                   value={

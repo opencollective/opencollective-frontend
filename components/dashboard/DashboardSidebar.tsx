@@ -4,7 +4,6 @@ import type { LucideIcon } from 'lucide-react';
 import { ArrowUpRight, ChevronDown, Globe2, LifeBuoy, Telescope } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
-import { FEATURES } from '@/lib/allowed-features';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
 import { cn } from '@/lib/utils';
@@ -115,16 +114,16 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
-            {account && account.type !== 'ROOT' && account.features?.[FEATURES.PUBLIC_PROFILE] !== 'UNSUPPORTED' && (
+            {account && account.type !== 'ROOT' && account.hasPublicProfile && (
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  tooltip={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+                  tooltip={intl.formatMessage({ id: 'Info.PublicProfile', defaultMessage: 'Public profile' })}
                 >
                   <SidebarLink
                     href={getCollectivePageRoute(account)}
                     Icon={Globe2}
-                    label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+                    label={intl.formatMessage({ id: 'Info.PublicProfile', defaultMessage: 'Public profile' })}
                     data-cy="public-profile-link"
                     external
                     onClick={closeMobileMenu}

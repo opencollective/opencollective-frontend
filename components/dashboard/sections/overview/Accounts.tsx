@@ -140,14 +140,20 @@ const AccountBalanceRow = ({ account, className = undefined, showDashboardLink =
       <AccountHoverCard
         account={account}
         trigger={
-          <Link
-            className="flex items-center gap-2 overflow-hidden text-muted-foreground hover:underline"
-            href={getCollectivePageRoute(account)}
-          >
-            <Avatar radius={24} collective={account} />
-
-            <span className="truncate">{account.name}</span>
-          </Link>
+          account.hasPublicProfile ? (
+            <Link
+              className="flex items-center gap-2 overflow-hidden text-muted-foreground hover:underline"
+              href={getCollectivePageRoute(account)}
+            >
+              <Avatar radius={24} collective={account} />
+              <span className="truncate">{account.name}</span>
+            </Link>
+          ) : (
+            <span className="flex items-center gap-2 overflow-hidden text-muted-foreground">
+              <Avatar radius={24} collective={account} />
+              <span className="truncate">{account.name}</span>
+            </span>
+          )
         }
       />
 
@@ -177,11 +183,13 @@ const AccountBalanceRow = ({ account, className = undefined, showDashboardLink =
                 </Link>
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem asChild>
-              <Link href={getCollectivePageRoute(account)}>
-                <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
-              </Link>
-            </DropdownMenuItem>
+            {account.hasPublicProfile && (
+              <DropdownMenuItem asChild>
+                <Link href={getCollectivePageRoute(account)}>
+                  <FormattedMessage id="Info.PublicProfile" defaultMessage="Public profile" />
+                </Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem asChild>
               <Link href={getDashboardRoute(account, 'info')}>
                 <FormattedMessage id="Settings" defaultMessage="Settings" />

@@ -57,6 +57,11 @@ interface CollectiveInterface {
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
   isGuest: Boolean
   canApply: Boolean
   canContact: Boolean!
@@ -511,6 +516,11 @@ type Contributor {
   A public message from contributors to describe their contributions
   """
   publicMessage: String
+
+  """
+  Whether this contributor has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 }
 
 """
@@ -1890,6 +1900,11 @@ type Collective implements CollectiveInterface {
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -2149,6 +2164,11 @@ type Event implements CollectiveInterface {
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2412,6 +2432,11 @@ type Fund implements CollectiveInterface {
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -2671,6 +2696,11 @@ type Organization implements CollectiveInterface {
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2934,6 +2964,11 @@ type Platform implements CollectiveInterface {
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -3193,6 +3228,11 @@ type Project implements CollectiveInterface {
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 
   """
   Returns whether this collective is archived
@@ -3755,6 +3795,11 @@ type User implements CollectiveInterface {
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -4016,6 +4061,11 @@ type Vendor implements CollectiveInterface {
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 
   """
   Returns whether this collective is archived

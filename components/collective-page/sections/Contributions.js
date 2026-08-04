@@ -107,7 +107,12 @@ const FILTER_PROPS = [
 ];
 
 const getAvailableFilters = roles => {
-  return FILTER_PROPS.filter(f => f.isActive(roles)).map(f => f.id);
+  let filters = FILTER_PROPS.filter(f => f.isActive(roles));
+  // Drop the "All" filter if it's the only one available with another filter
+  if (roles.length === 1 && filters.length === 2 && filters.some(f => f.id === FILTERS.ALL)) {
+    filters = filters.filter(f => f.id !== FILTERS.ALL);
+  }
+  return filters.map(f => f.id);
 };
 
 const I18nFilters = defineMessages({
@@ -273,9 +278,15 @@ const contributionsSectionQuery = gql`
 const SectionContributions = ({ collective }) => {
   const intl = useIntl();
   const [isLoadingMore, setLoadingMore] = React.useState(false);
-  const [filter, setFilter] = React.useState(collective.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL);
+  const [filter, setFilter] = React.useState(
+    collective.isHost
+      ? FILTERS.HOSTED_COLLECTIVES
+      : collective.type === CollectiveType.VENDOR
+        ? FILTERS.FINANCIAL
+        : FILTERS.ALL,
+  );
   const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
-  const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
+  const { data, loading, fetchMore, previousData } = useQuery(contributionsSectionQuery, {
     variables: {
       slug: collective.slug,
       limit: PAGE_SIZE,
@@ -289,6 +300,12 @@ const SectionContributions = ({ collective }) => {
   const { data: staticData } = useQuery(contributionsSectionStaticQuery, {
     variables: { slug: collective.slug },
   });
+  const availableFilters = React.useMemo(() => {
+    if (!data && !previousData) {
+      return [];
+    }
+    return getAvailableFilters((data || previousData)?.account?.memberOf?.roles || []);
+  }, [data, previousData]);
 
   const handleLoadMore = async () => {
     setLoadingMore(true);
@@ -328,7 +345,6 @@ const SectionContributions = ({ collective }) => {
   const { account, memberOf } = data?.account || {};
   const { hostedAccounts, connectedAccounts } = staticData?.account || {};
   const isOrganization = account?.type === CollectiveType.ORGANIZATION;
-  const availableFilters = getAvailableFilters(memberOf?.roles || []);
   const membersLeft = memberOf && memberOf.totalCount - memberOf.nodes.length;
   return (
     <Box pb={4}>
@@ -344,20 +360,18 @@ const SectionContributions = ({ collective }) => {
             </H3>
           )}
         </ContainerSectionContent>
-        {availableFilters.length > 1 && (
-          <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
-            <StyledFilters
-              filters={availableFilters}
-              getLabel={key => intl.formatMessage(I18nFilters[key])}
-              onChange={handleFilterSelect}
-              selected={filter}
-              justifyContent="left"
-              minButtonWidth={175}
-              px={Dimensions.PADDING_X}
-              disabled={isLoadingMore}
-            />
-          </Box>
-        )}
+        <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+          <StyledFilters
+            filters={availableFilters}
+            getLabel={key => intl.formatMessage(I18nFilters[key])}
+            onChange={handleFilterSelect}
+            selected={filter}
+            justifyContent="left"
+            minButtonWidth={175}
+            px={Dimensions.PADDING_X}
+            disabled={isLoadingMore}
+          />
+        </Box>
         <Container
           data-cy="Contributions"
           maxWidth={Dimensions.MAX_SECTION_WIDTH}

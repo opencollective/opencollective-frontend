@@ -22,6 +22,7 @@ export const contributorsFieldsFragment = gqlV1 /* GraphQL */ `
     isGuest
     tiersIds
     collectiveId
+    hasPublicProfile
   }
 `;
 
@@ -61,6 +62,7 @@ const contributeCardContributorFieldsFragment = gqlV1 /* GraphQL */ `
     name
     type
     isGuest
+    hasPublicProfile
   }
 `;
 

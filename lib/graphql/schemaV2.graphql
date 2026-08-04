@@ -284,6 +284,11 @@ interface Account {
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -3131,6 +3136,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -5013,6 +5023,11 @@ type Contributor {
   A public message from contributors to describe their contributions
   """
   publicMessage: String
+
+  """
+  Whether this contributor has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 }
 
 """
@@ -8036,7 +8051,7 @@ type KYCVerification {
   """
   The user who added this account to the KYC verification list
   """
-  createdByUser: Account
+  createdByUser: Individual
 
   """
   Provider specific data
@@ -10641,6 +10656,11 @@ type Bot implements Account {
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -11728,6 +11748,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
@@ -13399,6 +13424,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -14785,6 +14815,11 @@ type Individual implements Account {
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 
   """
   Returns whether the account accepts financial contributions.
@@ -16199,6 +16234,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 
   """
   Returns whether the account accepts financial contributions.
@@ -17672,6 +17712,11 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -18868,6 +18913,11 @@ type Vendor implements Account & AccountWithContributions {
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 
   """
   Returns whether the account accepts financial contributions.
@@ -23298,6 +23348,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isSuspended: Boolean!
 
   """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -24542,6 +24597,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Whether this account is suspended
   """
   isSuspended: Boolean!
+
+  """
+  Whether this account has a public profile that can be linked to
+  """
+  hasPublicProfile: Boolean!
 
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
@@ -28972,6 +29032,11 @@ input AccountUpdateSettingsInput {
   tos: String
   VAT: JSON
   GST: JSON
+  features: AccountUpdateSettingsFeaturesInput
+}
+
+input AccountUpdateSettingsFeaturesInput {
+  publicProfile: Boolean
 }
 
 input PoliciesInput {
@@ -31383,6 +31448,7 @@ input VendorCreateInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+  hasPublicProfile: Boolean
 
   """
   Restrict this vendor to specific accounts under the host. If empty/omitted, the vendor can be used with any hosted account.
@@ -31448,6 +31514,7 @@ input VendorEditInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+  hasPublicProfile: Boolean
 
   """
   Restrict this vendor to specific accounts under the host. If empty/omitted, the vendor can be used with any hosted account.
