@@ -42,11 +42,18 @@ const generatePlaidLinkTokenMutation = gql`
 export const connectPlaidAccountMutation = gql`
   mutation ConnectPlaidAccount(
     $publicToken: String!
+    $linkToken: String!
     $host: AccountReferenceInput!
     $sourceName: String
     $name: String
   ) {
-    connectPlaidAccount(publicToken: $publicToken, host: $host, sourceName: $sourceName, name: $name) {
+    connectPlaidAccount(
+      publicToken: $publicToken
+      linkToken: $linkToken
+      host: $host
+      sourceName: $sourceName
+      name: $name
+    ) {
       connectedAccount {
         id
       }
@@ -149,6 +156,7 @@ export const usePlaidConnectDialog = ({
           result = await connectPlaidAccount({
             variables: {
               publicToken,
+              linkToken,
               host: getAccountReferenceInput(host),
               sourceName: metadata.institution.name,
               name: metadata.accounts.map(a => a.name).join(', '),

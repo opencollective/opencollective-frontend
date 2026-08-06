@@ -76,6 +76,7 @@ const PlaidOAuthCallbackPage = () => {
           const result = await connectPlaidAccount({
             variables: {
               publicToken,
+              linkToken: windowData.accessToken,
               host: { id: windowData.hostId },
               sourceName: metadata.institution.name,
               name: metadata.accounts.map(a => a.name).join(', '),
