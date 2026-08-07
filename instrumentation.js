@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 
 import defaultConfig from './sentry.default.config.js';
 
+// ts-unused-exports:disable-next-line
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs' || process.env.NEXT_RUNTIME === 'edge') {
     Sentry.init({
@@ -14,4 +15,5 @@ export async function register() {
   }
 }
 
+// ts-unused-exports:disable-next-line
 export const onRequestError = Sentry.captureRequestError;
