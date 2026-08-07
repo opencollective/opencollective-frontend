@@ -3,11 +3,13 @@ import { Experiment, isExperimentEnabled } from './experiments';
 describe('experiments', () => {
   const originalOcEnv = process.env.OC_ENV;
   const originalRolloutPercentage = process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
+  const originalOscTipRolloutPercentage = process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE;
   const randomSpy = jest.spyOn(Math, 'random');
 
   beforeEach(() => {
     process.env.OC_ENV = 'development';
     delete process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
+    delete process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE;
     window.history.replaceState({}, '', '/');
   });
 
@@ -21,6 +23,11 @@ describe('experiments', () => {
       delete process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
     } else {
       process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = originalRolloutPercentage;
+    }
+    if (originalOscTipRolloutPercentage === undefined) {
+      delete process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE;
+    } else {
+      process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = originalOscTipRolloutPercentage;
     }
     randomSpy.mockRestore();
   });
@@ -73,5 +80,45 @@ describe('experiments', () => {
     window.history.replaceState({}, '', `/?${Experiment.NEW_PLATFORM_TIP_FLOW}=true`);
 
     expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW)).toBe(true);
+  });
+
+  it('defaults to a 10% rollout when the percentage is not configured', () => {
+    const context = { collective: { host: { slug: 'opensource' } } };
+
+    // Below the default rollout percentage: tip proposed (experiment not enabled)
+    randomSpy.mockReturnValueOnce(0.09);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
+
+    // At or above the default rollout percentage: tip hidden (experiment enabled)
+    randomSpy.mockReturnValueOnce(0.1);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+  });
+
+  it('uses the configured OSC platform tip rollout percentage', () => {
+    process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = '20';
+    const context = { collective: { host: { slug: 'opensource' } } };
+
+    // Below the rollout percentage: tip proposed (experiment not enabled)
+    randomSpy.mockReturnValueOnce(0.19);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
+
+    // At or above the rollout percentage: tip hidden (experiment enabled)
+    randomSpy.mockReturnValueOnce(0.2);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+
+    // Full rollout: tip always proposed
+    process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = '100';
+    randomSpy.mockReturnValueOnce(0.99);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
+  });
+
+  it('never hides the tip outside the Open Source Collective host', () => {
+    randomSpy.mockReturnValue(0.99);
+
+    expect(
+      isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, {
+        collective: { host: { slug: 'other-host' } },
+      }),
+    ).toBe(false);
   });
 });
