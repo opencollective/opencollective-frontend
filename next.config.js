@@ -350,21 +350,16 @@ const nextConfig = {
 let exportedConfig = nextConfig;
 
 if (process.env.SENTRY_AUTH_TOKEN) {
-  exportedConfig = withSentryConfig(
-    {
-      ...nextConfig,
-      sentry: {
-        hideSourceMaps: true,
-      },
+  exportedConfig = withSentryConfig(nextConfig, {
+    org: 'open-collective',
+    project: 'oc-frontend',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    applicationKey: SENTRY_APPLICATION_KEY,
+    silent: true,
+    sourcemaps: {
+      deleteSourcemapsAfterUpload: true,
     },
-    {
-      org: 'open-collective',
-      project: 'oc-frontend',
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      applicationKey: SENTRY_APPLICATION_KEY,
-      silent: true,
-    },
-  );
+  });
 } else if (process.env.OC_ENV === 'production') {
   // eslint-disable-next-line no-console
   console.warn('[!!! WARNING !!!] SENTRY_AUTH_TOKEN not found. Skipping Sentry configuration.');
