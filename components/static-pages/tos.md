@@ -111,7 +111,7 @@ The Host must promptly remit all Platform Tips to OFiTech (or its affiliates). R
 a. automatically through the payment processor’s integrated "application fee" mechanism (for example, Stripe); or
 b. periodically through invoicing or reconciliation when automatic transfer is not available.
 
-Platform Tips are payments to OFiTech and are not charitable contributions to the Host or any Collective. Platform Tips are receipted to Contributors separately from contributions, as described in Section 5(e).
+Platform Tips are payments to OFiTech and are not charitable contributions to the Host or any Collective. Platform Tips are receipted to Contributors separately from contributions, as described in Section 7(e).
 
 In cases where Platform Tips are not enabled or available for a Contribution, OFiTech may apply a Crowdfunding Fee of 5% charged to the Host.
 
