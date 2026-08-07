@@ -1,4 +1,5 @@
 import { AmountTypes, TierTypes } from '../constants/tiers-types';
+import { getEnvVar } from '../env-utils';
 import type LoggedInUser from '../LoggedInUser';
 import { parseToBoolean } from '../utils';
 
@@ -24,7 +25,7 @@ const NON_RANDOMIZED_ENVS = ['ci', 'e2e', 'test'];
 const OPEN_SOURCE_COLLECTIVE_HOST_SLUG = 'opensource';
 const OPEN_SOURCE_COLLECTIVE_HOST_LEGACY_ID = 11004;
 const DEFAULT_NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = 0;
-const DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = 10;
+const DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = 20;
 
 function getRolloutPercentage(rawValue: string, defaultValue: number): number {
   const percentage = parseInt(rawValue, 10);
@@ -43,9 +44,11 @@ function getNewPlatformTipFlowRolloutPercentage(): number {
   );
 }
 
+// Read through `getEnvVar` (not `process.env`) so the value comes from `__NEXT_DATA__.env` at
+// runtime: the percentage can be changed with a config var update alone, no rebuild needed.
 function getOscPlatformTipRolloutPercentage(): number {
   return getRolloutPercentage(
-    process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE,
+    getEnvVar('OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE'),
     DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE,
   );
 }
@@ -121,7 +124,7 @@ const experiments: Record<Experiment, ExperimentConfig> = {
   },
   // OSC-only experiment for measuring the impact of platform tips on contributions.
   // `true` means the tip step is hidden for this user. OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE
-  // is the share of eligible contributions that get the tip proposed (default 10); the
+  // is the share of eligible contributions that get the tip proposed (default 20); the
   // remainder is the holdout where the tip is hidden. Set to 100 to end the holdout.
   [Experiment.OPENSOURCE_PLATFORM_TIP_AB]: {
     enabled(_user, context): boolean {
