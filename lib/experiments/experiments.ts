@@ -24,7 +24,7 @@ const NON_RANDOMIZED_ENVS = ['ci', 'e2e', 'test'];
 const OPEN_SOURCE_COLLECTIVE_HOST_SLUG = 'opensource';
 const OPEN_SOURCE_COLLECTIVE_HOST_LEGACY_ID = 11004;
 const DEFAULT_NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = 0;
-const DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = 0;
+const DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = 10;
 
 function getRolloutPercentage(rawValue: string, defaultValue: number): number {
   const percentage = parseInt(rawValue, 10);
@@ -121,8 +121,8 @@ const experiments: Record<Experiment, ExperimentConfig> = {
   },
   // OSC-only experiment for measuring the impact of platform tips on contributions.
   // `true` means the tip step is hidden for this user. OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE
-  // is the share of eligible contributions that get the tip proposed (default 0: tip always
-  // hidden); the remainder is the holdout where the tip is hidden. Set to 100 to end the holdout.
+  // is the share of eligible contributions that get the tip proposed (default 10); the
+  // remainder is the holdout where the tip is hidden. Set to 100 to end the holdout.
   [Experiment.OPENSOURCE_PLATFORM_TIP_AB]: {
     enabled(_user, context): boolean {
       if (typeof window === 'undefined' || NON_RANDOMIZED_ENVS.includes(process.env.OC_ENV)) {
