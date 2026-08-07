@@ -3,13 +3,19 @@ import { Experiment, isExperimentEnabled } from './experiments';
 describe('experiments', () => {
   const originalOcEnv = process.env.OC_ENV;
   const originalRolloutPercentage = process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
-  const originalOscTipRolloutPercentage = process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE;
   const randomSpy = jest.spyOn(Math, 'random');
+
+  // The OSC rollout percentage is read through getEnvVar, which in the browser resolves from
+  // window.__NEXT_DATA__.env. Simulate that path so the tests cover what production executes.
+  const setOscRolloutPercentage = (value: string) => {
+    (window as any).__NEXT_DATA__.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = value;
+  };
 
   beforeEach(() => {
     process.env.OC_ENV = 'development';
     delete process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
-    delete process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE;
+    (process as any).browser = true;
+    (window as any).__NEXT_DATA__ = { env: {} };
     window.history.replaceState({}, '', '/');
   });
 
@@ -24,11 +30,8 @@ describe('experiments', () => {
     } else {
       process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = originalRolloutPercentage;
     }
-    if (originalOscTipRolloutPercentage === undefined) {
-      delete process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE;
-    } else {
-      process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = originalOscTipRolloutPercentage;
-    }
+    delete (process as any).browser;
+    delete (window as any).__NEXT_DATA__;
     randomSpy.mockRestore();
   });
 
@@ -95,7 +98,7 @@ describe('experiments', () => {
   });
 
   it('uses the configured OSC platform tip rollout percentage', () => {
-    process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = '20';
+    setOscRolloutPercentage('20');
     const context = { collective: { host: { slug: 'opensource' } } };
 
     // Below the rollout percentage: tip proposed (experiment not enabled)
@@ -107,7 +110,7 @@ describe('experiments', () => {
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
 
     // Full rollout: tip always proposed
-    process.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = '100';
+    setOscRolloutPercentage('100');
     randomSpy.mockReturnValueOnce(0.99);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
   });
