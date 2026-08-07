@@ -129,7 +129,12 @@ type TranslationStats = {
   completionPercent: number;
 };
 
-function isUntranslated(id: string, english: string, value: string | undefined, ignoredIds: Set<string>): boolean {
+function isUntranslated(
+  id: string,
+  english: string,
+  value: string | undefined,
+  ignoredIds: ReadonlySet<string>,
+): boolean {
   return value !== undefined && value === english && !ignoredIds.has(id);
 }
 
@@ -152,12 +157,16 @@ export function getUntranslatedEntries(
   return entries;
 }
 
-function getTranslationStats(en: Record<string, string>, translated: Record<string, string>): TranslationStats {
+function getTranslationStats(
+  en: Record<string, string>,
+  translated: Record<string, string>,
+  ignoredIds: ReadonlySet<string> = new Set(),
+): TranslationStats {
   const total = Object.keys(en).length;
   let untranslated = 0;
 
   for (const key of Object.keys(en)) {
-    if (!(key in translated) || translated[key] === en[key]) {
+    if (!(key in translated) || isUntranslated(key, en[key], translated[key], ignoredIds)) {
       untranslated++;
     }
   }
@@ -198,5 +207,5 @@ export function getLocaleTranslationStats(locale: string): TranslationStats | nu
     return null;
   }
 
-  return getTranslationStats(en, translated);
+  return getTranslationStats(en, translated, new Set(IGNORED[locale] ?? []));
 }
