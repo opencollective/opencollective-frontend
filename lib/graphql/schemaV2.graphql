@@ -27845,6 +27845,11 @@ type Mutation {
     publicToken: String!
 
     """
+    The link token returned by `generatePlaidLinkToken`, used to verify the request
+    """
+    linkToken: String!
+
+    """
     The account to which the Plaid account should be connected
     """
     host: AccountReferenceInput!
