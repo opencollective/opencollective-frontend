@@ -75,7 +75,6 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
 
 // For OTPLib
 global.TextDecoder = TextDecoder;
-// @ts-expect-error - global.TextEncoder is not defined
 global.TextEncoder = TextEncoder;
 
 // JSDOM doesn't implement scrollIntoView
