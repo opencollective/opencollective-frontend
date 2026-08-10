@@ -329,13 +329,13 @@
     "@types/react-dom": "19.2.4"
   },
   "allowScripts": {
-    "@tailwindcss/oxide@4.1.14": true,
-    "cypress@15.16.0": true,
-    "esbuild@0.28.1": true,
-    "sharp@0.34.5": true,
-    "@sentry/cli@2.58.5": true,
-    "canvas@3.2.0": true,
+    "@tailwindcss/oxide@4.3.3": true,
+    "cypress@15.20.0": true,
+    "esbuild@0.28.2": true,
+    "sharp@0.35.3": true,
+    "@sentry/cli@2.58.6": true,
+    "canvas@3.2.3": true,
     "husky@4.3.8": true,
-    "unrs-resolver@1.11.1": true
+    "unrs-resolver@1.12.2": true
   }
 }
