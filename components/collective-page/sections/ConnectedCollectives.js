@@ -155,6 +155,7 @@ class ConnectedCollectives extends React.PureComponent {
                   draggingId={draggingId}
                   onMount={this.onConnectedCollectivesAdminReady}
                   enableReordering={true}
+                  hideCreateNew
                 />
               </Container>
             )}
