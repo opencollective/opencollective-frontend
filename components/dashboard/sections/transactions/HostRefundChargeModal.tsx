@@ -48,6 +48,10 @@ const hostRefundChargeTransactionQuery = gql`
       isRefunded
       createdAt
       description
+      paymentMethod {
+        id
+        service
+      }
       amount {
         valueInCents
         currency
@@ -194,15 +198,31 @@ type HostRefundChargeModalProps = BaseModalProps & {
   onSuccess?: () => void;
 };
 
-const HostRefundChargeFormSchema = z.object({
-  cancelRecurringContribution: z.boolean(),
-  removeAsContributor: z.boolean(),
-  sendMessage: z.boolean(),
-  message: z.string().max(2000).optional(),
-  ignoreBalanceCheck: z.boolean(),
-});
+const getHostRefundChargeFormSchema = (intl: IntlShape) =>
+  z
+    .object({
+      cancelRecurringContribution: z.boolean(),
+      removeAsContributor: z.boolean(),
+      sendMessage: z.boolean(),
+      message: z.string().max(2000).optional(),
+      ignoreBalanceCheck: z.boolean(),
+      confirmManualRefund: z.boolean(),
+      isManualSettlement: z.boolean(),
+    })
+    .superRefine((values, ctx) => {
+      if (values.isManualSettlement && !values.confirmManualRefund) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['confirmManualRefund'],
+          message: intl.formatMessage({
+            defaultMessage: 'You must confirm that the refund has been or will be performed manually off-platform',
+            id: 'HostRefundChargeModal.confirmManualRefund.required',
+          }),
+        });
+      }
+    });
 
-type HostRefundChargeFormValues = z.infer<typeof HostRefundChargeFormSchema>;
+type HostRefundChargeFormValues = z.infer<ReturnType<typeof getHostRefundChargeFormSchema>>;
 
 const Section: React.FC<{
   children: React.ReactNode;
@@ -657,6 +677,7 @@ type RefundOptions = {
   showRemoveAsContributor: boolean;
   showHostMessage: boolean;
   canIgnoreBalanceCheck: boolean;
+  isManualSettlement: boolean;
 };
 
 type HostRefundChargeFormProps = {
@@ -850,6 +871,35 @@ const HostRefundChargeForm: React.FC<HostRefundChargeFormProps> = ({ transaction
         </ToggleOptionSection>
       )}
 
+      {options.isManualSettlement && (
+        <FormField name="confirmManualRefund" showError={false}>
+          {({ meta, form }) => {
+            const hasError = Boolean(meta.error && (meta.touched || form.submitCount));
+            return (
+              <ToggleOptionSection
+                title={
+                  <FormattedMessage
+                    defaultMessage="Confirm manual refund"
+                    id="HostRefundChargeModal.confirmManualRefund.title"
+                  />
+                }
+                description={
+                  <FormattedMessage
+                    defaultMessage="I confirm that the refund has been or will be performed manually off-platform. This action only reverses the transaction in the ledger; no money will be moved by the platform."
+                    id="HostRefundChargeModal.confirmManualRefund"
+                  />
+                }
+                checked={values.confirmManualRefund}
+                onCheckedChange={checked => setFieldValue('confirmManualRefund', checked === true)}
+                disabled={isSubmitting}
+              >
+                {hasError && <p className="mt-2 text-sm text-red-600">{meta.error}</p>}
+              </ToggleOptionSection>
+            );
+          }}
+        </FormField>
+      )}
+
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
           <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
@@ -879,20 +929,23 @@ export const HostRefundChargeModal = ({
   >(hostRefundChargeTransactionQuery, {
     variables: { transaction: { id: transactionRef.id } },
     skip: !open,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
   });
 
   const queriedTransaction = data?.transaction ?? previousData?.transaction;
   const transaction = queriedTransaction?.id === transactionRef.id ? queriedTransaction : undefined;
   const order = transaction?.order;
+  const isManualSettlement = transaction?.kind === TransactionKind.ADDED_FUNDS || transaction?.paymentMethod === null;
 
   const isFiscalHostAdmin = Boolean(transaction?.host && LoggedInUser?.isAdminOfCollective(transaction.host));
+  const isVendorContributor = transaction?.oppositeAccount?.type === AccountType.VENDOR;
 
   const options: RefundOptions = {
     showCancelRecurring: Boolean(order?.permissions?.canCancel),
     showRemoveAsContributor: Boolean(order?.permissions?.canRemoveAsContributor),
-    showHostMessage: isFiscalHostAdmin,
+    showHostMessage: isFiscalHostAdmin && !isVendorContributor,
     canIgnoreBalanceCheck: isFiscalHostAdmin,
+    isManualSettlement,
   };
 
   const [runRefund] = useMutation<HostRefundPaymentMutation, HostRefundPaymentMutationVariables>(
@@ -906,6 +959,8 @@ export const HostRefundChargeModal = ({
     [setOpen],
   );
 
+  const schema = React.useMemo(() => getHostRefundChargeFormSchema(intl), [intl]);
+
   const initialValues = React.useMemo<HostRefundChargeFormValues>(
     () => ({
       cancelRecurringContribution: options.showCancelRecurring,
@@ -913,8 +968,10 @@ export const HostRefundChargeModal = ({
       sendMessage: false,
       message: '',
       ignoreBalanceCheck: false,
+      confirmManualRefund: false,
+      isManualSettlement: options.isManualSettlement,
     }),
-    [options.showCancelRecurring],
+    [options.showCancelRecurring, options.isManualSettlement],
   );
 
   const handleSubmit = async (values: HostRefundChargeFormValues) => {
@@ -956,10 +1013,21 @@ export const HostRefundChargeModal = ({
       >
         <DialogHeader>
           <DialogTitle>
-            <FormattedMessage defaultMessage="Refund contribution charge" id="gCyTuO" />
+            {isManualSettlement ? (
+              <FormattedMessage defaultMessage="Reverse contribution charge" id="HostRefundChargeModal.reverseTitle" />
+            ) : (
+              <FormattedMessage defaultMessage="Refund contribution charge" id="gCyTuO" />
+            )}
           </DialogTitle>
           <DialogDescription>
-            <FormattedMessage defaultMessage="Review and confirm the refund details." id="i4akIU" />
+            {isManualSettlement ? (
+              <FormattedMessage
+                defaultMessage="Review and confirm the reversal details."
+                id="HostRefundChargeModal.reverseDescription"
+              />
+            ) : (
+              <FormattedMessage defaultMessage="Review and confirm the refund details." id="i4akIU" />
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -976,7 +1044,7 @@ export const HostRefundChargeModal = ({
         ) : (
           <FormikZod<HostRefundChargeFormValues>
             key={transaction.id}
-            schema={HostRefundChargeFormSchema}
+            schema={schema}
             initialValues={initialValues}
             onSubmit={handleSubmit}
           >

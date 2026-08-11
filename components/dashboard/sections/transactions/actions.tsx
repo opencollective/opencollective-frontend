@@ -10,6 +10,7 @@ import { PaymentMethodService } from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { saveInvoice } from '../../../../lib/transactions';
+import { TransactionKind } from '@/lib/constants/transactions';
 
 import { useModal } from '../../../ModalContext';
 import { toast } from '../../../ui/useToast';
@@ -81,10 +82,17 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
     }
 
     const isFiscalHostAdmin = LoggedInUser.isAdminOfCollective(transaction.host);
+    const isAddedFunds = transaction.kind === TransactionKind.ADDED_FUNDS;
+    const isManualPayment =
+      transaction.kind === TransactionKind.CONTRIBUTION &&
+      transaction.type === 'CREDIT' &&
+      transaction.paymentMethod === null;
     const isContributionCharge = Boolean(
       transaction.order &&
-      transaction.paymentMethod?.service &&
-      [PaymentMethodService.PAYPAL, PaymentMethodService.STRIPE].includes(transaction.paymentMethod.service),
+      ((transaction.paymentMethod?.service &&
+        [PaymentMethodService.PAYPAL, PaymentMethodService.STRIPE].includes(transaction.paymentMethod.service)) ||
+        isManualPayment ||
+        isAddedFunds),
     );
 
     const onMutationSuccess = () => {
