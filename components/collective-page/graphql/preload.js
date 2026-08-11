@@ -40,7 +40,7 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
         queries.push(
           client.query({
             query: getBudgetSectionQuery(Boolean(collective.host), isIndividual),
-            variables: getBudgetSectionQueryVariables(slug, isIndividual, collective.host),
+            variables: getBudgetSectionQueryVariables(slug, isIndividual, collective.host, collective.isHost),
           }),
         );
       }
@@ -50,7 +50,7 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
       queries.push(
         client.query({
           query: transactionsSectionQuery,
-          variables: getTransactionsSectionQueryVariables(slug),
+          variables: getTransactionsSectionQueryVariables(slug, collective.isHost),
         }),
       );
     }

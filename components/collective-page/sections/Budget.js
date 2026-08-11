@@ -227,7 +227,7 @@ export const getBudgetSectionQuery = (hasHost, isIndividual) => {
   }
 };
 
-export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual, host) => {
+export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual, host, isHost) => {
   if (isIndividual) {
     return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };
   } else {
@@ -235,7 +235,7 @@ export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual, hos
       slug: collectiveSlug,
       host: host ? { slug: host.slug } : null,
       limit: 3,
-      kind: getDefaultKinds(),
+      kind: getDefaultKinds({ isHost: Boolean(isHost) }),
       heavyAccount: isHeavyAccount(collectiveSlug),
     };
   }
@@ -333,7 +333,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
   const isIndividual = isIndividualAccount(collective) && !collective.isHost;
   const budgetQueryResult = useQuery(getBudgetSectionQuery(Boolean(collective.host), isIndividual), {
-    variables: getBudgetSectionQueryVariables(collective.slug, isIndividual, collective.host),
+    variables: getBudgetSectionQueryVariables(collective.slug, isIndividual, collective.host, collective.isHost),
   });
   const { data, refetch } = budgetQueryResult;
 
