@@ -515,7 +515,7 @@ const AddFundsModalContentWithCollective = ({
       refetchQueries: [
         {
           query: getBudgetSectionQuery(true, false),
-          variables: getBudgetSectionQueryVariables(collective.slug, false, host),
+          variables: getBudgetSectionQueryVariables(collective.slug, false, host, account?.isHost),
         },
         {
           query: collectivePageQuery,

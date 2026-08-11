@@ -63,13 +63,18 @@ export const transactionsSectionQuery = gql`
   ${transactionsQueryCollectionFragment}
 `;
 
-export const getTransactionsSectionQueryVariables = slug => {
-  return { slug, limit: NB_DISPLAYED, kind: getDefaultKinds(), includeGiftCardTransactions: !isHeavyAccount(slug) };
+export const getTransactionsSectionQueryVariables = (slug, isHost) => {
+  return {
+    slug,
+    limit: NB_DISPLAYED,
+    kind: getDefaultKinds({ isHost: Boolean(isHost) }),
+    includeGiftCardTransactions: !isHeavyAccount(slug),
+  };
 };
 
 const SectionTransactions = props => {
   const transactionsQueryResult = useQuery(transactionsSectionQuery, {
-    variables: getTransactionsSectionQueryVariables(props.collective.slug),
+    variables: getTransactionsSectionQueryVariables(props.collective.slug, props.collective.isHost),
 
     // We keep notifyOnNetworkStatusChange to remove the flash of collectiveHasNoTransactions bug
     // See https://github.com/apollographql/apollo-client/blob/9c80adf65ccbbb88ea5b9313c002f85976c225e3/src/core/ObservableQuery.ts#L274-L304
