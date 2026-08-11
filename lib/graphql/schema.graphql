@@ -2048,6 +2048,10 @@ type Collective implements CollectiveInterface {
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
+
+  """
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
+  """
   connectedAccounts: [ConnectedAccountType]
 
   """
@@ -2314,6 +2318,10 @@ type Event implements CollectiveInterface {
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
+
+  """
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
+  """
   connectedAccounts: [ConnectedAccountType]
 
   """
@@ -2580,6 +2588,10 @@ type Fund implements CollectiveInterface {
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
+
+  """
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
+  """
   connectedAccounts: [ConnectedAccountType]
 
   """
@@ -2846,6 +2858,10 @@ type Organization implements CollectiveInterface {
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
+
+  """
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
+  """
   connectedAccounts: [ConnectedAccountType]
 
   """
@@ -3112,6 +3128,10 @@ type Platform implements CollectiveInterface {
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
+
+  """
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
+  """
   connectedAccounts: [ConnectedAccountType]
 
   """
@@ -3378,6 +3398,10 @@ type Project implements CollectiveInterface {
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
+
+  """
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
+  """
   connectedAccounts: [ConnectedAccountType]
 
   """
@@ -3943,6 +3967,10 @@ type User implements CollectiveInterface {
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
+
+  """
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
+  """
   connectedAccounts: [ConnectedAccountType]
 
   """
@@ -4211,6 +4239,10 @@ type Vendor implements CollectiveInterface {
     """
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
+
+  """
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
+  """
   connectedAccounts: [ConnectedAccountType]
 
   """
