@@ -195,18 +195,18 @@ const ExpenseBudgetItem = ({
                   <span>
                     <StyledLink
                       $underlineOnHover
-                      {...(expenseAccountRoute
-                        ? useDrawer
+                      {...(useDrawer
+                        ? {
+                            as: 'button',
+                            type: 'button',
+                            onClick: expandExpense,
+                          }
+                        : expenseAccountRoute
                           ? {
                               as: Link,
                               href: `${expenseAccountRoute}/expenses/${expense.legacyId}`,
-                              onClick: expandExpense,
                             }
-                          : {
-                              as: Link,
-                              href: `${expenseAccountRoute}/expenses/${expense.legacyId}`,
-                            }
-                        : {})}
+                          : {})}
                     >
                       <AutosizeText
                         value={expense.description}
