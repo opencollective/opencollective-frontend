@@ -46,7 +46,8 @@ const RadioGroupCard = React.forwardRef<
     contentClassName?: string;
     indicatorClassName?: string;
   }
->(({ className, children, showSubcontent, subContent, ...props }, ref) => {
+>(({ className, children, showSubcontent, subContent, checked, ...props }, ref) => {
+  const isCheckedOverridden = checked !== undefined;
   return (
     <div
       className={cn(
@@ -61,6 +62,7 @@ const RadioGroupCard = React.forwardRef<
         )}
         asChild={false}
         {...props}
+        {...(isCheckedOverridden && { 'data-state': checked ? 'checked' : 'unchecked', 'aria-checked': checked })}
       >
         <div className={cn('flex w-full items-center gap-4', props.contentClassName)}>
           <div
@@ -69,9 +71,13 @@ const RadioGroupCard = React.forwardRef<
               props.indicatorClassName,
             )}
           >
-            <RadioGroupPrimitive.Indicator>
-              <Circle className="h-2.5 w-2.5 fill-current text-current" />
-            </RadioGroupPrimitive.Indicator>
+            {isCheckedOverridden ? (
+              checked && <Circle className="h-2.5 w-2.5 fill-current text-current" />
+            ) : (
+              <RadioGroupPrimitive.Indicator>
+                <Circle className="h-2.5 w-2.5 fill-current text-current" />
+              </RadioGroupPrimitive.Indicator>
+            )}
           </div>
 
           {children}
