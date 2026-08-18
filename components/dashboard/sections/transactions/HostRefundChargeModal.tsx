@@ -198,7 +198,7 @@ type HostRefundChargeModalProps = BaseModalProps & {
   onSuccess?: () => void;
 };
 
-const getHostRefundChargeFormSchema = (intl: IntlShape) =>
+const getHostRefundChargeFormSchema = () =>
   z
     .object({
       cancelRecurringContribution: z.boolean(),
@@ -209,17 +209,9 @@ const getHostRefundChargeFormSchema = (intl: IntlShape) =>
       confirmManualRefund: z.boolean(),
       isManualSettlement: z.boolean(),
     })
-    .superRefine((values, ctx) => {
-      if (values.isManualSettlement && !values.confirmManualRefund) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['confirmManualRefund'],
-          message: intl.formatMessage({
-            defaultMessage: 'You must confirm that the refund has been or will be performed manually off-platform',
-            id: 'HostRefundChargeModal.confirmManualRefund.required',
-          }),
-        });
-      }
+    .refine(values => !values.isManualSettlement || values.confirmManualRefund, {
+      message: 'Please confirm the manual refund',
+      path: ['confirmManualRefund'],
     });
 
 type HostRefundChargeFormValues = z.infer<ReturnType<typeof getHostRefundChargeFormSchema>>;
@@ -872,39 +864,31 @@ const HostRefundChargeForm: React.FC<HostRefundChargeFormProps> = ({ transaction
       )}
 
       {options.isManualSettlement && (
-        <FormField name="confirmManualRefund" showError={false}>
-          {({ meta, form }) => {
-            const hasError = Boolean(meta.error && (meta.touched || form.submitCount));
-            return (
-              <ToggleOptionSection
-                title={
-                  <FormattedMessage
-                    defaultMessage="Confirm manual refund"
-                    id="HostRefundChargeModal.confirmManualRefund.title"
-                  />
-                }
-                description={
-                  <FormattedMessage
-                    defaultMessage="I confirm that the refund has been or will be performed manually off-platform. This action only reverses the transaction in the ledger; no money will be moved by the platform."
-                    id="HostRefundChargeModal.confirmManualRefund"
-                  />
-                }
-                checked={values.confirmManualRefund}
-                onCheckedChange={checked => setFieldValue('confirmManualRefund', checked === true)}
-                disabled={isSubmitting}
-              >
-                {hasError && <p className="mt-2 text-sm text-red-600">{meta.error}</p>}
-              </ToggleOptionSection>
-            );
-          }}
-        </FormField>
+        <label className="flex cursor-pointer items-start gap-2 text-sm">
+          <Checkbox
+            checked={values.confirmManualRefund}
+            onCheckedChange={checked => setFieldValue('confirmManualRefund', checked === true)}
+            disabled={isSubmitting}
+          />
+          <FormattedMessage
+            defaultMessage="I confirm that the refund has been or will be performed manually off-platform. This action only reverses the transaction in the ledger; no money will be moved by the platform."
+            id="HostRefundChargeModal.confirmManualRefund"
+          />
+        </label>
       )}
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
           <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
         </Button>
-        <Button type="submit" loading={isSubmitting} disabled={isInsufficientBalance && !values.ignoreBalanceCheck}>
+        <Button
+          type="submit"
+          loading={isSubmitting}
+          disabled={
+            (isInsufficientBalance && !values.ignoreBalanceCheck) ||
+            (options.isManualSettlement && !values.confirmManualRefund)
+          }
+        >
           {submitLabel}
         </Button>
       </DialogFooter>
@@ -959,7 +943,7 @@ export const HostRefundChargeModal = ({
     [setOpen],
   );
 
-  const schema = React.useMemo(() => getHostRefundChargeFormSchema(intl), [intl]);
+  const schema = React.useMemo(() => getHostRefundChargeFormSchema(), []);
 
   const initialValues = React.useMemo<HostRefundChargeFormValues>(
     () => ({
@@ -976,6 +960,10 @@ export const HostRefundChargeModal = ({
 
   const handleSubmit = async (values: HostRefundChargeFormValues) => {
     if (!transaction) {
+      return;
+    }
+
+    if (options.isManualSettlement && !values.confirmManualRefund) {
       return;
     }
 
@@ -1014,20 +1002,16 @@ export const HostRefundChargeModal = ({
         <DialogHeader>
           <DialogTitle>
             {isManualSettlement ? (
-              <FormattedMessage defaultMessage="Reverse contribution charge" id="HostRefundChargeModal.reverseTitle" />
+              <FormattedMessage
+                defaultMessage="Mark contribution as refunded"
+                id="HostRefundChargeModal.MarkAsRefunded"
+              />
             ) : (
               <FormattedMessage defaultMessage="Refund contribution charge" id="gCyTuO" />
             )}
           </DialogTitle>
           <DialogDescription>
-            {isManualSettlement ? (
-              <FormattedMessage
-                defaultMessage="Review and confirm the reversal details."
-                id="HostRefundChargeModal.reverseDescription"
-              />
-            ) : (
-              <FormattedMessage defaultMessage="Review and confirm the refund details." id="i4akIU" />
-            )}
+            <FormattedMessage defaultMessage="Review and confirm the refund details." id="i4akIU" />
           </DialogDescription>
         </DialogHeader>
 
