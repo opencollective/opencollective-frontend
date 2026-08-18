@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { compact } from 'lodash-es';
 import { Download, ExternalLink, Filter, MinusCircle, Undo2 } from 'lucide-react';
@@ -14,6 +15,7 @@ import { TransactionKind } from '@/lib/constants/transactions';
 
 import { useModal } from '../../../ModalContext';
 import { toast } from '../../../ui/useToast';
+import { DashboardContext, inHostDashboardOfEntity } from '../../DashboardContext';
 
 import { HostRefundChargeModal } from './HostRefundChargeModal';
 import TransactionRejectModal from './TransactionRejectModal';
@@ -26,6 +28,11 @@ type UseTransactionActionsOptions = {
   refetchList?: () => void;
   redirectRelatedTransactionsTo?: string;
   excludeActions?: TransactionActionKey[];
+  /**
+   * When true, the refund action is only shown if we're currently inside the transaction's
+   * fiscal host's own dashboard.
+   */
+  restrictRefundToHostDashboard?: boolean;
 };
 
 const refundTransactionMutation = gql`
@@ -60,15 +67,13 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
   refetchList = null,
   redirectRelatedTransactionsTo = undefined,
   excludeActions = [],
+  restrictRefundToHostDashboard = false,
 }: UseTransactionActionsOptions = {}) {
   const intl = useIntl();
-
   const { showModal, showConfirmationModal } = useModal();
-
   const { LoggedInUser } = useLoggedInUser();
-
+  const { account: dashboardAccount } = useContext(DashboardContext);
   const [refundTransaction] = useMutation(refundTransactionMutation);
-
   const { callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice, { useErrorToast: true });
   const excludedActions = new Set(excludeActions);
 
@@ -125,7 +130,10 @@ export function useTransactionActions<T extends TransactionsTableQueryNode | Tra
         {
           key: 'refund',
           label: intl.formatMessage({ defaultMessage: 'Refund', id: 'Refund' }),
-          if: transaction?.permissions.canRefund && !transaction.isRefunded,
+          if:
+            transaction?.permissions.canRefund &&
+            !transaction.isRefunded &&
+            (!restrictRefundToHostDashboard || inHostDashboardOfEntity(transaction, dashboardAccount)),
           onClick: () => {
             if (isContributionCharge && isFiscalHostAdmin) {
               showModal(
