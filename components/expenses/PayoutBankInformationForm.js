@@ -88,6 +88,10 @@ const i18nFieldLabels = defineMessages({
     id: 'PayoutBankInformationForm.Field.AccountHolderName',
     defaultMessage: 'Full name of the account holder',
   },
+  'Date of birth': {
+    id: 'PayoutBankInformationForm.Field.DateOfBirth',
+    defaultMessage: 'Date of birth',
+  },
   'Bank code (BIC/SWIFT)': {
     id: 'PayoutBankInformationForm.Field.BankCode',
     defaultMessage: 'Bank code (BIC/SWIFT)',
