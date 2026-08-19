@@ -3337,6 +3337,7 @@
   "PayoutBankInformationForm.Error.RequiredFields": "Beim Abrufen der erforderlichen Felder ist ein Fehler aufgetreten",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",
   "PayoutBankInformationForm.Field.BankCode": "Bank code (BIC/SWIFT)",
+  "PayoutBankInformationForm.Field.DateOfBirth": "Date of birth",
   "PayoutBankInformationForm.Field.RecipientType": "Recipient type",
   "PayoutBankInformationForm.HolderAddress": "Adresse des Bankkontoinhabers (nicht die Bankadresse)",
   "PayoutBankInformationForm.RecipientAddress": "Adresse des Empfängers",

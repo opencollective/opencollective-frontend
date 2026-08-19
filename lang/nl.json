@@ -3337,6 +3337,7 @@
   "PayoutBankInformationForm.Error.RequiredFields": "Er is een fout opgetreden bij het ophalen van de vereiste velden",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",
   "PayoutBankInformationForm.Field.BankCode": "Bank code (BIC/SWIFT)",
+  "PayoutBankInformationForm.Field.DateOfBirth": "Date of birth",
   "PayoutBankInformationForm.Field.RecipientType": "Recipient type",
   "PayoutBankInformationForm.HolderAddress": "Bank account holder address (not the bank address)",
   "PayoutBankInformationForm.RecipientAddress": "Recipient's Address",
