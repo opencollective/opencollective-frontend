@@ -575,6 +575,7 @@ const expenseFormSchemaQuery = gql`
     slug
     name
     legalName
+    isUSEntity
     type
     isAdmin
     payoutMethods {

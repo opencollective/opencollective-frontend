@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import type { FieldMetaProps } from 'formik';
 import { Field, useFormikContext } from 'formik';
-import { isEmpty, pick } from 'lodash-es';
+import { isEmpty, isNil, pick } from 'lodash-es';
 import { AlertCircle, Lock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -32,6 +32,7 @@ import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import MessageBox from '../../MessageBox';
 import { Button } from '../../ui/Button';
+import { ButtonSet } from '../../ui/ButtonSet';
 import { Input } from '../../ui/Input';
 import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
@@ -45,7 +46,7 @@ import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
 import { InviteUserOption } from './InviteUserOption';
-import { updateAccountLegalNameMutation } from './mutations';
+import { updateAccountLegalNameMutation, updateAccountUSEntityMutation } from './mutations';
 
 type WhoIsGettingPaidSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
@@ -62,6 +63,7 @@ function getFormProps(form: ExpenseForm) {
       'lockedFields',
       'expense',
       'loggedInAccount',
+      'host',
     ]),
     ...pick(form.values, ['payeeSlug', 'inviteeAccountType', 'expenseTypeOption']),
   };
@@ -104,6 +106,18 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   const hasAdministeredProfiles = administeredProfiles.length > 0;
   const isInvite = [PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
     props.payeeSlug,
+  );
+
+  const isUSHost = props.host?.location?.country === 'US';
+  const isUSEntityRequired = React.useCallback(
+    (account: ExpenseForm['options']['payoutProfiles'][number] | ExpenseForm['options']['payee']) => {
+      if (!isUSHost || !account) {
+        return false;
+      }
+      const isEligibleType = account.type === AccountType.INDIVIDUAL || account.type === AccountType.ORGANIZATION;
+      return isEligibleType && isNil(account.isUSEntity);
+    },
+    [isUSHost],
   );
 
   const { setFieldValue, setFieldTouched } = props;
@@ -172,8 +186,20 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           <RadioGroupCard
             disabled={props.isSubmitting}
             value={lastUsedProfile.slug}
-            showSubcontent={props.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName)}
-            subContent={<LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.refresh} />}
+            showSubcontent={
+              props.payeeSlug === lastUsedProfile?.slug &&
+              (isEmpty(lastUsedProfile?.legalName) || isUSEntityRequired(lastUsedProfile))
+            }
+            subContent={
+              <div className="flex flex-col gap-2">
+                {isEmpty(lastUsedProfile?.legalName) && (
+                  <LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.refresh} />
+                )}
+                {isUSEntityRequired(lastUsedProfile) && (
+                  <USPersonWarning account={lastUsedProfile} onUSPersonUpdate={props.refresh} />
+                )}
+              </div>
+            }
             className="min-w-0"
           >
             <ExpenseAccountItem account={lastUsedProfile} />
@@ -187,9 +213,20 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             disabled={isLoading || props.isSubmitting}
             checked={isLoading ? false : props.payeeSlug === personalProfile.slug}
             showSubcontent={
-              !isLoading && props.payeeSlug === personalProfile.slug && isEmpty(personalProfile.legalName)
+              !isLoading &&
+              props.payeeSlug === personalProfile.slug &&
+              (isEmpty(personalProfile?.legalName) || isUSEntityRequired(personalProfile))
             }
-            subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />}
+            subContent={
+              <div className="flex flex-col gap-2">
+                {isEmpty(personalProfile?.legalName) && (
+                  <LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />
+                )}
+                {isUSEntityRequired(personalProfile) && (
+                  <USPersonWarning account={personalProfile} onUSPersonUpdate={props.refresh} />
+                )}
+              </div>
+            }
             className="min-w-0"
           >
             {isLoading ? <Skeleton className="h-6 w-full" /> : <ExpenseAccountItem account={personalProfile} />}
@@ -200,8 +237,20 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           <RadioGroupCard
             disabled={props.isSubmitting}
             value={singleOtherProfile.slug}
-            showSubcontent={props.payeeSlug === singleOtherProfile.slug && isEmpty(singleOtherProfile.legalName)}
-            subContent={<LegalNameWarning account={singleOtherProfile} onLegalNameUpdate={props.refresh} />}
+            showSubcontent={
+              props.payeeSlug === singleOtherProfile.slug &&
+              (isEmpty(singleOtherProfile.legalName) || isUSEntityRequired(singleOtherProfile))
+            }
+            subContent={
+              <div className="flex flex-col gap-2">
+                {isEmpty(singleOtherProfile.legalName) && (
+                  <LegalNameWarning account={singleOtherProfile} onLegalNameUpdate={props.refresh} />
+                )}
+                {isUSEntityRequired(singleOtherProfile) && (
+                  <USPersonWarning account={singleOtherProfile} onUSPersonUpdate={props.refresh} />
+                )}
+              </div>
+            }
             className="min-w-0"
           >
             <ExpenseAccountItem account={singleOtherProfile} />
@@ -216,16 +265,28 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             disabled={props.isSubmitting}
             className="min-w-0"
             subContent={
-              <div>
-                <CollectivePicker
-                  disabled={props.isSubmitting}
-                  collectives={otherProfiles}
-                  collective={props.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER ? null : props.payee}
-                  onChange={e => {
-                    const slug = e.value.slug;
-                    setFieldValue('payeeSlug', !slug ? PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER : slug);
-                  }}
-                />
+              <div className="flex flex-col gap-2">
+                <div>
+                  <CollectivePicker
+                    disabled={props.isSubmitting}
+                    collectives={otherProfiles}
+                    collective={props.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER ? null : props.payee}
+                    onChange={e => {
+                      const slug = e.value.slug;
+                      setFieldValue('payeeSlug', !slug ? PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER : slug);
+                    }}
+                  />
+                </div>
+                {props.payee && props.payeeSlug === props.payee.slug && (
+                  <React.Fragment>
+                    {isEmpty(props.payee.legalName) && (
+                      <LegalNameWarning account={props.payee} onLegalNameUpdate={props.refresh} />
+                    )}
+                    {isUSEntityRequired(props.payee) && (
+                      <USPersonWarning account={props.payee} onUSPersonUpdate={props.refresh} />
+                    )}
+                  </React.Fragment>
+                )}
               </div>
             }
           >
@@ -472,7 +533,7 @@ const VendorOption = React.memo(function VendorOption(props: {
 });
 
 function LegalNameWarning(props: {
-  account: ExpenseForm['options']['payoutProfiles'][number];
+  account: ExpenseForm['options']['payoutProfiles'][number] | ExpenseForm['options']['payee'];
   onLegalNameUpdate: () => void;
 }) {
   const intl = useIntl();
@@ -550,6 +611,89 @@ function LegalNameWarning(props: {
       />
       <Button variant="outline" onClick={onSubmitLegalName} disabled={isEmpty(legalName) || loading} loading={loading}>
         <FormattedMessage defaultMessage="Save legal name" id="WslCdZ" />
+      </Button>
+    </MessageBox>
+  );
+}
+
+function USPersonWarning(props: {
+  account: ExpenseForm['options']['payoutProfiles'][number] | ExpenseForm['options']['payee'];
+  onUSPersonUpdate: () => void;
+}) {
+  const intl = useIntl();
+  const { toast } = useToast();
+  const [isUSEntity, setIsUSEntity] = React.useState<boolean | null>(null);
+  const [usPersonUpdated, setUsPersonUpdated] = React.useState(false);
+  const timeoutRef = React.useRef(null);
+
+  const [submitUSPersonMutation, { loading }] = useMutation(updateAccountUSEntityMutation, {
+    variables: {
+      account: {
+        id: props.account.id,
+        isUSEntity,
+      },
+    },
+  });
+
+  const { onUSPersonUpdate } = props;
+  const handleUSPersonUpdate = React.useCallback(() => {
+    const timeout = setTimeout(() => {
+      onUSPersonUpdate();
+    }, 5000);
+    setUsPersonUpdated(true);
+    timeoutRef.current = timeout;
+  }, [onUSPersonUpdate]);
+
+  React.useEffect(() => {
+    return () => timeoutRef.current && clearTimeout(timeoutRef.current);
+  }, []);
+
+  const onSubmitUSPerson = React.useCallback(async () => {
+    try {
+      await submitUSPersonMutation();
+      handleUSPersonUpdate();
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Tax information updated', id: 'NeqwR2' }),
+      });
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    }
+  }, [submitUSPersonMutation, toast, intl, handleUSPersonUpdate]);
+
+  if (usPersonUpdated) {
+    return (
+      <MessageBox type="success">
+        <div>
+          <FormattedMessage defaultMessage="Tax information updated" id="NeqwR2" />
+        </div>
+      </MessageBox>
+    );
+  }
+
+  return (
+    <MessageBox type="warning">
+      <div className="mb-2 font-bold">
+        <FormattedMessage defaultMessage="Are you a US Person or Entity?" id="USPerson.label" />
+      </div>
+      <div className="mb-4">
+        <FormattedMessage
+          defaultMessage="US citizen, resident, green card holder, or US-incorporated entity."
+          id="USPerson.hint"
+        />
+      </div>
+      <div className="mb-3">
+        <ButtonSet
+          selected={isUSEntity}
+          onChange={value => setIsUSEntity(value)}
+          options={[
+            { label: <FormattedMessage defaultMessage="Yes" id="Yes" />, value: true },
+            { label: <FormattedMessage defaultMessage="No" id="No" />, value: false },
+          ]}
+        />
+      </div>
+      <Button variant="outline" onClick={onSubmitUSPerson} disabled={isUSEntity === null || loading} loading={loading}>
+        <FormattedMessage defaultMessage="Save" id="save" />
       </Button>
     </MessageBox>
   );
