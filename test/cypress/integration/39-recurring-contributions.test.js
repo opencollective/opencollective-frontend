@@ -196,6 +196,12 @@ describe('Recurring contributions: update platform tip', () => {
   let collective;
 
   before(() => {
+    cy.intercept('GET', 'https://js.stripe.com/dahlia/stripe.js', req => {
+      req.continue(res => {
+        res.body = res.body.replaceAll('window.top.location.href', 'window.location.href');
+      });
+    });
+
     // Host on the Open Source Collective with platform tips enabled. This host renders the
     // legacy Stripe card element, so we can reuse the same proven `useAnyPaymentMethod` flow as
     // the first describe block above instead of the real Stripe Payment Element (which redirects
