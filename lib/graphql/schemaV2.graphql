@@ -211,6 +211,11 @@ interface Account {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -3067,6 +3072,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -10587,6 +10597,11 @@ type Bot implements Account {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -11681,6 +11696,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -13355,6 +13375,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -14748,6 +14773,11 @@ type Individual implements Account {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -16167,6 +16197,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -17643,6 +17678,11 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -18846,6 +18886,11 @@ type Vendor implements Account & AccountWithContributions {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -23279,6 +23324,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -24530,6 +24580,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
   description: String
   longDescription: String
   tags: [String]
@@ -28979,6 +29034,11 @@ input AccountUpdateInput {
   id: String!
   name: String
   legalName: String
+
+  """
+  Whether the account is a US person or entity.
+  """
+  isUSEntity: Boolean
   slug: String
   description: String
   image: URL
