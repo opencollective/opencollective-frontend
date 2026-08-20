@@ -3337,6 +3337,7 @@
   "PayoutBankInformationForm.Error.RequiredFields": "Det gick inte att hämta de obligatoriska fälten",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",
   "PayoutBankInformationForm.Field.BankCode": "Bank code (BIC/SWIFT)",
+  "PayoutBankInformationForm.Field.DateOfBirth": "Date of birth",
   "PayoutBankInformationForm.Field.RecipientType": "Recipient type",
   "PayoutBankInformationForm.HolderAddress": "Bankkontoinnehavarens adress (ej bankadress)",
   "PayoutBankInformationForm.RecipientAddress": "Mottagarens adress",

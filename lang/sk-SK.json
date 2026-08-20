@@ -3337,6 +3337,7 @@
   "PayoutBankInformationForm.Error.RequiredFields": "Pri načítaní požadovaných polí nastala chyba",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",
   "PayoutBankInformationForm.Field.BankCode": "Bank code (BIC/SWIFT)",
+  "PayoutBankInformationForm.Field.DateOfBirth": "Date of birth",
   "PayoutBankInformationForm.Field.RecipientType": "Recipient type",
   "PayoutBankInformationForm.HolderAddress": "Adresa majiteľa bankového účtu (nie adresa banky)",
   "PayoutBankInformationForm.RecipientAddress": "Adresa príjemcu",

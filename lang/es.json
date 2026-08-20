@@ -3337,6 +3337,7 @@
   "PayoutBankInformationForm.Error.RequiredFields": "Hubo un error al recuperar la información requerida",
   "PayoutBankInformationForm.Field.AccountHolderName": "Nombre completo del titular de la cuenta",
   "PayoutBankInformationForm.Field.BankCode": "Código bancario (BIC/SWIFT)",
+  "PayoutBankInformationForm.Field.DateOfBirth": "Date of birth",
   "PayoutBankInformationForm.Field.RecipientType": "Tipo de destinatario",
   "PayoutBankInformationForm.HolderAddress": "Dirección del titular de la cuenta bancaria (no la dirección del banco)",
   "PayoutBankInformationForm.RecipientAddress": "Dirección del Destinatario",

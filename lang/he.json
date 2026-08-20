@@ -3337,6 +3337,7 @@
   "PayoutBankInformationForm.Error.RequiredFields": "היתה בעיה בהעלאת שדות נדרשים",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",
   "PayoutBankInformationForm.Field.BankCode": "Bank code (BIC/SWIFT)",
+  "PayoutBankInformationForm.Field.DateOfBirth": "Date of birth",
   "PayoutBankInformationForm.Field.RecipientType": "Recipient type",
   "PayoutBankInformationForm.HolderAddress": "כתובת בעל חשבון הבנק (לא כתובת הבנק)",
   "PayoutBankInformationForm.RecipientAddress": "כתובת הנמען",

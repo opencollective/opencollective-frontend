@@ -3337,6 +3337,7 @@
   "PayoutBankInformationForm.Error.RequiredFields": "在获取必要字段时出错",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",
   "PayoutBankInformationForm.Field.BankCode": "Bank code (BIC/SWIFT)",
+  "PayoutBankInformationForm.Field.DateOfBirth": "Date of birth",
   "PayoutBankInformationForm.Field.RecipientType": "Recipient type",
   "PayoutBankInformationForm.HolderAddress": "Bank account holder address (not the bank address)",
   "PayoutBankInformationForm.RecipientAddress": "收件地址",
