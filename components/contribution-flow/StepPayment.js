@@ -2,6 +2,7 @@ import React from 'react';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
+import { AnalyticsProperty } from '../../lib/analytics/properties';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../../lib/policies';
 
@@ -22,11 +23,21 @@ const StepPayment = ({
   hideCreditCardPostalCode = false,
   onNewCardFormReady,
   disabledPaymentMethodTypes,
+  showPlatformTip,
+  isOscTipExperiment,
 }) => {
   const { LoggedInUser } = useLoggedInUser();
 
   React.useEffect(() => {
-    track(AnalyticsEvent.CONTRIBUTION_PAYMENT_STEP);
+    track(AnalyticsEvent.CONTRIBUTION_PAYMENT_STEP, {
+      props: {
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails?.isNewPlatformTip ? 'new' : 'old',
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(showPlatformTip),
+        [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: Boolean(isOscTipExperiment),
+        [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: collective?.host?.slug,
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (require2FAForAdmins(stepProfile) && !LoggedInUser?.hasTwoFactorAuth) {

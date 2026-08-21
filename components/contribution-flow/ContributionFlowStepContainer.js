@@ -111,6 +111,8 @@ class ContributionFlowStepContainer extends React.Component {
         return (
           <StepPayment
             collective={this.props.collective}
+            showPlatformTip={this.props.showPlatformTip}
+            isOscTipExperiment={this.props.isOscTipExperiment}
             stepDetails={this.props.mainState.stepDetails}
             stepProfile={this.props.mainState.stepProfile}
             stepSummary={this.props.mainState.stepSummary}
