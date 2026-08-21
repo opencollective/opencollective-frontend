@@ -75,6 +75,11 @@ export const getSettingsQuery = gql`
           legalName
           address
         }
+        TAX_FORM_THRESHOLDS {
+          US
+          NON_US
+          includePayPalExpenses
+        }
       }
       ... on AccountWithHost {
         host {

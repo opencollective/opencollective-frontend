@@ -12,7 +12,7 @@ import { API_V1_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { editCollectivePolicyMutation } from '../../../lib/graphql/v1/mutations';
 import { stripHTML } from '../../../lib/html';
 import { omitDeep } from '../../../lib/utils';
-import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+import { FEATURES, isFeatureSupported, requiresUpgrade } from '@/lib/allowed-features';
 
 import { DashboardContext } from '@/components/dashboard/DashboardContext';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
@@ -78,6 +78,11 @@ const setPoliciesMutation = gql`
           requiredForCollectiveAdmins
         }
         USE_VENDOR_POLICY
+        TAX_FORM_THRESHOLDS {
+          US
+          NON_US
+          includePayPalExpenses
+        }
       }
     }
   }
@@ -192,6 +197,8 @@ const Policies = ({ collective }) => {
   const hasHosting = collective.hasHosting;
   const { account } = React.useContext(DashboardContext);
   const isUpgradeRequiredForChartOfAccounts = requiresUpgrade(account, FEATURES.CHART_OF_ACCOUNTS);
+  const isUpgradeRequiredForTaxForms = requiresUpgrade(account, FEATURES.TAX_FORMS);
+  const isTaxFormsSupported = isFeatureSupported(account, FEATURES.TAX_FORMS);
 
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
@@ -1100,6 +1107,190 @@ const Policies = ({ collective }) => {
                 </div>
               </RadioGroup>
             </Container>
+            {isTaxFormsSupported && (
+              <Container>
+                <SettingsSectionTitle>
+                  <FormattedMessage defaultMessage="Tax forms" id="TaxForms" />
+                </SettingsSectionTitle>
+                <P mb={3}>
+                  <FormattedMessage
+                    defaultMessage="Set thresholds for collecting US tax forms (W-9, W-8BEN, W-8BEN-E) from expense payees."
+                    id="98uNwe"
+                  />
+                </P>
+
+                <div className="flex flex-col gap-4">
+                  {/* US entities */}
+                  <div className="flex flex-col rounded-2xl border p-4">
+                    <div className="mb-2">
+                      <h1 className="text-sm/6 font-bold">
+                        <FormattedMessage defaultMessage="US registered entities & individuals" id="7o17/Z" />
+                      </h1>
+                      <p className="text-sm text-muted-foreground">
+                        <FormattedMessage
+                          defaultMessage="US citizens, residents, green card holders, or US-incorporated entities (W-9 form)."
+                          id="6iR6z+"
+                        />
+                      </p>
+                    </div>
+
+                    <RadioGroup
+                      disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
+                      value={formik.values.policies?.TAX_FORM_THRESHOLDS?.US === 0 ? 'ALWAYS' : 'THRESHOLD'}
+                      onValueChange={value => {
+                        const newPolicies = cloneDeep(formik.values.policies);
+                        if (value === 'ALWAYS') {
+                          set(newPolicies, 'TAX_FORM_THRESHOLDS.US', 0);
+                        } else {
+                          set(newPolicies, 'TAX_FORM_THRESHOLDS.US', 600e2);
+                        }
+                        formik.setFieldValue('policies', newPolicies);
+                      }}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="ALWAYS" id="TAX_FORM_THRESHOLDS-US-ALWAYS" />
+                        <Label htmlFor="TAX_FORM_THRESHOLDS-US-ALWAYS" className="font-normal">
+                          <FormattedMessage defaultMessage="Always collect" id="w7uE5w" />
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="THRESHOLD" id="TAX_FORM_THRESHOLDS-US-THRESHOLD" />
+                        <Label htmlFor="TAX_FORM_THRESHOLDS-US-THRESHOLD" className="font-normal">
+                          <FormattedMessage
+                            defaultMessage="Collect over a threshold of total disbursements"
+                            id="07q1kL"
+                          />
+                        </Label>
+                      </div>
+                    </RadioGroup>
+
+                    {formik.values.policies?.TAX_FORM_THRESHOLDS?.US !== 0 && (
+                      <div className="mt-3">
+                        <InputAmount
+                          className="max-w-[11em] sm:max-w-1/3"
+                          suffix={<FormattedMessage defaultMessage="/ calendar year" id="3Pps87" />}
+                          disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
+                          currency={data?.account?.currency || collective.currency || 'USD'}
+                          currencyDisplay="CODE"
+                          value={
+                            isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.US)
+                              ? 600e2
+                              : formik.values.policies?.TAX_FORM_THRESHOLDS?.US
+                          }
+                          onChange={value => {
+                            const newPolicies = cloneDeep(formik.values.policies);
+                            set(newPolicies, 'TAX_FORM_THRESHOLDS.US', !isNil(value) ? value : 600e2);
+                            formik.setFieldValue('policies', newPolicies);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Non-US entities */}
+                  <div className="flex flex-col rounded-2xl border p-4">
+                    <div className="mb-2">
+                      <h1 className="text-sm/6 font-bold">
+                        <FormattedMessage defaultMessage="Non-US registered entities & individuals" id="24sN51" />
+                      </h1>
+                      <p className="text-sm text-muted-foreground">
+                        <FormattedMessage
+                          defaultMessage="Foreign individuals and entities (W-8BEN, W-8BEN-E forms)."
+                          id="k0Wp0e"
+                        />
+                      </p>
+                    </div>
+
+                    <RadioGroup
+                      disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
+                      value={formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US === 0 ? 'ALWAYS' : 'THRESHOLD'}
+                      onValueChange={value => {
+                        const newPolicies = cloneDeep(formik.values.policies);
+                        if (value === 'ALWAYS') {
+                          set(newPolicies, 'TAX_FORM_THRESHOLDS.NON_US', 0);
+                        } else {
+                          set(newPolicies, 'TAX_FORM_THRESHOLDS.NON_US', 600e2);
+                        }
+                        formik.setFieldValue('policies', newPolicies);
+                      }}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="ALWAYS" id="TAX_FORM_THRESHOLDS-NON_US-ALWAYS" />
+                        <Label htmlFor="TAX_FORM_THRESHOLDS-NON_US-ALWAYS" className="font-normal">
+                          <FormattedMessage defaultMessage="Always collect" id="w7uE5w" />
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="THRESHOLD" id="TAX_FORM_THRESHOLDS-NON_US-THRESHOLD" />
+                        <Label htmlFor="TAX_FORM_THRESHOLDS-NON_US-THRESHOLD" className="font-normal">
+                          <FormattedMessage
+                            defaultMessage="Collect over a threshold of total disbursements"
+                            id="07q1kL"
+                          />
+                        </Label>
+                      </div>
+                    </RadioGroup>
+
+                    {formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US !== 0 && (
+                      <div className="mt-3">
+                        <InputAmount
+                          className="max-w-[11em] sm:max-w-1/3"
+                          suffix={<FormattedMessage defaultMessage="/ calendar year" id="3Pps87" />}
+                          disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
+                          currency={data?.account?.currency || collective.currency || 'USD'}
+                          currencyDisplay="CODE"
+                          value={
+                            isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US)
+                              ? 600e2
+                              : formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US
+                          }
+                          onChange={value => {
+                            const newPolicies = cloneDeep(formik.values.policies);
+                            set(newPolicies, 'TAX_FORM_THRESHOLDS.NON_US', !isNil(value) ? value : 600e2);
+                            formik.setFieldValue('policies', newPolicies);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Exclude PayPal expenses from threshold calculations */}
+                  <div className="flex flex-col rounded-2xl border p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex flex-col gap-1">
+                        <h1 className="text-sm/6 font-bold">
+                          <FormattedMessage
+                            defaultMessage="Exclude PayPal expenses from threshold calculations"
+                            id="taxFormThresholds.excludePayPalExpenses.label"
+                          />
+                        </h1>
+                        <p className="text-sm text-muted-foreground">
+                          <FormattedMessage
+                            defaultMessage="PayPal already collects tax forms based on its own thresholds and is responsible for the tax reporting for payees paid through it. By default, PayPal expenses are excluded from your thresholds and will not appear on your 990 forms. Turn this off only if you intentionally want to include PayPal payouts in your fiscal host's reporting."
+                            id="taxFormThresholds.excludePayPalExpenses.hint"
+                          />
+                        </p>
+                      </div>
+                      <Switch
+                        name="checkbox-TAX_FORM_THRESHOLDS-includePayPalExpenses"
+                        disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
+                        // The switch is phrased as "exclude PayPal expenses", so ON = exclude = includePayPalExpenses: false.
+                        checked={formik.values.policies?.TAX_FORM_THRESHOLDS?.includePayPalExpenses !== true}
+                        onCheckedChange={checked => {
+                          const newPolicies = cloneDeep(formik.values.policies);
+                          set(newPolicies, 'TAX_FORM_THRESHOLDS.includePayPalExpenses', !checked);
+                          formik.setFieldValue('policies', newPolicies);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {isUpgradeRequiredForTaxForms && (
+                  <UpgradePlanCTA className="mt-4" compact hideBenefits featureKey={FEATURES.TAX_FORMS} />
+                )}
+              </Container>
+            )}
           </React.Fragment>
         )}
 
