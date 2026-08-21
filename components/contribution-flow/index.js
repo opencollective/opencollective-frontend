@@ -222,7 +222,16 @@ class ContributionFlow extends React.Component {
 
       if (step !== 'details') {
         // started the contribution flow at advanced step with details picked.
-        track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED);
+        track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED, {
+          props: {
+            [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: this.state.stepDetails.isNewPlatformTip
+              ? 'new'
+              : 'old',
+            [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: this.canHavePlatformTips(),
+            [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: this.isOscTipExperiment(),
+            [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.collective?.host?.slug,
+          },
+        });
       }
     }
   }
