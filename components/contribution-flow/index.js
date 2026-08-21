@@ -1029,6 +1029,9 @@ class ContributionFlow extends React.Component {
                       stepDetails={stepDetails}
                       stepSummary={stepSummary}
                       disabled={this.state.isInitializing || this.state.isNavigating}
+                      showPlatformTip={this.canHavePlatformTips()}
+                      isOscTipExperiment={this.isOscTipExperiment()}
+                      hostSlug={this.props.collective?.host?.slug}
                     />
                   </Box>
                   {!isEmbed && (
