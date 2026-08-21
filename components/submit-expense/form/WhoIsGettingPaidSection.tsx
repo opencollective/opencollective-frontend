@@ -18,6 +18,7 @@ import {
   PAYEE_SLUG_NEW_VENDOR,
   PAYEE_SLUG_VENDOR,
 } from '@/components/expenses/lib/constants';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { FormField } from '@/components/FormField';
@@ -108,16 +109,17 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
     props.payeeSlug,
   );
 
-  const isUSHost = props.host?.location?.country === 'US';
+  const isUSHostWithTaxFormsEnabled =
+    props.host?.location?.country === 'US' && isFeatureEnabled(props.host, FEATURES.TAX_FORMS);
   const isUSEntityRequired = React.useCallback(
     (account: ExpenseForm['options']['payoutProfiles'][number] | ExpenseForm['options']['payee']) => {
-      if (!isUSHost || !account) {
+      if (!isUSHostWithTaxFormsEnabled || !account) {
         return false;
       }
       const isEligibleType = account.type === AccountType.INDIVIDUAL || account.type === AccountType.ORGANIZATION;
       return isEligibleType && isNil(account.isUSEntity);
     },
-    [isUSHost],
+    [isUSHostWithTaxFormsEnabled],
   );
 
   const { setFieldValue, setFieldTouched } = props;
@@ -687,8 +689,8 @@ function USPersonWarning(props: {
           selected={isUSEntity}
           onChange={value => setIsUSEntity(value)}
           options={[
-            { label: <FormattedMessage defaultMessage="Yes" id="Yes" />, value: true },
-            { label: <FormattedMessage defaultMessage="No" id="No" />, value: false },
+            { label: <FormattedMessage defaultMessage="Yes" id="a5msuh" />, value: true },
+            { label: <FormattedMessage defaultMessage="No" id="oUWADl" />, value: false },
           ]}
         />
       </div>
