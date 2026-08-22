@@ -2398,6 +2398,8 @@
   "HostFee.Global": "Taxa global de hospedagem",
   "HostFee.MonthlyRetainer": "Recipiente mensal",
   "HostPaymentRequests": "Todas as solicitações de pagamento",
+  "HostRefundChargeModal.confirmManualRefund": "I confirm that the refund has been or will be performed manually off-platform. This action only reverses the transaction in the ledger; no money will be moved by the platform.",
+  "HostRefundChargeModal.MarkAsRefunded": "Mark contribution as refunded",
   "HostSince": "Administrador desde",
   "HowHcn": "Selecione um indivíduo para verificação",
   "howItWorks": "Como funciona",
