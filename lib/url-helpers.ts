@@ -96,7 +96,7 @@ export const twitterProfileUrl = twitterHandle => {
  * @param opts {object} With the following attributes:
  *  - text: The message to share
  */
-export const blueSkyShareURL = opts => {
+export const blueskyShareURL = opts => {
   return `https://bsky.app/intent/compose${objectToQueryString(opts)}`;
 };
 
