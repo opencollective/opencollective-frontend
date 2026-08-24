@@ -17,6 +17,7 @@ import { ExpenseStatusFilter, ExpenseType, LastCommentBy } from '../../../../lib
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
+import { isOrganizationAccount } from '@/lib/account';
 import { limit } from '@/lib/filters/schemas';
 import { useDrawer } from '@/lib/hooks/useDrawer';
 import { i18nExpenseType } from '@/lib/i18n/expense';
@@ -302,18 +303,19 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
       hideExpensesMetaStatuses: true,
     },
     views,
-    ...(account?.hasHosting ? { skipFiltersOnReset: ['hostContext'] } : {}),
+    ...(isOrganizationAccount(account) && account.hasHosting ? { skipFiltersOnReset: ['hostContext'] } : {}),
   });
 
-  const accountVariables = account?.hasHosting
-    ? {
-        fromHost: { slug: accountSlug },
-        hostContext: queryFilter.values.hostContext,
-      }
-    : {
-        fromAccount: { slug: accountSlug },
-        includeChildrenExpenses: true,
-      };
+  const accountVariables =
+    isOrganizationAccount(account) && account.hasHosting
+      ? {
+          fromHost: { slug: accountSlug },
+          hostContext: queryFilter.values.hostContext,
+        }
+      : {
+          fromAccount: { slug: accountSlug },
+          includeChildrenExpenses: true,
+        };
   const variables = {
     ...accountVariables,
     fetchGrantHistory: false,
@@ -376,7 +378,7 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
           title={
             <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
               <FormattedMessage defaultMessage="Issued Payment Requests" id="IssuedPaymentRequests" />
-              {account?.hasHosting && (
+              {isOrganizationAccount(account) && account.hasHosting && (
                 <HostContextFilter
                   value={queryFilter.values.hostContext}
                   onChange={val => queryFilter.setFilter('hostContext', val)}
