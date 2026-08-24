@@ -7622,6 +7622,11 @@ type Policies {
   Contribution threshold to enforce contributor info. This resolver can be called from the collective or the host, when resolved through the collective the thresholds are returned in the collective currency
   """
   CONTRIBUTOR_INFO_THRESHOLDS: CONTRIBUTOR_INFO_THRESHOLDS
+
+  """
+  Tax form thresholds for US and non-US entities in cents (0 means always collect)
+  """
+  TAX_FORM_THRESHOLDS: TAX_FORM_THRESHOLDS
 }
 
 type EXPENSE_POLICIES {
@@ -7689,6 +7694,23 @@ enum UseVendorPolicy {
 type CONTRIBUTOR_INFO_THRESHOLDS {
   legalName: Int
   address: Int
+}
+
+type TAX_FORM_THRESHOLDS {
+  """
+  Threshold in cents for US entities (0 means always collect)
+  """
+  US: Int
+
+  """
+  Threshold in cents for non-US entities (0 means always collect)
+  """
+  NON_US: Int
+
+  """
+  Whether expenses paid through PayPal are included in threshold calculations
+  """
+  includePayPalExpenses: Boolean
 }
 
 type ActivitySubscription {
@@ -29114,6 +29136,7 @@ input PoliciesInput {
   USE_VENDOR_POLICY: UseVendorPolicy
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
   CONTRIBUTOR_INFO_THRESHOLDS: PoliciesContributorInfoThresholdsInput
+  TAX_FORM_THRESHOLDS: PoliciesTaxFormThresholdsInput
 }
 
 input PoliciesExpensePolicies {
@@ -29144,6 +29167,12 @@ input PoliciesExpenseCategorizationInput {
 input PoliciesContributorInfoThresholdsInput {
   legalName: Int
   address: Int
+}
+
+input PoliciesTaxFormThresholdsInput {
+  US: Int
+  NON_US: Int
+  includePayPalExpenses: Boolean
 }
 
 type SendMessageResult {
