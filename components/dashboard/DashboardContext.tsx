@@ -25,3 +25,18 @@ export const DashboardContext = React.createContext<DashboardContextType>({
   setDefaultSlug: () => {},
   getProfileUrl: () => null,
 });
+
+type EntityWithHost = {
+  host?: { id: string } | null;
+};
+
+/**
+ * Checks whether the currently active dashboard *is* the fiscal host of `entity` (a transaction,
+ * contribution/order, etc.) - i.e. whether we're inside that host's own dashboard right now.
+ */
+export function inHostDashboardOfEntity(
+  entity: EntityWithHost | null | undefined,
+  dashboardAccount: { id: string; isHost?: boolean } | null | undefined,
+): boolean {
+  return Boolean(dashboardAccount?.isHost && entity?.host?.id === dashboardAccount.id);
+}

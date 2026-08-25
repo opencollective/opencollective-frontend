@@ -176,6 +176,7 @@ export function ContributionCharges({
     resetFilters: transactionsQueryFilter.resetFilters,
     redirectRelatedTransactionsTo: redirectRelatedTransactionsTo,
     excludeActions: ['reject'],
+    restrictRefundToHostDashboard: true,
   });
   const getChargeActions = React.useCallback(
     (chargeGroup: ChargeGroup, onCloseFocusRef) =>
