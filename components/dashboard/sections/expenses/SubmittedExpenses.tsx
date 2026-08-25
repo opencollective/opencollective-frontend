@@ -64,6 +64,8 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     refetch: refetchExpenses,
   } = useQuery(accountExpensesQuery, {
     variables,
+    // Revalidate on mount so newly submitted expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
 
   const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
@@ -102,7 +104,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         ) : (
           <React.Fragment>
             <ExpensesList
-              isLoading={loading}
+              isLoading={loading && !data}
               collective={data?.account}
               host={data?.account?.isHost ? data?.account : data?.account?.host}
               expenses={data?.expenses?.nodes}
