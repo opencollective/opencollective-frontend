@@ -47,20 +47,22 @@ describe('experiments', () => {
     ).toBe(false);
   });
 
-  it('keeps the new platform tip flow disabled for Open Source Collective host', () => {
-    process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = '100';
-    randomSpy.mockReturnValue(0);
+  it('always enables the new platform tip flow for Open Source Collective host', () => {
+    // Even with the rollout at 0, OSC gets the new tip UI deterministically
+    process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = '0';
+    randomSpy.mockReturnValue(0.99);
 
     expect(
       isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
         collective: { host: { slug: 'opensource' } },
       }),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
         collective: { host: { legacyId: 11004 } },
       }),
-    ).toBe(false);
+    ).toBe(true);
+    expect(randomSpy).not.toHaveBeenCalled();
   });
 
   it('uses the configured rollout percentage for other hosts', () => {

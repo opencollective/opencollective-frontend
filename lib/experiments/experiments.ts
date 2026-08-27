@@ -148,9 +148,11 @@ const experiments: Record<Experiment, ExperimentConfig> = {
         return false;
       }
 
-      // Open Source Collective stays on the legacy flow for now, no A/B.
+      // Open Source Collective always uses the new platform tip UI, no A/B: the OSC tip
+      // experiment (opensourcePlatformTipAb) compares tip shown vs hidden, and when shown,
+      // the tip step uses the new interface.
       if (isOpenSourceCollectiveHost(context?.collective?.host)) {
-        return false;
+        return true;
       }
 
       return Math.random() * 100 < getNewPlatformTipFlowRolloutPercentage();
