@@ -188,4 +188,15 @@ describe('experiments', () => {
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
     expect(randomSpy).toHaveBeenCalledTimes(1);
   });
+
+  it.each(['true', '42', '"foo"', '[]'])('survives stored draws holding valid but wrongly shaped JSON (%s)', stored => {
+    window.localStorage.setItem('oscTipExperimentDraws', stored);
+    const context = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
+
+    // Neither throws nor loses stickiness: the bad value is replaced by a fresh draw map
+    randomSpy.mockReturnValueOnce(0.99);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+    expect(randomSpy).toHaveBeenCalledTimes(1);
+  });
 });

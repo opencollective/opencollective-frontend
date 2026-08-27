@@ -108,7 +108,11 @@ type StoredDraws = Record<string, { enabled: boolean; pct: number }>;
 function getStickyDraw(collectiveSlug: string, rolloutPercentage: number): boolean {
   let draws: StoredDraws;
   try {
-    draws = JSON.parse(getFromLocalStorage(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS)) || {};
+    const parsed = JSON.parse(getFromLocalStorage(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS));
+    // Guard against stored values that parse but aren't a plain object (true, 42, "foo", []):
+    // assigning a property to a primitive throws in strict mode, and arrays don't stringify
+    // their named properties, so either would break or silently disable the stickiness.
+    draws = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   } catch {
     draws = {};
   }
