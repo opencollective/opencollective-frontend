@@ -86,15 +86,15 @@ describe('experiments', () => {
     expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW)).toBe(true);
   });
 
-  it('defaults to a 20% rollout when the percentage is not configured', () => {
+  it('defaults to a 50% rollout when the percentage is not configured', () => {
     const context = { collective: { host: { slug: 'opensource' } } };
 
     // Below the default rollout percentage: tip proposed (experiment not enabled)
-    randomSpy.mockReturnValueOnce(0.19);
+    randomSpy.mockReturnValueOnce(0.49);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
 
     // At or above the default rollout percentage: tip hidden (experiment enabled)
-    randomSpy.mockReturnValueOnce(0.2);
+    randomSpy.mockReturnValueOnce(0.5);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
   });
 
