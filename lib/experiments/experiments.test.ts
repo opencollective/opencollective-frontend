@@ -17,6 +17,7 @@ describe('experiments', () => {
     (process as any).browser = true;
     (window as any).__NEXT_DATA__ = { env: {} };
     window.history.replaceState({}, '', '/');
+    window.localStorage.clear();
   });
 
   afterEach(() => {
@@ -123,5 +124,68 @@ describe('experiments', () => {
         collective: { host: { slug: 'other-host' } },
       }),
     ).toBe(false);
+  });
+
+  it('keeps the OSC tip draw sticky per collective across page loads', () => {
+    const context = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
+
+    // First load draws the tip-hidden arm and persists it
+    randomSpy.mockReturnValueOnce(0.99);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+
+    // Subsequent loads reuse the stored draw instead of re-rolling
+    randomSpy.mockReturnValueOnce(0);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+    expect(randomSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('draws independently for different collectives', () => {
+    const webpack = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
+    const curl = { collective: { slug: 'curl', host: { slug: 'opensource' } } };
+
+    randomSpy.mockReturnValueOnce(0.99).mockReturnValueOnce(0);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, webpack)).toBe(true);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, curl)).toBe(false);
+
+    // Each collective keeps its own arm
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, webpack)).toBe(true);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, curl)).toBe(false);
+  });
+
+  it('re-rolls stored draws when the rollout percentage changes', () => {
+    const context = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
+
+    setOscRolloutPercentage('20');
+    randomSpy.mockReturnValueOnce(0.99);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+
+    // Percentage changed: the stored draw is stale, a new one is made under the new split
+    setOscRolloutPercentage('100');
+    randomSpy.mockReturnValueOnce(0.99);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
+
+    // And the new draw is sticky in turn
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
+    expect(randomSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('falls back to a per-load draw when the context has no collective slug', () => {
+    const context = { collective: { host: { slug: 'opensource' } } };
+
+    randomSpy.mockReturnValueOnce(0.99).mockReturnValueOnce(0);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
+  });
+
+  it('survives corrupted stored draws', () => {
+    window.localStorage.setItem('oscTipExperimentDraws', '{not json');
+    const context = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
+
+    randomSpy.mockReturnValueOnce(0.99);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+
+    // The corrupted blob was replaced by a valid one holding the new draw
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+    expect(randomSpy).toHaveBeenCalledTimes(1);
   });
 });

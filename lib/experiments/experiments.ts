@@ -1,5 +1,6 @@
 import { AmountTypes, TierTypes } from '../constants/tiers-types';
 import { getEnvVar } from '../env-utils';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../local-storage';
 import type LoggedInUser from '../LoggedInUser';
 import { parseToBoolean } from '../utils';
 
@@ -14,6 +15,7 @@ type ExperimentConfig = {
 
 type ExperimentContext = {
   collective?: {
+    slug?: string;
     host?: {
       slug?: string;
       legacyId?: number | string;
@@ -94,6 +96,34 @@ export function isOscTipExperiment(collective?: PlatformTipCollective | null, ti
   return isOpenSourceCollectiveHost(collective?.host) && platformTipApplies(collective, tier);
 }
 
+// Sticky per-browser, per-collective draws for the OSC platform tip experiment. Without
+// persistence, every page load re-rolls the arm: a contributor who reloads mid-flow has an 80%
+// chance of leaving the tip arm, a one-way drift that selects deliberate (larger) contributions
+// into the holdout and biases the revenue comparison. Draws are stored per collective slug so a
+// visitor keeps their arm across visits to the same collective, while different collectives get
+// independent draws. Stored draws are keyed to the rollout percentage that produced them: when
+// the percentage changes, stale draws are re-rolled so the new split applies immediately.
+type StoredDraws = Record<string, { enabled: boolean; pct: number }>;
+
+function getStickyDraw(collectiveSlug: string, rolloutPercentage: number): boolean {
+  let draws: StoredDraws;
+  try {
+    draws = JSON.parse(getFromLocalStorage(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS)) || {};
+  } catch {
+    draws = {};
+  }
+
+  const stored = draws[collectiveSlug];
+  if (stored && stored.pct === rolloutPercentage && typeof stored.enabled === 'boolean') {
+    return stored.enabled;
+  }
+
+  const enabled = Math.random() * 100 >= rolloutPercentage;
+  draws[collectiveSlug] = { enabled, pct: rolloutPercentage };
+  setLocalStorage(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS, JSON.stringify(draws));
+  return enabled;
+}
+
 // Reads ?<experiment>=<value> from the current URL to force a variant.
 // Returns true/false to force, or undefined when not present.
 function getOverride(experiment: Experiment): boolean | undefined {
@@ -136,7 +166,13 @@ const experiments: Record<Experiment, ExperimentConfig> = {
         return false;
       }
 
-      return Math.random() * 100 >= getOscPlatformTipRolloutPercentage();
+      const rolloutPercentage = getOscPlatformTipRolloutPercentage();
+      const collectiveSlug = context?.collective?.slug;
+      if (!collectiveSlug) {
+        return Math.random() * 100 >= rolloutPercentage;
+      }
+
+      return getStickyDraw(collectiveSlug, rolloutPercentage);
     },
   },
 };
