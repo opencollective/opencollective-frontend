@@ -4253,6 +4253,7 @@
   "TaxableCountry.notProvidedYet": "Not provided yet",
   "TaxableCountry.residence": "Country of residence",
   "TaxableCountry.tooltip": "Set from the US tax form (W-9, W-8BEN or W-8BEN-E) submitted by this account.",
+  "TaxableCountry.USPersonStatus": "US person: {value}",
   "TaxForm": "טופס מס",
   "TaxForm.DisabledPayment": "אין אפשרות לשלם כי לא עודכנו אישורי מס.",
   "TaxForm.Invalidate": "Invalidate",
