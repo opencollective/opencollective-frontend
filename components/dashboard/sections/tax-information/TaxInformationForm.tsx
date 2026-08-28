@@ -109,12 +109,17 @@ export const TaxInformationForm = ({
   const initialValues = React.useMemo(
     () => ({
       type: null,
-      isUSPersonOrEntity: null,
+      // Pre-select the US person/entity answer from the account's stored
+      // isUSEntity (e.g. set from a previously submitted tax form or the
+      // expense form). The user can still change it: the form type is
+      // re-derived from the answer and the submitted answer updates
+      // isUSEntity via submitLegalDocument.
+      isUSPersonOrEntity: data?.account?.isUSEntity ?? null,
       submitterType: null,
       email: LoggedInUser.email,
       isSigned: false,
     }),
-    [LoggedInUser],
+    [data, LoggedInUser],
   );
 
   if (error) {
