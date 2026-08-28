@@ -216,6 +216,11 @@ interface Account {
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -3077,6 +3082,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -10624,6 +10634,11 @@ type Bot implements Account {
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -11723,6 +11738,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -13402,6 +13422,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -14800,6 +14825,11 @@ type Individual implements Account {
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -16224,6 +16254,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -17705,6 +17740,11 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -18913,6 +18953,11 @@ type Vendor implements Account & AccountWithContributions {
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -23351,6 +23396,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -24607,6 +24657,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Whether the account is a US person or entity. Scope: "account".
   """
   isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
