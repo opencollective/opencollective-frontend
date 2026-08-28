@@ -135,10 +135,11 @@ export function TaxFormBadge({ taxForms, onClick }: TaxFormBadgeProps) {
 type TaxableCountryProps = {
   accountType: AccountType;
   taxableCountry?: string | null;
+  isUSEntity?: boolean | null;
   isLoading?: boolean;
 };
 
-export function TaxableCountry({ accountType, taxableCountry, isLoading }: TaxableCountryProps) {
+export function TaxableCountry({ accountType, taxableCountry, isUSEntity, isLoading }: TaxableCountryProps) {
   const intl = useIntl();
   const label =
     accountType === AccountType.INDIVIDUAL ? (
@@ -156,6 +157,22 @@ export function TaxableCountry({ accountType, taxableCountry, isLoading }: Taxab
   ) : (
     <span className="text-muted-foreground">
       <FormattedMessage defaultMessage="Not provided yet" id="TaxableCountry.notProvidedYet" />
+      {isUSEntity !== null && isUSEntity !== undefined && (
+        <span>
+          {' · '}
+          <FormattedMessage
+            defaultMessage="US person: {value}"
+            id="TaxableCountry.USPersonStatus"
+            values={{
+              value: isUSEntity ? (
+                <FormattedMessage defaultMessage="Yes" id="a5msuh" />
+              ) : (
+                <FormattedMessage defaultMessage="No" id="oUWADl" />
+              ),
+            }}
+          />
+        </span>
+      )}
     </span>
   );
 

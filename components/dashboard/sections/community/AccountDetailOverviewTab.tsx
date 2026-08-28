@@ -221,6 +221,7 @@ export const AccountDetailsOverviewTab = ({
             <TaxableCountry
               accountType={account?.type || expectedAccountType}
               taxableCountry={account?.taxableCountry}
+              isUSEntity={account?.isUSEntity}
               isLoading={isLoading}
             />
             {account?.socialLinks?.length > 0 && (

@@ -190,6 +190,7 @@ export const communityAccountDetailQuery = gql`
       name
       legalName
       taxableCountry
+      isUSEntity
       type
       createdAt
       imageUrl
