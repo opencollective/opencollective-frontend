@@ -58,6 +58,8 @@ export type AccountingCategorySelectProps = {
   onChange: (category: AccountingCategory | null) => void;
   onBlur?: () => void;
   allowNone?: boolean;
+  /** Always show the search input, regardless of the number of options */
+  alwaysSearchable?: boolean;
   /** Usually true for host/organization admins, false for other users */
   showCode: boolean;
   id?: string;
@@ -348,6 +350,7 @@ const AccountingCategorySelect = ({
   id,
   error,
   allowNone = false,
+  alwaysSearchable = false,
   showCode,
   expenseValues = undefined,
   buttonClassName = '',
@@ -437,7 +440,7 @@ const AccountingCategorySelect = ({
           style={{ width: 'var(--radix-popover-trigger-width)' }}
         >
           <Command>
-            {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
+            {(alwaysSearchable || size(options) > 6) && <CommandInput placeholder="Filter by name" />}
 
             <CommandList>
               <CommandEmpty>

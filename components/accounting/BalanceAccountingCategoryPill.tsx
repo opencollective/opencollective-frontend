@@ -97,6 +97,7 @@ const BalanceAccountingCategoryPill = ({
       account={account}
       selectedCategory={selectedCategory}
       allowNone
+      alwaysSearchable
       showCode
       onChange={onChange}
     >
