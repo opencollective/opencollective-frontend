@@ -26,6 +26,10 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import { truncateMiddle } from '../../lib/utils';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 
+import {
+  BalanceAccountingCategoryPicker,
+  useBalanceAccountingCategories,
+} from '../accounting/BalanceAccountingCategoryPicker';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -238,6 +242,7 @@ const DEFAULT_VALUES = Object.freeze({
   totalAmountPaidInHostCurrency: null,
   feesPayer: 'COLLECTIVE',
   paymentMethodService: null,
+  balanceAccountingCategory: null,
 });
 
 const validate = values => {
@@ -400,7 +405,11 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
     return;
   }
 
-  return onSubmit({ ...omit(values, 'expenseAmountInHostCurrency'), totalAmountPaidInHostCurrency });
+  return onSubmit({
+    ...omit(values, 'expenseAmountInHostCurrency'),
+    totalAmountPaidInHostCurrency,
+    balanceAccountingCategory: values.balanceAccountingCategory ? { id: values.balanceAccountingCategory.value } : null,
+  });
 };
 
 /** Expense fields needed by PayExpenseModal - combines list and admin fragments */
@@ -423,7 +432,7 @@ type PayExpenseModalExpense = Pick<
 /** Host fields needed by PayExpenseModal */
 type PayExpenseModalHost = Pick<
   ExpenseHostFieldsFragment,
-  'currency' | 'settings' | 'transferwise' | 'features' | 'supportedPayoutMethods' | 'platformSubscription'
+  'currency' | 'settings' | 'transferwise' | 'features' | 'supportedPayoutMethods' | 'platformSubscription' | 'slug'
 >;
 
 /** Collective fields needed by PayExpenseModal */
@@ -457,6 +466,7 @@ const PayExpenseModal = ({
   const initialValues = getInitialValues(expense, host, blockAutomaticPayment);
   const formik = useFormik({ initialValues, validate, onSubmit: getHandleSubmit(intl, host.currency, onSubmit) });
   const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
+  const balanceCategories = useBalanceAccountingCategories(isManualPayment ? host.slug : undefined);
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
   const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
@@ -656,6 +666,30 @@ const PayExpenseModal = ({
                     />
                   )}
                 </StyledInputField>
+                {balanceCategories.enabled && (
+                  <StyledInputField
+                    name="balanceAccountingCategory"
+                    htmlFor="balanceAccountingCategory"
+                    required={false}
+                    mt={3}
+                    label={<FormattedMessage defaultMessage="Paid from" id="jhYP1/" />}
+                    hint={
+                      <FormattedMessage
+                        defaultMessage="The balance or clearing account the funds were paid from." id="OfBJ2R"
+                      />
+                    }
+                  >
+                    {inputProps => (
+                      <BalanceAccountingCategoryPicker
+                        hostSlug={host.slug}
+                        inputId={inputProps.id || 'balanceAccountingCategory'}
+                        value={formik.values.balanceAccountingCategory}
+                        menuPortalTarget={null}
+                        onChange={value => formik.setFieldValue('balanceAccountingCategory', value)}
+                      />
+                    )}
+                  </StyledInputField>
+                )}
                 <StyledInputField
                   name="clearedAt"
                   htmlFor="clearedAt"
