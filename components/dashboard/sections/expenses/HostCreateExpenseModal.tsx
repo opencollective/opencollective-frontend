@@ -25,6 +25,11 @@ import { attachmentDropzoneParams } from '../../../expenses/lib/attachments';
 import { formatCurrency } from '@/lib/currency-utils';
 import type { PossiblyArray } from '@/lib/types';
 
+import {
+  BalanceAccountingCategoryPicker,
+  getBalanceAccountingCategoryOption,
+  useBalanceAccountingCategories,
+} from '@/components/accounting/BalanceAccountingCategoryPicker';
 import AccountingCategorySelect from '@/components/AccountingCategorySelect';
 import { Button } from '@/components/ui/Button';
 
@@ -117,8 +122,14 @@ const hostCreateExpenseMutation = gql`
     $expense: ExpenseCreateInput!
     $account: AccountReferenceInput!
     $transactionsImportRow: TransactionsImportRowReferenceInput
+    $balanceAccountingCategory: AccountingCategoryReferenceInput
   ) {
-    createExpense(expense: $expense, account: $account, transactionsImportRow: $transactionsImportRow) {
+    createExpense(
+      expense: $expense
+      account: $account
+      transactionsImportRow: $transactionsImportRow
+      balanceAccountingCategory: $balanceAccountingCategory
+    ) {
       id
       legacyId
       account {
@@ -141,6 +152,7 @@ const hostExpenseFormValuesSchema = z
     payee: z.object({}),
     account: z.object({}),
     accountingCategory: z.object({}).optional().nullable(),
+    balanceAccountingCategory: z.object({ value: z.string() }).optional().nullable(),
     incurredAt: z.string(),
     amount: z.object({ valueInCents: z.number(), currency: z.nativeEnum(Currency) }),
     attachedFile: z.object({ url: z.string() }).optional().nullable(),
@@ -162,12 +174,16 @@ type FormValuesSchema = z.infer<typeof hostExpenseFormValuesSchema>;
 
 const getInitialValues = (importRow: TransactionsImportRow, account): FormValuesSchema => {
   const defaultAccount = !Array.isArray(account) ? account : account.length === 1 ? account[0] : null;
+  const matchedBankAccountCategory = importRow?.institutionAccount?.balanceAccountingCategory;
   return {
     type: null,
     description: importRow?.description || '',
     payee: null,
     account: pick(defaultAccount, ['id', 'slug', 'name', 'type', 'imageUrl']),
     accountingCategory: null,
+    balanceAccountingCategory: matchedBankAccountCategory
+      ? getBalanceAccountingCategoryOption(matchedBankAccountCategory)
+      : null,
     incurredAt: standardizeExpenseItemIncurredAt(importRow?.date),
     amount: {
       valueInCents: Math.abs(importRow?.amount.valueInCents) || 0,
@@ -197,6 +213,8 @@ export const HostCreateExpenseModal = ({
 } & BaseModalProps) => {
   const intl = useIntl();
   const [isAmountLocked, setIsAmountLocked] = React.useState(Boolean(transactionsImportRow?.amount?.valueInCents));
+  const balanceCategories = useBalanceAccountingCategories(host?.slug);
+  const matchedBankAccountCategory = transactionsImportRow?.institutionAccount?.balanceAccountingCategory;
   const [createExpense, { client }] = useMutation(hostCreateExpenseMutation);
   const { toast } = useToast();
   const expenseTypeOptions = React.useMemo(
@@ -225,6 +243,9 @@ export const HostCreateExpenseModal = ({
                 variables: {
                   account: getAccountReferenceInput(values.account),
                   transactionsImportRow: transactionsImportRow && { id: transactionsImportRow.id },
+                  balanceAccountingCategory: values.balanceAccountingCategory
+                    ? { id: values.balanceAccountingCategory.value }
+                    : null,
                   expense: {
                     ...pick(values, ['description', 'type']),
                     accountingCategory: values.accountingCategory && pick(values.accountingCategory, ['id']),
@@ -472,6 +493,33 @@ export const HostCreateExpenseModal = ({
                             showCode
                             allowNone
                           />
+                        )}
+                      </StyledInputFormikField>
+                    )}
+                    {(balanceCategories.enabled || matchedBankAccountCategory) && (
+                      <StyledInputFormikField
+                        name="balanceAccountingCategory"
+                        required={false}
+                        label={<FormattedMessage defaultMessage="Paid from" id="jhYP1/" />}
+                      >
+                        {({ field }) => (
+                          <div data-cy="host-create-expense-balance-accounting-category">
+                            <BalanceAccountingCategoryPicker
+                              hostSlug={host?.slug}
+                              inputId={field.id}
+                              value={field.value}
+                              disabled={Boolean(matchedBankAccountCategory)}
+                              menuPortalTarget={null}
+                              onChange={value => setFieldValue(field.name, value)}
+                            />
+                            {Boolean(matchedBankAccountCategory) && (
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                <FormattedMessage
+                                  defaultMessage="This is set by the bank account of the matched transaction. You can change it in the bank connection settings." id="blDEUf"
+                                />
+                              </p>
+                            )}
+                          </div>
                         )}
                       </StyledInputFormikField>
                     )}
