@@ -971,7 +971,7 @@ const ContributionFlow = ({
         const newStepProfile = getDefaultStepProfile();
         const hasChangedEmail = previousEmail && previousEmail !== newStepProfile.email;
         setState(prev => ({ ...prev, stepProfile: newStepProfile, stepSummary: null, stepPayment: null }));
-        if (hasChangedEmail && ![STEPS.DETAILS, STEPS.PROFILE].includes(stateRef.current.step)) {
+        if (hasChangedEmail && ![STEPS.DETAILS, STEPS.PROFILE].includes(getCurrentStepName())) {
           pushStepRoute(STEPS.PROFILE); // Force user to re-fill profile
         }
       }
@@ -982,7 +982,14 @@ const ContributionFlow = ({
     prevLoggedInUserRef.current = LoggedInUser;
     prevContributorProfilesRef.current = contributorProfiles || [];
     prevLoadingLoggedInUserRef.current = loadingLoggedInUser;
-  }, [LoggedInUser, contributorProfiles, getDefaultStepProfile, loadingLoggedInUser, pushStepRoute]);
+  }, [
+    LoggedInUser,
+    contributorProfiles,
+    getCurrentStepName,
+    getDefaultStepProfile,
+    loadingLoggedInUser,
+    pushStepRoute,
+  ]);
   const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = state;
   const isLoading = isSubmitted || isSubmitting;
   const pastEvent = collective.type === CollectiveType.EVENT && isPastEvent(collective);
