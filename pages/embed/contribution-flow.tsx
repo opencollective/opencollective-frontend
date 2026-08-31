@@ -72,9 +72,15 @@ const EmbedContributionFlowPage = ({ collectiveSlug, tierId, error, queryParams 
   }, [postMessage]);
 
   React.useEffect(() => {
+    if (!account) {
+      return;
+    }
     const path = router.asPath;
-    const rawPath = path.replace(new RegExp(`^/embed/${account?.slug}/`), '/');
+    const rawPath = path.replace(new RegExp(`^/embed/${account.slug}/`), '/');
     addParentToURLIfMissing(router, account, rawPath, undefined, { prefix: '/embed' });
+  }, [account]);
+
+  React.useEffect(() => {
     postMessage('initialized');
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
