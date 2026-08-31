@@ -260,51 +260,14 @@ const ContributionFlow = ({
     };
   }, [contributorProfiles, getQueryParams]);
   const [state, setState] = useState(() => {
-    const queryParams = (isEmbed ? EmbedContributionFlowUrlQueryHelper : ContributionFlowUrlQueryHelper).decode(
-      router.query,
-    );
-    const getCurrentStepNameForInit = () => getQueryStringParam(router.query.step) || STEPS.DETAILS;
-    const canHavePlatformTipsForInit = () => {
-      const platformTipDisabledByExperiment =
-        isOpenSourceCollectiveHost(collective?.host) &&
-        isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, LoggedInUser, { collective });
-      if (platformTipDisabledByExperiment) {
-        return false;
-      }
-      return platformTipApplies(collective, tier);
-    };
-    const getDefaultStepProfileForInit = () => {
-      const profiles = contributorProfiles || [];
-      let contributorProfile;
-      if (queryParams.contributeAs && queryParams.contributeAs !== PERSONAL_PROFILE_ALIAS) {
-        if (queryParams.contributeAs === INCOGNITO_PROFILE_ALIAS) {
-          contributorProfile = profiles.find(({ account: { isIncognito } }) => isIncognito);
-        } else if (queryParams.contributeAs === 'me') {
-          contributorProfile = profiles.find(({ account: { type } }) => type === AccountType.INDIVIDUAL);
-        } else {
-          contributorProfile = profiles.find(({ account: { slug } }) => slug === queryParams.contributeAs);
-        }
-      }
-      if (contributorProfile) {
-        return contributorProfile.account;
-      } else if (profiles[0]?.account) {
-        return profiles[0].account;
-      }
-      return {
-        isGuest: true,
-        email: queryParams.email || '',
-        name: queryParams.name || '',
-        legalName: queryParams.legalName || '',
-      };
-    };
     return getInitialState({
       collective,
       tier,
       LoggedInUser,
-      queryParams,
-      getCurrentStepName: getCurrentStepNameForInit,
-      getDefaultStepProfile: getDefaultStepProfileForInit,
-      canHavePlatformTips: canHavePlatformTipsForInit,
+      queryParams: getQueryParams(),
+      getCurrentStepName,
+      getDefaultStepProfile,
+      canHavePlatformTips,
     });
   });
   const stateRef = useRef(state);
