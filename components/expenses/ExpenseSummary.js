@@ -244,6 +244,14 @@ const ExpenseSummary = ({
             />
           </React.Fragment>
         )}
+        {Boolean(expense?.balanceAccountingCategory) && (
+          <span
+            className="max-w-40 truncate rounded-lg bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800"
+            title={intl.formatMessage({ defaultMessage: 'Balance / clearing account', id: '7XkFoL' })}
+          >
+            {`${expense.balanceAccountingCategory.code} - ${expense.balanceAccountingCategory.name}`}
+          </span>
+        )}
         <Tags expense={expense} canEdit={canEditTags} />
       </div>
       <Flex alignItems="center" mt="12px">

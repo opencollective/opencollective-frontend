@@ -264,6 +264,12 @@ export const expensePageExpenseFieldsFragment = gql`
       id
       ...AccountingCategorySelectFields
     }
+    balanceAccountingCategory {
+      id
+      code
+      name
+      friendlyName
+    }
     valuesByRole {
       id
       ...ExpenseValuesByRoleFragment

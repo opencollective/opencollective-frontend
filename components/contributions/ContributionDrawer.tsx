@@ -10,7 +10,7 @@ import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
-import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
+import { AccountingCategorySelectFieldsFragment, getCategoryLabel } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
 import { CopyIDDropdown } from '../CopyId';
 import DateTime from '../DateTime';
@@ -99,6 +99,12 @@ const contributionDrawerQuery = gql`
         rate
       }
       accountingCategory {
+        id
+        name
+        friendlyName
+        code
+      }
+      balanceAccountingCategory {
         id
         name
         friendlyName
@@ -585,6 +591,16 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
                       ) : null}
                     </DataListItemValue>
                   </DataListItem>
+                  {query.data?.order?.balanceAccountingCategory && (
+                    <DataListItem>
+                      <DataListItemLabel>
+                        <FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />
+                      </DataListItemLabel>
+                      <DataListItemValue>
+                        {getCategoryLabel(intl, query.data.order.balanceAccountingCategory, true)}
+                      </DataListItemValue>
+                    </DataListItem>
+                  )}
                   {query.data?.order?.status === OrderStatus.PENDING && (
                     <React.Fragment>
                       {query.data.order.pendingContributionData?.ponumber && (
