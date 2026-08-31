@@ -70,7 +70,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
   });
 
   return (
-    <StyledModal onClose={props.onClose} hasUnsavedChanges={formik.dirty}>
+    <StyledModal onClose={props.onClose} hasUnsavedChanges={formik.dirty} width="100%" maxWidth={576}>
       <ModalHeader>
         <FormattedMessage defaultMessage="Create accounting category" id="M+dnU9" />
       </ModalHeader>

@@ -18,6 +18,8 @@ import {
   AccountingCategoryAppliesToI18n,
   AccountingCategoryForm,
   AccountingCategoryKindI18n,
+  AccountingCategoryTypeLabel,
+  isBalanceSheetKind,
   useAccountingCategoryFormik,
 } from './AccountingCategoryForm';
 
@@ -76,8 +78,6 @@ type AccountingCategoryDrawerViewProps = {
 };
 
 function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) {
-  const intl = useIntl();
-
   return (
     <React.Fragment>
       <DataList className="text-sm">
@@ -96,41 +96,40 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
           <DataListItemLabel>
             <FormattedMessage defaultMessage="Category name" id="kgVqk1" />
           </DataListItemLabel>
-          <DataListItemValue>{props.accountingCategory?.name}</DataListItemValue>
+          <DataListItemValue>
+            <div className="flex flex-col">
+              <span>{props.accountingCategory?.name}</span>
+              {props.accountingCategory?.friendlyName && (
+                <span className="text-xs text-muted-foreground italic">{props.accountingCategory.friendlyName}</span>
+              )}
+            </div>
+          </DataListItemValue>
         </DataListItem>
 
-        {props.accountingCategory?.friendlyName && (
-          <DataListItem>
-            <DataListItemLabel>
-              <FormattedMessage id="AccountingCategory.friendlyName" defaultMessage="Friendly name" />
-            </DataListItemLabel>
-            <DataListItemValue className="italic">{props.accountingCategory?.friendlyName}</DataListItemValue>
-          </DataListItem>
-        )}
+        <DataListItem>
+          <DataListItemLabel>
+            <FormattedMessage defaultMessage="Type" id="Type" />
+          </DataListItemLabel>
+          <DataListItemValue>
+            {props.accountingCategory?.kind && (
+              <AccountingCategoryTypeLabel
+                kind={props.accountingCategory.kind}
+                expensesTypes={props.accountingCategory.expensesTypes}
+              />
+            )}
+          </DataListItemValue>
+        </DataListItem>
 
-        {props.hasHosting && (
+        {props.hasHosting && !isBalanceSheetKind(props.accountingCategory?.kind) && (
           <DataListItem>
             <DataListItemLabel>
               <FormattedMessage defaultMessage="Applies to" id="6WqHWi" />
             </DataListItemLabel>
             <DataListItemValue>
-              {props.accountingCategory?.appliesTo && (
-                <FormattedMessage {...AccountingCategoryAppliesToI18n[props.accountingCategory?.appliesTo]} />
-              )}
+              <FormattedMessage {...AccountingCategoryAppliesToI18n[props.accountingCategory?.appliesTo || 'ALL']} />
             </DataListItemValue>
           </DataListItem>
         )}
-
-        <DataListItem>
-          <DataListItemLabel>
-            <FormattedMessage defaultMessage="Kind" id="Transaction.Kind" />
-          </DataListItemLabel>
-          <DataListItemValue>
-            {props.accountingCategory?.kind && (
-              <FormattedMessage {...AccountingCategoryKindI18n[props.accountingCategory?.kind]} />
-            )}
-          </DataListItemValue>
-        </DataListItem>
 
         <DataListItem>
           <DataListItemLabel>
@@ -148,21 +147,6 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
             )}
           </DataListItemValue>
         </DataListItem>
-
-        {props.accountingCategory?.kind === AccountingCategoryKind.EXPENSE && (
-          <DataListItem>
-            <DataListItemLabel>
-              <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
-            </DataListItemLabel>
-            <DataListItemValue>
-              {props.accountingCategory?.expensesTypes ? (
-                props.accountingCategory.expensesTypes.map(value => i18nExpenseType(intl, value)).join(', ')
-              ) : (
-                <FormattedMessage id="AllExpenses" defaultMessage="All expenses" />
-              )}
-            </DataListItemValue>
-          </DataListItem>
-        )}
 
         {!isEmptyHTMLValue(props.accountingCategory?.instructions) && (
           <React.Fragment>
