@@ -229,9 +229,9 @@ const ExpenseSummary = ({
         </div>
       )}
 
-      <div className="flex items-baseline gap-2">
-        {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, collective?.host || host) && (
-          <React.Fragment>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-baseline gap-2">
+          {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, collective?.host || host) && (
             <ExpenseAccountingCategoryPill
               host={host}
               account={expense.account}
@@ -243,8 +243,9 @@ const ExpenseSummary = ({
               allowNone={!isLoggedInUserExpenseHostAdmin}
               showCodeInSelect={isLoggedInUserExpenseHostAdmin}
             />
-          </React.Fragment>
-        )}
+          )}
+          <Tags expense={expense} canEdit={canEditTags} />
+        </div>
         {expense && host && (
           <ExpenseBalanceAccountingCategoryPill
             expense={expense}
@@ -252,10 +253,10 @@ const ExpenseSummary = ({
             canEdit={
               isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') && Boolean(expense.permissions?.canEditAccountingCategory)
             }
-            emptyLabel={<FormattedMessage defaultMessage="Paid from" id="jhYP1/" />}
+            label={<FormattedMessage defaultMessage="Paid from" id="jhYP1/" />}
+            emptyLabel={<FormattedMessage defaultMessage="Not set" id="p5LNtB" />}
           />
         )}
-        <Tags expense={expense} canEdit={canEditTags} />
       </div>
       <Flex alignItems="center" mt="12px">
         {isLoading && !expense ? (

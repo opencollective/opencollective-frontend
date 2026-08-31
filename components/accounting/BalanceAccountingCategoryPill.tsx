@@ -61,6 +61,7 @@ const BalanceAccountingCategoryPill = ({
   selectedCategory,
   canEdit,
   loading,
+  label,
   emptyLabel,
   onChange,
 }: {
@@ -69,15 +70,27 @@ const BalanceAccountingCategoryPill = ({
   selectedCategory: PillCategory | null;
   canEdit: boolean;
   loading?: boolean;
+  /** When set, rendered as a muted prefix; only shows when the pill itself renders */
+  label?: React.ReactNode;
   emptyLabel: React.ReactNode;
   onChange: (category: PillCategory | null) => void | Promise<void>;
 }) => {
   const { enabled, categories } = useBalanceAccountingCategories(canEdit ? host?.slug : undefined);
+  const withLabel = (pill: React.ReactNode) =>
+    !label ? (
+      pill
+    ) : (
+      <div className="flex items-center gap-2">
+        <span className="shrink-0 text-xs text-muted-foreground">{label}</span>
+        {pill}
+      </div>
+    );
+
   if (!canEdit || !enabled) {
-    return selectedCategory ? <span className={BADGE_CLASS}>{getLabel(selectedCategory)}</span> : null;
+    return selectedCategory ? withLabel(<span className={BADGE_CLASS}>{getLabel(selectedCategory)}</span>) : null;
   }
 
-  return (
+  return withLabel(
     <AccountingCategorySelect
       kind="BALANCE_ACCOUNT"
       host={{ ...host, accountingCategories: { nodes: categories } }}
@@ -93,7 +106,7 @@ const BalanceAccountingCategoryPill = ({
         </span>
         {loading ? <Spinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
-    </AccountingCategorySelect>
+    </AccountingCategorySelect>,
   );
 };
 
@@ -101,6 +114,7 @@ export const ExpenseBalanceAccountingCategoryPill = ({
   expense,
   host,
   canEdit,
+  label,
   emptyLabel,
 }: {
   expense: Pick<Expense, 'id'> & {
@@ -109,6 +123,7 @@ export const ExpenseBalanceAccountingCategoryPill = ({
   };
   host: PillHost;
   canEdit: boolean;
+  label?: React.ReactNode;
   emptyLabel: React.ReactNode;
 }) => {
   const intl = useIntl();
@@ -121,6 +136,7 @@ export const ExpenseBalanceAccountingCategoryPill = ({
       selectedCategory={expense.balanceAccountingCategory}
       canEdit={canEdit}
       loading={loading}
+      label={label}
       emptyLabel={emptyLabel}
       onChange={async category => {
         try {
