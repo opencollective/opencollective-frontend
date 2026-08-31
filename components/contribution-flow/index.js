@@ -947,7 +947,7 @@ const ContributionFlow = ({
   const currency = tier?.amount.currency || collective.currency;
   const currentStepName = getCurrentStepName();
   if (currentStepName === STEPS.SUCCESS) {
-    return <ContributionFlowSuccess collective={collective} />;
+    return <ContributionFlowSuccess collective={collective} isEmbed={isEmbed} />;
   }
   return (
     <Steps
