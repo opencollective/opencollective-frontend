@@ -181,6 +181,12 @@ export const managedOrderFragment = gql`
       kind
       code
     }
+    balanceAccountingCategory {
+      id
+      name
+      kind
+      code
+    }
   }
   ${accountHoverCardFields}
   ${paymentMethodFragment}

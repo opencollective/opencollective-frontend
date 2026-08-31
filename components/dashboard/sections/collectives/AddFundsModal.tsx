@@ -34,6 +34,11 @@ import { quickCreateVendorCollectivePickerOptions } from '@/components/vendors/Q
 import { useQuickCreateVendor } from '@/components/vendors/useQuickCreateVendor';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
+import {
+  BalanceAccountingCategoryPicker,
+  getBalanceAccountingCategoryOption,
+  useBalanceAccountingCategories,
+} from '../../../accounting/BalanceAccountingCategoryPicker';
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
 import Avatar from '../../../Avatar';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../../../collective-page/graphql/queries';
@@ -144,6 +149,12 @@ const addFundsOrderFieldsFragment = gql`
       name
       kind
     }
+    balanceAccountingCategory {
+      id
+      code
+      name
+      kind
+    }
     tier {
       id
       legacyId
@@ -167,6 +178,7 @@ const addFundsMutation = gql`
     $invoiceTemplate: String
     $tax: TaxInput
     $accountingCategory: AccountingCategoryReferenceInput
+    $balanceAccountingCategory: AccountingCategoryReferenceInput
     $transactionsImportRow: TransactionsImportRowReferenceInput
   ) {
     addFunds(
@@ -182,6 +194,7 @@ const addFundsMutation = gql`
       invoiceTemplate: $invoiceTemplate
       tax: $tax
       accountingCategory: $accountingCategory
+      balanceAccountingCategory: $balanceAccountingCategory
       transactionsImportRow: $transactionsImportRow
     ) {
       id
@@ -206,6 +219,7 @@ const editAddedFundsMutation = gql`
     $invoiceTemplate: String
     $tax: TaxInput
     $accountingCategory: AccountingCategoryReferenceInput
+    $balanceAccountingCategory: AccountingCategoryReferenceInput
   ) {
     editAddedFunds(
       order: $order
@@ -221,6 +235,7 @@ const editAddedFundsMutation = gql`
       invoiceTemplate: $invoiceTemplate
       tax: $tax
       accountingCategory: $accountingCategory
+      balanceAccountingCategory: $balanceAccountingCategory
     ) {
       id
       ...AddFundsOrderFields
@@ -383,6 +398,7 @@ type AddFundsFormValues = {
   transactionsImportRow?: TransactionReferenceInput | null;
   invoiceTemplate?: { value: string };
   accountingCategory?: { id: string };
+  balanceAccountingCategory?: { value: string; label: string } | null;
   hasHostFee?: boolean;
   hasPaymentProcessorFee?: boolean;
 };
@@ -479,6 +495,7 @@ const AddFundsModalContentWithCollective = ({
   initialValues,
   onSuccess,
   editOrderId,
+  transactionsImportRow,
 }: {
   collective: Pick<Account, 'slug'>;
   fundDetails: FundDetails;
@@ -488,6 +505,13 @@ const AddFundsModalContentWithCollective = ({
   initialValues?: Partial<AddFundsFormValues>;
   onSuccess?: (order: Order) => void;
   editOrderId?: string;
+  transactionsImportRow?: {
+    institutionAccount?: {
+      id: string;
+      name: string;
+      balanceAccountingCategory?: { id: string; code: string; name: string } | null;
+    } | null;
+  } | null;
 }) => {
   const intl = useIntl();
   const [isAmountLocked, setIsAmountLocked] = React.useState(Boolean(initialValues?.amount));
@@ -529,6 +553,8 @@ const AddFundsModalContentWithCollective = ({
 
   const tiersNodes = get(data, 'account.tiers.nodes');
   const tiersOptions = React.useMemo(() => getTiersOptions(intl, tiersNodes), [intl, tiersNodes]);
+  const balanceCategories = useBalanceAccountingCategories(host?.slug);
+  const matchedBankAccountCategory = transactionsImportRow?.institutionAccount?.balanceAccountingCategory;
 
   // From the Collective page we pass collective as API v1 objects
   // From the Host dashboard we pass collective as API v2 objects
@@ -565,7 +591,14 @@ const AddFundsModalContentWithCollective = ({
 
   return (
     <Formik
-      initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account, ...initialValues })}
+      initialValues={getInitialValues({
+        hostFeePercent: defaultHostFeePercent,
+        account,
+        ...(matchedBankAccountCategory
+          ? { balanceAccountingCategory: getBalanceAccountingCategoryOption(matchedBankAccountCategory) }
+          : {}),
+        ...initialValues,
+      })}
       enableReinitialize={true}
       validate={values => validate(intl, values)}
       onSubmit={async (values, formik) => {
@@ -586,6 +619,9 @@ const AddFundsModalContentWithCollective = ({
               processedAt: values.processedAt ? new Date(values.processedAt) : null,
               tax: values.tax,
               accountingCategory: values.accountingCategory ? { id: values.accountingCategory.id } : null,
+              balanceAccountingCategory: values.balanceAccountingCategory
+                ? { id: values.balanceAccountingCategory.value }
+                : null,
               ...(isEdit && { order: { id: editOrderId } }),
             },
           });
@@ -1109,6 +1145,39 @@ const AddFundsModalContentWithCollective = ({
                       )}
                     </Field>
                   )}
+                  {(balanceCategories.enabled || matchedBankAccountCategory) && (
+                    <Field
+                      name="balanceAccountingCategory"
+                      htmlFor="addFunds-balanceAccountingCategory"
+                      required={false}
+                      label={
+                        <FormattedMessage
+                          defaultMessage="Received in" id="4Nv47+"
+                        />
+                      }
+                      mt={3}
+                    >
+                      {({ form, field }) => (
+                        <div data-cy="add-funds-balance-accounting-category">
+                          <BalanceAccountingCategoryPicker
+                            hostSlug={host?.slug}
+                            inputId={field.id}
+                            value={field.value}
+                            disabled={Boolean(matchedBankAccountCategory)}
+                            menuPortalTarget={null}
+                            onChange={value => form.setFieldValue(field.name, value)}
+                          />
+                          {Boolean(matchedBankAccountCategory) && (
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              <FormattedMessage
+                                defaultMessage="This is set by the bank account of the matched transaction. You can change it in the bank connection settings." id="blDEUf"
+                              />
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </Field>
+                  )}
                   <Field
                     name="description"
                     htmlFor="addFunds-description"
@@ -1388,7 +1457,13 @@ const AddFundsModal = ({
   initialValues?: Partial<AddFundsFormValues>;
   onSuccess?: (order: Order) => void;
   transactionsImportRow?: TransactionReferenceInput &
-    React.ComponentProps<typeof TransactionsImportRowDetails>['transactionsImportRow'];
+    React.ComponentProps<typeof TransactionsImportRowDetails>['transactionsImportRow'] & {
+      institutionAccount?: {
+        id: string;
+        name: string;
+        balanceAccountingCategory?: { id: string; code: string; name: string } | null;
+      } | null;
+    };
   editOrderId?: string;
   onClose: () => void;
 }) => {
@@ -1442,6 +1517,7 @@ const AddFundsModal = ({
           initialValues={initialValues}
           onSelectOtherAccount={!collective && (() => setHasConfirmedCollective(false))}
           onSuccess={onSuccess}
+          transactionsImportRow={transactionsImportRow}
           {...props}
         />
       ) : !host ? (
