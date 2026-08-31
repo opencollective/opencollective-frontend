@@ -403,6 +403,17 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
                     />
                   )
                 )}
+                {!isLoading && query.data?.order && (
+                  <OrderBalanceAccountingCategoryPill
+                    order={query.data.order}
+                    host={query.data.order.toAccount?.['host']}
+                    account={query.data.order.toAccount}
+                    canEdit={Boolean(
+                      query.data.order.permissions?.canUpdateAccountingCategory && query.data.order.toAccount?.['host'],
+                    )}
+                    emptyLabel={<FormattedMessage defaultMessage="Received in" id="4Nv47+" />}
+                  />
+                )}
                 <div>
                   {isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -592,26 +603,6 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
                       ) : null}
                     </DataListItemValue>
                   </DataListItem>
-                  {(query.data?.order?.balanceAccountingCategory ||
-                    query.data?.order?.permissions?.canUpdateAccountingCategory) && (
-                    <DataListItem>
-                      <DataListItemLabel>
-                        <FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />
-                      </DataListItemLabel>
-                      <DataListItemValue>
-                        <OrderBalanceAccountingCategoryPill
-                          order={query.data.order}
-                          host={query.data.order.toAccount?.['host']}
-                          account={query.data.order.toAccount}
-                          canEdit={Boolean(
-                            query.data.order.permissions?.canUpdateAccountingCategory &&
-                              query.data.order.toAccount?.['host'],
-                          )}
-                          emptyLabel={<FormattedMessage defaultMessage="Not set" id="p5LNtB" />}
-                        />
-                      </DataListItemValue>
-                    </DataListItem>
-                  )}
                   {query.data?.order?.status === OrderStatus.PENDING && (
                     <React.Fragment>
                       {query.data.order.pendingContributionData?.ponumber && (
