@@ -26970,6 +26970,21 @@ type Mutation {
   ): Expense!
 
   """
+  Update the balance/clearing accounting category of an expense. Scope: "expenses".
+  """
+  updateExpenseBalanceAccountingCategory(
+    """
+    Reference to the expense to update
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    The balance/clearing accounting category to set. Pass null to unset.
+    """
+    accountingCategory: AccountingCategoryReferenceInput
+  ): Expense!
+
+  """
   Delete an expense. Only work if the expense is rejected - please check permissions.canDelete. Scope: "expenses".
   """
   deleteExpense(
@@ -27632,6 +27647,21 @@ type Mutation {
     """
     platformTipAmount: AmountInput
   ): Order
+
+  """
+  Update the balance/clearing accounting category of an order. Scope: "orders".
+  """
+  updateOrderBalanceAccountingCategory(
+    """
+    Reference to the Order to update
+    """
+    order: OrderReferenceInput!
+
+    """
+    The balance/clearing accounting category to set. Pass null to unset.
+    """
+    accountingCategory: AccountingCategoryReferenceInput
+  ): Order!
 
   """
   Update the accounting category of an order. Scope: "orders".

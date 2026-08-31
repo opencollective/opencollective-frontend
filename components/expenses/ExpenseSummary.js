@@ -16,6 +16,7 @@ import { getExpenseExchangeRateWarningOrError } from './lib/utils';
 import { isFeatureEnabled } from '@/lib/allowed-features';
 
 import { AccountHoverCard } from '../AccountHoverCard';
+import { ExpenseBalanceAccountingCategoryPill } from '../accounting/BalanceAccountingCategoryPill';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -244,13 +245,15 @@ const ExpenseSummary = ({
             />
           </React.Fragment>
         )}
-        {Boolean(expense?.balanceAccountingCategory) && (
-          <span
-            className="max-w-40 truncate rounded-lg bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800"
-            title={intl.formatMessage({ defaultMessage: 'Balance / clearing account', id: '7XkFoL' })}
-          >
-            {`${expense.balanceAccountingCategory.code} - ${expense.balanceAccountingCategory.name}`}
-          </span>
+        {expense && host && (
+          <ExpenseBalanceAccountingCategoryPill
+            expense={expense}
+            host={host}
+            canEdit={
+              isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') && Boolean(expense.permissions?.canEditAccountingCategory)
+            }
+            emptyLabel={<FormattedMessage defaultMessage="Paid from" id="jhYP1/" />}
+          />
         )}
         <Tags expense={expense} canEdit={canEditTags} />
       </div>

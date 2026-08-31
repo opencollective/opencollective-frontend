@@ -193,6 +193,7 @@ const getOptions = (
   account: Pick<Account, 'id'> & { parent?: Pick<Account, 'id'> },
 ): AccountingCategoryOption[] => {
   const contributionCategories = ['CONTRIBUTION', 'ADDED_FUNDS'];
+  const balanceSheetCategories = ['BALANCE_ACCOUNT', 'CLEARING_ACCOUNT'];
   const possibleFields = ACCOUNTING_CATEGORY_HOST_FIELDS;
   const categories = uniq([...possibleFields.map(field => get(host, `${field}.nodes`, [])).flat()]);
   const options: AccountingCategoryOption[] = [];
@@ -202,6 +203,8 @@ const getOptions = (
     remove(categories, category => !isSupportedExpenseCategory(expenseType, category, isHostAdmin));
   } else if (contributionCategories.includes(kind)) {
     remove(categories, category => !contributionCategories.includes(category.kind));
+  } else if (balanceSheetCategories.includes(kind)) {
+    remove(categories, category => !balanceSheetCategories.includes(category.kind));
   }
 
   const expectedAppliesTo =
@@ -209,8 +212,10 @@ const getOptions = (
       ? AccountingCategoryAppliesTo.HOST
       : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES;
 
-  // Allow categories that either match the expected appliesTo or have no appliesTo (meaning they apply to both)
-  remove(categories, category => category.appliesTo && category.appliesTo !== expectedAppliesTo);
+  // Balance sheet accounts are the host's own; appliesTo does not restrict them
+  if (!balanceSheetCategories.includes(kind)) {
+    remove(categories, category => category.appliesTo && category.appliesTo !== expectedAppliesTo);
+  }
 
   categories.forEach(category => {
     options.push({

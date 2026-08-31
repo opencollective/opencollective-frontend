@@ -19,6 +19,8 @@ export const balanceAccountingCategoryPickerQuery = gql`
           id
           code
           name
+          friendlyName
+          kind
         }
       }
     }
@@ -47,7 +49,8 @@ export const useBalanceAccountingCategories = (hostSlug: string | undefined) => 
   );
 
   const enabled = Boolean(hostSlug) && contextFeature !== false && (options.length > 0 || loading);
-  return { enabled, loading, options };
+  const categories = data?.host?.balanceAccountingCategories?.nodes || [];
+  return { enabled, loading, options, categories };
 };
 
 export const BalanceAccountingCategoryPicker = ({

@@ -580,12 +580,18 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                       )
                     }
                   />
-                  {transaction.balanceAccountingCategory && (
-                    <DataListItem
-                      label={<FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />}
-                      value={getCategoryLabel(intl, transaction.balanceAccountingCategory, true)}
-                    />
-                  )}
+                  <DataListItem
+                    label={<FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />}
+                    value={
+                      transaction.balanceAccountingCategory ? (
+                        getCategoryLabel(intl, transaction.balanceAccountingCategory, true)
+                      ) : (
+                        <span className="text-muted-foreground">
+                          <FormattedMessage defaultMessage="Not set" id="p5LNtB" />
+                        </span>
+                      )
+                    }
+                  />
                   <DataListItem
                     label={<FormattedMessage defaultMessage="Group ID" id="nBKj/i" />}
                     value={
