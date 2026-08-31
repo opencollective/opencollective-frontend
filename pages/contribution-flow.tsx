@@ -52,12 +52,14 @@ const ContributionFlowPage = ({ collectiveSlug, tierId, error }: ContributionFlo
   const me = data?.me;
 
   React.useEffect(() => {
+    if (!account) {
+      return;
+    }
     const queryParameters = {
       ...omit(router.query, ['verb', 'step', 'collectiveSlug']),
     };
     addParentToURLIfMissing(router, account, `/${router.query.verb}/${router.query.step ?? ''}`, queryParameters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- preserve componentDidMount behavior
-  }, []);
+  }, [account]);
 
   const accountHost = account?.host;
 
