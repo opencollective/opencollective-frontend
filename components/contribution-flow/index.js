@@ -871,21 +871,26 @@ const ContributionFlow = ({
           onError: e => setState(prev => ({ ...prev, isSubmitting: false, error: e.message })),
           // New callback, used by `PayWithPaypalButton`
           onSuccess: paypalInfo => {
-            setState(prev => {
-              const next = {
-                ...prev,
-                stepPayment: {
-                  ...prev.stepPayment,
-                  paymentMethod: {
-                    service: PAYMENT_METHOD_SERVICE.PAYPAL,
-                    type: PAYMENT_METHOD_TYPE.PAYMENT,
-                    paypalInfo,
-                  },
+            const next = {
+              ...stateRef.current,
+              stepPayment: {
+                ...stateRef.current.stepPayment,
+                paymentMethod: {
+                  service: PAYMENT_METHOD_SERVICE.PAYPAL,
+                  type: PAYMENT_METHOD_TYPE.PAYMENT,
+                  paypalInfo,
                 },
-              };
-              Promise.resolve().then(() => submitOrderRef.current?.());
-              return next;
-            });
+              },
+            };
+            setState(prev => ({
+              ...prev,
+              stepPayment: {
+                ...prev.stepPayment,
+                paymentMethod: next.stepPayment.paymentMethod,
+              },
+            }));
+            stateRef.current = next;
+            Promise.resolve().then(() => submitOrderRef.current?.());
           },
         };
       }
@@ -895,21 +900,11 @@ const ContributionFlow = ({
   const setStateAndUpdateRoute = useCallback(
     data => {
       // Clear error when payment method changes
-      if (data.stepPayment && data.stepPayment.key !== stateRef.current.stepPayment?.key) {
-        setState(prev => {
-          const next = { ...prev, ...data, error: null };
-          stateRef.current = next;
-          Promise.resolve().then(() => updateRouteFromState(next));
-          return next;
-        });
-      } else {
-        setState(prev => {
-          const next = { ...prev, ...data };
-          stateRef.current = next;
-          Promise.resolve().then(() => updateRouteFromState(next));
-          return next;
-        });
-      }
+      const shouldClearError = Boolean(data.stepPayment && data.stepPayment.key !== stateRef.current.stepPayment?.key);
+      const next = { ...stateRef.current, ...data, ...(shouldClearError ? { error: null } : null) };
+      setState(prev => ({ ...prev, ...data, ...(shouldClearError ? { error: null } : null) }));
+      stateRef.current = next;
+      Promise.resolve().then(() => updateRouteFromState(next));
     },
     [updateRouteFromState],
   );
