@@ -207,9 +207,10 @@ const ContributionFlow = ({
   const formRef = useRef(null);
   const stepSummaryRef = useRef(null);
   // OSC-only A/B: half of OSC contributors that would otherwise see the tip get the tip step hidden.
-  // Cached on the instance so the variant is stable for the duration of the flow.
-  const platformTipDisabledByExperimentRef = useRef(
-    isOpenSourceCollectiveHost(collective?.host) &&
+  // The variant is randomized, so it's rolled once on mount to stay stable for the duration of the flow.
+  const [platformTipDisabledByExperiment] = useState(
+    () =>
+      isOpenSourceCollectiveHost(collective?.host) &&
       isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, LoggedInUser, { collective }),
   );
   const getQueryHelper = useCallback(() => {
@@ -223,11 +224,11 @@ const ContributionFlow = ({
     return getQueryStringParam(router.query.step) || STEPS.DETAILS;
   }, [router.query.step]);
   const canHavePlatformTips = useCallback(() => {
-    if (platformTipDisabledByExperimentRef.current) {
+    if (platformTipDisabledByExperiment) {
       return false;
     }
     return platformTipApplies(collective, tier);
-  }, [collective, tier]);
+  }, [collective, platformTipDisabledByExperiment, tier]);
   const isOscTipExperimentActive = useCallback(() => {
     return isOscTipExperiment(collective, tier);
   }, [collective, tier]);
