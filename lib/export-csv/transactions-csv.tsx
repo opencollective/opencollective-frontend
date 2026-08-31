@@ -9,6 +9,8 @@ export const HOST_OMITTED_FIELDS = ['balance', 'hostSlug', 'hostName', 'hostType
 export type CSVField =
   | 'accountingCategoryCode'
   | 'accountingCategoryName'
+  | 'balanceAccountingCategoryCode'
+  | 'balanceAccountingCategoryName'
   | 'date'
   | 'datetime'
   | 'effectiveDate'
@@ -101,6 +103,8 @@ export type CSVField =
 export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   accountingCategoryCode: 'Accounting Category Code',
   accountingCategoryName: 'Accounting Category Name',
+  balanceAccountingCategoryCode: 'Balance Accounting Category Code',
+  balanceAccountingCategoryName: 'Balance Accounting Category Name',
   date: 'Date',
   datetime: 'Date & Time',
   effectiveDate: 'Effective Date',
@@ -348,6 +352,26 @@ export const FIELDS: Array<{
       />
     ),
     label: 'Accounting Category Name',
+  },
+  {
+    id: 'balanceAccountingCategoryCode',
+    group: 'transaction',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The code of the balance or clearing account the funds moved through. Only populated for host admins and accountants." id="WBgXkF"
+      />
+    ),
+    label: 'Balance Accounting Category Code',
+  },
+  {
+    id: 'balanceAccountingCategoryName',
+    group: 'transaction',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The name of the balance or clearing account the funds moved through. Only populated for host admins and accountants." id="CXoWMO"
+      />
+    ),
+    label: 'Balance Accounting Category Name',
   },
   {
     id: 'merchantId',
