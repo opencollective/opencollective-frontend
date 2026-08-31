@@ -47,6 +47,11 @@ export const TransactionImportListFieldsFragment = gql`
       type
       subtype
       mask
+      balanceAccountingCategory {
+        id
+        code
+        name
+      }
     }
     assignments {
       ...TransactionsImportAssignmentFields
@@ -81,6 +86,15 @@ export const TransactionsImportRowFieldsFragment = gql`
     amount {
       valueInCents
       currency
+    }
+    institutionAccount {
+      id
+      name
+      balanceAccountingCategory {
+        id
+        code
+        name
+      }
     }
     assignedAccounts {
       id
