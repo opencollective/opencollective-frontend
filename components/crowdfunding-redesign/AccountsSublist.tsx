@@ -5,7 +5,8 @@ import { useRouter } from 'next/router';
 
 import type { AccountMetricsFragment } from '../../lib/graphql/types/v2/graphql';
 
-import { getPercentageDifference } from '../dashboard/sections/overview/Metric';
+import { getPercentageDifference } from '@/components/metrics';
+
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
 import { Button } from '../ui/Button';

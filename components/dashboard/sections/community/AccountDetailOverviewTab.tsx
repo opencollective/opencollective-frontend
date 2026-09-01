@@ -19,6 +19,7 @@ import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
+import { Metric } from '@/components/metrics';
 import StackedAvatars from '@/components/StackedAvatars';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -28,7 +29,6 @@ import { getEffectiveVendorPolicyLabel, VendorContactTag } from '@/components/ve
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
-import { Metric } from '../overview/Metric';
 import { transactionsTableQuery } from '../transactions/queries';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';

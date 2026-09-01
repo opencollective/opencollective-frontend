@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import dayjs from '@/lib/dayjs';
 import type {
+  Amount,
   Currency,
   HostedAccountContributionTypesQuery,
   HostedAccountContributionTypesQueryVariables,
@@ -11,13 +12,17 @@ import type {
   HostedAccountFinancialActivityQueryVariables,
   HostedAccountTransactionSizesQuery,
   HostedAccountTransactionSizesQueryVariables,
+  TimeUnit,
 } from '@/lib/graphql/types/v2/graphql';
 import { HostedCollectivesTransactionSizesKindClass as KindClass } from '@/lib/graphql/types/v2/graphql';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
+import { Metric, type MetricChartView, type MetricViewMode } from '@/components/metrics';
 
+import { AmountBandHistogram } from './AmountBandHistogram';
+import { ContributionTypeDonut } from './ContributionTypeDonut';
 import { bandHistogram, buildKindActivity, contributionTypeShares } from './financialActivity';
-import { HostedAccountKindActivityCard } from './HostedAccountKindActivityCard';
+import { HostedAccountKindOverTimeChart } from './HostedAccountKindOverTimeChart';
 import {
   hostedAccountContributionTypesQuery,
   hostedAccountFinancialActivityQuery,
@@ -27,24 +32,48 @@ import type { HostedAccountProfileData } from './types';
 
 const CONTRIBUTIONS_COLOR = '#14b8a6';
 const PAYOUTS_COLOR = '#dc2626';
-// All-time, monthly. "From" is intentionally well before Open Collective existed; the over-time
-// chart trims leading empty months so it starts at the account's first activity.
-const TIME_UNIT = 'MONTH';
 const ALL_TIME_FROM = '2015-01-01T00:00:00.000Z';
+
+type PeriodAmount = {
+  current?: Amount | null;
+  comparison?: Amount | null;
+};
+
+type PeriodCount = {
+  current?: number | null;
+  comparison?: number | null;
+};
 
 type HostedAccountContributionsPayoutsSectionProps = {
   account?: HostedAccountProfileData;
   hostSlug: string;
+  dateFrom?: string;
+  dateTo?: string;
+  timeUnit: TimeUnit;
+  received?: PeriodAmount | null;
+  spent?: PeriodAmount | null;
+  contributionsCount?: PeriodCount | null;
+  statsLoading?: boolean;
 };
 
 export function HostedAccountContributionsPayoutsSection({
   account,
   hostSlug,
+  dateFrom,
+  dateTo,
+  timeUnit,
+  received,
+  spent,
+  contributionsCount,
+  statsLoading,
 }: HostedAccountContributionsPayoutsSectionProps) {
   const intl = useIntl();
   const contributionsLabel = intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' });
   const payoutsLabel = intl.formatMessage({ defaultMessage: 'Payouts', id: 'Payouts' });
-  const dateRange = React.useMemo(() => ({ from: ALL_TIME_FROM, to: dayjs.utc().toISOString() }), []);
+  const dateRange = React.useMemo(
+    () => ({ from: dateFrom ?? ALL_TIME_FROM, to: dateTo ?? dayjs.utc().toISOString() }),
+    [dateFrom, dateTo],
+  );
 
   const { data, loading, error } = useQuery<
     HostedAccountFinancialActivityQuery,
@@ -53,7 +82,7 @@ export function HostedAccountContributionsPayoutsSection({
     variables: {
       hostSlug,
       dateRange,
-      timeUnit: TIME_UNIT as HostedAccountFinancialActivityQueryVariables['timeUnit'],
+      timeUnit: timeUnit as HostedAccountFinancialActivityQueryVariables['timeUnit'],
       accountFilter: { mainAccount: { eq: { id: account?.id } } },
       groupByAccount: false,
     },
@@ -103,24 +132,91 @@ export function HostedAccountContributionsPayoutsSection({
       buildKindActivity(rows, {
         amountMeasure: 'amountReceived',
         countMeasure: 'contributionsCount',
-        timeUnit: TIME_UNIT,
+        timeUnit,
         dateFrom: dateRange.from,
         dateTo: dateRange.to,
         currency,
       }),
-    [rows, dateRange, currency],
+    [rows, dateRange, currency, timeUnit],
   );
   const payouts = React.useMemo(
     () =>
       buildKindActivity(rows, {
         amountMeasure: 'amountSpent',
         countMeasure: 'payoutsCount',
-        timeUnit: TIME_UNIT,
+        timeUnit,
         dateFrom: dateRange.from,
         dateTo: dateRange.to,
         currency,
       }),
-    [rows, dateRange, currency],
+    [rows, dateRange, currency, timeUnit],
+  );
+
+  const chartsLoading = (loading && !data) || (sizesQuery.loading && !sizesQuery.data);
+  const contributionsViews: MetricChartView[] = React.useMemo(
+    () => [
+      {
+        id: 'overtime',
+        label: <FormattedMessage defaultMessage="Over time" id="ruPkNJ" />,
+        chart: (mode: MetricViewMode) => (
+          <HostedAccountKindOverTimeChart
+            timeSeries={contributions.timeSeries}
+            color={CONTRIBUTIONS_COLOR}
+            currency={contributions.currency}
+            mode={mode}
+          />
+        ),
+      },
+      {
+        id: 'size',
+        label: <FormattedMessage defaultMessage="By size" id="bSHoiI" />,
+        chart: (
+          <AmountBandHistogram
+            bars={contributionsHistogram}
+            color={CONTRIBUTIONS_COLOR}
+            currency={contributions.currency}
+            kindLabel={contributionsLabel}
+          />
+        ),
+      },
+      {
+        id: 'type',
+        label: <FormattedMessage defaultMessage="By type" id="j/wRjH" />,
+        chart: (mode: MetricViewMode) => (
+          <ContributionTypeDonut shares={typeShares} currency={contributions.currency} mode={mode} />
+        ),
+      },
+    ],
+    [contributions, contributionsHistogram, contributionsLabel, typeShares],
+  );
+  const payoutsViews: MetricChartView[] = React.useMemo(
+    () => [
+      {
+        id: 'overtime',
+        label: <FormattedMessage defaultMessage="Over time" id="ruPkNJ" />,
+        chart: (mode: MetricViewMode) => (
+          <HostedAccountKindOverTimeChart
+            timeSeries={payouts.timeSeries}
+            color={PAYOUTS_COLOR}
+            currency={payouts.currency}
+            mode={mode}
+          />
+        ),
+      },
+      {
+        id: 'size',
+        label: <FormattedMessage defaultMessage="By size" id="bSHoiI" />,
+        chart: (
+          <AmountBandHistogram
+            bars={payoutsHistogram}
+            color={PAYOUTS_COLOR}
+            currency={payouts.currency}
+            kindLabel={payoutsLabel}
+          />
+        ),
+      },
+    ],
+    [payouts, payoutsHistogram, payoutsLabel],
   );
 
   // `metrics` is null (not undefined) when the viewer is not a host admin — nothing to show.
@@ -134,22 +230,32 @@ export function HostedAccountContributionsPayoutsSection({
         <MessageBoxGraphqlError error={error} />
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <HostedAccountKindActivityCard
-            title={<FormattedMessage defaultMessage="Contributions" id="Contributions" />}
-            kindLabel={contributionsLabel}
+          <Metric
+            label={<FormattedMessage defaultMessage="Contributions" id="Contributions" />}
+            helpLabel={
+              <FormattedMessage defaultMessage="Total amount received this period" id="2kY5p5" />
+            }
+            amount={received?.current ? { current: received.current, comparison: received.comparison } : undefined}
+            count={
+              contributionsCount?.current !== null && contributionsCount?.current !== undefined
+                ? { current: contributionsCount.current, comparison: contributionsCount.comparison ?? undefined }
+                : undefined
+            }
+            loading={statsLoading || chartsLoading}
+            chartViews={contributionsViews}
+            defaultChartView="overtime"
             color={CONTRIBUTIONS_COLOR}
-            activity={contributions}
-            histogram={contributionsHistogram}
-            typeShares={typeShares}
-            loading={loading && !data}
           />
-          <HostedAccountKindActivityCard
-            title={<FormattedMessage defaultMessage="Payouts" id="Payouts" />}
-            kindLabel={payoutsLabel}
+          <Metric
+            label={<FormattedMessage defaultMessage="Payouts" id="Payouts" />}
+            helpLabel={<FormattedMessage defaultMessage="Total amount spent this period" id="6ctWuQ" />}
+            amount={spent?.current ? { current: spent.current, comparison: spent.comparison } : undefined}
+            count={payouts.totalCount ? { current: payouts.totalCount } : undefined}
+            useAbsoluteAmount
+            loading={statsLoading || chartsLoading}
+            chartViews={payoutsViews}
+            defaultChartView="overtime"
             color={PAYOUTS_COLOR}
-            activity={payouts}
-            histogram={payoutsHistogram}
-            loading={loading && !data}
           />
         </div>
       )}

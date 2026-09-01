@@ -3,8 +3,8 @@ import { clsx } from 'clsx';
 import { isNil } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
-import type { BaseMetricProps } from '../../dashboard/sections/overview/Metric';
-import { ChangeBadge, getPercentageDifference } from '../../dashboard/sections/overview/Metric';
+import { type BaseMetricProps,ChangeBadge, getPercentageDifference } from '@/components/metrics';
+
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { InfoTooltipIcon } from '../../InfoTooltipIcon';
 import { Skeleton } from '../../ui/Skeleton';

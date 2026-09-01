@@ -11,6 +11,7 @@ import { type HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/g
 import { i18nPeriodFilterType } from '@/lib/i18n/period-compare-filter';
 
 import { columns } from '@/components/dashboard/sections/transactions/TransactionsTable';
+import { Metric, type MetricProps } from '@/components/metrics';
 import { DataTable } from '@/components/table/DataTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import {
@@ -35,8 +36,6 @@ import {
 } from '../transactions/AccountTransactions';
 
 import { ConvertedAccountMessage } from './ConvertedAccountMessage';
-import type { MetricProps } from './Metric';
-import { Metric } from './Metric';
 import { orgOverviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { useSetupGuide } from './useSetupGuide';

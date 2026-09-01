@@ -8,12 +8,12 @@ import { z } from 'zod';
 import { TimeUnit } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
+import { ComparisonChart, type MetricProps } from '@/components/metrics';
+
 import { childAccountFilter } from '../../dashboard/filters/ChildAccountFilter';
 import { Filterbar } from '../../dashboard/filters/Filterbar';
 import { periodCompareFilter } from '../../dashboard/filters/PeriodCompareFilter';
 import { PeriodFilterCompare, PeriodFilterType } from '../../dashboard/filters/PeriodCompareFilter/schema';
-import ComparisonChart from '../../dashboard/sections/overview/ComparisonChart';
-import type { MetricProps } from '../../dashboard/sections/overview/Metric';
 import Link from '../../Link';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import { Badge } from '../../ui/Badge';

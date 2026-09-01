@@ -17,9 +17,10 @@ const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 type ContributionTypeDonutProps = {
   shares: ContributionTypeShare[];
   currency?: Currency;
+  mode?: 'amount' | 'count';
 };
 
-function Chart({ shares, currency }: ContributionTypeDonutProps) {
+function Chart({ shares, currency, mode = 'amount' }: ContributionTypeDonutProps) {
   const intl = useIntl();
   const labels: Record<FrequencyKey, string> = {
     [ContributionFrequency.ONE_TIME]: intl.formatMessage({ defaultMessage: 'One time', id: 'Frequency.OneTime' }),
@@ -38,15 +39,30 @@ function Chart({ shares, currency }: ContributionTypeDonutProps) {
     dataLabels: { enabled: true, formatter: (pct: number) => `${Math.round(pct)}%` },
     stroke: { width: 0 },
     tooltip: {
-      y: { formatter: value => (currency ? formatAmountForLegend(value, currency, intl.locale) : String(value)) },
+      y: {
+        formatter: value =>
+          mode === 'count'
+            ? intl.formatNumber(value)
+            : currency
+              ? formatAmountForLegend(value, currency, intl.locale)
+              : String(value),
+      },
     },
   };
 
-  return <ApexChart type="donut" width="100%" height="100%" options={options} series={shares.map(s => s.amount)} />;
+  return (
+    <ApexChart
+      type="donut"
+      width="100%"
+      height="100%"
+      options={options}
+      series={shares.map(s => (mode === 'count' ? s.count : s.amount))}
+    />
+  );
 }
 
 export function ContributionTypeDonut(props: ContributionTypeDonutProps) {
-  if (!props.shares.some(s => s.amount > 0)) {
+  if (!props.shares.some(s => (props.mode === 'count' ? s.count : s.amount) > 0)) {
     return (
       <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
         <NoData />

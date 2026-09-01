@@ -10,6 +10,8 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 
+import { Metric, type MetricProps } from '@/components/metrics';
+
 import DismissibleMessage from '../../../DismissibleMessage';
 import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
 import Image from '../../../Image';
@@ -33,8 +35,6 @@ import type { DashboardSectionProps } from '../../types';
 import { Accounts } from './Accounts';
 import AccountTable from './AccountTable';
 import { ConvertedAccountMessage } from './ConvertedAccountMessage';
-import type { MetricProps } from './Metric';
-import { Metric } from './Metric';
 import { PlatformBillingCollapsibleCard } from './PlatformBillingOverviewCard';
 import { overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';

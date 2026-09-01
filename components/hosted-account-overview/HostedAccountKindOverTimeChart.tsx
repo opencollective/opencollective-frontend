@@ -20,9 +20,11 @@ type HostedAccountKindOverTimeChartProps = {
   timeSeries: TimeSeriesAmount;
   color: string;
   currency?: Currency;
+  /** When set, only that series is drawn so it stays in sync with the Metric amount/count toggle. */
+  mode?: 'amount' | 'count';
 };
 
-function Chart({ timeSeries, color, currency }: HostedAccountKindOverTimeChartProps) {
+function Chart({ timeSeries, color, currency, mode }: HostedAccountKindOverTimeChartProps) {
   const intl = useIntl();
   const amountName = intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' });
   const countName = intl.formatMessage({ defaultMessage: 'Count', id: 'Count' });
@@ -41,6 +43,26 @@ function Chart({ timeSeries, color, currency }: HostedAccountKindOverTimeChartPr
   const amountData = amount.slice(start).map((p, i) => ({ x: i, y: p.y }));
   const countData = count.slice(start).map((p, i) => ({ x: i, y: p.y }));
 
+  const showAmount = mode !== 'count';
+  const showCount = mode !== 'amount';
+  const yaxis = [
+    showAmount && {
+      seriesName: amountName,
+      min: 0,
+      title: { text: amountName },
+      labels: {
+        formatter: value => (currency ? formatAmountForLegend(value, currency, intl.locale) : String(value)),
+      },
+    },
+    showCount && {
+      seriesName: countName,
+      opposite: showAmount,
+      min: 0,
+      title: { text: countName },
+      labels: { formatter: value => String(Math.round(value)) },
+    },
+  ].filter(Boolean);
+
   const options: ApexOptions = {
     chart: {
       type: 'line',
@@ -49,9 +71,9 @@ function Chart({ timeSeries, color, currency }: HostedAccountKindOverTimeChartPr
       fontFamily: 'Inter, sans-serif',
       foreColor: 'hsl(var(--muted-foreground))',
     },
-    colors: [color, COUNT_COLOR],
+    colors: [showAmount ? color : COUNT_COLOR, COUNT_COLOR],
     stroke: { curve: 'smooth', width: 2 },
-    legend: { show: true, position: 'bottom', horizontalAlign: 'center', markers: { size: 6 } },
+    legend: { show: showAmount && showCount, position: 'bottom', horizontalAlign: 'center', markers: { size: 6 } },
     dataLabels: { enabled: false },
     grid: { show: true, borderColor: 'hsl(var(--border))', strokeDashArray: 4 },
     xaxis: {
@@ -69,37 +91,25 @@ function Chart({ timeSeries, color, currency }: HostedAccountKindOverTimeChartPr
             : formatDateLabel({ startDate, index: Number(value), timeUnit: ts.timeUnit }),
       },
     },
-    yaxis: [
-      {
-        seriesName: amountName,
-        min: 0,
-        title: { text: amountName },
-        labels: {
-          formatter: value => (currency ? formatAmountForLegend(value, currency, intl.locale) : String(value)),
-        },
-      },
-      {
-        seriesName: countName,
-        opposite: true,
-        min: 0,
-        title: { text: countName },
-        labels: { formatter: value => String(Math.round(value)) },
-      },
-    ],
+    yaxis,
     tooltip: {
       custom: ({ dataPointIndex }) =>
         renderChartTooltip({
           title: formatDateLabel({ startDate, index: dataPointIndex, timeUnit: ts.timeUnit }),
           items: [
-            {
+            showAmount && {
               label: amountName,
               color,
               value: currency
                 ? formatAmountForLegend(amountData[dataPointIndex]?.y ?? 0, currency, intl.locale, false)
                 : String(amountData[dataPointIndex]?.y ?? 0),
             },
-            { label: countName, color: COUNT_COLOR, value: intl.formatNumber(countData[dataPointIndex]?.y ?? 0) },
-          ],
+            showCount && {
+              label: countName,
+              color: COUNT_COLOR,
+              value: intl.formatNumber(countData[dataPointIndex]?.y ?? 0),
+            },
+          ].filter(Boolean),
         }),
     },
   };
@@ -111,9 +121,9 @@ function Chart({ timeSeries, color, currency }: HostedAccountKindOverTimeChartPr
       height="100%"
       options={options}
       series={[
-        { name: amountName, data: amountData },
-        { name: countName, data: countData },
-      ]}
+        showAmount && { name: amountName, data: amountData },
+        showCount && { name: countName, data: countData },
+      ].filter(Boolean)}
     />
   );
 }

@@ -1,16 +1,18 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash-es';
-import { ArrowRight, Mail, MailMinus, Pencil } from 'lucide-react';
+import { Mail, MailMinus, Pencil } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
 
-import dayjs from '@/lib/dayjs';
 import { i18nGraphqlException } from '@/lib/errors';
 import type {
-  HostedAccountFinancialActivityQuery,
-  HostedAccountFinancialActivityQueryVariables,
+  HostedAccountOverviewMetricsQuery,
+  HostedAccountOverviewMetricsQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
+import { TimeUnit } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '@/lib/i18n/expense';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
 
@@ -18,12 +20,15 @@ import Avatar from '@/components/Avatar';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
+import { Filterbar } from '@/components/dashboard/filters/Filterbar';
+import { periodCompareFilter } from '@/components/dashboard/filters/PeriodCompareFilter';
 import DateTime from '@/components/DateTime';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
+import { Metric, type MetricProps } from '@/components/metrics';
 import ConfirmationModal from '@/components/NewConfirmationModal';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -31,18 +36,16 @@ import { DataList, DataListItem } from '@/components/ui/DataList';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import { EditCollectiveSettingsModal } from './EditCollectiveSettingsModal';
-import { buildKindActivity } from './financialActivity';
 import { HostedAccountContributionsPayoutsSection } from './HostedAccountContributionsPayoutsSection';
-import { HostedAccountOverviewChart } from './HostedAccountOverviewChart';
-import { hostedAccountFinancialActivityQuery } from './queries';
+import { hostedAccountOverviewMetricsQuery } from './queries';
 import { RecentContributionsCard } from './RecentContributionsCard';
 import { RecentPayoutsCard } from './RecentPayoutsCard';
 import type { HostedAccountProfileData, MoneyMovementsView } from './types';
 import { HostedAccountView } from './types';
 
-const BALANCE_COLOR = '#f59e0b';
-const RECEIVED_COLOR = '#14b8a6';
-const SPENT_COLOR = '#dc2626';
+const financialsSchema = z.object({
+  period: periodCompareFilter.schema,
+});
 
 type RecentTransaction = NonNullable<HostedAccountProfileData['recentContributions']>['nodes'][number];
 
@@ -109,57 +112,39 @@ const InteractionValue = ({
   );
 };
 
-type AmountLike = { valueInCents?: number | null; currency?: string | null } | null | undefined;
-
-const Metric = ({
-  label,
-  amount,
-  currency,
-  onClick,
-}: {
-  label: React.ReactNode;
-  amount?: AmountLike;
-  currency?: string;
-  onClick?: () => void;
-}) => (
-  <div className="flex flex-col gap-1">
-    <button
-      type="button"
-      className={`flex items-center gap-1 text-left text-sm text-muted-foreground ${onClick ? 'hover:text-foreground' : 'cursor-default'}`}
-      onClick={onClick}
-      disabled={!onClick}
-    >
-      {label}
-      {onClick && <ArrowRight size={14} />}
-    </button>
-    <span className="text-2xl font-semibold text-foreground">
-      {amount && typeof amount.valueInCents === 'number' ? (
-        <FormattedMoneyAmount
-          amount={Math.abs(amount.valueInCents)}
-          currency={(amount.currency || currency) as any}
-          showCurrencyCode
-          precision={2}
-        />
-      ) : (
-        '—'
-      )}
-    </span>
-  </div>
-);
-
 export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, refetch }: HostedAccountOverviewTabProps) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const openMoneyView = (view: MoneyMovementsView) => openTab(HostedAccountView.PAYMENT_INTENTS, view);
+  const queryFilter = useQueryFilter<typeof financialsSchema, HostedAccountOverviewMetricsQueryVariables>({
+    schema: financialsSchema,
+    toVariables: {
+      period: periodCompareFilter.toVariables,
+    },
+    filters: {
+      period: periodCompareFilter.filter,
+    },
+  });
+  const statsQuery = useQuery<HostedAccountOverviewMetricsQuery, HostedAccountOverviewMetricsQueryVariables>(
+    hostedAccountOverviewMetricsQuery,
+    {
+      variables: {
+        accountId: account?.id ?? '',
+        includeComparison: queryFilter.variables.includeComparison ?? false,
+        ...queryFilter.variables,
+      },
+      skip: !account?.id,
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+  const statsAccount = statsQuery.data?.account;
+  const statsLoading = statsQuery.loading && !statsQuery.data;
   const [openExpenseId, setOpenExpenseId] = React.useState<number | null>(null);
   const [openContributionId, setOpenContributionId] = React.useState<number | null>(null);
   const [isEditSettingsOpen, setEditSettingsOpen] = React.useState(false);
   const [invitationToCancel, setInvitationToCancel] = React.useState(null);
   const [cancelMemberInvitation] = useMutation(cancelMemberInvitationMutation);
 
-  const currency = account?.currency;
-  const stats = account?.stats;
-  const isChild = Boolean(account?.parent?.id);
   const isHosted = Boolean(account?.host?.id);
 
   const hostFeePercent = account?.hostFeePercent ?? host?.hostFeePercent;
@@ -171,55 +156,6 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, ref
     .filter(type => accountExpenseTypes[type])
     .map(type => i18nExpenseType(intl, type));
   const adminsCanSeePayoutMethods = Boolean(account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS);
-
-  const metricsDateRange = React.useMemo(
-    () => ({ from: '2015-01-01T00:00:00.000Z', to: dayjs.utc().toISOString() }),
-    [],
-  );
-  const financialActivityQuery = useQuery<
-    HostedAccountFinancialActivityQuery,
-    HostedAccountFinancialActivityQueryVariables
-  >(hostedAccountFinancialActivityQuery, {
-    variables: {
-      hostSlug,
-      dateRange: metricsDateRange,
-      timeUnit: 'MONTH' as HostedAccountFinancialActivityQueryVariables['timeUnit'],
-      accountFilter: { mainAccount: { eq: { id: account?.id } } },
-      groupByAccount: false,
-    },
-    skip: !account?.id || !hostSlug,
-    fetchPolicy: 'cache-and-network',
-  });
-
-  const metricsRows = React.useMemo(
-    () => financialActivityQuery.data?.host?.metrics?.consolidated?.rows ?? [],
-    [financialActivityQuery.data],
-  );
-  const metricsCurrency = financialActivityQuery.data?.host?.currency ?? currency;
-  const receivedTimeSeries = React.useMemo(
-    () =>
-      buildKindActivity(metricsRows, {
-        amountMeasure: 'amountReceived',
-        countMeasure: 'contributionsCount',
-        timeUnit: 'MONTH',
-        dateFrom: metricsDateRange.from,
-        dateTo: metricsDateRange.to,
-        currency: metricsCurrency,
-      }).timeSeries,
-    [metricsRows, metricsDateRange, metricsCurrency],
-  );
-  const spentTimeSeries = React.useMemo(
-    () =>
-      buildKindActivity(metricsRows, {
-        amountMeasure: 'amountSpent',
-        countMeasure: 'payoutsCount',
-        timeUnit: 'MONTH',
-        dateFrom: metricsDateRange.from,
-        dateTo: metricsDateRange.to,
-        currency: metricsCurrency,
-      }).timeSeries,
-    [metricsRows, metricsDateRange, metricsCurrency],
-  );
 
   const handleRowClick = (tx: RecentTransaction) => {
     if (tx.expense) {
@@ -243,6 +179,50 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, ref
   const latestInteraction = [account?.recentContributions?.nodes?.[0], account?.recentPayouts?.nodes?.[0]]
     .filter(Boolean)
     .sort((a, b) => +new Date(b.clearedAt || b.createdAt) - +new Date(a.clearedAt || a.createdAt))[0];
+
+  const metrics: (MetricProps & { id: string })[] = [
+    {
+      id: 'balance',
+      className: 'col-span-1 row-span-2',
+      label: <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />,
+      helpLabel: (
+        <FormattedMessage defaultMessage="Balance at end of this period, including starting balance" id="hi/nhW" />
+      ),
+      timeseries: {
+        ...statsAccount?.balanceTimeseries,
+        currency: statsAccount?.balance?.current?.currency,
+      },
+      amount: statsAccount?.balance,
+      showCurrencyCode: true,
+      isSnapshot: true,
+      showTimeSeries: true,
+      noTimeseriesLabel: <FormattedMessage defaultMessage="No data for selected period" id="Metric.NoDataForperiod" />,
+    },
+    {
+      id: 'received',
+      label: <FormattedMessage defaultMessage="Received" id="z/wUXE" />,
+      helpLabel: <FormattedMessage defaultMessage="Total amount received this period" id="2kY5p5" />,
+      amount: statsAccount?.received,
+      timeseries: {
+        ...statsAccount?.receivedTimeseries,
+        currency: statsAccount?.received?.current?.currency,
+      },
+      showTimeSeries: true,
+    },
+    {
+      id: 'spent',
+      useAbsoluteAmount: true,
+      label: <FormattedMessage defaultMessage="Spent" id="111qQK" />,
+      helpLabel: <FormattedMessage defaultMessage="Total amount spent this period" id="6ctWuQ" />,
+      amount: statsAccount?.spent,
+    },
+    {
+      id: 'contributions',
+      label: <FormattedMessage id="Contributions" defaultMessage="Contributions" />,
+      count: statsAccount?.contributionsCount,
+      hide: Boolean(statsAccount) && !statsAccount.isActive,
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-4">
@@ -447,59 +427,41 @@ export function HostedAccountOverviewTab({ account, host, hostSlug, openTab, ref
         )}
       </DashboardContentCard>
 
-      <DashboardContentCard title={<FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />}>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Metric
-            label={<FormattedMessage defaultMessage="Current Balance" id="PkACGs" />}
-            amount={isChild ? stats?.balance : stats?.consolidatedBalance}
-            currency={currency}
-          />
-          <Metric
-            label={<FormattedMessage defaultMessage="Received by Account (all-time)" id="26sbkf" />}
-            amount={stats?.consolidatedTotalNetAmountRaised}
-            currency={currency}
-            onClick={() => openMoneyView('CONTRIBUTIONS')}
-          />
-          <Metric
-            label={<FormattedMessage defaultMessage="Disbursed by account (all-time)" id="3wX8nB" />}
-            amount={stats?.consolidatedTotalAmountSpent}
-            currency={currency}
-            onClick={() => openMoneyView('PAYOUTS')}
-          />
+      <div className="space-y-3">
+        <Filterbar hideSeparator {...queryFilter} />
+        <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+          {metrics
+            .filter(metric => !metric.hide)
+            .map(metric => (
+              <Metric key={metric.id} {...metric} loading={statsLoading} />
+            ))}
         </div>
-        <div className="h-72 w-full">
-          <HostedAccountOverviewChart
-            currency={currency as any}
-            series={[
-              {
-                name: intl.formatMessage({ defaultMessage: 'Balance', id: 'Balance' }),
-                color: BALANCE_COLOR,
-                data: stats?.balanceTimeSeries,
-              },
-              {
-                name: intl.formatMessage({ defaultMessage: 'Received by account', id: 'C22hxu' }),
-                color: RECEIVED_COLOR,
-                data: receivedTimeSeries,
-              },
-              {
-                name: intl.formatMessage({ defaultMessage: 'Spent by account', id: 'bXI/iJ' }),
-                color: SPENT_COLOR,
-                data: spentTimeSeries,
-              },
-            ]}
+      </div>
+
+      <HostedAccountContributionsPayoutsSection
+        account={account}
+        hostSlug={hostSlug}
+        dateFrom={queryFilter.variables.dateFrom}
+        dateTo={queryFilter.variables.dateTo}
+        timeUnit={queryFilter.variables.timeUnit ?? TimeUnit.MONTH}
+        received={statsAccount?.received}
+        spent={statsAccount?.spent}
+        contributionsCount={statsAccount?.contributionsCount}
+        statsLoading={statsLoading}
+      />
+
+      <div className="space-y-3">
+        <h3 className="text-lg font-bold">
+          <FormattedMessage defaultMessage="Latest activity" id="hostedAccount.latestActivity" />
+        </h3>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <RecentContributionsCard
+            account={account}
+            hostSlug={hostSlug}
+            onViewAll={() => openMoneyView('CONTRIBUTIONS')}
           />
+          <RecentPayoutsCard account={account} hostSlug={hostSlug} onViewAll={() => openMoneyView('PAYOUTS')} />
         </div>
-      </DashboardContentCard>
-
-      <HostedAccountContributionsPayoutsSection account={account} hostSlug={hostSlug} />
-
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <RecentContributionsCard
-          account={account}
-          hostSlug={hostSlug}
-          onViewAll={() => openMoneyView('CONTRIBUTIONS')}
-        />
-        <RecentPayoutsCard account={account} hostSlug={hostSlug} onViewAll={() => openMoneyView('PAYOUTS')} />
       </div>
 
       <EditCollectiveSettingsModal

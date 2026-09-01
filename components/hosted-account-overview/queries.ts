@@ -31,19 +31,6 @@ export const hostedAccountProfileQuery = gql`
         address
         country
       }
-      stats {
-        id
-        balanceTimeSeries(timeUnit: MONTH, includeChildren: true) {
-          timeUnit
-          nodes {
-            date
-            amount {
-              valueInCents
-              currency
-            }
-          }
-        }
-      }
       firstTransaction: transactions(
         limit: 1
         offset: 0
@@ -137,6 +124,148 @@ export const hostedAccountProfileQuery = gql`
   }
 
   ${hostedCollectiveFields}
+`;
+
+export const hostedAccountOverviewMetricsQuery = gql`
+  query HostedAccountOverviewMetrics(
+    $accountId: String!
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $compareFrom: DateTime
+    $compareTo: DateTime
+    $includeComparison: Boolean!
+    $timeUnit: TimeUnit
+  ) {
+    account(id: $accountId) {
+      id
+      isActive
+      balance: stats {
+        id
+        current: balance(includeChildren: true, dateTo: $dateTo) {
+          currency
+          valueInCents
+        }
+        comparison: balance(includeChildren: true, dateTo: $compareTo) @include(if: $includeComparison) {
+          currency
+          valueInCents
+        }
+      }
+      balanceTimeseries: stats {
+        id
+        current: balanceTimeSeries(
+          includeChildren: true
+          dateFrom: $dateFrom
+          dateTo: $dateTo
+          timeUnit: $timeUnit
+        ) {
+          dateTo
+          dateFrom
+          timeUnit
+          nodes {
+            date
+            amount {
+              currency
+              value
+            }
+          }
+        }
+        comparison: balanceTimeSeries(
+          includeChildren: true
+          dateFrom: $compareFrom
+          dateTo: $compareTo
+          timeUnit: $timeUnit
+        ) @include(if: $includeComparison) {
+          dateTo
+          dateFrom
+          timeUnit
+          nodes {
+            date
+            amount {
+              currency
+              value
+            }
+          }
+        }
+      }
+      spent: stats {
+        id
+        current: totalAmountSpent(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
+          currency
+          valueInCents
+        }
+        comparison: totalAmountSpent(
+          includeChildren: true
+          dateFrom: $compareFrom
+          dateTo: $compareTo
+          net: true
+        ) @include(if: $includeComparison) {
+          currency
+          valueInCents
+        }
+      }
+      received: stats {
+        id
+        current: totalAmountReceived(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
+          currency
+          valueInCents
+        }
+        comparison: totalAmountReceived(
+          includeChildren: true
+          dateFrom: $compareFrom
+          dateTo: $compareTo
+          net: true
+        ) @include(if: $includeComparison) {
+          currency
+          valueInCents
+        }
+      }
+      receivedTimeseries: stats {
+        id
+        current: totalAmountReceivedTimeSeries(
+          includeChildren: true
+          dateFrom: $dateFrom
+          dateTo: $dateTo
+          timeUnit: $timeUnit
+          net: true
+        ) {
+          dateTo
+          dateFrom
+          timeUnit
+          nodes {
+            date
+            amount {
+              currency
+              value
+            }
+          }
+        }
+        comparison: totalAmountReceivedTimeSeries(
+          includeChildren: true
+          dateFrom: $compareFrom
+          dateTo: $compareTo
+          timeUnit: $timeUnit
+          net: true
+        ) @include(if: $includeComparison) {
+          dateTo
+          dateFrom
+          timeUnit
+          nodes {
+            date
+            amount {
+              currency
+              value
+            }
+          }
+        }
+      }
+      contributionsCount: stats {
+        id
+        current: contributionsCount(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo)
+        comparison: contributionsCount(includeChildren: true, dateFrom: $compareFrom, dateTo: $compareTo)
+          @include(if: $includeComparison)
+      }
+    }
+  }
 `;
 
 export const hostedAccountFinancialActivityQuery = gql`

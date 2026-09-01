@@ -14,6 +14,8 @@ import type {
 import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
+import { ChangeBadge, getPercentageDifference, type MetricProps } from '@/components/metrics';
+
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -26,8 +28,6 @@ import { Checkbox } from '../../../ui/Checkbox';
 import { DashboardContext } from '../../DashboardContext';
 
 import type { schema } from './DefaultOverview';
-import type { MetricProps } from './Metric';
-import { ChangeBadge, getPercentageDifference } from './Metric';
 import { metricsPerAccountQuery } from './queries';
 
 const SortableHeader = ({

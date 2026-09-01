@@ -12,6 +12,7 @@ import { HostContext, type HostOverviewMetricsQueryVariables } from '@/lib/graph
 import { i18nPeriodFilterType } from '@/lib/i18n/period-compare-filter';
 
 import { columns } from '@/components/dashboard/sections/transactions/TransactionsTable';
+import { Metric, type MetricProps } from '@/components/metrics';
 import { DataTable } from '@/components/table/DataTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import {
@@ -38,8 +39,6 @@ import {
 } from '../transactions/HostTransactions';
 
 import { ConvertedAccountMessage } from './ConvertedAccountMessage';
-import type { MetricProps } from './Metric';
-import { Metric } from './Metric';
 import { PlatformBillingCollapsibleCard } from './PlatformBillingOverviewCard';
 import { hostOverviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
