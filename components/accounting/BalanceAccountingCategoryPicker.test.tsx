@@ -18,7 +18,10 @@ import {
 
 const mocks = [
   {
-    request: { query: balanceAccountingCategoryPickerQuery, variables: { hostSlug: 'test-host', account: null, order: null, expense: null } },
+    request: {
+      query: balanceAccountingCategoryPickerQuery,
+      variables: { hostSlug: 'test-host', account: null, order: null, expense: null },
+    },
     result: {
       data: {
         host: {
@@ -27,9 +30,30 @@ const mocks = [
           balanceAccountingCategories: {
             __typename: 'AccountingCategoryCollection',
             nodes: [
-              { __typename: 'AccountingCategory', id: 'cat-1', code: '1051', name: 'Mercury Checking', friendlyName: null, kind: 'BALANCE_ACCOUNT' },
-              { __typename: 'AccountingCategory', id: 'cat-2', code: '1030', name: 'Stripe Clearing', friendlyName: null, kind: 'BALANCE_ACCOUNT' },
-              { __typename: 'AccountingCategory', id: 'cat-3', code: '1052', name: 'Umpqua Savings', friendlyName: null, kind: 'BALANCE_ACCOUNT' },
+              {
+                __typename: 'AccountingCategory',
+                id: 'cat-1',
+                code: '1051',
+                name: 'Mercury Checking',
+                friendlyName: null,
+                kind: 'BALANCE_ACCOUNT',
+              },
+              {
+                __typename: 'AccountingCategory',
+                id: 'cat-2',
+                code: '1030',
+                name: 'Stripe Clearing',
+                friendlyName: null,
+                kind: 'BALANCE_ACCOUNT',
+              },
+              {
+                __typename: 'AccountingCategory',
+                id: 'cat-3',
+                code: '1052',
+                name: 'Umpqua Savings',
+                friendlyName: null,
+                kind: 'BALANCE_ACCOUNT',
+              },
             ],
           },
           suggestedBalanceAccountingCategories: [],
@@ -65,7 +89,10 @@ const renderPicker = (props: Partial<React.ComponentProps<typeof BalanceAccounti
 describe('BalanceAccountingCategoryPicker', () => {
   it('renders nothing when the host has no balance/clearing categories', async () => {
     const emptyMock = {
-      request: { query: balanceAccountingCategoryPickerQuery, variables: { hostSlug: 'empty-host', account: null, order: null, expense: null } },
+      request: {
+        query: balanceAccountingCategoryPickerQuery,
+        variables: { hostSlug: 'empty-host', account: null, order: null, expense: null },
+      },
       result: {
         data: {
           host: {

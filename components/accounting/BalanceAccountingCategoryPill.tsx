@@ -78,7 +78,10 @@ const BalanceAccountingCategoryPill = ({
   context?: BalanceAccountingCategoryContext;
   onChange: (category: PillCategory | null) => void | Promise<void>;
 }) => {
-  const { enabled, categories, suggestedIds } = useBalanceAccountingCategories(canEdit ? host?.slug : undefined, context);
+  const { enabled, categories, suggestedIds } = useBalanceAccountingCategories(
+    canEdit ? host?.slug : undefined,
+    context,
+  );
   const withLabel = (pill: React.ReactNode) =>
     !label ? (
       pill

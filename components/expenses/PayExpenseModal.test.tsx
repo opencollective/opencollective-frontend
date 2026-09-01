@@ -31,8 +31,22 @@ const pickerMock = {
         balanceAccountingCategories: {
           __typename: 'AccountingCategoryCollection',
           nodes: [
-            { __typename: 'AccountingCategory', id: 'cat-1', code: '1051', name: 'Mercury Checking', friendlyName: null, kind: 'BALANCE_ACCOUNT' },
-            { __typename: 'AccountingCategory', id: 'cat-2', code: '1030', name: 'Stripe Clearing', friendlyName: null, kind: 'CLEARING_ACCOUNT' },
+            {
+              __typename: 'AccountingCategory',
+              id: 'cat-1',
+              code: '1051',
+              name: 'Mercury Checking',
+              friendlyName: null,
+              kind: 'BALANCE_ACCOUNT',
+            },
+            {
+              __typename: 'AccountingCategory',
+              id: 'cat-2',
+              code: '1030',
+              name: 'Stripe Clearing',
+              friendlyName: null,
+              kind: 'CLEARING_ACCOUNT',
+            },
           ],
         },
         suggestedBalanceAccountingCategories: [],
