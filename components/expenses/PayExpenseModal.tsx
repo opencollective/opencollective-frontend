@@ -675,7 +675,8 @@ const PayExpenseModal = ({
                     label={<FormattedMessage defaultMessage="Paid from" id="jhYP1/" />}
                     hint={
                       <FormattedMessage
-                        defaultMessage="The balance or clearing account the funds were paid from." id="OfBJ2R"
+                        defaultMessage="The balance or clearing account the funds were paid from."
+                        id="OfBJ2R"
                       />
                     }
                   >

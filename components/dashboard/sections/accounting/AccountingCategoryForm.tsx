@@ -93,7 +93,7 @@ export const AccountingCategoryType = {
 
 type AccountingCategoryTypeValue = (typeof AccountingCategoryType)[keyof typeof AccountingCategoryType];
 
-export const BALANCE_SHEET_KINDS: AccountingCategoryKind[] = [
+const BALANCE_SHEET_KINDS: AccountingCategoryKind[] = [
   AccountingCategoryKind.BALANCE_ACCOUNT,
   AccountingCategoryKind.CLEARING_ACCOUNT,
 ];
@@ -123,10 +123,12 @@ export const AccountingCategoryTypeI18n = defineMessages({
     defaultMessage: 'Balance',
   },
   [AccountingCategoryType.CLEARING]: {
-    defaultMessage: 'Clearing', id: 'c3NvXn',
+    defaultMessage: 'Clearing',
+    id: 'c3NvXn',
   },
   [AccountingCategoryType.PROFIT_AND_LOSS]: {
-    defaultMessage: 'Profit and Loss', id: 'a4eA0B',
+    defaultMessage: 'Profit and Loss',
+    id: 'a4eA0B',
   },
 });
 
@@ -144,10 +146,12 @@ export const AccountingCategoryKindI18n = defineMessages({
     defaultMessage: 'Contributions',
   },
   [AccountingCategoryKind.BALANCE_ACCOUNT]: {
-    defaultMessage: 'Balance account', id: 'tEEe+f',
+    defaultMessage: 'Balance account',
+    id: 'tEEe+f',
   },
   [AccountingCategoryKind.CLEARING_ACCOUNT]: {
-    defaultMessage: 'Clearing account', id: 'Ulo2mw',
+    defaultMessage: 'Clearing account',
+    id: 'Ulo2mw',
   },
 });
 
@@ -346,7 +350,8 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           hintPosition="above"
           hint={
             <FormattedMessage
-              defaultMessage="Balance and clearing categories track where money comes from and where it goes, Profit and Loss categories track the kind of expense or revenue" id="1Q7HMj"
+              defaultMessage="Balance and clearing categories track where money comes from and where it goes, Profit and Loss categories track the kind of expense or revenue"
+              id="1Q7HMj"
             />
           }
           mt={0}
@@ -459,7 +464,8 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           hint={
             isBalanceSheet ? (
               <FormattedMessage
-                defaultMessage="Balance and clearing accounts are only managed by host admins" id="dkE4/H"
+                defaultMessage="Balance and clearing accounts are only managed by host admins"
+                id="dkE4/H"
               />
             ) : selectedKind !== AccountingCategoryKind.EXPENSE ? (
               <FormattedMessage
@@ -498,7 +504,8 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
             hint={
               isBalanceSheet ? (
                 <FormattedMessage
-                  defaultMessage="Provide detailed instructions on when and how to use this account, this will be displayed when selecting the account" id="u2nQRm"
+                  defaultMessage="Provide detailed instructions on when and how to use this account, this will be displayed when selecting the account"
+                  id="u2nQRm"
                 />
               ) : (
                 <FormattedMessage

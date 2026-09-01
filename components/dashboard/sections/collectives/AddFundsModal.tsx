@@ -1150,11 +1150,7 @@ const AddFundsModalContentWithCollective = ({
                       name="balanceAccountingCategory"
                       htmlFor="addFunds-balanceAccountingCategory"
                       required={false}
-                      label={
-                        <FormattedMessage
-                          defaultMessage="Received in" id="4Nv47+"
-                        />
-                      }
+                      label={<FormattedMessage defaultMessage="Received in" id="4Nv47+" />}
                       mt={3}
                     >
                       {({ form, field }) => (
@@ -1170,7 +1166,8 @@ const AddFundsModalContentWithCollective = ({
                           {Boolean(matchedBankAccountCategory) && (
                             <p className="mt-1 text-xs text-muted-foreground">
                               <FormattedMessage
-                                defaultMessage="This is set by the bank account of the matched transaction. You can change it in the bank connection settings." id="blDEUf"
+                                defaultMessage="This is set by the bank account of the matched transaction. You can change it in the bank connection settings."
+                                id="blDEUf"
                               />
                             </p>
                           )}

@@ -358,7 +358,8 @@ export const FIELDS: Array<{
     group: 'transaction',
     tooltip: (
       <FormattedMessage
-        defaultMessage="The code of the balance or clearing account the funds moved through. Only populated for host admins and accountants." id="WBgXkF"
+        defaultMessage="The code of the balance or clearing account the funds moved through. Only populated for host admins and accountants."
+        id="WBgXkF"
       />
     ),
     label: 'Balance Accounting Category Code',
@@ -368,7 +369,8 @@ export const FIELDS: Array<{
     group: 'transaction',
     tooltip: (
       <FormattedMessage
-        defaultMessage="The name of the balance or clearing account the funds moved through. Only populated for host admins and accountants." id="CXoWMO"
+        defaultMessage="The name of the balance or clearing account the funds moved through. Only populated for host admins and accountants."
+        id="CXoWMO"
       />
     ),
     label: 'Balance Accounting Category Name',

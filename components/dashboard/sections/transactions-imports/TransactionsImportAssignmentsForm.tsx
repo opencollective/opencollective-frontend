@@ -297,9 +297,7 @@ export const TransactionsImportAssignmentsForm = ({
                                 className="mb-1 block text-xs font-medium text-gray-500"
                                 htmlFor={`institution-account-balance-category-${account.id}`}
                               >
-                                <FormattedMessage
-                                  defaultMessage="Balance / clearing account" id="7XkFoL"
-                                />
+                                <FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />
                               </label>
                               <BalanceAccountingCategoryPicker
                                 hostSlug={dashboardAccount?.slug}

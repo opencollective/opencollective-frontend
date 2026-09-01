@@ -431,7 +431,7 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
                         account={query.data.order.toAccount}
                         canEdit={Boolean(
                           query.data.order.permissions?.canUpdateAccountingCategory &&
-                            query.data.order.toAccount?.['host'],
+                          query.data.order.toAccount?.['host'],
                         )}
                         emptyLabel={<FormattedMessage defaultMessage="Not set" id="p5LNtB" />}
                       />

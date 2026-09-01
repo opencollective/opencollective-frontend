@@ -33,7 +33,8 @@ type PickedCategory = Pick<AccountingCategory, 'id' | 'code' | 'name'>;
 
 export const getBalanceAccountingCategoryOption = (
   category: PickedCategory | null | undefined,
-): BalanceAccountingCategoryOption | null => (category ? { value: category.id, label: `${category.code} - ${category.name}` } : null);
+): BalanceAccountingCategoryOption | null =>
+  category ? { value: category.id, label: `${category.code} - ${category.name}` } : null;
 
 export const useBalanceAccountingCategories = (hostSlug: string | undefined) => {
   const { account } = React.useContext(DashboardContext);
@@ -87,6 +88,7 @@ export const BalanceAccountingCategoryPicker = ({
       value={value || null}
       isClearable
       isSearchable
+      useSearchIcon
       isLoading={loading}
       disabled={disabled}
       fontSize={fontSize}
@@ -94,7 +96,8 @@ export const BalanceAccountingCategoryPicker = ({
       menuPortalTarget={menuPortalTarget}
       menuPosition="fixed"
       placeholder={intl.formatMessage({
-        defaultMessage: 'Select a balance or clearing account', id: '13dqX5',
+        defaultMessage: 'Select a balance or clearing account',
+        id: '13dqX5',
       })}
       onChange={onChange}
     />
@@ -140,12 +143,16 @@ export const ConnectedAccountBalanceCategoryPicker = ({
 
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium" htmlFor={`connected-account-balance-category-${connectedAccount.id}`}>
+      <label
+        className="mb-1 block text-sm font-medium"
+        htmlFor={`connected-account-balance-category-${connectedAccount.id}`}
+      >
         <FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />
       </label>
       <p className="mb-2 text-sm text-muted-foreground">
         <FormattedMessage
-          defaultMessage="Payments processed through this integration will be attributed to the selected account from your chart of accounts." id="3aoMDC"
+          defaultMessage="Payments processed through this integration will be attributed to the selected account from your chart of accounts."
+          id="3aoMDC"
         />
       </p>
       <div className="max-w-md">

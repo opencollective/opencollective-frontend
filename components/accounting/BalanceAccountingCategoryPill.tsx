@@ -102,9 +102,7 @@ const BalanceAccountingCategoryPill = ({
       onChange={onChange}
     >
       <Button className={cn(BADGE_CLASS, 'h-auto max-w-full min-w-0 hover:bg-neutral-50 hover:opacity-90')}>
-        <span className="mr-1 max-w-40 truncate">
-          {selectedCategory ? getLabel(selectedCategory) : emptyLabel}
-        </span>
+        <span className="mr-1 max-w-40 truncate">{selectedCategory ? getLabel(selectedCategory) : emptyLabel}</span>
         {loading ? <Spinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
     </AccountingCategorySelect>,

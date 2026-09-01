@@ -99,7 +99,10 @@ const setConnectedAccountBalanceCategoryMutation = gql`
     $connectedAccount: ConnectedAccountReferenceInput!
     $accountingCategory: AccountingCategoryReferenceInput
   ) {
-    setConnectedAccountBalanceAccountingCategory(connectedAccount: $connectedAccount, accountingCategory: $accountingCategory) {
+    setConnectedAccountBalanceAccountingCategory(
+      connectedAccount: $connectedAccount
+      accountingCategory: $accountingCategory
+    ) {
       id
       balanceAccountingCategory {
         id
@@ -109,7 +112,6 @@ const setConnectedAccountBalanceCategoryMutation = gql`
     }
   }
 `;
-
 
 const setManualPaymentProviderBalanceCategoryMutation = gql`
   mutation SetManualPaymentProviderBalanceAccountingCategory(
@@ -205,9 +207,7 @@ const PaymentAccountRow = ({
           isClearable
           isSearchable
           disabled={disabled}
-          placeholder={
-            <FormattedMessage defaultMessage="Select a balance or clearing account" id="13dqX5" />
-          }
+          placeholder={<FormattedMessage defaultMessage="Select a balance or clearing account" id="13dqX5" />}
           onChange={onChange}
           width="100%"
           maxWidth={420}
@@ -260,13 +260,15 @@ export const PaymentAccountsTable = ({ hostSlug, isAdmin }: { hostSlug: string; 
     <div className="flex flex-col gap-4">
       <p className="text-sm text-muted-foreground">
         <FormattedMessage
-          defaultMessage="Assign a balance or clearing account to each of your payment devices. Payments processed through them will be attributed to the selected account automatically." id="O+w8Ji"
+          defaultMessage="Assign a balance or clearing account to each of your payment devices. Payments processed through them will be attributed to the selected account automatically."
+          id="O+w8Ji"
         />
       </p>
       {isEmpty ? (
         <p className="text-sm text-muted-foreground italic">
           <FormattedMessage
-            defaultMessage="No payment devices setup yet. Connect Stripe, Wise or PayPal, add a manual payment method or connect a bank account" id="ill3eB"
+            defaultMessage="No payment devices setup yet. Connect Stripe, Wise or PayPal, add a manual payment method or connect a bank account"
+            id="ill3eB"
           />
         </p>
       ) : (
@@ -375,7 +377,8 @@ export const PaymentAccountsTable = ({ hostSlug, isAdmin }: { hostSlug: string; 
                         assignedAccounts.length > 0 && (
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                             <FormattedMessage
-                              defaultMessage="Assigned to {accounts}" id="rsYtmI"
+                              defaultMessage="Assigned to {accounts}"
+                              id="rsYtmI"
                               values={{
                                 accounts: (
                                   <span className="inline-flex flex-wrap items-center gap-2">

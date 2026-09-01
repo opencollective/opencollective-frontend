@@ -515,7 +515,8 @@ export const HostCreateExpenseModal = ({
                             {Boolean(matchedBankAccountCategory) && (
                               <p className="mt-1 text-xs text-muted-foreground">
                                 <FormattedMessage
-                                  defaultMessage="This is set by the bank account of the matched transaction. You can change it in the bank connection settings." id="blDEUf"
+                                  defaultMessage="This is set by the bank account of the matched transaction. You can change it in the bank connection settings."
+                                  id="blDEUf"
                                 />
                               </p>
                             )}

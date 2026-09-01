@@ -34,7 +34,12 @@ type EditCustomPaymentMethodDialogProps = {
   hostSlug?: string;
 };
 
-export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose, hostSlug }: EditCustomPaymentMethodDialogProps) => {
+export const EditCustomPaymentMethodDialog = ({
+  provider,
+  onSave,
+  onClose,
+  hostSlug,
+}: EditCustomPaymentMethodDialogProps) => {
   const intl = useIntl();
 
   const initialValues: FormValues = {
@@ -125,7 +130,8 @@ export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose, hostS
                   </Label>
                   <p className="mb-2 text-xs text-gray-600">
                     <FormattedMessage
-                      defaultMessage="Payments received through this method will be attributed to the selected account from your chart of accounts." id="T+Ilke"
+                      defaultMessage="Payments received through this method will be attributed to the selected account from your chart of accounts."
+                      id="T+Ilke"
                     />
                   </p>
                   <BalanceAccountingCategoryPicker

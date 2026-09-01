@@ -11,7 +11,10 @@ import theme from '../../lib/theme';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 
-import { BalanceAccountingCategoryPicker, balanceAccountingCategoryPickerQuery } from './BalanceAccountingCategoryPicker';
+import {
+  BalanceAccountingCategoryPicker,
+  balanceAccountingCategoryPickerQuery,
+} from './BalanceAccountingCategoryPicker';
 
 const mocks = [
   {
