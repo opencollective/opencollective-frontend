@@ -11,7 +11,6 @@ import { styled } from 'styled-components';
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { AnalyticsProperty } from '../../lib/analytics/properties';
-import { getCollectiveTypeForUrl } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
@@ -403,10 +402,7 @@ const ContributionFlow = ({
           stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.SEPA_DEBIT)
       ) {
         const { stripeData } = stepPayment;
-        const baseRoute = collective.parent?.slug
-          ? `${window.location.origin}/${collective.parent?.slug}/${getCollectiveTypeForUrl(collective)}/${collective.slug}`
-          : `${window.location.origin}/${collective.slug}`;
-        const returnUrl = new URL(`${baseRoute}/donate/success`);
+        const returnUrl = new URL(`${window.location.origin}${getRoute('success')}`);
         returnUrl.searchParams.set('OrderId', order.id);
         returnUrl.searchParams.set('stripeAccount', stripeData?.stripe?.stripeAccount);
         const queryParams = getQueryParams();
@@ -442,7 +438,7 @@ const ContributionFlow = ({
         return handleSuccess(order);
       }
     },
-    [collective, getQueryParams, handleSuccess],
+    [getQueryParams, getRoute, handleSuccess],
   );
   const handleStripeError = useCallback(
     async (order, stripeError, email, guestToken) => {
