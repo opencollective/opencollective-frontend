@@ -4578,6 +4578,26 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     """
     account: AccountReferenceInput
   ): AccountingCategoryCollection! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Suggested balance/clearing accounting categories for a context: the rail the money moved through, then the bank accounts assigned to the account. Only computed for host admins and accountants.
+  """
+  suggestedBalanceAccountingCategories(
+    """
+    Suggest from the bank accounts assigned to this account
+    """
+    account: AccountReferenceInput
+
+    """
+    Suggest from the payment rail of this order
+    """
+    order: OrderReferenceInput
+
+    """
+    Suggest from the payout rail of this expense
+    """
+    expense: ExpenseReferenceInput
+  ): [AccountingCategory!]! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
   contributionAccountingCategoryRules: [ContributionAccountingCategoryRule!]
     @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
 
@@ -17655,6 +17675,26 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     """
     account: AccountReferenceInput
   ): AccountingCategoryCollection!
+
+  """
+  Suggested balance/clearing accounting categories for a context: the rail the money moved through, then the bank accounts assigned to the account. Only computed for host admins and accountants.
+  """
+  suggestedBalanceAccountingCategories(
+    """
+    Suggest from the bank accounts assigned to this account
+    """
+    account: AccountReferenceInput
+
+    """
+    Suggest from the payment rail of this order
+    """
+    order: OrderReferenceInput
+
+    """
+    Suggest from the payout rail of this expense
+    """
+    expense: ExpenseReferenceInput
+  ): [AccountingCategory!]!
   contributionAccountingCategoryRules: [ContributionAccountingCategoryRule!]
 }
 

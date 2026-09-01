@@ -12,6 +12,7 @@ import Spinner from '../Spinner';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
+import type { BalanceAccountingCategoryContext } from './BalanceAccountingCategoryPicker';
 import { useBalanceAccountingCategories } from './BalanceAccountingCategoryPicker';
 
 const updateExpenseBalanceCategoryMutation = gql`
@@ -63,6 +64,7 @@ const BalanceAccountingCategoryPill = ({
   loading,
   label,
   emptyLabel,
+  context,
   onChange,
 }: {
   host: PillHost;
@@ -73,9 +75,10 @@ const BalanceAccountingCategoryPill = ({
   /** When set, rendered as a muted prefix; only shows when the pill itself renders */
   label?: React.ReactNode;
   emptyLabel: React.ReactNode;
+  context?: BalanceAccountingCategoryContext;
   onChange: (category: PillCategory | null) => void | Promise<void>;
 }) => {
-  const { enabled, categories } = useBalanceAccountingCategories(canEdit ? host?.slug : undefined);
+  const { enabled, categories, suggestedIds } = useBalanceAccountingCategories(canEdit ? host?.slug : undefined, context);
   const withLabel = (pill: React.ReactNode) =>
     !label ? (
       pill
@@ -98,6 +101,7 @@ const BalanceAccountingCategoryPill = ({
       selectedCategory={selectedCategory}
       allowNone
       alwaysSearchable
+      suggestedCategoryIds={suggestedIds}
       showCode
       onChange={onChange}
     >
@@ -137,6 +141,7 @@ export const ExpenseBalanceAccountingCategoryPill = ({
       loading={loading}
       label={label}
       emptyLabel={emptyLabel}
+      context={{ expenseId: expense.id, accountSlug: expense.account?.slug }}
       onChange={async category => {
         try {
           await updateExpense({
@@ -174,6 +179,7 @@ export const OrderBalanceAccountingCategoryPill = ({
       canEdit={canEdit}
       loading={loading}
       emptyLabel={emptyLabel}
+      context={{ orderId: order.id, accountSlug: account?.slug }}
       onChange={async category => {
         try {
           await updateOrder({

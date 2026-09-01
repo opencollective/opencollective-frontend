@@ -213,7 +213,9 @@ export const HostCreateExpenseModal = ({
 } & BaseModalProps) => {
   const intl = useIntl();
   const [isAmountLocked, setIsAmountLocked] = React.useState(Boolean(transactionsImportRow?.amount?.valueInCents));
-  const balanceCategories = useBalanceAccountingCategories(host?.slug);
+  const balanceCategories = useBalanceAccountingCategories(host?.slug, {
+    accountSlug: !Array.isArray(account) ? account?.slug : account.length === 1 ? account[0]?.slug : undefined,
+  });
   const matchedBankAccountCategory = transactionsImportRow?.institutionAccount?.balanceAccountingCategory;
   const [createExpense, { client }] = useMutation(hostCreateExpenseMutation);
   const { toast } = useToast();
@@ -509,6 +511,7 @@ export const HostCreateExpenseModal = ({
                               inputId={field.id}
                               value={field.value}
                               disabled={Boolean(matchedBankAccountCategory)}
+                              context={{ accountSlug: values.account?.['slug'] }}
                               menuPortalTarget={null}
                               onChange={value => setFieldValue(field.name, value)}
                             />

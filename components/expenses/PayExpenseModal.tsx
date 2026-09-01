@@ -466,7 +466,10 @@ const PayExpenseModal = ({
   const initialValues = getInitialValues(expense, host, blockAutomaticPayment);
   const formik = useFormik({ initialValues, validate, onSubmit: getHandleSubmit(intl, host.currency, onSubmit) });
   const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
-  const balanceCategories = useBalanceAccountingCategories(isManualPayment ? host.slug : undefined);
+  const balanceCategories = useBalanceAccountingCategories(isManualPayment ? host.slug : undefined, {
+    expenseId: expense.id,
+    accountSlug: expense.account?.slug,
+  });
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
   const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
@@ -685,6 +688,7 @@ const PayExpenseModal = ({
                         hostSlug={host.slug}
                         inputId={inputProps.id || 'balanceAccountingCategory'}
                         value={formik.values.balanceAccountingCategory}
+                        context={{ expenseId: expense.id, accountSlug: expense.account?.slug }}
                         menuPortalTarget={null}
                         onChange={value => formik.setFieldValue('balanceAccountingCategory', value)}
                       />

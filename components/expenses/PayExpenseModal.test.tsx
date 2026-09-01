@@ -14,7 +14,15 @@ import { balanceAccountingCategoryPickerQuery } from '../accounting/BalanceAccou
 import PayExpenseModal from './PayExpenseModal';
 
 const pickerMock = {
-  request: { query: balanceAccountingCategoryPickerQuery, variables: { hostSlug: 'test-host' } },
+  request: {
+    query: balanceAccountingCategoryPickerQuery,
+    variables: {
+      hostSlug: 'test-host',
+      account: { slug: 'test-collective' },
+      order: null,
+      expense: { id: 'expense-1' },
+    },
+  },
   result: {
     data: {
       host: {
@@ -23,10 +31,11 @@ const pickerMock = {
         balanceAccountingCategories: {
           __typename: 'AccountingCategoryCollection',
           nodes: [
-            { __typename: 'AccountingCategory', id: 'cat-1', code: '1051', name: 'Mercury Checking' },
-            { __typename: 'AccountingCategory', id: 'cat-2', code: '1030', name: 'Stripe Clearing' },
+            { __typename: 'AccountingCategory', id: 'cat-1', code: '1051', name: 'Mercury Checking', friendlyName: null, kind: 'BALANCE_ACCOUNT' },
+            { __typename: 'AccountingCategory', id: 'cat-2', code: '1030', name: 'Stripe Clearing', friendlyName: null, kind: 'CLEARING_ACCOUNT' },
           ],
         },
+        suggestedBalanceAccountingCategories: [],
       },
     },
   },

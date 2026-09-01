@@ -60,6 +60,8 @@ export type AccountingCategorySelectProps = {
   allowNone?: boolean;
   /** Always show the search input, regardless of the number of options */
   alwaysSearchable?: boolean;
+  /** Show these categories in the "Suggested" group, without calling the prediction service */
+  suggestedCategoryIds?: string[];
   /** Usually true for host/organization admins, false for other users */
   showCode: boolean;
   id?: string;
@@ -351,6 +353,7 @@ const AccountingCategorySelect = ({
   error,
   allowNone = false,
   alwaysSearchable = false,
+  suggestedCategoryIds = undefined,
   showCode,
   expenseValues = undefined,
   buttonClassName = '',
@@ -390,12 +393,17 @@ const AccountingCategorySelect = ({
   }, [options, selectFirstOptionIfSingle, selectedCategory, onChange]);
 
   const suggestedOptions = React.useMemo(() => {
+    if (suggestedCategoryIds?.length) {
+      return options.filter(option => suggestedCategoryIds.includes(option.value?.id));
+    }
     return !predictions.length
       ? []
       : options.filter(option => predictions.some(prediction => prediction.code === option.value?.code));
-  }, [options, predictions]);
+  }, [options, predictions, suggestedCategoryIds]);
 
-  const useSeparatePredictionsCommandGroup = Boolean(predictionStyle === 'inline-preload' && suggestedOptions.length);
+  const useSeparatePredictionsCommandGroup = Boolean(
+    suggestedOptions.length && (predictionStyle === 'inline-preload' || suggestedCategoryIds?.length),
+  );
 
   return (
     <div>

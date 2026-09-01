@@ -553,7 +553,7 @@ const AddFundsModalContentWithCollective = ({
 
   const tiersNodes = get(data, 'account.tiers.nodes');
   const tiersOptions = React.useMemo(() => getTiersOptions(intl, tiersNodes), [intl, tiersNodes]);
-  const balanceCategories = useBalanceAccountingCategories(host?.slug);
+  const balanceCategories = useBalanceAccountingCategories(host?.slug, { accountSlug: account?.slug });
   const matchedBankAccountCategory = transactionsImportRow?.institutionAccount?.balanceAccountingCategory;
 
   // From the Collective page we pass collective as API v1 objects
@@ -1160,6 +1160,7 @@ const AddFundsModalContentWithCollective = ({
                             inputId={field.id}
                             value={field.value}
                             disabled={Boolean(matchedBankAccountCategory)}
+                            context={{ accountSlug: form.values.account?.slug }}
                             menuPortalTarget={null}
                             onChange={value => form.setFieldValue(field.name, value)}
                           />

@@ -11,7 +11,12 @@ import StyledSelect from '../StyledSelect';
 import { useToast } from '../ui/useToast';
 
 export const balanceAccountingCategoryPickerQuery = gql`
-  query BalanceAccountingCategoryPicker($hostSlug: String!) {
+  query BalanceAccountingCategoryPicker(
+    $hostSlug: String!
+    $account: AccountReferenceInput
+    $order: OrderReferenceInput
+    $expense: ExpenseReferenceInput
+  ) {
     host(slug: $hostSlug) {
       id
       balanceAccountingCategories: accountingCategories(kind: [BALANCE_ACCOUNT, CLEARING_ACCOUNT]) {
@@ -23,9 +28,18 @@ export const balanceAccountingCategoryPickerQuery = gql`
           kind
         }
       }
+      suggestedBalanceAccountingCategories(account: $account, order: $order, expense: $expense) {
+        id
+      }
     }
   }
 `;
+
+export type BalanceAccountingCategoryContext = {
+  accountSlug?: string;
+  orderId?: string;
+  expenseId?: string;
+};
 
 type BalanceAccountingCategoryOption = { value: string; label: string };
 
@@ -36,11 +50,19 @@ export const getBalanceAccountingCategoryOption = (
 ): BalanceAccountingCategoryOption | null =>
   category ? { value: category.id, label: `${category.code} - ${category.name}` } : null;
 
-export const useBalanceAccountingCategories = (hostSlug: string | undefined) => {
+export const useBalanceAccountingCategories = (
+  hostSlug: string | undefined,
+  context?: BalanceAccountingCategoryContext,
+) => {
   const { account } = React.useContext(DashboardContext);
   const contextFeature = account ? isFeatureEnabled(account, FEATURES.CHART_OF_ACCOUNTS) : null;
   const { data, loading } = useQuery(balanceAccountingCategoryPickerQuery, {
-    variables: { hostSlug },
+    variables: {
+      hostSlug,
+      account: context?.accountSlug ? { slug: context.accountSlug } : null,
+      order: context?.orderId ? { id: context.orderId } : null,
+      expense: context?.expenseId ? { id: context.expenseId } : null,
+    },
     skip: contextFeature === false || !hostSlug,
   });
 
@@ -51,7 +73,8 @@ export const useBalanceAccountingCategories = (hostSlug: string | undefined) => 
 
   const enabled = Boolean(hostSlug) && contextFeature !== false && (options.length > 0 || loading);
   const categories = data?.host?.balanceAccountingCategories?.nodes || [];
-  return { enabled, loading, options, categories };
+  const suggestedIds = (data?.host?.suggestedBalanceAccountingCategories || []).map(category => category.id);
+  return { enabled, loading, options, categories, suggestedIds };
 };
 
 export const BalanceAccountingCategoryPicker = ({
@@ -63,6 +86,7 @@ export const BalanceAccountingCategoryPicker = ({
   fontSize = undefined,
   styles = undefined,
   menuPortalTarget = undefined,
+  context = undefined,
 }: {
   hostSlug: string;
   inputId: string;
@@ -73,9 +97,26 @@ export const BalanceAccountingCategoryPicker = ({
   styles?: Record<string, unknown>;
   /** Pass null inside StyledModal-based forms, portaled menus break there */
   menuPortalTarget?: HTMLElement | null;
+  /** Used to suggest categories from the rail used or the bank accounts assigned to the account */
+  context?: BalanceAccountingCategoryContext;
 }) => {
   const intl = useIntl();
-  const { enabled, loading, options } = useBalanceAccountingCategories(hostSlug);
+  const { enabled, loading, options, suggestedIds } = useBalanceAccountingCategories(hostSlug, context);
+  const groupedOptions = React.useMemo(() => {
+    if (!suggestedIds.length) {
+      return options;
+    }
+    return [
+      {
+        label: intl.formatMessage({ defaultMessage: 'Suggested', id: 'a0lFbM' }),
+        options: options.filter(option => suggestedIds.includes(option.value)),
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'All Categories', id: '1X6HtI' }),
+        options: options.filter(option => !suggestedIds.includes(option.value)),
+      },
+    ];
+  }, [intl, options, suggestedIds]);
 
   if (!enabled) {
     return null;
@@ -84,7 +125,7 @@ export const BalanceAccountingCategoryPicker = ({
   return (
     <StyledSelect
       inputId={inputId}
-      options={options}
+      options={groupedOptions}
       value={value || null}
       isClearable
       isSearchable
