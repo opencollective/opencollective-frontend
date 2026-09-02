@@ -308,7 +308,7 @@ function Expense(props: ExpenseProps) {
 
       <Box mb={3}>
         {(expense?.permissions?.canDeclineExpenseInvite ||
-          (expense?.status === ExpenseStatus.DRAFT && !isRecurring && draftKey && expense?.draft?.recipientNote)) && (
+          (expense?.status === ExpenseStatus.DRAFT && !isRecurring && draftKey)) && (
           <ExpenseInviteWelcome
             onContinueSubmissionClick={onContinueSubmissionClick}
             className="mb-6"

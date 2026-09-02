@@ -196,7 +196,7 @@ function ContributionTimeline(props: OrderTimelineProps) {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const [collapseGroupsToggle, setCollapseGroupsToggle] = useState({});
-  const getTransactionActions = useTransactionActions();
+  const getTransactionActions = useTransactionActions({ restrictRefundToHostDashboard: true });
 
   const toggleGroup = React.useCallback((group: string) => {
     setCollapseGroupsToggle(cur => {

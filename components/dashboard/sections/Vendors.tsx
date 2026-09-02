@@ -119,8 +119,8 @@ const dashboardVendorsQuery = gql`
     $slug: String!
     $searchTerm: String
     $isArchived: Boolean
-    $limit: Int
-    $offset: Int
+    $limit: Int = 20
+    $offset: Int = 0
     $totalContributed: AmountRangeInput
     $totalExpended: AmountRangeInput
     $onlyVendors: Boolean!

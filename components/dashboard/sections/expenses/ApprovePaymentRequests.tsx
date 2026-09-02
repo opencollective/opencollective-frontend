@@ -120,6 +120,8 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables,
+    // Revalidate on mount so newly submitted expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
 
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
@@ -159,7 +161,7 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
       ) : (
         <React.Fragment>
           <ExpensesList
-            isLoading={loading}
+            isLoading={loading && !data}
             host={data?.host}
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
