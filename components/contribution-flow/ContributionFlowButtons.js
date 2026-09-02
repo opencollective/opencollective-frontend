@@ -5,6 +5,7 @@ import { styled } from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
+import { AnalyticsProperty } from '../../lib/analytics/properties';
 
 import Currency from '../Currency';
 import { Box, Flex } from '../Grid';
@@ -35,6 +36,9 @@ class ContributionFlowButtons extends React.Component {
     tier: PropTypes.shape({ type: PropTypes.string }),
     stepDetails: PropTypes.object,
     stepSummary: PropTypes.object,
+    showPlatformTip: PropTypes.bool,
+    isOscTipExperiment: PropTypes.bool,
+    hostSlug: PropTypes.string,
   };
 
   state = { isLoadingNext: false };
@@ -49,7 +53,16 @@ class ContributionFlowButtons extends React.Component {
     }
 
     if (this.props.step.name === 'details') {
-      track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED);
+      track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED, {
+        props: {
+          [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: this.props.stepDetails?.isNewPlatformTip
+            ? 'new'
+            : 'old',
+          [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(this.props.showPlatformTip),
+          [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: Boolean(this.props.isOscTipExperiment),
+          [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.hostSlug,
+        },
+      });
     }
   };
 

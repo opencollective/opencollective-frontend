@@ -1,5 +1,6 @@
 import { AmountTypes, TierTypes } from '../constants/tiers-types';
 import { getEnvVar } from '../env-utils';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../local-storage';
 import type LoggedInUser from '../LoggedInUser';
 import { parseToBoolean } from '../utils';
 
@@ -14,6 +15,7 @@ type ExperimentConfig = {
 
 type ExperimentContext = {
   collective?: {
+    slug?: string;
     host?: {
       slug?: string;
       legacyId?: number | string;
@@ -25,7 +27,7 @@ const NON_RANDOMIZED_ENVS = ['ci', 'e2e', 'test'];
 const OPEN_SOURCE_COLLECTIVE_HOST_SLUG = 'opensource';
 const OPEN_SOURCE_COLLECTIVE_HOST_LEGACY_ID = 11004;
 const DEFAULT_NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = 0;
-const DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = 20;
+const DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = 50;
 
 function getRolloutPercentage(rawValue: string, defaultValue: number): number {
   const percentage = parseInt(rawValue, 10);
@@ -94,6 +96,38 @@ export function isOscTipExperiment(collective?: PlatformTipCollective | null, ti
   return isOpenSourceCollectiveHost(collective?.host) && platformTipApplies(collective, tier);
 }
 
+// Sticky per-browser, per-collective draws for the OSC platform tip experiment. Without
+// persistence, every page load re-rolls the arm: a contributor who reloads mid-flow has an 80%
+// chance of leaving the tip arm, a one-way drift that selects deliberate (larger) contributions
+// into the holdout and biases the revenue comparison. Draws are stored per collective slug so a
+// visitor keeps their arm across visits to the same collective, while different collectives get
+// independent draws. Stored draws are keyed to the rollout percentage that produced them: when
+// the percentage changes, stale draws are re-rolled so the new split applies immediately.
+type StoredDraws = Record<string, { enabled: boolean; pct: number }>;
+
+function getStickyDraw(collectiveSlug: string, rolloutPercentage: number): boolean {
+  let draws: StoredDraws;
+  try {
+    const parsed = JSON.parse(getFromLocalStorage(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS));
+    // Guard against stored values that parse but aren't a plain object (true, 42, "foo", []):
+    // assigning a property to a primitive throws in strict mode, and arrays don't stringify
+    // their named properties, so either would break or silently disable the stickiness.
+    draws = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    draws = {};
+  }
+
+  const stored = draws[collectiveSlug];
+  if (stored && stored.pct === rolloutPercentage && typeof stored.enabled === 'boolean') {
+    return stored.enabled;
+  }
+
+  const enabled = Math.random() * 100 >= rolloutPercentage;
+  draws[collectiveSlug] = { enabled, pct: rolloutPercentage };
+  setLocalStorage(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS, JSON.stringify(draws));
+  return enabled;
+}
+
 // Reads ?<experiment>=<value> from the current URL to force a variant.
 // Returns true/false to force, or undefined when not present.
 function getOverride(experiment: Experiment): boolean | undefined {
@@ -114,9 +148,11 @@ const experiments: Record<Experiment, ExperimentConfig> = {
         return false;
       }
 
-      // Open Source Collective stays on the legacy flow for now, no A/B.
+      // Open Source Collective always uses the new platform tip UI, no A/B: the OSC tip
+      // experiment (opensourcePlatformTipAb) compares tip shown vs hidden, and when shown,
+      // the tip step uses the new interface.
       if (isOpenSourceCollectiveHost(context?.collective?.host)) {
-        return false;
+        return true;
       }
 
       return Math.random() * 100 < getNewPlatformTipFlowRolloutPercentage();
@@ -124,8 +160,10 @@ const experiments: Record<Experiment, ExperimentConfig> = {
   },
   // OSC-only experiment for measuring the impact of platform tips on contributions.
   // `true` means the tip step is hidden for this user. OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE
-  // is the share of eligible contributions that get the tip proposed (default 20); the
-  // remainder is the holdout where the tip is hidden. Set to 100 to end the holdout.
+  // is the share of eligible contributions that get the tip proposed (default 50); the
+  // remainder is the holdout where the tip is hidden. Equal arms keep the revenue comparison
+  // centered and unbiased under the site's heavy-tailed contribution amounts. Set to 100 to
+  // end the holdout.
   [Experiment.OPENSOURCE_PLATFORM_TIP_AB]: {
     enabled(_user, context): boolean {
       if (typeof window === 'undefined' || NON_RANDOMIZED_ENVS.includes(process.env.OC_ENV)) {
@@ -136,7 +174,13 @@ const experiments: Record<Experiment, ExperimentConfig> = {
         return false;
       }
 
-      return Math.random() * 100 >= getOscPlatformTipRolloutPercentage();
+      const rolloutPercentage = getOscPlatformTipRolloutPercentage();
+      const collectiveSlug = context?.collective?.slug;
+      if (!collectiveSlug) {
+        return Math.random() * 100 >= rolloutPercentage;
+      }
+
+      return getStickyDraw(collectiveSlug, rolloutPercentage);
     },
   },
 };
