@@ -1155,15 +1155,23 @@ const AddFundsModalContentWithCollective = ({
                     >
                       {({ form, field }) => (
                         <div data-cy="add-funds-balance-accounting-category">
-                          <BalanceAccountingCategoryPicker
-                            hostSlug={host?.slug}
-                            inputId={field.id}
-                            value={field.value}
-                            disabled={Boolean(matchedBankAccountCategory)}
-                            context={{ accountSlug: form.values.account?.slug }}
-                            menuPortalTarget={null}
-                            onChange={value => form.setFieldValue(field.name, value)}
-                          />
+                          {balanceCategories.enabled ? (
+                            <BalanceAccountingCategoryPicker
+                              hostSlug={host?.slug}
+                              inputId={field.id}
+                              value={field.value}
+                              disabled={Boolean(matchedBankAccountCategory)}
+                              context={{ accountSlug: form.values.account?.slug }}
+                              menuPortalTarget={null}
+                              onChange={value => form.setFieldValue(field.name, value)}
+                            />
+                          ) : (
+                            matchedBankAccountCategory && (
+                              <span className="rounded-lg bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800">
+                                {`${matchedBankAccountCategory.code} - ${matchedBankAccountCategory.name}`}
+                              </span>
+                            )
+                          )}
                           {Boolean(matchedBankAccountCategory) && (
                             <p className="mt-1 text-xs text-muted-foreground">
                               <FormattedMessage

@@ -28,6 +28,7 @@ import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 
 import {
   BalanceAccountingCategoryPicker,
+  getBalanceAccountingCategoryOption,
   useBalanceAccountingCategories,
 } from '../accounting/BalanceAccountingCategoryPicker';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -330,6 +331,7 @@ const getInitialValues = (expense, host, blockAutomaticPayment = false) => {
   return {
     ...DEFAULT_VALUES,
     ...getPayoutOptionValue(expense.payoutMethod, !blockAutomaticPayment, host),
+    balanceAccountingCategory: getBalanceAccountingCategoryOption(expense.balanceAccountingCategory),
     feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
     expenseAmountInHostCurrency:
       expense.currency === host.currency ? expense.amount : expense.amountInHostCurrency?.valueInCents,
@@ -379,7 +381,7 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
   }
 };
 
-const getHandleSubmit = (intl, currency, onSubmit) => async values => {
+const getHandleSubmit = (intl, currency, onSubmit, payoutMethodType) => async values => {
   const totalAmountPaidInHostCurrency =
     values.expenseAmountInHostCurrency + (values.paymentProcessorFeeInHostCurrency || 0);
   // Show a confirm if the fee is unusually high (more than 50% of the total amount)
@@ -405,10 +407,12 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
     return;
   }
 
+  const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || values.forceManual;
   return onSubmit({
     ...omit(values, 'expenseAmountInHostCurrency'),
     totalAmountPaidInHostCurrency,
-    balanceAccountingCategory: values.balanceAccountingCategory ? { id: values.balanceAccountingCategory.value } : null,
+    balanceAccountingCategory:
+      isManualPayment && values.balanceAccountingCategory ? { id: values.balanceAccountingCategory.value } : null,
   });
 };
 
@@ -464,7 +468,11 @@ const PayExpenseModal = ({
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const blockAutomaticPayment = !canPayWithAutomaticPayment || requiresUpgrade(host, FEATURES.TRANSFERWISE);
   const initialValues = getInitialValues(expense, host, blockAutomaticPayment);
-  const formik = useFormik({ initialValues, validate, onSubmit: getHandleSubmit(intl, host.currency, onSubmit) });
+  const formik = useFormik({
+    initialValues,
+    validate,
+    onSubmit: getHandleSubmit(intl, host.currency, onSubmit, expense.payoutMethod?.type || PayoutMethodType.OTHER),
+  });
   const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const balanceCategories = useBalanceAccountingCategories(isManualPayment ? host.slug : undefined, {
     expenseId: expense.id,

@@ -847,6 +847,11 @@ export const expensesListAdminFieldsFragment = gql`
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
     onHold
+    balanceAccountingCategory {
+      id
+      code
+      name
+    }
     account {
       id
     }

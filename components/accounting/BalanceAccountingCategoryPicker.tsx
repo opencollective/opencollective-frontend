@@ -176,7 +176,7 @@ export const ConnectedAccountBalanceCategoryPicker = ({
   const intl = useIntl();
   const { toast } = useToast();
   const { account } = React.useContext(DashboardContext);
-  const [setBalanceCategory] = useMutation(setConnectedAccountBalanceCategoryFromSettingsMutation);
+  const [setBalanceCategory, { loading: saving }] = useMutation(setConnectedAccountBalanceCategoryFromSettingsMutation);
 
   if (!isFeatureEnabled(account, FEATURES.CHART_OF_ACCOUNTS)) {
     return null;
@@ -201,7 +201,7 @@ export const ConnectedAccountBalanceCategoryPicker = ({
           hostSlug={hostSlug}
           inputId={`connected-account-balance-category-${connectedAccount.id}`}
           value={getBalanceAccountingCategoryOption(connectedAccount.balanceAccountingCategory)}
-          disabled={disabled}
+          disabled={disabled || saving}
           onChange={async option => {
             try {
               await setBalanceCategory({

@@ -156,6 +156,7 @@ export const TransactionsImportAssignmentsForm = ({
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const [editTransactionsImportAssignments] = useMutation(editTransactionsImportAssignmentsMutation);
   const [setBankAccountBalanceCategory] = useMutation(setBankAccountBalanceCategoryMutation);
+  const [savingBalanceCategoryAccountId, setSavingBalanceCategoryAccountId] = React.useState<string | null>(null);
   const hasChartOfAccounts = isFeatureEnabled(dashboardAccount, FEATURES.CHART_OF_ACCOUNTS);
   // Watch the cache: the modal only gets a snapshot of the import
   const watchedImport = useFragment({
@@ -165,6 +166,7 @@ export const TransactionsImportAssignmentsForm = ({
   const institutionAccounts =
     (watchedImport.complete && watchedImport.data?.institutionAccounts) || transactionsImport.institutionAccounts || [];
   const onBalanceCategoryChange = async (importedAccountId: string, option: { value: string } | null) => {
+    setSavingBalanceCategoryAccountId(importedAccountId);
     try {
       await setBankAccountBalanceCategory({
         variables: {
@@ -176,6 +178,8 @@ export const TransactionsImportAssignmentsForm = ({
       toast({ variant: 'success', message: intl.formatMessage({ id: 'saved', defaultMessage: 'Saved' }) });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    } finally {
+      setSavingBalanceCategoryAccountId(null);
     }
   };
 
@@ -305,6 +309,7 @@ export const TransactionsImportAssignmentsForm = ({
                                 value={getBalanceAccountingCategoryOption(account.balanceAccountingCategory)}
                                 fontSize="12px"
                                 styles={CollectivePickerReactSelectStyles}
+                                disabled={savingBalanceCategoryAccountId === account.id}
                                 onChange={option => onBalanceCategoryChange(account.id, option)}
                               />
                             </div>
