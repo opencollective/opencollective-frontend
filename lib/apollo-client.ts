@@ -155,7 +155,8 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
       graphQLErrors.map(error => {
-        if (IGNORED_GRAPHQL_ERROR_CODES.includes(error?.extensions?.code)) {
+        const errorCode = error?.extensions?.code;
+        if (typeof errorCode === 'string' && IGNORED_GRAPHQL_ERROR_CODES.includes(errorCode)) {
           return;
         }
 
