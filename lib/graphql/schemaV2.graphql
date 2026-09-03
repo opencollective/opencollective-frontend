@@ -7961,8 +7961,6 @@ type CommunityStats {
     """
     type: CommunityTransactionType!
   ): TimeSeriesAmount!
-  lastInteractionAt: DateTime
-  firstInteractionAt: DateTime
   activities(
     """
     The number of results to fetch (default 10, max 1000)

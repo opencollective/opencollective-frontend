@@ -9,12 +9,13 @@ import { FEATURES, isFeatureEnabled, requiresUpgrade } from '@/lib/allowed-featu
 import { CollectiveType } from '@/lib/constants/collectives';
 import { i18nGraphqlException } from '@/lib/errors';
 import { gql } from '@/lib/graphql/helpers';
-import type {
-  AccountReferenceInput,
-  CommunityAccountDetailQuery,
-  VendorFieldsFragment,
+import {
+  type AccountReferenceInput,
+  type AccountType,
+  type CommunityAccountDetailQuery,
+  LegalDocumentType,
+  type VendorFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
-import { AccountType, LegalDocumentType } from '@/lib/graphql/types/v2/graphql';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
@@ -101,7 +102,6 @@ export function AccountDetails(props: AccountDetailsProps) {
     variables: {
       accountId: props.account.id,
       hostSlug: dashboardAccount.slug,
-      isIndividual: props.expectedAccountType === AccountType.INDIVIDUAL,
     },
   });
   const isLoading = query.loading || !query.data;
