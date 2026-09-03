@@ -150,9 +150,15 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     }
   });
 
+  const IGNORED_GRAPHQL_ERROR_CODES = ['ContentNotReady'];
+
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
       graphQLErrors.map(error => {
+        if (IGNORED_GRAPHQL_ERROR_CODES.includes(error?.extensions?.code)) {
+          return;
+        }
+
         if (error) {
           const { message, locations, path } = error;
           // eslint-disable-next-line no-console
