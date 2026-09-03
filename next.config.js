@@ -264,6 +264,12 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Legacy security.txt location, see RFC 9116
+      {
+        source: '/security.txt',
+        destination: '/.well-known/security.txt',
+        permanent: true,
+      },
       // Legacy settings (/edit)
       {
         source: '/:slug/edit/:section*',
