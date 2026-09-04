@@ -181,7 +181,7 @@ const communityAccountDetailActivityFields = gql`
 `;
 
 export const communityAccountDetailQuery = gql`
-  query CommunityAccountDetail($accountId: String!, $hostSlug: String!, $isIndividual: Boolean!) {
+  query CommunityAccountDetail($accountId: String!, $hostSlug: String!) {
     account(id: $accountId) {
       id
       publicId
@@ -332,10 +332,10 @@ export const communityAccountDetailQuery = gql`
 
     firstActivity: activities(
       host: { slug: $hostSlug }
-      individual: { id: $accountId }
+      account: [{ id: $accountId }]
       orderBy: { field: CREATED_AT, direction: ASC }
       limit: 1
-    ) @include(if: $isIndividual) {
+    ) {
       nodes {
         ...CommunityAccountDetailActivityFields
       }
@@ -343,10 +343,10 @@ export const communityAccountDetailQuery = gql`
 
     lastActivity: activities(
       host: { slug: $hostSlug }
-      individual: { id: $accountId }
+      account: [{ id: $accountId }]
       orderBy: { field: CREATED_AT, direction: DESC }
       limit: 1
-    ) @include(if: $isIndividual) {
+    ) {
       nodes {
         ...CommunityAccountDetailActivityFields
       }
@@ -408,8 +408,6 @@ export const communityAccountOverviewQuery = gql`
             count
           }
         }
-        lastInteractionAt
-        firstInteractionAt
       }
     }
   }
