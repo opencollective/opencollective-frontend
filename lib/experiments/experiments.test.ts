@@ -3,7 +3,18 @@ import { Experiment, isExperimentEnabled } from './experiments';
 describe('experiments', () => {
   const originalOcEnv = process.env.OC_ENV;
   const originalRolloutPercentage = process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
-  const randomSpy = jest.spyOn(Math, 'random');
+  // Draws read crypto.getRandomValues (see randomPercent in experiments.ts). The spy queues
+  // fractional values like Math.random would produce; ceil keeps boundary fractions (0.2, 0.5)
+  // exactly on their threshold after the Uint32 round-trip.
+  const randomSpy = jest.spyOn(window.crypto, 'getRandomValues');
+  const drawImpl = (fraction: number) => (array: Uint32Array) => {
+    array[0] = Math.ceil(fraction * 2 ** 32);
+    return array;
+  };
+  const mockDrawOnce = (...fractions: number[]) => {
+    fractions.forEach(f => randomSpy.mockImplementationOnce(drawImpl(f) as never));
+  };
+  const mockDrawAlways = (fraction: number) => randomSpy.mockImplementation(drawImpl(fraction) as never);
 
   // The OSC rollout percentage is read through getEnvVar, which in the browser resolves from
   // window.__NEXT_DATA__.env. Simulate that path so the tests cover what production executes.
@@ -38,7 +49,7 @@ describe('experiments', () => {
 
   it('keeps the new platform tip flow disabled by default in e2e', () => {
     process.env.OC_ENV = 'e2e';
-    randomSpy.mockReturnValue(0);
+    mockDrawAlways(0);
 
     expect(
       isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
@@ -50,7 +61,7 @@ describe('experiments', () => {
   it('always enables the new platform tip flow for Open Source Collective host', () => {
     // Even with the rollout at 0, OSC gets the new tip UI deterministically
     process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = '0';
-    randomSpy.mockReturnValue(0.99);
+    mockDrawAlways(0.99);
 
     expect(
       isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
@@ -67,7 +78,7 @@ describe('experiments', () => {
 
   it('uses the configured rollout percentage for other hosts', () => {
     process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = '25';
-    randomSpy.mockReturnValueOnce(0.24).mockReturnValueOnce(0.25);
+    mockDrawOnce(0.24, 0.25);
 
     expect(
       isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
@@ -92,11 +103,11 @@ describe('experiments', () => {
     const context = { collective: { host: { slug: 'opensource' } } };
 
     // Below the default rollout percentage: tip proposed (experiment not enabled)
-    randomSpy.mockReturnValueOnce(0.49);
+    mockDrawOnce(0.49);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
 
     // At or above the default rollout percentage: tip hidden (experiment enabled)
-    randomSpy.mockReturnValueOnce(0.5);
+    mockDrawOnce(0.5);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
   });
 
@@ -105,21 +116,21 @@ describe('experiments', () => {
     const context = { collective: { host: { slug: 'opensource' } } };
 
     // Below the rollout percentage: tip proposed (experiment not enabled)
-    randomSpy.mockReturnValueOnce(0.19);
+    mockDrawOnce(0.19);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
 
     // At or above the rollout percentage: tip hidden (experiment enabled)
-    randomSpy.mockReturnValueOnce(0.2);
+    mockDrawOnce(0.2);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
 
     // Full rollout: tip always proposed
     setOscRolloutPercentage('100');
-    randomSpy.mockReturnValueOnce(0.99);
+    mockDrawOnce(0.99);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
   });
 
   it('never hides the tip outside the Open Source Collective host', () => {
-    randomSpy.mockReturnValue(0.99);
+    mockDrawAlways(0.99);
 
     expect(
       isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, {
@@ -132,11 +143,11 @@ describe('experiments', () => {
     const context = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
 
     // First load draws the tip-hidden arm and persists it
-    randomSpy.mockReturnValueOnce(0.99);
+    mockDrawOnce(0.99);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
 
     // Subsequent loads reuse the stored draw instead of re-rolling
-    randomSpy.mockReturnValueOnce(0);
+    mockDrawOnce(0);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
     expect(randomSpy).toHaveBeenCalledTimes(1);
   });
@@ -145,7 +156,7 @@ describe('experiments', () => {
     const webpack = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
     const curl = { collective: { slug: 'curl', host: { slug: 'opensource' } } };
 
-    randomSpy.mockReturnValueOnce(0.99).mockReturnValueOnce(0);
+    mockDrawOnce(0.99, 0);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, webpack)).toBe(true);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, curl)).toBe(false);
 
@@ -158,12 +169,12 @@ describe('experiments', () => {
     const context = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
 
     setOscRolloutPercentage('20');
-    randomSpy.mockReturnValueOnce(0.99);
+    mockDrawOnce(0.99);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
 
     // Percentage changed: the stored draw is stale, a new one is made under the new split
     setOscRolloutPercentage('100');
-    randomSpy.mockReturnValueOnce(0.99);
+    mockDrawOnce(0.99);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
 
     // And the new draw is sticky in turn
@@ -174,7 +185,7 @@ describe('experiments', () => {
   it('falls back to a per-load draw when the context has no collective slug', () => {
     const context = { collective: { host: { slug: 'opensource' } } };
 
-    randomSpy.mockReturnValueOnce(0.99).mockReturnValueOnce(0);
+    mockDrawOnce(0.99, 0);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
   });
@@ -183,7 +194,7 @@ describe('experiments', () => {
     window.localStorage.setItem('oscTipExperimentDraws', '{not json');
     const context = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
 
-    randomSpy.mockReturnValueOnce(0.99);
+    mockDrawOnce(0.99);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
 
     // The corrupted blob was replaced by a valid one holding the new draw
@@ -196,7 +207,7 @@ describe('experiments', () => {
     const context = { collective: { slug: 'webpack', host: { slug: 'opensource' } } };
 
     // Neither throws nor loses stickiness: the bad value is replaced by a fresh draw map
-    randomSpy.mockReturnValueOnce(0.99);
+    mockDrawOnce(0.99);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
     expect(randomSpy).toHaveBeenCalledTimes(1);
