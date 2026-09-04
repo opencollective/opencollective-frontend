@@ -384,7 +384,7 @@ interface StepSharedProps extends StepProps {
   isLoading?: boolean;
 }
 
-// Props which shouldn't be passed to to the Step component from the user
+// Props which shouldn't be passed to the Step component from the user
 interface StepInternalConfig {
   index: number;
   isCompletedStep?: boolean;
