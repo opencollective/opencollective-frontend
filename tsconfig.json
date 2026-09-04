@@ -28,6 +28,8 @@
     "components",
     "cypress",
     "*.config.*",
+    "instrumentation.js",
+    "instrumentation-client.js",
     "lib",
     "proxy.ts",
     "next-env.d.ts",
