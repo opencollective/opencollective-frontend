@@ -28,6 +28,7 @@ import type {
 import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
+import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
 
 import { KYCVerificationProviderBadge } from '@/components/kyc/components/KYCVerificationProviderBadge';
@@ -37,6 +38,7 @@ import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';
 import { useModal } from '@/components/ModalContext';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/HoverCard';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import DateTime from '../../../DateTime';
@@ -127,6 +129,73 @@ export function TaxFormBadge({ taxForms, onClick }: TaxFormBadgeProps) {
         </div>
       </HoverCardContent>
     </HoverCard>
+  );
+}
+
+type TaxableCountryProps = {
+  accountType: AccountType;
+  taxableCountry?: string | null;
+  isUSEntity?: boolean | null;
+  isLoading?: boolean;
+};
+
+export function TaxableCountry({ accountType, taxableCountry, isUSEntity, isLoading }: TaxableCountryProps) {
+  const intl = useIntl();
+  const label =
+    accountType === AccountType.INDIVIDUAL ? (
+      <FormattedMessage defaultMessage="Country of residence" id="TaxableCountry.residence" />
+    ) : (
+      <FormattedMessage defaultMessage="Country of incorporation" id="TaxableCountry.incorporation" />
+    );
+
+  const value = isLoading ? (
+    <Skeleton className="h-4 w-1/2" />
+  ) : taxableCountry ? (
+    <span>
+      {getFlagEmoji(taxableCountry)} {getCountryDisplayName(intl, taxableCountry)}
+    </span>
+  ) : (
+    <span className="text-muted-foreground">
+      <FormattedMessage defaultMessage="Not provided yet" id="TaxableCountry.notProvidedYet" />
+      {isUSEntity !== null && isUSEntity !== undefined && (
+        <span>
+          {' · '}
+          <FormattedMessage
+            defaultMessage="US person: {value}"
+            id="TaxableCountry.USPersonStatus"
+            values={{
+              value: isUSEntity ? (
+                <FormattedMessage defaultMessage="Yes" id="a5msuh" />
+              ) : (
+                <FormattedMessage defaultMessage="No" id="oUWADl" />
+              ),
+            }}
+          />
+        </span>
+      )}
+    </span>
+  );
+
+  return (
+    <DataListItem
+      label={label}
+      value={
+        <div className="flex items-center gap-1.5">
+          {value}
+          <Tooltip delayDuration={100}>
+            <TooltipTrigger asChild>
+              <HelpCircle size={14} className="shrink-0 cursor-help text-muted-foreground" />
+            </TooltipTrigger>
+            <TooltipContent className="z-[9999] max-w-xs text-left">
+              <FormattedMessage
+                defaultMessage="Set from the US tax form (W-9, W-8BEN or W-8BEN-E) submitted by this account."
+                id="TaxableCountry.tooltip"
+              />
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      }
+    />
   );
 }
 

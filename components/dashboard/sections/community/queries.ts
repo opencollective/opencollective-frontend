@@ -189,6 +189,8 @@ export const communityAccountDetailQuery = gql`
       slug
       name
       legalName
+      taxableCountry
+      isUSEntity
       type
       createdAt
       imageUrl
