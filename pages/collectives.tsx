@@ -399,7 +399,7 @@ const collectiveFeatureSections: IFeatureSection[] = [
 const collectiveTestimonials: Testimonial[] = [
   {
     paragraphs: [
-      `Open Collective helped us fund-raise for our goal of open source development and knowledge, with the help of our donors and OpenCollective's platform we're able to provide knowledge to thousands of people, daily.`,
+      `Open Collective helped us fund-raise for our goal of open source development and knowledge. With the help of our donors and OpenCollective's platform we're able to provide knowledge to thousands of people, daily.`,
     ],
     author: 'Hytale Modding',
     linkLabel: (
@@ -421,8 +421,7 @@ const collectiveTestimonials: Testimonial[] = [
   },
   {
     paragraphs: [
-      `As an open source project, transparency isn't optional, it's core to who we are. Before Open Collective, financial contributions felt complicated. People wanted to support Mautic, but the process was unclear and tracking where money went required manual reporting that we frankly didn't have capacity for.`,
-      `Since we started using Open Collective, anyone can see our financial reality in real-time. The platform itself saves our small team hours of financial admin, but more importantly, it proves that open source projects can operate with the same financial transparency we bring to our code. It's a huge asset to the world and shows that there's another way of working - leading with transparency.`,
+      `As an open source project, transparency isn't optional, it's core to who we are. Since we started using Open Collective, anyone can see our financial reality in real-time. The platform itself saves our small team hours of financial admin, but more importantly, it proves that open source projects can operate with the same financial transparency we bring to our code. It's a huge asset to the world and shows that there's another way of working - leading with transparency.`,
     ],
     author: 'Mautic',
     avatar: '/static/images/testimonials/mautic.png',
@@ -433,7 +432,7 @@ const collectiveTestimonials: Testimonial[] = [
   },
   {
     paragraphs: [
-      `For years I searched for the right way to fund Project Liminality. Ever since discovering Open Collective, I can say with confidence that I've found it. Stewarding a deeply value-driven, open-source initiative, Open Collective's infrastructure — and more importantly, the incredible ecosystem it attracts — has proven to be the ideal environment for this vision to become reality.`,
+      `Stewarding a deeply value-driven, open-source initiative, Open Collective's infrastructure, and more importantly, the incredible ecosystem it attracts, has proven to be the ideal environment for the vision to become reality.`,
       `Ever since setting up my collective, I've been recommending it to every friend on a similar path. If you're holding a dream of a more beautiful world, this is the container to make it come true.`,
     ],
     author: 'ProjectLiminality',
