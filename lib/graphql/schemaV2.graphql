@@ -2327,6 +2327,11 @@ type Order {
   accountingCategory: AccountingCategory
 
   """
+  The balance/clearing accounting category the funds were received through (only visible to host admins and accountants)
+  """
+  balanceAccountingCategory: AccountingCategory
+
+  """
   The list of activities (ie. approved, edited, etc) for this Order ordered by date ascending
   """
   activities: ActivityCollection!
@@ -2525,6 +2530,11 @@ interface Transaction {
   clearedAt: DateTime
   expense: Expense
   order: Order
+
+  """
+  The balance/clearing accounting category the funds moved through, inherited from the related order or expense (only visible to host admins and accountants)
+  """
+  balanceAccountingCategory: AccountingCategory
   isRefunded: Boolean
   isRefund: Boolean
   isDisputed: Boolean
@@ -2722,6 +2732,11 @@ type Expense {
   The accounting category attached to this expense
   """
   accountingCategory: AccountingCategory
+
+  """
+  The balance/clearing accounting category the expense was paid from
+  """
+  balanceAccountingCategory: AccountingCategory
 
   """
   If available, this field will contain a breakdown of the expense values depending on who edited it
@@ -4563,6 +4578,26 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     """
     account: AccountReferenceInput
   ): AccountingCategoryCollection! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
+
+  """
+  Suggested balance/clearing accounting categories for a context: the rail the money moved through, then the bank accounts assigned to the account. Only computed for host admins and accountants.
+  """
+  suggestedBalanceAccountingCategories(
+    """
+    Suggest from the bank accounts assigned to this account
+    """
+    account: AccountReferenceInput
+
+    """
+    Suggest from the payment rail of this order
+    """
+    order: OrderReferenceInput
+
+    """
+    Suggest from the payout rail of this expense
+    """
+    expense: ExpenseReferenceInput
+  ): [AccountingCategory!]! @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
   contributionAccountingCategoryRules: [ContributionAccountingCategoryRule!]
     @deprecated(reason: "2026-04-22: This field has moved to the Organization type")
 
@@ -6770,6 +6805,11 @@ type ConnectedAccount {
   authorizationExpiresAt: DateTime
   settings: JSON
   service: ConnectedAccountService!
+
+  """
+  The balance/clearing accounting category used to attribute payments processed through this connected account
+  """
+  balanceAccountingCategory: AccountingCategory
 
   """
   The accounts that are mirroring this connected account
@@ -9257,6 +9297,8 @@ enum AccountingCategoryKind {
   ADDED_FUNDS
   CONTRIBUTION
   EXPENSE
+  BALANCE_ACCOUNT
+  CLEARING_ACCOUNT
 }
 
 """
@@ -9320,6 +9362,11 @@ type ManualPaymentProvider {
   Bank account details for BANK_TRANSFER type providers
   """
   accountDetails: JSON
+
+  """
+  The balance/clearing accounting category used to attribute payments through this provider
+  """
+  balanceAccountingCategory: AccountingCategory
 
   """
   Whether this provider has been archived
@@ -9630,6 +9677,11 @@ type TransactionsImportAccount {
   The mask of the account (Plaid only)
   """
   mask: String
+
+  """
+  The balance/clearing accounting category used to attribute activity matched from this bank sub-account (only visible to host admins)
+  """
+  balanceAccountingCategory: AccountingCategory
 }
 
 type TransactionsImportAssignment {
@@ -13141,6 +13193,11 @@ type Credit implements Transaction {
   clearedAt: DateTime
   expense: Expense
   order: Order
+
+  """
+  The balance/clearing accounting category the funds moved through, inherited from the related order or expense (only visible to host admins and accountants)
+  """
+  balanceAccountingCategory: AccountingCategory
   isRefunded: Boolean
   isRefund: Boolean
   isDisputed: Boolean
@@ -13293,6 +13350,11 @@ type Debit implements Transaction {
   clearedAt: DateTime
   expense: Expense
   order: Order
+
+  """
+  The balance/clearing accounting category the funds moved through, inherited from the related order or expense (only visible to host admins and accountants)
+  """
+  balanceAccountingCategory: AccountingCategory
   isRefunded: Boolean
   isRefund: Boolean
   isDisputed: Boolean
@@ -17611,6 +17673,26 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     """
     account: AccountReferenceInput
   ): AccountingCategoryCollection!
+
+  """
+  Suggested balance/clearing accounting categories for a context: the rail the money moved through, then the bank accounts assigned to the account. Only computed for host admins and accountants.
+  """
+  suggestedBalanceAccountingCategories(
+    """
+    Suggest from the bank accounts assigned to this account
+    """
+    account: AccountReferenceInput
+
+    """
+    Suggest from the payment rail of this order
+    """
+    order: OrderReferenceInput
+
+    """
+    Suggest from the payout rail of this expense
+    """
+    expense: ExpenseReferenceInput
+  ): [AccountingCategory!]!
   contributionAccountingCategoryRules: [ContributionAccountingCategoryRule!]
 }
 
@@ -26622,6 +26704,11 @@ type Mutation {
     accountingCategory: AccountingCategoryReferenceInput
 
     """
+    The balance/clearing accounting category the funds were received through
+    """
+    balanceAccountingCategory: AccountingCategoryReferenceInput
+
+    """
     The transaction import row to associate with this order
     """
     transactionsImportRow: TransactionsImportRowReferenceInput
@@ -26695,6 +26782,11 @@ type Mutation {
     The accounting category of this order
     """
     accountingCategory: AccountingCategoryReferenceInput
+
+    """
+    The balance/clearing accounting category the funds were received through
+    """
+    balanceAccountingCategory: AccountingCategoryReferenceInput
   ): Order!
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
@@ -26735,6 +26827,21 @@ type Mutation {
     """
     connectedAccount: ConnectedAccountReferenceInput!
   ): ConnectedAccount
+
+  """
+  Set the balance/clearing accounting category used to attribute payments processed through this connected account. Scope: "connectedAccounts".
+  """
+  setConnectedAccountBalanceAccountingCategory(
+    """
+    ConnectedAccount reference containing either id or legacyId
+    """
+    connectedAccount: ConnectedAccountReferenceInput!
+
+    """
+    The balance/clearing accounting category to set. Pass null to unset.
+    """
+    accountingCategory: AccountingCategoryReferenceInput
+  ): ConnectedAccount!
 
   """
   Create a conversation. Scope: "conversations".
@@ -26855,6 +26962,11 @@ type Mutation {
     transactionsImportRow: TransactionsImportRowReferenceInput
 
     """
+    Balance/clearing accounting category to record the expense against. Host admins only; defaults to the matched bank account category when created from an import row
+    """
+    balanceAccountingCategory: AccountingCategoryReferenceInput
+
+    """
     A optional private comment to add to the created expense
     """
     privateComment: String @deprecated(reason: "2025-11-03: This field is no longer used")
@@ -26893,6 +27005,21 @@ type Mutation {
     Reference of the account to move the expense to
     """
     destinationAccount: AccountReferenceInput!
+  ): Expense!
+
+  """
+  Update the balance/clearing accounting category of an expense. Scope: "expenses".
+  """
+  updateExpenseBalanceAccountingCategory(
+    """
+    Reference to the expense to update
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    The balance/clearing accounting category to set. Pass null to unset.
+    """
+    accountingCategory: AccountingCategoryReferenceInput
   ): Expense!
 
   """
@@ -27558,6 +27685,21 @@ type Mutation {
     """
     platformTipAmount: AmountInput
   ): Order
+
+  """
+  Update the balance/clearing accounting category of an order. Scope: "orders".
+  """
+  updateOrderBalanceAccountingCategory(
+    """
+    Reference to the Order to update
+    """
+    order: OrderReferenceInput!
+
+    """
+    The balance/clearing accounting category to set. Pass null to unset.
+    """
+    accountingCategory: AccountingCategoryReferenceInput
+  ): Order!
 
   """
   Update the accounting category of an order. Scope: "orders".
@@ -28246,6 +28388,26 @@ type Mutation {
     Assignments for the import
     """
     assignments: [TransactionsImportAssignmentInput!]
+  ): TransactionsImport!
+
+  """
+  Set the balance/clearing accounting category used to attribute activity matched from a bank sub-account of this import. Scope: "transactions".
+  """
+  setTransactionsImportAccountBalanceAccountingCategory(
+    """
+    Reference to the transactions import
+    """
+    transactionsImport: TransactionsImportReferenceInput!
+
+    """
+    The bank sub-account id, as returned in `institutionAccounts`
+    """
+    importedAccountId: NonEmptyString!
+
+    """
+    The balance/clearing accounting category to set. Pass null to unset.
+    """
+    accountingCategory: AccountingCategoryReferenceInput
   ): TransactionsImport!
 
   """
@@ -29914,6 +30076,11 @@ input ProcessExpensePaymentParams {
   paymentMethodService: PaymentMethodService
 
   """
+  The balance/clearing accounting category the funds were paid from (for manual payments)
+  """
+  balanceAccountingCategory: AccountingCategoryReferenceInput
+
+  """
   Date funds were cleared on the fiscal host bank, Wise, PayPal, Stripe or any other external account holding these funds.
   """
   clearedAt: DateTime
@@ -30205,6 +30372,11 @@ input ManualPaymentProviderCreateInput {
   Bank account details for BANK_TRANSFER type providers
   """
   accountDetails: JSON
+
+  """
+  The balance/clearing accounting category to attribute payments through this provider to
+  """
+  balanceAccountingCategory: AccountingCategoryReferenceInput
 }
 
 input ManualPaymentProviderUpdateInput {
@@ -30227,6 +30399,11 @@ input ManualPaymentProviderUpdateInput {
   Bank account details for BANK_TRANSFER type providers
   """
   accountDetails: JSON
+
+  """
+  The balance/clearing accounting category to attribute payments through this provider to. Pass null to unset.
+  """
+  balanceAccountingCategory: AccountingCategoryReferenceInput
 }
 
 type FollowAccountResult {

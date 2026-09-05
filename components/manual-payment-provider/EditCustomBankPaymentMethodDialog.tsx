@@ -14,6 +14,10 @@ import { ManualPaymentProviderType } from '@/lib/graphql/types/v2/graphql';
 import { InputGroup } from '@/components/ui/Input';
 
 import {
+  BalanceAccountingCategoryPicker,
+  getBalanceAccountingCategoryOption,
+} from '../accounting/BalanceAccountingCategoryPicker';
+import {
   createManualPaymentProviderMutation,
   editCollectiveBankTransferHostQuery,
   updateManualPaymentProviderMutation,
@@ -45,6 +49,7 @@ type FormValues = {
   instructions: string;
   icon: string;
   accountDetails: Record<string, unknown>;
+  balanceAccountingCategory: { value: string; label: string } | null;
 };
 
 export const EditCustomBankPaymentMethodDialog = ({
@@ -72,6 +77,7 @@ export const EditCustomBankPaymentMethodDialog = ({
     instructions: manualPaymentProvider?.instructions || BANK_TRANSFER_DEFAULT_INSTRUCTIONS,
     icon: manualPaymentProvider?.icon || 'Landmark',
     accountDetails: (manualPaymentProvider?.accountDetails as Record<string, unknown>) || {},
+    balanceAccountingCategory: getBalanceAccountingCategoryOption(manualPaymentProvider?.balanceAccountingCategory),
   };
 
   const handleSubmit = async (values: FormValues, { setSubmitting }: { setSubmitting: (val: boolean) => void }) => {
@@ -86,6 +92,9 @@ export const EditCustomBankPaymentMethodDialog = ({
               instructions: values.instructions,
               icon: values.icon,
               accountDetails: values.accountDetails,
+              balanceAccountingCategory: values.balanceAccountingCategory
+                ? { id: values.balanceAccountingCategory.value }
+                : null,
             },
           },
         });
@@ -100,6 +109,9 @@ export const EditCustomBankPaymentMethodDialog = ({
               instructions: values.instructions,
               icon: values.icon,
               accountDetails: values.accountDetails,
+              balanceAccountingCategory: values.balanceAccountingCategory
+                ? { id: values.balanceAccountingCategory.value }
+                : null,
             },
           },
         });
@@ -215,6 +227,24 @@ export const EditCustomBankPaymentMethodDialog = ({
                       return `__unknown_field_${fieldName}__`;
                     }
                   }}
+                />
+              </div>
+
+              <div className="mt-6 border-t pt-6">
+                <Label className="mb-2 block text-sm font-bold" htmlFor="bank-provider-balance-category">
+                  <FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />
+                </Label>
+                <p className="mb-2 text-xs text-gray-600">
+                  <FormattedMessage
+                    defaultMessage="Payments received through this method will be attributed to the selected account from your chart of accounts."
+                    id="T+Ilke"
+                  />
+                </p>
+                <BalanceAccountingCategoryPicker
+                  hostSlug={account.slug}
+                  inputId="bank-provider-balance-category"
+                  value={values.balanceAccountingCategory}
+                  onChange={option => setFieldValue('balanceAccountingCategory', option)}
                 />
               </div>
 

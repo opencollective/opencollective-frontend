@@ -5,6 +5,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/graphql';
 import { Currency } from '@/lib/graphql/types/v2/graphql';
 
+import {
+  BalanceAccountingCategoryPicker,
+  getBalanceAccountingCategoryOption,
+} from '../accounting/BalanceAccountingCategoryPicker';
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/Dialog';
 import { InputGroup } from '../ui/Input';
@@ -19,6 +23,7 @@ type FormValues = {
   name: string;
   instructions: string;
   icon: string;
+  balanceAccountingCategory: { value: string; label: string } | null;
 };
 
 type EditCustomPaymentMethodDialogProps = {
@@ -26,15 +31,22 @@ type EditCustomPaymentMethodDialogProps = {
   onSave: (values: FormValues, editingProvider?: ManualPaymentProvider) => Promise<void>;
   onClose: () => void;
   defaultCurrency: string;
+  hostSlug?: string;
 };
 
-export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: EditCustomPaymentMethodDialogProps) => {
+export const EditCustomPaymentMethodDialog = ({
+  provider,
+  onSave,
+  onClose,
+  hostSlug,
+}: EditCustomPaymentMethodDialogProps) => {
   const intl = useIntl();
 
   const initialValues: FormValues = {
     name: provider?.name || '',
     instructions: provider?.instructions || '',
     icon: provider?.icon || '',
+    balanceAccountingCategory: getBalanceAccountingCategoryOption(provider?.balanceAccountingCategory),
   };
 
   const handleClose = () => {
@@ -112,6 +124,23 @@ export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: Edi
                     setFieldValue('iconUrl', '');
                   }}
                 />
+                <div className="mt-6 border-t pt-6">
+                  <Label className="mb-2 block text-sm font-bold" htmlFor="custom-provider-balance-category">
+                    <FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />
+                  </Label>
+                  <p className="mb-2 text-xs text-gray-600">
+                    <FormattedMessage
+                      defaultMessage="Payments received through this method will be attributed to the selected account from your chart of accounts."
+                      id="T+Ilke"
+                    />
+                  </p>
+                  <BalanceAccountingCategoryPicker
+                    hostSlug={hostSlug}
+                    inputId="custom-provider-balance-category"
+                    value={values.balanceAccountingCategory}
+                    onChange={option => setFieldValue('balanceAccountingCategory', option)}
+                  />
+                </div>
                 <div className="mt-6 border-t pt-6">
                   <Label className="mb-2 block text-sm font-bold">
                     <FormattedMessage defaultMessage="Instructions" id="sV2v5L" />

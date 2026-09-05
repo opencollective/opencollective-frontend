@@ -82,6 +82,12 @@ const transactionQuery = gql`
       isDisputed
       isOrderRejected
       merchantId
+      balanceAccountingCategory {
+        id
+        code
+        name
+        friendlyName
+      }
       host {
         id
         slug
@@ -567,6 +573,18 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                     value={
                       accountingCategory ? (
                         getCategoryLabel(intl, accountingCategory, true)
+                      ) : (
+                        <span className="text-muted-foreground">
+                          <FormattedMessage defaultMessage="Not set" id="p5LNtB" />
+                        </span>
+                      )
+                    }
+                  />
+                  <DataListItem
+                    label={<FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />}
+                    value={
+                      transaction.balanceAccountingCategory ? (
+                        getCategoryLabel(intl, transaction.balanceAccountingCategory, true)
                       ) : (
                         <span className="text-muted-foreground">
                           <FormattedMessage defaultMessage="Not set" id="p5LNtB" />

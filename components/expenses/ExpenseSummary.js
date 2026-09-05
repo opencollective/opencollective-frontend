@@ -16,6 +16,7 @@ import { getExpenseExchangeRateWarningOrError } from './lib/utils';
 import { isFeatureEnabled } from '@/lib/allowed-features';
 
 import { AccountHoverCard } from '../AccountHoverCard';
+import { ExpenseBalanceAccountingCategoryPill } from '../accounting/BalanceAccountingCategoryPill';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -228,9 +229,9 @@ const ExpenseSummary = ({
         </div>
       )}
 
-      <div className="flex items-baseline gap-2">
-        {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, collective?.host || host) && (
-          <React.Fragment>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-baseline gap-2">
+          {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, collective?.host || host) && (
             <ExpenseAccountingCategoryPill
               host={host}
               account={expense.account}
@@ -242,9 +243,20 @@ const ExpenseSummary = ({
               allowNone={!isLoggedInUserExpenseHostAdmin}
               showCodeInSelect={isLoggedInUserExpenseHostAdmin}
             />
-          </React.Fragment>
+          )}
+          <Tags expense={expense} canEdit={canEditTags} />
+        </div>
+        {expense && host && (
+          <ExpenseBalanceAccountingCategoryPill
+            expense={expense}
+            host={host}
+            canEdit={
+              isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') && Boolean(expense.permissions?.canEditAccountingCategory)
+            }
+            label={<FormattedMessage defaultMessage="Paid from" id="jhYP1/" />}
+            emptyLabel={<FormattedMessage defaultMessage="Not set" id="p5LNtB" />}
+          />
         )}
-        <Tags expense={expense} canEdit={canEditTags} />
       </div>
       <Flex alignItems="center" mt="12px">
         {isLoading && !expense ? (

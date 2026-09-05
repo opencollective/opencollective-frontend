@@ -15,7 +15,7 @@ export const getI18nLink = linkProps => chunks => (
 // ts-unused-exports:disable-next-line
 export const I18nParagraph = chunks => <p>{chunks}</p>;
 export const I18nBold = chunks => <strong>{chunks}</strong>;
-export const I18nItalic = chunks => <i>{chunks}</i>;
+const I18nItalic = chunks => <i>{chunks}</i>;
 // ts-unused-exports:disable-next-line
 export const I18nCode = chunks => <code>{chunks}</code>;
 // ts-unused-exports:disable-next-line

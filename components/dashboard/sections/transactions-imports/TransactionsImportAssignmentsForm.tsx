@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useFragment, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { uniqBy } from 'lodash-es';
 import { Building, ChartCandlestick, ChartLine, CreditCard, HandCoins, Landmark, Wallet } from 'lucide-react';
@@ -7,13 +7,19 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { TransactionsImportAssignmentFieldsFragment } from './lib/graphql';
 import { DEFAULT_ASSIGNMENT_ACCOUNT_ID } from './lib/types';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { getAccountReferenceInput } from '@/lib/collective';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 import { i18nGraphqlException } from '@/lib/errors';
 import type { Account, TransactionsImport } from '@/lib/graphql/types/v2/graphql';
 import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
 
+import {
+  BalanceAccountingCategoryPicker,
+  getBalanceAccountingCategoryOption,
+} from '@/components/accounting/BalanceAccountingCategoryPicker';
 import CollectivePickerAsync from '@/components/CollectivePickerAsync';
+import { DashboardContext } from '@/components/dashboard/DashboardContext';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { useToast } from '@/components/ui/useToast';
@@ -31,6 +37,48 @@ const editTransactionsImportAssignmentsMutation = gql`
     }
   }
   ${TransactionsImportAssignmentFieldsFragment}
+`;
+
+const setBankAccountBalanceCategoryMutation = gql`
+  mutation SetBankAccountBalanceAccountingCategory(
+    $transactionsImport: TransactionsImportReferenceInput!
+    $importedAccountId: NonEmptyString!
+    $accountingCategory: AccountingCategoryReferenceInput
+  ) {
+    setTransactionsImportAccountBalanceAccountingCategory(
+      transactionsImport: $transactionsImport
+      importedAccountId: $importedAccountId
+      accountingCategory: $accountingCategory
+    ) {
+      id
+      institutionAccounts {
+        id
+        balanceAccountingCategory {
+          id
+          code
+          name
+        }
+      }
+    }
+  }
+`;
+
+const transactionsImportBalanceCategoriesFragment = gql`
+  fragment TransactionsImportBalanceCategoriesFields on TransactionsImport {
+    id
+    institutionAccounts {
+      id
+      name
+      type
+      subtype
+      mask
+      balanceAccountingCategory {
+        id
+        code
+        name
+      }
+    }
+  }
 `;
 
 const CollectivePickerReactSelectStyles = {
@@ -105,7 +153,35 @@ export const TransactionsImportAssignmentsForm = ({
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
   const [editTransactionsImportAssignments] = useMutation(editTransactionsImportAssignmentsMutation);
+  const [setBankAccountBalanceCategory] = useMutation(setBankAccountBalanceCategoryMutation);
+  const [savingBalanceCategoryAccountId, setSavingBalanceCategoryAccountId] = React.useState<string | null>(null);
+  const hasChartOfAccounts = isFeatureEnabled(dashboardAccount, FEATURES.CHART_OF_ACCOUNTS);
+  // Watch the cache: the modal only gets a snapshot of the import
+  const watchedImport = useFragment({
+    fragment: transactionsImportBalanceCategoriesFragment,
+    from: { __typename: 'TransactionsImport', id: transactionsImport.id },
+  });
+  const institutionAccounts =
+    (watchedImport.complete && watchedImport.data?.institutionAccounts) || transactionsImport.institutionAccounts || [];
+  const onBalanceCategoryChange = async (importedAccountId: string, option: { value: string } | null) => {
+    setSavingBalanceCategoryAccountId(importedAccountId);
+    try {
+      await setBankAccountBalanceCategory({
+        variables: {
+          transactionsImport: { id: transactionsImport.id },
+          importedAccountId,
+          accountingCategory: option ? { id: option.value } : null,
+        },
+      });
+      toast({ variant: 'success', message: intl.formatMessage({ id: 'saved', defaultMessage: 'Saved' }) });
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    } finally {
+      setSavingBalanceCategoryAccountId(null);
+    }
+  };
 
   return (
     <Formik<AssignmentFormValues>
@@ -170,7 +246,7 @@ export const TransactionsImportAssignmentsForm = ({
                   />{' '}
                   <FormattedMessage defaultMessage="You can override this assignment for each account." id="wckrmL" />
                 </p>
-                {!transactionsImport.institutionAccounts?.length ? (
+                {!institutionAccounts.length ? (
                   <p className="py-6 text-center text-sm text-muted-foreground">
                     <FormattedMessage
                       defaultMessage="The accounts for this import are not available."
@@ -179,7 +255,7 @@ export const TransactionsImportAssignmentsForm = ({
                   </p>
                 ) : (
                   <div className="max-h-[calc(100vh-200px)] space-y-4 overflow-y-auto">
-                    {(transactionsImport.institutionAccounts || []).map(account => (
+                    {institutionAccounts.map(account => (
                       <Card className="overflow-hidden p-0 shadow-xs" key={account.id}>
                         <CardContent className="p-3">
                           <div className="mb-2 flex items-center justify-between">
@@ -219,6 +295,25 @@ export const TransactionsImportAssignmentsForm = ({
                             }}
                             truncationThreshold={30}
                           />
+                          {hasChartOfAccounts && (
+                            <div className="mt-2">
+                              <label
+                                className="mb-1 block text-xs font-medium text-gray-500"
+                                htmlFor={`institution-account-balance-category-${account.id}`}
+                              >
+                                <FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />
+                              </label>
+                              <BalanceAccountingCategoryPicker
+                                hostSlug={dashboardAccount?.slug}
+                                inputId={`institution-account-balance-category-${account.id}`}
+                                value={getBalanceAccountingCategoryOption(account.balanceAccountingCategory)}
+                                fontSize="12px"
+                                styles={CollectivePickerReactSelectStyles}
+                                disabled={savingBalanceCategoryAccountId === account.id}
+                                onChange={option => onBalanceCategoryChange(account.id, option)}
+                              />
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     ))}

@@ -43,7 +43,15 @@ const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefe
   const [customProviders, otherProviders] = partition(manualPaymentProviders, p => p.type === 'OTHER');
 
   const handleSave = React.useCallback(
-    async (values: { name: string; instructions: string; icon?: string }, editingProvider?: ManualPaymentProvider) => {
+    async (
+      values: {
+        name: string;
+        instructions: string;
+        icon?: string;
+        balanceAccountingCategory?: { value: string; label: string } | null;
+      },
+      editingProvider?: ManualPaymentProvider,
+    ) => {
       try {
         if (editingProvider) {
           // Update existing
@@ -55,6 +63,9 @@ const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefe
                 name: values.name,
                 instructions: values.instructions,
                 icon: values.icon,
+                balanceAccountingCategory: values.balanceAccountingCategory
+                  ? { id: values.balanceAccountingCategory.value }
+                  : null,
               },
             },
           });
@@ -68,6 +79,9 @@ const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefe
                 name: values.name,
                 instructions: values.instructions,
                 icon: values.icon,
+                balanceAccountingCategory: values.balanceAccountingCategory
+                  ? { id: values.balanceAccountingCategory.value }
+                  : null,
               },
             },
           });
@@ -164,6 +178,7 @@ const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefe
           onSave={handleSave}
           onClose={() => setEditingId(null)}
           defaultCurrency={account.currency}
+          hostSlug={account.slug}
         />
       )}
     </div>

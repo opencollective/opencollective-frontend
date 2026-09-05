@@ -10,6 +10,7 @@ import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
+import { OrderBalanceAccountingCategoryPill } from '../accounting/BalanceAccountingCategoryPill';
 import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
 import { CopyIDDropdown } from '../CopyId';
@@ -99,6 +100,12 @@ const contributionDrawerQuery = gql`
         rate
       }
       accountingCategory {
+        id
+        name
+        friendlyName
+        code
+      }
+      balanceAccountingCategory {
         id
         name
         friendlyName
@@ -381,28 +388,55 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
             <MessageBoxGraphqlError error={query.error} />
           ) : (
             <React.Fragment>
-              <div className="flex items-center gap-2">
-                {isLoading ? (
-                  <Skeleton className="h-6 w-32" />
-                ) : (
-                  query.data?.order?.permissions?.canUpdateAccountingCategory &&
-                  query.data.order.toAccount &&
-                  'host' in query.data.order.toAccount &&
-                  query.data.order.toAccount['host'] && (
-                    <OrderAdminAccountingCategoryPill
-                      order={query.data?.order}
-                      account={query.data?.order.toAccount}
-                      host={query.data.order.toAccount.host}
-                    />
-                  )
-                )}
-                <div>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
                   {isLoading ? (
-                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-6 w-32" />
                   ) : (
-                    <Tags canEdit={query.data?.order?.permissions?.canSetTags} order={query.data?.order} />
+                    query.data?.order?.permissions?.canUpdateAccountingCategory &&
+                    query.data.order.toAccount &&
+                    'host' in query.data.order.toAccount &&
+                    query.data.order.toAccount['host'] && (
+                      <React.Fragment>
+                        <span className="w-20 shrink-0 text-xs text-muted-foreground">
+                          <FormattedMessage defaultMessage="Category" id="expense.accountingCategory" />
+                        </span>
+                        <OrderAdminAccountingCategoryPill
+                          order={query.data?.order}
+                          account={query.data?.order.toAccount}
+                          host={query.data.order.toAccount.host}
+                        />
+                      </React.Fragment>
+                    )
                   )}
+                  <div>
+                    {isLoading ? (
+                      <Skeleton className="h-6 w-24" />
+                    ) : (
+                      <Tags canEdit={query.data?.order?.permissions?.canSetTags} order={query.data?.order} />
+                    )}
+                  </div>
                 </div>
+                {!isLoading &&
+                  query.data?.order &&
+                  (query.data.order.balanceAccountingCategory ||
+                    query.data.order.permissions?.canUpdateAccountingCategory) && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-20 shrink-0 text-xs text-muted-foreground">
+                        <FormattedMessage defaultMessage="Received in" id="4Nv47+" />
+                      </span>
+                      <OrderBalanceAccountingCategoryPill
+                        order={query.data.order}
+                        host={query.data.order.toAccount?.['host']}
+                        account={query.data.order.toAccount}
+                        canEdit={Boolean(
+                          query.data.order.permissions?.canUpdateAccountingCategory &&
+                          query.data.order.toAccount?.['host'],
+                        )}
+                        emptyLabel={<FormattedMessage defaultMessage="Not set" id="p5LNtB" />}
+                      />
+                    </div>
+                  )}
               </div>
               <div className="text-sm">
                 <InfoList className="mt-4 mb-6 sm:grid-cols-2">
