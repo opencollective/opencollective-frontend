@@ -21,7 +21,7 @@ const CollapsedDisplayBox = styled.div<DisplayBoxProps>`
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
 
-/* The the padding to apply to the collapse blur; useful in the case of making sure only the blur effect is not applied unnecessarily. For
+/* The padding to apply to the collapse blur; useful in the case of making sure only the blur effect is not applied unnecessarily. For
  * example maxCollapsedHeight=20 and collapsePadding=22 ensure that content is collapsed only when there's more than two lines and if there's
  * only two lines the blur effect is not applied.
  */
