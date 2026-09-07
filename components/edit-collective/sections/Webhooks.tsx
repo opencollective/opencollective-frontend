@@ -73,6 +73,7 @@ const WEBHOOK_EVENT_GROUPS = defineMessages({
     events: [
       WebhookEvents.COLLECTIVE_APPLY,
       WebhookEvents.COLLECTIVE_APPROVED,
+      WebhookEvents.COLLECTIVE_REJECTED,
       WebhookEvents.COLLECTIVE_CREATED,
       WebhookEvents.CONNECTED_ACCOUNT_CREATED,
     ],
