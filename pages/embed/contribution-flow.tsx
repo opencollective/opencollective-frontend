@@ -13,6 +13,7 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
 import Container from '../../components/Container';
+import { STEPS } from '../../components/contribution-flow/constants';
 import ContributionBlocker, { getContributionBlocker } from '../../components/contribution-flow/ContributionBlocker';
 import { contributionFlowAccountQuery } from '../../components/contribution-flow/graphql/queries';
 import ContributionFlowContainer from '../../components/contribution-flow/index';
@@ -111,7 +112,12 @@ const EmbedContributionFlowPage = ({ collectiveSlug, tierId, error, queryParams 
       );
     }
 
-    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(tierId));
+    // The order already exists on the success step, so tier availability must not block the receipt
+    // (e.g. returning from a Stripe redirect after buying the last ticket)
+    const isSuccessStep = router.query.step === STEPS.SUCCESS;
+    const contributionBlocker = isSuccessStep
+      ? null
+      : getContributionBlocker(LoggedInUser, account, tier, Boolean(tierId));
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else {

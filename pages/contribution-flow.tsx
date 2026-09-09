@@ -12,6 +12,7 @@ import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-help
 import { isHiddenAccount } from '@/lib/collective';
 
 import Container from '../components/Container';
+import { STEPS } from '../components/contribution-flow/constants';
 import ContributionBlocker, {
   CONTRIBUTION_BLOCKER,
   getContributionBlocker,
@@ -92,7 +93,12 @@ const ContributionFlowPage = ({ collectiveSlug, tierId, error }: ContributionFlo
       );
     }
 
-    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(tierId));
+    // The order already exists on the success step, so tier availability must not block the receipt
+    // (e.g. returning from a Stripe redirect after buying the last ticket)
+    const isSuccessStep = router.query.step === STEPS.SUCCESS;
+    const contributionBlocker = isSuccessStep
+      ? null
+      : getContributionBlocker(LoggedInUser, account, tier, Boolean(tierId));
 
     if (contributionBlocker) {
       if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
