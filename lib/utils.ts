@@ -40,6 +40,12 @@ export const isValidUrl = url => {
 };
 
 /**
+ * Dummy origin used only to decide whether `url` stays same-site when resolved.
+ * Must not depend on WEBSITE_URL (unset in some unit tests / SSR).
+ */
+const RELATIVE_URL_PARSE_BASE = 'https://opencollective.com';
+
+/**
  * Validate a relative path.
  * > isValidRelativeUrl('a/b/c/d/e/f/g')
  * true
@@ -53,8 +59,26 @@ export const isValidUrl = url => {
  * false
  */
 export const isValidRelativeUrl = url => {
-  url = url?.trim();
+  if (typeof url !== 'string') {
+    return false;
+  }
+
+  url = url.trim();
   if (!url) {
+    return false;
+  }
+
+  // WHATWG parsers strip leading C0 controls / DEL, so a NUL-prefixed "//evil.com"
+  // would otherwise look relative here and resolve off-site via `new URL(url, base)`.
+  for (let i = 0; i < url.length; i++) {
+    const code = url.charCodeAt(i);
+    if (code <= 0x1f || code === 0x7f) {
+      return false;
+    }
+  }
+
+  // Some URL parsers treat backslash as a slash (/\evil.com -> //evil.com).
+  if (url.includes('\\')) {
     return false;
   }
 
@@ -63,12 +87,17 @@ export const isValidRelativeUrl = url => {
     new URL(url);
     return false;
   } catch {
-    // Prevent URLs like //example.com or /\n/example.com or /\/example.com/
+    // Prevent URLs like //example.com or / /example.com
     if (url.match(/^[\s\\/]{2,}.+/)) {
       return false;
-    } else {
-      return true;
     }
+  }
+
+  try {
+    const parsed = new URL(url, RELATIVE_URL_PARSE_BASE);
+    return parsed.origin === new URL(RELATIVE_URL_PARSE_BASE).origin;
+  } catch {
+    return false;
   }
 };
 
