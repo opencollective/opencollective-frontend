@@ -349,7 +349,7 @@ describe('profile completion redirects', () => {
   it('preserves a requested path and query after completing a profile', () => {
     const destination = `/home?source=${randomSlug()}`;
 
-    cy.signup({ redirect: destination });
+    cy.signup({ redirect: destination, completeProfile: false });
     cy.location('pathname').should('eq', '/signup/profile');
     cy.location('search').should('eq', `?next=${encodeURIComponent(destination)}`);
 

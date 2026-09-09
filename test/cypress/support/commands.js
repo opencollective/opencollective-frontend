@@ -38,7 +38,7 @@ Cypress.Commands.add('logout', () => {
  * Create a new account an SignIn. If no email is provided in `params`, the account
  * will be generated using a random email.
  */
-Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {}) => {
+Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, completeProfile = true } = {}) => {
   if (!user.email) {
     user.email = randomEmail();
   }
@@ -49,8 +49,36 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {})
     // opencollective-api/server/controllers/users.js for more info
     const token = getTokenFromRedirectUrl(redirect);
     if (token) {
-      return getLoggedInUserFromToken(token).then(user => {
-        return cy.visit(redirect, visitParams).then(() => user);
+      return getLoggedInUserFromToken(token).then(loggedInUser => {
+        if (completeProfile && loggedInUser.requiresProfileCompletion) {
+          return getIdV2FromReferenceInput({ slug: loggedInUser.collective.slug }, token)
+            .then(accountId => {
+              return graphqlQueryV2(token, {
+                operationName: 'EditAccount',
+                query: gql`
+                  mutation EditAccount($account: AccountUpdateInput!) {
+                    editAccount(account: $account) {
+                      id
+                      slug
+                      name
+                    }
+                  }
+                `,
+                variables: { account: { id: accountId, name: user.name ?? 'Test User' } },
+              });
+            })
+            .then(({ body }) => {
+              // `editAccount` regenerates the collective slug for profile-completion
+              // users, so reflect the fresh slug on the returned user (several specs
+              // read `user.collective.slug`).
+              const { slug } = body.data.editAccount;
+              if (loggedInUser.collective && slug) {
+                loggedInUser.collective.slug = slug;
+              }
+              return cy.visit(redirect, visitParams).then(() => loggedInUser);
+            });
+        }
+        return cy.visit(redirect, visitParams).then(() => loggedInUser);
       });
     } else {
       return cy.visit(redirect, visitParams).then(() => user);
