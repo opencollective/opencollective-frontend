@@ -321,7 +321,9 @@ const StepSummary = forwardRef(
         return false;
       }
 
-      if (taxInfo.taxType === TaxType.VAT && formState.isEnabled) {
+      // Also re-check numbers prefilled from the profile: a non-empty number zeroes cross-border VAT,
+      // so it must never leave this step unvalidated
+      if (taxInfo.taxType === TaxType.VAT && (formState.isEnabled || taxInfo.number)) {
         return commitVatInput(taxInfo.number || '', { keepFormOpen: false });
       }
 
