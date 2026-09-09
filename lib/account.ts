@@ -77,11 +77,14 @@ export function isHostableAccount<T extends AccountWithType>(
   );
 }
 
-export function hasPlatformSubscription<T extends object>(
-  account: T,
-): account is T & {
-  platformSubscription: NonNullable<(T & { platformSubscription?: unknown })['platformSubscription']>;
-} {
+/** Distributes over a union: keeps only the members that declare `platformSubscription`, and makes it non-null */
+type WithPlatformSubscription<T> = T extends { platformSubscription?: infer S }
+  ? 'platformSubscription' extends keyof T
+    ? T & { platformSubscription: NonNullable<S> }
+    : never
+  : never;
+
+export function hasPlatformSubscription<T extends object>(account: T): account is WithPlatformSubscription<T> {
   return (
     'platformSubscription' in account &&
     Boolean((account as T & { platformSubscription?: unknown }).platformSubscription)

@@ -6,7 +6,6 @@ import { styled } from 'styled-components';
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 import { getEnvVar } from '@/lib/env-utils';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import injectIntl from '@/lib/injectIntl';
 import { parseToBoolean } from '@/lib/utils';
 
 import { legacyTopBarItems, newMarketingTopbarItems } from './navigation/menu-items';
@@ -15,6 +14,7 @@ import Container from './Container';
 import { Box, Flex } from './Grid';
 import { HideGlobalScroll } from './HideGlobalScroll';
 import Link from './Link';
+
 const ListItem = styled.li`
   list-style: none;
   font-family: Inter;

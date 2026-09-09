@@ -3,7 +3,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash-es';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
-import type { WrappedComponentProps } from 'react-intl';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
@@ -83,7 +83,7 @@ type SignupMutationProps = {
 /** Full internal props: own props + all HOC-injected props */
 type InternalProps = SignInOrJoinFreeProps &
   Pick<UserContextValue, 'login'> &
-  WrappedComponentProps & { router: NextRouter } & SignupMutationProps;
+  { intl: IntlShape } & { router: NextRouter } & SignupMutationProps;
 
 type SignInOrJoinFreeState = {
   form: SignInOrJoinFreeForm;

@@ -5,7 +5,7 @@ import { decodeJwt } from 'jose';
 import { get, isEqual } from 'lodash-es';
 import type { NextRouter } from 'next/router';
 import Router, { withRouter } from 'next/router';
-import type { WrappedComponentProps } from 'react-intl';
+import type { IntlShape } from 'react-intl';
 
 import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
@@ -55,7 +55,7 @@ export const UserContext = React.createContext<UserContextValue>({
   updateLoggedInUserFromCache: () => {},
 });
 
-type UserProviderProps = WrappedComponentProps & {
+type UserProviderProps = { intl: IntlShape } & {
   getLoggedInUser: (options?: GetLoggedInUserOptions) => Promise<LoggedInUser | null>;
   getLoggedInUserFromCache: () => LoggedInUser | null;
   twoFactorAuthPrompt: TwoFactorAuthPrompt;
@@ -316,5 +316,5 @@ type UserProviderPublicProps = {
 export default injectIntl(
   withApollo(
     withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider)))),
-  ) as React.ComponentType<WrappedComponentProps<'intl'>>,
+  ) as React.ComponentType<{ intl: IntlShape }>,
 ) as React.ComponentType<UserProviderPublicProps>;
