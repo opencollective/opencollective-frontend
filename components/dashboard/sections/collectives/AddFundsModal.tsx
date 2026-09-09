@@ -1145,7 +1145,7 @@ const AddFundsModalContentWithCollective = ({
                       )}
                     </Field>
                   )}
-                  {(balanceCategories.enabled || matchedBankAccountCategory) && (
+                  {balanceCategories.hasPreview && (balanceCategories.enabled || matchedBankAccountCategory) && (
                     <Field
                       name="balanceAccountingCategory"
                       htmlFor="addFunds-balanceAccountingCategory"

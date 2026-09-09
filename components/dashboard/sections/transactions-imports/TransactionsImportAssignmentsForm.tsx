@@ -17,6 +17,7 @@ import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
 import {
   BalanceAccountingCategoryPicker,
   getBalanceAccountingCategoryOption,
+  useHasBalanceCategoriesPreview,
 } from '@/components/accounting/BalanceAccountingCategoryPicker';
 import CollectivePickerAsync from '@/components/CollectivePickerAsync';
 import { DashboardContext } from '@/components/dashboard/DashboardContext';
@@ -157,7 +158,9 @@ export const TransactionsImportAssignmentsForm = ({
   const [editTransactionsImportAssignments] = useMutation(editTransactionsImportAssignmentsMutation);
   const [setBankAccountBalanceCategory] = useMutation(setBankAccountBalanceCategoryMutation);
   const [savingBalanceCategoryAccountId, setSavingBalanceCategoryAccountId] = React.useState<string | null>(null);
-  const hasChartOfAccounts = isFeatureEnabled(dashboardAccount, FEATURES.CHART_OF_ACCOUNTS);
+  const hasBalanceCategoriesPreview = useHasBalanceCategoriesPreview();
+  const hasChartOfAccounts =
+    hasBalanceCategoriesPreview && isFeatureEnabled(dashboardAccount, FEATURES.CHART_OF_ACCOUNTS);
   // Watch the cache: the modal only gets a snapshot of the import
   const watchedImport = useFragment({
     fragment: transactionsImportBalanceCategoriesFragment,

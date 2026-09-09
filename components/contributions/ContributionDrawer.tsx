@@ -10,6 +10,7 @@ import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
+import { useHasBalanceCategoriesPreview } from '../accounting/BalanceAccountingCategoryPicker';
 import { OrderBalanceAccountingCategoryPill } from '../accounting/BalanceAccountingCategoryPill';
 import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
@@ -312,6 +313,7 @@ type ContributionDrawerProps = {
 
 export function ContributionDrawer({ open, onClose, orderId, getActions }: ContributionDrawerProps) {
   const intl = useIntl();
+  const hasBalanceCategoriesPreview = useHasBalanceCategoriesPreview();
 
   const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
     variables: {
@@ -417,7 +419,8 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
                     )}
                   </div>
                 </div>
-                {!isLoading &&
+                {hasBalanceCategoriesPreview &&
+                  !isLoading &&
                   query.data?.order &&
                   (query.data.order.balanceAccountingCategory ||
                     query.data.order.permissions?.canUpdateAccountingCategory) && (

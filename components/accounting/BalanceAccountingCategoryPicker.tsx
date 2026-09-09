@@ -5,6 +5,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
 import { i18nGraphqlException } from '../../lib/errors';
 import type { AccountingCategory } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import StyledSelect from '../StyledSelect';
@@ -50,10 +52,16 @@ export const getBalanceAccountingCategoryOption = (
 ): BalanceAccountingCategoryOption | null =>
   category ? { value: category.id, label: `${category.code} - ${category.name}` } : null;
 
+export const useHasBalanceCategoriesPreview = () => {
+  const { LoggedInUser } = useLoggedInUser();
+  return Boolean(LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BALANCE_ACCOUNTING_CATEGORIES));
+};
+
 export const useBalanceAccountingCategories = (
   hostSlug: string | undefined,
   context?: BalanceAccountingCategoryContext,
 ) => {
+  const hasPreview = useHasBalanceCategoriesPreview();
   const { account } = React.useContext(DashboardContext);
   const contextFeature = account ? isFeatureEnabled(account, FEATURES.CHART_OF_ACCOUNTS) : null;
   const { data, loading } = useQuery(balanceAccountingCategoryPickerQuery, {
@@ -63,7 +71,7 @@ export const useBalanceAccountingCategories = (
       order: context?.orderId ? { id: context.orderId } : null,
       expense: context?.expenseId ? { id: context.expenseId } : null,
     },
-    skip: contextFeature === false || !hostSlug,
+    skip: !hasPreview || contextFeature === false || !hostSlug,
   });
 
   const options = React.useMemo(
@@ -71,10 +79,10 @@ export const useBalanceAccountingCategories = (
     [data],
   );
 
-  const enabled = Boolean(hostSlug) && contextFeature !== false && (options.length > 0 || loading);
+  const enabled = hasPreview && Boolean(hostSlug) && contextFeature !== false && (options.length > 0 || loading);
   const categories = data?.host?.balanceAccountingCategories?.nodes || [];
   const suggestedIds = (data?.host?.suggestedBalanceAccountingCategories || []).map(category => category.id);
-  return { enabled, loading, options, categories, suggestedIds };
+  return { enabled, hasPreview, loading, options, categories, suggestedIds };
 };
 
 export const BalanceAccountingCategoryPicker = ({
@@ -176,9 +184,10 @@ export const ConnectedAccountBalanceCategoryPicker = ({
   const intl = useIntl();
   const { toast } = useToast();
   const { account } = React.useContext(DashboardContext);
+  const hasPreview = useHasBalanceCategoriesPreview();
   const [setBalanceCategory, { loading: saving }] = useMutation(setConnectedAccountBalanceCategoryFromSettingsMutation);
 
-  if (!isFeatureEnabled(account, FEATURES.CHART_OF_ACCOUNTS)) {
+  if (!hasPreview || !isFeatureEnabled(account, FEATURES.CHART_OF_ACCOUNTS)) {
     return null;
   }
 

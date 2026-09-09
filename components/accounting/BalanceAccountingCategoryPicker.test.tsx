@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom';
 
+jest.mock('../../lib/hooks/useLoggedInUser', () => ({
+  __esModule: true,
+  default: () => ({ LoggedInUser: { hasPreviewFeatureEnabled: () => true } }),
+}));
+
 import React from 'react';
 import { MockedProvider } from '@apollo/client/testing';
 import { render, screen, waitFor } from '@testing-library/react';

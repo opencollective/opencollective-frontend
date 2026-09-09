@@ -14,6 +14,7 @@ import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { useFormikZod } from '@/components/FormikZod';
 import { FormSectionTitle } from '@/components/ui/FormSectionTitle';
 
+import { useHasBalanceCategoriesPreview } from '../../../accounting/BalanceAccountingCategoryPicker';
 import RichTextEditor from '../../../RichTextEditor';
 import StyledInput from '../../../StyledInput';
 import StyledInputField from '../../../StyledInputField';
@@ -224,10 +225,13 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
   const selectedType = getAccountingCategoryType(selectedKind);
   const showInstructions = selectedKind === AccountingCategoryKind.EXPENSE || isBalanceSheet;
 
-  const accountingCategoryTypeOptions = Object.values(AccountingCategoryType).map(type => ({
-    value: type,
-    label: intl.formatMessage(AccountingCategoryTypeI18n[type]),
-  }));
+  const hasBalanceCategoriesPreview = useHasBalanceCategoriesPreview();
+  const accountingCategoryTypeOptions = Object.values(AccountingCategoryType)
+    .filter(type => hasBalanceCategoriesPreview || type === AccountingCategoryType.PROFIT_AND_LOSS)
+    .map(type => ({
+      value: type,
+      label: intl.formatMessage(AccountingCategoryTypeI18n[type]),
+    }));
 
   const accountingCategoryKindOptions = KINDS_BY_TYPE[selectedType].map(kind => ({
     value: kind,

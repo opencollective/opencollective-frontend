@@ -498,7 +498,7 @@ export const HostCreateExpenseModal = ({
                         )}
                       </StyledInputFormikField>
                     )}
-                    {(balanceCategories.enabled || matchedBankAccountCategory) && (
+                    {balanceCategories.hasPreview && (balanceCategories.enabled || matchedBankAccountCategory) && (
                       <StyledInputFormikField
                         name="balanceAccountingCategory"
                         required={false}

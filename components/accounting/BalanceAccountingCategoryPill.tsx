@@ -13,7 +13,7 @@ import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 import type { BalanceAccountingCategoryContext } from './BalanceAccountingCategoryPicker';
-import { useBalanceAccountingCategories } from './BalanceAccountingCategoryPicker';
+import { useBalanceAccountingCategories, useHasBalanceCategoriesPreview } from './BalanceAccountingCategoryPicker';
 
 const updateExpenseBalanceCategoryMutation = gql`
   mutation UpdateExpenseBalanceAccountingCategory(
@@ -78,6 +78,7 @@ const BalanceAccountingCategoryPill = ({
   context?: BalanceAccountingCategoryContext;
   onChange: (category: PillCategory | null) => void | Promise<void>;
 }) => {
+  const hasPreview = useHasBalanceCategoriesPreview();
   const { enabled, categories, suggestedIds } = useBalanceAccountingCategories(
     canEdit ? host?.slug : undefined,
     context,
@@ -91,6 +92,10 @@ const BalanceAccountingCategoryPill = ({
         {pill}
       </div>
     );
+
+  if (!hasPreview) {
+    return null;
+  }
 
   if (!canEdit || !enabled) {
     return selectedCategory ? withLabel(<span className={BADGE_CLASS}>{getLabel(selectedCategory)}</span>) : null;

@@ -14,6 +14,7 @@ import { getDashboardRoute } from '../../../../lib/url-helpers';
 import LinkCollective from '@/components/LinkCollective';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { useHasBalanceCategoriesPreview } from '../../../accounting/BalanceAccountingCategoryPicker';
 import { getCategoryLabel } from '../../../AccountingCategorySelect';
 import Avatar from '../../../Avatar';
 import ExpenseBudgetItem from '../../../budget/ExpenseBudgetItem';
@@ -285,6 +286,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   const dropdownTriggerRef = React.useRef(undefined);
   const actions = getActions(transaction, dropdownTriggerRef, refetch);
   const accountingCategory = transaction?.expense?.accountingCategory || transaction?.order?.accountingCategory;
+  const hasBalanceCategoriesPreview = useHasBalanceCategoriesPreview();
 
   let expenseUrl;
 
@@ -580,18 +582,20 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                       )
                     }
                   />
-                  <DataListItem
-                    label={<FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />}
-                    value={
-                      transaction.balanceAccountingCategory ? (
-                        getCategoryLabel(intl, transaction.balanceAccountingCategory, true)
-                      ) : (
-                        <span className="text-muted-foreground">
-                          <FormattedMessage defaultMessage="Not set" id="p5LNtB" />
-                        </span>
-                      )
-                    }
-                  />
+                  {hasBalanceCategoriesPreview && (
+                    <DataListItem
+                      label={<FormattedMessage defaultMessage="Balance / clearing account" id="7XkFoL" />}
+                      value={
+                        transaction.balanceAccountingCategory ? (
+                          getCategoryLabel(intl, transaction.balanceAccountingCategory, true)
+                        ) : (
+                          <span className="text-muted-foreground">
+                            <FormattedMessage defaultMessage="Not set" id="p5LNtB" />
+                          </span>
+                        )
+                      }
+                    />
+                  )}
                   <DataListItem
                     label={<FormattedMessage defaultMessage="Group ID" id="nBKj/i" />}
                     value={
