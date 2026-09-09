@@ -10,7 +10,6 @@ import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectivePageMutation } from '../../../lib/graphql/v1/mutations';
 import { editCollectivePageQuery } from '../../../lib/graphql/v1/queries';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
-import { loggedInUserQuery } from '@/lib/graphql/queries';
 
 import SettingsForm from '../../edit-collective/Form';
 import Loading from '../../Loading';
@@ -18,7 +17,7 @@ import { useToast } from '../../ui/useToast';
 import { ALL_SECTIONS } from '../constants';
 
 const AccountSettings = ({ account, section }) => {
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const router = useRouter();
   const [state, setState] = React.useState({ status: undefined, result: undefined });
   const { toast } = useToast();
@@ -104,12 +103,12 @@ const AccountSettings = ({ account, section }) => {
     }
     setState({ ...state, status: 'loading' });
     try {
-      const response = await editCollective({
-        variables: { collective: CollectiveInputType },
-        // It's heavy, but we need to refetch the information of the account after a mutation as fundamental
-        // properties like its name or whether it's a fiscal host can change.
-        refetchQueries: [{ query: loggedInUserQuery }],
-      });
+      const response = await editCollective({ variables: { collective: CollectiveInputType } });
+      // It's heavy, but the dashboard shell (sidebar, account switcher, `account` context) is built from
+      // `LoggedInUser.workspaces`, a snapshot held in `UserProvider` state, not from a reactive query. Fundamental
+      // properties like the name, slug or whether it's a fiscal host can change here, so refresh that snapshot.
+      // Done before any redirect so a new slug is already known to `pages/dashboard.tsx`.
+      await refetchLoggedInUser();
       const updatedCollective = response.data.editCollective;
       setState({ ...state, status: 'saved', result: { error: null } });
       const currentSlug = router.query.slug;
@@ -120,7 +119,6 @@ const AccountSettings = ({ account, section }) => {
             ...router.query,
           },
         });
-        // await refetchLoggedInUser();
       } else {
         setTimeout(() => {
           setState({ ...state, status: null });
