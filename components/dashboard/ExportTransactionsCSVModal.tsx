@@ -270,6 +270,8 @@ type ExportTransactionsCSVModalProps = {
   canCreatePreset?: boolean;
 };
 
+const BALANCE_CATEGORY_FIELDS: CSVField[] = ['balanceAccountingCategoryCode', 'balanceAccountingCategoryName'];
+
 const ExportTransactionsCSVModal = ({
   open,
   setOpen,
@@ -280,6 +282,15 @@ const ExportTransactionsCSVModal = ({
   canCreatePreset = true,
 }: ExportTransactionsCSVModalProps) => {
   const { LoggedInUser } = useLoggedInUser();
+  const hasBalanceCategoriesPreview = Boolean(
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BALANCE_ACCOUNTING_CATEGORIES),
+  );
+  const isFieldOmitted = React.useCallback(
+    (fieldId: string) =>
+      (isHostReport && HOST_OMITTED_FIELDS.includes(fieldId as CSVField)) ||
+      (!hasBalanceCategoriesPreview && BALANCE_CATEGORY_FIELDS.includes(fieldId as CSVField)),
+    [isHostReport, hasBalanceCategoriesPreview],
+  );
   const hasAsyncExportsFeature = React.useMemo(
     () =>
       account?.type === AccountType.ORGANIZATION &&
@@ -382,17 +393,17 @@ const ExportTransactionsCSVModal = ({
   );
 
   const totalAvailableFields = React.useMemo(
-    () => FIELDS.filter(({ id: fieldId }) => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))).length,
-    [isHostReport],
+    () => FIELDS.filter(({ id: fieldId }) => !isFieldOmitted(fieldId)).length,
+    [isFieldOmitted],
   );
   const tabs = React.useMemo(
     () =>
       Object.keys(GROUP_FIELDS).map(group => ({
         id: group,
         label: GROUPS[group] || group,
-        count: GROUP_FIELDS[group].filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))).length,
+        count: GROUP_FIELDS[group].filter(fieldId => !isFieldOmitted(fieldId)).length,
       })),
-    [isHostReport],
+    [isFieldOmitted],
   );
 
   const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] =
@@ -559,12 +570,7 @@ const ExportTransactionsCSVModal = ({
   const handleGroupSwitch = React.useCallback(
     ({ name, checked }) => {
       if (checked) {
-        setFields(fields =>
-          uniq([
-            ...fields,
-            ...GROUP_FIELDS[name].filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))),
-          ]),
-        );
+        setFields(fields => uniq([...fields, ...GROUP_FIELDS[name].filter(fieldId => !isFieldOmitted(fieldId))]));
       } else {
         setFields(fields => fields.filter(f => !GROUP_FIELDS[name].includes(f as any)));
       }
@@ -638,7 +644,7 @@ const ExportTransactionsCSVModal = ({
   const groupFields = React.useMemo(
     () =>
       GROUP_FIELDS[tab]
-        .filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId)))
+        .filter(fieldId => !isFieldOmitted(fieldId))
         .map(fieldId => {
           const field = FIELDS.find(f => f.id === fieldId);
           return (
@@ -695,7 +701,7 @@ const ExportTransactionsCSVModal = ({
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
   const disabled = !account || isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]
-    ?.filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId)))
+    ?.filter(fieldId => !isFieldOmitted(fieldId))
     .every(f => fields.includes(f));
 
   return (

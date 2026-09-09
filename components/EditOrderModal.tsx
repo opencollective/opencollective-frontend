@@ -808,6 +808,10 @@ const EditAddedFundsModal = (props: Omit<EditOrderModalProps, 'action'>) => {
         tier: props.order.tier && pick(props.order.tier, ['id', 'legacyId', 'name', 'slug']),
         accountingCategory:
           props.order.accountingCategory && pick(props.order.accountingCategory, ['id', 'name', 'code', 'type']),
+        balanceAccountingCategory: props.order.balanceAccountingCategory && {
+          value: props.order.balanceAccountingCategory.id,
+          label: `${props.order.balanceAccountingCategory.code} - ${props.order.balanceAccountingCategory.name}`,
+        },
       }}
     />
   );

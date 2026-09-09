@@ -350,6 +350,7 @@ export type StyledSelectProps = LayoutProps &
     disabled?: boolean;
     error?: boolean;
     inputId?: string;
+    useSearchIcon?: boolean;
   };
 
 export type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;

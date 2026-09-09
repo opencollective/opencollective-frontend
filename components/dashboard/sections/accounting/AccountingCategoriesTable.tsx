@@ -1,17 +1,14 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { Edit, Trash2 } from 'lucide-react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import type {
   AccountingCategory,
   AccountingCategoryTableQuery,
   AccountingCategoryTableQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
-import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
-import { I18nItalic } from '../../../I18nFormatters';
 import Loading from '../../../Loading';
 import { DataTable } from '../../../table/DataTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
@@ -19,7 +16,7 @@ import { TableActionsButton } from '../../../ui/Table';
 
 import { AccountingCategoryDrawer } from './AccountingCategoryDrawer';
 import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
-import { AccountingCategoryAppliesToI18n, AccountingCategoryKindI18n } from './AccountingCategoryForm';
+import { AccountingCategoryAppliesToI18n, AccountingCategoryTypeLabel } from './AccountingCategoryForm';
 
 type AccountingCategoriesTableMeta = {
   disabled?: boolean;
@@ -40,16 +37,14 @@ const columns = [
   },
   {
     accessorKey: 'name',
-    header: () => (
-      <FormattedMessage defaultMessage="Name <i>· Friendly name</i>" id="5xKiMX" values={{ i: I18nItalic }} />
-    ),
+    header: () => <FormattedMessage defaultMessage="Name" id="Fields.name" />,
     meta: { input: { required: true, maxLength: 255 } },
     cell: ({ cell, row }) => {
       return (
-        <div className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
-          {cell.getValue()}
+        <div className="flex flex-col">
+          <span className="font-bold text-slate-800">{cell.getValue()}</span>
           {row.original.friendlyName && (
-            <span className="font-normal text-slate-700 italic">&nbsp;·&nbsp;{row.original.friendlyName}</span>
+            <span className="text-xs text-muted-foreground italic">{row.original.friendlyName}</span>
           )}
         </div>
       );
@@ -72,11 +67,12 @@ const columns = [
     },
   },
   {
+    id: 'type',
     accessorKey: 'kind',
-    header: () => <FormattedMessage defaultMessage="Kind" id="Transaction.Kind" />,
-    cell: ({ cell }) => {
-      return <FormattedMessage {...AccountingCategoryKindI18n[cell.getValue()]} />;
-    },
+    header: () => <FormattedMessage defaultMessage="Type" id="Type" />,
+    cell: ({ row }) => (
+      <AccountingCategoryTypeLabel kind={row.original.kind} expensesTypes={row.original.expensesTypes} />
+    ),
   },
   {
     accessorKey: 'appliesTo',
@@ -84,27 +80,6 @@ const columns = [
     cell: ({ cell }) => {
       const value = cell.getValue();
       return <FormattedMessage {...AccountingCategoryAppliesToI18n[value || 'ALL']} />;
-    },
-  },
-  {
-    accessorKey: 'expensesTypes',
-    header: () => <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />,
-    cell: ({ cell, row }) => {
-      function CellContent() {
-        const intl = useIntl();
-        return cell.getValue() === null
-          ? intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })
-          : cell
-              .getValue()
-              .map(value => i18nExpenseType(intl, value))
-              .join(', ');
-      }
-
-      if (row.original.kind !== AccountingCategoryKind.EXPENSE) {
-        return '-';
-      }
-
-      return <CellContent />;
     },
   },
   {

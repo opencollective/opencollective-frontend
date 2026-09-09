@@ -264,6 +264,12 @@ export const expensePageExpenseFieldsFragment = gql`
       id
       ...AccountingCategorySelectFields
     }
+    balanceAccountingCategory {
+      id
+      code
+      name
+      friendlyName
+    }
     valuesByRole {
       id
       ...ExpenseValuesByRoleFragment
@@ -841,6 +847,11 @@ export const expensesListAdminFieldsFragment = gql`
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
     onHold
+    balanceAccountingCategory {
+      id
+      code
+      name
+    }
     account {
       id
     }

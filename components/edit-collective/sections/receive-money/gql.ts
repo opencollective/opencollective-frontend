@@ -8,6 +8,11 @@ const manualPaymentProviderFragment = gql`
     instructions
     icon
     accountDetails
+    balanceAccountingCategory {
+      id
+      code
+      name
+    }
     isArchived
     createdAt
     updatedAt

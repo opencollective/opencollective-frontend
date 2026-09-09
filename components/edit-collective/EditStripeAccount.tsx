@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '@/lib/errors';
 import type { Account, ConnectedAccount, EditStripeAccountQuery } from '@/lib/graphql/types/v2/graphql';
 
+import { ConnectedAccountBalanceCategoryPicker } from '../accounting/BalanceAccountingCategoryPicker';
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
 import MessageBox from '../MessageBox';
 import { Button } from '../ui/Button';
@@ -23,6 +24,11 @@ const editStripeAccountQuery = gql`
         createdAt
         settings
         hash
+        balanceAccountingCategory {
+          id
+          code
+          name
+        }
         createdByAccount {
           id
           legacyId
@@ -105,11 +111,14 @@ const EditStripeAccount = ({ collective }: { collective: Pick<Account, 'slug'> }
           </Button>
         </React.Fragment>
       ) : (
-        <ConnectedAccountsTable
-          connectedAccounts={connectedAccounts as Partial<ConnectedAccount>[]}
-          disconnect={handleDisconnect}
-          reconnect={handleConnect}
-        />
+        <div className="flex flex-col gap-4">
+          <ConnectedAccountsTable
+            connectedAccounts={connectedAccounts as Partial<ConnectedAccount>[]}
+            disconnect={handleDisconnect}
+            reconnect={handleConnect}
+          />
+          <ConnectedAccountBalanceCategoryPicker hostSlug={collective.slug} connectedAccount={connectedAccounts[0]} />
+        </div>
       )}
     </React.Fragment>
   );

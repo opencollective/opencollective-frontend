@@ -9,6 +9,7 @@ import { editCollectivePageQuery } from '../../lib/graphql/v1/queries';
 import { formatErrorMessage } from '@/lib/errors';
 import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
 
+import { ConnectedAccountBalanceCategoryPicker } from '../accounting/BalanceAccountingCategoryPicker';
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
 import { getI18nLink, I18nSignInLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
@@ -42,6 +43,11 @@ const editPayPalAccountQuery = gql`
         createdAt
         settings
         hash
+        balanceAccountingCategory {
+          id
+          code
+          name
+        }
         createdByAccount {
           id
           legacyId
@@ -196,6 +202,9 @@ const EditPayPalAccount = props => {
             values={{ SupportLink: I18nSignInLink }}
           />
         </div>
+        {!isReceiving && (
+          <ConnectedAccountBalanceCategoryPicker hostSlug={props.collective.slug} connectedAccount={connectedAccount} />
+        )}
         {!isReceiving && (
           <div className="flex flex-col gap-2">
             <h1 className="text-base font-bold">

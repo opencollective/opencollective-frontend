@@ -58,6 +58,10 @@ export type AccountingCategorySelectProps = {
   onChange: (category: AccountingCategory | null) => void;
   onBlur?: () => void;
   allowNone?: boolean;
+  /** Always show the search input, regardless of the number of options */
+  alwaysSearchable?: boolean;
+  /** Show these categories in the "Suggested" group, without calling the prediction service */
+  suggestedCategoryIds?: string[];
   /** Usually true for host/organization admins, false for other users */
   showCode: boolean;
   id?: string;
@@ -193,6 +197,7 @@ const getOptions = (
   account: Pick<Account, 'id'> & { parent?: Pick<Account, 'id'> },
 ): AccountingCategoryOption[] => {
   const contributionCategories = ['CONTRIBUTION', 'ADDED_FUNDS'];
+  const balanceSheetCategories = ['BALANCE_ACCOUNT', 'CLEARING_ACCOUNT'];
   const possibleFields = ACCOUNTING_CATEGORY_HOST_FIELDS;
   const categories = uniq([...possibleFields.map(field => get(host, `${field}.nodes`, [])).flat()]);
   const options: AccountingCategoryOption[] = [];
@@ -202,6 +207,8 @@ const getOptions = (
     remove(categories, category => !isSupportedExpenseCategory(expenseType, category, isHostAdmin));
   } else if (contributionCategories.includes(kind)) {
     remove(categories, category => !contributionCategories.includes(category.kind));
+  } else if (balanceSheetCategories.includes(kind)) {
+    remove(categories, category => !balanceSheetCategories.includes(category.kind));
   }
 
   const expectedAppliesTo =
@@ -209,8 +216,10 @@ const getOptions = (
       ? AccountingCategoryAppliesTo.HOST
       : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES;
 
-  // Allow categories that either match the expected appliesTo or have no appliesTo (meaning they apply to both)
-  remove(categories, category => category.appliesTo && category.appliesTo !== expectedAppliesTo);
+  // Balance sheet accounts are the host's own; appliesTo does not restrict them
+  if (!balanceSheetCategories.includes(kind)) {
+    remove(categories, category => category.appliesTo && category.appliesTo !== expectedAppliesTo);
+  }
 
   categories.forEach(category => {
     options.push({
@@ -343,6 +352,8 @@ const AccountingCategorySelect = ({
   id,
   error,
   allowNone = false,
+  alwaysSearchable = false,
+  suggestedCategoryIds = undefined,
   showCode,
   expenseValues = undefined,
   buttonClassName = '',
@@ -382,12 +393,17 @@ const AccountingCategorySelect = ({
   }, [options, selectFirstOptionIfSingle, selectedCategory, onChange]);
 
   const suggestedOptions = React.useMemo(() => {
+    if (suggestedCategoryIds?.length) {
+      return options.filter(option => suggestedCategoryIds.includes(option.value?.id));
+    }
     return !predictions.length
       ? []
       : options.filter(option => predictions.some(prediction => prediction.code === option.value?.code));
-  }, [options, predictions]);
+  }, [options, predictions, suggestedCategoryIds]);
 
-  const useSeparatePredictionsCommandGroup = Boolean(predictionStyle === 'inline-preload' && suggestedOptions.length);
+  const useSeparatePredictionsCommandGroup = Boolean(
+    suggestedOptions.length && (predictionStyle === 'inline-preload' || suggestedCategoryIds?.length),
+  );
 
   return (
     <div>
@@ -432,7 +448,7 @@ const AccountingCategorySelect = ({
           style={{ width: 'var(--radix-popover-trigger-width)' }}
         >
           <Command>
-            {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
+            {(alwaysSearchable || size(options) > 6) && <CommandInput placeholder="Filter by name" />}
 
             <CommandList>
               <CommandEmpty>

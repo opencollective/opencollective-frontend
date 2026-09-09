@@ -14,6 +14,7 @@ import type {
 import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { FEATURES, isFeatureEnabled, requiresUpgrade } from '@/lib/allowed-features';
 
 import { AccountingCategorizationRulesDashboard } from '@/components/accounting/dashboard/categorization/AccountingCategorizationRulesDashboard.tsx';
@@ -34,8 +35,14 @@ import type { DashboardSectionProps } from '../../types';
 
 import { AccountingCategoriesTable } from './AccountingCategoriesTable';
 import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
-import { AccountingCategoryKindI18n } from './AccountingCategoryForm';
+import {
+  AccountingCategoryKindI18n,
+  AccountingCategoryType,
+  AccountingCategoryTypeI18n,
+  getAccountingCategoryType,
+} from './AccountingCategoryForm';
 import { CreateAccountingCategoryModal } from './CreateAccountingCategoryModal';
+import { PaymentAccountsTable } from './PaymentAccountsTable';
 
 const accountingCategoriesQuery = gql`
   query AdminAccountingCategories($hostSlug: String!) {
@@ -100,6 +107,16 @@ const orderByCodeFilter = buildOrderByFilter(
   },
 );
 
+const typeFilter = buildComboSelectFilter(
+  z
+    .array(
+      z.enum([AccountingCategoryType.BALANCE, AccountingCategoryType.CLEARING, AccountingCategoryType.PROFIT_AND_LOSS]),
+    )
+    .optional(),
+  defineMessage({ defaultMessage: 'Type', id: 'Type' }),
+  AccountingCategoryTypeI18n,
+);
+
 const kindFilter = buildComboSelectFilter(
   z
     .array(
@@ -126,6 +143,9 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const { account } = React.useContext(DashboardContext);
   const isUpgradeRequired = requiresUpgrade(account, FEATURES.CHART_OF_ACCOUNTS);
   const { LoggedInUser } = useLoggedInUser();
+  const hasBalanceCategoriesPreview = Boolean(
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BALANCE_ACCOUNTING_CATEGORIES),
+  );
   const intl = useIntl();
   const { toast } = useToast();
 
@@ -140,6 +160,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
         z.object({
           searchTerm: searchFilter.schema,
           orderBy: orderByCodeFilter.schema,
+          ...(hasBalanceCategoriesPreview ? { type: typeFilter.schema } : {}),
           kind: kindFilter.schema,
           ...(hasHosting ? { hostOnly: hostOnlyFilter.schema } : {}),
         }),
@@ -148,12 +169,14 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     filters: {
       searchTerm: searchFilter.filter,
       orderBy: orderByCodeFilter.filter,
+      ...(hasBalanceCategoriesPreview ? { type: typeFilter.filter } : {}),
       kind: kindFilter.filter,
       ...(hasHosting ? { hostOnly: hostOnlyFilter.filter } : {}),
     },
     toVariables: {
       searchTerm: searchFilter.toVariables,
       orderBy: orderByCodeFilter.toVariables,
+      ...(hasBalanceCategoriesPreview ? { type: typeFilter.toVariables } : {}),
       kind: kindFilter.toVariables,
       ...(hasHosting ? { hostOnly: v => v === 'yes' } : {}),
     },
@@ -174,7 +197,12 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   );
 
   const filterFn: (c: (typeof categories)[number]) => boolean = React.useMemo(() => {
-    if (!queryFilter.values.searchTerm && !queryFilter.values.kind && !queryFilter.values.hostOnly) {
+    if (
+      !queryFilter.values.searchTerm &&
+      !queryFilter.values.type &&
+      !queryFilter.values.kind &&
+      !queryFilter.values.hostOnly
+    ) {
       return null;
     }
 
@@ -182,7 +210,8 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     return c => {
       return (
         (!termRegExp || termRegExp.test(c.code) || termRegExp.test(c.name) || termRegExp.test(c.friendlyName)) &&
-        (!queryFilter.values.kind || queryFilter.values.kind.includes(c.kind)) &&
+        (!queryFilter.values.type || queryFilter.values.type.includes(getAccountingCategoryType(c.kind))) &&
+        (!queryFilter.values.kind || (queryFilter.values.kind as AccountingCategoryKind[]).includes(c.kind)) &&
         (!queryFilter.values.hostOnly || (queryFilter.values.hostOnly === 'yes') === c.hostOnly)
       );
     };
@@ -272,6 +301,14 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
         id: 'categories',
         label: intl.formatMessage({ defaultMessage: 'Chart of Accounts', id: 'IzFWHI' }),
       },
+      ...(hasBalanceCategoriesPreview
+        ? [
+            {
+              id: 'payment-accounts',
+              label: intl.formatMessage({ defaultMessage: 'Payment device assignments', id: 'vUvS/g' }),
+            },
+          ]
+        : []),
       ...(isContributionCategorizationRulesEnabled
         ? [
             {
@@ -281,7 +318,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           ]
         : []),
     ],
-    [intl, isContributionCategorizationRulesEnabled],
+    [intl, isContributionCategorizationRulesEnabled, hasBalanceCategoriesPreview],
   );
 
   const [selectedTab, setSelectedTab] = React.useState('categories');
@@ -338,6 +375,9 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
                   hasHosting={hasHosting}
                 />
               </React.Fragment>
+            )}
+            {selectedTab === 'payment-accounts' && hasBalanceCategoriesPreview && (
+              <PaymentAccountsTable hostSlug={accountSlug} isAdmin={isAdmin} />
             )}
             {selectedTab === 'rules' && (
               <React.Fragment>

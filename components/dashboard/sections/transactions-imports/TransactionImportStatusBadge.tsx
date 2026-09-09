@@ -1,14 +1,16 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { TransactionsImport } from '@/lib/graphql/types/v2/graphql';
+import type { ConnectedAccount } from '@/lib/graphql/types/v2/graphql';
 
 import { getI18nLink } from '@/components/I18nFormatters';
 import Link from '@/components/Link';
 import { Badge } from '@/components/ui/Badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
-type TransactionsImportStatus = Pick<TransactionsImport, 'connectedAccount'>;
+type TransactionsImportStatus = {
+  connectedAccount?: Pick<ConnectedAccount, 'authorizationExpiresAt'> | null;
+};
 
 const isAuthorizationExpired = (authorizationExpiresAt?: string | null) => {
   return authorizationExpiresAt && new Date(authorizationExpiresAt) < new Date();

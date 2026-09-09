@@ -9,6 +9,7 @@ import type { Account, ConnectedAccount, EditTransferWiseAccountQuery } from '@/
 import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
+import { ConnectedAccountBalanceCategoryPicker } from '../accounting/BalanceAccountingCategoryPicker';
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
 import MessageBox from '../MessageBox';
 import { useModal } from '../ModalContext';
@@ -28,6 +29,11 @@ const editTransferWiseAccountQuery = gql`
         createdAt
         settings
         hash
+        balanceAccountingCategory {
+          id
+          code
+          name
+        }
         createdByAccount {
           id
           legacyId
@@ -243,6 +249,7 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
               )}
             </div>
           )}
+          <ConnectedAccountBalanceCategoryPicker hostSlug={collective.slug} connectedAccount={connectedAccounts[0]} />
           <div className="flex flex-col gap-2">
             <h1 className="text-base font-bold">
               <FormattedMessage id="header.options" defaultMessage="Options" />
