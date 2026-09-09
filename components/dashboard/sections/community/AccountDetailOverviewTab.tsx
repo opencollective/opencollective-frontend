@@ -330,12 +330,10 @@ export const AccountDetailsOverviewTab = ({
                 isLoading ? (
                   <Skeleton className="h-4 w-1/2" />
                 ) : (
-                  overviewAccount?.communityStats?.firstInteractionAt && (
-                    <RichActivityDate
-                      date={overviewAccount?.communityStats?.firstInteractionAt}
-                      activity={query.data?.firstActivity?.nodes?.[0]}
-                    />
-                  )
+                  <RichActivityDate
+                    date={query.data?.firstActivity?.nodes?.[0]?.createdAt}
+                    activity={query.data?.firstActivity?.nodes?.[0]}
+                  />
                 )
               }
             />
@@ -345,12 +343,10 @@ export const AccountDetailsOverviewTab = ({
                 isLoading ? (
                   <Skeleton className="h-4 w-1/2" />
                 ) : (
-                  overviewAccount?.communityStats?.lastInteractionAt && (
-                    <RichActivityDate
-                      date={overviewAccount?.communityStats?.lastInteractionAt}
-                      activity={query.data?.lastActivity?.nodes?.[0]}
-                    />
-                  )
+                  <RichActivityDate
+                    date={query.data?.lastActivity?.nodes?.[0]?.createdAt}
+                    activity={query.data?.lastActivity?.nodes?.[0]}
+                  />
                 )
               }
             />
