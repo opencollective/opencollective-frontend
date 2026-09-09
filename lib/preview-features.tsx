@@ -20,6 +20,7 @@ export enum PREVIEW_FEATURE_KEYS {
   ASYNC_EXPORTS = 'ASYNC_EXPORTS',
   TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
   HOSTED_ACCOUNT_OVERVIEW = 'HOSTED_ACCOUNT_OVERVIEW',
+  BALANCE_ACCOUNTING_CATEGORIES = 'BALANCE_ACCOUNTING_CATEGORIES',
 }
 
 enum Categories {
@@ -198,6 +199,22 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.GENERAL,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.BALANCE_ACCOUNTING_CATEGORIES,
+    title: (
+      <FormattedMessage defaultMessage="Balance & clearing accounts" id="PreviewFeatures.balanceAccountingCategories" />
+    ),
+    description: (
+      <FormattedMessage
+        defaultMessage="Attribute payments to balance and clearing accounts from your chart of accounts."
+        id="PreviewFeatures.balanceAccountingCategoriesDescription"
+      />
+    ),
+    alwaysEnableInDev: true,
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
+    category: Categories.HOSTING,
   },
   {
     key: PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE,
