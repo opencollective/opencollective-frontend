@@ -3,9 +3,9 @@ import { uniqBy } from 'lodash-es';
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
 import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
+import { type CommentFieldsFragment, MemberRole, type Update } from './graphql/types/v2/graphql';
 import type { WorkspaceAccount } from './account';
 import { isHiddenAccount } from './collective';
-import { type CommentFieldsFragment, MemberRole, type Update } from './graphql/types/v2/graphql';
 import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from './preview-features';
 import { previewFeatures } from './preview-features';
 
@@ -49,21 +49,14 @@ class LoggedInUser {
   public isSuspended: boolean;
   public location: { id?: string; address?: string; country?: string; structured?: any };
 
-  // Slim memberOf with v2 shape -- only fields needed for role map + remaining non-dashboard consumers.
-  // Dashboard-related fields (features, policies, childrenAccounts, etc.) come from workspaces instead.
+  // Slim memberOf (all roles) -- the query only fetches what the role map needs.
+  // Anything richer (name, type, features, host, childrenAccounts, ...) must come from `workspaces`.
   public memberOf: Array<{
     id: string;
     role: ReverseCompatibleMemberRole;
     account: {
       id: string;
-      legacyId: number;
       slug: string;
-      type: string;
-      name: string;
-      isHost?: boolean;
-      hasHosting?: boolean;
-      parent?: { id: string; slug?: string };
-      host?: { id: string };
     };
   }>;
 
@@ -277,16 +270,7 @@ class LoggedInUser {
    * List all the hosts this user belongs to and is admin of
    */
   hostsUserIsAdminOf(): WorkspaceAccount[] {
-    if (this.workspaces) {
-      return this.workspaces.filter(w => w.isHost && this.hasRole(MemberRole.ADMIN, w));
-    }
-    // Fallback to memberOf if workspaces not available
-    const accounts = this.memberOf
-      .filter(m => m.account?.isHost)
-      .filter(m => this.hasRole(MemberRole.ADMIN, m.account))
-      .map(m => m.account);
-
-    return uniqBy(accounts, 'id') as WorkspaceAccount[];
+    return this.workspaces.filter(w => w.isHost && this.hasRole(MemberRole.ADMIN, w));
   }
 
   isHostAdmin(collective: CollectiveParam) {
