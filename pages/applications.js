@@ -27,7 +27,7 @@ class Apps extends React.Component {
                 id="wQEy7N"
               />
             </MessageBox>
-            <StyledLink href={getDashboardRoute(LoggedInUser.collective, 'for-developers')}>
+            <StyledLink href={getDashboardRoute(LoggedInUser, 'for-developers')}>
               <StyledButton buttonStyle="primary" buttonSize="medium" mt={3}>
                 <FormattedMessage defaultMessage="View personal tokens" id="vaSCOx" />
               </StyledButton>

@@ -15,7 +15,7 @@ describe('Users can change their email address', () => {
 
   it('uses a form in advanced settings', () => {
     // Go to /dashboard/:collective/advanced
-    cy.visit(`/dashboard/${user.collective.slug}/advanced`);
+    cy.visit(`/dashboard/${user.slug}/advanced`);
 
     // Initial form should have current email in it
     cy.get('[data-cy=EditUserEmailForm] input[name=email]').should('have.value', user.email);
@@ -61,7 +61,7 @@ describe('Users can change their email address', () => {
   it('can re-send the confirmation email', () => {
     const emailForDoubleConfirmation = randomEmail();
 
-    cy.login({ email: newEmail, redirect: `/dashboard/${user.collective.slug}/advanced` });
+    cy.login({ email: newEmail, redirect: `/dashboard/${user.slug}/advanced` });
     cy.get('[data-cy=EditUserEmailForm] input[name=email]').type(`{selectall}${emailForDoubleConfirmation}`);
     cy.contains('[data-cy=EditUserEmailForm] button', 'Confirm new email').click();
     cy.contains('[data-cy=EditUserEmailForm] button', 'Re-send confirmation').click();

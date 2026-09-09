@@ -1421,8 +1421,8 @@ async function buildFormOptions(
         hasExpenseId: !!startOptions.expenseId,
         expenseId: startOptions.expenseId,
         expenseKey: startOptions.draftKey,
-        hasSubmitterSlug: !!loggedInUser?.collective?.slug,
-        submitterSlug: loggedInUser?.collective?.slug,
+        hasSubmitterSlug: !!loggedInUser?.slug,
+        submitterSlug: loggedInUser?.slug,
       },
       refresh,
     );

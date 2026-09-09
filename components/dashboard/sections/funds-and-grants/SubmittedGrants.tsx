@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { isIndividualAccount } from '@/lib/collective';
+import { isIndividualAccount } from '@/lib/account';
 import type { Expense } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
@@ -39,7 +39,7 @@ export function SubmittedGrants({ accountSlug }: DashboardSectionProps) {
     toVariables,
     filters,
   });
-  const createdByAccount = accountSlug === LoggedInUser?.collective.slug ? { slug: accountSlug } : null;
+  const createdByAccount = accountSlug === LoggedInUser?.slug ? { slug: accountSlug } : null;
   const fromAccount = !createdByAccount ? { slug: accountSlug } : null;
 
   const variables = {

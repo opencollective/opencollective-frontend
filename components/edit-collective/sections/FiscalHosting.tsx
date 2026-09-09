@@ -9,7 +9,9 @@ import { i18nGraphqlException } from '@/lib/errors';
 import { API_V1_CONTEXT, gql } from '@/lib/graphql/helpers';
 import type { FiscalHostingQuery } from '@/lib/graphql/types/v2/graphql';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
+import { DashboardContext } from '@/components/dashboard/DashboardContext';
 import I18nFormatters from '@/components/I18nFormatters';
 import { DocumentationLink } from '@/components/Link';
 
@@ -52,11 +54,14 @@ export const fiscalHostingQuery = gql`
 export const ToggleMoneyManagementButton = ({
   account,
   refetchQueries,
+  onSuccess,
   children,
   ...props
 }: {
   account: any;
   refetchQueries?: InternalRefetchQueriesInclude;
+  /** Called after mutation and refetches complete; use to sync UserProvider with cache (e.g. updateLoggedInUserFromCache). */
+  onSuccess?: () => void;
   children?: React.ReactNode;
 } & ButtonProps) => {
   const intl = useIntl();
@@ -64,6 +69,7 @@ export const ToggleMoneyManagementButton = ({
   const { showConfirmationModal } = useModal();
   const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
     refetchQueries,
+    onCompleted: onSuccess,
   });
   const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },
@@ -163,11 +169,14 @@ export const ToggleMoneyManagementButton = ({
 export const ToggleFiscalHostingButton = ({
   account,
   refetchQueries,
+  onSuccess,
   children,
   ...props
 }: {
   account: any;
   refetchQueries?: InternalRefetchQueriesInclude;
+  /** Called after mutation and refetches complete; use to sync UserProvider with cache (e.g. updateLoggedInUserFromCache). */
+  onSuccess?: () => void;
   children?: React.ReactNode;
 } & ButtonProps) => {
   const intl = useIntl();
@@ -183,6 +192,7 @@ export const ToggleFiscalHostingButton = ({
 
   const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
     refetchQueries,
+    onCompleted: onSuccess,
   });
 
   const handleFiscalHostUpdate = async ({ activate }) => {
@@ -259,7 +269,9 @@ export const ToggleFiscalHostingButton = ({
   );
 };
 
-const FiscalHosting = ({ collective, account }) => {
+const FiscalHosting = ({ collective }) => {
+  const { account } = React.useContext(DashboardContext);
+  const { updateLoggedInUserFromCache } = useLoggedInUser();
   const hasMoneyManagement = hasAccountMoneyManagement(account);
   const refetchQueries = [
     {
@@ -301,7 +313,12 @@ const FiscalHosting = ({ collective, account }) => {
               />
             </p>
           </div>
-          <ToggleMoneyManagementButton className="my-2 w-fit" account={account} refetchQueries={refetchQueries} />
+          <ToggleMoneyManagementButton
+            className="my-2 w-fit"
+            account={account}
+            refetchQueries={refetchQueries}
+            onSuccess={updateLoggedInUserFromCache}
+          />
         </div>
 
         <div
@@ -328,7 +345,12 @@ const FiscalHosting = ({ collective, account }) => {
               />
             </p>
           </div>
-          <ToggleFiscalHostingButton className="my-2 w-fit" account={account} refetchQueries={refetchQueries} />
+          <ToggleFiscalHostingButton
+            className="my-2 w-fit"
+            account={account}
+            refetchQueries={refetchQueries}
+            onSuccess={updateLoggedInUserFromCache}
+          />
         </div>
       </div>
     </div>
