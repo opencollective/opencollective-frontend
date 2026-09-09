@@ -9,6 +9,7 @@ import { MemberRole } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { getProfileCompletionRoute } from '@/lib/url-helpers';
 import { cn, parseToBoolean } from '@/lib/utils';
 
 import { Button } from '@/components/ui/Button';
@@ -130,7 +131,7 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
       !router.route.includes('/signup') &&
       LoggedInUser?.requiresProfileCompletion
     ) {
-      router.push('/signup/profile');
+      router.push(getProfileCompletionRoute(router.asPath));
     }
   }, [LoggedInUser, router]);
 
