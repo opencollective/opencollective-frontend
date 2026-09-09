@@ -3482,6 +3482,8 @@
   "PreviewFeatures.AdditionalFeatures": "Funciones adicionales",
   "PreviewFeatures.asyncExportsDescription": "Enable background processing for large data exports. Exports will be processed asynchronously and you'll be notified when they're ready to download.",
   "PreviewFeatures.asyncExportsTitle": "Async Exports",
+  "PreviewFeatures.balanceAccountingCategories": "Balance & clearing accounts",
+  "PreviewFeatures.balanceAccountingCategoriesDescription": "Attribute payments to balance and clearing accounts from your chart of accounts.",
   "PreviewFeatures.CollectiveOverview.Welcome.Description": "Hemos creado este espacio para que estés al tanto de todo lo que ocurre en tu Colectivo, ¡dinos cómo podemos mejorarlo!",
   "PreviewFeatures.CollectiveOverview.Welcome.Title": "Bienvenido a tu nuevo Resumen del Colectivo",
   "PreviewFeatures.crowdfundingRedesignDescription": "Participa en el <strong>proyecto de rediseño del crowdfunding</strong> y accede a avances de las nuevas páginas de crowdfunding y perfiles. Disfruta de perfiles mejorados con vistas separadas para la recaudación de fondos y la narración, relaciones más claras entre los colectivos y sus proyectos, un mejor seguimiento de los objetivos y narrativas más completas que muestran tu impacto y sostenibilidad a largo plazo.{newLine}{newLine}Echa un vistazo a la <blogPostLink>entrada del blog</blogPostLink> para obtener más detalles.",

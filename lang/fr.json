@@ -3482,6 +3482,8 @@
   "PreviewFeatures.AdditionalFeatures": "Fonctionnalités supplémentaires",
   "PreviewFeatures.asyncExportsDescription": "Activez le traitement en arrière-plan pour les exports de données volumineux. Les exports seront traités de manière asynchrone et vous serez notifié lorsqu'ils seront prêts à être téléchargés.",
   "PreviewFeatures.asyncExportsTitle": "Exports asynchrones",
+  "PreviewFeatures.balanceAccountingCategories": "Balance & clearing accounts",
+  "PreviewFeatures.balanceAccountingCategoriesDescription": "Attribute payments to balance and clearing accounts from your chart of accounts.",
   "PreviewFeatures.CollectiveOverview.Welcome.Description": "Nous avons créé cet espace pour vous permettre de rester au courant de tout ce qui se passe dans votre Collectif. Faites-nous savoir comment nous pouvons le rendre meilleur !",
   "PreviewFeatures.CollectiveOverview.Welcome.Title": "Bienvenue dans votre nouvelle vue d'ensemble",
   "PreviewFeatures.crowdfundingRedesignDescription": "Participez à la <strong>refonte du financement participatif</strong> et accédez en avant-première aux nouvelles pages et profils de financement participatif. Découvrez des pages de profil améliorées avec des vues distinctes pour la collecte de fonds et le storytelling, des relations plus claires entre les Collectifs et leurs projets, un suivi amélioré des objectifs et de meilleurs récits collectifs qui mettent en valeur votre impact et votre viabilité à long terme.{newLine}{newLine}Consultez l'<blogPostLink>article de blog</blogPostLink> pour plus de détails.\n\nTraduit avec DeepL.com (version gratuite)",
