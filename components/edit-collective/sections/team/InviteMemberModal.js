@@ -26,7 +26,6 @@ export const inviteMemberMutation = gql`
     $description: String
     $since: DateTime
     $privateNote: String
-    $isNewUser: Boolean
   ) {
     inviteMember(
       memberAccount: $memberAccount
@@ -35,7 +34,6 @@ export const inviteMemberMutation = gql`
       description: $description
       since: $since
       privateNote: $privateNote
-      isNewUser: $isNewUser
     ) {
       id
       role
@@ -51,7 +49,6 @@ const InviteMemberModal = props => {
   const { toast } = useToast();
 
   const [member, setMember] = React.useState(null);
-  const [isNewUser, setIsNewUser] = React.useState();
   const mutationOptions = {
     refetchQueries: [
       {
@@ -92,7 +89,6 @@ const InviteMemberModal = props => {
           since: showSince === false ? undefined : since,
           privateNote: privateNote?.trim() ? privateNote.trim() : undefined,
           isInvitee: true,
-          isNewUser: Boolean(isNewUser),
         },
       });
 
@@ -144,7 +140,6 @@ const InviteMemberModal = props => {
               minWidth={325}
               onChange={option => {
                 setMember(option.value);
-                setIsNewUser(option.isNew);
               }}
               isDisabled={Boolean(member)}
               types={[CollectiveType.USER]}
