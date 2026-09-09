@@ -293,8 +293,7 @@ const DashboardPage = () => {
   const isRootUser = LoggedInUser?.isRoot;
   const hasWorkspaceAccess =
     workspace.slug &&
-    (workspace.slug === LoggedInUser?.collective.slug ||
-      LoggedInUser?.memberOf?.some(member => member.collective?.slug === workspace.slug));
+    (workspace.slug === LoggedInUser?.collective.slug || LoggedInUser?.canSeeDashboard({ slug: workspace.slug }));
   const defaultSlug = hasWorkspaceAccess ? workspace.slug : LoggedInUser?.collective.slug;
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
@@ -314,18 +313,16 @@ const DashboardPage = () => {
         setWorkspace({ slug: activeSlug, isHost: membership?.collective.isHost });
       }
     }
-    // If there is no slug set (that means /dashboard)
-    // And if there is an activeSlug (this means workspace OR LoggedInUser)
-    // And a LoggedInUser
-    // And if activeSlug is different than LoggedInUser slug
+    // Redirect users that require profile completion
     if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
       router.replace(getProfileCompletionRoute(router.asPath));
     }
-    if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
+    // Redirect to activeSlug if no slug is provided
+    else if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
       router.replace(`/dashboard/${activeSlug}`);
     }
     // If slug is `me` and there is a LoggedInUser, redirect to the user's dashboard
-    if (slug === 'me' && LoggedInUser) {
+    else if (slug === 'me' && LoggedInUser) {
       router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
     }
   }, [activeSlug, LoggedInUser]);
