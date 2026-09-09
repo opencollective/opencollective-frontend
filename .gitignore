@@ -56,3 +56,5 @@ public/static/cmaps
 
 lib/graphql/types/v2/index.ts
 lib/graphql/types/v2/gql.ts
+
+.codegraph
