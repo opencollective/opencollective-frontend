@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import {
   checkVATNumberFormat,
   getGstPercentage,
@@ -59,7 +59,35 @@ const COUNTRY_SELECT_STYLES = {
   control: { minHeight: '32px' },
 };
 
-const VATInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChange, setFormState, formState }) => {
+const validateVatNumber = (rawNumber, countryISO) => {
+  let error = false;
+  let validationResult = checkVATNumberFormat(rawNumber);
+  if (!validationResult.isValid) {
+    validationResult = checkVATNumberFormat(`${countryISO}${rawNumber}`);
+    if (!validationResult.isValid) {
+      error = 'invalid';
+    }
+  } else if (get(validationResult, 'country.isoCode.short') !== countryISO) {
+    error = 'bad_country';
+  }
+
+  return {
+    error,
+    number: !error ? validationResult.value : rawNumber,
+  };
+};
+
+const VATInputs = ({
+  AmountLine,
+  Amount,
+  Label,
+  currency,
+  taxInfo,
+  dispatchChange,
+  commitVatInput,
+  setFormState,
+  formState,
+}) => {
   const hasConfirmedTaxID = taxInfo.number && taxInfo.isReady;
   const vatShortLabel = <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />;
   return (
@@ -143,25 +171,7 @@ const VATInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
                     required
                     maxWidth={180}
                     error={formState.error}
-                    onBlur={e => {
-                      const rawNumber = e.target.value;
-                      let error = false;
-                      let validationResult = checkVATNumberFormat(rawNumber);
-                      if (!validationResult.isValid) {
-                        // Try again with the country code
-                        validationResult = checkVATNumberFormat(`${taxInfo.countryISO}${rawNumber}`);
-                        if (!validationResult.isValid) {
-                          error = 'invalid';
-                        }
-                      } else if (get(validationResult, 'country.isoCode.short') !== taxInfo.countryISO) {
-                        error = 'bad_country';
-                      }
-
-                      const number = !error ? validationResult.value : rawNumber;
-                      const hasError = Boolean(error);
-                      setFormState({ isEnabled: true, error: error });
-                      dispatchChange({ number }, hasError);
-                    }}
+                    onBlur={e => commitVatInput(e.target.value, { keepFormOpen: true })}
                     onChange={e => {
                       setFormState({ isEnabled: true, error: false });
                       dispatchChange({ number: e.target.value });
@@ -170,9 +180,7 @@ const VATInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
                   <StyledButton
                     buttonSize="tiny"
                     disabled={formState.error}
-                    onClick={() => {
-                      setFormState({ isEnabled: false });
-                    }}
+                    onClick={() => commitVatInput(taxInfo.number || '', { keepFormOpen: false })}
                   >
                     <FormattedMessage id="save" defaultMessage="Save" />
                   </StyledButton>
@@ -246,90 +254,136 @@ const GSTInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
 /**
  * Breakdowns a total amount to show the user where the money goes.
  */
-const StepSummary = ({
-  stepProfile,
-  stepDetails,
-  collective,
-  stepPayment,
+const StepSummary = forwardRef(
+  ({ stepProfile, stepDetails, collective, stepPayment, applyTaxes, taxes, data, onChange, tier }, ref) => {
+    const { amount, quantity } = stepDetails;
+    const tierType = tier?.type;
+    const hostCountry = get(collective.host, 'location.country');
+    const collectiveCountry = collective.location?.country || get(collective.parent, 'location.country');
+    const currency = tier?.amount.currency || collective.currency;
 
-  applyTaxes,
-  taxes,
-  data,
-  onChange,
-  tier,
-}) => {
-  const { amount, quantity } = stepDetails;
-  const tierType = tier?.type;
-  const hostCountry = get(collective.host, 'location.country');
-  const collectiveCountry = collective.location?.country || get(collective.parent, 'location.country');
-  const currency = tier?.amount.currency || collective.currency;
+    const [formState, setFormState] = useState({ isEnabled: false, error: false });
+    const taxPercentage = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, data);
+    const taxInfo = prepareTaxInfo(taxes, data, amount, quantity, taxPercentage, formState.isEnabled);
 
-  const [formState, setFormState] = useState({ isEnabled: false, error: false });
-  const taxPercentage = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, data);
-  const taxInfo = prepareTaxInfo(taxes, data, amount, quantity, taxPercentage, formState.isEnabled);
-
-  // Set a tax renderer component
-  let TaxRenderer = null;
-  if (applyTaxes && amount > 0 && taxInfo.taxType) {
-    if (taxInfo.taxType === TaxType.VAT) {
-      TaxRenderer = VATInputs;
-    } else if (taxInfo.taxType === TaxType.GST) {
-      TaxRenderer = GSTInputs;
+    // Set a tax renderer component
+    let TaxRenderer = null;
+    if (applyTaxes && amount > 0 && taxInfo.taxType) {
+      if (taxInfo.taxType === TaxType.VAT) {
+        TaxRenderer = VATInputs;
+      } else if (taxInfo.taxType === TaxType.GST) {
+        TaxRenderer = GSTInputs;
+      }
     }
-  }
 
-  // Helper to prepare onChange data
-  const dispatchChange = (newValues, hasFormParam) => {
-    if (onChange) {
-      const newTaxInfo = { ...taxInfo, ...newValues };
-      const percent = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, newTaxInfo);
-      const hasForm = hasFormParam === undefined ? formState.isEnabled : hasFormParam;
-      return onChange({
-        stepSummary: prepareTaxInfo(taxes, newTaxInfo, amount, quantity, percent, hasForm),
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (!isEmpty(taxes)) {
-      // Dispatch initial value on mount
-      dispatchChange({
-        countryISO: data?.countryISO || get(stepProfile, 'location.country'),
-        number: data?.number || get(stepProfile, 'settings.VAT.number'),
-      });
-    } else if (!data?.isReady) {
-      // Remove stepSummary if taxes are not applied
-      onChange({ stepSummary: { isReady: true } });
-    }
-  }, [taxes]);
-
-  return (
-    <Box width="100%" px={[0, null, null, 2]}>
-      <ContributionSummary
-        collective={collective}
-        stepDetails={stepDetails}
-        stepSummary={data}
-        stepPayment={stepPayment}
-        currency={currency}
-        tier={tier}
-        renderTax={
-          TaxRenderer &&
-          (({ Amount, Label, AmountLine }) => (
-            <TaxRenderer
-              currency={currency}
-              dispatchChange={dispatchChange}
-              setFormState={setFormState}
-              formState={formState}
-              taxInfo={taxInfo}
-              Amount={Amount}
-              Label={Label}
-              AmountLine={AmountLine}
-            />
-          ))
+    // Helper to prepare onChange data
+    const dispatchChange = useCallback(
+      (newValues, hasFormParam) => {
+        if (onChange) {
+          const newTaxInfo = { ...taxInfo, ...(newValues || {}) };
+          const percent = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, newTaxInfo);
+          const hasForm = hasFormParam === undefined ? formState.isEnabled : hasFormParam;
+          return onChange({
+            stepSummary: prepareTaxInfo(taxes, newTaxInfo, amount, quantity, percent, hasForm),
+          });
         }
-      />
-    </Box>
-  );
-};
+      },
+      [amount, collectiveCountry, formState.isEnabled, hostCountry, onChange, quantity, taxInfo, taxes, tierType],
+    );
+
+    const commitVatInput = useCallback(
+      (rawNumber, { keepFormOpen = false } = {}) => {
+        const countryISO = taxInfo.countryISO;
+        const { error, number } = validateVatNumber(rawNumber, countryISO);
+        const hasError = Boolean(error);
+
+        if (hasError) {
+          setFormState({ isEnabled: true, error });
+        } else if (keepFormOpen) {
+          setFormState({ isEnabled: true, error: false });
+        } else {
+          setFormState({ isEnabled: false, error: false });
+        }
+
+        dispatchChange({ number }, hasError);
+        return !hasError;
+      },
+      [dispatchChange, taxInfo.countryISO],
+    );
+
+    const validate = useCallback(() => {
+      if (!applyTaxes || amount <= 0 || isEmpty(taxes)) {
+        return true;
+      }
+
+      const countryISO = data?.countryISO;
+      if (!countryISO) {
+        return false;
+      }
+
+      if (taxInfo.taxType === TaxType.VAT && formState.isEnabled) {
+        return commitVatInput(taxInfo.number || '', { keepFormOpen: false });
+      }
+
+      return Boolean(amount && countryISO && !formState.isEnabled);
+    }, [
+      amount,
+      applyTaxes,
+      commitVatInput,
+      data?.countryISO,
+      formState.isEnabled,
+      taxInfo.number,
+      taxInfo.taxType,
+      taxes,
+    ]);
+
+    useImperativeHandle(ref, () => ({ validate }), [validate]);
+
+    useEffect(() => {
+      if (!isEmpty(taxes)) {
+        // Dispatch initial value on mount
+        dispatchChange({
+          countryISO: data?.countryISO || get(stepProfile, 'location.country'),
+          number: data?.number || get(stepProfile, 'settings.VAT.number'),
+        });
+      } else if (!data?.isReady) {
+        // Remove stepSummary if taxes are not applied
+        onChange({ stepSummary: { isReady: true } });
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- preserve mount-only initialization
+    }, [taxes]);
+
+    return (
+      <Box width="100%" px={[0, null, null, 2]}>
+        <ContributionSummary
+          collective={collective}
+          stepDetails={stepDetails}
+          stepSummary={data}
+          stepPayment={stepPayment}
+          currency={currency}
+          tier={tier}
+          renderTax={
+            TaxRenderer &&
+            (({ Amount, Label, AmountLine }) => (
+              <TaxRenderer
+                currency={currency}
+                dispatchChange={dispatchChange}
+                commitVatInput={commitVatInput}
+                setFormState={setFormState}
+                formState={formState}
+                taxInfo={taxInfo}
+                Amount={Amount}
+                Label={Label}
+                AmountLine={AmountLine}
+              />
+            ))
+          }
+        />
+      </Box>
+    );
+  },
+);
+
+StepSummary.displayName = 'StepSummary';
 
 export default StepSummary;
