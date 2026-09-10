@@ -24,6 +24,7 @@ declare global {
         redirect?: string;
         visitParams?: Partial<Cypress.VisitOptions>;
         sendLink?: boolean;
+        completeProfile?: boolean;
       }): Chainable<{ email: string; newsletterOptIn: false }>;
 
       createCollective(params: {
