@@ -1,4 +1,4 @@
-import { uniqBy } from 'lodash-es';
+import { omit, uniqBy } from 'lodash-es';
 
 import { CollectiveType } from './constants/collectives';
 import type { ReverseCompatibleMemberRole } from './constants/roles';
@@ -60,7 +60,7 @@ class LoggedInUser {
     };
   }>;
 
-  // Workspace accounts: derived from memberOf (when query uses memberOf with role filter) or from individual.workspaces resolver
+  // Accounts the user can open a dashboard for: their own account plus the role-filtered `workspaces: memberOf(...)`
   public workspaces: WorkspaceAccount[];
 
   constructor(data) {
@@ -81,12 +81,13 @@ class LoggedInUser {
       },
       {} as Record<string, ReverseCompatibleMemberRole[]>,
     );
-    // workspaces: memberOf(...) with role filter — flatten nodes to account list,
-    // including the logged-in user's own account (loggedInAccount also has ...LoggedInUserWorkspaceFields)
+    // workspaces: memberOf(...) with role filter — flatten nodes to account list, prefixed with the user's own
+    // account (loggedInAccount also spreads ...WorkspaceSubFields) minus the membership lists it carries.
     const workspaceNodes = data?.workspaces?.nodes ?? data?.workspaces ?? [];
     const workspaceList = Array.isArray(workspaceNodes) ? workspaceNodes : [];
     const workspaceAccounts = workspaceList.map(m => m.account).filter(Boolean);
-    this.workspaces = uniqBy([data, ...workspaceAccounts], 'slug') as WorkspaceAccount[];
+    const ownAccount = data ? omit(data, ['memberOf', 'workspaces']) : null;
+    this.workspaces = uniqBy([ownAccount, ...workspaceAccounts].filter(Boolean), 'slug') as WorkspaceAccount[];
   }
 
   /**

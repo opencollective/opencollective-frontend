@@ -129,13 +129,16 @@ const sortWorkspaces = (workspaces: WorkspaceAccount[]) => {
   return [...workspaces].sort((a, b) => a.slug.localeCompare(b.slug));
 };
 
+/** Children are reached through their parent, and the user's own account has its own menu entry */
+const TYPES_NOT_LISTED = [CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.INDIVIDUAL] as string[];
+
 /** Filter workspaces to active, non-event/project accounts (workspaces resolver already filters by role) */
 const filterActiveWorkspaces = (workspaces: WorkspaceAccount[], user?: LoggedInUser) => {
   return workspaces.filter(w => {
     if (w.isArchived) {
       return false;
     }
-    if (['EVENT', 'PROJECT', 'USER', 'INDIVIDUAL'].includes(w.type)) {
+    if (TYPES_NOT_LISTED.includes(w.type)) {
       return false;
     }
     if (w.isPrivate && user && !user.hasRole([MemberRole.ADMIN, MemberRole.ACCOUNTANT], w)) {
@@ -146,7 +149,7 @@ const filterActiveWorkspaces = (workspaces: WorkspaceAccount[], user?: LoggedInU
 };
 
 const filterArchivedWorkspaces = (workspaces: WorkspaceAccount[]) => {
-  return workspaces.filter(w => w.isArchived && !['EVENT', 'PROJECT', 'USER', 'INDIVIDUAL'].includes(w.type));
+  return workspaces.filter(w => w.isArchived && !TYPES_NOT_LISTED.includes(w.type));
 };
 
 interface WorkspacesListProps {
