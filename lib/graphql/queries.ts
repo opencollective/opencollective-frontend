@@ -19,14 +19,12 @@ const workspaceSubFieldsFragment = gql`
     isActive
     hasPublicProfile
     settings
-    categories
     createdAt
     canHaveChangelogUpdates
     policies {
       id
       publicId
       REQUIRE_2FA_FOR_ADMINS
-      USE_VENDOR_POLICY
     }
     features {
       id
@@ -38,7 +36,6 @@ const workspaceSubFieldsFragment = gql`
       UPDATES
       COLLECTIVE_GOALS
       PUBLIC_PROFILE
-      VIRTUAL_CARDS
       ACCOUNTING_CATEGORIZATION_RULES
     }
     ... on AccountWithParent {
@@ -64,9 +61,6 @@ const workspaceSubFieldsFragment = gql`
     ... on AccountWithPlatformSubscription {
       platformSubscription {
         isAccountOnHold
-        plan {
-          title
-        }
       }
     }
     ... on Organization {
@@ -84,9 +78,6 @@ const workspaceSubFieldsFragment = gql`
         AGREEMENTS
         KYC
       }
-    }
-    ... on Event {
-      endsAt
     }
   }
 `;
