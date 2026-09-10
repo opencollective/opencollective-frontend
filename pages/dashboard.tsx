@@ -167,12 +167,15 @@ const DashboardPage = () => {
   const account = LoggedInUser?.getWorkspace(activeSlug) ?? null;
 
   // When a workspace account isn't found (e.g. navigating to a newly created event/project),
-  // refetch once to pick up the new account in the workspace data.
+  // refetch once to pick up the new account in the workspace data. `refetchLoggedInUser` doesn't
+  // toggle `loadingLoggedInUser`, so track it here to show a loading state rather than "doesn't exist".
   const lastRefetchedSlug = React.useRef<string | null>(null);
+  const [refetchingSlug, setRefetchingSlug] = React.useState<string | null>(null);
   React.useEffect(() => {
     if (activeSlug && LoggedInUser && !account && !isRootDashboard && lastRefetchedSlug.current !== activeSlug) {
       lastRefetchedSlug.current = activeSlug;
-      refetchLoggedInUser();
+      setRefetchingSlug(activeSlug);
+      refetchLoggedInUser().finally(() => setRefetchingSlug(current => (current === activeSlug ? null : current)));
     }
   }, [activeSlug, LoggedInUser, account, isRootDashboard, refetchLoggedInUser]);
 
@@ -209,15 +212,11 @@ const DashboardPage = () => {
 
   const [expandedSection, setExpandedSection] = React.useState(null);
 
-  // Only wait for LoggedInUser to load, not for adminPanelQuery
-  const isLoading = loadingLoggedInUser;
+  // Only wait for LoggedInUser to load (or be refetched for an unknown slug), not for a per-account query
+  const isLoading = loadingLoggedInUser || refetchingSlug === activeSlug;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection, isRootDashboard);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const accountIdentifier = isRootDashboard ? 'Platform Admin' : account && (account.name || `@${account.slug}`);
-
-  // if (!accountLoading && !account && error) {
-  //   return <ErrorPage error={error} />;
-  // }
 
   return (
     <DashboardContext.Provider
