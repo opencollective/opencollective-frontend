@@ -40,8 +40,10 @@ class OnboardingContentBox extends React.Component {
   }
 
   componentDidMount() {
-    const membershipId = this.props.collective.admins?.[0]?.id;
-    const admins = [{ id: membershipId, role: 'ADMIN', member: this.props.LoggedInUser.toV1Collective() }];
+    // The v1 editCollectiveMembers mutation needs the logged-in user's own (numeric) membership id, not the first admin's
+    const { collective, LoggedInUser } = this.props;
+    const membershipId = collective.admins?.find(admin => admin.member?.id === LoggedInUser.legacyId)?.id;
+    const admins = [{ id: membershipId, role: 'ADMIN', member: LoggedInUser.toV1Collective() }];
     this.setState({ admins }, () => this.props.updateAdmins(admins));
   }
 

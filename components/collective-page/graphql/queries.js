@@ -139,6 +139,9 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       }
       admins: members(role: "ADMIN") {
         id
+        member {
+          id
+        }
       }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
