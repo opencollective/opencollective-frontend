@@ -9,6 +9,7 @@ import { gql } from '../../../../lib/graphql/helpers';
 import type { DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { hasHosting } from '@/lib/account';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
@@ -184,7 +185,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostExpectedFundsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      hostContext: 'hasHosting' in account && account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: hasHosting(account) ? queryFilter.values.hostContext : undefined,
     },
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     skip: isUpgradeRequired,
@@ -223,7 +224,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />
-            {'hasHosting' in account && account.hasHosting && (
+            {hasHosting(account) && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}

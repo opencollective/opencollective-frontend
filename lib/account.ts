@@ -91,5 +91,16 @@ export function hasPlatformSubscription<T extends object>(account: T): account i
   );
 }
 
+/** Distributes over a union: keeps only the members that declare `hasHosting` as true */
+type WithHosting<T> = T extends { hasHosting?: boolean }
+  ? 'hasHosting' extends keyof T
+    ? T & { hasHosting: true }
+    : never
+  : never;
+
+export function hasHosting<T extends object>(account: T | null | undefined): account is WithHosting<T> {
+  return Boolean(account && 'hasHosting' in account && (account as T & { hasHosting?: unknown }).hasHosting);
+}
+
 export const getTransactionsSection = (account: WorkspaceAccount) =>
   isOrganizationAccount(account) && account.hasHosting ? 'host-transactions' : 'transactions';

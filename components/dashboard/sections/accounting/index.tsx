@@ -15,6 +15,7 @@ import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
+import { hasHosting } from '@/lib/account';
 import { FEATURES, isFeatureEnabled, requiresUpgrade } from '@/lib/allowed-features';
 
 import { AccountingCategorizationRulesDashboard } from '@/components/accounting/dashboard/categorization/AccountingCategorizationRulesDashboard.tsx';
@@ -152,7 +153,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const [isCreateCategoryModalOpen, setIsCreateCategoryModalOpen] = React.useState(false);
   const [deleteCategoryConfirmation, setDeleteCategoryConfirmation] = React.useState(null);
 
-  const hasHosting = 'hasHosting' in account && account.hasHosting;
+  const hosting = hasHosting(account);
 
   const queryFilter = useQueryFilter({
     schema: React.useMemo(
@@ -162,7 +163,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           orderBy: orderByCodeFilter.schema,
           ...(hasBalanceCategoriesPreview ? { type: typeFilter.schema } : {}),
           kind: kindFilter.schema,
-          ...(hasHosting ? { hostOnly: hostOnlyFilter.schema } : {}),
+          ...(hosting ? { hostOnly: hostOnlyFilter.schema } : {}),
         }),
       [],
     ),
@@ -171,14 +172,14 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
       orderBy: orderByCodeFilter.filter,
       ...(hasBalanceCategoriesPreview ? { type: typeFilter.filter } : {}),
       kind: kindFilter.filter,
-      ...(hasHosting ? { hostOnly: hostOnlyFilter.filter } : {}),
+      ...(hosting ? { hostOnly: hostOnlyFilter.filter } : {}),
     },
     toVariables: {
       searchTerm: searchFilter.toVariables,
       orderBy: orderByCodeFilter.toVariables,
       ...(hasBalanceCategoriesPreview ? { type: typeFilter.toVariables } : {}),
       kind: kindFilter.toVariables,
-      ...(hasHosting ? { hostOnly: v => v === 'yes' } : {}),
+      ...(hosting ? { hostOnly: v => v === 'yes' } : {}),
     },
   });
 
@@ -372,7 +373,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
                   isFiltered={!!queryFilter.values.searchTerm}
                   onDelete={onDelete}
                   onEdit={onEdit}
-                  hasHosting={hasHosting}
+                  hasHosting={hosting}
                 />
               </React.Fragment>
             )}
@@ -389,7 +390,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
       </div>
       {isCreateCategoryModalOpen && (
         <CreateAccountingCategoryModal
-          hasHosting={hasHosting}
+          hasHosting={hosting}
           onClose={() => setIsCreateCategoryModalOpen(false)}
           onCreate={onCreate}
         />

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { hasHosting } from '@/lib/account';
 import { ExpectedFundsFilter, OrderStatus } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
@@ -123,7 +124,7 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
   const { data: metadata, refetch: refetchMetadata } = useQuery(incompleteContributionsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      hostContext: 'hasHosting' in account && account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: hasHosting(account) ? queryFilter.values.hostContext : undefined,
     },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -146,7 +147,7 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="IncompleteContributions" defaultMessage="Incomplete Contributions" />
-            {'hasHosting' in account && account.hasHosting && (
+            {hasHosting(account) && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}

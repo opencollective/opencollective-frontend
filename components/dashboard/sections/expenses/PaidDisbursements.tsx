@@ -15,6 +15,7 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
+import { hasHosting } from '@/lib/account';
 import { isFeatureEnabled } from '@/lib/allowed-features';
 import { limit } from '@/lib/filters/schemas';
 import { useDrawer } from '@/lib/hooks/useDrawer';
@@ -375,7 +376,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="Paid Disbursements" id="rwMrEx" />
-            {'hasHosting' in account && account.hasHosting && (
+            {hasHosting(account) && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}
