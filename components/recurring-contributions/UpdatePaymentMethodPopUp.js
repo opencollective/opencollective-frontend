@@ -249,7 +249,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
     }
 
     const stripe = await getStripe();
-    const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
+    const result = await stripe.confirmCardSetup(response.setupIntent.client_secret);
     if (result.error) {
       toast({
         variant: 'error',
