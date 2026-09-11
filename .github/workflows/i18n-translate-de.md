@@ -13,7 +13,7 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
-  copilot-requests: write
+  copilot-requests: none
 timeout-minutes: 45
 network:
   allowed:
