@@ -5,7 +5,7 @@ import { max } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
-import { imagePreview } from '../lib/image-utils';
+import { imagePreview, isFrontendStaticImage, isProtectedUploadedFileUrl } from '../lib/image-utils';
 import { getFileExtensionFromUrl } from '../lib/url-helpers';
 import { formatFileSize } from '@/lib/file-utils';
 
@@ -120,8 +120,12 @@ const UploadedFilePreview = ({
   } else if (isPdf) {
     content = <img src="/static/images/mime-pdf.png" alt={alt || fileName || 'PDF file'} />;
   } else {
-    const resizeWidth = Array.isArray(size) ? max(size) : size;
-    content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
+    if (isProtectedUploadedFileUrl(url)) {
+      content = <ThumbnailAwareImagePreview url={url} alt={alt || fileName} />;
+    } else {
+      const resizeWidth = Array.isArray(size) ? max(size) : size;
+      content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
+    }
   }
 
   const getContainerAttributes = () => {
@@ -170,3 +174,55 @@ const UploadedFilePreview = ({
 };
 
 export default UploadedFilePreview;
+
+function ThumbnailAwareImagePreview({ url, alt }) {
+  const [isLoadingThumbnail, setIsLoadingThumbnail] = React.useState(true);
+  const [thumbnailUrl, setThumbnailUrl] = React.useState(() => {
+    const imgUrl = new URL(url);
+    imgUrl.searchParams.set('thumbnail', '');
+    return imgUrl.toString();
+  });
+  const [retryCount, setRetry] = React.useState(0);
+  const maxRetries = 5;
+
+  React.useEffect(() => {
+    async function checkThumbnail() {
+      try {
+        const res = await fetch(`${url}?thumbnail`, {
+          method: 'HEAD',
+        });
+
+        const imgUrl = new URL(url);
+        imgUrl.searchParams.set('thumbnail', '');
+
+        if (res.redirected && !isFrontendStaticImage(res.url)) {
+          imgUrl.searchParams.set('t', new Date().getTime());
+          setThumbnailUrl(imgUrl.toString());
+          setIsLoadingThumbnail(false);
+        } else {
+          setThumbnailUrl(imgUrl.toString());
+        }
+
+        if (retryCount >= maxRetries) {
+          setIsLoadingThumbnail(false);
+        }
+      } finally {
+        setRetry(retry => retry + 1);
+      }
+    }
+
+    let interval;
+    if (isLoadingThumbnail) {
+      interval = setInterval(checkThumbnail, 1500);
+    }
+
+    return () => interval && clearInterval(interval);
+  }, [url, retryCount, isLoadingThumbnail]);
+
+  return <img src={thumbnailUrl} alt={alt} />;
+}
+
+ThumbnailAwareImagePreview.propTypes = {
+  url: PropTypes.string,
+  alt: PropTypes.string,
+};
