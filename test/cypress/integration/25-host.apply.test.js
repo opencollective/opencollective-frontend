@@ -4,6 +4,12 @@ const env = Cypress.env('OC_ENV');
 
 describe('apply to host', () => {
   it('as a new collective', () => {
+    cy.intercept('POST', '/api/graphql/v1', req => {
+      if (req.body?.operationName === 'CreateCollective') {
+        req.alias = 'createCollective';
+      }
+    });
+
     cy.visit('/brusselstogetherasbl');
 
     if (env === 'ci') {
@@ -24,8 +30,9 @@ describe('apply to host', () => {
     cy.getByDataCy('checkbox-tos').click();
     cy.wait(300);
     cy.get('button[type="submit"]').click();
-    cy.wait(1000);
-    cy.get('[data-cy="collective-title"]', { timeout: 10000 }).contains('New collective');
+    cy.wait('@createCollective');
+    cy.url({ timeout: 15000 }).should('include', '/onboarding');
+    cy.get('[data-cy="collective-title"]', { timeout: 20000 }).contains('New collective');
     cy.url().then(currentUrl => {
       const collectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
       cy.login({ redirect: `/dashboard/brusselstogetherasbl/host-applications#application-${collectiveId}` });
