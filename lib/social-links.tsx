@@ -82,7 +82,7 @@ const SocialLinkIcon: Record<SocialLinkType, typeof Discord | React.FunctionComp
 };
 
 export const SocialLinkLabel: Record<SocialLinkType, string> = {
-  [SocialLinkType.BLUESKY]: 'BlueSky',
+  [SocialLinkType.BLUESKY]: 'Bluesky',
   [SocialLinkType.DISCORD]: 'Discord',
   [SocialLinkType.DISCOURSE]: 'Discourse',
   [SocialLinkType.FACEBOOK]: 'Facebook',

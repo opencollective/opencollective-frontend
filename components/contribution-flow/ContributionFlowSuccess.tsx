@@ -20,7 +20,7 @@ import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { iconForSocialLinkType } from '../../lib/social-links';
 import { getStripe } from '../../lib/stripe';
 import {
-  blueSkyShareURL,
+  blueskyShareURL,
   followOrderRedirectUrl,
   getCollectivePageRoute,
   linkedInShareURL,
@@ -120,7 +120,7 @@ const getShareProperties = (service, url, text) => {
       return {
         name: 'Bluesky',
         Icon: iconForSocialLinkType(SocialLinkType.BLUESKY),
-        url: blueSkyShareURL({ text: `${text} ${url}` }),
+        url: blueskyShareURL({ text: `${text} ${url}` }),
       };
     case SocialLinkType.LINKEDIN:
       return {
