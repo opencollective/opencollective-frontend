@@ -324,6 +324,14 @@ export const isRelativeHref = href => {
   return href.startsWith('#') || href === '/' || new RegExp('^/[^/\\\\]+').test(href);
 };
 
+export const getProfileCompletionRoute = currentPath => {
+  if (!currentPath || !isRelativeHref(currentPath) || currentPath === '/') {
+    return '/signup/profile';
+  }
+
+  return `/signup/profile?next=${encodeURIComponent(currentPath)}`;
+};
+
 export async function followOrderRedirectUrl(
   router,
   collective,
