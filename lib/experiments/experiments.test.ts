@@ -2,20 +2,24 @@ import { Experiment, isExperimentEnabled } from './experiments';
 
 describe('experiments', () => {
   const originalOcEnv = process.env.OC_ENV;
-  const originalRolloutPercentage = process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
   const randomSpy = jest.spyOn(Math, 'random');
 
-  // The OSC rollout percentage is read through getEnvVar, which in the browser resolves from
+  // The rollout percentages are read through getEnvVar, which in the browser resolves from
   // window.__NEXT_DATA__.env. Simulate that path so the tests cover what production executes.
+  const setNewFlowRolloutPercentage = (value: string) => {
+    (window as any).__NEXT_DATA__.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = value;
+  };
   const setOscRolloutPercentage = (value: string) => {
     (window as any).__NEXT_DATA__.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = value;
   };
 
   beforeEach(() => {
     process.env.OC_ENV = 'development';
-    delete process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
     (process as any).browser = true;
-    (window as any).__NEXT_DATA__ = { env: {} };
+    // Seeded with the env.js defaults, which always populate __NEXT_DATA__.env in the running app
+    (window as any).__NEXT_DATA__ = {
+      env: { NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: '50', OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE: '50' },
+    };
     window.history.replaceState({}, '', '/');
     window.localStorage.clear();
   });
@@ -26,11 +30,6 @@ describe('experiments', () => {
 
   afterAll(() => {
     process.env.OC_ENV = originalOcEnv;
-    if (originalRolloutPercentage === undefined) {
-      delete process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
-    } else {
-      process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = originalRolloutPercentage;
-    }
     delete (process as any).browser;
     delete (window as any).__NEXT_DATA__;
     randomSpy.mockRestore();
@@ -49,7 +48,7 @@ describe('experiments', () => {
 
   it('always enables the new platform tip flow for Open Source Collective host', () => {
     // Even with the rollout at 0, OSC gets the new tip UI deterministically
-    process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = '0';
+    setNewFlowRolloutPercentage('0');
     randomSpy.mockReturnValue(0.99);
 
     expect(
@@ -65,20 +64,85 @@ describe('experiments', () => {
     expect(randomSpy).not.toHaveBeenCalled();
   });
 
-  it('uses the configured rollout percentage for other hosts', () => {
-    process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = '25';
-    randomSpy.mockReturnValueOnce(0.24).mockReturnValueOnce(0.25);
+  it('keeps the old platform tip flow for other hosts when the percentage is missing or unparseable', () => {
+    randomSpy.mockReturnValue(0);
 
+    delete (window as any).__NEXT_DATA__.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE;
     expect(
       isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
-        collective: { host: { slug: 'other-host' } },
+        collective: { slug: 'babel', host: { slug: 'other-host' } },
+      }),
+    ).toBe(false);
+
+    setNewFlowRolloutPercentage('fifty');
+    expect(
+      isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
+        collective: { slug: 'eslint', host: { slug: 'other-host' } },
+      }),
+    ).toBe(false);
+  });
+
+  it('uses the configured rollout percentage for other hosts', () => {
+    setNewFlowRolloutPercentage('25');
+    randomSpy.mockReturnValueOnce(0.24).mockReturnValueOnce(0.25);
+
+    // Different collectives so each call gets its own draw
+    expect(
+      isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
+        collective: { slug: 'babel', host: { slug: 'other-host' } },
       }),
     ).toBe(true);
     expect(
       isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
-        collective: { host: { slug: 'other-host' } },
+        collective: { slug: 'eslint', host: { slug: 'other-host' } },
       }),
     ).toBe(false);
+  });
+
+  it('keeps the new platform tip flow draw sticky per collective across page loads', () => {
+    const context = { collective: { slug: 'babel', host: { slug: 'other-host' } } };
+
+    // First load draws the new UI arm and persists it
+    randomSpy.mockReturnValueOnce(0.1);
+    expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, context)).toBe(true);
+
+    // Subsequent loads reuse the stored draw instead of re-rolling
+    randomSpy.mockReturnValueOnce(0.99);
+    expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, context)).toBe(true);
+    expect(randomSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-rolls stored new platform tip flow draws when the rollout percentage changes', () => {
+    const context = { collective: { slug: 'babel', host: { slug: 'other-host' } } };
+
+    setNewFlowRolloutPercentage('50');
+    randomSpy.mockReturnValueOnce(0.1);
+    expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, context)).toBe(true);
+
+    // Percentage changed: the stored draw is stale, a new one is made under the new split
+    setNewFlowRolloutPercentage('0');
+    randomSpy.mockReturnValueOnce(0.1);
+    expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, context)).toBe(false);
+
+    // And the new draw is sticky in turn
+    expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, context)).toBe(false);
+    expect(randomSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('stores new platform tip flow draws separately from the OSC tip experiment draws', () => {
+    const newFlow = { collective: { slug: 'babel', host: { slug: 'other-host' } } };
+    const osc = { collective: { slug: 'babel', host: { slug: 'opensource' } } };
+
+    randomSpy.mockReturnValueOnce(0.1).mockReturnValueOnce(0.99);
+    expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, newFlow)).toBe(true);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, osc)).toBe(true);
+
+    expect(JSON.parse(window.localStorage.getItem('newPlatformTipFlowDraws'))).toEqual({
+      babel: { enabled: true, pct: 50 },
+    });
+    expect(JSON.parse(window.localStorage.getItem('oscTipExperimentDraws'))).toEqual({
+      babel: { enabled: true, pct: 50 },
+    });
   });
 
   it('lets the URL override force the new platform tip flow', () => {
@@ -88,16 +152,15 @@ describe('experiments', () => {
     expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW)).toBe(true);
   });
 
-  it('defaults to a 50% rollout when the percentage is not configured', () => {
+  it('always proposes the tip when the OSC percentage is missing or unparseable', () => {
     const context = { collective: { host: { slug: 'opensource' } } };
+    randomSpy.mockReturnValue(0.99);
 
-    // Below the default rollout percentage: tip proposed (experiment not enabled)
-    randomSpy.mockReturnValueOnce(0.49);
+    delete (window as any).__NEXT_DATA__.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE;
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
 
-    // At or above the default rollout percentage: tip hidden (experiment enabled)
-    randomSpy.mockReturnValueOnce(0.5);
-    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+    setOscRolloutPercentage('fifty');
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
   });
 
   it('uses the configured OSC platform tip rollout percentage', () => {
