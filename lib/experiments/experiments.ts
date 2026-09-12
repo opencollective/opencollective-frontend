@@ -26,33 +26,27 @@ type ExperimentContext = {
 const NON_RANDOMIZED_ENVS = ['ci', 'e2e', 'test'];
 const OPEN_SOURCE_COLLECTIVE_HOST_SLUG = 'opensource';
 const OPEN_SOURCE_COLLECTIVE_HOST_LEGACY_ID = 11004;
-const DEFAULT_NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE = 0;
-const DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = 50;
 
-function getRolloutPercentage(rawValue: string, defaultValue: number): number {
-  const percentage = parseInt(rawValue, 10);
-
-  if (!Number.isFinite(percentage)) {
+// Only a plain integer is accepted: parseInt would silently turn a typo like "1e3" or "7.5" into
+// a split nobody intended, so anything else uses the fallback.
+function getRolloutPercentage(rawValue: unknown, defaultValue: number): number {
+  if (typeof rawValue !== 'string' || !/^\d+$/.test(rawValue)) {
     return defaultValue;
   }
 
-  return Math.min(Math.max(percentage, 0), 100);
+  return Math.min(parseInt(rawValue, 10), 100);
 }
 
+// Read through `getEnvVar` (not `process.env`) so the values come from `__NEXT_DATA__.env` at
+// runtime: the percentages can be changed with a config var update alone, no rebuild needed.
+// The defaults live in env.js; a missing or unparseable value falls back to the pre-experiment
+// behaviour (old tip UI, tip always proposed).
 function getNewPlatformTipFlowRolloutPercentage(): number {
-  return getRolloutPercentage(
-    process.env.NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE,
-    DEFAULT_NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE,
-  );
+  return getRolloutPercentage(getEnvVar('NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE'), 0);
 }
 
-// Read through `getEnvVar` (not `process.env`) so the value comes from `__NEXT_DATA__.env` at
-// runtime: the percentage can be changed with a config var update alone, no rebuild needed.
 function getOscPlatformTipRolloutPercentage(): number {
-  return getRolloutPercentage(
-    getEnvVar('OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE'),
-    DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE,
-  );
+  return getRolloutPercentage(getEnvVar('OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE'), 100);
 }
 
 export function isOpenSourceCollectiveHost(host?: { slug?: string; legacyId?: number | string }): boolean {
@@ -96,19 +90,25 @@ export function isOscTipExperiment(collective?: PlatformTipCollective | null, ti
   return isOpenSourceCollectiveHost(collective?.host) && platformTipApplies(collective, tier);
 }
 
-// Sticky per-browser, per-collective draws for the OSC platform tip experiment. Without
-// persistence, every page load re-rolls the arm: a contributor who reloads mid-flow has an 80%
-// chance of leaving the tip arm, a one-way drift that selects deliberate (larger) contributions
-// into the holdout and biases the revenue comparison. Draws are stored per collective slug so a
-// visitor keeps their arm across visits to the same collective, while different collectives get
-// independent draws. Stored draws are keyed to the rollout percentage that produced them: when
-// the percentage changes, stale draws are re-rolled so the new split applies immediately.
+// Sticky per-browser, per-collective draws for the platform tip experiments. Without
+// persistence, every page load re-rolls the arm: a contributor who reloads mid-flow can switch
+// arms, a one-way drift that selects deliberate (larger) contributions into one arm and biases
+// the comparison. Draws are stored per collective slug so a visitor keeps their arm across visits
+// to the same collective, while different collectives get independent draws. Stored draws are
+// keyed to the rollout percentage that produced them: when the percentage changes, stale draws
+// are re-rolled so the new split applies immediately. Each experiment uses its own storage key
+// so their draws never collide.
 type StoredDraws = Record<string, { enabled: boolean; pct: number }>;
 
-function getStickyDraw(collectiveSlug: string, rolloutPercentage: number): boolean {
+function getStickyDraw(
+  storageKey: string,
+  collectiveSlug: string,
+  rolloutPercentage: number,
+  draw: () => boolean,
+): boolean {
   let draws: StoredDraws;
   try {
-    const parsed = JSON.parse(getFromLocalStorage(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS));
+    const parsed = JSON.parse(getFromLocalStorage(storageKey));
     // Guard against stored values that parse but aren't a plain object (true, 42, "foo", []):
     // assigning a property to a primitive throws in strict mode, and arrays don't stringify
     // their named properties, so either would break or silently disable the stickiness.
@@ -122,9 +122,9 @@ function getStickyDraw(collectiveSlug: string, rolloutPercentage: number): boole
     return stored.enabled;
   }
 
-  const enabled = Math.random() * 100 >= rolloutPercentage;
+  const enabled = draw();
   draws[collectiveSlug] = { enabled, pct: rolloutPercentage };
-  setLocalStorage(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS, JSON.stringify(draws));
+  setLocalStorage(storageKey, JSON.stringify(draws));
   return enabled;
 }
 
@@ -155,12 +155,22 @@ const experiments: Record<Experiment, ExperimentConfig> = {
         return true;
       }
 
-      return Math.random() * 100 < getNewPlatformTipFlowRolloutPercentage();
+      // Concurrent A/B for every other host: NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE is the share
+      // of contributors that get the new tip UI (see env.js for the default). The variant
+      // is persisted on the order as data.isNewPlatformTipFlow.
+      const rolloutPercentage = getNewPlatformTipFlowRolloutPercentage();
+      const draw = () => Math.random() * 100 < rolloutPercentage;
+      const collectiveSlug = context?.collective?.slug;
+      if (!collectiveSlug) {
+        return draw();
+      }
+
+      return getStickyDraw(LOCAL_STORAGE_KEYS.NEW_PLATFORM_TIP_FLOW_DRAWS, collectiveSlug, rolloutPercentage, draw);
     },
   },
   // OSC-only experiment for measuring the impact of platform tips on contributions.
   // `true` means the tip step is hidden for this user. OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE
-  // is the share of eligible contributions that get the tip proposed (default 50); the
+  // is the share of eligible contributions that get the tip proposed (see env.js for the default); the
   // remainder is the holdout where the tip is hidden. Equal arms keep the revenue comparison
   // centered and unbiased under the site's heavy-tailed contribution amounts. Set to 100 to
   // end the holdout.
@@ -175,12 +185,13 @@ const experiments: Record<Experiment, ExperimentConfig> = {
       }
 
       const rolloutPercentage = getOscPlatformTipRolloutPercentage();
+      const draw = () => Math.random() * 100 >= rolloutPercentage;
       const collectiveSlug = context?.collective?.slug;
       if (!collectiveSlug) {
-        return Math.random() * 100 >= rolloutPercentage;
+        return draw();
       }
 
-      return getStickyDraw(collectiveSlug, rolloutPercentage);
+      return getStickyDraw(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS, collectiveSlug, rolloutPercentage, draw);
     },
   },
 };
