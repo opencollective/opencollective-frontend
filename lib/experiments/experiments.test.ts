@@ -145,6 +145,25 @@ describe('experiments', () => {
     });
   });
 
+  it.each(['100%', '1e3', ' 50', '7.5', ''])('falls back when the percentage is not a plain integer (%j)', value => {
+    setNewFlowRolloutPercentage(value);
+    setOscRolloutPercentage(value);
+    randomSpy.mockReturnValue(0.99);
+
+    // New flow falls back to 0: old UI
+    expect(
+      isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
+        collective: { slug: 'babel', host: { slug: 'other-host' } },
+      }),
+    ).toBe(false);
+    // OSC falls back to 100: tip always proposed
+    expect(
+      isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, {
+        collective: { slug: 'webpack', host: { slug: 'opensource' } },
+      }),
+    ).toBe(false);
+  });
+
   it('lets the URL override force the new platform tip flow', () => {
     process.env.OC_ENV = 'e2e';
     window.history.replaceState({}, '', `/?${Experiment.NEW_PLATFORM_TIP_FLOW}=true`);

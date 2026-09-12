@@ -27,14 +27,14 @@ const NON_RANDOMIZED_ENVS = ['ci', 'e2e', 'test'];
 const OPEN_SOURCE_COLLECTIVE_HOST_SLUG = 'opensource';
 const OPEN_SOURCE_COLLECTIVE_HOST_LEGACY_ID = 11004;
 
-function getRolloutPercentage(rawValue: string, defaultValue: number): number {
-  const percentage = parseInt(rawValue, 10);
-
-  if (!Number.isFinite(percentage)) {
+// Only a plain integer is accepted: parseInt would silently turn a typo like "1e3" or "7.5" into
+// a split nobody intended, so anything else uses the fallback.
+function getRolloutPercentage(rawValue: unknown, defaultValue: number): number {
+  if (typeof rawValue !== 'string' || !/^\d+$/.test(rawValue)) {
     return defaultValue;
   }
 
-  return Math.min(Math.max(percentage, 0), 100);
+  return Math.min(parseInt(rawValue, 10), 100);
 }
 
 // Read through `getEnvVar` (not `process.env`) so the values come from `__NEXT_DATA__.env` at
