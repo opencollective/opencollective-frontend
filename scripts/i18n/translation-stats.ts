@@ -27,10 +27,36 @@ const IGNORED: Record<string, readonly string[]> = {
     'Error', // "Error" - identical
     'Fields.id', // "ID" - identical
     'Fields.slug', // "Slug" - technical term
+    'jgOqxt', // "Widgets" - loanword
+    'KYC', // "KYC" - acronym
+    'L8seEc', // "Subtotal" - identical
+    'MJ2jZQ', // "Total" - identical
+    'NewContributionFlow.CollectiveAndTier', // "{collective} - {tier}" - format identical
+    'paymentMethods.labelCreditCard', // "{name} {expiration}" - format identical
+    'PayoutMethod.New.Alias', // "Alias" - identical
+    'Q0lxqm', // "CVV/CVC" - identical
+    'Stripe.PaymentMethod.Label.bancontact', // "Bancontact" - brand
+    'Stripe.PaymentMethod.Label.link', // "Link" - brand
+    'Stripe.PaymentMethod.Label.swish', // "Swish" - brand
+    'tier.interval.flexible', // "Flexible" - identical
+    'tier.Pro.title', // "Pro" - plan name
+    'Timezone.UTC', // "UTC" - identical
+    'VirtualCards.CVV', // "CVV" - identical
+    'webhooks.url.label', // "URL" - identical
+    'withColon', // "{item}:" - format identical
+    'WWhVAU', // "Subtotal:" - identical
+    'oUWADl', // "No" - identical
+    'PaymentMethod.Manual', // "Manual" - identical
+    'Payout.Manual', // "Manual" - identical
+    'settings.general', // "General" - identical
+    'Timezone.Local', // "Local" - identical
+    'total', // "total" - identical
+    'webhook.index', // "Webhook #{index}" - technical term
   ],
   'pt-BR': [
     'Amount', // "{amount} {currencyCode}" - formato idêntico
     'Avatar', // "Avatar" - termo idêntico
+    'Bb2ain', // "Global ({percent}%)" - Global idêntico
     'Collective.Hero.Host', // "{FiscalHost}: {hostName}" - componente traduz o rótulo
     'company.blog', // "Blog" - identico
     'contributions.id', // "#" - identico
@@ -40,6 +66,26 @@ const IGNORED: Record<string, readonly string[]> = {
     'Fields.id', // "ID" - identico
     'Fields.slug', // "Slug" - termo técnico
     'KYC', // "KYC" - acrônimo
+    'PxYRJh', // "Payment Intent" - termo Stripe
+    'Q0lxqm', // "CVV/CVC" - idêntico
+    'solutions.features.crowdfunding', // "Crowdfunding" - termo já usado em pt-BR
+    'Status', // "Status" - já usado em pt-BR.json
+    'Stripe.PaymentMethod.Label.bancontact', // "Bancontact" - marca
+    'Stripe.PaymentMethod.Label.link', // "Link" - marca
+    'Stripe.PaymentMethod.Label.swish', // "Swish" - marca
+    'tax.gstShort', // "GST" - acrônimo
+    'tier.Basic.title', // "Basic" - nome do plano
+    'tier.Discover.title', // "Discover" - nome do plano
+    'tier.Pro.title', // "Pro" - nome do plano
+    'Timezone.Local', // "Local" - idêntico
+    'Timezone.UTC', // "UTC" - idêntico
+    'total', // "total" - idêntico
+    'transactions.import.status', // "Status"
+    'VirtualCards.Status', // "Status"
+    'webhook.index', // "Webhook #{index}" - termo técnico
+    'webhooks.url.label', // "URL" - idêntico
+    'withColon', // "{item}:" - formato idêntico
+    'WWhVAU', // "Subtotal:" - idêntico
   ],
   fr: [
     'qMePPG',
