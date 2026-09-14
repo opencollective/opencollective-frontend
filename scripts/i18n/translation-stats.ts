@@ -124,6 +124,67 @@ const IGNORED: Record<string, readonly string[]> = {
     '/TlAIY', // "Visible" - même terme en français
     'Interactions', // "Interactions" - identique
   ],
+  de: [
+    'AccountingCategory.code', // "Code" - identisch
+    'Amount', // "{amount} {currencyCode}" - Format identisch
+    'Avatar', // "Avatar" - Lehnwort
+    'Bb2ain', // "Global ({percent}%)" - identisch
+    'Changelog', // "Changelog" - etabliertes Lehnwort in de.json
+    'Collective.Hero.Host', // "{FiscalHost}: {hostName}" - Komponente übersetzt FiscalHost
+    'community.openSource', // "Open Source" - Standardbegriff
+    'company.blog', // "Blog" - identisch
+    'contributions.id', // "#" - identisch
+    'ContributionType.Ticket', // "Ticket" - identisch
+    'Dashboard', // "Dashboard" - durchgängig in de.json als Lehnwort
+    'Details', // "Details" - identisch
+    'editCollective.menu.webhooks', // "Webhooks" - Fachbegriff
+    'expense.status', // "Status" - identisch
+    'Fields.id', // "ID" - identisch
+    'Fields.name', // "Name" - identisch
+    'Fields.slug', // "Slug" - Fachbegriff
+    'Fields.status', // "Status" - identisch
+    'FormField.optional', // "optional" - identisch
+    'forms.optional', // "Optional" - identisch
+    'HostApplication.ProjectTypeSelect.code', // "Code" - identisch
+    'jgOqxt', // "Widgets" - Lehnwort
+    'KYC', // "KYC" - Akronym
+    'LegalDocument.Status', // "Status" - identisch
+    'Location.online', // "Online" - identisch
+    'Logo', // "Logo" - identisch
+    'LseLoM', // "Spam" - identisch
+    'Member.Role.FOLLOWER', // "Follower" - Social-Media-Begriff
+    'OptionalFieldLabel', // "{field} (optional)" - optional identisch
+    'order.status', // "Status" - identisch
+    'Parameter', // "Parameter" - identisch
+    'PaymentMethod.PayPal.type.Adaptive', // "Adaptive" - PayPal-Produktname
+    'paymentMethods.labelCreditCard', // "{name} {expiration}" - Format identisch
+    'PayoutMethod.New.Alias', // "Alias" - identisch
+    'PxYRJh', // "Payment Intent" - Stripe-Fachbegriff
+    'Q0lxqm', // "CVV/CVC" - identisch
+    'section.budget.title', // "Budget" - identisch
+    'section.tickets.title', // "Tickets" - identisch
+    'solutions.features.crowdfunding', // "Crowdfunding" - Lehnwort
+    'Status', // "Status" - identisch
+    'Stripe.PaymentMethod.Label.bancontact', // "Bancontact" - Markenname
+    'Stripe.PaymentMethod.Label.link', // "Link" - Markenname
+    'Stripe.PaymentMethod.Label.swish', // "Swish" - Markenname
+    'table.head.grow', // "Grow" - Plannamen
+    'table.head.scale', // "Scale" - Plannamen
+    'table.head.start', // "Start" - Plannamen
+    'tax.gstShort', // "GST" - Akronym
+    'Team', // "Team" - identisch
+    'tier.Basic.title', // "Basic" - Planname
+    'tier.Discover.title', // "Discover" - Planname
+    'tier.Pro.title', // "Pro" - Planname
+    'Timezone.UTC', // "UTC" - identisch
+    'transactions.import.status', // "Status" - identisch
+    'tzMNF3', // "Status" - identisch
+    'VirtualCards.CVV', // "CVV" - identisch
+    'VirtualCards.Status', // "Status" - identisch
+    'webhook.index', // "Webhook #{index}" - Fachbegriff
+    'webhooks.url.label', // "URL" - identisch
+    'withColon', // "{item}:" - Format identisch
+  ],
 };
 
 function loadJson(filePath: string): Record<string, string> {
