@@ -1,5 +1,5 @@
-# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"532ea87cb6ed2d32e7c4a970b22dea3d0c7f7f3f9c6f4938cc215657cc5b90e9","body_hash":"7aca990b92cecc0674b4f9a458b8d961cb319510b6676e802a4f060be6b0601c","compiler_version":"v0.88.7","strict":true,"agent_id":"copilot","agent_model":"gpt-5.6-luna","engine_versions":{"copilot":"1.0.80"}}
-# gh-aw-manifest: {"version":1,"secrets":["COPILOT_GITHUB_TOKEN","GH_AW_CI_TRIGGER_TOKEN","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN","SLACK_WEBHOOK_URL"],"actions":[{"repo":"actions/cache","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/cache/restore","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/cache/save","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/download-artifact","sha":"3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c","version":"v8.0.1"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"820762786026740c76f36085b0efc47a31fe5020","version":"v7.0.0"},{"repo":"actions/upload-artifact","sha":"043fb46d1a93c77aae656e7c1c64a875d1fc6a0a","version":"v7.0.1"},{"repo":"github/gh-aw-actions/setup","sha":"5e508589e03a7757a7e05b26e834292f5445bfb6","version":"v0.88.7"}],"skills":[".agents/skills/i18n-frontend-translate"],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14","digest":"sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14@sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14","digest":"sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14@sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5"},{"image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14","digest":"sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34","pinned_image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14@sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14","digest":"sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14@sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.4.18","digest":"sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.4.18@sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23","pinned_image":"ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23"},{"image":"ghcr.io/github/github-mcp-server:v1.11.0","digest":"sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699","pinned_image":"ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699"}],"mcp_servers":[{"name":"safeoutputs","tools":["create_pull_request","missing_data","missing_tool","noop","post_slack_summary"]}]}
+# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"da4badd106cf6b36ab9bbdf6988d240b01c78079c424596f772378ff2b8e8895","body_hash":"6bc9482269c5ac3ca0e1dcfb0462eba728d3dec3d728c6d6eb91017d8a536208","compiler_version":"v0.88.7","strict":true,"agent_id":"copilot","agent_model":"gpt-5.6-luna","engine_versions":{"copilot":"1.0.80"}}
+# gh-aw-manifest: {"version":1,"secrets":["COPILOT_GITHUB_TOKEN","GH_AW_CI_TRIGGER_TOKEN","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN","SLACK_WEBHOOK_URL"],"actions":[{"repo":"actions/cache/restore","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/cache/save","sha":"55cc8345863c7cc4c66a329aec7e433d2d1c52a9","version":"v6.1.0"},{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/download-artifact","sha":"3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c","version":"v8.0.1"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"820762786026740c76f36085b0efc47a31fe5020","version":"v7.0.0"},{"repo":"actions/upload-artifact","sha":"043fb46d1a93c77aae656e7c1c64a875d1fc6a0a","version":"v7.0.1"},{"repo":"github/gh-aw-actions/setup","sha":"5e508589e03a7757a7e05b26e834292f5445bfb6","version":"v0.88.7"}],"skills":[".agents/skills/i18n-frontend-translate"],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14","digest":"sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.28.14@sha256:f7df036c86575527b61f3f7df91c4412349a12b2a74988d929eafa2999230c98"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14","digest":"sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.28.14@sha256:6f95e2234dd9bd6333a8ff28ccea7ecf0204acd4a09108723844dbd2bf6268c5"},{"image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14","digest":"sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34","pinned_image":"ghcr.io/github/gh-aw-firewall/cli-proxy:0.28.14@sha256:3a379c5e96e29499c815e9dd2a71334d01c326a9b73991c76544fda9cae35c34"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14","digest":"sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.28.14@sha256:2ce8df3abf3e9b76e9c0cf5863da41f1ab3f89b20ad14b988806ab89e7bf2cd5"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.4.18","digest":"sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.4.18@sha256:85b940556a8faa4e1fdbef124bfd75f2c4ebd855a10b88a1c3b6f3e97f6f1a53"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23","pinned_image":"ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23"},{"image":"ghcr.io/github/github-mcp-server:v1.11.0","digest":"sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699","pinned_image":"ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699"}],"mcp_servers":[{"name":"safeoutputs","tools":["create_pull_request","missing_data","missing_tool","noop","post_slack_summary"]}]}
 # This file was automatically generated by gh-aw (v0.88.7). DO NOT EDIT. To debug this workflow, load the skill at https://github.com/github/gh-aw/blob/main/debug.md
 #
 #    ___                   _   _
@@ -23,9 +23,13 @@
 #
 # For more information: https://github.github.com/gh-aw/introduction/overview/
 #
-# Weekly batch of German frontend locale strings that still match English, opened as a reviewable pull request.
+# Weekly pass over all French frontend locale strings that still match English, opened as a reviewable pull request.
 #
-# Intent: Reduce remaining German frontend locale strings that still match English so German-speaking users see translated UI copy.
+# Intent: Reduce remaining French frontend locale strings that still match English so French-speaking users see translated UI copy.
+#
+# Resolved workflow manifest:
+#   Imports:
+#     - .github/workflows/i18n/shared/i18n-translate.md
 #
 # Secrets used:
 #   - COPILOT_GITHUB_TOKEN
@@ -39,7 +43,6 @@
 # Custom actions used:
 #   - actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
 #   - actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-#   - actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
 #   - actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 #   - actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
 #   - actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1 (source v8)
@@ -59,11 +62,11 @@
 #   - ghcr.io/github/gh-aw-node@sha256:0daa8971fa4732b647150cb6524a6b0804b68d5d24f6f58b5dd1af23bd63fb23
 #   - ghcr.io/github/github-mcp-server:v1.11.0@sha256:fbec75de11c255213fa08d80fb166abe73d851fff631c51c0079872967720699
 
-name: "i18n Translate German"
+name: "i18n Translate French"
 on:
   schedule:
-    - cron: "11 13 * * 0"  # Friendly format: weekly on sunday (scattered)
-  # skip-if-match: "is:pr is:open \"gh-aw-workflow-id: i18n-translate-de\" in:body" # Skip-if-match processed as search check in pre-activation job
+    - cron: "24 3 * * 0"  # Friendly format: weekly on sunday (scattered)
+  # skip-if-match: "is:pr is:open \"gh-aw-workflow-id: i18n-translate-fr\" in:body" # Skip-if-match processed as search check in pre-activation job
   workflow_dispatch:
     inputs:
       aw_context:
@@ -78,17 +81,15 @@ concurrency:
   group: "gh-aw-${{ github.workflow }}"
   queue: max
 
-run-name: "i18n Translate German"
+run-name: "i18n Translate French"
 
 env:
   OTEL_EXPORTER_OTLP_ENDPOINT: ${{ vars.GH_AW_DEFAULT_OTLP_ENDPOINT }}
-  OTEL_SERVICE_NAME: gh-aw.i18n-translate-de
-  OTEL_RESOURCE_ATTRIBUTES: 'gh-aw.workflow.name=i18n%20Translate%20German,gh-aw.repository=${{ github.repository }},gh-aw.run.id=${{ github.run_id }},github.run_id=${{ github.run_id }},gh-aw.engine.id=copilot'
+  OTEL_SERVICE_NAME: gh-aw.i18n-translate-fr
+  OTEL_RESOURCE_ATTRIBUTES: 'gh-aw.workflow.name=i18n%20Translate%20French,gh-aw.repository=${{ github.repository }},gh-aw.run.id=${{ github.run_id }},github.run_id=${{ github.run_id }},gh-aw.engine.id=copilot'
   OTEL_EXPORTER_OTLP_HEADERS: ${{ secrets.GH_AW_DEFAULT_OTLP_HEADERS }}
   GH_AW_OTLP_ENDPOINTS: '[{"url":"${{ vars.GH_AW_DEFAULT_OTLP_ENDPOINT }}","headers":"${{ secrets.GH_AW_DEFAULT_OTLP_HEADERS }}"}]'
   GH_AW_OTLP_IF_MISSING: ignore
-
-# Cache configuration from frontmatter was processed and added to the main job steps
 
 jobs:
   activation:
@@ -130,8 +131,8 @@ jobs:
           parent-span-id: ${{ needs.pre_activation.outputs.setup-parent-span-id || needs.pre_activation.outputs.setup-span-id }}
           safe-output-artifact-client: ${{ env.GH_AW_MAX_DAILY_AI_CREDITS != '' }}
         env:
-          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-de.lock.yml@${{ github.ref }}
+          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-fr.lock.yml@${{ github.ref }}
           GH_AW_INFO_VERSION: "1.0.80"
           GH_AW_INFO_AWF_VERSION: "v0.28.14"
           GH_AW_INFO_ENGINE_ID: "copilot"
@@ -146,7 +147,7 @@ jobs:
           GH_AW_INFO_VERSION: "1.0.80"
           GH_AW_INFO_AGENT_VERSION: "1.0.80"
           GH_AW_INFO_CLI_VERSION: "v0.88.7"
-          GH_AW_INFO_WORKFLOW_NAME: "i18n Translate German"
+          GH_AW_INFO_WORKFLOW_NAME: "i18n Translate French"
           GH_AW_INFO_EXPERIMENTAL: "false"
           GH_AW_INFO_SUPPORTS_TOOLS_ALLOWLIST: "true"
           GH_AW_INFO_STAGED: "false"
@@ -156,7 +157,7 @@ jobs:
           GH_AW_INFO_AWMG_VERSION: ""
           GH_AW_INFO_FIREWALL_TYPE: "squid"
           GH_AW_INFO_AGENT_RUNTIME: ""
-          GH_AW_INFO_FRONTMATTER_EMOJI: "🇩🇪"
+          GH_AW_INFO_FRONTMATTER_EMOJI: "🇫🇷"
           GH_AW_COMPILED_STRICT: "true"
           GH_AW_INFO_SKILLS: '[".agents/skills/i18n-frontend-translate"]'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -174,8 +175,8 @@ jobs:
         continue-on-error: true
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: agentic-workflow-usage-i18ntranslatede-${{ github.run_id }}
-          restore-keys: agentic-workflow-usage-i18ntranslatede-
+          key: agentic-workflow-usage-i18ntranslatefr-${{ github.run_id }}
+          restore-keys: agentic-workflow-usage-i18ntranslatefr-
           path: /tmp/gh-aw/agentic-workflow-usage-cache.jsonl
       - name: Restore daily AIC usage cache (artifact fallback)
         id: restore-daily-aic-cache-fallback
@@ -199,8 +200,8 @@ jobs:
         if: ${{ env.GH_AW_MAX_DAILY_AI_CREDITS != '' }}
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          GH_AW_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_WORKFLOW_ID: "i18n-translate-de"
+          GH_AW_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_WORKFLOW_ID: "i18n-translate-fr"
           GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_AW_WORKFLOW_DISPATCH_AW_CONTEXT: ${{ github.event.inputs.aw_context || '' }}
           GH_AW_HAS_SLASH_COMMAND: "false"
@@ -251,7 +252,7 @@ jobs:
         id: check-lock-file
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          GH_AW_WORKFLOW_FILE: "i18n-translate-de.lock.yml"
+          GH_AW_WORKFLOW_FILE: "i18n-translate-fr.lock.yml"
           GH_AW_CONTEXT_WORKFLOW_REF: "${{ github.workflow_ref }}"
         with:
           script: |
@@ -312,7 +313,7 @@ jobs:
           GH_AW_ACTIONS_DIR: ${{ runner.temp }}/gh-aw/actions
           GH_AW_PROMPT: ${{ runner.temp }}/gh-aw/aw-prompts/prompt.txt
           GH_AW_SAFE_OUTPUTS: ${{ runner.temp }}/gh-aw/safeoutputs/outputs.jsonl
-          GH_AW_PROMPT_CONFIG: "{\"items\":[{\"content_env\":\"GH_AW_PROMPT_CONTENT_0000\"},{\"file\":\"xpia.md\"},{\"file\":\"temp_folder_prompt.md\"},{\"file\":\"markdown.md\"},{\"file\":\"safe_outputs_prompt.md\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0001\"},{\"file\":\"safe_outputs_create_pull_request.md\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0002\"},{\"file\":\"mcp_cli_tools_with_safeoutputs_prompt.md\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0003\"},{\"file\":\"cli_proxy_with_safeoutputs_prompt.md\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0004\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0005\"}]}"
+          GH_AW_PROMPT_CONFIG: "{\"items\":[{\"content_env\":\"GH_AW_PROMPT_CONTENT_0000\"},{\"file\":\"xpia.md\"},{\"file\":\"temp_folder_prompt.md\"},{\"file\":\"markdown.md\"},{\"file\":\"safe_outputs_prompt.md\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0001\"},{\"file\":\"safe_outputs_create_pull_request.md\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0002\"},{\"file\":\"mcp_cli_tools_with_safeoutputs_prompt.md\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0003\"},{\"file\":\"cli_proxy_with_safeoutputs_prompt.md\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0004\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0005\"},{\"content_env\":\"GH_AW_PROMPT_CONTENT_0006\"}]}"
           GH_AW_EXPR_1A3A194A: ${{ github.event.discussion.number || (fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_type == 'discussion' && fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_number) }}
           GH_AW_EXPR_463A214A: ${{ github.event.pull_request.number || (fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_type == 'pull_request' && fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_number) }}
           GH_AW_EXPR_802A9F6A: ${{ github.event.issue.number || (fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_type == 'issue' && fromJSON(github.event.inputs.aw_context || github.event.client_payload.aw_context || '{}').item_number) }}
@@ -326,7 +327,8 @@ jobs:
           GH_AW_PROMPT_CONTENT_0002: "</safe-output-tools>\n"
           GH_AW_PROMPT_CONTENT_0003: "<github-context>\nThe following GitHub context information is available for this workflow:\n{{#if github.actor}}\n- **actor**: __GH_AW_GITHUB_ACTOR__\n{{/if}}\n{{#if github.repository}}\n- **repository**: __GH_AW_GITHUB_REPOSITORY__\n{{/if}}\n{{#if github.workspace}}\n- **workspace**: __GH_AW_GITHUB_WORKSPACE__\n{{/if}}\n{{#if github.event.issue.number || (github.aw.context.item_type == 'issue' && github.aw.context.item_number)}}\n- **issue-number**: #__GH_AW_EXPR_802A9F6A__\n{{/if}}\n{{#if github.event.discussion.number || (github.aw.context.item_type == 'discussion' && github.aw.context.item_number)}}\n- **discussion-number**: #__GH_AW_EXPR_1A3A194A__\n{{/if}}\n{{#if github.event.pull_request.number || (github.aw.context.item_type == 'pull_request' && github.aw.context.item_number)}}\n- **pull-request-number**: #__GH_AW_EXPR_463A214A__\n{{/if}}\n{{#if github.event.comment.id || github.aw.context.comment_id}}\n- **comment-id**: __GH_AW_EXPR_FF1D34CE__\n{{/if}}\n{{#if github.run_id}}\n- **workflow-run-id**: __GH_AW_GITHUB_RUN_ID__\n{{/if}}\n</github-context>\n\n"
           GH_AW_PROMPT_CONTENT_0004: "</system>\n"
-          GH_AW_PROMPT_CONTENT_0005: "{{#runtime-import .github/workflows/i18n-translate-de.md}}\n"
+          GH_AW_PROMPT_CONTENT_0005: "# i18n Translate French\n\n## Task\n\nObjective: Reduce remaining French frontend locale strings that still match English so French-speaking users see translated UI copy.\n\nActivation: this Sunday (or manual) run, after Node dependencies are installed. Required evidence is `/tmp/gh-aw/data/untranslated-fr.txt` (every remaining `{id}: {english}` line) and `/tmp/gh-aw/data/untranslated-count.txt`. Follow the `i18n-frontend-translate` skill. Locale is `fr`.\n\nRequired effects when the prefetch file has at least one line:\n\n1. Translate or ignore **every** id listed in `untranslated-fr.txt` (full backlog for this run).\n2. Read recently merged PRs in `/tmp/gh-aw/data/recent-i18n-prs.json` for terminology, then match existing `lang/fr.json`.\n3. Apply translations with `npx tsx scripts/i18n/set-translation.ts fr <id> \"...\"`.\n4. For strings that should stay English, add the **message id** to `IGNORED.fr` in `scripts/i18n/translation-stats.ts` with a short comment. Do not call `set-translation` for those ids.\n5. Run `npm run langs:update-progress` once after all listed ids are handled.\n6. Open one pull request via `create_pull_request` (reviewer `znarf` is assigned automatically). Title starts with `[i18n-fr] `. Body: prefetch count, translated vs IGNORED counts, notable IGNORED ids, and how many untranslated ids remain (re-run `show-untranslated.ts fr` if needed).\n7. Call `post_slack_summary` with the same summary plus the PR URL.\n\nNo-op: if the prefetch file is empty, or the run produces no file changes, call `noop` with a short reason and still call `post_slack_summary` (no PR). Do not create an empty pull request.\n\nDo not merge the pull request. Do not edit files outside `lang/fr.json`, `scripts/i18n/translation-stats.ts`, and `lib/constants/locales.js`. Use `gh` for GitHub reads. Use configured safe outputs for all writes.\n\n## Safe Outputs\n\n- `create_pull_request` when the run changed allowed files.\n- `post_slack_summary` on every completed run (including noop).\n- `noop` when French is already caught up or nothing changed.\n"
+          GH_AW_PROMPT_CONTENT_0006: "{{#runtime-import .github/workflows/i18n/i18n-translate-fr.md}}\n"
         with:
           script: |
             const { setupGlobals } = require(process.env.GH_AW_ACTIONS_DIR + '/setup_globals.cjs');
@@ -444,7 +446,7 @@ jobs:
       GH_AW_PR_HEAD_BASE_SHA: ""
       GH_AW_PR_HEAD_REPO: ""
       GH_AW_RUNTIME_FEATURES: ${{ vars.GH_AW_RUNTIME_FEATURES }}
-      GH_AW_WORKFLOW_ID_SANITIZED: i18ntranslatede
+      GH_AW_WORKFLOW_ID_SANITIZED: i18ntranslatefr
     outputs:
       agentic_engine_timeout: ${{ steps.detect-agent-errors.outputs.agentic_engine_timeout || 'false' }}
       ai_credits_rate_limit_error: ${{ steps.parse-mcp-gateway.outputs.ai_credits_rate_limit_error || 'false' }}
@@ -479,8 +481,8 @@ jobs:
           trace-id: ${{ needs.activation.outputs.setup-trace-id }}
           parent-span-id: ${{ needs.activation.outputs.setup-parent-span-id || needs.activation.outputs.setup-span-id }}
         env:
-          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-de.lock.yml@${{ github.ref }}
+          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-fr.lock.yml@${{ github.ref }}
           GH_AW_INFO_VERSION: "1.0.80"
           GH_AW_INFO_AWF_VERSION: "v0.28.14"
           GH_AW_INFO_ENGINE_ID: "copilot"
@@ -525,16 +527,9 @@ jobs:
         run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
       - env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        name: Prefetch untranslated German strings
-        run: "mkdir -p /tmp/gh-aw/data\nnpx tsx scripts/i18n/show-untranslated.ts de --limit 30 > /tmp/gh-aw/data/untranslated-de.txt\nwc -l < /tmp/gh-aw/data/untranslated-de.txt | tr -d ' ' > /tmp/gh-aw/data/untranslated-count.txt\ngh pr list --state merged --search '[i18n-de]' --limit 3 \\\n  --json number,title,url,mergedAt \\\n  > /tmp/gh-aw/data/recent-i18n-prs.json"
+        name: Prefetch untranslated French strings
+        run: "mkdir -p /tmp/gh-aw/data\nnpx tsx scripts/i18n/show-untranslated.ts fr > /tmp/gh-aw/data/untranslated-fr.txt\nwc -l < /tmp/gh-aw/data/untranslated-fr.txt | tr -d ' ' > /tmp/gh-aw/data/untranslated-count.txt\ngh pr list --state merged --search '[i18n-fr]' --limit 3 \\\n  --json number,title,url,mergedAt \\\n  > /tmp/gh-aw/data/recent-i18n-prs.json\n"
 
-      # Cache configuration from frontmatter processed below
-      - name: Cache (node-modules-${{ hashFiles('package-lock.json') }})
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          key: node-modules-${{ hashFiles('package-lock.json') }}
-          path: node_modules
-          restore-keys: node-modules-
       - name: Configure Git credentials
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -603,7 +598,7 @@ jobs:
         env:
           GH_AW_FILE_ROOT: "${{ runner.temp }}/gh-aw"
           GH_AW_FILE_CONFIG: "{\"files\":[{\"path\":\"safeoutputs/config.json\",\"content_env\":\"GH_AW_SAFE_OUTPUTS_CONFIG\"}]}"
-          GH_AW_SAFE_OUTPUTS_CONFIG: "{\"create_pull_request\":{\"allowed_files\":[\"lang/de.json\",\"scripts/i18n/translation-stats.ts\",\"lib/constants/locales.js\"],\"draft\":false,\"expires\":504,\"if_no_changes\":\"ignore\",\"max\":1,\"max_patch_files\":100,\"max_patch_size\":4096,\"protect_top_level_dot_folders\":true,\"protected_files\":[\"package.json\",\"bun.lockb\",\"bunfig.toml\",\"deno.json\",\"deno.jsonc\",\"deno.lock\",\"global.json\",\"NuGet.Config\",\"Directory.Packages.props\",\"mix.exs\",\"mix.lock\",\"go.mod\",\"go.sum\",\"stack.yaml\",\"stack.yaml.lock\",\"pom.xml\",\"build.gradle\",\"build.gradle.kts\",\"settings.gradle\",\"settings.gradle.kts\",\"gradle.properties\",\"package-lock.json\",\"yarn.lock\",\"pnpm-lock.yaml\",\"npm-shrinkwrap.json\",\"requirements.txt\",\"Pipfile\",\"Pipfile.lock\",\"pyproject.toml\",\"setup.py\",\"setup.cfg\",\"Gemfile\",\"Gemfile.lock\",\"uv.lock\",\"CODEOWNERS\",\"DESIGN.md\",\"README.md\",\"CONTRIBUTING.md\",\"CHANGELOG.md\",\"SECURITY.md\",\"CODE_OF_CONDUCT.md\",\"AGENTS.md\"],\"protected_files_policy\":\"request_review\",\"reviewers\":[\"znarf\"],\"title_prefix\":\"[i18n-de] \"},\"create_report_incomplete_issue\":{},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"false\"},\"post-slack-summary\":{\"description\":\"Post a German i18n run summary to Slack\",\"inputs\":{\"message\":{\"default\":null,\"description\":\"Slack summary with batch counts, IGNORED ids, and the pull request URL when one was opened\",\"required\":true,\"type\":\"string\"}}},\"report_incomplete\":{}}"
+          GH_AW_SAFE_OUTPUTS_CONFIG: "{\"create_pull_request\":{\"allowed_files\":[\"lang/fr.json\",\"scripts/i18n/translation-stats.ts\",\"lib/constants/locales.js\"],\"draft\":false,\"expires\":504,\"if_no_changes\":\"ignore\",\"max\":1,\"max_patch_files\":100,\"max_patch_size\":4096,\"protect_top_level_dot_folders\":true,\"protected_files\":[\"package.json\",\"bun.lockb\",\"bunfig.toml\",\"deno.json\",\"deno.jsonc\",\"deno.lock\",\"global.json\",\"NuGet.Config\",\"Directory.Packages.props\",\"mix.exs\",\"mix.lock\",\"go.mod\",\"go.sum\",\"stack.yaml\",\"stack.yaml.lock\",\"pom.xml\",\"build.gradle\",\"build.gradle.kts\",\"settings.gradle\",\"settings.gradle.kts\",\"gradle.properties\",\"package-lock.json\",\"yarn.lock\",\"pnpm-lock.yaml\",\"npm-shrinkwrap.json\",\"requirements.txt\",\"Pipfile\",\"Pipfile.lock\",\"pyproject.toml\",\"setup.py\",\"setup.cfg\",\"Gemfile\",\"Gemfile.lock\",\"uv.lock\",\"CODEOWNERS\",\"DESIGN.md\",\"README.md\",\"CONTRIBUTING.md\",\"CHANGELOG.md\",\"SECURITY.md\",\"CODE_OF_CONDUCT.md\",\"AGENTS.md\"],\"protected_files_policy\":\"request_review\",\"reviewers\":[\"znarf\"],\"title_prefix\":\"[i18n-fr] \"},\"create_report_incomplete_issue\":{},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"false\"},\"post-slack-summary\":{\"description\":\"Post an i18n run summary to Slack\",\"inputs\":{\"message\":{\"default\":null,\"description\":\"Slack summary with translated and IGNORED counts, IGNORED ids, and the pull request URL when one was opened\",\"required\":true,\"type\":\"string\"}}},\"report_incomplete\":{}}"
         with:
           script: |
             const path = require('path');
@@ -617,17 +612,17 @@ jobs:
           GH_AW_TOOLS_META_JSON: |
             {
               "description_suffixes": {
-                "create_pull_request": " CONSTRAINTS: Maximum 1 pull request(s) can be created. Title will be prefixed with \"[i18n-de] \". Reviewers [\"znarf\"] will be assigned."
+                "create_pull_request": " CONSTRAINTS: Maximum 1 pull request(s) can be created. Title will be prefixed with \"[i18n-fr] \". Reviewers [\"znarf\"] will be assigned."
               },
               "repo_params": {},
               "dynamic_tools": [
                 {
-                  "description": "Post a German i18n run summary to Slack",
+                  "description": "Post an i18n run summary to Slack",
                   "inputSchema": {
                     "additionalProperties": false,
                     "properties": {
                       "message": {
-                        "description": "Slack summary with batch counts, IGNORED ids, and the pull request URL when one was opened",
+                        "description": "Slack summary with translated and IGNORED counts, IGNORED ids, and the pull request URL when one was opened",
                         "type": "string"
                       }
                     },
@@ -929,7 +924,7 @@ jobs:
       - name: Execute GitHub Copilot CLI
         id: agentic_execution
         # Copilot CLI tool arguments (sorted):
-        timeout-minutes: 45
+        timeout-minutes: 60
         run: |
           set -o pipefail
           printf '%s' "$(date +%s%3N)" > /tmp/gh-aw/agent_cli_start_ms.txt
@@ -996,7 +991,7 @@ jobs:
           GH_AW_PHASE: agent
           GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
           GH_AW_SAFE_OUTPUTS: ${{ steps.set-runtime-paths.outputs.GH_AW_SAFE_OUTPUTS }}
-          GH_AW_TIMEOUT_MINUTES: 45
+          GH_AW_TIMEOUT_MINUTES: 60
           GH_AW_TOOL_TIMEOUT: 120
           GH_AW_VERSION: v0.88.7
           GH_TOKEN: ${{ secrets.GH_AW_GITHUB_TOKEN || github.token }}
@@ -1025,7 +1020,7 @@ jobs:
         continue-on-error: true
         env:
           GH_AW_AGENTIC_EXECUTION_OUTCOME: ${{ steps.agentic_execution.outcome }}
-          GH_AW_ENGINE_STEP_TIMEOUT_MINUTES: 45
+          GH_AW_ENGINE_STEP_TIMEOUT_MINUTES: 60
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
@@ -1231,7 +1226,7 @@ jobs:
       issues: write
       pull-requests: write
     concurrency:
-      group: "gh-aw-conclusion-i18n-translate-de"
+      group: "gh-aw-conclusion-i18n-translate-fr"
       cancel-in-progress: false
       queue: max
     env:
@@ -1251,8 +1246,8 @@ jobs:
           trace-id: ${{ needs.activation.outputs.setup-trace-id }}
           parent-span-id: ${{ needs.activation.outputs.setup-parent-span-id || needs.activation.outputs.setup-span-id }}
         env:
-          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-de.lock.yml@${{ github.ref }}
+          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-fr.lock.yml@${{ github.ref }}
           GH_AW_INFO_VERSION: "1.0.80"
           GH_AW_INFO_AWF_VERSION: "v0.28.14"
           GH_AW_INFO_ENGINE_ID: "copilot"
@@ -1328,8 +1323,8 @@ jobs:
         continue-on-error: true
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: agentic-workflow-usage-i18ntranslatede-${{ github.run_id }}
-          restore-keys: agentic-workflow-usage-i18ntranslatede-
+          key: agentic-workflow-usage-i18ntranslatefr-${{ github.run_id }}
+          restore-keys: agentic-workflow-usage-i18ntranslatefr-
           path: /tmp/gh-aw/agentic-workflow-usage-cache.jsonl
       - name: Write daily AIC usage cache entry
         id: write-daily-aic-cache
@@ -1351,7 +1346,7 @@ jobs:
         continue-on-error: true
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: agentic-workflow-usage-i18ntranslatede-${{ github.run_id }}
+          key: agentic-workflow-usage-i18ntranslatefr-${{ github.run_id }}
           path: /tmp/gh-aw/agentic-workflow-usage-cache.jsonl
       - name: Upload daily AIC usage cache artifact
         id: upload-daily-aic-cache
@@ -1369,8 +1364,8 @@ jobs:
         env:
           GH_AW_AGENT_OUTPUT: ${{ steps.setup-agent-output-env.outputs.GH_AW_AGENT_OUTPUT }}
           GH_AW_NOOP_MAX: "1"
-          GH_AW_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n-translate-de.md"
+          GH_AW_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n/i18n-translate-fr.md"
           GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_AW_AGENT_CONCLUSION: ${{ needs.agent.result }}
           GH_AW_NOOP_REPORT_AS_ISSUE: "false"
@@ -1378,7 +1373,7 @@ jobs:
           GH_AW_THREAT_DETECTION_AIC: ${{ needs.detection.outputs.aic }}
           GH_AW_EVALS_AIC: ${{ needs.evals.outputs.aic }}
           GH_AW_AMBIENT_CONTEXT: ${{ needs.agent.outputs.ambient_context }}
-          GH_AW_WORKFLOW_ID: "i18n-translate-de"
+          GH_AW_WORKFLOW_ID: "i18n-translate-fr"
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
@@ -1393,8 +1388,8 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           GH_AW_AGENT_OUTPUT: ${{ steps.setup-agent-output-env.outputs.GH_AW_AGENT_OUTPUT }}
-          GH_AW_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n-translate-de.md"
+          GH_AW_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n/i18n-translate-fr.md"
           GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_AW_DETECTION_CONCLUSION: ${{ needs.detection.outputs.detection_conclusion }}
           GH_AW_DETECTION_REASON: ${{ needs.detection.outputs.detection_reason }}
@@ -1413,8 +1408,8 @@ jobs:
         env:
           GH_AW_AGENT_OUTPUT: ${{ steps.setup-agent-output-env.outputs.GH_AW_AGENT_OUTPUT }}
           GH_AW_MISSING_TOOL_CREATE_ISSUE: "true"
-          GH_AW_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n-translate-de.md"
+          GH_AW_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n/i18n-translate-fr.md"
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
@@ -1430,8 +1425,8 @@ jobs:
         env:
           GH_AW_AGENT_OUTPUT: ${{ steps.setup-agent-output-env.outputs.GH_AW_AGENT_OUTPUT }}
           GH_AW_REPORT_INCOMPLETE_CREATE_ISSUE: "true"
-          GH_AW_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n-translate-de.md"
+          GH_AW_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n/i18n-translate-fr.md"
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
@@ -1447,11 +1442,11 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           GH_AW_AGENT_OUTPUT: ${{ steps.setup-agent-output-env.outputs.GH_AW_AGENT_OUTPUT }}
-          GH_AW_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n-translate-de.md"
+          GH_AW_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n/i18n-translate-fr.md"
           GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_AW_AGENT_CONCLUSION: ${{ needs.agent.result }}
-          GH_AW_WORKFLOW_ID: "i18n-translate-de"
+          GH_AW_WORKFLOW_ID: "i18n-translate-fr"
           GH_AW_ACTION_FAILURE_ISSUE_EXPIRES_HOURS: "168"
           GH_AW_ENGINE_ID: "copilot"
           GH_AW_SECRET_VERIFICATION_RESULT: ${{ needs.activation.outputs.secret_verification_result }}
@@ -1488,7 +1483,7 @@ jobs:
           GH_AW_FAILURE_REPORT_AS_ISSUE: "true"
           GH_AW_MISSING_TOOL_REPORT_AS_FAILURE: "true"
           GH_AW_MISSING_DATA_REPORT_AS_FAILURE: "true"
-          GH_AW_TIMEOUT_MINUTES: "45"
+          GH_AW_TIMEOUT_MINUTES: "60"
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
@@ -1504,8 +1499,8 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           GH_AW_AGENT_OUTPUT: ${{ steps.setup-agent-output-env.outputs.GH_AW_AGENT_OUTPUT }}
-          GH_AW_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n-translate-de.md"
+          GH_AW_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n/i18n-translate-fr.md"
           GH_AW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_AW_REPORT_FAILED_JOBS: "true"
         with:
@@ -1544,8 +1539,8 @@ jobs:
           trace-id: ${{ needs.activation.outputs.setup-trace-id }}
           parent-span-id: ${{ needs.activation.outputs.setup-parent-span-id || needs.activation.outputs.setup-span-id }}
         env:
-          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-de.lock.yml@${{ github.ref }}
+          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-fr.lock.yml@${{ github.ref }}
           GH_AW_INFO_VERSION: "1.0.80"
           GH_AW_INFO_AWF_VERSION: "v0.28.14"
           GH_AW_INFO_ENGINE_ID: "copilot"
@@ -1612,8 +1607,8 @@ jobs:
         if: always() && steps.detection_guard.outputs.run_detection == 'true'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          WORKFLOW_NAME: "i18n Translate German"
-          WORKFLOW_DESCRIPTION: "Weekly batch of German frontend locale strings that still match English, opened as a reviewable pull request."
+          WORKFLOW_NAME: "i18n Translate French"
+          WORKFLOW_DESCRIPTION: "Weekly pass over all French frontend locale strings that still match English, opened as a reviewable pull request."
           HAS_PATCH: ${{ needs.agent.outputs.has_patch }}
           GH_AW_DETECTION_CONTINUE_ON_ERROR: "true"
           GH_AW_DETECTION_SKIP_PROMPT_SUMMARY: "true"
@@ -1680,8 +1675,8 @@ jobs:
           GIT_COMMITTER_NAME: github-actions[bot]
           RUNNER_TEMP: ${{ runner.temp }}
           TRACEPARENT: ${{ env.GITHUB_AW_OTEL_TRACE_ID != '' && env.GITHUB_AW_OTEL_PARENT_SPAN_ID != '' && format('00-{0}-{1}-01', env.GITHUB_AW_OTEL_TRACE_ID, env.GITHUB_AW_OTEL_PARENT_SPAN_ID) || '' }}
-          WORKFLOW_NAME: "i18n Translate German"
-          WORKFLOW_DESCRIPTION: "Weekly batch of German frontend locale strings that still match English, opened as a reviewable pull request."
+          WORKFLOW_NAME: "i18n Translate French"
+          WORKFLOW_DESCRIPTION: "Weekly pass over all French frontend locale strings that still match English, opened as a reviewable pull request."
           HAS_PATCH: ${{ needs.agent.outputs.has_patch }}
           GH_AW_DETECTION_CONTINUE_ON_ERROR: "true"
         run: |
@@ -1803,8 +1798,8 @@ jobs:
           trace-id: ${{ needs.activation.outputs.setup-trace-id }}
           parent-span-id: ${{ needs.activation.outputs.setup-parent-span-id || needs.activation.outputs.setup-span-id }}
         env:
-          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-de.lock.yml@${{ github.ref }}
+          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-fr.lock.yml@${{ github.ref }}
           GH_AW_INFO_VERSION: "1.0.80"
           GH_AW_INFO_AWF_VERSION: "v0.28.14"
           GH_AW_INFO_ENGINE_ID: "copilot"
@@ -1842,7 +1837,7 @@ jobs:
         if: always()
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          GH_AW_EVALS_QUESTIONS: '[{"id":"translates_when_backlog","question":"If untranslated German strings were listed, does the agent output show set-translation or IGNORED updates and a create_pull_request call? If the untranslated list was empty, answer UNKNOWN."},{"id":"noop_when_caught_up","question":"If the untranslated German list was empty, does the agent output show noop and no create_pull_request? If strings were listed, answer UNKNOWN."},{"id":"scoped_files","question":"Does the agent output show file changes limited to lang/de.json, scripts/i18n/translation-stats.ts, and lib/constants/locales.js?"}]'
+          GH_AW_EVALS_QUESTIONS: '[{"id":"translates_when_backlog","question":"If untranslated French strings were listed, does the agent output show set-translation or IGNORED updates and a create_pull_request call? If the untranslated list was empty, answer UNKNOWN."},{"id":"noop_when_caught_up","question":"If the untranslated French list was empty, does the agent output show noop and no create_pull_request? If strings were listed, answer UNKNOWN."},{"id":"scoped_files","question":"Does the agent output show file changes limited to lang/fr.json, scripts/i18n/translation-stats.ts, and lib/constants/locales.js?"}]'
           GH_AW_EVALS_MODEL: "gpt-5.6-luna"
           GH_AW_EVALS_PHASE: setup
         with:
@@ -1874,7 +1869,7 @@ jobs:
         continue-on-error: true
         id: evals_agentic_execution
         # Copilot CLI tool arguments (sorted):
-        timeout-minutes: 45
+        timeout-minutes: 60
         run: |
           set -o pipefail
           printf '%s' "$(date +%s%3N)" > /tmp/gh-aw/agent_cli_start_ms.txt
@@ -1939,7 +1934,7 @@ jobs:
           GH_AW_MAX_TURNS: ${{ vars.GH_AW_DEFAULT_MAX_TURNS || '' }}
           GH_AW_PHASE: evals
           GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
-          GH_AW_TIMEOUT_MINUTES: 45
+          GH_AW_TIMEOUT_MINUTES: 60
           GH_AW_VERSION: v0.88.7
           GITHUB_API_URL: ${{ github.api_url }}
           GITHUB_AW: true
@@ -1972,7 +1967,7 @@ jobs:
         continue-on-error: true
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          GH_AW_EVALS_QUESTIONS: '[{"id":"translates_when_backlog","question":"If untranslated German strings were listed, does the agent output show set-translation or IGNORED updates and a create_pull_request call? If the untranslated list was empty, answer UNKNOWN."},{"id":"noop_when_caught_up","question":"If the untranslated German list was empty, does the agent output show noop and no create_pull_request? If strings were listed, answer UNKNOWN."},{"id":"scoped_files","question":"Does the agent output show file changes limited to lang/de.json, scripts/i18n/translation-stats.ts, and lib/constants/locales.js?"}]'
+          GH_AW_EVALS_QUESTIONS: '[{"id":"translates_when_backlog","question":"If untranslated French strings were listed, does the agent output show set-translation or IGNORED updates and a create_pull_request call? If the untranslated list was empty, answer UNKNOWN."},{"id":"noop_when_caught_up","question":"If the untranslated French list was empty, does the agent output show noop and no create_pull_request? If strings were listed, answer UNKNOWN."},{"id":"scoped_files","question":"Does the agent output show file changes limited to lang/fr.json, scripts/i18n/translation-stats.ts, and lib/constants/locales.js?"}]'
           GH_AW_EVALS_MODEL: "gpt-5.6-luna"
           GH_AW_EVALS_PHASE: parse
           GITHUB_RUN_ID: ${{ github.run_id }}
@@ -2106,8 +2101,8 @@ jobs:
           destination: ${{ runner.temp }}/gh-aw/actions
           job-name: ${{ github.job }}
         env:
-          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-de.lock.yml@${{ github.ref }}
+          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-fr.lock.yml@${{ github.ref }}
           GH_AW_INFO_VERSION: "1.0.80"
           GH_AW_INFO_AWF_VERSION: "v0.28.14"
           GH_AW_INFO_ENGINE_ID: "copilot"
@@ -2129,8 +2124,8 @@ jobs:
         id: check_skip_if_match
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          GH_AW_SKIP_QUERY: "is:pr is:open \"gh-aw-workflow-id: i18n-translate-de\" in:body"
-          GH_AW_WORKFLOW_NAME: "i18n Translate German"
+          GH_AW_SKIP_QUERY: "is:pr is:open \"gh-aw-workflow-id: i18n-translate-fr\" in:body"
+          GH_AW_WORKFLOW_NAME: "i18n Translate French"
           GH_AW_SKIP_MAX_MATCHES: "1"
         with:
           script: |
@@ -2161,8 +2156,8 @@ jobs:
           trace-id: ${{ needs.activation.outputs.setup-trace-id }}
           parent-span-id: ${{ needs.activation.outputs.setup-parent-span-id || needs.activation.outputs.setup-span-id }}
         env:
-          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-de.lock.yml@${{ github.ref }}
+          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-fr.lock.yml@${{ github.ref }}
           GH_AW_INFO_VERSION: "1.0.80"
           GH_AW_INFO_AWF_VERSION: "v0.28.14"
           GH_AW_INFO_ENGINE_ID: "copilot"
@@ -2193,7 +2188,7 @@ jobs:
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GH_AW_STATE_DIR: /tmp/gh-aw/evals-state
-          GH_AW_STATE_BRANCH: evals/i18ntranslatede
+          GH_AW_STATE_BRANCH: evals/i18ntranslatefr
           GH_AW_STATE_FILES: evals.jsonl
           GH_AW_STATE_LABEL: evals results
         with:
@@ -2221,7 +2216,7 @@ jobs:
       GH_AW_AGENT_AIC: ${{ needs.agent.outputs.aic }}
       GH_AW_AIC: ${{ needs.agent.outputs.aic }}
       GH_AW_AMBIENT_CONTEXT: ${{ needs.agent.outputs.ambient_context }}
-      GH_AW_CALLER_WORKFLOW_ID: "${{ github.repository }}/i18n-translate-de"
+      GH_AW_CALLER_WORKFLOW_ID: "${{ github.repository }}/i18n-translate-fr"
       GH_AW_DETECTION_CONCLUSION: ${{ needs.detection.outputs.detection_conclusion }}
       GH_AW_DETECTION_REASON: ${{ needs.detection.outputs.detection_reason }}
       GH_AW_EFFECTIVE_TOKENS: ${{ needs.agent.outputs.effective_tokens }}
@@ -2229,10 +2224,10 @@ jobs:
       GH_AW_ENGINE_MODEL: "gpt-5.6-luna"
       GH_AW_RUNTIME_FEATURES: ${{ vars.GH_AW_RUNTIME_FEATURES }}
       GH_AW_THREAT_DETECTION_AIC: ${{ needs.detection.outputs.aic }}
-      GH_AW_WORKFLOW_EMOJI: "🇩🇪"
-      GH_AW_WORKFLOW_ID: "i18n-translate-de"
-      GH_AW_WORKFLOW_NAME: "i18n Translate German"
-      GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n-translate-de.md"
+      GH_AW_WORKFLOW_EMOJI: "🇫🇷"
+      GH_AW_WORKFLOW_ID: "i18n-translate-fr"
+      GH_AW_WORKFLOW_NAME: "i18n Translate French"
+      GH_AW_WORKFLOW_SOURCE_URL: "${{ github.server_url }}/${{ github.repository }}/blob/${{ github.ref_name }}/.github/workflows/i18n/i18n-translate-fr.md"
     outputs:
       code_push_failure_count: ${{ steps.process_safe_outputs.outputs.code_push_failure_count }}
       code_push_failure_errors: ${{ steps.process_safe_outputs.outputs.code_push_failure_errors }}
@@ -2260,8 +2255,8 @@ jobs:
           trace-id: ${{ needs.activation.outputs.setup-trace-id }}
           parent-span-id: ${{ needs.activation.outputs.setup-parent-span-id || needs.activation.outputs.setup-span-id }}
         env:
-          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate German"
-          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-de.lock.yml@${{ github.ref }}
+          GH_AW_SETUP_WORKFLOW_NAME: "i18n Translate French"
+          GH_AW_CURRENT_WORKFLOW_REF: ${{ github.repository }}/.github/workflows/i18n-translate-fr.lock.yml@${{ github.ref }}
           GH_AW_INFO_VERSION: "1.0.80"
           GH_AW_INFO_AWF_VERSION: "v0.28.14"
           GH_AW_INFO_ENGINE_ID: "copilot"
@@ -2322,7 +2317,7 @@ jobs:
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_API_URL: ${{ github.api_url }}
           GH_AW_SAFE_OUTPUT_JOBS: "{\"post_slack_summary\":\"\"}"
-          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"create_pull_request\":{\"allowed_files\":[\"lang/de.json\",\"scripts/i18n/translation-stats.ts\",\"lib/constants/locales.js\"],\"draft\":false,\"expires\":504,\"if_no_changes\":\"ignore\",\"max\":1,\"max_patch_files\":100,\"max_patch_size\":4096,\"protect_top_level_dot_folders\":true,\"protected_files\":[\"package.json\",\"bun.lockb\",\"bunfig.toml\",\"deno.json\",\"deno.jsonc\",\"deno.lock\",\"global.json\",\"NuGet.Config\",\"Directory.Packages.props\",\"mix.exs\",\"mix.lock\",\"go.mod\",\"go.sum\",\"stack.yaml\",\"stack.yaml.lock\",\"pom.xml\",\"build.gradle\",\"build.gradle.kts\",\"settings.gradle\",\"settings.gradle.kts\",\"gradle.properties\",\"package-lock.json\",\"yarn.lock\",\"pnpm-lock.yaml\",\"npm-shrinkwrap.json\",\"requirements.txt\",\"Pipfile\",\"Pipfile.lock\",\"pyproject.toml\",\"setup.py\",\"setup.cfg\",\"Gemfile\",\"Gemfile.lock\",\"uv.lock\",\"CODEOWNERS\",\"DESIGN.md\",\"README.md\",\"CONTRIBUTING.md\",\"CHANGELOG.md\",\"SECURITY.md\",\"CODE_OF_CONDUCT.md\",\"AGENTS.md\"],\"protected_files_policy\":\"request_review\",\"reviewers\":[\"znarf\"],\"title_prefix\":\"[i18n-de] \"},\"create_report_incomplete_issue\":{},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"false\"},\"report_incomplete\":{}}"
+          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"create_pull_request\":{\"allowed_files\":[\"lang/fr.json\",\"scripts/i18n/translation-stats.ts\",\"lib/constants/locales.js\"],\"draft\":false,\"expires\":504,\"if_no_changes\":\"ignore\",\"max\":1,\"max_patch_files\":100,\"max_patch_size\":4096,\"protect_top_level_dot_folders\":true,\"protected_files\":[\"package.json\",\"bun.lockb\",\"bunfig.toml\",\"deno.json\",\"deno.jsonc\",\"deno.lock\",\"global.json\",\"NuGet.Config\",\"Directory.Packages.props\",\"mix.exs\",\"mix.lock\",\"go.mod\",\"go.sum\",\"stack.yaml\",\"stack.yaml.lock\",\"pom.xml\",\"build.gradle\",\"build.gradle.kts\",\"settings.gradle\",\"settings.gradle.kts\",\"gradle.properties\",\"package-lock.json\",\"yarn.lock\",\"pnpm-lock.yaml\",\"npm-shrinkwrap.json\",\"requirements.txt\",\"Pipfile\",\"Pipfile.lock\",\"pyproject.toml\",\"setup.py\",\"setup.cfg\",\"Gemfile\",\"Gemfile.lock\",\"uv.lock\",\"CODEOWNERS\",\"DESIGN.md\",\"README.md\",\"CONTRIBUTING.md\",\"CHANGELOG.md\",\"SECURITY.md\",\"CODE_OF_CONDUCT.md\",\"AGENTS.md\"],\"protected_files_policy\":\"request_review\",\"reviewers\":[\"znarf\"],\"title_prefix\":\"[i18n-fr] \"},\"create_report_incomplete_issue\":{},\"missing_data\":{},\"missing_tool\":{},\"noop\":{\"max\":1,\"report-as-issue\":\"false\"},\"report_incomplete\":{}}"
           GH_AW_CI_TRIGGER_TOKEN: ${{ secrets.GH_AW_CI_TRIGGER_TOKEN }}
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
