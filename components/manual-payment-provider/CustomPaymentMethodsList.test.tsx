@@ -10,12 +10,6 @@ import { withRequiredProviders } from '../../test/providers';
 
 import { CustomPaymentMethodsList } from './CustomPaymentMethodsList';
 
-// Mock FlipMove animation library
-jest.mock('react-flip-move', () => ({
-  __esModule: true,
-  default: ({ children }: any) => <div>{children}</div>,
-}));
-
 const mockAccount = {
   slug: 'test-collective',
   currency: 'USD',

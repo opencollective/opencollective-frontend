@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -10,6 +9,7 @@ import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { cn } from '../../lib/utils';
 
 import ExpenseBudgetItem from '../budget/ExpenseBudgetItem';
+import FlipMove from '../FlipMove';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';

@@ -10,10 +10,27 @@ const { SENTRY_APPLICATION_KEY } = require('./sentry.constants');
 require('./env');
 const { REWRITES } = require('./rewrites');
 
+/** Limit static/page-data workers on memory-constrained CI/Vercel (see scripts/build_next.sh). */
+function getBuildWorkerCpus() {
+  if (process.env.NEXT_BUILD_CPUS) {
+    return Number(process.env.NEXT_BUILD_CPUS);
+  } else if (process.env.VERCEL || process.env.CI) {
+    return 2;
+  }
+  return undefined;
+}
+
+const buildWorkerCpus = getBuildWorkerCpus();
+
 const nextConfig = {
   useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
+  ...(buildWorkerCpus !== undefined && {
+    experimental: {
+      cpus: buildWorkerCpus,
+    },
+  }),
   typescript: {
     ignoreBuildErrors: true,
   },

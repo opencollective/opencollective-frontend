@@ -11,7 +11,7 @@ module.exports = async () => {
   // Override transformIgnorePatterns to include ESM-only packages that need to be transformed
   nextConfig.transformIgnorePatterns = [
     '^.+\\.module\\.(css|sass|scss)$',
-    'node_modules/(?!(@scure|@otplib|@noble|uuid|react-intl|intl-messageformat|@formatjs)/)',
+    'node_modules/(?!(@scure|@otplib|@noble|uuid|react-intl|intl-messageformat|@formatjs|cookie)/)',
   ];
 
   // Map lodash-es to CJS lodash in the test environment to avoid ESM parse errors.

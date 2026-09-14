@@ -6,7 +6,6 @@ import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { useFormikContext } from 'formik';
 import { get, isNil, pick, round, truncate } from 'lodash-es';
 import { ArrowDown, ArrowUp, Coins, Plus, Trash2 } from 'lucide-react';
-import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
@@ -31,6 +30,7 @@ import {
 import { DISABLE_ANIMATIONS } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 
+import FlipMove from '@/components/FlipMove';
 import { FormField } from '@/components/FormField';
 import PrivateInfoIcon from '@/components/icons/PrivateInfoIcon';
 import InputAmount from '@/components/InputAmount';
