@@ -13,6 +13,7 @@ import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
 import type { ExportRequestsQuery, ExportRequestsQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { ExportRequestStatus, ExportRequestType } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '../../../Avatar';
@@ -244,14 +245,18 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   status: statusFilter.filter,
 };
 
-const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
+const Exports = ({ accountSlug, subpath, account }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
   const { toast } = useToast();
   const { showConfirmationModal } = useModal();
+  const { LoggedInUser } = useLoggedInUser();
   const selectedExportRequestId = subpath?.[0] || null;
   const pushSubpath = React.useMemo(() => makePushSubpath(router), [router]);
   const [removeExportRequest] = useMutation(removeExportRequestMutation);
+
+  // Deleting an export is reserved for admins; accountants can request, download and rename them.
+  const canDelete = Boolean(account && LoggedInUser && !LoggedInUser.isAccountantOnly(account));
 
   const views: Views<z.infer<typeof schema>> = [
     {
@@ -371,16 +376,18 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
         });
       }
 
-      secondary.push({
-        key: 'delete',
-        label: intl.formatMessage({ defaultMessage: 'Delete', id: 'actions.delete' }),
-        Icon: Trash2,
-        onClick: () => handleRemove(exportRequest),
-      });
+      if (canDelete) {
+        secondary.push({
+          key: 'delete',
+          label: intl.formatMessage({ defaultMessage: 'Delete', id: 'actions.delete' }),
+          Icon: Trash2,
+          onClick: () => handleRemove(exportRequest),
+        });
+      }
 
       return { primary, secondary };
     },
-    [intl, handleRemove],
+    [intl, handleRemove, canDelete],
   );
 
   const columns = React.useMemo(() => getColumns({ intl }), [intl]);
@@ -419,6 +426,7 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
 
       <ExportRequestDetailsDrawer
         exportRequestId={selectedExportRequestId}
+        canDelete={canDelete}
         onClose={() => pushSubpath('')}
         onDelete={exportRequest => {
           handleRemove(exportRequest);

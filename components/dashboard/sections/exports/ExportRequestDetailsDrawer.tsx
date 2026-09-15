@@ -323,11 +323,18 @@ const formatExportParameters = (
 
 type ExportRequestDetailsDrawerProps = {
   exportRequestId: string | null;
+  /** Deleting is reserved for admins; accountants can rename. */
+  canDelete: boolean;
   onClose: () => void;
   onDelete: (exportRequest: NonNullable<ExportRequestDetailsQuery['exportRequest']>) => void;
 };
 
-export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete }: ExportRequestDetailsDrawerProps) => {
+export const ExportRequestDetailsDrawer = ({
+  exportRequestId,
+  canDelete,
+  onClose,
+  onDelete,
+}: ExportRequestDetailsDrawerProps) => {
   const intl = useIntl();
   const { copy, isCopied } = useClipboard();
   const [editExportRequest] = useMutation(editExportRequestMutation);
@@ -397,15 +404,17 @@ export const ExportRequestDetailsDrawer = ({ exportRequestId, onClose, onDelete 
       });
     }
 
-    secondary.push({
-      key: 'delete',
-      label: intl.formatMessage({ defaultMessage: 'Delete', id: 'actions.delete' }),
-      Icon: Trash2,
-      onClick: () => onDelete(exportRequest),
-    });
+    if (canDelete) {
+      secondary.push({
+        key: 'delete',
+        label: intl.formatMessage({ defaultMessage: 'Delete', id: 'actions.delete' }),
+        Icon: Trash2,
+        onClick: () => onDelete(exportRequest),
+      });
+    }
 
     return { primary, secondary };
-  }, [exportRequest, intl, onDelete, copy, isCopied]);
+  }, [exportRequest, intl, onDelete, copy, isCopied, canDelete]);
 
   if (!exportRequestId) {
     return null;
