@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Edit, X } from 'lucide-react';
-import FlipMove from 'react-flip-move';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { Account, ManualPaymentProvider } from '@/lib/graphql/types/v2/graphql';
+
+import FlipMove from '@/components/FlipMove';
 
 import Spinner from '../Spinner';
 import { Button } from '../ui/Button';

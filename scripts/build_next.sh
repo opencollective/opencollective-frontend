@@ -8,7 +8,24 @@ shx mkdir -p $DIST
 
 echo "> Building next"
 
-NODE_OPTIONS="--max-old-space-size=8192" next build --webpack || exit 1
+# Page-data workers inherit NODE_OPTIONS; a high heap per process × many workers can OOM
+# 16GB builders (e.g. Vercel). Override with BUILD_NODE_MAX_OLD_SPACE_SIZE / NEXT_BUILD_CPUS.
+if [ -z "${BUILD_NODE_MAX_OLD_SPACE_SIZE:-}" ]; then
+  if [ -n "${VERCEL:-}" ] || [ -n "${CI:-}" ]; then
+    BUILD_NODE_MAX_OLD_SPACE_SIZE=5120
+  else
+    BUILD_NODE_MAX_OLD_SPACE_SIZE=8192
+  fi
+fi
+
+echo "> Node heap limit (max-old-space-size): ${BUILD_NODE_MAX_OLD_SPACE_SIZE}MB"
+
+NODE_OPTIONS="--max-old-space-size=${BUILD_NODE_MAX_OLD_SPACE_SIZE}" next build --webpack || exit 1
+
+if [ ! -f .next/routes-manifest.json ]; then
+  echo "next build did not write .next/routes-manifest.json" >&2
+  exit 1
+fi
 
 echo "> Copying .next to dist folder"
 

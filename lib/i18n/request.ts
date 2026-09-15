@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { parseCookie } from 'cookie';
 import { pick } from 'lodash-es';
 import type { NextPageContext } from 'next';
 
@@ -31,8 +32,7 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
     if (queryLanguage && supportedLanguages.includes(queryLanguage)) {
       language = queryLanguage;
     } else if (typeof window === 'undefined') {
-      const cookie = require('cookie'); // eslint-disable-line @typescript-eslint/no-require-imports
-      const cookies = cookie.parse(req.headers['cookie'] ?? '');
+      const cookies = parseCookie(req.headers['cookie'] ?? '');
       const cookieLanguage = cookies?.['language'];
 
       if (cookieLanguage && supportedLanguages.includes(cookieLanguage)) {
