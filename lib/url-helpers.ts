@@ -7,8 +7,7 @@ import { TransactionTypes } from './constants/transactions';
 import type { Comment, Conversation, Expense, HostApplication, Order, Update } from './graphql/types/v2/graphql';
 import { isHiddenAccount } from './collective';
 import type LoggedInUser from './LoggedInUser';
-import { getWebsiteUrl } from './utils';
-import { getWindowLocation } from './window';
+import { getWebsiteUrl, isValidRelativeUrl } from './utils';
 
 export const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL;
 
@@ -304,24 +303,15 @@ export const isRelativeHref = href => {
 
   // We force all relative URLs to start with `/`
   href = href.trim();
-  if (!href.startsWith('/')) {
-    return false;
+  return href.startsWith('/') && isValidRelativeUrl(href);
+};
+
+export const getProfileCompletionRoute = currentPath => {
+  if (!currentPath || !isRelativeHref(currentPath) || currentPath === '/') {
+    return '/signup/profile';
   }
 
-  // If we're in the browser, there's a safe way to check this
-  const windowLocation = getWindowLocation();
-  if (windowLocation) {
-    try {
-      const parsedUrl = new URL(href, windowLocation.origin);
-      return parsedUrl.origin === windowLocation.origin;
-    } catch {
-      return false; // Invalid URL
-    }
-  }
-
-  // Otherwise, we fallback on a regex that will protect against `javascript:`, `//evil.com`, etc.
-  href = href.trim();
-  return href.startsWith('#') || href === '/' || new RegExp('^/[^/\\\\]+').test(href);
+  return `/signup/profile?next=${encodeURIComponent(currentPath)}`;
 };
 
 export async function followOrderRedirectUrl(

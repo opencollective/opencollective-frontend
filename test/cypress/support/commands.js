@@ -16,16 +16,26 @@ import generateToken from './token';
  * @param {object} params:
  *    - redirect: The redirect URL
  *    - email: User email
+ *    - completeProfile: Complete a newly-created user's profile before visiting redirect
  */
 Cypress.Commands.add('login', (params = {}) => {
-  const { email = defaultTestUserEmail, redirect = null, visitParams, sendLink } = params;
+  const { email = defaultTestUserEmail, redirect = null, visitParams, sendLink, completeProfile = true } = params;
   const user = { email, newsletterOptIn: false };
 
   return signinRequest(user, redirect, sendLink).then(({ body: { redirect } }) => {
     // Test users are allowed to signin directly with E2E, thus a signin URL
     // is directly returned by the API. See signin function in
     // opencollective-api/server/controllers/users.js for more info
-    return cy.visit(redirect, visitParams).then(() => user);
+    const token = redirect ? getTokenFromRedirectUrl(redirect) : null;
+    if (!token) {
+      return cy.visit(redirect, visitParams).then(() => user);
+    }
+
+    return getLoggedInUserFromToken(token).then(loggedInUser => {
+      return completeProfileIfRequired({ token, loggedInUser, completeProfile }).then(() => {
+        return cy.visit(redirect, visitParams).then(() => user);
+      });
+    });
   });
 });
 
@@ -38,7 +48,7 @@ Cypress.Commands.add('logout', () => {
  * Create a new account an SignIn. If no email is provided in `params`, the account
  * will be generated using a random email.
  */
-Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {}) => {
+Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, completeProfile = true } = {}) => {
   if (!user.email) {
     user.email = randomEmail();
   }
@@ -49,14 +59,54 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {})
     // opencollective-api/server/controllers/users.js for more info
     const token = getTokenFromRedirectUrl(redirect);
     if (token) {
-      return getLoggedInUserFromToken(token).then(user => {
-        return cy.visit(redirect, visitParams).then(() => user);
+      return getLoggedInUserFromToken(token).then(loggedInUser => {
+        return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name }).then(() => {
+          return cy.visit(redirect, visitParams).then(() => loggedInUser);
+        });
       });
     } else {
       return cy.visit(redirect, visitParams).then(() => user);
     }
   });
 });
+
+function completeProfileIfRequired({ token, loggedInUser, completeProfile, name }) {
+  if (!completeProfile || !loggedInUser.requiresProfileCompletion) {
+    return cy.wrap(loggedInUser);
+  }
+
+  return getIdV2FromReferenceInput({ slug: loggedInUser.collective.slug }, token)
+    .then(accountId => {
+      return graphqlQueryV2(token, {
+        operationName: 'EditAccount',
+        query: gql`
+          mutation EditAccount($account: AccountUpdateInput!) {
+            editAccount(account: $account) {
+              id
+              slug
+              name
+            }
+          }
+        `,
+        variables: {
+          account: {
+            id: accountId,
+            name: name ?? loggedInUser.collective.name ?? 'Test User',
+          },
+        },
+      });
+    })
+    .then(({ body }) => {
+      // `editAccount` regenerates the collective slug for profile-completion
+      // users, so reflect the fresh slug on the returned user (several specs
+      // read `user.collective.slug`).
+      const { slug } = body.data.editAccount;
+      if (loggedInUser.collective && slug) {
+        loggedInUser.collective.slug = slug;
+      }
+      return loggedInUser;
+    });
+}
 
 /**
  * Returns all the email sent by the API

@@ -12,7 +12,7 @@ import type { Context } from '@/lib/apollo-client';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
-import { getDashboardRoute } from '@/lib/url-helpers';
+import { getDashboardRoute, getProfileCompletionRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
@@ -291,7 +291,10 @@ const DashboardPage = () => {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { workspace, setWorkspace } = useWorkspace();
   const isRootUser = LoggedInUser?.isRoot;
-  const defaultSlug = workspace.slug || LoggedInUser?.collective.slug;
+  const hasWorkspaceAccess =
+    workspace.slug &&
+    (workspace.slug === LoggedInUser?.collective.slug || LoggedInUser?.canSeeDashboard({ slug: workspace.slug }));
+  const defaultSlug = hasWorkspaceAccess ? workspace.slug : LoggedInUser?.collective.slug;
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
@@ -310,18 +313,16 @@ const DashboardPage = () => {
         setWorkspace({ slug: activeSlug, isHost: membership?.collective.isHost });
       }
     }
-    // If there is no slug set (that means /dashboard)
-    // And if there is an activeSlug (this means workspace OR LoggedInUser)
-    // And a LoggedInUser
-    // And if activeSlug is different than LoggedInUser slug
-    if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
+    // Redirect users that require profile completion
+    if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
+      router.replace(getProfileCompletionRoute(router.asPath));
+    }
+    // Redirect to activeSlug if no slug is provided
+    else if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
       router.replace(`/dashboard/${activeSlug}`);
     }
-    if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
-      router.replace('/signup/profile');
-    }
     // If slug is `me` and there is a LoggedInUser, redirect to the user's dashboard
-    if (slug === 'me' && LoggedInUser) {
+    else if (slug === 'me' && LoggedInUser) {
       router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
     }
   }, [activeSlug, LoggedInUser]);
