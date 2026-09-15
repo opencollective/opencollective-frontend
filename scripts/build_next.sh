@@ -22,6 +22,11 @@ echo "> Node heap limit (max-old-space-size): ${BUILD_NODE_MAX_OLD_SPACE_SIZE}MB
 
 NODE_OPTIONS="--max-old-space-size=${BUILD_NODE_MAX_OLD_SPACE_SIZE}" next build --webpack || exit 1
 
+if [ ! -f .next/routes-manifest.json ]; then
+  echo "next build did not write .next/routes-manifest.json" >&2
+  exit 1
+fi
+
 echo "> Copying .next to dist folder"
 
 # We have to remove the cache to prevent issues with heroku slug size: https://github.com/opencollective/opencollective-frontend/pull/8661

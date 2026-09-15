@@ -26,11 +26,23 @@ const nextConfig = {
   useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
-  ...(buildWorkerCpus !== undefined && {
-    experimental: {
-      cpus: buildWorkerCpus,
-    },
-  }),
+  // Pages Router leaves node_modules external; sanitize-html is CJS and
+  // require()s htmlparser2@12 (ESM-only), which Vercel's runtime cannot load.
+  // Bundle Pages deps like the App Router, and allow webpack CJS↔ESM interop.
+  bundlePagesRouterDependencies: true,
+  transpilePackages: [
+    'sanitize-html',
+    'htmlparser2',
+    'domhandler',
+    'domutils',
+    'domelementtype',
+    'dom-serializer',
+    'entities',
+  ],
+  experimental: {
+    esmExternals: 'loose',
+    ...(buildWorkerCpus !== undefined ? { cpus: buildWorkerCpus } : {}),
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
