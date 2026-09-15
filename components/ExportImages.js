@@ -86,6 +86,11 @@ class ExportImages extends React.Component {
                 defaultValue: 'true',
               },
               {
+                name: 'follow',
+                description: 'set to true to remove rel and emit dofollow links',
+                defaultValue: 'false',
+              },
+              {
                 name: 'format',
                 description: 'image format (replace .svg with .png or .jpg)',
               },
