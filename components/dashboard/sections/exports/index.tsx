@@ -256,7 +256,7 @@ const Exports = ({ accountSlug, subpath, account }: DashboardSectionProps) => {
   const [removeExportRequest] = useMutation(removeExportRequestMutation);
 
   // Deleting an export is reserved for admins; accountants can request, download and rename them.
-  const canDelete = Boolean(account && LoggedInUser && !LoggedInUser.isAccountantOnly(account));
+  const canDelete = Boolean(account && LoggedInUser?.isAdminOfCollective(account));
 
   const views: Views<z.infer<typeof schema>> = [
     {
