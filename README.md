@@ -24,6 +24,7 @@ If you see a step below that could be improved (or is outdated), please update t
 1. Make sure you have Node.js version 24.x and NPM version 12.x.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
+- Node.js 24 bundles npm 11, so install npm 12 on top: `npm install --global npm@12`.
 
 ### Install
 
