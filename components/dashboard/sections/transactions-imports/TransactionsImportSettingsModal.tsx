@@ -96,6 +96,18 @@ export default function TransactionsImportSettingsModal({
   const [deleteConnectedAccount, { loading: isDisconnecting }] = useMutation(deleteConnectedAccountMutation);
   const [deleteTransactionsImport, { loading: isDeleting }] = useMutation(deleteTransactionsImportMutation);
 
+  // If the modal unmounts mid-sync, the sync button can't reset the request flag itself, which would leave
+  // the parent polling forever. Mirror the latest values in refs so the unmount cleanup can clear it.
+  const syncRequestRef = React.useRef({ hasRequestedSync, setHasRequestedSync });
+  syncRequestRef.current = { hasRequestedSync, setHasRequestedSync };
+  React.useEffect(() => {
+    return () => {
+      if (syncRequestRef.current.hasRequestedSync) {
+        syncRequestRef.current.setHasRequestedSync(false);
+      }
+    };
+  }, []);
+
   const handleDisconnect = async () => {
     try {
       await deleteConnectedAccount({

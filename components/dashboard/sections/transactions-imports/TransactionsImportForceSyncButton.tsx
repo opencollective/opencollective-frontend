@@ -14,6 +14,8 @@ const syncTransactionsImportMutation = gql`
   mutation SyncTransactionsImport($transactionImport: TransactionsImportReferenceInput!) {
     syncTransactionsImport(transactionImport: $transactionImport) {
       id
+      isSyncing
+      lastSyncAt
     }
   }
 `;
@@ -45,14 +47,16 @@ export const TransactionsImportForceSyncButton = ({
     };
   }, []);
 
-  // Reset wasClickedRecently when sync is done
+  // Reset hasRequestedSync when sync is done
   React.useEffect(() => {
     if (prevIsSyncing && !isSyncing) {
       if (setHasRequestedSyncTimeout.current) {
         clearTimeout(setHasRequestedSyncTimeout.current);
+        setHasRequestedSyncTimeout.current = null;
       }
+      setHasRequestedSync(false);
     }
-  }, [toast, intl, isSyncing, prevIsSyncing]);
+  }, [isSyncing, prevIsSyncing, setHasRequestedSync]);
 
   return (
     <Button
