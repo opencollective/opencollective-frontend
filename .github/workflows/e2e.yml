@@ -122,6 +122,9 @@ jobs:
           node-version-file: 'package.json'
           cache: 'npm'
 
+      - name: Enable npm 12
+        run: npm install -g npm@12.0.2
+
       # Checkouts
 
       - name: Set REF in env, removing the `refs/` part
