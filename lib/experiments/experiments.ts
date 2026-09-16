@@ -105,6 +105,21 @@ export function isOscTipExperiment(collective?: PlatformTipCollective | null, ti
 // the percentage changes, stale draws are re-rolled so the new split applies immediately.
 type StoredDraws = Record<string, { enabled: boolean; pct: number }>;
 
+// Experiment draws use crypto.getRandomValues rather than Math.random. Anti-fingerprinting
+// tools (JShelter, CanvasBlocker and similar) replace Math.random with deterministic,
+// domain-seeded sequences to prevent tracking; in such browsers a Math.random draw lands on
+// the same value on every page load, silently pinning the visitor to one arm. The crypto API
+// is left untouched by these tools. Falls back to Math.random where crypto is unavailable.
+function randomPercent(): number {
+  try {
+    const buffer = new Uint32Array(1);
+    window.crypto.getRandomValues(buffer);
+    return (buffer[0] / 2 ** 32) * 100;
+  } catch {
+    return Math.random() * 100;
+  }
+}
+
 function getStickyDraw(collectiveSlug: string, rolloutPercentage: number): boolean {
   let draws: StoredDraws;
   try {
@@ -122,7 +137,7 @@ function getStickyDraw(collectiveSlug: string, rolloutPercentage: number): boole
     return stored.enabled;
   }
 
-  const enabled = Math.random() * 100 >= rolloutPercentage;
+  const enabled = randomPercent() >= rolloutPercentage;
   draws[collectiveSlug] = { enabled, pct: rolloutPercentage };
   setLocalStorage(LOCAL_STORAGE_KEYS.OSC_TIP_EXPERIMENT_DRAWS, JSON.stringify(draws));
   return enabled;
@@ -155,7 +170,7 @@ const experiments: Record<Experiment, ExperimentConfig> = {
         return true;
       }
 
-      return Math.random() * 100 < getNewPlatformTipFlowRolloutPercentage();
+      return randomPercent() < getNewPlatformTipFlowRolloutPercentage();
     },
   },
   // OSC-only experiment for measuring the impact of platform tips on contributions.
@@ -177,7 +192,7 @@ const experiments: Record<Experiment, ExperimentConfig> = {
       const rolloutPercentage = getOscPlatformTipRolloutPercentage();
       const collectiveSlug = context?.collective?.slug;
       if (!collectiveSlug) {
-        return Math.random() * 100 >= rolloutPercentage;
+        return randomPercent() >= rolloutPercentage;
       }
 
       return getStickyDraw(collectiveSlug, rolloutPercentage);
