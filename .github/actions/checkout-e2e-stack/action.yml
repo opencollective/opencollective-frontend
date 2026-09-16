@@ -34,7 +34,6 @@ runs:
       id: resolve-api-ref
       shell: bash
       env:
-        GH_TOKEN: ${{ inputs.github-token }}
         API_REF_INPUT: ${{ inputs.api-ref }}
       run: |
         set -euo pipefail
@@ -46,13 +45,11 @@ runs:
 
         BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
         REPO_URL="https://github.com/opencollective/opencollective-api.git"
-        extra=()
-        if [ -n "${GH_TOKEN}" ]; then
-          extra=(-c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${GH_TOKEN}")
-        fi
 
+        # Do not add another Authorization extraheader: actions/checkout already
+        # sets one on the runner, and a second header makes GitHub return 400.
         resolve() {
-          git "${extra[@]}" ls-remote --heads "${REPO_URL}" "refs/heads/${1}" \
+          git ls-remote --heads "${REPO_URL}" "refs/heads/${1}" \
             | awk -v ref="refs/heads/${1}" '$2 == ref { print $1 }'
         }
 
