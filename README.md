@@ -21,7 +21,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ### Prerequisite
 
-1. Make sure you have Node.js version 20.x and NPM version >=9.0.0.
+1. Make sure you have Node.js version 24.x and NPM version 12.x.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
 
