@@ -235,6 +235,8 @@ const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) =>
 
   const { data, loading, refetch } = useQuery(expensesPageQuery, {
     variables,
+    // Revalidate on mount so newly submitted expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
 
   React.useEffect(() => {

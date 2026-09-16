@@ -189,7 +189,7 @@ const ApproveExpenseModalWrapper = ({
   );
 };
 
-const DuplicateExpenseFlowWrapper = ({
+export const DuplicateExpenseFlowWrapper = ({
   open,
   setOpen,
   expenseId,
