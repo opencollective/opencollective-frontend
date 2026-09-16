@@ -10,6 +10,7 @@ import { API_V1_CONTEXT, gql } from '@/lib/graphql/helpers';
 import type { FiscalHostingQuery } from '@/lib/graphql/types/v2/graphql';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
+import { adminPanelQuery } from '@/components/dashboard/queries';
 import I18nFormatters from '@/components/I18nFormatters';
 import { DocumentationLink } from '@/components/Link';
 
@@ -62,16 +63,22 @@ export const ToggleMoneyManagementButton = ({
   const intl = useIntl();
   const { toast } = useToast();
   const { showConfirmationModal } = useModal();
-  const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
-    refetchQueries,
-  });
+  const [editMoneyManagementAndHosting, { loading: mutating, data: mutationData }] = useMutation(
+    editMoneyManagementAndHostingMutation,
+    {
+      refetchQueries,
+    },
+  );
   const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },
   });
 
   const totalHostedAccounts = data?.host?.totalHostedAccounts;
-  const hasHosting = account.hasHosting;
-  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const updatedAccount = mutationData?.editOrganizationMoneyManagementAndHosting;
+  const hasHosting = updatedAccount?.hasHosting ?? account.hasHosting;
+  const hasMoneyManagement = updatedAccount
+    ? Boolean(updatedAccount.hasMoneyManagement)
+    : hasAccountMoneyManagement(account);
 
   const handleMoneyManagementUpdate = async ({ activate }) => {
     if (activate) {
@@ -173,17 +180,23 @@ export const ToggleFiscalHostingButton = ({
   const intl = useIntl();
   const { toast } = useToast();
   const { showConfirmationModal } = useModal();
-  const hasHosting = account.hasHosting;
-  const hasMoneyManagement = hasAccountMoneyManagement(account);
   const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },
   });
 
   const totalHostedAccounts = data?.host?.totalHostedAccounts;
 
-  const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
-    refetchQueries,
-  });
+  const [editMoneyManagementAndHosting, { loading: mutating, data: mutationData }] = useMutation(
+    editMoneyManagementAndHostingMutation,
+    {
+      refetchQueries,
+    },
+  );
+  const updatedAccount = mutationData?.editOrganizationMoneyManagementAndHosting;
+  const hasHosting = updatedAccount?.hasHosting ?? account.hasHosting;
+  const hasMoneyManagement = updatedAccount
+    ? Boolean(updatedAccount.hasMoneyManagement)
+    : hasAccountMoneyManagement(account);
 
   const handleFiscalHostUpdate = async ({ activate }) => {
     if (activate) {
@@ -265,6 +278,12 @@ const FiscalHosting = ({ collective, account }) => {
     {
       query: editCollectivePageQuery,
       context: API_V1_CONTEXT,
+      variables: {
+        slug: collective.slug,
+      },
+    },
+    {
+      query: adminPanelQuery,
       variables: {
         slug: collective.slug,
       },
