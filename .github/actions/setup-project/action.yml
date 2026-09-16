@@ -23,4 +23,4 @@ runs:
     - name: Install dependencies
       shell: bash
       if: steps.node-modules.outputs.cache-hit != 'true'
-      run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
+      run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit --no-fund

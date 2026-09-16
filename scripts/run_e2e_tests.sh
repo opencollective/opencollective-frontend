@@ -29,7 +29,7 @@ if [ -z "$FRONTEND_FOLDER" ]; then
 else
   cd $FRONTEND_FOLDER
 fi
-npm run start:ci &
+node server &
 FRONTEND_PID=$!
 cd -
 
@@ -99,7 +99,30 @@ wait_for_service PDF 127.0.0.1 3002
 echo ""
 echo "> Running cypress tests"
 
-npm run cypress:run -- ${CYPRESS_RECORD} --browser chromium --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
+SPEC_ARG=""
+if [ -n "${CYPRESS_SHARD:-}" ]; then
+  SHARD_COUNT="${CYPRESS_SHARD_COUNT:-5}"
+  mapfile -t ALL_SPECS < <(find test/cypress/integration -maxdepth 1 -type f \( -name '*.js' -o -name '*.ts' \) | LC_ALL=C sort)
+  SPECS=()
+  for i in "${!ALL_SPECS[@]}"; do
+    if (( i % SHARD_COUNT == CYPRESS_SHARD )); then
+      SPECS+=("${ALL_SPECS[$i]}")
+    fi
+  done
+  if [ ${#SPECS[@]} -eq 0 ]; then
+    echo "No specs for shard ${CYPRESS_SHARD}"
+    exit 1
+  fi
+  echo "> Shard ${CYPRESS_SHARD}/${SHARD_COUNT}: ${#SPECS[@]} specs"
+  printf '  %s\n' "${SPECS[@]}"
+  SPEC_ARG=$(IFS=,; echo "${SPECS[*]}")
+elif [ -n "${CYPRESS_TEST_FILES:-}" ]; then
+  SPEC_ARG="test/cypress/integration/${CYPRESS_TEST_FILES}"
+else
+  SPEC_ARG="test/cypress/integration"
+fi
+
+npm run cypress:run -- ${CYPRESS_RECORD} --browser chromium --env OC_ENV=$OC_ENV --spec "${SPEC_ARG}"
 
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then

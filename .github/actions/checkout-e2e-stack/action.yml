@@ -1,0 +1,132 @@
+name: Checkout E2E stack
+description: Checkout API (matching branch or pinned ref), images, and PDF for frontend E2E
+inputs:
+  api-ref:
+    description: Pin API checkout to this SHA or ref. If empty, resolve a matching branch then main.
+    required: false
+    default: ''
+  images-ref:
+    description: Pin images checkout to this SHA or ref. If empty, use the default branch.
+    required: false
+    default: ''
+  pdf-ref:
+    description: Pin PDF checkout to this SHA or ref. If empty, use the default branch.
+    required: false
+    default: ''
+  github-token:
+    description: Token used to resolve the API ref and check out stack repositories
+    required: false
+    default: ${{ github.token }}
+outputs:
+  api-ref:
+    description: Resolved API commit SHA
+    value: ${{ steps.record-refs.outputs.api-ref }}
+  images-ref:
+    description: Resolved images commit SHA
+    value: ${{ steps.record-refs.outputs.images-ref }}
+  pdf-ref:
+    description: Resolved PDF commit SHA
+    value: ${{ steps.record-refs.outputs.pdf-ref }}
+runs:
+  using: composite
+  steps:
+    - name: Resolve API ref
+      id: resolve-api-ref
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        API_REF_INPUT: ${{ inputs.api-ref }}
+      run: |
+        set -euo pipefail
+        if [ -n "${API_REF_INPUT}" ]; then
+          echo "api-ref=${API_REF_INPUT}" >> "${GITHUB_OUTPUT}"
+          echo "Using pinned API ref ${API_REF_INPUT}"
+          exit 0
+        fi
+
+        BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+        REPO_URL="https://github.com/opencollective/opencollective-api.git"
+        extra=()
+        if [ -n "${GH_TOKEN}" ]; then
+          extra=(-c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${GH_TOKEN}")
+        fi
+
+        resolve() {
+          git "${extra[@]}" ls-remote --heads "${REPO_URL}" "refs/heads/${1}" \
+            | awk -v ref="refs/heads/${1}" '$2 == ref { print $1 }'
+        }
+
+        SHA="$(resolve "${BRANCH}")"
+        if [ -z "${SHA}" ] && [ "${BRANCH}" != "main" ]; then
+          echo "No matching API branch '${BRANCH}', falling back to main"
+          SHA="$(resolve main)"
+        fi
+        if [ -z "${SHA}" ]; then
+          echo "Failed to resolve opencollective-api ref" >&2
+          exit 1
+        fi
+
+        echo "api-ref=${SHA}" >> "${GITHUB_OUTPUT}"
+        echo "Resolved API ref ${SHA}"
+
+    - name: Checkout (api)
+      uses: actions/checkout@v7
+      with:
+        repository: opencollective/opencollective-api
+        path: opencollective-api
+        ref: ${{ steps.resolve-api-ref.outputs.api-ref }}
+        token: ${{ inputs.github-token }}
+        persist-credentials: false
+
+    - name: Checkout (images)
+      if: ${{ inputs.images-ref == '' }}
+      uses: actions/checkout@v7
+      with:
+        repository: opencollective/opencollective-images
+        path: opencollective-images
+        token: ${{ inputs.github-token }}
+        persist-credentials: false
+
+    - name: Checkout (images - pinned)
+      if: ${{ inputs.images-ref != '' }}
+      uses: actions/checkout@v7
+      with:
+        repository: opencollective/opencollective-images
+        path: opencollective-images
+        ref: ${{ inputs.images-ref }}
+        token: ${{ inputs.github-token }}
+        persist-credentials: false
+
+    - name: Checkout (PDF)
+      if: ${{ inputs.pdf-ref == '' }}
+      uses: actions/checkout@v7
+      with:
+        repository: opencollective/opencollective-pdf
+        path: opencollective-pdf
+        token: ${{ inputs.github-token }}
+        persist-credentials: false
+
+    - name: Checkout (PDF - pinned)
+      if: ${{ inputs.pdf-ref != '' }}
+      uses: actions/checkout@v7
+      with:
+        repository: opencollective/opencollective-pdf
+        path: opencollective-pdf
+        ref: ${{ inputs.pdf-ref }}
+        token: ${{ inputs.github-token }}
+        persist-credentials: false
+
+    - name: Record stack refs
+      id: record-refs
+      shell: bash
+      run: |
+        set -euo pipefail
+        API_SHA="$(git -C opencollective-api rev-parse HEAD)"
+        IMAGES_SHA="$(git -C opencollective-images rev-parse HEAD)"
+        PDF_SHA="$(git -C opencollective-pdf rev-parse HEAD)"
+        echo "api-ref=${API_SHA}" >> "${GITHUB_OUTPUT}"
+        echo "images-ref=${IMAGES_SHA}" >> "${GITHUB_OUTPUT}"
+        echo "pdf-ref=${PDF_SHA}" >> "${GITHUB_OUTPUT}"
+        echo "API ${API_SHA}"
+        echo "images ${IMAGES_SHA}"
+        echo "PDF ${PDF_SHA}"
