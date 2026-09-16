@@ -7,7 +7,7 @@ ENV CYPRESS_INSTALL_BINARY 0
 
 # Install dependencies first
 COPY package*.json ./
-RUN npm install -g npm@12.0.2
+RUN npm install -g npm@12
 RUN npm install
 
 COPY . .
