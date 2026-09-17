@@ -29,7 +29,7 @@ if [ -z "$FRONTEND_FOLDER" ]; then
 else
   cd $FRONTEND_FOLDER
 fi
-npm run start:ci &
+node server &
 FRONTEND_PID=$!
 cd -
 

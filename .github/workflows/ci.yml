@@ -14,6 +14,10 @@ on:
       - synchronize
       - reopened
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 env:
   TZ: UTC
   OC_ENV: ci
@@ -28,7 +32,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 15
 
@@ -40,11 +44,19 @@ jobs:
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - name: Restore ESLint cache
+        uses: actions/cache@v6
+        with:
+          path: .eslintcache
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-eslint-${{ hashFiles('eslint.config.mjs', 'package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-eslint-${{ hashFiles('eslint.config.mjs', 'package-lock.json') }}-
 
       - run: npm run lint:quiet
 
   prettier:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 15
 
@@ -57,10 +69,18 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
+      - name: Restore Prettier cache
+        uses: actions/cache@v6
+        with:
+          path: .prettiercache
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-prettier-${{ hashFiles('.prettierrc', 'package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-prettier-${{ hashFiles('.prettierrc', 'package-lock.json') }}-
+
       - run: npm run prettier:check
 
   depcheck:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 15
 
@@ -76,7 +96,7 @@ jobs:
       - run: npm run depcheck
 
   ts-unused-exports:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 15
 
@@ -92,7 +112,7 @@ jobs:
       - run: npm run ts-unused-exports
 
   check-langs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 15
 
@@ -108,7 +128,7 @@ jobs:
       - run: npm run langs:check
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 15
 
@@ -125,25 +145,34 @@ jobs:
         uses: actions/cache@v6
         with:
           path: .next/cache
-          # Generate a new cache whenever packages or source files change
-          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('package-lock.json') }}-
 
       - name: Build
         run: PRESERVE_NEXT_CACHE=true npm run build
 
-      - name: Save NextJS build
-        uses: actions/cache@v6
+      # Stage to a non-hidden directory so upload-artifact cannot drop `.next`.
+      # Copy only; leave workspace `.next/cache` for the cache post-save step.
+      - name: Stage Next.js build
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/frontend-next
+          rsync -a --exclude cache/ .next/ /tmp/frontend-next/
+          test -f /tmp/frontend-next/BUILD_ID
+          test -f /tmp/frontend-next/routes-manifest.json
+
+      - name: Upload Next.js build
+        uses: actions/upload-artifact@v7
         with:
-          path: .next
-          key: ${{ runner.os }}-next-build-${{ github.sha }}
+          name: frontend-next
+          path: /tmp/frontend-next
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 15
 
@@ -156,22 +185,29 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run test:coverage
+      - name: Test
+        if: github.event_name != 'push' || github.ref != 'refs/heads/main'
+        run: npm run test:jest -- --reporters=default --reporters=jest-junit
+
+      - name: Test with coverage
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npm run test:coverage
 
       - name: Report coverage
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: GraphQL
 
       - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
         uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   typescript:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:
@@ -183,9 +219,25 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
+      - name: Restore TypeScript incremental cache
+        uses: actions/cache@v6
+        with:
+          path: tsconfig.tsbuildinfo
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-tsc-${{ hashFiles('tsconfig.json', 'package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-tsc-${{ hashFiles('tsconfig.json', 'package-lock.json') }}-
+
       - run: npm run type:check
 
+  e2e-prepare:
+    uses: ./.github/workflows/e2e-prepare.yml
+    secrets: inherit
+
   e2e:
-    needs: build
+    needs: [build, e2e-prepare]
     uses: ./.github/workflows/e2e.yml
+    with:
+      api-ref: ${{ needs.e2e-prepare.outputs.api-ref }}
+      images-ref: ${{ needs.e2e-prepare.outputs.images-ref }}
+      pdf-ref: ${{ needs.e2e-prepare.outputs.pdf-ref }}
     secrets: inherit

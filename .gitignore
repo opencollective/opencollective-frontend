@@ -40,6 +40,10 @@ test_results.xml
 tsconfig.tsbuildinfo
 next-env.d.ts
 
+# Tool caches
+.eslintcache
+.prettiercache
+
 # Frontend components build files
 scripts/publish-components/.tmp
 .rollup.cache
