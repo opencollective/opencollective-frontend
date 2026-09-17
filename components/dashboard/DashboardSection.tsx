@@ -216,7 +216,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
     return (
       <div className="w-full">
         <DashboardErrorBoundary>
-          <LegacySettingsComponent accountSlug={account.slug} subpath={subpath} />
+          <LegacySettingsComponent accountSlug={account.slug} account={account} subpath={subpath} />
         </DashboardErrorBoundary>
       </div>
     );
