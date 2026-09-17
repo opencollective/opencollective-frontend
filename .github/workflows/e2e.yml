@@ -3,7 +3,7 @@ name: E2E
 # Security: Do not switch this workflow to `pull_request_target` to run on fork PRs with secrets.
 # Use `pull_request` (secrets blocked for forks by default) or trusted push/workflow_dispatch instead.
 #
-# Branch protection: required checks are `e2e / e2e (0)` … `e2e / e2e (4)`.
+# Branch protection: required checks are `e2e / e2e (0*.(js|ts))` … `e2e / e2e (4*.(js|ts))`.
 
 on:
   workflow_call:
@@ -62,7 +62,7 @@ env:
 
 jobs:
   e2e:
-    name: e2e (${{ matrix.shard }})
+    name: e2e (${{ matrix.files }})
     runs-on: ubuntu-24.04
 
     timeout-minutes: 30
@@ -70,7 +70,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4]
+        files: ['0*.(js|ts)', '1*.(js|ts)', '2*.(js|ts)', '3*.(js|ts)', '4*.(js|ts)']
 
     services:
       redis:
@@ -264,8 +264,7 @@ jobs:
       - name: Run E2E with Cypress
         run: ./scripts/run_e2e_tests.sh
         env:
-          CYPRESS_SHARD: ${{ matrix.shard }}
-          CYPRESS_SHARD_COUNT: '5'
+          CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test recordings
         uses: actions/upload-artifact@v7
