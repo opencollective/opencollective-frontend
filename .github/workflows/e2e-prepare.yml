@@ -16,6 +16,12 @@ on:
         description: Resolved opencollective-pdf commit SHA
         value: ${{ jobs.prepare.outputs.pdf-ref }}
 
+# Reusable workflows do not inherit env from ci.yml. OC_ENV=ci skips the API
+# postinstall DB restore, which needs Postgres that this job does not run.
+env:
+  CI: true
+  OC_ENV: ci
+
 jobs:
   prepare:
     runs-on: ubuntu-24.04
