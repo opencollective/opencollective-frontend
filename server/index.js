@@ -4,7 +4,7 @@ const next = require('next');
 const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
-const cloudflareIps = require('cloudflare-ip/ips.json');
+const cloudflareIps = require('./cloudflare-ips.json');
 const isEmpty = require('lodash-es/isEmpty').default;
 const throng = require('throng');
 
