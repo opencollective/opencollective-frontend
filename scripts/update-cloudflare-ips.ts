@@ -7,7 +7,7 @@ import { writeFileSync } from 'fs';
 
 const output = process.argv[2] || 'server/cloudflare-ips.json';
 
-fetch('https://api.cloudflare.com/client/v4/ips')
+fetch('https://api.cloudflare.com/client/v4/ips', { signal: AbortSignal.timeout(10_000) })
   .then(res => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
   .then(({ result: { ipv4_cidrs: ipv4, ipv6_cidrs: ipv6 } }) => {
     writeFileSync(output, `${JSON.stringify([...ipv4, ...ipv6], null, 2)}\n`);
