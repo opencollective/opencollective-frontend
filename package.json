@@ -228,6 +228,7 @@
     "@types/webpack-env": "^1.18.5",
     "@typescript-eslint/eslint-plugin": "^8.60.1",
     "@typescript-eslint/parser": "^8.60.1",
+    "babel-plugin-react-compiler": "^1.0.0",
     "cheerio": "^1.0.0",
     "circular-dependency-plugin": "^5.2.2",
     "commitizen": "^4.3.2",
@@ -319,7 +320,8 @@
       "mocha-junit-reporter",
       "cypress-multi-reporters",
       "@jest/globals",
-      "cross-env"
+      "cross-env",
+      "babel-plugin-react-compiler"
     ]
   },
   "overrides": {

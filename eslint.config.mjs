@@ -22,13 +22,7 @@ export default defineConfig([
   pluginCypress.configs.recommended,
   jsxA11y.flatConfigs.recommended,
   styledA11y.flatConfigs.recommended,
-  {
-    plugins: { 'react-hooks': reactHooks },
-    rules: {
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
-    },
-  },
+  reactHooks.configs.flat.recommended,
   includeIgnoreFile(gitignorePath),
   globalIgnores(['lib/graphql/types/v2/*', 'lib/graphql/*.graphql']),
 
