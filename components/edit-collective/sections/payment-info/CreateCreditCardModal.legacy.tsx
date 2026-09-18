@@ -53,7 +53,7 @@ export default function CreateCreditCardModal({ account, open, onOpenChange, onU
       const { paymentMethod, stripeError } = res.data.addCreditCard;
       if (stripeError) {
         const stripe = await getStripe();
-        const result = await stripe.handleCardSetup(stripeError.response.setupIntent.client_secret);
+        const result = await stripe.confirmCardSetup(stripeError.response.setupIntent.client_secret);
         if (result.error) {
           throw result.error;
         } else {
