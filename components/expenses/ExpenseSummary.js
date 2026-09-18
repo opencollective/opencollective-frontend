@@ -6,6 +6,7 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { i18nGraphqlException } from '../../lib/errors';
+import { isExpenseOnHold } from '../../lib/expense';
 import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { cn } from '../../lib/utils';
@@ -198,7 +199,7 @@ const ExpenseSummary = ({
               <ExpenseStatusTag
                 display="block"
                 status={
-                  expense.onHold
+                  isExpenseOnHold(expense)
                     ? 'ON_HOLD'
                     : expense.type === ExpenseType.PLATFORM_BILLING && expense.status === ExpenseStatus.APPROVED
                       ? 'PAYMENT_DUE'
