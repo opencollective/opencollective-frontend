@@ -70,18 +70,24 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
   const hasQuickActionsPreviewEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
     PREVIEW_FEATURE_KEYS.TABLE_QUICK_ACTIONS,
   );
+  const { getActions, openDrawer, showQuickActions } = table.options.meta ?? {};
+  const rowActions = React.useMemo(() => {
+    if (!row.original || !getActions) {
+      return {};
+    }
+    // eslint-disable-next-line react-hooks/refs -- getActions stores the trigger ref for the actions menu; it does not read .current here
+    return getActions(row.original, actionsMenuTriggerRef) ?? {};
+  }, [getActions, row.original, actionsMenuTriggerRef]);
+  const { primary, secondary } = rowActions;
 
   if (!row.original) {
     return null;
   }
-  const { getActions, openDrawer, showQuickActions } = table.options.meta;
   const hasQuickActionsEnabled = showQuickActions || hasQuickActionsPreviewEnabled;
 
   if (!getActions) {
     return null;
   }
-
-  const { primary, secondary } = getActions(row.original, actionsMenuTriggerRef) ?? {};
   const hasNoActions = !primary?.length && !secondary?.length && !openDrawer;
 
   if (hasNoActions) {

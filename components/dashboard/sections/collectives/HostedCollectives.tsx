@@ -166,6 +166,7 @@ const HostedCollectivesList = ({ accountSlug: hostSlug, subpath }: DashboardSect
 
   React.useEffect(() => {
     if (!hasAccountProfile && subpath?.[0] !== ((showCollectiveOverview as Account)?.id || showCollectiveOverview)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync drawer state from URL subpath
       handleDrawer(subpath?.[0]);
     }
   }, [subpath?.[0], hasAccountProfile]);

@@ -216,7 +216,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
         refetchExpensePipelineOverview(client, { slug: hostSlug, currency: account.currency });
       }
     },
-    [refetch, refetchMetadata, client, hostSlug, account?.currency],
+    [refetch, refetchMetadata, client, hostSlug, account],
   );
 
   const onExpenseProcess = useCallback(

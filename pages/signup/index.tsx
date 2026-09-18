@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { findKey, omit, pick } from 'lodash-es';
+import { omit, pick } from 'lodash-es';
 import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -45,6 +45,16 @@ const getRedirectPathSafe = (router: NextRouter) => {
   return isRelativeHref(next) && next !== '/' ? next : null;
 };
 
+const getNextActionFlowFromQuery = (query: NextRouter['query']): NEXT_ACTION_FLOWS | null => {
+  if (query?.step === 'organization' || query?.organization === 'true') {
+    return NEXT_ACTION_FLOWS.ORGANIZATION;
+  }
+  if (query?.step === 'collective' || query?.collective === 'true') {
+    return NEXT_ACTION_FLOWS.COLLECTIVE;
+  }
+  return null;
+};
+
 enum NEXT_ACTION_FLOWS {
   ORGANIZATION = 'organization',
   COLLECTIVE = 'collective',
@@ -60,13 +70,7 @@ export const getServerSideProps = async ({ query }) => {
 // ts-unused-exports:disable-next-line
 export default function SignupPage(props) {
   const router = useRouter();
-  const [nextActionFlow, setNextActionFlow] = React.useState<NEXT_ACTION_FLOWS>(
-    findKey(NEXT_ACTION_FLOWS, f => f === router.query?.step) || router.query?.organization === 'true'
-      ? NEXT_ACTION_FLOWS.ORGANIZATION
-      : router.query?.collective === 'true'
-        ? NEXT_ACTION_FLOWS.COLLECTIVE
-        : null,
-  );
+  const nextActionFlow = getNextActionFlowFromQuery(router.query);
   const steps = React.useMemo(
     () =>
       nextActionFlow === NEXT_ACTION_FLOWS.ORGANIZATION
@@ -121,32 +125,28 @@ export default function SignupPage(props) {
 
   const me = data?.me;
   React.useLayoutEffect(() => {
-    if (router.query.step === 'organization' || router.query.organization === 'true') {
-      setNextActionFlow(NEXT_ACTION_FLOWS.ORGANIZATION);
-    } else if (router.query.step === 'collective' || router.query.collective === 'true') {
-      setNextActionFlow(NEXT_ACTION_FLOWS.COLLECTIVE);
-    }
-
-    if (me && step === steps[0]) {
-      if (me.requiresProfileCompletion) {
-        nextStep(SignupSteps.COMPLETE_PROFILE, omit(router.query, ['email']));
-      } else if (nextActionFlow === NEXT_ACTION_FLOWS.ORGANIZATION) {
-        nextStep(SignupSteps.CREATE_ORG);
-      } else if (nextActionFlow === NEXT_ACTION_FLOWS.COLLECTIVE) {
-        nextStep(SignupSteps.CREATE_COLLECTIVE);
-      } else {
-        // If the user is already logged in and not creating an org, redirect to home page
-        router.push(getRedirectPathSafe(router) || '/dashboard');
+    queueMicrotask(() => {
+      if (me && step === steps[0]) {
+        if (me.requiresProfileCompletion) {
+          nextStep(SignupSteps.COMPLETE_PROFILE, omit(router.query, ['email']));
+        } else if (nextActionFlow === NEXT_ACTION_FLOWS.ORGANIZATION) {
+          nextStep(SignupSteps.CREATE_ORG);
+        } else if (nextActionFlow === NEXT_ACTION_FLOWS.COLLECTIVE) {
+          nextStep(SignupSteps.CREATE_COLLECTIVE);
+        } else {
+          // If the user is already logged in and not creating an org, redirect to home page
+          router.push(getRedirectPathSafe(router) || '/dashboard');
+        }
+      } else if (
+        !me &&
+        !loading &&
+        step === SignupSteps.EMAIL_INPUT &&
+        router.query?.email &&
+        router.query?.step === 'verify'
+      ) {
+        nextStep(SignupSteps.VERIFY_OTP);
       }
-    } else if (
-      !me &&
-      !loading &&
-      step === SignupSteps.EMAIL_INPUT &&
-      router.query?.email &&
-      router.query?.step === 'verify'
-    ) {
-      nextStep(SignupSteps.VERIFY_OTP);
-    }
+    });
   }, [me, router, step, steps, nextActionFlow, loading, nextStep]);
 
   const progress = React.useMemo(() => (steps.indexOf(step) + 1) / steps.length, [step, steps]);

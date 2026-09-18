@@ -14,26 +14,29 @@ import FilterViews from './FilterViews';
 
 function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
   const filterKeys = React.useMemo(() => Object.keys(filters), [filters]);
-  const [displayedFilters, setDisplayedFilters] = React.useState(
+  const [displayedFilters, setDisplayedFilters] = React.useState(() =>
     filterKeys.filter(key => filterShouldDisplay(key, { values, filters, defaultSchemaValues, meta })),
   );
+
+  const [prevSyncKey, setPrevSyncKey] = React.useState(() => JSON.stringify({ values, meta, filterKeys }));
+  const syncKey = JSON.stringify({ values, meta, filterKeys });
+  if (syncKey !== prevSyncKey) {
+    setPrevSyncKey(syncKey);
+    const updatedKeys = filterKeys.filter(key =>
+      filterShouldDisplay(key, { values, filters, defaultSchemaValues, meta }),
+    );
+    setDisplayedFilters(prevDisplayed => {
+      const remainingKeys = prevDisplayed.filter(key => updatedKeys.includes(key));
+      const keysToAppend = updatedKeys.filter(key => !remainingKeys.includes(key));
+      return [...remainingKeys, ...keysToAppend];
+    });
+  }
 
   const remainingFilters = React.useMemo(
     () =>
       filterKeys.filter(key => filterShouldBeInAddFilterOptions(key, { values, filters, defaultSchemaValues, meta })),
     [filterKeys, values, filters, defaultSchemaValues, meta],
   );
-
-  // When the values change, this effect makes sure to update the displayed filter keys array and maintain the order of the filters
-  React.useEffect(() => {
-    const updatedKeys = filterKeys.filter(key =>
-      filterShouldDisplay(key, { values, filters, defaultSchemaValues, meta }),
-    );
-    const remainingKeys = displayedFilters.filter(key => updatedKeys.includes(key));
-    const keysToAppend = updatedKeys.filter(key => !remainingKeys.includes(key));
-
-    setDisplayedFilters([...remainingKeys, ...keysToAppend]);
-  }, [values, meta]);
 
   return { displayedFilters, remainingFilters };
 }

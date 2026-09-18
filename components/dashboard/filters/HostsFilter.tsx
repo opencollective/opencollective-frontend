@@ -90,8 +90,6 @@ const resultNodeToOption = account => ({
 });
 
 function HostsFilter({ ...props }: FilterComponentProps<z.infer<typeof schema>, object>) {
-  const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>([]);
-
   const [search, { loading, data }] = useLazyQuery(hostsFilterSearchQuery, {
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
@@ -109,11 +107,8 @@ function HostsFilter({ ...props }: FilterComponentProps<z.infer<typeof schema>, 
     [search],
   );
 
-  React.useEffect(() => {
-    if (!loading) {
-      setOptions(data?.accounts?.nodes.map(resultNodeToOption) || []);
-    }
-  }, [loading, data]);
+  const optionsFromQuery = !loading ? data?.accounts?.nodes.map(resultNodeToOption) || [] : undefined;
+  const options = optionsFromQuery ?? [];
 
   return <ComboSelectFilter options={options} loading={loading} searchFunc={searchFunc} {...props} />;
 }

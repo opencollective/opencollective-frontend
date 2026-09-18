@@ -89,6 +89,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
     if (resumeOrderId) {
       const order = orders.nodes.find(o => o.legacyId === parseInt(resumeOrderId));
       if (order) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- open edit flow from resumeOrderId query param
         setEditOrder({ order, action: 'editPaymentMethod' });
         const [url, rawQuery] = router.asPath.split('?');
         const queryParams = new URLSearchParams(rawQuery);

@@ -20,14 +20,11 @@ import FeaturedFiscalHostResults from './FeaturedFiscalHostResults';
 import OtherFiscalHostResults from './OtherFiscalHostResults';
 
 function useNonEmptyResultCache(data: FindAFiscalHostQuery) {
-  const nonEmptyResult = React.useRef(data);
-  React.useEffect(() => {
-    if (data && data?.hosts?.nodes?.length !== 0) {
-      nonEmptyResult.current = data;
-    }
-  }, [data]);
-
-  return nonEmptyResult.current;
+  const [cachedNonEmptyResult, setCachedNonEmptyResult] = React.useState(data);
+  if (data?.hosts?.nodes?.length !== 0 && data !== cachedNonEmptyResult) {
+    setCachedNonEmptyResult(data);
+  }
+  return data?.hosts?.nodes?.length !== 0 ? data : cachedNonEmptyResult;
 }
 
 const findAFiscalHostQuery = gql`
@@ -98,10 +95,12 @@ export default function FindAHostSearch(props: {
     props.selectedCountry !== 'ALL' ||
     props.selectedCurrency !== 'ANY';
 
-  // Return to first page when filters change.
-  React.useEffect(() => {
+  const filterKey = `${props.searchTerm}-${props.selectedCountry}-${props.selectedCurrency}-${props.communityTags.join(',')}`;
+  const [queryPageFilterKey, setQueryPageFilterKey] = React.useState(filterKey);
+  if (filterKey !== queryPageFilterKey) {
+    setQueryPageFilterKey(filterKey);
     setQueryPage(1);
-  }, [props.communityTags, props.selectedCountry, props.selectedCurrency, props.searchTerm]);
+  }
 
   const onPageChange = React.useCallback(
     (page: number) => {

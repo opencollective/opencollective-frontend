@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
@@ -164,12 +164,9 @@ export const ConfirmContributionForm = ({
   const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation);
   const isOriginalAmount = amountReceived === amountInitiated;
 
-  // When amount received equals the original initiated amount, force the original platform tip
-  useEffect(() => {
-    if (isOriginalAmount && platformTip !== defaultPlatformTip) {
-      setPlatformTip(defaultPlatformTip);
-    }
-  }, [isOriginalAmount, platformTip, defaultPlatformTip]);
+  if (isOriginalAmount && platformTip !== defaultPlatformTip) {
+    setPlatformTip(defaultPlatformTip);
+  }
 
   const contributionAmount = amountReceived - platformTip;
   const grossContributionAmount = Math.round(contributionAmount / (1 + taxPercent / 100));

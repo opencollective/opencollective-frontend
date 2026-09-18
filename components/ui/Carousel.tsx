@@ -102,11 +102,14 @@ function Carousel({
     if (!api) {
       return;
     }
-    onSelect(api);
+    const handleInitialSelect = () => onSelect(api);
+    const initialSelectTimeout = window.setTimeout(handleInitialSelect, 0);
     api.on('reInit', onSelect);
     api.on('select', onSelect);
 
     return () => {
+      window.clearTimeout(initialSelectTimeout);
+      api?.off('reInit', onSelect);
       api?.off('select', onSelect);
     };
   }, [api, onSelect]);

@@ -416,11 +416,12 @@ export const MatchDebitDialog = ({
   const loading = queryFilter.activeViewId === TabType.CONTRIBUTIONS ? contributionsLoading : expensesLoading;
   const error = queryFilter.activeViewId === TabType.CONTRIBUTIONS ? contributionsError : expensesError;
 
-  // When switching tab, clear selection
-  React.useEffect(() => {
+  const [prevActiveViewId, setPrevActiveViewId] = React.useState(queryFilter.activeViewId);
+  if (queryFilter.activeViewId !== prevActiveViewId) {
+    setPrevActiveViewId(queryFilter.activeViewId);
     setSelectedExpense(null);
     setSelectedContribution(null);
-  }, [queryFilter.activeViewId]);
+  }
 
   // When opening the modal, make sure we reset the filters to their default values
   React.useEffect(() => {

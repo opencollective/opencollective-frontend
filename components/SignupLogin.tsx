@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -34,13 +34,8 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
   className,
   whitelabel,
 }) => {
-  const redirectAfterSigninRef = useRef('/');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      redirectAfterSigninRef.current = window.location.href.replace(/^https?:\/\/[^/]+/, '');
-    }
-  }, []);
+  const redirectAfterSignin =
+    typeof window !== 'undefined' ? window.location.href.replace(/^https?:\/\/[^/]+/, '') : '/';
 
   const label = <FormattedMessage id="LogIn" defaultMessage="Log In" />;
 
@@ -133,7 +128,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
       )}
 
       <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="sm">
-        <Link href={{ pathname: '/signin', query: { next: redirectAfterSigninRef.current } }}>
+        <Link href={{ pathname: '/signin', query: { next: redirectAfterSignin } }}>
           {loadingLoggedInUser ? <Spinner size="1em" /> : label}
         </Link>
       </Button>

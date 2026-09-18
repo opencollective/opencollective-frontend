@@ -70,17 +70,19 @@ const ignoreOnWheel = e => {
 
 /** Returns the minimum width for an amount input, auto-adjusting to the number of digits */
 const useAmountInputMinWidth = (value, max = 1000000000) => {
-  const prevValue = React.useRef(value);
+  const [lastValidWidth, setLastValidWidth] = React.useState('0.7em');
 
   // Do not change size if value becomes invalid (to prevent jumping)
   if (typeof value?.toFixed !== 'function') {
-    return prevValue.current || '0.7em';
+    return lastValidWidth;
   }
 
   const maxLength = max.toString().length;
   const valueLength = clamp(value.toFixed(2).length, 1, maxLength);
   const result = `${valueLength * 0.7}em`;
-  prevValue.current = result;
+  if (result !== lastValidWidth) {
+    setLastValidWidth(result);
+  }
   return result;
 };
 

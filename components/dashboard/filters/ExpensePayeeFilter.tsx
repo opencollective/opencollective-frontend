@@ -68,11 +68,14 @@ function ExpensePayeeFilter({
   values,
   ...props
 }: FilterComponentProps<z.infer<typeof schema>, ExpensePayeeFilterMeta, RequiredFilterValueTypes>) {
-  const [options, setOptions] = React.useState<{ label: React.ReactNode; keywords: string[]; value: string }[]>([]);
   const [search, { loading, data }] = useLazyQuery(expensePayeeFilterSearchQuery, {
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
   });
+
+  const optionsFromQuery =
+    !loading && data?.expenses?.payees?.nodes ? data.expenses.payees.nodes.map(resultNodeToOption) : undefined;
+  const options = optionsFromQuery ?? [];
 
   const accountScope = React.useMemo(
     () =>
@@ -103,12 +106,6 @@ function ExpensePayeeFilter({
   React.useEffect(() => {
     searchFunc('');
   }, [searchFunc]);
-
-  React.useEffect(() => {
-    if (!loading && data?.expenses?.payees?.nodes) {
-      setOptions(data.expenses.payees.nodes.map(resultNodeToOption));
-    }
-  }, [loading, data]);
 
   return <ComboSelectFilter options={options} loading={loading} searchFunc={searchFunc} isMulti {...props} />;
 }

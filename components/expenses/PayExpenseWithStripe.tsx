@@ -35,7 +35,7 @@ type PayExpenseWithStripeProps = {
 
 export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
   const intl = useIntl();
-  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = React.useState(null);
+  const [selectedPaymentMethodIdOverride, setSelectedPaymentMethodIdOverride] = React.useState(null);
   const [isConfirmingPayment, setIsConfirmingPayment] = React.useState(false);
   const [isConfirmingExpenseStatus, setIsConfirmingExpenseStatus] = React.useState(false);
   const [paymentElementData, setPaymentElementData] = React.useState(null);
@@ -64,13 +64,12 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
     return (paymentMethodsData?.account?.paymentMethods ?? []).filter(filter);
   }, [paymentIntent, paymentMethodsData?.account?.paymentMethods]);
 
-  React.useEffect(() => {
-    if (selectedPaymentMethodId || loading) {
-      return;
-    }
-
-    setSelectedPaymentMethodId(savedPaymentMethods?.length ? savedPaymentMethods[0].id : 'new-payment-method');
-  }, [savedPaymentMethods, selectedPaymentMethodId, loading]);
+  const defaultSelectedPaymentMethodId = loading
+    ? null
+    : savedPaymentMethods?.length
+      ? savedPaymentMethods[0].id
+      : 'new-payment-method';
+  const selectedPaymentMethodId = selectedPaymentMethodIdOverride ?? defaultSelectedPaymentMethodId;
 
   const options: StripeElementsOptions = {
     clientSecret: paymentIntent?.client_secret,
@@ -186,7 +185,11 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
       {isConfirmingExpenseStatus ? (
         <Skeleton className="h-6 w-full" />
       ) : savedPaymentMethods?.length ? (
-        <RadioGroup id="paymentMethod" value={selectedPaymentMethodId} onValueChange={setSelectedPaymentMethodId}>
+        <RadioGroup
+          id="paymentMethod"
+          value={selectedPaymentMethodId}
+          onValueChange={setSelectedPaymentMethodIdOverride}
+        >
           {savedPaymentMethods.map(pm => (
             <RadioGroupCard key={pm.id} value={pm.id}>
               <div>{getPaymentMethodIcon(pm)}</div>

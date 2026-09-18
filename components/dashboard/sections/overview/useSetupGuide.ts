@@ -10,19 +10,16 @@ import { editAccountSettingMutation } from './queries';
 export function useSetupGuide(): [boolean | undefined, (open: boolean) => Promise<void>] {
   const { account } = React.useContext(DashboardContext);
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
-  const [showSetupGuide, setShowSetupGuide] = React.useState<boolean | undefined>(undefined);
+  const [showSetupGuideOverride, setShowSetupGuideOverride] = React.useState<boolean | undefined>(undefined);
   const [editAccountSetting] = useMutation(editAccountSettingMutation);
 
-  React.useEffect(() => {
-    if (showSetupGuide === undefined && LoggedInUser && account) {
-      const showGuide = LoggedInUser.shouldDisplaySetupGuide(account);
-      setShowSetupGuide(showGuide !== false);
-    }
-  }, [showSetupGuide, LoggedInUser, account]);
+  const defaultShowSetupGuide =
+    LoggedInUser && account ? LoggedInUser.shouldDisplaySetupGuide(account) !== false : undefined;
+  const showSetupGuide = showSetupGuideOverride ?? defaultShowSetupGuide;
 
   const handleSetupGuideToggle = React.useCallback(
     async (open: boolean) => {
-      setShowSetupGuide(open);
+      setShowSetupGuideOverride(open);
       await editAccountSetting({
         variables: {
           account: { legacyId: LoggedInUser.collective.id },

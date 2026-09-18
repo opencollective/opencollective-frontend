@@ -39,13 +39,13 @@ export default function AgreementDrawer({
 }: AgreementDrawerProps) {
   const [isEditing, setEditing] = React.useState<boolean>(initialIsEditing);
   const [filesViewerOpen, setFilesViewerOpen] = React.useState<boolean>(false);
+  const openSyncKey = open ? `${agreement?.id ?? 'new'}-${initialIsEditing}` : null;
+  const [lastOpenSyncKey, setLastOpenSyncKey] = React.useState<string | null>(null);
 
-  // Reset editing state when drawer opens/closes or agreement changes
-  React.useEffect(() => {
-    if (open) {
-      setEditing(initialIsEditing);
-    }
-  }, [open, initialIsEditing, agreement]);
+  if (open && openSyncKey !== lastOpenSyncKey) {
+    setLastOpenSyncKey(openSyncKey);
+    setEditing(initialIsEditing);
+  }
 
   const closeDrawer = React.useCallback(() => {
     setEditing(false);

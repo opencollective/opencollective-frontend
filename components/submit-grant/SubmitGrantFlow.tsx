@@ -234,11 +234,11 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const intl = useIntl();
   const formRef = React.useRef<HTMLFormElement>(undefined);
 
-  const startOptions = React.useRef<ExpenseForm['startOptions']>({
+  const startOptions: ExpenseForm['startOptions'] = {
     expenseId: props.expenseId,
     draftKey: props.draftKey,
     duplicateExpense: props.duplicateGrant,
-  });
+  };
 
   const onError = React.useCallback(
     err => {
@@ -288,7 +288,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
         data: {},
       },
     },
-    startOptions: startOptions.current,
+    startOptions,
     handleOnSubmit: true,
     onSuccess,
     onError,

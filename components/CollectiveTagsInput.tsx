@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
@@ -95,10 +95,6 @@ const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
   />
 );
 
-const debouncedSearch = debounce((searchFunc, variables) => {
-  return searchFunc({ variables });
-}, 500);
-
 function CollectiveTagsInput({
   defaultValue = [],
   onChange,
@@ -110,10 +106,21 @@ function CollectiveTagsInput({
 }) {
   const intl = useIntl();
   const [searchTags, { loading: fetching, data }] = useLazyQuery(searchTagsQuery);
-  const [debouncing, setDebouncing] = useState<boolean>(false);
-  const loading = fetching || debouncing;
   const [input, setInput] = useState<string>('');
-  const [options, setOptions] = useState<TagOption[]>([]);
+  const [debouncedInput, setDebouncedInput] = useState<string>('');
+  const debouncing = Boolean(input?.length) && input !== debouncedInput;
+  if (!input?.length && debouncedInput) {
+    setDebouncedInput('');
+  }
+  const loading = fetching || debouncing;
+  const debouncedSearchTags = useMemo(
+    () =>
+      debounce((term: string) => {
+        setDebouncedInput(term);
+        searchTags({ variables: { term } });
+      }, 500),
+    [searchTags],
+  );
   const [selected, setSelected] = useState<TagOption[]>(defaultValue?.map(tag => ({ label: tag, value: tag })) || []);
   const [draggingTag, setDraggingTag] = useState<string | null>(null);
 
@@ -123,31 +130,25 @@ function CollectiveTagsInput({
 
   useEffect(() => {
     if (input?.length) {
-      setDebouncing(true);
-      debouncedSearch(searchTags, {
-        term: input,
-      });
+      debouncedSearchTags(input);
     } else {
       // Skip debouncing when input is empty (on initial load for instance)
       searchTags();
     }
-  }, [input]);
+  }, [input, debouncedSearchTags, searchTags]);
 
-  useEffect(() => {
-    if (!fetching) {
-      setOptions(
-        data?.tagStats?.nodes
-          .filter(({ tag }) => !IGNORED_TAGS.includes(tag))
-          .map(({ tag }) => ({
-            label: tag,
-            value: tag,
-          })) || [],
-      );
-      setDebouncing(false);
-    }
-  }, [fetching, data]);
+  const options = useMemo(
+    () =>
+      data?.tagStats?.nodes
+        ?.filter(({ tag }) => !IGNORED_TAGS.includes(tag))
+        .map(({ tag }) => ({
+          label: tag,
+          value: tag,
+        })) || [],
+    [data],
+  );
 
-  function handleDragOver(event) {
+  const handleDragOver = useCallback(event => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -157,15 +158,16 @@ function CollectiveTagsInput({
         return arrayMove(selected, oldIndex, newIndex);
       });
     }
-  }
+  }, []);
 
   // Fix to avoid infinite loop caused by dragging over two items with variable sizes: https://github.com/clauderic/dnd-kit/issues/44#issuecomment-1018686592
-  const debouncedDragOver = useCallback(
-    debounce(handleDragOver, 40, {
-      trailing: false,
-      leading: true,
-    }),
-    [],
+  const debouncedDragOver = useMemo(
+    () =>
+      debounce((event: Parameters<typeof handleDragOver>[0]) => handleDragOver(event), 40, {
+        trailing: false,
+        leading: true,
+      }),
+    [handleDragOver],
   );
 
   function handleDragStart(event) {

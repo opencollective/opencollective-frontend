@@ -75,6 +75,24 @@ function buildTransactionGroups(order: ContributionDrawerQuery['order']): Transa
   }));
 }
 
+function applyCollapseGroups(items: OrderTimelineItem[]): OrderTimelineItem[] {
+  let lastCollapseGroup;
+  return items.map((item, i, arr) => {
+    const lastItem = i - 1 >= 0 ? arr[i - 1] : null;
+
+    if (lastItem?.collapsable && !item.collapsable) {
+      lastCollapseGroup = lastItem.id;
+      return { ...item, collapseGroup: lastItem.id };
+    } else if (lastCollapseGroup && !item.collapsable) {
+      return { ...item, collapseGroup: lastCollapseGroup };
+    } else {
+      lastCollapseGroup = null;
+    }
+
+    return item;
+  });
+}
+
 function getTransactionsUrl(
   LoggedInUser: LoggedInUser,
   order: ContributionDrawerQuery['order'] | ManagedOrderFieldsFragment,
@@ -395,23 +413,8 @@ function ContributionTimeline(props: OrderTimelineProps) {
     type: 'info',
   });
 
-  let lastCollapseGroup;
-  const timeline: OrderTimelineItem[] = sortBy([...activities, ...transactions, ...otherActivities], 'date')
-    .reverse()
-    .map((item, i, arr) => {
-      const lastItem = i - 1 >= 0 ? arr[i - 1] : null;
-
-      if (lastItem?.collapsable && !item.collapsable) {
-        lastCollapseGroup = lastItem.id;
-        return { ...item, collapseGroup: lastItem.id };
-      } else if (lastCollapseGroup && !item.collapsable) {
-        return { ...item, collapseGroup: lastCollapseGroup };
-      } else {
-        lastCollapseGroup = null;
-      }
-
-      return item;
-    });
+  const sortedTimelineItems = sortBy([...activities, ...transactions, ...otherActivities], 'date').reverse();
+  const timeline = applyCollapseGroups(sortedTimelineItems);
 
   return (
     <ol className="mt-3 pl-3">

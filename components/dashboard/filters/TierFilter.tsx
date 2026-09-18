@@ -93,47 +93,46 @@ function TierFilter({
   });
 
   // Get tiers for the selected account, or all tiers grouped by account if none selected
-  const { tierOptions, groupedOptions } = React.useMemo(() => {
-    if (!data?.account) {
-      return { tierOptions: [], groupedOptions: undefined };
-    }
+  let tierOptions: { label: string; value: string }[] = [];
+  let groupedOptions: { label: string; options: { label: string; value: string }[] }[] | undefined;
 
-    // If an account is selected, show only its tiers
-    if (meta.selectedAccountSlug) {
-      const account =
-        meta.selectedAccountSlug === meta.accountSlug
-          ? data.account
-          : data.account.childrenAccounts?.nodes?.find(child => child.slug === meta.selectedAccountSlug);
+  if (!data?.account) {
+    tierOptions = [];
+    groupedOptions = undefined;
+  } else if (meta.selectedAccountSlug) {
+    const account =
+      meta.selectedAccountSlug === meta.accountSlug
+        ? data.account
+        : data.account.childrenAccounts?.nodes?.find(child => child.slug === meta.selectedAccountSlug);
 
-      const tiers = account?.tiers?.nodes?.map(tier => ({ label: tier.name, value: tier.id })) || [];
-      return { tierOptions: tiers, groupedOptions: undefined };
-    }
-
-    // No account selected - show all tiers, grouped by account
+    tierOptions = account?.tiers?.nodes?.map(tier => ({ label: tier.name, value: tier.id })) || [];
+    groupedOptions = undefined;
+  } else {
     const hasChildren = data.account.childrenAccounts?.nodes?.length > 0;
     if (!hasChildren) {
-      const tiers = data.account.tiers?.nodes?.map(tier => ({ label: tier.name, value: tier.id })) || [];
-      return { tierOptions: tiers, groupedOptions: undefined };
-    }
-
-    const groups: { label: string; options: { label: string; value: string }[] }[] = [];
-    if (data.account.tiers?.nodes?.length) {
-      groups.push({
-        label: data.account.name,
-        options: data.account.tiers.nodes.map(tier => ({ label: tier.name, value: tier.id })),
-      });
-    }
-    data.account.childrenAccounts.nodes.forEach(childAccount => {
-      if (childAccount.tiers?.nodes?.length) {
+      tierOptions = data.account.tiers?.nodes?.map(tier => ({ label: tier.name, value: tier.id })) || [];
+      groupedOptions = undefined;
+    } else {
+      const groups: { label: string; options: { label: string; value: string }[] }[] = [];
+      if (data.account.tiers?.nodes?.length) {
         groups.push({
-          label: childAccount.name,
-          options: childAccount.tiers.nodes.map(tier => ({ label: tier.name, value: tier.id })),
+          label: data.account.name,
+          options: data.account.tiers.nodes.map(tier => ({ label: tier.name, value: tier.id })),
         });
       }
-    });
+      data.account.childrenAccounts.nodes.forEach(childAccount => {
+        if (childAccount.tiers?.nodes?.length) {
+          groups.push({
+            label: childAccount.name,
+            options: childAccount.tiers.nodes.map(tier => ({ label: tier.name, value: tier.id })),
+          });
+        }
+      });
 
-    return { tierOptions: [], groupedOptions: groups.length > 0 ? groups : undefined };
-  }, [data?.account, meta.selectedAccountSlug, meta.accountSlug]);
+      tierOptions = [];
+      groupedOptions = groups.length > 0 ? groups : undefined;
+    }
+  }
 
   // Auto-unselect tiers that don't belong to selected account
   React.useEffect(() => {

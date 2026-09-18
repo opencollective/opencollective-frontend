@@ -52,21 +52,19 @@ export default function TwoFactorAuthenticationModal() {
 
   const prompt = useTwoFactorAuthenticationPrompt();
   const isOpen = prompt?.isOpen ?? false;
-  const supportedMethods = React.useMemo(() => {
-    return (prompt?.supportedMethods ?? []).filter(method => {
-      return method !== 'recovery_code' || prompt?.allowRecovery;
-    });
-  }, [prompt?.supportedMethods, prompt.allowRecovery]);
+  const supportedMethods = (prompt?.supportedMethods ?? []).filter(method => {
+    return method !== 'recovery_code' || prompt?.allowRecovery;
+  });
 
-  const [selectedMethod, setSelectedMethod] = React.useState(initialMethod(supportedMethods));
+  const defaultSelectedMethod = initialMethod(supportedMethods);
+  const [selectedMethodOverride, setSelectedMethodOverride] = React.useState<string | null>(null);
+  const selectedMethod =
+    selectedMethodOverride && supportedMethods.includes(selectedMethodOverride)
+      ? selectedMethodOverride
+      : defaultSelectedMethod;
+  const setSelectedMethod = setSelectedMethodOverride;
   const [twoFactorCode, setTwoFactorCode] = React.useState('');
   const [confirming, setConfirming] = React.useState(false);
-
-  React.useEffect(() => {
-    if (supportedMethods.length > 0) {
-      setSelectedMethod(initialMethod(supportedMethods));
-    }
-  }, [supportedMethods]);
 
   const useWebAuthn = React.useCallback(async () => {
     setLocalStorage(LOCAL_STORAGE_KEYS.PREFERRED_TWO_FACTOR_METHOD, 'webauthn');

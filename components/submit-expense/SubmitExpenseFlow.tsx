@@ -283,11 +283,11 @@ function ExpenseFormikContainer(props: {
 }) {
   const formRef = React.useRef<HTMLFormElement>(undefined);
 
-  const startOptions = React.useRef({
+  const startOptions = {
     draftKey: props.draftKey,
     duplicateExpense: props.duplicateExpense,
     expenseId: props.expenseId,
-  });
+  };
 
   const [activeStep, setActiveStep] = React.useState(Step.WHO_IS_PAYING);
   const onVisibleSectionChange = React.useCallback(v => setActiveStep(v as Step), []);
@@ -320,7 +320,7 @@ function ExpenseFormikContainer(props: {
         data: {},
       },
     },
-    startOptions: startOptions.current,
+    startOptions,
     handleOnSubmit: true,
     customData: props.customData,
     onSuccess: props.onSuccess,

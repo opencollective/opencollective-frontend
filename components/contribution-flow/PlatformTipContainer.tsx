@@ -152,10 +152,11 @@ type PlatformTipContainerProps = {
 export function PlatformTipContainer(props: PlatformTipContainerProps) {
   const intl = useIntl();
   const [isCollapsed, setIsCollapsed] = React.useState(true);
-
-  React.useEffect(() => {
+  const [collapsedForStep, setCollapsedForStep] = React.useState(props.step);
+  if (props.step !== collapsedForStep) {
+    setCollapsedForStep(props.step);
     setIsCollapsed(true);
-  }, [props.step]);
+  }
 
   const percentage = props.value && props.amount && props.amount > 0 ? props.value / props.amount : 0;
 

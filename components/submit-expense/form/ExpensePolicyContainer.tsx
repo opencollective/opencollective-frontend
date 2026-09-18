@@ -16,21 +16,16 @@ type ExpensePolicyContainerProps = {
 };
 
 export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
-  const [isOpen, setIsOpen] = React.useState(!props.checked);
+  const [isOpenWhenChecked, setIsOpenWhenChecked] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    if (!props.checked) {
-      setIsOpen(true);
-    }
-  }, [props.checked]);
+  const isOpen = !props.checked ? true : isOpenWhenChecked;
 
   return (
     <Collapsible
       asChild
       onOpenChange={open => {
         if (props.checked) {
-          setIsOpen(open);
+          setIsOpenWhenChecked(open);
         }
       }}
       open={isOpen}
@@ -58,7 +53,7 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
                     onCheckedChange={v => {
                       props.onAcknowledgedChanged(v as boolean);
                       if (v) {
-                        setIsOpen(false);
+                        setIsOpenWhenChecked(false);
                         window.setTimeout(() => {
                           containerRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
                         }, 220);

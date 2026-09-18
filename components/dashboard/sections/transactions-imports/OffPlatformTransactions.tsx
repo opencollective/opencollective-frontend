@@ -312,7 +312,6 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   const [focus, setFocus] = React.useState<{ rowId: string; noteForm?: boolean } | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
   const apolloClient = useApolloClient();
-  const [pollInterval, setPollInterval] = React.useState<number>(0); // Do not poll by default
 
   const [selection, dispatchSelection] = React.useReducer(
     multiPagesRowSelectionReducer,
@@ -330,13 +329,12 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
     },
   });
 
-  const { data, loading, error, refetch, variables } = useQuery<
+  const { data, loading, error, refetch, variables, startPolling, stopPolling } = useQuery<
     OffPlatformTransactionsQuery,
     OffPlatformTransactionsQueryVariables
   >(offPlatformTransactionsQuery, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
-    pollInterval,
     variables: {
       hostSlug: accountSlug,
       hasImportFilter: Boolean(queryFilter.variables.importIds?.length),
@@ -352,6 +350,14 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
   const importData = data?.transactionsImport;
   const isInitialSync = Boolean(importData && !importData?.lastSyncAt && importData?.connectedAccount);
+
+  React.useEffect(() => {
+    if (isInitialSync) {
+      startPolling(3_000);
+      return () => stopPolling();
+    }
+    stopPolling();
+  }, [isInitialSync, startPolling, stopPolling]);
 
   const { getActions, setRowsStatus } = useTransactionsImportActions({
     host,
@@ -377,15 +383,6 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   React.useEffect(() => {
     dispatchSelection({ type: 'CLEAR' });
   }, [variables]);
-
-  // Adapt poll interval for first sync
-  React.useEffect(() => {
-    if (isInitialSync && !pollInterval) {
-      setPollInterval(3_000);
-    } else if (!isInitialSync && pollInterval) {
-      setPollInterval(0);
-    }
-  }, [pollInterval, isInitialSync]);
 
   const filtersMeta = React.useMemo(() => {
     return {

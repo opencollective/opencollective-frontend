@@ -53,11 +53,15 @@ const shouldRedirectDirectly = urlStr => {
  */
 const ExternalRedirectPage = () => {
   const router = useRouter();
-  const [isReady, setReady] = React.useState(false);
   const [pendingAction, setPendingAction] = React.useState(false);
   const query = router?.query || {};
   const fallback = getFallback(query.fallback);
   const shouldRedirectParent = parseToBoolean(query.shouldRedirectParent);
+  const isReady =
+    Boolean(query.url) &&
+    !isValidRelativeUrl(query.url) &&
+    isValidExternalRedirect(query.url) &&
+    !shouldRedirectDirectly(query.url);
 
   React.useEffect(() => {
     if (router && !query.url) {
@@ -72,10 +76,8 @@ const ExternalRedirectPage = () => {
       } else {
         router.push(query.url);
       }
-    } else {
-      setReady(true);
     }
-  }, [router, query.url]);
+  }, [router, query.url, fallback, shouldRedirectParent]);
 
   return (
     <Page noRobots>

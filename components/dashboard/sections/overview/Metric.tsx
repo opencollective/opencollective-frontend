@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { clsx } from 'clsx';
 import { isNil } from 'lodash-es';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
@@ -89,7 +89,7 @@ export function Metric({
   const effectiveAmount = showViewToggle && view === 'count' ? undefined : amount;
   const effectiveCount = showViewToggle && view === 'amount' ? undefined : count;
 
-  const countTimeseries = useMemo(() => {
+  const countTimeseries = (() => {
     if (!timeseries?.current) {
       return undefined;
     }
@@ -106,7 +106,7 @@ export function Metric({
       comparison: timeseries.comparison ? transformNodes(timeseries.comparison) : undefined,
       currency: undefined as Currency | undefined,
     };
-  }, [timeseries]);
+  })();
 
   const effectiveTimeseries = showViewToggle && view === 'count' ? countTimeseries : timeseries;
   const effectiveTimeseriesHasNonZeroNodes =

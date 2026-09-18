@@ -323,7 +323,7 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
   });
 
   const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== orderId;
-  const dropdownTriggerRef = React.useRef(undefined);
+  const dropdownTriggerRef = React.useMemo(() => ({ current: undefined as HTMLButtonElement | undefined }), []);
   const order = query.data?.order;
   const contributorAccount = order?.fromAccount?.mainProfile ?? order?.fromAccount;
   const contributorLegalName =
@@ -334,10 +334,7 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
     [order],
   );
 
-  const actions = React.useMemo(
-    () => (order ? getActions(order, dropdownTriggerRef) : null),
-    [order, getActions, dropdownTriggerRef],
-  );
+  const actions = order ? getActions(order, dropdownTriggerRef) : null;
 
   return (
     <Sheet open={open} onOpenChange={isOpen => !isOpen && onClose()}>

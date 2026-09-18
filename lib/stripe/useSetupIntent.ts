@@ -38,6 +38,7 @@ export default function useSetupIntent({
 
   React.useEffect(() => {
     async function load() {
+      setLoading(true);
       if (typeof window.Stripe === 'undefined') {
         await loadScriptAsync('https://js.stripe.com/v3/');
       }
@@ -82,7 +83,6 @@ export default function useSetupIntent({
       return;
     }
 
-    setLoading(true);
     load();
 
     return () => {

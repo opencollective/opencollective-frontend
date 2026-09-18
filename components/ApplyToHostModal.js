@@ -247,7 +247,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   const [applyToHost, { loading: submitting }] = useMutation(applyToHostMutation);
   const intl = useIntl();
   const { toast } = useToast();
-  const [step, setStep] = React.useState(STEPS.INFORMATION);
+  const [userStep, setUserStep] = React.useState(STEPS.INFORMATION);
   const contentRef = React.useRef(undefined);
   const canApply = Boolean(data?.host?.isOpenToApplications);
   const collectives = map(get(data, 'loggedInAccount.memberOf.nodes'), 'account');
@@ -259,12 +259,8 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   const host = data?.host;
   const isOSCHost = host?.legacyId === OPENSOURCE_COLLECTIVE_ID;
   const useTwoSteps = !isNil(data?.host?.longDescription);
-
-  React.useEffect(() => {
-    if (host && !useTwoSteps) {
-      setStep(STEPS.APPLY);
-    }
-  }, [useTwoSteps]);
+  const step = host && !useTwoSteps ? STEPS.APPLY : userStep;
+  const setStep = setUserStep;
 
   return (
     <StyledModal onClose={onClose} maxWidth="550px" {...props}>

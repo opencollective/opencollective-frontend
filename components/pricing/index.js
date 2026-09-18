@@ -114,29 +114,35 @@ const Pricing = () => {
   const tabRef = React.useRef(null);
   const sectionContainerRef = React.useRef(null);
 
-  const handleOnScroll = throttle(() => {
-    if (!(tabRef.current && tabRef.current.getBoundingClientRect().top <= 0)) {
-      return;
-    }
-
-    let currentTab = activeTab;
-    const distanceThreshold = 200;
-    const breakpoint = window.scrollY + distanceThreshold;
-    for (const section of sectionContainerRef.current.children) {
-      if (breakpoint >= section.offsetTop) {
-        currentTab = section.id;
-      }
-    }
-
-    if (activeTab !== currentTab) {
-      setActiveTab(currentTab);
-    }
-  }, 100);
+  const activeTabRef = React.useRef(activeTab);
 
   React.useEffect(() => {
+    activeTabRef.current = activeTab;
+    const handleOnScroll = throttle(() => {
+      if (!(tabRef.current && tabRef.current.getBoundingClientRect().top <= 0)) {
+        return;
+      }
+
+      let currentTab = activeTabRef.current;
+      const distanceThreshold = 200;
+      const breakpoint = window.scrollY + distanceThreshold;
+      for (const section of sectionContainerRef.current.children) {
+        if (breakpoint >= section.offsetTop) {
+          currentTab = section.id;
+        }
+      }
+
+      if (activeTabRef.current !== currentTab) {
+        setActiveTab(currentTab);
+      }
+    }, 100);
+
     window.addEventListener('scroll', handleOnScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleOnScroll);
-  });
+    return () => {
+      handleOnScroll.cancel();
+      window.removeEventListener('scroll', handleOnScroll);
+    };
+  }, [activeTab]);
 
   return (
     <React.Fragment>

@@ -64,7 +64,6 @@ function OrderCreatedByFilter({
   values,
   ...props
 }: FilterComponentProps<z.infer<typeof schema>, OrderCreatedByFilterMeta, RequiredFilterValueTypes>) {
-  const [options, setOptions] = React.useState<{ label: React.ReactNode; keywords: string[]; value: string }[]>([]);
   const [search, { loading, data }] = useLazyQuery(createdByFilterSearchQuery, {
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
@@ -98,11 +97,11 @@ function OrderCreatedByFilter({
     });
   }, [meta.accountSlug, search, values.hostContext, values.expectedFundsFilter, values.status]);
 
-  React.useEffect(() => {
-    if (!loading && data?.orders?.createdByUsers?.nodes) {
-      setOptions(data.orders.createdByUsers.nodes.map(resultNodeToOption));
-    }
-  }, [loading, data]);
+  const optionsFromQuery =
+    !loading && data?.orders?.createdByUsers?.nodes
+      ? data.orders.createdByUsers.nodes.map(resultNodeToOption)
+      : undefined;
+  const options = optionsFromQuery ?? [];
 
   return <ComboSelectFilter options={options} loading={loading} searchFunc={searchFunc} isMulti {...props} />;
 }

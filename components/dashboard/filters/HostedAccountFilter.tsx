@@ -117,7 +117,6 @@ function HostedAccountFilter({
     () => meta.hostedAccounts?.map(resultNodeToOption) || [],
     [meta.hostedAccounts],
   );
-  const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>(defaultAccounts);
 
   const [search, { loading, data }] = useLazyQuery(hostedAccountFilterSearchQuery, {
     variables: { hostSlug: meta.hostSlug },
@@ -144,11 +143,8 @@ function HostedAccountFilter({
     }
   }, [defaultAccounts.length, searchFunc]);
 
-  React.useEffect(() => {
-    if (!loading && data?.accounts?.nodes) {
-      setOptions(data.accounts.nodes.map(resultNodeToOption));
-    }
-  }, [loading, data]);
+  const optionsFromQuery = !loading && data?.accounts?.nodes ? data.accounts.nodes.map(resultNodeToOption) : undefined;
+  const options = optionsFromQuery ?? defaultAccounts;
 
   return (
     <ComboSelectFilter

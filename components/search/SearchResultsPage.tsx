@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useQuery } from '@apollo/client';
 import { SearchIcon } from 'lucide-react';
 import { useIntl } from 'react-intl';
@@ -128,11 +128,12 @@ export const SearchResults = () => {
   });
 
   const [input, setInput] = React.useState(queryFilter.values.searchTerm);
+  const [prevSearchTerm, setPrevSearchTerm] = React.useState(queryFilter.values.searchTerm);
 
-  // Sync input state with URL changes (e.g., from SearchCommand navigation)
-  useEffect(() => {
+  if (prevSearchTerm !== queryFilter.values.searchTerm) {
+    setPrevSearchTerm(queryFilter.values.searchTerm);
     setInput(queryFilter.values.searchTerm || '');
-  }, [queryFilter.values.searchTerm]);
+  }
 
   const { data, loading } = useQuery(searchPageQuery, {
     variables: {

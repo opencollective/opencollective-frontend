@@ -232,7 +232,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const refetchPipeline = useCallback(() => {
     refetchExpensePipelineOverview(client, { slug: hostSlug, currency: account?.currency });
-  }, [client, hostSlug, account?.currency]);
+  }, [client, hostSlug, account]);
 
   const refetchAfterExpenseChange = useCallback(() => {
     void expenses.refetch();

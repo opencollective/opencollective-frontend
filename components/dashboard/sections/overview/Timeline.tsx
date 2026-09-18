@@ -23,7 +23,6 @@ const PAGE_SIZE = 20;
 
 export function Timeline({ accountSlug, withTitle = false }) {
   const { account } = useContext(DashboardContext);
-  const [isTimelineBeingGenerated, setIsTimelineBeingGenerated] = React.useState(false);
   const [openExpenseLegacyId, setOpenExpenseLegacyId] = React.useState<number | null>(null);
 
   const { data, loading, error, fetchMore, refetch } = useQuery(timelineQuery, {
@@ -37,15 +36,15 @@ export function Timeline({ accountSlug, withTitle = false }) {
   });
   const activities: TimelineQuery['account']['feed'] = data?.account.feed || [];
   const canViewMore = activities.length >= PAGE_SIZE && activities.length % PAGE_SIZE === 0;
+  const isContentNotReady = error?.graphQLErrors?.[0]?.extensions?.code === 'ContentNotReady';
+  const isTimelineBeingGenerated = isContentNotReady;
 
   React.useEffect(() => {
-    if (error?.graphQLErrors?.[0]?.extensions?.code === 'ContentNotReady') {
-      setIsTimelineBeingGenerated(true);
-      setTimeout(() => refetch(), 1000);
-    } else if (data?.account?.feed) {
-      setIsTimelineBeingGenerated(false);
+    if (isContentNotReady) {
+      const timeout = setTimeout(() => refetch(), 1000);
+      return () => clearTimeout(timeout);
     }
-  }, [error, data]);
+  }, [isContentNotReady, refetch]);
 
   return (
     <Card className="pb-3 shadow-none">

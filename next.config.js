@@ -26,6 +26,9 @@ const nextConfig = {
   useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
+  // Automatically memoize components/hooks. Existing useMemo/useCallback/memo can stay.
+  // https://nextjs.org/docs/app/api-reference/config/next-config-js/reactCompiler
+  reactCompiler: true,
   // Pages Router leaves node_modules external; sanitize-html is CJS and
   // require()s htmlparser2@12 (ESM-only), which Vercel's runtime cannot load.
   // Bundle Pages deps like the App Router, and allow webpack CJS↔ESM interop.

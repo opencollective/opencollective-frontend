@@ -306,23 +306,29 @@ export const useContributeOptions = (order, tiers, tiersLoading, disableCustomCo
     setLoading(false);
   }
 
-  useEffect(() => {
-    if (selectedContributeOption !== null) {
-      const options = getTierAmountOptions(selectedContributeOption, order, intl.locale);
-      setAmountOptions(options);
-
-      let option;
-      if ((selectedContributeOption.id || null) !== (order.tier?.id || null)) {
-        // Just pick first if tier is different than current one
-        option = first(options);
-      } else {
-        // Find one of the presets, or default to the last one which is supposed to be "Other" by convention
-        option = options.find(option => option.value === order.amount.valueInCents) || last(options);
-      }
-      setSelectedAmountOption(option);
-      setInputAmountValue(option.value || order.amount.valueInCents);
+  const amountOptionsFromSelection =
+    selectedContributeOption !== null ? getTierAmountOptions(selectedContributeOption, order, intl.locale) : null;
+  const amountSelectionKey =
+    selectedContributeOption !== null
+      ? `${selectedContributeOption.id ?? 'none'}-${order.tier?.id ?? 'none'}-${order.amount.valueInCents}`
+      : null;
+  const [syncedAmountSelectionKey, setSyncedAmountSelectionKey] = useState(null);
+  if (amountOptionsFromSelection && amountSelectionKey !== syncedAmountSelectionKey) {
+    const options = amountOptionsFromSelection;
+    let option;
+    if ((selectedContributeOption.id || null) !== (order.tier?.id || null)) {
+      option = first(options);
+    } else {
+      option = options.find(option => option.value === order.amount.valueInCents) || last(options);
     }
-  }, [selectedContributeOption]);
+    setSyncedAmountSelectionKey(amountSelectionKey);
+    setAmountOptions(options);
+    setSelectedAmountOption(option);
+    setInputAmountValue(option.value || order.amount.valueInCents);
+  } else if (!amountOptionsFromSelection && syncedAmountSelectionKey !== null) {
+    setSyncedAmountSelectionKey(null);
+    setAmountOptions(null);
+  }
 
   return {
     loading,

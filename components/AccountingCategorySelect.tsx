@@ -309,14 +309,12 @@ const useExpenseCategoryPredictionService = (
   }, [host, hasValidParams, data]);
 
   // Store previous predictions to keep showing them while loading
-  const previousPredictions = React.useRef(predictions);
-  React.useEffect(() => {
-    if (predictions) {
-      previousPredictions.current = predictions;
-    }
-  }, [predictions]);
+  const [cachedPredictions, setCachedPredictions] = React.useState(predictions ?? []);
+  if (predictions && predictions !== cachedPredictions) {
+    setCachedPredictions(predictions);
+  }
 
-  return { loading, predictions: predictions || (showPreviousPredictions && previousPredictions.current) || [] };
+  return { loading, predictions: predictions || (showPreviousPredictions && cachedPredictions) || [] };
 };
 
 const hostSupportsPredictions = (host: RequiredHostFields) => ['opensource'].includes(host?.slug);

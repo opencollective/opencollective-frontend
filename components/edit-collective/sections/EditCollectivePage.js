@@ -393,13 +393,11 @@ const EditCollectivePage = ({ collective }) => {
     refetchQueries: [{ query: collectiveSettingsQuery, variables: { slug: collective.slug }, context: API_V1_CONTEXT }],
   });
 
-  // Load sections from fetched collective
-  React.useEffect(() => {
-    if (data?.account) {
-      const sections = getCollectiveSections(data.account);
-      setSections(sections);
-    }
-  }, [data?.account]);
+  const [loadedAccount, setLoadedAccount] = React.useState(null);
+  if (data?.account && data.account !== loadedAccount && !isDirty) {
+    setLoadedAccount(data.account);
+    setSections(getCollectiveSections(data.account));
+  }
 
   const onSectionToggle = (selectedSection, { isEnabled, restrictedTo, version }) => {
     const newSections = cloneDeep(sections);

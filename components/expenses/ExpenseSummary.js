@@ -117,7 +117,7 @@ const ExpenseSummary = ({
   );
   const attachedFiles = React.useMemo(
     () => (expense?.attachedFiles?.length ? expense.attachedFiles : (expense?.draft?.attachedFiles ?? [])),
-    [expense?.attachedFiles, expense?.draft?.attachedFiles],
+    [expense],
   );
   const processButtons = (
     <Flex

@@ -124,13 +124,10 @@ export function OrganizationForm({ nextStep, setCreatedAccount }: SignupStepProp
       })),
     [],
   );
-  const initialValues = useMemo(
-    () => ({
-      ...generateInitialValuesFromSchema(createOrganizationSchema),
-      ...(LoggedInUser?.id ? { individual: { id: LoggedInUser.id } } : {}),
-    }),
-    [LoggedInUser?.id],
-  );
+  const initialValues = {
+    ...generateInitialValuesFromSchema(createOrganizationSchema),
+    ...(LoggedInUser?.id ? { individual: { id: LoggedInUser.id } } : {}),
+  };
   const handleOpenCountrySelect = useCallback(
     open => {
       setShowCountrySelect(open);

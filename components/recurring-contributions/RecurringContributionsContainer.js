@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -78,7 +78,13 @@ const RecurringContributionsContainer = ({
   const isAdminOrRoot = Boolean(LoggedInUser?.isAdminOfCollective(account) || LoggedInUser?.isRoot);
   const intl = useIntl();
   const [editingContributionId, setEditingContributionId] = React.useState();
-  const [filter, setFilter] = React.useState(outsideFilter ?? FILTERS.ACTIVE);
+  const [filterState, setFilter] = React.useState(outsideFilter ?? FILTERS.ACTIVE);
+  const [outsideFilterSnapshot, setOutsideFilterSnapshot] = React.useState(outsideFilter);
+  if (outsideFilter && outsideFilter !== outsideFilterSnapshot) {
+    setOutsideFilterSnapshot(outsideFilter);
+    setFilter(outsideFilter);
+  }
+  const filter = outsideFilter ?? filterState;
   const displayedRecurringContributions = React.useMemo(() => {
     const filteredContributions = filterContributions(recurringContributions?.nodes || [], filter);
     return isAdminOrRoot
@@ -86,18 +92,8 @@ const RecurringContributionsContainer = ({
       : filteredContributions.filter(contrib => contrib.status !== ORDER_STATUS.ERROR);
   }, [recurringContributions, filter, isAdminOrRoot]);
 
-  useEffect(() => {
-    if (outsideFilter) {
-      setFilter(outsideFilter);
-    }
-  }, [outsideFilter]);
-
-  // Reset edit when changing filters and contribution is not in the list anymore
-  React.useEffect(() => {
-    if (!displayedRecurringContributions.some(c => c.id === editingContributionId)) {
-      setEditingContributionId(null);
-    }
-  }, [displayedRecurringContributions]);
+  const editingContributionInList = displayedRecurringContributions.some(c => c.id === editingContributionId);
+  const effectiveEditingContributionId = editingContributionInList ? editingContributionId : null;
 
   const filterOptions = React.useMemo(() => [
     { value: FILTERS.ACTIVE, label: intl.formatMessage(I18nFilters[FILTERS.ACTIVE]) },
@@ -136,8 +132,8 @@ const RecurringContributionsContainer = ({
                 position="relative"
                 account={account}
                 isAdmin={isAdminOrRoot}
-                isEditing={contribution.id === editingContributionId}
-                canEdit={isAdminOrRoot && !editingContributionId}
+                isEditing={contribution.id === effectiveEditingContributionId}
+                canEdit={isAdminOrRoot && !effectiveEditingContributionId}
                 onEdit={() => setEditingContributionId(contribution.id)}
                 onCloseEdit={() => setEditingContributionId(null)}
                 showPaymentMethod={isAdminOrRoot}

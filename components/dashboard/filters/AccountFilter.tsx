@@ -104,7 +104,7 @@ function AccountFilter({
   z.infer<typeof schema>,
   { hostSlug: string; hostedAccounts?: Partial<AccountHoverCardFieldsFragment>[] }
 >) {
-  const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>();
+  const [clearedOptions, setClearedOptions] = React.useState(false);
 
   const [search, { loading, data }] = useLazyQuery(accountFilterSearchQuery, {
     variables: {},
@@ -112,19 +112,18 @@ function AccountFilter({
     notifyOnNetworkStatusChange: true,
   });
 
+  const optionsFromQuery = !loading ? data?.accounts?.nodes.map(resultNodeToOption) || [] : undefined;
+
   const searchFunc = async searchTerm => {
     if (!searchTerm) {
-      setOptions([]);
+      setClearedOptions(true);
     } else {
+      setClearedOptions(false);
       search({ variables: { searchTerm } });
     }
   };
 
-  React.useEffect(() => {
-    if (!loading) {
-      setOptions(data?.accounts?.nodes.map(resultNodeToOption) || []);
-    }
-  }, [loading, data]);
+  const options = clearedOptions ? [] : optionsFromQuery;
 
   return <ComboSelectFilter options={options} loading={loading} searchFunc={searchFunc} {...props} />;
 }

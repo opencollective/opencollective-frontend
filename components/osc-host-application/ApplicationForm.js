@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
@@ -118,13 +118,14 @@ const ApplicationForm = ({
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
 
-  const [codeSectionExpanded, setCodeSectionExpanded] = useState(false);
+  const typeOfProject = initialValues?.applicationData?.typeOfProject;
+  const [codeSectionExpanded, setCodeSectionExpanded] = useState(typeOfProject === 'CODE');
   const [communitySectionExpanded, setCommunitySectionExpanded] = useState(false);
-
-  useEffect(() => {
-    const { typeOfProject } = initialValues?.applicationData || {};
+  const [codeSectionTypeOfProject, setCodeSectionTypeOfProject] = useState(typeOfProject);
+  if (typeOfProject !== codeSectionTypeOfProject) {
+    setCodeSectionTypeOfProject(typeOfProject);
     setCodeSectionExpanded(typeOfProject === 'CODE');
-  }, [initialValues?.applicationData?.typeOfProject]);
+  }
 
   const validate = values => {
     const errors = requireFields(values, [

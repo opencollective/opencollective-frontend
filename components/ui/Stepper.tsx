@@ -94,13 +94,17 @@ const StepperProvider = ({ value, children }: StepperContextProviderProps) => {
 // <---------- HOOKS ---------->
 
 function usePrevious<T>(value: T): T | undefined {
-  const ref = React.useRef<T>(undefined);
+  const [state, setState] = React.useState<{ current: T; previous: T | undefined }>(() => ({
+    current: value,
+    previous: undefined,
+  }));
 
-  React.useEffect(() => {
-    ref.current = value;
-  }, [value]);
+  if (state.current !== value) {
+    setState({ current: value, previous: state.current });
+    return state.current;
+  }
 
-  return ref.current;
+  return state.previous;
 }
 
 function useStepper() {
@@ -132,21 +136,15 @@ function useStepper() {
 }
 
 function useMediaQuery(query: string) {
-  const [value, setValue] = React.useState(false);
-
-  React.useEffect(() => {
-    function onChange(event: MediaQueryListEvent) {
-      setValue(event.matches);
-    }
-
-    const result = matchMedia(query);
-    result.addEventListener('change', onChange);
-    setValue(result.matches);
-
-    return () => result.removeEventListener('change', onChange);
-  }, [query]);
-
-  return value;
+  return React.useSyncExternalStore(
+    onStoreChange => {
+      const mediaQueryList = matchMedia(query);
+      mediaQueryList.addEventListener('change', onStoreChange);
+      return () => mediaQueryList.removeEventListener('change', onStoreChange);
+    },
+    () => matchMedia(query).matches,
+    () => false,
+  );
 }
 
 // <---------- STEPS ---------->

@@ -209,16 +209,6 @@ function HostedFundsList({ accountSlug: hostSlug, subpath }: DashboardSectionPro
     skip: isUpgradeRequired,
   });
 
-  useEffect(() => {
-    if (
-      !hasAccountProfile &&
-      subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)
-    ) {
-      handleDrawer(subpath[0]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subpath[0], hasAccountProfile]);
-
   const handleDrawer = (collective: HostedCollectiveFieldsFragment | string | undefined) => {
     if (collective) {
       pushSubpath(typeof collective === 'string' ? collective : collective.id);
@@ -227,6 +217,17 @@ function HostedFundsList({ accountSlug: hostSlug, subpath }: DashboardSectionPro
     }
     setShowCollectiveOverview(collective);
   };
+
+  useEffect(() => {
+    if (
+      !hasAccountProfile &&
+      subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)
+    ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync drawer state from URL subpath
+      handleDrawer(subpath[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subpath[0], hasAccountProfile]);
 
   const handleEdit = () => {
     refetchMetadata();

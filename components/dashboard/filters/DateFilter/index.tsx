@@ -119,7 +119,7 @@ function DateFilter({
   onChange: (value: DateFilterValueType) => void;
 }) {
   const intl = useIntl();
-  value = value ?? {
+  const dateFilterValue = value ?? {
     type: DateFilterType.IN_LAST_PERIOD,
     period: Period.DAYS,
   };
@@ -127,9 +127,9 @@ function DateFilter({
   return (
     <div className="flex flex-col gap-2 p-2">
       <Select
-        defaultValue={value.type}
+        defaultValue={dateFilterValue.type}
         onValueChange={(type: DateFilterType) => {
-          onChange({ ...value, type });
+          onChange({ ...dateFilterValue, type });
         }}
       >
         <SelectTrigger className="w-full">
@@ -148,8 +148,8 @@ function DateFilter({
         </SelectContent>
       </Select>
 
-      {renderOptions(value, onChange, intl)}
-      <Timezonepicker value={value.tz} onChange={tz => onChange({ ...value, tz })} />
+      {renderOptions(dateFilterValue, onChange, intl)}
+      <Timezonepicker value={dateFilterValue.tz} onChange={tz => onChange({ ...dateFilterValue, tz })} />
     </div>
   );
 }

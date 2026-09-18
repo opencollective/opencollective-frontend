@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
@@ -31,10 +31,10 @@ export function Drawer({
 }) {
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
 
-  const drawerRef = useRef<HTMLDivElement>(null);
+  const [drawerElement, setDrawerElement] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!drawerRef.current) {
+    if (!drawerElement) {
       return;
     }
 
@@ -42,13 +42,11 @@ export function Drawer({
       const width = entries[0].contentRect.width;
       document.documentElement.style.setProperty('--drawer-width', `${width}px`);
     });
-    observer.observe(drawerRef.current);
+    observer.observe(drawerElement);
     return () => {
-      if (drawerRef.current) {
-        observer.unobserve(drawerRef.current);
-      }
+      observer.unobserve(drawerElement);
     };
-  }, [drawerRef.current]);
+  }, [drawerElement]);
 
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
@@ -60,7 +58,7 @@ export function Drawer({
           }
         }}
       >
-        <SheetContent className={clsx('flex flex-col gap-0 p-0', className)} ref={drawerRef} data-cy={dataCy}>
+        <SheetContent className={clsx('flex flex-col gap-0 p-0', className)} ref={setDrawerElement} data-cy={dataCy}>
           <div className="relative flex flex-1 flex-col overflow-y-scroll px-4 py-6 sm:px-6">
             {showCloseButton && (
               <Button

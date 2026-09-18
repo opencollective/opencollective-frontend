@@ -185,15 +185,13 @@ export const UserLocationInput = ({
   useStructuredForFallback = false,
 }) => {
   const [useFallback, setUseFallback] = React.useState(false);
-  const locationRef = React.useRef(location);
-  locationRef.current = location;
 
   const updateLocation = React.useCallback(
     patch => {
-      const currentLocation = locationRef.current || DEFAULT_LOCATION;
+      const currentLocation = location || DEFAULT_LOCATION;
       onChange(typeof patch === 'function' ? patch(currentLocation) : patch);
     },
-    [onChange],
+    [location, onChange],
   );
 
   const forceLegacyFormat = Boolean(!location?.structured && location?.address);

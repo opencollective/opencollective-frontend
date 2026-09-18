@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import AnimateHeight from 'react-animate-height';
@@ -18,11 +18,7 @@ const Content = styled.div`
 `;
 
 const CollapseSection = ({ title, isExpanded, toggleExpanded, subtitle, imageSrc, children }) => {
-  const [height, setHeight] = useState(isExpanded ? 'auto' : 0);
-
-  useEffect(() => {
-    setHeight(isExpanded ? 'auto' : 0);
-  }, [isExpanded]);
+  const height = isExpanded ? 'auto' : 0;
 
   return (
     <Container>
