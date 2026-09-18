@@ -501,19 +501,25 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
     [propagateStructuredValues],
   );
 
-  const [syncedCountry, setSyncedCountry] = React.useState(selectedCountry);
-  if (fields && addressFormFields && selectedCountry !== syncedCountry) {
-    setSyncedCountry(selectedCountry);
+  // Notify the parent when the country (and therefore the field set) changes.
+  React.useEffect(() => {
+    if (!fields || !addressFormFields) {
+      return;
+    }
     const normalized = normalizeStructuredZone(structuredValues, fields);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- keep local structured values aligned with country fields
     setStructuredValues(prev => (isEqual(prev, normalized) ? prev : normalized));
-    propagateStructuredValues(normalized);
+    setLastPropagatedValues(normalized);
+    onCountryChange(normalized);
     try {
       onLoadSuccess?.({ countryInfo: addressFormFields, addressFields: fields });
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn('Error calling onLoadSuccess: ', (e as Error).message);
     }
-  }
+    // Intentionally only re-run when the country changes; local edits propagate via updateStructuredValues.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCountry]);
 
   if (!selectedCountry || !fields || !addressFormFields) {
     return null;

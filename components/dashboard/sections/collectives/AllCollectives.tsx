@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { compact, isEmpty, isString, omit } from 'lodash-es';
 import { useRouter } from 'next/router';
@@ -128,8 +128,6 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
     skip: isEmpty(query),
   });
 
-  const pushSubpath = makePushSubpath(router);
-
   const handleDrawer = (collective: HostedCollectiveFieldsFragment | string | undefined) => {
     if (collective) {
       pushSubpath(typeof collective === 'string' ? collective : collective.id);
@@ -139,11 +137,9 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
     setShowCollectiveOverview(collective);
   };
 
-  useEffect(() => {
-    if (subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)) {
-      handleDrawer(subpath[0]);
-    }
-  }, [subpath[0]]);
+  if (subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)) {
+    setShowCollectiveOverview(subpath[0]);
+  }
 
   const handleEdit = () => {
     refetch();
