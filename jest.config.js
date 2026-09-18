@@ -19,6 +19,7 @@ module.exports = async () => {
   // The second entry handles sub-path imports like `lodash-es/range`.
   nextConfig.moduleNameMapper = {
     ...nextConfig.moduleNameMapper,
+    '^@/(.*)$': '<rootDir>/$1',
     '^lodash-es$': '<rootDir>/node_modules/lodash',
     '^lodash-es/(.*)$': '<rootDir>/node_modules/lodash/$1',
   };
