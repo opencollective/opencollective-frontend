@@ -56,8 +56,6 @@ function useExportRequest({
   const [sessionKey, setSessionKey] = React.useState(0);
   // Track which session the mutation result belongs to
   const [mutationSessionKey, setMutationSessionKey] = React.useState<number | null>(null);
-  const [isGenerating, setIsGenerating] = React.useState(false);
-  const [hasFailed, setHasFailed] = React.useState(false);
 
   const [createMutation, { data: created, loading: isCreating, called, error: createError }] = useMutation<
     UseExportRequestCreateMutation,
@@ -85,8 +83,6 @@ function useExportRequest({
       const newSessionKey = sessionKey + 1;
       setSessionKey(newSessionKey);
       setMutationSessionKey(null);
-      setIsGenerating(false);
-      setHasFailed(false);
       stopPolling();
 
       const result = await createMutation(options);
@@ -99,48 +95,52 @@ function useExportRequest({
     [createMutation, stopPolling, sessionKey],
   );
 
+  const sessionActive = mutationSessionKey === sessionKey;
+  const exportRequest = sessionActive ? data?.exportRequest : undefined;
+  const exportStatus = exportRequest?.status;
+  const willRetry = exportRequest ? (exportRequest as { willRetry?: boolean }).willRetry : undefined;
+
+  const hasFailed =
+    sessionActive && Boolean((called && createError) || (exportStatus === ExportRequestStatus.FAILED && !willRetry));
+
+  const isGenerating =
+    sessionActive &&
+    called &&
+    Boolean(created) &&
+    !createError &&
+    !hasFailed &&
+    (!exportRequest ||
+      [ExportRequestStatus.ENQUEUED, ExportRequestStatus.PROCESSING].includes(exportStatus) ||
+      (exportStatus === ExportRequestStatus.FAILED && willRetry));
+
   React.useEffect(() => {
-    // Only process if we're in the correct session
-    if (mutationSessionKey !== sessionKey) {
+    if (!sessionActive) {
       return;
     }
 
     if (called && created && !createError && !data) {
-      setIsGenerating(true);
       startPolling(pollInterval);
     } else if (called && createError) {
-      setIsGenerating(false);
-      setHasFailed(true);
       stopPolling();
-    } else if (data?.exportRequest) {
-      const { status } = data.exportRequest;
-      // Type assertion needed until GraphQL types are regenerated
-      const willRetry = (data.exportRequest as { willRetry?: boolean }).willRetry;
+    } else if (exportRequest) {
+      const { status } = exportRequest;
 
-      // Keep polling for in-progress statuses
       if ([ExportRequestStatus.ENQUEUED, ExportRequestStatus.PROCESSING].includes(status)) {
         return;
       }
 
-      // Handle failed status
       if (status === ExportRequestStatus.FAILED) {
-        // If willRetry is true, keep polling - the request will be retried
         if (willRetry) {
           return;
         }
-        // Permanent failure - stop polling and notify
-        setIsGenerating(false);
-        setHasFailed(true);
         stopPolling();
-        onError?.(data.exportRequest);
+        onError?.(exportRequest);
         return;
       }
 
-      // Handle completed status
-      setIsGenerating(false);
       stopPolling();
       if (status === ExportRequestStatus.COMPLETED) {
-        onSuccess?.(data.exportRequest);
+        onSuccess?.(exportRequest);
       }
     }
   }, [
@@ -153,12 +153,13 @@ function useExportRequest({
     data,
     onSuccess,
     onError,
-    sessionKey,
-    mutationSessionKey,
+    sessionActive,
+    exportRequest,
+    willRetry,
   ]);
 
   // Only return data if it belongs to the current session
-  const currentData = mutationSessionKey === sessionKey ? data : undefined;
+  const currentData = sessionActive ? data : undefined;
 
   return { create, isCreating, data: currentData, isLoading, refetch, isGenerating, hasFailed };
 }

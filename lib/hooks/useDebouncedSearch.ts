@@ -9,23 +9,25 @@ export default function useDebouncedSearch(
     noDelayEmpty?: boolean;
   },
 ): { isDebouncing: boolean } {
-  const [isDebouncing, setIsDebouncing] = React.useState(false);
+  const [completedInput, setCompletedInput] = React.useState(input);
 
   const debouncedSearch = React.useRef(
     debounce((v: string) => {
-      setIsDebouncing(false);
+      setCompletedInput(v);
       searchFunc(v);
     }, opts.delay),
   );
+
+  if (searchFunc && opts.noDelayEmpty && input === '' && completedInput !== '') {
+    setCompletedInput('');
+  }
 
   React.useEffect(() => {
     if (searchFunc) {
       if (opts.noDelayEmpty && input === '') {
         debouncedSearch.current.cancel();
         searchFunc(input);
-        setIsDebouncing(false);
       } else {
-        setIsDebouncing(true);
         debouncedSearch.current(input);
       }
 
@@ -34,6 +36,8 @@ export default function useDebouncedSearch(
       };
     }
   }, [input, searchFunc, opts.noDelayEmpty]);
+
+  const isDebouncing = Boolean(searchFunc) && input !== completedInput;
 
   return { isDebouncing };
 }

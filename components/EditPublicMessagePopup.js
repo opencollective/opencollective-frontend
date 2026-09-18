@@ -129,9 +129,16 @@ const REACT_POPPER_MODIFIERS = [
 
 function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef, onClose, message = '', intl }) {
   const [messageDraft, setMessageDraft] = useState(message || '');
+  const [referenceElement, setReferenceElement] = useState(null);
+
+  React.useLayoutEffect(() => {
+    if (cardRef.current) {
+      setReferenceElement(cardRef.current);
+    }
+  }, [cardRef]);
 
   // Can't be rendered SSR
-  if (typeof window === 'undefined' || !cardRef.current) {
+  if (typeof window === 'undefined' || !referenceElement) {
     return null;
   }
 
@@ -139,7 +146,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
     <Mutation mutation={editPublicMessageMutation} context={API_V1_CONTEXT}>
       {(submitMessage, { loading, error }) => (
         <Popper
-          referenceElement={cardRef.current}
+          referenceElement={referenceElement}
           placement={width < 780 ? 'bottom' : 'right'}
           modifiers={REACT_POPPER_MODIFIERS}
         >

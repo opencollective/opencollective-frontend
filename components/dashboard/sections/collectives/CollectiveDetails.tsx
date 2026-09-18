@@ -271,6 +271,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
       !loading &&
       !isEqual(expenseTypes, data?.editAccountSetting?.settings || collective.settings?.expenseTypes || {})
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- auto-save expense types when selection changes
       handleUpdate(expenseTypes);
     }
   }, [expenseTypes, collective]);

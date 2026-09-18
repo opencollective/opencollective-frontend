@@ -150,10 +150,12 @@ function HostApplication({
   >([]);
   const [threadOffset, setThreadOffset] = React.useState(0);
 
-  React.useEffect(() => {
+  const [prevApplicationId, setPrevApplicationId] = React.useState(applicationId);
+  if (applicationId !== prevApplicationId) {
+    setPrevApplicationId(applicationId);
     setThreadItems([]);
     setThreadOffset(0);
-  }, [applicationId]);
+  }
 
   const onDataComplete = React.useCallback(
     (data: HostApplicationThreadQuery, existingThreadItems = threadItems) => {

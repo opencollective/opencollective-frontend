@@ -283,7 +283,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
   React.useEffect(() => {
     (inputRef.current as any).stripeElements = elements;
     (inputRef.current as any).paymentElement = paymentElement;
-  }, [paymentElement, elements, inputRef.current]);
+  }, [paymentElement, elements]);
 
   React.useEffect(() => {
     function onChange(e: StripePaymentElementChangeEvent) {
@@ -318,7 +318,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     }
 
     return types;
-  }, [intl, setupIntent?.payment_method_types, props.currency]);
+  }, [intl, setupIntent, props.currency]);
 
   return (
     <div>

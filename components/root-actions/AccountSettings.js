@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
@@ -38,17 +38,21 @@ const AccountSettings = () => {
   const { toast } = useToast();
   const intl = useIntl();
   const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
+  const selectedAccount = selectedAccountOption?.value;
   const [archivedFlag, setArchivedFlag] = React.useState();
   const [trustedHostFlag, setTrustedHostFlag] = React.useState();
   const [twoFactorEnabledFlag, setTwoFactorEnabledFlag] = React.useState();
   const [enableSave, setEnableSave] = React.useState(false);
   const [editAccountFlags, { loading }] = useMutation(editAccountFlagsMutation);
+  const [syncedAccountId, setSyncedAccountId] = React.useState();
 
-  useEffect(() => {
-    setArchivedFlag(selectedAccountOption?.value?.isArchived);
-    setTrustedHostFlag(selectedAccountOption?.value?.isTrustedHost);
-    setTwoFactorEnabledFlag(selectedAccountOption?.value?.isTwoFactorAuthEnabled);
-  }, [selectedAccountOption]);
+  if (selectedAccount?.id !== syncedAccountId) {
+    setSyncedAccountId(selectedAccount?.id);
+    setArchivedFlag(selectedAccount?.isArchived);
+    setTrustedHostFlag(selectedAccount?.isTrustedHost);
+    setTwoFactorEnabledFlag(selectedAccount?.isTwoFactorAuthEnabled);
+    setEnableSave(false);
+  }
 
   return (
     <React.Fragment>

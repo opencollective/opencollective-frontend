@@ -164,13 +164,15 @@ const CollectivePickerAsync = ({
   const fetchPolicy = noCache ? 'network-only' : undefined;
   const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery, { context: API_V1_CONTEXT, fetchPolicy });
   const [term, setTerm] = React.useState(null);
-  const [isSearchPending, setIsSearchPending] = React.useState(false);
   const [resolvedSearchTerm, setResolvedSearchTerm] = React.useState(null);
   const lastSearchedTermRef = React.useRef(null);
   const throttledSearchRef = React.useRef(null);
-  if (!throttledSearchRef.current) {
+  if (throttledSearchRef.current === null) {
     throttledSearchRef.current = makeThrottledSearch();
   }
+  const searchTerm = term || '';
+  const effectiveResolvedSearchTerm = term || preload ? resolvedSearchTerm : null;
+  const isSearchPending = Boolean(term || preload) && effectiveResolvedSearchTerm !== searchTerm;
   const intl = useIntl();
 
   // Filter defaultCollectives by term if provided
@@ -223,13 +225,11 @@ const CollectivePickerAsync = ({
     const searchTerm = term || '';
 
     if (term || preload) {
-      setIsSearchPending(true);
       throttledSearch(
         ({ variables }) => {
           lastSearchedTermRef.current = variables.term;
           return Promise.resolve(searchCollectives({ variables })).finally(() => {
             if (lastSearchedTermRef.current === variables.term) {
-              setIsSearchPending(false);
               setResolvedSearchTerm(variables.term);
             }
           });
@@ -250,8 +250,6 @@ const CollectivePickerAsync = ({
     } else {
       throttledSearch.cancel();
       lastSearchedTermRef.current = null;
-      setIsSearchPending(false);
-      setResolvedSearchTerm(null);
     }
   }, [
     types,

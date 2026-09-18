@@ -284,6 +284,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   const { account } = React.useContext(DashboardContext);
   const { transaction } = data || { transaction: null };
   const dropdownTriggerRef = React.useRef(undefined);
+  // eslint-disable-next-line react-hooks/refs -- ref forwarded to action handlers only
   const actions = getActions(transaction, dropdownTriggerRef, refetch);
   const accountingCategory = transaction?.expense?.accountingCategory || transaction?.order?.accountingCategory;
   const hasBalanceCategoriesPreview = useHasBalanceCategoriesPreview();

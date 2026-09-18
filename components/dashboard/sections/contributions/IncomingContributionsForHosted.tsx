@@ -111,10 +111,12 @@ const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
-  // Add dynamic values to meta
-  queryFilter.meta = {
-    ...filterMeta,
-    selectedAccountSlug: queryFilter.values.account || undefined,
+  const queryFilterProps = {
+    ...queryFilter,
+    meta: {
+      ...filterMeta,
+      selectedAccountSlug: queryFilter.values.account || undefined,
+    },
   };
 
   const handleRefetch = React.useCallback(() => {
@@ -141,7 +143,7 @@ const IncomingContributionsForHosted = ({ accountSlug }: DashboardSectionProps) 
 
       <ContributionsTable
         accountSlug={accountSlug}
-        queryFilter={queryFilter}
+        queryFilter={queryFilterProps}
         views={viewsWithCount}
         orders={orders}
         loading={loading}

@@ -1688,12 +1688,15 @@ async function buildFormOptions(
   }
 }
 
-function usePrevious<T>(value: T): T {
-  const ref = React.useRef<T>(value);
-  React.useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  return ref.current;
+function usePrevious<T>(value: T): T | undefined {
+  const [state, setState] = React.useState<{ current: T; previous: T | undefined }>({
+    current: value,
+    previous: undefined,
+  });
+  if (state.current !== value) {
+    setState({ current: value, previous: state.current });
+  }
+  return state.previous;
 }
 
 const needExchangeRateFilter = (expectedCurrency: string) => (ei: ExpenseItem) =>
@@ -1766,15 +1769,14 @@ export function useExpenseForm(opts: {
   const apolloClient = useApolloClient();
   const { LoggedInUser } = useLoggedInUser();
   const [formOptions, setFormOptions] = React.useState<ExpenseFormOptions>({ schema: z.object({}) });
-  const startOptions = React.useRef(opts.startOptions);
+  const [startOptions] = React.useState(() => opts.startOptions);
   const [expenseLoaded, setExpenseLoaded] = React.useState(false);
   const setInitialExpenseValues = React.useRef(false);
   const setInitialFormOptions = React.useRef(false);
-  const initialLoading = React.useRef(true);
+  const [initialLoading, setInitialLoading] = React.useState(true);
   const expenseFormValues = React.useRef<ExpenseFormValues>(opts.initialValues);
 
-  const initialValues = React.useRef(opts.initialValues);
-  const initialStatus = React.useRef({ schema: formOptions.schema });
+  const [initialFormValues] = React.useState(opts.initialValues);
 
   // GraphQL mutations for expense operations
   const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
@@ -1928,7 +1930,7 @@ export function useExpenseForm(opts: {
               : null,
           };
 
-          if (formOptions.expense?.id && !startOptions.current.duplicateExpense) {
+          if (formOptions.expense?.id && !startOptions.duplicateExpense) {
             const isConfirmingInvite = formOptions.expense?.status === ExpenseStatus.DRAFT && !formOptions.payee?.slug;
             const editInput: EditExpenseFromDashboardMutationVariables['expenseEditInput'] = {
               ...expenseInput,
@@ -1940,7 +1942,7 @@ export function useExpenseForm(opts: {
             result = await editExpense({
               variables: {
                 expenseEditInput: editInput,
-                draftKey: startOptions.current.draftKey,
+                draftKey: startOptions.draftKey,
               },
             });
 
@@ -2003,7 +2005,7 @@ export function useExpenseForm(opts: {
         }
         return;
       }
-      return onSubmit(values, formikHelpers, formOptions, startOptions.current);
+      return onSubmit(values, formikHelpers, formOptions, startOptions);
     },
     [
       opts.handleOnSubmit,
@@ -2051,8 +2053,8 @@ export function useExpenseForm(opts: {
   );
 
   const expenseForm: ExpenseFormik = useFormik<ExpenseFormValues>({
-    initialValues: initialValues.current,
-    initialStatus: initialStatus.current,
+    initialValues: initialFormValues,
+    initialStatus: { schema: formOptions.schema },
     validate,
     onSubmit: onSubmitCallback,
     validateOnBlur: false,
@@ -2130,7 +2132,7 @@ export function useExpenseForm(opts: {
         : formOptions.expense.invoiceFile;
     const additionalAttachments = expenseAttachedFiles;
 
-    if (!startOptions.current.duplicateExpense) {
+    if (!startOptions.duplicateExpense) {
       if (invoiceFile) {
         setFieldValue('invoiceFile', invoiceFile.url);
         setFieldValue('hasInvoiceOption', YesNoOption.YES);
@@ -2154,7 +2156,7 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.draft?.items?.map(ei => ({
-          id: !startOptions.current.duplicateExpense ? ei.id : undefined,
+          id: !startOptions.duplicateExpense ? ei.id : undefined,
           key: ei.id,
           attachment: ei.url,
           description: ei.description ?? '',
@@ -2169,21 +2171,21 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.items?.map(ei => ({
-          id: !startOptions.current.duplicateExpense ? ei.id : undefined,
+          id: !startOptions.duplicateExpense ? ei.id : undefined,
           key: ei.id,
-          attachment: !startOptions.current.duplicateExpense ? ei.url : null,
+          attachment: !startOptions.duplicateExpense ? ei.url : null,
           description: ei.description ?? '',
-          incurredAt: !startOptions.current.duplicateExpense
-            ? dayjs.utc(ei.incurredAt).toISOString().substring(0, 10)
-            : null,
+          incurredAt: !startOptions.duplicateExpense ? dayjs.utc(ei.incurredAt).toISOString().substring(0, 10) : null,
           amount: {
             valueInCents: ei.amount.valueInCents,
             currency: ei.amount.currency,
-            exchangeRate: !startOptions.current.duplicateExpense ? ei.amount.exchangeRate : null,
+            exchangeRate: !startOptions.duplicateExpense ? ei.amount.exchangeRate : null,
           },
         })),
       );
       setFieldTouched('expenseItems', true);
+      // One-time flag so item-currency effects can run after GraphQL expense data is applied.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpenseLoaded(true);
     }
   }, [formOptions.expense, formOptions.loggedInAccount, setInitialExpenseValues, setFieldValue, setFieldTouched]);
@@ -2268,7 +2270,7 @@ export function useExpenseForm(opts: {
   ]);
 
   React.useEffect(() => {
-    if (initialLoading.current) {
+    if (initialLoading) {
       return;
     } else if (!expenseForm.values.hasTax) {
       setFieldValue('tax', null);
@@ -2291,7 +2293,7 @@ export function useExpenseForm(opts: {
   // Reset expense type if the account does not support it (unless we're editing an existing one)
   React.useEffect(() => {
     if (
-      !initialLoading.current &&
+      !initialLoading &&
       expenseForm.values.expenseTypeOption &&
       !formOptions.expense?.id &&
       formOptions.supportedExpenseTypes &&
@@ -2310,7 +2312,7 @@ export function useExpenseForm(opts: {
   // Reset reference currency if it's no longer in the available currencies
   React.useEffect(() => {
     if (
-      !initialLoading.current &&
+      !initialLoading &&
       formOptions.availableReferenceCurrencies &&
       expenseForm.values.referenceCurrency &&
       !formOptions.availableReferenceCurrencies.includes(expenseForm.values.referenceCurrency as Currency)
@@ -2322,7 +2324,7 @@ export function useExpenseForm(opts: {
   // Set item currency if we're done loading and there's a single available reference currency
   React.useEffect(() => {
     if (
-      !initialLoading.current &&
+      !initialLoading &&
       formOptions.availableReferenceCurrencies &&
       formOptions.availableReferenceCurrencies.length === 1 &&
       expenseForm.values.expenseItems.length === 1 &&
@@ -2458,14 +2460,7 @@ export function useExpenseForm(opts: {
   const refreshFormOptions = React.useCallback(
     async (force?: boolean) => {
       setFormOptions(
-        await buildFormOptions(
-          intl,
-          apolloClient,
-          LoggedInUser,
-          expenseFormValues.current,
-          startOptions.current,
-          force,
-        ),
+        await buildFormOptions(intl, apolloClient, LoggedInUser, expenseFormValues.current, startOptions, force),
       );
 
       setInitialFormOptions.current = true;
@@ -2486,17 +2481,17 @@ export function useExpenseForm(opts: {
     async function runValidation() {
       await validateForm();
 
-      if (setInitialFormOptions.current && !startOptions.current.expenseId) {
-        initialLoading.current = false;
+      if (setInitialFormOptions.current && !startOptions.expenseId) {
+        setInitialLoading(false);
       } else if (setInitialFormOptions.current && setInitialExpenseValues.current) {
-        initialLoading.current = false;
+        setInitialLoading(false);
       }
     }
 
     runValidation();
   }, [formOptions.schema, validateForm]);
   React.useEffect(() => {
-    if (startOptions.current.expenseId && !expenseLoaded) {
+    if (startOptions.expenseId && !expenseLoaded) {
       return;
     }
 
@@ -2506,7 +2501,7 @@ export function useExpenseForm(opts: {
         setFieldValue(`expenseItems.${i}.amount.currency`, formOptions.expenseCurrency);
       }
     }
-  }, [formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue, expenseLoaded]);
+  }, [formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue, formOptions.expense, expenseLoaded]);
 
   React.useEffect(() => {
     // Reset selection if the payout method is not supported (only once payout methods have loaded)
@@ -2542,7 +2537,7 @@ export function useExpenseForm(opts: {
       !expenseForm.touched.expenseItems &&
       !isCompletingDraftWithCurrency &&
       expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency &&
-      !startOptions.current.isInlineEdit // expenseItems will not be touched when editing the payout method, we don't want to update the expense items currency then
+      !startOptions.isInlineEdit // expenseItems will not be touched when editing the payout method, we don't want to update the expense items currency then
     ) {
       setFieldValue(
         'expenseItems',
@@ -2570,12 +2565,13 @@ export function useExpenseForm(opts: {
 
   const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
 
-  return Object.assign(expenseForm, {
+  return {
+    ...expenseForm,
     options: formOptions,
-    startOptions: startOptions.current,
-    initialLoading: initialLoading.current,
+    startOptions,
+    initialLoading,
     refresh,
-  });
+  };
 }
 export function generateGrantTitle(
   account: ExpenseFormOptions['account'],

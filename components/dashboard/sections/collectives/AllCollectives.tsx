@@ -128,11 +128,7 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
     skip: isEmpty(query),
   });
 
-  useEffect(() => {
-    if (subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)) {
-      handleDrawer(subpath[0]);
-    }
-  }, [subpath[0]]);
+  const pushSubpath = makePushSubpath(router);
 
   const handleDrawer = (collective: HostedCollectiveFieldsFragment | string | undefined) => {
     if (collective) {
@@ -142,6 +138,12 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
     }
     setShowCollectiveOverview(collective);
   };
+
+  useEffect(() => {
+    if (subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)) {
+      handleDrawer(subpath[0]);
+    }
+  }, [subpath[0]]);
 
   const handleEdit = () => {
     refetch();

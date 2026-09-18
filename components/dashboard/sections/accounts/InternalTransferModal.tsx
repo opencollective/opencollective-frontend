@@ -75,11 +75,9 @@ export default function InternalTransferModal({
     },
   });
 
-  const activeAccounts = React.useMemo(
-    () =>
-      data?.account ? [data?.account, ...(data?.account?.childrenAccounts?.nodes.filter(a => a.isActive) || [])] : [],
-    [data?.account],
-  );
+  const activeAccounts = data?.account
+    ? [data.account, ...(data.account.childrenAccounts?.nodes.filter(a => a.isActive) || [])]
+    : [];
 
   // Update currency when activeAccounts load
   React.useEffect(() => {

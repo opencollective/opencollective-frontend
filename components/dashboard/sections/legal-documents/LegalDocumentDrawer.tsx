@@ -84,7 +84,7 @@ export default function LegalDocumentDrawer({
         <SheetContent className="text-sm">
           <DrawerHeader
             dropdownTriggerRef={dropdownTriggerRef}
-            actions={getActions(document, dropdownTriggerRef)}
+            actions={getActions(document)}
             entityName={intl.formatMessage({ defaultMessage: 'Tax form', id: 'TaxForm' })}
             entityIdentifier={<CopyID value={document.publicId}>{document.publicId}</CopyID>}
             entityLabel={

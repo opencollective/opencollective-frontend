@@ -10,16 +10,17 @@ import { TaxInformationForm } from './TaxInformationForm';
 export const TaxInformationFormDialog = ({ account, open, onOpenChange, onSuccess }) => {
   const intl = useIntl();
   const [isFormDirty, setIsFormDirty] = React.useState(false);
-
-  // Reset the dirty state when opening the dialog
-  React.useEffect(() => {
-    if (open) {
-      setIsFormDirty(false);
-    }
-  }, [open]);
+  const [prevOpen, setPrevOpen] = React.useState(open);
+  if (open && !prevOpen) {
+    setPrevOpen(open);
+    setIsFormDirty(false);
+  } else if (open !== prevOpen) {
+    setPrevOpen(open);
+  }
 
   const handleOpenChange = isOpen => {
     if (isOpen) {
+      setIsFormDirty(false);
       onOpenChange(true);
     } else if (
       !isFormDirty ||

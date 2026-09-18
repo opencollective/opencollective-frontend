@@ -23,7 +23,7 @@ const generateLanguageOptions = () => {
 export function LanguageSwitcher() {
   const localeContext = useLocaleContext();
   const intl = useIntl();
-  const languageOptions = React.useMemo(generateLanguageOptions, []);
+  const languageOptions = React.useMemo(() => generateLanguageOptions(), []);
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale) || languageOptions[0];
   return (
     <div className="relative max-w-full">

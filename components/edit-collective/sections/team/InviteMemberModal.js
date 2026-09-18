@@ -68,10 +68,10 @@ const InviteMemberModal = props => {
     mutationOptions,
   );
 
-  let submitMemberForm = null;
+  const submitMemberFormRef = React.useRef(null);
 
   const bindSubmitForm = submitForm => {
-    submitMemberForm = submitForm;
+    submitMemberFormRef.current = submitForm;
   };
 
   const handleInviteMemberMutation = async values => {
@@ -108,8 +108,8 @@ const InviteMemberModal = props => {
   };
 
   const handleSubmitForm = () => {
-    if (submitMemberForm) {
-      submitMemberForm();
+    if (submitMemberFormRef.current) {
+      submitMemberFormRef.current();
     }
   };
 

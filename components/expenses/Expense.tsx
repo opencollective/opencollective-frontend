@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useRef, useState } from 'react';
 import type { ApolloClient } from '@apollo/client';
 import type { FetchMoreFunction } from '@apollo/client/react/hooks/useSuspenseQuery';
 import { themeGet } from '@styled-system/theme-get';
@@ -123,7 +123,6 @@ function Expense(props: ExpenseProps) {
   const {
     data,
     loading,
-    error,
     refetch,
     fetchMore,
     draftKey,
@@ -155,18 +154,12 @@ function Expense(props: ExpenseProps) {
     setIsSubmissionFlowOpen(true);
   }, [data?.expense?.account, data?.expense?.legacyId, data?.expense?.type, draftKey, router]);
 
-  const [state, setState] = useState({
-    showFilesViewerModal: false,
-  });
   const [openUrl, setOpenUrl] = useState(router.query.attachmentUrl as string);
   const [replyingToComment, setReplyingToComment] = useState(null);
+  const [showFilesViewerModalUserOpen, setShowFilesViewerModalUserOpen] = useState(false);
+  const [showFilesViewerModalDismissed, setShowFilesViewerModalDismissed] = useState(false);
 
   const drawerActionsContainer = useDrawerActionsContainer();
-
-  // Update error state when error prop changes (from Expense query)
-  useEffect(() => {
-    setState(state => ({ ...state, error }));
-  }, [error]);
 
   const expenseTopRef = useRef(null);
   const { viewport } = useWindowResize(null, { useMinWidth: true });
@@ -249,18 +242,28 @@ function Expense(props: ExpenseProps) {
     });
   };
 
-  const openFileViewer = url => {
-    setOpenUrl(url);
-    setState({ ...state, showFilesViewerModal: true });
-  };
-
   const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense, intl]);
 
-  useEffect(() => {
-    const showFilesViewerModal = isDrawer && isDesktop && files?.length > 0;
-    setState(state => ({ ...state, showFilesViewerModal }));
-    setOpenUrl(files?.[0]?.url || null);
-  }, [files, isDesktop, isDrawer]);
+  const autoShowFilesViewerModal = isDrawer && isDesktop && files?.length > 0;
+  const autoOpenUrl = files?.[0]?.url || null;
+  const autoFilesViewerContextKey = `${autoShowFilesViewerModal}:${autoOpenUrl ?? ''}`;
+  const [prevAutoFilesViewerContextKey, setPrevAutoFilesViewerContextKey] = useState(autoFilesViewerContextKey);
+  if (autoFilesViewerContextKey !== prevAutoFilesViewerContextKey) {
+    setPrevAutoFilesViewerContextKey(autoFilesViewerContextKey);
+    if (autoShowFilesViewerModal) {
+      setOpenUrl(autoOpenUrl);
+      setShowFilesViewerModalDismissed(false);
+    }
+  }
+
+  const showFilesViewerModal =
+    showFilesViewerModalUserOpen || (autoShowFilesViewerModal && !showFilesViewerModalDismissed);
+
+  const openFileViewer = url => {
+    setOpenUrl(url);
+    setShowFilesViewerModalUserOpen(true);
+    setShowFilesViewerModalDismissed(false);
+  };
 
   return (
     <Box ref={expenseTopRef}>
@@ -328,7 +331,7 @@ function Expense(props: ExpenseProps) {
           drawerActionsContainer={drawerActionsContainer}
           openFileViewer={openFileViewer}
           enableKeyboardShortcuts={enableKeyboardShortcuts}
-          openedItemId={openUrl && state.showFilesViewerModal && files?.find?.(file => file.url === openUrl)?.id}
+          openedItemId={openUrl && showFilesViewerModal && files?.find?.(file => file.url === openUrl)?.id}
         />
       </Box>
 
@@ -413,7 +416,7 @@ function Expense(props: ExpenseProps) {
         />
       )}
 
-      {state.showFilesViewerModal &&
+      {showFilesViewerModal &&
         expense &&
         createPortal(
           <FilesViewerModal
@@ -429,7 +432,12 @@ function Expense(props: ExpenseProps) {
             openFileUrl={openUrl}
             setOpenFileUrl={setOpenUrl}
             onClose={
-              isDrawer && isDesktop ? onClose : () => setState(state => ({ ...state, showFilesViewerModal: false }))
+              isDrawer && isDesktop
+                ? onClose
+                : () => {
+                    setShowFilesViewerModalUserOpen(false);
+                    setShowFilesViewerModalDismissed(true);
+                  }
             }
             hideCloseButton={isDrawer && isDesktop}
           />,

@@ -196,6 +196,8 @@ const AccountDetails = ({ accountId, getActions }: AccountDetailsProps) => {
   const dropdownTriggerRef = React.useRef(undefined);
   const account = data?.account;
 
+  // getActions stores the ref for modal focus restore; it is not read during action construction
+  // eslint-disable-next-line react-hooks/refs -- ref forwarded to action handlers only
   const actions = getActions(account, dropdownTriggerRef, refetch);
 
   const activities = data?.activities?.nodes;

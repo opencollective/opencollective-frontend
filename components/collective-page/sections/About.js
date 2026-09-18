@@ -40,7 +40,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyHTMLValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isFund = collective.type === CollectiveType.FUND;
-  canEdit = collective.isArchived ? false : canEdit;
+  const effectiveCanEdit = collective.isArchived ? false : canEdit;
 
   return (
     <ContainerSectionContent px={2} pb={5}>
@@ -50,7 +50,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           mutationOptions={editCollectiveLongDescriptionMutationOptions}
           values={collective}
           field="longDescription"
-          canEdit={canEdit}
+          canEdit={effectiveCanEdit}
           topEdit={-20}
           showEditIcon={!isEmptyDescription}
           formatBeforeSubmit={v => (isEmptyHTMLValue(v) ? null : v)}
@@ -78,7 +78,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
             } else if (isEmptyDescription) {
               return (
                 <Flex justifyContent="center">
-                  {canEdit ? (
+                  {effectiveCanEdit ? (
                     <Flex flexDirection="column" alignItems="center">
                       {isCollective && !isFund && (
                         <MessageBox type="info" withIcon fontStyle="italic" fontSize="14px" mb={4}>

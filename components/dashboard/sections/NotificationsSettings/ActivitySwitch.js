@@ -48,24 +48,23 @@ const ActivitySwitch = ({ account, activityType }) => {
           ? intl.formatMessage(ActivityClassesI18N[`${notification.type}.title`])
           : notification.type,
       );
-  const [isSubscribed, setSubscribed] = React.useState(existingSetting ? existingSetting.active : true);
   const isOverridedByAll = activityType !== 'ACTIVITY_ALL' && existingSetting?.type === ActivityTypes.ACTIVITY_ALL;
+  const baseSubscribed = isOverridedByAll ? false : existingSetting ? existingSetting.active : true;
+  const [pendingSubscribed, setPendingSubscribed] = React.useState(null);
+  const [prevBaseSubscribed, setPrevBaseSubscribed] = React.useState(baseSubscribed);
+  if (baseSubscribed !== prevBaseSubscribed) {
+    setPrevBaseSubscribed(baseSubscribed);
+    setPendingSubscribed(null);
+  }
+  const isSubscribed = pendingSubscribed ?? baseSubscribed;
 
   const [setEmailNotification] = useMutation(setEmailNotificationMutation, {
     refetchQueries: [{ query: refetchEmailNotificationQuery, variables: { id: account.id } }],
   });
 
-  React.useEffect(() => {
-    if (isOverridedByAll) {
-      setSubscribed(false);
-    } else {
-      setSubscribed(existingSetting ? existingSetting.active : true);
-    }
-  }, [isOverridedByAll]);
-
   const handleToggle = async variables => {
     try {
-      setSubscribed(variables.active);
+      setPendingSubscribed(variables.active);
       await setEmailNotification({ variables });
     } catch (e) {
       toast({

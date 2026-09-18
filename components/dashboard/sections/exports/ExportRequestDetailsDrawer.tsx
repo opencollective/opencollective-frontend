@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { Copy, Download, FileText, Loader2, Trash2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Copy, Download, FileText, Loader2, TimerOff, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -36,7 +36,24 @@ import { Checkbox } from '../../../ui/Checkbox';
 import { DataList, DataListItem } from '../../../ui/DataList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
-import { ExportStatusLabels, ExportTypeLabels, getStatusClassName, getStatusIcon } from './constants';
+import { ExportStatusLabels, ExportTypeLabels, getStatusClassName } from './constants';
+
+function ExportRequestStatusIcon({ status, className }: { status: ExportRequestStatus; className?: string }) {
+  switch (status) {
+    case ExportRequestStatus.ENQUEUED:
+      return <Clock className={className} />;
+    case ExportRequestStatus.PROCESSING:
+      return <Loader2 className={className} />;
+    case ExportRequestStatus.COMPLETED:
+      return <CheckCircle2 className={className} />;
+    case ExportRequestStatus.FAILED:
+      return <AlertCircle className={className} />;
+    case ExportRequestStatus.EXPIRED:
+      return <TimerOff className={className} />;
+    default:
+      return <FileText className={className} />;
+  }
+}
 
 const editExportRequestMutation = gql`
   mutation EditExportRequest($exportRequest: ExportRequestReferenceInput!, $name: NonEmptyString) {
@@ -420,7 +437,6 @@ export const ExportRequestDetailsDrawer = ({
     return null;
   }
 
-  const StatusIcon = exportRequest ? getStatusIcon(exportRequest.status) : null;
   const statusClassName = exportRequest ? getStatusClassName(exportRequest.status) : '';
 
   return (
@@ -466,7 +482,8 @@ export const ExportRequestDetailsDrawer = ({
                 label={<FormattedMessage defaultMessage="Status" id="expense.status" />}
                 value={
                   <Badge className={`gap-1 ${statusClassName}`}>
-                    <StatusIcon
+                    <ExportRequestStatusIcon
+                      status={exportRequest.status}
                       className={`h-3 w-3 ${exportRequest.status === ExportRequestStatus.PROCESSING ? 'animate-spin' : ''}`}
                     />
                     {intl.formatMessage(ExportStatusLabels[exportRequest.status])}

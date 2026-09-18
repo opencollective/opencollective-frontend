@@ -27,6 +27,7 @@ const PopupMenu = ({
 }) => {
   const [isOpen, setOpen] = React.useState(false);
   const ref = React.useRef(undefined);
+  const [referenceElement, setReferenceElement] = React.useState(null);
   useGlobalBlur(
     ref,
     outside => {
@@ -39,7 +40,12 @@ const PopupMenu = ({
   );
 
   return (
-    <Box ref={ref}>
+    <Box
+      ref={node => {
+        ref.current = node;
+        setReferenceElement(node);
+      }}
+    >
       <Button
         onMouseOver={() => setOpen(true)}
         onClick={() => setOpen(!isOpen)}
@@ -49,7 +55,7 @@ const PopupMenu = ({
       {isOpen && (
         <Popper
           placement={placement || 'bottom'}
-          referenceElement={ref?.current}
+          referenceElement={referenceElement}
           modifiers={[
             {
               name: 'offset',

@@ -66,6 +66,7 @@ export default function usePaymentIntent({
 
   React.useEffect(() => {
     async function load() {
+      setLoading(true);
       if (typeof window.Stripe === 'undefined') {
         await loadScriptAsync('https://js.stripe.com/v3/');
       }
@@ -138,7 +139,6 @@ export default function usePaymentIntent({
       abort.current.abort();
     }
 
-    setLoading(true);
     load();
 
     return () => {

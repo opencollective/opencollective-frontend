@@ -73,13 +73,13 @@ export default function AcceptContributionsThroughAFiscalHost(props: StartAccept
   const [searchTerm, setSearchTerm] = React.useState('');
 
   const debouncedSearchTerm = useDebounced(searchTerm, 500);
-
-  // reset filters when doing textual search
-  React.useEffect(() => {
+  const [filtersSearchTerm, setFiltersSearchTerm] = React.useState(debouncedSearchTerm);
+  if (debouncedSearchTerm !== filtersSearchTerm) {
+    setFiltersSearchTerm(debouncedSearchTerm);
     setSelectedCommunityType([]);
     setSelectedCountry('ALL');
     setSelectedCurrency(currencyOptions[0]);
-  }, [debouncedSearchTerm]);
+  }
 
   const communityTags = selectedCommunityType.reduce((tags, community) => {
     return [...tags, ...CommunityTypesToTags[community]];

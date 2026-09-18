@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import StyledLink from './StyledLink';
@@ -35,18 +35,18 @@ const makeBbox = ({ x, y, zoom }) => {
 };
 
 const Map = ({ lat, long }) => {
-  const [src, prepareMap] = useState(null);
+  const src = React.useMemo(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
 
-  useEffect(() => {
     const zoom = 16;
     const x = long2tile(long, zoom);
     const y = lat2tile(lat, zoom);
     const bbox = makeBbox({ x, y, zoom });
 
-    // Set iframe url after component has mounted to prevent https://github.com/opencollective/opencollective/issues/2845
-    const src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&marker=${lat}%2C${long}&layers=ND`;
-
-    prepareMap(src);
+    // Set iframe url on the client to prevent https://github.com/opencollective/opencollective/issues/2845
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&marker=${lat}%2C${long}&layers=ND`;
   }, [lat, long]);
 
   return (

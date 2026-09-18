@@ -39,6 +39,7 @@ export const TransactionsImportRowDrawer = ({
         {row && (
           <React.Fragment>
             <DrawerHeader
+              // eslint-disable-next-line react-hooks/refs -- ref forwarded to action handlers only
               actions={getActions(row, dropdownTriggerRef)}
               entityName={<FormattedMessage defaultMessage="Transaction import row" id="qqPBY/" />}
               forceMoreActions

@@ -238,7 +238,7 @@ export const SearchCommand = ({ open, setOpen }) => {
       .filter(item => item.section !== ALL_SECTIONS.SEARCH);
   }, [intl, account, LoggedInUser]);
 
-  const filteredEntityOptions = React.useMemo(() => {
+  const filteredEntityOptions = (() => {
     if (queryFilter.values.workspace) {
       const entities = [
         SearchEntity.ACCOUNTS,
@@ -255,7 +255,7 @@ export const SearchCommand = ({ open, setOpen }) => {
       return Object.values(pick(entityFilterOptions, entities));
     }
     return Object.values(pick(entityFilterOptions, [SearchEntity.ACCOUNTS, SearchEntity.UPDATES]));
-  }, [queryFilter.values.workspace, defaultContext?.type]);
+  })();
 
   const filteredGoToPages = React.useMemo(() => {
     if (!queryFilter.values.workspace || !input || queryFilter.values.entity !== SearchEntity.ALL) {

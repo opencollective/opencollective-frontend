@@ -435,11 +435,12 @@ export const MatchCreditDialog = ({
   const loading = queryFilter.activeViewId === TabType.EXPENSES ? expensesLoading : contributionsLoading;
   const error = queryFilter.activeViewId === TabType.EXPENSES ? expensesError : contributionsError;
 
-  // When switching tab, clear selection
-  React.useEffect(() => {
+  const [prevActiveViewId, setPrevActiveViewId] = React.useState(queryFilter.activeViewId);
+  if (queryFilter.activeViewId !== prevActiveViewId) {
+    setPrevActiveViewId(queryFilter.activeViewId);
     setSelectedExpense(null);
     setSelectedContribution(null);
-  }, [queryFilter.activeViewId]);
+  }
 
   React.useEffect(() => {
     if (props.open) {

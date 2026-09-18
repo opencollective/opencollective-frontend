@@ -170,7 +170,6 @@ const ExportHostedCollectivesCSVModal = ({
   queryFilter,
   isHostReport,
 }: ExportHostedCollectivesCSVModalProps) => {
-  const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
@@ -226,7 +225,16 @@ const ExportHostedCollectivesCSVModal = ({
     ];
   }, [customFields]);
 
-  React.useEffect(() => {
+  const [prevPresetState, setPrevPresetState] = React.useState<{
+    preset: typeof preset;
+    presetOptions: typeof presetOptions;
+  } | null>(null);
+  if (
+    prevPresetState === null ||
+    preset !== prevPresetState.preset ||
+    presetOptions !== prevPresetState.presetOptions
+  ) {
+    setPrevPresetState({ preset, presetOptions });
     const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
     if (selectedSet && selectedSet.fields) {
       setFields(selectedSet.fields);
@@ -237,7 +245,7 @@ const ExportHostedCollectivesCSVModal = ({
         setPresetName('');
       }
     }
-  }, [presetOptions, preset]);
+  }
 
   React.useEffect(() => {
     if (open) {
@@ -247,8 +255,12 @@ const ExportHostedCollectivesCSVModal = ({
 
   React.useEffect(() => {
     setRestAuthorizationCookie();
-    setDownloadUrl(makeUrl({ account, queryFilter, fields }));
-  }, [fields, queryFilter, account, isHostReport, setDownloadUrl]);
+  }, [fields, queryFilter, account, isHostReport]);
+
+  const downloadUrl = React.useMemo(
+    () => makeUrl({ account, queryFilter, fields }),
+    [fields, queryFilter, account, isHostReport],
+  );
 
   const handleFieldSwitch = React.useCallback(
     ({ name, checked }) => {
@@ -278,26 +290,26 @@ const ExportHostedCollectivesCSVModal = ({
   };
 
   // Fix to avoid infinite loop caused by dragging over two items with variable sizes: https://github.com/clauderic/dnd-kit/issues/44#issuecomment-1018686592
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleDragOver = React.useCallback(
-    debounce(
-      event => {
-        const { active, over } = event;
+  const handleDragOver = React.useMemo(
+    () =>
+      debounce(
+        event => {
+          const { active, over } = event;
 
-        if (over && active.id !== over.id) {
-          setFields(selected => {
-            const oldIndex = selected.findIndex(item => item === active.id);
-            const newIndex = selected.findIndex(item => item === over.id);
-            return arrayMove(selected, oldIndex, newIndex);
-          });
-        }
-      },
-      40,
-      {
-        trailing: false,
-        leading: true,
-      },
-    ),
+          if (over && active.id !== over.id) {
+            setFields(selected => {
+              const oldIndex = selected.findIndex(item => item === active.id);
+              const newIndex = selected.findIndex(item => item === over.id);
+              return arrayMove(selected, oldIndex, newIndex);
+            });
+          }
+        },
+        40,
+        {
+          trailing: false,
+          leading: true,
+        },
+      ),
     [],
   );
 

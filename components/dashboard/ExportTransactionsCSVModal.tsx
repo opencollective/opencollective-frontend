@@ -298,7 +298,6 @@ const ExportTransactionsCSVModal = ({
       LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS),
     [account, LoggedInUser],
   );
-  const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
   const [exportName, setExportName] = React.useState(
@@ -318,18 +317,21 @@ const ExportTransactionsCSVModal = ({
   const [isDeletingPreset, setIsDeletingPreset] = React.useState(false);
   const [step, setStep] = React.useState<ModalStep>(ModalStep.CONFIGURE);
 
-  React.useEffect(() => {
-    if (open) {
-      setExportName(
-        getDefaultExportName({
-          accountFromFilter: queryFilter.values?.account,
-          accountName: account?.name,
-          accountSlug: account?.slug,
-          loggedInUserCollectiveName: LoggedInUser?.collective?.name,
-        }),
-      );
-    }
-  }, [open, queryFilter.values?.account, account, LoggedInUser]);
+  const exportNameResetKey = open
+    ? [queryFilter.values?.account, account?.slug, account?.name, LoggedInUser?.collective?.name].join('|')
+    : '';
+  const [lastExportNameResetKey, setLastExportNameResetKey] = React.useState('');
+  if (open && exportNameResetKey && exportNameResetKey !== lastExportNameResetKey) {
+    setLastExportNameResetKey(exportNameResetKey);
+    setExportName(
+      getDefaultExportName({
+        accountFromFilter: queryFilter.values?.account,
+        accountName: account?.name,
+        accountSlug: account?.slug,
+        loggedInUserCollectiveName: LoggedInUser?.collective?.name,
+      }),
+    );
+  }
 
   const {
     create: createExportRequest,
@@ -487,6 +489,8 @@ const ExportTransactionsCSVModal = ({
     [preset, presetOptions, setFlattenTaxesAndPaymentProcessorFees],
   );
 
+  // Preset changes reset several interdependent field/export options together.
+  /* eslint-disable react-hooks/set-state-in-effect -- keep preset-driven state updates atomic */
   React.useEffect(() => {
     const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
     const isCustomPreset = !PLATFORM_PRESETS[preset] && preset in customFields;
@@ -545,6 +549,7 @@ const ExportTransactionsCSVModal = ({
     LoggedInUser,
     handleTaxAndPaymentProcessorFeeSwitch,
   ]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   React.useEffect(() => {
     if (open && account && !hasAsyncExportsFeature) {
@@ -554,10 +559,12 @@ const ExportTransactionsCSVModal = ({
 
   React.useEffect(() => {
     setRestAuthorizationCookie();
-    setDownloadUrl(
-      makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, useFieldNames, fields }),
-    );
-  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl, useFieldNames]);
+  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, useFieldNames]);
+
+  const downloadUrl = React.useMemo(
+    () => makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, useFieldNames, fields }),
+    [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, useFieldNames],
+  );
 
   const handleFieldSwitch = React.useCallback(({ name, checked }) => {
     if (checked) {
@@ -586,27 +593,26 @@ const ExportTransactionsCSVModal = ({
     setDraggingTag(null);
   };
 
-  // Fix to avoid infinite loop caused by dragging over two items with variable sizes: https://github.com/clauderic/dnd-kit/issues/44#issuecomment-1018686592
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleDragOver = React.useCallback(
-    debounce(
-      event => {
-        const { active, over } = event;
+  const handleDragOver = React.useMemo(
+    () =>
+      debounce(
+        event => {
+          const { active, over } = event;
 
-        if (over && active.id !== over.id) {
-          setFields(selected => {
-            const oldIndex = selected.findIndex(item => item === active.id);
-            const newIndex = selected.findIndex(item => item === over.id);
-            return arrayMove(selected, oldIndex, newIndex);
-          });
-        }
-      },
-      40,
-      {
-        trailing: false,
-        leading: true,
-      },
-    ),
+          if (over && active.id !== over.id) {
+            setFields(selected => {
+              const oldIndex = selected.findIndex(item => item === active.id);
+              const newIndex = selected.findIndex(item => item === over.id);
+              return arrayMove(selected, oldIndex, newIndex);
+            });
+          }
+        },
+        40,
+        {
+          trailing: false,
+          leading: true,
+        },
+      ),
     [],
   );
 

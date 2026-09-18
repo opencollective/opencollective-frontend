@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { cva } from 'class-variance-authority';
 // eslint-disable-next-line no-restricted-imports
 import Link from 'next/link';
@@ -7,14 +7,11 @@ import sanitizeHtml from 'sanitize-html';
 import { triggerPrototypeToast } from './helpers';
 
 export const ContentOverview = ({ content }) => {
-  const [headings, setHeadings] = useState<string[]>([]);
-
-  useEffect(() => {
+  const headings = React.useMemo(() => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, 'text/html');
     const headingElements = doc.querySelectorAll('h3');
-    const headingTexts = Array.from(headingElements).map(h3 => h3.textContent?.trim() || '');
-    setHeadings(headingTexts);
+    return Array.from(headingElements).map(h3 => h3.textContent?.trim() || '');
   }, [content]);
 
   const linkClasses = cva('block border-l-[3px] px-2 text-sm font-semibold hover:text-primary', {

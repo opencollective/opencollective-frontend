@@ -187,7 +187,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
 
 const EditPayee = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>(undefined);
-  const startOptions = React.useRef({
+  const startOptions = {
     expenseId: expense.legacyId,
     isInlineEdit: true,
     pickSchemaFields: {
@@ -198,7 +198,7 @@ const EditPayee = ({ expense, onSubmit }) => {
       payeeSlug: true,
       accountSlug: true,
     },
-  });
+  };
   const transformedOnSubmit = React.useCallback(
     async (values, h, formOptions) => {
       const editValues = {
@@ -269,7 +269,7 @@ const EditPayee = ({ expense, onSubmit }) => {
         data: {},
       },
     },
-    startOptions: startOptions.current,
+    startOptions,
     onSubmit: transformedOnSubmit,
   });
 
@@ -303,7 +303,7 @@ const EditPayee = ({ expense, onSubmit }) => {
 
 const EditPayoutMethod = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>(undefined);
-  const startOptions = React.useRef({
+  const startOptions = {
     expenseId: expense.legacyId,
     isInlineEdit: true,
     pickSchemaFields: {
@@ -315,7 +315,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
       payeeLocation: true,
       referenceCurrency: true,
     },
-  });
+  };
   const transformedOnSubmit = React.useCallback(
     async (values, h, formOptions) => {
       const editValues = {
@@ -383,7 +383,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
         data: {},
       },
     },
-    startOptions: startOptions.current,
+    startOptions,
     onSubmit: transformedOnSubmit,
   });
 
@@ -399,7 +399,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
 
 const EditExpenseDetails = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>(undefined);
-  const startOptions = React.useRef({
+  const startOptions = {
     expenseId: expense.legacyId,
     isInlineEdit: true,
     pickSchemaFields: {
@@ -412,7 +412,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       invoiceInfo: true,
       referenceCurrency: true,
     },
-  });
+  };
   const transformedOnSubmit = (values, h, formOptions) => {
     let invoiceFile;
     if (values.hasInvoiceOption === YesNoOption.YES && values.invoiceFile) {
@@ -482,7 +482,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
         data: {},
       },
     },
-    startOptions: startOptions.current,
+    startOptions,
     onSubmit: transformedOnSubmit,
   });
 
@@ -502,13 +502,13 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
 
 const AttachReceipts = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>(undefined);
-  const startOptions = React.useRef({
+  const startOptions = {
     expenseId: expense.legacyId,
     isInlineEdit: true,
     pickSchemaFields: {
       expenseItems: true,
     },
-  });
+  };
   const transformedOnSubmit = values => {
     const editValues = {
       items: values.expenseItems.map(ei => ({
@@ -558,7 +558,7 @@ const AttachReceipts = ({ expense, onSubmit }) => {
       },
       expenseTypeOption: ExpenseType.CHARGE,
     },
-    startOptions: startOptions.current,
+    startOptions,
     onSubmit: transformedOnSubmit,
   });
 
@@ -604,7 +604,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
   const intl = useIntl();
 
   const formRef = React.useRef<HTMLFormElement>(undefined);
-  const startOptions = React.useRef({
+  const startOptions = {
     expenseId: expense.legacyId,
     isInlineEdit: true,
     pickSchemaFields: {
@@ -617,7 +617,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
       invoiceInfo: true,
       expenseTypeOption: true,
     },
-  });
+  };
   const transformedOnSubmit = (values, h, formOptions) => {
     const editValues = {
       items: values.expenseItems.map(ei => ({
@@ -685,7 +685,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
         data: {},
       },
     },
-    startOptions: startOptions.current,
+    startOptions,
     onSubmit: transformedOnSubmit,
   });
 

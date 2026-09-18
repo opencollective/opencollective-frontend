@@ -24,19 +24,18 @@ const getBlockReason = (collective: GraphQLV1Collective): 'HOSTED' | 'BALANCE_NO
 
 export function ConvertToOrganization({ collective }: { collective: GraphQLV1Collective }) {
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const shouldOpenFromQuery = parseToBoolean(router.query.convertToOrg);
+  const [isModalOpen, setIsModalOpen] = React.useState(shouldOpenFromQuery);
   const { account } = React.useContext(DashboardContext); // The convert to organization modal needs an Account from GraphQL V2
 
-  // Check for query parameter to auto-open modal
+  // Remove query parameter from URL without reloading after auto-opening the modal
   React.useEffect(() => {
-    if (parseToBoolean(router.query.convertToOrg)) {
-      setIsModalOpen(true);
-      // Remove query parameter from URL without reloading
+    if (shouldOpenFromQuery) {
       router.replace({ pathname: router.pathname, query: omit(router.query, 'convertToOrg') }, undefined, {
         shallow: true,
       });
     }
-  }, [router.query.convertToOrg, router]);
+  }, [shouldOpenFromQuery, router]);
 
   const blockReason = getBlockReason(collective);
   return (

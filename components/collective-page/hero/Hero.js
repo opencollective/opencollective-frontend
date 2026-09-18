@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment } from 'react';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
@@ -126,11 +126,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const numberOfHiddenTags = hiddenTags?.length;
   const hasHosting = collective.hasHosting;
 
-  // Cancel edit mode when user navigates out to another collective
-  useEffect(() => {
+  const [editModeCollectiveId, setEditModeCollectiveId] = React.useState(collective.id);
+  if (collective.id !== editModeCollectiveId) {
+    setEditModeCollectiveId(collective.id);
     editCover(false);
     showColorPicker(false);
-  }, [collective.id]);
+  }
 
   const hasSocialLinks = collective.socialLinks && collective.socialLinks.length > 0;
 

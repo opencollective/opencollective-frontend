@@ -147,15 +147,12 @@ export default function FilesViewerModal({
   setOpenFileUrl,
 }: FilesViewerModalProps) {
   const intl = useIntl();
-  const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
-  const [selectedIndex, setSelectedIndex] = useState(initialIndex);
-
-  React.useEffect(() => {
-    if (openFileUrl) {
-      const idx = files?.findIndex(f => f.url === openFileUrl) ?? 0;
-      setSelectedIndex(idx);
-    }
-  }, [openFileUrl, files]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const indexFromOpenFileUrl =
+    openFileUrl !== null && openFileUrl !== undefined && openFileUrl !== ''
+      ? (files?.findIndex(f => f.url === openFileUrl) ?? 0)
+      : null;
+  const activeIndex = indexFromOpenFileUrl ?? selectedIndex;
 
   const onArrowLeft = React.useCallback(
     () =>
@@ -180,14 +177,14 @@ export default function FilesViewerModal({
   useKeyBoardShortcut({ callback: onArrowRight, keyMatch: ARROW_RIGHT_KEY });
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
-  const selectedItem = files?.length ? files?.[selectedIndex] : null;
+  const selectedItem = files?.length ? files?.[activeIndex] : null;
   const selectedItemContentType = selectedItem?.info?.type || selectedItem?.type;
 
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
   const contentWrapperRef = React.useRef(null);
 
-  const renderFile = ({ url, name }: { url: string; name?: string; info?: { width: number } }, contentWrapperRef) => {
+  const renderFile = ({ url, name }: { url: string; name?: string; info?: { width: number } }) => {
     let content: React.ReactNode;
 
     const isText = ['text/csv', 'text/plain'].includes(selectedItemContentType);
@@ -249,7 +246,7 @@ export default function FilesViewerModal({
                       <FormattedMessage
                         id="CountOfTotalCount"
                         defaultMessage="{count} of {totalCount}"
-                        values={{ count: selectedIndex + 1, totalCount: nbFiles }}
+                        values={{ count: activeIndex + 1, totalCount: nbFiles }}
                       />
                     </Span>
                   )}{' '}
@@ -302,14 +299,14 @@ export default function FilesViewerModal({
         </Header>
         {hasMultipleFiles && (
           <React.Fragment>
-            <StyledArrowButton direction="left" onClick={onArrowLeft} disabled={!selectedIndex}>
+            <StyledArrowButton direction="left" onClick={onArrowLeft} disabled={!activeIndex}>
               <ChevronLeft size={24} />
             </StyledArrowButton>
 
             <StyledArrowButton
               direction="right"
               onClick={onArrowRight}
-              disabled={!nbFiles || selectedIndex === nbFiles - 1}
+              disabled={!nbFiles || activeIndex === nbFiles - 1}
             >
               <ChevronRight size={24} />
             </StyledArrowButton>
@@ -335,7 +332,7 @@ export default function FilesViewerModal({
               }
             }}
           >
-            {selectedItem && renderFile(selectedItem, contentWrapperRef)}
+            {selectedItem && renderFile(selectedItem)}
           </div>
         </div>
       </DialogPrimitive.Content>

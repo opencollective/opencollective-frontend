@@ -281,12 +281,13 @@ export function NewPlatformTipContainer(props: NewPlatformTipContainerProps) {
   const { step } = props;
   const intl = useIntl();
   const [isEditing, setIsEditing] = React.useState(false);
-
-  React.useEffect(() => {
+  const [lastStep, setLastStep] = React.useState(step);
+  if (step !== lastStep) {
+    setLastStep(step);
     if (step === 'details') {
       setIsEditing(false);
     }
-  }, [step]);
+  }
 
   if (step !== 'details' && !isEditing) {
     const tipAmount = formatCurrency(props.value ?? 0, props.currency as Currency, { locale: intl.locale });

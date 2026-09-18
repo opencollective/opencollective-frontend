@@ -290,23 +290,27 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
   // data handling
   const paymentMethods = get(data, 'account.paymentMethods', null);
   const existingPaymentMethod = get(data, 'order.paymentMethod', null);
-  const filterPaymentMethodsParams = [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod];
   const paymentOptions = React.useMemo(
-    () => sortAndFilterPaymentMethods(...filterPaymentMethodsParams),
-    filterPaymentMethodsParams,
+    () => sortAndFilterPaymentMethods(paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod),
+    [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod],
   );
 
-  useEffect(() => {
-    if (!paymentOptions) {
-      return;
-    }
-    if (selectedPaymentMethod === null && contribution.paymentMethod) {
+  const paymentSelectionSyncKey = paymentOptions
+    ? `${paymentOptions.map(option => option.id).join(',')}-${addedPaymentMethod?.id ?? 'none'}-${contribution.paymentMethod?.id ?? 'none'}`
+    : null;
+  const [syncedPaymentSelectionKey, setSyncedPaymentSelectionKey] = useState(null);
+  if (paymentOptions && paymentSelectionSyncKey !== syncedPaymentSelectionKey) {
+    setSyncedPaymentSelectionKey(paymentSelectionSyncKey);
+    if (addedPaymentMethod) {
+      setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.id) ?? null);
+    } else if (selectedPaymentMethod === null && contribution.paymentMethod) {
       setSelectedPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
-    } else if (addedPaymentMethod) {
-      setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.id));
     }
     setLoadingSelectedPaymentMethod(false);
-  }, [paymentOptions, addedPaymentMethod]);
+  } else if (!paymentOptions && syncedPaymentSelectionKey !== null) {
+    setSyncedPaymentSelectionKey(null);
+    setLoadingSelectedPaymentMethod(true);
+  }
 
   return (
     <Fragment>

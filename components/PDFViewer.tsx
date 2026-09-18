@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { throttle } from 'lodash-es';
 import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -49,10 +49,11 @@ const PDFViewer = ({
   const [wrapperWidth, setWrapperWidth] = useState(0);
   const [pageWidth, setPageWidth] = useState(0);
 
-  const throttledSetWrapperWidth = useCallback(
-    throttle(w => {
-      setWrapperWidth(w);
-    }, 500),
+  const throttledSetWrapperWidth = useMemo(
+    () =>
+      throttle((w: number) => {
+        setWrapperWidth(w);
+      }, 500),
     [],
   );
 

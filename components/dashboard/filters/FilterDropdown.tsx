@@ -310,15 +310,6 @@ function FilterDropdown<FV, FM>({
   const appliedValue = values[filterKey];
   const [draftValue, setDraftValue] = React.useState(appliedValue);
 
-  // Sync draft value when the applied value changes externally (e.g., URL change).
-  // Only sync while the popover is closed to avoid resetting in-progress edits when the
-  // parent re-renders (e.g. after a GraphQL refetch).
-  React.useEffect(() => {
-    if (!open) {
-      setDraftValue(appliedValue);
-    }
-  }, [appliedValue, open]);
-
   const handleOpenChange = (isOpen: boolean) => {
     if (locked) {
       return;
@@ -326,6 +317,8 @@ function FilterDropdown<FV, FM>({
     setDraftValue(appliedValue);
     setOpen(isOpen);
   };
+
+  const effectiveDraftValue = open ? draftValue : appliedValue;
 
   const handleClear = () => {
     setFilter(filterKey, undefined);
@@ -337,7 +330,7 @@ function FilterDropdown<FV, FM>({
         <FilterPill
           filterKey={filterKey}
           filters={filters}
-          value={draftValue}
+          value={effectiveDraftValue}
           isOpen={open}
           highlighted={highlighted}
           meta={meta}
@@ -347,7 +340,7 @@ function FilterDropdown<FV, FM>({
       </PopoverAnchor>
       <PopoverContent className="w-[260px] p-0" align="start">
         <FilterValueForm
-          draftValue={draftValue}
+          draftValue={effectiveDraftValue}
           setDraftValue={setDraftValue}
           filters={filters}
           filterKey={filterKey}
@@ -386,14 +379,8 @@ export function AddFilterDropdown<FV, FM>({
   const [selectedFilterKey, setSelectedFilterKey] = React.useState<keyof FV | null>(null);
   const [draftValue, setDraftValue] = React.useState<FV[keyof FV] | undefined>(undefined);
 
-  // Reset state when the selected filter is no longer available
-  // (e.g., it was just applied and moved to displayed filters)
-  React.useEffect(() => {
-    if (selectedFilterKey && !remainingFilters.includes(selectedFilterKey) && !open) {
-      setSelectedFilterKey(null);
-      setDraftValue(undefined);
-    }
-  }, [selectedFilterKey, remainingFilters, open]);
+  const effectiveSelectedFilterKey =
+    selectedFilterKey && (open || remainingFilters.includes(selectedFilterKey)) ? selectedFilterKey : null;
 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -414,20 +401,20 @@ export function AddFilterDropdown<FV, FM>({
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverAnchor>
         <FilterPill<FV, FM>
-          filterKey={selectedFilterKey}
+          filterKey={effectiveSelectedFilterKey}
           filters={filters}
-          value={draftValue}
+          value={effectiveSelectedFilterKey ? draftValue : undefined}
           isOpen={open}
           meta={meta}
         />
       </PopoverAnchor>
       <PopoverContent className="w-[260px] p-0" align="start">
-        {selectedFilterKey ? (
+        {effectiveSelectedFilterKey ? (
           <FilterValueForm
             draftValue={draftValue}
             setDraftValue={setDraftValue}
             filters={filters}
-            filterKey={selectedFilterKey}
+            filterKey={effectiveSelectedFilterKey}
             setFilter={setFilter}
             setOpen={setOpen}
             meta={meta}

@@ -41,6 +41,7 @@ const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefe
   const [reorderProviders] = useMutation(reorderManualPaymentProvidersMutation);
 
   const [customProviders, otherProviders] = partition(manualPaymentProviders, p => p.type === 'OTHER');
+  const otherProviderIds = otherProviders.map(p => p.id).join(',');
 
   const handleSave = React.useCallback(
     async (
@@ -149,7 +150,7 @@ const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefe
         });
       }
     },
-    [reorderProviders, account, intl, toast, onRefetch, otherProviders],
+    [reorderProviders, account, intl, toast, onRefetch, otherProviderIds, otherProviders],
   );
 
   return (

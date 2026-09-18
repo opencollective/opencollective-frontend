@@ -141,13 +141,14 @@ const MenuEntry = ({
 }) => {
   const hasActiveChild = !!account.children?.some(child => child.slug === activeSlug);
   const [expanded, setExpanded] = React.useState(hasActiveChild);
-  const isActive = activeSlug === account.slug || (hasActiveChild && !expanded);
-
-  React.useEffect(() => {
+  const [prevHasActiveChild, setPrevHasActiveChild] = React.useState(hasActiveChild);
+  if (hasActiveChild !== prevHasActiveChild) {
+    setPrevHasActiveChild(hasActiveChild);
     if (hasActiveChild) {
       setExpanded(true);
     }
-  }, [hasActiveChild]);
+  }
+  const isActive = activeSlug === account.slug || (hasActiveChild && !expanded);
   return (
     <Collapsible open={expanded} onOpenChange={setExpanded}>
       <DropdownMenuItem

@@ -297,14 +297,12 @@ const Policies = ({ collective }) => {
     },
   });
 
-  React.useEffect(() => {
-    if (collectiveContributionFilteringCategories && isEmpty(selected)) {
-      const alreadyPickedCategories = collectiveContributionFilteringCategories.map(category => {
-        return selectOptions.find(option => option.value === category);
-      });
-      setSelected(alreadyPickedCategories);
-    }
-  }, [loading, collectiveContributionFilteringCategories]);
+  if (collectiveContributionFilteringCategories && isEmpty(selected) && !loading) {
+    const alreadyPickedCategories = collectiveContributionFilteringCategories.map(category => {
+      return selectOptions.find(option => option.value === category);
+    });
+    setSelected(alreadyPickedCategories);
+  }
 
   React.useEffect(() => {
     if (data) {

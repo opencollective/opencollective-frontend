@@ -54,7 +54,6 @@ function ExpenseTagsFilter({
   ...props
 }: FilterComponentProps<ExpenseTagFilterValue, ExpenseTagsFilterMeta>) {
   const { onChange, value } = props;
-  const [options, setOptions] = React.useState<{ label: string; value: string }[]>([]);
 
   const [search, { loading, data }] = useLazyQuery(expenseTagsQuery, {
     fetchPolicy: 'cache-first',
@@ -90,6 +89,10 @@ function ExpenseTagsFilter({
     searchFunc('');
   }, [searchFunc]);
 
+  const tagOptionsFromQuery =
+    !loading && data?.tagStats?.nodes ? data.tagStats.nodes.map(({ tag }) => ({ label: tag, value: tag })) : undefined;
+  const options = tagOptionsFromQuery ?? [];
+
   const untaggedOption = React.useMemo(
     () => ({
       label: <span className="text-muted-foreground">{intl.formatMessage(untaggedLabel)}</span>,
@@ -97,12 +100,6 @@ function ExpenseTagsFilter({
     }),
     [intl],
   );
-
-  React.useEffect(() => {
-    if (!loading && data?.tagStats?.nodes) {
-      setOptions(data.tagStats.nodes.map(({ tag }) => ({ label: tag, value: tag })));
-    }
-  }, [loading, data]);
 
   const displayOptions = isSearching ? options : [untaggedOption, ...options];
 

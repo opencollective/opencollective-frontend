@@ -23,17 +23,18 @@ type SearchBarProps = {
  */
 const SearchBar = ({ onSubmit, defaultValue, placeholder, ...props }: SearchBarProps) => {
   const [value, setValue] = React.useState(defaultValue || '');
+  const [prevDefaultValue, setPrevDefaultValue] = React.useState(defaultValue);
   const intl = useIntl();
+
+  if (prevDefaultValue !== defaultValue) {
+    setPrevDefaultValue(defaultValue);
+    setValue(defaultValue || '');
+  }
 
   const handleClearFilter = () => {
     setValue('');
     onSubmit(null);
   };
-
-  // Reset value when `defaultValue` change, to handle reset filters
-  React.useEffect(() => {
-    setValue(defaultValue || '');
-  }, [defaultValue]);
 
   return (
     <SearchForm

@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
@@ -25,27 +25,19 @@ import { editAccountSettingMutation } from './queries';
 
 export function PlatformBillingCollapsibleCard() {
   const { account } = useContext(DashboardContext);
-  const [showSubscriptionCard, setShowSubscriptionCard] = useState(undefined);
+  const [showSubscriptionCardOverride, setShowSubscriptionCardOverride] = useState<boolean | undefined>(undefined);
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [editAccountSetting] = useMutation(editAccountSettingMutation);
 
-  useEffect(() => {
-    if (!LoggedInUser || !account) {
-      return;
-    }
-
-    if (showSubscriptionCard === undefined) {
-      const showSubscriptionCardKey = `id${account.legacyId}`;
-      const showSubscriptionCardSetting =
-        LoggedInUser.collective.settings?.showInitialOverviewSubscriptionCard?.[showSubscriptionCardKey];
-
-      setShowSubscriptionCard(showSubscriptionCardSetting !== false ? true : false);
-    }
-  }, [LoggedInUser, account, showSubscriptionCard]);
+  const defaultShowSubscriptionCard =
+    LoggedInUser && account
+      ? LoggedInUser.collective.settings?.showInitialOverviewSubscriptionCard?.[`id${account.legacyId}`] !== false
+      : undefined;
+  const showSubscriptionCard = showSubscriptionCardOverride ?? defaultShowSubscriptionCard;
 
   const handleSubscriptionCardToggle = useCallback(
     async (open: boolean) => {
-      setShowSubscriptionCard(open);
+      setShowSubscriptionCardOverride(open);
 
       await editAccountSetting({
         variables: {

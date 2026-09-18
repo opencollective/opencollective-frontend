@@ -50,9 +50,10 @@ const ConfirmGuestPage = () => {
   const theme = useTheme();
   const router = useRouter();
   const { login } = useLoggedInUser();
+  const { token, email } = router.query;
   const [status, setStatus] = React.useState(STATUS.SUBMITTING);
   const [callConfirmGuestAccount, { error, data }] = useMutation(confirmGuestAccountMutation);
-  const { token, email } = router.query;
+  const displayStatus = email ? status : STATUS.ERROR;
 
   const confirmGuestAccount = async () => {
     try {
@@ -67,16 +68,15 @@ const ConfirmGuestPage = () => {
     }
   };
 
-  // Auto-submit on mount, or switch to "Pick profile"
   React.useEffect(() => {
-    if (!email) {
-      setStatus(STATUS.ERROR);
-    } else {
-      // Directly submit the confirmation
-      setStatus(STATUS.SUBMITTING);
+    if (email) {
+      // Starts an async mutation; status updates happen after the request settles.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       confirmGuestAccount();
     }
-  }, []);
+    // Auto-submit once the confirmation email is available on the query string.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email]);
 
   return (
     <Page title={intl.formatMessage(MESSAGES.pageTitle)}>
@@ -88,7 +88,7 @@ const ConfirmGuestPage = () => {
         alignItems="center"
         background="linear-gradient(180deg, #EBF4FF, #FFFFFF)"
       >
-        {status === STATUS.SUBMITTING && (
+        {displayStatus === STATUS.SUBMITTING && (
           <Fragment>
             <Box my={3}>
               <Email size={42} color={theme.colors.primary[500]} />
@@ -98,7 +98,7 @@ const ConfirmGuestPage = () => {
             </MessageBox>
           </Fragment>
         )}
-        {status === STATUS.SUCCESS && (
+        {displayStatus === STATUS.SUCCESS && (
           <Fragment>
             <Container mb={3} pb={3} px={4} textAlign="center" boxShadow="0px 8px 8px -10px rgb(146 146 146 / 40%)">
               <Box my={3}>
@@ -131,7 +131,7 @@ const ConfirmGuestPage = () => {
             </Container>
           </Fragment>
         )}
-        {status === STATUS.ERROR && (
+        {displayStatus === STATUS.ERROR && (
           <Fragment>
             <Box my={3}>
               <Email size={42} color={theme.colors.red[500]} />

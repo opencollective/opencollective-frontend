@@ -475,24 +475,22 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
   // Keep structured values locally so country changes can normalize them even if the
   // parent briefly clears `value` when updating the country (e.g. UserLocationInput).
   const [structuredValues, setStructuredValues] = React.useState<StructuredAddress>(() => value || {});
-  const structuredValuesRef = React.useRef(structuredValues);
-  structuredValuesRef.current = structuredValues;
-  const lastPropagatedValuesRef = React.useRef<StructuredAddress | undefined>(undefined);
+  const [lastPropagatedValues, setLastPropagatedValues] = React.useState<StructuredAddress | undefined>(undefined);
+  const [lastExternalValue, setLastExternalValue] = React.useState(value);
 
-  React.useEffect(() => {
-    if (value && !isEmpty(value)) {
-      setStructuredValues(prev => (isEqual(prev, value) ? prev : value!));
-    }
-  }, [value]);
+  if (value && !isEmpty(value) && !isEqual(lastExternalValue, value)) {
+    setLastExternalValue(value);
+    setStructuredValues(prev => (isEqual(prev, value) ? prev : value!));
+  }
 
   const propagateStructuredValues = React.useCallback(
     (next: StructuredAddress) => {
-      if (!isEqual(lastPropagatedValuesRef.current, next)) {
-        lastPropagatedValuesRef.current = next;
+      if (!isEqual(lastPropagatedValues, next)) {
+        setLastPropagatedValues(next);
         onCountryChange(next);
       }
     },
-    [onCountryChange],
+    [lastPropagatedValues, onCountryChange],
   );
 
   const updateStructuredValues = React.useCallback(
@@ -503,22 +501,19 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
     [propagateStructuredValues],
   );
 
-  // Notify parent when country changes and fields are updated
-  React.useEffect(() => {
-    if (fields && addressFormFields) {
-      const normalized = normalizeStructuredZone(structuredValuesRef.current, fields);
-      setStructuredValues(prev => (isEqual(prev, normalized) ? prev : normalized));
-      lastPropagatedValuesRef.current = normalized;
-      onCountryChange(normalized);
-      try {
-        onLoadSuccess?.({ countryInfo: addressFormFields, addressFields: fields });
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.warn('Error calling onLoadSuccess: ', (e as Error).message);
-      }
+  const [syncedCountry, setSyncedCountry] = React.useState(selectedCountry);
+  if (fields && addressFormFields && selectedCountry !== syncedCountry) {
+    setSyncedCountry(selectedCountry);
+    const normalized = normalizeStructuredZone(structuredValues, fields);
+    setStructuredValues(prev => (isEqual(prev, normalized) ? prev : normalized));
+    propagateStructuredValues(normalized);
+    try {
+      onLoadSuccess?.({ countryInfo: addressFormFields, addressFields: fields });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('Error calling onLoadSuccess: ', (e as Error).message);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCountry]);
+  }
 
   if (!selectedCountry || !fields || !addressFormFields) {
     return null;

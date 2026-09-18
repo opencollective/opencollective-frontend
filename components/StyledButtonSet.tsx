@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import type { ReactNode } from 'react';
 import { styled } from 'styled-components';
@@ -86,11 +86,9 @@ const StyledButtonItem = ({
   const isSelected = item === selected;
   const [isAlwaysShown, setIsAlwaysShown] = useState(isSelected);
 
-  useEffect(() => {
-    if (isSelected && !isAlwaysShown) {
-      setIsAlwaysShown(true);
-    }
-  }, [isSelected, isAlwaysShown]);
+  if (isSelected && !isAlwaysShown) {
+    setIsAlwaysShown(true);
+  }
 
   return (
     <ButtonItem

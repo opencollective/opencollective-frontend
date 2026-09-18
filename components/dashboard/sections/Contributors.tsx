@@ -270,25 +270,17 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   ];
 
   // Prepare tier options for the filter
-  const tierOptions = React.useMemo(() => {
-    const options = [];
-
-    // Add option for contributors without tiers
-    options.push({
-      label: <i>{intl.formatMessage({ defaultMessage: 'Default (no tier)', id: 'Contributors.NoTier' })}</i>,
-      value: '__NO_TIER__',
-      key: '__NO_TIER__',
+  const tierOptions = [];
+  tierOptions.push({
+    label: <i>{intl.formatMessage({ defaultMessage: 'Default (no tier)', id: 'Contributors.NoTier' })}</i>,
+    value: '__NO_TIER__',
+    key: '__NO_TIER__',
+  });
+  if (metadata?.account?.tiers?.nodes) {
+    metadata.account.tiers.nodes.forEach(tier => {
+      tierOptions.push({ label: tier.name, value: tier.legacyId, key: tier.id });
     });
-
-    // Add all available tiers
-    if (metadata?.account?.tiers?.nodes) {
-      metadata.account.tiers.nodes.forEach(tier => {
-        options.push({ label: tier.name, value: tier.legacyId, key: tier.id });
-      });
-    }
-
-    return options;
-  }, [metadata?.account?.tiers?.nodes, intl]);
+  }
 
   const queryFilter = useQueryFilter({
     schema: z.object({

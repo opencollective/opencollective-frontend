@@ -70,7 +70,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
 
   React.useEffect(() => {
     if (LoggedInUser && redirectToGithub) {
-      callRedirectToGithub(collectiveSlug);
+      void Promise.resolve().then(() => callRedirectToGithub(collectiveSlug));
     }
   }, [LoggedInUser, redirectToGithub, callRedirectToGithub, collectiveSlug]);
 

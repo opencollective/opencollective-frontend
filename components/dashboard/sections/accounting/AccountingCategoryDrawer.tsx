@@ -34,17 +34,13 @@ type AccountingCategoryDrawerProps = {
 };
 
 export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
+  const drawerStateKey = `${props.open}-${props.isInitiallyEditing}-${props.accountingCategory?.id ?? ''}`;
   const [isEditing, setIsEditing] = React.useState(props.isInitiallyEditing || false);
-
-  React.useEffect(() => {
-    if (!props.open) {
-      setIsEditing(false);
-    }
-  }, [props.open]);
-
-  React.useEffect(() => {
-    setIsEditing(props.isInitiallyEditing || false);
-  }, [props.isInitiallyEditing]);
+  const [lastDrawerStateKey, setLastDrawerStateKey] = React.useState(drawerStateKey);
+  if (drawerStateKey !== lastDrawerStateKey) {
+    setLastDrawerStateKey(drawerStateKey);
+    setIsEditing(props.open ? props.isInitiallyEditing || false : false);
+  }
 
   return (
     <Drawer maxWidth="512px" open={props.open} onClose={props.onClose} showActionsContainer>

@@ -144,10 +144,10 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
 
   const [showRemoveConfirmation, setShowRemoveConfirmation] = React.useState(false);
 
-  let submitMemberForm = null;
+  const submitMemberFormRef = React.useRef(null);
 
   const bindSubmitForm = submitForm => {
-    submitMemberForm = submitForm;
+    submitMemberFormRef.current = submitForm;
   };
 
   const handleEditMemberMutation = async values => {
@@ -283,8 +283,8 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
   };
 
   const handleSubmitForm = () => {
-    if (submitMemberForm) {
-      submitMemberForm();
+    if (submitMemberFormRef.current) {
+      submitMemberFormRef.current();
     }
   };
 
