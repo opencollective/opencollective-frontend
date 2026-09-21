@@ -52,10 +52,10 @@ env:
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
   GITHUB_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
   GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
-  FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
-  API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
-  IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
-  PDF_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-pdf
+  FRONTEND_FOLDER: ${{ github.workspace }}
+  API_FOLDER: ${{ github.workspace }}/opencollective-api
+  IMAGES_FOLDER: ${{ github.workspace }}/opencollective-images
+  PDF_FOLDER: ${{ github.workspace }}/opencollective-pdf
   TERM: xterm
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
   STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
