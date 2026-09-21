@@ -27,26 +27,33 @@ const NON_RANDOMIZED_ENVS = ['ci', 'e2e', 'test'];
 const OPEN_SOURCE_COLLECTIVE_HOST_SLUG = 'opensource';
 const OPEN_SOURCE_COLLECTIVE_HOST_LEGACY_ID = 11004;
 
+const DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE = 50;
+
+// Read through `getEnvVar` (not `process.env`) so the values come from `__NEXT_DATA__.env` at
+// runtime: the percentages can be changed with a config var update alone, no rebuild needed.
+// The defaults live in env.js.
+
 // Only a plain integer is accepted: parseInt would silently turn a typo like "1e3" or "7.5" into
-// a split nobody intended, so anything else uses the fallback.
-function getRolloutPercentage(rawValue: unknown, defaultValue: number): number {
+// a split nobody intended, so anything else falls back to the pre-experiment behaviour (old tip UI).
+function getNewPlatformTipFlowRolloutPercentage(): number {
+  const rawValue = getEnvVar('NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE');
   if (typeof rawValue !== 'string' || !/^\d+$/.test(rawValue)) {
-    return defaultValue;
+    return 0;
   }
 
   return Math.min(parseInt(rawValue, 10), 100);
 }
 
-// Read through `getEnvVar` (not `process.env`) so the values come from `__NEXT_DATA__.env` at
-// runtime: the percentages can be changed with a config var update alone, no rebuild needed.
-// The defaults live in env.js; a missing or unparseable value falls back to the pre-experiment
-// behaviour (old tip UI, tip always proposed).
-function getNewPlatformTipFlowRolloutPercentage(): number {
-  return getRolloutPercentage(getEnvVar('NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE'), 0);
-}
-
+// Kept as originally shipped (lenient parseInt, 50% fallback) so the running OSC experiment is not
+// affected by the new platform tip flow rollout.
 function getOscPlatformTipRolloutPercentage(): number {
-  return getRolloutPercentage(getEnvVar('OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE'), 100);
+  const percentage = parseInt(getEnvVar('OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE'), 10);
+
+  if (!Number.isFinite(percentage)) {
+    return DEFAULT_OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE;
+  }
+
+  return Math.min(Math.max(percentage, 0), 100);
 }
 
 export function isOpenSourceCollectiveHost(host?: { slug?: string; legacyId?: number | string }): boolean {
@@ -170,7 +177,7 @@ const experiments: Record<Experiment, ExperimentConfig> = {
   },
   // OSC-only experiment for measuring the impact of platform tips on contributions.
   // `true` means the tip step is hidden for this user. OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE
-  // is the share of eligible contributions that get the tip proposed (see env.js for the default); the
+  // is the share of eligible contributions that get the tip proposed (default 50); the
   // remainder is the holdout where the tip is hidden. Equal arms keep the revenue comparison
   // centered and unbiased under the site's heavy-tailed contribution amounts. Set to 100 to
   // end the holdout.

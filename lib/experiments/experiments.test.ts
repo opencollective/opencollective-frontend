@@ -145,24 +145,19 @@ describe('experiments', () => {
     });
   });
 
-  it.each(['100%', '1e3', ' 50', '7.5', ''])('falls back when the percentage is not a plain integer (%j)', value => {
-    setNewFlowRolloutPercentage(value);
-    setOscRolloutPercentage(value);
-    randomSpy.mockReturnValue(0.99);
+  it.each(['100%', '1e3', ' 50', '7.5', ''])(
+    'keeps the old platform tip flow when the percentage is not a plain integer (%j)',
+    value => {
+      setNewFlowRolloutPercentage(value);
+      randomSpy.mockReturnValue(0.99);
 
-    // New flow falls back to 0: old UI
-    expect(
-      isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
-        collective: { slug: 'babel', host: { slug: 'other-host' } },
-      }),
-    ).toBe(false);
-    // OSC falls back to 100: tip always proposed
-    expect(
-      isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, {
-        collective: { slug: 'webpack', host: { slug: 'opensource' } },
-      }),
-    ).toBe(false);
-  });
+      expect(
+        isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, undefined, {
+          collective: { slug: 'babel', host: { slug: 'other-host' } },
+        }),
+      ).toBe(false);
+    },
+  );
 
   it('lets the URL override force the new platform tip flow', () => {
     process.env.OC_ENV = 'e2e';
@@ -171,15 +166,31 @@ describe('experiments', () => {
     expect(isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW)).toBe(true);
   });
 
-  it('always proposes the tip when the OSC percentage is missing or unparseable', () => {
+  it('defaults to a 50% OSC rollout when the percentage is missing or unparseable', () => {
     const context = { collective: { host: { slug: 'opensource' } } };
-    randomSpy.mockReturnValue(0.99);
 
     delete (window as any).__NEXT_DATA__.env.OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE;
+    // Below the default rollout percentage: tip proposed (experiment not enabled)
+    randomSpy.mockReturnValueOnce(0.49);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
+    // At or above the default rollout percentage: tip hidden (experiment enabled)
+    randomSpy.mockReturnValueOnce(0.5);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
 
     setOscRolloutPercentage('fifty');
+    randomSpy.mockReturnValueOnce(0.5);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
+  });
+
+  it('keeps the lenient OSC percentage parsing', () => {
+    const context = { collective: { host: { slug: 'opensource' } } };
+
+    // "70%" parses as 70 like before: tip proposed below 70, hidden at or above
+    setOscRolloutPercentage('70%');
+    randomSpy.mockReturnValueOnce(0.69);
     expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(false);
+    randomSpy.mockReturnValueOnce(0.7);
+    expect(isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, undefined, context)).toBe(true);
   });
 
   it('uses the configured OSC platform tip rollout percentage', () => {
