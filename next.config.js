@@ -87,6 +87,7 @@ const nextConfig = {
         API_URL: null,
         PDF_SERVICE_URL: null,
         ML_SERVICE_URL: null,
+        EXPENSE_CATEGORY_PREDICTION_ORG_SLUGS: '',
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
