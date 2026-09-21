@@ -14,12 +14,16 @@ export const fetchExpenseCategoryPredictions = async ({
   type,
   description,
   items,
+  isHostExpense,
+  includeHostOnly,
 }: {
   hostSlug: string;
   accountSlug: string;
   type: ExpenseType;
   description: string;
   items: string;
+  isHostExpense?: boolean;
+  includeHostOnly?: boolean;
 }) => {
   const urlParams = new URLSearchParams();
   urlParams.append('host_slug', hostSlug);
@@ -27,6 +31,13 @@ export const fetchExpenseCategoryPredictions = async ({
   urlParams.append('type', type);
   urlParams.append('description', description);
   urlParams.append('items', items);
+
+  if (isHostExpense !== undefined) {
+    urlParams.append('is_host_expense', String(isHostExpense));
+  }
+  if (includeHostOnly !== undefined) {
+    urlParams.append('include_host_only', String(includeHostOnly));
+  }
 
   const response = await fetch(`${ML_SERVICE_URL}/models/expense-category?${urlParams}`);
   const data = await response.json();

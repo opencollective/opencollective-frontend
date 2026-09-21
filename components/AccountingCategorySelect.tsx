@@ -12,7 +12,7 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
 import { cn } from '../lib/utils';
 import { ACCOUNTING_CATEGORY_HOST_FIELDS } from './expenses/lib/accounting-categories';
-import { isSameAccount } from '@/lib/collective';
+import { isHostExpenseAccount } from '@/lib/collective';
 
 import { Button } from './ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
@@ -211,10 +211,9 @@ const getOptions = (
     remove(categories, category => !balanceSheetCategories.includes(category.kind));
   }
 
-  const expectedAppliesTo =
-    isSameAccount(host, account) || isSameAccount(host, account?.parent)
-      ? AccountingCategoryAppliesTo.HOST
-      : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES;
+  const expectedAppliesTo = isHostExpenseAccount(host, account)
+    ? AccountingCategoryAppliesTo.HOST
+    : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES;
 
   // Balance sheet accounts are the host's own; appliesTo does not restrict them
   if (!balanceSheetCategories.includes(kind)) {
@@ -270,8 +269,10 @@ const getCleanInputData = (
 const useExpenseCategoryPredictionService = (
   enabled: boolean,
   host: RequiredHostFields,
-  account: Pick<Account, 'slug'>,
+  account: Pick<Account, 'slug'> & { parent?: Pick<Account, 'id'> },
   expenseValues?: AccountingCategorySelectProps['expenseValues'],
+  isHostExpense?: boolean,
+  includeHostOnly?: boolean,
 ) => {
   const { call: fetchPredictionsCall, data, loading } = useAsyncCall(fetchExpenseCategoryPredictions);
   const throttledFetchPredictions = React.useMemo(() => throttle(fetchPredictionsCall, 500), []);
@@ -285,14 +286,20 @@ const useExpenseCategoryPredictionService = (
   React.useEffect(() => {
     if (hasValidParams && host?.slug) {
       const hidePredictionsTimeout = setTimeout(() => setShowPreviousPredictions(false), 1000);
-      throttledFetchPredictions({ hostSlug: host.slug, accountSlug: account.slug, ...inputData }).then(() => {
+      throttledFetchPredictions({
+        hostSlug: host.slug,
+        accountSlug: account.slug,
+        ...inputData,
+        isHostExpense,
+        includeHostOnly,
+      }).then(() => {
         clearTimeout(hidePredictionsTimeout);
         if (showPreviousPredictions) {
           setShowPreviousPredictions(true);
         }
       });
     }
-  }, [host?.slug, account?.slug, hasValidParams, ...Object.values(inputData)]);
+  }, [host?.slug, account?.slug, hasValidParams, isHostExpense, includeHostOnly, ...Object.values(inputData)]);
 
   // Map returned categories with known ones to build `predictions`
   const predictions = React.useMemo(() => {
@@ -370,8 +377,16 @@ const AccountingCategorySelect = ({
   const [isOpen, setOpen] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
+  const isHostExpense = isHostExpenseAccount(host, account);
   const usePredictions = shouldUsePredictions(host, kind, predictionStyle, isOpen, selectedCategory);
-  const { predictions } = useExpenseCategoryPredictionService(usePredictions, host, account, expenseValues);
+  const { predictions } = useExpenseCategoryPredictionService(
+    usePredictions,
+    host,
+    account,
+    expenseValues,
+    isHostExpense,
+    isHostAdmin,
+  );
   const hasPredictions = Boolean(predictions?.length);
 
   const triggerChange = newCategory => {
