@@ -52,10 +52,10 @@ env:
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
   GITHUB_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
   GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
-  FRONTEND_FOLDER: ${{ github.workspace }}
-  API_FOLDER: ${{ github.workspace }}/opencollective-api
-  IMAGES_FOLDER: ${{ github.workspace }}/opencollective-images
-  PDF_FOLDER: ${{ github.workspace }}/opencollective-pdf
+  FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
+  API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
+  IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
+  PDF_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-pdf
   TERM: xterm
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
   STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
@@ -63,7 +63,7 @@ env:
 jobs:
   e2e:
     name: e2e (${{ matrix.files }})
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 30
 
@@ -149,7 +149,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version-file: 'package.json'
-          check-latest: true
           cache: 'npm'
 
       - name: Checkout E2E stack

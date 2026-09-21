@@ -24,7 +24,7 @@ env:
 
 jobs:
   prepare:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     outputs:
       api-ref: ${{ steps.checkout-stack.outputs.api-ref }}
@@ -39,18 +39,12 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version-file: package.json
-          check-latest: true
 
       - name: Checkout E2E stack
         id: checkout-stack
         uses: ./.github/actions/checkout-e2e-stack
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install GraphicsMagick
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes graphicsmagick
 
       - name: Restore node_modules (api)
         uses: actions/cache@v6
