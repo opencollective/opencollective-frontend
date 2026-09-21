@@ -20,7 +20,7 @@ import {
 } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 import { NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID, NEW_PAYOUT_METHOD_ID } from './lib/constants';
-import { getAccountReferenceInput } from '@/lib/collective';
+import { getAccountReferenceInput, isSameAccount } from '@/lib/collective';
 
 import CollectivePicker from '../CollectivePicker';
 import { accountsQuery } from '../dashboard/sections/accounts/queries';
@@ -150,8 +150,8 @@ const EditPaidBy = ({ expense, handleClose }) => {
     >
       {({ setFieldValue, values }) => {
         // Check if the selected account is the same as the current expense account
-        const isSameAccount = values.destinationAccount?.id === expense.account.id;
-        const payerIsPayee = expense.payee?.id === values.destinationAccount?.id;
+        const payerIsAccount = isSameAccount(expense.account, values.destinationAccount);
+        const payerIsPayee = isSameAccount(expense.payee, values.destinationAccount);
         return (
           <Form className="space-y-4">
             <FormField name="destinationAccount">
@@ -177,7 +177,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
                 </AlertDescription>
               </Alert>
             )}
-            <EditExpenseActionButtons disabled={isSameAccount || payerIsPayee || isLoading} loading={submitting} />
+            <EditExpenseActionButtons disabled={payerIsAccount || payerIsPayee || isLoading} loading={submitting} />
           </Form>
         );
       }}
