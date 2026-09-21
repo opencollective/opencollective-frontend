@@ -32,7 +32,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
@@ -56,7 +56,7 @@ jobs:
       - run: npm run lint:quiet
 
   prettier:
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
@@ -80,7 +80,7 @@ jobs:
       - run: npm run prettier:check
 
   depcheck:
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
@@ -96,7 +96,7 @@ jobs:
       - run: npm run depcheck
 
   ts-unused-exports:
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
@@ -112,7 +112,7 @@ jobs:
       - run: npm run ts-unused-exports
 
   check-langs:
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
@@ -128,7 +128,7 @@ jobs:
       - run: npm run langs:check
 
   build:
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
@@ -172,7 +172,7 @@ jobs:
           retention-days: 1
 
   test:
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
@@ -207,7 +207,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   typescript:
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 15
 
     steps:
