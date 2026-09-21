@@ -228,6 +228,8 @@ jobs:
             ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-tsc-${{ hashFiles('tsconfig.json', 'package-lock.json') }}-
 
       - run: npm run type:check
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
   e2e-prepare:
     uses: ./.github/workflows/e2e-prepare.yml
