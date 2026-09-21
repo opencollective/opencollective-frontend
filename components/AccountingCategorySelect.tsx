@@ -319,7 +319,12 @@ const useExpenseCategoryPredictionService = (
   return { loading, predictions: predictions || (showPreviousPredictions && previousPredictions.current) || [] };
 };
 
-const hostSupportsPredictions = (host: RequiredHostFields) => ['opensource'].includes(host?.slug);
+const expenseCategoryPredictionHostSlugs = (process.env.EXPENSE_CATEGORY_PREDICTION_ORG_SLUGS || '')
+  .split(',')
+  .map(slug => slug.trim())
+  .filter(Boolean);
+
+const hostSupportsPredictions = (host: RequiredHostFields) => expenseCategoryPredictionHostSlugs.includes(host?.slug);
 
 const shouldUsePredictions = (
   host: RequiredHostFields,
