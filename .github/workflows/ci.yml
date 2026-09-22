@@ -54,6 +54,8 @@ jobs:
             ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-eslint-${{ hashFiles('eslint.config.mjs', 'package-lock.json') }}-
 
       - run: npm run lint:quiet
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
   prettier:
     runs-on: blacksmith-2vcpu-ubuntu-2404
