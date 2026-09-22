@@ -4,6 +4,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import { i18nGraphqlException } from '@/lib/errors';
 import type {
   ConnectPaypalPayoutMethodMutation,
@@ -12,7 +13,6 @@ import type {
   GetPaypalOAuthUrlMutation,
   GetPaypalOAuthUrlMutationVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import { cn } from '@/lib/utils';
 
 import PayPalIcon from '../icons/PayPal';
