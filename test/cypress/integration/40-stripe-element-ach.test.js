@@ -22,6 +22,8 @@ function contributeWithNewUsBankAccount({ name } = {}) {
       cy.get('[data-testid="agree-button"]').click();
       cy.get('[data-testid="success"]').click(); // Bank account with name 'Success'
       cy.get('[data-testid="select-button"]').click();
+      // Stripe now offers to save the bank account with Link before the done screen
+      cy.contains('Finish without saving').click();
       cy.get('[data-testid="done-button"]').click();
     });
 
