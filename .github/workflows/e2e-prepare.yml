@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: APT Update and Install
         run: |
-          sudo apt-get update || exit 0
+          sudo apt-get update || true
           sudo apt-get install graphicsmagick
 
       - name: Checkout (frontend)
