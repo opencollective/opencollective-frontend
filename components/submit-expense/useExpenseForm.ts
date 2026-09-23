@@ -1605,7 +1605,7 @@ async function buildFormOptions(
     const availableCurrencies = new Set<Currency>();
     if (options.expense && options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)) {
       availableCurrencies.add(options.expense.currency);
-    } else if (expenseType === ExpenseType.GRANT) {
+    } else if (expenseType === ExpenseType.GRANT && options.isHostAdmin !== true) {
       // Grants are always in the account currency
       availableCurrencies.add(options.account?.currency);
     } else {
@@ -1644,7 +1644,7 @@ async function buildFormOptions(
 
     if (expenseType === ExpenseType.GRANT) {
       options.isLongFormItemDescription = true;
-      options.allowDifferentItemCurrency = false;
+      options.allowDifferentItemCurrency = Boolean(options.isHostAdmin);
       options.hasExpenseItemDate = false;
       options.canSetupRecurrence = false;
     }
