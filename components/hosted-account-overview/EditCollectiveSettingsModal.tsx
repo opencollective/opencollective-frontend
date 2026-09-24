@@ -11,8 +11,8 @@ import { HOST_FEE_STRUCTURE } from '@/lib/constants/host-fee-structure';
 import { i18nGraphqlException } from '@/lib/errors';
 import { i18nExpenseType } from '@/lib/i18n/expense';
 
-import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { useFormikZod } from '@/components/FormikZod';
+import HeroSocialLinks from '@/components/hosted-account-overview/SocialLinks';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LocationAddress from '@/components/LocationAddress';
 import { Badge } from '@/components/ui/Badge';

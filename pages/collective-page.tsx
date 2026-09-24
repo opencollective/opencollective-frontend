@@ -10,7 +10,6 @@ import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { FEATURES, getFeatureStatus } from '@/lib/allowed-features';
 import { getRequestIntl } from '@/lib/i18n/request';
@@ -19,7 +18,6 @@ import { getWhitelabelRedirection } from '@/lib/whitelabel';
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import { CrowdfundingPreviewBanner } from '../components/crowdfunding-redesign/CrowdfundingPreviewBanner';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
@@ -147,12 +145,6 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
     return <Custom404 />;
   }
 
-  const showCrowdfundingPreviewBanner =
-    !['ORGANIZATION', 'FUND', 'INDIVIDUAL', 'USER'].includes(collective?.type) &&
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN) &&
-    LoggedInUser?.isAdminOfCollective(collective) &&
-    collective?.isActive;
-
   return (
     <Page
       collective={collective}
@@ -168,8 +160,6 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
         </div>
       ) : (
         <React.Fragment>
-          {showCrowdfundingPreviewBanner && <CrowdfundingPreviewBanner account={collective} />}
-
           <CollectiveNotificationBar
             collective={collective}
             host={collective.host}

@@ -2,8 +2,8 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import Avatar from '@/components/Avatar';
-import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
+import HeroSocialLinks from '@/components/hosted-account-overview/SocialLinks';
 import HTMLContent, { isEmptyHTMLValue } from '@/components/HTMLContent';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';

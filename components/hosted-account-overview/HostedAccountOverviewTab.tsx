@@ -16,11 +16,11 @@ import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
 
 import Avatar from '@/components/Avatar';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
-import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import DateTime from '@/components/DateTime';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
+import HeroSocialLinks from '@/components/hosted-account-overview/SocialLinks';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
