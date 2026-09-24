@@ -156,6 +156,13 @@ const ContributorsGrid = ({
   const hasScroll = rowWidth + paddingLeft > width;
   const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
   const gridHeight = (COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y) * nbRows + COLLECTIVE_CARD_MARGIN_Y;
+  const getColumnKey = React.useCallback(
+    ({ columnIndex, rowIndex }) => {
+      const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
+      return idx < contributors.length ? contributors[idx].id : `empty-${idx}`;
+    },
+    [contributors, nbRows, nbCols, hasScroll],
+  );
 
   return (
     <StyledContributorsGrid
@@ -173,10 +180,7 @@ const ContributorsGrid = ({
       }}
       columnCount={nbCols}
       columnWidth={COLLECTIVE_CARD_FULL_WIDTH}
-      columnKey={({ columnIndex, rowIndex }) => {
-        const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
-        return idx < contributors.length ? contributors[idx].id : `empty-${idx}`;
-      }}
+      columnKey={getColumnKey}
       rowCount={nbRows}
       rowHeight={COLLECTIVE_CARD_HEIGHT + COLLECTIVE_CARD_MARGIN_Y}
       defaultHeight={gridHeight}
