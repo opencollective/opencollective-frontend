@@ -47,7 +47,7 @@ export type PreviewFeature = {
 };
 
 export const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
-const ENGINEERS = ['znarf', 'betree', 'leokewitz', 'henrique-silva', 'gustavlrsn', 'sudharaka-palamakumbura'];
+const ENGINEERS = ['fhodierne', 'betree', 'leokewitz', 'henrique-silva', 'gustavlrsn', 'sudharaka-palamakumbura'];
 const OFICO_MEMBER_ORGANIZATIONS = [
   'europe',
   'giftcollective',
