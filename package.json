@@ -320,7 +320,8 @@
       "mocha-junit-reporter",
       "cypress-multi-reporters",
       "@jest/globals",
-      "cross-env"
+      "cross-env",
+      "@graphql-codegen/client-preset"
     ]
   },
   "overrides": {
