@@ -329,7 +329,7 @@ const DashboardPage = () => {
 
   // Clear last visited workspace account if not admin
   React.useEffect(() => {
-    if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootProfile && isRootUser)) {
+    if (account && !LoggedInUser.canSeeDashboard(account) && !(isRootProfile && isRootUser)) {
       setWorkspace({ slug: undefined });
     }
   }, [account]);
