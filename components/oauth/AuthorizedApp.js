@@ -73,7 +73,7 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
               <FormattedMessage
                 defaultMessage="Connected on {date, date, simple}"
                 id="Zi4M6s"
-                values={{ date: new Date() }}
+                values={{ date: new Date(authorization.createdAt) }}
               />
             </time>
             <Span mr={1}>
