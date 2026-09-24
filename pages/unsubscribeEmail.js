@@ -63,7 +63,7 @@ class UnsubscribeEmail extends React.Component {
 
   render() {
     return (
-      <Page title="Unsubscribe Email">
+      <Page title="Unsubscribe Email" noRobots>
         <Container
           display="flex"
           py={[5, 6]}
@@ -96,4 +96,6 @@ class UnsubscribeEmail extends React.Component {
   }
 }
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(UnsubscribeEmail);

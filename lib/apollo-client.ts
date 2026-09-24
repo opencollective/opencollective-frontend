@@ -1,13 +1,18 @@
 // This file is mostly adapted from:
 // https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/initApollo.js
 
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/client';
+import type { NormalizedCacheObject, QueryOptions } from '@apollo/client';
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, useQuery } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
+import { mergeDeep } from '@apollo/client/utilities';
 import { createUploadLink } from 'apollo-upload-client';
-import { pick } from 'lodash';
+import { isUndefined, omitBy, pick } from 'lodash-es';
+import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
+import type { OCError } from './errors';
+import { getErrorFromGraphqlException, isNotFoundGraphQLException } from './errors';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from './local-storage';
 import { parseToBoolean } from './utils';
 
@@ -17,6 +22,12 @@ const INTERNAL_API_V1_URL = process.env.INTERNAL_API_V1_URL;
 const INTERNAL_API_V2_URL = process.env.INTERNAL_API_V2_URL;
 const INTERNAL_API_V1_OPERATION_NAMES = process.env.INTERNAL_API_V1_OPERATION_NAMES;
 const INTERNAL_API_V2_OPERATION_NAMES = process.env.INTERNAL_API_V2_OPERATION_NAMES;
+
+export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__' as const;
+// ts-unused-exports:disable-next-line
+export const APOLLO_ERROR_PROP_NAME = '__APOLLO_ERROR__' as const;
+export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
+export const APOLLO_QUERY_DATA_PROP_NAME = '__APOLLO_QUERY_DATA__' as const;
 
 const getBaseApiUrl = (apiVersion, internal = false) => {
   if (process.browser) {
@@ -45,12 +56,12 @@ const getGraphqlUrl = (apiVersion, internal = false) => {
 };
 
 const getCustomAgent = () => {
-  if (!customAgent) {
+  if (typeof window === 'undefined' && !customAgent) {
     const { FETCH_AGENT_KEEP_ALIVE, FETCH_AGENT_KEEP_ALIVE_MSECS } = process.env;
     const keepAlive = FETCH_AGENT_KEEP_ALIVE !== undefined ? parseToBoolean(FETCH_AGENT_KEEP_ALIVE) : true;
     const keepAliveMsecs = FETCH_AGENT_KEEP_ALIVE_MSECS ? Number(FETCH_AGENT_KEEP_ALIVE_MSECS) : 10000;
-    const http = require('http');
-    const https = require('https');
+    const http = require('http'); // eslint-disable-line @typescript-eslint/no-require-imports
+    const https = require('https'); // eslint-disable-line @typescript-eslint/no-require-imports
     const httpAgent = new http.Agent({ keepAlive, keepAliveMsecs });
     const httpsAgent = new https.Agent({ keepAlive, keepAliveMsecs });
     customAgent = _parsedURL => (_parsedURL.protocol === 'http:' ? httpAgent : httpsAgent);
@@ -58,63 +69,77 @@ const getCustomAgent = () => {
   return customAgent;
 };
 
-const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?: string } = {}) => {
-  const nodeFetch = require('node-fetch');
-
-  options.agent = getCustomAgent();
-
-  // Add headers to help the API identify origin of requests
-  options.headers = options.headers || {};
-  options.headers['oc-env'] = process.env.OC_ENV;
-  options.headers['oc-secret'] = process.env.OC_SECRET;
-  options.headers['oc-application'] = process.env.OC_APPLICATION;
-  options.headers['user-agent'] = 'opencollective-frontend/1.0 node-fetch/1.0';
-
-  // Start benchmarking if the request is server side
-  const start = process.hrtime.bigint();
-
-  const result = await nodeFetch(url, options);
-
-  // Complete benchmark measure and log
-  if (process.env.GRAPHQL_BENCHMARK) {
-    const end = process.hrtime.bigint();
-    const executionTime = Math.round(Number(end - start) / 1000000);
-    const apiExecutionTime = result.headers.get('Execution-Time');
-    const graphqlCache = result.headers.get('GraphQL-Cache');
-    const latencyTime = apiExecutionTime ? executionTime - Number(apiExecutionTime) : null;
-    const body = JSON.parse(options.body);
-    if (body.operationName || body.variables) {
-      const pickList = [
-        'CollectiveId',
-        'collectiveSlug',
-        'CollectiveSlug',
-        'id',
-        'ledgacyId',
-        'legacyExpenseId',
-        'slug',
-        'term',
-        'tierId',
-      ];
-      const operationName = body.operationName || 'anonymous GraphQL query';
-      const variables = pick(body.variables, pickList) || {};
-      // eslint-disable-next-line no-console
-      console.log(
-        '-> Fetched',
-        operationName,
-        variables,
-        executionTime ? `in ${executionTime}ms` : '',
-        latencyTime ? `latency=${latencyTime}ms` : '',
-        graphqlCache ? `GraphQL Cache ${graphqlCache}` : '',
-      );
-    }
+const logRequest = (action = 'Fetched', start, options, result?) => {
+  const end = process.hrtime.bigint();
+  const executionTime = Math.round(Number(end - start) / 1000000);
+  const apiExecutionTime = result?.headers.get('Execution-Time');
+  const graphqlCache = result?.headers.get('GraphQL-Cache');
+  const latencyTime = apiExecutionTime ? executionTime - Number(apiExecutionTime) : null;
+  const body = JSON.parse(options.body);
+  if (body.operationName || body.variables) {
+    const pickList = [
+      'CollectiveId',
+      'collectiveSlug',
+      'CollectiveSlug',
+      'id',
+      'legacyId',
+      'legacyExpenseId',
+      'slug',
+      'term',
+      'tierId',
+    ];
+    const operationName = body.operationName || 'anonymous GraphQL query';
+    const variables = process.env.NODE_ENV === 'development' ? body.variables : pick(body.variables || {}, pickList);
+    // eslint-disable-next-line no-console
+    console.log(
+      `-> ${action}`,
+      operationName,
+      variables,
+      executionTime ? `in ${executionTime}ms` : '',
+      latencyTime ? `latency=${latencyTime}ms` : '',
+      graphqlCache ? `GraphQL Cache ${graphqlCache}` : '',
+    );
   }
-
-  return result;
 };
 
-function createLink({ twoFactorAuthContext }) {
+async function serverSideFetch(url: RequestInfo | URL, options: RequestInit = {}) {
+  if (typeof window === 'undefined') {
+    const nodeFetch = require('node-fetch'); // eslint-disable-line @typescript-eslint/no-require-imports
+
+    options['agent'] = getCustomAgent();
+
+    // Add headers to help the API identify origin of requests
+    options.headers = options.headers || {};
+    options.headers['oc-env'] = process.env.OC_ENV;
+    options.headers['oc-secret'] = process.env.OC_SECRET;
+    options.headers['oc-application'] = process.env.OC_APPLICATION;
+    options.headers['oc-version'] = process.env.HEROKU_SLUG_COMMIT?.slice(0, 7);
+    options.headers['user-agent'] = 'opencollective-frontend/1.0 node-fetch/1.0';
+
+    // Start benchmarking if the request is server side
+    const start = process.hrtime.bigint();
+
+    try {
+      const result = await nodeFetch(url, options);
+
+      // Complete benchmark measure and log
+      if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
+        logRequest('Fetched', start, options, result);
+      }
+
+      return result;
+    } catch (error) {
+      if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
+        logRequest('Failed', start, options);
+      }
+      throw error;
+    }
+  }
+}
+
+function createLink({ twoFactorAuthContext, accessToken = null }) {
   const authLink = setContext((_, { headers }) => {
-    const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    const token = accessToken || getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     if (token) {
       return {
         headers: {
@@ -125,9 +150,16 @@ function createLink({ twoFactorAuthContext }) {
     }
   });
 
+  const IGNORED_GRAPHQL_ERROR_CODES = ['ContentNotReady'];
+
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
       graphQLErrors.map(error => {
+        const errorCode = error?.extensions?.code;
+        if (typeof errorCode === 'string' && IGNORED_GRAPHQL_ERROR_CODES.includes(errorCode)) {
+          return;
+        }
+
         if (error) {
           const { message, locations, path } = error;
           // eslint-disable-next-line no-console
@@ -146,19 +178,39 @@ function createLink({ twoFactorAuthContext }) {
     }
   });
 
+  const sentryLink = setContext((_, { headers }) => {
+    if (
+      headers?.['x-sentry-force-sample'] ||
+      (typeof window !== 'undefined' && window.location.search.includes('forceSentryTracing=1'))
+    ) {
+      return {
+        headers: { ...headers, 'x-sentry-force-sample': '1' },
+      };
+    }
+  });
+
   const linkFetch = process.browser ? fetch : serverSideFetch;
 
-  const httpHeaders = { 'oc-application': process.env.OC_APPLICATION };
+  const httpHeaders = {
+    'oc-application': process.env.OC_APPLICATION,
+    'oc-version': process.env.HEROKU_SLUG_COMMIT?.slice(0, 7),
+  };
 
   const apiV1DefaultLink = createUploadLink({
     uri: getGraphqlUrl('v1'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
+    formDataAppendFile(formData, fieldName, file) {
+      formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
+    },
   });
   const apiV2DefaultLink = createUploadLink({
     uri: getGraphqlUrl('v2'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
+    formDataAppendFile(formData, fieldName, file) {
+      formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
+    },
   });
 
   // Setup internal links handling to be able to split traffic to different API servers
@@ -186,14 +238,14 @@ function createLink({ twoFactorAuthContext }) {
    * v1 or the api v2.
    */
   const httpLink = ApolloLink.split(
-    operation => operation.getContext().apiVersion === '2', // Routes the query to the proper client
-    apiV2Link,
+    operation => operation.getContext().apiVersion === '1', // Routes the query to the proper client
     apiV1Link,
+    apiV2Link,
   );
 
   const twoFactorAuthLink = new TwoFactorAuthenticationApolloLink(twoFactorAuthContext);
 
-  return ApolloLink.from([errorLink, authLink, twoFactorAuthLink, httpLink]);
+  return ApolloLink.from([sentryLink, errorLink, authLink, twoFactorAuthLink, httpLink]);
 }
 
 function createInMemoryCache() {
@@ -201,12 +253,25 @@ function createInMemoryCache() {
     // Documentation:
     // https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
     possibleTypes: {
-      Transaction: ['Expense', 'Order'],
-      CollectiveInterface: ['Collective', 'Event', 'Project', 'Fund', 'Organization', 'User', 'Vendor'],
-      Account: ['Collective', 'Host', 'Individual', 'Fund', 'Project', 'Bot', 'Event', 'Organization', 'Vendor'],
-      AccountWithHost: ['Collective', 'Event', 'Fund', 'Project'],
-      AccountWithParent: ['Event', 'Project'],
+      Transaction: ['Expense', 'Order', 'Debit', 'Credit'],
+      CollectiveInterface: ['Collective', 'Event', 'Project', 'Fund', 'Organization', 'User', 'Vendor', 'Platform'],
+      Account: [
+        'Collective',
+        'Host',
+        'Individual',
+        'Fund',
+        'Project',
+        'Bot',
+        'Event',
+        'Organization',
+        'Vendor',
+        'Platform',
+      ],
+      AccountWithHost: ['Collective', 'Event', 'Fund', 'Project', 'Platform'],
+      AccountWithParent: ['Event', 'Project', 'Platform'],
       AccountWithContributions: ['Collective', 'Organization', 'Event', 'Fund', 'Project', 'Host'],
+      AccountWithPlatformSubscription: ['Organization', 'Collective'],
+      KYCProviderData: ['ManualKYCProviderData', 'PersonaKYCProviderData'],
     },
     // Documentation:
     // https://www.apollographql.com/docs/react/caching/cache-field-behavior/#merging-non-normalized-objects
@@ -220,19 +285,200 @@ function createInMemoryCache() {
           },
         },
       },
+      Host: {
+        fields: {
+          metrics: {
+            merge: true,
+          },
+        },
+      },
+      // Add this for search results pagination
+      SearchResults: {
+        fields: {
+          accounts: {
+            keyArgs: false, // Don't separate cache by any args, we handle it manually
+            merge(existing, incoming, { args, variables }) {
+              // If no existing data or offset is 0, replace with incoming
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              // Check if the component explicitly requested infinite scroll behavior
+              // This is set via a special variable: __infiniteScroll: true
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                // Infinite scroll mode: append new results to existing ones
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              // Regular pagination mode: replace results
+              return incoming;
+            },
+          },
+          expenses: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          orders: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          transactions: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          updates: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          comments: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          hostApplications: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+        },
+      },
+      Tier: {
+        keyFields: ['id'],
+      },
     },
   });
 
   return inMemoryCache;
 }
 
-function createClient({ initialState, twoFactorAuthContext }: any = {}) {
+function createClient({ initialState = null, twoFactorAuthContext = null, accessToken = null }) {
   const cache = createInMemoryCache();
   if (initialState) {
     cache.restore(initialState);
   }
 
-  const link = createLink({ twoFactorAuthContext });
+  const link = createLink({ twoFactorAuthContext, accessToken });
 
   return new ApolloClient({
     cache,
@@ -243,11 +489,13 @@ function createClient({ initialState, twoFactorAuthContext }: any = {}) {
   });
 }
 
-export function initClient({ initialState, twoFactorAuthContext }: any = {}): ReturnType<typeof createClient> {
+export function initClient({ initialState = null, twoFactorAuthContext = null, accessToken = null } = {}): ReturnType<
+  typeof createClient
+> {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (!process.browser) {
-    return createClient({ initialState });
+    return createClient({ initialState, accessToken });
   }
 
   // Reuse client on the client-side
@@ -255,5 +503,91 @@ export function initClient({ initialState, twoFactorAuthContext }: any = {}): Re
     apolloClient = createClient({ initialState, twoFactorAuthContext });
   }
 
+  // If the page has Next.js data fetching methods that use Apollo Client, the initial state
+  // get hydrated here
+  if (initialState) {
+    // Get existing cache, loaded during client side data fetching
+    const existingCache = apolloClient.extract();
+
+    // Merge the existing cache into data passed from getStaticProps/getServerSideProps
+    const data = mergeDeep(initialState, existingCache);
+
+    // Restore the cache with the merged data
+    apolloClient.cache.restore(data);
+  }
+
   return apolloClient;
+}
+
+type SSRQueryHelperProps<TVariables, TQueryData> = {
+  [APOLLO_STATE_PROP_NAME]: NormalizedCacheObject;
+  [APOLLO_VARIABLES_PROP_NAME]: Partial<TVariables>;
+  [APOLLO_ERROR_PROP_NAME]: string;
+  [APOLLO_QUERY_DATA_PROP_NAME]: TQueryData;
+};
+
+export type Context = GetServerSidePropsContext & {
+  req: GetServerSidePropsContext['res'] & { apolloClient: ApolloClient<unknown> };
+};
+
+/**
+ * A helper to easily plug Apollo on functional components that use `getServerSideProps` thats make sure that
+ * the server-side query and the client-side query/variables are the same; to properly rehydrate the cache.
+ */
+export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>, TQueryData = Record<string, unknown>>({
+  query,
+  getVariablesFromContext = undefined,
+  getPropsFromContext = undefined,
+  skipClientIfSSRThrows404 = false,
+  ...queryOptions
+}: QueryOptions<TVariables> & {
+  getPropsFromContext?: (context: GetServerSidePropsContext) => TProps;
+  getVariablesFromContext?: (context: GetServerSidePropsContext, props: Partial<TProps>) => TVariables;
+  skipClientIfSSRThrows404?: boolean;
+  preload?: (client: ApolloClient<unknown>, queryResult: TQueryData) => Promise<void>;
+}) {
+  type ServerSideProps = TProps & SSRQueryHelperProps<TVariables, TQueryData>;
+  return {
+    getServerSideProps: async (context: Context): Promise<GetServerSidePropsResult<ServerSideProps>> => {
+      const props = (getPropsFromContext && getPropsFromContext(context)) || {};
+      const variables = (getVariablesFromContext && getVariablesFromContext(context, props)) || {};
+      const client = context.req.apolloClient;
+
+      let error, result;
+      try {
+        result = await client.query<TQueryData>({ query, variables, ...queryOptions }); // Not handling the result here, we just want to make sure the query result is in the cache
+        if (queryOptions.preload) {
+          await queryOptions.preload(client, result?.data);
+        }
+      } catch (e) {
+        error = e;
+      }
+
+      return {
+        props: {
+          ...omitBy<TProps>(props, isUndefined),
+          [APOLLO_STATE_PROP_NAME]: client.cache.extract() as NormalizedCacheObject,
+          [APOLLO_VARIABLES_PROP_NAME]: omitBy<TVariables>(variables, isUndefined) as Partial<TVariables>,
+          [APOLLO_ERROR_PROP_NAME]: !error ? null : JSON.parse(JSON.stringify(error)),
+          [APOLLO_QUERY_DATA_PROP_NAME]: result?.data || null,
+        } as ServerSideProps,
+      };
+    },
+    useQuery: (pageProps: ServerSideProps) => {
+      const variables = pageProps[APOLLO_VARIABLES_PROP_NAME] as TVariables;
+      let skip = false;
+      if (skipClientIfSSRThrows404) {
+        const ssrError = pageProps[APOLLO_ERROR_PROP_NAME];
+        skip = ssrError && isNotFoundGraphQLException(ssrError);
+      }
+
+      return useQuery(query, { variables, skip, ...queryOptions });
+    },
+    getVariablesFromPageProps: (pageProps: ServerSideProps): Partial<TVariables> => {
+      return pageProps[APOLLO_VARIABLES_PROP_NAME];
+    },
+    getSSRErrorFromPageProps: (pageProps: ServerSideProps): OCError => {
+      return pageProps[APOLLO_ERROR_PROP_NAME] && getErrorFromGraphqlException(pageProps[APOLLO_ERROR_PROP_NAME]);
+    },
+  };
 }

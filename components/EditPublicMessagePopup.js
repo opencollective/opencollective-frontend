@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { Popper } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import withViewport from '../lib/withViewport';
 
 import { collectivePageQuery } from '../components/collective-page/graphql/queries';
@@ -94,9 +93,9 @@ const Arrow = styled('div')`
   }
 `;
 
-const editPublicMessageMutation = gqlV1/* GraphQL */ `
-  mutation EditPublicMessage($FromCollectiveId: Int!, $CollectiveId: Int!, $message: String) {
-    editPublicMessage(FromCollectiveId: $FromCollectiveId, CollectiveId: $CollectiveId, message: $message) {
+const editPublicMessageMutation = gqlV1 /* GraphQL */ `
+  mutation EditPublicMessage($fromCollectiveId: Int!, $collectiveId: Int!, $message: String) {
+    editPublicMessage(FromCollectiveId: $fromCollectiveId, CollectiveId: $collectiveId, message: $message) {
       id
       publicMessage
       tier {
@@ -128,7 +127,7 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef, onClose, message, intl }) {
+function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef, onClose, message = '', intl }) {
   const [messageDraft, setMessageDraft] = useState(message || '');
 
   // Can't be rendered SSR
@@ -137,7 +136,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
   }
 
   return createPortal(
-    <Mutation mutation={editPublicMessageMutation}>
+    <Mutation mutation={editPublicMessageMutation} context={API_V1_CONTEXT}>
       {(submitMessage, { loading, error }) => (
         <Popper
           referenceElement={cardRef.current}
@@ -190,8 +189,8 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                     onClick={async () => {
                       await submitMessage({
                         variables: {
-                          FromCollectiveId: fromCollectiveId,
-                          CollectiveId: collectiveId,
+                          fromCollectiveId,
+                          collectiveId,
                           message: messageDraft ? messageDraft.trim() : null,
                         },
                         // Update cache after mutation
@@ -202,6 +201,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           const queries = [
                             {
                               query: collectivePageQuery,
+                              context: API_V1_CONTEXT,
                               variables: {
                                 slug: collectiveSlug,
                                 nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
@@ -211,6 +211,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           if (tier) {
                             queries.push({
                               query: tierPageQuery,
+                              context: API_V1_CONTEXT,
                               variables: { tierId: tier.id },
                             });
                           }
@@ -233,20 +234,5 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
     document.body,
   );
 }
-
-EditPublicMessagePopup.defaultProps = {
-  message: '',
-};
-
-EditPublicMessagePopup.propTypes = {
-  fromCollectiveId: PropTypes.number.isRequired,
-  collectiveId: PropTypes.number.isRequired,
-  cardRef: PropTypes.shape({ current: PropTypes.object }).isRequired,
-  onClose: PropTypes.func.isRequired,
-  message: PropTypes.string,
-  intl: PropTypes.object,
-  /** @ignore from withViewport */
-  width: PropTypes.number,
-};
 
 export default withViewport(EditPublicMessagePopup, { withWidth: true });

@@ -1,14 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
-import { get } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { get, omit } from 'lodash-es';
+import { defineMessages } from 'react-intl';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import roles from '../../../../lib/constants/roles';
 import formatMemberRole from '../../../../lib/i18n/member-role';
+import injectIntl from '@/lib/injectIntl';
 
 import Avatar from '../../../Avatar';
 import Container from '../../../Container';
@@ -18,6 +18,7 @@ import StyledInput from '../../../StyledInput';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledSelect from '../../../StyledSelect';
 import { P } from '../../../Text';
+import { Textarea } from '../../../ui/Textarea';
 
 const MemberContainer = styled(Container)`
   border: 1px solid #dcdee0;
@@ -30,22 +31,42 @@ const memberFormMessages = defineMessages({
   roleLabel: { id: 'members.role.label', defaultMessage: 'Role' },
   sinceLabel: { id: 'user.since.label', defaultMessage: 'Since' },
   descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
-  inValidDateError: { defaultMessage: 'Please enter a valid date' },
+  privateNoteLabel: { id: 'Expense.PrivateNote', defaultMessage: 'Private note' },
+  privateNotePlaceholder: {
+    id: 'editTeam.member.invite.privateNote.placeholder',
+    defaultMessage: 'Optional message included in the invitation email sent to the invitee.',
+  },
+  inValidDateError: { defaultMessage: 'Please enter a valid date', id: '6DCLcI' },
 });
 
 const MemberForm = props => {
-  const { intl, member, collectiveImg, bindSubmitForm, triggerSubmit } = props;
-
-  const [memberRole, setMemberRole] = React.useState(member?.role || roles.ADMIN);
+  const {
+    intl,
+    member,
+    collectiveImg,
+    bindSubmitForm,
+    triggerSubmit,
+    isPrivateAccount,
+    fixedRole,
+    showDescription = true,
+    showSince = true,
+    showPrivateNote = true,
+  } = props;
 
   const memberCollective = member && (member.account || member.memberAccount);
 
+  const supportedRoles = isPrivateAccount
+    ? [roles.ADMIN, roles.ACCOUNTANT]
+    : [roles.ADMIN, roles.MEMBER, roles.COMMUNITY_MANAGER, roles.ACCOUNTANT];
+
+  const providedMemberRole = fixedRole || get(member, 'role');
   const initialValues = {
     description: get(member, 'description') || '',
-    role: get(member, 'role') || roles.ADMIN,
+    role: fixedRole || (providedMemberRole && supportedRoles.includes(providedMemberRole) ? providedMemberRole : null),
     since: get(member, 'since')
       ? dayjs(get(member, 'since')).format('YYYY-MM-DD')
       : dayjs(new Date()).format('YYYY-MM-DD'),
+    privateNote: '',
   };
 
   const submit = values => {
@@ -63,8 +84,11 @@ const MemberForm = props => {
 
   const validate = values => {
     const errors = {};
-    if (!dayjs(values.since).isValid()) {
+    if (showSince && !dayjs(values.since).isValid()) {
       errors.since = intl.formatMessage(memberFormMessages.inValidDateError);
+    } else if (!fixedRole && (!values.role || !supportedRoles.includes(values.role))) {
+      // "Error.FieldRequired": "This field is required",
+      errors.role = intl.formatMessage({ defaultMessage: 'This field is required', id: 'Error.FieldRequired' });
     }
     return errors;
   };
@@ -96,80 +120,90 @@ const MemberForm = props => {
           const { submitForm } = formik;
 
           bindSubmitForm(submitForm);
-
+          const allRoleOptions = getOptions(Object.values(roles));
+          const filteredRoleOptions = allRoleOptions.filter(option => supportedRoles.includes(option.value));
           return (
-            <Form>
-              <StyledInputFormikField
-                name="role"
-                htmlFor="memberForm-role"
-                label={<P fontWeight="bold"> {intl.formatMessage(memberFormMessages.roleLabel)} </P>}
-                mt={3}
-              >
-                {({ form, field }) => (
-                  <React.Fragment>
-                    <StyledSelect
-                      inputId={field.id}
-                      error={field.error}
-                      defaultValue={getOptions([memberRole])[0]}
-                      onBlur={() => form.setFieldTouched(field.name, true)}
-                      onChange={({ value }) => {
-                        form.setFieldValue(field.name, value);
-                        setMemberRole(value);
-                      }}
-                      options={getOptions([roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT])}
-                    />
-                    {hasRoleDescription(memberRole) && (
-                      <Flex mb={3}>
-                        <Box mx={1} mt={1} fontSize="12px" color="black.600" fontStyle="italic">
-                          <MemberRoleDescription role={memberRole} />
-                        </Box>
-                      </Flex>
-                    )}
-                  </React.Fragment>
-                )}
-              </StyledInputFormikField>
-              <StyledInputFormikField
-                name="description"
-                htmlFor="memberForm-description"
-                label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.descriptionLabel)}</P>}
-                mt={3}
-              >
-                {({ field }) => <StyledInput {...field} />}
-              </StyledInputFormikField>
-              <StyledInputFormikField
-                name="since"
-                htmlFor="memberForm-since"
-                inputType="date"
-                label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.sinceLabel)}</P>}
-                mt={3}
-              >
-                {({ form, field }) => (
-                  <StyledInput
-                    {...field}
-                    required
-                    onChange={event => {
-                      if (event.target.value) {
+            <Form className="flex flex-col gap-2">
+              {!fixedRole && (
+                <StyledInputFormikField
+                  name="role"
+                  htmlFor="memberForm-role"
+                  label={<P fontWeight="bold"> {intl.formatMessage(memberFormMessages.roleLabel)} </P>}
+                >
+                  {({ form, field }) => (
+                    <React.Fragment>
+                      <StyledSelect
+                        inputId={field.id}
+                        error={field.error}
+                        value={field.value ? allRoleOptions.find(option => option.value === field.value) : null}
+                        onBlur={() => form.setFieldTouched(field.name, true)}
+                        onChange={({ value }) => {
+                          form.setFieldValue(field.name, value);
+                        }}
+                        options={filteredRoleOptions}
+                      />
+                      {Boolean(field.value && hasRoleDescription(field.value)) && (
+                        <div className="mt-2 gap-1 text-xs text-muted-foreground">
+                          <MemberRoleDescription role={field.value} />
+                        </div>
+                      )}
+                    </React.Fragment>
+                  )}
+                </StyledInputFormikField>
+              )}
+              {showDescription && (
+                <StyledInputFormikField
+                  name="description"
+                  htmlFor="memberForm-description"
+                  label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.descriptionLabel)}</P>}
+                >
+                  {({ field }) => <StyledInput {...field} />}
+                </StyledInputFormikField>
+              )}
+              {showSince && (
+                <StyledInputFormikField
+                  name="since"
+                  htmlFor="memberForm-since"
+                  inputType="date"
+                  label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.sinceLabel)}</P>}
+                >
+                  {({ form, field }) => (
+                    <StyledInput
+                      {...omit(field, ['value', 'onChange', 'onBlur'])}
+                      required
+                      onChange={event => {
                         form.setFieldValue(field.name, event.target.value);
-                      }
-                    }}
-                    value={field.value}
-                  />
-                )}
-              </StyledInputFormikField>
+                      }}
+                      defaultValue={field.value}
+                    />
+                  )}
+                </StyledInputFormikField>
+              )}
+              {showPrivateNote && (
+                <StyledInputFormikField
+                  name="privateNote"
+                  htmlFor="memberForm-privateNote"
+                  label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.privateNoteLabel)}</P>}
+                >
+                  {({ form, field }) => (
+                    <Textarea
+                      id={field.id}
+                      name={field.name}
+                      value={field.value}
+                      className="min-h-20"
+                      onChange={event => form.setFieldValue(field.name, event.target.value)}
+                      onBlur={() => form.setFieldTouched(field.name, true)}
+                      placeholder={intl.formatMessage(memberFormMessages.privateNotePlaceholder)}
+                    />
+                  )}
+                </StyledInputFormikField>
+              )}
             </Form>
           );
         }}
       </Formik>
     </Flex>
   );
-};
-
-MemberForm.propTypes = {
-  bindSubmitForm: PropTypes.func,
-  collectiveImg: PropTypes.string,
-  intl: PropTypes.object.isRequired,
-  member: PropTypes.object,
-  triggerSubmit: PropTypes.func,
 };
 
 export default injectIntl(MemberForm);

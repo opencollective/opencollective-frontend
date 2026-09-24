@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { Box } from '../Grid';
@@ -55,16 +54,19 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage defaultMessage="Why do you need my legal name?" />
+        <FormattedMessage defaultMessage="Why do you need my legal name?" id="FpmEYP" />
       </Title>
       <Content>
-        <FormattedMessage defaultMessage="The display name is public and the legal name is private, appearing on receipts, invoices, and other official documentation used for tax and accounting purposes." />
+        <FormattedMessage
+          defaultMessage="The display name is public and the legal name is private, appearing on receipts, invoices, and other official documentation used for tax and accounting purposes."
+          id="ntqqkx"
+        />
       </Content>
     </Entry>
     <Box mt={2} pl={2}>
       <StyledLink
         as={StyledLink}
-        href="https://docs.opencollective.com/help/expenses-and-getting-paid/submitting-expenses"
+        href="https://documentation.opencollective.com/expenses-and-getting-paid/submitting-expenses"
         openInNewTab
         fontSize="12px"
         color="black.700"
@@ -75,9 +77,5 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
     </Box>
   </FAQ>
 );
-
-CreateExpenseFAQ.propTypes = {
-  defaultOpen: PropTypes.bool,
-};
 
 export default CreateExpenseFAQ;

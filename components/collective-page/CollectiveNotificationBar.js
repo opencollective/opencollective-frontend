@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { get } from 'lodash-es';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { moneyCanMoveFromEvent } from '../../lib/events';
+import injectIntl from '@/lib/injectIntl';
 
 import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
@@ -160,7 +160,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       type: 'warning',
       inline: true,
     };
-  } else if (!collective.isApproved && collective.host) {
+  } else if (!collective.isApproved && collective.host && collective.type !== CollectiveType.VENDOR) {
     return {
       title: intl.formatMessage(messages.approvalPending),
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
@@ -174,7 +174,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
     collective.isApproved &&
     host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze &&
     host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > numberOfAdmins &&
-    collective?.features?.RECEIVE_FINANCIAL_CONTRIBUTIONS === 'DISABLED'
+    collective.features?.RECEIVE_FINANCIAL_CONTRIBUTIONS === 'DISABLED'
   ) {
     return {
       title: intl.formatMessage(messages.tooFewAdmins, {
@@ -185,8 +185,8 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       }),
       type: 'warning',
       actions: (
-        <NotificationBarLink href={`/${collective.slug}/admin/team`}>
-          <FormattedMessage defaultMessage="Manage members" />
+        <NotificationBarLink href={`/dashboard/${collective.slug}/team`}>
+          <FormattedMessage defaultMessage="Manage members" id="XVzYBE" />
         </NotificationBarLink>
       ),
     };
@@ -221,26 +221,6 @@ const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUse
   const notification = getNotification(intl, status, collective, host, LoggedInUser, refetch);
 
   return !notification ? null : <NotificationBar {...notification} />;
-};
-
-CollectiveNotificationBar.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    name: PropTypes.string,
-    type: PropTypes.string,
-    isArchived: PropTypes.bool,
-  }),
-  /** Host */
-  host: PropTypes.shape({
-    name: PropTypes.string,
-  }),
-  /** A special status to show the notification bar (collective created, archived...etc) */
-  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated', 'projectCreated', 'eventCreated']),
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
-  refetch: PropTypes.func,
-  /** from withUser */
-  LoggedInUser: PropTypes.object,
 };
 
 export default injectIntl(CollectiveNotificationBar);

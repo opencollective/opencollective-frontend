@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
-import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
+import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { getCollectivePageMetadata, shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
+import { getCollectivePageMetadata, isHiddenAccount, shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { stripHTML } from '../lib/utils';
+import { gql } from '../lib/graphql/helpers';
+import { stripHTML } from '../lib/html';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -24,6 +23,7 @@ import FollowConversationButton from '../components/conversations/FollowConversa
 import FollowersAvatars from '../components/conversations/FollowersAvatars';
 import { commentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
+import EditTags from '../components/EditTags';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import CommentIcon from '../components/icons/CommentIcon';
@@ -34,7 +34,6 @@ import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import StyledButton from '../components/StyledButton';
-import StyledInputTags from '../components/StyledInputTags';
 import StyledLink from '../components/StyledLink';
 import StyledTag from '../components/StyledTag';
 import { H2, H4 } from '../components/Text';
@@ -52,8 +51,8 @@ const conversationPageQuery = gql`
       settings
       imageUrl
       twitterHandle
-      imageUrl
       backgroundImageUrl
+      isSuspended
       ... on AccountWithParent {
         parent {
           id
@@ -64,7 +63,7 @@ const conversationPageQuery = gql`
       }
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
       }
       conversationsTags {
         id
@@ -322,8 +321,8 @@ class ConversationPage extends React.Component {
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.account) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
+      } else if (!data.account || isHiddenAccount(data.account)) {
+        return <ErrorPage error={generateNotFoundError()} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
@@ -372,7 +371,6 @@ class ConversationPage extends React.Component {
                           <H2 fontSize="24px" lineHeight="32px" mb={4} wordBreak="break-word">
                             <InlineEditField
                               mutation={editConversationMutation}
-                              mutationOptions={{ context: API_V2_CONTEXT }}
                               canEdit={canEdit}
                               values={conversation}
                               field="title"
@@ -465,7 +463,6 @@ class ConversationPage extends React.Component {
                               canEdit={canEdit}
                               values={conversation}
                               mutation={editConversationMutation}
-                              mutationOptions={{ context: API_V2_CONTEXT }}
                               prepareVariables={(value, draft) => ({
                                 ...value,
                                 tags: draft,
@@ -488,7 +485,7 @@ class ConversationPage extends React.Component {
                                     )
                                   ) : (
                                     <Box mx={2}>
-                                      <StyledInputTags
+                                      <EditTags
                                         suggestedTags={this.getSuggestedTags(collective)}
                                         defaultValue={conversation.tags}
                                         onChange={options => this.handleTagsChange(options, setValue)}
@@ -516,8 +513,9 @@ class ConversationPage extends React.Component {
 const getData = graphql(conversationPageQuery, {
   options: {
     pollInterval: 60000, // Will refresh the data every 60s to get new comments
-    context: API_V2_CONTEXT,
   },
 });
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(getData(withRouter(withApollo(ConversationPage))));

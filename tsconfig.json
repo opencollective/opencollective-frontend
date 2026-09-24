@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2018",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "checkJs": false,
@@ -12,18 +12,27 @@
     "esModuleInterop": true,
     "module": "esnext",
     "isolatedModules": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "typeRoots": ["node_modules/@types", "lib/custom_typings"],
-    "jsx": "preserve",
-    "resolveJsonModule": true
+    "types": ["node", "jest", "webpack-env"],
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"]
+    }
   },
   "include": [
-    "next-env.d.ts",
-    "lib/graphql/types/v2/gql.d.ts",
+    ".eslintrc.js",
     "components",
     "cypress",
+    "*.config.*",
     "lib",
+    "proxy.ts",
+    "next-env.d.ts",
     "pages",
+    "rewrites.js",
     "scripts",
     "server",
     "stories",

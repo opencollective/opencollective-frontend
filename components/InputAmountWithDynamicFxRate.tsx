@@ -1,0 +1,65 @@
+import React from 'react';
+import { gql, useQuery } from '@apollo/client';
+import { useIntl } from 'react-intl';
+
+import { i18nGraphqlException } from '../lib/errors';
+
+import { useToast } from './ui/useToast';
+import InputAmount from './InputAmount';
+
+const currencyExchangeRateQuery = gql`
+  query HostExpenseModalCurrencyExchangeRate($requests: [CurrencyExchangeRateRequest!]!) {
+    currencyExchangeRate(requests: $requests) {
+      value
+      source
+      fromCurrency
+      toCurrency
+      date
+      isApproximate
+    }
+  }
+`;
+
+export const InputAmountWithDynamicFxRate = ({
+  fromCurrency,
+  toCurrency,
+  date,
+  value,
+  onChange,
+  ...props
+}: Omit<React.ComponentProps<typeof InputAmount>, 'currency' | 'loadingExchangeRate' | 'hasCurrencyPicker'>) => {
+  const intl = useIntl();
+  const { toast } = useToast();
+  const { loading } = useQuery(currencyExchangeRateQuery, {
+    skip: !fromCurrency || !toCurrency || fromCurrency === toCurrency,
+
+    variables: {
+      requests: [{ fromCurrency, toCurrency, date }],
+    },
+    onCompleted: data => {
+      props.onExchangeRateChange?.(data?.currencyExchangeRate[0]);
+    },
+    onError: e => {
+      // If the API fails (e.g. network error), we'll ask the user to provide an exchange rate manually
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    },
+  });
+
+  // Reset FX rate when currencies are the same
+  React.useEffect(() => {
+    if (fromCurrency === toCurrency) {
+      props.onExchangeRateChange?.(null);
+    }
+  }, [fromCurrency, toCurrency, date]);
+
+  return (
+    <InputAmount
+      value={value}
+      onChange={onChange}
+      hasCurrencyPicker
+      loadingExchangeRate={loading}
+      currency={fromCurrency}
+      {...props}
+    />
+  );
+};

@@ -1,0 +1,39 @@
+import React from 'react';
+import { DialogTitle } from '@radix-ui/react-dialog';
+import { Formik } from 'formik';
+import { noop } from 'lodash-es';
+import { FormattedMessage } from 'react-intl';
+
+import { PayoutMethodType } from '@/lib/graphql/types/v2/graphql';
+
+import { validatePayoutMethod } from '@/components/expenses/PayoutMethodForm';
+import { NewPayoutMethodOptionWrapper } from '@/components/submit-expense/form/PayoutMethodSection';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/Dialog';
+
+export default function CreatePayoutMethodModal({ account, open, onOpenChange, onUpdate }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="gap-2">
+        <DialogHeader>
+          <DialogTitle className="text-xl">
+            <FormattedMessage defaultMessage="Add a new payout method" id="vuU49U" />
+          </DialogTitle>
+        </DialogHeader>
+        <Formik
+          initialValues={{ newPayoutMethod: { data: {} } }}
+          onSubmit={noop}
+          validate={v => ({ newPayoutMethod: validatePayoutMethod(v.newPayoutMethod) })}
+        >
+          <NewPayoutMethodOptionWrapper
+            newPayoutMethodTypes={[PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.PAYPAL, PayoutMethodType.OTHER]}
+            loggedInAccount={account}
+            payeeSlug={account.slug}
+            payee={account}
+            refresh={onUpdate}
+            isPaypalConnectEnabled
+          />
+        </Formik>
+      </DialogContent>
+    </Dialog>
+  );
+}

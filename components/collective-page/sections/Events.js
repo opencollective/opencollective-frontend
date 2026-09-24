@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { sortEvents } from '../../../lib/events';
+import injectIntl from '@/lib/injectIntl';
 
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
@@ -49,12 +50,11 @@ class SectionEvents extends React.PureComponent {
 
   render() {
     const { collective, events, isAdmin } = this.props;
-    const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
-
     if (!events?.length && !isAdmin) {
       return null;
     }
 
+    const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     return (
       <Box pb={4} mt={2}>
         <ContainerSectionContent>
@@ -80,11 +80,6 @@ class SectionEvents extends React.PureComponent {
           container={ContributeCardsContainer}
           getScrollDistance={this.getContributeCardsScrollDistance}
         >
-          {this.sortEvents(events).map(event => (
-            <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-              <ContributeEvent collective={collective} event={event} hideContributors={hasNoContributorForEvents} />
-            </Box>
-          ))}
           {isAdmin && (
             <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
               <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
@@ -92,8 +87,13 @@ class SectionEvents extends React.PureComponent {
               </CreateNew>
             </Box>
           )}
+          {this.sortEvents(events).map(event => (
+            <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+              <ContributeEvent collective={collective} event={event} hideContributors={hasNoContributorForEvents} />
+            </Box>
+          ))}
         </HorizontalScroller>
-        {Boolean(events?.length > 6) && (
+        {Boolean(events.length > 6) && (
           <ContainerSectionContent>
             <Link href={`/${collective.slug}/events`}>
               <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">

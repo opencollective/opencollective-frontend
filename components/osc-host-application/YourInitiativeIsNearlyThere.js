@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
@@ -25,7 +25,7 @@ const YourInitiativeIsNearlyThere = () => (
         alignItems="center"
         justifyContent="center"
         width={['288px', '360px']}
-        height={('128px', '160px')}
+        height="160px"
         mb="24px"
       >
         <NextIllustration
@@ -59,7 +59,7 @@ const YourInitiativeIsNearlyThere = () => (
         <Link href="/help">
           <FormattedMessage id="community.support" defaultMessage="Support" />
         </Link>
-        <Link href="https://slack.opencollective.com/">Slack</Link>
+        <Link href="https://discord.opencollective.com/">Discord</Link>
         <Link href="https://blog.opencollective.com/">
           <FormattedMessage id="company.blog" defaultMessage="Blog" />
         </Link>

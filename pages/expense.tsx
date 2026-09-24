@@ -1,16 +1,13 @@
 import React, { useEffect } from 'react';
-import { useLazyQuery } from '@apollo/client';
+import { useApolloClient } from '@apollo/client';
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { initClient } from '../lib/apollo-client';
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
+import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { ExpensePageQuery } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
@@ -24,14 +21,22 @@ import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollecti
 import { Box, Flex } from '../components/Grid';
 import Page from '../components/Page';
 
-export const getVariableFromProps = props => {
+export const getVariablesFromQuery = query => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
     .utc(true)
     .toISOString();
   return {
-    legacyExpenseId: parseInt(props.ExpenseId),
-    draftKey: props.key || null,
+    legacyExpenseId: parseInt(query.ExpenseId),
+    draftKey: query.key || null,
     totalPaidExpensesDateFrom: firstOfCurrentYear,
+  };
+};
+
+const getPropsFromQuery = query => {
+  return {
+    legacyExpenseId: parseInt(query.ExpenseId),
+    draftKey: query.key || null,
+    collectiveSlug: query.collectiveSlug,
   };
 };
 
@@ -44,37 +49,18 @@ const messages = defineMessages({
 
 const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
 
-type ExpensePageProps = {
-  collectiveSlug: string;
-  legacyExpenseId: number;
-  edit?: string;
-  draftKey?: string;
-  data: Partial<ExpensePageQuery>;
-  error?: any;
-};
+const expensePageQueryHelper = getSSRQueryHelpers<
+  ReturnType<typeof getVariablesFromQuery>,
+  ReturnType<typeof getPropsFromQuery>
+>({
+  query: expensePageQuery,
+  getVariablesFromContext: context => getVariablesFromQuery(context.query),
+  getPropsFromContext: context => getPropsFromQuery(context.query),
+});
 
-export const getServerSideProps: GetServerSideProps<ExpensePageProps> = async ctx => {
-  const query = ctx.query as { collectiveSlug: string; ExpenseId: string; key?: string; edit?: string };
-  const client = initClient();
-  const variables = getVariableFromProps(query);
-  const { data, error } = await client.query({
-    query: expensePageQuery,
-    variables,
-    context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
-    errorPolicy: 'ignore',
-  });
-
-  return {
-    props: {
-      ...query,
-      legacyExpenseId: parseInt(query.ExpenseId as string),
-      draftKey: query.key || null,
-      data,
-      error: error || null,
-    }, // will be passed to the page component as props
-  };
-};
+// next.js export
+// ts-unused-exports:disable-next-line
+export const getServerSideProps = expensePageQueryHelper.getServerSideProps;
 
 const getPageMetadata = (intl, legacyExpenseId, expense) => {
   const baseMetadata = getCollectivePageMetadata(expense?.account);
@@ -88,47 +74,52 @@ const getPageMetadata = (intl, legacyExpenseId, expense) => {
   }
 };
 
+const isValidCollectiveSlug = (collectiveSlug: string, expense) => {
+  return [expense.account.slug, expense.account.parent?.slug].filter(Boolean).includes(collectiveSlug);
+};
+
+// next.js export
+// ts-unused-exports:disable-next-line
 export default function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
-  const [fetchData, query] = useLazyQuery(expensePageQuery, {
-    variables: getVariableFromProps(props),
-    context: API_V2_CONTEXT,
-  });
+  const queryResult = expensePageQueryHelper.useQuery(props);
   const router = useRouter();
-  const client = query.client;
+  const client = useApolloClient();
 
+  // Refetch data when logging in
   useEffect(() => {
-    if (LoggedInUser) {
-      fetchData();
+    if (LoggedInUser && !queryResult.data?.loggedInAccount) {
+      queryResult.refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, queryResult.data?.loggedInAccount]);
 
   useEffect(() => {
-    addParentToURLIfMissing(router, props.data?.expense?.account, `/expenses/${props.legacyExpenseId}`);
+    addParentToURLIfMissing(router, queryResult.data?.expense?.account, `/expenses/${props.legacyExpenseId}`);
   });
 
-  const { collectiveSlug, edit, draftKey } = props;
-  const data = query?.data || props.data;
-  const error = query?.error || props.error;
-  const { refetch, fetchMore, startPolling, stopPolling } = query;
-  if (!query.loading) {
+  const { collectiveSlug, draftKey } = props;
+  const data = queryResult.data;
+  const error = queryResult.error;
+  const { refetch, fetchMore } = queryResult;
+
+  if (!queryResult.loading) {
     if (!data || error) {
       return <ErrorPage data={data} />;
-    } else if (!data.expense) {
+    } else if (!data.expense || isHiddenAccount(data.expense.account)) {
       return <ErrorPage error={generateNotFoundError(null)} log={false} />;
-    } else if (!data.expense.account || props.collectiveSlug !== data.expense.account.slug) {
+    } else if (!data.expense.account || !isValidCollectiveSlug(collectiveSlug, data.expense)) {
       return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
     }
   }
 
-  const expense = cloneDeep(data.expense);
-  if (expense && data.expensePayeeStats?.payee?.stats) {
-    expense.payee.stats = data.expensePayeeStats?.payee?.stats;
-  }
+  const expense = data?.expense;
   const collective = expense?.account;
-  const host = collective?.host;
   const metadata = getPageMetadata(intl, props.legacyExpenseId, expense);
+
+  if (draftKey && !metadata.noRobots) {
+    metadata.noRobots = true;
+  }
 
   return (
     <Page collective={collective} canonicalURL={`${getCollectivePageCanonicalURL(collective)}/expense`} {...metadata}>
@@ -138,27 +129,29 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
         <Box flex="1 1 650px" minWidth={300} maxWidth={[null, null, null, 792]} mr={[null, 2, 3, 4]} px={2}>
           <Expense
             data={data}
-            loading={query.loading}
+            loading={queryResult.loading}
             error={error}
             refetch={refetch}
             client={client}
             fetchMore={fetchMore}
             legacyExpenseId={props.legacyExpenseId}
-            startPolling={startPolling}
-            stopPolling={stopPolling}
-            isRefetchingDataForUser={query.loading}
-            edit={edit}
+            isRefetchingDataForUser={queryResult.loading}
             draftKey={draftKey}
           />
         </Box>
         <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
           <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
-            <ExpenseInfoSidebar isLoading={query.loading} collective={collective} host={host} />
+            <ExpenseInfoSidebar
+              isLoading={queryResult.loading}
+              collective={collective}
+              host={collective?.host}
+              expenseHost={expense?.host}
+            />
           </Box>
         </Flex>
         <Box width={SIDE_MARGIN_WIDTH} />
       </Flex>
-      <MobileCollectiveInfoStickyBar isLoading={query.loading} collective={collective} host={host} />
+      <MobileCollectiveInfoStickyBar isLoading={queryResult.loading} collective={collective} host={collective?.host} />
     </Page>
   );
 }

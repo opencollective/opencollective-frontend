@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { P } from '../Text';
 
@@ -9,10 +8,6 @@ const SettingsSubtitle = ({ children }) => {
       {children}
     </P>
   );
-};
-
-SettingsSubtitle.propTypes = {
-  children: PropTypes.node,
 };
 
 export default SettingsSubtitle;

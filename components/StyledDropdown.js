@@ -4,6 +4,7 @@ import { flexbox } from 'styled-system';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
+import { defaultShouldForwardProp } from '../lib/styled_components_utils';
 
 export const DropdownContent = styled.div`
   display: none;
@@ -51,9 +52,11 @@ export const DropdownArrow = styled('div')`
  * When using `click` as a `trigger` you must pass a function as `children` and
  * make sure you pass down the `triggerProps` and `dropdownProps`.
  * The ref must be on the wrapping div in order to work in Firefox (Mac) and Safari.
+ *
+ * @deprecated Use `ui/DropdownMenu` instead
  */
 export const Dropdown = styled(({ children, trigger, ...props }) => {
-  const dropdownRef = useRef();
+  const dropdownRef = useRef(undefined);
   const [isDisplayed, setDisplayed] = React.useState(false);
   const closeDropdown = React.useCallback(() => {
     if (isDisplayed) {
@@ -74,7 +77,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
 
   if (typeof children === 'function' && trigger === 'click') {
     return (
-      <div ref={dropdownRef} {...props} data-expanded={isDisplayed}>
+      <div {...props} ref={dropdownRef} data-expanded={isDisplayed}>
         {children({
           isDisplayed,
           triggerProps: {
@@ -101,7 +104,6 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
     <div
       role="button"
       tabIndex={0}
-      // eslint-disable-next-line react/no-unknown-property
       trigger={trigger}
       {...props}
       onFocus={() => setTimeout(() => setDisplayed(true), 50)}
@@ -119,6 +121,8 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
       {children}
     </div>
   );
+}).withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !flexbox.propNames.includes(prop),
 })`
   ${flexbox}
   ${props =>

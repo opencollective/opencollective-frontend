@@ -18,11 +18,6 @@ export const randomGmailEmail = () => {
   return `oc-test-${randomID}@gmail.com`;
 };
 
-export const randomHotMail = () => {
-  const randomID = uuid().split('-')[0];
-  return `oc-test-${randomID}@hotmail.com`;
-};
-
 export const randomSlug = () => {
   return uuid().split('-')[0];
 };

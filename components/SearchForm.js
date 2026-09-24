@@ -1,14 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { withRouter } from 'next/router';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { borderColor, borderRadius, height, typography } from 'styled-system';
 
+import { compose } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
+
 import { Box, Flex } from './Grid';
+import Spinner from './Spinner';
 import StyledInput from './StyledInput';
 import StyledRoundButton from './StyledRoundButton';
-import StyledSpinner from './StyledSpinner';
 import { Span } from './Text';
 
 const SearchInputContainer = styled(Flex)`
@@ -17,6 +19,13 @@ const SearchInputContainer = styled(Flex)`
   ${borderRadius};
   ${height};
   background-color: white;
+
+  input[type='search']::-webkit-search-cancel-button,
+  input[type='search']::-webkit-search-clear-button {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
 `;
 
 const SearchInput = styled(Box)`
@@ -24,8 +33,9 @@ const SearchInput = styled(Box)`
     appearance: none;
     background-color: transparent;
     border: none;
+    margin-right: 1.5rem;
     ${typography}
-    ::placeholder {
+    &::placeholder {
       color: #9d9fa3;
     }
   }
@@ -37,6 +47,14 @@ const SearchButton = styled(Flex)`
     background-color: transparent;
     border: none;
   }
+`;
+
+const ClearFilterButton = styled.button`
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  margin-right: 8px;
+  padding: 4px;
 `;
 
 class SearchForm extends React.Component {
@@ -73,9 +91,12 @@ class SearchForm extends React.Component {
       fontSize = '0.75rem',
       lineHeight,
       fontWeight,
+      className,
+      onClearFilter,
+      intl,
     } = this.props;
     return (
-      <form action="/search" method="GET" onSubmit={onSubmit}>
+      <form action="/search" method="GET" onSubmit={onSubmit} className={className}>
         <SearchInputContainer
           borderRadius={borderRadius}
           borderColor={borderColor}
@@ -112,13 +133,21 @@ class SearchForm extends React.Component {
             onFocus={onFocus}
             autoComplete={autoComplete}
           />
+          {this.props.value && (
+            <ClearFilterButton
+              onClick={onClearFilter}
+              aria-label={intl.formatMessage({ id: 'search.clear', defaultMessage: 'Clear search' })}
+            >
+              <X size={13} className="text-slate-500" />
+            </ClearFilterButton>
+          )}
           {this.props.showSearchButton && (
             <StyledRoundButton
               style={{ backgroundColor: '#F9FAFB', color: '#323334', ...this.props.searchButtonStyles }}
               isBorderless
               mr="6px"
             >
-              {this.state.isLoading ? <StyledSpinner size="20px" /> : <Span>→</Span>}
+              {this.state.isLoading ? <Spinner size="20px" /> : <Span>→</Span>}
             </StyledRoundButton>
           )}
         </SearchInputContainer>
@@ -127,31 +156,6 @@ class SearchForm extends React.Component {
   }
 }
 
-SearchForm.propTypes = {
-  fontSize: PropTypes.string,
-  defaultValue: PropTypes.string,
-  py: PropTypes.string,
-  value: PropTypes.string,
-  onSubmit: PropTypes.func,
-  placeholder: PropTypes.string,
-  backgroundColor: PropTypes.string,
-  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  onChange: PropTypes.func,
-  borderRadius: PropTypes.string,
-  borderColor: PropTypes.string,
-  height: PropTypes.string,
-  router: PropTypes.object,
-  disabled: PropTypes.bool,
-  autoFocus: PropTypes.bool,
-  showSearchButton: PropTypes.bool,
-  searchButtonStyles: PropTypes.object,
-  onFocus: PropTypes.func,
-  autoComplete: PropTypes.string,
-  fontStyle: PropTypes.string,
-  letterSpacing: PropTypes.string,
-  lineHeight: PropTypes.string,
-  fontWeight: PropTypes.string,
-  closeSearchModal: PropTypes.func,
-};
+const composedFunction = compose(withRouter, injectIntl);
 
-export default withRouter(SearchForm);
+export default composedFunction(SearchForm);

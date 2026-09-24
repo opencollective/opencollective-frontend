@@ -1,49 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
-import jwt from 'jsonwebtoken';
-import { get, isEqual } from 'lodash';
+import { decodeJwt } from 'jose';
+import { get, isEqual } from 'lodash-es';
 import Router, { withRouter } from 'next/router';
-import { injectIntl } from 'react-intl';
 
+import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
+import { API_V1_CONTEXT } from '../lib/graphql/helpers';
+import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import injectIntl from '@/lib/injectIntl';
 
-import { TOAST_TYPE, withToasts } from './ToastProvider';
+import { toast } from './ui/useToast';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
   errorLoggedInUser: null,
   LoggedInUser: null,
-  logout() {},
-  login() {},
-  refetchLoggedInUser() {},
+  logout: async () => null,
+  login: async () => null,
+  async refetchLoggedInUser() {},
+  updateLoggedInUserFromCache: () => {},
 });
 
 class UserProvider extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
-    addToast: PropTypes.func,
     twoFactorAuthPrompt: PropTypes.object,
     router: PropTypes.object,
-    token: PropTypes.string,
     client: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
     children: PropTypes.node,
     intl: PropTypes.object,
-    /**
-     * If not used inside of NextJS (ie. in styleguide), the code that checks if we are
-     * on `/signin` that uses `Router` will crash. Setting this prop bypass this behavior.
-     */
-    skipRouteCheck: PropTypes.bool,
+    initialLoggedInUser: PropTypes.object,
   };
 
   state = {
-    loadingLoggedInUser: true,
-    LoggedInUser: null,
+    loadingLoggedInUser: this.props.initialLoggedInUser ? false : true,
+    LoggedInUser: this.props.initialLoggedInUser,
     errorLoggedInUser: null,
   };
 
@@ -51,7 +48,7 @@ class UserProvider extends React.Component {
     window.addEventListener('storage', this.checkLogin);
 
     // Disable auto-login on SignIn page
-    if (this.props.skipRouteCheck || Router.pathname !== '/signin') {
+    if (Router.pathname !== '/signin') {
       await this.login();
     }
   }
@@ -79,12 +76,26 @@ class UserProvider extends React.Component {
     }
   };
 
-  logout = async () => {
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.LAST_DASHBOARD_SLUG);
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE);
+  logout = async ({ redirect, skipQueryRefetch } = {}) => {
+    auth.logout();
+
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
+    // Clear the Apollo store without automatically refetching queries
     await this.props.client.clearStore();
+
+    // By default, we refetch all queries to make sure we don't display stale data
+    if (!skipQueryRefetch) {
+      await this.props.client.reFetchObservableQueries();
+    } else {
+      // Send any request to API to clear rootRedirectDashboard cookie
+      await this.props.client.query({ query: loggedInUserQuery, context: API_V1_CONTEXT, fetchPolicy: 'network-only' });
+    }
+
+    if (redirect) {
+      this.props.router.push({
+        pathname: redirect,
+      });
+    }
   };
 
   login = async token => {
@@ -112,34 +123,37 @@ class UserProvider extends React.Component {
         this.logout();
         this.setState({ loadingLoggedInUser: false });
         const message = formatErrorMessage(intl, createError(ERROR.JWT_EXPIRED));
-        this.props.addToast({ type: TOAST_TYPE.ERROR, message });
+        toast({ variant: 'error', message });
         return null;
       }
 
-      // Store the error
-      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       if (error.message.includes('Two-factor authentication is enabled')) {
-        // eslint-disable-next-line no-constant-condition
         while (true) {
           try {
-            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            const decodedToken = jwt.decode(token);
+            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
+            const decodedToken = decodeJwt(token);
 
             const result = await twoFactorAuthPrompt.open({
               supportedMethods: decodedToken.supported2FAMethods,
               authenticationOptions: decodedToken.authenticationOptions,
-              isRequired: true,
               allowRecovery: true,
             });
 
+            // An empty result means the prompt is already open elsewhere. This could either be due to
+            // React strict mode calling lifecycle methods twice or a developer mistake. The safest option is to early
+            // return and let the other prompt handle the result.
+            if (!result) {
+              return;
+            }
+
             const LoggedInUser = await getLoggedInUser({
-              token: getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN),
+              token: getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN),
               twoFactorAuthenticatorCode: result.code,
               twoFactorAuthenticationType: result.type,
             });
             if (result.type === 'recovery_code') {
               this.props.router.replace({
-                pathname: '/[slug]/admin/user-security',
+                pathname: '/dashboard/[slug]/user-security',
                 query: { slug: LoggedInUser.collective.slug },
               });
             } else {
@@ -149,24 +163,32 @@ class UserProvider extends React.Component {
                 LoggedInUser,
               });
             }
+            removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
 
             return LoggedInUser;
           } catch (e) {
             this.setState({ loadingLoggedInUser: false, errorLoggedInUser: e.message });
-            this.props.addToast({
-              type: TOAST_TYPE.ERROR,
-              message: e.message,
-            });
 
-            // stop trying to get the code.
+            // Stop loop if user cancelled the prompt
+            if (e.type === 'TWO_FACTOR_AUTH_CANCELED') {
+              throw new Error(formatErrorMessage(intl, e), { cause: e });
+            }
+
+            // Stop loop if too many requests or token is invalid
             if (
               e.type === 'too_many_requests' ||
               (e.type === 'unauthorized' && e.message.includes('Cannot use this token'))
             ) {
-              throw new Error(e.message);
+              throw new Error(e.message, { cause: e });
             }
+
+            // Otherwise, retry 2fa prompt and show error
+            toast({ variant: 'error', message: e.message });
           }
         }
+      } else {
+        // Store the error
+        this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       }
     }
   };
@@ -192,10 +214,25 @@ class UserProvider extends React.Component {
     return true;
   };
 
+  /**
+   * Reloads the logged in user from the Apollo cache
+   */
+  updateLoggedInUserFromCache = () => {
+    const { getLoggedInUserFromCache } = this.props;
+    const LoggedInUser = getLoggedInUserFromCache();
+    this.setState({ LoggedInUser });
+  };
+
   render() {
     return (
       <UserContext.Provider
-        value={{ ...this.state, logout: this.logout, login: this.login, refetchLoggedInUser: this.refetchLoggedInUser }}
+        value={{
+          ...this.state,
+          logout: this.logout,
+          login: this.login,
+          refetchLoggedInUser: this.refetchLoggedInUser,
+          updateLoggedInUserFromCache: this.updateLoggedInUserFromCache,
+        }}
       >
         {this.props.children}
       </UserContext.Provider>
@@ -215,8 +252,8 @@ const withUser = WrappedComponent => {
   return WithUser;
 };
 
-export default withToasts(
-  injectIntl(withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider)))))),
+export default injectIntl(
+  withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider))))),
 );
 
-export { UserConsumer, withUser };
+export { withUser };

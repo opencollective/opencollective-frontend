@@ -1,10 +1,12 @@
 .next
 .env
 .env.*
+.envrc
 node_modules
 npm-debug.log.*
 ./report.*.json
 *.log
+logs
 yarn.lock
 .DS_Store
 build
@@ -12,14 +14,13 @@ coverage
 .nyc_output
 test/cypress/screenshots
 test/cypress/videos
+test/cypress/downloads
 dist
 stage
 *.swp
-styleguide/index.html
-styleguide/build/
-styleguide/static/fonts
 storybook-static
 .vimrc
+test_results.xml
 
 # VSCode & VSCode's extensions
 .vscode/*
@@ -29,12 +30,19 @@ storybook-static
 .idea/
 *.iml
 
+# Cursor
+.cursor/
+
 # Git time manager
 .gtm
 
 # Typescript
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+# Tool caches
+.eslintcache
+.prettiercache
 
 # Frontend components build files
 scripts/publish-components/.tmp
@@ -44,8 +52,13 @@ scripts/publish-components/.tmp
 .sentryclirc
 
 # pdfjs worker - copied from node_modules by webpack (see next.config.js)
-public/static/scripts/pdf.worker.min.js
+public/static/scripts/pdf.worker.min.mjs
 
 # pdfjs character maps - copied from node_modules by webpack (see next.config.js)
 public/static/cmaps
 .vercel
+
+lib/graphql/types/v2/index.ts
+lib/graphql/types/v2/gql.ts
+
+.codegraph

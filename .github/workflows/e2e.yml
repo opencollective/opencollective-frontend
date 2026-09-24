@@ -1,21 +1,51 @@
 name: E2E
 
+# Security: Do not switch this workflow to `pull_request_target` to run on fork PRs with secrets.
+# Use `pull_request` (secrets blocked for forks by default) or trusted push/workflow_dispatch instead.
+#
+# Branch protection: required checks are `e2e / e2e (0*.(js|ts))` … `e2e / e2e (4*.(js|ts))`.
+
 on:
   workflow_call:
+    inputs:
+      api-ref:
+        description: opencollective-api commit SHA resolved by e2e-prepare
+        required: true
+        type: string
+      images-ref:
+        description: opencollective-images commit SHA resolved by e2e-prepare
+        required: true
+        type: string
+      pdf-ref:
+        description: opencollective-pdf commit SHA resolved by e2e-prepare
+        required: true
+        type: string
 
 env:
   TZ: UTC
   OC_ENV: ci
   NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
+  IMAGES_URL: http://localhost:3001
+  PDF_SERVICE_URL: http://localhost:3002
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
 
+  AWS_KEY: user
+  AWS_SECRET: password
+  AWS_S3_BUCKET: opencollective-e2e
+  AWS_S3_REGION: us-east-1
+  AWS_S3_API_VERSION: latest
+  AWS_S3_ENDPOINT: http://localhost:9000
+  AWS_S3_SSL_ENABLED: false
+  AWS_S3_FORCE_PATH_STYLE: true
+  GRAPHQL_ERROR_DETAILED: true
+  DISABLE_MOCK_UPLOADS: 1
   E2E_TEST: 1
   PGHOST: localhost
   PGUSER: postgres
-  IMAGES_URL: http://localhost:3001
+  CYPRESS_COVERAGE: false
   CYPRESS_RECORD: false
   CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
@@ -25,32 +55,31 @@ env:
   FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
   API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
+  PDF_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-pdf
   TERM: xterm
-  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
   STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
 
 jobs:
   e2e:
-    if: github.ref_name != 'i18n/crowdin'
-
-    runs-on: ubuntu-latest
+    name: e2e (${{ matrix.files }})
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 30
 
     strategy:
       fail-fast: false
       matrix:
-        files: ['0*.js', '1*.js', '2*.js', '3*.js']
+        files: ['0*.(js|ts)', '1*.(js|ts)', '2*.(js|ts)', '3*.(js|ts)', '4*.(js|ts)']
 
     services:
       redis:
-        image: redis
+        image: redis@sha256:aa049e689e141a4358ad1d4562dc49c88a89fbab711fd8fcc33f684c80b26301
         ports:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:13.12
+        image: postgres:16.14@sha256:4b7183ac05f8ef417db21fd72d71047a4238340c261d3cc3ddb6d579ab5071ae
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -58,79 +87,80 @@ jobs:
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd pg_isready --health-interval 2s --health-timeout 5s --health-retries 5
+      rustfs:
+        image: rustfs/rustfs:1.0.0-rc.6@sha256:97171b3d72cd47dc81000f92ea84de25608bfc35a94c965501afaeb5d99f6035
+        ports:
+          - 9000:9000
+        options: --name=rustfs --health-cmd "curl -f http://localhost:9000/health/ready"
+        env:
+          RUSTFS_ACCESS_KEY: user
+          RUSTFS_SECRET_KEY: password
 
     steps:
+      # man-db trigger on apt install is taking some time
+      - name: Disable man-db update
+        run: sudo rm -f /var/lib/man-db/auto-update
       - name: Update apt
         run: sudo apt-get update || exit 0
 
-      - name: Install Cypress dependencies
-        run: sudo apt-get install --no-install-recommends -y libgtk2.0-0 libgtk-3-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb fonts-arphic-bkai00mp fonts-arphic-bsmi00lp fonts-arphic-gbsn00lp fonts-arphic-gkai00mp fonts-arphic-ukai fonts-arphic-uming ttf-wqy-zenhei ttf-wqy-microhei xfonts-wqy
-
-      - name: Install postgresql-client
-        run: sudo apt-get install -y postgresql-client
-
-      - name: Install graphicsmagick
-        run: sudo apt-get install -y graphicsmagick
-
-      - name: Install stripe-cli
+      - name: Install dependencies
         run: |
-          sudo apt-get install -y wget
-          wget https://github.com/stripe/stripe-cli/releases/download/v1.13.9/stripe_1.13.9_linux_x86_64.tar.gz -O /tmp/stripe_1.13.9_linux_x86_64.tar.gz
-          sudo tar xzvf /tmp/stripe_1.13.9_linux_x86_64.tar.gz -C /bin/
+          sudo apt-get install \
+          `# Cypress dependencies - see https://docs.cypress.io/app/get-started/install-cypress#UbuntuDebian` \
+          libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb \
+          `# Postgres client` \
+          postgresql-client-16
+
+      - name: Setup S3 bucket
+        env:
+          AWS_ACCESS_KEY_ID: user
+          AWS_SECRET_ACCESS_KEY: password
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          aws --endpoint-url http://127.0.0.1:9000 s3api head-bucket --bucket opencollective-e2e 2>/dev/null ||
+            aws --endpoint-url http://127.0.0.1:9000 s3api create-bucket --bucket opencollective-e2e
 
       - name: Checkout (frontend)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
+
+      - name: Restore stripe-cli
+        uses: actions/cache@v6
+        id: stripe-cli
+        with:
+          path: ${{ github.workspace }}/.stripe-cli
+          key: ${{ runner.os }}-stripe-cli-1.13.9-linux-x86_64
+
+      - name: Install stripe-cli
+        if: steps.stripe-cli.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p "${GITHUB_WORKSPACE}/.stripe-cli"
+          curl -fsSL -o /tmp/stripe.tgz https://github.com/stripe/stripe-cli/releases/download/v1.13.9/stripe_1.13.9_linux_x86_64.tar.gz
+          tar -xzf /tmp/stripe.tgz -C /tmp
+          mv /tmp/stripe "${GITHUB_WORKSPACE}/.stripe-cli/stripe"
+          chmod +x "${GITHUB_WORKSPACE}/.stripe-cli/stripe"
+
+      - name: Add stripe-cli to PATH
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/.stripe-cli/stripe"
+          echo "${GITHUB_WORKSPACE}/.stripe-cli" >> "${GITHUB_PATH}"
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version-file: 'package.json'
           cache: 'npm'
 
-      # Checkouts
-
-      - name: Set REF in env, removing the `refs/` part
-        run: |
-          echo "MATCHING_BRANCH_REF=${GITHUB_HEAD_REF-${GITHUB_REF##*/}}" >> $GITHUB_ENV
-
-      - name: Check matching branch (api)
-        id: check-matching-branch
-        uses: octokit/request-action@v2.x
+      - name: Checkout E2E stack
+        uses: ./.github/actions/checkout-e2e-stack
         with:
-          route: GET /repos/{owner}/{repo}/git/ref/{ref}
-          owner: opencollective
-          repo: opencollective-api
-          ref: heads/${{ env.MATCHING_BRANCH_REF }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
-
-      - name: Checkout (api - matching branch)
-        if: steps.check-matching-branch.outputs.status == 200
-        uses: actions/checkout@v3
-        with:
-          repository: opencollective/opencollective-api
-          path: opencollective-api
-          ref: ${{ env.MATCHING_BRANCH_REF }}
-
-      - name: Checkout (api - main)
-        if: steps.check-matching-branch.outputs.status != 200
-        uses: actions/checkout@v3
-        with:
-          repository: opencollective/opencollective-api
-          path: opencollective-api
-
-      - name: Checkout (images)
-        uses: actions/checkout@v3
-        with:
-          repository: opencollective/opencollective-images
-          path: opencollective-images
-
-      # Prepare API
+          api-ref: ${{ inputs.api-ref }}
+          images-ref: ${{ inputs.images-ref }}
+          pdf-ref: ${{ inputs.pdf-ref }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore node_modules (api)
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         id: api-node-modules
         with:
           path: opencollective-api/node_modules
@@ -139,16 +169,10 @@ jobs:
       - name: Install dependencies (api)
         working-directory: opencollective-api
         if: steps.api-node-modules.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
-
-      - name: Build (api)
-        working-directory: opencollective-api
-        run: npm run build
-
-      # Prepare Images
+        run: npm ci --prefer-offline --no-audit --no-fund
 
       - name: Restore node_modules (images)
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         id: images-node-modules
         with:
           path: opencollective-images/node_modules
@@ -157,16 +181,22 @@ jobs:
       - name: Install dependencies (images)
         working-directory: opencollective-images
         if: steps.images-node-modules.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
+        run: npm ci --prefer-offline --no-audit --no-fund
 
-      - name: Build (images)
-        working-directory: opencollective-images
-        run: npm run build
+      - name: Restore node_modules (pdf)
+        uses: actions/cache@v6
+        id: pdf-node-modules
+        with:
+          path: opencollective-pdf/node_modules
+          key: ${{ runner.os }}-pdf-node-modules-${{ hashFiles('opencollective-pdf/package-lock.json') }}
 
-      # Prepare Frontend
+      - name: Install dependencies (pdf)
+        working-directory: opencollective-pdf
+        if: steps.pdf-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit --no-fund
 
       - name: Restore node_modules (frontend)
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         id: node-modules
         with:
           path: node_modules
@@ -174,10 +204,10 @@ jobs:
 
       - name: Install dependencies (frontend)
         if: steps.node-modules.outputs.cache-hit != 'true'
-        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
+        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit --no-fund
 
       - name: Restore Cypress
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         id: cypress
         with:
           path: ~/.cache/Cypress
@@ -187,41 +217,67 @@ jobs:
         if: steps.cypress.outputs.cache-hit != 'true'
         run: npx cypress install
 
-      - name: Restore .next build (frontend)
-        uses: actions/cache@v3
-        id: next-build
+      - name: Download Next.js build
+        uses: actions/download-artifact@v7
         with:
-          path: .next
-          key: ${{ runner.os }}-next-build-${{ github.sha }}
+          name: frontend-next
+          path: /tmp/frontend-next
 
-      - name: Restore .next cache (frontend)
-        if: steps.next-build.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
+      - name: Download service dist artifacts
+        uses: actions/download-artifact@v7
         with:
-          path: .next/cache
-          key: ${{ runner.os }}-next-cache-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-next-cache-${{ github.sha }}
-            ${{ runner.os }}-next-cache-
+          name: e2e-service-dists
+          path: /tmp/e2e-service-dists
 
-      - name: Build (frontend)
-        if: steps.next-build.outputs.cache-hit != 'true'
-        run: npm run build
+      - name: Restore downloaded builds
+        run: |
+          set -euo pipefail
+
+          next_root=/tmp/frontend-next
+          if [ ! -f "${next_root}/BUILD_ID" ] && [ -f "${next_root}/frontend-next/BUILD_ID" ]; then
+            next_root="${next_root}/frontend-next"
+          fi
+          mkdir -p .next
+          rsync -a "${next_root}/" .next/
+          test -f .next/BUILD_ID
+          test -f .next/routes-manifest.json
+
+          stack_root=/tmp/e2e-service-dists
+          if [ ! -d "${stack_root}/opencollective-api/dist" ] && [ -d "${stack_root}/e2e-service-dists/opencollective-api/dist" ]; then
+            stack_root="${stack_root}/e2e-service-dists"
+          fi
+          rm -rf opencollective-api/dist opencollective-images/dist opencollective-pdf/dist
+          cp -a "${stack_root}/opencollective-api/dist" opencollective-api/dist
+          cp -a "${stack_root}/opencollective-images/dist" opencollective-images/dist
+          cp -a "${stack_root}/opencollective-pdf/dist" opencollective-pdf/dist
+          test -f opencollective-api/dist/e2e.js
+          test -e opencollective-images/dist/server
+          test -f opencollective-pdf/dist/server/index.js
+
+      # Seed DB
 
       - name: Setup DB
         run: ./scripts/setup_db.sh
+
+      # Run tests
 
       - name: Run E2E with Cypress
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
-      - name: Archive test screenshots
-        uses: actions/upload-artifact@v3
+      - name: Archive test recordings
+        uses: actions/upload-artifact@v7
         with:
-          name: screenshots
-          path: opencollective-frontend/test/cypress/screenshots
+          name: cypress-recordings-${{ github.run_id }}-${{ strategy.job-index }}
+          path: |
+            test/cypress/screenshots
+            test/cypress/videos
         if: ${{ failure() }}
 
-      - name: Report Coverage
-        run: npm run test:coverage
+      - name: Archive download folder
+        uses: actions/upload-artifact@v7
+        with:
+          name: downloads-${{ github.run_id }}-${{ strategy.job-index }}
+          path: test/cypress/downloads
+        if: ${{ failure() }}

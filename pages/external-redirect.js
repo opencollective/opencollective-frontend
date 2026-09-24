@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isURL } from 'validator';
 
-import { isRelativeHref, isTrustedRedirectHost } from '../lib/url-helpers';
+import { isRelativeHref, isTrustedRedirectURL } from '../lib/url-helpers';
 import { isValidRelativeUrl, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
@@ -27,14 +27,20 @@ const getFallback = fallback => {
 };
 
 export const isValidExternalRedirect = url => {
-  const validationParams = process.env.NODE_ENV === 'production' ? {} : { require_tld: false }; // eslint-disable-line camelcase
+  // Default params: { protocols: ['http','https','ftp'], require_tld: true, require_protocol: false, require_host: true, require_port: false, require_valid_protocol: true, allow_underscores: false, host_whitelist: false, host_blacklist: false, allow_trailing_dot: false, allow_protocol_relative_urls: false, allow_fragments: true, allow_query_components: true, disallow_auth: false, validate_length: true }
+  const validationParams = {};
+  validationParams['protocols'] = ['http', 'https'];
+  if (process.env.NODE_ENV !== 'production') {
+    validationParams['require_tld'] = false;
+  }
+
   return url && isURL(url, validationParams);
 };
 
 const shouldRedirectDirectly = urlStr => {
   try {
     const parsedUrl = new URL(urlStr);
-    return isTrustedRedirectHost(parsedUrl.host);
+    return isTrustedRedirectURL(parsedUrl.host);
   } catch {
     return false;
   }
@@ -72,7 +78,7 @@ const ExternalRedirectPage = () => {
   }, [router, query.url]);
 
   return (
-    <Page>
+    <Page noRobots>
       <Flex justifyContent="center" alignItems="center" py={[4, 5, 6]}>
         {isReady ? (
           <StyledCard maxWidth={450}>
@@ -136,4 +142,6 @@ const ExternalRedirectPage = () => {
   );
 };
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default ExternalRedirectPage;

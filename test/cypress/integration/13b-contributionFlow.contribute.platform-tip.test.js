@@ -26,6 +26,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     cy.getByDataCy('ContributionSummary-TodaysCharge').should('contain', '$57.50 USD');
 
     // Switch to the 10% percentage preset
+    cy.contains('Edit').click();
     cy.contains('[data-cy="platform-tip-options"] button', '10%').click();
     cy.contains('[data-cy="platform-tip-options"] button', '10%').should('have.class', 'selected');
     cy.getByDataCy('ContributionSummary-Tip').should('contain', '$5.00 USD');
@@ -38,7 +39,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
 
     // Use a custom amount
     cy.contains('[data-cy="amount-picker"] button', 'Other').click();
-    cy.get('input[name="custom-amount"]').type('{backspace}{backspace}');
+    cy.get('input[name="custom-amount"]').type('{selectall}{backspace}');
     cy.get('[data-cy="platform-tip-options"] button').should('be.disabled'); // When empty, the tip input is disabled
     cy.get('input[name="custom-amount"]').type('12');
     cy.getByDataCy('ContributionSummary-Tip').should('contain', '$1.20 USD');
@@ -53,7 +54,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     cy.contains('[data-cy="platform-tip-options"] button', 'Other').click();
 
     // Can empty
-    cy.get('[data-cy="platform-tip-other-amount"]').type('{backspace}{backspace}{backspace}');
+    cy.get('[data-cy="platform-tip-other-amount"]').type('{selectall}{backspace}');
     cy.getByDataCy('ContributionSummary-Tip').should('not.exist');
     cy.getByDataCy('ContributionSummary-TodaysCharge').should('contain', '$10.00 USD');
 
@@ -71,7 +72,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     const confirmStub = cy.stub();
     confirmStub.returns(false); // Do not accept
     cy.on('window:confirm', confirmStub);
-    cy.get('[data-cy="platform-tip-other-amount"]').type('{backspace}{backspace}{backspace}48');
+    cy.get('[data-cy="platform-tip-other-amount"]').type('{selectall}48');
     cy.getByDataCy('cf-next-step')
       .click()
       .then(() => {
@@ -82,7 +83,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
       });
 
     // ---- Opt out ----
-    cy.contains('[data-cy="platform-tip-options"] button', 'No thank you').click();
+    cy.contains(`I don't want to contribute to Open Collective`).click();
 
     // Removes the tip
     cy.getByDataCy('ContributionSummary-Tip').should('not.exist');
@@ -97,11 +98,11 @@ describe('Contribution Flow: contribute with platform tips', () => {
   it('Is not displayed when contribution amount is 0', () => {
     // Create a special tier to allow free contributions
     // TODO: Would be great to have that as a cypress command for that part, but there's no mutation to edit tiers on GQLV2 yet
-    cy.login({ redirect: `/${collective.slug}/admin/tiers` });
+    cy.login({ redirect: `/dashboard/${collective.slug}/tiers` });
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
-    cy.get('[data-cy="minimumAmount"]input').type('{backspace}{backspace}{backspace}0');
+    cy.get('[data-cy="minimumAmount"]input').type('{selectall}0');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier updated.' });
+    cy.checkToast({ variant: 'success', message: 'Tier updated.' });
     cy.visit(`/${collective.slug}/contribute`);
     cy.get('[data-cy="contribute-btn"]:first').click();
 
@@ -112,7 +113,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
 
     // But the tip disappears when the amount is 0
     cy.contains('[data-cy="amount-picker"] button', 'Other').click();
-    cy.get('input[name="custom-amount"]').type('{backspace}{backspace}0');
+    cy.get('input[name="custom-amount"]').type('{selectall}0');
     cy.get('[data-cy="platform-tip-container"]').invoke('css', 'display').should('equal', 'none');
     cy.getByDataCy('ContributionSummary-Tip').should('not.exist');
     cy.getByDataCy('ContributionSummary-TodaysCharge').should('contain', '$0.00 USD');

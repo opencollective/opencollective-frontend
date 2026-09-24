@@ -1,13 +1,13 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Lock } from '@styled-icons/fa-solid/Lock';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { Account, Update } from '../../../lib/graphql/types/v2/graphql';
-import { getCollectivePageRoute } from '../../../lib/url-helpers';
+import { gql } from '../../../lib/graphql/helpers';
+import type { Account, Update } from '../../../lib/graphql/types/v2/graphql';
+import { getCollectivePageRoute, getDashboardRoute } from '../../../lib/url-helpers';
 import { formatDate } from '../../../lib/utils';
 
 import Avatar from '../../Avatar';
@@ -36,7 +36,6 @@ export const updatesSectionQuery = gql`
       id
       updates(limit: 3, onlyPublishedUpdates: $onlyPublishedUpdates) {
         nodes {
-          id
           id
           slug
           title
@@ -77,7 +76,6 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
  */
 const SectionUpdates = ({ collective, isAdmin }) => {
   const { data } = useQuery<{ account: Account }>(updatesSectionQuery, {
-    context: API_V2_CONTEXT,
     variables: getUpdatesSectionQueryVariables(collective.slug, isAdmin),
   });
 
@@ -113,7 +111,7 @@ const SectionUpdates = ({ collective, isAdmin }) => {
           <FormattedMessage id="section.updates.subtitle" defaultMessage="Updates on our activities and progress." />
         </P>
         {isAdmin && (
-          <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
+          <Link href={`${getDashboardRoute(collective)}/updates/new`}>
             <StyledButton data-cy="create-new-update-btn" buttonStyle="primary" my={[2, 0]}>
               <Span fontSize="16px" fontWeight="bold" mr={2}>
                 +
@@ -220,10 +218,10 @@ const SectionUpdates = ({ collective, isAdmin }) => {
                       ) : (
                         <FormattedMessage
                           id="update.createdAtBy"
-                          defaultMessage={'Created on {date} (draft) by {author}'}
+                          defaultMessage="Created on {date} (draft) by {author}"
                           values={{
                             date: formatDate(update.createdAt),
-                            author: <LinkCollective collective={update.fromAccount} />,
+                            author: <LinkCollective key="author" collective={update.fromAccount} />,
                           }}
                         />
                       )}

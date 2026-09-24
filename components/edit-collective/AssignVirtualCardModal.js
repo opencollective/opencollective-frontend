@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -23,7 +22,7 @@ import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 import { virtualCardsAssignedToCollectiveQuery } from './EditVirtualCardModal';
@@ -39,7 +38,7 @@ const initialValues = {
 };
 
 const assignNewVirtualCardMutation = gql`
-  mutation assignNewVirtualCard(
+  mutation AssignNewVirtualCard(
     $virtualCard: VirtualCardInput!
     $account: AccountReferenceInput!
     $assignee: AccountReferenceInput!
@@ -76,14 +75,10 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modalProps }) => {
-  const { addToast } = useToasts();
-  const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
-    context: API_V2_CONTEXT,
-  });
+const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClose, ...modalProps }) => {
+  const { toast } = useToast();
+  const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation);
+  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery);
 
   const formik = useFormik({
     initialValues: {
@@ -113,8 +108,8 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
           },
         });
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: (
             <FormattedMessage
               id="Host.VirtualCards.AssignCard.Error"
@@ -162,7 +157,6 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
   const { data: virtualCardsAssignedToCollectiveData, loading: isLoadingVirtualCardsAssignedToCollective } = useQuery(
     virtualCardsAssignedToCollectiveQuery,
     {
-      context: API_V2_CONTEXT,
       variables: {
         collectiveSlug: formik.values?.collective?.slug,
         hostSlug: host.slug,
@@ -190,7 +184,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal onClose={handleClose} {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
           <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
@@ -207,7 +201,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" />}
+              label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" id="goAEwY" />}
               htmlFor="collective"
               error={formik.touched.collective && formik.errors.collective}
             >
@@ -243,6 +237,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
                   >
                     <FormattedMessage
                       defaultMessage="This collective already has {allCardsCount} other cards assigned to it. {missingReceiptsCardsCount, plural, =0 {} other {# of the {allCardsCount} cards have missing receipts.}}"
+                      id="Ox+jio"
                       values={{
                         allCardsCount: virtualCardsAssignedToCollectiveData.host.allCards.totalCount,
                         missingReceiptsCardsCount:
@@ -251,9 +246,9 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
                     />
                     <Box mt={3}>
                       <StyledLink
-                        href={`/${host.slug}/admin/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
+                        href={`/dashboard/${host.slug}/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
                       >
-                        <FormattedMessage defaultMessage="View Assigned Cards" />
+                        <FormattedMessage defaultMessage="View Assigned Cards" id="PO4Kx4" />
                       </StyledLink>
                     </Box>
                   </MessageBox>
@@ -262,7 +257,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Which user will be responsible for this card?" />}
+              label={<FormattedMessage defaultMessage="Which user will be responsible for this card?" id="vwk9m4" />}
               htmlFor="assignee"
               error={formik.touched.assignee && formik.errors.assignee}
             >
@@ -305,7 +300,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Card name" />}
+              label={<FormattedMessage defaultMessage="Card name" id="8oufoc" />}
               htmlFor="cardName"
               error={formik.touched.cardName && formik.errors.cardName}
             >
@@ -325,7 +320,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Card number" />}
+              label={<FormattedMessage defaultMessage="Card number" id="qBST+n" />}
               htmlFor="number"
               error={formik.touched.cardNumber && formik.errors.cardNumber}
             >
@@ -375,7 +370,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
             </StyledInputField>
             <StyledInputField
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Expiry date" />}
+              label={<FormattedMessage defaultMessage="Expiry date" id="x/oJ17" />}
               htmlFor="expiryDate"
               error={formik.touched.expiryDate && formik.errors.expiryDate}
             >
@@ -395,7 +390,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
             </StyledInputField>
             <StyledInputField
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="CVV/CVC" />}
+              label={<FormattedMessage defaultMessage="CVV/CVC" id="Q0lxqm" />}
               htmlFor="cvv"
               error={formik.touched.cvv && formik.errors.cvv}
             >
@@ -437,26 +432,6 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
       </form>
     </StyledModal>
   );
-};
-
-AssignVirtualCardModal.propTypes = {
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
-  host: PropTypes.shape({
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }).isRequired,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }),
 };
 
 /** @component */

@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -84,16 +83,16 @@ class CreateConversationPage extends React.Component {
     const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
 
     if (!data.loading) {
-      if (!data || data.error) {
+      if (data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.account) {
+      } else if (!data.account || isHiddenAccount(data.account)) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
     }
 
-    const collective = data && data.account;
+    const collective = data.account;
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)}>
         {data.loading ? (
@@ -152,8 +151,8 @@ const createConversationPageQuery = gql`
       settings
       imageUrl
       twitterHandle
-      imageUrl
       backgroundImageUrl
+      isSuspended
       ... on AccountWithParent {
         parent {
           id
@@ -168,7 +167,7 @@ const createConversationPageQuery = gql`
       }
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
       }
 
       ... on AccountWithHost {
@@ -179,10 +178,8 @@ const createConversationPageQuery = gql`
   ${collectiveNavbarFieldsFragment}
 `;
 
-const addCreateConversationPageData = graphql(createConversationPageQuery, {
-  options: {
-    context: API_V2_CONTEXT,
-  },
-});
+const addCreateConversationPageData = graphql(createConversationPageQuery);
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(withRouter(addCreateConversationPageData(CreateConversationPage)));

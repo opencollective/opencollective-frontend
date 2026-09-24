@@ -1,0 +1,361 @@
+import * as cheerio from 'cheerio';
+
+import mockRecaptcha from '../mocks/recaptcha';
+import { randomGmailEmail, randomSlug } from '../support/faker';
+
+const visitParams = { onBeforeLoad: mockRecaptcha };
+
+/** Select a country in the org signup form and wait until currency is auto-filled. */
+const selectOrganizationCountry = (countryCode: string, searchText: string) => {
+  cy.getByDataCy('organization-country-trigger').click();
+  cy.getByDataCy('organization-country-search').focus().type(searchText);
+  cy.getByDataCy('organization-country-list')
+    .find(`[data-cy="organization-country-${countryCode}"]`)
+    .should('be.visible')
+    .click();
+  cy.getByDataCy('organization-country-trigger').should('not.contain', 'Select Country');
+  cy.getByDataCy('organization-currency-trigger').should('not.contain', 'Select currency');
+  cy.getByDataCy('organization-country-trigger').should('not.have.attr', 'aria-expanded', 'true');
+};
+
+/** Type into a Formik-controlled input and wait until the value is committed to the DOM. */
+const typeFormField = (selector: string, value: string) => {
+  cy.get('@form')
+    .find(selector)
+    .click()
+    .clear()
+    .type(value, { delay: 20 })
+    .should('have.value', value)
+    .then($el => $el[0].blur());
+};
+
+/** Fill the org signup form fields in a stable order. Text fields are filled before the country
+ *  Select is opened, so Radix's async focus-restore after the Select closes can't steal focus
+ *  mid-keystroke (which previously froze the input at a single character). */
+const fillOrganizationForm = ({
+  legalName,
+  name,
+  description,
+  slug,
+}: {
+  legalName: string;
+  name: string;
+  description: string;
+  slug: string;
+}) => {
+  typeFormField('input[name="organization.legalName"]', legalName);
+  typeFormField('input[name="organization.name"]', name);
+  typeFormField('input[name="organization.description"]', description);
+  cy.get('@form')
+    .find('input[name="organization.slug"]')
+    .click()
+    .clear()
+    .type(`{selectall}${slug}`, { delay: 20 })
+    .should('have.value', slug)
+    .then($el => $el[0].blur());
+  selectOrganizationCountry('PR', 'Puerto Rico');
+};
+
+/** Full page reload: wait for UserProvider before the org form's hidden fields are populated. */
+const visitOrganizationSignupAsLoggedInUser = (query = '') => {
+  cy.intercept('POST', '/api/graphql/v1', req => {
+    if (req.body?.operationName === 'LoggedInUser') {
+      req.alias = 'loggedInUser';
+    }
+  });
+  cy.visit(`/signup/organization${query}`, visitParams);
+  cy.wait('@loggedInUser');
+  cy.getByDataCy('create-organization-form').should('be.visible');
+};
+
+const getEmailToMatcher = (To, email) =>
+  To[0].Address.includes(email) || To[0].Address.includes(email.replace(/@/g, '-at-'));
+
+describe('/signup', () => {
+  (describe as unknown as Mocha.SuiteFunction)('Create a new Individual Profile', { testIsolation: false }, () => {
+    const email = randomGmailEmail();
+    before(() => {
+      cy.mailpitDeleteAllEmails();
+      cy.clearLocalStorage();
+      cy.clearCookie('accessTokenPayload');
+      cy.clearCookie('accessTokenSignature');
+    });
+
+    it('should request email', () => {
+      cy.visit('/signup', visitParams);
+      cy.getByDataCy('signup-form').as('form');
+      cy.get('@form').find('input[name="email"]').type(email);
+      cy.get('@form').find('button[type="submit"]').click();
+      cy.url().should('include', `/signup/verify?email=${encodeURIComponent(email)}`);
+      cy.reload();
+      cy.url().should('include', `/signup/verify?email=${encodeURIComponent(email)}`);
+    });
+
+    it('should send OTP through email', () => {
+      cy.getByDataCy('signup-form').as('otp-form');
+      cy.get('@otp-form').contains(`Enter the code sent to ${email}.`);
+      cy.openEmail(({ Subject, To }) => getEmailToMatcher(To, email) && Subject.includes('Email Confirmation')).then(
+        email => {
+          const $html = cheerio.load(email.HTML);
+          const otp = $html('h3 > span').text();
+          cy.get('@otp-form').find('input[data-slot="input-otp"]').type(otp);
+        },
+      );
+      cy.url().should('include', '/signup/profile');
+    });
+
+    it('should redirect to complete profile if user is signed in', () => {
+      cy.visit('/signup', visitParams);
+      cy.url().should('include', '/signup/profile');
+    });
+
+    it('should coerce user to complete their profile', () => {
+      cy.visit('/home', visitParams);
+      cy.url().should('include', '/signup/profile');
+
+      cy.visit('/dashboard', visitParams);
+      cy.url().should('include', '/signup/profile');
+    });
+
+    it('should complete profile and redirect to dashboard', () => {
+      cy.getByDataCy('complete-profile-form').as('form');
+      cy.get('@form').find('h1').contains("Let's complete your profile");
+      cy.get('@form').find('input[name="name"]').type('John Doe');
+      cy.get('@form').find('button[type="submit"]').click();
+      cy.url().should('include', '/dashboard');
+    });
+  });
+
+  (describe as unknown as Mocha.SuiteFunction)(
+    'Create a new Individual and Organization Profile',
+    { testIsolation: false },
+    () => {
+      const email = randomGmailEmail();
+      const inviteeEmail = randomGmailEmail();
+      const slug = randomSlug();
+
+      before(() => {
+        cy.mailpitDeleteAllEmails();
+        cy.clearLocalStorage();
+        cy.clearCookie('accessTokenPayload');
+        cy.clearCookie('accessTokenSignature');
+      });
+
+      it('completes individual profile', () => {
+        cy.visit('/signup/organization', visitParams);
+        cy.getByDataCy('signup-form').as('form');
+        cy.get('@form').find('input[name="email"]').type(email);
+        cy.get('@form').find('button[type="submit"]').click();
+        cy.url().should('include', `/signup/verify?email=${encodeURIComponent(email)}`);
+        cy.url().should('include', `&organization=true`);
+      });
+
+      it('should send OTP through email', () => {
+        cy.getByDataCy('signup-form').as('otp-form');
+        cy.get('@otp-form').contains(`Enter the code sent to ${email}.`);
+        cy.openEmail(({ Subject, To }) => getEmailToMatcher(To, email) && Subject.includes('Email Confirmation')).then(
+          email => {
+            const $html = cheerio.load(email.HTML);
+            const otp = $html('h3 > span').text();
+            cy.get('@otp-form').find('input[data-slot="input-otp"]').type(otp);
+          },
+        );
+        cy.url().should('include', '/signup/profile');
+      });
+
+      it('should complete profile', () => {
+        cy.getByDataCy('complete-profile-form').as('form');
+        cy.get('@form').find('h1').contains("Let's complete your profile");
+        cy.get('@form').find('input[name="name"]').type('John Doe');
+        cy.get('@form').find('button[type="submit"]').click();
+        cy.url().should('include', '/signup/organization');
+        cy.getByDataCy('create-organization-form').should('be.visible');
+      });
+
+      it('should create organization', () => {
+        cy.get('[data-cy="create-organization-form"]').as('form');
+        fillOrganizationForm({
+          legalName: 'Cool Stuff 2 Inc.',
+          name: 'Cool Stuff 2',
+          description: 'We also do super cool stuff',
+          slug,
+        });
+        cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
+        cy.get('[data-cy="invite-admins-form"]').should('be.visible');
+      });
+
+      it('should allow user to invite more admins', () => {
+        cy.get('[data-cy="invite-admins-form"]').as('form');
+        cy.get('@form').find('h1').contains('Invite your team');
+        cy.getByDataCy('add-team-member').click();
+        cy.getByDataCy('invite-user-modal-form').as('modalform');
+        cy.get('@modalform').find('input[name="name"]').type(`Leo ${randomSlug()}`);
+        cy.get('@modalform').find('input[name="email"]').type(inviteeEmail);
+        cy.get('@modalform').find('button').click();
+        cy.get('@form').find('button[type="submit"]').click();
+
+        cy.openEmail(
+          ({ Subject, To }) => getEmailToMatcher(To, inviteeEmail) && Subject.includes('Invitation to join'),
+        ).then(email => {
+          // @ts-expect-error 2339
+          expect(email.HTML).to.include('just invited you to the role of Administrator of');
+        });
+
+        cy.url().should('include', `/dashboard/${slug}/overview`);
+      });
+
+      it('should create active organization', () => {
+        const slug = randomSlug();
+        visitOrganizationSignupAsLoggedInUser('?active=true');
+        cy.get('[data-cy="create-organization-form"]').as('form');
+        fillOrganizationForm({
+          legalName: 'Active Org Inc.',
+          name: 'Active Org',
+          description: 'We manage money and stuff',
+          slug,
+        });
+        cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
+        cy.getByDataCy('skip-button').click();
+        cy.getByDataCy('menu-item-Settings').click();
+        cy.getByDataCy('menu-item-advanced').click();
+        cy.getByDataCy('money-management-section').find('button').contains('Deactivate');
+
+        cy.getByDataCy('fiscal-hosting-section').find('button').contains('Activate');
+      });
+
+      it('should create active fiscal host', () => {
+        const slug = randomSlug();
+        visitOrganizationSignupAsLoggedInUser('?host=true');
+        cy.get('[data-cy="create-organization-form"]').as('form');
+        fillOrganizationForm({
+          legalName: 'Fiscal Host Inc.',
+          name: 'Fiscal Host',
+          description: 'We fiscally sponsor collectives',
+          slug,
+        });
+        cy.get('@form').find('button[type="submit"]').should('not.be.disabled').click();
+        cy.getByDataCy('skip-button').click();
+        cy.getByDataCy('menu-item-Settings').click();
+        cy.getByDataCy('menu-item-advanced').click();
+        cy.getByDataCy('money-management-section').find('button').contains('Deactivate');
+        cy.getByDataCy('fiscal-hosting-section').find('button').contains('Deactivate');
+      });
+    },
+  );
+
+  (describe as unknown as Mocha.SuiteFunction)(
+    'Create a new Individual and Collective Profile',
+    { testIsolation: false },
+    () => {
+      const email = randomGmailEmail();
+      const inviteeEmail = randomGmailEmail();
+      const slug = randomSlug();
+
+      before(() => {
+        cy.mailpitDeleteAllEmails();
+        cy.clearLocalStorage();
+        cy.clearCookie('accessTokenPayload');
+        cy.clearCookie('accessTokenSignature');
+      });
+
+      it('completes individual profile', () => {
+        cy.visit('/signup/collective', visitParams);
+        cy.getByDataCy('signup-form').as('form');
+        cy.get('@form').find('input[name="email"]').type(email);
+        cy.get('@form').find('button[type="submit"]').click();
+        cy.url().should('include', `/signup/verify?email=${encodeURIComponent(email)}`);
+        cy.url().should('include', `&collective=true`);
+      });
+
+      it('should send OTP through email', () => {
+        cy.getByDataCy('signup-form').as('otp-form');
+        cy.get('@otp-form').contains(`Enter the code sent to ${email}.`);
+        cy.openEmail(({ Subject, To }) => getEmailToMatcher(To, email) && Subject.includes('Email Confirmation')).then(
+          email => {
+            const $html = cheerio.load(email.HTML);
+            const otp = $html('h3 > span').text();
+            cy.get('@otp-form').find('input[data-slot="input-otp"]').type(otp);
+          },
+        );
+        cy.url().should('include', '/signup/profile');
+      });
+
+      it('should complete profile', () => {
+        cy.getByDataCy('complete-profile-form').as('form');
+        cy.get('@form').find('h1').contains("Let's complete your profile");
+        cy.get('@form').find('input[name="name"]').type('John Doe');
+        cy.get('@form').find('button[type="submit"]').click();
+      });
+
+      it('should create collective', () => {
+        cy.get('[data-cy="create-collective-form"]').as('form');
+        cy.get('@form').find('input[name="collective.name"]').type('Cool Community 2');
+        cy.get('@form').find('input[name="collective.description"]').type('A community of cool people');
+        cy.get('@form').find('input[name="collective.slug"]').type(`{selectall}${slug}`);
+        cy.get('@form').find('button[type="submit"]').click();
+      });
+
+      it('should allow user to invite more admins', () => {
+        cy.get('[data-cy="invite-admins-form"]').as('form');
+        cy.get('@form').find('h1').contains('Invite your team');
+        cy.getByDataCy('add-team-member').click();
+        cy.getByDataCy('invite-user-modal-form').as('modalform');
+        cy.get('@modalform').find('input[name="name"]').type(`Leo ${randomSlug()}`);
+        cy.get('@modalform').find('input[name="email"]').type(inviteeEmail);
+        cy.get('@modalform').find('button').click();
+        cy.get('@form').find('button[type="submit"]').click();
+
+        cy.openEmail(
+          ({ Subject, To }) => getEmailToMatcher(To, inviteeEmail) && Subject.includes('Invitation to join'),
+        ).then(email => {
+          // @ts-expect-error 2339
+          expect(email.HTML).to.include('just invited you to the role of Administrator of');
+        });
+        cy.wait(500); // Wait for redirect
+        cy.url().should('include', `/dashboard/${slug}/overview`);
+      });
+
+      it('should create collective while logged-in', () => {
+        const slug = randomSlug();
+        cy.visit('/signup/collective', visitParams);
+        cy.get('[data-cy="create-collective-form"]').as('form');
+        cy.get('@form').find('input[name="collective.name"]').type('Another Cool Community');
+        cy.get('@form').find('input[name="collective.description"]').type('Yet another community of cool people');
+        cy.get('@form').find('input[name="collective.slug"]').type(`{selectall}${slug}`);
+        cy.get('@form').find('button[type="submit"]').click();
+        cy.getByDataCy('skip-button').click();
+        cy.wait(500); // Wait for redirect
+        cy.url().should('include', `/dashboard/${slug}/overview`);
+      });
+    },
+  );
+});
+
+// Generated by Cypress Author on 2026-09-09: profile completion redirect coverage.
+describe('profile completion redirects', () => {
+  beforeEach(() => {
+    cy.mailpitDeleteAllEmails();
+    cy.clearLocalStorage();
+    cy.clearCookie('accessTokenPayload');
+    cy.clearCookie('accessTokenSignature');
+  });
+
+  const completeProfile = (name = `Profile User ${randomSlug()}`) => {
+    cy.getByDataCy('complete-profile-form').as('profileForm');
+    cy.get('@profileForm').find('input[name="name"]').type(name);
+    cy.get('@profileForm').find('button[type="submit"]').click();
+  };
+
+  it('preserves a requested path and query after completing a profile', () => {
+    const destination = `/home?source=${randomSlug()}`;
+
+    cy.signup({ redirect: destination, completeProfile: false });
+    cy.location('pathname').should('eq', '/signup/profile');
+    cy.location('search').should('eq', `?next=${encodeURIComponent(destination)}`);
+
+    completeProfile();
+    cy.wait(1000);
+    cy.location('pathname').should('eq', '/home');
+    cy.location('search').should('eq', destination.slice(destination.indexOf('?')));
+  });
+});

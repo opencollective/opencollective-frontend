@@ -4,26 +4,22 @@ describe('event.createOrder page', () => {
   let collective = null;
 
   const createEvent = name => {
-    // Create event
-    cy.visit(`${collective.slug}/events/new`);
-    cy.get('.inputs input[name="name"]').type(name);
-    cy.get('.inputs .startsAt input[type="datetime-local"]')
+    cy.login({ redirect: `${collective.slug}/events/create` });
+    cy.get('input[name="name"]').type(name);
+    cy.get('input[name="startsAt"]')
       .clear()
       .type(`${dayjs().format('YYYY-MM-DD')}T19:00`)
       .blur();
-    cy.get('.inputs .endsAt input[type="datetime-local"]')
+    cy.get('input[name="endsAt"]')
       .clear()
       .type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}T19:00`)
       .blur();
+    cy.get('input[name="description"]').type('We are going to the Eiffel Tower');
     cy.contains('button', 'Create Event').click();
   };
 
   before(() => {
     cy.createHostedCollective().then(c => (collective = c));
-  });
-
-  beforeEach(() => {
-    cy.login({ redirect: `/${collective.slug}/events/create` });
   });
 
   it('makes an order for a free ticket', () => {
@@ -35,8 +31,8 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy=name]').type('Free ticket');
     cy.get('input[data-cy=amount]').type('0');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
-    cy.getByDataCy('menu-account-avatar-link').click();
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
+    cy.getByDataCy('public-profile-link').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
@@ -45,6 +41,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="contribution-quantity"]').should('exist');
 
     cy.getByDataCy('cf-next-step').click();
+    cy.getByDataCy('input-legalName').type('John Doe');
     cy.getByDataCy('cf-next-step').contains('Get ticket').click();
 
     cy.wait(500);
@@ -60,8 +57,8 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy=name]').type('Paying Ticket');
     cy.get('input[data-cy=amount]').type('10');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
-    cy.getByDataCy('menu-account-avatar-link').click();
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
+    cy.getByDataCy('public-profile-link').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
@@ -70,6 +67,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="contribution-quantity"]').should('exist');
 
     cy.getByDataCy('cf-next-step').click();
+    cy.getByDataCy('input-legalName').type('John Doe');
 
     // Skip the step profile on the new contribution flow
     cy.getByDataCy('cf-next-step').click();
@@ -93,8 +91,8 @@ describe('event.createOrder page', () => {
     cy.get('input[data-cy=amount]').type('10');
     cy.get('input[data-cy=minimumAmount]').type('5');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
-    cy.getByDataCy('menu-account-avatar-link').click();
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
+    cy.getByDataCy('public-profile-link').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
@@ -103,6 +101,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="contribution-quantity"]').should('exist');
 
     cy.getByDataCy('cf-next-step').click();
+    cy.getByDataCy('input-legalName').type('John Doe');
 
     // Skip the step profile on the new contribution flow
     cy.getByDataCy('cf-next-step').click();
@@ -116,8 +115,8 @@ describe('event.createOrder page', () => {
 
   it('makes an order for tickets with VAT', () => {
     // Activate VAT for collective
-    cy.editCollective({
-      id: collective.id,
+    cy.editAccount({
+      slug: collective.slug,
       location: { country: 'BE' },
       settings: { VAT: { type: 'OWN', number: 'FRXX999999999' } },
     });
@@ -132,14 +131,15 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy=name]').type('Ticket with VAT');
     cy.get('input[data-cy=amount]').type('10');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
-    cy.getByDataCy('menu-account-avatar-link').click();
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
+    cy.getByDataCy('public-profile-link').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
 
     cy.get('input[type=number][name=quantity]').type('{selectall}8');
     cy.getByDataCy('cf-next-step').click();
+    cy.getByDataCy('input-legalName').type('John Doe');
 
     // Skip the step profile on the new contribution flow
     cy.getByDataCy('cf-next-step').click();
@@ -148,21 +148,21 @@ describe('event.createOrder page', () => {
     const breakdownLineSelector = '[data-cy="ContributionSummary-AmountLine"]';
     cy.contains(breakdownLineSelector, 'Contribution to Test Event with VAT - "Ticket with VAT"').contains('$10.00');
     cy.contains(breakdownLineSelector, 'Quantity').contains('8');
-    cy.contains(breakdownLineSelector, "Today's charge").contains('$80.00');
+    cy.contains(breakdownLineSelector, 'Total charge').contains('$80.00');
     cy.wait(1000);
 
     // Algeria should not have taxes
     cy.contains('[data-cy="country-select"]', 'Please select your country').click();
     cy.contains('[data-cy="select-option"]', 'Algeria').click();
     cy.getByDataCy('VAT-amount').contains('$0.00');
-    cy.contains(breakdownLineSelector, "Today's charge").contains('$80.00');
+    cy.contains(breakdownLineSelector, 'Total charge').contains('$80.00');
     cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
 
     // French should have taxes
     cy.get('[data-cy="country-select"]').click();
     cy.contains('[data-cy="select-option"]', 'France').click();
     cy.getByDataCy('VAT-amount').contains('$16.80');
-    cy.contains(breakdownLineSelector, "Today's charge").contains('$96.80');
+    cy.contains(breakdownLineSelector, 'Total charge').contains('$96.80');
     cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
 
     // ...except if they can provide a valid VAT number
@@ -190,7 +190,7 @@ describe('event.createOrder page', () => {
     cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
     cy.contains('FRXX999999999'); // Number is properly formatted
     cy.getByDataCy('VAT-amount').contains('$0.00');
-    cy.contains(breakdownLineSelector, "Today's charge").contains('80.00');
+    cy.contains(breakdownLineSelector, 'Total charge').contains('80.00');
 
     // User can update the number
     cy.contains('div', 'Change VAT number').click();
@@ -206,7 +206,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="country-select"]').click();
     cy.contains('[data-cy="select-option"]', 'Belgium').click();
     cy.getByDataCy('VAT-amount').contains('$16.80');
-    cy.contains(breakdownLineSelector, "Today's charge").contains('$96.80');
+    cy.contains(breakdownLineSelector, 'Total charge').contains('$96.80');
     cy.contains('div', 'Enter VAT number (if you have one)').click();
     cy.get('input[name=taxIdNumber]').type('FRXX999999998');
     cy.get('button[data-cy="cf-next-step"]').click();
@@ -218,7 +218,7 @@ describe('event.createOrder page', () => {
     cy.get('button[data-cy="cf-prev-step"]').click();
     cy.contains('BE0414445663'); // Number is properly formatted
     cy.getByDataCy('VAT-amount').contains('$16.80');
-    cy.contains(breakdownLineSelector, "Today's charge").contains('$96.80');
+    cy.contains(breakdownLineSelector, 'Total charge').contains('$96.80');
 
     // Let's submit this order!
     cy.getByDataCy('cf-next-step').click();

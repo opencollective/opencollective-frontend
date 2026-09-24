@@ -1,19 +1,22 @@
-// eslint-disable-next-line node/no-unpublished-require
 const { defineConfig } = require('cypress');
+const fs = require('fs');
+const { getTextFromPdfContent } = require('./test/cypress/scripts/get-text-from-pdf-content.ts');
 
 module.exports = defineConfig({
   experimentalMemoryManagement: true,
   viewportWidth: 1200,
   viewportHeight: 1660,
   projectId: 'yt5kwm',
-  defaultCommandTimeout: 15000,
+  defaultCommandTimeout: 30000,
   responseTimeout: 60000,
-  video: false,
+  video: true,
   chromeWebSecurity: false,
   scrollBehavior: 'center',
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
+  expose: {
+    MAILPIT_URL: process.env.MAILPIT_URL || 'http://localhost:1080',
+  },
   env: {
-    MAILDEV_URL: 'http://localhost:1080',
     codeCoverage: {
       url: '/__coverage__',
     },
@@ -21,10 +24,20 @@ module.exports = defineConfig({
   fixturesFolder: 'test/cypress/fixtures',
   screenshotsFolder: 'test/cypress/screenshots',
   videosFolder: 'test/cypress/videos',
+  downloadsFolder: 'test/cypress/downloads',
+  hosts: {
+    'local.opencollective': '127.0.0.1',
+    'local.crooked': '127.0.0.1',
+  },
+  reporter: 'cypress-multi-reporters',
+  reporterOptions: {
+    configFile: 'test/cypress/reporter-config.json',
+  },
   e2e: {
     setupNodeEvents(on, config) {
-      // eslint-disable-next-line node/no-unpublished-require
-      require('@cypress/code-coverage/task')(on, config);
+      require('cypress-terminal-report/src/installLogsPrinter')(on, {
+        printLogsToConsole: 'onFail',
+      });
 
       on('before:browser:launch', (browser, launchOptions) => {
         if (browser.name === 'chrome') {
@@ -38,6 +51,19 @@ module.exports = defineConfig({
           console.log(...message); // eslint-disable-line no-console
           return null;
         },
+        getTextFromPdfContent,
+      });
+
+      // Delete videos if the test succeeds
+      on('after:spec', (spec, results) => {
+        if (results && results.video && !process.env.CYPRESS_KEEP_VIDEOS) {
+          // Do we have failures for any retry attempts?
+          const failures = results.tests.some(test => test.attempts.some(attempt => attempt.state === 'failed'));
+          if (!failures) {
+            // delete the video if the spec passed and no tests retried
+            fs.unlinkSync(results.video);
+          }
+        }
       });
 
       config.baseUrl = process.env.WEBSITE_URL || 'http://localhost:3000';

@@ -1,0 +1,110 @@
+import React from 'react';
+import { useFormikContext } from 'formik';
+import { FormattedMessage } from 'react-intl';
+
+import { cn } from '../../../lib/utils';
+import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
+
+import ExpenseInviteWelcome from '@/components/expenses/ExpenseInviteWelcome';
+
+import { Button } from '../../ui/Button';
+import { Step } from '../SubmitExpenseFlowSteps';
+import type { ExpenseForm } from '../useExpenseForm';
+
+import { AdditionalDetailsSection } from './AdditionalDetailsSection';
+import { ExpenseCategorySection } from './ExpenseCategorySection';
+import { ExpenseItemsSection } from './ExpenseItemsSection';
+import { FormSectionContainer } from './FormSectionContainer';
+import { PayoutMethodSection } from './PayoutMethodSection';
+import { SummarySection } from './SummarySection';
+import { TypeOfExpenseSection } from './TypeOfExpenseSection';
+import { WhoIsGettingPaidSection } from './WhoIsGettingPaidSection';
+import { WhoIsPayingSection } from './WhoIsPayingSection';
+
+type SubmitExpenseFlowFormProps = {
+  className?: string;
+  onVisibleSectionChange: (sectionId: string) => void;
+  onNextClick: () => void;
+  onExpenseInviteDeclined: () => void;
+};
+
+/**
+ * Main form layout component that orchestrates all expense form sections.
+ *
+ * Renders form sections in order, handles intersection observer for step tracking,
+ * and manages the submit button. Each section uses the getFormProps pattern for
+ * memoization and prop extraction.
+ *
+ * @see README.md - Key Design Patterns section for getFormProps pattern
+ */
+export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
+  const form = useFormikContext() as ExpenseForm;
+
+  const { onVisibleSectionChange } = props;
+
+  /**
+   * Intersection observer callback for tracking which section is currently visible.
+   * Used by SubmitExpenseFlowSteps to highlight the active step in the sidebar.
+   */
+  const onInViewChange = React.useCallback(
+    (visible, entry) => {
+      if (visible) {
+        onVisibleSectionChange(entry.target.id);
+      }
+    },
+    [onVisibleSectionChange],
+  );
+
+  return (
+    <div className={cn('flex flex-col gap-8 pb-28', props.className)}>
+      {form.options.expense?.status === ExpenseStatus.DRAFT && (
+        <ExpenseInviteWelcomeSection
+          inViewChange={onInViewChange}
+          form={form}
+          onExpenseInviteDeclined={props.onExpenseInviteDeclined}
+        />
+      )}
+      <WhoIsPayingSection inViewChange={onInViewChange} {...WhoIsPayingSection.getFormProps(form)} />
+      {!form.options.hasInvalidAccount && (
+        <React.Fragment>
+          <WhoIsGettingPaidSection inViewChange={onInViewChange} {...WhoIsGettingPaidSection.getFormProps(form)} />
+          <PayoutMethodSection inViewChange={onInViewChange} {...PayoutMethodSection.getFormProps(form)} />
+          <TypeOfExpenseSection inViewChange={onInViewChange} {...TypeOfExpenseSection.getFormProps(form)} />
+          {form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length > 0 && (
+            <ExpenseCategorySection inViewChange={onInViewChange} {...ExpenseCategorySection.getFormProps(form)} />
+          )}
+          <ExpenseItemsSection inViewChange={onInViewChange} form={form} />
+          <AdditionalDetailsSection inViewChange={onInViewChange} {...AdditionalDetailsSection.getFormProps(form)} />
+          <SummarySection inViewChange={onInViewChange} form={form} />
+        </React.Fragment>
+      )}
+      <div className="flex justify-center sm:justify-end">
+        <Button
+          disabled={form.initialLoading || form.isSubmitting || form.isValidating}
+          loading={form.isSubmitting || form.isValidating}
+          onClick={() => form.handleSubmit()}
+        >
+          <FormattedMessage defaultMessage="Submit Expense" id="menu.submitExpense" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+type ExpenseInviteWelcomeSectionProps = {
+  form: ExpenseForm;
+  inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
+  onExpenseInviteDeclined: () => void;
+};
+
+function ExpenseInviteWelcomeSection(props: ExpenseInviteWelcomeSectionProps) {
+  return (
+    <FormSectionContainer step={Step.INVITE_WELCOME} inViewChange={props.inViewChange} hideTitle hideSubtitle>
+      <ExpenseInviteWelcome
+        expense={props.form.options.expense}
+        draftKey={props.form.startOptions.draftKey}
+        onExpenseInviteDeclined={props.onExpenseInviteDeclined}
+      />
+    </FormSectionContainer>
+  );
+}

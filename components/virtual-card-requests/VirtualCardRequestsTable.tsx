@@ -1,22 +1,25 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
-import { CellContext, ColumnDef } from '@tanstack/react-table';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import { useMutation } from '@apollo/client';
+import type { CellContext, ColumnDef } from '@tanstack/react-table';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import { gql } from '../../lib/graphql/helpers';
+import type { Account, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
+import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
-import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
 import EditVirtualCardModal from '../edit-collective/EditVirtualCardModal';
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import StyledTag from '../StyledTag';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { DataTable } from '../table/DataTable';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/DropdownMenu';
 import { TableActionsButton } from '../ui/Table';
+import { useToast } from '../ui/useToast';
 
 import VirtualCardRequestCard from './VirtualCardRequestCard';
 
@@ -45,12 +49,11 @@ function VirtualCardRequestTableActions({
   onSelectedVirtualCardRequest: (virtualCardRequest: VirtualCardRequest) => void;
 }) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [isVirtualCardModalOpen, setIsVirtualCardModalOpen] = React.useState(false);
 
   const [rejectRequestMutation, rejectRequestMutationResult] = useMutation(RejectVirtualCardRequestMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       virtualCardRequest: {
         id: virtualCardRequest.id,
@@ -62,7 +65,7 @@ function VirtualCardRequestTableActions({
     try {
       await rejectRequestMutation();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   }, [rejectRequestMutation, intl]);
   const loading = rejectRequestMutationResult.loading;
@@ -79,7 +82,7 @@ function VirtualCardRequestTableActions({
               onSelectedVirtualCardRequest(virtualCardRequest);
             }}
           >
-            <FormattedMessage defaultMessage="View details" />
+            <FormattedMessage defaultMessage="View details" id="MnpUD7" />
           </DropdownMenuItem>
           {virtualCardRequest.status === VirtualCardRequestStatus.PENDING && (
             <React.Fragment>
@@ -125,19 +128,24 @@ type VirtualCardRequestsTableMeta = {
   intl: IntlShape;
 };
 
-export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
+const tableColumns: ColumnDef<VirtualCardRequest>[] = [
   {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     meta: { className: 'w-48' },
 
     cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
       const account = cell.getValue();
       return (
-        <div className="flex items-center gap-2 truncate">
-          <Avatar collective={account} radius={24} />
-          <span className="truncate">{account.name}</span>
-        </div>
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={account} radius={24} />
+              <span className="truncate">{account.name}</span>
+            </div>
+          }
+        />
       );
     },
   },
@@ -145,14 +153,21 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     accessorKey: 'assignee',
     meta: { className: 'w-36' },
 
-    header: () => <FormattedMessage defaultMessage="Assignee" />,
-    cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
+    header: () => <FormattedMessage defaultMessage="Assignee" id="vx8bv3" />,
+    cell: ({ cell, row }: CellContext<VirtualCardRequest, Account>) => {
       const assignee = cell.getValue();
+      const virtualCardRequest = row.original;
       return (
-        <div className="flex items-center gap-2 truncate">
-          <Avatar collective={assignee} radius={24} />
-          <span className="truncate">{assignee.name}</span>
-        </div>
+        <AccountHoverCard
+          account={assignee}
+          includeAdminMembership={{ accountSlug: virtualCardRequest.account.slug }}
+          trigger={
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={assignee} radius={24} />
+              <span className="truncate">{assignee.name}</span>
+            </div>
+          }
+        />
       );
     },
   },
@@ -167,7 +182,7 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
   {
     accessorKey: 'createdAt',
     meta: { className: 'w-28' },
-    header: () => <FormattedMessage id="VirtualCards.CreatedAt" defaultMessage="Created At" />,
+    header: () => <FormattedMessage id="CreatedAt" defaultMessage="Created At" />,
     cell: ({ cell }: CellContext<VirtualCardRequest, string>) => {
       return (
         <div className="">
@@ -184,8 +199,8 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
       const vcr = row.original;
       const meta = table.options.meta as VirtualCardRequestsTableMeta;
       return getSpendingLimitShortString(meta.intl, vcr.currency, vcr.spendingLimitAmount, vcr.spendingLimitInterval, {
-        LimitAmount: v => <span className="italic text-slate-600">{v}</span>,
-        LimitInterval: v => <span className="italic text-slate-600">{v}</span>,
+        LimitAmount: v => <span className="text-slate-600 italic">{v}</span>,
+        LimitInterval: v => <span className="text-slate-600 italic">{v}</span>,
       });
     },
   },
@@ -193,9 +208,9 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     accessorKey: 'status',
     meta: { className: 'w-28' },
     header: () => <FormattedMessage id="VirtualCards.Status" defaultMessage="Status" />,
-    cell: ({ cell }: CellContext<VirtualCardRequest, string>) => {
+    cell: ({ cell, table }: CellContext<VirtualCardRequest, string>) => {
       const status = cell.getValue();
-
+      const { intl } = table.options.meta as VirtualCardRequestsTableMeta;
       return (
         <StyledTag
           textTransform="uppercase"
@@ -205,11 +220,11 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
             status === VirtualCardRequestStatus.PENDING
               ? 'warning'
               : status === VirtualCardRequestStatus.APPROVED
-              ? 'success'
-              : 'error'
+                ? 'success'
+                : 'error'
           }
         >
-          {status}
+          {i18nVirtualCardRequestStatus(intl, status)}
         </StyledTag>
       );
     },
@@ -266,7 +281,7 @@ export function VirtualCardRequestsTable(props: VirtualCardRequestsTableProps) {
           onClickRow={row => props?.onSelectedVirtualCardRequest(row.original)}
           emptyMessage={() => (
             <p className="font-base">
-              <FormattedMessage defaultMessage="No Virtual Card Requests" />
+              <FormattedMessage defaultMessage="No Virtual Card Requests" id="zUk+h9" />
             </p>
           )}
         />

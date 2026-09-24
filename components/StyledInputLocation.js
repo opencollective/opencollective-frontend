@@ -1,12 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatFormErrorMessage } from '../lib/form-utils';
 
 import I18nAddressFields, { SimpleLocationFieldRenderer } from './I18nAddressFields';
+import I18nFormatters from './I18nFormatters';
 import InputTypeCountry from './InputTypeCountry';
+import MessageBox from './MessageBox';
 import StyledInputField from './StyledInputField';
 import StyledTextarea from './StyledTextarea';
 
@@ -23,19 +24,20 @@ const DEFAULT_LOCATION = {
 const StyledInputLocation = ({
   name,
   location,
-  autoDetectCountry,
-  labelFontSize,
-  labelFontWeight,
+  autoDetectCountry = false,
+  labelFontSize = undefined,
+  labelFontWeight = undefined,
   onChange,
-  errors,
-  prefix,
-  required,
+  errors = undefined,
+  prefix = '',
+  required = true,
+  onLoadSuccess = undefined,
+  useStructuredForFallback = false,
 }) => {
   const [useFallback, setUseFallback] = React.useState(false);
   const intl = useIntl();
   const forceLegacyFormat = Boolean(!location?.structured && location?.address);
   const hasCountry = Boolean(location?.country);
-
   return (
     <div>
       <StyledInputField
@@ -67,13 +69,23 @@ const StyledInputLocation = ({
           selectedCountry={location?.country}
           value={location?.structured || {}}
           onLoadError={() => setUseFallback(true)} // TODO convert from structured to raw
+          onLoadSuccess={onLoadSuccess}
           Component={SimpleLocationFieldRenderer}
           fieldProps={{ labelFontSize, labelFontWeight }}
           required={required}
+          errors={errors?.structured}
           onCountryChange={structured =>
             onChange(pick({ ...(location || DEFAULT_LOCATION), structured }, ['country', 'structured']))
           }
         />
+      ) : useFallback ? (
+        <MessageBox type="error" withIcon mt={2}>
+          <FormattedMessage
+            defaultMessage="Failed to load the structured address fields. Please reload the page or <SupportLink>contact support</SupportLink>."
+            id="5A4zUi"
+            values={I18nFormatters}
+          />
+        </MessageBox>
       ) : (
         <StyledInputField
           name={`${prefix}${name}`}
@@ -93,7 +105,16 @@ const StyledInputLocation = ({
               defaultValue={location?.address || ''}
               onChange={e => {
                 const address = e.target.value;
-                onChange(pick({ ...(location || DEFAULT_LOCATION), address }, ['country', 'address']));
+                if (!useStructuredForFallback) {
+                  onChange(pick({ ...(location || DEFAULT_LOCATION), address }, ['country', 'address']));
+                } else {
+                  onChange(
+                    pick({ ...(location || DEFAULT_LOCATION), structured: { address1: address } }, [
+                      'country',
+                      'structured',
+                    ]),
+                  );
+                }
               }}
             />
           )}
@@ -101,27 +122,6 @@ const StyledInputLocation = ({
       )}
     </div>
   );
-};
-
-StyledInputLocation.propTypes = {
-  name: PropTypes.string,
-  prefix: PropTypes.string,
-  onChange: PropTypes.func,
-  autoDetectCountry: PropTypes.bool,
-  required: PropTypes.bool,
-  labelFontWeight: PropTypes.any,
-  labelFontSize: PropTypes.any,
-  location: PropTypes.shape({
-    structured: PropTypes.object,
-    address: PropTypes.string,
-    country: PropTypes.string,
-  }),
-  errors: PropTypes.object,
-};
-
-StyledInputLocation.defaultProps = {
-  required: true,
-  prefix: '',
 };
 
 export default StyledInputLocation;

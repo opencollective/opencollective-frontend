@@ -1,6 +1,6 @@
 import React from 'react';
+import { render } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
-import renderer from 'react-test-renderer';
 
 import { withRequiredProviders } from './providers';
 
@@ -17,8 +17,34 @@ import { withRequiredProviders } from './providers';
  */
 export const snapshot = (component, providersParams = {}) => {
   const componentWithProviders = withRequiredProviders(component, providersParams);
-  const tree = renderer.create(componentWithProviders).toJSON();
-  return expect(tree).toMatchSnapshot();
+  const { container } = render(componentWithProviders);
+  return expect(container).toMatchSnapshot();
+};
+
+/**
+ * Same as `snapshot` but removes all `className` from the tree
+ */
+export const snapshotWithoutClassNames = (component, providersParams = {}) => {
+  const componentWithProviders = withRequiredProviders(component, providersParams);
+  const { container } = render(componentWithProviders);
+
+  /**
+   * @param {HTMLElement} node
+   */
+  const removeClassName = node => {
+    if (node.hasAttribute('class')) {
+      node.removeAttribute('class');
+    }
+
+    if (node.children) {
+      for (const child of node.children) {
+        removeClassName(child);
+      }
+    }
+  };
+
+  removeClassName(container);
+  return expect(container).toMatchSnapshot();
 };
 
 /**
@@ -26,6 +52,6 @@ export const snapshot = (component, providersParams = {}) => {
  * Same as `snapshot` but wraps component in a IntlProvider
  */
 export const snapshotI18n = (component, locale = 'en') => {
-  const tree = renderer.create(<IntlProvider locale={locale}>{component}</IntlProvider>).toJSON();
-  return expect(tree).toMatchSnapshot();
+  const { container } = render(<IntlProvider locale={locale}>{component}</IntlProvider>);
+  return expect(container).toMatchSnapshot();
 };

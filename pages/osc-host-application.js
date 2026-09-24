@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType, IGNORED_TAGS } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
-import ApplicationForm from '../components/osc-host-application/ApplicationForm';
+const ApplicationForm = dynamic(() => import('../components/osc-host-application/ApplicationForm'));
 import ConnectGithub from '../components/osc-host-application/ConnectGithub';
 import TermsOfFiscalSponsorship from '../components/osc-host-application/TermsOfFiscalSponsorship';
 import YourInitiativeIsNearlyThere from '../components/osc-host-application/YourInitiativeIsNearlyThere';
 import Page from '../components/Page';
-import { TOAST_TYPE, useToasts } from '../components/ToastProvider';
+import { useToast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
 
 const oscCollectiveApplicationQuery = gql`
@@ -110,22 +110,19 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
 
   const intl = useIntl();
   const router = useRouter();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const step = router.query.step || 'intro';
   const collectiveSlug = router.query.collectiveSlug;
 
-  const { data: hostData } = useQuery(oscHostApplicationPageQuery, {
-    context: API_V2_CONTEXT,
-  });
+  const { data: hostData } = useQuery(oscHostApplicationPageQuery);
 
   const { data, loading: loadingCollective } = useQuery(oscCollectiveApplicationQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: collectiveSlug },
     skip: !(LoggedInUser && collectiveSlug && step === 'form'),
     onError: error => {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: intl.formatMessage(messages['error.title']),
         message: i18nGraphqlException(intl, error),
       });
@@ -134,12 +131,12 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   const collective = data?.account;
   const canApplyWithCollective = collective && collective.isAdmin && collective.type === CollectiveType.COLLECTIVE;
   const hasHost = collective && collective?.host?.id;
-  const popularTags = hostData?.tagStats.nodes.map(({ tag }) => tag).filter(tag => !IGNORED_TAGS.includes(tag));
+  const popularTags = hostData?.tagStats?.nodes?.map(({ tag }) => tag).filter(tag => !IGNORED_TAGS.includes(tag)) || [];
 
   React.useEffect(() => {
     if (step === 'form' && collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: intl.formatMessage(messages['error.title']),
         message: hasHost
           ? intl.formatMessage(
@@ -171,7 +168,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
               collective: {
                 ...initialValues.collective,
                 name: handle ? formatNameFromSlug(repo ?? owner) : '',
-                slug: handle ? repo ?? owner : '',
+                slug: handle ? (repo ?? owner) : '',
               },
               applicationData: {
                 ...initialValues.applicationData,
@@ -205,10 +202,6 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   );
 };
 
-OSCHostApplication.propTypes = {
-  loadingLoggedInUser: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
-  refetchLoggedInUser: PropTypes.func,
-};
-
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(OSCHostApplication);

@@ -1,28 +1,29 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { Camera } from '@styled-icons/feather/Camera';
-import { inRange } from 'lodash';
+import { inRange } from 'lodash-es';
 import dynamic from 'next/dynamic';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { upload } from '../../../lib/api';
-import { isIndividualAccount } from '../../../lib/collective.lib';
+import { isIndividualAccount } from '../../../lib/collective';
 import { AVATAR_HEIGHT_RANGE, AVATAR_WIDTH_RANGE } from '../../../lib/constants/collectives';
+import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
+import { editCollectiveAvatarMutation } from '../../../lib/graphql/v1/mutations';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Avatar from '../../Avatar';
 import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
+import { DROPZONE_ACCEPT_IMAGES } from '../../Dropzone';
 import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
-import { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import { P, Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-import { editCollectiveAvatarMutation } from '../graphql/mutations';
+import { useToast } from '../../ui/useToast';
 
 const AVATAR_SIZE = 128;
 
@@ -30,8 +31,10 @@ const AVATAR_SIZE = 128;
 const DropzoneLoadingPlaceholder = () => (
   <LoadingPlaceholder height={AVATAR_SIZE} width={AVATAR_SIZE} color="primary.500" borderRadius="25%" />
 );
-const dynamicParams = { loading: DropzoneLoadingPlaceholder, ssr: false };
-const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ 'react-dropzone'), dynamicParams);
+const ReactDropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ 'react-dropzone'), {
+  loading: DropzoneLoadingPlaceholder,
+  ssr: false,
+});
 
 const EditOverlay = styled.div`
   position: absolute;
@@ -88,8 +91,8 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
-  const [editImage] = useMutation(editCollectiveAvatarMutation);
-  const { addToast, removeToasts } = useToasts();
+  const [editImage] = useMutation(editCollectiveAvatarMutation, { context: API_V1_CONTEXT });
+  const { toast, dismissToasts } = useToast();
 
   const onDropImage = async ([image]) => {
     if (image) {
@@ -111,8 +114,8 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           !inRange(img.height, ...AVATAR_HEIGHT_RANGE) ||
           image.size >= 5000000
         ) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
+          toast({
+            variant: 'error',
             __isAvatarUploadError: true, // Flag to allow for easy removal of toast when a valid image is uploaded
             message: intl.formatMessage(
               {
@@ -131,7 +134,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           resolve(false);
         } else {
           resolve(true);
-          removeToasts(toast => Boolean(toast.__isAvatarUploadError));
+          dismissToasts(toast => Boolean(toast.__isAvatarUploadError));
         }
       };
       img.src = image.preview;
@@ -144,7 +147,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
     const imgType = isIndividualAccount(collective) ? 'AVATAR' : 'LOGO';
     return (
       <Fragment>
-        <Dropzone
+        <ReactDropzone
           style={{}}
           multiple={false}
           accept={DROPZONE_ACCEPT_IMAGES}
@@ -204,7 +207,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
               </EditableAvatarContainer>
             </div>
           )}
-        </Dropzone>
+        </ReactDropzone>
         {showModal && (
           <ConfirmationModal
             width="100%"
@@ -242,7 +245,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
     );
   } else {
     return uploadedImage || collective.imageUrl ? (
-      <Mutation mutation={editCollectiveAvatarMutation}>
+      <Mutation mutation={editCollectiveAvatarMutation} context={API_V1_CONTEXT}>
         {editAvatar => (
           <Fragment>
             <EditingAvatarContainer borderRadius={borderRadius}>
@@ -311,17 +314,6 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
       <Avatar collective={collective} radius={AVATAR_SIZE} />
     );
   }
-};
-
-HeroAvatar.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    type: PropTypes.string,
-    image: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }).isRequired,
-  isAdmin: PropTypes.bool,
-  intl: PropTypes.object,
 };
 
 export default injectIntl(HeroAvatar);

@@ -1,4 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>opencollective/renovate-config"]
+  "extends": ["local>opencollective/renovate-config"],
+  "packageRules": [
+    {
+      "assignees": ["kewitz"],
+      "matchPackageNames": ["@transferwise/**"]
+    }
+  ]
 }

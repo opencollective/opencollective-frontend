@@ -1,7 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
@@ -31,8 +31,8 @@ const ListItem = styled.li`
       : "url('/static/images/pricing/checkMark.svg') no-repeat left center"};
   padding-left: 26px;
 
-  :first-of-type,
-  :last-of-type {
+  &:first-of-type,
+  &:last-of-type {
     margin-top: 0;
     margin-bottom: 0;
   }
@@ -54,8 +54,8 @@ const FeeDescription = styled(P)`
 `;
 
 const AccessToWrapper = styled(Container)`
-  :nth-child(1),
-  :nth-child(2) {
+  &:nth-child(1),
+  &:nth-child(2) {
     margin-bottom: 46px;
   }
 `;
@@ -77,6 +77,7 @@ const Card = styled(Container)`
 const messages = defineMessages({
   'pricing.dashboard': {
     defaultMessage: 'Host Admin Dashboard',
+    id: 'cpa6/N',
   },
   'pricing.dashboard.description': {
     id: 'HostDashboard.description',
@@ -90,6 +91,7 @@ const messages = defineMessages({
   'pricing.outsideFunds.description': {
     defaultMessage:
       'Manually credit Collective budgets with funds received outside the platform, such as other e-commerce or fundraising tools.',
+    id: 'wdqJMo',
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',
@@ -98,6 +100,7 @@ const messages = defineMessages({
   'pricing.bankTransfer.description': {
     defaultMessage:
       'Automatically provide wire instructions and a reference number for tracking. Confirm receipt of funds with one click.',
+    id: '2oHG9J',
   },
   'pricing.creditCard': {
     id: 'pricing.creditCard',
@@ -106,6 +109,7 @@ const messages = defineMessages({
   'pricing.creditCard.description': {
     defaultMessage:
       'Receive financial contributions via credit card, automatically updating each Collective budget. *Stripe fees apply',
+    id: 'nQw9Hb',
   },
   'pricing.plan.start': {
     id: 'table.head.start',
@@ -179,7 +183,7 @@ const ForFiscalHosts = () => {
             letterSpacing={[null, '-0.00em']}
             color="primary.900"
           >
-            <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
+            <FormattedMessage defaultMessage="For Organizations" id="X7kjxh" />
           </H3>
           <StyledHR my="8px" />
           <P fontSize="14px" lineHeight="20px" color="black.800">
@@ -261,7 +265,7 @@ const ForFiscalHosts = () => {
         </Box>
         <ListWrapper as="ul" mt={['16px', 0]}>
           <ListItem>
-            <FormattedMessage defaultMessage="Each Collective gets its own fundraising page" />
+            <FormattedMessage defaultMessage="Each Collective gets its own fundraising page" id="hQGJj5" />
           </ListItem>
           <ListItem>
             <FormattedMessage
@@ -270,24 +274,33 @@ const ForFiscalHosts = () => {
             />
           </ListItem>
           <ListItem>
-            <FormattedMessage defaultMessage="Manually add funds from other channels, accurately tracking all budgets" />
+            <FormattedMessage
+              defaultMessage="Manually add funds from other channels, accurately tracking all budgets"
+              id="czGYFp"
+            />
           </ListItem>
           <ListItem>
-            <FormattedMessage defaultMessage="Community engagement features" />
+            <FormattedMessage defaultMessage="Community engagement features" id="CWdtPd" />
           </ListItem>
           <ListItem>
-            <FormattedMessage defaultMessage="Financial tracking and transparency means reporting writes itself" />
+            <FormattedMessage
+              defaultMessage="Financial tracking and transparency means reporting writes itself"
+              id="PJubm9"
+            />
           </ListItem>
           <ListItem>
-            <FormattedMessage defaultMessage="Expense management and one-click payouts via Paypal and Wise" />
+            <FormattedMessage
+              defaultMessage="Expense management and one-click payouts via Paypal and Wise"
+              id="whNhSE"
+            />
           </ListItem>
         </ListWrapper>
       </Flex>
 
       <Flex justifyContent={['center', 'left']} alignItems={['flex-start', 'center']} mt={10}>
-        <Link href="/organizations/new">
+        <Link href="/signup/organization?active=true">
           <StyledButton px={3} py={2} buttonStyle="primary" width="160px" whiteSpace="nowrap" mb={4}>
-            <FormattedMessage id="home.createHost" defaultMessage="Create a Fiscal Host" />
+            <FormattedMessage id="host.organization.create" defaultMessage="Create an Organization" />
           </StyledButton>
         </Link>
       </Flex>

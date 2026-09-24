@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import injectIntl from '@/lib/injectIntl';
 
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
@@ -84,6 +84,13 @@ const Description = styled.div`
 
   /* Neutral Tints / 700 */
   color: #4e5052;
+`;
+
+const MissingCTAExplanation = styled(Description)`
+  flex: 0;
+  font-style: italic;
+  font-size: 12px;
+  padding-bottom: 4px;
 `;
 
 /** Translations */
@@ -174,11 +181,11 @@ const getFooterMessage = type => {
   switch (type) {
     case ContributionTypes.TICKET:
     case ContributionTypes.EVENT_PARTICIPATE:
-      return <FormattedMessage defaultMessage="Be the first one to attend!" />;
+      return <FormattedMessage defaultMessage="Be the first one to attend!" id="9911qB" />;
     case ContributionTypes.EVENT_PASSED:
-      return <FormattedMessage defaultMessage="No attendees" />;
+      return <FormattedMessage defaultMessage="No attendees" id="CqlI1A" />;
     default:
-      return <FormattedMessage defaultMessage="Be the first one to contribute!" />;
+      return <FormattedMessage defaultMessage="Be the first one to contribute!" id="yaM7Qg" />;
   }
 };
 
@@ -211,6 +218,7 @@ const ContributeCard = ({
   onClickEdit,
   tier,
   isPreview,
+  missingCTAMsg,
   ...props
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
@@ -242,6 +250,7 @@ const ContributeCard = ({
             {title}
           </Container>
           <Description data-cy="contribute-description">{children}</Description>
+          {(hideCTA || disableCTA) && missingCTAMsg && <MissingCTAExplanation>{missingCTAMsg}</MissingCTAExplanation>}
         </Flex>
         <Box>
           {!disableCTA && !hideCTA && (
@@ -308,6 +317,7 @@ const ContributeCard = ({
               <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3} data-cy="edit-btn" onClick={onClickEdit}>
                 <FormattedMessage
                   defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                  id="/CCt2w"
                   values={{ type: tier.type }}
                 />
               </StyledButton>
@@ -317,48 +327,6 @@ const ContributeCard = ({
       </Flex>
     </StyledContributeCard>
   );
-};
-
-ContributeCard.propTypes = {
-  /** Contribution title */
-  title: PropTypes.node.isRequired,
-  /** Type of the contribution */
-  type: PropTypes.oneOf(Object.values(ContributionTypes)).isRequired,
-  /** Route for the contribute button */
-  route: PropTypes.string.isRequired,
-  /** A custom button text to override the default one */
-  buttonText: PropTypes.string,
-  /** An image to display on the card hero */
-  image: PropTypes.string,
-  /** The card body */
-  children: PropTypes.node,
-  /** If true, the call to action will not be displayed */
-  disableCTA: PropTypes.bool,
-  hideCTA: PropTypes.bool,
-  /** Contributors */
-  contributors: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      image: PropTypes.string,
-      collectiveSlug: PropTypes.string,
-    }),
-  ),
-  /** Contributors stats */
-  stats: PropTypes.shape({
-    all: PropTypes.number,
-    users: PropTypes.number,
-    organizations: PropTypes.number,
-  }),
-  /** If true, contributors will not be displayed */
-  hideContributors: PropTypes.bool,
-  /** @ignore from injectIntl */
-  intl: PropTypes.object.isRequired,
-  router: PropTypes.object,
-  tier: PropTypes.object,
-  collective: PropTypes.object,
-  isPreview: PropTypes.bool,
-  onClickEdit: PropTypes.func,
 };
 
 export default injectIntl(ContributeCard);

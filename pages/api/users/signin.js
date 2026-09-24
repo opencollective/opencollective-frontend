@@ -1,3 +1,5 @@
+// next.js export
+// ts-unused-exports:disable-next-line
 export default async function handle(req, res) {
   const apiUrl = `${process.env.API_URL}/users/signin?api_key=${process.env.API_KEY}`;
 

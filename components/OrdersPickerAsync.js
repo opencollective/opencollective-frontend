@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
-import { debounce } from 'lodash';
+import { useLazyQuery } from '@apollo/client';
+import { debounce } from 'lodash-es';
 import { FormattedDate } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import Avatar from './Avatar';
 import { Flex } from './Grid';
@@ -13,7 +12,7 @@ import StyledTag from './StyledTag';
 import { Span } from './Text';
 
 const ordersSearchQuery = gql`
-  query OrdersPickerSearchQuery(
+  query OrdersPickerSearch(
     $account: AccountReferenceInput
     $includeIncognito: Boolean
     $filter: AccountOrdersFilter
@@ -41,6 +40,9 @@ const ordersSearchQuery = gql`
           slug
           isIncognito
           imageUrl(height: 48)
+          ... on Individual {
+            isGuest
+          }
         }
         toAccount {
           id
@@ -108,7 +110,7 @@ const formatOptionLabel = option => {
 const OrdersPickerAsync = ({ inputId, noCache, account, filter, includeIncognito, ...props }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
   const variables = { includeIncognito, filter, account: getAccountInput(account) };
-  const queryParameters = { fetchPolicy, variables, context: API_V2_CONTEXT };
+  const queryParameters = { fetchPolicy, variables };
   const [searchOrders, { loading, data }] = useLazyQuery(ordersSearchQuery, queryParameters);
   const [searchTerm, setSearchTerm] = React.useState('');
   const options = React.useMemo(() => getOptionsFromOrders(data?.orders?.nodes), [data?.orders?.nodes]);
@@ -133,23 +135,5 @@ const OrdersPickerAsync = ({ inputId, noCache, account, filter, includeIncognito
     />
   );
 };
-
-OrdersPickerAsync.propTypes = {
-  /** The id of the search input */
-  inputId: PropTypes.string.isRequired,
-  /** Max number of collectives displayed at the same time */
-  limit: PropTypes.number,
-  /** If set, only the collectives under this host will be retrieved */
-  hostCollectiveIds: PropTypes.arrayOf(PropTypes.number),
-  /** If true, a query will be triggered even if search is empty */
-  preload: PropTypes.bool,
-  /** If true, results won't be cached (Apollo "network-only" mode) */
-  noCache: PropTypes.bool,
-  includeIncognito: PropTypes.bool,
-  filter: PropTypes.oneOf(['OUTGOING', 'INCOMING']),
-  account: PropTypes.object,
-};
-
-OrdersPickerAsync.defaultProps = {};
 
 export default OrdersPickerAsync;

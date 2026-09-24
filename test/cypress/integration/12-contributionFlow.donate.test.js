@@ -10,17 +10,16 @@ describe('Contribution Flow: Donate', () => {
   it('Can donate as new user', () => {
     const userParams = { name: 'Donate Tester' };
     cy.signup({ user: userParams, redirect: donateRoute, visitParams });
-
-    // Mock clock so we can check next contribution date in a consistent way
-    cy.clock(Date.parse('2042/05/25'));
-
     // ---- Step Details ----
     // Has default amount selected
     cy.get('#amount button.selected').should('exist');
 
+    // Mock clock so we can check next contribution date in a consistent way
+    cy.clock(Date.parse('2042/05/25'));
+
     // Change amount
     cy.getByDataCy('amount-picker-btn-other').click();
-    cy.get('input[type=number][name=custom-amount]').type('{selectall}1337');
+    cy.get('input[name=custom-amount]').type('{selectall}1337');
     cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
     cy.contains('[data-cy="progress-step-details"]', '$1,337.00');
 
@@ -28,7 +27,7 @@ describe('Contribution Flow: Donate', () => {
     cy.contains('#interval button', 'Monthly').click();
     cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
     cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / mo.');
-    cy.contains("Today's charge");
+    cy.contains('Monthly charge');
     // next charge in 2 months time, first day, because it was made on or after 15th.
     cy.contains('the next charge will be on July 1, 2042');
 
@@ -36,7 +35,7 @@ describe('Contribution Flow: Donate', () => {
     cy.contains('#interval button', 'Yearly').click();
     cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
     cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / yr.');
-    cy.contains("Today's charge");
+    cy.contains('Yearly charge');
     cy.contains('the next charge will be on May 1, 2043');
 
     cy.get('button[data-cy="cf-next-step"]').click();
@@ -52,6 +51,8 @@ describe('Contribution Flow: Donate', () => {
     cy.contains('[data-cy="select-option"]:first', userName);
     cy.contains('[data-cy="select-option"]:first', 'Personal');
     cy.get('body').type('{esc}');
+    cy.getByDataCy('input-legalName').type('Very Legal Name');
+    cy.get('button[data-cy="cf-next-step"]').click();
 
     // User profile is shown on step, all other steps must be disabled
     cy.getByDataCy(`progress-step-profile`).contains(userName);
@@ -121,9 +122,10 @@ describe('Contribution Flow: Donate', () => {
 
   it('Forces params if given in URL', () => {
     cy.signup({ redirect: `${donateRoute}/42/year`, visitParams });
-
+    // Setting up clock can prevent the page from loading, so we wait for the component to be loaded first
+    cy.getByDataCy('contribution-summary');
     cy.clock(Date.parse('2042/05/25'));
-    cy.contains('the next charge will be on May 1, 2043');
+    cy.getByDataCy('contribution-summary').contains('the next charge will be on May 1, 2043');
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile'] });
     cy.get('button[data-cy="cf-next-step"]').click();
@@ -147,23 +149,23 @@ describe('Contribution Flow: Donate', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile', 'payment'] });
     cy.wait(3000); // Wait for stripe to be loaded
-    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE_2 });
     cy.contains('button', 'Contribute $42').click();
     cy.wait(8000); // Wait for order to be submitted and popup to appear
 
     // Rejecting the validation should produce an error
-    cy.complete3dSecure(false);
+    cy.complete3dSecure(false, { version: 2 });
     cy.contains('We are unable to authenticate your payment method.');
 
     // Refill stripe input to avoid using the same token twice
-    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE_2 });
 
     // Re-trigger the popup
     cy.contains('button', 'Contribute $42').click();
 
     // Approving the validation should create the order
     cy.wait(8000); // Wait for order to be submitted and popup to appear
-    cy.complete3dSecure(true);
+    cy.complete3dSecure(true, { version: 2 });
     cy.getByDataCy('order-success', { timeout: 20000 });
     cy.contains('You are now supporting APEX.');
   });
@@ -200,7 +202,7 @@ describe('Contribution Flow: Donate', () => {
       cy.wait(2000);
 
       // Rejecting the validation should produce an error
-      cy.complete3dSecure(true);
+      cy.complete3dSecure(true, { version: 2 });
       cy.contains('Your payment method has now been confirmed and the payment successfully went through');
     });
   });

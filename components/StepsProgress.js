@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
@@ -9,7 +8,7 @@ import withViewport, { VIEWPORTS } from '../lib/withViewport';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 import { P } from './Text';
 
 const Circle = styled.svg`
@@ -35,12 +34,12 @@ const Circle = styled.svg`
       `}
 
   ${props =>
-      props.checked &&
-      (props.disabled
-        ? css`
-            fill: ${themeGet('colors.black.500')};
-          `
-        : css`
+    props.checked &&
+    (props.disabled
+      ? css`
+          fill: ${themeGet('colors.black.500')};
+        `
+      : css`
         fill: ${themeGet('colors.primary.600')};
         &:hover {
           fill: ${themeGet('colors.primary.400')};
@@ -249,7 +248,7 @@ const PieHalfCircleRight = styled(PieHalfCircle)`
 
 const getBubbleContent = (idx, checked, disabled, focused, loading) => {
   if (loading) {
-    return <StyledSpinner color={checked ? '#FFFFFF' : 'primary.700'} size={14} />;
+    return <Spinner color={checked ? '#FFFFFF' : 'primary.700'} size={14} />;
   } else if (checked) {
     return <Check color="white" size={14} />;
   }
@@ -269,13 +268,13 @@ const getBubbleContent = (idx, checked, disabled, focused, loading) => {
  */
 const StepsProgress = ({
   steps,
-  disabledStepNames,
+  disabledStepNames = [],
   children,
   focus,
-  loadingStep,
+  loadingStep = null,
   onStepSelect,
   allCompleted,
-  stepWidth,
+  stepWidth = '100%',
   viewport,
 }) => {
   const focusIdx = focus ? steps.findIndex(step => step.name === focus.name) : -1;
@@ -367,41 +366,6 @@ const StepsProgress = ({
       )}
     </StepsOuter>
   );
-};
-
-const stepType = PropTypes.shape({
-  /** A unique identifier for the step */
-  name: PropTypes.string.isRequired,
-  /** A pretty label to display to the user */
-  label: PropTypes.string,
-});
-
-StepsProgress.propTypes = {
-  /** The list of steps. Each step **must** be unique */
-  steps: PropTypes.arrayOf(stepType).isRequired,
-  /** A list of steps that will be disabled (unclickable). Steps must exist in `steps` */
-  disabledStepNames: PropTypes.arrayOf(PropTypes.string),
-  /** A renderer func. Gets passed an object like `{step, checked, focused}` */
-  children: PropTypes.func,
-  /** The currently focused step, or null if none focused yet */
-  focus: stepType,
-  /** Step will show a loading spinner */
-  loadingStep: stepType,
-  /** Called when a step is clicked */
-  onStepSelect: PropTypes.func,
-  /** If true, all steps will be marked as completed */
-  allCompleted: PropTypes.bool,
-  /** Base step width */
-  stepWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** @ignore from withViewport */
-  viewport: PropTypes.oneOf(Object.values(VIEWPORTS)),
-};
-
-StepsProgress.defaultProps = {
-  focused: null,
-  loadingStep: null,
-  disabledStepNames: [],
-  stepWidth: '100%',
 };
 
 export default withViewport(StepsProgress);

@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { color, flex, typography } from 'styled-system';
 
 import INTERVALS from '../../lib/constants/intervals';
@@ -17,7 +16,7 @@ import { Box } from '../Grid';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
-import { P, Span } from '../Text';
+import { Span } from '../Text';
 
 import { getTotalAmount } from './utils';
 
@@ -35,7 +34,9 @@ const AmountLine = styled.div.attrs({
   ${typography}
 `;
 
-const Label = styled(Span)`
+const Label = styled(Span).attrs(props => ({
+  fontWeight: props.fontWeight ?? 400,
+}))`
   margin-right: 4px;
   color: inherit;
   flex: 0 1 70%;
@@ -43,10 +44,6 @@ const Label = styled(Span)`
   word-break: break-word;
   ${flex}
 `;
-
-Label.defaultProps = {
-  fontWeight: 400,
-};
 
 const Amount = styled(Span)`
   flex: 1 1 30%;
@@ -62,83 +59,67 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
   const showQuantity = stepDetails.quantity > 1 || ['TICKET', 'PRODUCT'].includes(tier?.type);
   const contributionName = tier?.name ? `${collective.name} - "${tier.name}"` : collective.name;
   return (
-    <Container>
-      {stepDetails && (
-        <React.Fragment>
-          {showQuantity && (
-            <AmountLine color="black.700">
-              <Label>
-                <FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />
-              </Label>
-              <Amount>{stepDetails.quantity}</Amount>
-            </AmountLine>
-          )}
+    <Container data-cy="contribution-summary">
+      <React.Fragment>
+        {showQuantity && (
           <AmountLine color="black.700">
             <Label>
-              <FormattedMessage
-                id="ContributionToProject"
-                defaultMessage="Contribution to {projectName}"
-                values={{ projectName: contributionName }}
-              />
+              <FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />
             </Label>
-            <Amount>
-              <FormattedMoneyAmount
-                amount={amount || 0}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
-            </Amount>
+            <Amount>{stepDetails.quantity}</Amount>
           </AmountLine>
-          {Boolean(stepSummary?.taxType) &&
-            (renderTax ? (
-              renderTax({ AmountLine, Amount, Label })
-            ) : (
-              <AmountLine color="black.700">
-                <Label>
-                  {i18nTaxType(intl, stepSummary.taxType)} {stepSummary.percentage}%
-                </Label>
-                <Amount>
-                  <FormattedMoneyAmount
-                    amount={stepSummary.amount}
-                    currency={currency}
-                    amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                  />
-                </Amount>
-              </AmountLine>
-            ))}
-
-          {Boolean(platformTip) && (
+        )}
+        <AmountLine color="black.700">
+          <Label>
+            <FormattedMessage
+              id="ContributionToProject"
+              defaultMessage="Contribution to {projectName}"
+              values={{ projectName: contributionName }}
+            />
+          </Label>
+          <Amount>
+            <FormattedMoneyAmount amount={amount || 0} currency={currency} />
+          </Amount>
+        </AmountLine>
+        {Boolean(stepSummary?.taxType) &&
+          (renderTax ? (
+            renderTax({ AmountLine, Amount, Label })
+          ) : (
             <AmountLine color="black.700">
               <Label>
-                {stepDetails.isNewPlatformTip ? (
-                  <FormattedMessage defaultMessage="Optional tip to the platform" />
-                ) : (
-                  <FormattedMessage
-                    id="SupportProject"
-                    defaultMessage="Support {projectName}"
-                    values={{ projectName: 'Open Collective' }}
-                  />
-                )}
+                {i18nTaxType(intl, stepSummary.taxType)} {stepSummary.percentage}%
               </Label>
-              <Amount data-cy="ContributionSummary-Tip">
-                <FormattedMoneyAmount
-                  amount={platformTip}
-                  currency={currency}
-                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                />
+              <Amount>
+                <FormattedMoneyAmount amount={stepSummary.amount} currency={currency} />
               </Amount>
             </AmountLine>
-          )}
-        </React.Fragment>
-      )}
+          ))}
+
+        {Boolean(platformTip) && (
+          <AmountLine color="black.700">
+            <Label>
+              <FormattedMessage defaultMessage="Contribution to the Platform" id="platformTip.summaryLabel" />
+            </Label>
+            <Amount data-cy="ContributionSummary-Tip">
+              <FormattedMoneyAmount amount={platformTip} currency={currency} />
+            </Amount>
+          </AmountLine>
+        )}
+      </React.Fragment>
 
       <StyledHr borderColor="black.500" my={1} />
       <AmountLine color="black.800" fontWeight="500">
         <Label fontWeight="500">
-          <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
+          {!stepDetails.interval || stepDetails.interval === INTERVALS.oneTime ? (
+            <FormattedMessage id="TotalCharge" defaultMessage="Total charge" />
+          ) : stepDetails.interval === INTERVALS.year ? (
+            <FormattedMessage id="YearlyCharge" defaultMessage="Yearly charge" />
+          ) : (
+            <FormattedMessage id="MonthlyCharge" defaultMessage="Monthly charge" />
+          )}
         </Label>
         <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
-          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
+          <FormattedMoneyAmount amount={totalAmount} currency={currency} />
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && (
@@ -186,11 +167,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={pmFeeInfo.fee || null}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
+              <FormattedMoneyAmount amount={pmFeeInfo.fee || null} currency={currency} />
             </Amount>
           </AmountLine>
           <AmountLine color="black.700">
@@ -207,25 +184,24 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   <StyledTooltip
                     verticalAlign="top"
                     content={
-                      <FormattedMessage defaultMessage="Net Amount = Today's charge - Payment processor fee - Support Open Collective" />
+                      <FormattedMessage
+                        defaultMessage="Net Amount = Total charge - Payment processor fee - Platform tip"
+                        id="netAmountFormula"
+                      />
                     }
                   >
                     <InfoCircle size="16px" color="#76777A" />
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={totalAmount - pmFeeInfo.fee - platformTip}
-                currency={currency}
-                amountStyles={null}
-              />
+              <FormattedMoneyAmount amount={totalAmount - pmFeeInfo.fee - platformTip} currency={currency} />
             </Amount>
           </AmountLine>
         </React.Fragment>
       )}
       <StyledHr borderColor="black.500" my={1} />
-      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.oneTime && (
-        <P color="black.800" fontSize="12px" mt={3}>
+      {stepDetails.interval && stepDetails.interval !== INTERVALS.oneTime && (
+        <Container color="black.800" fontSize="12px" mt={3}>
           {!stepPayment || stepPayment.isKeyOnly ? (
             <FormattedMessage
               id="ContributionSummary.NextCharge"
@@ -247,7 +223,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               <FormattedMessage
                 id="withColon"
                 defaultMessage="{item}:"
-                values={{ item: <FormattedMessage defaultMessage="Next charge date" /> }}
+                values={{ item: <FormattedMessage defaultMessage="Next charge date" id="1u4k2w" /> }}
               />{' '}
               <FormattedDate
                 value={getNextChargeDate(new Date(), stepDetails.interval, stepPayment?.paymentMethod?.service)}
@@ -281,20 +257,10 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               </Box>
             </React.Fragment>
           )}
-        </P>
+        </Container>
       )}
     </Container>
   );
-};
-
-ContributionSummary.propTypes = {
-  collective: PropTypes.object,
-  tier: PropTypes.object,
-  stepDetails: PropTypes.object,
-  stepSummary: PropTypes.object,
-  stepPayment: PropTypes.object,
-  currency: PropTypes.string,
-  renderTax: PropTypes.func,
 };
 
 export default ContributionSummary;

@@ -1,0 +1,86 @@
+import React from 'react';
+import { useMutation } from '@apollo/client';
+import { isUndefined } from 'lodash-es';
+import { FormattedMessage, useIntl } from 'react-intl';
+
+import { i18nGraphqlException } from '../../lib/errors';
+import type {
+  ExpensesListAdminFieldsFragmentFragment,
+  ExpensesListFieldsFragmentFragment,
+} from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+
+import type { AccountingCategorySelectProps } from '../AccountingCategorySelect';
+import AccountingCategorySelect from '../AccountingCategorySelect';
+import ConfirmationModal from '../ConfirmationModal';
+import { useToast } from '../ui/useToast';
+
+import { editExpenseCategoryMutation } from './graphql/mutations';
+
+type ApproveExpenseModalProps = {
+  onClose: () => void;
+  expense: Pick<
+    ExpensesListFieldsFragmentFragment & ExpensesListAdminFieldsFragmentFragment,
+    'id' | 'type' | 'accountingCategory' | 'description' | 'items' | 'valuesByRole'
+  >;
+  host: AccountingCategorySelectProps['host'];
+  account: AccountingCategorySelectProps['account'];
+  onConfirm?: () => Promise<void>;
+};
+
+export default function ApproveExpenseModal({ onClose, onConfirm, host, account, expense }: ApproveExpenseModalProps) {
+  const intl = useIntl();
+  const [editExpense] = useMutation(editExpenseCategoryMutation);
+  const [selectedCategory, setSelectedCategory] = React.useState(expense.accountingCategory || undefined);
+  const { toast } = useToast();
+  const { LoggedInUser } = useLoggedInUser();
+  const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
+  return (
+    <ConfirmationModal
+      onClose={onClose}
+      header={<FormattedMessage defaultMessage="Approve Expense" id="PJNkaW" />}
+      maxWidth={384}
+      disableSubmit={isUndefined(selectedCategory)}
+      continueHandler={async () => {
+        try {
+          // 1. Edit the accounting category if it was changed
+          if (selectedCategory?.id !== expense.accountingCategory?.id) {
+            await editExpense({
+              variables: {
+                expenseId: expense.id,
+                category: selectedCategory ? { id: selectedCategory.id } : null,
+              },
+            });
+          }
+
+          // 2. Approve the expense
+          await onConfirm();
+          onClose();
+        } catch (e) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+        }
+      }}
+    >
+      <div className="my-4">
+        <label htmlFor="confirm-expense-category" className="mb-2 text-base font-bold">
+          <FormattedMessage defaultMessage="Confirm Expense Category" id="X5FRNX" />
+        </label>
+        <AccountingCategorySelect
+          id="confirm-expense-category"
+          kind="EXPENSE"
+          onChange={setSelectedCategory}
+          host={host}
+          account={account}
+          expenseType={expense.type}
+          expenseValues={expense}
+          selectedCategory={selectedCategory}
+          valuesByRole={expense.valuesByRole as AccountingCategorySelectProps['valuesByRole']}
+          allowNone={false}
+          predictionStyle="full"
+          selectFirstOptionIfSingle
+          showCode={isHostAdmin}
+        />
+      </div>
+    </ConfirmationModal>
+  );
+}

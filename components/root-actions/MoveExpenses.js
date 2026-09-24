@@ -1,15 +1,16 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
-import { omit } from 'lodash';
+import { useMutation } from '@apollo/client';
+import { omit } from 'lodash-es';
 import { FormattedDate, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import ExpensesPickerAsync from '../ExpensesPickerAsync';
 import { Flex } from '../Grid';
 import Link from '../Link';
@@ -19,10 +20,10 @@ import StyledInputField from '../StyledInputField';
 import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const moveExpensesMutation = gql`
-  mutation MoveExpensesMutation($destinationAccount: AccountReferenceInput!, $expenses: [ExpenseReferenceInput!]!) {
+  mutation MoveExpenses($destinationAccount: AccountReferenceInput!, $expenses: [ExpenseReferenceInput!]!) {
     moveExpenses(destinationAccount: $destinationAccount, expenses: $expenses) {
       id
     }
@@ -31,8 +32,8 @@ const moveExpensesMutation = gql`
 
 export default function MoveExpenses() {
   const intl = useIntl();
-  const { addToast } = useToasts();
-  const [submitMoveExpenses] = useMutation(moveExpensesMutation, { context: API_V2_CONTEXT });
+  const { toast } = useToast();
+  const [submitMoveExpenses] = useMutation(moveExpensesMutation);
 
   const [sourceAccount, setSourceAccount] = React.useState(null);
   const [destinationAccount, setDestinationAccount] = React.useState(null);
@@ -55,25 +56,27 @@ export default function MoveExpenses() {
       };
 
       await submitMoveExpenses({ variables: mutationVariables });
-      addToast({ type: TOAST_TYPE.SUCCESS, title: 'Expenses moved successfully', message: callToAction });
+      toast({ variant: 'success', title: 'Expenses moved successfully', message: callToAction });
       // Reset form and purge cache
       setIsConfirmationModelOpen(false);
       setSourceAccount(null);
       setDestinationAccount(null);
       setSelectedExpenses([]);
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   }, [selectedExpenses, destinationAccount, callToAction]);
 
   return (
     <div>
+      <DashboardHeader title="Move Expenses" className="mb-10" />
       <StyledInputField htmlFor="sourceAccount" label="Source account for the expenses" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync
             types={allowedAccountTypes}
             inputId={id}
             collective={sourceAccount}
+            includeAllVendors
             isClearable
             onChange={option => {
               setSourceAccount(option?.value || null);
@@ -103,6 +106,7 @@ export default function MoveExpenses() {
           <CollectivePickerAsync
             types={allowedAccountTypes}
             inputId={id}
+            includeAllVendors
             disabled={selectedExpenses.length === 0}
             collective={destinationAccount}
             isClearable
@@ -117,7 +121,7 @@ export default function MoveExpenses() {
         mt={4}
         width="100%"
         buttonStyle="primary"
-        disabled={!selectedExpenses.length === 0 || !destinationAccount}
+        disabled={selectedExpenses.length === 0 || !destinationAccount}
         onClick={() => setIsConfirmationModelOpen(true)}
       >
         {callToAction}

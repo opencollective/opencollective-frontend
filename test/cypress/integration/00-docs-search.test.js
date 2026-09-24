@@ -36,7 +36,7 @@ describe('Search docs on from help page', () => {
     cy.getByDataCy('search-input').type('collective');
     cy.wait('@searchDocs');
     cy.checkToast({
-      type: 'ERROR',
+      variant: 'error',
       message: 'Oops! There was an unexpected error.',
     });
     cy.get('[data-cy=search-result-popup]').within(() => {

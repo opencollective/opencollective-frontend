@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, NetworkStatus, useQuery } from '@apollo/client';
+import { NetworkStatus, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { getPersonalTokenSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
@@ -33,6 +32,7 @@ const personalTokenQuery = gql`
         totalCount
         nodes {
           id
+          publicId
           name
         }
       }
@@ -45,7 +45,6 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
   const [showCreatePersonalToken, setShowCreatePersonalTokenModal] = React.useState(false);
   const { data, loading, error, networkStatus } = useQuery(personalTokenQuery, {
     variables,
-    context: API_V2_CONTEXT,
   });
 
   const showLoadingState = loading || networkStatus === NetworkStatus.refetch;
@@ -54,7 +53,7 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
     <div data-cy="personal-tokens-list">
       <Flex width="100%" alignItems="center">
         <H3 fontSize="18px" fontWeight="700">
-          <FormattedMessage defaultMessage="Personal Tokens" />
+          <FormattedMessage defaultMessage="Personal Tokens" id="IPdwXJ" />
         </H3>
         <StyledHr mx={2} flex="1" borderColor="black.400" />
         <StyledButton
@@ -62,19 +61,21 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
           buttonSize="tiny"
           onClick={() => setShowCreatePersonalTokenModal(true)}
         >
-          + <FormattedMessage defaultMessage="Create Personal token" />
+          + <FormattedMessage defaultMessage="Create Personal token" id="MMyZfL" />
         </StyledButton>
         {showCreatePersonalToken && (
           <CreatePersonalTokenModal
-            account={data.individual}
+            account={data?.individual}
             onClose={() => setShowCreatePersonalTokenModal(false)}
             onSuccess={onPersonalTokenCreated}
+            disabled={!data?.individual}
           />
         )}
       </Flex>
       <P my={2} color="black.700">
         <FormattedMessage
           defaultMessage="Personal tokens are used to authenticate with the API. They are not tied to a specific application. Pass it as {headerName} HTTP header or {queryParam} query parameter in the URL."
+          id="QZRYxh"
           values={{
             headerName: <code>Personal-Token</code>,
             queryParam: <code>personalToken</code>,
@@ -92,11 +93,12 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
               </Flex>
               <Flex flexDirection="column" ml={3}>
                 <P fontSize="14px" fontWeight="700" lineHeight="20px" mb="12px">
-                  <FormattedMessage defaultMessage="You don't have any token yet" />
+                  <FormattedMessage defaultMessage="You don't have any token yet" id="1SzDWu" />
                 </P>
                 <P fontSize="12px" lineHeight="18px" color="black.700">
                   <FormattedMessage
                     defaultMessage="You can create personal token that integrate with the Open Collective platform. <CreateTokenLink>Create Personal Token</CreateTokenLink>."
+                    id="oG4/dR"
                     values={{
                       CreateTokenLink: children => (
                         <StyledLink
@@ -125,7 +127,7 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
                     </Box>
                     <Flex flexDirection="column">
                       <P fontSize="18px" lineHeight="26px" fontWeight="500" color="black.900">
-                        {token.name ?? <FormattedMessage defaultMessage={'Unnamed token'} />}
+                        {token.name ?? <FormattedMessage defaultMessage="Unnamed token" id="3IwVoe" />}
                       </P>
                       <P mt="10px" fontSize="14px">
                         <Link href={getPersonalTokenSettingsRoute(data.individual, token)}>
@@ -150,14 +152,6 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
       )}
     </div>
   );
-};
-
-PersonalTokensList.propTypes = {
-  account: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
-  onPersonalTokenCreated: PropTypes.func.isRequired,
-  offset: PropTypes.number,
 };
 
 export default PersonalTokensList;

@@ -8,4 +8,8 @@ coverage:
         threshold: 0.1
     patch: off
 
+ignore:
+  - test
+  - lib/graphql/types
+
 comment: false

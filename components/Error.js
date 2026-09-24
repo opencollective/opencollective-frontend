@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { H1 } from './Text';
 
@@ -11,10 +10,6 @@ const ErrorComponent = ({ message }) => {
       </H1>
     </div>
   );
-};
-
-ErrorComponent.propTypes = {
-  message: PropTypes.string,
 };
 
 export default ErrorComponent;

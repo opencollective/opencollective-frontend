@@ -1,11 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
-import { Account, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
-import { Box, Flex, Grid } from '../Grid';
-import { P } from '../Text';
+import { Grid } from '../Grid';
 
 import ApplyToHostCard from './ApplyToHostCard';
 
@@ -24,35 +23,41 @@ export default function OtherFiscalHostResults({
   hosts,
   totalCount,
   collective,
-  onHostApplyClick,
 }: {
-  hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
+  hosts: Pick<
+    Host,
+    | 'slug'
+    | 'totalHostedCollectives'
+    | 'description'
+    | 'currency'
+    | 'hostFeePercent'
+    | 'platformContributionAvailable'
+    | 'settings'
+  >[];
   totalCount: number;
   collective: Pick<Account, 'slug'>;
-  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   return (
-    <Box>
-      <Flex>
-        <P mr={3} fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
-          <FormattedMessage defaultMessage="Other Hosts" />
-        </P>
-        <P fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
+    <div>
+      <div className="flex flex-wrap items-baseline gap-3">
+        <h1 className="text-2xl font-bold">
+          <FormattedMessage defaultMessage="Other Hosts" id="8DxsHx" />
+        </h1>
+        <p>
           <FormattedMessage
             defaultMessage="{ hostCount, plural, one {# host} other {# hosts} } found"
+            id="PB3Bh9"
             values={{
               hostCount: totalCount,
             }}
           />
-        </P>
-      </Flex>
+        </p>
+      </div>
       <HostCardContainer mt={3}>
         {hosts.map(host => {
-          return (
-            <ApplyToHostCard key={host.slug} host={host} collective={collective} onHostApplyClick={onHostApplyClick} />
-          );
+          return <ApplyToHostCard key={host.slug} host={host} collective={collective} />;
         })}
       </HostCardContainer>
-    </Box>
+    </div>
   );
 }

@@ -1,14 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { groupBy, isEmpty, uniqBy } from 'lodash';
+import { groupBy, isEmpty, uniqBy } from 'lodash-es';
 import { LayoutDashboard, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
-import { isPastEvent } from '../../lib/events';
+import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import Avatar from '../Avatar';
 import Collapse from '../Collapse';
@@ -70,10 +69,30 @@ const CollectiveListItem = styled.div`
   }
 `;
 
-const MembershipLine = ({ user, membership, closeDrawer }) => {
+interface MembershipLineProps {
+  user?: LoggedInUser;
+  closeDrawer?(...args: unknown[]): unknown;
+  membership?: {
+    collective: GraphQLV1Collective;
+  };
+}
+
+const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) => {
+  const canSeeDashboard = user.canSeeDashboard(membership.collective);
+
+  // Not supposed to happen since already filtered in `filterMemberships`
+  if (!canSeeDashboard && membership.collective.isPrivate) {
+    return null;
+  }
+
   return (
     <CollectiveListItem className="group h-9">
-      <MenuLink href={`/${membership.collective.slug}`} onClick={closeDrawer}>
+      <MenuLink
+        href={
+          membership.collective.isPrivate ? getDashboardRoute(membership.collective) : `/${membership.collective.slug}`
+        }
+        onClick={closeDrawer}
+      >
         <Avatar collective={membership.collective} radius={16} />
         <P
           fontSize="inherit"
@@ -87,12 +106,12 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
         </P>
       </MenuLink>
 
-      {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
-        <div className="absolute bottom-1 right-1 top-1">
+      {canSeeDashboard && (
+        <div className="absolute top-1 right-1 bottom-1">
           <Tooltip>
             <TooltipTrigger>
               <Link
-                className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all hover:border-white hover:bg-slate-900 hover:text-white group-hover:opacity-100"
+                className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all group-hover:opacity-100 hover:border-white hover:bg-slate-900 hover:text-white"
                 href={getDashboardRoute(membership.collective)}
                 onClick={closeDrawer}
               >
@@ -100,19 +119,13 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
               </Link>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <FormattedMessage defaultMessage="Go to Dashboard" />
+              <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
             </TooltipContent>
           </Tooltip>
         </div>
       )}
     </CollectiveListItem>
   );
-};
-
-MembershipLine.propTypes = {
-  user: PropTypes.object,
-  membership: PropTypes.object,
-  closeDrawer: PropTypes.func,
 };
 
 const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
@@ -126,26 +139,17 @@ const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
 };
 
 const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
-  const archivedMemberships = memberships.filter(m => {
-    if (
-      m.role !== 'BACKER' &&
-      m.collective.isArchived &&
-      !(m.collective.type === 'EVENT' && isPastEvent(m.collective))
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  });
-
+  const archivedMemberships = memberships.filter(m => Boolean(m.collective.isArchived));
   return uniqBy(archivedMemberships, m => m.collective.id);
 };
 
 const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   const filteredMemberships = memberships.filter(m => {
-    if (m.role === 'BACKER' || m.collective.isArchived) {
+    if (!['ADMIN', 'ACCOUNTANT', 'HOST', 'COMMUNITY_MANAGER'].includes(m.role) || m.collective.isArchived) {
       return false;
-    } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
+    } else if (['EVENT', 'PROJECT'].includes(m.collective.type)) {
+      return false;
+    } else if (!['ADMIN', 'ACCOUNTANT'].includes(m.role) && m.collective.isPrivate) {
       return false;
     } else {
       return Boolean(m.collective);
@@ -155,7 +159,13 @@ const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   return uniqBy(filteredMemberships, m => m.collective.id);
 };
 
-const MembershipsList = ({ user, memberships, closeDrawer }) => {
+interface MembershipsListProps {
+  user?: LoggedInUser;
+  memberships?: LoggedInUser['memberOf'];
+  closeDrawer?(...args: unknown[]): unknown;
+}
+
+const MembershipsList = ({ user, memberships, closeDrawer }: MembershipsListProps) => {
   return (
     <Box as="ul" p={0} my={2}>
       {sortMemberships(memberships).map(member => (
@@ -163,12 +173,6 @@ const MembershipsList = ({ user, memberships, closeDrawer }) => {
       ))}
     </Box>
   );
-};
-
-MembershipsList.propTypes = {
-  user: PropTypes.object,
-  memberships: PropTypes.array,
-  closeDrawer: PropTypes.func,
 };
 
 /**
@@ -185,14 +189,14 @@ MembershipsList.propTypes = {
 const MENU_SECTIONS = {
   [CollectiveType.COLLECTIVE]: {
     title: defineMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
-    emptyMessage: defineMessage({ defaultMessage: 'Create a collective to collect and spend money transparently' }),
+    emptyMessage: defineMessage({
+      defaultMessage: 'Create a collective to collect and spend money transparently',
+      id: 'MZB6HL',
+    }),
     plusButton: {
       text: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
-      href: '/create',
+      href: '/signup/collective',
     },
-  },
-  [CollectiveType.EVENT]: {
-    title: defineMessage({ id: 'events', defaultMessage: 'My Events' }),
   },
   [CollectiveType.FUND]: {
     title: defineMessage({ id: 'funds', defaultMessage: 'My Funds' }),
@@ -205,10 +209,11 @@ const MENU_SECTIONS = {
     title: defineMessage({ id: 'organization', defaultMessage: 'My Organizations' }),
     emptyMessage: defineMessage({
       defaultMessage: 'A profile representing a company or organization instead of an individual',
+      id: 'CBITv6',
     }),
     plusButton: {
       text: defineMessage({ id: 'host.organization.create', defaultMessage: 'Create an Organization' }),
-      href: '/organizations/new',
+      href: '/signup/organization',
     },
   },
   ARCHIVED: {
@@ -230,7 +235,7 @@ const MenuSectionHeader = ({ section, hidePlusIcon, closeDrawer }) => {
               href={plusButton.href}
               aria-label={intl.formatMessage(plusButton.text)}
               onClick={closeDrawer}
-              tabIndex="-1"
+              tabIndex={-1}
               className="mr-1.5 flex h-6 w-6 items-center justify-center rounded-full border"
             >
               <Plus size={12} color="#76777A" />
@@ -254,18 +259,12 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
   const archivedMemberships = filterArchivedMemberships(user.memberOf);
   const groupedMemberships = groupBy(memberships, m => m.collective.type);
   groupedMemberships.ARCHIVED = archivedMemberships;
-  const hasNoMemberships = isEmpty(memberships);
   const shouldDisplaySection = section => {
     return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
   };
 
   return (
     <React.Fragment>
-      {hasNoMemberships && (
-        <P color="blue.900" fontSize="20px" lineHeight="28px" fontWeight="bold" mt="8px" mb="12px">
-          <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Open Collective" />
-        </P>
-      )}
       {Object.keys(MENU_SECTIONS)
         .filter(shouldDisplaySection)
         .map((accountType, i) => {
@@ -280,10 +279,8 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
                   <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
                 )}
                 {sectionIsEmpty ? (
-                  <Box my={2}>
-                    <P fontSize="12px" lineHeight="18px" color="black.700">
-                      {intl.formatMessage(sectionData.emptyMessage)}
-                    </P>
+                  <div className="m-2">
+                    <p className="text-xs text-muted-foreground">{intl.formatMessage(sectionData.emptyMessage)}</p>
                     {Boolean(sectionData.plusButton) && (
                       <Link href={sectionData.plusButton.href} onClick={closeDrawer}>
                         <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
@@ -305,7 +302,7 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
                         </StyledButton>
                       </Link>
                     )}
-                  </Box>
+                  </div>
                 ) : accountType === 'ARCHIVED' ? (
                   <Collapse
                     buttonSize={24}
@@ -330,13 +327,6 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
         })}
     </React.Fragment>
   );
-};
-
-ProfileMenuMemberships.propTypes = {
-  user: PropTypes.shape({
-    memberOf: PropTypes.arrayOf(PropTypes.object),
-  }),
-  closeDrawer: PropTypes.func,
 };
 
 export default React.memo(ProfileMenuMemberships);

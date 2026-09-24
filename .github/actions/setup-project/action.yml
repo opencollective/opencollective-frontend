@@ -8,13 +8,14 @@ runs:
   using: 'composite'
   steps:
     - name: Setup node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version-file: 'package.json'
+        check-latest: true
         cache: 'npm'
 
     - name: Restore node_modules
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       id: node-modules
       with:
         path: node_modules
@@ -23,4 +24,4 @@ runs:
     - name: Install dependencies
       shell: bash
       if: steps.node-modules.outputs.cache-hit != 'true'
-      run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
+      run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit --no-fund

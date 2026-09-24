@@ -4,15 +4,15 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/con
 
 import * as fragments from './fragments';
 
-// We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
-/* eslint-disable graphql/template-strings */
-export const collectivePageQuery = gqlV1/* GraphQL */ `
+export const collectivePageQuery = gqlV1 /* GraphQL */ `
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
       id
+      idV2
       slug
       path
       name
+      hasHosting
       description
       longDescription
       backgroundImage
@@ -24,21 +24,30 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         type
         url
       }
+      location {
+        id
+        country
+      }
       tags
       company
       type
       currency
+      createdAt
       settings
       isActive
-      isPledged
       isApproved
+      isVerified
       isArchived
       isFrozen
+      isSuspended
       isHost
       isIncognito
       isGuest
+      isTrustedHost
+      isFirstPartyHost
       hostFeePercent
       platformFeePercent
+      platformContributionAvailable
       image
       imageUrl(height: 256)
       canApply
@@ -46,11 +55,7 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       supportedExpenseTypes
       features {
         id
-        ...NavbarFields
-      }
-      ordersFromCollective(subscriptionsOnly: true) {
-        id
-        isSubscriptionActive
+        ...NavbarFieldsV1
       }
       memberOf(onlyActiveCollectives: true, limit: 1) {
         id
@@ -58,22 +63,12 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       stats {
         id
         balance
-        balanceWithBlockedFunds
         yearlyBudget
-        updates
-        activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12)
-        totalAmountRaised: totalAmountReceived
-        totalNetAmountRaised: totalNetAmountReceived
         backers {
           id
           all
           users
           organizations
-        }
-        transactions {
-          id
-          all
         }
       }
       connectedTo: memberOf(role: "CONNECTED_COLLECTIVE", limit: 1) {
@@ -103,15 +98,16 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         name
         slug
         type
+        hasHosting
+        location {
+          id
+          country
+        }
         settings
         plan {
           id
           hostFees
           hostFeeSharePercent
-        }
-        features {
-          id
-          VIRTUAL_CARDS
         }
         policies {
           id
@@ -186,11 +182,13 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           long
         }
         privateInstructions
-        orders {
+        orders(status: PAID) {
           id
+          description
           createdAt
           quantity
           publicMessage
+          status
           fromCollective {
             id
             type
@@ -222,7 +220,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
   ${fragments.contributeCardEventFieldsFragment}
   ${fragments.contributeCardProjectFieldsFragment}
 `;
-/* eslint-enable graphql/template-strings */
 
 export const getCollectivePageQueryVariables = slug => {
   return {

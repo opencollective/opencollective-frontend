@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { hasAccountMoneyManagement } from '@/lib/collective';
+import { getErrorFromGraphqlException } from '@/lib/errors';
+import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
-import { adminPanelQuery } from '../../admin-panel/queries';
-import Container from '../../Container';
-import { getI18nLink } from '../../I18nFormatters';
+import { adminPanelQuery } from '../../dashboard/queries';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
-const archiveCollectiveMutation = gqlV1/* GraphQL */ `
+const archiveCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation ArchiveCollective($id: Int!) {
     archiveCollective(id: $id) {
       id
@@ -25,7 +22,7 @@ const archiveCollectiveMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const unarchiveCollectiveMutation = gqlV1/* GraphQL */ `
+const unarchiveCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation UnarchiveCollective($id: Int!) {
     unarchiveCollective(id: $id) {
       id
@@ -46,10 +43,16 @@ const ArchiveCollective = ({ collective }) => {
   const [modal, setModal] = useState({ type: defaultAction, show: false });
 
   const adminPanelMutationParams = {
-    refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug }, context: API_V2_CONTEXT }],
+    refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug } }],
   };
-  const [archiveCollective] = useMutation(archiveCollectiveMutation, adminPanelMutationParams);
-  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation, adminPanelMutationParams);
+  const [archiveCollective] = useMutation(archiveCollectiveMutation, {
+    ...adminPanelMutationParams,
+    context: API_V1_CONTEXT,
+  });
+  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation, {
+    ...adminPanelMutationParams,
+    context: API_V1_CONTEXT,
+  });
 
   const handleArchiveCollective = async ({ id }) => {
     setModal({ type: 'Archive', show: false });
@@ -83,28 +86,25 @@ const ArchiveCollective = ({ collective }) => {
     }
   };
 
-  const hasBalance = collective.stats.balance > 0 && (collective.type === 'COLLECTIVE' || collective.type === 'FUND');
+  const hasBalance = collective.stats.balance > 0;
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
 
   const closeModal = () => setModal({ ...modal, show: false });
 
   return (
-    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={50}>
+    <div className="mb-8 flex flex-col items-start gap-2">
       <SettingsSectionTitle>
         <FormattedMessage
           id="collective.archive.title"
-          defaultMessage={
-            'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-          }
+          defaultMessage="Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
           values={{ type: collective.type }}
         />
       </SettingsSectionTitle>
       {!isArchived && (
-        <P mb={3} lineHeight="16px" fontSize="14px">
+        <p className="text-sm">
           <FormattedMessage
             id="collective.archive.description"
-            defaultMessage={
-              'Archiving {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.'
-            }
+            defaultMessage="Archiving {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} means it will visually appear inactive and no new activity will be allowed."
             values={{ type: collective.type }}
           />
           &nbsp;
@@ -114,79 +114,60 @@ const ArchiveCollective = ({ collective }) => {
               defaultMessage="Recurring financial contributions will be automatically canceled, and all pending expenses will be marked as canceled."
             />
           )}
-        </P>
+        </p>
       )}
-      {error && (
-        <P my={3} color="#ff5252">
-          {error}
-        </P>
-      )}
-      {!isArchived && (
-        <StyledButton
-          onClick={() => setModal({ type: 'Archive', show: true })}
-          loading={processing}
-          disabled={collective.isHost || hasBalance}
-          mb={2}
-        >
-          <FormattedMessage
-            id="collective.archive.title"
-            defaultMessage={
-              'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-            }
-            values={{ type: collective.type }}
-          />
-        </StyledButton>
-      )}
+      {error && <MessageBox type="error">{error}</MessageBox>}
+
       {!isArchived && hasBalance && (
-        <P color="rgb(224, 183, 0)" my={1}>
+        <MessageBox type="warning">
           <FormattedMessage
             id="collective.archive.availableBalance"
-            defaultMessage={
-              "Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your Fiscal Host using the 'empty balance' option."
-            }
+            defaultMessage="Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your Fiscal Host using the 'empty balance' option."
             values={{ type: collective.type }}
           />
-        </P>
+        </MessageBox>
       )}
-      {!isArchived && collective.isHost && (
-        <P color="rgb(224, 183, 0)" my={1}>
-          {collective.type === CollectiveType.COLLECTIVE ? (
-            <FormattedMessage
-              id="collective.archive.selfHosted"
-              defaultMessage={`To archive this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
-              values={{ SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/admin/host` }) }}
-            />
-          ) : (
-            <FormattedMessage
-              id="collective.archive.isHost"
-              defaultMessage={
-                "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
-              }
-              values={{ type: collective.type }}
-            />
-          )}
-        </P>
+      {!isArchived && !hasBalance && hasMoneyManagement && (
+        <MessageBox type="warning">
+          <FormattedMessage
+            id="collective.archive.balance.warning"
+            defaultMessage="You can't archive {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
+            values={{ type: collective.type }}
+          />
+        </MessageBox>
       )}
       {isArchived && confirmationMsg && (
         <MessageBox withIcon type="info" mb={4}>
           {confirmationMsg}
         </MessageBox>
       )}
-
-      {isArchived && (
-        <StyledButton onClick={() => setModal({ type: 'Unarchive', show: true })} loading={processing}>
+      {!isArchived && (
+        <Button
+          onClick={() => setModal({ type: 'Archive', show: true })}
+          loading={processing}
+          disabled={hasMoneyManagement || hasBalance}
+          variant="outline"
+        >
           <FormattedMessage
-            id="collective.unarchive.button"
-            defaultMessage={
-              'Unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-            }
+            id="collective.archive.title"
+            defaultMessage="Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
             values={{ type: collective.type }}
           />
-        </StyledButton>
+        </Button>
+      )}
+
+      {isArchived && (
+        <Button variant="outline" onClick={() => setModal({ type: 'Unarchive', show: true })} loading={processing}>
+          <FormattedMessage
+            id="collective.unarchive.button"
+            defaultMessage="Unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
+            values={{ type: collective.type }}
+          />
+        </Button>
       )}
 
       {modal.show && (
-        <StyledModal width="570px" onClose={closeModal}>
+        <StyledModal onClose={closeModal}>
           <ModalHeader onClose={closeModal}>
             {modal.type === 'Unarchive' ? (
               <FormattedMessage
@@ -208,33 +189,32 @@ const ArchiveCollective = ({ collective }) => {
                 <React.Fragment>
                   <FormattedMessage
                     id="archive.account.confirmation"
-                    defaultMessage={
-                      'Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-                    }
+                    defaultMessage="Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?"
                     values={{ type: collective.type }}
                   />
-                  <MessageBox fontSize={13} type="warning" withIcon mt={3} mb={3}>
-                    <FormattedMessage defaultMessage="Note that archiving will cancel all active recurring contributions." />
+                  <MessageBox fontSize={13} type="warning" withIcon mt={4}>
+                    <FormattedMessage
+                      defaultMessage="Note that archiving will cancel all active recurring contributions."
+                      id="kyC4C+"
+                    />
                   </MessageBox>
                 </React.Fragment>
               )}
               {modal.type === 'Unarchive' && (
                 <FormattedMessage
                   id="unarchive.account.confirmation"
-                  defaultMessage={
-                    'Are you sure you want to unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-                  }
+                  defaultMessage="Are you sure you want to unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?"
                   values={{ type: collective.type }}
                 />
               )}
             </P>
           </ModalBody>
-          <ModalFooter>
-            <Container display="flex" justifyContent="flex-end">
-              <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false })}>
-                <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
-              </StyledButton>
-              <StyledButton
+          <ModalFooter showDivider={false}>
+            <div className="flex justify-between gap-2">
+              <Button variant="outline" onClick={() => setModal({ ...modal, show: false })}>
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+              </Button>
+              <Button
                 buttonStyle="primary"
                 data-cy="action"
                 onClick={() => {
@@ -246,23 +226,17 @@ const ArchiveCollective = ({ collective }) => {
                 }}
               >
                 {modal.type === 'Unarchive' ? (
-                  <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage={'Unarchive'} />
+                  <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage="Unarchive" />
                 ) : (
-                  <FormattedMessage id="collective.archive.confirm.btn" defaultMessage={'Archive'} />
+                  <FormattedMessage id="collective.archive.confirm.btn" defaultMessage="Archive" />
                 )}
-              </StyledButton>
-            </Container>
+              </Button>
+            </div>
           </ModalFooter>
         </StyledModal>
       )}
-    </Container>
+    </div>
   );
-};
-
-ArchiveCollective.propTypes = {
-  collective: PropTypes.object.isRequired,
-  archiveCollective: PropTypes.func,
-  unarchiveCollective: PropTypes.func,
 };
 
 export default ArchiveCollective;

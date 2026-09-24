@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import { get } from 'lodash';
-import styled from 'styled-components';
+import { get } from 'lodash-es';
+import { styled } from 'styled-components';
 
 import Container from './Container';
 import StyledInput from './StyledInput';
@@ -40,7 +39,7 @@ const getColor = ({ error, success }) => {
   return 'black.800';
 };
 
-const getBgColor = ({ error, focused, success }) => {
+const getBgColor = ({ error, focused, success, defaultBg = 'black.50' }) => {
   if (focused) {
     return 'primary.100';
   }
@@ -53,7 +52,7 @@ const getBgColor = ({ error, focused, success }) => {
     return 'green.100';
   }
 
-  return 'black.50';
+  return defaultBg;
 };
 
 const getBorderColor = ({ error, focused, success }) => {
@@ -77,18 +76,18 @@ const getBorderColor = ({ error, focused, success }) => {
  * @see See [StyledInput](/#!/StyledInput) for details about props passed to it
  */
 const StyledInputGroup = ({
-  append,
-  prepend,
-  disabled,
-  success,
-  error,
-  maxWidth,
-  containerProps,
-  prependProps,
-  appendProps,
-  innerRef,
-  autoFocus,
-  overflow,
+  append = undefined,
+  prepend = undefined,
+  disabled = undefined,
+  success = undefined,
+  error = undefined,
+  maxWidth = undefined,
+  containerProps = undefined,
+  prependProps = undefined,
+  appendProps = undefined,
+  innerRef = undefined,
+  autoFocus = undefined,
+  overflow = undefined,
   ...inputProps
 }) => {
   const [focused, setFocus] = useState(false);
@@ -138,13 +137,13 @@ const StyledInputGroup = ({
           {...inputProps}
           onFocus={e => {
             setFocus(true);
-            if (inputProps && inputProps.onFocus) {
+            if (inputProps.onFocus) {
               inputProps.onFocus(e);
             }
           }}
           onBlur={e => {
             setFocus(false);
-            if (inputProps && inputProps.onBlur) {
+            if (inputProps.onBlur) {
               inputProps.onBlur(e);
             }
           }}
@@ -156,7 +155,7 @@ const StyledInputGroup = ({
             color={getColor({ error, success })}
             fontSize="14px"
             {...appendProps}
-            bg={getBgColor({ error, focused, success })}
+            bg={getBgColor({ error, focused, success, defaultBg: appendProps?.bg })}
           >
             {append}
           </Container>
@@ -169,34 +168,6 @@ const StyledInputGroup = ({
       )}
     </React.Fragment>
   );
-};
-
-StyledInputGroup.propTypes = {
-  /** Text shown after input */
-  append: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.element]),
-  /** Text shown before input */
-  prepend: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.element]),
-  /** Show disabled state for field */
-  disabled: PropTypes.bool,
-  /** Show error state for field, and a message error if given a string */
-  error: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  /** Show success state for field */
-  success: PropTypes.bool,
-  /** Passed to internal StyledInput */
-  type: PropTypes.string,
-  /** Props passed to the `InputContainer` */
-  containerProps: PropTypes.object,
-  /** Props passed to the prepend `Container` */
-  prependProps: PropTypes.object,
-  /** Props passed to the append `Container` */
-  appendProps: PropTypes.object,
-  /** Max Width */
-  maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  /** Whether to auto focus this element **/
-  autoFocus: PropTypes.bool,
-  /** Specifies what should happen if content overflows an element's box **/
-  overflow: PropTypes.string,
-  innerRef: PropTypes.any,
 };
 
 export default StyledInputGroup;

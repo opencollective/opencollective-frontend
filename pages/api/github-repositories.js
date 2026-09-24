@@ -1,7 +1,9 @@
 import { URL } from 'url';
 
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default async function handle(req, res) {
   const apiUrl = new URL(`${process.env.API_URL}/github-repositories?api_key=${process.env.API_KEY}`);
 

@@ -2,22 +2,20 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { Flex } from '../Grid';
 import StepsProgress from '../StepsProgress';
 import { Span } from '../Text';
 
-const StepLabel = styled(Span)`
-  text-transform: uppercase;
-  text-align: center;
-`;
-
-StepLabel.defaultProps = {
+const StepLabel = styled(Span).attrs({
   color: 'black.400',
   fontSize: '10px',
   mt: 1,
-};
+})`
+  text-transform: uppercase;
+  text-align: center;
+`;
 
 const steps = [{ name: 'Welcome' }, { name: 'Administrators' }, { name: 'Contact' }];
 

@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { get } from 'lodash-es';
+import { defineMessages } from 'react-intl';
+import { styled } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Avatar from './Avatar';
 import CollectiveCard from './CollectiveCard';
@@ -53,6 +54,7 @@ class Member extends React.Component {
       'membership.since': { id: 'membership.since', defaultMessage: 'since {date}' },
       ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Admin' },
       MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
+      COMMUNITY_MANAGER: { id: 'Member.Role.COMMUNITY_MANAGER', defaultMessage: 'Community Manager' },
       BACKER: { id: 'Member.Role.BACKER', defaultMessage: 'Financial Contributor' },
       'membership.totalDonations': {
         id: 'membership.totalDonations',
@@ -79,8 +81,8 @@ class Member extends React.Component {
     const tierName = membership.tier
       ? singular(membership.tier.name)
       : this.messages[membership.role]
-      ? intl.formatMessage(this.messages[membership.role])
-      : membership.role;
+        ? intl.formatMessage(this.messages[membership.role])
+        : membership.role;
     let memberSinceStr = '';
     if (tierName) {
       memberSinceStr += capitalize(tierName);

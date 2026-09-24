@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Form, Formik } from 'formik';
@@ -8,7 +7,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import spdxLicenses from 'spdx-license-list';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import {
@@ -18,7 +17,7 @@ import {
   verifyFieldLength,
   verifyURLPattern,
 } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { i18nLabels } from '../../lib/i18n/custom-application-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -101,9 +100,7 @@ const applyToHostMutation = gql`
 `;
 
 const useApplicationMutation = canApplyWithCollective =>
-  useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation, {
-    context: API_V2_CONTEXT,
-  });
+  useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation);
 
 const ApplicationForm = ({
   LoggedInUser,
@@ -136,12 +133,14 @@ const ApplicationForm = ({
       'collective.name',
       'collective.slug',
       'message',
-      'collective.description',
       'applicationData.typeOfProject',
     ]);
 
-    verifyEmailPattern(errors, values, 'user.email');
-    verifyFieldLength(intl, errors, values, 'collective.description', 1, 150);
+    // User is not inputting a Collective or User if there is already a Collective that they apply with
+    if (!canApplyWithCollective) {
+      verifyEmailPattern(errors, values, 'user.email');
+      verifyFieldLength(intl, errors, values, 'collective.description', 1, 255);
+    }
     verifyURLPattern(errors, values, 'applicationData.repositoryUrl');
     verifyChecked(errors, values, 'termsOfServiceOC');
 
@@ -222,8 +221,8 @@ const ApplicationForm = ({
                 defaultMessage="Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
-                    <StyledLink href="https://docs.oscollective.org/faq/general" openInNewTab color="purple.500">
-                      <FormattedMessage id="HostApplication.form.readFaqs" defaultMessage="Read our FAQs" />
+                    <StyledLink href="https://docs.oscollective.org/how-to-apply" openInNewTab color="purple.500">
+                      <FormattedMessage id="HostApplication.form.readFaqs" defaultMessage="Visit our docs" />
                     </StyledLink>
                   ),
                 }}
@@ -359,7 +358,7 @@ const ApplicationForm = ({
                             <Box>
                               <StyledInputFormikField
                                 label={intl.formatMessage(i18nLabels.slug)}
-                                helpText={<FormattedMessage defaultMessage="This can be edited later" />}
+                                helpText={<FormattedMessage defaultMessage="This can be edited later" id="03Q893" />}
                                 labelFontSize="16px"
                                 labelProps={{ fontWeight: '600' }}
                                 name="collective.slug"
@@ -369,7 +368,6 @@ const ApplicationForm = ({
                                 {({ field }) => (
                                   <StyledInputGroup
                                     prepend="opencollective.com/"
-                                    type="url"
                                     placeholder="agora"
                                     {...field}
                                     onChange={e => setFieldValue('collective.slug', e.target.value)}
@@ -635,7 +633,7 @@ const ApplicationForm = ({
                       <Box mb={2}>
                         <H4 fontSize="16px" lineHeight="24px" color="black.800" mb={0}>
                           <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
-                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
                             <Span fontWeight="300" fontSize="11px" color="black.700" letterSpacing="0.06em">
                               {` (${1 + values.inviteMembers?.length}/${
                                 host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
@@ -691,10 +689,11 @@ const ApplicationForm = ({
                             }}
                           />
                         </Box>
-                        {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                        {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
                           <MessageBox type="info" mt={3} fontSize="13px">
                             <FormattedMessage
                               defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                              id="GTK0Wf"
                               values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                             />
                           </MessageBox>
@@ -715,6 +714,7 @@ const ApplicationForm = ({
                               {...field}
                               rows={6}
                               fontSize="14px"
+                              maxLength={3000}
                               placeholder={intl.formatMessage(i18nLabels.tellUsMorePlaceholder)}
                             />
                           )}
@@ -800,31 +800,6 @@ const ApplicationForm = ({
       </Flex>
     </React.Fragment>
   );
-};
-
-ApplicationForm.propTypes = {
-  loadingLoggedInUser: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
-  refetchLoggedInUser: PropTypes.func,
-  initialValues: PropTypes.object,
-  setInitialValues: PropTypes.func,
-  collective: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    isAdmin: PropTypes.bool,
-    description: PropTypes.description,
-  }),
-  host: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string,
-    policies: PropTypes.object,
-  }),
-  popularTags: PropTypes.arrayOf(PropTypes.string),
-  loadingCollective: PropTypes.bool,
-  canApplyWithCollective: PropTypes.bool,
-  router: PropTypes.object,
 };
 
 export default withRouter(ApplicationForm);

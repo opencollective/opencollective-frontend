@@ -1,8 +1,11 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../lib/graphql/helpers';
+
+import { accountHoverCardFields } from '../AccountHoverCard';
 
 export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
   fragment AgreementViewFields on Agreement {
     id
+    publicId
     title
     createdAt
     expiresAt
@@ -14,6 +17,7 @@ export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
       slug
       imageUrl
       name
+      ...AccountHoverCardFields
     }
     createdBy {
       id
@@ -22,6 +26,7 @@ export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
       slug
       imageUrl
       name
+      ...AccountHoverCardFields
     }
     attachment {
       id
@@ -31,4 +36,5 @@ export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
       type
     }
   }
+  ${accountHoverCardFields}
 `;

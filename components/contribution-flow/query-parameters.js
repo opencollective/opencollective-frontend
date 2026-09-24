@@ -1,4 +1,4 @@
-import { assign, pick } from 'lodash';
+import { assign, pick } from 'lodash-es';
 
 import UrlQueryHelper from '../../lib/UrlQueryHelper';
 
@@ -25,7 +25,7 @@ const ContributionFlowUrlParametersConfig = {
   quantity: { type: 'integer' },
   /**
    * The contribution interval (must be supported by the selected tier, if any)
-   * @example 'month'
+   * @example month
    */
   interval: { type: 'interval' },
   /**
@@ -58,7 +58,7 @@ const ContributionFlowUrlParametersConfig = {
   hideCreditCardPostalCode: { type: 'boolean', static: true },
   /**
    * To disable specific payment method types
-   * @example "MANUAL", "BANK_TRANSFER", "PAYMENT" (for PayPal)
+   * @example MANUAL,BANK_TRANSFER,PAYMENT
    */
   disabledPaymentMethodTypes: { type: 'stringArray', static: true },
   // -- Success
@@ -116,8 +116,7 @@ const EmbedContributionFlowUrlParametersConfig = {
    */
   useTheme: { type: 'boolean', static: true },
   /**
-   * Whether to redirect the parent of the iframe rather than the iframe itself. The `iframe` needs to have
-   * its `sandbox` property set to `allow-top-navigation` for this to work.
+   * Whether to redirect the parent of the iframe rather than the iframe itself. The `iframe` needs to have its `sandbox` property set to `allow-top-navigation` for this to work.
    */
   shouldRedirectParent: { type: 'boolean', static: true },
 };

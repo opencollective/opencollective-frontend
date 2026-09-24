@@ -1,7 +1,8 @@
-import type { Account } from '../../lib/graphql/types/v2/graphql';
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
-export type AdminSectionProps = {
-  account: Partial<Account>;
-  subpath: string;
-  hostSlug: string;
+export type DashboardSectionProps = {
+  accountSlug: string;
+  account?: DashboardQuery['account'];
+  subpath?: string[];
+  isDashboard?: boolean;
 };

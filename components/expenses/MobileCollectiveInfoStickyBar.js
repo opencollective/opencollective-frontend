@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { CurrencyPrecision } from '../../lib/constants/currency-precision';
@@ -44,7 +43,7 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
           </P>
           {isLoading ? (
             <LoadingPlaceholder height={16} width={75} />
-          ) : (
+          ) : collective?.stats?.balanceWithBlockedFunds ? (
             <Span color="black.500" fontSize="16px">
               <FormattedMoneyAmount
                 currency={collective.stats.balanceWithBlockedFunds.currency}
@@ -52,7 +51,7 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
                 precision={CurrencyPrecision.DEFAULT}
               />
             </Span>
-          )}
+          ) : null}
         </Box>
         <Box flex="0 0 5%" />
         {host && (
@@ -61,7 +60,9 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
               <FormattedMessage
                 id="withColon"
                 defaultMessage="{item}:"
-                values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
+                values={{
+                  item: <FormattedMessage key="item" id="Fiscalhost" defaultMessage="Fiscal Host" />,
+                }}
               />
             </P>
             <LinkCollective collective={host}>
@@ -84,27 +85,6 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
       </Flex>
     </Container>
   );
-};
-
-MobileCollectiveInfoStickyBar.propTypes = {
-  isLoading: PropTypes.bool,
-  /** Must be provided if `isLoading` is false */
-  collective: PropTypes.shape({
-    currency: PropTypes.string.isRequired,
-    type: PropTypes.string,
-    isActive: PropTypes.bool,
-    stats: PropTypes.shape({
-      balanceWithBlockedFunds: PropTypes.shape({
-        valueInCents: PropTypes.number.isRequired,
-        currency: PropTypes.string.isRequired,
-      }),
-    }),
-  }),
-  host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-  }),
 };
 
 export default React.memo(MobileCollectiveInfoStickyBar);

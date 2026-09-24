@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { display } from 'styled-system';
 
@@ -6,8 +5,10 @@ import { CustomScrollbarCSS } from '../../lib/styled-components-shared-styles';
 
 import { Dimensions } from './_constants';
 
-/** An horizontally scrollable container to display contribute cards cards */
-const ContributeCardsContainer = styled.div`
+/** An horizontally scrollable container to display contribute cards */
+const ContributeCardsContainer = styled.div.attrs(props => ({
+  display: props.display ?? 'flex',
+}))`
   ${display}
   padding: 16px 0;
   overflow-x: auto;
@@ -57,14 +58,6 @@ const ContributeCardsContainer = styled.div`
     }
   }
 `;
-
-ContributeCardsContainer.defaultProps = {
-  display: 'flex',
-};
-
-ContributeCardsContainer.propTypes = {
-  disableScrollSnapping: PropTypes.bool,
-};
 
 /** @component */
 export default ContributeCardsContainer;

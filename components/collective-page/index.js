@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { compact, concat, isEmpty, throttle } from 'lodash';
+import { compact, concat, isEmpty, throttle } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 
 import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
@@ -24,7 +24,6 @@ import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
 import SectionOurTeam from './sections/OurTeam';
 import SectionProjects from './sections/Projects';
-import SectionRecurringContributions from './sections/RecurringContributions';
 import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionTopFinancialContributors from './sections/TopFinancialContributors';
 import SectionTransactions from './sections/Transactions';
@@ -62,11 +61,10 @@ class CollectivePage extends Component {
     isRoot: PropTypes.bool.isRequired,
     onPrimaryColorChange: PropTypes.func.isRequired,
     stats: PropTypes.shape({
-      balance: PropTypes.number.isRequired,
-      yearlyBudget: PropTypes.number.isRequired,
-      updates: PropTypes.number.isRequired,
-      backers: PropTypes.object,
-    }),
+      backers: PropTypes.shape({
+        all: PropTypes.number,
+      }),
+    }).isRequired,
     status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
     refetch: PropTypes.func,
   };
@@ -124,7 +122,7 @@ class CollectivePage extends Component {
     // Update the state only if necessary
     if (this.state.isFixed !== isFixed || this.state.selectedCategory !== selectedCategory) {
       this.setState({ isFixed, selectedCategory });
-    } else if (!selectedCategory && categories?.length) {
+    } else if (!selectedCategory && categories.length) {
       // Select first category by default
       this.setState({ isFixed, selectedCategory: categories[0].name });
     }
@@ -147,10 +145,6 @@ class CollectivePage extends Component {
       case Sections.CONVERSATIONS:
         return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
 
-      case Sections.RECURRING_CONTRIBUTIONS:
-        return (
-          <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
-        );
       case Sections.LOCATION:
         return <SectionLocation collective={this.props.collective} refetch={this.props.refetch} />;
 
@@ -236,6 +230,7 @@ class CollectivePage extends Component {
           <SectionConnectedCollectives
             collective={this.props.collective}
             connectedCollectives={this.props.connectedCollectives}
+            isAdmin={this.props.isAdmin}
           />
         );
       case Sections.TOP_FINANCIAL_CONTRIBUTORS:
@@ -270,7 +265,6 @@ class CollectivePage extends Component {
           isAdmin={isAdmin}
           selectedCategory={selectedCategory}
           onCollectiveClick={this.onCollectiveClick}
-          showBackButton={false}
           isFullWidth
           useAnchorsForCategories
           isInHero={!isFixed}

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { Dialog, DialogContent } from './ui/Dialog';
@@ -19,7 +18,10 @@ const SearchModal = ({ open, setOpen }) => {
           overflow="hidden"
           fontSize="14px"
           height="48px"
-          placeholder={intl.formatMessage({ defaultMessage: 'Search for Collectives, organizations, and more...' })}
+          placeholder={intl.formatMessage({
+            defaultMessage: 'Search for Collectives, organizations, and more...',
+            id: 'LOtm7B',
+          })}
           showSearchButton
           searchButtonStyles={{ width: '32px', height: '32px' }}
           closeSearchModal={onClose}
@@ -27,11 +29,6 @@ const SearchModal = ({ open, setOpen }) => {
       </DialogContent>
     </Dialog>
   );
-};
-
-SearchModal.propTypes = {
-  setOpen: PropTypes.func,
-  open: PropTypes.bool,
 };
 
 export default SearchModal;

@@ -1,11 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { FEATURES } from '../../lib/allowed-features';
-import { canContributeRecurring } from '../../lib/collective.lib';
+import { canContributeRecurring } from '../../lib/collective';
 import { isTierExpired } from '../../lib/tier-utils';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -29,6 +29,7 @@ export const CONTRIBUTION_BLOCKER = {
 const msg = defineMessages({
   [CONTRIBUTION_BLOCKER.DISABLED]: {
     defaultMessage: 'This account cannot receive financial contributions at this time',
+    id: 'ZN02TE',
   },
   [CONTRIBUTION_BLOCKER.NO_HOST]: {
     id: 'createOrder.missingHost',
@@ -108,17 +109,18 @@ const paymentMethodUnavailableWarning = (loggedInUser, account, tier) => {
             <P lineHeight="18px">
               <FormattedMessage
                 defaultMessage="None of the payment providers currently active on your account supports recurring contributions. You can enable them by connecting Stripe or PayPal. Alternatively, you can remove the ability to contribute recurringly from the <TiersLink>tiers settings</TiersLink>."
+                id="3RuqnL"
                 values={{
                   TiersLink: getI18nLink({
                     as: Link,
-                    href: `${getCollectivePageRoute(account)}/admin/tiers`,
+                    href: `${getDashboardRoute(account, 'tiers')}`,
                   }),
                 }}
               />
             </P>
           ) : (
             <Container textAlign="center">
-              <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
+              <Link href={`/${account.slug}/accept-financial-contributions/host`}>
                 <StyledButton buttonStyle="primary" mt={3}>
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
                 </StyledButton>
@@ -131,11 +133,27 @@ const paymentMethodUnavailableWarning = (loggedInUser, account, tier) => {
   );
 };
 
-const ContributionBlocker = ({ account, blocker }) => {
+interface ContributionBlockerProps {
+  blocker: {
+    reason: string;
+    intlParams?: Parameters<IntlShape['formatMessage']>[1];
+    /** To override the default message.  */
+    content?: React.ReactNode;
+    type?: string;
+    showOtherWaysToContribute?: boolean;
+  };
+  account?: Parameters<typeof getCollectivePageRoute>[0];
+}
+
+const ContributionBlocker = ({ account, blocker }: ContributionBlockerProps) => {
   const intl = useIntl();
   return (
     <Flex flexDirection="column" alignItems="center" py={[5, null, 6]}>
-      <MessageBox type={blocker.type || 'info'} withIcon maxWidth={800}>
+      <MessageBox
+        type={(blocker.type as React.ComponentProps<typeof MessageBox>['type']) || 'info'}
+        withIcon
+        maxWidth={800}
+      >
         {blocker.content ||
           (msg[blocker.reason] && intl.formatMessage(msg[blocker.reason], blocker.intlParams)) ||
           blocker.reason}
@@ -149,18 +167,6 @@ const ContributionBlocker = ({ account, blocker }) => {
       )}
     </Flex>
   );
-};
-
-ContributionBlocker.propTypes = {
-  blocker: PropTypes.shape({
-    reason: PropTypes.oneOf(Object.values(CONTRIBUTION_BLOCKER)).isRequired,
-    intlParams: PropTypes.object,
-    /** To override the default message.  */
-    content: PropTypes.node,
-    type: PropTypes.string,
-    showOtherWaysToContribute: PropTypes.bool,
-  }).isRequired,
-  account: PropTypes.object,
 };
 
 export default ContributionBlocker;

@@ -1,17 +1,18 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { Account } from '../lib/graphql/types/v2/graphql';
+import { gql } from '../lib/graphql/helpers';
+import type { Account } from '../lib/graphql/types/v2/graphql';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import CollectiveContactForm from '../components/CollectiveContactForm';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -50,14 +51,13 @@ const CollectiveContact = () => {
   // We query here rather than SSR cause the query is authenticated
   const { loading, data, error } = useQuery(collectiveContactPageQuery, {
     variables: { collectiveSlug },
-    context: API_V2_CONTEXT,
   });
 
   if (!loading) {
     if (error) {
       return <ErrorPage data={error} />;
-    } else if (!data?.account) {
-      return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
+    } else if (isHiddenAccount(data?.account)) {
+      return <ErrorPage error={generateNotFoundError()} log={false} />;
     }
   }
 
@@ -97,6 +97,7 @@ const collectiveContactPageQuery = gql`
       slug
       name
       type
+      isSuspended
       permissions {
         id
         contact {
@@ -113,7 +114,9 @@ const collectiveContactPageQuery = gql`
       }
     }
   }
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
 `;
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default CollectiveContact;

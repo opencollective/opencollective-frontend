@@ -1,4 +1,20 @@
 public/*
 .next/*
+dist/
+storybook-static/
+build/
+stage/
+out/
+
+# Coverage and test artifacts
+coverage/
+test/cypress/screenshots/
+test/cypress/videos/
+.nyc_output/
+
 # Auto-generated files
 lib/graphql/types/v2/*
+scripts/publish-components/.tmp/
+.rollup.cache/
+tsconfig.tsbuildinfo
+next-env.d.ts

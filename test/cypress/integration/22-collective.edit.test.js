@@ -1,4 +1,5 @@
-import speakeasy from 'speakeasy';
+import * as cheerio from 'cheerio';
+import { generateSync } from 'otplib';
 
 import { randomEmail, randomSlug } from '../support/faker';
 
@@ -11,11 +12,11 @@ describe('edit collective', () => {
     });
     // Give it a few ms to actually receive the email before we clean the inbox
     cy.wait(200);
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
   });
 
   beforeEach(() => {
-    cy.login({ redirect: `/${collectiveSlug}/admin` });
+    cy.login({ redirect: `/dashboard/${collectiveSlug}/info` });
   });
 
   it('edit members', () => {
@@ -35,35 +36,64 @@ describe('edit collective', () => {
     });
     cy.wait(200);
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
+    cy.get('#memberForm-role').click({ force: true });
+    cy.contains('[data-cy=select-option]', 'Admin').click();
     cy.getByDataCy('confirmation-modal-continue').click();
-    cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
-    cy.getEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
+    cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('exist');
+    cy.mailpitHasEmailsBySubject('[TESTING] Invitation to join CollectiveToEdit').then(result => {
+      expect(result.count).to.eq(1);
+    });
 
     // Re-send the invitation email
-    cy.clearInbox();
-    cy.getByDataCy('resend-invite-btn').should('exist').first().click({ force: true });
+    cy.mailpitDeleteAllEmails();
+    cy.get('[data-cy="members-table"]')
+      .find('tr:nth-child(1) ')
+      .find('[data-cy="member-actions-btn"]')
+      .should('exist')
+      .click({ force: true });
+    cy.getByDataCy('resend-invite-btn').should('exist').click({ force: true });
 
-    // Check invitation email
-    cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
-    cy.contains('Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective');
+    // Check invitation email, logout and visit the invitation link
+    cy.openEmail(({ Subject }) => Subject.includes('Invitation to join CollectiveToEdit')).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const emailBody = $html('body').text();
+      expect(emailBody).to.include(
+        'Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective',
+      );
+      const inviteLink = $html('a:contains("Sign up and view invitation"), a:contains("View invitation")').first();
+      const href = inviteLink.attr('href');
+      expect(href, 'invitation link href').to.be.a('string');
+      const parsedUrl = new URL(href);
+      cy.logout();
+      cy.log(`Visiting invitation link: ${parsedUrl.pathname}${parsedUrl.search}`);
+      cy.visit(parsedUrl.pathname + parsedUrl.search);
+    });
+
+    // Sign in as the invited user
+    cy.url().should('include', '/signin');
+    cy.get('input[name=email]').type(invitedUserEmail);
+    cy.get('button[type=submit]').click();
+
+    // Complete profile
+    cy.url().should('include', '/signup/profile');
+    cy.getByDataCy('complete-profile-form').as('profileForm');
+    cy.get('@profileForm').find('input[name="name"]').type('AmazingNewUser');
+    cy.get('@profileForm').find('button[type="submit"]').click();
 
     // Accept invitation as new user
-    cy.login({ email: invitedUserEmail, redirect: `/member-invitations` });
     cy.getByDataCy('member-invitation-card').contains('CollectiveToEdit');
     cy.getByDataCy('member-invitation-accept-btn').click();
 
     // Should be redirected to the collective page and added to the team section
-    cy.url().should('eq', `${Cypress.config().baseUrl}/${collectiveSlug}`);
-    cy.contains('#section-our-team', 'AmazingNewUser');
-
-    cy.visit(`/${collectiveSlug}/admin/team`);
-    cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/${collectiveSlug}`);
+    cy.getByDataCy('menu-item-team').click();
+    cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('not.exist');
     cy.getByDataCy('resend-invite-btn').should('not.exist');
   });
 
   it('edit info', () => {
-    cy.get('.name.inputField input', { timeout: 10000 }).type(' edited');
-    cy.get('.description.inputField input').type(' edited');
+    cy.get('input[name="name"]', { timeout: 10000 }).type(' edited');
+    cy.get('input[name="description"]').type(' edited');
     cy.contains('Add social link').click();
     cy.focused().type('https://opencollective.com/');
     cy.contains('Add social link').click();
@@ -71,8 +101,8 @@ describe('edit collective', () => {
     cy.contains('Add social link').click();
     cy.focused().type('https://github.com/opencollective');
     cy.wait(500);
-    cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
-    cy.get('.backToProfile a').click(); // back to profile
+    cy.get('[data-cy="save"]').click(); // save changes
+    cy.getByDataCy('public-profile-link').click();
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
     cy.get('[data-cy="social-link-0"]').should('have.attr', 'href', 'https://opencollective.com/');
@@ -91,7 +121,7 @@ describe('edit collective', () => {
       .invoke('prop', 'validity')
       .should('deep.include', { valid: false, valueMissing: true });
     cy.getByDataCy('select-type').click();
-    cy.contains('[data-cy=select-option]', 'product').click();
+    cy.contains('[data-cy=select-option]', 'Product').click();
     cy.get('[data-cy=name]').click();
     cy.get('[data-cy=name]').type('Tshirt');
     cy.get('[data-cy=description]').type('Made with love');
@@ -101,7 +131,7 @@ describe('edit collective', () => {
     cy.get('input[data-cy=maxQuantity]').type('100');
     cy.get('input[data-cy=button]').type('Buy it!');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
+    cy.checkToast({ variant: 'success', message: 'Tier created.' });
     cy.getByDataCy('contribute-card-tier').should('have.length', 3);
 
     // TODO: Also do the check below on the profile page (need https://github.com/opencollective/opencollective/issues/6331)
@@ -119,10 +149,10 @@ describe('edit collective', () => {
     cy.get('[data-cy=description]').type('!');
     cy.get('[data-cy=amountType]').click();
     cy.contains('[data-cy=select-option]', 'Flexible').click();
-    cy.get('.currency1.inputField input').type('{selectall}25');
-    cy.get('.currency2.inputField input').type('{selectall}50');
+    cy.get('[data-testid=currency1-input-amount]').type('{selectall}25');
+    cy.get('[data-testid=currency2-input-amount]').type('{selectall}50');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier updated.' });
+    cy.checkToast({ variant: 'success', message: 'Tier updated.' });
     cy.getByDataCy('contribute-card-tier')
       .last()
       .should('contain', 'Potatoes')
@@ -136,7 +166,7 @@ describe('edit collective', () => {
     cy.getByDataCy('contribute-card-tier').last().find('button').click();
     cy.getByDataCy('delete-btn').click();
     cy.getByDataCy('confirm-delete-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier deleted.' });
+    cy.checkToast({ variant: 'success', message: 'Tier deleted.' });
 
     // TODO: Check profile page (need https://github.com/opencollective/opencollective/issues/6331)
   });
@@ -144,15 +174,34 @@ describe('edit collective', () => {
   it('enables VAT', () => {
     cy.get('input[id=geosuggest__input]').type('Belgium');
     cy.contains('.geosuggest__suggests > :nth-child(1)', 'Belgium').click();
-    cy.getByDataCy('VAT').click();
+    // VAT fields appear once country is BE; don't wait on the location map iframe (OpenStreetMap
+    // loads asynchronously inside a cross-origin iframe and can shift layout while typing below).
+    cy.getByDataCy('VAT', { timeout: 10000 }).should('be.visible');
 
+    cy.getByDataCy('VAT').click();
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
-    cy.contains('button', 'Save').click();
-    cy.contains('Saved');
-    cy.visit(`${collectiveSlug}/admin/tiers`);
+    cy.get('input[name="settings.VAT.number"]').should('be.visible');
+
+    cy.retryChain(
+      () =>
+        cy
+          .get('input[name="settings.VAT.number"]')
+          .scrollIntoView()
+          .clear()
+          .type('EU123456789', { delay: 50 })
+          .invoke('val'),
+      val => {
+        expect(val).to.eq('EU123456789');
+      },
+      { maxAttempts: 5, wait: 500 },
+    );
+
+    cy.getByDataCy('save').click();
+    cy.checkToast({ variant: 'success', message: 'Account updated' });
+    cy.visit(`/dashboard/${collectiveSlug}/tiers`);
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();
-    cy.contains('[data-cy=select-option]', 'product').click();
+    cy.contains('[data-cy=select-option]', 'Product').click();
     cy.contains('[data-cy="edit-tier-modal-form"]:first', 'Value-added tax (VAT): 21%');
     // TODO save and make sure it's enabled
   });
@@ -163,27 +212,21 @@ describe('edit user collective', () => {
     const userSlug = randomSlug();
     cy.signup({
       user: { name: userSlug, settings: { features: { twoFactorAuth: true } } },
-      redirect: `/${userSlug}/admin`,
+      redirect: `/dashboard/${userSlug}/info`,
     });
 
-    cy.getByDataCy('menu-item-user-security').click();
+    cy.getByDataCy('menu-item-user-security').should('be.visible').click();
     cy.contains('Add authenticator').click();
     cy.getByDataCy('qr-code').should('exist');
     cy.getByDataCy('manual-entry-2fa-token')
       .invoke('text')
-      .then(text => {
-        expect(text.trim()).to.have.lengthOf(117);
-        const secret = text.split(':')[1].trim();
+      .then(secret => {
         // typing the wrong code fails
         cy.getByDataCy('add-two-factor-auth-totp-code-field').type('123456');
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
         cy.getByDataCy('InputField-twoFactorAuthenticatorCode').contains('Invalid code');
         // typing the right code passes
-        const TOTPCode = speakeasy.totp({
-          algorithm: 'SHA1',
-          encoding: 'base32',
-          secret,
-        });
+        const TOTPCode = generateSync({ secret, algorithm: 'sha1', strategy: 'totp' });
         cy.getByDataCy('add-two-factor-auth-totp-code-field').clear().type(TOTPCode);
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
         cy.getByDataCy('recovery-codes-container').should('exist');

@@ -29,13 +29,13 @@ async function serviceLimiterMiddleware(req, res, next) {
   }
   if (serviceLevel < 100) {
     if (req.identity && nonEssentialRobots.includes(req.identity)) {
-      onServiceLimited(req, res, next);
+      onServiceLimited(req, res);
       return;
     }
   }
   if (serviceLevel < 50) {
     if (req.identity && !essentialRobots.includes(req.identity)) {
-      onServiceLimited(req, res, next);
+      onServiceLimited(req, res);
       return;
     }
   }

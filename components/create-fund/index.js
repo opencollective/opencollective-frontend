@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { omit, pick } from 'lodash';
+import { omit, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
+import injectIntl from '@/lib/injectIntl';
 
 import { Box, Flex } from '../Grid';
 import SignInOrJoinFree from '../SignInOrJoinFree';
@@ -39,15 +39,6 @@ class CreateFund extends Component {
   }
 
   getHost() {
-    if (this.props.router.query.category === 'foundation') {
-      return {
-        slug: 'foundation',
-        name: 'Open Collective Foundation',
-        termsUrl:
-          'https://docs.google.com/document/u/2/d/e/2PACX-1vQ_fs7IOojAHaMBKYtaJetlTXJZLnJ7flIWkwxUSQtTkWUMtwFYC2ssb-ooBnT-Ldl6wbVhNQiCkSms/pub',
-        faqUrl: 'https://docs.opencollective.foundation/',
-      };
-    }
     if (this.props.router.query.category === 'opensource') {
       return {
         slug: 'opensource',
@@ -60,7 +51,14 @@ class CreateFund extends Component {
       return {
         slug: 'europe',
         name: 'Open Collective Europe',
-        termsUrl: 'https://docs.opencollective.com/oceurope/getting-started/our-terms-and-conditions',
+        termsUrl: 'https://docs.opencollective.com/oceurope/terms-of-service',
+      };
+    }
+    if (this.props.router.query.category === 'oce-foundation') {
+      return {
+        slug: 'oce-foundation',
+        name: 'Open Collective Europe Foundation',
+        termsUrl: 'https://docs.opencollective.com/oceurope/terms-of-service',
       };
     }
   }
@@ -141,7 +139,6 @@ const createFundMutation = gql`
 
 const addCreateFundMutation = graphql(createFundMutation, {
   name: 'createFund',
-  options: { context: API_V2_CONTEXT },
 });
 
 export default withRouter(withUser(addCreateFundMutation(injectIntl(CreateFund))));

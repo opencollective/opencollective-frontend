@@ -1,12 +1,15 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import { gql } from '../../lib/graphql/helpers';
+import type { VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
+import { accountHoverCardFields } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import { Drawer, DrawerActions, DrawerHeader } from '../Drawer';
@@ -16,8 +19,8 @@ import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledTag from '../StyledTag';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { InfoList, InfoListItem } from '../ui/InfoList';
+import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const virtualCardRequestQuery = gql`
@@ -39,6 +42,7 @@ const virtualCardRequestQuery = gql`
         name
         slug
         imageUrl
+        ...AccountHoverCardFields
       }
       assignee {
         id
@@ -46,6 +50,7 @@ const virtualCardRequestQuery = gql`
         email
         slug
         imageUrl
+        ...AccountHoverCardFields
       }
       host {
         id
@@ -55,6 +60,7 @@ const virtualCardRequestQuery = gql`
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 const RejectVirtualCardRequestMutation = gql`
@@ -68,12 +74,11 @@ const RejectVirtualCardRequestMutation = gql`
 
 function VirtualCardRequestDrawerActions({ virtualCardRequest }: { virtualCardRequest: VirtualCardRequest }) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [isVirtualCardModalOpen, setIsVirtualCardModalOpen] = React.useState(false);
 
   const [rejectRequestMutation, rejectRequestMutationResult] = useMutation(RejectVirtualCardRequestMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       virtualCardRequest: {
         id: virtualCardRequest.id,
@@ -85,7 +90,7 @@ function VirtualCardRequestDrawerActions({ virtualCardRequest }: { virtualCardRe
     try {
       await rejectRequestMutation();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   }, [rejectRequestMutation, intl]);
   const loading = rejectRequestMutationResult.loading;
@@ -139,7 +144,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
   const intl = useIntl();
   const query = useQuery<{ virtualCardRequest: VirtualCardRequest }>(virtualCardRequestQuery, {
     skip: !props.open,
-    context: API_V2_CONTEXT,
+
     variables: {
       virtualCardRequest: {
         legacyId: props.virtualCardRequestId,
@@ -177,11 +182,11 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                     virtualCardRequest.status === VirtualCardRequestStatus.PENDING
                       ? 'warning'
                       : virtualCardRequest.status === VirtualCardRequestStatus.APPROVED
-                      ? 'success'
-                      : 'error'
+                        ? 'success'
+                        : 'error'
                   }
                 >
-                  {virtualCardRequest?.status}
+                  {i18nVirtualCardRequestStatus(intl, virtualCardRequest?.status)}
                 </StyledTag>
               }
               onClose={props.onClose}
@@ -189,22 +194,25 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
 
             <InfoList className="sm:grid-cols-2">
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Account" />}
+                title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                 value={
                   <LinkCollective
                     collective={virtualCardRequest.account}
                     className="flex items-center gap-2 font-medium hover:underline"
+                    withHoverCard
                   >
                     <Avatar collective={virtualCardRequest.account} radius={24} /> {virtualCardRequest.account.name}
                   </LinkCollective>
                 }
               />
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Assigned to" />}
+                title={<FormattedMessage defaultMessage="Assigned to" id="ONVN5F" />}
                 value={
                   <LinkCollective
                     collective={virtualCardRequest.assignee}
                     className="flex items-center gap-2 font-medium hover:underline"
+                    withHoverCard
+                    hoverCardProps={{ includeAdminMembership: { accountSlug: virtualCardRequest.account.slug } }}
                   >
                     <Avatar collective={virtualCardRequest.assignee} radius={24} /> {virtualCardRequest.assignee.name}
                   </LinkCollective>
@@ -218,8 +226,8 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                   virtualCardRequest.spendingLimitAmount,
                   virtualCardRequest.spendingLimitInterval,
                   {
-                    LimitAmount: v => <span className="italic text-slate-600">{v}</span>,
-                    LimitInterval: v => <span className="italic text-slate-600">{v}</span>,
+                    LimitAmount: v => <span className="text-slate-600 italic">{v}</span>,
+                    LimitInterval: v => <span className="text-slate-600 italic">{v}</span>,
                   },
                 )}
               />

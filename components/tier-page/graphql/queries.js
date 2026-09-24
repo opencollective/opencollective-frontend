@@ -2,16 +2,18 @@ import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
-export const tierPageQuery = gqlV1/* GraphQL */ `
+export const tierPageQuery = gqlV1 /* GraphQL */ `
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id
+      idV2
       name
       slug
       description
       longDescription
       videoUrl
       goal
+      type
       currency
       interval
       endsAt
@@ -46,18 +48,9 @@ export const tierPageQuery = gqlV1/* GraphQL */ `
         host {
           id
         }
-        stats {
-          id
-          updates
-          balance
-          transactions {
-            id
-            all
-          }
-        }
         features {
           id
-          ...NavbarFields
+          ...NavbarFieldsV1
         }
         admins: members(role: "ADMIN") {
           id
@@ -73,6 +66,7 @@ export const tierPageQuery = gqlV1/* GraphQL */ `
         parentCollective {
           id
           slug
+          name
           twitterHandle
           image
           backgroundImageUrl

@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
@@ -151,7 +151,7 @@ const Transparency = () => (
             >
               <FormattedMessage
                 id="becomeASponsor.paperWork.description"
-                defaultMessage="The Fiscal Host of the Collective you want to support is an established legal entity who can engage with your vendor systems and purchase order processes, and meet documentation requirements like tax forms and signing agreements. "
+                defaultMessage="The Fiscal Host of the Collective you want to support is an established legal entity who can engage with your vendor systems and purchase order processes, and meet documentation requirements like tax forms and signing agreements."
               />
             </P>
           </Box>

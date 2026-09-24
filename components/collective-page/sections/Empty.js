@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -17,14 +16,8 @@ const OutlineContainer = styled(Container)`
   border-radius: 12px;
 `;
 
-const Illustration = styled.img`
-  width: 248px;
-  height: 248px;
-`;
-
+import Image from '../../Image';
 import Link from '../../Link';
-
-import EmptyCollectivePageIllustration from '../../../public/static/images/collective-navigation/EmptyCollectivePageIllustration.png';
 
 const SectionEmpty = props => {
   const { collective } = props;
@@ -40,7 +33,12 @@ const SectionEmpty = props => {
           px={[3, 4, 6]}
         >
           <Flex alignItems="center" justifyContent="center">
-            <Illustration src={EmptyCollectivePageIllustration} alt="Empty jars illustration" />
+            <Image
+              height={248}
+              width={248}
+              src="/static/images/collective-navigation/EmptyCollectivePageIllustration.png"
+              alt="Empty jars illustration"
+            />
           </Flex>
           <Flex
             flexDirection="column"
@@ -69,13 +67,6 @@ const SectionEmpty = props => {
       </ContainerSectionContent>
     </Box>
   );
-};
-
-SectionEmpty.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default SectionEmpty;

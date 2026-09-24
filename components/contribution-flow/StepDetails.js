@@ -1,13 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { isEmpty, isNil } from 'lodash';
+import { isEmpty, isNil } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { AnalyticsProperty } from '../../lib/analytics/properties';
-import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective.lib';
+import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -15,8 +14,8 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 
+import InputAmount from '../../components/InputAmount';
 import StyledButtonSet from '../../components/StyledButtonSet';
-import StyledInputAmount from '../../components/StyledInputAmount';
 import StyledInputField from '../../components/StyledInputField';
 
 import { AutoCollapse } from '../AutoCollapse';
@@ -30,10 +29,9 @@ import { H5, P, Span } from '../Text';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
 import CustomFields, { buildCustomFieldsConfig } from './CustomFields';
-import PlatformTipInput from './PlatformTipInput';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip, router, isEmbed }) => {
+const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlatformTip, isOscTipExperiment }) => {
   const intl = useIntl();
   const amount = stepDetails?.amount;
   const currency = tier?.amount.currency || collective.currency;
@@ -42,7 +40,6 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
   const { LoggedInUser } = useLoggedInUser();
-  const selectedInterval = stepDetails?.interval;
   const tierCustomFields = tier?.customFields;
   const hostCustomFields = collective.host?.settings?.contributionFlow?.customFields;
   const customFieldsConfig = React.useMemo(
@@ -51,32 +48,48 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
   );
 
   const minAmount = getTierMinAmount(tier, currency);
+  const noIntervalBecauseFreeContribution = minAmount === 0 && amount === 0;
+  const selectedInterval = noIntervalBecauseFreeContribution ? INTERVALS.oneTime : stepDetails?.interval;
   const hasQuantity = (tier?.type === TierTypes.TICKET && !tier.singleTicket) || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
   const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
   const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
 
-  const dispatchChange = (field, value) => {
-    // Assumption: we only have restrictions related to payment method types on recurring contributions
-    const stepPayment = field === 'interval' && value !== INTERVALS.oneTime ? null : stepPayment;
-    onChange({ stepDetails: { ...stepDetails, [field]: value }, stepPayment, stepSummary: null });
-  };
+  const dispatchChange = React.useCallback(
+    (field, value) => {
+      // Assumption: we only have restrictions related to payment method types on recurring contributions
+      onChange({
+        stepDetails: { ...stepDetails, [field]: value },
+        ...(field === 'interval' && value !== INTERVALS.oneTime && { stepPayment: null }),
+        stepSummary: null,
+      });
+    },
+    [onChange, stepDetails],
+  );
 
   // If an interval has been set (either from the tier defaults, or form an URL param) and the
   // collective doesn't support it, we reset the interval
   React.useEffect(() => {
-    if (selectedInterval && ((!isFixedInterval && !supportsRecurring) || amount === 0)) {
+    if (
+      selectedInterval &&
+      selectedInterval !== INTERVALS.oneTime &&
+      ((!isFixedInterval && !supportsRecurring) || amount === 0)
+    ) {
       dispatchChange('interval', INTERVALS.oneTime);
     }
-  }, [selectedInterval, isFixedInterval, supportsRecurring, amount]);
+  }, [selectedInterval, isFixedInterval, supportsRecurring, amount, dispatchChange]);
 
   React.useEffect(() => {
     track(AnalyticsEvent.CONTRIBUTION_STARTED, {
       props: {
         [AnalyticsProperty.CONTRIBUTION_STEP]: 'details',
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails.isNewPlatformTip ? 'new' : 'old',
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: showPlatformTip,
+        [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: isOscTipExperiment,
+        [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: collective?.host?.slug,
       },
     });
-  }, []);
+  }, [stepDetails.isNewPlatformTip, showPlatformTip, isOscTipExperiment, collective?.host?.slug]);
 
   return (
     <Box width={1}>
@@ -101,7 +114,7 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
           buttonProps={{ px: 2, py: '5px' }}
           role="group"
           aria-label="Amount types"
-          disabled={minAmount === 0 && amount === 0}
+          disabled={noIntervalBecauseFreeContribution}
           onChange={interval => {
             if (tier && tier.interval !== INTERVALS.flexible) {
               setTemporaryInterval(interval);
@@ -120,6 +133,17 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
 
       {!isFixedContribution ? (
         <Box mb="30px">
+          {typeof amount === 'number' && !isNaN(amount) && amount < minAmount && (
+            <div className="mb-2 text-red-400">
+              <FormattedMessage
+                id="amount.belowMinimum"
+                defaultMessage="Please enter an amount of {minAmount} or more"
+                values={{
+                  minAmount: formatCurrency(minAmount, currency, { locale: intl.locale }),
+                }}
+              />
+            </div>
+          )}
           <StyledAmountPicker
             currency={currency}
             presets={presets}
@@ -135,15 +159,14 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
           />
           {isOtherAmountSelected && (
             <Flex justifyContent="space-between" alignItems="center" mt={2}>
-              <StyledInputAmount
+              <InputAmount
                 name="custom-amount"
                 type="number"
                 currency={currency}
                 value={stepDetails?.amount}
-                width={1}
+                className="w-full"
                 min={minAmount}
                 currencyDisplay="full"
-                prependProps={{ color: 'black.500' }}
                 required
                 onChange={(value, event) => {
                   // Increase/Decrease the amount by $0.5 instead of $0.01 when using the arrows
@@ -257,18 +280,6 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
           <StyledHr borderColor="black.300" mt={16} mb={32} />
         </React.Fragment>
       )}
-      {showPlatformTip && (
-        <Box mt={28}>
-          <PlatformTipInput
-            currency={currency}
-            amount={stepDetails?.amount}
-            value={stepDetails?.platformTip}
-            quantity={stepDetails?.quantity}
-            onChange={value => dispatchChange('platformTip', value)}
-            isEmbed={isEmbed}
-          />
-        </Box>
-      )}
       {!isEmpty(customFieldsConfig?.fields) && (
         <Box mt={28}>
           <H5 fontSize="20px" fontWeight="normal" color="black.800">
@@ -294,45 +305,6 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
       )}
     </Box>
   );
-};
-
-StepDetails.propTypes = {
-  onChange: PropTypes.func,
-  showPlatformTip: PropTypes.bool,
-  isEmbed: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
-  stepDetails: PropTypes.shape({
-    amount: PropTypes.number,
-    platformTip: PropTypes.number,
-    quantity: PropTypes.number,
-    interval: PropTypes.string,
-    customData: PropTypes.object,
-  }),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    type: PropTypes.string,
-    host: PropTypes.object,
-  }).isRequired,
-  tier: PropTypes.shape({
-    amountType: PropTypes.string,
-    interval: PropTypes.string,
-    description: PropTypes.string,
-    name: PropTypes.string,
-    maxQuantity: PropTypes.number,
-    availableQuantity: PropTypes.number,
-    type: PropTypes.oneOf(Object.values(TierTypes)),
-    customFields: PropTypes.array,
-    amount: PropTypes.shape({
-      currency: PropTypes.string,
-      valueInCents: PropTypes.number,
-    }),
-    minAmount: PropTypes.shape({
-      valueInCents: PropTypes.number,
-    }),
-    singleTicket: PropTypes.bool,
-  }),
-  router: PropTypes.object,
 };
 
 export default withRouter(StepDetails);

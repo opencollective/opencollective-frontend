@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { encodeDateInterval } from '../../lib/date-utils';
 
@@ -62,13 +61,6 @@ const OrdersFilters = ({ currency, filters, hasStatus, onChange }) => {
       )}
     </Flex>
   );
-};
-
-OrdersFilters.propTypes = {
-  onChange: PropTypes.func,
-  filters: PropTypes.object,
-  currency: PropTypes.string,
-  hasStatus: PropTypes.bool,
 };
 
 export default React.memo(OrdersFilters);

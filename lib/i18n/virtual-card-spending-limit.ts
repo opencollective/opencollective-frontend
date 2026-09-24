@@ -1,7 +1,9 @@
-import { defineMessage, defineMessages, IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { defineMessage, defineMessages } from 'react-intl';
 
 import { formatCurrency, type Options as FormatCurrencyOptions } from '../currency-utils';
-import { Amount, Currency, VirtualCardLimitInterval } from '../graphql/types/v2/graphql';
+import type { Amount, Currency } from '../graphql/types/v2/graphql';
+import { VirtualCardLimitInterval } from '../graphql/types/v2/graphql';
 
 const VirtualCardSpendingLimitShortI18n = defineMessages({
   [VirtualCardLimitInterval.DAILY]: {
@@ -30,20 +32,13 @@ const VirtualCardSpendingLimitShortI18n = defineMessages({
   },
 });
 
-export function getSpendingLimitIntervalShortString(
-  intl: IntlShape,
-  spendingLimitInterval: VirtualCardLimitInterval,
-): string {
+function getSpendingLimitIntervalShortString(intl: IntlShape, spendingLimitInterval: VirtualCardLimitInterval): string {
   return intl.formatMessage(VirtualCardSpendingLimitShortI18n[spendingLimitInterval]);
 }
 
 const SpendingLimitShortI18n = defineMessage({
   id: 'VirtualCard.SpendingLimit.Short',
-  defaultMessage: `{ spendingLimitInterval, select,
-      ALL_TIME {<LimitAmount>{ spendingLimitAmount }</LimitAmount>}
-      PER_AUTHORIZATION {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval> per use</LimitInterval>}
-      other {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>}
-    }`,
+  defaultMessage: `{ spendingLimitInterval, select, ALL_TIME {<LimitAmount>{ spendingLimitAmount }</LimitAmount>} PER_AUTHORIZATION {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval> per use</LimitInterval>} other {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>} }`,
 });
 
 export function getSpendingLimitShortString(
@@ -64,11 +59,7 @@ export function getSpendingLimitShortString(
 
 const AvailableLimitShortI18n = defineMessage({
   id: 'VirtualCard.AvailableLimit.Short',
-  defaultMessage: `{ spendingLimitInterval, select,
-      ALL_TIME {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount>}
-      PER_AUTHORIZATION {<AvailableAmount>{ spendingLimitAmount }</AvailableAmount><LimitInterval> per use</LimitInterval>}
-      other {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>}
-    }`,
+  defaultMessage: `{ spendingLimitInterval, select, ALL_TIME {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount>} PER_AUTHORIZATION {<AvailableAmount>{ spendingLimitAmount }</AvailableAmount><LimitInterval> per use</LimitInterval>} other {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>} }`,
 });
 
 export function getAvailableLimitShortString(
@@ -94,11 +85,7 @@ export function getAvailableLimitShortString(
 
 const AvailableLimitI18n = defineMessage({
   id: 'VirtualCard.AvailableLimit',
-  defaultMessage: `{ spendingLimitInterval, select,
-      ALL_TIME {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount>}
-      PER_AUTHORIZATION {Limited to <AvailableAmount>{ spendingLimitAmount }</AvailableAmount><LimitInterval> per use</LimitInterval>}
-      other {Avl. <AvailableAmount>{ availableLimitAmount }</AvailableAmount> <AmountSeparator>of</AmountSeparator> <LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>}
-    }`,
+  defaultMessage: `{ spendingLimitInterval, select, ALL_TIME {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount>} PER_AUTHORIZATION {Limited to <AvailableAmount>{ spendingLimitAmount }</AvailableAmount><LimitInterval> per use</LimitInterval>} other {Avl. <AvailableAmount>{ availableLimitAmount }</AvailableAmount> <AmountSeparator>of</AmountSeparator> <LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>} }`,
 });
 
 export function getAvailableLimitString(

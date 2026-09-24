@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -28,11 +27,6 @@ const messages = defineMessages({
     id: 'becomeAHost.caseStudies.socialchangenestcollective',
     defaultMessage:
       'We have been able to support over 150 Mutual Aid groups to get going quickly by providing them with fiscal hosting back office support.',
-  },
-  'becomeAHost.caseStudies.foundation': {
-    id: 'becomeAHost.caseStudies.foundation',
-    defaultMessage:
-      'The Open Collective Platform provides the tools to more effectively manage group finances. They can offer their donors tax-deductible status without needing to incorporate a legal entity.',
   },
   'becomeAHost.caseStudies.opensource': {
     id: 'becomeAHost.caseStudies.opensource',
@@ -62,14 +56,6 @@ const caseStudies = [
     learnMorePath: 'https://opencollective.com/the-social-change-nest',
     bgImage: 'socialchangenest',
     logo: '/static/images/become-a-host/socialchangenest-logo.png',
-  },
-  {
-    id: 'foundation',
-    name: 'Open Collective Foundation',
-    collectivePath: '/foundation',
-    learnMorePath: 'https://opencollective.foundation/',
-    bgImage: 'ocf',
-    logo: '/static/images/become-a-host/ocf-logo.png',
   },
   {
     id: 'opensource',
@@ -147,14 +133,6 @@ const CaseStudy = ({ bgImage, name, id, logo, learnMorePath }) => {
   );
 };
 
-CaseStudy.propTypes = {
-  bgImage: PropTypes.string,
-  name: PropTypes.string,
-  id: PropTypes.string,
-  logo: PropTypes.string,
-  learnMorePath: PropTypes.string,
-};
-
 const CaseStudies = () => {
   return (
     <Flex
@@ -166,14 +144,14 @@ const CaseStudies = () => {
     >
       <Box width={['288px', '648px', null, null, '1152px']} mb="8px">
         <SectionTitle textAlign="center">
-          <FormattedMessage defaultMessage="Who is using Open Collective?" />
+          <FormattedMessage defaultMessage="Who is using Open Collective?" id="vnfbPl" />
         </SectionTitle>
       </Box>
       <Box mb={[4, 3]} width={['288px', '648px']}>
         <SectionDescription textAlign="center">
           <FormattedMessage
             id="home.OCUsersSection.subtitle"
-            defaultMessage={'Communities around the world are using Open Collective. Find out more about them!'}
+            defaultMessage="Communities around the world are using Open Collective. Find out more about them!"
           />
         </SectionDescription>
       </Box>

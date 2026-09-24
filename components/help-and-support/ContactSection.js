@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-// import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
@@ -17,7 +16,6 @@ import Captcha, { isCaptchaEnabled } from '../Captcha';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-// import Link from '../Link';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
@@ -33,12 +31,13 @@ const ContactForm = () => {
   const { LoggedInUser } = useLoggedInUser();
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const shouldDisplayCatcha = !LoggedInUser && isCaptchaEnabled();
-  const { getFieldProps, handleSubmit, errors, touched, setFieldValue } = useFormik({
+  const shouldDisplayCaptcha = !LoggedInUser && isCaptchaEnabled();
+
+  const { getFieldProps, values, handleSubmit, errors, touched, setFieldValue } = useFormik({
     initialValues: {
       name: '',
       email: '',
-      topic: '',
+      topic: router.query.topic || '',
       message: '',
       link: '',
       captcha: null,
@@ -70,7 +69,7 @@ const ContactForm = () => {
         errors.message = createError(ERROR.FORM_FIELD_REQUIRED);
       }
 
-      if (shouldDisplayCatcha && !captcha) {
+      if (shouldDisplayCaptcha && !captcha) {
         errors.captcha = createError(ERROR.FORM_FIELD_REQUIRED);
       }
 
@@ -147,7 +146,7 @@ const ContactForm = () => {
               <React.Fragment>
                 <Box mb="28px">
                   <StyledInputField
-                    label={<FormattedMessage defaultMessage="Your name" />}
+                    label={<FormattedMessage defaultMessage="Your name" id="vlKhIl" />}
                     labelFontWeight="700"
                     labelProps={{
                       lineHeight: '24px',
@@ -161,7 +160,7 @@ const ContactForm = () => {
                 </Box>
                 <Box mb="28px">
                   <StyledInputField
-                    label={<FormattedMessage defaultMessage="Your email" />}
+                    label={<FormattedMessage defaultMessage="Your email" id="nONnTw" />}
                     labelFontWeight="700"
                     labelProps={{
                       lineHeight: '24px',
@@ -203,13 +202,20 @@ const ContactForm = () => {
                   />
                 }
               >
-                {inputProps => <StyledInput {...inputProps} placeholder="e.g. Transactions, profile" width="100%" />}
+                {inputProps => (
+                  <StyledInput
+                    {...inputProps}
+                    value={values.topic}
+                    placeholder="e.g. Transactions, profile"
+                    width="100%"
+                  />
+                )}
               </StyledInputField>
             </Box>
             <Box mb="28px">
               <StyledInputField
                 required={false}
-                label={<FormattedMessage defaultMessage="Enter related Collectives" />}
+                label={<FormattedMessage defaultMessage="Enter related Collectives" id="9HVZ95" />}
                 {...getFieldProps('relatedCollectives')}
                 labelFontWeight="700"
                 labelProps={{
@@ -217,7 +223,7 @@ const ContactForm = () => {
                   fontSize: '16px',
                 }}
                 error={touched.relatedCollectives && formatFormErrorMessage(intl, errors.relatedCollectives)}
-                hint={<FormattedMessage defaultMessage="Enter collectives related to your request." />}
+                hint={<FormattedMessage defaultMessage="Enter collectives related to your request." id="r4N4cF" />}
               >
                 {inputProps => (
                   <CollectivePickerAsync
@@ -289,7 +295,7 @@ const ContactForm = () => {
                 )}
               </StyledInputField>
             </Box>
-            {shouldDisplayCatcha && (
+            {shouldDisplayCaptcha && (
               <Box mb="28px">
                 <Captcha onVerify={result => setFieldValue('captcha', result)} />
               </Box>
@@ -309,7 +315,7 @@ const ContactForm = () => {
                 mb={['24px', 0]}
                 loading={isSubmitting}
               >
-                <FormattedMessage defaultMessage="Submit Issue" />
+                <FormattedMessage defaultMessage="Submit Issue" id="KmbUa3" />
                 <Span ml={['10px', '5px']}>
                   <ArrowRight2 size="14px" />
                 </Span>

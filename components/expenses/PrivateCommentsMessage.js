@@ -1,20 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+
+import { ExpenseType } from '@/lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import { P } from '../Text';
-
-import privateLockIconUrl from '../icons/PrivateLockIcon.png';
-
-const PrivateLockIcon = styled.img.attrs({ src: privateLockIconUrl })`
-  width: 32px;
-  height: 32px;
-  margin-left: 8px;
-`;
 
 const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
   if (isLoading) {
@@ -24,7 +17,7 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
   return (
     <MessageBox type="info" {...props}>
       <Flex alignItems="center" my={1}>
-        <PrivateLockIcon alt="" />
+        <Image alt="" className="ml-2 min-w-6" src="/static/images/PrivateLockIcon.png" width={32} height={32} />
         <Box ml={3}>
           <P fontWeight="bold" fontSize="12px" lineHeight="20px">
             {isAllowed ? (
@@ -35,14 +28,21 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
           </P>
           <P fontSize="12px" lineHeight="18px">
             {isAllowed ? (
-              <FormattedMessage
-                id="PrivateCommentsMessage.AllowedDetails"
-                defaultMessage="Expenses comments are private, because they sometimes contain confidential information such as payment details. Only the expense submitter and the admins can see them."
-              />
+              props.expenseType === ExpenseType.GRANT ? (
+                <FormattedMessage
+                  defaultMessage="Grant request comments are private, because they sometimes contain confidential information such as payment details. Only the grant request submitter, the admins and the accountants can see them."
+                  id="OysmzD"
+                />
+              ) : (
+                <FormattedMessage
+                  id="PrivateCommentsMessage.AllowedDetails"
+                  defaultMessage="Expenses comments are private, because they sometimes contain confidential information such as payment details. Only the expense submitter, the admins and the accountants can see them."
+                />
+              )
             ) : (
               <FormattedMessage
                 id="PrivateCommentsMessage.NotAllowedDetails"
-                defaultMessage="You must be signed in as an admin or the expense submitter to read comments on an expense."
+                defaultMessage="You must be signed in as an admin, an accountant or the expense submitter to read comments on an expense."
               />
             )}
           </P>
@@ -50,11 +50,6 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
       </Flex>
     </MessageBox>
   );
-};
-
-PrivateCommentsMessage.propTypes = {
-  isLoading: PropTypes.bool,
-  isAllowed: PropTypes.bool,
 };
 
 export default PrivateCommentsMessage;

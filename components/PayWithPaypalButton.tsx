@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { truncate } from 'lodash';
-import { injectIntl } from 'react-intl';
+import { truncate } from 'lodash-es';
 import styled, { css } from 'styled-components';
 
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
 import { getEnvVar } from '../lib/env-utils';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { getPaypal } from '../lib/paypal';
+import injectIntl from '@/lib/injectIntl';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
 import StyledButton from './StyledButton';
@@ -31,13 +30,13 @@ type PayWithPaypalButtonProps = {
   interval?: string;
   isSubmitting?: boolean;
   /** Called when user authorize the payment with a payment method generated from PayPal data */
-  onSuccess: Function;
+  onSuccess: ({ orderId, subscriptionId }: { orderId?: string; subscriptionId?: string }) => void;
   /** Called when user cancel paypal flow */
-  onCancel?: Function;
+  onCancel?: () => void;
   /** Called when an error is thrown during paypal flow */
-  onError?: Function;
+  onError?: ({ message }: { message: string }) => void;
   /** Called when the button is clicked */
-  onClick?: Function;
+  onClick?: () => void;
   /** Styles to apply to the button. See https://developer.paypal.com/docs/checkout/how-to/customize-button/#button-styles */
   style?: {
     color?: 'gold' | 'blue' | 'silver' | 'white' | 'black';
@@ -100,7 +99,7 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
   };
 
   isRecurring = () => {
-    return [INTERVALS.month, INTERVALS.year].includes(this.props.interval);
+    return ([INTERVALS.month, INTERVALS.year] as string[]).includes(this.props.interval);
   };
 
   async initialize() {
@@ -135,6 +134,7 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
         this.props.onError?.({
           message: this.props.intl.formatMessage({
             defaultMessage: 'There was an error while initializing the PayPal checkout',
+            id: 'PyJNQd',
           }),
         }),
       intent: null,
@@ -214,13 +214,14 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
 }
 
 const paypalPlanQuery = gql`
-  query PaypalPlanQuery(
+  query PaypalPlan(
     $account: AccountReferenceInput!
     $tier: TierReferenceInput
     $amount: AmountInput!
     $frequency: ContributionFrequency!
+    $order: OrderReferenceInput
   ) {
-    paypalPlan(account: $account, tier: $tier, amount: $amount, frequency: $frequency) {
+    paypalPlan(account: $account, tier: $tier, amount: $amount, frequency: $frequency, order: $order) {
       id
     }
   }
@@ -230,10 +231,14 @@ const addPaypalPlan = graphql(paypalPlanQuery, {
   // We only need a plan if using an interval
   skip: props => !props.interval || props.interval === INTERVALS.oneTime,
   options: (props: any) => ({
-    context: API_V2_CONTEXT,
     variables: {
       account: { id: props.collective.id },
       tier: props.tier ? { id: props.tier.id } : null,
+      order: !props.order?.id
+        ? null
+        : typeof props.order.id === 'string'
+          ? { id: props.order.id }
+          : { legacyId: props.order.id },
       frequency: getGQLV2FrequencyFromInterval(props.interval),
       amount: {
         valueInCents: props.totalAmount,

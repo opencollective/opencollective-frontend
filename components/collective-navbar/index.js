@@ -1,6 +1,5 @@
 import React, { Fragment, useRef } from 'react';
-import { PropTypes } from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
@@ -8,25 +7,22 @@ import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Close } from '@styled-icons/material/Close';
-import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { themeGet } from '@styled-system/theme-get';
-import { get, pickBy, without } from 'lodash';
+import { get, pickBy, without } from 'lodash-es';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { createGlobalStyle, css, ThemeProvider } from 'styled-components';
 import { display } from 'styled-system';
 
-import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
+import { expenseSubmissionAllowed, getContributeRoute, isIndividualAccount } from '../../lib/collective';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
-import roles from '../../lib/constants/roles';
-import { isSupportedExpenseType } from '../../lib/expenses';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { getCollectivePageRoute, getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import theme from '@/lib/theme';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -35,18 +31,23 @@ import Avatar from '../Avatar';
 import { Dimensions, Sections } from '../collective-page/_constants';
 import ContactCollectiveBtn from '../ContactCollectiveBtn';
 import Container from '../Container';
+import { FullscreenFlowLoadingPlaceholder } from '../FullscreenFlowLoadingPlaceholder';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import StyledButton from '../StyledButton';
 import { fadeIn } from '../StyledKeyframes';
+import SubmitExpenseBtn from '../SubmitExpenseBtn';
 import { Span } from '../Text';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
-import { NAVBAR_CATEGORIES } from './constants';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
+
+// Lazy load the submit expense flow
+const SubmitExpenseFlow = React.lazy(() =>
+  import('../submit-expense/SubmitExpenseFlow').then(module => ({ default: module.SubmitExpenseFlow })),
+);
 
 const DisableGlobalScrollOnMobile = createGlobalStyle`
   @media (max-width: 64em) {
@@ -79,7 +80,30 @@ const NavBarContainerGlobalStyle = createGlobalStyle`
 const NavbarContentContainer = styled(Container)`
   background: white;
   display: flex;
+  justify-content: space-between;
+
+  @media (min-width: 40em) {
+    align-items: center;
+  }
+
+  @media (min-width: 64em) {
+    justify-content: flex-start;
+  }
+`;
+
+const StyledContainer = styled.div`
+  display: flex;
+  width: auto;
+  flex-direction: column;
+  overflow-y: auto;
   justify-content: flex-start;
+
+  @media (min-width: 64em) {
+    flex-direction: row;
+    width: 100%;
+    overflow-y: none;
+    justify-content: center;
+  }
 `;
 
 const AvatarBox = styled(Box)`
@@ -225,8 +249,8 @@ const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
   color: ${themeGet('colors.primary.600')};
 
   &:hover {
-    background: radial-gradient(transparent 14px, white 3px),
-      linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+    background:
+      radial-gradient(transparent 14px, white 3px), linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
       linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
   }
 
@@ -247,8 +271,8 @@ const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
   color: ${themeGet('colors.primary.600')};
 
   &:hover {
-    background: radial-gradient(transparent 14px, white 3px),
-      linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+    background:
+      radial-gradient(transparent 14px, white 3px), linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
       linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
   }
 
@@ -276,75 +300,37 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (
-  collective,
-  sections,
-  isAdmin,
-  isAccountant,
-  isHostAdmin,
-  LoggedInUser,
-  isAllowedAddFunds,
-) => {
-  if (!collective) {
+const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, isAllowedAddFunds, isHostAdmin) => {
+  if (!collective || collective.type === CollectiveType.VENDOR) {
     return {};
   }
 
-  const { features, host } = collective;
+  const { features } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
-    hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
+    hasContact: !isAdmin && (isHostAdmin || isFeatureAvailable(collective, 'CONTACT_FORM')),
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
     hasSubmitExpense:
       isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
-    hasManageSubscriptions: isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
+    hasManageSubscriptions:
+      isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE' && isIndividualAccount(collective),
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
-      isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
+      isFeatureAvailable(collective, 'FUNDS_GRANTS_MANAGEMENT') && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isAllowedAddFunds,
-    createVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
-    assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
-    requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
-    hasSettings: isAdmin || isAccountant,
   };
 };
 
 /**
  * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
  */
-const getMainAction = (collective, callsToAction, LoggedInUser) => {
+const getMainAction = (collective, callsToAction, LoggedInUser, onOpenSubmitExpenseModalClick = () => {}) => {
   if (!collective || !callsToAction) {
     return null;
   }
 
   // Order of the condition defines main call to action: first match gets displayed
-  if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
-    return {
-      type: NAVBAR_ACTION_TYPE.SETTINGS,
-      component: (
-        <Link
-          href={
-            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(collective)
-              : getSettingsRoute(collective)
-          }
-          data-cy="edit-collective-btn"
-        >
-          <ActionButton tabIndex="-1">
-            <Settings size="1em" />
-            <Span ml={2}>
-              {LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ? (
-                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-              ) : collective.isHost ? (
-                <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
-              ) : (
-                <FormattedMessage id="Settings" defaultMessage="Settings" />
-              )}
-            </Span>
-          </ActionButton>
-        </Link>
-      ),
-    };
-  } else if (callsToAction.includes('hasContribute')) {
+  if (callsToAction.includes('hasContribute')) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
@@ -367,7 +353,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/grants/new`}>
           <ActionButton tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
@@ -381,27 +367,35 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
-        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
-          <ActionButton tabIndex="-1">
-            <Receipt size="1em" />
-            <Span ml={2}>
-              <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-            </Span>
-          </ActionButton>
-        </Link>
+        <SubmitExpenseBtn
+          collective={collective}
+          LoggedInUser={LoggedInUser}
+          onOpenSubmitExpenseModalClick={onOpenSubmitExpenseModalClick}
+        >
+          {btnProps => {
+            const button = (
+              <ActionButton
+                tabIndex="-1"
+                {...(btnProps.onClick ? { onClick: btnProps.onClick } : {})}
+                data-cy="submit-expense-button"
+              >
+                <Receipt size="1em" />
+                <Span ml={2}>
+                  <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+                </Span>
+              </ActionButton>
+            );
+
+            return btnProps.href ? <Link href={btnProps.href}>{button}</Link> : button;
+          }}
+        </SubmitExpenseBtn>
       ),
     };
   } else if (callsToAction.includes('hasManageSubscriptions')) {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link
-          href={
-            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(collective, 'manage-contributions')
-              : `${getCollectivePageRoute(collective)}/manage-contributions`
-          }
-        >
+        <Link href={getDashboardRoute(collective, 'outgoing-contributions')}>
           <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
@@ -455,29 +449,34 @@ export const NAVBAR_HEIGHT = [56, 64];
  */
 const CollectiveNavbar = ({
   collective,
-  isAdmin,
-  isLoading,
-  sections: sectionsFromParent,
+  isAdmin = undefined,
+  isLoading = false,
+  sections: sectionsFromParent = undefined,
   selectedCategory,
-  callsToAction,
-  onCollectiveClick,
-  isInHero,
-  onlyInfos,
-  showBackButton,
-  useAnchorsForCategories,
-  showSelectedCategoryOnMobile,
+  callsToAction = {},
+  onCollectiveClick = undefined,
+  isInHero = false,
+  onlyInfos = false,
+  useAnchorsForCategories = false,
+  showSelectedCategoryOnMobile = false,
+  onSubmitExpenseModalOpenChange = undefined,
 }) => {
+  const router = useRouter();
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
-  const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
   isAdmin = isAdmin || LoggedInUser?.isAdminOfCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   const { data, dataLoading } = useQuery(accountPermissionsQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: collective?.slug },
     skip: !collective?.slug || !LoggedInUser,
   });
+
+  const [isSubmitExpenseModalOpen, _setIsSubmitExpenseModalOpen] = React.useState(false);
+  const setIsSubmitExpenseModalOpen = open => {
+    _setIsSubmitExpenseModalOpen(open);
+    onSubmitExpenseModalOpenChange?.(open);
+  };
 
   const loading = isLoading || dataLoading;
 
@@ -486,23 +485,18 @@ const CollectiveNavbar = ({
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(
-      collective,
-      sections,
-      isAdmin,
-      isAccountant,
-      isHostAdmin,
-      LoggedInUser,
-      isAllowedAddFunds,
-    ),
+    ...getDefaultCallsToActions(collective, sections, isAdmin, LoggedInUser, isAllowedAddFunds, isHostAdmin),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(collective, actionsArray, LoggedInUser);
+  const mainAction = getMainAction(collective, actionsArray, LoggedInUser, () => setIsSubmitExpenseModalOpen(true));
   const secondAction =
-    actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser);
-  const navbarRef = useRef();
-  const mainContainerRef = useRef();
+    actionsArray.length === 2 &&
+    getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser, () =>
+      setIsSubmitExpenseModalOpen(true),
+    );
+  const navbarRef = useRef(undefined);
+  const mainContainerRef = useRef(undefined);
 
   /** This is to close the navbar dropdown menus (desktop)/slide-out menu (tablet)/non-collapsible menu (mobile)
    * when we click a category header to scroll down to (i.e. Connect) or sub-section page to open (i.e. Updates) */
@@ -530,17 +524,6 @@ const CollectiveNavbar = ({
           <InfosContainer px={[3, 0]} py={[2, 1]}>
             <Flex alignItems="center" maxWidth={['90%', '100%']} flex="1 1">
               <BackButtonAndAvatar data-hide-on-desktop={isInHero}>
-                {showBackButton && (
-                  <Container display={['none', null, null, null, 'block']} position="absolute" left={-30}>
-                    {collective && (
-                      <Link href={getCollectivePageRoute(collective)}>
-                        <StyledButton px={1} isBorderless>
-                          &larr;
-                        </StyledButton>
-                      </Link>
-                    )}
-                  </Container>
-                )}
                 <AvatarBox>
                   <LinkCollective collective={collective} onClick={onCollectiveClick}>
                     <Container borderRadius="25%" mr={2}>
@@ -591,13 +574,7 @@ const CollectiveNavbar = ({
           {/** Main navbar items */}
 
           {!onlyInfos && (
-            <Container
-              overflowY="auto"
-              display={['block', 'flex']}
-              width="100%"
-              justifyContent="space-between"
-              flexDirection={['column', 'row']}
-            >
+            <StyledContainer>
               {isExpanded && <DisableGlobalScrollOnMobile />}
               <CategoriesContainer
                 ref={navbarRef}
@@ -640,92 +617,50 @@ const CollectiveNavbar = ({
                 )}
                 {!loading && (
                   <CollectiveNavbarActionsMenu
+                    onOpenSubmitExpenseModalClick={() => setIsSubmitExpenseModalOpen(true)}
                     collective={collective}
                     callsToAction={callsToAction}
                     hiddenActionForNonMobile={mainAction?.type}
                     LoggedInUser={LoggedInUser}
                   />
                 )}
-                {!onlyInfos && (
-                  <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
-                    {isExpanded ? (
-                      <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
-                    ) : (
-                      <ExpandMenuIcon
-                        onClick={() => {
-                          mainContainerRef.current?.scrollIntoView(true);
-                          setExpanded(!isExpanded);
-                        }}
-                      />
-                    )}
-                  </Container>
-                )}
+                <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
+                  {isExpanded ? (
+                    <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                  ) : (
+                    <ExpandMenuIcon
+                      onClick={() => {
+                        mainContainerRef.current?.scrollIntoView(true);
+                        setExpanded(!isExpanded);
+                      }}
+                    />
+                  )}
+                </Container>
               </Container>
-            </Container>
+            </StyledContainer>
           )}
         </NavbarContentContainer>
       </NavBarContainer>
+      {isSubmitExpenseModalOpen && (
+        <React.Suspense
+          fallback={<FullscreenFlowLoadingPlaceholder handleOnClose={() => setIsSubmitExpenseModalOpen(false)} />}
+        >
+          {/* Reset the theme, to avoid collective's custom color to leak on StyledSelect */}
+          <ThemeProvider theme={theme}>
+            <SubmitExpenseFlow
+              onClose={(isSubmitted, hasSelectedViewAll) => {
+                setIsSubmitExpenseModalOpen(false);
+                if (isSubmitted && hasSelectedViewAll) {
+                  router.push(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
+                }
+              }}
+              submitExpenseTo={collective?.slug}
+            />
+          </ThemeProvider>
+        </React.Suspense>
+      )}
     </Fragment>
   );
-};
-
-CollectiveNavbar.propTypes = {
-  /** Collective to show info about */
-  collective: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    path: PropTypes.string,
-    isArchived: PropTypes.bool,
-    canContact: PropTypes.bool,
-    canApply: PropTypes.bool,
-    host: PropTypes.object,
-    plan: PropTypes.object,
-    parentCollective: PropTypes.object,
-  }),
-  /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
-  callsToAction: PropTypes.shape({
-    hasContact: PropTypes.bool,
-    hasSubmitExpense: PropTypes.bool,
-    hasApply: PropTypes.bool,
-    hasDashboard: PropTypes.bool,
-    hasManageSubscriptions: PropTypes.bool,
-    hasSettings: PropTypes.bool,
-  }),
-  /** Used to check what sections can be used */
-  isAdmin: PropTypes.bool,
-  /** Will show loading state */
-  isLoading: PropTypes.bool,
-  /** The list of sections to be displayed by the NavBar. If not provided, will show all the sections available to this collective type. */
-  sections: PropTypes.arrayOf(
-    PropTypes.shape({
-      type: PropTypes.oneOf(['CATEGORY', 'SECTION']),
-      name: PropTypes.string,
-    }),
-  ),
-  /** Called when users click the collective logo or name */
-  onCollectiveClick: PropTypes.func,
-  /** Currently selected category */
-  selectedCategory: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)),
-  /** The behavior of the navbar is slightly different when integrated in a hero (in the collective page) */
-  isInHero: PropTypes.bool,
-  /** If true, the CTAs will be hidden on mobile */
-  hideButtonsOnMobile: PropTypes.bool,
-  /** If true, the Navbar items and buttons will be skipped  */
-  onlyInfos: PropTypes.bool,
-  /** Set this to true to make the component smaller in height */
-  isSmall: PropTypes.bool,
-  showBackButton: PropTypes.bool,
-  showSelectedCategoryOnMobile: PropTypes.bool,
-  /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */
-  useAnchorsForCategories: PropTypes.bool,
-};
-
-CollectiveNavbar.defaultProps = {
-  isInHero: false,
-  onlyInfos: false,
-  callsToAction: {},
-  showBackButton: true,
 };
 
 export default React.memo(CollectiveNavbar);

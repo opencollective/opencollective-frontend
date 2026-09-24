@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import React, { useCallback, useEffect } from 'react';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
+import EditTags from '../EditTags';
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -17,7 +17,6 @@ import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
-import StyledInputTags from '../StyledInputTags';
 import { H4, P } from '../Text';
 
 const createConversationMutation = gql`
@@ -32,8 +31,6 @@ const createConversationMutation = gql`
     }
   }
 `;
-
-const mutationOptions = { context: API_V2_CONTEXT };
 
 const messages = defineMessages({
   titlePlaceholder: {
@@ -74,7 +71,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
   const intl = useIntl();
   const { slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();
-  const [createConversation, { error: submitError }] = useMutation(createConversationMutation, mutationOptions);
+  const [createConversation, { error: submitError }] = useMutation(createConversationMutation);
   const [formPersister] = React.useState(new FormPersister());
   const [uploading, setUploading] = React.useState(false);
 
@@ -112,6 +109,15 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
       formPersister.saveValues({ html: values.html, tags: values.tags, title: values.title });
     }
   }, [values.title, values.html, values.tags]);
+
+  const onChangeTags = useCallback(
+    options =>
+      setFieldValue(
+        'tags',
+        options.map(el => el.value),
+      ),
+    [setFieldValue],
+  );
 
   return (
     <form onSubmit={handleSubmit}>
@@ -177,16 +183,11 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
               {loading ? (
                 <LoadingPlaceholder height={38} />
               ) : (
-                <StyledInputTags
+                <EditTags
                   name="tags"
                   {...getFieldProps('tags')}
-                  maxWidth={300}
                   suggestedTags={suggestedTags}
-                  onChange={options => {
-                    const tags = [];
-                    options && options.length > 0 ? options.map(option => tags.push(option.value)) : [];
-                    setFieldValue('tags', tags);
-                  }}
+                  onChange={onChangeTags}
                 />
               )}
             </Box>
@@ -221,21 +222,6 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
       </StyledButton>
     </form>
   );
-};
-
-CreateConversationForm.propTypes = {
-  /** the collective where the conversation will be created */
-  collective: PropTypes.object.isRequired,
-  /** Called when the conversation gets successfully created. Return a promise if you want to keep the submitting state active. */
-  onSuccess: PropTypes.func.isRequired,
-  /** Will disable the form */
-  disabled: PropTypes.bool,
-  /** Will show a loading state. Use this if loggedInUser or required data is not loaded yet. */
-  loading: PropTypes.bool,
-  /** Tags suggested for this new conversation */
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  /** LoggedInUser */
-  LoggedInUser: PropTypes.object,
 };
 
 export default CreateConversationForm;

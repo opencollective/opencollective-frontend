@@ -1,6 +1,6 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
@@ -178,7 +178,10 @@ const WhoAreFiscalHosts = () => {
                 {` `}
                 {feature.id === 'fiscalSponsorshipService' &&
                   intl.formatMessage(
-                    { defaultMessage: 'Learn more about <fiscalHostingLink>fiscal hosting</fiscalHostingLink>.' },
+                    {
+                      defaultMessage: 'Learn more about <fiscalHostingLink>fiscal hosting</fiscalHostingLink>.',
+                      id: 'Wd/w9L',
+                    },
                     {
                       fiscalHostingLink: getI18nLink({
                         as: Link,

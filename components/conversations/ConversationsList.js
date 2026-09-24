@@ -1,6 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { size } from 'lodash';
+import { Markup } from 'interweave';
+import { size } from 'lodash-es';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
@@ -49,13 +49,9 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
             }}
           />
         </P>
-        <P
-          color="black.700"
-          mt={2}
-          fontSize="13px"
-          dangerouslySetInnerHTML={{ __html: summary }}
-          data-cy="conversation-preview"
-        />
+        <P color="black.700" mt={2} fontSize="13px" data-cy="conversation-preview">
+          <Markup noWrap content={summary} />
+        </P>
         {(hasFollowers || hasComments) && (
           <Flex mt={3} alignItems="center">
             {hasFollowers && (
@@ -89,33 +85,6 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
   );
 };
 
-ConversationListItem.propTypes = {
-  collectiveSlug: PropTypes.string.isRequired,
-  conversation: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    summary: PropTypes.string.isRequired,
-    createdAt: PropTypes.string.isRequired,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    fromAccount: PropTypes.shape({
-      type: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-    }).isRequired,
-    followers: PropTypes.shape({
-      totalCount: PropTypes.number,
-      nodes: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string,
-        }),
-      ),
-    }),
-    stats: PropTypes.shape({
-      commentsCount: PropTypes.number,
-    }),
-  }),
-};
-
 /**
  * Displays a list of conversations
  */
@@ -133,11 +102,6 @@ const ConversationsList = ({ collectiveSlug, conversations }) => {
       ))}
     </StyledCard>
   );
-};
-
-ConversationsList.propTypes = {
-  collectiveSlug: PropTypes.string.isRequired,
-  conversations: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default ConversationsList;

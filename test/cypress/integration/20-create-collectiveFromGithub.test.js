@@ -1,6 +1,6 @@
 describe('Create collective from Github', () => {
   it('Should submit create github page', () => {
-    cy.intercept('GET', '/api/github-repositories?*', { fixture: 'github-repos.json' });
+    cy.intercept('GET', '/api/github-repositories*', { fixture: 'github-repos.json' });
     cy.login({ email: 'testuser@opencollective.com', redirect: '/opensource/apply/pick-repo?token=foofoo' });
     cy.contains('[data-cy=connect-github-header]', 'Pick a repository');
     cy.get('[data-cy=radio-select]').first().check();

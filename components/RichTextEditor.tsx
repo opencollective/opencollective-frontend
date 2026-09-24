@@ -1,7 +1,7 @@
 import React from 'react';
 import { css } from '@styled-system/css';
-import { get } from 'lodash';
-import styled from 'styled-components';
+import { get } from 'lodash-es';
+import { styled } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
 
@@ -28,6 +28,8 @@ type RichTextEditorContainerProps = {
   withStickyToolbar?: boolean;
   /** Version of the editor */
   version: 'default' | 'simplified';
+  /** If true, the image upload button will be displayed - even in simplified mode */
+  imageUploadEnabled?: boolean;
   /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
   toolbarTop?: number | string | number[] | string[];
   /** Useful to compensate the height of the toolbar when editing inline */
@@ -75,9 +77,12 @@ type RichTextEditorProps = RichTextEditorContainerProps & {
   disabled?: boolean;
 
   videoEmbedEnabled?: boolean;
+  imageUploadEnabled?: boolean;
   'data-cy': string;
+  /** Accessible label for the editor element (for screen readers) */
+  'aria-label'?: string;
   /** Called when an image is being uploaded to set a boolean */
-  setUploading: (uploading: boolean) => void;
+  setUploading?: (uploading: boolean) => void;
 };
 
 const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
@@ -85,7 +90,7 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
     props.withBorders &&
     css({
       border: '1px solid',
-      borderColor: !props.error ? 'black.300' : 'red.300',
+      borderColor: !props.error ? 'oklch(92.9% 0.013 255.508)' : 'red.300',
       borderRadius: 10,
       padding: 3,
     })}
@@ -93,8 +98,9 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
   trix-editor {
     border: none;
     padding: 0;
-    margin-top: 8px;
+    margin-top: 1px;
     padding-top: 8px;
+    padding-right: 4px;
     outline-offset: 0.5em;
     ${CustomScrollbarCSS}
     &::-webkit-scrollbar {
@@ -132,10 +138,18 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
   trix-toolbar {
     min-height: 40px;
     background: ${props => props.toolbarBackgroundColor};
-    ${props => !props.withBorders && `box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);`}
     z-index: 2;
     margin-bottom: 8px;
-    ${props => props.withBorders && `min-height: 0px; margin-bottom: 0;`}
+    ${props =>
+      props.withBorders
+        ? css`
+            min-height: 0px;
+            margin-bottom: 0;
+            padding: 0 !important;
+          `
+        : css`
+            box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);
+          `}
 
     .trix-button-group {
       border-radius: 6px;
@@ -170,9 +184,11 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
     ${props =>
       props.version === 'simplified' &&
       css({
-        '.trix-button-group--file-tools': {
-          display: 'none',
-        },
+        ...(!props.imageUploadEnabled && {
+          '.trix-button-group--file-tools': {
+            display: 'none',
+          },
+        }),
         '.trix-button-group--block-tools .trix-button:not(.trix-button--icon-number-list):not(.trix-button--icon-bullet-list)':
           {
             display: 'none',
@@ -228,7 +244,7 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
     })}
 `;
 
-const SUPPORTED_SERVICE_URLS = { youTube: 'https://www.youtube-nocookie.com/embed/', anchorFm: 'https://anchor.fm/' };
+const SUPPORTED_IFRAME_URLS = { youTube: 'https://www.youtube-nocookie.com/embed/', anchorFm: 'https://anchor.fm/' };
 
 type RichTextEditorState = {
   id: string;
@@ -262,7 +278,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
     // Load Trix
     if (typeof window !== 'undefined') {
-      this.Trix = require('trix').default;
+      this.Trix = require('trix').default; // eslint-disable-line @typescript-eslint/no-require-imports
       document.addEventListener('trix-before-initialize', this.trixBeforeInitialize);
     }
   }
@@ -292,6 +308,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       this.editorRef.current.removeEventListener('trix-attachment-add', this.handleFileAccept);
       this.editorRef.current.removeEventListener('trix-action-invoke', this.trixActionInvoke);
       this.editorRef.current.removeEventListener('trix-initialize', this.trixInitialize);
+      this.isReady = false;
     }
   }
 
@@ -312,8 +329,10 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     const figures = htmlDoc.querySelectorAll('figure[data-trix-content-type="--embed-iframe-video"]');
     figures.forEach(figure => {
       const iframe = figure.querySelector('iframe');
-      const dataTrixAttachment = { content: iframe.outerHTML, contentType: '--embed-iframe-video' };
-      figure.setAttribute('data-trix-attachment', JSON.stringify(dataTrixAttachment));
+      if (iframe) {
+        const dataTrixAttachment = { content: iframe.outerHTML, contentType: '--embed-iframe-video' };
+        figure.setAttribute('data-trix-attachment', JSON.stringify(dataTrixAttachment));
+      }
     });
 
     return htmlDoc.querySelector('body').innerHTML;
@@ -334,6 +353,9 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
       // Component ready!
       this.isReady = true;
+
+      // Set initial value for text
+      this.setState({ text: this.editorRef.current.innerText });
     }
   };
 
@@ -342,6 +364,54 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
   trixBeforeInitialize = () => {
     this.Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
     this.Trix.config.attachments.preview.caption = { name: false, size: false };
+
+    // Allow iframes for video embeds
+    this.Trix.config.dompurify.ADD_TAGS = ['iframe'];
+    this.Trix.config.dompurify.ADD_ATTR = [
+      'allow',
+      'allowfullscreen',
+      'frameborder',
+      'referrerpolicy',
+      'src',
+      'width',
+      'height',
+    ];
+
+    // Monkey patch for configuring HTML sanitization on attachment HTML. See https://github.com/basecamp/trix/issues/1178
+    // Trix strips attributes in sanitizeElement() before DOMPurify runs, using allowedAttributes (default:
+    // style, href, src, width, height, language, class). DOMPurify ADD_ATTR alone is not enough.
+    const originalSetHTML = this.Trix.HTMLSanitizer.setHTML;
+    const originalDomPurifyConfig = this.Trix.config.dompurify;
+    const htmlSanitizer = this.Trix.HTMLSanitizer;
+    const iframeAllowedAttributes = [
+      'dir', // For RTL languages
+      'language',
+      'data-trix-content-type',
+      'data-trix-attachment',
+      // Images
+      'alt',
+      'title',
+      // Links
+      'href',
+      'name',
+      'target',
+      // Iframes
+      'src',
+      'allowfullscreen',
+      'frameborder',
+      'referrerpolicy',
+      'autoplay',
+      'width',
+      'height',
+    ];
+
+    this.Trix.HTMLSanitizer.setHTML = function (element, html, options) {
+      options = options || {};
+      options.forbiddenElements = ['script', 'form', 'noscript']; // explicitly omitting iframe
+      options.allowedAttributes = iframeAllowedAttributes;
+      options.purifyOptions = originalDomPurifyConfig;
+      originalSetHTML.apply(htmlSanitizer, [element, html, options]);
+    };
   };
 
   trixInitialize = event => {
@@ -370,7 +440,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         <div class="trix-dialog__link-fields">
           <input type="url" name="video-url" class="trix-input trix-input--dialog trix-input--dialog-embed" placeholder="Enter Video URL…" aria-label="Video URL" data-trix-input="">
           <div class="trix-button-group">
-            <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
+            <input data-cy="add-video-submit" type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
           </div>
         </div>
         <strong>Note: Only YouTube links are supported.</strong>
@@ -397,15 +467,25 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       const embedLink = toolbarElement.querySelector('.trix-input--dialog-embed').value?.trim();
       if (embedLink) {
         this.embedIframe(embedLink);
+
+        const attachVideoDialog = toolbarElement.querySelector('[data-trix-dialog=video-url]');
+
+        // Clear input
+        attachVideoDialog.querySelector('.trix-input--dialog-embed').value = '';
+
+        // Close dialog
+        if (attachVideoDialog.getAttribute('data-trix-active') === '') {
+          attachVideoDialog.removeAttribute('data-trix-active');
+        }
       }
     }
   };
 
   constructVideoEmbedURL = (service, id) => {
     if (service === 'youtube') {
-      return `${SUPPORTED_SERVICE_URLS.youTube}${id}`;
+      return `${SUPPORTED_IFRAME_URLS.youTube}${id}`;
     } else if (service === 'anchorFm') {
-      return `${SUPPORTED_SERVICE_URLS.anchorFm}${id}`;
+      return `${SUPPORTED_IFRAME_URLS.anchorFm}${id}`;
     } else {
       return null;
     }
@@ -446,7 +526,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       if (videoServices.includes(service)) {
         attachmentData = {
           contentType: '--embed-iframe-video',
-          content: `<iframe src="${sanitizedLink}/?showinfo=0" width="100%" height="394" frameborder="0" allowfullscreen/>`,
+          content: `<iframe src="${sanitizedLink}?showinfo=0" width="100%" height="394" frameborder="0" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"/>`,
         };
       } else {
         attachmentData = {
@@ -494,8 +574,9 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     const { attachment } = e;
     const attachmentContent = get(attachment, 'attachment.attributes.values.content');
     const isEmbedAttachment =
-      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.youTube}`) ||
-      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.anchorFm}`);
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.youTube}`) ||
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.anchorFm}`);
+
     if (isEmbedAttachment) {
       return;
     } else if (!attachment.file) {
@@ -506,6 +587,10 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         attachment.remove(); // Remove unknown stuff, usually when copy-pasting HTML
       }
 
+      return;
+    } else if (this.props.version === 'simplified' && !this.props.imageUploadEnabled) {
+      // Don't upload files in simplified mode
+      attachment.remove();
       return;
     }
 
@@ -653,6 +738,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       showCount,
       maxLength,
       editorMaxHeight,
+      imageUploadEnabled,
     } = this.props;
 
     return !this.state.id ? (
@@ -670,6 +756,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         editorMaxHeight={editorMaxHeight}
         withBorders={withBorders}
         version={version}
+        imageUploadEnabled={imageUploadEnabled}
         isDisabled={disabled}
         error={error}
         data-cy={this.props['data-cy']}
@@ -682,17 +769,19 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
           </MessageBox>
         )}
 
-        <input id={this.state.id} value={this.state.value} type="hidden" name={inputName} />
+        <input id={this.state.id} value={this.state.value} type="hidden" name={inputName} disabled={disabled} />
         <HTMLContent fontSize={fontSize}>
-          <div className="relative focus-visible:[&>_trix-editor]:outline-none">
+          <div className="relative [&>_trix-editor]:focus-visible:outline-hidden">
             {React.createElement('trix-editor', {
               ref: this.editorRef,
               input: this.state.id,
-              autofocus: autoFocus ? true : undefined,
+              autofocus: !disabled && autoFocus ? true : undefined,
               placeholder: placeholder,
+              disabled,
+              'aria-label': this.props['aria-label'],
             })}
             <Container position="absolute" bottom="1em" right="1em">
-              {showCount && (
+              {showCount && !disabled && (
                 <StyledTag textTransform="uppercase">
                   <span>{this.state.text.length}</span>
                   {maxLength && <span> / {maxLength}</span>}

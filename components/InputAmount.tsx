@@ -1,0 +1,326 @@
+import React from 'react';
+import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
+import { clamp, isNil, isUndefined, round } from 'lodash-es';
+import { useIntl } from 'react-intl';
+
+import { Currency, ZERO_DECIMAL_CURRENCIES } from '@/lib/constants/currency';
+import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '@/lib/currency-utils';
+import { RICH_ERROR_MESSAGES } from '@/lib/form-utils';
+import type { Currency as CurrencyEnum } from '@/lib/graphql/types/v2/graphql';
+import { cn } from '@/lib/utils';
+
+import Spinner from '@/components/Spinner';
+import { InputGroup } from '@/components/ui/Input';
+import { Separator } from '@/components/ui/Separator';
+
+import CurrencyPicker from './CurrencyPicker';
+
+const formatCurrencyName = (currency, currencyDisplay) => {
+  if (!currency) {
+    return '---';
+  } else if (currencyDisplay === 'SYMBOL') {
+    return getCurrencySymbol(currency);
+  } else if (currencyDisplay === 'CODE') {
+    return currency;
+  } else {
+    return `${getCurrencySymbol(currency)} ${currency}`;
+  }
+};
+
+const parseValueFromEvent = (e, precision, ignoreComma = false) => {
+  let value = e.target.value as string;
+  if (value === '') {
+    return null;
+  }
+
+  if (value.endsWith(',') || value.endsWith('.')) {
+    value += '0';
+  }
+
+  if (value.startsWith(',') || value.startsWith('.')) {
+    value = `0${value}`;
+  }
+
+  if (ignoreComma) {
+    value = value.replaceAll(',', '.');
+  }
+
+  const parsedNumber = parseFloat(value);
+  return isNaN(parsedNumber) ? NaN : parsedNumber.toFixed(precision);
+};
+
+/** Formats value is valid, fallbacks on rawValue otherwise */
+const getValue = (value, rawValue, isEmpty) => {
+  if (isEmpty) {
+    return '';
+  }
+
+  return isNaN(value) || value === null ? rawValue : value / 100;
+};
+
+// const getError = (curVal, minAmount, required) => {
+//   return Boolean((required && isNil(curVal)) || (minAmount && curVal < minAmount));
+// };
+
+/** Prevent changing the value when scrolling on the input */
+const ignoreOnWheel = e => {
+  e.preventDefault();
+  e.target.blur();
+};
+
+/** Returns the minimum width for an amount input, auto-adjusting to the number of digits */
+const useAmountInputMinWidth = (value, max = 1000000000) => {
+  const prevValue = React.useRef(value);
+
+  // Do not change size if value becomes invalid (to prevent jumping)
+  if (typeof value?.toFixed !== 'function') {
+    return prevValue.current || '0.7em';
+  }
+
+  const maxLength = max.toString().length;
+  const valueLength = clamp(value.toFixed(2).length, 1, maxLength);
+  const result = `${valueLength * 0.7}em`;
+  prevValue.current = result;
+  return result;
+};
+
+interface ConvertedAmountInputProps {
+  exchangeRate?: {
+    toCurrency: CurrencyEnum;
+    value: number;
+  };
+  onChange?(...args: unknown[]): unknown;
+  baseAmount?: number;
+  minFxRate?: number;
+  maxFxRate?: number;
+  inputId: string;
+}
+
+const ConvertedAmountInput = ({
+  inputId,
+  exchangeRate,
+  onChange,
+  baseAmount,
+  minFxRate,
+  maxFxRate,
+}: ConvertedAmountInputProps) => {
+  const precision = getDefaultCurrencyPrecision(exchangeRate.toCurrency);
+  const targetAmount = round((baseAmount || 0) * exchangeRate.value, precision);
+  const [isEditing, setEditing] = React.useState(false);
+  const [rawValue, setRawValue] = React.useState(targetAmount / 100 || '');
+  const minWidth = useAmountInputMinWidth(targetAmount / 100);
+  const value = getValue(targetAmount, rawValue, false);
+  const isBaseAmountInvalid = isNaN(baseAmount) || isNil(baseAmount);
+
+  const getLimitAmountFromFxRate = fxRate => {
+    return round(((baseAmount || 0) * fxRate) / 100.0, precision);
+  };
+
+  return (
+    <div className="flex flex-auto px-2 text-sm whitespace-nowrap text-muted-foreground">
+      <span className="mr-1 align-middle">= {exchangeRate.toCurrency} </span>
+      <input
+        className="w-full flex-auto [appearance:textfield] rounded px-[2px] focus:text-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        style={{ minWidth }}
+        name={inputId}
+        id={inputId}
+        data-testid={inputId}
+        type="text"
+        inputMode="decimal"
+        pattern="([0-9]+)?([,.]([0-9]+)?)?"
+        step={1 / 10 ** precision} // Precision=2 -> 0.01, Precision=0 -> 1
+        min={minFxRate ? getLimitAmountFromFxRate(minFxRate) : 1 / 10 ** precision}
+        max={maxFxRate ? getLimitAmountFromFxRate(maxFxRate) : undefined}
+        value={isBaseAmountInvalid ? '' : isEditing ? rawValue : value.toFixed(precision)}
+        onWheel={ignoreOnWheel}
+        required
+        placeholder={!precision ? '--' : `--.${'-'.repeat(precision)}`}
+        disabled={isBaseAmountInvalid}
+        onChange={e => {
+          setEditing(true);
+          setRawValue(e.target.value);
+          const convertedAmount = e.target.value ? parseFloat(e.target.value.replaceAll(',', '.')) : 0;
+          if (!convertedAmount) {
+            onChange({ ...exchangeRate, value: null });
+          } else {
+            const newFxRate = round((convertedAmount * 100) / (baseAmount || 1), 8);
+            onChange({
+              ...exchangeRate,
+              value: newFxRate,
+              source: 'USER',
+              isApproximate: false,
+              date: null,
+            });
+          }
+        }}
+        onBlur={() => {
+          setEditing(false);
+        }}
+      />
+      <span className="ml-1">{getEmojiByCurrencyCode(exchangeRate.toCurrency)}</span>
+    </div>
+  );
+};
+
+const MAX_VALIDATION_LIMIT = 100000000000;
+/**
+ * An input for amount inputs.
+ */
+const InputAmount = ({
+  currency,
+  currencyDisplay = 'SYMBOL',
+  name = 'amount',
+  min = 0,
+  max = MAX_VALIDATION_LIMIT,
+  precision = ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2,
+  defaultValue = undefined,
+  value,
+  onBlur = undefined,
+  onChange,
+  isEmpty = false,
+  hasCurrencyPicker = false,
+  onCurrencyChange = undefined,
+  availableCurrencies = Currency,
+  exchangeRate = undefined,
+  loadingExchangeRate = false,
+  onExchangeRateChange = undefined,
+  minFxRate = undefined,
+  maxFxRate = undefined,
+  className = null,
+  suffix = null,
+  ...props
+}) => {
+  const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
+  const isControlled = !isUndefined(value);
+  const curValue = isControlled ? getValue(value, rawValue, isEmpty) : undefined;
+  const minAmount = precision !== 0 ? min / 10 ** precision : min / 100;
+  const disabled = props.disabled || loadingExchangeRate;
+  const canUseExchangeRate = Boolean(!loadingExchangeRate && exchangeRate && exchangeRate.fromCurrency === currency);
+  const minWidth = useAmountInputMinWidth(curValue, max);
+  const [isEditing, setEditing] = React.useState(false);
+  const intl = useIntl();
+
+  const minMaxValidityMsg = intl.formatMessage(
+    max !== MAX_VALIDATION_LIMIT ? RICH_ERROR_MESSAGES.notInRange : RICH_ERROR_MESSAGES.min,
+    {
+      min: (min / 100).toFixed(precision),
+      max: (max / 100).toFixed(precision),
+    },
+  );
+
+  const dispatchValue = (e, parsedValue) => {
+    setRawValue(e.target.value);
+    e.target.setCustomValidity('');
+    if (onChange) {
+      const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
+      if (parsedValue === null || isNaN(parsedValue)) {
+        onChange(parsedValue, e);
+      } else if (!e.target.checkValidity() || parsedValue !== valueWithIgnoredComma) {
+        onChange(isNaN(e.target.value) ? NaN : null, e);
+      } else {
+        const numericValue = floatAmountToCents(parsedValue);
+        if (numericValue < min || numericValue > max) {
+          e.target.setCustomValidity(minMaxValidityMsg);
+        }
+
+        onChange(numericValue, e);
+      }
+    }
+  };
+
+  const inputGroup = (
+    <InputGroup
+      {...props}
+      data-testid={props.id ? `${props.id}-input-amount` : undefined}
+      className={cn('w-full overflow-hidden', suffix ? null : className)}
+      disabled={disabled}
+      prepend={
+        !hasCurrencyPicker ? (
+          <div className="flex items-center p-2 text-sm whitespace-nowrap">
+            {formatCurrencyName(currency, currencyDisplay)}
+          </div>
+        ) : (
+          <CurrencyPicker
+            data-cy={`${props.id}-currency-picker`}
+            data-testid={`${props.id}-currency-picker`}
+            id={`${props.id}-currency-picker`}
+            onChange={onCurrencyChange}
+            value={currency}
+            availableCurrencies={availableCurrencies}
+            disabled={disabled}
+            className="w-24 rounded-none border-0 bg-muted px-2 focus-visible:bg-primary/20 focus-visible:ring-0"
+          />
+        )
+      }
+      prependClassName="px-0 py-0"
+      append={
+        loadingExchangeRate ? (
+          <div className="px-3 py-2">
+            <Spinner size={16} className="text-slate-700" />
+          </div>
+        ) : canUseExchangeRate ? (
+          <div className="flex h-[38px] flex-auto basis-1/2 items-center" data-cy={`${props.id}-converted`}>
+            <Separator orientation="vertical" className="h-6" />
+            <ConvertedAmountInput
+              inputId={`${props.id}-converted-input`}
+              exchangeRate={exchangeRate}
+              onChange={onExchangeRateChange}
+              baseAmount={value}
+              minFxRate={minFxRate}
+              maxFxRate={maxFxRate}
+            />
+          </div>
+        ) : undefined
+      }
+      appendClassName="px-0 py-0 bg-background"
+      width="100%"
+      type="text"
+      inputMode="decimal"
+      pattern="[0-9]*([0-9]+)?([,.]([0-9]+)?)?"
+      step={1 / 10 ** precision}
+      style={{ minWidth }}
+      name={name}
+      min={minAmount}
+      max={max / 100}
+      value={isEditing ? rawValue : isNil(value) || isNaN(value) ? rawValue : (value / 100).toFixed(precision)}
+      onWheel={ignoreOnWheel}
+      onChange={e => {
+        setEditing(true);
+        e.stopPropagation();
+        dispatchValue(e, parseValueFromEvent(e, precision, true));
+      }}
+      onBlur={e => {
+        setEditing(false);
+        // Clean number if valid (ie. 41.1 -> 41.10)
+        const parsedNumber = parseValueFromEvent(e, precision);
+        const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
+        if (
+          e.target.checkValidity() &&
+          !(typeof parsedNumber === 'number' && isNaN(parsedNumber)) &&
+          parsedNumber !== null &&
+          valueWithIgnoredComma === parsedNumber
+        ) {
+          e.target.value = parsedNumber.toString();
+          dispatchValue(e, parsedNumber);
+        }
+
+        if (onBlur) {
+          onBlur(e);
+        }
+      }}
+    />
+  );
+
+  if (suffix) {
+    return (
+      <div className={cn('flex items-center gap-2', className)}>
+        {inputGroup}
+        <div className="pointer-events-none shrink-0 text-xs text-muted-foreground">{suffix}</div>
+      </div>
+    );
+  }
+
+  return inputGroup;
+};
+
+export default InputAmount;

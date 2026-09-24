@@ -1,14 +1,16 @@
-import speakeasy from 'speakeasy';
+import { generateSecret, generateSync } from 'otplib';
 
 describe('OAuth Applications', () => {
   let user, clientId, clientSecret;
 
   before(() => {
     cy.signup({ user: { name: 'OAuth tester', settings: { features: { adminPanel: true } } } }).then(u => (user = u));
+    cy.logout();
+    cy.visit('/home');
   });
 
   it('create and edit applications', () => {
-    cy.login({ email: user.email, redirect: `${user.collective.slug}/admin/for-developers` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
     cy.log('Starts with an empty state');
     cy.contains('[data-cy="oauth-apps-list"]', "You don't have any app yet");
@@ -66,13 +68,15 @@ describe('OAuth Applications', () => {
 
   it('create application with 2fa enabled', () => {
     cy.signup({ user: { name: 'OAuth tester', settings: { features: { adminPanel: true } } } }).then(user => {
-      cy.login({ email: user.email, redirect: `${user.collective.slug}/admin/for-developers` });
+      cy.logout();
+      cy.visit('/home');
+      cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
-      const secret = speakeasy.generateSecret({ length: 64 });
+      const secret = generateSecret({ length: 64 });
       cy.enableTwoFactorAuth({
         userEmail: user.email,
         userSlug: user.collective.slug,
-        secret: secret.base32,
+        secret: secret,
       });
 
       cy.getByDataCy('create-app-link').click();
@@ -81,13 +85,7 @@ describe('OAuth Applications', () => {
       cy.get('input[name=redirectUri]').type('https://example.com/callback');
       cy.get('[data-cy="create-oauth-app-modal"] button[type=submit]').click();
 
-      cy.complete2FAPrompt(
-        speakeasy.totp({
-          algorithm: 'SHA1',
-          encoding: 'base32',
-          secret: secret.base32,
-        }),
-      );
+      cy.complete2FAPrompt(generateSync({ secret, algorithm: 'sha1', strategy: 'totp' }));
 
       cy.contains('[data-cy=toast-notification]:last', 'Application "My App created with 2FA enabled" created');
 
@@ -142,7 +140,7 @@ describe('OAuth Applications', () => {
   // Warning: this test is dependant on the previous one. To make it independent, connect the OAuth app with
   it('can list & revoke authorization tokens in the admin', () => {
     cy.log('App is in list');
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/admin/authorized-apps` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/authorized-apps` });
     cy.getByDataCy('connected-oauth-app').should('have.length', 1);
     cy.getByDataCy('connected-oauth-app').should('contain', 'My second App');
 

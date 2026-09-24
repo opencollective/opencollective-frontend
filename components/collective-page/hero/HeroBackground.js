@@ -1,9 +1,8 @@
 import React from 'react';
-import { PropTypes } from 'prop-types';
-import { get, has } from 'lodash';
+import { get, has } from 'lodash-es';
 import styled, { css } from 'styled-components';
 
-import HeroBackgroundMask from '../images/HeroBackgroundMask.svg';
+import HeroBackgroundMask from '../../../public/static/images/collective-page/HeroBackgroundMask.svg';
 
 export const BASE_HERO_WIDTH = 1368;
 export const BASE_HERO_HEIGHT = 325;
@@ -59,11 +58,17 @@ export const StyledHeroBackground = styled.div`
 
     mask: url(${HeroBackgroundMask}) no-repeat;
     mask-size: cover;
-    mask-position-x: 100%;
-    mask-position-y: -150px;
+
+    -webkit-mask-position-x: 0;
+    -webkit-mask-position-y: -120px;
+    mask-position-x: 0;
+    mask-position-y: -120px;
 
     @media (max-width: 900px) {
       mask-position-x: 20%;
+      mask-position-y: -250px;
+      -webkit-mask-position-x: 20%;
+      -webkit-mask-position-y: -250px;
     }
   }
 `;
@@ -106,27 +111,6 @@ const HeroBackground = ({ collective }) => {
       )}
     </StyledHeroBackground>
   );
-};
-
-HeroBackground.propTypes = {
-  /** The collective to show the image for */
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    /** The background image */
-    backgroundImage: PropTypes.string,
-    backgroundImageUrl: PropTypes.string,
-    /** Collective settings */
-    settings: PropTypes.shape({
-      collectivePage: PropTypes.shape({
-        background: PropTypes.shape({
-          /** Used to display the background at the right position */
-          offset: PropTypes.shape({ y: PropTypes.number.isRequired }),
-          /** Only used for the editor */
-          crop: PropTypes.shape({ y: PropTypes.number.isRequired }),
-        }),
-      }),
-    }),
-  }).isRequired,
 };
 
 /** @component */

@@ -1,30 +1,27 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
 
 import { commentFieldsFragment } from '../../conversations/graphql';
 
-import { expensePageExpenseFieldsFragment, loggedInAccountExpensePayoutFieldsFragment } from './fragments';
+import {
+  expensePageExpenseFieldsFragment,
+  expensePayeeFieldsFragment,
+  loggedInAccountExpensePayoutFieldsFragment,
+} from './fragments';
 
 export const expensePageQuery = gql`
   query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       id
       ...ExpensePageExpenseFields
-      comments(limit: 100, offset: $offset) {
-        totalCount
-        nodes {
-          id
-          ...CommentFields
-        }
-      }
-    }
-
-    # As it uses a dedicated variable this needs to be separated from the ExpensePageExpenseFields fragment
-    expensePayeeStats: expense(expense: { legacyId: $legacyExpenseId }) {
-      id
       payee {
         id
+        ...ExpensePayeeFields
         stats {
           id
+          totalPaidExpenses(dateFrom: $totalPaidExpensesDateFrom) {
+            valueInCents
+            currency
+          }
           totalPaidInvoices: totalPaidExpenses(expenseType: [INVOICE], dateFrom: $totalPaidExpensesDateFrom) {
             valueInCents
             currency
@@ -39,6 +36,16 @@ export const expensePageQuery = gql`
           }
         }
       }
+      permissions {
+        canDeclineExpenseInvite(draftKey: $draftKey)
+      }
+      comments(limit: 100, offset: $offset) {
+        totalCount
+        nodes {
+          id
+          ...CommentFields
+        }
+      }
     }
 
     loggedInAccount {
@@ -50,4 +57,5 @@ export const expensePageQuery = gql`
   ${loggedInAccountExpensePayoutFieldsFragment}
   ${expensePageExpenseFieldsFragment}
   ${commentFieldsFragment}
+  ${expensePayeeFieldsFragment}
 `;

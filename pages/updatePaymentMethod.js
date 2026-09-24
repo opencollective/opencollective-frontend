@@ -2,21 +2,23 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { CardElement } from '@stripe/react-stripe-js';
-import { get } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { get } from 'lodash-es';
+import { FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { compose } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import HappyBackground from '../components/gift-cards/HappyBackground';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
+import LinkCollective from '../components/LinkCollective';
 import Loading from '../components/Loading';
 import NewCreditCardForm from '../components/NewCreditCardForm';
 import Page from '../components/Page';
@@ -107,7 +109,7 @@ class UpdatePaymentPage extends React.Component {
         const paymentMethod = stripeTokenToPaymentMethod(token);
         const res = await this.props.replaceCreditCard({
           variables: {
-            CollectiveId: this.props.LoggedInUser.collective.id,
+            collectiveId: this.props.LoggedInUser.collective.id,
             ...paymentMethod,
             id: parseInt(this.props.paymentMethodId),
           },
@@ -193,8 +195,8 @@ class UpdatePaymentPage extends React.Component {
     }
 
     const orders = data.PaymentMethod?.orders || [];
-    const hasForm = showCreditCardForm && Boolean(data.PaymentMethod);
-    const contributingAccount = orders?.[0]?.fromCollective || LoggedInUser.collective;
+    const hasForm = Boolean(showCreditCardForm && data.PaymentMethod && orders.length);
+    const contributingAccount = orders[0]?.fromCollective || LoggedInUser.collective;
     return (
       <div className="UpdatedPaymentMethodPage">
         <Page>
@@ -206,7 +208,7 @@ class UpdatePaymentPage extends React.Component {
                 </H1>
               </Box>
 
-              {Boolean(data.PaymentMethod) && (
+              {Boolean(data.PaymentMethod && orders.length) && (
                 <React.Fragment>
                   <Box mt={3}>
                     <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
@@ -226,7 +228,7 @@ class UpdatePaymentPage extends React.Component {
                           {orders.map(order => {
                             return (
                               <li key={order.id}>
-                                {order.collective.name}:{' '}
+                                <LinkCollective collective={order.collective} openInNewTab />:{' '}
                                 {formatCurrency(order.totalAmount, order.currency, {
                                   precision: 2,
                                   locale: intl.locale,
@@ -261,10 +263,20 @@ class UpdatePaymentPage extends React.Component {
                       ) : success ? (
                         <FormattedMessage
                           id="updatePaymentMethod.form.success"
-                          defaultMessage="Your new card info has been added"
+                          defaultMessage="Your new card info has been added."
+                        />
+                      ) : !data.PaymentMethod ? (
+                        <FormattedMessage
+                          defaultMessage="This payment method does not exist or has already been updated."
+                          id="RiYYFO"
+                        />
+                      ) : !orders.length ? (
+                        <FormattedMessage
+                          defaultMessage="There are no active subscriptions linked to this payment method, it may have already been updated."
+                          id="jor/DD"
                         />
                       ) : (
-                        <FormattedMessage defaultMessage="This payment method does not exist or has already been updated" />
+                        <FormattedMessage defaultMessage="An unexpected error occurred." id="3IKub9" />
                       )}
                     </ShadowBox>
                   </Container>
@@ -334,15 +346,15 @@ class UpdatePaymentPage extends React.Component {
   }
 }
 
-const replaceCreditCardMutation = gqlV1/* GraphQL */ `
+const replaceCreditCardMutation = gqlV1 /* GraphQL */ `
   mutation ReplaceCreditCard(
     $id: Int!
-    $CollectiveId: Int!
+    $collectiveId: Int!
     $name: String!
     $token: String!
     $data: StripeCreditCardDataInputType!
   ) {
-    replaceCreditCard(CollectiveId: $CollectiveId, name: $name, token: $token, data: $data, id: $id) {
+    replaceCreditCard(CollectiveId: $collectiveId, name: $name, token: $token, data: $data, id: $id) {
       id
       data
       createdAt
@@ -350,7 +362,7 @@ const replaceCreditCardMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const subscriptionsQuery = gqlV1/* GraphQL */ `
+const subscriptionsQuery = gqlV1 /* GraphQL */ `
   query UpdateSubscriptionsForPaymentMethod($paymentMethodId: Int) {
     PaymentMethod(id: $paymentMethodId) {
       id
@@ -368,6 +380,7 @@ const subscriptionsQuery = gqlV1/* GraphQL */ `
         collective {
           id
           name
+          slug
         }
       }
     }
@@ -376,9 +389,15 @@ const subscriptionsQuery = gqlV1/* GraphQL */ `
 
 const addReplaceCreditCardMutation = graphql(replaceCreditCardMutation, {
   name: 'replaceCreditCard',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const addSubscriptionsData = graphql(subscriptionsQuery, {
+  options: {
+    context: API_V1_CONTEXT,
+  },
   skip: props => {
     return props.loadingLoggedInUser || !props.LoggedInUser;
   },
@@ -386,4 +405,6 @@ const addSubscriptionsData = graphql(subscriptionsQuery, {
 
 const addGraphql = compose(addSubscriptionsData, addReplaceCreditCardMutation);
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default injectIntl(withUser(addGraphql(withStripeLoader(UpdatePaymentPage))));

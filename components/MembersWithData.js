@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import classNames from 'classnames';
-import { uniqBy } from 'lodash';
+import { clsx } from 'clsx';
+import { uniqBy } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import Error from './Error';
@@ -116,7 +116,7 @@ class MembersWithData extends React.Component {
             <Member
               key={member.id}
               member={member}
-              className={classNames(this.props.className, size)}
+              className={clsx(this.props.className, size)}
               collective={collective}
               viewMode={viewMode}
               LoggedInUser={LoggedInUser}
@@ -136,19 +136,10 @@ class MembersWithData extends React.Component {
   }
 }
 
-const membersQuery = gqlV1/* GraphQL */ `
-  query Members(
-    $collectiveSlug: String!
-    $TierId: Int
-    $role: String
-    $type: String
-    $limit: Int
-    $offset: Int
-    $orderBy: String
-  ) {
+const membersQuery = gqlV1 /* GraphQL */ `
+  query Members($collectiveSlug: String!, $role: String, $type: String, $limit: Int, $offset: Int, $orderBy: String) {
     allMembers(
       collectiveSlug: $collectiveSlug
-      TierId: $TierId
       role: $role
       type: $type
       limit: $limit
@@ -186,11 +177,11 @@ const membersQuery = gqlV1/* GraphQL */ `
   }
 `;
 
-export const addMembersData = graphql(membersQuery, {
+const addMembersData = graphql(membersQuery, {
   options: props => ({
+    context: API_V1_CONTEXT,
     variables: {
       collectiveSlug: props.collective.slug,
-      TierId: props.tier && props.tier.id,
       offset: 0,
       type: props.type,
       role: props.memberRole,

@@ -1,10 +1,11 @@
 import { defineMessages } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import { hasSection } from '../../lib/collective-sections';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { CollectiveType } from '@/lib/constants/collectives';
 
 import { Sections } from '../collective-page/_constants';
 
@@ -21,7 +22,6 @@ export const NAVBAR_ACTION_TYPE = {
   CONTRIBUTE: 'hasContribute',
   MANAGE_SUBSCRIPTIONS: 'hasManageSubscriptions',
   REQUEST_GRANT: 'hasRequestGrant',
-  SETTINGS: 'hasSettings',
 };
 
 const titles = defineMessages({
@@ -38,6 +38,7 @@ const titles = defineMessages({
     defaultMessage: 'Expenses',
   },
   SUBMITTED_EXPENSES: {
+    id: 'NpGb+x',
     defaultMessage: 'Submitted Expenses',
   },
   UPDATES: {
@@ -131,7 +132,7 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
         route: `${collectivePageRoute}/submitted-expenses`,
         title: intl.formatMessage(titles.SUBMITTED_EXPENSES),
       });
-    } else {
+    } else if (collective.type !== CollectiveType.VENDOR) {
       links.push({
         route: `${collectivePageRoute}/expenses`,
         title: intl.formatMessage(titles.EXPENSES),

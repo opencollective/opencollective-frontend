@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose, isValidEmail } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Body from '../components/Body';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
@@ -261,7 +262,7 @@ class RedeemPage extends React.Component {
   }
 }
 
-const redeemPageQuery = gqlV1/* GraphQL */ `
+const redeemPageQuery = gqlV1 /* GraphQL */ `
   query RedeemPage($collectiveSlug: String!) {
     Collective(slug: $collectiveSlug) {
       id
@@ -278,9 +279,12 @@ const redeemPageQuery = gqlV1/* GraphQL */ `
 
 const addRedeemPageData = graphql(redeemPageQuery, {
   skip: props => !props.collectiveSlug,
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
-const redeemPaymentMethodMutation = gqlV1/* GraphQL */ `
+const redeemPaymentMethodMutation = gqlV1 /* GraphQL */ `
   mutation RedeemPaymentMethod($code: String!, $user: UserInputType) {
     claimPaymentMethod(code: $code, user: $user) {
       id
@@ -291,8 +295,13 @@ const redeemPaymentMethodMutation = gqlV1/* GraphQL */ `
 
 const addRedeemPaymentMethodMutation = graphql(redeemPaymentMethodMutation, {
   name: 'redeemPaymentMethod',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const addGraphql = compose(addRedeemPageData, addRedeemPaymentMethodMutation);
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default injectIntl(withUser(withRouter(addGraphql(RedeemPage))));

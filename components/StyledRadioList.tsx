@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { find, isUndefined } from 'lodash';
-import styled from 'styled-components';
+import { find, isUndefined } from 'lodash-es';
+import { styled } from 'styled-components';
 import { size } from 'styled-system';
 
 import Container from './Container';
@@ -14,7 +13,7 @@ import { Box } from './Grid';
  * @param {array|object} options: an options iterable
  * @param {string|function} keyGetter: a key to get value from, or an extract func
  */
-export const getKeyExtractor = (options, keyGetter) => {
+const getKeyExtractor = (options, keyGetter) => {
   if (typeof keyGetter === 'function') {
     return item => keyGetter(item).toString();
   } else if (typeof keyGetter === 'string') {
@@ -48,7 +47,7 @@ const RadioInput = styled.input`
  *  JSON representation of the item will be used. This can have very bad performances
  *  impact, so we should avoid using it.
  */
-export const getItems = (options, keyGetter) => {
+const getItems = (options, keyGetter) => {
   const keyExtractor = getKeyExtractor(options, keyGetter);
 
   return Object.keys(options).reduce(
@@ -80,7 +79,19 @@ type RadioListProps = {
   /** Name for the radio inputs */
   name: string;
   /** A function that returns the content of each radio item */
-  children: Function;
+  children: ({
+    checked,
+    index,
+    key,
+    value,
+    radio,
+  }: {
+    checked: boolean;
+    index: number;
+    key: string;
+    value: any;
+    radio: React.ReactNode;
+  }) => React.ReactNode;
   /** A function that returns the key to use for each item */
   keyGetter?: string | ((item: any) => string);
   /** A list of options to use */
@@ -103,11 +114,25 @@ type RadioListProps = {
   'data-cy'?: string;
 };
 
+interface DefaultChildProps {
+  value?: string;
+  radio?: React.ReactNode;
+}
+
+const DefaultChild = ({ value, radio }: DefaultChildProps) => (
+  <Box mb={2}>
+    <Box as="span" mr={2}>
+      {radio}
+    </Box>
+    {value}
+  </Box>
+);
+
 const StyledRadioList = ({
-  children,
+  children = DefaultChild,
   id,
   name,
-  onChange,
+  onChange = () => {},
   options,
   keyGetter,
   disabled,
@@ -171,25 +196,9 @@ const StyledRadioList = ({
   );
 };
 
-const defaultChild = ({ value, radio }) => (
-  <Box mb={2}>
-    <Box as="span" mr={2}>
-      {radio}
-    </Box>
-    {value}
-  </Box>
-);
-
-defaultChild.propTypes = {
-  value: PropTypes.string,
-  radio: PropTypes.func,
-};
-
-StyledRadioList.defaultProps = {
-  children: defaultChild,
-  onChange: () => {}, // noop
-};
-
 StyledRadioList.displayName = 'StyledRadioList';
 
+/**
+ * @deprecated Use `ui/RadioGroup` instead
+ */
 export default StyledRadioList;

@@ -1,22 +1,25 @@
+// @deprecated: Use `useGetExpenseActions` instead
+
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as OtherIcon } from '@styled-icons/fa-solid/University';
-import { get, includes } from 'lodash';
+import { get, includes } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getAmountInCents } from '../../lib/currency-utils';
+import useKeyboardKey, { P } from '../../lib/hooks/useKeyboardKey';
+import expenseTypes from '@/lib/constants/expenseTypes';
 
 import TransferwiseIcon from '../icons/TransferwiseIcon';
-import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
+import { Button } from '../ui/Button';
 
 import PayExpenseModal from './PayExpenseModal';
 import SecurityChecksModal, { expenseRequiresSecurityConfirmation } from './SecurityChecksModal';
 
-const getDisabledMessage = (expense, collective, host, payoutMethod) => {
+export const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   // Collective / Balance can be v1 or v2 there ...
   const expenseAmountInAccountCurrency = getAmountInCents(expense.amountInAccountCurrency);
   const balance = get(
@@ -28,7 +31,10 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
     return (
       <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a Fiscal Host" />
     );
-  } else if (balance < expenseAmountInAccountCurrency) {
+  } else if (
+    ![expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING].includes(expense.type) &&
+    balance < expenseAmountInAccountCurrency
+  ) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
   } else if (includes(expense.requiredLegalDocuments, 'US_TAX_FORM')) {
     return (
@@ -71,15 +77,16 @@ const PayoutMethodTypeIcon = ({ type, host, ...props }) => {
   }
 };
 
-PayoutMethodTypeIcon.propTypes = {
-  type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  host: PropTypes.shape({
-    transferwise: PropTypes.object,
-  }),
-};
-
-const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, ...props }) => {
+const PayExpenseButton = ({
+  expense,
+  collective,
+  host,
+  disabled,
+  onSubmit,
+  error,
+  canPayWithAutomaticPayment,
+  ...props
+}) => {
   const [hasModal, showModal] = React.useState(false);
   const [hasSecurityModal, showSecurityModal] = React.useState(false);
   const disabledMessage = getDisabledMessage(expense, collective, host, expense.payoutMethod);
@@ -88,19 +95,23 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
 
   const handleClick = () => (requiresSecurityCheck ? showSecurityModal(true) : showModal(true));
 
+  useKeyboardKey({
+    keyMatch: P,
+    callback: e => {
+      if (props.enableKeyboardShortcuts) {
+        e.preventDefault();
+        handleClick();
+      }
+    },
+  });
+
   const button = (
-    <StyledButton
-      buttonStyle="successSecondary"
-      data-cy="pay-button"
-      {...props}
-      disabled={isDisabled}
-      onClick={handleClick}
-    >
+    <Button variant="outlineSuccess" data-cy="pay-button" {...props} disabled={isDisabled} onClick={handleClick}>
       <PayoutMethodTypeIcon type={expense.payoutMethod?.type} host={host} size={12} />
       <Span ml="6px">
         <FormattedMessage id="actions.goToPay" defaultMessage="Go to Pay" />
       </Span>
-    </StyledButton>
+    </Button>
   );
 
   if (disabledMessage) {
@@ -115,6 +126,7 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
           host={host}
           onClose={() => showModal(false)}
           error={error}
+          canPayWithAutomaticPayment={canPayWithAutomaticPayment}
           onSubmit={async values => {
             const { action, ...data } = values;
             const success = await onSubmit(action, data);
@@ -142,47 +154,6 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
   } else {
     return button;
   }
-};
-
-PayExpenseButton.propTypes = {
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    amount: PropTypes.number,
-    payoutMethod: PropTypes.shape({
-      type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-    }),
-    payee: PropTypes.shape({
-      host: PropTypes.shape({
-        id: PropTypes.string,
-      }),
-    }),
-  }).isRequired,
-  collective: PropTypes.shape({
-    host: PropTypes.shape({
-      plan: PropTypes.object,
-    }),
-    stats: PropTypes.shape({
-      // Collective / Balance can be v1 or v2 there ...
-      balanceWithBlockedFunds: PropTypes.oneOfType([
-        PropTypes.number,
-        PropTypes.shape({
-          valueInCents: PropTypes.number.isRequired,
-          currency: PropTypes.string.isRequired,
-        }),
-      ]),
-    }),
-  }).isRequired,
-  host: PropTypes.shape({
-    id: PropTypes.string,
-    plan: PropTypes.object,
-  }),
-  /** To disable the button */
-  disabled: PropTypes.bool,
-  /** Function called when users click on one of the "Pay" buttons */
-  onSubmit: PropTypes.func.isRequired,
-  /** If set, will be displayed in the pay modal */
-  error: PropTypes.string,
 };
 
 export default PayExpenseButton;

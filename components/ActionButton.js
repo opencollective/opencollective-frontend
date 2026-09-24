@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
 
@@ -66,10 +65,5 @@ const ActionButton = styled(StyledButton).attrs({
           }
         `}
 `;
-
-ActionButton.propTypes = {
-  borderRadius: PropTypes.string,
-  isSecondary: PropTypes.bool,
-};
 
 export default ActionButton;

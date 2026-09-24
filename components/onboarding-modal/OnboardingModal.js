@@ -1,29 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
-import { map, omit } from 'lodash';
+import { map, omit } from 'lodash-es';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
-import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import { API_V1_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { editCollectiveContactMutation, editCollectiveMembersMutation } from '../../lib/graphql/v1/mutations';
 import { compose, isValidUrl } from '../../lib/utils';
 
 import Container from '../../components/Container';
 import MessageBox from '../../components/MessageBox';
 import StyledButton from '../../components/StyledButton';
-import StyledModal, {
-  CloseIcon,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-} from '../../components/StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../components/StyledModal';
 import { H1, P } from '../../components/Text';
 
 import { Box, Flex } from '../Grid';
@@ -68,9 +61,6 @@ const ResponsiveModalHeader = styled(ModalHeader)`
       display: none;
     }
   }
-  ${CloseIcon} {
-    margin-top: -100px;
-  }
 `;
 
 const ResponsiveModalBody = styled(ModalBody)`
@@ -82,17 +72,6 @@ const ResponsiveModalBody = styled(ModalBody)`
 const ResponsiveModalFooter = styled(ModalFooter)`
   @media screen and (max-width: 40em) {
     padding-bottom: 20px;
-  }
-`;
-
-const ResponsiveModalOverlay = styled(ModalOverlay)`
-  ${overlay =>
-    overlay.noOverlay &&
-    css`
-      display: none;
-    `}
-  @media screen and (max-width: 40em) {
-    display: none;
   }
 `;
 
@@ -147,7 +126,6 @@ class OnboardingModal extends React.Component {
       step: 0,
       members: [],
       error: null,
-      noOverlay: false,
     };
 
     this.messages = defineMessages({
@@ -199,7 +177,7 @@ class OnboardingModal extends React.Component {
       });
     } catch (e) {
       const errorMsg = getErrorFromGraphqlException(e).message;
-      throw new Error(errorMsg);
+      throw new Error(errorMsg, { cause: e });
     }
   };
 
@@ -213,7 +191,7 @@ class OnboardingModal extends React.Component {
       await this.props.editCollectiveContact({ variables: { collective } });
     } catch (e) {
       const errorMsg = getErrorFromGraphqlException(e).message;
-      throw new Error(errorMsg);
+      throw new Error(errorMsg, { cause: e });
     }
   };
 
@@ -234,7 +212,6 @@ class OnboardingModal extends React.Component {
   };
 
   onClose = () => {
-    this.setState({ noOverlay: true });
     this.props.setShowOnboardingModal(false);
     this.props.router.push(`/${this.props.collective.slug}`);
   };
@@ -253,7 +230,7 @@ class OnboardingModal extends React.Component {
 
   render() {
     const { collective, LoggedInUser, showOnboardingModal, mode, data } = this.props;
-    const { step, isSubmitting, error, noOverlay } = this.state;
+    const { step, isSubmitting, error } = this.state;
 
     return (
       <React.Fragment>
@@ -323,15 +300,7 @@ class OnboardingModal extends React.Component {
                   validate={this.validateFormik}
                   validateOnBlur={true}
                   initialValues={{
-                    socialLinks:
-                      collective.socialLinks?.length !== 0
-                        ? map(collective.socialLinks, sl => omit(sl, '__typename'))
-                        : [
-                            {
-                              type: SocialLinkType.WEBSITE,
-                              url: '',
-                            },
-                          ],
+                    socialLinks: map(collective.socialLinks, sl => omit(sl, '__typename')),
                   }}
                   onSubmit={values => {
                     this.submitCollectiveInfo(values);
@@ -385,53 +354,28 @@ class OnboardingModal extends React.Component {
             )}
           </React.Fragment>
         )}
-        <ResponsiveModalOverlay onClick={this.onClose} noOverlay={noOverlay} />
       </React.Fragment>
     );
   }
 }
 
-// GraphQL for editing Collective admins info
-const editCollectiveMembersMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
-    editCoreContributors(collectiveId: $collectiveId, members: $members) {
-      id
-      members(roles: ["ADMIN"]) {
-        id
-        role
-        member {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
-
-export const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
+const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
   name: 'editCollectiveMembers',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
-
-// GraphQL for editing Collective contact info
-const editCollectiveContactMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveContact($collective: CollectiveInputType!) {
-    editCollective(collective: $collective) {
-      id
-      socialLinks {
-        type
-        url
-      }
-    }
-  }
-`;
 
 const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, {
   name: 'editCollectiveContact',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const addMemberInvitationQuery = graphql(
   gql`
-    query MemberInvitationsQuery($slug: String!) {
+    query MemberInvitations($slug: String!) {
       memberInvitations(account: { slug: $slug }, role: [ADMIN]) {
         id
         role
@@ -447,7 +391,6 @@ const addMemberInvitationQuery = graphql(
   {
     options: props => ({
       variables: { slug: props.collective.slug },
-      context: API_V2_CONTEXT,
     }),
   },
 );
@@ -458,4 +401,4 @@ const addGraphql = compose(
   addMemberInvitationQuery,
 );
 
-export default injectIntl(addGraphql(withRouter(OnboardingModal)));
+export default addGraphql(withRouter(OnboardingModal));

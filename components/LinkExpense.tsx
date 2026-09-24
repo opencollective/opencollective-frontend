@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { getCollectiveTypeForUrl } from '../lib/collective';
 
 import Link from './Link';
 
@@ -17,7 +17,7 @@ type LinkExpenseProps = {
     legacyId?: number;
   };
   onClick?: (expenseId: string | number) => void;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 
   title?: string;
   openInNewTab?: boolean;

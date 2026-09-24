@@ -1,7 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
@@ -29,7 +29,7 @@ const ListItem = styled.li`
   padding-left: 26px;
 
   @media screen and (min-width: 64em) {
-    :first-of-type {
+    &:first-of-type {
       margin-top: 0;
     }
   }
@@ -53,8 +53,8 @@ const FeeDescription = styled(FeeData)`
 `;
 
 const AccessToWrapper = styled(Container)`
-  :nth-child(1),
-  :nth-child(2) {
+  &:nth-child(1),
+  &:nth-child(2) {
     margin-bottom: 46px;
   }
 `;
@@ -90,6 +90,7 @@ const messages = defineMessages({
   'pricing.outsideFunds.description': {
     defaultMessage:
       'Manually credit Collective budgets with funds received outside the platform (e.g., cash, historical transactions, or third party channels like a shop).',
+    id: 'SqpA8z',
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',
@@ -97,6 +98,7 @@ const messages = defineMessages({
   },
   'pricing.bankTransfer.description': {
     defaultMessage: 'Automatically provide wire instructions and a reference number for tracking transactions.',
+    id: 'LnnC1J',
   },
   'pricing.creditCard': {
     id: 'pricing.creditCard',
@@ -105,6 +107,7 @@ const messages = defineMessages({
   'pricing.creditCard.description': {
     defaultMessage:
       'Receive financial contributions via credit card, automatically updating your budget for transparent tracking. *Stripe fees apply',
+    id: 'uM2WZi',
   },
 });
 
@@ -216,23 +219,23 @@ const ForCollectiveCard = () => {
         <Box>
           <ListWrapper as="ul" mt={['32px', 0]}>
             <ListItem>
-              <FormattedMessage defaultMessage="Fundraising and crowdfunding features" />
+              <FormattedMessage defaultMessage="Fundraising and crowdfunding features" id="DDNNLJ" />
             </ListItem>
             <ListItem>
               <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other channels" />
             </ListItem>
             <ListItem>
-              <FormattedMessage defaultMessage="Community engagement tools" />
+              <FormattedMessage defaultMessage="Community engagement tools" id="GuPr/j" />
             </ListItem>
             <ListItem>
-              <FormattedMessage defaultMessage="Transparent budget" />
+              <FormattedMessage defaultMessage="Transparent budget" id="YhM3lt" />
             </ListItem>
             <ListItem>
-              <FormattedMessage defaultMessage="Expense payouts in local currencies" />
+              <FormattedMessage defaultMessage="Expense payouts in local currencies" id="zixHKi" />
             </ListItem>
           </ListWrapper>
           <Container display="flex" flexDirection={['column', null, null, null, 'row']}>
-            <Link href="/create">
+            <Link href="/signup/collective">
               <StyledButton
                 buttonStyle="primary"
                 width={['224px', '226px', null, '237px', '160px']}

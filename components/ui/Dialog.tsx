@@ -1,6 +1,9 @@
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import type { VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 import { X } from 'lucide-react';
+import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../../lib/utils';
 
@@ -8,47 +11,83 @@ const Dialog = DialogPrimitive.Root;
 
 const DialogTrigger = DialogPrimitive.Trigger;
 
-const DialogPortal = ({ className, ...props }: DialogPrimitive.DialogPortalProps) => (
-  <DialogPrimitive.Portal className={cn(className)} {...props} />
+const DialogPortal = DialogPrimitive.Portal;
+
+const dialogOverlayVariants = cva(
+  'fixed inset-0 z-3000 flex max-h-screen flex-col items-center overflow-y-auto bg-foreground/25 px-0 py-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0',
+  {
+    variants: {
+      size: {
+        default: 'sm:px-6 sm:py-20',
+        fullscreen: '',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
 );
-DialogPortal.displayName = DialogPrimitive.Portal.displayName;
 
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & VariantProps<typeof dialogOverlayVariants>
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={cn(
-      'fixed inset-0 z-[3000] flex max-h-screen flex-col items-center overflow-y-auto bg-foreground/25 px-0 py-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:px-6 sm:py-20',
-      className,
-    )}
+    className={cn(dialogOverlayVariants({ size: props.size, className }))}
     {...props}
   />
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+const dialogVariants = cva(
+  'relative z-50 flex w-full grow flex-col gap-4 bg-background p-6 shadow-lg duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+  {
+    variants: {
+      size: {
+        default: 'sm:max-w-lg sm:grow-0 sm:rounded-lg',
+        fullscreen: 'sm:max-w-full',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
+    },
+  },
+);
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
-    hideCloseButton?: boolean;
-  }
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> &
+    VariantProps<typeof dialogVariants> & {
+      hideCloseButton?: boolean;
+      overlayClassName?: string;
+      ignoreOutsideInteraction?: boolean;
+    }
 >(({ className, children, hideCloseButton, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay>
+    <DialogOverlay size={props.size} className={props.overlayClassName}>
       <DialogPrimitive.Content
         ref={ref}
-        className={cn(
-          'relative z-50 w-full grow gap-4 bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out  data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:max-w-lg sm:grow-0 sm:rounded-lg',
-          className,
-        )}
+        className={cn(dialogVariants({ size: props.size, className }))}
+        onInteractOutside={props.ignoreOutsideInteraction ? e => e.preventDefault() : props.onInteractOutside}
+        onPointerDownOutside={e => {
+          // Prevent closing the dialog when clicking on the scrollbar
+          const currentTarget = e.currentTarget as HTMLElement;
+          if (e.detail.originalEvent.offsetX > currentTarget.clientWidth) {
+            e.preventDefault();
+          } else {
+            props.onPointerDownOutside?.(e);
+          }
+        }}
         {...props}
       >
         {children}
         {!hideCloseButton && (
-          <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+          <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
             <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">
+              <FormattedMessage defaultMessage="Close" id="Close" />
+            </span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
@@ -73,7 +112,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-semibold leading-none tracking-tight', className)}
+    className={cn('text-lg leading-none font-semibold tracking-tight', className)}
     {...props}
   />
 ));
@@ -87,4 +126,16 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
-export { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription };
+// ui library
+// ts-unused-exports:disable-next-line
+export {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogOverlay,
+  DialogPortal,
+};

@@ -1,9 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
+import { AnalyticsProperty } from '../../lib/analytics/properties';
 
 import Currency from '../Currency';
 import { Box, Flex } from '../Grid';
@@ -12,6 +14,12 @@ import StyledButton from '../StyledButton';
 
 import { STEPS } from './constants';
 import { getTotalAmount } from './utils';
+
+const ButtonWithTextCentered = styled(StyledButton)`
+  span {
+    vertical-align: baseline;
+  }
+`;
 
 class ContributionFlowButtons extends React.Component {
   static propTypes = {
@@ -28,6 +36,9 @@ class ContributionFlowButtons extends React.Component {
     tier: PropTypes.shape({ type: PropTypes.string }),
     stepDetails: PropTypes.object,
     stepSummary: PropTypes.object,
+    showPlatformTip: PropTypes.bool,
+    isOscTipExperiment: PropTypes.bool,
+    hostSlug: PropTypes.string,
   };
 
   state = { isLoadingNext: false };
@@ -42,7 +53,16 @@ class ContributionFlowButtons extends React.Component {
     }
 
     if (this.props.step.name === 'details') {
-      track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED);
+      track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED, {
+        props: {
+          [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: this.props.stepDetails?.isNewPlatformTip
+            ? 'new'
+            : 'old',
+          [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(this.props.showPlatformTip),
+          [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: Boolean(this.props.isOscTipExperiment),
+          [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.hostSlug,
+        },
+      });
     }
   };
 
@@ -53,7 +73,7 @@ class ContributionFlowButtons extends React.Component {
       case STEPS.PAYMENT:
         return <FormattedMessage id="ContributionFlow.Payment" defaultMessage="Payment" />;
       case STEPS.DETAILS:
-        return <FormattedMessage defaultMessage="Contribution" />;
+        return <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />;
     }
   }
 
@@ -81,7 +101,7 @@ class ContributionFlowButtons extends React.Component {
             </StyledButton>
           )}
           {!paypalButtonProps || nextStep ? (
-            <StyledButton
+            <ButtonWithTextCentered
               mt={2}
               mx={[1, null, 2]}
               minWidth={!nextStep ? 185 : 145}
@@ -116,7 +136,7 @@ class ContributionFlowButtons extends React.Component {
               ) : (
                 <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />
               )}
-            </StyledButton>
+            </ButtonWithTextCentered>
           ) : (
             <Box mx={[1, null, 2]} minWidth={200} mt={2}>
               <PayWithPaypalButton {...paypalButtonProps} isSubmitting={isValidating || this.state.isLoadingNext} />

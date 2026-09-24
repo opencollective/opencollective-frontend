@@ -127,10 +127,10 @@ const MoreFeatures = () => (
         width="100%"
         buttonStyle="marketingSecondary"
         buttonSize="medium"
-        href="https://docs.opencollective.com/help/"
+        href="https://documentation.opencollective.com"
         fontWeight="500"
       >
-        <FormattedMessage defaultMessage="Learn more" />
+        <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
       </StyledLink>
     </Box>
   </Flex>

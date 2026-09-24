@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -34,15 +33,10 @@ const OpenEmailProviderButton = ({ email, children }) => {
     : children(
         <Container mt="24px" mb="24px">
           <StyledLink data-cy="open-inbox-link" href={provider.link}>
-            <FormattedMessage defaultMessage="Go to your mail" />
+            <FormattedMessage defaultMessage="Go to your mail" id="EDXxE/" />
           </StyledLink>
         </Container>,
       );
 };
 
-OpenEmailProviderButton.propTypes = {
-  email: PropTypes.string,
-  /** Called with the button component if email is recognized */
-  children: PropTypes.func.isRequired,
-};
 export default OpenEmailProviderButton;

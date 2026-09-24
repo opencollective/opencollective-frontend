@@ -1,24 +1,42 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
 
-import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+
+import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
+
+export const paymentMethodFragment = gql`
+  fragment UpdatePaymentMethodFragment on PaymentMethod {
+    id
+    name
+    data
+    service
+    type
+    expiryDate
+    account {
+      id
+    }
+    balance {
+      value
+      valueInCents
+      currency
+    }
+  }
+`;
 
 export const managedOrderFragment = gql`
   fragment ManagedOrderFields on Order {
     id
     legacyId
+    publicId
     nextChargeDate
     paymentMethod {
+      ...UpdatePaymentMethodFragment
+    }
+    manualPaymentProvider {
       id
-      service
-      name
       type
-      expiryDate
-      data
-      balance {
-        value
-        valueInCents
-        currency
-      }
+      name
     }
     amount {
       value
@@ -32,17 +50,33 @@ export const managedOrderFragment = gql`
     }
     status
     description
+    memo
     createdAt
     processedAt
+    lastChargedAt
+    hostFeePercent
     frequency
     tier {
       id
       name
     }
-    totalDonations {
-      value
-      valueInCents
-      currency
+    tax {
+      id
+      type
+      rate
+      idNumber
+    }
+    permissions {
+      id
+      canResume
+      canMarkAsExpired
+      canMarkAsPaid
+      canCancel
+      canEdit
+      canComment
+      canSeePrivateActivities
+      canSetTags
+      canUpdateAccountingCategory
     }
     fromAccount {
       id
@@ -53,6 +87,22 @@ export const managedOrderFragment = gql`
       ... on Individual {
         isGuest
       }
+      ...AccountHoverCardFields
+      mainProfile {
+        id
+        name
+        slug
+        imageUrl
+        type
+        ...AccountHoverCardFields
+      }
+    }
+    createdByAccount {
+      id
+      name
+      slug
+      type
+      ...AccountHoverCardFields
     }
     toAccount {
       id
@@ -61,15 +111,31 @@ export const managedOrderFragment = gql`
       type
       description
       tags
-      imageUrl(height: 96)
+      imageUrl
       backgroundImageUrl(height: 256)
       settings
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          name
+          type
+          imageUrl
+        }
+      }
       ... on AccountWithHost {
         host {
           id
           slug
           paypalClientId
           supportedPaymentMethods
+
+          orderAccountingCategories: accountingCategories(kind: CONTRIBUTION) {
+            nodes {
+              id
+              ...AccountingCategorySelectFields
+            }
+          }
         }
       }
       ... on Organization {
@@ -78,14 +144,53 @@ export const managedOrderFragment = gql`
           slug
           paypalClientId
           supportedPaymentMethods
+
+          orderAccountingCategories: accountingCategories(kind: CONTRIBUTION) {
+            nodes {
+              id
+              ...AccountingCategorySelectFields
+            }
+          }
         }
       }
+      ...AccountHoverCardFields
     }
     platformTipAmount {
       value
       valueInCents
+      currency
+    }
+    platformTipEligible
+    paymentProcessorFee {
+      valueInCents
+      currency
+    }
+    pendingContributionData {
+      expectedAt
+      paymentMethod
+      ponumber
+      memo
+      fromAccountInfo {
+        name
+        email
+      }
+    }
+    accountingCategory {
+      id
+      name
+      kind
+      code
+    }
+    balanceAccountingCategory {
+      id
+      name
+      kind
+      code
     }
   }
+  ${accountHoverCardFields}
+  ${paymentMethodFragment}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 export const manageContributionsQuery = gql`
@@ -113,10 +218,15 @@ export const manageContributionsQuery = gql`
         nodes {
           id
           ...ManagedOrderFields
+          totalDonations {
+            value
+            valueInCents
+            currency
+          }
         }
       }
     }
   }
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${managedOrderFragment}
 `;

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useSwipeable } from 'react-swipeable';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -66,13 +65,19 @@ const ControllerButton = styled(StyledRoundButton)`
   }
 `;
 
-const StyledCarousel = props => {
-  const [activeIndex, setActiveIndex] = useState(props.activeIndex || 0);
+const StyledCarousel = ({
+  children,
+  onChange,
+  showArrowController = true,
+  controllerPosition = 'bottom',
+  contentPosition = 'center',
+  ...props
+}) => {
+  const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState('');
   const [sliding, setSliding] = useState(false);
 
   const getOrder = itemIndex => {
-    const { children } = props;
     const numItems = children.length || 1;
     if (numItems === 2) {
       return itemIndex;
@@ -82,7 +87,6 @@ const StyledCarousel = props => {
   };
 
   const nextSlide = () => {
-    const children = props.children;
     const numItems = children.length || 1;
     if (numItems === activeIndex + 1) {
       return;
@@ -92,13 +96,11 @@ const StyledCarousel = props => {
   };
 
   const prevSlide = () => {
-    const children = props.children;
-    const numItems = children.length || 1;
     if (activeIndex === 0) {
       return;
     }
 
-    performSliding('prev', activeIndex === 0 ? numItems - 1 : activeIndex - 1);
+    performSliding('prev', activeIndex - 1);
   };
 
   const performSliding = (direction, activeIndex) => {
@@ -109,8 +111,8 @@ const StyledCarousel = props => {
     setTimeout(() => {
       setSliding(false);
 
-      if (props.onChange) {
-        props.onChange(activeIndex);
+      if (onChange) {
+        onChange(activeIndex);
       }
     }, 50);
   };
@@ -135,7 +137,6 @@ const StyledCarousel = props => {
   };
 
   const renderRightController = () => {
-    const children = props.children;
     const numItems = children.length - 1;
 
     return (
@@ -153,12 +154,11 @@ const StyledCarousel = props => {
     );
   };
 
-  const { children, showArrowController, controllerPosition, contentPosition } = props;
   const handlers = useSwipeable({ onSwipedLeft: () => handleSwipe(true), onSwipedRight: () => handleSwipe() });
 
   return (
     <Container {...props}>
-      <Flex justifyContent={contentPosition || 'center'} alignItems="center" width={1}>
+      <Flex justifyContent={contentPosition} alignItems="center" width={1}>
         {showArrowController && controllerPosition === 'side' && renderLeftController()}
         <Box overflow="hidden" px={2}>
           <Container {...handlers}>
@@ -186,21 +186,6 @@ const StyledCarousel = props => {
       </Container>
     </Container>
   );
-};
-
-StyledCarousel.propTypes = {
-  children: PropTypes.any,
-  activeIndex: PropTypes.number,
-  showArrowController: PropTypes.bool,
-  controllerPosition: PropTypes.string,
-  contentPosition: PropTypes.string,
-  onChange: PropTypes.func,
-  display: PropTypes.array,
-};
-
-StyledCarousel.defaultProps = {
-  showArrowController: true,
-  controllerPosition: 'bottom',
 };
 
 export default StyledCarousel;

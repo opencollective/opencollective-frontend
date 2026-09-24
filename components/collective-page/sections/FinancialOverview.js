@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { isHeavyAccount } from '../../../lib/collective';
+import { gql } from '../../../lib/graphql/helpers';
 
 import { Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -14,8 +14,8 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import ContributionsBudget from './Budget/ContributionsBudget';
 import ExpenseBudget from './Budget/ExpenseBudget';
 
-export const budgetSectionQuery = gql`
-  query BudgetSection($slug: String!) {
+const budgetSectionQuery = gql`
+  query BudgetSection($slug: String!, $heavyAccount: Boolean!) {
     account(slug: $slug) {
       id
       stats {
@@ -24,16 +24,16 @@ export const budgetSectionQuery = gql`
           valueInCents
           currency
         }
-        consolidatedBalance {
+        consolidatedBalance: balance(includeChildren: true) @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
-        yearlyBudget {
+        yearlyBudget @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
-        activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12) {
+        activeRecurringContributions @skip(if: $heavyAccount)
+        totalAmountReceived(periodInMonths: 12) @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
@@ -41,7 +41,7 @@ export const budgetSectionQuery = gql`
           valueInCents
           currency
         }
-        totalNetAmountRaised: totalNetAmountReceived {
+        totalNetAmountRaised: totalAmountReceived(net: true) {
           valueInCents
           currency
         }
@@ -56,8 +56,10 @@ export const budgetSectionQuery = gql`
  */
 const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
-    variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
+    variables: {
+      slug: collective.slug,
+      heavyAccount: isHeavyAccount(collective.slug),
+    },
   });
   const { data, refetch } = budgetQueryResult;
 
@@ -100,21 +102,6 @@ const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
       </Flex>
     </ContainerSectionContent>
   );
-};
-
-SectionFinancialOverview.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    isArchived: PropTypes.bool,
-    settings: PropTypes.object,
-    host: PropTypes.object,
-  }),
-
-  LoggedInUser: PropTypes.object,
 };
 
 export default React.memo(withUser(SectionFinancialOverview));

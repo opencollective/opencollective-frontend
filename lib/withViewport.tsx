@@ -1,5 +1,5 @@
 import React from 'react';
-import { debounce, findIndex, isEqual, zipObject } from 'lodash';
+import { debounce, findIndex, findLastIndex, isEqual, zipObject } from 'lodash-es';
 
 import breakpoints from './theme/breakpoints';
 import { emToPx } from './theme/helpers';
@@ -16,7 +16,9 @@ export enum VIEWPORTS {
 }
 
 // Please keep the same length for these two arrays
+// ts-unused-exports:disable-next-line
 export const BREAKPOINTS_NAMES = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL, VIEWPORTS.MEDIUM, VIEWPORTS.LARGE];
+// ts-unused-exports:disable-next-line
 export const BREAKPOINTS_WIDTHS = BREAKPOINTS_NAMES.map((_, idx) => emToPx(breakpoints[idx]));
 export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS) as Record<
   (typeof BREAKPOINTS_NAMES)[number],
@@ -30,6 +32,7 @@ export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS) as R
  * @param {VIEWPORTS} viewport
  * @param {VIEWPORTS} breakpointName
  */
+// ts-unused-exports:disable-next-line
 export const viewportIsAbove = (viewport, breakpointName) => {
   return BREAKPOINTS_NAMES.indexOf(viewport) >= BREAKPOINTS_NAMES.indexOf(breakpointName);
 };
@@ -39,14 +42,21 @@ export const viewportIsAbove = (viewport, breakpointName) => {
  *
  * @param {VIEWPORTS} viewport
  */
+// ts-unused-exports:disable-next-line
 export const isDesktopOrAbove = viewport => {
   return BREAKPOINTS_NAMES.indexOf(viewport) >= BREAKPOINTS_NAMES.indexOf(VIEWPORTS.MEDIUM);
 };
 
 /** Returns the name of the viewport based on max-width media selector (see `BREAKPOINTS_NAMES`) */
-export const getViewportFromWidth = width => {
+export const getViewportFromMaxWidth = width => {
   const breakpointIdx = findIndex(BREAKPOINTS_WIDTHS, b => width <= b);
   return breakpointIdx === -1 ? VIEWPORTS.LARGE : BREAKPOINTS_NAMES[breakpointIdx];
+};
+
+/** Returns the name of the viewport based on min-width media selector (see `BREAKPOINTS_NAMES`) */
+export const getViewportFromMinWidth = width => {
+  const breakpointIdx = findLastIndex(BREAKPOINTS_WIDTHS, b => width >= b);
+  return breakpointIdx === -1 ? VIEWPORTS.XSMALL : BREAKPOINTS_NAMES[breakpointIdx];
 };
 
 /** Function to build component's state */
@@ -72,11 +82,14 @@ const getStateBuilder = (withWidth, withHeight) => {
  *  - `withHeight` (default: false) - pass the height of the window
  *  - `defaultViewport` (default: UNKNOWN) - if detection fails, fallback on this screen size
  */
-const withViewport = (ChildComponent, options) => {
+function withViewport<T>(
+  ChildComponent: React.ComponentType<T>,
+  options?: { withWidth?: boolean; withHeight?: boolean; defaultViewport?: VIEWPORTS },
+): React.ComponentClass<T> {
   const { withWidth, withHeight, defaultViewport = VIEWPORTS.UNKNOWN } = options || {};
   const buildState = getStateBuilder(withWidth || false, withHeight || false);
 
-  return class Viewport extends React.Component {
+  return class Viewport extends React.Component<T> {
     // Default height usually doesn't matters much, so we use the width as default
     constructor(props) {
       super(props);
@@ -103,7 +116,7 @@ const withViewport = (ChildComponent, options) => {
     onResize: () => void;
 
     doResize = () => {
-      const viewport = getViewportFromWidth(window.innerWidth);
+      const viewport = getViewportFromMaxWidth(window.innerWidth);
       const state = buildState(window.innerWidth, window.innerHeight, viewport);
       if (!isEqual(this.state, state)) {
         this.setState(state);
@@ -114,6 +127,6 @@ const withViewport = (ChildComponent, options) => {
       return <ChildComponent {...this.state} {...this.props} />;
     }
   };
-};
+}
 
 export default withViewport;

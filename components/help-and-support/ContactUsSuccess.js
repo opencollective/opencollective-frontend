@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Newsletter from '../collectives/Newsletter';
@@ -38,6 +38,7 @@ const ContactUsSuccess = () => (
           src="/static/images/help-and-support/success-illustration.png"
           width={96}
           height={96}
+          loading="eager"
         />
       </Box>
       <Box ml={['4px', 3]}>
@@ -55,14 +56,14 @@ const ContactUsSuccess = () => (
       </P>
     </Box>
     <Flex mt="32px" flexDirection="column" alignItems="center">
-      <StyledLink href="https://slack.opencollective.com/" openInNewTab>
+      <StyledLink href="https://discord.opencollective.com/" openInNewTab>
         <Wrapper color="black.900" className="linkWrapper" my={[3, null, 4]} width={['288px', '520px']}>
           <Box width={['184px', 1]}>
             <H3 fontSize="24px" textAlign="left" lineHeight="32px" letterSpacing="-0.008em" mb={2} color="black.800">
-              <FormattedMessage id="helpAndSupport.joinCommunity" defaultMessage="Join our slack community" />
+              <FormattedMessage id="helpAndSupport.joinCommunity" defaultMessage="Join our Discord community" />
             </H3>
             <P fontSize="15px" color="black.700" lineHeight="22px" textDecoration="underline">
-              https://slack.opencollective.com/
+              https://discord.opencollective.com
             </P>
           </Box>
           <Box className="arrowWrapper" color="black.900" fontWeight="bold">

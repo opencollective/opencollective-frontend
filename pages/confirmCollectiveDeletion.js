@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../components/Container';
 import { Flex } from '../components/Grid';
@@ -95,9 +94,6 @@ class ConfirmCollectiveDeletion extends Component {
   }
 }
 
-ConfirmCollectiveDeletion.propTypes = {
-  type: PropTypes.string.isRequired,
-  logout: PropTypes.func,
-};
-
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(ConfirmCollectiveDeletion);

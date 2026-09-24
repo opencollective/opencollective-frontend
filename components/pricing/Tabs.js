@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../Container';
 import Link from '../Link';
@@ -52,7 +51,7 @@ const Tabs = ({ activeTab }) => (
     </Link>
     <Link href="#fiscalHost">
       <Tab active={activeTab === 'fiscalHost'}>
-        <FormattedMessage id="pricing.forFiscalHost" defaultMessage="For fiscal hosts" />
+        <FormattedMessage defaultMessage="For Organizations" id="X7kjxh" />
       </Tab>
     </Link>
     <Link href="#faq">
@@ -62,9 +61,5 @@ const Tabs = ({ activeTab }) => (
     </Link>
   </Container>
 );
-
-Tabs.propTypes = {
-  activeTab: PropTypes.string,
-};
 
 export default Tabs;

@@ -1,0 +1,46 @@
+import type { ExpenseType } from './graphql/types/v2/graphql';
+
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+
+type ExpenseCategoryPrediction = {
+  code: string;
+  name: string;
+  confidence: number;
+};
+
+export const fetchExpenseCategoryPredictions = async ({
+  hostSlug,
+  accountSlug,
+  type,
+  description,
+  items,
+  isHostExpense,
+  includeHostOnly,
+}: {
+  hostSlug: string;
+  accountSlug: string;
+  type: ExpenseType;
+  description: string;
+  items: string;
+  isHostExpense?: boolean;
+  includeHostOnly?: boolean;
+}) => {
+  const urlParams = new URLSearchParams();
+  urlParams.append('host_slug', hostSlug);
+  urlParams.append('collective_slug', accountSlug);
+  urlParams.append('type', type);
+  urlParams.append('description', description);
+  urlParams.append('items', items);
+
+  if (isHostExpense !== undefined) {
+    urlParams.append('is_host_expense', String(isHostExpense));
+  }
+  if (includeHostOnly !== undefined) {
+    urlParams.append('include_host_only', String(includeHostOnly));
+  }
+
+  const response = await fetch(`${ML_SERVICE_URL}/models/expense-category?${urlParams}`);
+  const data = await response.json();
+
+  return data.predictions as ExpenseCategoryPrediction[];
+};

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Box, Flex } from '../Grid';
 
@@ -16,20 +15,15 @@ const UpdateFilters = ({ values, onChange }) => {
   });
 
   return (
-    <Flex flexWrap="wrap">
-      <Box width={[1, 1, 2 / 12]} mr={['none', '15px']}>
+    <Flex flexWrap="wrap" gap="16px">
+      <Box flex="1 0 150px">
         <UpdateOrderByFilter {...getFilterProps('orderBy')} />
       </Box>
-      <Box width={[1, 1, '82%']}>
+      <Box flex="10 0 250px">
         <UpdateSearchFilter {...getFilterProps('searchTerm')} />
       </Box>
     </Flex>
   );
-};
-
-UpdateFilters.propTypes = {
-  values: PropTypes.object,
-  onChange: PropTypes.func,
 };
 
 export default React.memo(UpdateFilters);

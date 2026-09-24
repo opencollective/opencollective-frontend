@@ -1,17 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
-import ExpenseTypeTag from './expenses/ExpenseTypeTag';
+import { expenseTagsQuery, UNTAGGED_VALUE } from './dashboard/filters/ExpenseTagsFilter';
+import { useToast } from './ui/useToast';
+import EditTags, { AutocompleteEditTags } from './EditTags';
 import { Flex } from './Grid';
-import StyledInputTags from './StyledInputTags';
 import StyledTag from './StyledTag';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const setTagsMutation = gql`
   mutation SetTags($order: OrderReferenceInput, $expense: ExpenseReferenceInput, $tags: [String!]!) {
@@ -32,52 +31,51 @@ const setTagsMutation = gql`
  * Display expense tags, with the ability to edit them. Triggers a migration whenever a tag changes.
  */
 const TagsForAdmins = ({ expense, order, suggestedTags }) => {
-  const [setTags, { loading }] = useMutation(setTagsMutation, { context: API_V2_CONTEXT });
+  const [setTags, { loading }] = useMutation(setTagsMutation);
   const tagList = expense?.tags || order?.tags;
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
-  return (
-    <StyledInputTags
-      disabled={loading}
-      value={tagList}
-      suggestedTags={suggestedTags}
-      onChange={async tags => {
-        try {
-          const referencedObject = expense ? { expense: { id: expense.id } } : { order: { id: order.id } };
-          await setTags({ variables: { ...referencedObject, tags: tags.map(tag => tag.value) } });
-        } catch (e) {
-          addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
-        }
-      }}
-    />
-  );
-};
 
-TagsForAdmins.propTypes = {
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
+  const onChange = React.useCallback(
+    async tags => {
+      try {
+        const referencedObject = expense ? { expense: { id: expense.id } } : { order: { id: order.id } };
+        await setTags({ variables: { ...referencedObject, tags: tags.map(tag => tag.value) } });
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      }
+    },
+    [expense, order],
+  );
+
+  if (expense) {
+    return (
+      <AutocompleteEditTags
+        disabled={loading}
+        value={tagList}
+        query={expenseTagsQuery}
+        variables={{ account: { slug: expense?.account?.slug } }}
+        onChange={onChange}
+      />
+    );
+  }
+  return <EditTags disabled={loading} value={tagList} suggestedTags={suggestedTags} onChange={onChange} />;
 };
 
 const Tag = styled(StyledTag).attrs({
-  mb: '4px',
-  mr: '4px',
   variant: 'rounded-right',
 })``;
 
-const Tags = ({ expense, order, isLoading, limit, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
+const Tags = ({
+  expense = null,
+  order = null,
+  limit = 4,
+  getTagProps = undefined,
+  children = undefined,
+  canEdit = false,
+  suggestedTags = undefined,
+  showUntagged = false,
+}) => {
   const intl = useIntl();
   const tagList = expense?.tags || order?.tags;
 
@@ -93,9 +91,7 @@ const Tags = ({ expense, order, isLoading, limit, getTagProps, children, canEdit
     return children ? children({ key: tag, tag, renderedTag, props: extraTagProps }) : renderedTag;
   };
   return (
-    <Flex flexWrap="wrap" alignItems="flex-start">
-      {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />}
-
+    <Flex flexWrap="wrap" alignItems="flex-start" gap={2}>
       {canEdit ? (
         <TagsForAdmins expense={expense} order={order} suggestedTags={suggestedTags} />
       ) : (
@@ -104,8 +100,8 @@ const Tags = ({ expense, order, isLoading, limit, getTagProps, children, canEdit
             {tagList.slice(0, limit).map(tag => renderTag({ tag }))}
             {showUntagged &&
               renderTag({
-                tag: 'untagged',
-                label: intl.formatMessage(defineMessage({ defaultMessage: 'Untagged' })),
+                tag: UNTAGGED_VALUE,
+                label: intl.formatMessage(defineMessage({ defaultMessage: 'Untagged', id: '8/OT+O' })),
               })}
 
             {tagList.length > limit && (
@@ -122,40 +118,6 @@ const Tags = ({ expense, order, isLoading, limit, getTagProps, children, canEdit
       )}
     </Flex>
   );
-};
-
-Tags.propTypes = {
-  isLoading: PropTypes.bool,
-  /** Max number of tags to display */
-  limit: PropTypes.number,
-  /** A render func that gets passed the tag */
-  children: PropTypes.func,
-  /** A function to build the tag props dynamically */
-  getTagProps: PropTypes.func,
-  /** Whether current user can edit the tags */
-  canEdit: PropTypes.bool,
-  /** If canEdit is true, this array is used to display suggested tags */
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
-  /** Whether to show an "Untagged" tag (when used for filtering) */
-  showUntagged: PropTypes.bool,
-};
-
-Tags.defaultProps = {
-  limit: 4,
 };
 
 export default Tags;

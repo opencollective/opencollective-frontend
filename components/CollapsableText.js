@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import StyledLink from './StyledLink';
@@ -44,11 +43,6 @@ const CollapsableText = ({ text, maxLength }) => {
       </span>
     );
   }
-};
-
-CollapsableText.propTypes = {
-  maxLength: PropTypes.number.isRequired,
-  text: PropTypes.string,
 };
 
 export default CollapsableText;

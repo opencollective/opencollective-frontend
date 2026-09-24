@@ -1,14 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import roles from '../lib/constants/roles';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import formatMemberRole from '../lib/i18n/member-role';
 import { formatDate } from '../lib/utils';
+import roles from '@/lib/constants/roles';
 
 import Avatar from './Avatar';
 import { Box, Flex } from './Grid';
@@ -63,9 +62,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
   const [acceptedTOS, setAcceptedTOS] = React.useState(!hostTermsUrl); // Automatically accepts the TOS if there is no TOS URL
   const [accepted, setAccepted] = React.useState();
   const [isSubmitting, setSubmitting] = React.useState(false);
-  const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation);
   const isDisabled = isSubmitting;
   const hasReplied = data && typeof data.replyToMemberInvitation !== 'undefined';
 
@@ -75,7 +72,8 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
     await sendReplyToInvitation({ variables: { invitation: { id: invitation.id }, accept } });
     await refetchLoggedInUser();
     if (accept && redirectOnAccept) {
-      await router.push(`/${invitation.account.slug}`);
+      const redirectToDashboard = [roles.ADMIN, roles.ACCOUNTANT].includes(invitation.role);
+      await router.push(redirectToDashboard ? `/dashboard/${invitation.account.slug}` : `/${invitation.account.slug}`);
     }
     setSubmitting(false);
   };
@@ -194,29 +192,6 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
       )}
     </StyledCard>
   );
-};
-
-ReplyToMemberInvitationCard.propTypes = {
-  isSelected: PropTypes.bool,
-  invitation: PropTypes.shape({
-    id: PropTypes.string,
-    role: PropTypes.oneOf(Object.values(roles)),
-    account: PropTypes.shape({
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      host: PropTypes.shape({
-        name: PropTypes.string,
-        termsUrl: PropTypes.string,
-      }),
-    }),
-    inviter: PropTypes.shape({
-      name: PropTypes.string,
-    }),
-    createdAt: PropTypes.string,
-  }),
-  /** @ignore form withUser */
-  refetchLoggedInUser: PropTypes.func,
-  redirectOnAccept: PropTypes.bool,
 };
 
 export default withUser(ReplyToMemberInvitationCard);

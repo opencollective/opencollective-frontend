@@ -27,8 +27,8 @@ describe('Conversations', () => {
       );
 
       // Add tags
-      cy.getByDataCy('styled-input-tags-open').click();
-      cy.getByDataCy('styled-input-tags-input').type('amazing stuff{enter}{enter}');
+      cy.getByDataCy('edit-tags-open').click();
+      cy.getByDataCy('edit-tags-input').type('amazing stuff{enter}{enter}');
 
       // Save then redirects to the conversation page
       cy.getByDataCy('submit-new-conversation-btn').click();
@@ -48,8 +48,8 @@ describe('Conversations', () => {
       // Edit tags
       const sampleTag = 'alot more amazing stuff';
       cy.getByDataCy('InlineEditField-Trigger-tags').click();
-      cy.getByDataCy('styled-input-tags-open').click();
-      cy.getByDataCy('styled-input-tags-input').type(`${sampleTag}{enter}`).blur();
+      cy.getByDataCy('edit-tags-open').click();
+      cy.getByDataCy('edit-tags-input').type(`${sampleTag}{enter}`).blur();
       cy.contains(`${sampleTag}`.toLowerCase());
 
       // Add comment

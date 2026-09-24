@@ -1,36 +1,22 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
-import { max } from 'lodash';
+import { max } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { imagePreview } from '../lib/image-utils';
 import { getFileExtensionFromUrl } from '../lib/url-helpers';
+import { formatFileSize } from '@/lib/file-utils';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
 import Link from './Link';
 import LoadingPlaceholder from './LoadingPlaceholder';
+import Spinner from './Spinner';
 import { fadeInDown } from './StyledKeyframes';
 import StyledLink from './StyledLink';
-import StyledSpinner from './StyledSpinner';
 import { P } from './Text';
-
-const ImageLink = styled(StyledLink)`
-  cursor: pointer;
-  overflow: hidden;
-  display: block;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-`;
-
-ImageLink.defaultProps = {
-  openInNewTab: true,
-};
-
 const FileTextIcon = styled(FileText)`
   opacity: 1;
 `;
@@ -85,25 +71,6 @@ const FileName = styled(P)`
   text-overflow: ellipsis;
 `;
 
-const PrivateIconContainer = styled.div`
-  text-align: center;
-  svg {
-    max-height: 32px;
-  }
-`;
-
-const formatFileSize = sizeInBytes => {
-  if (sizeInBytes < 1024) {
-    return `${sizeInBytes} bytes`;
-  } else if (sizeInBytes < 1048576) {
-    return `${(sizeInBytes / 1024).toFixed(2)} KB`;
-  } else if (sizeInBytes < 1073741824) {
-    return `${(sizeInBytes / 1048576).toFixed(2)} MB`;
-  } else {
-    return `${(sizeInBytes / 1073741824).toFixed(2)} GB`;
-  }
-};
-
 /**
  * To display the preview of a file uploaded on Open Collective.
  * Supports images and PDFs.
@@ -118,22 +85,24 @@ const UploadedFilePreview = ({
   alt = 'Uploaded file preview',
   fileName = undefined,
   fileSize = undefined,
+  fileType = undefined,
   showFileName = undefined,
   border = '1px solid #dcdee0',
   openFileViewer = undefined,
   ...props
 }) => {
-  let content = null;
+  let content;
   const fileExtension = getFileExtensionFromUrl(url);
-  const isText = ['csv', 'txt'].includes(fileExtension);
+  const isText = ['csv', 'txt'].includes(fileExtension) || fileType === 'text/csv' || fileType === 'text/plain';
+  const isPdf = fileExtension === 'pdf' || fileType === 'application/pdf';
 
   if (isLoading) {
     content = <LoadingPlaceholder borderRadius={8} />;
   } else if (isDownloading) {
-    content = <StyledSpinner size="50%" />;
+    content = <Spinner size="50%" />;
   } else if (isPrivate) {
     content = (
-      <PrivateInfoIcon color="#dcdee0" size="60%" tooltipProps={{ childrenContainer: PrivateIconContainer }}>
+      <PrivateInfoIcon size="60%" className="mx-auto text-slate-200">
         <FormattedMessage id="Attachment.Private" defaultMessage="This attachment is private" />
       </PrivateInfoIcon>
     );
@@ -148,16 +117,18 @@ const UploadedFilePreview = ({
     content = <FileText color="#dcdee0" size="60%" />;
   } else if (isText) {
     content = <FileTextIcon color="#dcdee0" size="60%" />;
+  } else if (isPdf) {
+    content = <img src="/static/images/mime-pdf.png" alt={alt || fileName || 'PDF file'} />;
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
     content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
   }
 
   const getContainerAttributes = () => {
-    if (isPrivate) {
+    if (isPrivate || !url) {
       return { as: 'div' };
     } else if (isText || !openFileViewer) {
-      return { href: url, openInNewTab: true, as: url.startsWith('/') ? Link : StyledLink };
+      return { href: url, target: '_blank', rel: 'noopener noreferrer', as: url.startsWith('/') ? Link : StyledLink };
     } else {
       return {
         as: 'div',
@@ -196,22 +167,6 @@ const UploadedFilePreview = ({
       )}
     </MainContainer>
   );
-};
-
-UploadedFilePreview.propTypes = {
-  url: PropTypes.string,
-  isPrivate: PropTypes.bool,
-  isLoading: PropTypes.bool,
-  isDownloading: PropTypes.bool,
-  showFileName: PropTypes.bool,
-  alt: PropTypes.string,
-  fileName: PropTypes.string,
-  onClick: PropTypes.func,
-  fileSize: PropTypes.number,
-  border: PropTypes.string,
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  openFileViewer: PropTypes.func,
 };
 
 export default UploadedFilePreview;

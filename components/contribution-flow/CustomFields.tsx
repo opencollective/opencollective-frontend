@@ -1,5 +1,6 @@
-import React, { HTMLInputTypeAttribute } from 'react';
-import { get, merge, pick } from 'lodash';
+import React from 'react';
+import { get, merge, pick } from 'lodash-es';
+import type { HTMLInputTypeAttribute } from 'react';
 import { useIntl } from 'react-intl';
 
 import StyledHr from '../StyledHr';
@@ -94,7 +95,7 @@ const CustomFieldSelect = ({
   translate: (value: string) => string;
   value: any;
 }) => {
-  const options = customField.options?.map(option => ({ ...option, label: translate(option.label) }));
+  const options = customField.options?.map(option => ({ ...option, label: translate(option.label) })) || [];
   return (
     <StyledSelect
       inputId={fieldProps.id}

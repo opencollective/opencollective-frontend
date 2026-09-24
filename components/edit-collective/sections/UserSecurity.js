@@ -1,11 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { get } from 'lodash-es';
+import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
 
 import Container from '../../Container';
@@ -13,19 +12,18 @@ import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
+import { PasswordInput } from '../../PasswordInput';
 import { PasswordStrengthBar } from '../../PasswordStrengthBar';
-import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import { H3, P } from '../../Text';
-import { TOAST_TYPE, withToasts } from '../../ToastProvider';
 import { TwoFactorAuthenticationSettings } from '../../two-factor-authentication/TwoFactorAuthenticationSettings';
+import { Button } from '../../ui/Button';
+import { toast } from '../../ui/useToast';
 import { withUser } from '../../UserProvider';
 
 class UserSecurity extends React.Component {
   static propTypes = {
-    /** From intl */
-    intl: PropTypes.object.isRequired,
     /** From graphql query */
     setPassword: PropTypes.func.isRequired,
     /** From withUser */
@@ -41,8 +39,6 @@ class UserSecurity extends React.Component {
       individual: PropTypes.object,
       loading: PropTypes.bool,
     }),
-    /** From withToasts */
-    addToast: PropTypes.func.isRequired,
     /** From parent component */
     slug: PropTypes.string,
   };
@@ -61,6 +57,15 @@ class UserSecurity extends React.Component {
     };
 
     this.setPassword = this.setPassword.bind(this);
+    this.hasTriggeredScroll = false;
+  }
+
+  componentDidUpdate() {
+    if (window.location.hash && !this.hasTriggeredScroll && !this.props.data.loading) {
+      this.hasTriggeredScroll = true;
+      const section = document.querySelector(window.location.hash);
+      section.scrollIntoView();
+    }
   }
 
   async setPassword() {
@@ -68,7 +73,9 @@ class UserSecurity extends React.Component {
 
     if (password === currentPassword) {
       this.setState({
-        passwordError: <FormattedMessage defaultMessage="Password can't be the same as current password" />,
+        passwordError: (
+          <FormattedMessage defaultMessage="New password can't be the same as current password" id="ne9Dbl" />
+        ),
       });
       return;
     }
@@ -76,7 +83,10 @@ class UserSecurity extends React.Component {
     if (passwordScore <= 1) {
       this.setState({
         passwordError: (
-          <FormattedMessage defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one." />
+          <FormattedMessage
+            defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one."
+            id="C2rcD0"
+          />
         ),
       });
       return;
@@ -98,12 +108,12 @@ class UserSecurity extends React.Component {
         passwordLoading: false,
         passwordKey: Number(passwordKey) + 1,
       });
-      this.props.addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: hadPassword ? (
-          <FormattedMessage defaultMessage="Password successfully updated" />
+          <FormattedMessage defaultMessage="Password successfully updated" id="6oGOC9" />
         ) : (
-          <FormattedMessage defaultMessage="Password successfully set" />
+          <FormattedMessage defaultMessage="Password successfully set" id="cLP25w" />
         ),
       });
     } catch (e) {
@@ -152,19 +162,16 @@ class UserSecurity extends React.Component {
 
           {LoggedInUser.hasPassword && (
             <StyledInputField
-              label={<FormattedMessage defaultMessage="Current Password" />}
+              label={<FormattedMessage defaultMessage="Current Password" id="GretYf" />}
               labelFontWeight="bold"
               htmlFor="current-password"
               mb={2}
               width="100%"
             >
-              <StyledInput
+              <PasswordInput
                 key={`current-password-${passwordKey}`}
-                fontSize="14px"
                 id="current-password"
-                autoComplete="current-password"
                 name="current-password"
-                type="password"
                 required
                 onChange={e => {
                   this.setState({ passwordError: null, currentPassword: e.target.value });
@@ -174,7 +181,7 @@ class UserSecurity extends React.Component {
           )}
 
           <StyledInputField
-            label={<FormattedMessage defaultMessage="New Password" />}
+            label={<FormattedMessage defaultMessage="New Password" id="Ev6SEF" />}
             labelFontWeight="bold"
             htmlFor="new-password"
             mt={2}
@@ -183,6 +190,7 @@ class UserSecurity extends React.Component {
             hint={
               <FormattedMessage
                 defaultMessage="Strong password recommended. Short or weak one restricted. <link>The strength of a password is a function of length, complexity, and unpredictability.</link>"
+                id="qaIW32"
                 values={{
                   link: getI18nLink({
                     href: 'https://en.wikipedia.org/wiki/Password_strength',
@@ -192,12 +200,10 @@ class UserSecurity extends React.Component {
               />
             }
           >
-            <StyledInput
+            <PasswordInput
               key={`current-password-${passwordKey}`}
-              fontSize="14px"
               id="new-password"
-              autoComplete="new-password"
-              type="password"
+              name="new-password"
               required
               onChange={e => {
                 this.setState({ passwordError: null, password: e.target.value });
@@ -214,9 +220,10 @@ class UserSecurity extends React.Component {
             />
           </div>
 
-          <StyledButton
-            my={2}
-            minWidth={140}
+          <Button
+            variant="outline"
+            size="default"
+            className="mt-3"
             loading={passwordLoading}
             disabled={!password || (LoggedInUser.hasPassword && !currentPassword)}
             onClick={this.setPassword}
@@ -226,7 +233,7 @@ class UserSecurity extends React.Component {
             ) : (
               <FormattedMessage id="Security.SetPassword.Button" defaultMessage="Set Password" />
             )}
-          </StyledButton>
+          </Button>
         </Container>
       </Fragment>
     );
@@ -247,7 +254,7 @@ class UserSecurity extends React.Component {
       <Flex flexDirection="column">
         {this.renderPasswordManagement()}
 
-        <H3 fontSize="18px" fontWeight="700" mb={3}>
+        <H3 id="two-factor-auth" fontSize="18px" fontWeight="700" mb={3}>
           <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
         </H3>
         <TwoFactorAuthenticationSettings individual={account} userTwoFactorAuthenticationMethods={twoFactorMethods} />
@@ -292,11 +299,9 @@ const setPasswordMutation = gql`
 const addGraphql = compose(
   graphql(setPasswordMutation, {
     name: 'setPassword',
-    options: { context: API_V2_CONTEXT },
   }),
   graphql(accountHasTwoFactorAuthQuery, {
     options: props => ({
-      context: API_V2_CONTEXT,
       variables: {
         slug: props.slug,
       },
@@ -304,4 +309,4 @@ const addGraphql = compose(
   }),
 );
 
-export default injectIntl(withToasts(withUser(addGraphql(UserSecurity))));
+export default withUser(addGraphql(UserSecurity));

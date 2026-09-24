@@ -1,5 +1,5 @@
 import { themeGet } from '@styled-system/theme-get';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { typography } from 'styled-system';
 
 import { H1, H2, P } from '../Text';
@@ -27,7 +27,7 @@ export const MainTitle = styled(H1)`
 `;
 
 export const MainDescription = styled(P)`
-  font-weight: 500;
+  font-weight: 400;
   font-size: 16px;
   line-height: 24px;
   color: ${themeGet('colors.black.800')};

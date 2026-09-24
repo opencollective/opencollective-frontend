@@ -1,11 +1,10 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { MessageSquare } from '@styled-icons/feather/MessageSquare';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
@@ -77,7 +76,7 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
       >
         <StyledLink
           as={Link}
-          underlineOnHover
+          $underlineOnHover
           href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
         >
           {children}
@@ -92,7 +91,7 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
       >
         <StyledLink
           as={Link}
-          underlineOnHover
+          $underlineOnHover
           href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}
         >
           {children}
@@ -102,22 +101,6 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
   } else {
     return <React.Fragment>{children}</React.Fragment>;
   }
-};
-
-ItemTitleWrapper.propTypes = {
-  children: PropTypes.node.isRequired,
-  expense: PropTypes.shape({
-    legacyId: PropTypes.number,
-    account: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }),
-  order: PropTypes.shape({
-    legacyId: PropTypes.number,
-    toAccount: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }),
 };
 
 const KindTag = styled(StyledTag).attrs({
@@ -152,7 +135,7 @@ const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   );
 };
 
-const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
+const TransactionItem = ({ displayActions, collective, transaction }) => {
   const {
     toAccount,
     fromAccount,
@@ -178,7 +161,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const legacyCollectiveId = collective.legacyId || collective.id;
   const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === legacyCollectiveId;
   const avatarCollective = isCredit ? fromAccount : toAccount;
-  const isProcessingOrPending = hasOrder && [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(order?.status);
+  const isPending = hasOrder && [ORDER_STATUS.PENDING].includes(order?.status);
 
   const displayedAmount = getDisplayedAmount(transaction, collective);
 
@@ -218,7 +201,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         <Flex flexWrap="wrap" justifyContent="space-between">
           <Flex flex="1" minWidth="60%" mr={3}>
             <Box mr={3}>
-              <LinkCollective collective={avatarCollective}>
+              <LinkCollective collective={avatarCollective} withHoverCard>
                 <Avatar collective={avatarCollective} radius={40} />
               </LinkCollective>
             </Box>
@@ -230,7 +213,11 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 lineHeight={['20px', null, null, '24px']}
               >
                 <ItemTitleWrapper expense={expense} order={order}>
-                  <Span title={description} color={description ? 'black.900' : 'black.600'}>
+                  <Span
+                    fontSize={['14px', null, null, '16px']}
+                    title={description}
+                    color={description ? 'black.900' : 'black.600'}
+                  >
                     {description ? (
                       truncate(description, { length: 60 })
                     ) : (
@@ -239,14 +226,12 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   </Span>
                 </ItemTitleWrapper>
                 {isOwnUserProfile && transaction.fromAccount?.isIncognito && (
-                  <Span ml={1} css={{ verticalAlign: 'text-bottom' }}>
-                    <PrivateInfoIcon color="#969BA3">
-                      <FormattedMessage
-                        id="PrivateTransaction"
-                        defaultMessage="This incognito transaction is only visible to you"
-                      />
-                    </PrivateInfoIcon>
-                  </Span>
+                  <PrivateInfoIcon className="ml-1 align-bottom text-muted-foreground">
+                    <FormattedMessage
+                      id="PrivateTransaction"
+                      defaultMessage="This incognito transaction is only visible to you"
+                    />
+                  </PrivateInfoIcon>
                 )}
               </Container>
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
@@ -257,7 +242,9 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                     <FormattedMessage
                       id="Transaction.from"
                       defaultMessage="from {name}"
-                      values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} /> }}
+                      values={{
+                        name: <StyledLink key="name" as={LinkCollective} withHoverCard collective={fromAccount} />,
+                      }}
                     />
                     &nbsp;
                   </Fragment>
@@ -266,7 +253,9 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   <FormattedMessage
                     id="Transaction.to"
                     defaultMessage="to {name}"
-                    values={{ name: <StyledLink as={LinkCollective} collective={toAccount} /> }}
+                    values={{
+                      name: <StyledLink key="name" as={LinkCollective} withHoverCard collective={toAccount} />,
+                    }}
                   />
                 }
                 {giftCardEmitterAccount && (
@@ -276,8 +265,15 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                       id="transaction.usingGiftCardFrom"
                       defaultMessage="using a {giftCard} from {collective}"
                       values={{
-                        giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
-                        collective: <StyledLink as={LinkCollective} collective={giftCardEmitterAccount} />,
+                        giftCard: <DefinedTerm key="gift-card" term={Terms.GIFT_CARD} textTransform="lowercase" />,
+                        collective: (
+                          <StyledLink
+                            key="collective"
+                            as={LinkCollective}
+                            withHoverCard
+                            collective={giftCardEmitterAccount}
+                          />
+                        ),
                       }}
                     />
                   </React.Fragment>
@@ -309,12 +305,12 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               ml="auto"
             >
               <TransactionSign isCredit={isCredit} />
-              <Span fontWeight="bold" color="black.900" mr={1}>
+              <Span fontWeight="bold" color="black.900" mr={1} fontSize="16px">
                 {formatCurrency(Math.abs(displayedAmount.valueInCents), displayedAmount.currency, {
                   locale: intl.locale,
                 })}
               </Span>
-              <Span color="black.700" textTransform="uppercase">
+              <Span color="black.700" textTransform="uppercase" fontSize="16px">
                 {displayedAmount.currency}
               </Span>
             </Container>
@@ -338,7 +334,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               {i18nTransactionKind(intl, transaction.kind)}
               {Boolean(order?.legacyId) && ` #${order.legacyId}`}
             </KindTag>
-            {(!isProcessingOrPending || transaction.paymentMethod) && transactionDetailsLink()}
+            {(!isPending || transaction.paymentMethod) && transactionDetailsLink()}
           </Container>
         )}
         {isExpense && (
@@ -354,90 +350,10 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         )}
       </Box>
       {isExpanded && (hasOrder || isExpense) && (
-        <TransactionDetails
-          displayActions={displayActions}
-          transaction={transaction}
-          onMutationSuccess={onMutationSuccess}
-        />
+        <TransactionDetails displayActions={displayActions} transaction={transaction} />
       )}
     </Item>
   );
-};
-
-TransactionItem.propTypes = {
-  /* Display Refund and Download buttons in transactions */
-  displayActions: PropTypes.bool,
-  transaction: PropTypes.shape({
-    isRefunded: PropTypes.bool,
-    isRefund: PropTypes.bool,
-    isOrderRejected: PropTypes.bool,
-    fromAccount: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-      isIncognito: PropTypes.bool,
-    }).isRequired,
-    host: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }),
-    toAccount: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }),
-    giftCardEmitterAccount: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }),
-    order: PropTypes.shape({
-      id: PropTypes.string,
-      legacyId: PropTypes.number,
-      status: PropTypes.string,
-    }),
-    expense: PropTypes.shape({
-      id: PropTypes.string,
-      status: PropTypes.string,
-      legacyId: PropTypes.number,
-      comments: PropTypes.shape({
-        totalCount: PropTypes.number,
-      }),
-    }),
-    id: PropTypes.string,
-    uuid: PropTypes.string,
-    type: PropTypes.oneOf(Object.values(TransactionTypes)),
-    kind: PropTypes.oneOf(Object.values(TransactionKind)),
-    currency: PropTypes.string,
-    description: PropTypes.string,
-    createdAt: PropTypes.string,
-    hostFeeInHostCurrency: PropTypes.number,
-    platformFeeInHostCurrency: PropTypes.number,
-    paymentProcessorFeeInHostCurrency: PropTypes.number,
-    taxAmount: PropTypes.object,
-    amount: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-    netAmount: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-    netAmountInCollectiveCurrency: PropTypes.number,
-    usingGiftCardFromCollective: PropTypes.object,
-    paymentMethod: PropTypes.object,
-  }),
-  collective: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    legacyId: PropTypes.number,
-    slug: PropTypes.string.isRequired,
-  }).isRequired,
-  onMutationSuccess: PropTypes.func,
 };
 
 export default TransactionItem;

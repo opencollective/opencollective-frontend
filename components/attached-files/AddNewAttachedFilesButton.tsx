@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone';
+import ReactDropzone from 'react-dropzone';
 import { FormattedMessage } from 'react-intl';
 
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
@@ -8,7 +7,21 @@ import { attachmentDropzoneParams } from './lib/attachments';
 
 import StyledButton from '../StyledButton';
 
-const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess, isMulti, kind }) => {
+interface AddNewAttachedFilesButtonProps {
+  disabled?: boolean;
+  onSuccess?(...args: unknown[]): unknown;
+  mockImageGenerator?(...args: unknown[]): unknown;
+  isMulti?: boolean;
+  kind?: string;
+}
+
+const AddNewAttachedFilesButton = ({
+  disabled,
+  mockImageGenerator,
+  onSuccess,
+  isMulti,
+  kind,
+}: AddNewAttachedFilesButtonProps) => {
   const { isUploading, uploadFiles } = useImageUploader({
     isMulti,
     mockImageGenerator,
@@ -18,7 +31,7 @@ const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess, is
   });
 
   return (
-    <Dropzone {...attachmentDropzoneParams} disabled={disabled} multiple={true} onDrop={uploadFiles}>
+    <ReactDropzone {...attachmentDropzoneParams} disabled={disabled} multiple={true} onDrop={uploadFiles}>
       {({ getRootProps, getInputProps }) => (
         <div {...getRootProps()}>
           <input {...getInputProps()} />
@@ -28,14 +41,8 @@ const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess, is
           </StyledButton>
         </div>
       )}
-    </Dropzone>
+    </ReactDropzone>
   );
-};
-
-AddNewAttachedFilesButton.propTypes = {
-  disabled: PropTypes.bool,
-  onSuccess: PropTypes.func,
-  mockImageGenerator: PropTypes.func,
 };
 
 export default AddNewAttachedFilesButton;

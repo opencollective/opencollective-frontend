@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';

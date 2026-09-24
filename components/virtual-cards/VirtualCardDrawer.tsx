@@ -1,12 +1,14 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { VirtualCard as GraphQLVirtualCard, VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
+import { gql } from '../../lib/graphql/helpers';
+import type { VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
+import { accountHoverCardFields } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import { Drawer, DrawerActions, DrawerHeader } from '../Drawer';
@@ -19,8 +21,8 @@ import LinkCollective from '../LinkCollective';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { InfoList, InfoListItem } from '../ui/InfoList';
+import { useToast } from '../ui/useToast';
 
 import { StripeVirtualCardComplianceStatement } from './StripeVirtualCardComplianceStatement';
 
@@ -34,7 +36,7 @@ type VirtualCardDrawerProps = {
 };
 
 const virtualCardQuery = gql`
-  query VirtualCard($virtualCard: VirtualCardReferenceInput!) {
+  query VirtualCardDrawer($virtualCard: VirtualCardReferenceInput!) {
     virtualCard(virtualCard: $virtualCard) {
       id
       name
@@ -54,6 +56,7 @@ const virtualCardQuery = gql`
         name
         slug
         imageUrl
+        ...AccountHoverCardFields
       }
       assignee {
         id
@@ -61,6 +64,7 @@ const virtualCardQuery = gql`
         email
         slug
         imageUrl
+        ...AccountHoverCardFields
       }
       host {
         id
@@ -71,16 +75,16 @@ const virtualCardQuery = gql`
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [isEditingVirtualCard, setIsEditingVirtualCard] = React.useState(false);
 
   const query = useQuery<{ virtualCard: GraphQLVirtualCard }>(virtualCardQuery, {
-    context: API_V2_CONTEXT,
     skip: !props.open,
     variables: {
       virtualCard: {
@@ -92,12 +96,12 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
   const handleEditSuccess = React.useCallback(
     message => {
       setIsEditingVirtualCard(false);
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: message,
       });
     },
-    [addToast],
+    [toast],
   );
 
   const { loading, data, error } = query;
@@ -126,7 +130,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               <Box flexGrow={1} m="24px 24px 0 24px">
                 <Flex fontSize="16px" lineHeight="24px" fontWeight="500" justifyContent="space-between">
                   <Box>{virtualCard.name}</Box>
-                  {/* @ts-ignore */}
+                  {/* @ts-expect-error StateLabel is not typed */}
                   <StateLabel isActive={virtualCard.status === VirtualCardStatus.ACTIVE}>
                     {virtualCard.status}
                   </StateLabel>
@@ -138,11 +142,12 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
             <InfoList className="mt-8 sm:grid-cols-2">
               <InfoListItem
                 className="sm:col-span-2"
-                title={<FormattedMessage defaultMessage="Account" />}
+                title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                 value={
                   <LinkCollective
                     collective={virtualCard.account}
                     className="flex items-center gap-2 font-medium hover:underline"
+                    withHoverCard
                   >
                     <Avatar collective={virtualCard.account} radius={24} /> {virtualCard.account.name}
                   </LinkCollective>
@@ -150,11 +155,13 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               />
 
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Assigned to" />}
+                title={<FormattedMessage defaultMessage="Assigned to" id="ONVN5F" />}
                 value={
                   <LinkCollective
                     collective={virtualCard.assignee}
                     className="flex items-center gap-2 font-medium hover:underline"
+                    withHoverCard
+                    hoverCardProps={{ includeAdminMembership: { accountSlug: virtualCard.account.slug } }}
                   >
                     <Avatar collective={virtualCard.assignee} radius={24} /> {virtualCard.assignee.name}
                   </LinkCollective>
@@ -166,7 +173,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                 value={<DateTime dateStyle="medium" value={virtualCard.createdAt} />}
               />
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Available balance" />}
+                title={<FormattedMessage defaultMessage="Available balance" id="f1MZ8o" />}
                 value={getAvailableLimitShortString(
                   intl,
                   virtualCard.currency,
@@ -176,15 +183,15 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                   {
                     AvailableAmount: I18nBold,
                     AmountSeparator: v => <strong>&nbsp;{v}&nbsp;</strong>,
-                    LimitAmount: v => <span className="italic text-slate-600">{v}</span>,
-                    LimitInterval: v => <span className="italic text-slate-600">{v}</span>,
+                    LimitAmount: v => <span className="text-slate-600 italic">{v}</span>,
+                    LimitInterval: v => <span className="text-slate-600 italic">{v}</span>,
                   },
                 )}
               />
 
               {virtualCard.spendingLimitRenewsOn && (
                 <InfoListItem
-                  title={<FormattedMessage defaultMessage="Renews on" />}
+                  title={<FormattedMessage defaultMessage="Renews on" id="vSfZde" />}
                   value={<DateTime dateStyle="medium" value={virtualCard.spendingLimitRenewsOn} />}
                 />
               )}
@@ -200,15 +207,14 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
             <ActionsButton
               virtualCard={virtualCard}
               host={virtualCard.host}
-              onError={error => addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) })}
+              onError={error => toast({ variant: 'error', message: i18nGraphqlException(intl, error) })}
               canDeleteVirtualCard={props.canDeleteVirtualCard}
               onDeleteRefetchQuery={props.onDeleteRefetchQuery}
               hideViewTransactions
-              // eslint-disable-next-line react/display-name
               as={React.forwardRef((props, ref: React.ForwardedRef<HTMLButtonElement>) => {
                 return (
                   <StyledButton {...props} ref={ref}>
-                    <FormattedMessage defaultMessage="More actions" />
+                    <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
                   </StyledButton>
                 );
               })}
@@ -220,10 +226,10 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                 href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
                 buttonStyle="secondary"
               >
-                <FormattedMessage defaultMessage="View transactions" />
+                <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
               </StyledButton>
               <StyledButton buttonStyle="primary" onClick={() => setIsEditingVirtualCard(true)}>
-                <FormattedMessage defaultMessage="Edit Card Details" />
+                <FormattedMessage defaultMessage="Edit Card Details" id="ILnhs8" />
               </StyledButton>
             </Flex>
           </Flex>

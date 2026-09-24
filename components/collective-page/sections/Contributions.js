@@ -1,13 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
-import { uniqWith } from 'lodash';
+import { useQuery } from '@apollo/client';
+import { uniqWith } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import CollectiveRoles from '../../../lib/constants/roles';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
@@ -108,7 +107,12 @@ const FILTER_PROPS = [
 ];
 
 const getAvailableFilters = roles => {
-  return FILTER_PROPS.filter(f => f.isActive(roles)).map(f => f.id);
+  let filters = FILTER_PROPS.filter(f => f.isActive(roles));
+  // Drop the "All" filter if it's the only one available with another filter
+  if (roles.length === 1 && filters.length === 2 && filters.some(f => f.id === FILTERS.ALL)) {
+    filters = filters.filter(f => f.id !== FILTERS.ALL);
+  }
+  return filters.map(f => f.id);
 };
 
 const I18nFilters = defineMessages({
@@ -202,6 +206,7 @@ const contributionsSectionQuery = gql`
     $role: [MemberRole]
     $accountType: [AccountType]
     $orderBy: OrderByInput
+    $skipTotalDonations: Boolean!
   ) {
     account(slug: $slug) {
       id
@@ -216,6 +221,7 @@ const contributionsSectionQuery = gql`
         orderByRoles: true
         isApproved: true
         isArchived: false
+        isFrozen: false
         orderBy: $orderBy
       ) {
         offset
@@ -234,7 +240,7 @@ const contributionsSectionQuery = gql`
             description
           }
           since
-          totalDonations {
+          totalDonations @skip(if: $skipTotalDonations) {
             currency
             valueInCents
           }
@@ -262,10 +268,6 @@ const contributionsSectionQuery = gql`
                 backgroundImageUrl(height: 200)
               }
             }
-            stats {
-              id
-              contributorsCount
-            }
           }
         }
       }
@@ -276,17 +278,34 @@ const contributionsSectionQuery = gql`
 const SectionContributions = ({ collective }) => {
   const intl = useIntl();
   const [isLoadingMore, setLoadingMore] = React.useState(false);
-  const [filter, setFilter] = React.useState(collective.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL);
+  const [filter, setFilter] = React.useState(
+    collective.isHost
+      ? FILTERS.HOSTED_COLLECTIVES
+      : collective.type === CollectiveType.VENDOR
+        ? FILTERS.FINANCIAL
+        : FILTERS.ALL,
+  );
   const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
-  const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
-    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...selectedFilter.args },
-    context: API_V2_CONTEXT,
+  const { data, loading, fetchMore, previousData } = useQuery(contributionsSectionQuery, {
+    variables: {
+      slug: collective.slug,
+      limit: PAGE_SIZE,
+      offset: 0,
+      skipTotalDonations: [FILTERS.HOSTED_COLLECTIVES, FILTERS.HOSTED_EVENTS, FILTERS.HOSTED_FUNDS].includes(filter),
+      ...selectedFilter.args,
+    },
+
     notifyOnNetworkStatusChange: true,
   });
   const { data: staticData } = useQuery(contributionsSectionStaticQuery, {
     variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
   });
+  const availableFilters = React.useMemo(() => {
+    if (!data && !previousData) {
+      return [];
+    }
+    return getAvailableFilters((data || previousData)?.account?.memberOf?.roles || []);
+  }, [data, previousData]);
 
   const handleLoadMore = async () => {
     setLoadingMore(true);
@@ -326,7 +345,6 @@ const SectionContributions = ({ collective }) => {
   const { account, memberOf } = data?.account || {};
   const { hostedAccounts, connectedAccounts } = staticData?.account || {};
   const isOrganization = account?.type === CollectiveType.ORGANIZATION;
-  const availableFilters = getAvailableFilters(memberOf?.roles || [], account);
   const membersLeft = memberOf && memberOf.totalCount - memberOf.nodes.length;
   return (
     <Box pb={4}>
@@ -342,20 +360,18 @@ const SectionContributions = ({ collective }) => {
             </H3>
           )}
         </ContainerSectionContent>
-        {availableFilters?.length > 1 && (
-          <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
-            <StyledFilters
-              filters={availableFilters}
-              getLabel={key => intl.formatMessage(I18nFilters[key])}
-              onChange={handleFilterSelect}
-              selected={filter}
-              justifyContent="left"
-              minButtonWidth={175}
-              px={Dimensions.PADDING_X}
-              disabled={isLoadingMore}
-            />
-          </Box>
-        )}
+        <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+          <StyledFilters
+            filters={availableFilters}
+            getLabel={key => intl.formatMessage(I18nFilters[key])}
+            onChange={handleFilterSelect}
+            selected={filter}
+            justifyContent="left"
+            minButtonWidth={175}
+            px={Dimensions.PADDING_X}
+            disabled={isLoadingMore}
+          />
+        </Box>
         <Container
           data-cy="Contributions"
           maxWidth={Dimensions.MAX_SECTION_WIDTH}
@@ -367,7 +383,7 @@ const SectionContributions = ({ collective }) => {
             {(!loading || (isLoadingMore && loading)) &&
               uniqWith(
                 memberOf?.nodes,
-                (member1, member2) => member1.role === member2.role && member1?.account.id === member2?.account.id,
+                (member1, member2) => member1?.role === member2?.role && member1?.account?.id === member2?.account?.id,
               ).map(membership => (
                 <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                   <StyledMembershipCard membership={membership} />
@@ -426,38 +442,6 @@ const SectionContributions = ({ collective }) => {
       )}
     </Box>
   );
-};
-
-SectionContributions.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    isHost: PropTypes.bool,
-  }),
-};
-
-const ContributionsGrid = ({ entries, children }) => {
-  return (
-    <Container
-      data-cy="Contributions"
-      maxWidth={Dimensions.MAX_SECTION_WIDTH}
-      px={Dimensions.PADDING_X}
-      mt={4}
-      mx="auto"
-    >
-      <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
-        {entries.map(entry => (
-          <MembershipCardContainer key={entry.id} data-cy="collective-contribution">
-            {children(entry)}
-          </MembershipCardContainer>
-        ))}
-      </Grid>
-    </Container>
-  );
-};
-
-ContributionsGrid.propTypes = {
-  entries: PropTypes.array.isRequired,
-  children: PropTypes.func.isRequired,
 };
 
 export default SectionContributions;

@@ -1,46 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
-import { CardElement } from '@stripe/react-stripe-js';
+import React from 'react';
+import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { first, get, merge, pick, startCase } from 'lodash';
+import { get, pick, startCase } from 'lodash-es';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { PAYMENT_METHOD_SERVICE } from '../lib/constants/payment-methods';
 import { formatCurrency } from '../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
-import { getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
+import { getErrorFromGraphqlException, i18nGraphqlException } from '../lib/errors';
+import { gql } from '../lib/graphql/helpers';
+import type {
+  AccountReferenceInput,
+  EditPaymentMethodModalQuery,
+  PaymentMethod,
+  SetupIntentInput,
+} from '../lib/graphql/types/v2/graphql';
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
-import AddPaymentMethod, { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
+import { NewPlatformTipSelector } from './contribution-flow/NewPlatformTipContainer';
+import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';
+import type { PaymentMethodOption } from './orders/PaymentMethodPicker';
+import PaymentMethodPicker from './orders/PaymentMethodPicker';
+import { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
 import {
   ContributionInterval,
+  getPlatformTipOptionFromAmount,
   tiersQuery,
   useContributeOptions,
   useUpdateOrder,
+  useUpdatePlatformTip,
 } from './recurring-contributions/UpdateOrderPopUp';
-import {
-  addCreditCardMutation,
-  confirmCreditCardMutation,
-  paymentMethodsQuery,
-  sortAndFilterPaymentMethods,
-  useUpdatePaymentMethod,
-} from './recurring-contributions/UpdatePaymentMethodPopUp';
+import { useUpdatePaymentMethod } from './recurring-contributions/UpdatePaymentMethodPopUp';
+import { Button } from './ui/Button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
+import { toast, useToast } from './ui/useToast';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
 import I18nFormatters from './I18nFormatters';
+import InputAmount from './InputAmount';
+import Loading from './Loading';
 import LoadingPlaceholder from './LoadingPlaceholder';
+import type { BaseModalProps } from './ModalContext';
 import PayWithPaypalButton from './PayWithPaypalButton';
-import { withStripeLoader } from './StripeProvider';
-import StyledButton from './StyledButton';
-import StyledInputAmount from './StyledInputAmount';
-import StyledModal, { ModalBody, ModalHeader } from './StyledModal';
 import StyledRadioList from './StyledRadioList';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
-import { H4, P, Span } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
+import { P, Span } from './Text';
 
 const i18nReasons = defineMessages({
   NO_LONGER_WANT_TO_SUPPORT: {
@@ -51,13 +57,13 @@ const i18nReasons = defineMessages({
   OTHER: { id: 'subscription.cancel.other', defaultMessage: 'Other' },
 });
 
-export type EditOrderActions = 'cancel' | 'editAmount' | 'editPaymentMethod';
+export type EditOrderActions = 'cancel' | 'editAmount' | 'editPlatformTip' | 'editPaymentMethod' | 'editAddedFunds';
 
-type EditOrderModalProps = {
-  onClose: () => void;
+type EditOrderModalProps = BaseModalProps & {
   order: any;
-  account: any;
+  accountSlug: string;
   action: EditOrderActions;
+  onSuccess?: () => void;
 };
 
 const cancelRecurringContributionMutation = gql`
@@ -71,20 +77,16 @@ const cancelRecurringContributionMutation = gql`
 
 const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
 
-  const [submitCancellation] = useMutation(cancelRecurringContributionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitCancellation] = useMutation(cancelRecurringContributionMutation);
 
   const onSubmit = async values => {
     try {
       await submitCancellation({
         variables: values,
       });
-      props.onClose();
-      addToast({
-        type: TOAST_TYPE.INFO,
+      props.setOpen(false);
+      toast({
         message: (
           <FormattedMessage
             id="subscription.createSuccessCancel"
@@ -93,9 +95,10 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
           />
         ),
       });
+      props.onSuccess?.();
     } catch (error) {
       const errorMsg = getErrorFromGraphqlException(error).message;
-      addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+      toast({ variant: 'error', message: errorMsg });
     }
   };
   const formik = useFormik({
@@ -104,56 +107,73 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   });
 
   return (
-    <StyledModal onClose={props.onClose} maxWidth="420px">
-      <ModalHeader onClose={props.onClose}>
-        <H4 fontSize="20px" fontWeight="700">
-          <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
-        </H4>
-      </ModalHeader>
-      <ModalBody as="form" onSubmit={formik.handleSubmit as () => void} mb={0}>
-        <P fontSize="15px" mb="10" lineHeight="20px">
-          <FormattedMessage
-            id="subscription.cancel.question"
-            defaultMessage="Why are you cancelling your subscription today? 🥺"
-          />
-        </P>
-        <StyledRadioList
-          id="reasonCode"
-          name="reasonCode"
-          defaultValue="NO_LONGER_WANT_TO_SUPPORT"
-          options={['NO_LONGER_WANT_TO_SUPPORT', 'UPDATING_ORDER', 'OTHER']}
-          onChange={({ value, name }) => formik.setFieldValue(name, value)}
-          value={formik.values.reasonCode}
-          data-cy="cancel-reason"
-        >
-          {({ value, radio }) => (
-            <Box data-cy={value} my={1} fontSize="13px" fontWeight={400}>
-              <Span mx={2}>{radio}</Span>
-              <Span>{intl.formatMessage(i18nReasons[value])}</Span>
-            </Box>
+    <Dialog open={props.open} onOpenChange={props.setOpen}>
+      <DialogContent
+        className="max-w-[420px]"
+        data-cy="cancel-order-modal"
+        onCloseAutoFocus={e => {
+          if (props.onCloseFocusRef?.current) {
+            e.preventDefault();
+            props.onCloseFocusRef.current.focus();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={formik.handleSubmit as () => void}>
+          <P fontSize="15px" mb="10px" lineHeight="20px">
+            <FormattedMessage
+              id="subscription.cancel.question"
+              defaultMessage="Why are you cancelling your subscription today? 🥺"
+            />
+          </P>
+          <StyledRadioList
+            id="reasonCode"
+            name="reasonCode"
+            defaultValue="NO_LONGER_WANT_TO_SUPPORT"
+            options={['NO_LONGER_WANT_TO_SUPPORT', 'UPDATING_ORDER', 'OTHER']}
+            onChange={({ value, name }) => formik.setFieldValue(name, value)}
+            value={formik.values.reasonCode}
+            data-cy="cancel-reason"
+          >
+            {({ value, radio }) => (
+              <Box data-cy={value} my={1} fontSize="13px" fontWeight={400}>
+                <Span mx={2}>{radio}</Span>
+                <Span>{intl.formatMessage(i18nReasons[value])}</Span>
+              </Box>
+            )}
+          </StyledRadioList>
+          {formik.values.reasonCode === 'OTHER' && (
+            <StyledTextarea
+              name="reason"
+              fontSize="12px"
+              placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)', id: '41Cgcs' })}
+              height={70}
+              width="100%"
+              resize="none"
+              onChange={formik.handleChange}
+              value={formik.values.reason}
+              mt={2}
+              data-cy="cancellation-text-area"
+            />
           )}
-        </StyledRadioList>
-        {formik.values.reasonCode === 'OTHER' && (
-          <StyledTextarea
-            name="reason"
-            fontSize="12px"
-            placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)' })}
-            height={70}
-            width="100%"
-            resize="none"
-            onChange={formik.handleChange}
-            value={formik.values.reason}
-            mt={2}
-          />
-        )}
 
-        <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
-          <StyledButton width="100%" m={1} type="submit" loading={formik.isSubmitting}>
-            <FormattedMessage id="submit" defaultMessage="Submit" />
-          </StyledButton>
-        </Flex>
-      </ModalBody>
-    </StyledModal>
+          <div className="mt-4 flex justify-center">
+            <Button
+              className="w-full"
+              type="submit"
+              loading={formik.isSubmitting}
+              data-cy="recurring-contribution-cancel-yes"
+            >
+              <FormattedMessage id="submit" defaultMessage="Submit" />
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -161,15 +181,19 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   const OTHER_LABEL = 'Other';
   // GraphQL mutations and queries
   const queryVariables = { slug: props.order.toAccount.slug };
-  const { data, loading: tiersLoading } = useQuery(tiersQuery, { variables: queryVariables, context: API_V2_CONTEXT });
+  const { data, loading: tiersLoading } = useQuery(tiersQuery, { variables: queryVariables });
 
   // state management
   const { locale } = useIntl();
-  const { addToast } = useToasts();
-  const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution: props.order, onSuccess: props.onClose });
+  const handleSuccess = () => {
+    props.setOpen(false);
+    props.onSuccess?.();
+  };
+  const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution: props.order, onSuccess: handleSuccess });
   const tiers = get(data, 'account.tiers.nodes', null);
   const disableCustomContributions = get(data, 'account.settings.disableCustomContributions', false);
   const contributeOptionsState = useContributeOptions(props.order, tiers, tiersLoading, disableCustomContributions);
+  const hasTierOptions = tiers?.some(tier => tier.interval !== null);
   const {
     amountOptions,
     inputAmountValue,
@@ -181,9 +205,8 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   } = contributeOptionsState;
   const selectedTier = selectedContributeOption?.isCustom ? null : selectedContributeOption;
   const isPaypal = props.order.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
-  const tipAmount = props.order.platformTipAmount?.valueInCents || 0;
   const newAmount = selectedAmountOption?.label === OTHER_LABEL ? inputAmountValue : selectedAmountOption?.value;
-  const newTotalAmount = newAmount + tipAmount; // For now tip can't be updated, we're just carrying it over
+  const newTotalAmount = newAmount + (props.order.platformTipAmount?.valueInCents || 0);
 
   // When we change the amount option (One of the presets or Other)
   const setSelectedAmountOption = ({ label, value }) => {
@@ -196,19 +219,28 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   };
 
   return (
-    <StyledModal onClose={props.onClose} maxWidth="420px">
-      <ModalHeader onClose={props.onClose}>
-        <H4 fontSize="20px" fontWeight="700">
-          <FormattedMessage id="subscription.menu.updateTier" defaultMessage="Update tier" />
-        </H4>
-      </ModalHeader>
-      <ModalBody mb={0}>
-        <P fontSize="15px" mb="10" lineHeight="20px">
-          <FormattedMessage
-            id="subscription.updateTier.subheader"
-            defaultMessage="Pick an existing tier or enter a custom amount."
-          />
-        </P>
+    <Dialog open={props.open} onOpenChange={props.setOpen}>
+      <DialogContent
+        className="max-w-[420px]"
+        onCloseAutoFocus={e => {
+          if (props.onCloseFocusRef?.current) {
+            e.preventDefault();
+            props.onCloseFocusRef.current.focus();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            <FormattedMessage defaultMessage="Update contribution amount" id="HpWk9J" />
+          </DialogTitle>
+          <DialogDescription>
+            {hasTierOptions ? (
+              <FormattedMessage defaultMessage="Change the tier and recurring contribution amount." id="UNylJ0" />
+            ) : (
+              <FormattedMessage defaultMessage="Change the recurring contribution amount." id="HLCT2z" />
+            )}
+          </DialogDescription>
+        </DialogHeader>
         {tiersLoading || contributeOptionsState.loading ? (
           <LoadingPlaceholder height={100} />
         ) : (
@@ -255,15 +287,13 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
                             <FormattedMessage id="RecurringContributions.customAmount" defaultMessage="Custom amount" />
                           </P>
                           <Box>
-                            <StyledInputAmount
+                            <InputAmount
                               type="number"
                               data-cy="recurring-contribution-custom-amount-input"
                               currency={currency}
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
                               min={DEFAULT_MINIMUM_AMOUNT}
-                              precision={2}
-                              px="2px"
                             />
                           </Box>
                           <P fontSize="12px" fontWeight="600" my={2}>
@@ -295,7 +325,7 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
             )}
           </StyledRadioList>
         )}
-        <Flex flexWrap="wrap" justifyContent="space-between" mt={4}>
+        <div className="mt-4 flex flex-wrap justify-between">
           {isPaypal && selectedAmountOption ? (
             <PayWithPaypalButton
               isSubmitting={isSubmittingOrder}
@@ -304,311 +334,500 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
               interval={
                 selectedContributeOption?.interval || getIntervalFromContributionFrequency(props.order.frequency)
               }
+              order={props.order}
               host={props.order.toAccount.host}
               collective={props.order.toAccount}
               tier={selectedTier}
               style={{ height: 47, size: 'responsive' }}
               subscriptionStartDate={getSubscriptionStartDate(props.order)}
-              onError={e => addToast({ type: TOAST_TYPE.ERROR, title: e.message })}
+              onError={e => toast({ variant: 'error', title: e.message })}
               onSuccess={({ subscriptionId }) =>
                 updateOrder(selectedTier, selectedAmountOption, inputAmountValue, subscriptionId)
               }
             />
           ) : (
-            <StyledButton
-              buttonStyle="secondary"
+            <Button
+              variant="outline"
               loading={isSubmittingOrder}
               data-cy="recurring-contribution-update-order-button"
               onClick={() => updateOrder(selectedTier, selectedAmountOption, inputAmountValue)}
-              width="100%"
+              className="w-full"
             >
               <FormattedMessage id="actions.update" defaultMessage="Update" />
-            </StyledButton>
+            </Button>
           )}
-        </Flex>
-      </ModalBody>
-    </StyledModal>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-const EditPaymentMethodModal = withStripeLoader(
-  ({
-    account,
-    order: contribution,
-    loadStripe,
-    ...props
-  }: Omit<EditOrderModalProps, 'action'> & { loadStripe: any }) => {
-    const { addToast } = useToasts();
+const EditPlatformTipModal = (props: Omit<EditOrderModalProps, 'action'>) => {
+  const handleSuccess = () => {
+    props.setOpen(false);
+    props.onSuccess?.();
+  };
+  const { toast } = useToast();
+  const orderAmount = props.order.amount.valueInCents;
+  const orderCurrency = props.order.amount.currency;
+  const storedTipAmount = props.order.platformTipAmount?.valueInCents || 0;
+  const [tipAmount, setTipAmount] = React.useState(storedTipAmount);
+  const [selectedTipOption, setSelectedTipOption] = React.useState(() =>
+    getPlatformTipOptionFromAmount(storedTipAmount, orderAmount, orderCurrency),
+  );
+  // If the contribution amount changes under the modal (e.g. after editing the amount and
+  // refetching), reset to the freshly-fetched tip so the selected percentage can't stay stale —
+  // otherwise the still-highlighted preset becomes a no-op click that keeps the old tip.
+  const prevOrderAmountRef = React.useRef(orderAmount);
+  React.useEffect(() => {
+    if (prevOrderAmountRef.current !== orderAmount) {
+      prevOrderAmountRef.current = orderAmount;
+      setTipAmount(storedTipAmount);
+      setSelectedTipOption(getPlatformTipOptionFromAmount(storedTipAmount, orderAmount, orderCurrency));
+    }
+  }, [orderAmount, storedTipAmount, orderCurrency]);
+  const { isSubmittingPlatformTip, updatePlatformTip } = useUpdatePlatformTip({
+    contribution: props.order,
+    onSuccess: handleSuccess,
+  });
+  const isPaypal = props.order.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
+  const totalAmount = props.order.totalAmount.valueInCents - storedTipAmount + tipAmount;
 
-    const mutationOptions = { context: API_V2_CONTEXT };
-    // state management
-    const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-    const [loadingSelectedPaymentMethod, setLoadingSelectedPaymentMethod] = useState(true);
-    const [stripe, setStripe] = useState(null);
-    const [stripeElements, setStripeElements] = useState(null);
-    const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
-    const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
-    const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
-    const { isSubmitting, updatePaymentMethod } = useUpdatePaymentMethod(contribution);
+  return (
+    <Dialog open={props.open} onOpenChange={props.setOpen}>
+      <DialogContent
+        className="max-w-[420px]"
+        onCloseAutoFocus={e => {
+          if (props.onCloseFocusRef?.current) {
+            e.preventDefault();
+            props.onCloseFocusRef.current.focus();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            <FormattedMessage defaultMessage="Update platform tip amount" id="rU2A5H" />
+          </DialogTitle>
+          <DialogDescription>
+            <FormattedMessage defaultMessage="Change the platform tip for this recurring contribution." id="dxvB7P" />
+          </DialogDescription>
+        </DialogHeader>
+        <Box mt={3}>
+          <NewPlatformTipSelector
+            amount={props.order.amount.valueInCents}
+            collectiveName={props.order.toAccount.name}
+            currency={props.order.platformTipAmount?.currency || props.order.amount.currency}
+            showHeader={false}
+            showOptOutNudge={false}
+            disableAmountSync
+            selectedOption={selectedTipOption}
+            value={tipAmount}
+            onChange={(selectedOption, value) => {
+              setSelectedTipOption(selectedOption);
+              setTipAmount(Number.isFinite(value) ? value : 0);
+            }}
+          />
+        </Box>
+        <div className="mt-4 flex flex-wrap justify-between">
+          {isPaypal ? (
+            <PayWithPaypalButton
+              isSubmitting={isSubmittingPlatformTip}
+              totalAmount={totalAmount}
+              currency={props.order.amount.currency}
+              interval={getIntervalFromContributionFrequency(props.order.frequency)}
+              order={props.order}
+              host={props.order.toAccount.host}
+              collective={props.order.toAccount}
+              tier={props.order.tier}
+              style={{ height: 47, size: 'responsive' }}
+              subscriptionStartDate={getSubscriptionStartDate(props.order)}
+              onError={e => toast({ variant: 'error', title: e.message })}
+              onSuccess={({ subscriptionId }) => updatePlatformTip(tipAmount, subscriptionId)}
+            />
+          ) : (
+            <Button
+              variant="outline"
+              loading={isSubmittingPlatformTip}
+              data-cy="recurring-contribution-update-platform-tip-button"
+              onClick={() => updatePlatformTip(tipAmount)}
+              className="w-full"
+            >
+              <FormattedMessage id="actions.update" defaultMessage="Update" />
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
-    // GraphQL mutations and queries
-    const { data, refetch } = useQuery(paymentMethodsQuery, {
-      variables: { accountId: account.id, orderId: contribution.id },
-      context: API_V2_CONTEXT,
-      fetchPolicy: 'network-only',
-    });
-    const [submitAddPaymentMethod] = useMutation(addCreditCardMutation, mutationOptions);
-    const [submitConfirmPaymentMethodMutation] = useMutation(confirmCreditCardMutation, mutationOptions);
+function EditPaymentMethodModal(props: EditOrderModalProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const intl = useIntl();
+  const [isSubmitting, setSubmitting] = React.useState(false);
+  const [option, setOption] = React.useState<PaymentMethodOption>({
+    id: props.order?.paymentMethod?.id,
+    name: props.order?.paymentMethod?.name,
+    type: props.order?.paymentMethod?.type,
+  });
 
-    const handleAddPaymentMethodResponse = async response => {
-      const { paymentMethod, stripeError } = response;
-      if (stripeError) {
-        return handleStripeError(paymentMethod, stripeError);
-      } else {
-        return handleSuccess(paymentMethod);
-      }
-    };
-
-    const handleStripeError = async (paymentMethod, stripeError) => {
-      const { message, response } = stripeError;
-
-      if (!response) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
-          message: message,
-        });
-        setAddingPaymentMethod(false);
-        return false;
-      }
-
-      const stripe = await getStripe();
-      const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
-      if (result.error) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
-          message: result.error.message,
-        });
-        setAddingPaymentMethod(false);
-        return false;
-      } else {
-        try {
-          const response = await submitConfirmPaymentMethodMutation({
-            variables: { paymentMethod: { id: paymentMethod.id } },
-          });
-          return handleSuccess(response.data.confirmCreditCard.paymentMethod);
-        } catch (error) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
-            message: error.message,
-          });
-          setAddingPaymentMethod(false);
-          return false;
+  const query = useQuery<EditPaymentMethodModalQuery>(
+    gql`
+      query EditPaymentMethodModal($order: OrderReferenceInput!) {
+        order(order: $order) {
+          id
+          totalAmount {
+            currency
+            valueInCents
+          }
+          fromAccount {
+            id
+            slug
+          }
+          toAccount {
+            id
+            slug
+            ... on AccountWithHost {
+              host {
+                id
+                slug
+                paypalClientId
+                supportedPaymentMethods
+              }
+            }
+            ... on Organization {
+              host {
+                id
+                slug
+                paypalClientId
+                supportedPaymentMethods
+              }
+            }
+          }
         }
       }
-    };
+    `,
+    {
+      variables: {
+        order: {
+          id: props.order.id,
+        },
+      },
+      skip: !props.order.id,
+    },
+  );
 
-    const handleSuccess = paymentMethod => {
-      setAddingPaymentMethod(false);
-      refetch();
-      setAddedPaymentMethod(paymentMethod);
-      setShowAddPaymentMethod(false);
-      setLoadingSelectedPaymentMethod(true);
-    };
+  const order = query.data?.order;
 
-    // load stripe on mount
-    useEffect(() => {
-      loadStripe();
-    }, []);
+  const [addStripePaymentMethodFromSetupIntent, { loading }] = useMutation<
+    { addStripePaymentMethodFromSetupIntent: PaymentMethod },
+    { account?: AccountReferenceInput; setupIntent?: SetupIntentInput }
+  >(
+    gql`
+      mutation AddStripePaymentMethodFromSetupIntent(
+        $setupIntent: SetupIntentInput!
+        $account: AccountReferenceInput!
+      ) {
+        addStripePaymentMethodFromSetupIntent(setupIntent: $setupIntent, account: $account) {
+          id
+          type
+          name
+        }
+      }
+    `,
+    {
+      variables: {
+        account: {
+          slug: order?.fromAccount?.slug,
+        },
+      },
+    },
+  );
 
-    // data handling
-    const paymentMethods = get(data, 'account.paymentMethods', null);
-    const existingPaymentMethod = get(data, 'order.paymentMethod', null);
-    const filterPaymentMethodsParams = [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod];
-    const paymentOptions = React.useMemo(
-      () => sortAndFilterPaymentMethods(...filterPaymentMethodsParams),
-      filterPaymentMethodsParams,
-    );
+  const { updatePaymentMethod } = useUpdatePaymentMethod(props.order);
 
-    useEffect(() => {
-      if (!paymentOptions) {
+  const handleClose = React.useCallback(() => {
+    props.setOpen(false);
+  }, [props.setOpen]);
+
+  const handleSuccess = React.useCallback(() => {
+    props.setOpen(false);
+    props.onSuccess?.();
+  }, [props.setOpen, props.onSuccess]);
+
+  const onSaveClick = React.useCallback(async () => {
+    let paymentMethodId;
+
+    setSubmitting(true);
+    try {
+      if (option.id === 'stripe-payment-element' && 'stripe' in option) {
+        const res = await option.elements.submit();
+        if (res.error) {
+          toast({ variant: 'error', message: res.error.message });
+          handleClose();
+          return;
+        }
+
+        const returnUrl = new URL(`${window.location.origin}/dashboard/${props.accountSlug}/outgoing-contributions`);
+        returnUrl.searchParams.set('orderId', props.order.id);
+        returnUrl.searchParams.set('stripeAccount', option.setupIntent.stripeAccount);
+        returnUrl.searchParams.set('action', 'editPaymentMethod');
+
+        const setupResponse = await option.stripe.confirmSetup({
+          clientSecret: option.setupIntent.client_secret,
+          elements: option.elements,
+          redirect: 'if_required',
+          confirmParams: {
+            expand: ['payment_method'],
+            // eslint-disable-next-line camelcase
+            return_url: returnUrl.href,
+          },
+        });
+        if (setupResponse.error) {
+          toast({ variant: 'error', message: setupResponse.error.message });
+          handleClose();
+          return;
+        }
+
+        try {
+          const paymentMethodResponse = await addStripePaymentMethodFromSetupIntent({
+            variables: {
+              setupIntent: {
+                id: option.setupIntent.id,
+                stripeAccount: option.setupIntent.stripeAccount,
+              },
+            },
+          });
+          paymentMethodId = paymentMethodResponse.data.addStripePaymentMethodFromSetupIntent.id;
+        } catch (e) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          return;
+        }
+      } else {
+        paymentMethodId = option.id;
+      }
+
+      const success = await updatePaymentMethod({ id: paymentMethodId });
+      if (success) {
+        handleSuccess();
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }, [option, handleClose, handleSuccess, intl]);
+
+  const onPaypalSubscription = React.useCallback(
+    async paypalSubscriptionId => {
+      setSubmitting(true);
+      try {
+        const success = await updatePaymentMethod({
+          service: PAYMENT_METHOD_SERVICE.PAYPAL,
+          paypalInfo: { subscriptionId: paypalSubscriptionId },
+        });
+        if (success) {
+          handleSuccess();
+        }
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [handleSuccess],
+  );
+
+  React.useEffect(() => {
+    async function onPaymentMethodSetup() {
+      try {
+        const response = await addStripePaymentMethodFromSetupIntent({
+          variables: {
+            setupIntent: {
+              id: router.query.setup_intent as string,
+              stripeAccount: router.query.stripeAccount as string,
+            },
+            account: {
+              slug: props.accountSlug,
+            },
+          },
+        });
+        setOption({
+          id: response.data.addStripePaymentMethodFromSetupIntent.id,
+          name: response.data.addStripePaymentMethodFromSetupIntent.name,
+          type: response.data.addStripePaymentMethodFromSetupIntent.type,
+        });
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         return;
       }
-      if (selectedPaymentMethod === null && contribution.paymentMethod) {
-        setSelectedPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
-      } else if (addedPaymentMethod) {
-        setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.id));
-      }
-      setLoadingSelectedPaymentMethod(false);
-    }, [paymentOptions, addedPaymentMethod]);
+    }
 
-    return (
-      <StyledModal onClose={props.onClose} maxWidth="420px">
-        <ModalHeader onClose={props.onClose}>
-          <H4 fontSize="20px" fontWeight="700">
-            {showAddPaymentMethod ? (
-              <FormattedMessage id="subscription.menu.addPaymentMethod" defaultMessage="Add new payment method" />
+    if (
+      router.query.orderId &&
+      router.query.stripeAccount &&
+      router.query.setup_intent &&
+      router.query.redirect_status === 'succeeded'
+    ) {
+      onPaymentMethodSetup();
+    }
+  }, [router.query.orderId, router.query.stripeAccount, router.query.setup_intent, router.query.redirect_status]);
+
+  return (
+    <Dialog open={props.open} onOpenChange={props.setOpen}>
+      <DialogContent
+        className="w-full max-w-[480px]"
+        onCloseAutoFocus={e => {
+          if (props.onCloseFocusRef?.current) {
+            e.preventDefault();
+            props.onCloseFocusRef.current.focus();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            {props.order.status === 'PAUSED' ? (
+              <FormattedMessage defaultMessage="Resume contribution" id="51nF6S" />
             ) : (
               <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
             )}
-          </H4>
-        </ModalHeader>
-        <ModalBody mb={0}>
-          <P fontSize="15px" mb="10" lineHeight="20px">
-            <FormattedMessage
-              id="subscription.updatePaymentMethod.subheader"
-              defaultMessage="Pick an existing payment method or add a new one."
-            />
-          </P>
-          {showAddPaymentMethod ? (
-            <Box>
-              <AddPaymentMethod
-                order={contribution}
-                isSubmitting={isSubmitting}
-                setNewPaymentMethodInfo={setNewPaymentMethodInfo}
-                onStripeReady={({ stripe, stripeElements }) => {
-                  setStripe(stripe);
-                  setStripeElements(stripeElements);
-                }}
-                onPaypalSuccess={async paypalPaymentMethod => {
-                  await updatePaymentMethod(paypalPaymentMethod);
-                  props.onClose();
+          </DialogTitle>
+          <DialogDescription>
+            {props.order.status === 'PAUSED' ? (
+              <FormattedMessage
+                defaultMessage="To resume your {amountAndInterval} contribution to {collective}, pick an existing payment method or add a new one."
+                id="sEJpMg"
+                values={{
+                  amountAndInterval: (
+                    <Span fontWeight="bold">
+                      <FormattedMoneyAmount
+                        amount={props.order.totalAmount.valueInCents}
+                        currency={props.order.totalAmount.currency}
+                        interval={getIntervalFromContributionFrequency(props.order.frequency)}
+                      />
+                    </Span>
+                  ),
+                  collective: <Span fontWeight="bold">{props.order.toAccount.name}</Span>,
                 }}
               />
-            </Box>
-          ) : loadingSelectedPaymentMethod ? (
-            <LoadingPlaceholder height={100} />
-          ) : (
-            <StyledRadioList
-              id="PaymentMethod"
-              name={`${contribution.id}-PaymentMethod`}
-              keyGetter="key"
-              options={paymentOptions}
-              onChange={setSelectedPaymentMethod}
-              value={selectedPaymentMethod?.key}
-            >
-              {({ radio, value: { title, subtitle, icon } }) => (
-                <Flex minHeight={50} py={2} bg="white.full" data-cy="recurring-contribution-pm-box">
-                  <Flex alignItems="center">
-                    <Box as="span" mr={3} flexWrap="wrap">
-                      {radio}
-                    </Box>
-                    <Flex mr={2} css={{ flexBasis: '26px' }}>
-                      {icon}
-                    </Flex>
-                    <Flex flexDirection="column" width="100%">
-                      <P fontSize="12px" fontWeight={subtitle ? 600 : 400} color="black.900" overflowWrap="anywhere">
-                        {title}
-                      </P>
-                      {subtitle && (
-                        <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500" overflowWrap="anywhere">
-                          {subtitle}
-                        </P>
-                      )}
-                    </Flex>
-                  </Flex>
-                </Flex>
-              )}
-            </StyledRadioList>
-          )}
-          {!showAddPaymentMethod && (
-            <StyledButton
-              buttonSize="tiny"
-              width="100%"
-              mt={2}
-              onClick={() => setShowAddPaymentMethod(true)}
-              data-cy="recurring-contribution-add-pm-button"
-            >
-              <FormattedMessage id="subscription.menu.addPaymentMethod" defaultMessage="Add new payment method" />
-            </StyledButton>
-          )}
-          {showAddPaymentMethod ? (
-            <Flex flexWrap="wrap" justifyContent="space-between" mt={4}>
-              <StyledButton
-                onClick={() => {
-                  setNewPaymentMethodInfo(null);
-                  setShowAddPaymentMethod(false);
+            ) : (
+              <FormattedMessage
+                defaultMessage="Pick an existing payment method or add a new one for your {amountAndInterval} contribution to {collective}."
+                id="JYTV+i"
+                values={{
+                  amountAndInterval: (
+                    <Span fontWeight="bold">
+                      <FormattedMoneyAmount
+                        amount={props.order.totalAmount.valueInCents}
+                        currency={props.order.totalAmount.currency}
+                        interval={getIntervalFromContributionFrequency(props.order.frequency)}
+                      />
+                    </Span>
+                  ),
+                  collective: <Span fontWeight="bold">{props.order.toAccount.slug}</Span>,
                 }}
-              >
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton
-                buttonSize="tiny"
-                buttonStyle="secondary"
-                disabled={newPaymentMethodInfo ? !newPaymentMethodInfo.value?.complete : true}
-                type="submit"
-                loading={addingPaymentMethod}
-                data-cy="recurring-contribution-submit-pm-button"
-                onClick={async () => {
-                  setAddingPaymentMethod(true);
-                  if (!stripe) {
-                    addToast({
-                      type: TOAST_TYPE.ERROR,
-                      message: (
-                        <FormattedMessage
-                          id="Stripe.Initialization.Error"
-                          defaultMessage="There was a problem initializing the payment form. Please reload the page and try again."
-                        />
-                      ),
-                    });
-                    setAddingPaymentMethod(false);
-                    return false;
-                  }
-                  const cardElement = stripeElements.getElement(CardElement);
-                  const { token, error } = await stripe.createToken(cardElement);
+              />
+            )}
+          </DialogDescription>
+        </DialogHeader>
+        {!order ? (
+          <Loading />
+        ) : (
+          <PaymentMethodPicker
+            className="mt-3"
+            value={option}
+            onChange={setOption}
+            order={order}
+            host={order.toAccount && 'host' in order.toAccount ? order.toAccount.host : null}
+            account={order?.fromAccount}
+          />
+        )}
+        <div className="mt-4 flex flex-wrap justify-between">
+          {option.id === 'pay-with-paypal' ? (
+            <PayWithPaypalButton
+              order={props.order}
+              totalAmount={props.order.totalAmount.valueInCents}
+              currency={props.order.totalAmount.currency}
+              interval={getIntervalFromContributionFrequency(props.order.frequency)}
+              host={props.order.toAccount.host}
+              collective={props.order.toAccount}
+              tier={props.order.tier}
+              style={{ height: 45, size: 'small' }}
+              subscriptionStartDate={getSubscriptionStartDate(props.order)}
+              isSubmitting={isSubmitting}
+              onError={e => toast({ variant: 'error', title: e.message })}
+              onSuccess={({ subscriptionId }) => {
+                onPaypalSubscription(subscriptionId);
+              }}
+            />
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              type="submit"
+              data-cy="recurring-contribution-submit-pm-button"
+              onClick={onSaveClick}
+              loading={isSubmitting}
+              disabled={loading || query.loading}
+              className="min-w-[60px]"
+            >
+              <FormattedMessage id="save" defaultMessage="Save" />
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
-                  if (error) {
-                    addToast({ type: TOAST_TYPE.ERROR, message: error.message });
-                    return false;
-                  }
-                  const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
-                  const newCreditCardInfo = merge(newStripePaymentMethod.data, pick(newStripePaymentMethod, ['token']));
-                  try {
-                    const res = await submitAddPaymentMethod({
-                      variables: {
-                        creditCardInfo: newCreditCardInfo,
-                        name: get(newStripePaymentMethod, 'name'),
-                        account: { id: account.id },
-                      },
-                    });
-                    return handleAddPaymentMethodResponse(res.data.addCreditCard);
-                  } catch (error) {
-                    const errorMsg = getErrorFromGraphqlException(error).message;
-                    addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
-                    setAddingPaymentMethod(false);
-                    return false;
-                  }
-                }}
-              >
-                <FormattedMessage id="save" defaultMessage="Save" />
-              </StyledButton>
-            </Flex>
-          ) : (
-            <Flex mt={4}>
-              <StyledButton
-                buttonStyle="secondary"
-                loading={isSubmitting}
-                data-cy="recurring-contribution-update-pm-button"
-                onClick={() => updatePaymentMethod(selectedPaymentMethod).then(props.onClose)}
-                width="100%"
-              >
-                <FormattedMessage id="actions.update" defaultMessage="Update" />
-              </StyledButton>
-            </Flex>
-          )}
-        </ModalBody>
-      </StyledModal>
-    );
-  },
-);
+const EditAddedFundsModal = (props: Omit<EditOrderModalProps, 'action'>) => {
+  const handleClose = () => {
+    props.setOpen(false);
+  };
+
+  const handleSuccess = () => {
+    props.setOpen(false);
+    props.onSuccess?.();
+  };
+
+  // AddFundsModal still uses the old onClose pattern, so we bridge it here
+  // The modal visibility is controlled by the parent via `open` prop
+  if (!props.open) {
+    return null;
+  }
+
+  return (
+    <AddFundsModal
+      onClose={handleClose}
+      onSuccess={handleSuccess}
+      collective={props.order.toAccount}
+      editOrderId={props.order.id}
+      initialValues={{
+        ...pick(props.order, ['fromAccount', 'hostFeePercent', 'description', 'memo']),
+        amount: props.order.amount.valueInCents,
+        processedAt: props.order.processedAt?.slice(0, 10),
+        paymentProcessorFee: props.order.paymentProcessorFee?.valueInCents,
+        tax: props.order.tax && pick(props.order.tax, ['rate', 'idNumber', 'type']),
+        tier: props.order.tier && pick(props.order.tier, ['id', 'legacyId', 'name', 'slug']),
+        accountingCategory:
+          props.order.accountingCategory && pick(props.order.accountingCategory, ['id', 'name', 'code', 'type']),
+        balanceAccountingCategory: props.order.balanceAccountingCategory && {
+          value: props.order.balanceAccountingCategory.id,
+          label: `${props.order.balanceAccountingCategory.code} - ${props.order.balanceAccountingCategory.name}`,
+        },
+      }}
+    />
+  );
+};
 
 const EditOrderModal = (props: EditOrderModalProps) => {
   if (props.action === 'cancel') {
     return <CancelModal {...props} />;
   } else if (props.action === 'editAmount') {
     return <EditAmountModal {...props} />;
+  } else if (props.action === 'editPlatformTip') {
+    return <EditPlatformTipModal {...props} />;
   } else if (props.action === 'editPaymentMethod') {
     return <EditPaymentMethodModal {...props} />;
+  } else if (props.action === 'editAddedFunds') {
+    return <EditAddedFundsModal {...props} />;
   }
   return null;
 };

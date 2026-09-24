@@ -1,32 +1,29 @@
 import React from 'react';
-import { CellContext, ColumnDef } from '@tanstack/react-table';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { CellContext, ColumnDef } from '@tanstack/react-table';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import {
-  Account,
-  Host,
-  VirtualCard as GraphQLVirtualCard,
-  VirtualCardStatus,
-} from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host, VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
-import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
 import VirtualCard, { ActionsButton } from '../edit-collective/VirtualCard';
 import { Grid } from '../Grid';
 import StyledTag from '../StyledTag';
+import { DataTable } from '../table/DataTable';
 import { P } from '../Text';
-import { Toast, TOAST_TYPE, useToasts } from '../ToastProvider';
 import { TableActionsButton } from '../ui/Table';
+import { toast } from '../ui/useToast';
 
 import VirtualCardDrawer from './VirtualCardDrawer';
 
 type VirtualCardsTableMeta = {
   intl: IntlShape;
-  addToast: (toast: Partial<Toast>) => void;
   openVirtualCardDrawer: (vc: GraphQLVirtualCard) => void;
   host: Host;
   canEditVirtualCard?: boolean;
@@ -34,17 +31,22 @@ type VirtualCardsTableMeta = {
   onDeleteRefetchQuery?: string;
 };
 
-export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
+const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
   {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     cell: ({ cell }: CellContext<GraphQLVirtualCard, Account>) => {
       const account = cell.getValue();
       return (
-        <div className="flex items-center gap-2">
-          <Avatar collective={account} radius={24} />
-          <span className="min-w-0 flex-1 truncate">{account.name}</span>
-        </div>
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-2">
+              <Avatar collective={account} radius={24} />
+              <span className="min-w-0 flex-1 truncate">{account.name}</span>
+            </div>
+          }
+        />
       );
     },
   },
@@ -73,7 +75,7 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
       const vc = row.original;
       const meta = table.options.meta as VirtualCardsTableMeta;
       return (
-        <div className="italic text-slate-500">
+        <div className="text-slate-500 italic">
           {getAvailableLimitShortString(
             meta.intl,
             vc.currency,
@@ -81,7 +83,7 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
             vc.spendingLimitAmount,
             vc.spendingLimitInterval,
             {
-              AvailableAmount: v => <span className="font-medium not-italic text-slate-950">{v}</span>,
+              AvailableAmount: v => <span className="font-medium text-slate-950 not-italic">{v}</span>,
               AmountSeparator: v => <span>&nbsp;{v}&nbsp;</span>,
               LimitAmount: v => <span>{v}</span>,
               LimitInterval: v => <span>{v}</span>,
@@ -141,9 +143,7 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
           <ActionsButton
             virtualCard={row.original}
             host={meta.host}
-            onError={error =>
-              meta.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(meta.intl, error) })
-            }
+            onError={error => toast({ variant: 'error', message: i18nGraphqlException(meta.intl, error) })}
             openVirtualCardDrawer={meta.openVirtualCardDrawer}
             canEditVirtualCard={meta.canEditVirtualCard}
             canDeleteVirtualCard={meta.canDeleteVirtualCard}
@@ -167,7 +167,6 @@ type VirtualCardsTableProps = {
 
 export default function VirtualCardsTable(props: VirtualCardsTableProps) {
   const intl = useIntl();
-  const { addToast } = useToasts();
   const [isTableView, setIsTableView] = React.useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [selectedVirtualCard, setSelectedVirtualCard] = React.useState<GraphQLVirtualCard>(null);
@@ -184,7 +183,6 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
       onDeleteRefetchQuery: props.onDeleteRefetchQuery,
       host: props.host,
       intl,
-      addToast,
     };
     return (
       <React.Fragment>
@@ -199,7 +197,7 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
           emptyMessage={() => (
             <div>
               <P fontSize="16px">
-                <FormattedMessage defaultMessage="No virtual cards" />
+                <FormattedMessage defaultMessage="No virtual cards" id="Uqkhct" />
               </P>
             </div>
           )}
@@ -217,7 +215,7 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
   } else {
     return (
       <Grid justifyContent="center" mt={4} gridTemplateColumns={['100%', '366px']} gridGap="32px 24px">
-        {props.virtualCards.map(vc => (
+        {props.virtualCards?.map(vc => (
           <VirtualCard
             key={vc.id}
             host={props.host}

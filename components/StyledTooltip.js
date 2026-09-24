@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Manager, Popper, Reference } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { lineHeight, verticalAlign } from 'styled-system';
 import { v4 as uuid } from 'uuid';
 
@@ -21,6 +21,10 @@ const StyledTooltipContainer = styled(`div`)`
   color: white;
   background: #141414;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
+
+  a {
+    text-decoration: underline;
+  }
 `;
 
 const Arrow = styled('div')`
@@ -124,7 +128,13 @@ const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow })
   return ReactDOM.createPortal(
     <Popper placement={place} modifiers={REACT_POPPER_MODIFIERS}>
       {({ ref, style, placement, arrowProps }) => (
-        <StyledTooltipContainer ref={ref} style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        <StyledTooltipContainer
+          ref={ref}
+          style={style}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          data-cy="tooltip-content"
+        >
           {typeof content === 'function' ? content() : content}
           {!noArrow && <Arrow ref={arrowProps.ref} data-placement={placement} style={arrowProps.style} />}
         </StyledTooltipContainer>
@@ -139,6 +149,8 @@ const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow })
  *
  * Relies on [react-tooltip](https://react-tooltip.netlify.com/) and accepts any
  * of its properties.
+ *
+ * @deprecated Use `ui/Tooltip` instead
  */
 class StyledTooltip extends React.Component {
   static propTypes = {
@@ -217,7 +229,8 @@ class StyledTooltip extends React.Component {
         onMouseLeave={this.onMouseLeave}
         verticalAlign={this.props.containerVerticalAlign}
         lineHeight={this.props.containerLineHeight}
-        cursor={this.props.containerCursor}
+        cursor={this.props.noTooltip ? undefined : this.props.containerCursor}
+        data-cy="tooltip-trigger"
       >
         {this.props.children}
       </ChildrenContainer>

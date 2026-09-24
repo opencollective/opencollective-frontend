@@ -1,19 +1,19 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
-import { CheckCircle2Icon, PencilIcon, TrashIcon } from 'lucide-react';
+import { useMutation } from '@apollo/client';
+import { CheckCircle2Icon, Pencil, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import { gql } from '../../lib/graphql/helpers';
+import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 import theme from '../../lib/theme';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { Button } from '../ui/Button';
+import { useToast } from '../ui/useToast';
 
 const RemoveTwoFactorAuthFromIndividualMutation = gql`
   mutation RemoveTwoFactorAuthFromIndividual(
@@ -63,10 +63,9 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
   const [newMethodName, setNewMethodName] = React.useState(props.userTwoFactorMethod.name);
 
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [removeTwoFactorMethod, removing] = useMutation(RemoveTwoFactorAuthFromIndividualMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       account: {
         id: props.individual.id,
@@ -78,7 +77,6 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
   });
 
   const [editTwoFactorMethod, editing] = useMutation(EditTwoFactorAuthenticationMethodMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       userTwoFactorMethod: {
         id: props.userTwoFactorMethod.id,
@@ -97,42 +95,36 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
           {props.userTwoFactorMethod.name}
         </Box>
         <Flex gap="20px">
-          <StyledButton
+          <Button
+            variant="ghost"
+            size="xs"
             onClick={() => setIsEditingMethodName(true)}
             loading={isEditingMethodName || editing.loading}
             disabled={isConfirmingDelete || removing.loading}
-            buttonStyle="borderless"
-            buttonSize="tiny"
             color={theme.colors.blue[500]}
-            display="flex"
-            alignItems="center"
           >
-            <PencilIcon size="18px" />
-            &nbsp;
-            <FormattedMessage defaultMessage="Rename" />
-          </StyledButton>
+            <Pencil className="mr-2 h-4 w-4" />
+            <FormattedMessage defaultMessage="Rename" id="iXNbPf" />
+          </Button>
 
-          <StyledButton
+          <Button
+            variant="ghost"
+            size="xs"
+            className="text-destructive"
             onClick={() => setIsConfirmingRemove(true)}
             loading={isConfirmingDelete || removing.loading}
             disabled={isEditingMethodName || editing.loading}
-            buttonStyle="borderless"
-            buttonSize="tiny"
-            color={theme.colors.red[500]}
-            display="flex"
-            alignItems="center"
           >
-            <TrashIcon size="18px" />
-            &nbsp;
+            <Trash2 className="mr-2 h-4 w-4" />
             <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-          </StyledButton>
+          </Button>
         </Flex>
       </Flex>
       {isEditingMethodName && (
         <ConfirmationModal
           type="confirm"
           onClose={() => setIsEditingMethodName(false)}
-          header={<FormattedMessage defaultMessage="Edit Two Factor Method" />}
+          header={<FormattedMessage defaultMessage="Edit Two Factor Method" id="UiRkiD" />}
           cancelHandler={() => {
             setNewMethodName(props.userTwoFactorMethod.name);
             setIsEditingMethodName(false);
@@ -171,21 +163,21 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
           continueHandler={async () => {
             try {
               await removeTwoFactorMethod();
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
-                message: <FormattedMessage defaultMessage="Two factor method removed successfully" />,
+              toast({
+                variant: 'success',
+                message: <FormattedMessage defaultMessage="Two factor method removed successfully" id="GQh4z0" />,
               });
               setIsConfirmingRemove(false);
               return CONFIRMATION_MODAL_TERMINATE;
             } catch (e) {
-              addToast({
-                type: TOAST_TYPE.ERROR,
+              toast({
+                variant: 'error',
                 message: i18nGraphqlException(intl, e),
               });
             }
           }}
         >
-          <FormattedMessage defaultMessage="This will permanently removed this two factor method" />
+          <FormattedMessage defaultMessage="This will permanently remove this two factor method" id="xr1raH" />
         </ConfirmationModal>
       )}
     </React.Fragment>

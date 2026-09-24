@@ -1,0 +1,713 @@
+import React from 'react';
+import { gql, useQuery } from '@apollo/client';
+import { isEmpty } from 'lodash-es';
+import { FormattedMessage, useIntl } from 'react-intl';
+
+import type { GetActions } from '../../lib/actions/types';
+import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import { ContributionFrequency, OrderStatus, PaymentMethodService } from '../../lib/graphql/types/v2/graphql';
+import { i18nFrequency } from '../../lib/i18n/order';
+import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
+
+import { accountHoverCardFields } from '../AccountHoverCard';
+import { useHasBalanceCategoriesPreview } from '../accounting/BalanceAccountingCategoryPicker';
+import { OrderBalanceAccountingCategoryPill } from '../accounting/BalanceAccountingCategoryPill';
+import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
+import Avatar from '../Avatar';
+import { CopyIDDropdown } from '../CopyId';
+import DateTime from '../DateTime';
+import DrawerHeader from '../DrawerHeader';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import LinkCollective from '../LinkCollective';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
+import OrderStatusTag from '../orders/OrderStatusTag';
+import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
+import Tags from '../Tags';
+import { Badge } from '../ui/Badge';
+import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../ui/DataList';
+import { InfoList, InfoListItem } from '../ui/InfoList';
+import { Sheet, SheetContent } from '../ui/Sheet';
+import { Skeleton } from '../ui/Skeleton';
+
+import { ContributionCharges } from './ContributionCharges';
+import ContributionTimeline from './ContributionTimeline';
+
+const contributionDrawerQuery = gql`
+  query ContributionDrawer($orderId: Int!) {
+    order(order: { legacyId: $orderId }) {
+      id
+      legacyId
+      publicId
+      nextChargeDate
+      lastChargedAt
+      amount {
+        value
+        valueInCents
+        currency
+      }
+      totalAmount {
+        value
+        valueInCents
+        currency
+      }
+      paymentMethod {
+        id
+        type
+        service
+      }
+      manualPaymentProvider {
+        id
+        type
+        name
+      }
+      status
+      description
+      createdAt
+      processedAt
+      frequency
+      tier {
+        id
+        name
+        description
+      }
+      individual: createdByAccount {
+        ...AccountHoverCardFields
+      }
+      fromAccount {
+        ...ContributionDrawerAccountFields
+        ... on AccountWithHost {
+          host {
+            id
+            slug
+            type
+          }
+        }
+      }
+      toAccount {
+        ...ContributionDrawerAccountFields
+      }
+      platformTipEligible
+      platformTipAmount {
+        value
+        valueInCents
+        currency
+      }
+      hostFeePercent
+      tags
+      tax {
+        type
+        idNumber
+        rate
+      }
+      accountingCategory {
+        id
+        name
+        friendlyName
+        code
+      }
+      balanceAccountingCategory {
+        id
+        name
+        friendlyName
+        code
+      }
+      activities {
+        nodes {
+          id
+          type
+          createdAt
+          fromAccount {
+            ...ActivityAccountFields
+          }
+          account {
+            ...ActivityAccountFields
+          }
+          host {
+            ...ActivityAccountFields
+          }
+          individual {
+            ...ActivityAccountFields
+          }
+          data
+          transaction {
+            ...ContributionDrawerTransactionFields
+          }
+        }
+      }
+      customData
+      memo
+      needsConfirmation
+      pendingContributionData {
+        expectedAt
+        paymentMethod
+        ponumber
+        memo
+        fromAccountInfo {
+          name
+          email
+        }
+      }
+      transactions {
+        ...ContributionDrawerTransactionFields
+      }
+      permissions {
+        id
+        canResume
+        canMarkAsExpired
+        canMarkAsPaid
+        canCancel
+        canEdit
+        canComment
+        canSeePrivateActivities
+        canSetTags
+        canUpdateAccountingCategory
+      }
+    }
+  }
+
+  fragment ContributionDrawerAccountFields on Account {
+    id
+    name
+    slug
+    isIncognito
+    type
+    imageUrl
+    isHost
+    isArchived
+    ...AccountHoverCardFields
+    mainProfile {
+      id
+      name
+      slug
+      type
+      imageUrl
+      isHost
+      isArchived
+      ...AccountHoverCardFields
+    }
+    ... on Individual {
+      isGuest
+    }
+    ... on AccountWithHost {
+      host {
+        id
+        slug
+        type
+        accountingCategories {
+          nodes {
+            ...AccountingCategorySelectFields
+          }
+        }
+      }
+      approvedAt
+    }
+    ... on Organization {
+      host {
+        id
+        slug
+        type
+        accountingCategories {
+          nodes {
+            ...AccountingCategorySelectFields
+          }
+        }
+      }
+    }
+
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
+      }
+    }
+  }
+
+  fragment ActivityAccountFields on Account {
+    ...AccountHoverCardFields
+    isIncognito
+    mainProfile {
+      id
+      name
+      slug
+      type
+      imageUrl
+      ...AccountHoverCardFields
+    }
+  }
+
+  fragment ContributionDrawerTransactionFields on Transaction {
+    id
+    legacyId
+    uuid
+    kind
+    amount {
+      currency
+      valueInCents
+    }
+    netAmount {
+      currency
+      valueInCents
+    }
+    group
+    type
+    description
+    createdAt
+    isRefunded
+    isRefund
+    isOrderRejected
+    host {
+      id
+      slug
+      legacyId
+      type
+    }
+    account {
+      ...AccountHoverCardFields
+      isIncognito
+    }
+    oppositeAccount {
+      ...AccountHoverCardFields
+      isIncognito
+    }
+    expense {
+      id
+      type
+      legacyId
+    }
+    order {
+      id
+      legacyId
+    }
+    paymentMethod {
+      id
+      service
+    }
+    permissions {
+      id
+      canRefund
+      canDownloadInvoice
+      canReject
+    }
+    paymentProcessorUrl
+    refundTransaction {
+      id
+      group
+    }
+    oppositeTransaction {
+      id
+    }
+  }
+  ${accountHoverCardFields}
+  ${AccountingCategorySelectFieldsFragment}
+`;
+
+const EXTERNAL_PAYMENT_METHOD_SERVICES = [PaymentMethodService.STRIPE, PaymentMethodService.PAYPAL];
+
+type ContributionDrawerProps = {
+  open: boolean;
+  onClose: () => void;
+  orderId?: number;
+  getActions: GetActions<ContributionDrawerQuery['order']>;
+};
+
+export function ContributionDrawer({ open, onClose, orderId, getActions }: ContributionDrawerProps) {
+  const intl = useIntl();
+  const hasBalanceCategoriesPreview = useHasBalanceCategoriesPreview();
+
+  const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
+    variables: {
+      orderId,
+    },
+    skip: !open || !orderId,
+  });
+
+  const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== orderId;
+  const dropdownTriggerRef = React.useRef(undefined);
+  const order = query.data?.order;
+  const contributorAccount = order?.fromAccount?.mainProfile ?? order?.fromAccount;
+  const contributorLegalName =
+    contributorAccount?.legalName !== contributorAccount?.name && contributorAccount?.legalName;
+
+  const showChargesSection = React.useMemo(
+    () => !!order?.paymentMethod?.service && EXTERNAL_PAYMENT_METHOD_SERVICES.includes(order.paymentMethod.service),
+    [order],
+  );
+
+  const actions = React.useMemo(
+    () => (order ? getActions(order, dropdownTriggerRef) : null),
+    [order, getActions, dropdownTriggerRef],
+  );
+
+  return (
+    <Sheet open={open} onOpenChange={isOpen => !isOpen && onClose()}>
+      <SheetContent className="flex max-w-2xl flex-col overflow-hidden">
+        <DrawerHeader
+          actions={actions}
+          dropdownTriggerRef={dropdownTriggerRef}
+          entityName={
+            <div className="flex items-center gap-1">
+              <OrderStatusTag status={query.data?.order?.status} overflow="visible" />
+              <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
+            </div>
+          }
+          forceMoreActions
+          entityIdentifier={
+            <div className="flex items-center gap-1">
+              <CopyIDDropdown
+                tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
+                ids={[
+                  {
+                    name: <FormattedMessage defaultMessage="Order ID" id="GfBSPQ" />,
+                    label: `#${orderId}`,
+                    value: `${orderId}`,
+                    tooltipLabel: <FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />,
+                  },
+                  ...(order?.publicId
+                    ? [
+                        {
+                          name: <FormattedMessage defaultMessage="Order Public ID" id="Y0PZn+" />,
+                          label: order.publicId,
+                          value: order.publicId,
+                          tooltipLabel: <FormattedMessage defaultMessage="Copy contribution public ID" id="G4u5yE" />,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            </div>
+          }
+          entityLabel={
+            isLoading ? (
+              <Skeleton className="h-6 w-56" />
+            ) : (
+              <div className="text-base font-semibold text-foreground">{query.data.order.description}</div>
+            )
+          }
+        />
+        <div className="grow overflow-auto px-8 py-4">
+          {query.error ? (
+            <MessageBoxGraphqlError error={query.error} />
+          ) : (
+            <React.Fragment>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  {isLoading ? (
+                    <Skeleton className="h-6 w-32" />
+                  ) : (
+                    query.data?.order?.permissions?.canUpdateAccountingCategory &&
+                    query.data.order.toAccount &&
+                    'host' in query.data.order.toAccount &&
+                    query.data.order.toAccount['host'] && (
+                      <React.Fragment>
+                        <span className="w-20 shrink-0 text-xs text-muted-foreground">
+                          <FormattedMessage defaultMessage="Category" id="expense.accountingCategory" />
+                        </span>
+                        <OrderAdminAccountingCategoryPill
+                          order={query.data?.order}
+                          account={query.data?.order.toAccount}
+                          host={query.data.order.toAccount.host}
+                        />
+                      </React.Fragment>
+                    )
+                  )}
+                  <div>
+                    {isLoading ? (
+                      <Skeleton className="h-6 w-24" />
+                    ) : (
+                      <Tags canEdit={query.data?.order?.permissions?.canSetTags} order={query.data?.order} />
+                    )}
+                  </div>
+                </div>
+                {hasBalanceCategoriesPreview &&
+                  !isLoading &&
+                  query.data?.order &&
+                  (query.data.order.balanceAccountingCategory ||
+                    query.data.order.permissions?.canUpdateAccountingCategory) && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-20 shrink-0 text-xs text-muted-foreground">
+                        <FormattedMessage defaultMessage="Received in" id="4Nv47+" />
+                      </span>
+                      <OrderBalanceAccountingCategoryPill
+                        order={query.data.order}
+                        host={query.data.order.toAccount?.['host']}
+                        account={query.data.order.toAccount}
+                        canEdit={Boolean(
+                          query.data.order.permissions?.canUpdateAccountingCategory &&
+                          query.data.order.toAccount?.['host'],
+                        )}
+                        emptyLabel={<FormattedMessage defaultMessage="Not set" id="p5LNtB" />}
+                      />
+                    </div>
+                  )}
+              </div>
+              <div className="text-sm">
+                <InfoList className="mt-4 mb-6 sm:grid-cols-2">
+                  <InfoListItem
+                    className="border-t-0 border-b"
+                    title={<FormattedMessage defaultMessage="Contributor" id="Contributor" />}
+                    value={
+                      isLoading ? (
+                        <Skeleton className="h-6 w-48" />
+                      ) : (
+                        <LinkCollective
+                          collective={contributorAccount}
+                          className="group hover:text-primary hover:underline"
+                          withHoverCard
+                        >
+                          <div className="flex min-w-0 items-center gap-1">
+                            <Avatar radius={24} collective={query.data.order.fromAccount} />
+                            <span className="min-w-0">
+                              {contributorAccount.name}
+                              {contributorLegalName && (
+                                <span className="text-muted-foreground group-hover:text-primary">{` (${contributorLegalName})`}</span>
+                              )}
+                            </span>
+                          </div>
+                        </LinkCollective>
+                      )
+                    }
+                  />
+
+                  <InfoListItem
+                    className="border-t-0 border-b"
+                    title={<FormattedMessage defaultMessage="Collective" id="Collective" />}
+                    value={
+                      isLoading ? (
+                        <Skeleton className="h-6 w-48" />
+                      ) : (
+                        <LinkCollective
+                          className="hover:text-primary hover:underline"
+                          collective={query.data.order.toAccount}
+                          withHoverCard
+                        >
+                          <div className="flex items-center gap-1">
+                            <Avatar radius={24} collective={query.data.order.toAccount} />
+                            {query.data.order.toAccount.name}
+                          </div>
+                        </LinkCollective>
+                      )
+                    }
+                  />
+                </InfoList>
+
+                <DataList className="mb-4">
+                  {!query.data?.order?.platformTipAmount?.valueInCents && (
+                    <DataListItem>
+                      <DataListItemLabel>
+                        <FormattedMessage defaultMessage="Charge Amount" id="ChargeAmount" />
+                      </DataListItemLabel>
+                      <DataListItemValue>
+                        {isLoading ? (
+                          <Skeleton className="h-5 w-32" />
+                        ) : (
+                          <FormattedMoneyAmount
+                            showCurrencyCode={true}
+                            currency={query.data.order.totalAmount.currency}
+                            amount={query.data.order.totalAmount.valueInCents}
+                          />
+                        )}
+                      </DataListItemValue>
+                    </DataListItem>
+                  )}
+                  {query.data?.order?.platformTipAmount?.valueInCents > 0 && (
+                    <React.Fragment>
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          <FormattedMoneyAmount
+                            showCurrencyCode={true}
+                            currency={query.data.order.amount.currency}
+                            amount={query.data.order.amount.valueInCents}
+                          />
+                        </DataListItemValue>
+                      </DataListItem>
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Platform Tip" id="Fields.platformTip" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          <FormattedMoneyAmount
+                            showCurrencyCode={true}
+                            currency={query.data.order.platformTipAmount.currency}
+                            amount={query.data.order.platformTipAmount.valueInCents}
+                          />
+                        </DataListItemValue>
+                      </DataListItem>
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Charge Amount" id="ChargeAmount" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          <FormattedMoneyAmount
+                            showCurrencyCode={true}
+                            currency={query.data.order.totalAmount.currency}
+                            amount={query.data.order.totalAmount.valueInCents}
+                          />
+                        </DataListItemValue>
+                      </DataListItem>
+                    </React.Fragment>
+                  )}
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Frequency" id="Frequency" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-44" />
+                      ) : (
+                        i18nFrequency(intl, query.data?.order?.frequency)
+                      )}
+                    </DataListItemValue>
+                  </DataListItem>
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage id="Contribution.CreationDate" defaultMessage="Creation Date" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-32" />
+                      ) : (
+                        <DateTime value={query.data?.order?.createdAt} dateStyle="long" />
+                      )}
+                    </DataListItemValue>
+                  </DataListItem>
+                  {query.data?.order?.lastChargedAt &&
+                    query.data?.order.frequency !== ContributionFrequency.ONETIME && (
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage id="Contribution.LastChargeDate" defaultMessage="Last Charge Date" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          <DateTime value={query.data?.order?.lastChargedAt} dateStyle="long" />
+                        </DataListItemValue>
+                      </DataListItem>
+                    )}
+                  {query.data?.order?.nextChargeDate &&
+                    query.data?.order.frequency !== ContributionFrequency.ONETIME &&
+                    query.data?.order.status !== OrderStatus.CANCELLED && (
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Next Charge Date" id="oJNxUE" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          {isLoading ? (
+                            <Skeleton className="h-5 w-32" />
+                          ) : (
+                            <DateTime value={query.data?.order?.nextChargeDate} dateStyle="long" />
+                          )}
+                        </DataListItemValue>
+                      </DataListItem>
+                    )}
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Payment Method" id="paymentmethod.label" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-44" />
+                      ) : query.data.order.paymentMethod?.type ? (
+                        <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
+                      ) : query.data.order.manualPaymentProvider ? (
+                        <div className="flex items-center gap-1">
+                          <Badge size="xs" type="neutral">
+                            <FormattedMessage defaultMessage="Manual" id="PaymentMethod.Manual" />
+                          </Badge>
+                          <span>{query.data.order.manualPaymentProvider.name}</span>
+                        </div>
+                      ) : query.data.order.status === OrderStatus.PENDING ? (
+                        i18nPaymentMethodProviderType(intl, query.data.order.pendingContributionData.paymentMethod)
+                      ) : null}
+                    </DataListItemValue>
+                  </DataListItem>
+                  {query.data?.order?.status === OrderStatus.PENDING && (
+                    <React.Fragment>
+                      {query.data.order.pendingContributionData?.ponumber && (
+                        <DataListItem>
+                          <DataListItemLabel>
+                            <FormattedMessage defaultMessage="PO Number" id="Fields.PONumber" />
+                          </DataListItemLabel>
+                          <DataListItemValue>{query.data.order.pendingContributionData.ponumber}</DataListItemValue>
+                        </DataListItem>
+                      )}
+
+                      {query.data.order.pendingContributionData?.fromAccountInfo && (
+                        <DataListItem>
+                          <DataListItemLabel>
+                            <FormattedMessage defaultMessage="Contact" id="Contact" />
+                          </DataListItemLabel>
+                          <DataListItemValue>
+                            {' '}
+                            {query.data.order.pendingContributionData?.fromAccountInfo?.email
+                              ? `${query.data.order.pendingContributionData.fromAccountInfo.name} (${query.data.order.pendingContributionData.fromAccountInfo.email})`
+                              : query.data.order.pendingContributionData.fromAccountInfo.name}
+                          </DataListItemValue>
+                        </DataListItem>
+                      )}
+                    </React.Fragment>
+                  )}
+
+                  {query.data?.order?.tier && (
+                    <DataListItem>
+                      <DataListItemLabel>
+                        <FormattedMessage defaultMessage="Tier" id="b07w+D" />
+                      </DataListItemLabel>
+                      <DataListItemValue>{query.data.order.tier.name}</DataListItemValue>
+                    </DataListItem>
+                  )}
+
+                  {query.data?.order?.memo ||
+                    (query.data?.order?.pendingContributionData?.memo && (
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Memo" id="D5NqQO" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          {query.data.order.memo || query.data.order.pendingContributionData.memo}
+                        </DataListItemValue>
+                      </DataListItem>
+                    ))}
+                  {!isEmpty(query.data?.order?.customData) && (
+                    <DataListItem>
+                      <DataListItemLabel>
+                        <FormattedMessage defaultMessage="Custom Data" id="DRPEis" />
+                      </DataListItemLabel>
+                      <DataListItemValue>{JSON.stringify(query.data.order.customData)}</DataListItemValue>
+                    </DataListItem>
+                  )}
+                </DataList>
+
+                {showChargesSection && <ContributionCharges isLoading={isLoading} order={query.data?.order} />}
+
+                <div>
+                  <div className="flex items-center justify-between gap-2 py-4">
+                    <div className="text-slate-80 w-fit text-base leading-6 font-bold">
+                      <FormattedMessage defaultMessage="Related Activity" id="LP8cIK" />
+                    </div>
+                    <hr className="grow border-neutral-300" />
+                  </div>
+
+                  {isLoading ? (
+                    <div className="flex flex-col gap-6">
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <div className="flex gap-5" key={index}>
+                          <Skeleton className="h-10 w-12 rounded-full" />
+                          <Skeleton className="mt-2 h-10 w-full" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <ContributionTimeline order={query.data.order} />
+                  )}
+                </div>
+              </div>
+            </React.Fragment>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

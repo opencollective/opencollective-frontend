@@ -1,12 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
+import { getDashboardRoute } from '../../lib/url-helpers';
 
 import { Flex } from '../Grid';
-import I18nFormatters from '../I18nFormatters';
+import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
 
@@ -15,9 +16,12 @@ export const getExpenseStatusMsgType = status => {
     case ExpenseStatus.REJECTED:
     case ExpenseStatus.SPAM:
     case ExpenseStatus.ERROR:
+    case ExpenseStatus.INVITE_DECLINED:
+    case 'OVERDUE':
       return 'error';
     case ExpenseStatus.PENDING:
     case ExpenseStatus.UNVERIFIED:
+    case 'PAYMENT_DUE':
     case 'ON_HOLD':
       return 'warning';
     case ExpenseStatus.SCHEDULED_FOR_PAYMENT:
@@ -44,10 +48,6 @@ const ExtendedTag = ({ children, ...props }) => (
   </StyledTag>
 );
 
-ExtendedTag.propTypes = {
-  children: PropTypes.any,
-};
-
 const BaseTag = ({ status, ...props }) => {
   const intl = useIntl();
   return (
@@ -57,17 +57,13 @@ const BaseTag = ({ status, ...props }) => {
   );
 };
 
-BaseTag.propTypes = {
-  status: PropTypes.oneOf(Object.values(ExpenseStatus)),
-};
-
 /**
  * Displays an i18n version of the expense status in a `StyledTag`.
  * The color change in function of the status.
  *
  * Accepts all the props exposed by `StyledTag`.
  */
-const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) => {
+const ExpenseStatusTag = ({ status, showTaxFormTag = false, payee = null, ...props }) => {
   const tagProps = {
     fontWeight: '600',
     fontSize: '10px',
@@ -87,41 +83,37 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
     );
   } else if (!showTaxFormTag) {
     return <BaseTag status={status} {...tagProps} />;
-  } else if (!showTaxFormMsg) {
+  } else if (!payee?.isAdmin) {
     return (
-      <Flex alignItems="center">
+      <div className="flex flex-wrap items-center justify-end gap-y-1">
         <BaseTag status={status} {...tagProps} />
-        <ExtendedTag>
-          <FormattedMessage id="TaxForm" defaultMessage="Tax form" />
+        <ExtendedTag fontSize="10px">
+          <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />
         </ExtendedTag>
-      </Flex>
+      </div>
     );
   } else {
     return (
-      <Flex alignItems="center">
+      <div className="flex flex-wrap items-center justify-end gap-y-1">
         <BaseTag status={status} {...tagProps} />
         <StyledTooltip
           content={() => (
             <FormattedMessage
-              id="expenseNeedsTaxForm.hover"
-              defaultMessage="We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact <SupportLink>support</SupportLink>"
-              values={I18nFormatters}
+              id="expenseNeedsTaxForm.new.hover"
+              defaultMessage="We can't pay until we receive your tax info. <Link>Click here</Link> to complete your tax form."
+              values={{
+                Link: getI18nLink({ as: Link, href: getDashboardRoute(payee, 'tax-information') }),
+              }}
             />
           )}
         >
-          <ExtendedTag>
-            <FormattedMessage id="TaxForm" defaultMessage="Tax form" />
+          <ExtendedTag fontSize="10px">
+            <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />
           </ExtendedTag>
         </StyledTooltip>
-      </Flex>
+      </div>
     );
   }
-};
-
-ExpenseStatusTag.propTypes = {
-  status: PropTypes.oneOf(Object.values(ExpenseStatus)),
-  showTaxFormMsg: PropTypes.bool,
-  showTaxFormTag: PropTypes.bool,
 };
 
 export default ExpenseStatusTag;

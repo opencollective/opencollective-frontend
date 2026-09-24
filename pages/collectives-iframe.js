@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import MembershipsWithData from '../components/MembershipsWithData';
 
@@ -133,4 +133,6 @@ class CollectivesIframe extends React.Component {
   }
 }
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default CollectivesIframe;

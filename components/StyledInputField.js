@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { Question } from '@styled-icons/remix-line/Question';
 import { FormattedMessage } from 'react-intl';
@@ -12,11 +11,10 @@ import { P, Span } from './Text';
 const PrivateIconWithSpace = () => (
   <React.Fragment>
     &nbsp;
-    <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-top' }} />
+    <PrivateInfoIcon />
   </React.Fragment>
 );
 
-// eslint-disable-next-line react/prop-types
 const QuestionMarkIconWithSpace = ({ helpText, labelFontSize, labelColor }) => (
   <StyledTooltip content={helpText}>
     &nbsp;
@@ -34,21 +32,24 @@ const StyledInputField = ({
   name = undefined,
   error = undefined,
   hint = undefined,
+  hintPosition = 'below',
   success = undefined,
   disabled = undefined,
   required = undefined,
   inputType = undefined,
   labelFontSize = undefined,
-  labelFontWeight = 'normal',
+  labelFontWeight = '700',
   labelColor = 'black.800',
   labelProps = undefined,
   hideOptionalLabel = undefined,
   useRequiredLabel = undefined,
+  requiredIndicator = '*',
   isPrivate = undefined,
   helpText = undefined,
   flexDirection = undefined,
   justifyContent = undefined,
   alignItems = undefined,
+  placeholder = undefined,
   ...props
 }) => {
   const isCheckbox = inputType === 'checkbox';
@@ -92,8 +93,17 @@ const StyledInputField = ({
                 {isPrivate && <PrivateIconWithSpace />}
               </Span>
             ) : displayRequiredLabel ? (
-              <Span color="black.700">
-                {labelContent} * {isPrivate && <PrivateIconWithSpace />}
+              <Span color="black.700" fontWeight={requiredIndicator === 'label' ? 'normal' : undefined}>
+                {requiredIndicator === 'label' ? (
+                  <FormattedMessage
+                    id="RequiredFieldLabel"
+                    defaultMessage="{field} (required)"
+                    values={{ field: labelContent }}
+                  />
+                ) : (
+                  <React.Fragment>{labelContent} *</React.Fragment>
+                )}{' '}
+                {isPrivate && <PrivateIconWithSpace />}
               </Span>
             ) : (
               <React.Fragment>
@@ -106,6 +116,7 @@ const StyledInputField = ({
             )}
           </P>
         )}
+        {hint && hintPosition === 'above' && <div className="mb-2 text-xs font-light text-gray-600">{hint}</div>}
         {typeof children === 'function'
           ? children({
               name: name || htmlFor,
@@ -115,64 +126,21 @@ const StyledInputField = ({
               success,
               disabled,
               required,
+              placeholder,
             })
           : children}
       </Flex>
       {error && typeof error === 'string' && (
-        <Box pt={2}>
+        <Box pt={2} lineHeight="1em">
           <ExclamationCircle color="#E03F6A" size={16} />
-          <Span ml={1} color="black.700" fontSize="14px" css={{ verticalAlign: 'middle' }}>
+          <Span ml={1} color="black.700" fontSize="0.9em" css={{ verticalAlign: 'middle' }}>
             {error}
           </Span>
         </Box>
       )}
-      {hint && (!error || typeof error !== 'string') && (
-        <Box mt="6px">
-          <Span fontSize="12px" color="black.700" css={{ verticalAlign: 'middle' }}>
-            {hint}
-          </Span>
-        </Box>
-      )}
+      {hint && hintPosition === 'below' && <div className="mt-1 text-xs font-light text-gray-600">{hint}</div>}
     </Box>
   );
-};
-
-StyledInputField.propTypes = {
-  /** React component to wrap with the label and errors */
-  children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
-  /** Show disabled state for field */
-  disabled: PropTypes.bool,
-  /** If true, a "Private" lock icon will be displayed next to the label */
-  isPrivate: PropTypes.bool,
-  /** text to display below the input or error status */
-  error: PropTypes.any,
-  /** text to display below the input when there's no error */
-  hint: PropTypes.any,
-  /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
-  htmlFor: PropTypes.string,
-  /** By default name is equal to htmlFor, but you can use this prop to override it */
-  name: PropTypes.string,
-  /** text to display above the input */
-  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  /** Passed to input as `type`. Adapts layout for checkboxes */
-  inputType: PropTypes.string,
-  /** Show success state for field */
-  success: PropTypes.bool,
-  /** If set to false, the field will be marked as optional */
-  required: PropTypes.bool,
-  /** If set to true, will hide the (optional) label tag even if required is false and display "*" if required */
-  useRequiredLabel: PropTypes.bool,
-  /** Font size for the label */
-  labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  /** Font weight for the label */
-  labelFontWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  labelColor: PropTypes.string,
-  /** Anything here will be passed down to label */
-  labelProps: PropTypes.object,
-  /** Help text that will appear next to the label (a small question mark with help text shown when hovered) */
-  helpText: PropTypes.node,
-  /** All props from `Box` */
-  ...Box.propTypes,
 };
 
 export default StyledInputField;

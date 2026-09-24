@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../../lib/graphql/helpers';
 
 const memberFieldsFragment = gql`
   fragment MemberFields on Member {
@@ -25,12 +25,35 @@ export const teamSectionQuery = gql`
   query TeamSection($collectiveSlug: String!, $account: AccountReferenceInput!) {
     account(slug: $collectiveSlug) {
       id
+      legacyId
+      slug
+      name
       isFrozen
+      isPrivate
+      type
+      imageUrl(height: 256)
       ... on AccountWithParent {
         parent {
           id
           slug
           type
+          name
+        }
+      }
+      connectedAccounts {
+        id
+        legacyId
+        service
+        createdAt
+        createdByAccount {
+          id
+          legacyId
+          name
+          slug
+        }
+        accountsMirrored {
+          id
+          slug
           name
         }
       }
@@ -43,9 +66,17 @@ export const teamSectionQuery = gql`
             id
             CONTACT_FORM
           }
+          policies {
+            id
+            COLLECTIVE_MINIMUM_ADMINS {
+              numberOfAdmins
+              applies
+              freeze
+            }
+          }
         }
       }
-      members(role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
+      members(role: [ADMIN, MEMBER, ACCOUNTANT, COMMUNITY_MANAGER], limit: 100) {
         nodes {
           id
           ...MemberFields
@@ -57,7 +88,7 @@ export const teamSectionQuery = gql`
           slug
           type
           name
-          members(includeInherited: false, role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
+          members(includeInherited: false, role: [ADMIN, MEMBER, ACCOUNTANT, COMMUNITY_MANAGER], limit: 100) {
             nodes {
               id
               ...MemberFields

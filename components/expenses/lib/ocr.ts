@@ -1,9 +1,9 @@
-import { FormikProps } from 'formik';
-import { cloneDeep, get, partition, set, uniq } from 'lodash';
+import type { FormikProps } from 'formik';
+import { cloneDeep, get, isNil, set } from 'lodash-es';
 
-import { UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
+import type { Account, UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
 
-import type { ExpenseFormValues } from '../types/FormValues';
+import type { ExpenseFormValues, ExpenseItemFormValues } from '../types/FormValues';
 
 import { expenseItemsMustHaveFiles, newExpenseItem } from './items';
 
@@ -13,42 +13,41 @@ import { expenseItemsMustHaveFiles, newExpenseItem } from './items';
  */
 const updateExpenseItemWithUploadResult = (
   formValues: ExpenseFormValues,
-  parsedItem: UploadFileResult['parsingResult']['expense']['items'][0],
-  /** E.g., 'items[0]' */
-  itemPath: string,
+  uploadResult: UploadFileResult,
+  itemIdx: number,
 ): boolean => {
-  // We don't support items with 0 amount yet, see https://github.com/opencollective/opencollective/issues/3044
-  if (parsedItem.amount?.valueInCents === 0) {
-    return false;
-  }
+  const itemPath = `items[${itemIdx}]`;
+  const itemValues: ExpenseItemFormValues = get(formValues, itemPath) || newExpenseItem({}, formValues.currency);
 
-  const itemValues = get(formValues, itemPath) || newExpenseItem();
-
-  if (parsedItem.url) {
+  // Set item URL
+  const fileUrl = uploadResult.file?.url;
+  if (fileUrl) {
     if (expenseItemsMustHaveFiles(formValues.type)) {
-      itemValues.url = parsedItem.url;
-    } else if (!formValues.attachedFiles?.find(file => file.url === parsedItem.url)) {
-      formValues.attachedFiles = [...formValues.attachedFiles, { url: parsedItem.url }];
+      itemValues.url = fileUrl;
+    } else if (!formValues.attachedFiles?.find(file => file.url === fileUrl)) {
+      formValues.attachedFiles = [...formValues.attachedFiles, { url: fileUrl }];
     }
   }
 
-  if (parsedItem.description) {
-    itemValues.description = parsedItem.description;
+  // Store the parsing result in the item
+  const parsingResult = uploadResult.parsingResult?.expense;
+  if (!parsingResult) {
+    return Boolean(fileUrl);
   }
+
+  // Update internal form props
+  itemValues.__isUploading = false;
+  itemValues.__parsingResult = parsingResult;
+  itemValues.__file = uploadResult.file;
 
   // We don't allow changing the date or amount for virtual cards
   if (formValues.type !== 'CHARGE') {
-    if (parsedItem.incurredAt) {
-      itemValues.incurredAt = parsedItem.incurredAt;
+    if (parsingResult.date && isNil(itemValues.incurredAt)) {
+      itemValues.incurredAt = parsingResult.date;
     }
 
-    // TODO(OCR): Figure a strategy for multiple currencies, see https://github.com/opencollective/opencollective/issues/6906
-    if (!formValues.currency && parsedItem.amount?.currency) {
-      itemValues.currency = parsedItem.amount?.currency;
-    }
-
-    if (parsedItem.amount && parsedItem.amount.currency === formValues.currency) {
-      itemValues.amount = parsedItem.amount.valueInCents;
+    if (parsingResult.amount?.valueInCents && !itemValues.amountV2?.valueInCents) {
+      itemValues.amountV2 = parsingResult.amount;
     }
   }
 
@@ -66,64 +65,109 @@ const updateExpenseItemWithUploadResult = (
  * @returns
  */
 export const updateExpenseFormWithUploadResult = (
+  collective: Account,
   form: FormikProps<ExpenseFormValues>,
   uploadResults: UploadFileResult[],
-  itemIdxToReplace: number = undefined,
+  /** Keep this to null to append items at the end */
+  itemIndexesToReplace: number[] = null,
 ) => {
   const formValues = cloneDeep(form.values);
-  const getItemsFromUploadResult = (uploadResult: UploadFileResult) => get(uploadResult, 'parsingResult.expense.items');
-  const [resultWithItems, resultsWithoutItems] = partition(uploadResults, getItemsFromUploadResult);
-  const allParsedItems = resultWithItems.map(getItemsFromUploadResult).flat();
-  const isVirtualCardCharge = formValues.type === 'CHARGE';
+  const resultsThatReplaceItems = uploadResults.slice(0, itemIndexesToReplace?.length || 0);
+  const resultsToAppend = uploadResults.slice(itemIndexesToReplace?.length || 0);
 
-  // Update global values
-  // TOOD(OCR): Figure a strategy for multiple files
-  const firstParsingResult = uploadResults[0].parsingResult?.expense;
-  if (firstParsingResult && uploadResults.length === 1) {
+  // Update global values if there's a single document
+  const uniqueOCRResult = uploadResults.length === 1 && uploadResults.find(result => result.parsingResult?.expense);
+  if (uniqueOCRResult) {
     // Expense title/description
     if (!form.values.description) {
-      formValues.description = firstParsingResult.description;
-    }
-
-    // Currency - we only force it if all items have the same currency
-    if (form.values.type !== 'CHARGE') {
-      const allCurrencies = uniq(allParsedItems.map(item => item.amount.currency));
-      if (allCurrencies.length === 1) {
-        formValues.currency = allCurrencies[0];
-      }
+      formValues.description = uniqueOCRResult.parsingResult.expense.description;
     }
   }
 
-  // Update items
-  if (isVirtualCardCharge) {
-    // Virtual cards are a special case, we don't want to touch most fields (amount, date)
-    set(formValues, 'items[0].description', firstParsingResult?.description);
-    set(formValues, 'items[0].url', allParsedItems?.[0]?.url);
-  } else if (allParsedItems.length > 0) {
-    // Feed items (or attached files) with uploaded files
-    allParsedItems.forEach(parsedItem => {
-      // If there's an item to replace, we replace it then append the other lines as new items
-      const itemIdx = itemIdxToReplace ?? formValues.items.length;
-      if (updateExpenseItemWithUploadResult(formValues, parsedItem, `items[${itemIdx}]`)) {
-        itemIdxToReplace = null;
-      }
-    });
-  }
+  // Replace items specified with `itemIndexesToReplace`
+  resultsThatReplaceItems.forEach((uploadResult, idx) => {
+    updateExpenseItemWithUploadResult(formValues, uploadResult, itemIndexesToReplace[idx]);
+  });
 
-  // We still want to add any unparsed files as items/attachments
-  if (!isVirtualCardCharge && resultsWithoutItems.length > 0) {
-    if (expenseItemsMustHaveFiles(formValues.type)) {
-      formValues.items = [
-        ...formValues.items,
-        ...resultsWithoutItems.map(result => newExpenseItem({ url: result.file.url })),
-      ];
-    } else {
-      formValues.attachedFiles = [
-        ...formValues.attachedFiles,
-        ...resultsWithoutItems.map(result => ({ url: result.file.url })),
-      ];
+  // Append other items at the end
+  resultsToAppend.forEach(uploadResult => {
+    updateExpenseItemWithUploadResult(formValues, uploadResult, formValues.items.length);
+  });
+
+  // Make sure all items are marked as uploaded, even if there's no parsing result
+  itemIndexesToReplace?.forEach(idx => {
+    if (formValues.items[idx]?.__isUploading) {
+      formValues.items[idx].__isUploading = false;
     }
-  }
+  });
 
+  // Update form with the new values
   form.setValues(formValues);
+
+  return true;
+};
+
+export const filterParsableItems = (items: UploadFileResult['parsingResult']['expense']['items']) => {
+  if (!items) {
+    return [];
+  } else {
+    return items.filter(item => item.amount?.valueInCents && item.amount.currency);
+  }
+};
+
+type FieldsWithOCRSupport = 'description' | 'incurredAt' | 'amountV2';
+
+type ExpenseItemFields = Extract<keyof ExpenseItemFormValues, FieldsWithOCRSupport>;
+
+const ITEM_OCR_FIELD_MAPPING: Record<ExpenseItemFields, string> = {
+  incurredAt: '__parsingResult.date',
+  description: '__parsingResult.description',
+  amountV2: '__parsingResult.amount',
+};
+
+/**
+ * Check whether there's a mismatch between the OCR value and the value entered by the user.
+ */
+const compareItemOCRValue = (
+  item: ExpenseItemFormValues,
+  field: Omit<keyof ExpenseItemFormValues, `_${string}`>,
+): {
+  hasMismatch: boolean;
+  ocrValue: any;
+} => {
+  const existingValue = item[field as keyof ExpenseItemFormValues];
+  const checkValue = ocrValue => {
+    if (isNil(existingValue) || isNil(ocrValue)) {
+      return { hasMismatch: false, ocrValue };
+    } else if (field === 'amountV2') {
+      const hasCurrencyMismatch = ocrValue.currency !== existingValue?.['currency'];
+      const hasAmountMismatch = existingValue?.['valueInCents'] !== ocrValue.valueInCents;
+      return {
+        hasCurrencyMismatch,
+        hasAmountMismatch,
+        hasMismatch: hasCurrencyMismatch || hasAmountMismatch,
+        ocrValue,
+      };
+    } else if (field === 'incurredAt') {
+      const normalizeDateStr = dateStr => dateStr.split('T')[0];
+      return { hasMismatch: normalizeDateStr(ocrValue) !== normalizeDateStr(existingValue), ocrValue };
+    } else {
+      return { hasMismatch: existingValue !== ocrValue, ocrValue };
+    }
+  };
+
+  const ocrValue = get(item, ITEM_OCR_FIELD_MAPPING[field as keyof ExpenseItemFormValues]);
+  return checkValue(ocrValue);
+};
+
+type ExpenseOCRValuesComparison = Record<FieldsWithOCRSupport, { hasMismatch: boolean; ocrValue: any }>;
+
+export const compareItemOCRValues = (item: ExpenseItemFormValues): ExpenseOCRValuesComparison => {
+  return Object.keys(ITEM_OCR_FIELD_MAPPING).reduce((result, field) => {
+    result[field as keyof ExpenseItemFormValues] = compareItemOCRValue(
+      item,
+      field as Omit<keyof ExpenseItemFormValues, `_${string}`>,
+    );
+    return result;
+  }, {} as ExpenseOCRValuesComparison);
 };

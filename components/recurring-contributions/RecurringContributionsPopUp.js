@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { i18nGraphqlException } from '../../lib/errors';
+import { gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -21,10 +20,10 @@ import { slideInUp } from '../StyledKeyframes';
 import StyledRadioList from '../StyledRadioList';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 import { withUser } from '../UserProvider';
 
-import UpdateOrderPopUp from './UpdateOrderPopUp';
+import UpdateOrderPopUp, { UpdatePlatformTipPopUp } from './UpdateOrderPopUp';
 import UpdatePaymentMethodPopUp from './UpdatePaymentMethodPopUp';
 
 //  Styled components
@@ -82,15 +81,13 @@ const cancelRecurringContributionMutation = gql`
   }
 `;
 
-const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account }) => {
-  const { addToast } = useToasts();
+const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account, LoggedInUser }) => {
+  const { toast } = useToast();
   const [menuState, setMenuState] = useState('mainMenu');
   const intl = useIntl();
   const [cancelReason, setCancelReason] = useState('NO_LONGER_WANT_TO_SUPPORT');
   const [cancelReasonMessage, setCancelReasonMessage] = useState('');
-  const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation);
 
   const mainMenu =
     menuState === 'mainMenu' &&
@@ -100,7 +97,9 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
       status === ORDER_STATUS.NEW);
   const cancelMenu = menuState === 'cancelMenu';
   const updateOrderMenu = menuState === 'updateOrderMenu';
+  const updatePlatformTipMenu = menuState === 'updatePlatformTipMenu';
   const paymentMethodMenu = menuState === 'paymentMethodMenu';
+  const canUpdatePlatformTip = Boolean(contribution.platformTipEligible);
 
   return (
     <PopUpMenu data-cy="recurring-contribution-menu">
@@ -115,7 +114,8 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             </Flex>
             <GrayXCircle size={26} onClick={onCloseEdit} />
           </Flex>
-          {account.type !== 'COLLECTIVE' && (
+          {/** This popup is also used by root users, and we don't want them to touch the payment methods */}
+          {account.type !== 'COLLECTIVE' && Boolean(LoggedInUser?.isAdminOfCollective(account)) && (
             <MenuItem
               flexGrow={1 / 4}
               width={1}
@@ -151,10 +151,31 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             </Flex>
             <Flex flexGrow={1}>
               <P fontSize="14px" fontWeight="400">
-                <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
+                <FormattedMessage defaultMessage="Update contribution amount" id="HpWk9J" />
               </P>
             </Flex>
           </MenuItem>
+          {canUpdatePlatformTip && (
+            <MenuItem
+              flexGrow={1 / 4}
+              width={1}
+              alignItems="center"
+              justifyContent="space-between"
+              onClick={() => {
+                setMenuState('updatePlatformTipMenu');
+              }}
+              data-cy="recurring-contribution-menu-platform-tip-option"
+            >
+              <Flex width={1 / 6}>
+                <Dollar size={20} />
+              </Flex>
+              <Flex flexGrow={1}>
+                <P fontSize="14px" fontWeight="400">
+                  <FormattedMessage defaultMessage="Update platform tip amount" id="rU2A5H" />
+                </P>
+              </Flex>
+            </MenuItem>
+          )}
           <MenuItem
             flexGrow={1 / 4}
             width={1}
@@ -224,7 +245,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                   onChange={e => setCancelReasonMessage(e.target.value)}
                   value={cancelReasonMessage}
                   fontSize="12px"
-                  placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)' })}
+                  placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)', id: '41Cgcs' })}
                   height={70}
                   width="100%"
                   resize="none"
@@ -254,8 +275,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                     },
                   });
                   onCloseEdit();
-                  addToast({
-                    type: TOAST_TYPE.INFO,
+                  toast({
                     message: (
                       <FormattedMessage
                         id="subscription.createSuccessCancel"
@@ -265,8 +285,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                     ),
                   });
                 } catch (error) {
-                  const errorMsg = getErrorFromGraphqlException(error).message;
-                  addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+                  toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
                 }
               }}
             >
@@ -292,16 +311,14 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
           <UpdateOrderPopUp setMenuState={setMenuState} contribution={contribution} onCloseEdit={onCloseEdit} />
         </MenuSection>
       )}
+
+      {updatePlatformTipMenu && (
+        <MenuSection data-cy="recurring-contribution-platform-tip-menu">
+          <UpdatePlatformTipPopUp contribution={contribution} onCloseEdit={onCloseEdit} />
+        </MenuSection>
+      )}
     </PopUpMenu>
   );
-};
-
-RecurringContributionsPopUp.propTypes = {
-  contribution: PropTypes.object.isRequired,
-  LoggedInUser: PropTypes.object.isRequired,
-  status: PropTypes.string.isRequired,
-  onCloseEdit: PropTypes.func,
-  account: PropTypes.object.isRequired,
 };
 
 export default withUser(RecurringContributionsPopUp);

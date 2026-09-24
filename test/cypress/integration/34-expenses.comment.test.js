@@ -26,9 +26,9 @@ describe('New Expense Flow comments', () => {
     cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
     cy.get('@editor').type('I am typing a comment');
     cy.getByDataCy('submit-comment-btn').click();
-    cy.get('[data-cy="comment-body"]:nth-child(1) > div').contains('I am typing a comment');
+    cy.getByDataCy('comment-body').contains('I am typing a comment').should('exist');
     cy.reload();
-    cy.get('[data-cy="comment-body"]:nth-child(1) > div').contains('I am typing a comment');
+    cy.getByDataCy('comment-body').contains('I am typing a comment').should('exist');
 
     // Editing the same comment
     cy.get('[data-cy="comment"]:nth-child(1)').within(() => {

@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
+
+import injectIntl from '@/lib/injectIntl';
 
 import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
@@ -8,6 +10,7 @@ import StyledHr from '../StyledHr';
 import { H4 } from '../Text';
 import { withUser } from '../UserProvider';
 
+import { NewPlatformTipContainer } from './NewPlatformTipContainer';
 import { PlatformTipContainer } from './PlatformTipContainer';
 import ShareButton from './ShareButton';
 import StepDetails from './StepDetails';
@@ -20,9 +23,11 @@ class ContributionFlowStepContainer extends React.Component {
     intl: PropTypes.object,
     LoggedInUser: PropTypes.object,
     collective: PropTypes.object,
+    contributorProfiles: PropTypes.arrayOf(PropTypes.object),
     tier: PropTypes.object,
     onChange: PropTypes.func,
     showPlatformTip: PropTypes.bool,
+    isOscTipExperiment: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
     onSignInClick: PropTypes.func,
     isEmbed: PropTypes.bool,
@@ -33,7 +38,6 @@ class ContributionFlowStepContainer extends React.Component {
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
-    contributeProfiles: PropTypes.arrayOf(PropTypes.object),
     mainState: PropTypes.shape({
       stepDetails: PropTypes.object,
       stepProfile: PropTypes.shape({
@@ -73,7 +77,7 @@ class ContributionFlowStepContainer extends React.Component {
   };
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed } = this.props;
+    const { collective, mainState, tier, isEmbed, showPlatformTip, isOscTipExperiment } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
@@ -84,15 +88,15 @@ class ContributionFlowStepContainer extends React.Component {
             onChange={this.props.onChange}
             stepDetails={stepDetails}
             stepPayment={stepPayment}
-            showPlatformTip={this.props.showPlatformTip && !stepDetails.isNewPlatformTip}
-            isEmbed={isEmbed}
+            showPlatformTip={showPlatformTip}
+            isOscTipExperiment={isOscTipExperiment}
           />
         );
 
       case 'profile': {
         return (
           <StepProfile
-            profiles={this.props.contributeProfiles}
+            profiles={this.props.contributorProfiles}
             collective={collective}
             tier={tier}
             stepDetails={stepDetails}
@@ -107,6 +111,8 @@ class ContributionFlowStepContainer extends React.Component {
         return (
           <StepPayment
             collective={this.props.collective}
+            showPlatformTip={this.props.showPlatformTip}
+            isOscTipExperiment={this.props.isOscTipExperiment}
             stepDetails={this.props.mainState.stepDetails}
             stepProfile={this.props.mainState.stepProfile}
             stepSummary={this.props.mainState.stepSummary}
@@ -147,6 +153,8 @@ class ContributionFlowStepContainer extends React.Component {
     const { stepDetails } = mainState;
 
     const currency = tier?.amount.currency || collective.currency;
+    // Review needed: preserve the old platform tip behavior, where percentages were based on amount * quantity.
+    const platformTipBaseAmount = (stepDetails.amount || 0) * (stepDetails.quantity || 1);
 
     return (
       <Box>
@@ -172,24 +180,43 @@ class ContributionFlowStepContainer extends React.Component {
             {this.renderStep(step.name)}
           </Flex>
         </StyledCard>
-        {showPlatformTip && stepDetails.isNewPlatformTip && (
-          <PlatformTipContainer
-            step={step.name}
-            amount={stepDetails.amount}
-            currency={currency}
-            selectedOption={stepDetails.platformTipOption}
-            value={stepDetails.platformTip}
-            onChange={(option, value) => {
-              this.props.onChange({
-                stepDetails: {
-                  ...stepDetails,
-                  platformTip: value,
-                  platformTipOption: option,
-                },
-              });
-            }}
-          />
-        )}
+        {showPlatformTip &&
+          (stepDetails.isNewPlatformTip ? (
+            <NewPlatformTipContainer
+              step={step.name}
+              collectiveName={collective.name}
+              amount={platformTipBaseAmount}
+              currency={currency}
+              selectedOption={stepDetails.platformTipOption}
+              value={stepDetails.platformTip}
+              onChange={(option, value) => {
+                this.props.onChange({
+                  stepDetails: {
+                    ...stepDetails,
+                    platformTip: value,
+                    platformTipOption: option,
+                  },
+                });
+              }}
+            />
+          ) : (
+            <PlatformTipContainer
+              step={step.name}
+              amount={platformTipBaseAmount}
+              currency={currency}
+              selectedOption={stepDetails.platformTipOption}
+              value={stepDetails.platformTip}
+              onChange={(option, value) => {
+                this.props.onChange({
+                  stepDetails: {
+                    ...stepDetails,
+                    platformTip: value,
+                    platformTipOption: option,
+                  },
+                });
+              }}
+            />
+          ))}
       </Box>
     );
   }

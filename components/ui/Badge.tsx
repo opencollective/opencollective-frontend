@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
 
-const badgeVariants = cva('inline-flex align-middle items-center font-medium', {
+const badgeVariants = cva('inline-flex items-center gap-0.5 align-middle font-medium', {
   variants: {
     type: {
       info: 'bg-blue-100 text-blue-700',
@@ -11,16 +11,23 @@ const badgeVariants = cva('inline-flex align-middle items-center font-medium', {
       warning: 'bg-yellow-100 text-yellow-800',
       error: 'bg-red-100 text-red-800',
       neutral: 'bg-slate-100 text-slate-700',
+      outline: 'bg-transparent text-muted-foreground ring-1 ring-slate-300 ring-inset',
     },
     round: {
       true: 'rounded-full',
     },
     size: {
+      xs: 'px-1 py-0.5 text-xs',
       sm: 'px-2 py-1 text-xs',
       default: 'px-3 py-1 text-sm',
     },
   },
   compoundVariants: [
+    {
+      size: 'xs',
+      round: false,
+      className: 'rounded-sm',
+    },
     {
       size: 'sm',
       round: false,
@@ -45,4 +52,4 @@ function Badge({ className, type, size, round, ...props }: BadgeProps) {
   return <div className={cn(badgeVariants({ type, size, round }), className)} {...props} />;
 }
 
-export { Badge, badgeVariants };
+export { Badge };

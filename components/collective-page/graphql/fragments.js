@@ -3,7 +3,7 @@ import { gqlV1 } from '../../../lib/graphql/helpers';
 /**
  * Fields fetched for contributors
  */
-export const contributorsFieldsFragment = gqlV1/* GraphQL */ `
+export const contributorsFieldsFragment = gqlV1 /* GraphQL */ `
   fragment ContributorsFields on Contributor {
     id
     name
@@ -22,14 +22,15 @@ export const contributorsFieldsFragment = gqlV1/* GraphQL */ `
     isGuest
     tiersIds
     collectiveId
+    hasPublicProfile
   }
 `;
 
 /**
  * Fields fetched for all possible collective page features
  */
-export const collectiveNavbarFieldsFragment = gqlV1/* GraphQL */ `
-  fragment NavbarFields on CollectiveFeatures {
+export const collectiveNavbarFieldsFragment = gqlV1 /* GraphQL */ `
+  fragment NavbarFieldsV1 on CollectiveFeatures {
     id
     ABOUT
     CONNECTED_ACCOUNTS
@@ -39,7 +40,7 @@ export const collectiveNavbarFieldsFragment = gqlV1/* GraphQL */ `
     PROJECTS
     USE_EXPENSES
     RECEIVE_EXPENSES
-    USE_EXPENSES
+    FUNDS_GRANTS_MANAGEMENT
     COLLECTIVE_GOALS
     TOP_FINANCIAL_CONTRIBUTORS
     CONVERSATIONS
@@ -49,11 +50,11 @@ export const collectiveNavbarFieldsFragment = gqlV1/* GraphQL */ `
     RECEIVE_HOST_APPLICATIONS
     HOST_DASHBOARD
     TRANSACTIONS
-    REQUEST_VIRTUAL_CARDS
+    PUBLIC_PROFILE
   }
 `;
 
-const contributeCardContributorFieldsFragment = gqlV1/* GraphQL */ `
+const contributeCardContributorFieldsFragment = gqlV1 /* GraphQL */ `
   fragment ContributeCardContributorFields on Contributor {
     id
     image(height: 64)
@@ -61,10 +62,11 @@ const contributeCardContributorFieldsFragment = gqlV1/* GraphQL */ `
     name
     type
     isGuest
+    hasPublicProfile
   }
 `;
 
-export const contributeCardTierFieldsFragment = gqlV1/* GraphQL */ `
+export const contributeCardTierFieldsFragment = gqlV1 /* GraphQL */ `
   fragment ContributeCardTierFields on Tier {
     id
     name
@@ -101,7 +103,7 @@ export const contributeCardTierFieldsFragment = gqlV1/* GraphQL */ `
   ${contributeCardContributorFieldsFragment}
 `;
 
-export const contributeCardEventFieldsFragment = gqlV1/* GraphQL */ `
+export const contributeCardEventFieldsFragment = gqlV1 /* GraphQL */ `
   fragment ContributeCardEventFields on Event {
     id
     slug
@@ -133,7 +135,7 @@ export const contributeCardEventFieldsFragment = gqlV1/* GraphQL */ `
   ${contributeCardContributorFieldsFragment}
 `;
 
-export const contributeCardProjectFieldsFragment = gqlV1/* GraphQL */ `
+export const contributeCardProjectFieldsFragment = gqlV1 /* GraphQL */ `
   fragment ContributeCardProjectFields on Project {
     id
     slug

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
@@ -30,7 +29,7 @@ const getFollwersNotDisplayedNames = (followers, maxNbDisplayed) => {
 /**
  * A small list of avatars with a count next to it.
  */
-const FollowersAvatars = ({ followers, totalCount, avatarRadius, maxNbDisplayed }) => {
+const FollowersAvatars = ({ followers, totalCount, avatarRadius = 24, maxNbDisplayed = 5 }) => {
   const { formatMessage } = useIntl();
 
   if (!followers || !followers.length) {
@@ -63,23 +62,6 @@ const FollowersAvatars = ({ followers, totalCount, avatarRadius, maxNbDisplayed 
       )}
     </Container>
   );
-};
-
-FollowersAvatars.propTypes = {
-  /** Max number of followers to display */
-  maxNbDisplayed: PropTypes.number.isRequired,
-  totalCount: PropTypes.number.isRequired,
-  avatarRadius: PropTypes.number.isRequired,
-  followers: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-    }),
-  ),
-};
-
-FollowersAvatars.defaultProps = {
-  maxNbDisplayed: 5,
-  avatarRadius: 24,
 };
 
 export default withUser(FollowersAvatars);

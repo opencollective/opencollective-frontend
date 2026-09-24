@@ -1,14 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-
 import ContributeCardsContainer from '../collective-page/ContributeCardsContainer';
+import ContainerOverlay from '../ContainerOverlay';
 import EditTierModal from '../edit-collective/tiers/EditTierModal';
+import Spinner from '../Spinner';
 
 import ContributeCardContainer from './ContributeCardContainer';
 import CreateNew from './CreateNew';
@@ -23,12 +22,16 @@ const AdminContributeCardsContainer = ({
   onReorder,
   draggingId,
   setDraggingId,
-  onMount,
-  CardsContainer,
-  useTierModals,
-  enableReordering,
-  createNewType,
-  onTierUpdate,
+  onMount = undefined,
+  CardsContainer = ContributeCardsContainer,
+  enableReordering = true,
+  createNewType = undefined,
+  onTierUpdate = undefined,
+  canEdit = false,
+  isSaving,
+  useTierModals = true,
+  hideCreateNew = false,
+  supportedTierTypes = undefined,
 }) => {
   const [items, setItems] = React.useState(cards || []);
 
@@ -65,13 +68,13 @@ const AdminContributeCardsContainer = ({
   }
 
   const [showTierModal, setShowTierModal] = React.useState(false);
-  const isEvent = collective.type === CollectiveType.EVENT;
-  const createContributionTierRoute = isEvent
-    ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
-    : `/${collective.slug}/admin/tiers`;
+  const closeTierModal = React.useCallback(() => setShowTierModal(false), [setShowTierModal]);
+
   const addNewMessage =
     createNewType === 'TICKET' ? (
       <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
+    ) : createNewType === 'PROJECT' ? (
+      <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
     ) : (
       <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
     );
@@ -87,52 +90,70 @@ const AdminContributeCardsContainer = ({
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
       <SortableContext items={items.map(c => c.key)} strategy={horizontalListSortingStrategy}>
-        <CardsContainer>
-          {items.map(({ key, Component, componentProps }) => {
-            // Add onClickEdit to the component props if we're using tier modals
-            componentProps =
-              useTierModals && componentProps.tier
-                ? { ...componentProps, onClickEdit: () => setShowTierModal(componentProps.tier) }
-                : componentProps;
+        <div className="relative">
+          <CardsContainer>
+            {isSaving && (
+              <ContainerOverlay position="absolute" top={0} alignItems="center">
+                <Spinner size={64} />
+                <p className="mt-3 text-sm">
+                  <FormattedMessage id="Saving" defaultMessage="Saving..." />
+                </p>
+              </ContainerOverlay>
+            )}
+            {items.map(({ key, Component, componentProps }) => {
+              // Add onClickEdit to the component props if we're using tier modals
+              componentProps =
+                canEdit && useTierModals && componentProps.tier
+                  ? { ...componentProps, onClickEdit: () => setShowTierModal(componentProps.tier) }
+                  : componentProps;
 
-            return (
-              <ContributeCardContainer key={key}>
-                {cards.length === 1 || !enableReordering ? (
-                  <Component {...componentProps} />
+              return (
+                <ContributeCardContainer key={key}>
+                  {cards.length === 1 || !enableReordering ? (
+                    <Component {...componentProps} />
+                  ) : (
+                    <DraggableContributeCardWrapper Component={Component} componentProps={componentProps} id={key} />
+                  )}
+                </ContributeCardContainer>
+              );
+            })}
+            {!hideCreateNew && (
+              <ContributeCardContainer>
+                {createNewType === 'PROJECT' ? (
+                  <CreateNew data-cy="create-project" route={`/${collective.slug}/projects/create`}>
+                    {addNewMessage}
+                  </CreateNew>
+                ) : useTierModals ? (
+                  <CreateNew
+                    as="div"
+                    data-cy={createNewType === 'TICKET' ? 'create-ticket' : 'create-contribute-tier'}
+                    onClick={() => setShowTierModal('new')}
+                  >
+                    {addNewMessage}
+                  </CreateNew>
+                ) : createNewType === 'TICKET' ? (
+                  <CreateNew data-cy="create-ticket" route={`/dashboard/${collective.slug}/tickets`}>
+                    {addNewMessage}
+                  </CreateNew>
                 ) : (
-                  <DraggableContributeCardWrapper Component={Component} componentProps={componentProps} id={key} />
+                  <CreateNew data-cy="create-contribute-tier" route={`/dashboard/${collective.slug}/tiers`}>
+                    {addNewMessage}
+                  </CreateNew>
                 )}
               </ContributeCardContainer>
-            );
-          })}
-          <ContributeCardContainer>
-            {useTierModals ? (
-              <CreateNew
-                as="div"
-                data-cy={createNewType === 'TICKET' ? 'create-ticket' : 'create-contribute-tier'}
-                onClick={() => setShowTierModal('new')}
-              >
-                {addNewMessage}
-              </CreateNew>
-            ) : (
-              <CreateNew
-                data-cy={createNewType === 'TICKET' ? 'create-ticket' : 'create-contribute-tier'}
-                route={createContributionTierRoute}
-              >
-                {addNewMessage}
-              </CreateNew>
             )}
-          </ContributeCardContainer>
-          {showTierModal && (
-            <EditTierModal
-              tier={showTierModal === 'new' ? null : showTierModal}
-              collective={collective}
-              onClose={() => setShowTierModal(false)}
-              forcedType={createNewType}
-              onUpdate={onTierUpdate}
-            />
-          )}
-        </CardsContainer>
+            {showTierModal && (
+              <EditTierModal
+                tier={showTierModal === 'new' ? null : showTierModal}
+                collective={collective}
+                onClose={closeTierModal}
+                forcedType={createNewType}
+                onUpdate={onTierUpdate}
+                supportedTierTypes={supportedTierTypes}
+              />
+            )}
+          </CardsContainer>
+        </div>
         <DragOverlay>
           {draggingItem ? (
             <ContributeCardWithDragHandle
@@ -145,35 +166,6 @@ const AdminContributeCardsContainer = ({
       </SortableContext>
     </DndContext>
   );
-};
-
-AdminContributeCardsContainer.propTypes = {
-  cards: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    }),
-  ).isRequired,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    type: PropTypes.string,
-    parentCollective: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }).isRequired,
-  /** Whether to use the new modals to edit/create tiers */ useTierModals: PropTypes.bool,
-  onReorder: PropTypes.func,
-  setDraggingId: PropTypes.func,
-  draggingId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onMount: PropTypes.func,
-  CardsContainer: PropTypes.elementType,
-  createNewType: PropTypes.string,
-  enableReordering: PropTypes.bool,
-  onTierUpdate: PropTypes.func,
-};
-
-AdminContributeCardsContainer.defaultProps = {
-  CardsContainer: ContributeCardsContainer,
-  enableReordering: true,
 };
 
 export default AdminContributeCardsContainer;

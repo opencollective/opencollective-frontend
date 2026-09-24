@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { CurrencyPrecision } from '../../lib/constants/currency-precision';
 
 import Container from '../Container';
+import { DefinitionTooltip } from '../dashboard/sections/reports/DefinitionTooltip';
 import CreateExpenseFAQ from '../faqs/CreateExpenseFAQ';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box } from '../Grid';
@@ -13,13 +13,17 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { H5, P, Span } from '../Text';
 
 import ExpandableExpensePolicies from './ExpandableExpensePolicies';
-
 /**
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
  * in a sidebar.
  */
-const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
+const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, children = undefined }) => {
+  const balance = collective?.stats.balance;
   const balanceWithBlockedFunds = collective?.stats.balanceWithBlockedFunds;
+  const blockedFundsAmount = {
+    valueInCents: balance?.valueInCents - balanceWithBlockedFunds?.valueInCents,
+    currency: balance?.currency,
+  };
   return (
     <Box width="100%">
       <Box display={['none', 'block']}>
@@ -36,22 +40,51 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
           borderLeft="1px solid"
           borderColor="black.300"
           pl={3}
-          fontSize="20px"
+          pb={1}
+          fontSize="18px"
           color="black.500"
           data-cy="collective-balance"
         >
-          {isLoading && !balanceWithBlockedFunds ? (
+          {isLoading && !balance ? (
             <LoadingPlaceholder height={28} width={75} />
           ) : (
             <Box>
-              <FormattedMoneyAmount
-                currency={balanceWithBlockedFunds.currency}
-                amount={balanceWithBlockedFunds.valueInCents}
-                amountStyles={{ color: 'black.800' }}
-                precision={CurrencyPrecision.DEFAULT}
-              />
+              {blockedFundsAmount.valueInCents > 0 ? (
+                <DefinitionTooltip
+                  definition={
+                    <FormattedMessage
+                      defaultMessage="This number accounts for {blockedFunds} currently not available to spend"
+                      id="LWUmrm"
+                      values={{
+                        blockedFunds: (
+                          <FormattedMoneyAmount
+                            amount={blockedFundsAmount.valueInCents}
+                            currency={blockedFundsAmount.currency}
+                            precision={CurrencyPrecision.DEFAULT}
+                          />
+                        ),
+                      }}
+                    />
+                  }
+                >
+                  <FormattedMoneyAmount
+                    currency={balance.currency}
+                    amount={balance.valueInCents}
+                    amountClassName="text-foreground"
+                    precision={CurrencyPrecision.DEFAULT}
+                  />
+                </DefinitionTooltip>
+              ) : balance ? (
+                <FormattedMoneyAmount
+                  currency={balance.currency}
+                  amount={balance.valueInCents}
+                  amountClassName="text-foreground"
+                  precision={CurrencyPrecision.DEFAULT}
+                />
+              ) : null}
+
               {host && (
-                <P fontSize="11px" color="black.700" mt={2}>
+                <P fontSize="11px" color="black.700" mt={3}>
                   <Span
                     fontSize="9px"
                     fontWeight="600"
@@ -59,7 +92,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                     color="black.700"
                     letterSpacing="0.06em"
                   >
-                    <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
+                    <FormattedMessage defaultMessage="Current Fiscal Host" id="06GnOc" />
                   </Span>
                   <br />
                   <LinkCollective collective={host}>
@@ -77,6 +110,21 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                   </LinkCollective>
                 </P>
               )}
+              {expenseHost && expenseHost.id !== host?.id && (
+                <P fontSize="11px" color="black.700" mt={3}>
+                  <Span
+                    fontSize="9px"
+                    fontWeight="600"
+                    textTransform="uppercase"
+                    color="black.700"
+                    letterSpacing="0.06em"
+                  >
+                    <FormattedMessage defaultMessage="Expense Fiscal Host" id="r4sUYI" />
+                  </Span>
+                  <br />
+                  <LinkCollective collective={expenseHost}>{expenseHost.name}</LinkCollective>
+                </P>
+              )}
             </Box>
           )}
         </Container>
@@ -88,32 +136,6 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
       </Box>
     </Box>
   );
-};
-
-ExpenseInfoSidebar.propTypes = {
-  isLoading: PropTypes.bool,
-
-  /** To render custom content inside the sidebar */
-  children: PropTypes.node,
-
-  /** Must be provided if isLoading is false */
-  collective: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    type: PropTypes.string,
-    parent: PropTypes.object,
-    isActive: PropTypes.bool,
-    stats: PropTypes.shape({
-      balanceWithBlockedFunds: PropTypes.shape({
-        valueInCents: PropTypes.number.isRequired,
-        currency: PropTypes.string.isRequired,
-      }),
-    }),
-  }),
-  host: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }),
 };
 
 export default React.memo(ExpenseInfoSidebar);

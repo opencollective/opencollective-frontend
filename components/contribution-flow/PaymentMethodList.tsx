@@ -1,18 +1,21 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Elements } from '@stripe/react-stripe-js';
-import { StripeElementsOptions } from '@stripe/stripe-js';
+import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { themeGet } from '@styled-system/theme-get';
-import { get, isEmpty, pick } from 'lodash';
+import { get, isEmpty, pick, set } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, CaptchaInput, Host, Individual, PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
+import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
+import { gql } from '../../lib/graphql/helpers';
+import type { Account, CaptchaInput, Host, Individual } from '../../lib/graphql/types/v2/graphql';
+import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';
 import usePaymentIntent from '../../lib/stripe/usePaymentIntent';
 
+import Captcha from '../Captcha';
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
@@ -105,7 +108,7 @@ type PaymentMethodListProps = {
   disabledPaymentMethodTypes: string[];
   stepSummary: object;
   stepDetails: { amount: number; currency: string; interval?: string };
-  stepPayment: { key: string; isKeyOnly?: boolean };
+  stepPayment: { key: string; isKeyOnly?: boolean; chargeAttempt: number };
   isEmbed: boolean;
   isSubmitting: boolean;
   hideCreditCardPostalCode: boolean;
@@ -123,22 +126,24 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     error: paymentMethodsError,
   } = useQuery(paymentMethodsQuery, {
     variables: { slug: props.stepProfile.slug },
-    context: API_V2_CONTEXT,
+
     skip: !props.stepProfile.slug,
     fetchPolicy: 'no-cache',
   });
 
   const hostSupportedPaymentMethods = props.host?.supportedPaymentMethods ?? [];
   const [paymentIntent, stripe, loadingPaymentIntent, paymentIntentCreateError] = usePaymentIntent({
+    chargeAttempt: props.stepPayment?.chargeAttempt,
     skip: !hostSupportedPaymentMethods.includes(PaymentMethodLegacyType.PAYMENT_INTENT),
     amount: { valueInCents: props.stepDetails.amount, currency: props.stepDetails.currency },
     fromAccount: props.stepProfile.isGuest
       ? undefined
       : typeof props.stepProfile.id === 'string'
-      ? { id: props.stepProfile.id }
-      : { legacyId: props.stepProfile.id },
+        ? { id: props.stepProfile.id }
+        : { legacyId: props.stepProfile.id },
     guestInfo: props.stepProfile.isGuest ? getGuestInfoFromStepProfile(props.stepProfile) : undefined,
     toAccount: pick(props.toAccount, 'id'),
+    frequency: getGQLV2FrequencyFromInterval(props.stepDetails.interval as any) as any,
   });
 
   const paymentMethodOptions = React.useMemo(() => {
@@ -198,12 +203,24 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       const keyToSelect = props.stepPayment?.key;
       const newOption = paymentMethodOptions.find(pm => !pm.disabled && (!keyToSelect || pm.key === keyToSelect));
       if (newOption) {
-        setNewPaymentMethod(newOption.key, { ...newOption.paymentMethod, paymentIntentId: paymentIntent?.id });
+        setNewPaymentMethod(newOption.key, {
+          ...newOption.paymentMethod,
+          stripePaymentIntentId: paymentIntent?.id,
+        });
       } else if (props.stepPayment) {
         props.onChange({ stepPayment: null }); // Make sure we unselect the option if it's not available
       }
     }
   }, [paymentMethodOptions, props.stepPayment, loading, paymentIntent]);
+
+  const onCaptchaResult = React.useCallback(
+    result => {
+      if (result) {
+        props.onChange({ stepProfile: set({ ...props.stepProfile }, 'captcha', result) });
+      }
+    },
+    [props.onChange, props.stepProfile],
+  );
 
   if (loading) {
     return <Loading />;
@@ -213,14 +230,19 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     return <MessageBoxGraphqlError error={error} />;
   }
 
-  if (paymentIntentCreateError?.message === 'You need to provide a valid captcha token') {
+  if (paymentIntentCreateError?.message?.toLowerCase().includes('captcha')) {
     return (
-      <MessageBox type="warning" withIcon>
-        <FormattedMessage
-          id="NewContribute.completeCaptchToContinue"
-          defaultMessage="Complete the captcha form to continue"
-        />
-      </MessageBox>
+      <div>
+        <MessageBox type="warning" withIcon>
+          <FormattedMessage
+            id="NewContribute.completeCaptchToContinue"
+            defaultMessage="Complete the captcha form to continue"
+          />
+        </MessageBox>
+        <Flex mt="18px" justifyContent="center">
+          <Captcha onVerify={onCaptchaResult} />
+        </Flex>
+      </div>
     );
   }
 
@@ -239,7 +261,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       keyGetter="key"
       options={paymentMethodOptions}
       onChange={option =>
-        setNewPaymentMethod(option.key, { ...option.value.paymentMethod, paymentIntentId: paymentIntent?.id })
+        setNewPaymentMethod(option.key, { ...option.value.paymentMethod, stripePaymentIntentId: paymentIntent?.id })
       }
       value={props.stepPayment?.key || null}
       disabled={props.isSubmitting}
@@ -297,7 +319,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
                   name: props.stepProfile?.name,
                   email: LoggedInUser?.email ?? props?.stepProfile?.email,
                 }}
-                paymentIntentId={paymentIntent.id}
+                stripePaymentIntentId={paymentIntent.id}
                 paymentIntentClientSecret={paymentIntent.client_secret}
                 onChange={props.onChange}
                 defaultIsSaved={!props.stepProfile?.isGuest}

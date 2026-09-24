@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { truncate } from 'lodash';
+import { truncate } from 'lodash-es';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -25,20 +24,6 @@ const ContributeCollective = ({ collective, ...props }) => {
       {description}
     </Contribute>
   );
-};
-
-ContributeCollective.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    backgroundImageUrl: PropTypes.string,
-    contributors: PropTypes.arrayOf(PropTypes.object),
-    stats: PropTypes.shape({
-      backers: PropTypes.object,
-    }).isRequired,
-  }),
 };
 
 export default ContributeCollective;

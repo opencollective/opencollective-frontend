@@ -2,25 +2,35 @@
 // The config you add here will be used whenever a page is visited.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-import { Replay } from '@sentry/browser';
 import * as Sentry from '@sentry/nextjs';
 
+import { SENTRY_APPLICATION_KEY } from './sentry.constants';
 import defaultConfig from './sentry.default.config.js';
+import { isExtensionOrInjectedScriptError } from './sentry-filters.js';
+
+const shouldUseThirdPartyErrorFilter = process.env.NODE_ENV === 'production';
 
 Sentry.init({
   ...defaultConfig,
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0,
-  // If the entire session is not sampled, use the below sample rate to sample
-  // sessions when an error occurs.
-  replaysOnErrorSampleRate: 0.01,
+  integrations(defaultIntegrations) {
+    const integrations = [...defaultIntegrations];
 
-  integrations: [
-    new Replay({
-      // Additional SDK configuration goes in here, for example:
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-  ],
+    if (shouldUseThirdPartyErrorFilter) {
+      integrations.push(
+        Sentry.thirdPartyErrorFilterIntegration({
+          filterKeys: [SENTRY_APPLICATION_KEY],
+          behaviour: 'drop-error-if-exclusively-contains-third-party-frames',
+        }),
+      );
+    }
+
+    return integrations;
+  },
+  beforeSend(event) {
+    if (isExtensionOrInjectedScriptError(event)) {
+      return null;
+    }
+
+    return event;
+  },
 });

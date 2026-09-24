@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import get from 'lodash/get';
+import get from 'lodash-es/get';
 import { FixedSizeGrid } from 'react-window';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
 import withViewport, { VIEWPORTS } from '../lib/withViewport';
@@ -12,7 +11,7 @@ import { fadeIn } from './StyledKeyframes';
 import { withUser } from './UserProvider';
 
 // Define static dimensions
-export const COLLECTIVE_CARD_MARGIN_X = 32;
+const COLLECTIVE_CARD_MARGIN_X = 32;
 const COLLECTIVE_CARD_MARGIN_Y = 26;
 const COLLECTIVE_CARD_WIDTH = 144;
 const COLLECTIVE_CARD_HEIGHT = 220;
@@ -39,7 +38,6 @@ const StyledGridContainer = styled.div`
  * let you pass custom props to outer container.
  */
 const getGridContainer = (paddingLeft, hasScroll) => {
-  // eslint-disable-next-line react/prop-types
   const GridContainer = ({ style, ...props }, ref) => {
     return (
       <StyledGridContainer
@@ -64,10 +62,6 @@ const getGridContainer = (paddingLeft, hasScroll) => {
  */
 const GridInnerContainer = ({ style, ...props }) => {
   return <div style={{ ...style, position: 'relative', width: style.width + COLLECTIVE_CARD_MARGIN_X }} {...props} />;
-};
-
-GridInnerContainer.propTypes = {
-  style: PropTypes.object,
 };
 
 /** Cards to show individual contributors */
@@ -123,18 +117,27 @@ const computePaddingLeft = (width, rowWidth, nbRows, maxWidthWhenNotFull) => {
   }
 };
 
+const DEFAULT_MAX_NB_ROWS_FOR_VIEWPORTS = {
+  [VIEWPORTS.UNKNOWN]: 1,
+  [VIEWPORTS.XSMALL]: 1,
+  [VIEWPORTS.SMALL]: 2,
+  [VIEWPORTS.MEDIUM]: 3,
+  [VIEWPORTS.LARGE]: 3,
+};
+
 /**
  * A grid to show contributors, with horizontal scroll to search them.
  */
 const ContributorsGrid = ({
   contributors,
   width,
-  maxNbRowsForViewports,
+  maxNbRowsForViewports = DEFAULT_MAX_NB_ROWS_FOR_VIEWPORTS,
   viewport,
   maxWidthWhenNotFull,
   currency,
   LoggedInUser,
   collectiveId,
+  gridRef,
 }) => {
   const maxNbRows = maxNbRowsForViewports[viewport];
   const [nbCols, nbRows] = getItemsRepartition(contributors.length, width, maxNbRows);
@@ -159,6 +162,7 @@ const ContributorsGrid = ({
         const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
         return idx < contributors.length ? contributors[idx].id : `empty-${idx}`;
       }}
+      ref={gridRef}
     >
       {({ columnIndex, rowIndex, style }) => {
         const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
@@ -182,57 +186,6 @@ const ContributorsGrid = ({
       }}
     </FixedSizeGrid>
   );
-};
-
-ContributorsGrid.propTypes = {
-  /** The contributors */
-  contributors: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      collectiveId: PropTypes.number,
-    }),
-  ),
-
-  /** Maximum number of rows for different viewports. Will fallback on `defaultNbRows` if not provided */
-  maxNbRowsForViewports: PropTypes.shape({
-    [VIEWPORTS.UNKNOWN]: PropTypes.number,
-    [VIEWPORTS.XSMALL]: PropTypes.number,
-    [VIEWPORTS.SMALL]: PropTypes.number,
-    [VIEWPORTS.MEDIUM]: PropTypes.number,
-    [VIEWPORTS.LARGE]: PropTypes.number,
-  }).isRequired,
-
-  /** Currency used for contributions */
-  currency: PropTypes.string,
-
-  /** @ignore from withViewport */
-  viewport: PropTypes.oneOf(Object.values(VIEWPORTS)),
-
-  /** @ignore from withViewport */
-  width: PropTypes.number.isRequired,
-
-  /** To center the content when the grid is not full */
-  maxWidthWhenNotFull: PropTypes.number,
-
-  /** @ignore from withUser */
-  LoggedInUser: PropTypes.shape({
-    CollectiveId: PropTypes.number,
-  }),
-
-  /** Collective id */
-  collectiveId: PropTypes.number,
-};
-
-ContributorsGrid.defaultProps = {
-  limit: 30,
-  defaultNbRows: 1,
-  maxNbRowsForViewports: {
-    [VIEWPORTS.UNKNOWN]: 1,
-    [VIEWPORTS.XSMALL]: 1,
-    [VIEWPORTS.SMALL]: 2,
-    [VIEWPORTS.MEDIUM]: 3,
-    [VIEWPORTS.LARGE]: 3,
-  },
 };
 
 export default withViewport(withUser(ContributorsGrid), { withWidth: true });

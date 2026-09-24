@@ -19,12 +19,12 @@ export function SaveRecoveryCodesModal(props: SaveRecoveryCodesModalProps) {
   const [showRecoveryCodesConfirmationModal, setShowRecoveryCodesConfirmationModal] = React.useState(false);
 
   return (
-    <StyledModal ignoreEscapeKey trapFocus preventClose onClose={props.onClose}>
+    <StyledModal ignoreEscapeKey preventClose onClose={props.onClose}>
       <React.Fragment>
         <Box width="500px">
           <Flex alignItems="center">
             <H3 fontSize="18px" fontWeight="700" mr={1}>
-              <FormattedMessage defaultMessage="Save your recovery codes" />
+              <FormattedMessage defaultMessage="Save your recovery codes" id="n0fdpg" />
             </H3>
           </Flex>
           <P>
@@ -64,7 +64,7 @@ export function SaveRecoveryCodesModal(props: SaveRecoveryCodesModalProps) {
                   )
                 }
               >
-                <FormattedMessage defaultMessage="Download codes" />
+                <FormattedMessage defaultMessage="Download codes" id="TvWROv" />
                 &nbsp;
                 <DownloadIcon size="1em" />
               </StyledButton>
@@ -77,12 +77,7 @@ export function SaveRecoveryCodesModal(props: SaveRecoveryCodesModalProps) {
             type="confirm"
             onClose={() => setShowRecoveryCodesConfirmationModal(false)}
             continueHandler={() => props.onClose()}
-            header={
-              <FormattedMessage
-                id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Header"
-                defaultMessage="Are you sure?"
-              />
-            }
+            header={<FormattedMessage id="AreYouSure" defaultMessage="Are you sure?" />}
           >
             <FormattedMessage
               id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body"

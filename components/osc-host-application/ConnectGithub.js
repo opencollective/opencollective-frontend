@@ -95,7 +95,7 @@ class ConnectGithub extends React.Component {
                   values={{
                     helplink: (
                       <StyledLink
-                        href="https://docs.opencollective.com/help/collectives/osc-verification"
+                        href="https://docs.oscollective.org/how-to-apply/github-verification#github-verification-troubleshooting"
                         openInNewTab
                         color="purple.500"
                       >
@@ -108,6 +108,7 @@ class ConnectGithub extends React.Component {
               <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
                 <FormattedMessage
                   defaultMessage="Want to apply using an <AltVerificationLink>alternative verification criteria</AltVerificationLink>? <ApplyLink>Click here</ApplyLink>."
+                  id="kwIdJS"
                   values={{
                     ApplyLink: getI18nLink({
                       as: Link,
@@ -116,7 +117,7 @@ class ConnectGithub extends React.Component {
                     }),
                     AltVerificationLink: getI18nLink({
                       openInNewTab: true,
-                      href: 'https://www.oscollective.org/#criteria',
+                      href: 'https://docs.oscollective.org/how-to-apply/manual-verification',
                       color: 'purple.500',
                     }),
                   }}

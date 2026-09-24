@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import {
   checkVATNumberFormat,
   getGstPercentage,
@@ -8,12 +7,9 @@ import {
   TaxType,
 } from '@opencollective/taxes';
 import { Close } from '@styled-icons/material/Close';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
-
-import tiersTypes from '../../lib/constants/tiers-types';
-import { propTypeCountry } from '../../lib/custom-prop-types';
+import { styled } from 'styled-components';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -70,7 +66,7 @@ const VATInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
     <AmountLine my={3}>
       <Flex flexDirection="column">
         <Flex alignItems="center" flexWrap="wrap">
-          <Label mr={2} flex="1 1 auto">
+          <Label mr={2} flex="1 1 auto" whiteSpace="nowrap">
             {vatShortLabel}
           </Label>
           <Box flex="1 1 180px">
@@ -203,26 +199,11 @@ const VATInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
           </Box>
         )}
       </Flex>
-      <Amount pt={2} ml={2} data-cy="VAT-amount">
-        <FormattedMoneyAmount
-          amount={taxInfo.amount}
-          currency={currency}
-          amountStyles={{ color: 'black.700', fontWeight: 400 }}
-        />
+      <Amount pt={2} ml={2} data-cy="VAT-amount" color="black.700" fontWeight={400}>
+        <FormattedMoneyAmount amount={taxInfo.amount} currency={currency} />
       </Amount>
     </AmountLine>
   );
-};
-
-VATInputs.propTypes = {
-  formState: PropTypes.object,
-  taxInfo: PropTypes.object,
-  currency: PropTypes.string,
-  dispatchChange: PropTypes.func,
-  setFormState: PropTypes.func,
-  AmountLine: PropTypes.node,
-  Amount: PropTypes.node,
-  Label: PropTypes.node,
 };
 
 const GSTInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChange }) => {
@@ -231,7 +212,7 @@ const GSTInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
     <AmountLine my={3}>
       <Flex flexDirection="column" width="100%">
         <Flex alignItems="center" flexWrap="wrap">
-          <Label mr={2} flex="0 1 30px">
+          <Label mr={2} flex="0 1 30px" whiteSpace="nowrap">
             {gstShortLabel}
           </Label>
           <Box flex="1 1 auto">
@@ -255,24 +236,11 @@ const GSTInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
           </Box>
         </Flex>
       </Flex>
-      <Amount pt={2} ml={2} data-cy="GST-amount">
-        <FormattedMoneyAmount
-          amount={taxInfo.amount}
-          currency={currency}
-          amountStyles={{ color: 'black.700', fontWeight: 400 }}
-        />
+      <Amount pt={2} ml={2} data-cy="GST-amount" color="black.700" fontWeight={400}>
+        <FormattedMoneyAmount amount={taxInfo.amount} currency={currency} />
       </Amount>
     </AmountLine>
   );
-};
-
-GSTInputs.propTypes = {
-  taxInfo: PropTypes.object,
-  currency: PropTypes.string,
-  dispatchChange: PropTypes.func,
-  AmountLine: PropTypes.node,
-  Amount: PropTypes.node,
-  Label: PropTypes.node,
 };
 
 /**
@@ -362,75 +330,6 @@ const StepSummary = ({
       />
     </Box>
   );
-};
-
-StepSummary.propTypes = {
-  stepDetails: PropTypes.shape({
-    /** The total amount without tax in cents */
-    amount: PropTypes.number.isRequired,
-    /** Number of items to order */
-    quantity: PropTypes.number,
-    /** Currency of the order (for crypto flow) */
-    currency: PropTypes.string,
-  }),
-  stepProfile: PropTypes.shape({
-    location: PropTypes.shape({
-      country: propTypeCountry,
-    }),
-  }),
-  collective: PropTypes.shape({
-    currency: PropTypes.string.isRequired,
-    /** Host fees, as an integer percentage */
-    hostFeePercent: PropTypes.number,
-    /** Platform fee */
-    platformFeePercent: PropTypes.number,
-    location: PropTypes.shape({
-      country: propTypeCountry,
-    }),
-    parent: PropTypes.shape({
-      location: PropTypes.shape({
-        country: propTypeCountry,
-      }),
-    }),
-    host: PropTypes.shape({
-      location: PropTypes.shape({
-        country: propTypeCountry,
-      }),
-    }),
-  }),
-  stepPayment: PropTypes.object,
-  /** If we need to activate tax for this order */
-  applyTaxes: PropTypes.bool,
-  /** The tax identification information from user */
-  data: PropTypes.shape({
-    /** Country ISO of the contributing profile. Used to see what taxes applies */
-    countryISO: PropTypes.string,
-    /** The tax identification numer */
-    number: PropTypes.string,
-    /** A flag to indicate if the form is ready to be submitted */
-    isReady: PropTypes.bool,
-    /** The tax amount in cents */
-    amount: PropTypes.number,
-  }),
-  /** Type of the tier. Used to check if taxes apply */
-  tier: PropTypes.shape({
-    type: PropTypes.oneOf(tiersTypes),
-    amount: PropTypes.shape({
-      currency: PropTypes.string,
-    }),
-  }),
-  /** Payment method, used to generate label and payment fee */
-  paymentMethod: PropTypes.shape({
-    /** Payment method service provider */
-    service: PropTypes.string,
-    /** Payment method type */
-    type: PropTypes.string,
-    /** Payment method currency */
-    currency: PropTypes.string,
-  }),
-  /** Called with the step info as `{countryCode, taxInfoNumber, isValid}`  */
-  onChange: PropTypes.func.isRequired,
-  taxes: PropTypes.arrayOf(PropTypes.oneOf(Object.values(TaxType))),
 };
 
 export default StepSummary;

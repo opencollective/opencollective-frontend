@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Email } from '@styled-icons/material/Email';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { useTheme } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { removeGuestTokens } from '../lib/guest-accounts';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
@@ -16,7 +16,7 @@ import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import MessageBoxGraphqlError from '../components/MessageBoxGraphqlError';
 import Page from '../components/Page';
-import StyledSpinner from '../components/StyledSpinner';
+import Spinner from '../components/Spinner';
 import { P } from '../components/Text';
 
 const STATUS = {
@@ -45,15 +45,13 @@ const MESSAGES = defineMessages({
   },
 });
 
-const MUTATION_OPTS = { context: API_V2_CONTEXT };
-
 const ConfirmGuestPage = () => {
   const intl = useIntl();
   const theme = useTheme();
   const router = useRouter();
   const { login } = useLoggedInUser();
   const [status, setStatus] = React.useState(STATUS.SUBMITTING);
-  const [callConfirmGuestAccount, { error, data }] = useMutation(confirmGuestAccountMutation, MUTATION_OPTS);
+  const [callConfirmGuestAccount, { error, data }] = useMutation(confirmGuestAccountMutation);
   const { token, email } = router.query;
 
   const confirmGuestAccount = async () => {
@@ -112,7 +110,7 @@ const ConfirmGuestPage = () => {
             </Container>
             <Container textAlign="center" p={2}>
               <Box my={2}>
-                <StyledSpinner size={32} />
+                <Spinner size={32} />
               </Box>
               {data?.confirmGuestAccount?.account && (
                 <P fontSize="13px" lineHeight="18px" textAlign="center">
@@ -150,4 +148,6 @@ ConfirmGuestPage.getInitialProps = ({ req: { query } }) => {
   return { token: query.token, email: query.email };
 };
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default ConfirmGuestPage;

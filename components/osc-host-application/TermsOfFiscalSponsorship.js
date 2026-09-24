@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { addAuthTokenToHeader } from '../../lib/api';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
@@ -27,27 +27,52 @@ const messages = defineMessages({
 const FISCAL_SPONSOR_TERMS =
   'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub';
 
-const getGithubConnectUrl = collectiveSlug => {
+const _callRedirectToGithub = async collectiveSlug => {
   const urlParams = new URLSearchParams({
     context: 'createCollective',
     ...(collectiveSlug ? { CollectiveId: collectiveSlug } : null),
   });
 
-  const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-  if (accessToken) {
-    urlParams.set('access_token', accessToken);
+  const response = await fetch(`/api/connected-accounts/github/oauthUrl?${urlParams.toString()}`, {
+    method: 'GET',
+    headers: addAuthTokenToHeader(),
+  });
+  const json = await response.json();
+  if (json?.redirectUrl) {
+    window.location.href = json.redirectUrl;
+    return true;
+  } else {
+    return false;
   }
-
-  return `/api/connected-accounts/github/oauthUrl?${urlParams.toString()}`;
 };
 
 const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
+  const { LoggedInUser } = useLoggedInUser();
   const { formatMessage } = useIntl();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const router = useRouter();
   const [error, setError] = useState();
 
-  const { collectiveSlug } = router.query;
+  const { collectiveSlug, redirectToGithub } = router.query;
+
+  const callRedirectToGithub = React.useCallback(async collectiveSlug => {
+    try {
+      setIsRedirecting(true);
+      if ((await _callRedirectToGithub(collectiveSlug)) === false) {
+        setIsRedirecting(false);
+      }
+    } catch (error) {
+      setError(error.message);
+      setIsRedirecting(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (LoggedInUser && redirectToGithub) {
+      callRedirectToGithub(collectiveSlug);
+    }
+  }, [LoggedInUser, redirectToGithub, callRedirectToGithub, collectiveSlug]);
 
   return (
     <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
@@ -113,15 +138,28 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
             textAlign="center"
             buttonSize="large"
             buttonStyle="purple"
+            loading={isRedirecting}
             onClick={() => {
               if (!checked) {
                 setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
+              } else if (!LoggedInUser) {
+                router.push({
+                  pathname: '/signin',
+                  query: { next: `${router.asPath}?redirectToGithub=true` },
+                });
               } else {
-                window.location.href = getGithubConnectUrl(collectiveSlug);
+                callRedirectToGithub(collectiveSlug);
               }
             }}
           >
-            <FormattedMessage id="createcollective.opensource.VerifyGithub" defaultMessage="Verify using GitHub" />
+            {!LoggedInUser ? (
+              <FormattedMessage
+                id="createcollective.opensource.LogInAndVerifyGithub"
+                defaultMessage="Sign in and verify using GitHub"
+              />
+            ) : (
+              <FormattedMessage id="createcollective.opensource.VerifyGithub" defaultMessage="Verify using GitHub" />
+            )}
           </StyledButton>
           <Link
             href={{
@@ -153,11 +191,6 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
       </Box>
     </Flex>
   );
-};
-
-TermsOfFiscalSponsorship.propTypes = {
-  checked: PropTypes.bool,
-  onChecked: PropTypes.func,
 };
 
 export default TermsOfFiscalSponsorship;

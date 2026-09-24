@@ -5,28 +5,29 @@ import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
-import { get, truncate } from 'lodash';
+import { get, truncate } from 'lodash-es';
 import memoizeOne from 'memoize-one';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
 
 import { isPrepaid } from '../lib/constants/payment-methods';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose, reportValidityHTML5 } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
+import { Button } from './ui/Button';
 import CollectivePicker from './CollectivePicker';
 import Container from './Container';
 import CreateGiftCardsSuccess from './CreateGiftCardsSuccess';
 import { Box, Flex } from './Grid';
 import { I18nSupportLink } from './I18nFormatters';
+import InputAmount from './InputAmount';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import PaymentMethodSelect from './PaymentMethodSelect';
-import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInput from './StyledInput';
-import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
 
@@ -73,9 +74,6 @@ InlineField.propTypes = {
   label: PropTypes.node,
   isLabelClickable: PropTypes.bool,
 };
-
-/** Entry title */
-export const Title = styled.summary``;
 
 const DeliverTypeRadioSelector = styled(Flex)`
   justify-content: space-evenly;
@@ -237,9 +235,9 @@ class CreateGiftCardsForm extends Component {
 
       this.setState({ submitting: true });
       const variables = {
-        CollectiveId: this.props.collectiveId,
+        collectiveId: this.props.collectiveId,
         amount: values.amount,
-        PaymentMethodId: paymentMethod.id,
+        paymentMethodId: paymentMethod.id,
         expiryDate: values.expiryDate,
         batch: values.batch,
         ...limitations,
@@ -314,30 +312,22 @@ class CreateGiftCardsForm extends Component {
     const count = this.getGiftCardsCount();
     const enable = this.isSubmitEnabled();
     return (
-      <StyledButton
-        type="submit"
-        buttonSize="large"
-        buttonStyle="primary"
-        minWidth="16em"
-        disabled={!submitting && !enable}
-        loading={submitting}
-        data-cy="submit-new-gift-cards"
-      >
+      <Button type="submit" disabled={!submitting && !enable} loading={submitting} data-cy="submit-new-gift-cards">
         <FormattedMessage id="giftCards.generate" defaultMessage="Create {count} gift cards" values={{ count }} />
-      </StyledButton>
+      </Button>
     );
   }
 
   renderNoPaymentMethodMessage() {
     return (
       <Flex justifyContent="center">
-        <Link href={`/${this.props.collectiveSlug}/admin/payment-methods`}>
-          <StyledButton buttonSize="large" mt="2em" justifyContent="center">
+        <Link href={`/dashboard/${this.props.collectiveSlug}/payment-methods`}>
+          <Button className="mt-8 justify-center">
             <FormattedMessage
               id="giftCards.create.requirePM"
               defaultMessage="Add a payment method to create gift cards"
             />
-          </StyledButton>
+          </Button>
         </Link>
       </Flex>
     );
@@ -361,7 +351,6 @@ class CreateGiftCardsForm extends Component {
           </label>
           <StyledMultiEmailInput
             id="gift-cards-recipients"
-            className="gift-cards-recipients"
             mt="0.25em"
             invalids={errors.emails}
             initialState={multiEmailsInitialState}
@@ -489,7 +478,7 @@ class CreateGiftCardsForm extends Component {
         </MessageBox>
         <Flex flexDirection="column">
           <InlineField name="amount" label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}>
-            <StyledInputAmount
+            <InputAmount
               id="giftcard-amount"
               currency={currency}
               prepend={currency}
@@ -516,7 +505,11 @@ class CreateGiftCardsForm extends Component {
             />
           </InlineField>
 
-          <InlineField name="expiryDate" isLabelClickable label={<FormattedMessage defaultMessage="Expiry date" />}>
+          <InlineField
+            name="expiryDate"
+            isLabelClickable
+            label={<FormattedMessage defaultMessage="Expiry date" id="x/oJ17" />}
+          >
             <StyledInput
               id="giftcard-expiryDate"
               name="expiryDate"
@@ -612,6 +605,7 @@ class CreateGiftCardsForm extends Component {
             <MessageBox type="warning" fontSize="14px" lineHeight="20px" withIcon mb={4}>
               <FormattedMessage
                 defaultMessage="We strongly recommend limiting your gift cards to specific fiscal hosts - otherwise, malicious users could create fake Collectives to withdraw the funds. Collectives under trusted fiscal hosts have all been vetted and confirmed as legitimate."
+                id="f7yDbJ"
                 values={{ SupportLink: I18nSupportLink }}
               />
             </MessageBox>
@@ -620,6 +614,7 @@ class CreateGiftCardsForm extends Component {
             <MessageBox type="warning" fontSize="14px" lineHeight="20px" withIcon mb={4}>
               <FormattedMessage
                 defaultMessage="Credit card payments incur processor fees, which can add up on large campaigns. Banks may also flag the numerous transactions as suspicious. We strongly recommend adding a prepaid budget via bank transfer instead. <SupportLink>Contact us</SupportLink> to learn more."
+                id="wT94tD"
                 values={{ SupportLink: I18nSupportLink }}
               />
               <Box mt={2}>
@@ -627,7 +622,7 @@ class CreateGiftCardsForm extends Component {
                   name="accept-payment-method-warning"
                   checked={this.state.hasAcceptedWarning}
                   onChange={() => this.setState({ hasAcceptedWarning: !this.state.hasAcceptedWarning })}
-                  label={<FormattedMessage defaultMessage="I understand, let me continue" />}
+                  label={<FormattedMessage defaultMessage="I understand, let me continue" id="8jaG3F" />}
                 />
               </Box>
             </MessageBox>
@@ -647,7 +642,7 @@ class CreateGiftCardsForm extends Component {
  * gift cards, as a gift card cannot be used as a source payment method
  * for another payment method.
  */
-export const collectiveSourcePaymentMethodsQuery = gqlV1/* GraphQL */ `
+const collectiveSourcePaymentMethodsQuery = gqlV1 /* GraphQL */ `
   query CollectiveSourcePaymentMethods($id: Int) {
     Collective(id: $id) {
       id
@@ -685,17 +680,18 @@ export const collectiveSourcePaymentMethodsQuery = gqlV1/* GraphQL */ `
 
 const addCollectiveSourcePaymentMethodsQuery = graphql(collectiveSourcePaymentMethodsQuery, {
   options: props => ({
+    context: API_V1_CONTEXT,
     variables: { id: props.collectiveId },
     fetchPolicy: 'network-only',
   }),
 });
 
-const createGiftCardsMutation = gqlV1/* GraphQL */ `
+const createGiftCardsMutation = gqlV1 /* GraphQL */ `
   mutation CreateGiftCards(
-    $CollectiveId: Int!
+    $collectiveId: Int!
     $numberOfGiftCards: Int
     $emails: [String]
-    $PaymentMethodId: Int
+    $paymentMethodId: Int
     $amount: Int
     $monthlyLimitPerMember: Int
     $description: String
@@ -709,8 +705,8 @@ const createGiftCardsMutation = gqlV1/* GraphQL */ `
     createGiftCards(
       amount: $amount
       monthlyLimitPerMember: $monthlyLimitPerMember
-      CollectiveId: $CollectiveId
-      PaymentMethodId: $PaymentMethodId
+      CollectiveId: $collectiveId
+      PaymentMethodId: $paymentMethodId
       description: $description
       expiryDate: $expiryDate
       currency: $currency
@@ -738,6 +734,7 @@ const createGiftCardsMutation = gqlV1/* GraphQL */ `
 
 const addCreateGiftCardsMutation = graphql(createGiftCardsMutation, {
   name: 'createGiftCards',
+  options: { context: API_V1_CONTEXT },
 });
 
 const addGraphql = compose(addCollectiveSourcePaymentMethodsQuery, addCreateGiftCardsMutation);

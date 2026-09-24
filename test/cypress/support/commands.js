@@ -1,12 +1,13 @@
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { loggedInUserQuery } from '../../../lib/graphql/queries';
+import 'cypress-mailpit';
+
+import { API_V1_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
+import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
 
 import { CreditCards } from '../../stripe-helpers';
 
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
-
-// const gqlV1 = gql;
+import generateToken from './token';
 
 /**
  * Login with an existing account. If not provided in `params`, the email used for
@@ -15,29 +16,39 @@ import { randomEmail, randomSlug } from './faker';
  * @param {object} params:
  *    - redirect: The redirect URL
  *    - email: User email
+ *    - completeProfile: Complete a newly-created user's profile before visiting redirect
  */
 Cypress.Commands.add('login', (params = {}) => {
-  const { email = defaultTestUserEmail, redirect = null, visitParams, sendLink } = params;
+  const { email = defaultTestUserEmail, redirect = null, visitParams, sendLink, completeProfile = true } = params;
   const user = { email, newsletterOptIn: false };
 
   return signinRequest(user, redirect, sendLink).then(({ body: { redirect } }) => {
     // Test users are allowed to signin directly with E2E, thus a signin URL
     // is directly returned by the API. See signin function in
     // opencollective-api/server/controllers/users.js for more info
-    return cy.visit(redirect, visitParams).then(() => user);
+    const token = redirect ? getTokenFromRedirectUrl(redirect) : null;
+    if (!token) {
+      return cy.visit(redirect, visitParams).then(() => user);
+    }
+
+    return getLoggedInUserFromToken(token).then(loggedInUser => {
+      return completeProfileIfRequired({ token, loggedInUser, completeProfile }).then(() => {
+        return cy.visit(redirect, visitParams).then(() => user);
+      });
+    });
   });
 });
 
 Cypress.Commands.add('logout', () => {
-  cy.getByDataCy('user-menu-trigger').click();
-  cy.getByDataCy('logout').click();
+  cy.getByDataCy('user-menu-trigger').click({ force: true });
+  cy.getByDataCy('logout').click({ force: true });
 });
 
 /**
  * Create a new account an SignIn. If no email is provided in `params`, the account
  * will be generated using a random email.
  */
-Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {}) => {
+Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, completeProfile = true } = {}) => {
   if (!user.email) {
     user.email = randomEmail();
   }
@@ -48,8 +59,10 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {})
     // opencollective-api/server/controllers/users.js for more info
     const token = getTokenFromRedirectUrl(redirect);
     if (token) {
-      return getLoggedInUserFromToken(token).then(user => {
-        return cy.visit(redirect, visitParams).then(() => user);
+      return getLoggedInUserFromToken(token).then(loggedInUser => {
+        return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name }).then(() => {
+          return cy.visit(redirect, visitParams).then(() => loggedInUser);
+        });
       });
     } else {
       return cy.visit(redirect, visitParams).then(() => user);
@@ -57,21 +70,43 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {})
   });
 });
 
-/**
- * Open a link not covered by `baseUrl`.
- * See https://github.com/cypress-io/cypress/issues/1777
- */
-Cypress.Commands.add('openExternalLink', url => {
-  cy.visit('/signin').then(window => {
-    const linkIdentifier = '__TMP_CY_EXTERNAL_LINK__';
-    const link = window.document.createElement('a');
-    link.innerHTML = linkIdentifier;
-    link.setAttribute('href', url);
-    link.setAttribute('id', linkIdentifier);
-    window.document.body.appendChild(link);
-    cy.get(`#${linkIdentifier}`).click();
-  });
-});
+function completeProfileIfRequired({ token, loggedInUser, completeProfile, name }) {
+  if (!completeProfile || !loggedInUser.requiresProfileCompletion) {
+    return cy.wrap(loggedInUser);
+  }
+
+  return getIdV2FromReferenceInput({ slug: loggedInUser.collective.slug }, token)
+    .then(accountId => {
+      return graphqlQueryV2(token, {
+        operationName: 'EditAccount',
+        query: gql`
+          mutation EditAccount($account: AccountUpdateInput!) {
+            editAccount(account: $account) {
+              id
+              slug
+              name
+            }
+          }
+        `,
+        variables: {
+          account: {
+            id: accountId,
+            name: name ?? loggedInUser.collective.name ?? 'Test User',
+          },
+        },
+      });
+    })
+    .then(({ body }) => {
+      // `editAccount` regenerates the collective slug for profile-completion
+      // users, so reflect the fresh slug on the returned user (several specs
+      // read `user.collective.slug`).
+      const { slug } = body.data.editAccount;
+      if (loggedInUser.collective && slug) {
+        loggedInUser.collective.slug = slug;
+      }
+      return loggedInUser;
+    });
+}
 
 /**
  * Returns all the email sent by the API
@@ -88,7 +123,7 @@ Cypress.Commands.add('getInbox', () => {
 });
 
 /**
- * Navigate to an email in maildev.
+ * Open an email on Mailpit. Resolves the email message.
  *
  * API must be configured to use maildev
  * - configured by default in development, e2e and ci environments
@@ -97,35 +132,8 @@ Cypress.Commands.add('getInbox', () => {
  * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
  *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
  */
-Cypress.Commands.add('openEmail', emailMatcher => {
-  return loopOpenEmail(emailMatcher);
-});
-
-/**
- * Gets an email in maildev.
- *
- * API must be configured to use maildev
- * - configured by default in development, e2e and ci environments
- * - otherwise MAILDEV_CLIENT=true and MAILDEV_SERVER=true
- *
- * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
- *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
- */
-Cypress.Commands.add('getEmail', emailMatcher => {
-  return getEmail(emailMatcher);
-});
-
-/**
- * Clear maildev inbox.
- */
-Cypress.Commands.add('clearInbox', () => {
-  return cy.request({
-    url: `${Cypress.env('MAILDEV_URL')}/email/all`,
-    method: 'DELETE',
-    headers: {
-      Accept: 'application/json',
-    },
-  });
+Cypress.Commands.add('openEmail', (emailMatcher, timeout = 8000) => {
+  return getEmail(emailMatcher, timeout);
 });
 
 /**
@@ -137,9 +145,9 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
   return signinRequest(user, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
-      operationName: 'createCollective',
-      query: /* GraphQL */ `
-        mutation createCollective($collective: CollectiveInputType!) {
+      operationName: 'CreateCollective',
+      query: gqlV1 /* GraphQL */ `
+        mutation CreateCollective($collective: CollectiveInputType!) {
           createCollective(collective: $collective) {
             id
             slug
@@ -152,7 +160,8 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
           }
         }
       `,
-      variables: { collective: { location: {}, name: 'TestOrg', slug: '', tiers: [], type, ...params } },
+      context: API_V1_CONTEXT,
+      variables: { collective: { location: {}, name: 'TestOrg', slug: '', type, ...params } },
     }).then(({ body }) => {
       return body.data.createCollective;
     });
@@ -160,30 +169,36 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 });
 
 /**
- * Calls the mutation to edit the settings of an account
+ * Edit account fields via GraphQL v2 `editAccount`.
  */
-Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserEmail) => {
+Cypress.Commands.add('editAccount', (account, userEmail = defaultTestUserEmail) => {
   return signinRequestAndReturnToken({ email: userEmail }).then(token => {
-    return graphqlQuery(token, {
-      operationName: 'EditCollective',
-      query: /* GraphQL */ `
-        mutation EditCollective($collective: CollectiveInputType!) {
-          editCollective(collective: $collective) {
-            id
-            slug
-            name
-            settings
-            location {
-              id
-              country
+    return getIdV2FromReferenceInput(account, token)
+      .then(id => {
+        return graphqlQueryV2(token, {
+          operationName: 'EditAccount',
+          query: gql`
+            mutation EditAccount($account: AccountUpdateInput!) {
+              editAccount(account: $account) {
+                id
+                slug
+                name
+                settings
+                location {
+                  id
+                  country
+                }
+              }
             }
-          }
-        }
-      `,
-      variables: { collective },
-    }).then(({ body }) => {
-      return body.data.createCollective;
-    });
+          `,
+          variables: {
+            account: { ...account, id },
+          },
+        });
+      })
+      .then(({ body }) => {
+        return body.data.editAccount;
+      });
   });
 });
 
@@ -193,7 +208,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
  */
 Cypress.Commands.add(
   'createHostedCollectiveV2',
-  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, ...attributes } = {}) => {
+  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, collective, ...attributes } = {}) => {
     return cy.createCollectiveV2({
       ...attributes,
       email,
@@ -201,6 +216,7 @@ Cypress.Commands.add(
       host: { slug: hostSlug },
       collective: {
         repositoryUrl: 'https://github.com/opencollective',
+        ...collective,
       },
       applicationData: {
         useGithubValidation: true,
@@ -216,7 +232,7 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
   const expense = {
     tags: ['Engineering'],
     type: 'INVOICE',
-    payoutMethod: { type: 'PAYPAL', data: { email: userEmail || randomEmail() } },
+    payoutMethod: { type: 'PAYPAL', data: { email: userEmail || randomEmail(), currency: 'USD' } },
     description: 'Expense 1',
     items: [{ description: 'Some stuff', amount: 1000 }],
     ...params,
@@ -224,12 +240,13 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
     return graphqlQueryV2(token, {
-      operationName: 'createExpense',
-      query: /* GraphQL */ `
-        mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
+      operationName: 'CreateExpense',
+      query: gql`
+        mutation CreateExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
           createExpense(expense: $expense, account: $account) {
             id
             legacyId
+            createdAt
             account {
               id
               slug
@@ -246,8 +263,35 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 });
 
 /**
+ * Persist an expense as a draft and invite someone to edit and submit it. In E2E the
+ * draft key is always `draft-key`, so the draft can be opened at
+ * `/{collectiveSlug}/expenses/{legacyId}?key=draft-key`.
+ */
+Cypress.Commands.add('draftExpenseAndInviteUser', ({ userEmail = defaultTestUserEmail, account, expense } = {}) => {
+  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+    return graphqlQueryV2(token, {
+      operationName: 'DraftExpenseAndInviteUser',
+      query: gql`
+        mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
+          draftExpenseAndInviteUser(expense: $expense, account: $account) {
+            id
+            legacyId
+            status
+            currency
+          }
+        }
+      `,
+      variables: { expense, account },
+      failOnStatusCode: false,
+    }).then(({ body }) => {
+      return body.data.draftExpenseAndInviteUser;
+    });
+  });
+});
+
+/**
  * Create a collective hosted by the open source collective.
- * TODO: Migrate this to GQLV2 -> `createCollective` with `automateApprovalWithGithub` set to true
+ * TODO: Migrate this to GQLV2 -> `createCollective` with `__skipApprovalTestOnly` set to true
  */
 Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEmail, ...collectiveParams } = {}) => {
   const collective = {
@@ -261,7 +305,7 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
       operationName: 'CreateCollectiveWithHost',
-      query: /* GraphQL */ `
+      query: gqlV1 /* GraphQL */ `
         mutation CreateCollectiveWithHost($collective: CollectiveInputType!) {
           createCollectiveFromGithub(collective: $collective) {
             id
@@ -273,6 +317,7 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
           }
         }
       `,
+      context: API_V1_CONTEXT,
       variables: { collective },
     }).then(({ body }) => {
       return body.data.createCollectiveFromGithub;
@@ -291,7 +336,7 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQueryV2(token, {
       operationName: 'CreateProject',
-      query: /* GraphQL */ `
+      query: gql`
         mutation CreateProject($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
           createProject(project: $project, parent: $parent) {
             id
@@ -309,17 +354,65 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
   });
 });
 
+Cypress.Commands.add('createHostOrganization', (userEmail, variables = {}) => {
+  return signinRequest({ email: userEmail }, null).then(response => {
+    const token = getTokenFromRedirectUrl(response.body.redirect);
+    return graphqlQueryV2(token, {
+      operationName: 'CreateOrganization',
+      query: gql`
+        mutation CreateOrganization(
+          $organization: OrganizationCreateInput!
+          $inviteMembers: [InviteMemberInput!]
+          $hasMoneyManagement: Boolean
+          $hasHosting: Boolean
+        ) {
+          createOrganization(
+            organization: $organization
+            inviteMembers: $inviteMembers
+            hasMoneyManagement: $hasMoneyManagement
+            hasHosting: $hasHosting
+          ) {
+            id
+            legacyId
+            slug
+          }
+        }
+      `,
+      variables: {
+        hasMoneyManagement: true,
+        hasHosting: true,
+        ...variables,
+        organization: {
+          slug: randomSlug(),
+          description: 'Test Host',
+          name: 'Test Host',
+          ...variables?.organization,
+        },
+      },
+    }).then(({ body }) => {
+      return body.data.createOrganization;
+    });
+  });
+});
+
+Cypress.Commands.add('graphqlQueryV2', (query, { variables = {}, token = null } = {}) => {
+  return graphqlQueryV2(token, { query, variables }).then(({ body }) => {
+    return body.data;
+  });
+});
+
 /**
  * Add a stripe credit card on the collective designated by `collectiveSlug`.
  */
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
-  cy.login({ redirect: `/${collectiveSlug}/admin/payment-methods` });
-  cy.contains('button', 'Add a credit card').click();
+  cy.login({ redirect: `/dashboard/${collectiveSlug}/payment-methods` });
+  cy.getByDataCy('add-credit-card-button').click();
   cy.wait(2000);
   fillStripeInput();
   cy.wait(1000);
-  cy.contains('button[type="submit"]', 'Save').click();
-  cy.wait(2000);
+  cy.getByDataCy('save-credit-card-button').click();
+  cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('exist');
+  cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('not.exist', { timeout: 30_000 });
 });
 
 /**
@@ -339,36 +432,36 @@ Cypress.Commands.add('fillStripeInput', fillStripeInput);
  *
  * @param {boolean} approve: Set to false to reject
  */
-Cypress.Commands.add('complete3dSecure', (approve = true) => {
+Cypress.Commands.add('complete3dSecure', (approve = true, { version = 1 } = {}) => {
   const iframeSelector = 'iframe[name^="__privateStripeFrame"]';
   const targetBtn = approve ? '#test-source-authorize-3ds' : '#test-source-fail-3ds';
 
   cy.get(iframeSelector)
     .should($stripeFrame => {
       const frameContent = $stripeFrame.contents();
-      const challengeFrame = frameContent.find('body iframe#challengeFrame');
-      expect(challengeFrame).to.exist;
 
-      const acsFrame = challengeFrame.contents().find('iframe[name="acsFrame"]');
-      expect(acsFrame).to.exist;
+      let buttonsFrame = frameContent.find('body iframe#challengeFrame');
+      expect(buttonsFrame).to.exist;
 
-      const frameBody = acsFrame.contents().find('body');
-      expect(frameBody).to.exist;
+      // With 3DSecure v2, the buttons are stored directly in the iframe. With v1, there is an extra iframe.
+      if (version === 1) {
+        const acsFrame = buttonsFrame.contents().find('iframe[name="acsFrame"]');
+        expect(acsFrame).to.exist;
+        buttonsFrame = acsFrame;
+      }
 
-      expect(frameBody.find(targetBtn)).to.exist;
+      const challengeFrameBody = buttonsFrame.contents().find('body');
+      expect(challengeFrameBody).to.exist;
+      expect(challengeFrameBody.find(targetBtn)).to.exist;
     })
     .then($iframe => {
-      const btn = cy.wrap(
-        $iframe
-          .contents()
-          .find('body iframe#challengeFrame')
-          .contents()
-          .find('iframe[name="acsFrame"]')
-          .contents()
-          .find('body')
-          .find(targetBtn),
-      );
+      const $challengeFrameContent = $iframe.contents().find('body iframe#challengeFrame').contents();
+      let $btnContainer = $challengeFrameContent;
+      if (version === 1) {
+        $btnContainer = $btnContainer.find('iframe[name="acsFrame"]').contents();
+      }
 
+      const btn = cy.wrap($btnContainer.find('body').find(targetBtn));
       btn.click();
     });
 });
@@ -414,10 +507,10 @@ Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => 
   Array.isArray(disabled) ? disabled.forEach(isDisabled) : isDisabled(disabled);
 });
 
-Cypress.Commands.add('checkToast', ({ type, message }) => {
+Cypress.Commands.add('checkToast', ({ variant, message }) => {
   const $toast = cy.contains('[data-cy="toast-notification"]', message);
-  if (type) {
-    $toast.should('have.attr', 'data-type', type);
+  if (variant) {
+    $toast.should('have.attr', 'data-variant', variant);
   }
 });
 
@@ -432,6 +525,10 @@ Cypress.Commands.add('assertLoggedIn', user => {
     cy.contains('[data-cy="user-menu"]', user.email);
     cy.getByDataCy('user-menu-trigger').click(); // To close the menu
   }
+});
+
+Cypress.Commands.add('generateToken', async expiresIn => {
+  return await generateToken(expiresIn);
 });
 
 /**
@@ -489,13 +586,9 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
     authToken = token;
     return graphqlQueryV2(authToken, {
       operationName: 'AccountHasTwoFactorAuth',
-      query: /* GraphQL */ `
+      query: gql`
         query AccountHasTwoFactorAuth($slug: String) {
           individual(slug: $slug) {
-            id
-            slug
-            name
-            type
             id
             slug
             name
@@ -507,7 +600,6 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
         }
       `,
       variables: { slug: userSlug },
-      options: { context: API_V2_CONTEXT },
     })
       .then(({ body }) => {
         const account = {
@@ -517,7 +609,7 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
 
         return graphqlQueryV2(authToken, {
           operationName: 'AddTwoFactorAuthToIndividual',
-          query: /* GraphQL */ `
+          query: gql`
             mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
               addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
                 account {
@@ -526,12 +618,12 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
                     hasTwoFactorAuth
                   }
                 }
+
                 recoveryCodes
               }
             }
           `,
           variables: { account, token },
-          options: { context: API_V2_CONTEXT },
         });
       })
       .then(({ body }) => {
@@ -567,26 +659,38 @@ Cypress.Commands.add('restoreLocalStorage', () => {
 
 Cypress.Commands.add('getStripePaymentElement', getStripePaymentElement);
 
+Cypress.Commands.add('fillStripePaymentElementInput', () => {
+  cy.getStripePaymentElement().within(() => {
+    cy.get('#payment-numberInput').type('4242424242424242');
+    cy.get('#payment-expiryInput').type('1235');
+    cy.get('#payment-cvcInput').type('123');
+    cy.get('#payment-countryInput').select('US');
+    cy.get('#payment-postalCodeInput').type('90210');
+  });
+});
+
 Cypress.Commands.add(
   'createCollectiveV2',
-  ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData } = {}) => {
+  ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData, skipApproval = false } = {}) => {
     const user = { email, newsletterOptIn: false };
     return signinRequest(user, null).then(response => {
       const token = getTokenFromRedirectUrl(response.body.redirect);
       return graphqlQueryV2(token, {
-        operationName: 'createCollective',
-        query: /* GraphQL */ `
-          mutation createCollective(
+        operationName: 'CreateCollective',
+        query: gql`
+          mutation CreateCollective(
             $collective: CollectiveCreateInput!
             $host: AccountReferenceInput!
             $testPayload: JSON
             $applicationData: JSON
+            $skipApproval: Boolean
           ) {
             createCollective(
               collective: $collective
               host: $host
               testPayload: $testPayload
               applicationData: $applicationData
+              skipApprovalTestOnly: $skipApproval
             ) {
               id
               slug
@@ -606,6 +710,7 @@ Cypress.Commands.add(
             ...collective,
           },
           applicationData,
+          skipApproval,
         },
       }).then(({ body }) => {
         return body.data.createCollective;
@@ -614,7 +719,82 @@ Cypress.Commands.add(
   },
 );
 
+/**
+ * Wait for a file to be downloaded
+ */
+Cypress.Commands.add('getDownloadedPDFContent', (filename, options) => {
+  const downloadFolder = Cypress.config('downloadsFolder');
+  cy.readFile(`${downloadFolder}/${filename}`, null, options).then(pdfFileContent => {
+    cy.task('getTextFromPdfContent', pdfFileContent);
+  });
+});
+
+Cypress.Commands.add('waitOrderStatus', (orderId, status) => {
+  return cy.retryChain(
+    () =>
+      cy
+        .graphqlQueryV2(
+          gql`
+            query OrderStatus($orderId: Int!) {
+              order(order: { legacyId: $orderId }) {
+                status
+              }
+            }
+          `,
+          { variables: { orderId } },
+        )
+        .then(data => data.order.status),
+    apiStatus => {
+      if (!apiStatus.match(status)) {
+        throw new Error(`Order did not transition to ${status} before timeout, current value: ${apiStatus}.`);
+      }
+    },
+    {
+      maxAttempts: 50,
+      wait: 1000,
+    },
+  );
+});
+
+Cypress.Commands.add('getOrderIdFromContributionSuccessPage', () => {
+  return cy
+    .get('[data-cy^="contribution-id-"]')
+    .invoke('attr', 'data-cy')
+    .then(contributionIdStr => {
+      const contributionId = parseInt(contributionIdStr.replace('contribution-id-', ''));
+      return contributionId;
+    });
+});
+
 // ---- Private ----
+
+/**
+ * `editA
+ */
+function getIdV2FromReferenceInput(account, token) {
+  const { id, slug } = account;
+  if (typeof id === 'string') {
+    return account;
+  } else if (!slug) {
+    throw new Error(
+      'cy.editCollective: pass a GraphQL v2 account id string, or `slug` (with a legacy id) so the account can be resolved',
+    );
+  }
+
+  return graphqlQueryV2(token, {
+    operationName: 'CypressResolveCollectiveId',
+    query: gql`
+      query CypressResolveCollectiveId($slug: String!) {
+        account(slug: $slug) {
+          id
+        }
+      }
+    `,
+    variables: { slug },
+  }).then(({ body }) => {
+    return body.data.account.id;
+  });
+}
 
 /**
  * @param {object} user - should have `email` and `id` set
@@ -639,11 +819,12 @@ function getTokenFromRedirectUrl(url) {
 /**
  * @param {object} user - should have `email` and `id` set
  */
-function signinRequestAndReturnToken(user, redirect) {
+export function signinRequestAndReturnToken(user, redirect) {
   return signinRequest(user, redirect, true).then(({ body }) => getTokenFromRedirectUrl(body.redirect));
 }
 
 function graphqlQuery(token, body) {
+  body.operationName && cy.log(`GraphQL: ${body.operationName}`);
   return cy.request({
     url: '/api/graphql/v1',
     method: 'POST',
@@ -656,7 +837,8 @@ function graphqlQuery(token, body) {
   });
 }
 
-function graphqlQueryV2(token, body) {
+export function graphqlQueryV2(token, body) {
+  body.operationName && cy.log(`GraphQL: ${body.operationName}`);
   return cy.request({
     url: '/api/graphql/v2',
     method: 'POST',
@@ -673,6 +855,7 @@ function getLoggedInUserFromToken(token) {
   return graphqlQuery(token, {
     operationName: 'LoggedInUser',
     query: loggedInUserQuery.loc.source.body,
+    context: API_V1_CONTEXT,
   }).then(({ body }) => {
     return body.data.LoggedInUser;
   });
@@ -686,31 +869,29 @@ function getLoggedInUserFromToken(token) {
 function fillStripeInput(params) {
   const { container, card } = params || {};
   const stripeIframeSelector = '.__PrivateStripeElement iframe';
-  const iframePromise = container ? container.find(stripeIframeSelector) : cy.get(stripeIframeSelector);
-  const cardParams = card || CreditCards.CARD_DEFAULT;
+  const { creditCardNumber, expirationDate, cvcCode, postalCode } = card || CreditCards.CARD_DEFAULT;
 
-  return iframePromise.then(iframe => {
-    const { creditCardNumber, expirationDate, cvcCode, postalCode } = cardParams;
-    const body = iframe.contents().find('body');
-    const fillInput = (index, value) => {
-      if (value === undefined) {
-        return;
-      }
+  // Re-query the iframe body on every input fill so Cypress can retry through
+  // Stripe iframe re-renders (otherwise a cached `body` reference gets detached
+  // from the DOM and fails the chain with "subject is no longer attached").
+  const getIframeBody = () =>
+    (container ? cy.wrap(container).find(stripeIframeSelector) : cy.get(stripeIframeSelector))
+      .its('0.contentDocument.body')
+      .should('not.be.empty')
+      .then(cy.wrap);
 
-      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`, { force: true });
-    };
+  const fillInput = (index, value) => {
+    if (value === undefined) {
+      return;
+    }
 
-    fillInput(1, creditCardNumber);
-    fillInput(2, expirationDate);
-    fillInput(3, cvcCode);
-    fillInput(4, postalCode);
-  });
-}
+    return getIframeBody().find(`input:eq(${index})`).type(`{selectall}${value}`, { force: true });
+  };
 
-function loopOpenEmail(emailMatcher, timeout = 8000) {
-  return getEmail(emailMatcher, timeout).then(email => {
-    return cy.openExternalLink(`${Cypress.env('MAILDEV_URL')}/email/${email.id}/html`);
-  });
+  fillInput(1, creditCardNumber);
+  fillInput(2, expirationDate);
+  fillInput(3, cvcCode);
+  fillInput(4, postalCode);
 }
 
 function getEmail(emailMatcher, timeout = 8000) {
@@ -718,10 +899,10 @@ function getEmail(emailMatcher, timeout = 8000) {
     return assert.fail('Could not find email: getEmail timed out');
   }
 
-  return cy.getInbox().then(inbox => {
-    const email = inbox.find(emailMatcher);
+  return cy.mailpitGetAllMails().then(result => {
+    const email = result.messages.find(emailMatcher);
     if (email) {
-      return cy.wrap(email);
+      return cy.mailpitGetMail(email.ID);
     }
     cy.wait(100);
     return getEmail(emailMatcher, timeout - 100);

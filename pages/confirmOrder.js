@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { getStripe } from '../lib/stripe';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
+import { Button } from '../components/ui/Button';
 import { withUser } from '../components/UserProvider';
 
 class ConfirmOrderPage extends React.Component {
@@ -36,17 +37,18 @@ class ConfirmOrderPage extends React.Component {
     status: ConfirmOrderPage.SUBMITTING,
     isRequestSent: false,
     error: null,
+    showDashboardLinkForOrder: null,
   };
 
   componentDidMount() {
     if (!this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-      return this.triggerRequest();
+      this.triggerRequest();
     }
   }
 
   componentDidUpdate() {
     if (!this.state.isRequestSent && !this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-      return this.triggerRequest();
+      this.triggerRequest();
     }
   }
 
@@ -62,7 +64,7 @@ class ConfirmOrderPage extends React.Component {
         this.handleStripeError(orderConfirmed);
       } else {
         this.props.router.replace(
-          `/${orderConfirmed.order.fromAccount.slug}/admin/payment-methods?successType=payment`,
+          `/dashboard/${orderConfirmed.order.fromAccount.slug}/payment-methods?successType=payment`,
         );
       }
     } catch (e) {
@@ -71,7 +73,7 @@ class ConfirmOrderPage extends React.Component {
     }
   }
 
-  handleStripeError = async ({ id, stripeError: { message, account, response } }) => {
+  handleStripeError = async ({ order, stripeError: { message, account, response } }) => {
     if (!response) {
       this.setState({ status: ConfirmOrderPage.ERROR, error: message });
       return;
@@ -79,11 +81,16 @@ class ConfirmOrderPage extends React.Component {
     if (response.paymentIntent) {
       const stripe = await getStripe(null, account);
       const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
+      result.error = 'An error occurred while processing your payment. Please try again.';
       if (result.error) {
-        this.setState({ status: ConfirmOrderPage.ERROR, error: result.error.message });
+        this.setState({
+          status: ConfirmOrderPage.ERROR,
+          error: result.error.message,
+          showDashboardLinkForOrder: order,
+        });
       }
       if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
-        this.triggerRequest({ id });
+        this.triggerRequest();
       }
     }
   };
@@ -107,9 +114,21 @@ class ConfirmOrderPage extends React.Component {
             </MessageBox>
           )}
           {status === ConfirmOrderPage.ERROR && (
-            <MessageBox type="error" withIcon>
-              {error}
-            </MessageBox>
+            <div>
+              <MessageBox type="error" withIcon>
+                {error}
+              </MessageBox>
+              {this.state.showDashboardLinkForOrder && (
+                <Link
+                  href={`/dashboard/${this.state.showDashboardLinkForOrder.fromAccount.slug}/outgoing-contributions?orderId=${this.state.showDashboardLinkForOrder.legacyId}`}
+                  className="mt-4"
+                >
+                  <Button>
+                    <FormattedMessage defaultMessage="Update your contribution in the Dashboard" id="cJ499a" />
+                  </Button>
+                </Link>
+              )}
+            </div>
           )}
         </Container>
       </AuthenticatedPage>
@@ -117,15 +136,13 @@ class ConfirmOrderPage extends React.Component {
   }
 }
 
-export const confirmOrderMutation = gql`
+const confirmOrderMutation = gql`
   mutation ConfirmOrder($order: OrderReferenceInput!) {
     confirmOrder(order: $order) {
       order {
         id
+        legacyId
         status
-        transactions {
-          id
-        }
         fromAccount {
           id
           slug
@@ -142,7 +159,8 @@ export const confirmOrderMutation = gql`
 
 const addConfirmOrderMutation = graphql(confirmOrderMutation, {
   name: 'confirmOrder',
-  options: { context: API_V2_CONTEXT },
 });
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(addConfirmOrderMutation(withRouter(ConfirmOrderPage)));

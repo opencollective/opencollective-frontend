@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import CustomStyledIcon from './CustomStyledIcon';
 
-const PayPal = ({ width, height, size, ...props }) => {
+const PayPal = ({ width = undefined, height = undefined, size = undefined, ...props }) => {
   return (
     <CustomStyledIcon
       width={size || width || 21}
@@ -33,12 +32,6 @@ const PayPal = ({ width, height, size, ...props }) => {
       />
     </CustomStyledIcon>
   );
-};
-
-PayPal.propTypes = {
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default PayPal;

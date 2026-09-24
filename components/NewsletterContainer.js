@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import StyledInput, { SubmitInput } from '../components/StyledInput';
+import StyledInput from '../components/StyledInput';
 
 import Container from './Container';
 import { Flex } from './Grid';
@@ -46,13 +46,11 @@ class NewsletterContainer extends React.Component {
                 type="email"
                 width={1}
               />
-              <SubmitInput
-                buttonSize="small"
-                fontWeight="500"
-                textAlign="center"
-                name="subscribe"
+              <input
+                className="cursor-pointer rounded rounded-l-none bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-700"
                 type="submit"
                 value="Subscribe"
+                name="subscribe"
               />
             </Container>
           </form>

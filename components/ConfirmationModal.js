@@ -1,9 +1,9 @@
+// @deprecated: Use `NewConfirmationModal` instead
+
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
-import Container from './Container';
-import StyledButton from './StyledButton';
+import { Button } from './ui/Button';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P } from './Text';
 
@@ -39,6 +39,7 @@ export const CONFIRMATION_MODAL_TERMINATE = { __CONFIRMATION_MODAL_TERMINATE: tr
 /**
  * ConfirmationModal component. Uses `StyledModal` to create a reusable modal mainly for
  * confirmation purpose.
+ * @deprecated: Use `NewConfirmationModal` instead
  */
 const ConfirmationModal = ({
   header = undefined,
@@ -59,29 +60,25 @@ const ConfirmationModal = ({
   const { formatMessage } = useIntl();
 
   return (
-    <StyledModal role="alertdialog" width="570px" onClose={onClose} trapFocus {...props}>
+    <StyledModal role="alertdialog" className="flex flex-col gap-4" onClose={onClose} {...props}>
       <ModalHeader onClose={onClose}>{header}</ModalHeader>
-      <ModalBody pt={2}>{children || <P>{body}</P>}</ModalBody>
-      <ModalFooter>
-        <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
-          <StyledButton
-            mx={20}
-            my={1}
+      <ModalBody>{children || <P>{body}</P>}</ModalBody>
+      <ModalFooter showDivider={false}>
+        <div className="flex w-full justify-center gap-2 md:justify-end">
+          <Button
             autoFocus
-            minWidth={140}
             onClick={cancelHandler}
             disabled={submitting}
             data-cy="confirmation-modal-cancel"
+            variant="outline"
           >
             {cancelLabel || formatMessage(messages.cancel)}
-          </StyledButton>
-          <StyledButton
-            my={1}
-            minWidth={140}
-            buttonStyle={isDanger ? 'danger' : isSuccess ? 'success' : 'primary'}
+          </Button>
+          <Button
             data-cy="confirmation-modal-continue"
             loading={submitting}
             disabled={disableSubmit}
+            variant={isDanger ? 'destructive' : isSuccess ? 'success' : 'default'}
             onClick={async () => {
               let result;
               try {
@@ -95,40 +92,11 @@ const ConfirmationModal = ({
             }}
           >
             {continueLabel || formatMessage(confirmBtnMsgs[type])}
-          </StyledButton>
-        </Container>
+          </Button>
+        </div>
       </ModalFooter>
     </StyledModal>
   );
-};
-
-ConfirmationModal.propTypes = {
-  /** header of the confirmation modal */
-  header: PropTypes.node.isRequired,
-  /** body of the confirmation modal */
-  children: PropTypes.node,
-  /** Body of the confirmation modal, used in a paragraph if there's no children */
-  body: PropTypes.node,
-  /** handles how the modal is closed */
-  onClose: PropTypes.func.isRequired,
-  /** handles onClick continue button */
-  continueHandler: PropTypes.func.isRequired,
-  /** You can pass a type here to auto-set labels to remove/delete/confirm...etc */
-  type: PropTypes.oneOf(['confirm', 'delete', 'remove']),
-  /** If true, a danger style button will be used for the main button */
-  isDanger: PropTypes.bool,
-  isSuccess: PropTypes.bool,
-  disableSubmit: PropTypes.bool,
-  /** handles onClick cancel button. Defaults to `onClose` prop. */
-  cancelHandler: PropTypes.func,
-  /** continue button label of the confirmation modal. Defaults to `Confirm`. */
-  continueLabel: PropTypes.node,
-  /** cancel button label of the confirmation modal. Defaults to `Cancel`. */
-  cancelLabel: PropTypes.node,
-};
-
-ConfirmationModal.defaultProps = {
-  type: 'confirm',
 };
 
 /** @component */

@@ -1,116 +1,263 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { values } from 'lodash';
+import React, { useContext } from 'react';
+import { values } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
-import { cn } from '../../lib/utils';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
-import AccountSettings from '../admin-panel/sections/AccountSettings';
-import FinancialContributions from '../admin-panel/sections/FinancialContributions';
-import HostVirtualCardRequests from '../admin-panel/sections/HostVirtualCardRequests';
-import HostVirtualCards from '../admin-panel/sections/HostVirtualCards';
-import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
-import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
-import PendingContributions from '../admin-panel/sections/PendingContributions';
-import TeamSettings from '../admin-panel/sections/Team';
 import Container from '../Container';
-import { Box } from '../Grid';
-import HostApplications from '../host-dashboard/applications/HostApplications';
-import HostDashboardAgreements from '../host-dashboard/HostDashboardAgreements';
-import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
-import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
-import HostDashboardReports from '../host-dashboard/HostDashboardReports';
+import { KYCRequests } from '../kyc/dashboard/KYCRequests';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
+import AccountSettingsForm from '../root-actions/AccountSettings';
+import AccountType from '../root-actions/AccountType';
+import { AnonymizeAccount } from '../root-actions/AnonymizeAccount';
+import BanAccount from '../root-actions/BanAccounts';
+import BanAccountsWithSearch from '../root-actions/BanAccountsWithSearch';
+import ClearCacheForAccountForm from '../root-actions/ClearCacheForAccountForm';
+import ConnectAccountsForm from '../root-actions/ConnectAccountsForm';
+import MergeAccountsForm from '../root-actions/MergeAccountsForm';
+import MoveAuthoredContributions from '../root-actions/MoveAuthoredContributions';
+import MoveExpenses from '../root-actions/MoveExpenses';
+import MoveReceivedContributions from '../root-actions/MoveReceivedContributions';
+import RecurringContributions from '../root-actions/RecurringContributions';
+import RootActivityLog from '../root-actions/RootActivityLog';
+import UnhostAccountForm from '../root-actions/UnhostAccountForm';
 
-import Contributions from './sections/Contributions';
+import { HostAdminAccountingSection } from './sections/accounting';
+import Accounts from './sections/accounts';
+import AccountSettings from './sections/AccountSettings';
+import AllCollectives from './sections/collectives/AllCollectives';
+import HostApplications from './sections/collectives/HostApplications';
+import HostedCollectives from './sections/collectives/HostedCollectives';
+import PeopleRouter from './sections/community/People';
+import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
+import IncomingContributions from './sections/contributions/IncomingContributions';
+import IncompleteContributions from './sections/contributions/IncompleteContributions';
+import InternalTransfers from './sections/contributions/InternalTransfers';
+import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
-import Expenses from './sections/Expenses';
-import Home from './sections/Home';
-import ManageContributions from './sections/ManageContributions';
-import Transactions from './sections/Transactions';
+import ApprovePaymentRequests from './sections/expenses/ApprovePaymentRequests';
+import HostPaymentRequests from './sections/expenses/HostPaymentRequests';
+import IssuedPaymentRequests from './sections/expenses/IssuedPaymentRequests';
+import { PaidDisbursements } from './sections/expenses/PaidDisbursements';
+import PayDisbursements from './sections/expenses/PayDisbursements';
+import PaymentRequests from './sections/expenses/PaymentRequests';
+import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
+import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
+import Exports from './sections/exports';
+import { ApproveGrantRequests } from './sections/funds-and-grants/ApproveGrantRequests';
+import { Grants } from './sections/funds-and-grants/Grants';
+import { HostedFunds } from './sections/funds-and-grants/HostedFunds';
+import { HostedGrants } from './sections/funds-and-grants/HostedGrants';
+import { SubmittedGrants } from './sections/funds-and-grants/SubmittedGrants';
+import HostDashboardAgreements from './sections/HostDashboardAgreements';
+import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
+import HostVirtualCards from './sections/HostVirtualCards';
+import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
+import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
+import NotificationsSettings from './sections/NotificationsSettings';
+import Overview from './sections/overview/Overview';
+import { DashboardPlatformSubscription } from './sections/platform-subscription/DashboardPlatformSubscription';
+import Reports from './sections/reports/Reports';
+import Search from './sections/search/Search';
+import LegacyPlatformSubscribers from './sections/subscriptions/LegacyPlatformSubscribers';
+import PlatformSubscribers from './sections/subscriptions/PlatformSubscribers';
+import { TaxInformationSettingsSection } from './sections/tax-information';
+import Team from './sections/Team';
+import AccountTransactions from './sections/transactions/AccountTransactions';
+import AllTransactions from './sections/transactions/AllTransactions';
+import HostTransactions from './sections/transactions/HostTransactions';
+import { CSVTransactionsImports } from './sections/transactions-imports/CSVTransactionsImports';
+import { OffPlatformConnections } from './sections/transactions-imports/OffPlatformConnections';
+import { OffPlatformTransactions } from './sections/transactions-imports/OffPlatformTransactions';
+import Updates from './sections/updates';
+import Vendors from './sections/Vendors';
+import VirtualCards from './sections/virtual-cards/VirtualCards';
 import {
-  COLLECTIVE_SECTIONS,
-  FISCAL_HOST_SECTIONS,
-  HOST_DASHBOARD_SECTIONS,
-  LEGACY_COLLECTIVE_SETTINGS_SECTIONS,
+  ALL_SECTIONS,
+  LEGACY_SECTIONS,
+  LEGACY_SETTINGS_SECTIONS,
+  ROOT_PROFILE_KEY,
+  ROOT_SECTIONS,
   SECTION_LABELS,
+  SECTIONS,
+  SETTINGS_SECTIONS,
 } from './constants';
+import { DashboardContext } from './DashboardContext';
+import DashboardErrorBoundary from './DashboardErrorBoundary';
+import DashboardHeader from './DashboardHeader';
 
-const ADMIN_PANEL_SECTIONS = {
-  [HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
-  [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
-  [HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
-  [HOST_DASHBOARD_SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
-  [HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
-  [HOST_DASHBOARD_SECTIONS.HOST_APPLICATIONS]: HostApplications,
-  [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
-  [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
-  [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
-  [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
-  [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
-  // NEW
-  [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
-  [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
-  [COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW]: Home,
-  [COLLECTIVE_SECTIONS.CONTRIBUTORS]: Contributors,
-  [COLLECTIVE_SECTIONS.CONTRIBUTIONS]: Contributions,
-  [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
+const DASHBOARD_COMPONENTS = {
+  [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
+  [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
+  [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
+  [SECTIONS.OFF_PLATFORM_TRANSACTIONS]: OffPlatformTransactions,
+  [SECTIONS.LEDGER_CSV_IMPORTS]: CSVTransactionsImports,
+  [SECTIONS.HOST_EXPENSES]: PayDisbursements,
+  [SECTIONS.PAY_DISBURSEMENTS]: PayDisbursements,
+  [SECTIONS.PAID_DISBURSEMENTS]: PaidDisbursements,
+  [SECTIONS.APPROVE_PAYMENT_REQUESTS]: ApprovePaymentRequests,
+  [SECTIONS.HOST_PAYMENT_REQUESTS]: HostPaymentRequests,
+  [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
+  [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
+  [SECTIONS.HOST_APPLICATIONS]: HostApplications,
+  [SECTIONS.REPORTS]: Reports,
+  [SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
+  [SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
+  [SECTIONS.OVERVIEW]: Overview,
+  [SECTIONS.EXPENSES]: ReceivedExpenses,
+  [SECTIONS.PAYMENT_REQUESTS]: PaymentRequests,
+  [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.ISSUED_PAYMENT_REQUESTS]: IssuedPaymentRequests,
+  [SECTIONS.HOSTED_FUNDS]: HostedFunds,
+  [SECTIONS.HOSTED_GRANTS]: HostedGrants,
+  [SECTIONS.GRANTS]: Grants,
+  [SECTIONS.APPROVE_GRANT_REQUESTS]: ApproveGrantRequests,
+  [SECTIONS.SUBMITTED_GRANTS]: SubmittedGrants,
+  [SECTIONS.CONTRIBUTORS]: Contributors,
+  [SECTIONS.PEOPLE]: PeopleRouter,
+  [SECTIONS.KYC]: KYCRequests,
+  [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
+  [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
+  [SECTIONS.INTERNAL_TRANSFERS]: InternalTransfers,
+  [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
+  [SECTIONS.INCOMPLETE_CONTRIBUTIONS]: IncompleteContributions,
+  [SECTIONS.TRANSACTIONS]: AccountTransactions,
+  [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
+  [SECTIONS.UPDATES]: Updates,
+  [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
+  [SECTIONS.TEAM]: Team,
+  [SECTIONS.VENDORS]: Vendors,
+  [SECTIONS.ACCOUNTS]: Accounts,
+  [SECTIONS.SEARCH]: Search,
 };
 
-const FISCAL_HOST_SETTINGS_SECTIONS = {
-  [FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
+const LEGACY_SETTINGS_COMPONENTS = {
+  [LEGACY_SETTINGS_SECTIONS.EXPORTS]: Exports,
 };
 
-const Title = ({ className, children, ...props }: { className?: string; children: React.ReactNode }) => (
-  <h1 className={cn('text-2xl font-bold leading-10 tracking-tight', className)} {...props}>
-    {children}
-  </h1>
-);
+const SETTINGS_COMPONENTS = {
+  [SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
+  [SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
+  [SETTINGS_SECTIONS.TAX_INFORMATION]: TaxInformationSettingsSection,
+  [SECTIONS.PLATFORM_SUBSCRIPTION]: DashboardPlatformSubscription,
+};
 
-const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
+const ROOT_COMPONENTS = {
+  [SECTIONS.HOST_TRANSACTIONS]: AllTransactions,
+  [ALL_SECTIONS.ACTIVITY_LOG]: RootActivityLog,
+  [ROOT_SECTIONS.ALL_COLLECTIVES]: AllCollectives,
+  [ROOT_SECTIONS.BAN_ACCOUNTS]: BanAccount,
+  [ROOT_SECTIONS.ANONYMIZE_ACCOUNT]: AnonymizeAccount,
+  [ROOT_SECTIONS.SEARCH_AND_BAN]: BanAccountsWithSearch,
+  [ROOT_SECTIONS.MOVE_AUTHORED_CONTRIBUTIONS]: MoveAuthoredContributions,
+  [ROOT_SECTIONS.MOVE_RECEIVED_CONTRIBUTIONS]: MoveReceivedContributions,
+  [ROOT_SECTIONS.MOVE_EXPENSES]: MoveExpenses,
+  [ROOT_SECTIONS.CLEAR_CACHE]: ClearCacheForAccountForm,
+  [ROOT_SECTIONS.CONNECT_ACCOUNTS]: ConnectAccountsForm,
+  [ROOT_SECTIONS.MERGE_ACCOUNTS]: MergeAccountsForm,
+  [ROOT_SECTIONS.UNHOST_ACCOUNTS]: UnhostAccountForm,
+  [ROOT_SECTIONS.ACCOUNT_SETTINGS]: AccountSettingsForm,
+  [ROOT_SECTIONS.ACCOUNT_TYPE]: AccountType,
+  [ROOT_SECTIONS.RECURRING_CONTRIBUTIONS]: RecurringContributions,
+  [ROOT_SECTIONS.LEGACY_SUBSCRIBERS]: LegacyPlatformSubscribers,
+  [ROOT_SECTIONS.SUBSCRIBERS]: PlatformSubscribers,
+};
+
+interface DashboardSectionProps {
+  isLoading?: boolean;
+  section?: string;
+  subpath?: string[];
+  /** The account. Can be null if isLoading is true */
+  account?: DashboardQuery['account'];
+}
+
+const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSectionProps) => {
+  const { LoggedInUser } = useLoggedInUser();
+  const { activeSlug } = useContext(DashboardContext);
+
   const { formatMessage } = useIntl();
 
   if (isLoading) {
     return (
-      <Container width="100%" px={2}>
+      <div className="w-full pb-6">
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
-      </Container>
+      </div>
     );
   }
 
-  const AdminSectionComponent = ADMIN_PANEL_SECTIONS[section];
-  if (AdminSectionComponent) {
+  const RootComponent = ROOT_COMPONENTS[section];
+  if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
     return (
-      <Container width="100%">
-        {/* @ts-ignore-next-line */}
-        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
-      </Container>
+      <div className="w-full">
+        <DashboardErrorBoundary>
+          <RootComponent subpath={subpath} isDashboard />
+        </DashboardErrorBoundary>
+      </div>
     );
   }
 
-  // Fiscal Host Settings
-  const FiscalHostSettingsComponent = FISCAL_HOST_SETTINGS_SECTIONS[section];
-  if (FiscalHostSettingsComponent) {
+  const DashboardComponent = DASHBOARD_COMPONENTS[section];
+  if (DashboardComponent) {
     return (
-      <Container width="100%">
-        <FiscalHostSettingsComponent collective={collective} />
-      </Container>
+      <div className="h-full w-full">
+        <DashboardErrorBoundary>
+          <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
+        </DashboardErrorBoundary>
+      </div>
     );
   }
 
-  // Form
-  if (values(LEGACY_COLLECTIVE_SETTINGS_SECTIONS).includes(section)) {
+  // Legacy settings component (new sections without AccountSettings)
+  const LegacySettingsComponent = LEGACY_SETTINGS_COMPONENTS[section];
+  if (LegacySettingsComponent) {
     return (
-      <Container width="100%">
-        {SECTION_LABELS[section] && (
-          <Box mb={3}>
-            <Title>{formatMessage(SECTION_LABELS[section])}</Title>
-          </Box>
+      <div className="w-full">
+        <DashboardErrorBoundary>
+          <LegacySettingsComponent accountSlug={account.slug} account={account} subpath={subpath} />
+        </DashboardErrorBoundary>
+      </div>
+    );
+  }
+
+  // Settings component
+  const SettingsComponent = SETTINGS_COMPONENTS[section];
+  if (SettingsComponent) {
+    return (
+      <div className="mx-auto w-full max-w-(--breakpoint-md)">
+        <DashboardErrorBoundary>
+          <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+        </DashboardErrorBoundary>
+      </div>
+    );
+  }
+
+  if (values(LEGACY_SECTIONS).includes(section)) {
+    return (
+      <div className="w-full">
+        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
+          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
-        <AccountSettings account={collective} section={section} />
-      </Container>
+
+        <DashboardErrorBoundary>
+          <AccountSettings account={account} section={section} />
+        </DashboardErrorBoundary>
+      </div>
+    );
+  }
+
+  if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
+    return (
+      <div className="mx-auto w-full max-w-(--breakpoint-md)">
+        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
+          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
+        )}
+        <DashboardErrorBoundary>
+          <AccountSettings account={account} section={section} />
+        </DashboardErrorBoundary>
+      </div>
     );
   }
 
@@ -121,16 +268,4 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   );
 };
 
-AdminPanelSection.propTypes = {
-  isLoading: PropTypes.bool,
-  section: PropTypes.string,
-  subpath: PropTypes.arrayOf(PropTypes.string),
-  /** The account. Can be null if isLoading is true */
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string,
-    isHost: PropTypes.bool,
-  }),
-};
-
-export default AdminPanelSection;
+export default DashboardSection;

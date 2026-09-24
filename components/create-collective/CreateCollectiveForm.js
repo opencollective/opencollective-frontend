@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
-import { get, trim } from 'lodash';
-import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { get, trim } from 'lodash-es';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { checkUseAlternativeHostFeeNaming, suggestSlug } from '../../lib/collective';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 import withData from '../../lib/withData';
+import injectIntl from '@/lib/injectIntl';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -17,6 +17,7 @@ import NextIllustration from '../collectives/HomeNextIllustration';
 import CollectiveTagsInput from '../CollectiveTagsInput';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
+import HostPricingInfoRow from '../HostPricingInfoRow';
 import { getI18nLink } from '../I18nFormatters';
 import InputTypeLocation from '../InputTypeLocation';
 import MessageBox from '../MessageBox';
@@ -31,7 +32,7 @@ import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, P } from '../Text';
 
-export const BackButton = styled(StyledButton)`
+const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
   font-size: 14px;
 `;
@@ -85,8 +86,6 @@ class CreateCollectiveForm extends React.Component {
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
     intl: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    router: PropTypes.object.isRequired,
     loggedInUser: PropTypes.object,
     popularTags: PropTypes.arrayOf(PropTypes.string),
   };
@@ -137,7 +136,7 @@ class CreateCollectiveForm extends React.Component {
 
     const submit = values => {
       const { description, name, slug, message, tags, location, inviteMembers } = values;
-      this.props.onSubmit({ collective: { name, description, slug, tags, location }, message, inviteMembers });
+      return this.props.onSubmit({ collective: { name, description, slug, tags, location }, message, inviteMembers });
     };
 
     return (
@@ -156,26 +155,37 @@ class CreateCollectiveForm extends React.Component {
         <Box>
           <Flex flexDirection="column" mb={[2, 4, 48]} px={2} pt={2}>
             {host ? (
-              <Flex justifyContent="center" alignItems="center">
-                <Box mr={3}>
-                  <Avatar radius={96} collective={host} />
-                </Box>
-                <Box maxWidth={345}>
-                  <H1
-                    fontSize={['20px', '32px']}
-                    lineHeight={['24px', '40px']}
-                    fontWeight="500"
-                    textAlign="left"
-                    color="black.900"
-                  >
-                    <FormattedMessage
-                      id="host.applyTo"
-                      defaultMessage="Apply to {hostName}"
-                      values={{ hostName: host.name }}
-                    />
-                  </H1>
-                </Box>
-              </Flex>
+              <React.Fragment>
+                <Flex justifyContent="center" alignItems="center" flexDirection="column" gap={16}>
+                  <Box>
+                    <Avatar radius={96} collective={host} />
+                  </Box>
+                  <Box maxWidth={345}>
+                    <H1
+                      fontSize={['20px', '32px']}
+                      lineHeight={['24px', '40px']}
+                      fontWeight="500"
+                      textAlign="center"
+                      color="black.900"
+                    >
+                      <FormattedMessage
+                        id="host.applyTo"
+                        defaultMessage="Apply to {hostName}"
+                        values={{ hostName: <strong>{host.name}</strong> }}
+                      />
+                    </H1>
+                  </Box>
+                </Flex>
+                <div className="mt-6 flex justify-center">
+                  <HostPricingInfoRow
+                    createdAt={host.createdAt}
+                    currency={host.currency}
+                    hostFeePercent={host.hostFeePercent}
+                    platformContributionAvailable={host.platformContributionAvailable}
+                    useAlternativeHostFeeNaming={checkUseAlternativeHostFeeNaming(host)}
+                  />
+                </div>
+              </React.Fragment>
             ) : (
               <div>
                 <Box mb={[2, 3]}>
@@ -290,7 +300,7 @@ class CreateCollectiveForm extends React.Component {
                           <Flex mt={1} width="100%">
                             <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
                               <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
-                              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
+                              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 &&
                                 ` (${1 + values.inviteMembers.length}/${
                                   host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
                                 })`}
@@ -347,10 +357,11 @@ class CreateCollectiveForm extends React.Component {
                             />
                           </Box>
 
-                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
                             <MessageBox type="info" mt={3} fontSize="13px">
                               <FormattedMessage
                                 defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                                id="GTK0Wf"
                                 values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                               />
                             </MessageBox>
@@ -521,4 +532,4 @@ class CreateCollectiveForm extends React.Component {
   }
 }
 
-export default injectIntl(withData(withRouter(CreateCollectiveForm)));
+export default injectIntl(withData(CreateCollectiveForm));

@@ -1,15 +1,16 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
-import { truncate, uniqBy } from 'lodash';
+import { useMutation, useQuery } from '@apollo/client';
+import { truncate, uniqBy } from 'lodash-es';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { stripHTML } from '../../lib/utils';
+import { gql } from '../../lib/graphql/helpers';
+import { stripHTML } from '../../lib/html';
 
 import ConfirmationModal from '../ConfirmationModal';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -19,12 +20,13 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
+import { useToast } from '../ui/useToast';
 
 import { banAccountsMutation } from './BanAccounts';
 import BanAccountsSummary from './BanAccountsSummary';
 
-export const searchQuery = gql`
+const searchQuery = gql`
   query BanAccountSearch($term: String!, $offset: Int) {
     accounts(
       searchTerm: $term
@@ -116,14 +118,14 @@ const BanAccountsWithSearch = () => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const { data, loading, error, refetch } = useQuery(searchQuery, {
     variables: { term: searchTerm },
-    context: API_V2_CONTEXT,
+
     skip: !searchTerm,
   });
   const [selectedAccounts, setSelectedAccounts] = React.useState([]);
   const [includeAssociatedAccounts, setIncludeAssociatedAccounts] = React.useState(true);
   const [dryRunData, setDryRunData] = React.useState(null);
-  const [_banAccounts, { loading: submitting }] = useMutation(banAccountsMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const [_banAccounts, { loading: submitting }] = useMutation(banAccountsMutation);
+  const { toast } = useToast();
   const intl = useIntl();
   const isValid = Boolean(selectedAccounts?.length);
   const toggleAccountSelection = account => {
@@ -143,7 +145,16 @@ const BanAccountsWithSearch = () => {
 
   return (
     <div>
-      <SearchBar placeholder="Search accounts" onSubmit={setSearchTerm} disabled={loading || submitting} />
+      <DashboardHeader title="Search & Ban Accounts" className="mb-10" />
+      <Alert className="relative mb-8 flex items-center gap-2 bg-destructive/5 fade-in" variant="destructive">
+        <AlertTitle className="flex items-center">Dangerous Action</AlertTitle>
+        <AlertDescription>
+          Please be super careful with the action below, and double check everything you do.
+        </AlertDescription>
+      </Alert>
+      <Box width="276px">
+        <SearchBar placeholder="Search accounts" onSubmit={setSearchTerm} disabled={loading || submitting} />
+      </Box>
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
@@ -248,8 +259,8 @@ const BanAccountsWithSearch = () => {
             const result = await banAccounts(true);
             setDryRunData(result.data.banAccount);
           } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: i18nGraphqlException(intl, e),
             });
           }
@@ -262,7 +273,7 @@ const BanAccountsWithSearch = () => {
           isDanger
           continueLabel="Ban accounts"
           header="Ban accounts"
-          cancelHandler={() => setDryRunData(null)}
+          onClose={() => setDryRunData(null)}
           disableSubmit={!dryRunData.isAllowed}
           continueHandler={async () => {
             try {
@@ -270,14 +281,14 @@ const BanAccountsWithSearch = () => {
               setDryRunData(null);
               setSelectedAccounts([]);
               refetch(); // Refresh the search results, no need to wait for it
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 title: `Successfully banned ${result.data.banAccount.accounts.length} accounts`,
                 message: <P whiteSpace="pre-wrap">{result.data.banAccount.message}</P>,
               });
             } catch (e) {
-              addToast({
-                type: TOAST_TYPE.ERROR,
+              toast({
+                variant: 'error',
                 message: i18nGraphqlException(intl, e),
               });
             }
@@ -289,7 +300,5 @@ const BanAccountsWithSearch = () => {
     </div>
   );
 };
-
-BanAccountsWithSearch.propTypes = {};
 
 export default BanAccountsWithSearch;

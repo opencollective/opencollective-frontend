@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { groupBy, sortBy, truncate } from 'lodash';
+import { groupBy, sortBy, truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -10,9 +9,9 @@ import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE, FLAG_NEW_COLLECTIV
 import { Flex } from '../Grid';
 import { Span } from '../Text';
 
-import { canUseIncognitoForContribution } from './utils';
+import { canUseIncognitoForContribution, INCOGNITO_ID } from './utils';
 
-const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
+const { ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
 
 const formatAccountName = (intl, account) => {
   return account.isIncognito
@@ -21,22 +20,28 @@ const formatAccountName = (intl, account) => {
 };
 
 const getProfileOptions = (intl, profiles, tier) => {
-  const getOptionFromAccount = value => ({ [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true, value, label: value.name });
+  const getOptionFromAccount = value => ({
+    [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
+    value: value.account,
+    label: value.account.name,
+  });
   const sortOptions = options => sortBy(options, 'value.name');
   const profileOptions = profiles.map(getOptionFromAccount);
   const profilesByType = groupBy(profileOptions, p => p.value.type);
-  const myself = profilesByType[USER] || [];
+  const myself = profilesByType[INDIVIDUAL] || [];
   const myOrganizations = sortOptions(profilesByType[ORGANIZATION] || []);
 
   // Add incognito profile entry if it doesn't exists
-  const hasIncognitoProfile = profiles.some(p => p.type === CollectiveType.USER && p.isIncognito);
+  const hasIncognitoProfile = profiles.some(p => p.account.type === CollectiveType.INDIVIDUAL && p.account.isIncognito);
   if (!hasIncognitoProfile && canUseIncognitoForContribution(tier)) {
     myself.push(
       getOptionFromAccount({
-        id: 'incognito',
-        type: CollectiveType.USER,
-        isIncognito: true,
-        name: intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' }),
+        account: {
+          id: INCOGNITO_ID,
+          type: CollectiveType.INDIVIDUAL,
+          isIncognito: true,
+          name: intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' }),
+        },
       }),
     );
   }
@@ -52,7 +57,7 @@ const getProfileOptions = (intl, profiles, tier) => {
   });
 
   const options = [
-    { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself' }) },
+    { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself', id: 'YjO/0+' }) },
     { options: myOrganizations, label: intl.formatMessage({ id: 'organization', defaultMessage: 'My Organizations' }) },
   ];
 
@@ -71,7 +76,7 @@ const getProfileOptions = (intl, profiles, tier) => {
   if (profilesByType[PROJECT]?.length) {
     options.push({
       options: sortOptions(profilesByType[PROJECT]),
-      label: intl.formatMessage({ defaultMessage: 'My Projects' }),
+      label: intl.formatMessage({ defaultMessage: 'My Projects', id: 'FVO2wx' }),
     });
   }
   if (profilesByType[EVENT]?.length) {
@@ -95,11 +100,11 @@ const formatProfileOption = (option, _, intl) => {
         </Span>
         {account.isIncognito ? (
           <Span fontSize="12px" lineHeight="18px" color="black.700">
-            <FormattedMessage defaultMessage="Private contribution - Check privacy box for info" />
+            <FormattedMessage defaultMessage="Private contribution - Check privacy box for info" id="104ECN" />
           </Span>
         ) : (
           <Span fontSize="12px" lineHeight="18px" color="black.700">
-            {account.type === 'USER' && (
+            {account.type === CollectiveType.INDIVIDUAL && (
               <React.Fragment>
                 <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
                 {' - '}
@@ -137,13 +142,6 @@ const ContributeProfilePicker = ({ profiles, tier, selectedProfile, onChange }) 
       }}
     />
   );
-};
-
-ContributeProfilePicker.propTypes = {
-  profiles: PropTypes.array,
-  onChange: PropTypes.func,
-  selectedProfile: PropTypes.object,
-  tier: PropTypes.object,
 };
 
 export default ContributeProfilePicker;

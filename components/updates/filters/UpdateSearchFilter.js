@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../../Container';
 import { Box } from '../../Grid';
@@ -47,11 +46,6 @@ const UpdateSearchFilter = ({ searchTerm, onChange }) => {
       </SearchFormContainer>
     </Container>
   );
-};
-
-UpdateSearchFilter.propTypes = {
-  searchTerm: PropTypes.string,
-  onChange: PropTypes.func,
 };
 
 export default React.memo(UpdateSearchFilter);

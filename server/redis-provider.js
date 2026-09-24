@@ -15,7 +15,7 @@ const redisProvider = async () => {
       if (value) {
         try {
           return unserialize(value);
-        } catch (err) {
+        } catch {
           logger.error(`redisProvider: Invalid JSON`);
           logger.error(value);
         }

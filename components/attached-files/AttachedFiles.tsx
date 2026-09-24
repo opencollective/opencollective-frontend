@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDefaultFileName } from '../../lib/expenses';
-import { FileInfo } from '../../lib/graphql/types/v2/graphql';
+import type { FileInfo } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
 import LocalFilePreview from '../LocalFilePreview';
@@ -10,7 +10,7 @@ import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 type AttachedFilesProps = {
-  files: Array<File | FileInfo>;
+  files: Array<File | Partial<FileInfo>>;
   onRemove?: (idx: number) => void;
   openFileViewer?: (url: string) => void;
   size?: number;
@@ -30,12 +30,13 @@ const AttachedFiles = ({ files, onRemove, openFileViewer, size = 88 }: AttachedF
               url={file.url}
               fileName={file.name || getDefaultFileName(intl, idx, files.length)}
               fileSize={file.size}
+              fileType={file.type}
               showFileName
               openFileViewer={openFileViewer}
             />
           )}
           {onRemove && (
-            <Box ml="4px" mt="2px">
+            <Box mt="2px">
               <StyledLinkButton variant="danger" fontSize="12px" onClick={() => onRemove(idx)}>
                 <FormattedMessage id="Remove" defaultMessage="Remove" />
               </StyledLinkButton>

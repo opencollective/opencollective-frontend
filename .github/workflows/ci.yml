@@ -1,5 +1,9 @@
 name: CI
 
+# Security: Do not replace `pull_request` with `pull_request_target` to expose secrets or
+# GITHUB_TOKEN write access to PR code. pull_request_target runs untrusted fork PR code with
+# base-branch privileges.
+
 on:
   push:
     branches:
@@ -10,56 +14,81 @@ on:
       - synchronize
       - reopened
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 env:
   TZ: UTC
   OC_ENV: ci
   NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
   API_URL: http://localhost:3060
+  PDF_SERVICE_URL: http://localhost:3002
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
+  DISABLE_MOCK_UPLOADS: 1
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - name: Restore ESLint cache
+        uses: actions/cache@v6
+        with:
+          path: .eslintcache
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-eslint-${{ hashFiles('eslint.config.mjs', 'package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-eslint-${{ hashFiles('eslint.config.mjs', 'package-lock.json') }}-
 
       - run: npm run lint:quiet
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
   prettier:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - name: Restore Prettier cache
+        uses: actions/cache@v6
+        with:
+          path: .prettiercache
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-prettier-${{ hashFiles('.prettierrc', 'package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-prettier-${{ hashFiles('.prettierrc', 'package-lock.json') }}-
 
       - run: npm run prettier:check
 
   depcheck:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -68,14 +97,30 @@ jobs:
 
       - run: npm run depcheck
 
-  check-langs:
-    runs-on: ubuntu-latest
+  ts-unused-exports:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - run: npm run ts-unused-exports
+
+  check-langs:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -85,13 +130,13 @@ jobs:
       - run: npm run langs:check
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -99,68 +144,104 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - name: Restore NextJS build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: .next/cache
-          # Generate a new cache whenever packages or source files change
-          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('package-lock.json') }}-
 
       - name: Build
         run: PRESERVE_NEXT_CACHE=true npm run build
 
+      # Stage to a non-hidden directory so upload-artifact cannot drop `.next`.
+      # Copy only; leave workspace `.next/cache` for the cache post-save step.
+      - name: Stage Next.js build
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/frontend-next
+          rsync -a --exclude cache/ .next/ /tmp/frontend-next/
+          test -f /tmp/frontend-next/BUILD_ID
+          test -f /tmp/frontend-next/routes-manifest.json
+
+      - name: Upload Next.js build
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-next
+          path: /tmp/frontend-next
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
   test:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     timeout-minutes: 15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run test:jest
+      - name: Test
+        if: github.event_name != 'push' || github.ref != 'refs/heads/main'
+        run: npm run test:jest -- --reporters=default --reporters=jest-junit
+
+      - name: Test with coverage
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npm run test:coverage
+
+      - name: Report coverage
+        if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: GraphQL
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   typescript:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - name: Restore TypeScript incremental cache
+        uses: actions/cache@v6
+        with:
+          path: tsconfig.tsbuildinfo
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-tsc-${{ hashFiles('tsconfig.json', 'package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-tsc-${{ hashFiles('tsconfig.json', 'package-lock.json') }}-
 
       - run: npm run type:check
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
-  build-components:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup project
-        uses: ./.github/actions/setup-project
-        with:
-          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
-
-      - run: npm run build:components
+  e2e-prepare:
+    uses: ./.github/workflows/e2e-prepare.yml
+    secrets: inherit
 
   e2e:
-    if: github.ref_name != 'i18n/crowdin'
-    needs: build
+    needs: [build, e2e-prepare]
     uses: ./.github/workflows/e2e.yml
+    with:
+      api-ref: ${{ needs.e2e-prepare.outputs.api-ref }}
+      images-ref: ${{ needs.e2e-prepare.outputs.images-ref }}
+      pdf-ref: ${{ needs.e2e-prepare.outputs.pdf-ref }}
     secrets: inherit

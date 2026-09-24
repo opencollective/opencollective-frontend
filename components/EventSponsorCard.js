@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedDate, FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { getCollectiveImage } from '../lib/image-utils';
 
@@ -28,6 +27,8 @@ const CollectiveImage = styled.img`
   max-width: 6.25rem;
   max-height: 3.15rem;
   margin-bottom: 0.3rem;
+  margin-left: auto;
+  margin-right: auto;
 `;
 
 const EventSponsorCard = ({ sponsor }) => (
@@ -61,9 +62,5 @@ const EventSponsorCard = ({ sponsor }) => (
     </EventSponsorCardContainer>
   </a>
 );
-
-EventSponsorCard.propTypes = {
-  sponsor: PropTypes.object,
-};
 
 export default EventSponsorCard;

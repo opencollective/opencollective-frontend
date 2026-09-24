@@ -1,11 +1,15 @@
-import React, { useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
-import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
+import React, { useRef } from 'react';
+import { Markup } from 'interweave';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
+
+import { useIsomorphicLayoutEffect } from '../lib/hooks/useIsomorphicLayoutEffect';
+import { defaultShouldForwardProp } from '../lib/styled_components_utils';
+
+import { Button } from './ui/Button';
 
 /**
  * React-Quill usually saves something like `<p><br/></p` when saving with an empty
@@ -29,15 +33,12 @@ export const isEmptyHTMLValue = value => {
   }
 };
 
-const ReadFullLink = styled.a`
-  cursor: pointer;
-  font-size: 12px;
-  > svg {
-    vertical-align: baseline;
-  }
-`;
+/** Returns '' for empty rich-text scaffold HTML (e.g. Trix/React-Quill), otherwise the original value. */
+export const normalizeRichTextContent = value => (isEmptyHTMLValue(value) ? '' : value);
 
-const InlineDisplayBox = styled.div`
+const InlineDisplayBox = styled.div.withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+})`
   overflow-y: hidden;
   p {
     margin: 1em 0;
@@ -45,9 +46,11 @@ const InlineDisplayBox = styled.div`
   ${props => props.maxHeight && `max-height: ${props.maxHeight + 20}px;`}
 `;
 
-const CollapsedDisplayBox = styled.div`
+const CollapsedDisplayBox = styled.div.withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+})`
   overflow-y: hidden;
-  ${props => props.maxHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
+  ${props => props.maxCollapsedHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
@@ -58,27 +61,29 @@ const CollapsedDisplayBox = styled.div`
  * just willing to take the styles, for example to match the content displayed in the
  * editor with how it's rendered on the page.
  *
- * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
- * always ensure `content` is properly sanitized!
+ * ⚠️ Be careful! Though this component uses Markup from interweave as a double-safety mechanism to sanitize the input,
+ * always ensure `content` is properly sanitized in the API (using `api/server/lib/sanitize-html.ts`)
  */
 const HTMLContent = styled(
   ({
     content,
     collapsable = false,
-    maxHeight,
+    maxHeight = undefined,
     maxCollapsedHeight = 20,
     collapsePadding = 1,
     hideViewMoreLink = false,
+    openLinksInNewTab = false,
+    readMoreMessage,
     ...props
   }) => {
     const [isOpen, setOpen] = React.useState(false);
     const [isCollapsed, setIsCollapsed] = React.useState(false);
-    const contentRef = useRef();
+    const contentRef = useRef(undefined);
 
     const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
-    useEffect(() => {
-      if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + collapsePadding) {
+    useIsomorphicLayoutEffect(() => {
+      if (collapsable && contentRef?.current?.scrollHeight > maxCollapsedHeight + collapsePadding) {
         setIsCollapsed(true);
       }
     }, [content]);
@@ -89,18 +94,47 @@ const HTMLContent = styled(
 
     return (
       <div>
-        <DisplayBox
-          ref={contentRef}
-          maxHeight={maxHeight}
-          maxCollapsedHeight={maxCollapsedHeight}
-          dangerouslySetInnerHTML={{ __html: content }}
-          {...props}
-        />
+        <DisplayBox maxHeight={maxHeight} maxCollapsedHeight={maxCollapsedHeight} {...props} ref={contentRef}>
+          {/* See api/server/lib/sanitize-html.ts */}
+          <Markup
+            noWrap
+            content={content}
+            allowAttributes
+            transform={node => {
+              // Allow some iframes
+              if (node.tagName.toLowerCase() === 'iframe') {
+                const src = node.getAttribute('src');
+                const parsedUrl = new URL(src);
+                const hostname = parsedUrl.hostname;
+                if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
+                  const isYouTube = hostname.includes('youtube');
+                  return (
+                    <iframe
+                      allowFullScreen
+                      referrerPolicy={isYouTube ? 'strict-origin-when-cross-origin' : undefined}
+                      width={node.getAttribute('width')}
+                      height={node.getAttribute('height')}
+                      title={node.getAttribute('title') || 'Embed content'}
+                      src={src}
+                    />
+                  );
+                }
+              } else if (node.tagName.toLowerCase() === 'a') {
+                // Open links in new tab
+                if (openLinksInNewTab) {
+                  node.setAttribute('target', '_blank');
+                  node.setAttribute('rel', 'noopener noreferrer');
+                }
+              }
+            }}
+          />
+        </DisplayBox>
         {!isOpen && isCollapsed && !hideViewMoreLink && (
-          <ReadFullLink
+          <Button
+            variant="outline"
+            className="mt-4"
+            size="xs"
             onClick={() => setOpen(true)}
-            {...props}
-            role="button"
             tabIndex={0}
             onKeyDown={event => {
               if (event.key === 'Enter') {
@@ -109,15 +143,16 @@ const HTMLContent = styled(
               }
             }}
           >
-            <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
-            <CaretDown size="10px" />
-          </ReadFullLink>
+            {readMoreMessage || <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />}
+            <ChevronDown size={10} />
+          </Button>
         )}
         {isOpen && isCollapsed && (
-          <ReadFullLink
+          <Button
+            variant="outline"
+            className="mt-4"
+            size="xs"
             onClick={() => setOpen(false)}
-            {...props}
-            role="button"
             tabIndex={0}
             onKeyDown={event => {
               if (event.key === 'Enter') {
@@ -126,14 +161,16 @@ const HTMLContent = styled(
               }
             }}
           >
-            <FormattedMessage defaultMessage="Collapse" />
-            <CaretUp size="10px" />
-          </ReadFullLink>
+            <FormattedMessage defaultMessage="Collapse" id="W/V6+Y" />
+            <ChevronUp size={10} />
+          </Button>
         )}
       </div>
     );
   },
-)`
+).attrs(props => ({
+  fontSize: props.fontSize ?? '14px',
+}))`
   /** Override global styles to match what we have in the editor */
   width: 100%;
   line-height: 1.75em;
@@ -209,6 +246,22 @@ const HTMLContent = styled(
     padding: 16px;
     font-family: monospace;
     overflow-x: auto;
+    max-width: 100%;
+    white-space: nowrap;
+    border-radius: 4px;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul li,
+  ol li {
+    margin-left: 1.5em;
   }
 
   ${typography}
@@ -241,28 +294,5 @@ const HTMLContent = styled(
     `;
   }}
 `;
-
-HTMLContent.propTypes = {
-  content: PropTypes.string,
-  /* Whether the content is collapsible; adds a blur effect and a show/hide link. */
-  collapsable: PropTypes.bool,
-  /* The maximum a height of the content. */
-  maxHeight: PropTypes.number,
-  /* The maximum a height of the content before being collapsed. */
-  maxCollapsedHeight: PropTypes.number,
-  /* The the padding to apply to the collapse blur; useful in the case of
-   *  making sure only the blur effect is not applied unnecessarily. For
-   *  example maxCollapsedHeight=20 and collapsePadding=22 ensure that
-   *  content is collapsed only when there's more than two lines and if there's
-   *  only two lines the blur effect is not applied.
-   */
-  collapsePadding: PropTypes.number,
-  /* Hides the "Read full description/collapse" link */
-  hideViewMoreLink: PropTypes.bool,
-};
-
-HTMLContent.defaultProps = {
-  fontSize: '14px',
-};
 
 export default HTMLContent;

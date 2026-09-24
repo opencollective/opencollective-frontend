@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import ReactDOM from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
@@ -13,7 +12,6 @@ import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
-import StyledSpinner from '../StyledSpinner';
 import StyledTag from '../StyledTag';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
@@ -43,7 +41,7 @@ const PopupContainer = styled(`div`)`
     display: none;
   }
 
-  ${StyledSpinner} {
+  svg[data-spinner='true'] {
     display: block;
     margin: auto;
   }
@@ -77,7 +75,7 @@ const ChevronDownIcon = styled(ChevronDown)`
 
 const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const intl = useIntl();
-  const wrapperRef = React.useRef();
+  const wrapperRef = React.useRef(undefined);
   const [showPopup, setShowPopup] = React.useState(false);
   const [isClosable, setClosable] = React.useState(true);
   const [processModal, setProcessModal] = React.useState(false);
@@ -185,16 +183,19 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
           )}
       </Manager>
       {processModal && (
-        <ConfirmProcessExpenseModal type={processModal} expense={expense} onClose={() => setProcessModal(false)} />
+        <ConfirmProcessExpenseModal
+          type={processModal}
+          open={!!processModal}
+          setOpen={open => {
+            if (!open) {
+              setProcessModal(null);
+            }
+          }}
+          expense={expense}
+        />
       )}
     </React.Fragment>
   );
-};
-
-AdminExpenseStatusTag.propTypes = {
-  collective: PropTypes.object.isRequired,
-  expense: PropTypes.object.isRequired,
-  host: PropTypes.object,
 };
 
 export default AdminExpenseStatusTag;

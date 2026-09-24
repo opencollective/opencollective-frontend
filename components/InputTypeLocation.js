@@ -2,11 +2,13 @@ import React, { createRef, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
-import { get, isNil, omitBy } from 'lodash';
-import Geosuggest from 'react-geosuggest';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import Geosuggest from '@ubilabs/react-geosuggest';
+import { get, isNil, omitBy } from 'lodash-es';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
 import { isURL } from 'validator';
+
+import injectIntl from '@/lib/injectIntl';
 
 import Container from './Container';
 import Location from './Location';
@@ -186,7 +188,7 @@ class InputTypeLocation extends React.Component {
   }
 
   isAutocompleteServiceAvailable() {
-    return window && Boolean(get(window, 'google.maps.places.AutocompleteService'));
+    return typeof window !== 'undefined' && Boolean(get(window, 'google.maps.places.AutocompleteService'));
   }
 
   render() {
@@ -199,16 +201,13 @@ class InputTypeLocation extends React.Component {
             <FormattedMessage
               id="location.googleAutocompleteService.unavailable"
               values={{ service: 'Google Autocomplete Service', domain: 'maps.googleapis.com', lineBreak: <br /> }}
-              defaultMessage={
-                'Location field requires "{service}" to function.{lineBreak} Make sure "{domain}" is not blocked.'
-              }
+              defaultMessage={`Location field requires "{service}" to function.{lineBreak} Make sure "{domain}" is not blocked.`}
             />
           </MessageBox>
         ) : (
           <Fragment>
             <Container position="relative">
               <GeoSuggestItem
-                ref={this.geoSuggestRef}
                 onSuggestSelect={event => this.handleChange(event)}
                 placeholder={this.props.placeholder}
                 initialValue={this.props.value?.name}
@@ -220,6 +219,7 @@ class InputTypeLocation extends React.Component {
                   },
                 ]}
                 {...options}
+                ref={this.geoSuggestRef}
               />
               <Container position="absolute" top="0.5em" right="1em">
                 <ClearIcon

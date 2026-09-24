@@ -1,0 +1,97 @@
+'use client';
+
+import * as React from 'react';
+import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import { Circle } from 'lucide-react';
+
+import { cn } from '../../lib/utils';
+
+import { Collapsible, CollapsibleContent } from './Collapsible';
+
+const RadioGroup = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
+>(({ className, ...props }, ref) => {
+  return <RadioGroupPrimitive.Root className={cn('grid gap-2', className)} {...props} ref={ref} />;
+});
+RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
+
+const RadioGroupItem = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
+>(({ className, ...props }, ref) => {
+  return (
+    <RadioGroupPrimitive.Item
+      ref={ref}
+      className={cn(
+        'aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+        className,
+      )}
+      id={props.id || props.value}
+      {...props}
+    >
+      <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
+        <Circle className="h-2.5 w-2.5 fill-current text-current" />
+      </RadioGroupPrimitive.Indicator>
+    </RadioGroupPrimitive.Item>
+  );
+});
+RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
+
+const RadioGroupCard = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & {
+    showSubcontent?: boolean;
+    subContent?: React.ReactNode;
+    contentClassName?: string;
+    indicatorClassName?: string;
+  }
+>(({ className, children, showSubcontent, subContent, checked, ...props }, ref) => {
+  const isCheckedOverridden = checked !== undefined;
+  return (
+    <div
+      className={cn(
+        `relative rounded-lg bg-card text-sm text-card-foreground shadow-xs ring-1 ring-border has-data-[state=checked]:ring-2 has-data-[state=checked]:ring-ring [&:has([role="radio"]:focus-visible)]:bg-primary/5`,
+        className,
+      )}
+    >
+      <RadioGroupPrimitive.Item
+        ref={ref}
+        className={cn(
+          'group w-full p-4 text-left outline-hidden disabled:cursor-not-allowed disabled:text-muted-foreground disabled:[&_.border]:border-muted-foreground/50',
+        )}
+        asChild={false}
+        {...props}
+        {...(isCheckedOverridden && { 'data-state': checked ? 'checked' : 'unchecked', 'aria-checked': checked })}
+      >
+        <div className={cn('flex w-full items-center gap-4', props.contentClassName)}>
+          <div
+            className={cn(
+              'flex aspect-square h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              props.indicatorClassName,
+            )}
+          >
+            {isCheckedOverridden ? (
+              checked && <Circle className="h-2.5 w-2.5 fill-current text-current" />
+            ) : (
+              <RadioGroupPrimitive.Indicator>
+                <Circle className="h-2.5 w-2.5 fill-current text-current" />
+              </RadioGroupPrimitive.Indicator>
+            )}
+          </div>
+
+          {children}
+        </div>
+      </RadioGroupPrimitive.Item>
+      {subContent && (
+        <Collapsible open={showSubcontent}>
+          <CollapsibleContent className="p-4 pt-0">{subContent}</CollapsibleContent>
+        </Collapsible>
+      )}
+    </div>
+  );
+});
+
+RadioGroupCard.displayName = 'RadioGroupCards.Item';
+
+export { RadioGroup, RadioGroupItem, RadioGroupCard };

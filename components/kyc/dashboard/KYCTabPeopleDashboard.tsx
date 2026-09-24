@@ -1,0 +1,128 @@
+import React from 'react';
+import { gql, useQuery } from '@apollo/client';
+import { FormattedMessage } from 'react-intl';
+import { z } from 'zod';
+
+import { getAccountReferenceInput } from '@/lib/collective';
+import { integer } from '@/lib/filters/schemas';
+import type {
+  AccountReferenceInput,
+  KycTabPeopleDashboardQuery,
+  KycVerificationCollection,
+} from '@/lib/graphql/types/v2/graphql';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
+
+import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import { Pagination } from '@/components/dashboard/filters/Pagination';
+import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
+import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
+
+import { kycVerificationCollectionFields } from '../graphql';
+import { SubmitKYCVerificationButton } from '../request/SubmitKYCVerificationButton';
+
+import { KYCVerificationRequestsTable } from './KYCVerificationRequestsTable';
+
+type KYCTabPeopleDashboardProps = {
+  requestedByAccount: AccountReferenceInput;
+  verifyAccount: AccountReferenceInput;
+};
+
+const PAGE_SIZE = 5;
+
+export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
+  const queryFilter = useQueryFilter({
+    skipRouter: true,
+    schema: z.object({
+      limit: integer.default(PAGE_SIZE),
+      offset: integer.default(0),
+    }),
+    filters: {},
+  });
+  const query = useQuery<KycTabPeopleDashboardQuery>(
+    gql`
+      query KYCTabPeopleDashboard(
+        $verifyAccountId: String!
+        $requestedByAccount: AccountReferenceInput!
+        $limit: Int!
+        $offset: Int!
+      ) {
+        verifyAccount: account(id: $verifyAccountId) {
+          id
+          ... on Individual {
+            kycVerifications(requestedByAccounts: [$requestedByAccount], limit: $limit, offset: $offset) {
+              ...KYCVerificationCollectionFields
+              nodes {
+                ... on KYCVerification {
+                  account {
+                    ...AccountHoverCardFields
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      ${kycVerificationCollectionFields}
+      ${accountHoverCardFields}
+    `,
+    {
+      variables: {
+        verifyAccountId: props.verifyAccount.id,
+        requestedByAccount: getAccountReferenceInput(props.requestedByAccount),
+        ...queryFilter.variables,
+      },
+    },
+  );
+
+  const kycVerifications =
+    query.data?.verifyAccount && 'kycVerifications' in query.data.verifyAccount
+      ? (query.data.verifyAccount.kycVerifications as KycVerificationCollection)
+      : { nodes: [], limit: 0, offset: 0, totalCount: 0 };
+
+  const hasVerifications = kycVerifications.totalCount > 0;
+  const isEmpty = !query.loading && !query.error && !hasVerifications;
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex-1 space-y-6">
+        <div className="flex items-center justify-end">
+          <SubmitKYCVerificationButton
+            requestedByAccount={props.requestedByAccount}
+            verifyAccount={props.verifyAccount}
+            refetchQueries={['KYCTabPeopleDashboard', 'CommunityAccountDetail']}
+          />
+        </div>
+        {query.error ? (
+          <MessageBoxGraphqlError error={query.error} />
+        ) : isEmpty ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="mb-2 text-slate-600">
+              <FormattedMessage defaultMessage="This user has not been verified yet" id="06DMYQ" />
+            </p>
+          </div>
+        ) : (
+          <React.Fragment>
+            <KYCVerificationRequestsTable
+              data={kycVerifications.nodes}
+              loading={query.loading}
+              refetchQueries={['KYCTabPeopleDashboard', 'CommunityAccountDetail']}
+              nbPlaceholders={PAGE_SIZE}
+            />
+            <Pagination queryFilter={queryFilter} total={kycVerifications.totalCount} />
+          </React.Fragment>
+        )}
+      </div>
+      <DocumentationCardList
+        className="mt-auto pt-6"
+        docs={[
+          {
+            href: 'https://documentation.opencollective.com/fiscal-hosts/know-your-customer-kyc',
+            title: 'Know Your Customer (KYC)',
+            excerpt:
+              'KYC (Know Your Customer) verification is a critical process that helps organizations ensure compliance with regulatory requirements. It involves verifying the identity and legal information of account holders to prevent fraud and maintain security standards.',
+          },
+        ]}
+      />
+    </div>
+  );
+}

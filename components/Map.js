@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import StyledLink from './StyledLink';
@@ -61,12 +60,6 @@ const Map = ({ lat, long }) => {
       </StyledLink>
     </div>
   );
-};
-
-Map.propTypes = {
-  lat: PropTypes.number,
-  long: PropTypes.number,
-  address: PropTypes.string,
 };
 
 export default Map;

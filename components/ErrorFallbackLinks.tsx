@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Link from './Link';
 
@@ -27,7 +27,6 @@ const LinksContainer = styled.div`
 
 type ErrorFallbackLinksProps = {
   showHome?: boolean;
-  showSlack?: boolean;
   showDiscover?: boolean;
   showDocumentation?: boolean;
   showSupport?: boolean;
@@ -38,7 +37,6 @@ type ErrorFallbackLinksProps = {
  */
 export const ErrorFallbackLinks = ({
   showHome = true,
-  showSlack = false,
   showDiscover = false,
   showDocumentation = true,
   showSupport = true,
@@ -50,12 +48,11 @@ export const ErrorFallbackLinks = ({
           <FormattedMessage id="home" defaultMessage="Home" />
         </Link>
       )}
-      {showSlack && <Link href="https://slack.opencollective.com/">Slack</Link>}
       <Link href="https://opencollective.com/discover">
         {showDiscover && <FormattedMessage id="menu.discover" defaultMessage="Discover" />}
       </Link>
       {showDocumentation && (
-        <Link href="https://docs.opencollective.com">
+        <Link href="https://documentation.opencollective.com">
           <FormattedMessage id="menu.documentation" defaultMessage="Documentation" />
         </Link>
       )}

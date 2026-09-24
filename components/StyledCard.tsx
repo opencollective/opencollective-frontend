@@ -1,26 +1,29 @@
-import styledPropTypes from '@styled-system/prop-types';
-import styled from 'styled-components';
-import {
-  background,
+import { styled } from 'styled-components';
+import type {
   BackgroundProps,
-  border,
   BorderProps,
-  color,
   ColorProps,
-  compose,
-  flexbox,
   FlexboxProps,
-  layout,
   LayoutProps,
-  position,
   PositionProps,
-  shadow,
   ShadowProps,
-  space,
   SpaceProps,
-  typography,
   TypographyProps,
 } from 'styled-system';
+import {
+  background,
+  border,
+  color,
+  compose,
+  flexbox,
+  layout,
+  position,
+  shadow,
+  space,
+  typography,
+} from 'styled-system';
+
+import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 
 type StyledCardProps = BackgroundProps &
   BorderProps &
@@ -36,32 +39,21 @@ type StyledCardProps = BackgroundProps &
  * A simple styled-component to contain content in a card UI using styled-system.
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
+ * @deprecated Use `ui/Card` instead
  */
-const StyledCard = styled.div<StyledCardProps>(
-  compose(flexbox, typography, background, border, shadow, color, layout, position, space),
-);
-
-StyledCard.propTypes = {
-  ...styledPropTypes.flexbox,
-  ...styledPropTypes.typography,
-  ...styledPropTypes.background,
-  ...styledPropTypes.border,
-  ...styledPropTypes.shadow,
-  ...styledPropTypes.color,
-  ...styledPropTypes.layout,
-  ...styledPropTypes.space,
-  ...styledPropTypes.position,
-};
-
-StyledCard.defaultProps = {
-  bg: 'white.full',
-  borderWidth: '1px',
-  borderStyle: 'solid',
-  borderColor: 'black.300',
-  borderRadius: '8px',
-  overflowX: 'hidden',
-  overflowY: 'hidden',
-};
+const StyledCard = styled.div
+  .withConfig({
+    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+  })
+  .attrs<StyledCardProps>(props => ({
+    bg: props.bg ?? 'white.full',
+    borderWidth: props.borderWidth ?? '1px',
+    borderStyle: props.borderStyle ?? 'solid',
+    borderColor: props.borderColor ?? 'black.300',
+    borderRadius: props.borderRadius ?? '8px',
+    overflowX: props.overflowX ?? 'hidden',
+    overflowY: props.overflowY ?? 'hidden',
+  }))<StyledCardProps>(compose(flexbox, typography, background, border, shadow, color, layout, position, space));
 
 /** @component */
 export default StyledCard;

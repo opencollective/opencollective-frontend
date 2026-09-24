@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
@@ -27,7 +26,7 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
       <Content>
         <FormattedMessage
           id="EditCollectivePageFAQ.EditHiddenDetails"
-          defaultMessage="No. To edit a section, you need to make it to visible."
+          defaultMessage="No. To edit a section, you need to make it visible."
         />
       </Content>
     </Entry>
@@ -52,9 +51,5 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
     </Entry>
   </FAQ>
 );
-
-EditCollectivePageFAQ.propTypes = {
-  defaultOpen: PropTypes.bool,
-};
 
 export default EditCollectivePageFAQ;

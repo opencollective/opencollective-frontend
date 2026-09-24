@@ -1,12 +1,11 @@
 require('../env');
 
-const path = require('path');
-
 const next = require('next');
 const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
-const cloudflareIps = require('cloudflare-ip/ips.json');
+const cloudflareIps = require('./cloudflare-ips.json');
+const isEmpty = require('lodash-es/isEmpty').default;
 const throng = require('throng');
 
 const logger = require('./logger');
@@ -23,10 +22,11 @@ const app = express();
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
 
 const dev = process.env.NODE_ENV === 'development';
-
-const nextApp = next({ dev, dir: path.dirname(__dirname) });
-
 const port = process.env.PORT;
+const hostname = process.env.HOSTNAME;
+// Next.js 16 defaults to Turbopack; keep webpack for our custom next.config.js plugins.
+const nextApp = next({ dev, hostname, port, webpack: true });
+const nextRequestHandler = nextApp.getRequestHandler();
 
 const workers = process.env.WEB_CONCURRENCY || 1;
 
@@ -70,15 +70,24 @@ const start = id =>
       app.use(
         duplicateHandler({
           skip: req =>
+            !isEmpty(req.cookies) ||
+            req.headers.authorization ||
+            req.headers.cookie ||
             req.url.match(/^\/_/) ||
             req.url.match(/^\/static/) ||
+            req.url.match(/^\/dashboard/) ||
             req.url.match(/^\/api/) ||
             req.url.match(/^\/favicon\.ico/),
         }),
       );
     }
 
-    app.use(routes(app, nextApp));
+    routes(app);
+
+    app.all('/{*splat}', (req, res) => {
+      return nextRequestHandler(req, res);
+    });
+
     app.use(loggerMiddleware.errorLogger);
 
     app.listen(port, err => {
@@ -99,7 +108,7 @@ const start = id =>
     });
   });
 
-if (workers && workers > 1) {
+if (workers > 1) {
   throng({ worker: start, count: workers });
 } else {
   start(1);

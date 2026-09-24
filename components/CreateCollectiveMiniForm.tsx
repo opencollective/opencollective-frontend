@@ -1,21 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
-import { assign, cloneDeep, get, pick } from 'lodash';
+import { assign, cloneDeep, get, pick } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { i18nGraphqlException } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql, gqlV1 } from '../lib/graphql/helpers';
 import { isValidEmail } from '../lib/utils';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
-import Container from './Container';
-import { Box } from './Grid';
+import { Button } from './ui/Button';
 import InputTypeCountry from './InputTypeCountry';
 import MessageBox from './MessageBox';
-import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import StyledInputFormikField from './StyledInputFormikField';
@@ -39,6 +37,33 @@ const CreateNewMessages = defineMessages({
   [CollectiveType.ORGANIZATION]: {
     id: 'Organization.CreateNew',
     defaultMessage: 'Create new Organization',
+  },
+  [CollectiveType.VENDOR]: {
+    id: 'Vendor.CreateNew',
+    defaultMessage: 'Create new Vendor',
+  },
+});
+
+const SaveButtonMessage = defineMessages({
+  [CollectiveType.COLLECTIVE]: {
+    id: 'CreateCollective',
+    defaultMessage: 'Create collective',
+  },
+  [CollectiveType.USER]: {
+    id: 'InviteUser',
+    defaultMessage: 'Invite user',
+  },
+  [CollectiveType.EVENT]: {
+    id: 'CreateEvent',
+    defaultMessage: 'Create event',
+  },
+  [CollectiveType.ORGANIZATION]: {
+    id: 'CreateOrganization',
+    defaultMessage: 'Create organization',
+  },
+  [CollectiveType.VENDOR]: {
+    defaultMessage: 'Create vendor',
+    id: 'jrCJwo',
   },
 });
 
@@ -67,6 +92,14 @@ const msg = defineMessages({
     id: 'Fields.website',
     defaultMessage: 'Website',
   },
+  contactName: {
+    id: 'ContactName',
+    defaultMessage: 'Contact name',
+  },
+  contactEmail: {
+    defaultMessage: "Contact's email",
+    id: '9W4YHR',
+  },
   cancel: {
     id: 'actions.cancel',
     defaultMessage: 'Cancel',
@@ -74,10 +107,6 @@ const msg = defineMessages({
   save: {
     id: 'save',
     defaultMessage: 'Save',
-  },
-  saveUser: {
-    id: 'InviteUser',
-    defaultMessage: 'Invite user',
   },
   invalidEmail: {
     id: 'error.email.invalid',
@@ -118,12 +147,16 @@ const prepareMutationVariables = collective => {
   } else if (collective.type === CollectiveType.ORGANIZATION) {
     collective.members.forEach(member => (member.role = roles.ADMIN));
     return { collective: pick(collective, ['name', 'legalName', 'type', 'website', 'members', ...locationFields]) };
+  } else if (collective.type === CollectiveType.VENDOR) {
+    return {
+      collective: pick(collective, ['name', 'legalName', 'type', 'website', 'ParentCollectiveId', 'vendorInfo']),
+    };
   } else {
     return { collective: pick(collective, ['name', 'type', 'website', ...locationFields]) };
   }
 };
 
-const createCollectiveMutation = gqlV1`
+const createCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation CreateCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
@@ -150,7 +183,20 @@ const createCollectiveMutation = gqlV1`
   }
 `;
 
-const createUserMutation = gqlV1`
+const createVendorV2Mutation = gql`
+  mutation CreateVendorFromMiniForm($host: AccountReferenceInput!, $vendor: VendorCreateInput!) {
+    createVendor(host: $host, vendor: $vendor) {
+      id
+      legacyId
+      slug
+      name
+      type
+      imageUrl(height: 64)
+    }
+  }
+`;
+
+const createUserMutation = gqlV1 /* GraphQL */ `
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
       user {
@@ -176,6 +222,32 @@ const createUserMutation = gqlV1`
   }
 `;
 
+interface CreateCollectiveMiniFormProps {
+  /** The collective type to create */
+  type: (typeof CollectiveType)[keyof typeof CollectiveType];
+  /** Called when cancel is clicked */
+  onCancel(...args: unknown[]): unknown;
+  /** Called with the collective created when the function succeed */
+  onSuccess(...args: unknown[]): unknown;
+  /** If true, the logged in user will be added as an admin of the collective */
+  addLoggedInUserAsAdmin?: boolean;
+  /** @ignore from withUser */
+  LoggedInUser?: LoggedInUser | null;
+  /** @ignore from withUser */
+  refetchLoggedInUser?(...args: unknown[]): unknown;
+  /** If true, this does not render the 'admin name' and 'admin email' for create org form */
+  excludeAdminFields?: boolean;
+  /** The collective email */
+  email?: string;
+  /** The collective name */
+  name?: string;
+  /** A list of optional fields to include in the form */
+  optionalFields?: ('location.address' | 'location.country')[];
+  /** Any other initial values to pass to the form */
+  otherInitialValues?: object;
+  vendorVisibleToAccountIds?: number[];
+}
+
 /**
  * A mini-form to create collectives/orgs/users. Meant to be embed in popups or
  * small component where we want to provide just the essential fields.
@@ -191,17 +263,28 @@ const CreateCollectiveMiniForm = ({
   optionalFields,
   email = '',
   name = '',
-}) => {
+  otherInitialValues = {},
+  vendorVisibleToAccountIds,
+}: CreateCollectiveMiniFormProps) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
+  const isVendor = type === CollectiveType.VENDOR;
   const noAdminFields = isOrganization && excludeAdminFields;
-  const mutation = isUser ? createUserMutation : createCollectiveMutation;
-  const [createCollective, { error: submitError }] = useMutation(mutation);
+  const useV2VendorMutation = isVendor && Array.isArray(vendorVisibleToAccountIds);
+  const mutation = useV2VendorMutation
+    ? createVendorV2Mutation
+    : isUser
+      ? createUserMutation
+      : createCollectiveMutation;
+  const [createCollective, { error: submitError }] = useMutation(mutation, {
+    context: useV2VendorMutation ? undefined : API_V1_CONTEXT,
+  });
   const intl = useIntl();
   const { formatMessage } = intl;
 
   const initialValues = {
+    ...otherInitialValues,
     members: [{ member: { email, name } }],
     email,
     name,
@@ -216,9 +299,11 @@ const CreateCollectiveMiniForm = ({
         errors.members = [{ member: { email: formatMessage(msg.invalidEmail) } }];
       }
       if (!get(values, 'members[0].member.name')) {
-        errors.members
-          ? (errors.members[0].member.name = formatMessage(msg.invalidName))
-          : [{ member: { name: formatMessage(msg.invalidName) } }];
+        if (!errors.members) {
+          errors.members = [{ member: { name: formatMessage(msg.invalidName) } }];
+        } else {
+          errors.members[0].member.name = formatMessage(msg.invalidName);
+        }
       }
     } else if (isUser) {
       if (!values.email || !isValidEmail(values.email)) {
@@ -233,6 +318,20 @@ const CreateCollectiveMiniForm = ({
   };
 
   const submit = formValues => {
+    if (useV2VendorMutation) {
+      const hostLegacyId = (otherInitialValues as { ParentCollectiveId?: number }).ParentCollectiveId;
+      return createCollective({
+        variables: {
+          host: { legacyId: hostLegacyId },
+          vendor: {
+            name: formValues.name,
+            legalName: formValues.legalName || undefined,
+            canBeUsedWithAccounts: vendorVisibleToAccountIds.map(legacyId => ({ legacyId })),
+          },
+        },
+      }).then(({ data }) => onSuccess(data.createVendor));
+    }
+
     let values;
     if (excludeAdminFields) {
       const clonedValues = cloneDeep({ ...formValues, type });
@@ -259,9 +358,9 @@ const CreateCollectiveMiniForm = ({
         const { values, errors, touched, isSubmitting } = formik;
 
         return (
-          <Form data-cy="create-collective-mini-form">
+          <Form data-cy="create-collective-mini-form" className="flex h-full flex-col overflow-y-hidden">
             <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
-            <Box mt={3}>
+            <div className="w-full grow overflow-y-auto pb-4">
               {(isUser || isOrganization) && !noAdminFields && (
                 <StyledInputField
                   name={isOrganization ? 'members[0].member.email' : 'email'}
@@ -320,14 +419,14 @@ const CreateCollectiveMiniForm = ({
                       isUser
                         ? 'e.g., Jane Doe, Frank Zappa'
                         : isCollective
-                        ? 'e.g., Webpack, Babel'
-                        : 'e.g., AirBnb, TripleByte'
+                          ? 'e.g., Webpack, Babel'
+                          : 'e.g., AirBnb, TripleByte'
                     }
                     data-cy="mini-form-name-field"
                   />
                 )}
               </StyledInputField>
-              {(isUser || isOrganization) && (
+              {(isUser || isOrganization || isVendor) && (
                 <StyledInputField
                   name="legalName"
                   htmlFor="legalName"
@@ -356,7 +455,49 @@ const CreateCollectiveMiniForm = ({
                   )}
                 </StyledInputField>
               )}
-              {!isUser && (
+              {isVendor && (
+                <React.Fragment>
+                  <StyledInputField
+                    name="vendorInfo.contact.name"
+                    htmlFor="vendorInfo.contact.name"
+                    required={false}
+                    label={formatMessage(msg.contactName)}
+                    mt={3}
+                    value={values.vendorInfo?.contact?.name}
+                  >
+                    {inputProps => (
+                      <Field
+                        as={StyledInput}
+                        {...inputProps}
+                        placeholder={intl.formatMessage(msg.examples, {
+                          examples: 'Jane Mary Doe, Frank Vincent Zappa',
+                        })}
+                        width="100%"
+                      />
+                    )}
+                  </StyledInputField>
+                  <StyledInputField
+                    name="vendorInfo.contact.email"
+                    htmlFor="vendorInfo.contact.email"
+                    required={false}
+                    label={formatMessage(msg.contactEmail)}
+                    mt={3}
+                    value={values.vendorInfo?.contact?.email}
+                  >
+                    {inputProps => (
+                      <Field
+                        as={StyledInput}
+                        {...inputProps}
+                        placeholder={intl.formatMessage(msg.examples, {
+                          examples: 'steve@apple.com',
+                        })}
+                        width="100%"
+                      />
+                    )}
+                  </StyledInputField>
+                </React.Fragment>
+              )}
+              {!(isUser || isVendor) && (
                 <StyledInputField
                   name="website"
                   htmlFor="website"
@@ -404,61 +545,25 @@ const CreateCollectiveMiniForm = ({
                   }}
                 </StyledInputFormikField>
               ))}
-            </Box>
+            </div>
             {submitError && (
               <MessageBox type="error" withIcon mt={2}>
                 {i18nGraphqlException(intl, submitError)}
               </MessageBox>
             )}
-            <Container
-              display="flex"
-              flexWrap="wrap"
-              justifyContent="flex-end"
-              borderTop="1px solid #D7DBE0"
-              mt={4}
-              pt={3}
-            >
-              <StyledButton mr={2} minWidth={100} onClick={() => onCancel()} disabled={isSubmitting}>
+            <div className="flex w-full justify-stretch gap-4 pt-4">
+              <Button type="submit" loading={isSubmitting} data-cy="mini-form-save-button" size="sm" className="flex-1">
+                {formatMessage(SaveButtonMessage[type]) || formatMessage(msg.save)}
+              </Button>
+              <Button onClick={() => onCancel()} disabled={isSubmitting} variant="outline" size="sm" className="flex-1">
                 {formatMessage(msg.cancel)}
-              </StyledButton>
-              <StyledButton
-                type="submit"
-                buttonStyle="primary"
-                minWidth={100}
-                loading={isSubmitting}
-                data-cy="mini-form-save-button"
-              >
-                {isUser ? formatMessage(msg.saveUser) : formatMessage(msg.save)}
-              </StyledButton>
-            </Container>
+              </Button>
+            </div>
           </Form>
         );
       }}
     </Formik>
   );
-};
-
-CreateCollectiveMiniForm.propTypes = {
-  /** The collective type to create */
-  type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-  /** Called when cancel is clicked */
-  onCancel: PropTypes.func.isRequired,
-  /** Called with the collective created when the function succeed */
-  onSuccess: PropTypes.func.isRequired,
-  /** If true, the logged in user will be added as an admin of the collective */
-  addLoggedInUserAsAdmin: PropTypes.bool,
-  /** @ignore from withUser */
-  LoggedInUser: PropTypes.object,
-  /** @ignore from withUser */
-  refetchLoggedInUser: PropTypes.func,
-  /** If true, this does not render the 'admin name' and 'admin email' for create org form */
-  excludeAdminFields: PropTypes.bool,
-  /** The collective email */
-  email: PropTypes.string,
-  /** The collective name */
-  name: PropTypes.string,
-  /** A list of optional fields to include in the form */
-  optionalFields: PropTypes.arrayOf(PropTypes.oneOf(['location.address', 'location.country'])),
 };
 
 export default withUser(CreateCollectiveMiniForm);

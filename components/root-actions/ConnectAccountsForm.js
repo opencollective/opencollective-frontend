@@ -1,17 +1,18 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const connectAccountsMutation = gql`
   mutation ConnectAccounts($memberAccount: AccountReferenceInput!, $account: AccountReferenceInput!) {
@@ -30,10 +31,10 @@ const CONNECTED_ACCOUNT_ACCEPTED_TYPES = [
 ];
 
 const ConnectAccountsForm = () => {
-  const [submitConnectAccounts, { loading }] = useMutation(connectAccountsMutation, { context: API_V2_CONTEXT });
+  const [submitConnectAccounts, { loading }] = useMutation(connectAccountsMutation);
   const [memberAccount, setMemberAccount] = React.useState(null);
   const [account, setAccount] = React.useState(null);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const isValid = memberAccount && account;
   const intl = useIntl();
   const connectCTA = getConnectCTA(memberAccount, account);
@@ -47,8 +48,8 @@ const ConnectAccountsForm = () => {
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: (
           <React.Fragment>
             <LinkCollective collective={memberAccount} /> is now connected to <LinkCollective collective={account} />
@@ -60,9 +61,9 @@ const ConnectAccountsForm = () => {
       setMemberAccount(null);
       setAccount(null);
     } catch (e) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
-        variant: 'light',
+      toast({
+        variant: 'error',
+
         message: i18nGraphqlException(intl, e),
       });
     }
@@ -70,6 +71,7 @@ const ConnectAccountsForm = () => {
 
   return (
     <div>
+      <DashboardHeader title="Connect Accounts" className="mb-10" />
       <Flex alignItems="flex-end">
         <StyledInputField htmlFor="connect-account-1" label="Make..." flex="1 1">
           {({ id }) => (
@@ -118,7 +120,5 @@ const getConnectCTA = (fromAccount, toAccount) => {
     return `Connect @${fromAccount.slug} to @${toAccount.slug}`;
   }
 };
-
-ConnectAccountsForm.propTypes = {};
 
 export default ConnectAccountsForm;

@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled, { css } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import { Flex } from '../Grid';
@@ -117,18 +116,16 @@ const getOptimisticResponse = (entity, emoji, isAdding) => {
   }
 };
 
-const mutationOptions = { context: API_V2_CONTEXT };
-
 /**
  * A component to render the reaction picker on comments.
  */
-const EmojiReactionPicker = ({ comment, update }) => {
+const EmojiReactionPicker = ({ comment = null, update = null }) => {
   const emojiFirstRow = ['👍️', '👎', '😀', '🎉'];
   const emojiSecondRow = ['😕', '❤️', '🚀', '👀'];
   const [open, setOpen] = React.useState(false);
-  const wrapperRef = React.useRef();
-  const [addReaction] = useMutation(addReactionMutation, mutationOptions);
-  const [removeReaction] = useMutation(removeReactionMutation, mutationOptions);
+  const wrapperRef = React.useRef(undefined);
+  const [addReaction] = useMutation(addReactionMutation);
+  const [removeReaction] = useMutation(removeReactionMutation);
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {
@@ -144,7 +141,7 @@ const EmojiReactionPicker = ({ comment, update }) => {
       isSelected = update.userReactions?.includes(emoji);
     }
     return {
-      children: <Emoji>{emoji}</Emoji>,
+      children: <Emoji className="font-emoji">{emoji}</Emoji>,
       isSelected,
       onClick: () => {
         setOpen(false);
@@ -152,12 +149,12 @@ const EmojiReactionPicker = ({ comment, update }) => {
         if (comment) {
           return action({
             variables: { emoji: emoji, comment: { id: comment.id } },
-            optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected, true),
+            optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected),
           });
         } else if (update) {
           return action({
             variables: { emoji: emoji, update: { id: update.id } },
-            optimisticResponse: getOptimisticResponse(update, emoji, !isSelected, false),
+            optimisticResponse: getOptimisticResponse(update, emoji, !isSelected),
           });
         }
       },
@@ -210,25 +207,6 @@ const EmojiReactionPicker = ({ comment, update }) => {
       </div>
     </Manager>
   );
-};
-
-EmojiReactionPicker.propTypes = {
-  comment: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    html: PropTypes.string,
-    createdAt: PropTypes.string,
-    userReactions: PropTypes.array,
-  }),
-  update: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    html: PropTypes.string,
-    createdAt: PropTypes.string,
-    fromAccount: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-    }),
-    userReactions: PropTypes.array,
-  }),
 };
 
 export default EmojiReactionPicker;

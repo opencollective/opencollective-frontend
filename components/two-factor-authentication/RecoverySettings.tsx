@@ -1,18 +1,17 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
-import { CheckCircle2Icon } from 'lucide-react';
+import { useMutation } from '@apollo/client';
+import { RefreshCcw } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
-import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { H3 } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { Button } from '../ui/Button';
+import { useToast } from '../ui/useToast';
 
 const regenerateRecoveryCodesMutation = gql`
   mutation RegenerateRecoveryCodes {
@@ -26,58 +25,56 @@ type RecoverySettingsProps = {
 
 export function RecoverySettings(props: RecoverySettingsProps) {
   const intl = useIntl();
-  const { addToast } = useToasts();
-  const [isRegenetingRecoveryCodes, setIsRegenetingRecoveryCodes] = React.useState(false);
+  const { toast } = useToast();
+  const [isRegeneratingRecoveryCodes, setIsRegeneratingRecoveryCodes] = React.useState(false);
 
   const [regenerateRecoveryCodes, { loading }] = useMutation<{ regenerateRecoveryCodes: string[] }>(
     regenerateRecoveryCodesMutation,
-    {
-      context: API_V2_CONTEXT,
-    },
   );
 
   const onRegenerateConfirmation = React.useCallback(async () => {
     try {
       const res = await regenerateRecoveryCodes();
-      setIsRegenetingRecoveryCodes(false);
+      setIsRegeneratingRecoveryCodes(false);
       props.onRecoveryCodes(res.data.regenerateRecoveryCodes);
     } catch (err) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, err) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
     }
   }, [intl, props.onRecoveryCodes]);
 
   return (
     <React.Fragment>
       <StyledCard px={3} py={2}>
-        <Flex alignItems="center">
-          <Box mr={3}>{<CheckCircle2Icon color="#0EA755" />}</Box>
-          <H3 fontSize="14px" fontWeight="700">
-            <FormattedMessage defaultMessage="Recovery" />
-          </H3>
-        </Flex>
-        <div className="border-b pb-3 text-sm">
-          <FormattedMessage defaultMessage="Recovery codes can be used to access you account in case you lose access to your other two factor methods." />
+        <H3 fontSize="14px" fontWeight="700" my={3}>
+          <FormattedMessage defaultMessage="Recovery" id="AAB4k2" />
+        </H3>
+        <div className="text-sm">
+          <FormattedMessage
+            defaultMessage="Recovery codes can be used to access your account in case you lose access to your other two factor methods."
+            id="Pw3c53"
+          />
         </div>
-        <div className="mt-3 flex gap-2">
-          <StyledButton
-            loading={loading}
-            onClick={() => setIsRegenetingRecoveryCodes(true)}
-            buttonSize="tiny"
-            buttonStyle="secondary"
-          >
-            <FormattedMessage defaultMessage="Regenerate" />
-          </StyledButton>
-        </div>
+        <Button
+          variant="outline"
+          loading={loading}
+          onClick={() => setIsRegeneratingRecoveryCodes(true)}
+          className="mt-3 mb-2 w-full"
+        >
+          <RefreshCcw className="mr-2 h-4 w-4" />
+          <FormattedMessage defaultMessage="Regenerate codes" id="TWwiPo" />
+        </Button>
       </StyledCard>
-      {isRegenetingRecoveryCodes && (
+      {isRegeneratingRecoveryCodes && (
         <ConfirmationModal
           isDanger
-          onClose={() => setIsRegenetingRecoveryCodes(false)}
-          header={<FormattedMessage defaultMessage="Are you sure you want to regenerate your recovery codes?" />}
+          onClose={() => setIsRegeneratingRecoveryCodes(false)}
+          header={
+            <FormattedMessage defaultMessage="Are you sure you want to regenerate your recovery codes?" id="844sMC" />
+          }
           continueHandler={onRegenerateConfirmation}
         >
           <MessageBox type="warning" withIcon>
-            <FormattedMessage defaultMessage="This will inactive your previous recovery codes." />
+            <FormattedMessage defaultMessage="This will inactivate your previous recovery codes." id="bHcyqz" />
           </MessageBox>
         </ConfirmationModal>
       )}

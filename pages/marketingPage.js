@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl } from 'react-intl';
 
 import languages from '../lib/constants/locales';
 import { loadScriptAsync } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Body from '../components/Body';
 import Header from '../components/Header';
@@ -83,6 +83,7 @@ class MarketingPage extends React.Component {
         <div>
           <Header LoggedInUser={LoggedInUser} />
           <Body>
+            {/* We control the pages content, since it's defined in markdown files we host in this codebase */}
             <style type="text/css" dangerouslySetInnerHTML={{ __html: style }} />
             <div className={className} dangerouslySetInnerHTML={{ __html: html }} />
           </Body>
@@ -93,4 +94,6 @@ class MarketingPage extends React.Component {
   }
 }
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default injectIntl(withUser(MarketingPage));

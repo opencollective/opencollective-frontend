@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -35,11 +34,12 @@ const headerMessages = defineMessages({
     defaultMessage: 'Read our stories',
   },
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {
-    id: 'home.joinUsSection.newsletter',
-    defaultMessage: 'Subscribe to our newsletter',
+    id: 'NewContributionFlow.Success.CTA.Newsletter.Header',
+    defaultMessage: 'Subscribe to the Open{nbsp}Collective newsletter',
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
     defaultMessage: "Go to {accountName}'s page",
+    id: 'iPy92R',
   },
 });
 
@@ -63,6 +63,7 @@ const contentMessages = defineMessages({
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
     defaultMessage: 'Go to the public page of {accountName} on Open Collective',
+    id: '/aBz/1',
   },
 });
 
@@ -100,7 +101,7 @@ const CTAContainer = styled(Container)`
     `}
 `;
 
-const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
+const SuccessCTAWrapper = ({ type, email, account, ...props }) => {
   switch (type) {
     case SUCCESS_CTA_TYPE.JOIN:
       return (
@@ -108,7 +109,7 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
           as={Link}
           display="block"
           data-cy="join-opencollective-link"
-          href={{ pathname: '/create-account/guest', query: { OrderId: orderId, email } }}
+          href={{ pathname: '/signup', query: { email } }}
           color="black.800"
           {...props}
         />
@@ -133,19 +134,12 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
   }
 };
 
-SuccessCTAWrapper.propTypes = {
-  type: PropTypes.string,
-  orderId: PropTypes.string,
-  email: PropTypes.string,
-  account: PropTypes.object,
-};
-
-const SuccessCTA = ({ type, orderId, email, account, isPrimary }) => {
+const SuccessCTA = ({ type, email, account, isPrimary }) => {
   const { formatMessage } = useIntl();
   const isNewsletter = type === SUCCESS_CTA_TYPE.NEWSLETTER;
   return (
     <Container px={[3, 0]} my={3} maxWidth={600}>
-      <SuccessCTAWrapper account={account} type={type} orderId={orderId} email={email}>
+      <SuccessCTAWrapper account={account} type={type} email={email}>
         <CTAContainer px={4} py={2} hoverable={!isNewsletter} $isPrimary={isPrimary}>
           <Flex
             flexDirection="column"
@@ -155,7 +149,10 @@ const SuccessCTA = ({ type, orderId, email, account, isPrimary }) => {
             my={3}
           >
             <H3 mb={3} color="black.800">
-              {formatMessage(headerMessages[type], { accountName: account.name })}
+              {formatMessage(headerMessages[type], {
+                accountName: account.name,
+                nbsp: <React.Fragment>&nbsp;</React.Fragment>,
+              })}
             </H3>
             <P fontSize="14px" lineHeight="24px" fontWeight={300} color="black.700">
               {formatMessage(contentMessages[type], { accountName: account.name })}
@@ -175,17 +172,6 @@ const SuccessCTA = ({ type, orderId, email, account, isPrimary }) => {
       </SuccessCTAWrapper>
     </Container>
   );
-};
-
-SuccessCTA.propTypes = {
-  type: PropTypes.oneOf(Object.values(SUCCESS_CTA_TYPE)).isRequired,
-  orderId: PropTypes.string,
-  email: PropTypes.string,
-  isPrimary: PropTypes.bool,
-  account: PropTypes.shape({
-    name: PropTypes.string,
-    slug: PropTypes.string,
-  }).isRequired,
 };
 
 export default SuccessCTA;

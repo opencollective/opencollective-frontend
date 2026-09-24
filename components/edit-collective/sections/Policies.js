@@ -1,30 +1,41 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { filter, get, isEmpty, size } from 'lodash';
+import { cloneDeep, filter, get, isEmpty, isNil, set, size } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { hasAccountMoneyManagement } from '../../../lib/collective';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
-import { omitDeep, stripHTML } from '../../../lib/utils';
+import { API_V1_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { editCollectivePolicyMutation } from '../../../lib/graphql/v1/mutations';
+import { stripHTML } from '../../../lib/html';
+import { omitDeep } from '../../../lib/utils';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+
+import { DashboardContext } from '@/components/dashboard/DashboardContext';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
+import InputAmount from '../../InputAmount';
 import Link from '../../Link';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
-import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
-import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { Button } from '../../ui/Button';
+import { Collapsible, CollapsibleContent } from '../../ui/Collapsible';
+import { Label } from '../../ui/Label';
+import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
+import { Switch } from '../../ui/Switch';
+import { useToast } from '../../ui/useToast';
 
 import { getSettingsQuery } from './EditCollectivePage';
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -35,17 +46,6 @@ const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average
 const updateFilterCategoriesMutation = gql`
   mutation UpdateFilterCategories($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
-      id
-      type
-      isActive
-      settings
-    }
-  }
-`;
-
-const editCollectiveMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveMutation($collective: CollectiveInputType!) {
-    editCollective(collective: $collective) {
       id
       type
       isActive
@@ -73,6 +73,11 @@ const setPoliciesMutation = gql`
           applies
           freeze
         }
+        EXPENSE_CATEGORIZATION {
+          requiredForExpenseSubmitters
+          requiredForCollectiveAdmins
+        }
+        USE_VENDOR_POLICY
       }
     }
   }
@@ -107,6 +112,54 @@ const messages = defineMessages({
     id: 'collective.expensePolicy.error',
     defaultMessage: 'Expense policy must contain less than {maxLength} characters',
   },
+  'invoiceExpensePolicy.label': {
+    id: 'collective.invoiceExpensePolicy.label',
+    defaultMessage: 'Invoice Expenses Policy',
+  },
+  'invoiceExpensePolicy.placeholder': {
+    id: 'collective.expensePolicy.placeholder',
+    defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
+  },
+  'invoiceExpensePolicy.error': {
+    id: 'collective.expensePolicy.error',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
+  },
+  'grantExpensePolicy.label': {
+    id: 'collective.grantExpensePolicy.label',
+    defaultMessage: 'Grant Expenses Policy',
+  },
+  'grantExpensePolicy.placeholder': {
+    id: 'collective.expensePolicy.placeholder',
+    defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
+  },
+  'grantExpensePolicy.error': {
+    id: 'collective.grantExpensePolicy.error',
+    defaultMessage: 'Grant policy must contain less than {maxLength} characters',
+  },
+  'receiptExpensePolicy.label': {
+    id: 'collective.receiptExpensePolicy.label',
+    defaultMessage: 'Reimbursement Expenses Policy',
+  },
+  'receiptExpensePolicy.placeholder': {
+    id: 'collective.expensePolicy.placeholder',
+    defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
+  },
+  'receiptExpensePolicy.error': {
+    id: 'collective.expensePolicy.error',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
+  },
+  'titleExpensePolicy.label': {
+    id: 'collective.titleExpensePolicy.label',
+    defaultMessage: 'Expenses Title Policy',
+  },
+  'titleExpensePolicy.placeholder': {
+    id: 'collective.expensePolicy.placeholder',
+    defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
+  },
+  'titleExpensePolicy.error': {
+    id: 'collective.expensePolicy.error',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
+  },
   'expensePolicy.allowExpense': {
     id: 'collective.expensePolicy.allowExpense',
     defaultMessage:
@@ -126,40 +179,40 @@ const messages = defineMessages({
   },
   'requiredAdmins.numberOfAdmins': {
     defaultMessage: '{admins, plural, =0 {Do not enforce minimum number of admins} one {# Admin} other {# Admins} }',
+    id: 'tGmvPD',
   },
 });
 
-const Policies = ({ collective, showOnlyExpensePolicy }) => {
+const Policies = ({ collective }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const [selected, setSelected] = React.useState([]);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
+  const hasHosting = collective.hasHosting;
+  const { account } = React.useContext(DashboardContext);
+  const isUpgradeRequiredForChartOfAccounts = requiresUpgrade(account, FEATURES.CHART_OF_ACCOUNTS);
 
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
     variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
   });
-  const [updateCategories, { loading: isSubmittingCategories, error: categoriesError }] = useMutation(
-    updateFilterCategoriesMutation,
-    {
-      context: API_V2_CONTEXT,
-    },
+  const [updateCategories, { loading: isSubmittingCategories, error: categoriesError }] =
+    useMutation(updateFilterCategoriesMutation);
+  const [updateCollective, { loading: isSubmittingSettings, error: settingsError }] = useMutation(
+    editCollectivePolicyMutation,
+    { context: API_V1_CONTEXT },
   );
-  const [updateCollective, { loading: isSubmittingSettings, error: settingsError }] =
-    useMutation(editCollectiveMutation);
-  const [setPolicies, { loading: isSettingPolicies, error: policiesError }] = useMutation(setPoliciesMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [setPolicies, { loading: isSettingPolicies, error: policiesError }] = useMutation(setPoliciesMutation);
   const error = categoriesError || settingsError || policiesError;
 
   // Data and data handling
   const collectiveContributionFilteringCategories = get(data, 'account.settings.moderation.rejectedCategories', null);
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
-  const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
   const collectiveDisableExpenseSubmission = get(collective, 'settings.disablePublicExpenseSubmission', false);
   const expenseTypes = get(collective, 'settings.expenseTypes') || DEFAULT_SUPPORTED_EXPENSE_TYPES;
   const numberOfAdmins = size(filter(collective.members, m => m.role === 'ADMIN'));
+  const policies = omitDeep(data?.account?.policies || {}, ['__typename']);
 
   const selectOptions = React.useMemo(() => {
     const optionsArray = Object.entries(MODERATION_CATEGORIES).map(([key, value], index) => ({
@@ -174,15 +227,14 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const formik = useFormik({
     initialValues: {
       contributionPolicy: collectiveContributionPolicy || '',
-      expensePolicy: collectiveExpensePolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
       expenseTypes,
-      policies: omitDeep(data?.account?.policies || {}, ['__typename']),
+      policies,
     },
     async onSubmit(values) {
-      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
+      const { contributionPolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
       const newSettings = { ...collective.settings, disablePublicExpenseSubmission };
-      if (collective.isHost) {
+      if (hasMoneyManagement) {
         newSettings.expenseTypes = expenseTypes;
       }
 
@@ -192,7 +244,6 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             collective: {
               id: collective.id,
               contributionPolicy,
-              expensePolicy,
               settings: newSettings,
             },
           },
@@ -218,13 +269,13 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           }),
         ]);
 
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
-          message: formatMessage({ defaultMessage: 'Policies updated successfully' }),
+        toast({
+          variant: 'success',
+          message: formatMessage({ defaultMessage: 'Policies updated successfully', id: 'Owy3QB' }),
         });
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: i18nGraphqlException(intl, e),
         });
       }
@@ -258,6 +309,9 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   React.useEffect(() => {
     if (data) {
       formik.setFieldValue('policies', omitDeep(data?.account?.policies || {}, ['__typename', 'id']));
+      if (typeof window !== 'undefined' && window.location.hash !== '') {
+        document.querySelector(window.location.hash)?.scrollIntoView();
+      }
     }
   }, [data]);
 
@@ -266,8 +320,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     label: formatMessage(messages['requiredAdmins.numberOfAdmins'], { admins: n }),
   }));
   const minAdminsApplies = [
-    { value: 'NEW_COLLECTIVES', label: <FormattedMessage defaultMessage="New Collectives Only" /> },
-    { value: 'ALL_COLLECTIVES', label: <FormattedMessage defaultMessage="All Collectives" /> },
+    { value: 'NEW_COLLECTIVES', label: <FormattedMessage defaultMessage="New Collectives Only" id="SeQW9/" /> },
+    { value: 'ALL_COLLECTIVES', label: <FormattedMessage defaultMessage="All Collectives" id="uQguR/" /> },
   ];
 
   const hostAuthorCannotApproveExpensePolicy = data?.account?.host?.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'];
@@ -277,19 +331,19 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   return (
     <Flex flexDirection="column">
       {error && <MessageBoxGraphqlError error={error} />}
-      <form onSubmit={formik.handleSubmit}>
+      <form onSubmit={formik.handleSubmit} className="space-y-12">
         <Container>
-          {!showOnlyExpensePolicy && (
+          {collective.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED' && (
             <Container mb={4}>
+              <SettingsSectionTitle>
+                <FormattedMessage defaultMessage="Contributions" id="Contributions" />
+              </SettingsSectionTitle>
+              <div className="mb-2 font-bold">{formatMessage(messages['contributionPolicy.label'])}</div>
               <StyledInputField
                 name="contributionPolicy"
                 htmlFor="contributionPolicy"
                 error={formik.errors.contributionPolicy}
                 disabled={isSubmittingSettings}
-                labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
-                label={
-                  <SettingsSectionTitle>{formatMessage(messages['contributionPolicy.label'])}</SettingsSectionTitle>
-                }
               >
                 {inputProps => (
                   <RichTextEditor
@@ -304,47 +358,333 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                     inputName={inputProps.name}
                     onChange={formik.handleChange}
                     placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
-                    defaultValue={formik.values.contributionPolicy}
+                    defaultValue={formik.values.contributionPolicy || ''}
                     fontSize="14px"
                   />
                 )}
               </StyledInputField>
-              <P fontSize="14px" lineHeight="18px" color="black.600" mt={2}>
-                <FormattedMessage
-                  id="collective.contributionPolicy.description"
-                  defaultMessage="Financial Contributors are manually reviewed by the Open Collective team to check for abuse or spam. Financial Contributors with a good reputation should not be affected by this setting."
+
+              {/* Rejected categories: For everyone */}
+              <Container mt={4}>
+                <SettingsSectionTitle>
+                  <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
+                </SettingsSectionTitle>
+                <P mb={2}>
+                  <FormattedMessage
+                    id="editCollective.rejectCategories.description"
+                    defaultMessage="Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)"
+                  />
+                </P>
+                <StyledSelect
+                  inputId="policy-select"
+                  isSearchable={false}
+                  isLoading={loading}
+                  placeholder={formatMessage(messages['rejectCategories.placeholder'])}
+                  minWidth={300}
+                  maxWidth={600}
+                  options={selectOptions}
+                  value={selected}
+                  onChange={selectedOptions => setSelected(selectedOptions)}
+                  isMulti
                 />
-              </P>
+              </Container>
+
+              {/* Allow collective admins to refund: For Host Organizations */}
+              {hasHosting && (
+                <Container mt={4}>
+                  <SettingsSectionTitle>
+                    <FormattedMessage defaultMessage="Refunds" id="pXQSzm" />
+                  </SettingsSectionTitle>
+
+                  <StyledCheckbox
+                    name={`checkbox-COLLECTIVE_ADMINS_CAN_REFUND`}
+                    label={
+                      <FormattedMessage
+                        defaultMessage="Allow collective admins to refund contributions for up to 30 days after the transaction date."
+                        id="ctV8Cf"
+                      />
+                    }
+                    checked={formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND}
+                    onChange={() =>
+                      formik.setFieldValue('policies', {
+                        ...formik.values.policies,
+                        COLLECTIVE_ADMINS_CAN_REFUND: !formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND,
+                      })
+                    }
+                  />
+                </Container>
+              )}
+
+              {/* Mandatory Information: For Organizations */}
+              {hasMoneyManagement && (
+                <div className="mt-6 flex flex-col gap-2">
+                  <div className="font-bold">
+                    <FormattedMessage defaultMessage="Mandatory Information" id="IuoUBR" />
+                  </div>
+                  <div className="mb-2 text-sm text-gray-500">
+                    <FormattedMessage
+                      defaultMessage="Activate the fields that you want as mandatory information. Once activated, you can set up the threshold for the individual fields."
+                      id="erAK+p"
+                    />
+                  </div>
+                  <div className="flex flex-col rounded-2xl border p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <h1 className="text-sm/6 font-bold">
+                        <FormattedMessage defaultMessage="Legal Name" id="LegalName" />
+                      </h1>
+                      <Switch
+                        name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-legalName`}
+                        checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)}
+                        onCheckedChange={checked => {
+                          const newPolicies = cloneDeep(formik.values.policies);
+                          if (checked) {
+                            set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.legalName', 250e2);
+                          } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)) {
+                            delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName;
+                          }
+                          formik.setFieldValue('policies', newPolicies);
+                        }}
+                      />
+                    </div>
+                    <Collapsible open={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)}>
+                      <CollapsibleContent className="animate-none! pt-2">
+                        <p className="text-sm">
+                          <FormattedMessage
+                            defaultMessage="Require the contributor to provide their legal name when they contribute more than:"
+                            id="MKoNvi"
+                          />
+                        </p>
+                        <InputAmount
+                          className="mt-2 max-w-[11em] sm:max-w-1/3"
+                          suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
+                          disabled={isSettingPolicies}
+                          currency={data?.account?.currency}
+                          currencyDisplay="CODE"
+                          value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName || 250e2}
+                          onChange={value =>
+                            !isNil(value) &&
+                            formik.setFieldValue('policies', {
+                              ...formik.values.policies,
+                              ['CONTRIBUTOR_INFO_THRESHOLDS']: {
+                                ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
+                                legalName: value || 0,
+                              },
+                            })
+                          }
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                  <div className="flex flex-col rounded-2xl border p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <h1 className="text-sm/6 font-bold">
+                        <FormattedMessage defaultMessage="Physical Address" id="OQhu3R" />
+                      </h1>
+
+                      <Switch
+                        name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-address`}
+                        checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)}
+                        onCheckedChange={checked => {
+                          const newPolicies = cloneDeep(formik.values.policies);
+                          if (checked) {
+                            set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.address', 500e2);
+                          } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address)) {
+                            delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address;
+                          }
+                          formik.setFieldValue('policies', newPolicies);
+                        }}
+                      />
+                    </div>
+
+                    <Collapsible open={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)}>
+                      <CollapsibleContent className="animate-none! pt-2">
+                        <p className="text-sm">
+                          <FormattedMessage
+                            defaultMessage="Require the contributor to provide their physical address when they contribute more than:"
+                            id="pKF7TO"
+                          />
+                        </p>
+                        <InputAmount
+                          className="mt-2 max-w-[11em] sm:max-w-1/3"
+                          suffix={<FormattedMessage defaultMessage="/ fiscal year" id="fD5OMn" />}
+                          disabled={
+                            isSettingPolicies || isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)
+                          }
+                          currency={data?.account?.currency}
+                          currencyDisplay="CODE"
+                          value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address || 500e2}
+                          onChange={value =>
+                            formik.setFieldValue('policies', {
+                              ...formik.values.policies,
+                              ['CONTRIBUTOR_INFO_THRESHOLDS']: {
+                                ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
+                                address: value || 0,
+                              },
+                            })
+                          }
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                </div>
+              )}
             </Container>
           )}
 
+          <SettingsSectionTitle id="expenses">{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>
+
           <StyledInputField
-            name="expensePolicy"
-            htmlFor="expensePolicy"
-            error={formik.errors.expensePolicy}
+            name="policies.EXPENSE_POLICIES.invoicePolicy"
+            htmlFor="policies.EXPENSE_POLICIES.invoicePolicy"
+            error={formik.errors.policies?.EXPENSE_POLICIES?.invoicePolicy}
             disabled={isSubmittingSettings}
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
-            label={<SettingsSectionTitle>{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>}
+            label={formatMessage(messages['invoiceExpensePolicy.label'])}
           >
-            {inputProps => (
-              <RichTextEditor
-                data-cy="expense-policy-input"
-                withBorders
-                showCount
-                maxLength={EXPENSE_POLICY_MAX_LENGTH}
-                error={formik.errors.expensePolicy}
-                version="simplified"
-                editorMinHeight="12.5rem"
-                editorMaxHeight={500}
-                id={inputProps.id}
-                inputName={inputProps.name}
-                onChange={formik.handleChange}
-                placeholder={formatMessage(messages['expensePolicy.placeholder'])}
-                defaultValue={formik.values.expensePolicy}
-                fontSize="14px"
-                maxHeight={600}
-              />
-            )}
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  data-cy="invoice-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['invoiceExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.invoicePolicy || ''}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
+          </StyledInputField>
+          <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
+            <FormattedMessage
+              id="collective.expensePolicy.description"
+              defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
+            />
+          </P>
+
+          <StyledInputField
+            name="policies.EXPENSE_POLICIES.receiptPolicy"
+            htmlFor="policies.EXPENSE_POLICIES.receiptPolicy"
+            error={formik.errors.policies?.EXPENSE_POLICIES?.receiptPolicy}
+            disabled={isSubmittingSettings}
+            labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+            label={formatMessage(messages['receiptExpensePolicy.label'])}
+          >
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  data-cy="receipt-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['receiptExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy || ''}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
+          </StyledInputField>
+          <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
+            <FormattedMessage
+              id="collective.expensePolicy.description"
+              defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
+            />
+          </P>
+
+          <StyledInputField
+            name="policies.EXPENSE_POLICIES.grantPolicy"
+            htmlFor="policies.EXPENSE_POLICIES.grantPolicy"
+            error={formik.errors.policies?.EXPENSE_POLICIES?.grantPolicy}
+            disabled={isSubmittingSettings}
+            labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+            label={formatMessage(messages['grantExpensePolicy.label'])}
+          >
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.grantPolicy}
+                  data-cy="grant-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.grantPolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={e => formik.handleChange(e)}
+                  placeholder={formatMessage(messages['grantExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.grantPolicy || ''}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
+          </StyledInputField>
+          <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
+            <FormattedMessage
+              id="collective.grantExpensePolicy.description"
+              defaultMessage="It can be daunting to request a grant if you're not sure what's allowed. Provide a clear policy to guide grant requesters."
+            />
+          </P>
+
+          <StyledInputField
+            name="policies.EXPENSE_POLICIES.titlePolicy"
+            htmlFor="policies.EXPENSE_POLICIES.titlePolicy"
+            error={formik.errors.policies?.EXPENSE_POLICIES?.titlePolicy}
+            disabled={isSubmittingSettings}
+            labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+            label={formatMessage(messages['titleExpensePolicy.label'])}
+          >
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.titlePolicy}
+                  data-cy="title-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.titlePolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['titleExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.titlePolicy || ''}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
           </StyledInputField>
           <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
@@ -354,9 +694,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           </P>
         </Container>
 
-        {collective?.isHost && (
+        {/* Required Admins: For Host Organizations */}
+        {hasHosting && (
           <Container>
-            <SettingsSectionTitle mt={4}>
+            <SettingsSectionTitle>
               <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
             </SettingsSectionTitle>
             <P mb={2}>
@@ -370,7 +711,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 disabled={isSubmittingSettings}
                 labelFontSize="13px"
                 labelFontWeight="700"
-                label={<FormattedMessage defaultMessage="Minimum number of admins" />}
+                label={<FormattedMessage defaultMessage="Minimum number of admins" id="s01/Qi" />}
                 flexGrow={1}
               >
                 <StyledSelect
@@ -396,7 +737,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 disabled={isSubmittingSettings}
                 labelFontSize="13px"
                 labelFontWeight="700"
-                label={<FormattedMessage defaultMessage="Whom does this apply to" />}
+                label={<FormattedMessage defaultMessage="Whom does this apply to" id="8F65mn" />}
                 flexGrow={1}
               >
                 <StyledSelect
@@ -416,7 +757,12 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             </Flex>
             <StyledCheckbox
               name="minAdminsFreeze"
-              label={<FormattedMessage defaultMessage="Freeze collectives that don’t meet the minimum requirement" />}
+              label={
+                <FormattedMessage
+                  defaultMessage="Freeze collectives that don’t meet the minimum requirement"
+                  id="FcYV6Y"
+                />
+              }
               onChange={({ checked }) => {
                 formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
                   ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
@@ -426,18 +772,26 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               checked={Boolean(formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze)}
             />
             <P fontSize="14px" lineHeight="18px" color="black.600" ml="1.4rem">
-              <FormattedMessage defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More." />
+              <FormattedMessage
+                defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More."
+                id="mp9gR3"
+              />
             </P>
             {formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies === 'ALL_COLLECTIVES' &&
               formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze && (
                 <MessageBox type="warning" mt={2} fontSize="13px">
-                  <FormattedMessage defaultMessage="Some collectives hosted by you may not fulfill the minimum admin requirements. If you choose to apply the setting to all Collectives, the ones that don't comply will be frozen until they meet the minimum requirements for admins." />
+                  <FormattedMessage
+                    defaultMessage="Some collectives hosted by you may not fulfill the minimum admin requirements. If you choose to apply the setting to all Collectives, the ones that don't comply will be frozen until they meet the minimum requirements for admins."
+                    id="amI2+/"
+                  />
                 </MessageBox>
               )}
           </Container>
         )}
+
+        {/* Expense Approvals: For everyone */}
         <Container>
-          <SettingsSectionTitle mt={4}>
+          <SettingsSectionTitle>
             <FormattedMessage id="editCollective.expenseApprovalsPolicy.header" defaultMessage="Expense approvals" />
           </SettingsSectionTitle>
           <StyledCheckbox
@@ -477,10 +831,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
           >
             <P mr="1.25rem">
-              <FormattedMessage defaultMessage="Enforce for expenses above:" />
+              <FormattedMessage defaultMessage="Enforce for expenses above:" id="8bP95s" />
             </P>
-            <StyledInputAmount
-              maxWidth="11em"
+            <InputAmount
+              className="max-w-[11em]"
               disabled={
                 isSettingPolicies ||
                 authorCannotApproveExpenseEnforcedByHost ||
@@ -505,9 +859,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               }
             />
           </Flex>
-          {collective?.isHost && (
+
+          {hasHosting && (
             <React.Fragment>
-              <P
+              <Container
                 ml="1.4rem"
                 mt="0.65rem"
                 color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
@@ -534,8 +889,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                     })
                   }
                 />
-              </P>
-              <P
+              </Container>
+              <Container
                 ml="1.4rem"
                 mt="0.65rem"
                 color={
@@ -568,7 +923,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                     })
                   }
                 />
-              </P>
+              </Container>
             </React.Fragment>
           )}
           {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled) && (
@@ -580,6 +935,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             </P>
           )}
         </Container>
+
+        {/* Public Expense submission: For everyone */}
         <Container mt={3}>
           <StyledCheckbox
             name="allow-expense-submission"
@@ -590,116 +947,174 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
         </Container>
-        {collective.isHost && (
-          <Container>
-            <SettingsSectionTitle mt={4}>
-              <FormattedMessage defaultMessage="Expense types" />
-            </SettingsSectionTitle>
-            <P mb={2}>
-              <FormattedMessage
-                id="editCollective.expenseTypes.description"
-                defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
-                values={{
-                  HostedCollectivesLink: getI18nLink({
-                    as: Link,
-                    href: `/${collective.slug}/admin/hosted-collectives`,
-                  }),
+
+        {/* Expense Types: For Organizations */}
+        {hasMoneyManagement && (
+          <React.Fragment>
+            <Container>
+              <SettingsSectionTitle>
+                <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
+              </SettingsSectionTitle>
+              <P mb={2}>
+                {!hasHosting ? (
+                  <FormattedMessage
+                    defaultMessage="Specify the types of expenses allowed for {type, select, ORGANIZATION {your organization} COLLECTIVE {your collective} other {your account}}"
+                    id="a9eYkM"
+                    values={{ type: collective.type }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="editCollective.expenseTypes.description"
+                    defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
+                    values={{
+                      HostedCollectivesLink: getI18nLink({
+                        as: Link,
+                        href: `/dashboard/${collective.slug}/hosted-collectives`,
+                      }),
+                    }}
+                  />
+                )}
+              </P>
+
+              {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
+                <StyledCheckbox
+                  key={type}
+                  name={`allow-${type}-submission`}
+                  label={formatMessage(messages[`expensePolicy.${type}`])}
+                  checked={Boolean(formik.values.expenseTypes[type])}
+                  onChange={() =>
+                    formik.setFieldValue('expenseTypes', {
+                      ...formik.values.expenseTypes,
+                      [type]: !formik.values.expenseTypes[type],
+                    })
+                  }
+                />
+              ))}
+            </Container>
+            <Container>
+              <SettingsSectionTitle>
+                <FormattedMessage defaultMessage="Vendors" id="RilevA" />
+              </SettingsSectionTitle>
+              <P mb={3}>
+                <FormattedMessage defaultMessage="Who can attribute financial activities to vendors:" id="gQQN76" />
+              </P>
+              <RadioGroup
+                className="mb-1"
+                value={formik.values.policies?.USE_VENDOR_POLICY ?? 'HOST_AND_COLLECTIVE_ADMINS'}
+                onValueChange={value => {
+                  const newPolicies = cloneDeep(formik.values.policies);
+                  set(newPolicies, 'USE_VENDOR_POLICY', value);
+                  formik.setFieldValue('policies', newPolicies);
                 }}
-              />
-            </P>
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="HOST_ADMINS" id="USE_VENDOR_POLICY-HOST_ADMINS" />
+                  <Label htmlFor="USE_VENDOR_POLICY-HOST_ADMINS" className="font-normal">
+                    <FormattedMessage
+                      defaultMessage="Only Admins of {orgName}"
+                      id="0x4xsj"
+                      values={{ orgName: collective.name }}
+                    />
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value="HOST_AND_COLLECTIVE_ADMINS"
+                    id="USE_VENDOR_POLICY-HOST_AND_COLLECTIVE_ADMINS"
+                  />
+                  <Label htmlFor="USE_VENDOR_POLICY-HOST_AND_COLLECTIVE_ADMINS" className="font-normal">
+                    <FormattedMessage
+                      defaultMessage="{orgName} admins and collective admins"
+                      id="IaKZQb"
+                      values={{ orgName: collective.name }}
+                    />
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="ALL_SUBMITTERS" id="USE_VENDOR_POLICY-ALL_SUBMITTERS" />
+                  <Label htmlFor="USE_VENDOR_POLICY-ALL_SUBMITTERS" className="font-normal">
+                    <FormattedMessage defaultMessage="Anybody" id="d6b55T" />
+                  </Label>
+                </div>
+              </RadioGroup>
+            </Container>
 
-            {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
-              <StyledCheckbox
-                key={type}
-                name={`allow-${type}-submission`}
-                label={formatMessage(messages[`expensePolicy.${type}`])}
-                checked={Boolean(formik.values.expenseTypes[type])}
-                onChange={() =>
-                  formik.setFieldValue('expenseTypes', {
-                    ...formik.values.expenseTypes,
-                    [type]: !formik.values.expenseTypes[type],
-                  })
-                }
-              />
-            ))}
-          </Container>
-        )}
-        <Container>
-          <SettingsSectionTitle mt={4}>
-            <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
-          </SettingsSectionTitle>
-          <P mb={2}>
-            <FormattedMessage
-              id="editCollective.rejectCategories.description"
-              defaultMessage="Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)"
-            />
-          </P>
-          <StyledSelect
-            inputId="policy-select"
-            isSearchable={false}
-            isLoading={loading}
-            placeholder={formatMessage(messages['rejectCategories.placeholder'])}
-            minWidth={300}
-            maxWidth={600}
-            options={selectOptions}
-            value={selected}
-            onChange={selectedOptions => setSelected(selectedOptions)}
-            isMulti
-          />
-        </Container>
-        {collective.isHost && (
-          <Container>
-            <SettingsSectionTitle mt={4}>
-              <FormattedMessage defaultMessage="Refunds" />
-            </SettingsSectionTitle>
+            <Container>
+              <SettingsSectionTitle>
+                <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
+              </SettingsSectionTitle>
+              <P mb={3}>
+                <FormattedMessage
+                  defaultMessage="Involve expense submitters and collective admins in expense categorization, based on the categories you've set up in your <LinkAccountingCategories>chart of accounts</LinkAccountingCategories>."
+                  id="QwktWn"
+                  values={{
+                    LinkAccountingCategories: getI18nLink({
+                      as: Link,
+                      href: `/dashboard/${collective.slug}/chart-of-accounts`,
+                    }),
+                  }}
+                />
+              </P>
 
-            <StyledCheckbox
-              name={`checkbox-COLLECTIVE_ADMINS_CAN_REFUND`}
-              label={
-                <FormattedMessage defaultMessage="Allow collective admins to refund contributions for up to 30 days after the transaction date." />
-              }
-              checked={formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND}
-              onChange={() =>
-                formik.setFieldValue('policies', {
-                  ...formik.values.policies,
-                  COLLECTIVE_ADMINS_CAN_REFUND: !formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND,
-                })
-              }
-            />
-          </Container>
+              <div className="mb-1">
+                <StyledCheckbox
+                  name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
+                  label={
+                    <FormattedMessage
+                      defaultMessage="Require expense submitters to select a category when submitting an expense"
+                      id="CwU4gm"
+                    />
+                  }
+                  disabled={isUpgradeRequiredForChartOfAccounts}
+                  checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
+                  onChange={({ checked }) => {
+                    const newPolicies = cloneDeep(formik.values.policies);
+                    set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForExpenseSubmitters', checked);
+                    formik.setFieldValue('policies', newPolicies);
+                  }}
+                />
+              </div>
+              {hasHosting && (
+                <div>
+                  <StyledCheckbox
+                    name={`checkbox-EXPENSE_CATEGORIZATION-requiredForCollectiveAdmins`}
+                    label={
+                      <FormattedMessage
+                        defaultMessage="Require collective admins to verify expense categories when reviewing and approving expenses"
+                        id="4cDrzh"
+                      />
+                    }
+                    disabled={isUpgradeRequiredForChartOfAccounts}
+                    checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForCollectiveAdmins}
+                    onChange={({ checked }) => {
+                      const newPolicies = cloneDeep(formik.values.policies);
+                      set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForCollectiveAdmins', checked);
+                      formik.setFieldValue('policies', newPolicies);
+                    }}
+                  />
+                </div>
+              )}
+              {isUpgradeRequiredForChartOfAccounts && (
+                <UpgradePlanCTA className="mt-4" compact hideBenefits featureKey={FEATURES.CHART_OF_ACCOUNTS} />
+              )}
+            </Container>
+          </React.Fragment>
         )}
-        <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
-          <StyledButton
+
+        <div className="mt-10 flex w-full justify-stretch">
+          <Button
             data-cy="submit-policy-btn"
-            buttonStyle="primary"
-            mx={2}
-            minWidth={200}
-            buttonSize="medium"
+            className="w-full"
             loading={isSubmittingSettings || isSubmittingCategories}
             type="submit"
             onSubmit={formik.handleSubmit}
           >
             <FormattedMessage id="save" defaultMessage="Save" />
-          </StyledButton>
-        </Flex>
+          </Button>
+        </div>
       </form>
     </Flex>
   );
-};
-
-Policies.propTypes = {
-  collective: PropTypes.shape({
-    settings: PropTypes.object,
-    id: PropTypes.number,
-    slug: PropTypes.string,
-    isHost: PropTypes.bool,
-    members: PropTypes.arrayOf(
-      PropTypes.shape({
-        role: PropTypes.string,
-      }),
-    ),
-  }),
-  showOnlyExpensePolicy: PropTypes.bool,
 };
 
 export default Policies;

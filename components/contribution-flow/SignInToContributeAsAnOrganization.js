@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import SignInOrJoinFree from '../SignInOrJoinFree';
@@ -29,10 +28,6 @@ const SignInToContributeAsAnOrganization = ({ onCancel, ...props }) => {
       />
     </React.Fragment>
   );
-};
-
-SignInToContributeAsAnOrganization.propTypes = {
-  onCancel: PropTypes.func,
 };
 
 export default SignInToContributeAsAnOrganization;

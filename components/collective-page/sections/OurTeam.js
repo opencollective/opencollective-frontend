@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Mail } from '@styled-icons/feather/Mail';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
 import ContactCollectiveBtn from '../../ContactCollectiveBtn';
@@ -48,7 +47,7 @@ const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
                   <Span mr="8px">
                     <Mail size={16} />
                   </Span>
-                  <FormattedMessage defaultMessage="Contact Collective" />
+                  <FormattedMessage defaultMessage="Contact Collective" id="FAYdqn" />
                 </StyledButton>
               )}
             </ContactCollectiveBtn>
@@ -57,22 +56,6 @@ const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
       </Container>
     </ContainerSectionContent>
   );
-};
-
-SectionOurTeam.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    slug: PropTypes.string,
-    currency: PropTypes.string,
-    parentCollective: PropTypes.shape({
-      coreContributors: PropTypes.array.isRequired,
-    }),
-    canContact: PropTypes.bool,
-  }).isRequired,
-
-  coreContributors: PropTypes.array.isRequired,
-
-  LoggedInUser: PropTypes.object,
 };
 
 export default React.memo(SectionOurTeam);

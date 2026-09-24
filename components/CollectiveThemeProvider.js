@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { clamp, get, throttle } from 'lodash';
+import { clamp, get, throttle } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { darken, getContrast, getLuminance, setLightness } from 'polished';
 import { ThemeProvider } from 'styled-components';

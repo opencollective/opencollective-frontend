@@ -4,12 +4,15 @@ import { themeGet } from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
 import { border, color, layout, space, typography } from 'styled-system';
 
+import { defaultShouldForwardProp } from '../lib/styled_components_utils';
 import { overflow, resize } from '../lib/styled-system-custom-properties';
 
 import Container from './Container';
 import StyledTag from './StyledTag';
 
-const TextArea = styled.textarea`
+const TextArea = styled.textarea.withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+})`
   outline: none;
 
   /** Size */
@@ -62,6 +65,8 @@ const TextArea = styled.textarea`
 
 /**
  * A styled textarea that can grows with its content.
+ *
+ * @deprecated Use `ui/Textarea` instead
  */
 export default class StyledTextarea extends React.PureComponent {
   static propTypes = {
@@ -112,7 +117,9 @@ export default class StyledTextarea extends React.PureComponent {
     // Reset height to 0 so component will auto-size
     target.style.height = 0;
     // Use the scroll height to define size
-    target.style.height = `${target.scrollHeight}px`;
+    const isBorderless = [`0`, '0px'].includes(this.props.border);
+    const borderSpace = isBorderless ? 0 : 2;
+    target.style.height = `${target.scrollHeight + borderSpace}px`;
   }
 
   onChange = e => {
@@ -136,6 +143,7 @@ export default class StyledTextarea extends React.PureComponent {
         ref={this.textareaRef}
         as="textarea"
         resize={resize || (autoSize ? 'none' : 'vertical')}
+        width="100%"
         {...props}
         onChange={this.onChange}
       />

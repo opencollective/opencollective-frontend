@@ -1,23 +1,24 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import * as webauthn from '@simplewebauthn/browser';
-import { CheckCircle2Icon, CircleIcon, PlusIcon } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Individual, TwoFactorMethod, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import { gql } from '../../lib/graphql/helpers';
+import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 
-import { Box, Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { H3 } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { Button } from '../ui/Button';
+import { useToast } from '../ui/useToast';
 
 import { UserTwoFactorMethodItem } from './UserTwoFactorMethodItem';
 
 const I18nMessages = defineMessages({
   DEVICE_ADDED: {
     defaultMessage: 'Device added',
+    id: '9GxuH5',
   },
 });
 
@@ -56,16 +57,11 @@ type DevicesSettingsProps = {
 export function DevicesSettings(props: DevicesSettingsProps) {
   const intl = useIntl();
   const twoFactorMethods = props.userTwoFactorAuthenticationMethods.filter(m => m.method === TwoFactorMethod.WEBAUTHN);
-  const hasTwoFactorMethod = twoFactorMethods.length > 0;
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
-  const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation);
 
-  const [addWebauthnDevice] = useMutation(AddTwoFactorAuthToIndividualMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [addWebauthnDevice] = useMutation(AddTwoFactorAuthToIndividualMutation);
 
   const startWebauthnDeviceRegistration = React.useCallback(async () => {
     const response = await createPublicKeyRequestOptions({
@@ -77,7 +73,9 @@ export function DevicesSettings(props: DevicesSettingsProps) {
     });
 
     try {
-      const registration = await webauthn.startRegistration(response.data.createWebAuthnRegistrationOptions);
+      const registration = await webauthn.startRegistration({
+        optionsJSON: response.data.createWebAuthnRegistrationOptions,
+      });
       const registrationBase64 = Buffer.from(JSON.stringify(registration)).toString('base64');
 
       const result = await addWebauthnDevice({
@@ -93,45 +91,39 @@ export function DevicesSettings(props: DevicesSettingsProps) {
         props.onRecoveryCodes(result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes);
       }
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: intl.formatMessage(I18nMessages.DEVICE_ADDED),
       });
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+      toast({ variant: 'error', message: e.message });
     }
   }, [props.individual.id, intl]);
 
   return (
     <StyledCard px={3} py={2}>
-      <Flex alignItems="center">
-        <Box mr={3}>{hasTwoFactorMethod ? <CheckCircle2Icon color="#0EA755" /> : <CircleIcon />}</Box>
-        <H3 fontSize="14px" fontWeight="700">
-          <FormattedMessage defaultMessage="U2F (Universal 2nd Factor)" />
-        </H3>
-      </Flex>
+      <H3 fontSize="14px" fontWeight="700" my={2}>
+        <FormattedMessage defaultMessage="U2F (Universal 2nd Factor)" id="7I69Bp" />
+      </H3>
       <div className="mb-3 text-sm">
-        <FormattedMessage defaultMessage="A device or platform authenticator that supports the U2F specification. This can be a hardware key (like a YubiKey) or other methods supported by your browser." />
+        <FormattedMessage
+          defaultMessage="A device or platform authenticator that supports the U2F specification. This can be a hardware key (like a YubiKey) or other methods supported by your browser."
+          id="tE0Vtz"
+        />
       </div>
-      <Box>
+      <div>
         {twoFactorMethods.map(device => {
           return (
-            <Box className="border-b last:border-b-0" mx={4} key={device.id}>
+            <div className="border-b last:border-b-0" key={device.id}>
               <UserTwoFactorMethodItem individual={props.individual} userTwoFactorMethod={device} />
-            </Box>
+            </div>
           );
         })}
-      </Box>
-      <Box mt={3}>
-        <StyledButton
-          onClick={startWebauthnDeviceRegistration}
-          buttonSize="tiny"
-          buttonStyle="secondary"
-          display="flex"
-        >
-          <FormattedMessage defaultMessage="Add device" /> <PlusIcon size="14px" />
-        </StyledButton>
-      </Box>
+      </div>
+      <Button onClick={startWebauthnDeviceRegistration} variant="outline" className="mt-3 mb-2 w-full">
+        <Plus size="14px" />
+        <FormattedMessage defaultMessage="Add device" id="kFWJpj" />
+      </Button>
     </StyledCard>
   );
 }

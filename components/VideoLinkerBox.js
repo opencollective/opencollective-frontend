@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { VideoPlus } from '@styled-icons/boxicons-regular/VideoPlus';
 import { ArrowDownCircle } from '@styled-icons/feather/ArrowDownCircle';
 import { themeGet } from '@styled-system/theme-get';
@@ -96,19 +95,12 @@ const VideoLinkerBox = ({ url, onChange, isEditing, setEditing }) => {
         type="url"
         placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         value={url || ''}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value || null)}
         width={1}
         autoFocus
       />
     </MainFormContainer>
   );
-};
-
-VideoLinkerBox.propTypes = {
-  url: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  isEditing: PropTypes.bool,
-  setEditing: PropTypes.func.isRequired,
 };
 
 export default VideoLinkerBox;

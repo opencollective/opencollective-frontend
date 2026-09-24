@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
+import { isHiddenAccount } from '@/lib/collective';
 
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
@@ -19,9 +19,17 @@ const createCollectiveHostQuery = gql`
       type
       slug
       name
+      createdAt
       currency
+      hostFeePercent
+      platformContributionAvailable
       isOpenToApplications
+      isSuspended
       termsUrl
+      features {
+        id
+        PUBLIC_PROFILE
+      }
       policies {
         id
         COLLECTIVE_MINIMUM_ADMINS {
@@ -37,21 +45,18 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   const slug = router.query.hostCollectiveSlug || (router.query.category === 'opensource' ? 'opensource' : undefined);
   const skipQuery = !LoggedInUser || !slug;
   const { loading, error, data } = useQuery(createCollectiveHostQuery, {
-    context: API_V2_CONTEXT,
     skip: skipQuery,
     variables: { slug },
   });
 
   if (loading || loadingLoggedInUser) {
     return <ErrorPage loading={true} />;
-  }
-
-  if (!skipQuery && (!data || !data.host)) {
-    return <ErrorPage error={generateNotFoundError(slug)} data={{ error }} log={false} />;
+  } else if (!skipQuery && (!data || !data.host || isHiddenAccount(data.host))) {
+    return <ErrorPage error={generateNotFoundError()} data={{ error }} log={false} />;
   }
 
   return (
-    <Page showFooter={Boolean(LoggedInUser)}>
+    <Page showFooter={Boolean(LoggedInUser)} showMenuItems={false}>
       <CreateCollective host={data && data.host} />
     </Page>
   );
@@ -63,9 +68,6 @@ CreateCollectivePage.getInitialProps = () => {
   };
 };
 
-CreateCollectivePage.propTypes = {
-  loadingLoggedInUser: PropTypes.bool.isRequired,
-  LoggedInUser: PropTypes.object,
-};
-
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(CreateCollectivePage);

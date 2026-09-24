@@ -1,0 +1,91 @@
+import React from 'react';
+import { orderBy } from 'lodash-es';
+import { FormattedMessage } from 'react-intl';
+
+import { PayoutMethodType } from '@/lib/constants/payout-method';
+
+import { PayoutMethodRadioGroupItem } from '@/components/submit-expense/form/PayoutMethodSection';
+
+import { MethodCard, moreActionsThunk } from './common';
+
+export default function PayoutMethodsTable({ account, loading, onUpdate, ...props }) {
+  const [archived, active] = React.useMemo(() => {
+    const { archived, active } = orderBy(props.payoutMethods, ['isSaved'], ['desc'])
+      .filter(pm => pm.type !== PayoutMethodType.ACCOUNT_BALANCE)
+      .reduce(
+        (acc, pm) => {
+          if (pm.isSaved) {
+            acc.active.push(pm);
+          } else {
+            acc.archived.push(pm);
+          }
+          return acc;
+        },
+        { archived: [], active: [] },
+      );
+    return [archived, active];
+  }, [props.payoutMethods]);
+
+  const generateMoreActions = moreActionsThunk(account);
+
+  return !loading && !props.payoutMethods?.length ? (
+    <div className="flex flex-col items-center gap-2 py-6 text-center text-sm sm:p-12">
+      <FormattedMessage
+        defaultMessage="After you add a new payout information or submit an expense, you'll find your saved payout method(s) here."
+        id="Z2/9Fy"
+      />
+    </div>
+  ) : (
+    <div className="flex flex-col gap-5">
+      {active?.map(payoutMethod => (
+        <PayoutMethodRadioGroupItem
+          key={payoutMethod.id}
+          payoutMethod={payoutMethod}
+          payeeSlug={account.slug}
+          payee={account}
+          Component={MethodCard}
+          onPaymentMethodDeleted={onUpdate}
+          onPaymentMethodEdited={onUpdate}
+          refresh={onUpdate}
+          moreActions={generateMoreActions(payoutMethod)}
+          isChecked
+          isEditable
+          disableWarningMessages
+          isPaypalConnectEnabled
+        />
+      ))}
+      {archived?.length > 0 && (
+        <React.Fragment>
+          <div className="mt-2">
+            <h1>
+              <FormattedMessage defaultMessage="Archived" id="0HT+Ib" />
+            </h1>
+            <p className="text-sm leading-none text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="Previously used payout methods. Details are no longer visible to your account and cannot be restored."
+                id="PayoutMethodsTable.archivedDescription"
+              />
+            </p>
+          </div>
+          {archived?.map(payoutMethod => (
+            <PayoutMethodRadioGroupItem
+              key={payoutMethod.id}
+              payoutMethod={payoutMethod}
+              payeeSlug={account.slug}
+              payee={account}
+              Component={MethodCard}
+              onPaymentMethodDeleted={onUpdate}
+              onPaymentMethodEdited={onUpdate}
+              refresh={onUpdate}
+              moreActions={generateMoreActions(payoutMethod)}
+              isChecked
+              isEditable
+              archived
+              disableWarningMessages
+            />
+          ))}
+        </React.Fragment>
+      )}
+    </div>
+  );
+}

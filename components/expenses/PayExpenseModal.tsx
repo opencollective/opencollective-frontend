@@ -1,0 +1,964 @@
+import React, { useEffect } from 'react';
+import { useQuery } from '@apollo/client';
+import { Check } from '@styled-icons/boxicons-regular/Check';
+import { FormikProvider, useFormik, useFormikContext } from 'formik';
+import { cloneDeep, kebabCase, omit, round } from 'lodash-es';
+import { CircleHelp } from 'lucide-react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { styled } from 'styled-components';
+import type { BorderProps, SpaceProps } from 'styled-system';
+import { border, color, space, typography } from 'styled-system';
+
+import { default as hasFeature, FEATURES, requiresUpgrade } from '../../lib/allowed-features';
+import { EXPENSE_PAYMENT_METHOD_SERVICES, PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
+import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { formatCurrency, getDefaultCurrencyPrecision } from '../../lib/currency-utils';
+import { createError, ERROR } from '../../lib/errors';
+import { gql } from '../../lib/graphql/helpers';
+import type {
+  ExpenseHostFieldsFragment,
+  ExpensesListAdminFieldsFragmentFragment,
+  ExpensesListFieldsFragmentFragment,
+} from '../../lib/graphql/types/v2/graphql';
+import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
+import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
+import { i18nTaxType } from '../../lib/i18n/taxes';
+import { truncateMiddle } from '../../lib/utils';
+import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
+
+import {
+  BalanceAccountingCategoryPicker,
+  getBalanceAccountingCategoryOption,
+  useBalanceAccountingCategories,
+} from '../accounting/BalanceAccountingCategoryPicker';
+import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { Box, Flex } from '../Grid';
+import InputAmount from '../InputAmount';
+import LoadingPlaceholder from '../LoadingPlaceholder';
+import MessageBox from '../MessageBox';
+import { UpgradePlanCTA } from '../platform-subscriptions/UpgradePlanCTA';
+import StyledButton from '../StyledButton';
+import StyledButtonSet from '../StyledButtonSet';
+import StyledCheckbox from '../StyledCheckbox';
+import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
+import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
+import StyledSelect from '../StyledSelect';
+import StyledTooltip from '../StyledTooltip';
+import { H4, P, Span } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+
+import { PayExpenseWithStripe } from './PayExpenseWithStripe';
+import { FieldGroup } from './PayoutBankInformationForm';
+import PayoutMethodData from './PayoutMethodData';
+import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
+
+const quoteExpenseQuery = gql`
+  query QuoteExpense($id: String!) {
+    expense(expense: { id: $id }) {
+      id
+      currency
+      reference
+      amountInHostCurrency: amountV2(currencySource: HOST) {
+        exchangeRate {
+          value
+          fromCurrency
+          toCurrency
+        }
+      }
+      host {
+        id
+        transferwise {
+          id
+          amountBatched {
+            valueInCents
+            currency
+          }
+          balances {
+            valueInCents
+            currency
+          }
+        }
+      }
+      quote {
+        paymentProcessorFeeAmount {
+          valueInCents
+          currency
+        }
+        sourceAmount {
+          valueInCents
+          currency
+        }
+        estimatedDeliveryAt
+        notices {
+          type
+          text
+        }
+      }
+    }
+  }
+`;
+
+const validateTransferRequirementsQuery = gql`
+  query ValidateTransferRequirements($id: String!, $details: JSON) {
+    expense(expense: { id: $id }) {
+      id
+      validateTransferRequirements(details: $details) {
+        type
+        fields {
+          name
+          group {
+            key
+            name
+            type
+            required
+            example
+            minLength
+            maxLength
+            validationRegexp
+            refreshRequirementsOnChange
+            valuesAllowed {
+              key
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+type TransferDetailsFieldsProps = {
+  setDisabled: (disabled: boolean) => void;
+} & Pick<PayExpenseModalProps, 'expense' | 'host'>;
+
+const generateDefaultReference = (expense, limit) => {
+  const id = expense.legacyId.toString();
+  return [
+    expense.account.name
+      .replace(/ /g, '')
+      .toUpperCase()
+      .slice(0, limit - 1 - id.length),
+    id,
+  ].join(' ');
+};
+
+const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFieldsProps) => {
+  const formik = useFormikContext();
+  const generateReference = host.settings?.transferwise?.generateReference !== false;
+  const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
+    variables: { id: expense.id },
+  });
+
+  useEffect(() => {
+    setDisabled(loading);
+  }, [loading, setDisabled]);
+
+  useEffect(() => {
+    let referenceField;
+    data?.expense?.validateTransferRequirements?.find(requirement => {
+      return requirement.fields.find(field => {
+        const r = field?.group?.find(group => group.key === 'reference');
+        if (r) {
+          referenceField = r;
+        }
+        return;
+      });
+    });
+    if (referenceField) {
+      const reference =
+        expense.reference ||
+        (generateReference ? generateDefaultReference(expense, referenceField.maxLength) : undefined);
+      if (reference) {
+        formik.setFieldValue('transfer.details.reference', truncateMiddle(reference, referenceField.maxLength, ' '));
+      }
+    }
+  }, [data]);
+
+  if (error) {
+    return (
+      <MessageBox fontSize="12px" type="error">
+        <FormattedMessage
+          id="PayExpense.Error.TransferDetails"
+          defaultMessage="There was an error fetching the transfer required details."
+        />
+        {error.message && ` ${error.message}`}
+      </MessageBox>
+    );
+  } else if (loading) {
+    return <LoadingPlaceholder height="40px" />;
+  }
+
+  return data?.expense?.validateTransferRequirements?.map(({ fields }) =>
+    fields.map(field => (
+      <FieldGroup
+        key={kebabCase(field.name)}
+        field={field}
+        formik={formik}
+        getFieldName={name => `transfer.${name}`}
+        loading={loading}
+      />
+    )),
+  );
+};
+
+const getPayoutLabel = (intl, type) => {
+  return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
+};
+
+const DEFAULT_PAYMENT_METHOD_SERVICE = {
+  [PayoutMethodType.PAYPAL]: 'PAYPAL',
+  [PayoutMethodType.BANK_ACCOUNT]: 'WISE',
+};
+
+const getPayoutOptionValue = (payoutMethod, isAuto, host) => {
+  const payoutMethodType = payoutMethod?.type;
+  if (payoutMethodType === PayoutMethodType.OTHER) {
+    return { forceManual: true, action: 'PAY', paymentMethodService: null };
+  } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
+    return { forceManual: true, action: 'PAY', paymentMethodService: 'WISE' };
+  } else if (!isAuto) {
+    const paymentMethodService = DEFAULT_PAYMENT_METHOD_SERVICE[payoutMethodType] || null;
+    return { forceManual: true, action: 'PAY', paymentMethodService };
+  } else {
+    const isPaypalPayouts =
+      host.features[FEATURES.PAYPAL_PAYOUTS] === 'ACTIVE' &&
+      payoutMethodType === PayoutMethodType.PAYPAL &&
+      host.supportedPayoutMethods?.includes(PayoutMethodType.PAYPAL);
+    const isWiseOTT =
+      payoutMethodType === PayoutMethodType.BANK_ACCOUNT &&
+      host.supportedPayoutMethods?.includes(PayoutMethodType.BANK_ACCOUNT) &&
+      hasFeature(host, FEATURES.TRANSFERWISE_OTT);
+    return {
+      forceManual: false,
+      action: isPaypalPayouts || isWiseOTT ? 'SCHEDULE_FOR_PAYMENT' : 'PAY',
+      paymentMethodService: null,
+    };
+  }
+};
+
+const DEFAULT_VALUES = Object.freeze({
+  paymentProcessorFeeInHostCurrency: null,
+  totalAmountPaidInHostCurrency: null,
+  feesPayer: 'COLLECTIVE',
+  paymentMethodService: null,
+  balanceAccountingCategory: null,
+});
+
+const validate = values => {
+  const errors: Partial<Record<keyof typeof DEFAULT_VALUES, any>> = {};
+  if (isNaN(values.paymentProcessorFeeInHostCurrency)) {
+    errors.paymentProcessorFeeInHostCurrency = createError(ERROR.FORM_FIELD_PATTERN);
+  }
+  if (isNaN(values.totalAmountPaidInHostCurrency)) {
+    errors.totalAmountPaidInHostCurrency = createError(ERROR.FORM_FIELD_PATTERN);
+  }
+  return errors;
+};
+
+const getCanCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount) => {
+  // Platform settlements / billing are paid to the platform: the host always covers the fees, the
+  // payee (platform) never does. So don't allow customizing the fees payer for these.
+  if (['SETTLEMENT', 'PLATFORM_BILLING'].includes(expense.type)) {
+    return false;
+  }
+
+  const supportedPayoutMethods = [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.OTHER];
+  const isSupportedPayoutMethod = supportedPayoutMethods.includes(expense.payoutMethod?.type);
+  const isSameCurrency = expense.currency === collective?.currency;
+
+  // Current limitations:
+  // - Only for transferwise and manual payouts
+  // - Only when emptying the account balance (unless root user)
+  // - Only with expenses submitted in the same currency as the collective
+  if (!(isSupportedPayoutMethod && isSameCurrency)) {
+    return false;
+  }
+
+  // We should only show the checkbox if there may actually be fees on the payout:
+  // - When the payment is manual, we only show the checkbox if a fee is set by the user
+  // - If it's an automatic payment then we can't predict the fees, so in doubt we show the checkbox
+  return !isManualPayment || Boolean(feeAmount);
+};
+
+const AmountLine = styled.div<BorderProps & SpaceProps>`
+  display: flex;
+  justify-content: space-between;
+  font-weight: 400;
+  padding: 9px 0;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0em;
+
+  ${border}
+  ${space}
+`;
+
+const Label = styled(Span)`
+  margin-right: 4px;
+  flex: 0 1 70%;
+  margin-right: 8px;
+  line-height: 18px;
+  word-break: break-word;
+  color: #4e5052;
+  ${color}
+  ${typography}
+  font-size: 12px;
+`;
+
+const Amount = styled.span`
+  flex: 1 1 30%;
+  text-align: right;
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: row-reverse;
+  & > * {
+    margin-left: 4px;
+  }
+`;
+
+const SectionLabel = styled.p`
+  font-size: 9px;
+  font-weight: 500;
+  color: #4e5052;
+  margin: 5px 0;
+  text-transform: uppercase;
+`;
+
+const getInitialValues = (expense, host, blockAutomaticPayment = false) => {
+  return {
+    ...DEFAULT_VALUES,
+    ...getPayoutOptionValue(expense.payoutMethod, !blockAutomaticPayment, host),
+    balanceAccountingCategory: getBalanceAccountingCategoryOption(expense.balanceAccountingCategory),
+    feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
+    expenseAmountInHostCurrency:
+      expense.currency === host.currency ? expense.amount : expense.amountInHostCurrency?.valueInCents,
+  };
+};
+
+const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
+  const expenseAmountInHostCurrency = expense.amountInHostCurrency;
+
+  if (values.forceManual) {
+    const totalAmount = {
+      valueInCents: values.expenseAmountInHostCurrency + (values.paymentProcessorFeeInHostCurrency || 0),
+      currency: host.currency,
+    };
+    const paymentProcessorFee = {
+      valueInCents: values.paymentProcessorFeeInHostCurrency,
+      currency: host.currency,
+    };
+    const grossAmount = totalAmount.valueInCents - (paymentProcessorFee.valueInCents || 0);
+    const effectiveRate = expense.currency !== host.currency && grossAmount / expense.amount;
+    return { paymentProcessorFee, totalAmount, effectiveRate, expenseAmountInHostCurrency };
+  } else if (quote) {
+    const effectiveRate = expense.currency !== host.currency && quote.sourceAmount.valueInCents / expense.amount;
+    const totalAmount = cloneDeep(quote.sourceAmount);
+    const expenseAmountInHostCurrency = {
+      valueInCents: quote.sourceAmount.valueInCents - quote.paymentProcessorFeeAmount.valueInCents,
+      currency: quote.sourceAmount.currency,
+    };
+    if (feesPayer === 'PAYEE') {
+      totalAmount.valueInCents -= quote.paymentProcessorFeeAmount.valueInCents;
+    }
+    return {
+      paymentProcessorFee: quote.paymentProcessorFeeAmount,
+      totalAmount,
+      effectiveRate,
+      expenseAmountInHostCurrency,
+    };
+  } else {
+    const isMultiCurrency = expense.currency !== host.currency;
+    return {
+      amountInExpenseCurrency: { valueInCents: expense.amount, currency: expense.currency },
+      expenseAmountInHostCurrency,
+      totalAmount: expenseAmountInHostCurrency,
+      paymentProcessorFee: null,
+      isMultiCurrency,
+    };
+  }
+};
+
+const getHandleSubmit = (intl, currency, onSubmit, payoutMethodType) => async values => {
+  const totalAmountPaidInHostCurrency =
+    values.expenseAmountInHostCurrency + (values.paymentProcessorFeeInHostCurrency || 0);
+  // Show a confirm if the fee is unusually high (more than 50% of the total amount)
+  if (
+    values.forceManual &&
+    values.paymentProcessorFeeInHostCurrency &&
+    values.paymentProcessorFeeInHostCurrency > totalAmountPaidInHostCurrency / 2 &&
+    !confirm(
+      intl.formatMessage(
+        {
+          defaultMessage:
+            'You are about to record a payment for {totalAmount} that includes a {paymentProcessorFeeAmount} payment processor fee. This fee looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
+          id: 'UW7XhX',
+        },
+        {
+          totalAmount: formatCurrency(values.totalAmountPaidInHostCurrency, currency),
+          paymentProcessorFeeAmount: formatCurrency(values.paymentProcessorFeeInHostCurrency, currency),
+          newLine: '\n',
+        },
+      ),
+    )
+  ) {
+    return;
+  }
+
+  const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || values.forceManual;
+  return onSubmit({
+    ...omit(values, 'expenseAmountInHostCurrency'),
+    totalAmountPaidInHostCurrency,
+    balanceAccountingCategory:
+      isManualPayment && values.balanceAccountingCategory ? { id: values.balanceAccountingCategory.value } : null,
+  });
+};
+
+/** Expense fields needed by PayExpenseModal - combines list and admin fragments */
+type PayExpenseModalExpense = Pick<
+  ExpensesListFieldsFragmentFragment,
+  | 'id'
+  | 'legacyId'
+  | 'currency'
+  | 'amount'
+  | 'reference'
+  | 'feesPayer'
+  | 'type'
+  | 'payoutMethod'
+  | 'amountInHostCurrency'
+> &
+  Pick<ExpensesListAdminFieldsFragmentFragment, 'taxes'> & {
+    account: Pick<ExpensesListFieldsFragmentFragment['account'], 'name' | 'slug'>;
+  };
+
+/** Host fields needed by PayExpenseModal */
+type PayExpenseModalHost = Pick<
+  ExpenseHostFieldsFragment,
+  'currency' | 'settings' | 'transferwise' | 'features' | 'supportedPayoutMethods' | 'platformSubscription' | 'slug'
+>;
+
+/** Collective fields needed by PayExpenseModal */
+type PayExpenseModalCollective = Pick<ExpensesListFieldsFragmentFragment['account'], 'currency'>;
+
+type PayExpenseModalProps = {
+  canPayWithAutomaticPayment: boolean;
+  expense: PayExpenseModalExpense;
+  collective: PayExpenseModalCollective | null;
+  host: PayExpenseModalHost;
+  onClose: () => void;
+  onSubmit: (values: unknown) => Promise<void>;
+  error?: Error;
+};
+
+/**
+ * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
+ */
+const PayExpenseModal = ({
+  onClose,
+  onSubmit,
+  expense,
+  collective,
+  host,
+  error,
+  canPayWithAutomaticPayment,
+}: PayExpenseModalProps) => {
+  const intl = useIntl();
+  const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
+  const blockAutomaticPayment = !canPayWithAutomaticPayment || requiresUpgrade(host, FEATURES.TRANSFERWISE);
+  const initialValues = getInitialValues(expense, host, blockAutomaticPayment);
+  const formik = useFormik({
+    initialValues,
+    validate,
+    onSubmit: getHandleSubmit(intl, host.currency, onSubmit, expense.payoutMethod?.type || PayoutMethodType.OTHER),
+  });
+  const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
+  const balanceCategories = useBalanceAccountingCategories(isManualPayment ? host.slug : undefined, {
+    expenseId: expense.id,
+    accountSlug: expense.account?.slug,
+  });
+  const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
+  const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
+  const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
+  const hasAutomaticManualPicker =
+    canPayWithAutomaticPayment &&
+    ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(payoutMethodType);
+  const [isLoadingTransferDetails, setTransferDetailsLoadingState] = React.useState(false);
+
+  const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !blockAutomaticPayment;
+  const quoteQuery = useQuery(quoteExpenseQuery, {
+    variables: { id: expense.id },
+    skip: !canQuote,
+    fetchPolicy: 'no-cache',
+  });
+  const quote = quoteQuery.data?.expense?.quote;
+
+  const amounts = calculateAmounts({
+    values: formik.values,
+    expense,
+    quote,
+    host,
+    feesPayer: formik.values.feesPayer,
+  });
+  const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
+  const paymentServiceOptions = React.useMemo(
+    () => [
+      { value: null, label: <FormattedMessage id="Other" defaultMessage="Other" /> },
+      ...EXPENSE_PAYMENT_METHOD_SERVICES.map(service => ({
+        value: service,
+        label: i18nPaymentMethodService(intl, service),
+      })),
+    ],
+    [intl],
+  );
+
+  const amountBatched = quoteQuery.data?.expense.host?.transferwise.amountBatched;
+  const amountInBalance = quoteQuery.data?.expense.host?.transferwise.balances.find(
+    balance => balance.currency === amountBatched?.currency,
+  );
+  const hasFunds =
+    canQuote &&
+    amountInBalance &&
+    amountBatched &&
+    amountInBalance.valueInCents >= amountBatched.valueInCents + amounts.totalAmount?.valueInCents;
+
+  const isStripePayment = payoutMethodType === PayoutMethodType.STRIPE;
+
+  const onPayWithStripeSuccess = React.useCallback(async () => {
+    await onSubmit({
+      action: 'MARK_AS_PAID_WITH_STRIPE',
+      paymentMethodService: PAYMENT_METHOD_SERVICE.STRIPE,
+    });
+  }, [onSubmit]);
+
+  return (
+    <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={400} data-cy="pay-expense-modal">
+      <ModalHeader>
+        <H4 fontSize="20px" fontWeight="700">
+          <FormattedMessage id="PayExpenseTitle" defaultMessage="Pay expense" />
+        </H4>
+      </ModalHeader>
+      <ModalBody mb={0}>
+        <form onSubmit={formik.handleSubmit}>
+          <FormikProvider value={formik}>
+            <SectionLabel>
+              <FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />
+            </SectionLabel>
+            <Box mb={2}>
+              <PayoutMethodTypeWithIcon type={payoutMethodType} />
+            </Box>
+            <PayoutMethodData payoutMethod={expense.payoutMethod} showLabel={false} />
+            {hasAutomaticManualPicker && !hasBankInfoWithoutWise && (
+              <React.Fragment>
+                <StyledButtonSet
+                  items={['AUTO', 'MANUAL']}
+                  buttonProps={{ width: '50%' }}
+                  buttonPropsBuilder={({ item }) => ({ 'data-cy': `pay-type-${item}` })}
+                  mt={3}
+                  selected={formik.values.forceManual ? 'MANUAL' : 'AUTO'}
+                  customBorderRadius="6px"
+                  onChange={item => {
+                    formik.setValues({
+                      ...formik.values,
+                      ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
+                      paymentProcessorFeeInHostCurrency: null,
+                      expenseAmountInHostCurrency:
+                        expense.currency === host.currency
+                          ? expense.amount
+                          : expense.amountInHostCurrency?.valueInCents,
+                      feesPayer: !getCanCustomizeFeesPayer(expense, collective, isManualPayment, null)
+                        ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
+                        : formik.values.feesPayer,
+                    });
+                  }}
+                >
+                  {({ item }) =>
+                    item === 'AUTO' ? (
+                      <FormattedMessage id="Payout.Automatic" defaultMessage="Automatic" />
+                    ) : (
+                      <FormattedMessage id="Payout.Manual" defaultMessage="Manual" />
+                    )
+                  }
+                </StyledButtonSet>
+                {blockAutomaticPayment && !isManualPayment && !isStripePayment && (
+                  <UpgradePlanCTA featureKey={FEATURES.TRANSFERWISE} compact className="my-4" />
+                )}
+              </React.Fragment>
+            )}
+            {isManualPayment && (
+              <React.Fragment>
+                <StyledInputField
+                  name="expenseAmountInHostCurrency"
+                  htmlFor="expenseAmountInHostCurrency"
+                  inputType="number"
+                  error={formik.errors.expenseAmountInHostCurrency}
+                  required
+                  mt={3}
+                  label={
+                    <FormattedMessage
+                      id="PayExpense.expenseAmountInHostCurrency.Input"
+                      defaultMessage="Amount paid for expense"
+                    />
+                  }
+                  hint={
+                    <FormattedMessage
+                      id="PayExpense.expenseAmountInHostCurrency.Hint"
+                      defaultMessage="The amount paid for this expense, in host currency, without payment processor fees."
+                    />
+                  }
+                >
+                  {inputProps => (
+                    <InputAmount
+                      {...inputProps}
+                      currency={host.currency}
+                      currencyDisplay="FULL"
+                      value={formik.values.expenseAmountInHostCurrency}
+                      data-cy="expense-amount-paid"
+                      min={10 ** (2 - getDefaultCurrencyPrecision(host.currency))}
+                      onChange={value => formik.setFieldValue('expenseAmountInHostCurrency', value)}
+                    />
+                  )}
+                </StyledInputField>
+                <StyledInputField
+                  name="paymentProcessorFeeInHostCurrency"
+                  htmlFor="paymentProcessorFeeInHostCurrency"
+                  inputType="number"
+                  error={formik.errors.paymentProcessorFeeInHostCurrency}
+                  required={false}
+                  mt={3}
+                  label={
+                    <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
+                  }
+                  hint={
+                    <FormattedMessage
+                      id="PayExpense.paymentProcessorFeeInHostCurrency.Hint"
+                      defaultMessage="Amount that was charged in fees. Leave it empty if the payee is paying the fees."
+                    />
+                  }
+                >
+                  {inputProps => (
+                    <InputAmount
+                      {...inputProps}
+                      currency={host.currency}
+                      currencyDisplay="FULL"
+                      value={formik.values.paymentProcessorFeeInHostCurrency}
+                      min={0}
+                      max={formik.values.expenseAmountInHostCurrency || 100000000}
+                      onChange={value => formik.setFieldValue('paymentProcessorFeeInHostCurrency', value)}
+                    />
+                  )}
+                </StyledInputField>
+                <StyledInputField
+                  name="paymentMethodService"
+                  htmlFor="paymentMethodService"
+                  error={formik.errors.paymentMethodService}
+                  required={false}
+                  mt={3}
+                  label={<FormattedMessage id="PayExpense.PaymentMethodService" defaultMessage="Payment service" />}
+                  hint={
+                    <FormattedMessage
+                      id="PayExpense.paymentMethodService.Hint"
+                      defaultMessage="The payment service used to pay for this expense."
+                    />
+                  }
+                >
+                  {inputProps => (
+                    <StyledSelect
+                      options={paymentServiceOptions}
+                      minWidth={300}
+                      value={
+                        formik.values.paymentMethodService
+                          ? paymentServiceOptions.find(o => o.value === formik.values.paymentMethodService)
+                          : undefined
+                      }
+                      onChange={({ value }) => formik.setFieldValue('paymentMethodService', value)}
+                      {...inputProps}
+                    />
+                  )}
+                </StyledInputField>
+                {balanceCategories.enabled && (
+                  <StyledInputField
+                    name="balanceAccountingCategory"
+                    htmlFor="balanceAccountingCategory"
+                    required={false}
+                    mt={3}
+                    label={<FormattedMessage defaultMessage="Paid from" id="jhYP1/" />}
+                    hint={
+                      <FormattedMessage
+                        defaultMessage="The balance or clearing account the funds were paid from."
+                        id="OfBJ2R"
+                      />
+                    }
+                  >
+                    {inputProps => (
+                      <BalanceAccountingCategoryPicker
+                        hostSlug={host.slug}
+                        inputId={inputProps.id || 'balanceAccountingCategory'}
+                        value={formik.values.balanceAccountingCategory}
+                        context={{ expenseId: expense.id, accountSlug: expense.account?.slug }}
+                        menuPortalTarget={null}
+                        onChange={value => formik.setFieldValue('balanceAccountingCategory', value)}
+                      />
+                    )}
+                  </StyledInputField>
+                )}
+                <StyledInputField
+                  name="clearedAt"
+                  htmlFor="clearedAt"
+                  error={formik.errors.clearedAt}
+                  required={false}
+                  mt={3}
+                  label={<FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />}
+                  hint={
+                    <FormattedMessage
+                      defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                      id="s3O6iq"
+                    />
+                  }
+                >
+                  {inputProps => (
+                    <StyledInput
+                      {...inputProps}
+                      id="clearedAt"
+                      name="clearedAt"
+                      type="date"
+                      data-cy="clearedAt"
+                      defaultValue={formik.values.clearedAt}
+                      onChange={e => formik.setFieldValue('clearedAt', new Date(e.target.value))}
+                    />
+                  )}
+                </StyledInputField>
+              </React.Fragment>
+            )}
+            {canQuote && !isManualPayment && (
+              <div className="mt-3">
+                <TransferDetailFields host={host} expense={expense} setDisabled={setTransferDetailsLoadingState} />
+              </div>
+            )}
+            {getCanCustomizeFeesPayer(
+              expense,
+              collective,
+              isManualPayment,
+              formik.values.paymentProcessorFeeInHostCurrency,
+            ) && (
+              <Flex mt={16}>
+                <StyledTooltip
+                  content={
+                    <FormattedMessage
+                      defaultMessage="Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)"
+                      id="ewvfiF"
+                    />
+                  }
+                >
+                  <StyledCheckbox
+                    name="feesPayer"
+                    checked={formik.values.feesPayer === 'PAYEE'}
+                    onChange={({ checked }) => formik.setFieldValue('feesPayer', checked ? 'PAYEE' : 'COLLECTIVE')}
+                    label={
+                      <Span fontSize="12px">
+                        <FormattedMessage defaultMessage="The payee is covering the fees" id="zoC8Gb" />
+                      </Span>
+                    }
+                  />
+                </StyledTooltip>
+              </Flex>
+            )}
+            <Box mt={19} mb={3}>
+              <SectionLabel>
+                <FormattedMessage id="PaymentBreakdown" defaultMessage="Payment breakdown" />
+              </SectionLabel>
+              <AmountLine>
+                <Label>
+                  <FormattedMessage id="ExpenseAmount" defaultMessage="Expense amount" />
+                </Label>
+                <Amount>
+                  {amounts.isMultiCurrency ? (
+                    <FormattedMoneyAmount
+                      amount={amounts.amountInExpenseCurrency?.valueInCents}
+                      currency={amounts.amountInExpenseCurrency?.currency}
+                      amountClassName="font-medium"
+                      currencyCodeClassName="text-muted-foreground"
+                    />
+                  ) : (
+                    <FormattedMoneyAmount
+                      amount={formik.values.expenseAmountInHostCurrency}
+                      currency={amounts.expenseAmountInHostCurrency?.currency}
+                      amountClassName="font-medium"
+                      currencyCodeClassName="text-muted-foreground"
+                    />
+                  )}
+                </Amount>
+              </AmountLine>
+              {expense.taxes?.map(tax => (
+                <AmountLine key={tax.type} data-cy={`tax-${tax.type}-expense-amount-line`} pt={0}>
+                  <Label>
+                    {i18nTaxType(intl, tax.type, 'short')} ({round(tax.rate * 100, 2) || 0}%)
+                  </Label>
+                  &nbsp;
+                  <Amount>
+                    <FormattedMoneyAmount
+                      amount={getTaxAmount(amountWithoutTaxes, tax)}
+                      precision={2}
+                      currency={expense.currency}
+                      amountClassName="font-medium"
+                      showCurrencyCode={false}
+                    />
+                  </Amount>
+                </AmountLine>
+              ))}
+              {amounts.paymentProcessorFee && (
+                <AmountLine borderTop="0.8px dashed #9D9FA3">
+                  <Label>
+                    <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
+                  </Label>
+                  <Amount>
+                    {quoteQuery.loading ? (
+                      <LoadingPlaceholder height="16px" />
+                    ) : (
+                      <FormattedMoneyAmount
+                        amount={amounts.paymentProcessorFee.valueInCents}
+                        currency={amounts.paymentProcessorFee.currency}
+                        currencyCodeClassName="text-muted-foreground"
+                        amountClassName="text-foreground font-medium"
+                      />
+                    )}
+                  </Amount>
+                </AmountLine>
+              )}
+              <AmountLine borderTop="1px solid #4E5052" pt={11}>
+                <Label color="black.900" fontWeight="600">
+                  {amounts.paymentProcessorFee !== null ? (
+                    <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger className="flex items-center gap-1">
+                        <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
+                        <CircleHelp size={16} className="text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <FormattedMessage
+                          defaultMessage="This payment provider doesn’t offer a way to calculate the fees in advance."
+                          id="EC5IZi"
+                        />
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </Label>
+                <Amount>
+                  {quoteQuery.loading ? (
+                    <LoadingPlaceholder height="16px" />
+                  ) : amounts.isMultiCurrency ? (
+                    <AmountWithExchangeRateInfo
+                      amount={amounts.expenseAmountInHostCurrency}
+                      currencyCodeClassName="text-muted-foreground"
+                      amountWrapperClassName="flex flex-row-reverse gap-1"
+                    />
+                  ) : (
+                    <FormattedMoneyAmount
+                      amount={amounts.totalAmount?.valueInCents}
+                      currency={amounts.totalAmount?.currency}
+                      currencyCodeClassName="text-muted-foreground"
+                    />
+                  )}
+                </Amount>
+              </AmountLine>
+              {amounts.effectiveRate ? (
+                <AmountLine py={0}>
+                  <Label color="black.600" fontWeight="500">
+                    <FormattedMessage defaultMessage="Currency exchange rate" id="jLTPuL" />
+                  </Label>
+                  <P fontSize="13px" color="black.600" whiteSpace="nowrap">
+                    ~ {expense.currency} 1 = {amounts.totalAmount?.currency} {round(amounts.effectiveRate, 5)}
+                  </P>
+                </AmountLine>
+              ) : null}
+            </Box>
+            {!error && formik.values.forceManual && payoutMethodType !== PayoutMethodType.OTHER && (
+              <MessageBox type="warning" withIcon my={3} fontSize="12px">
+                <strong>
+                  <FormattedMessage id="Warning.Important" defaultMessage="Important" />
+                </strong>
+                <br />
+                <P mt={2} fontSize="12px" lineHeight="18px">
+                  <FormattedMessage
+                    id="PayExpenseModal.ManualPayoutWarning"
+                    defaultMessage="By clicking below, you acknowledge that this expense has already been paid outside the platform (through Wise, bank transfer or else)."
+                  />
+                </P>
+              </MessageBox>
+            )}
+            {quote?.notices?.map(notice => (
+              <MessageBox key={notice.text} type={notice.type === 'INFO' ? 'info' : 'warning'} my={3}>
+                <p>{notice.text}</p>
+              </MessageBox>
+            ))}
+            {canQuote && hasFunds === false && (
+              <MessageBox type="error" withIcon my={3} fontSize="12px">
+                <strong>
+                  <FormattedMessage id="Warning.NotEnoughFunds" defaultMessage="Not Enough Funds" />
+                </strong>
+                <br />
+                <P mt={2} fontSize="12px" lineHeight="18px">
+                  <FormattedMessage
+                    id="PayExpenseModal.NotEnoughFundsOnWise"
+                    defaultMessage="Your Wise {currency} account has insufficient balance to cover the existing batch plus this expense amount. You need {totalNeeded} and you currently only have {available}. Please add funds to your Wise {currency} account."
+                    values={{
+                      currency: amountInBalance.currency,
+                      totalNeeded: formatCurrency(
+                        amountBatched.valueInCents + amounts.totalAmount.valueInCents,
+                        amountBatched.currency,
+                      ),
+                      available: formatCurrency(amountInBalance.valueInCents, amountInBalance.currency),
+                    }}
+                  />
+                </P>
+              </MessageBox>
+            )}
+            {isStripePayment && <PayExpenseWithStripe onSuccess={onPayWithStripeSuccess} expense={expense} />}
+            {!isStripePayment && (
+              <Flex flexWrap="wrap" justifyContent="space-evenly">
+                <StyledButton
+                  buttonStyle="success"
+                  width="100%"
+                  m={1}
+                  type="submit"
+                  loading={formik.isSubmitting}
+                  data-cy="mark-as-paid-button"
+                  disabled={
+                    !isManualPayment &&
+                    (blockAutomaticPayment ||
+                      (canQuote && (quoteQuery.loading || hasFunds === false || isLoadingTransferDetails)))
+                  }
+                >
+                  {isManualPayment ? (
+                    <React.Fragment>
+                      <Check size="1.5em" />
+                      <Span css={{ verticalAlign: 'middle' }} ml={1}>
+                        <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
+                      </Span>
+                    </React.Fragment>
+                  ) : isScheduling ? (
+                    <FormattedMessage
+                      id="expense.schedule.btn"
+                      defaultMessage="Schedule to Pay with {paymentMethod}"
+                      values={{ paymentMethod: payoutMethodLabel }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="expense.pay.btn"
+                      defaultMessage="Pay with {paymentMethod}"
+                      values={{ paymentMethod: payoutMethodLabel }}
+                    />
+                  )}
+                </StyledButton>
+              </Flex>
+            )}
+          </FormikProvider>
+        </form>
+      </ModalBody>
+    </StyledModal>
+  );
+};
+
+export default PayExpenseModal;

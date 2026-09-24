@@ -1,16 +1,15 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { CardElement } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import { themeGet } from '@styled-system/theme-get';
-import { first, get, merge, pick, uniqBy } from 'lodash';
+import { first, get, merge, pick, uniqBy } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -24,8 +23,9 @@ import StyledHr from '../StyledHr';
 import StyledRadioList from '../StyledRadioList';
 import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
+import { managedOrderFragment, paymentMethodFragment } from './graphql/queries';
 import AddPaymentMethod from './AddPaymentMethod';
 
 const PaymentMethodBox = styled(Flex)`
@@ -43,71 +43,37 @@ const messages = defineMessages({
   },
 });
 
-export const paymentMethodFragment = gql`
-  fragment UpdatePaymentMethodFragment on PaymentMethod {
-    id
-    name
-    data
-    service
-    type
-    balance {
-      value
-      valueInCents
-      currency
-    }
-    account {
+const paymentMethodsQuery = gql`
+  query UpdatePaymentMethodPopUpPaymentMethod($accountSlug: String!, $orderId: String!) {
+    account(slug: $accountSlug) {
       id
-    }
-  }
-`;
-
-export const paymentMethodsQuery = gql`
-  query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
-    account(id: $accountId) {
-      id
-      paymentMethods(type: [CREDITCARD, GIFTCARD, PREPAID, COLLECTIVE]) {
+      paymentMethods(type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]) {
         id
         ...UpdatePaymentMethodFragment
       }
     }
     order(order: { id: $orderId }) {
-      id
-      paymentMethod {
-        id
-        ...UpdatePaymentMethodFragment
-      }
+      ...ManagedOrderFields
     }
   }
+  ${managedOrderFragment}
   ${paymentMethodFragment}
 `;
 
-export const updatePaymentMethodMutation = gql`
+const updatePaymentMethodMutation = gql`
   mutation UpdatePaymentMethod(
     $order: OrderReferenceInput!
     $paymentMethod: PaymentMethodReferenceInput
     $paypalSubscriptionId: String
   ) {
     updateOrder(order: $order, paymentMethod: $paymentMethod, paypalSubscriptionId: $paypalSubscriptionId) {
-      id
-      status
-      paymentMethod {
-        id
-        service
-        name
-        type
-        data
-        expiryDate
-        balance {
-          value
-          valueInCents
-          currency
-        }
-      }
+      ...ManagedOrderFields
     }
   }
+  ${managedOrderFragment}
 `;
 
-export const paymentMethodResponseFragment = gql`
+const paymentMethodResponseFragment = gql`
   fragment paymentMethodResponseFragment on CreditCardWithStripeError {
     paymentMethod {
       id
@@ -141,14 +107,7 @@ export const confirmCreditCardMutation = gql`
   ${paymentMethodResponseFragment}
 `;
 
-const mutationOptions = { context: API_V2_CONTEXT };
-
-export const sortAndFilterPaymentMethods = (
-  paymentMethods,
-  contribution,
-  addedPaymentMethod,
-  existingPaymentMethod,
-) => {
+const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod) => {
   if (!paymentMethods) {
     return null;
   }
@@ -204,13 +163,16 @@ export const sortAndFilterPaymentMethods = (
 };
 
 export const useUpdatePaymentMethod = contribution => {
-  const { addToast } = useToasts();
-  const [submitUpdatePaymentMethod, { loading }] = useMutation(updatePaymentMethodMutation, mutationOptions);
+  const { toast } = useToast();
+  const [submitUpdatePaymentMethod, { loading }] = useMutation(updatePaymentMethodMutation);
 
   return {
     isSubmitting: loading,
     updatePaymentMethod: async paymentMethod => {
-      const hasUpdate = !contribution.paymentMethod || paymentMethod.id !== contribution.paymentMethod.id;
+      const hasUpdate =
+        contribution.status === 'PAUSED' ||
+        !contribution.paymentMethod ||
+        paymentMethod.id !== contribution.paymentMethod.id;
       try {
         if (hasUpdate) {
           const variables = { order: { id: contribution.id } };
@@ -221,8 +183,8 @@ export const useUpdatePaymentMethod = contribution => {
           }
           await submitUpdatePaymentMethod({ variables });
         }
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: (
             <FormattedMessage
               id="subscription.createSuccessUpdated"
@@ -231,9 +193,10 @@ export const useUpdatePaymentMethod = contribution => {
             />
           ),
         });
+        return true;
       } catch (error) {
         const errorMsg = getErrorFromGraphqlException(error).message;
-        addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+        toast({ variant: 'error', message: errorMsg });
         return false;
       }
     },
@@ -242,7 +205,7 @@ export const useUpdatePaymentMethod = contribution => {
 
 const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, account }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   // state management
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
@@ -257,12 +220,12 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
 
   // GraphQL mutations and queries
   const { data, refetch } = useQuery(paymentMethodsQuery, {
-    variables: { accountId: account.id, orderId: contribution.id },
-    context: API_V2_CONTEXT,
+    variables: { accountSlug: account.slug, orderId: contribution.id },
+
     fetchPolicy: 'network-only',
   });
-  const [submitAddPaymentMethod] = useMutation(addCreditCardMutation, mutationOptions);
-  const [submitConfirmPaymentMethodMutation] = useMutation(confirmCreditCardMutation, mutationOptions);
+  const [submitAddPaymentMethod] = useMutation(addCreditCardMutation);
+  const [submitConfirmPaymentMethodMutation] = useMutation(confirmCreditCardMutation);
 
   const handleAddPaymentMethodResponse = async response => {
     const { paymentMethod, stripeError } = response;
@@ -277,8 +240,8 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
     const { message, response } = stripeError;
 
     if (!response) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: message,
       });
       setAddingPaymentMethod(false);
@@ -288,8 +251,8 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
     const stripe = await getStripe();
     const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
     if (result.error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: result.error.message,
       });
       setAddingPaymentMethod(false);
@@ -301,8 +264,8 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
         });
         return handleSuccess(response.data.confirmCreditCard.paymentMethod);
       } catch (error) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: error.message,
         });
         setAddingPaymentMethod(false);
@@ -379,8 +342,10 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
               setStripeElements(stripeElements);
             }}
             onPaypalSuccess={async paypalPaymentMethod => {
-              await updatePaymentMethod(paypalPaymentMethod);
-              onCloseEdit();
+              const success = await updatePaymentMethod(paypalPaymentMethod);
+              if (success) {
+                onCloseEdit();
+              }
             }}
           />
         </Box>
@@ -449,8 +414,8 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
               onClick={async () => {
                 setAddingPaymentMethod(true);
                 if (!stripe) {
-                  addToast({
-                    type: TOAST_TYPE.ERROR,
+                  toast({
+                    variant: 'error',
                     message: (
                       <FormattedMessage
                         id="Stripe.Initialization.Error"
@@ -465,7 +430,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
                 const { token, error } = await stripe.createToken(cardElement);
 
                 if (error) {
-                  addToast({ type: TOAST_TYPE.ERROR, message: error.message });
+                  toast({ variant: 'error', message: error.message });
                   return false;
                 }
                 const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
@@ -481,7 +446,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
                   return handleAddPaymentMethodResponse(res.data.addCreditCard);
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
-                  addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+                  toast({ variant: 'error', message: errorMsg });
                   setAddingPaymentMethod(false);
                   return false;
                 }
@@ -502,7 +467,12 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
               buttonStyle="secondary"
               loading={isSubmitting}
               data-cy="recurring-contribution-update-pm-button"
-              onClick={() => updatePaymentMethod(selectedPaymentMethod).then(onCloseEdit)}
+              onClick={async () => {
+                const success = await updatePaymentMethod(selectedPaymentMethod);
+                if (success) {
+                  onCloseEdit();
+                }
+              }}
             >
               <FormattedMessage id="actions.update" defaultMessage="Update" />
             </StyledButton>
@@ -511,14 +481,6 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
       </Flex>
     </Fragment>
   );
-};
-
-UpdatePaymentMethodPopUp.propTypes = {
-  data: PropTypes.object,
-  contribution: PropTypes.object.isRequired,
-  onCloseEdit: PropTypes.func,
-  loadStripe: PropTypes.func.isRequired,
-  account: PropTypes.object.isRequired,
 };
 
 export default withStripeLoader(UpdatePaymentMethodPopUp);

@@ -1,9 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
-import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { GQLV2_PAYMENT_METHOD_LEGACY_TYPES } from '../../lib/constants/payment-methods';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 import { i18nPaymentMethodType } from '../../lib/i18n/payment-method-type';
@@ -19,6 +17,7 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import ProcessOrderButtons from '../orders/ProcessOrderButtons';
 import StyledLink from '../StyledLink';
@@ -65,7 +64,13 @@ const OrderContainer = styled.div`
   }
 `;
 
-const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) => {
+const OrderBudgetItem = ({
+  isLoading = false,
+  order,
+  showPlatformTip = false,
+  showAmountSign = true,
+  host = undefined,
+}) => {
   const intl = useIntl();
   return (
     <OrderContainer>
@@ -108,13 +113,16 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                   )}
                 </AutosizeText>
               </StyledLink>
+              {order.permissions?.canUpdateAccountingCategory && (
+                <OrderAdminAccountingCategoryPill order={order} account={order.toAccount} host={host} />
+              )}
               <P mt="5px" fontSize="12px" color="black.600">
                 <FormattedMessage
                   id="Order.fromTo"
                   defaultMessage="for {account} from {contributor}"
                   values={{
-                    contributor: <LinkCollective collective={order.fromAccount} />,
-                    account: <LinkCollective collective={order.toAccount} />,
+                    contributor: <LinkCollective collective={order.fromAccount} withHoverCard />,
+                    account: <LinkCollective collective={order.toAccount} withHoverCard />,
                   }}
                 />
 
@@ -155,7 +163,6 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                             amount={order.platformTipAmount.valueInCents}
                             currency={order.platformTipAmount.currency}
                             precision={2}
-                            amountStyles={null}
                           />
                         ),
                       }}
@@ -170,7 +177,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
           ) : (
             <Flex>
               <StyledTag variant="rounded-left" fontSize="10px" fontWeight="500" mr={1} textTransform="uppercase">
-                <FormattedMessage defaultMessage="Contribution" /> #{order.legacyId}
+                <FormattedMessage defaultMessage="Contribution" id="0LK5eg" /> #{order.legacyId}
               </StyledTag>
               <OrderStatusTag status={order.status} />
             </Flex>
@@ -206,7 +213,10 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                   <DetailColumnHeader>
                     <StyledTooltip
                       content={
-                        <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
+                        <FormattedMessage
+                          defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system."
+                          id="LqD2Po"
+                        />
                       }
                       containerCursor="default"
                     >
@@ -226,7 +236,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
               {order.pendingContributionData.expectedAt && (
                 <Flex flexDirection="column" justifyContent="flex-end" mr={[3, 4]} minHeight={50}>
                   <DetailColumnHeader>
-                    <FormattedMessage defaultMessage="Expected" />
+                    <FormattedMessage defaultMessage="Expected" id="6srLb2" />
                   </DetailColumnHeader>
                   {isLoading ? (
                     <LoadingPlaceholder height={16} />
@@ -252,62 +262,6 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
       </Flex>
     </OrderContainer>
   );
-};
-
-OrderBudgetItem.propTypes = {
-  isLoading: PropTypes.bool,
-  showAmountSign: PropTypes.bool,
-  onDelete: PropTypes.func,
-  onProcess: PropTypes.func,
-  showProcessActions: PropTypes.bool,
-  view: PropTypes.oneOf(['public', 'admin']),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string,
-    stats: PropTypes.shape({
-      balance: PropTypes.shape({
-        valueInCents: PropTypes.number,
-      }),
-    }),
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
-  }),
-  host: PropTypes.object,
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    description: PropTypes.string.isRequired,
-    status: PropTypes.oneOf(Object.values(ORDER_STATUS)).isRequired,
-    createdAt: PropTypes.string.isRequired,
-    amount: PropTypes.object.isRequired,
-    platformTipAmount: PropTypes.object.isRequired,
-    permissions: PropTypes.shape({
-      canReject: PropTypes.bool,
-      canMarkAsPaid: PropTypes.bool,
-    }),
-    pendingContributionData: PropTypes.shape({
-      ponumber: PropTypes.number,
-      expectedAt: PropTypes.string,
-      paymentMethod: PropTypes.string,
-    }),
-    paymentMethod: PropTypes.shape({
-      providerType: PropTypes.string,
-      type: PropTypes.string,
-    }),
-    /** If available, this `account` will be used in place of the `collective` */
-    toAccount: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-    fromAccount: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }),
-  showPlatformTip: PropTypes.bool,
-};
-
-OrderBudgetItem.defaultProps = {
-  showAmountSign: true,
 };
 
 export default OrderBudgetItem;

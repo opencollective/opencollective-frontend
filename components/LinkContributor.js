@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Link from './Link';
@@ -17,23 +16,11 @@ const LinkContributor = ({ contributor, children }) => {
     return children || <FormattedMessage id="profile.guest" defaultMessage="Guest" />;
   } else if (contributor.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
-  } else if (contributor.collectiveSlug) {
+  } else if (contributor.collectiveSlug && contributor.hasPublicProfile) {
     return <Link href={`/${contributor.collectiveSlug}`}>{children || contributor.name}</Link>;
   } else {
     return children || <span>{contributor.name}</span>;
   }
-};
-
-LinkContributor.propTypes = {
-  /** The contributor to link to */
-  contributor: PropTypes.shape({
-    collectiveSlug: PropTypes.string,
-    name: PropTypes.string,
-    isIncognito: PropTypes.bool,
-    isGuest: PropTypes.bool,
-  }).isRequired,
-  /** By default we show the name in the link. Use this prop to override this */
-  children: PropTypes.node,
 };
 
 export default LinkContributor;

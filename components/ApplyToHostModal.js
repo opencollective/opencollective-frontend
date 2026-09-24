@@ -1,24 +1,24 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
-import { get, isNil, map, pick } from 'lodash';
+import { get, isNil, map, pick } from 'lodash-es';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { OPENCOLLECTIVE_FOUNDATION_ID, OPENSOURCE_COLLECTIVE_ID } from '../lib/constants/collectives';
+import { checkUseAlternativeHostFeeNaming } from '../lib/collective';
+import { OPENSOURCE_COLLECTIVE_ID } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { requireFields } from '../lib/form-utils';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
-import ApplicationDescription from './ocf-host-application/ApplicationDescription';
-import OCFPrimaryButton from './ocf-host-application/OCFPrimaryButton';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
+import { useToast } from './ui/useToast';
 import Avatar from './Avatar';
 import CollectivePicker from './CollectivePicker';
 import CollectivePickerAsync from './CollectivePickerAsync';
 import { Box, Flex } from './Grid';
+import HostPricingInfoRow from './HostPricingInfoRow';
 import HTMLContent from './HTMLContent';
 import { getI18nLink } from './I18nFormatters';
 import Link from './Link';
@@ -32,7 +32,6 @@ import StyledInputFormikField from './StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import StyledTextarea from './StyledTextarea';
 import { H1, P, Span } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const messages = defineMessages({
   SUCCESS: {
@@ -55,6 +54,7 @@ const hostFields = gql`
     termsUrl
     longDescription
     hostFeePercent
+    platformContributionAvailable
     settings
     policies {
       id
@@ -169,18 +169,17 @@ const applyToHostMutation = gql`
   ${hostFields}
 `;
 
-const GQL_CONTEXT = { context: API_V2_CONTEXT };
 const INITIAL_FORM_VALUES = { message: '', areTosChecked: false, collective: null, inviteMembers: [] };
 const STEPS = {
-  INFORMATION: { name: 'Information', label: <FormattedMessage defaultMessage="Information" /> },
-  APPLY: { name: 'Apply', label: <FormattedMessage id="Apply" defaultMessage="Apply" /> },
+  INFORMATION: { name: 'Information', label: <FormattedMessage defaultMessage="Information" id="E80WrK" /> },
+  APPLY: { name: 'Apply', label: <FormattedMessage id="ApplyToHost" defaultMessage="Apply" /> },
 };
 
 const getAccountInput = collective => {
   return typeof collective.id === 'number' ? { legacyId: collective.id } : { id: collective.id };
 };
 
-const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, isOCFHost, isOSCHost }) => {
+const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, isOSCHost }) => {
   return (
     <Flex justifyContent="flex-end" width="100%">
       <StyledButton
@@ -198,21 +197,7 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         )}
       </StyledButton>
-      {isOCFHost ? (
-        <OCFPrimaryButton
-          type="submit"
-          disabled={!canSubmit}
-          loading={isSubmitting}
-          onClick={onSubmit}
-          mt={[2, 3]}
-          mb={2}
-          ml={3}
-          px={3}
-          minWidth={153}
-        >
-          <FormattedMessage id="actions.continue" defaultMessage="Continue" />
-        </OCFPrimaryButton>
-      ) : isOSCHost ? (
+      {isOSCHost ? (
         <StyledButton
           type="submit"
           disabled={!canSubmit}
@@ -249,17 +234,6 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
   );
 };
 
-ConfirmButtons.propTypes = {
-  onClose: PropTypes.func,
-  onBack: PropTypes.func,
-  onSubmit: PropTypes.func,
-  isSubmitting: PropTypes.bool,
-  canSubmit: PropTypes.bool,
-  canCancel: PropTypes.bool,
-  isOCFHost: PropTypes.bool,
-  isOSCHost: PropTypes.bool,
-};
-
 /**
  * A modal to apply to a given host
  * This modal triggers a query when mounted
@@ -267,24 +241,22 @@ ConfirmButtons.propTypes = {
 const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ...props }) => {
   const query = collective ? applyToHostQuery : applyToHostWithAccountsQuery;
   const { data, loading, error } = useQuery(query, {
-    ...GQL_CONTEXT,
     variables: { hostSlug, collectiveSlug: collective?.slug },
     fetchPolicy: 'network-only',
   });
-  const [applyToHost, { loading: submitting }] = useMutation(applyToHostMutation, GQL_CONTEXT);
+  const [applyToHost, { loading: submitting }] = useMutation(applyToHostMutation);
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [step, setStep] = React.useState(STEPS.INFORMATION);
-  const contentRef = React.useRef();
+  const contentRef = React.useRef(undefined);
   const canApply = Boolean(data?.host?.isOpenToApplications);
   const collectives = map(get(data, 'loggedInAccount.memberOf.nodes'), 'account');
   const selectedCollective = collective
     ? { ...collective, ...pick(data?.account, ['admins', 'memberInvitations']) }
     : collectives.length === 1
-    ? collectives[0]
-    : undefined;
+      ? collectives[0]
+      : undefined;
   const host = data?.host;
-  const isOCFHost = host?.legacyId === OPENCOLLECTIVE_FOUNDATION_ID;
   const isOSCHost = host?.legacyId === OPENSOURCE_COLLECTIVE_ID;
   const useTwoSteps = !isNil(data?.host?.longDescription);
 
@@ -295,7 +267,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   }, [useTwoSteps]);
 
   return (
-    <StyledModal onClose={onClose} width="570px" {...props}>
+    <StyledModal onClose={onClose} maxWidth="550px" {...props}>
       {loading ? (
         <React.Fragment>
           <ModalHeader hideCloseIcon>
@@ -323,11 +295,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
             return requireFields(values, host.termsUrl ? ['areTosChecked', 'collective'] : ['collective']);
           }}
           onSubmit={async values => {
-            if (isOCFHost) {
-              await router.push(`/foundation/apply/intro?collectiveSlug=${values.collective.slug}`);
-              window.scrollTo(0, 0);
-              return;
-            } else if (isOSCHost) {
+            if (isOSCHost) {
               await router.push(`/opensource/apply/intro?collectiveSlug=${values.collective.slug}`);
               window.scrollTo(0, 0);
               return;
@@ -349,8 +317,8 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
               if (onSuccess) {
                 await onSuccess(result);
               } else {
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   message: intl.formatMessage(messages.SUCCESS, {
                     hostName: host.name,
                     collectiveName: values.collective.name,
@@ -360,7 +328,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                 onClose();
               }
             } catch (e) {
-              addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+              toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
             }
           }}
         >
@@ -372,35 +340,16 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                 ) : host ? (
                   <Flex flexDirection="column" alignItems="center" width="100%">
                     <Avatar collective={host} type={host.type} radius={64} />
-                    <H1 fontSize="20px" lineHeight="28px" color="black.900" mt={3} mb={3}>
+                    <H1 fontSize="20px" lineHeight="28px" color="black.900" mt={3} mb={3} textAlign="center">
                       {host.name}
                     </H1>
-                    <Flex justifyContent="center" width="100%" gap="32px" flexWrap="wrap">
-                      <Flex flexDirection="column">
-                        <P fontWeight="400" fontSize="12px" lineHeight="18px" color="black.600" mb={1}>
-                          <FormattedMessage id="HostSince" defaultMessage="Host since" />
-                        </P>
-                        <P fontSize="16px" fontWeight="500" lineHeight="24px">
-                          <FormattedDate value={host.createdAt} month="short" year="numeric" />
-                        </P>
-                      </Flex>
-                      <Flex flexDirection="column">
-                        <P fontWeight="400" fontSize="12px" lineHeight="18px" color="black.600" mb={1}>
-                          <FormattedMessage id="Currency" defaultMessage="Currency" />
-                        </P>
-                        <P fontSize="16px" fontWeight="500" lineHeight="24px">
-                          {host.currency}
-                        </P>
-                      </Flex>
-                      <Flex flexDirection="column">
-                        <P fontWeight="400" fontSize="12px" lineHeight="18px" color="black.600" mb={1}>
-                          <FormattedMessage id="HostFee" defaultMessage="Host fee" />
-                        </P>
-                        <P fontSize="16px" fontWeight="500" lineHeight="24px">
-                          {host.hostFeePercent}%
-                        </P>
-                      </Flex>
-                    </Flex>
+                    <HostPricingInfoRow
+                      createdAt={host.createdAt}
+                      currency={host.currency}
+                      hostFeePercent={host.hostFeePercent}
+                      platformContributionAvailable={host.platformContributionAvailable}
+                      useAlternativeHostFeeNaming={checkUseAlternativeHostFeeNaming(host)}
+                    />
                     <Box my={3}>
                       {useTwoSteps && (
                         <StepsProgress steps={Object.values(STEPS)} focus={step} onStepSelect={setStep}>
@@ -462,13 +411,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                   creatable
                                   renderNewCollectiveOption={() => (
                                     <Link
-                                      href={
-                                        isOCFHost
-                                          ? `/foundation/apply/intro`
-                                          : isOSCHost
-                                          ? '/opensource/apply/intro'
-                                          : `/${host.slug}/create`
-                                      }
+                                      href={isOSCHost ? '/opensource/apply/intro' : `/${host.slug}/create`}
                                       data-cy="host-apply-new-collective-link"
                                     >
                                       <StyledButton borderRadius="14px" width="100%">
@@ -496,7 +439,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                               <React.Fragment>
                                 <Box>
                                   <P fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
-                                    <FormattedMessage defaultMessage="Minimum Administrators Required" />
+                                    <FormattedMessage defaultMessage="Minimum Administrators Required" id="ceGKEG" />
                                   </P>
                                   <Flex mt={1} width="100%">
                                     <P
@@ -584,10 +527,11 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                       }}
                                     />
                                   </Box>
-                                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
                                     <MessageBox type="info" mt={3} fontSize="13px">
                                       <FormattedMessage
                                         defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                                        id="GTK0Wf"
                                         values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                                       />
                                     </MessageBox>
@@ -596,37 +540,31 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                 <StyledHr my="18px" width="100%" borderColor="black.300" />
                               </React.Fragment>
                             )}
-                            {isOCFHost ? (
-                              <ApplicationDescription />
-                            ) : (
-                              <React.Fragment>
-                                <StyledInputFormikField
-                                  name="message"
-                                  htmlFor="apply-host-modal-message"
-                                  label={
-                                    <Span fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
-                                      {get(host, 'settings.applyMessage') || (
-                                        <FormattedMessage
-                                          id="ApplyToHost.WriteMessage"
-                                          defaultMessage="Message to the Fiscal Host"
-                                        />
-                                      )}
-                                    </Span>
-                                  }
-                                >
-                                  {({ field }) => (
-                                    <StyledTextarea
-                                      {...field}
-                                      width="100%"
-                                      minHeight={76}
-                                      maxLength={3000}
-                                      fontSize="14px"
-                                      showCount
+                            <StyledInputFormikField
+                              name="message"
+                              htmlFor="apply-host-modal-message"
+                              label={
+                                <Span fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
+                                  {get(host, 'settings.applyMessage') || (
+                                    <FormattedMessage
+                                      id="ApplyToHost.WriteMessage"
+                                      defaultMessage="Message to the Fiscal Host"
                                     />
                                   )}
-                                </StyledInputFormikField>
-                              </React.Fragment>
-                            )}
+                                </Span>
+                              }
+                            >
+                              {({ field }) => (
+                                <StyledTextarea
+                                  {...field}
+                                  width="100%"
+                                  minHeight={76}
+                                  maxLength={3000}
+                                  fontSize="14px"
+                                  showCount
+                                />
+                              )}
+                            </StyledInputFormikField>
                             {host.termsUrl && (
                               <StyledInputFormikField name="areTosChecked">
                                 {({ form, field }) => (
@@ -642,7 +580,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                             TOSLink: getI18nLink({
                                               href: host.termsUrl,
                                               openInNewTabNoFollow: true,
-                                              ...(isOCFHost && { color: '#396C6F' }),
                                               onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
                                             }),
                                           }}
@@ -688,7 +625,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                     onSubmit={handleSubmit}
                     isSubmitting={submitting}
                     canSubmit={canApply}
-                    isOCFHost={isOCFHost}
                     isOSCHost={isOSCHost}
                   />
                 )}
@@ -699,16 +635,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
       )}
     </StyledModal>
   );
-};
-
-ApplyToHostModal.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-  /** If not provided, the default is to ad a success toast and to call onClose */
-  onSuccess: PropTypes.func,
-  /** Use this to force the value for `collective`. If not specified, user's administrated collectives will be displayed instead */
-  collective: PropTypes.object,
-  router: PropTypes.object,
 };
 
 export default withRouter(ApplyToHostModal);

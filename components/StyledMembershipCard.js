@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { FormattedDate, FormattedMessage, injectIntl, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import { formatCurrency } from '../lib/currency-utils';
 import formatMemberRole from '../lib/i18n/member-role';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -29,7 +29,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                 values={{
                   contributorType:
                     role === roles.HOST
-                      ? intl.formatMessage({ defaultMessage: 'Hosted' })
+                      ? intl.formatMessage({ defaultMessage: 'Hosted', id: 'yVPYIH' })
                       : formatMemberRole(intl, role),
                 }}
               />{' '}
@@ -38,7 +38,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               </Span>
             </P>
           )}
-          {role === roles.BACKER ? (
+          {role === roles.BACKER && membership.totalDonations?.valueInCents ? (
             <P mt={3} data-cy="amount-contributed">
               <Span fontSize="12px" lineHeight="18px">
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />{' '}
@@ -76,29 +76,6 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
       </Container>
     </StyledCollectiveCard>
   );
-};
-
-StyledMembershipCard.propTypes = {
-  membership: PropTypes.shape({
-    account: PropTypes.shape({
-      id: PropTypes.string,
-      imageUrl: PropTypes.string,
-      isAdmin: PropTypes.bool,
-      isHost: PropTypes.bool,
-      isIncognito: PropTypes.bool,
-      name: PropTypes.string,
-      stats: PropTypes.shape({
-        contributorsCount: PropTypes.number,
-      }),
-    }),
-    description: PropTypes.string,
-    id: PropTypes.string,
-    publicMessage: PropTypes.string,
-    role: PropTypes.string,
-    since: PropTypes.string,
-    totalDonations: PropTypes.shape({ currency: PropTypes.string, valueInCents: PropTypes.number }),
-  }),
-  intl: PropTypes.object,
 };
 
 export default injectIntl(StyledMembershipCard);

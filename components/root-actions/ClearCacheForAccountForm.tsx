@@ -1,19 +1,21 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
-import { startCase, uniq } from 'lodash';
+import { useMutation } from '@apollo/client';
+import { startCase, uniq } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { AccountCacheType, ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/graphql/types/v2/graphql';
+import { gql } from '../../lib/graphql/helpers';
+import type { ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/graphql/types/v2/graphql';
+import { AccountCacheType } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const CACHE_TYPES = Object.values(AccountCacheType);
 
@@ -30,14 +32,13 @@ const clearCacheMutation = gql`
 const ClearCacheForAccountForm = () => {
   const [account, setAccount] = React.useState(null);
   const [cacheTypes, setCacheTypes] = React.useState<AccountCacheType[]>(() => [...CACHE_TYPES]);
-  const [clearCache, { loading }] = useMutation<ClearCacheMutation, ClearCacheMutationVariables>(clearCacheMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const { addToast } = useToasts();
+  const [clearCache, { loading }] = useMutation<ClearCacheMutation, ClearCacheMutationVariables>(clearCacheMutation);
+  const { toast } = useToast();
   const isValid = account && cacheTypes.length > 0;
   const intl = useIntl();
   return (
     <div>
+      <DashboardHeader title="Clear Cache" description="Clear cache for account" className="mb-10" />
       <StyledInputField htmlFor="clear-cache-account" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync inputId={id} onChange={({ value }) => setAccount(value)} skipGuests={false} />
@@ -87,13 +88,13 @@ const ClearCacheForAccountForm = () => {
           try {
             const result = await clearCache({ variables: { account: { legacyId: account.id }, cacheTypes } });
             const resultAccount = result.data.clearCacheForAccount;
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: `Cache cleared for ${resultAccount.name} (@${resultAccount.slug})`,
             });
           } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: i18nGraphqlException(intl, e),
             });
           }
@@ -104,7 +105,5 @@ const ClearCacheForAccountForm = () => {
     </div>
   );
 };
-
-ClearCacheForAccountForm.propTypes = {};
 
 export default ClearCacheForAccountForm;

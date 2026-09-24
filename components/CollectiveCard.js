@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { get } from 'lodash-es';
+import { defineMessages, FormattedDate, FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
 import { width } from 'styled-system';
 
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import { imagePreview } from '../lib/image-utils';
 import { firstSentence } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -261,7 +262,7 @@ class CollectiveCard extends React.Component {
                     />
                   </ValueWrapper>
                   <LabelWrapper>
-                    <FormattedMessage id="collective.card.stats.yearlyBudget" defaultMessage={'yearly budget'} />
+                    <FormattedMessage id="collective.card.stats.yearlyBudget" defaultMessage="yearly budget" />
                   </LabelWrapper>
                 </div>
               </StatsWrapper>
@@ -291,27 +292,7 @@ class CollectiveCard extends React.Component {
                 </div>
               </StatsWrapper>
             )}
-            {collective.stats && collective.stats.collectives && (
-              <StatsWrapper>
-                <div className="backers">
-                  <ValueWrapper>{get(collective, 'stats.collectives.hosted')}</ValueWrapper>
-                  <LabelWrapper>
-                    <FormattedMessage
-                      id="collective.card.collectives.count"
-                      defaultMessage="Hosted {n, plural, one {Collective} other {Collectives}}"
-                      values={{ n: get(collective, 'stats.collectives.hosted') }}
-                    />
-                  </LabelWrapper>
-                </div>
-                <div className="currency">
-                  <ValueWrapper>{collective.currency}</ValueWrapper>
-                  <LabelWrapper>
-                    <FormattedMessage id="currency" defaultMessage="currency" />
-                  </LabelWrapper>
-                </div>
-              </StatsWrapper>
-            )}
-            {!hideRoles && roles && roles.size > 0 && (
+            {!hideRoles && roles.size > 0 && (
               <MembershipWrapper>
                 <Container
                   minHeight="13px"
@@ -338,7 +319,7 @@ class CollectiveCard extends React.Component {
                   >
                     <FormattedMessage
                       id="membership.since"
-                      defaultMessage={'since {date}'}
+                      defaultMessage="since {date}"
                       values={{
                         date: <FormattedDate value={oldestMembershipDate} month="long" year="numeric" />,
                       }}
@@ -358,7 +339,7 @@ class CollectiveCard extends React.Component {
                         currency={get(membership, 'collective.currency')}
                       />
                     </Container>
-                    <FormattedMessage id="membership.totalDonations.title" defaultMessage={'Amount contributed'} />
+                    <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
                   </MembershipWrapper>
                 ),
             )}

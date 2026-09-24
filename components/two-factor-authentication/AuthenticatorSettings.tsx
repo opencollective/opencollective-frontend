@@ -1,77 +1,61 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
-import { CheckCircle2Icon, CircleIcon, PlusIcon } from 'lucide-react';
-import QRCode from 'qrcode.react';
+import { Plus } from 'lucide-react';
+import { generateSecret, generateURI, verifySync } from 'otplib';
+import { QRCodeSVG } from 'qrcode.react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import speakeasy from 'speakeasy';
-import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Individual, TwoFactorMethod, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import { gql } from '../../lib/graphql/helpers';
+import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
-import { H3, P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { H3 } from '../Text';
+import { Button } from '../ui/Button';
+import { useToast } from '../ui/useToast';
 
 import { UserTwoFactorMethodItem } from './UserTwoFactorMethodItem';
 
 function generateNewAuthenticatorAppSecret(email: string) {
   let issuer;
   if (window.location.hostname === 'localhost') {
-    issuer = '&issuer=Open%20Collective%20Local';
+    issuer = 'Open Collective Local';
   } else if (window.location.hostname === 'staging.opencollective.com') {
-    issuer = '&issuer=Open%20Collective%20Staging';
+    issuer = 'Open Collective Staging';
   } else {
-    issuer = '&issuer=Open%20Collective';
+    issuer = 'Open Collective';
   }
-  const options = {
-    name: email,
-    length: 64,
-  };
-  const secret = speakeasy.generateSecret(options);
-  const otpAuthUrl = secret.otpauth_url + issuer;
+  const base32 = generateSecret({ length: 64 });
+  const otpAuthUrl = generateURI({
+    issuer,
+    label: email,
+    secret: base32,
+  });
   return {
     otpAuthUrl,
-    base32: secret.base32,
+    base32,
   };
 }
 
 const I18nMessages = defineMessages({
   INVALID_TOTP_CODE: {
     defaultMessage: 'Invalid code',
+    id: 'x2R8CB',
   },
   REQUIRED: {
     defaultMessage: 'Required',
+    id: 'Seanpx',
   },
 });
 
-const TokenBox = styled(Box)`
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-`;
-
-const Code = styled.code`
-  background: ${props => props.theme.colors.black[100]};
-  color: ${props => props.theme.colors.black[700]};
-  word-break: break-all;
-  display: block;
-  margin-top: 8px;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: #4d4f51;
-  max-width: 350px;
-`;
-
 const AddAuthenticatorAppToIndividualMutation = gql`
-  mutation addAuthenticatorAppToIndividual($account: AccountReferenceInput!, $token: String!) {
+  mutation AddAuthenticatorAppToIndividual($account: AccountReferenceInput!, $token: String!) {
     addTwoFactorAuthTokenToIndividual(account: $account, token: $token, type: TOTP) {
       account {
         id
@@ -101,35 +85,28 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
 
   return (
     <StyledCard px={3} py={2}>
-      <Flex alignItems="center">
-        <Box mr={3}>{userTwoFactorMethods.length > 0 ? <CheckCircle2Icon color="#0EA755" /> : <CircleIcon />}</Box>
-        <H3 fontSize="14px" fontWeight="700">
-          <FormattedMessage defaultMessage="Authenticator App" />
-        </H3>
-      </Flex>
+      <H3 fontSize="14px" fontWeight="700" my={2}>
+        <FormattedMessage defaultMessage="Authenticator App" id="eoPp92" />
+      </H3>
       <div className="mb-3 text-sm">
-        <FormattedMessage defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password." />
+        <FormattedMessage
+          defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password."
+          id="gL/uHv"
+        />
       </div>
-      <Box>
+      <div>
         {userTwoFactorMethods.map(device => {
           return (
-            <Box className="border-b last:border-b-0" mx={4} key={device.id} data-cy="authenticator-2fa-method">
+            <Box className="border-b last:border-b-0" key={device.id} data-cy="authenticator-2fa-method">
               <UserTwoFactorMethodItem individual={props.individual} userTwoFactorMethod={device} />
             </Box>
           );
         })}
-      </Box>
+      </div>
       {userTwoFactorMethods.length === 0 && (
-        <Box mt={3}>
-          <StyledButton
-            onClick={() => setIsAddingAuthenticator(true)}
-            buttonSize="tiny"
-            buttonStyle="secondary"
-            display="flex"
-          >
-            <FormattedMessage defaultMessage="Add authenticator" /> <PlusIcon size="14px" />
-          </StyledButton>
-        </Box>
+        <Button className="mt-3 mb-2 w-full" variant="outline" onClick={() => setIsAddingAuthenticator(true)}>
+          <Plus size="14px" /> <FormattedMessage defaultMessage="Add authenticator" id="cMa+0l" />
+        </Button>
       )}
       {isAddingAuthenticator && (
         <AddAuthenticatorModal
@@ -149,7 +126,7 @@ type AddAuthenticatorModalProps = {
 };
 
 function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
 
   const { otpAuthUrl, base32 } = React.useMemo(() => {
@@ -162,7 +139,6 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
       recoveryCodes: string[];
     };
   }>(AddAuthenticatorAppToIndividualMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       account: {
         id: props.individual.id,
@@ -178,17 +154,17 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
     async onSubmit() {
       try {
         const result = await addAuthenticatorAppMutation();
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
-          message: <FormattedMessage defaultMessage="Authenticator added" />,
+        toast({
+          variant: 'success',
+          message: <FormattedMessage defaultMessage="Authenticator added" id="sL33nT" />,
         });
 
         if (result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes) {
           props.onRecoveryCodes(result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes);
         }
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: i18nGraphqlException(intl, e),
         });
       } finally {
@@ -199,15 +175,18 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
       const errors: Record<string, unknown> = {};
       if (!values.twoFactorAuthenticatorCode) {
         errors.twoFactorAuthenticatorCode = intl.formatMessage(I18nMessages.REQUIRED);
+      } else if (!/^[0-9]{6}$/.test(values.twoFactorAuthenticatorCode)) {
+        errors.twoFactorAuthenticatorCode = intl.formatMessage(I18nMessages.INVALID_TOTP_CODE);
       } else {
-        const verified = speakeasy.totp.verify({
-          secret: base32,
-          encoding: 'base32',
+        const result = verifySync({
           token: values.twoFactorAuthenticatorCode,
-          window: 2,
+          secret: base32,
+          epochTolerance: 60,
+          strategy: 'totp',
+          algorithm: 'sha1',
         });
 
-        if (!verified) {
+        if (!result.valid) {
           errors.twoFactorAuthenticatorCode = intl.formatMessage(I18nMessages.INVALID_TOTP_CODE);
         }
       }
@@ -216,76 +195,80 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
     },
   });
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      formik.handleSubmit();
+    }
+  };
+
   return (
     <StyledModal onClose={props.onClose}>
       <ModalHeader>
-        <FormattedMessage defaultMessage="Add authenticator" />
+        <FormattedMessage defaultMessage="Add authenticator" id="cMa+0l" />
       </ModalHeader>
       <form onSubmit={formik.handleSubmit}>
         <ModalBody>
-          <Box>
-            <Flex gap="20px">
-              <Flex justifyContent="center">
-                <QRCode value={otpAuthUrl} renderAs="svg" size={128} level="L" includeMargin data-cy="qr-code" />
-              </Flex>
-              <Box>
-                <TokenBox data-cy="manual-entry-2fa-token">
-                  <P>
-                    <FormattedMessage
-                      id="TwoFactorAuth.Setup.ManualEntry"
-                      defaultMessage="Manual entry: {token}"
-                      values={{
-                        token: <Code>{base32}</Code>,
-                      }}
-                    />
-                  </P>
-                </TokenBox>
-                <Box mt={4}>
-                  <StyledInputField
-                    required
-                    mt={2}
-                    mb={3}
-                    label={<FormattedMessage defaultMessage="Enter your code without any dashes" />}
-                    htmlFor="twoFactorAuthenticatorCode"
-                    error={formik.touched.twoFactorAuthenticatorCode && formik.errors.twoFactorAuthenticatorCode}
-                    {...formik.getFieldProps('twoFactorAuthenticatorCode')}
-                  >
-                    {inputProps => (
-                      <StyledInput
-                        disabled={formik.isSubmitting}
-                        as={StyledInput}
-                        {...inputProps}
-                        width={240}
-                        minHeight={60}
-                        fontSize="20px"
-                        lineHeight="28px"
-                        placeholder="123456"
-                        pattern="[0-9]{6}"
-                        inputMode="numeric"
-                        minLength={6}
-                        maxLength={6}
-                        data-cy="add-two-factor-auth-totp-code-field"
-                      />
-                    )}
-                  </StyledInputField>
-                </Box>
-              </Box>
-            </Flex>
-          </Box>
+          <div className="flex flex-col gap-4">
+            <div className="self-center">
+              <QRCodeSVG value={otpAuthUrl} size={256} level="L" includeMargin data-cy="qr-code" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-bold">
+                <FormattedMessage
+                  id="TwoFactorAuth.Setup.ManualEntry"
+                  defaultMessage="Manual entry: {token}"
+                  values={{ token: '' }}
+                />
+              </p>
+              <code
+                className="mx-8 rounded-md bg-gray-100 p-4 font-mono text-sm break-all"
+                data-cy="manual-entry-2fa-token"
+              >
+                {base32}
+              </code>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-bold">
+                <FormattedMessage defaultMessage="Enter your code without any dashes" id="M+Txk3" />
+              </p>
+              <StyledInputField
+                required
+                htmlFor="twoFactorAuthenticatorCode"
+                error={formik.touched.twoFactorAuthenticatorCode && formik.errors.twoFactorAuthenticatorCode}
+                className="self-center"
+                {...formik.getFieldProps('twoFactorAuthenticatorCode')}
+              >
+                {inputProps => (
+                  <StyledInput
+                    disabled={formik.isSubmitting}
+                    as={StyledInput}
+                    {...inputProps}
+                    width={240}
+                    minHeight={60}
+                    fontSize="20px"
+                    lineHeight="28px"
+                    placeholder="123456"
+                    pattern="[0-9]{6}"
+                    inputMode="numeric"
+                    minLength={6}
+                    maxLength={6}
+                    data-cy="add-two-factor-auth-totp-code-field"
+                    onKeyDown={handleKeyDown}
+                  />
+                )}
+              </StyledInputField>
+            </div>
+          </div>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter showDivider={false}>
           <Flex justifyContent="space-between">
-            <StyledButton disabled={formik.isSubmitting} buttonStyle="danger" onClick={props.onClose}>
+            <Button disabled={formik.isSubmitting} variant="outline" onClick={props.onClose}>
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
-            <StyledButton
-              type="submit"
-              loading={formik.isSubmitting}
-              buttonStyle="secondary"
-              data-cy="add-two-factor-auth-totp-code-button"
-            >
+            </Button>
+            <Button type="submit" loading={formik.isSubmitting} data-cy="add-two-factor-auth-totp-code-button">
               <FormattedMessage id="actions.verify" defaultMessage="Verify" />
-            </StyledButton>
+            </Button>
           </Flex>
         </ModalFooter>
       </form>

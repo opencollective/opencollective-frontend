@@ -1,10 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
 import { Separator } from './ui/Separator';
@@ -18,22 +16,18 @@ import StyledLink from './StyledLink';
 import { P, Span } from './Text';
 
 const newsAndUpdatesQuery = gql`
-  query ChangelogUpdates($limit: Int) {
-    account(slug: "opencollective") {
-      id
-      updates(
-        orderBy: { field: PUBLISHED_AT, direction: DESC }
-        onlyChangelogUpdates: true
-        onlyPublishedUpdates: true
-        limit: $limit
-      ) {
-        nodes {
+  query ChangelogUpdates {
+    updates(orderBy: { field: PUBLISHED_AT, direction: DESC }, onlyChangelogUpdates: true, limit: 5) {
+      nodes {
+        id
+        slug
+        publishedAt
+        title
+        html
+        summary
+        account {
           id
           slug
-          publishedAt
-          title
-          html
-          summary
         }
       }
     }
@@ -44,7 +38,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
   if (loading === false && data) {
     return (
       <StyledCarousel contentPosition="left">
-        {data.account.updates.nodes.map(update => (
+        {data.updates.nodes.map(update => (
           <div key={update.id} className="px-3">
             <span className="text-sm text-muted-foreground">
               <FormattedDate value={update.publishedAt} day="numeric" month="long" year="numeric" />
@@ -62,11 +56,11 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
                 {update.title}
               </P>
             </div>
-            <div className="flex pb-4 pt-2">
+            <div className="flex pt-2 pb-4">
               <StyledLink
                 onClick={onClose}
                 as={Link}
-                href={`/opencollective/updates/${update.slug}`}
+                href={`/${update.account?.slug}/updates/${update.slug}`}
                 className="text-blue-800"
                 fontSize="14px"
                 display="flex"
@@ -87,11 +81,11 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
                 />
               </div>
             </div>
-            <div className="flex pb-4 pt-1">
+            <div className="flex pt-1 pb-4">
               <StyledLink
                 onClick={onClose}
                 as={Link}
-                href={`/opencollective/updates/${update.slug}`}
+                href={`/${update.account?.slug}/updates/${update.slug}`}
                 fontSize="14px"
                 display="flex"
                 className="text-blue-800"
@@ -128,7 +122,7 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
                 <FormattedMessage id="NewsAndUpdates.link.whatsNew" defaultMessage="What's new" />
               </DialogTitle>
               <DialogDescription>
-                <FormattedMessage defaultMessage="Keep track of the latest updates from Open Collective." />
+                <FormattedMessage defaultMessage="Keep track of the latest updates from Open Collective." id="8RwcsZ" />
               </DialogDescription>
             </div>
             <Image
@@ -143,18 +137,13 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
         </DialogHeader>
         <Separator className="my-3" />
         <div className="px-0 pb-6">
-          <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
+          <Query query={newsAndUpdatesQuery}>
             {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
           </Query>
         </div>
       </DialogContent>
     </Dialog>
   );
-};
-
-NewsAndUpdatesModal.propTypes = {
-  setOpen: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired,
 };
 
 export default NewsAndUpdatesModal;

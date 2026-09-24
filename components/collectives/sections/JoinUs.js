@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -11,13 +10,13 @@ import { H1, H3, P } from '../../Text';
 import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
-export const JoinUsWrapper = styled(Container)`
+const JoinUsWrapper = styled(Container)`
   background: ${props =>
     props.page && props.page === 'becomeAHost'
       ? `url('/static/images/home/joinus-green-bg-sm.png')`
       : props.page && props.page === 'fiscalHosting'
-      ? `url('/static/images/home/fiscalhost-blue-bg-sm.png')`
-      : `url('/static/images/home/joinus-pink-bg-sm.png')`};
+        ? `url('/static/images/home/fiscalhost-blue-bg-sm.png')`
+        : `url('/static/images/home/joinus-pink-bg-sm.png')`};
   background-size: 100% 100%;
 
   a {
@@ -33,8 +32,8 @@ export const JoinUsWrapper = styled(Container)`
       props.page && props.page === 'becomeAHost'
         ? `url('/static/images/home/joinus-green-bg-md.png')`
         : props.page && props.page === 'fiscalHosting'
-        ? `url('/static/images/home/fiscalhost-blue-bg-md.png')`
-        : `url('/static/images/home/joinus-pink-bg-md.png')`};
+          ? `url('/static/images/home/fiscalhost-blue-bg-md.png')`
+          : `url('/static/images/home/joinus-pink-bg-md.png')`};
     background-size: 100% 100%;
   }
 
@@ -43,8 +42,8 @@ export const JoinUsWrapper = styled(Container)`
       props.page && props.page === 'becomeAHost'
         ? `url('/static/images/home/joinus-green-bg-lg.png')`
         : props.page && props.page === 'fiscalHosting'
-        ? `url('/static/images/home/fiscalhost-blue-bg-lg.png')`
-        : `url('/static/images/home/joinus-pink-bg-lg.png')`};
+          ? `url('/static/images/home/fiscalhost-blue-bg-lg.png')`
+          : `url('/static/images/home/joinus-pink-bg-lg.png')`};
     background-size: 100% 100%;
   }
 `;
@@ -66,7 +65,7 @@ const Wrapper = styled(Container)`
   }
 `;
 
-export const JoinUsActionContainer = ({ title, description, link }) => {
+const JoinUsActionContainer = ({ title, description, link }) => {
   return (
     <Link href={link}>
       <Wrapper
@@ -99,13 +98,7 @@ export const JoinUsActionContainer = ({ title, description, link }) => {
   );
 };
 
-JoinUsActionContainer.propTypes = {
-  title: PropTypes.node,
-  description: PropTypes.node,
-  link: PropTypes.string,
-};
-
-const JoinUs = ({ page }) => (
+const JoinUs = ({ page = undefined }) => (
   <JoinUsWrapper py={[5, null, null, 4]} width={1} page={page}>
     <Flex
       mx={[3, 4]}
@@ -126,7 +119,7 @@ const JoinUs = ({ page }) => (
         >
           <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
         </H1>
-        <Box my={(null, null, null, null, 3)} width={['288px', '438px', null, '335px']}>
+        <Box my={[null, null, null, null, 3]} width={['288px', '438px', null, '335px']}>
           <SectionSubtitle
             fontSize={['20px', null, null, '24px']}
             lineHeight={['28px', null, null, '32px']}
@@ -140,7 +133,10 @@ const JoinUs = ({ page }) => (
                 defaultMessage="Open Collective makes fiscal sponsorship shine. Grantees and project participants will love the simplicity and accessibility, and you’ll love the huge reduction of overheads."
               />
             ) : (
-              <FormattedMessage defaultMessage="Collective finances. Collective technology. Collective power." />
+              <FormattedMessage
+                defaultMessage="Collective finances. Collective technology. Collective power."
+                id="Jzh8eo"
+              />
             )}
           </SectionSubtitle>
         </Box>
@@ -148,12 +144,12 @@ const JoinUs = ({ page }) => (
 
       <Container ml={[null, null, null, 3, 6]}>
         <JoinUsActionContainer
-          link={page === 'becomeAHost' ? '/organizations/new' : '/create'}
+          link={page === 'becomeAHost' ? '/signup/organization?host=true' : '/signup/collective'}
           title={
             page === 'becomeAHost' ? (
-              <FormattedMessage defaultMessage="Join as a Fiscal Host" />
+              <FormattedMessage defaultMessage="Join as a Fiscal Host" id="Y0G9KM" />
             ) : (
-              <FormattedMessage defaultMessage="Get started now free!" />
+              <FormattedMessage defaultMessage="Get started now for free!" id="KOBC7Z" />
             )
           }
           description={<FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />}
@@ -198,9 +194,5 @@ const JoinUs = ({ page }) => (
     </Flex>
   </JoinUsWrapper>
 );
-
-JoinUs.propTypes = {
-  page: PropTypes.string,
-};
 
 export default JoinUs;

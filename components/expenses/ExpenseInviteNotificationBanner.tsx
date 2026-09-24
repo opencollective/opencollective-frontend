@@ -1,24 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
-import { pick } from 'lodash';
+import { useMutation } from '@apollo/client';
+import { pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { checkUserExistence, signin } from '../../lib/api';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import { Flex } from '../Grid';
+import Image from '../Image';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledLink from '../StyledLink';
 import { H4, P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
-
-import pidgeon from '../../public/static/images/pidgeon.png';
+import { useToast } from '../ui/useToast';
 
 const resendDraftExpenseInviteMutation = gql`
   mutation ResendDraftExpenseInvite($expense: ExpenseReferenceInput!) {
@@ -28,17 +25,10 @@ const resendDraftExpenseInviteMutation = gql`
   }
 `;
 
-const PidgeonIllustration = styled.img.attrs({ src: pidgeon })`
-  width: 132px;
-  height: 132px;
-`;
-
 const ResendDraftInviteButton = ({ expense }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
-  const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation);
   const success = !error && data?.resendDraftExpenseInvite?.id;
 
   return (
@@ -51,13 +41,13 @@ const ResendDraftInviteButton = ({ expense }) => {
       onClick={async () => {
         try {
           await resendDraftInvite({ variables: { expense: pick(expense, ['id', 'legacyId']) } });
-          addToast({
-            type: TOAST_TYPE.SUCCESS,
+          toast({
+            variant: 'success',
             message: <FormattedMessage id="ResendInviteSuccessful" defaultMessage="Invite sent" />,
           });
         } catch (e) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
+          toast({
+            variant: 'error',
             message: i18nGraphqlException(intl, e),
           });
         }
@@ -70,10 +60,6 @@ const ResendDraftInviteButton = ({ expense }) => {
       )}
     </StyledButton>
   );
-};
-
-ResendDraftInviteButton.propTypes = {
-  expense: PropTypes.object.isRequired,
 };
 
 const ResendSignInEmailButton = ({ createdUser }) => {
@@ -109,42 +95,24 @@ const ResendSignInEmailButton = ({ createdUser }) => {
   );
 };
 
-ResendSignInEmailButton.propTypes = {
-  createdUser: PropTypes.object.isRequired,
-};
-
 const ExpenseInviteNotificationBanner = props => {
   const canResendEmail = Boolean(props.expense.permissions?.canVerifyDraftExpense);
   return (
     <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'} data-cy="expense-draft-banner">
       <Flex flexDirection={['column', null, 'row']} alignItems="center">
-        <PidgeonIllustration alt="" />
+        <Image alt="" src="/static/images/pidgeon.png" width={132} height={132} />
         <Flex ml={[0, 2]} maxWidth="448px" flexDirection="column">
           <H4 mb="10px" fontWeight="500">
-            {props.createdUser ? (
-              <FormattedMessage id="VerifyEmailAddress" defaultMessage="Verify your email address" />
-            ) : (
-              <FormattedMessage id="InviteOnItsWay" defaultMessage="Your invite is on its way" />
-            )}
+            <FormattedMessage id="InviteOnItsWay" defaultMessage="Your invite is on its way" />
           </H4>
           <P lineHeight="20px">
-            {props.createdUser ? (
-              <FormattedMessage
-                id="VerifyEmailInstructions"
-                defaultMessage="A verification email has been sent to {email}. Click the link to complete submitting this expense. If you have not received the email, please check your spam."
-                values={{
-                  email: props.createdUser?.email || props.expense.draft?.payee?.name,
-                }}
-              />
-            ) : (
-              <FormattedMessage
-                id="Expense.InviteIsOnItsWay.Description"
-                defaultMessage="An invitation to submit this expense has been sent to {email}. Once they confirm and finish the process, it will appear on the expenses list."
-                values={{
-                  email: props.expense.draft?.payee?.email || props.expense.draft?.payee?.name,
-                }}
-              />
-            )}
+            <FormattedMessage
+              id="Expense.InviteIsOnItsWay.Description"
+              defaultMessage="An invitation to submit this expense has been sent to {email}. Once they confirm and finish the process, it will appear on the expenses list."
+              values={{
+                email: props.expense.draft?.payee?.email || props.expense.draft?.payee?.name,
+              }}
+            />
           </P>
           {canResendEmail && (
             <Flex mt="10px" flexWrap="wrap" gap="8px">
@@ -162,11 +130,6 @@ const ExpenseInviteNotificationBanner = props => {
       </Flex>
     </StyledCard>
   );
-};
-
-ExpenseInviteNotificationBanner.propTypes = {
-  createdUser: PropTypes.object,
-  expense: PropTypes.object.isRequired,
 };
 
 export default ExpenseInviteNotificationBanner;

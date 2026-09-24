@@ -1,18 +1,9 @@
 import * as Sentry from '@sentry/nextjs';
-import accepts from 'accepts';
-import cookie from 'cookie';
-import { pick } from 'lodash';
-import { NextPageContext } from 'next';
+import { parseCookie } from 'cookie';
+import { pick } from 'lodash-es';
+import type { NextPageContext } from 'next';
 
-const supportedLanguages = ['en'];
-
-const languages = require.context('../../lang', false, /\.json$/i, 'weak');
-languages.keys().forEach(element => {
-  const match = element.match(/\.?\/?([^.]+)\.json$/);
-  if (match) {
-    supportedLanguages.push(match[1]);
-  }
-});
+import supportedLanguages from './supported-languages';
 
 type IntlProps = {
   language?: string;
@@ -40,8 +31,8 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
 
     if (queryLanguage && supportedLanguages.includes(queryLanguage)) {
       language = queryLanguage;
-    } else {
-      const cookies = cookie.parse(req?.headers?.['cookie'] ?? '');
+    } else if (typeof window === 'undefined') {
+      const cookies = parseCookie(req.headers['cookie'] ?? '');
       const cookieLanguage = cookies?.['language'];
 
       if (cookieLanguage && supportedLanguages.includes(cookieLanguage)) {
@@ -52,7 +43,10 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
     if (['test', 'e2e', 'ci'].includes(process.env.OC_ENV)) {
       locale = language || 'en';
     } else {
-      locale = language || accepts(req).language(supportedLanguages) || 'en';
+      if (typeof window === 'undefined') {
+        const accepts = require('accepts'); // eslint-disable-line @typescript-eslint/no-require-imports
+        locale = language || accepts(req).language(supportedLanguages) || 'en';
+      }
     }
 
     return {
@@ -87,10 +81,10 @@ export function getPreloadedLocaleMessages(locale: string) {
   }
   // checks if the module is loaded using a weak require (does not include the dependency in this bundle)
   const moduleId = require.resolveWeak(`../../lang/${locale}.json`);
-  // eslint-disable-next-line no-undef, camelcase
+  // eslint-disable-next-line camelcase
   if (moduleId && __webpack_modules__[moduleId]) {
     // if the module is loaded, require it using the webpack raw require to avoid adding it to this bundle as a dependency.
-    // eslint-disable-next-line no-undef
+
     return __webpack_require__(moduleId);
   }
 

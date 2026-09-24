@@ -1,24 +1,8 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import AddFundsModal from './host-dashboard/AddFundsModal';
+import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';
 import StyledButton from './StyledButton';
-
-const AddFundsBtn = ({ children, collective }) => {
-  const [showModal, setShowModal] = React.useState(false);
-  return (
-    <Fragment>
-      {children({ onClick: () => setShowModal(true) })}
-      {showModal && <AddFundsModal collective={collective} onClose={() => setShowModal(null)} />}
-    </Fragment>
-  );
-};
-
-AddFundsBtn.propTypes = {
-  children: PropTypes.func.isRequired,
-  collective: PropTypes.object.isRequired,
-};
 
 const DefaultAddFundsButton = props => (
   <StyledButton {...props}>
@@ -26,8 +10,14 @@ const DefaultAddFundsButton = props => (
   </StyledButton>
 );
 
-AddFundsBtn.defaultProps = {
-  children: DefaultAddFundsButton,
+const AddFundsBtn = ({ children = DefaultAddFundsButton, collective }) => {
+  const [showModal, setShowModal] = React.useState(false);
+  return (
+    <Fragment>
+      {children({ onClick: () => setShowModal(true) })}
+      {showModal && <AddFundsModal collective={collective} host={collective.host} onClose={() => setShowModal(null)} />}
+    </Fragment>
+  );
 };
 
 export default AddFundsBtn;

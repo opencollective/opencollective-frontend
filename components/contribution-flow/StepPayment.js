@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
+import { AnalyticsProperty } from '../../lib/analytics/properties';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../../lib/policies';
 
@@ -20,14 +20,24 @@ const StepPayment = ({
   onChange,
   isSubmitting,
   isEmbed,
-  hideCreditCardPostalCode,
+  hideCreditCardPostalCode = false,
   onNewCardFormReady,
   disabledPaymentMethodTypes,
+  showPlatformTip,
+  isOscTipExperiment,
 }) => {
   const { LoggedInUser } = useLoggedInUser();
 
   React.useEffect(() => {
-    track(AnalyticsEvent.CONTRIBUTION_PAYMENT_STEP);
+    track(AnalyticsEvent.CONTRIBUTION_PAYMENT_STEP, {
+      props: {
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails?.isNewPlatformTip ? 'new' : 'old',
+        [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(showPlatformTip),
+        [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: Boolean(isOscTipExperiment),
+        [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: collective?.host?.slug,
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (require2FAForAdmins(stepProfile) && !LoggedInUser?.hasTwoFactorAuth) {
@@ -52,24 +62,6 @@ const StepPayment = ({
       />
     </Container>
   );
-};
-
-StepPayment.propTypes = {
-  collective: PropTypes.object,
-  stepDetails: PropTypes.object,
-  stepPayment: PropTypes.object,
-  stepProfile: PropTypes.object,
-  stepSummary: PropTypes.object,
-  onChange: PropTypes.func,
-  onNewCardFormReady: PropTypes.func,
-  hideCreditCardPostalCode: PropTypes.bool,
-  isSubmitting: PropTypes.bool,
-  isEmbed: PropTypes.bool,
-  disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
-};
-
-StepPayment.defaultProps = {
-  hideCreditCardPostalCode: false,
 };
 
 export default StepPayment;

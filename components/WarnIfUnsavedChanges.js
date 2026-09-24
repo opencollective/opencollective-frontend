@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Router from 'next/router';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
 import { IgnorableError } from '../lib/errors';
+import injectIntl from '@/lib/injectIntl';
 
 /**
  * A component to warn users if they try to leave with unsaved data. Just set
  * `hasUnsavedChanges` to true when this is the case and this component will block any
  * attempt to leave the page.
+ *
+ * See `lib/hooks/warnIfUnsavedChanges.ts` for the hook version of this component.
  */
 class WarnIfUnsavedChanges extends React.Component {
   static propTypes = {

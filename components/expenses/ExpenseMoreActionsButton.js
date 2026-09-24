@@ -1,32 +1,45 @@
+// @deprecated: Use `useGetExpenseActions` instead
+
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
-import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { MinusCircle } from '@styled-icons/feather/MinusCircle';
 import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
 import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
+import { get } from 'lodash-es';
+import { ArrowRightLeft, Copy, FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { styled } from 'styled-components';
 import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
+import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../lib/hooks/useClipboard';
-import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '../../lib/url-helpers';
+import useKeyboardKey, { H, I } from '../../lib/hooks/useKeyboardKey';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getCollectivePageRoute, getDashboardRoute, getPermalinkUrl } from '../../lib/url-helpers';
 
-import { Flex } from '../Grid';
+import { DashboardContext } from '../dashboard/DashboardContext';
+import { FullscreenFlowLoadingPlaceholder } from '../FullscreenFlowLoadingPlaceholder';
+import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
+import { useToast } from '../ui/useToast';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
+
+// Lazy load the submit expense flow
+const SubmitExpenseFlow = React.lazy(() =>
+  import('../submit-expense/SubmitExpenseFlow').then(module => ({ default: module.SubmitExpenseFlow })),
+);
 
 const Action = styled.button`
   ${margin}
@@ -43,11 +56,11 @@ const Action = styled.button`
 
   color: ${props => props.theme.colors.black[900]};
 
-  :hover {
+  &:hover {
     color: ${props => props.theme.colors.black[700]};
   }
 
-  :focus {
+  &:focus {
     color: ${props => props.theme.colors.black[700]};
     text-decoration: underline;
   }
@@ -57,9 +70,34 @@ const Action = styled.button`
   }
 
   > svg {
+    display: inline-block;
     margin-right: 14px;
   }
 `;
+
+const getTransactionsUrl = (dashboardAccount, expense) => {
+  if (dashboardAccount?.isHost && expense?.host?.id === dashboardAccount.id) {
+    return getDashboardRoute(expense.host, `host-transactions?expenseId=${expense.legacyId}`);
+  } else if (dashboardAccount?.slug === expense?.account.slug) {
+    return getDashboardRoute(expense.account, `transactions?expenseId=${expense.legacyId}`);
+  }
+  return null;
+};
+
+export const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
+  if (!LoggedInUser || !expense) {
+    return false;
+  }
+
+  return (
+    [ExpenseType.INVOICE, ExpenseType.RECEIPT].includes(expense.type) &&
+    expense.status !== ExpenseStatus.DRAFT &&
+    (LoggedInUser.CollectiveId === expense.createdByAccount?.legacyId ||
+      LoggedInUser.isAdminOfCollective(expense.account) ||
+      LoggedInUser.isAdminOfCollective(expense.payee) ||
+      LoggedInUser.isAdminOfCollective(expense.host))
+  );
+};
 
 /**
  * Admin buttons for the expense, displayed in a React fragment to let parent
@@ -68,16 +106,24 @@ const Action = styled.button`
 const ExpenseMoreActionsButton = ({
   expense,
   onError,
-  onEdit,
   isDisabled,
-  linkAction,
+  linkAction = 'copy',
   onModalToggle,
   onDelete,
+  onExpenseUpdate,
+  isViewingExpenseInHostContext = false,
+  enableKeyboardShortcuts,
+  onCloneModalOpenChange,
   ...props
 }) => {
-  const [processModal, setProcessModal] = React.useState(false);
+  const [processModal, setProcessModal] = React.useState(null);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
+  const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
+  const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
   const { isCopied, copy } = useClipboard();
+  const { account } = React.useContext(DashboardContext);
+  const { toast } = useToast();
+  const intl = useIntl();
 
   const router = useRouter();
   const permissions = expense?.permissions;
@@ -86,10 +132,36 @@ const ExpenseMoreActionsButton = ({
     expense,
   });
 
+  useKeyboardKey({
+    keyMatch: H,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setProcessModal('HOLD');
+      }
+    },
+  });
+  useKeyboardKey({
+    keyMatch: I,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setProcessModal('MARK_AS_INCOMPLETE');
+      }
+    },
+  });
+  const { LoggedInUser } = useLoggedInUser();
+
   const showDeleteConfirmMoreActions = isOpen => {
     setDeleteConfirm(isOpen);
     onModalToggle?.(isOpen);
   };
+
+  const viewTransactionsUrl = expense && getTransactionsUrl(account, expense);
+
+  if (!permissions) {
+    return null;
+  }
 
   return (
     <React.Fragment>
@@ -104,15 +176,43 @@ const ExpenseMoreActionsButton = ({
             flexGrow={1}
             {...props}
           >
-            <FormattedMessage defaultMessage="More actions" />
+            <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
             &nbsp;
             <ChevronDown size="20px" />
           </StyledButton>
         )}
       >
         {({ setOpen }) => (
-          <Flex flexDirection="column">
-            {permissions?.canApprove && props.isViewingExpenseInHostContext && (
+          <div className="flex flex-col">
+            {permissions.canMarkAsSpam && (
+              <Action
+                disabled={processExpense.loading || isDisabled}
+                buttonStyle="dangerSecondary"
+                data-cy="spam-button"
+                onClick={async () => {
+                  const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.CollectiveId;
+
+                  if (isSubmitter) {
+                    toast({
+                      variant: 'error',
+                      message: intl.formatMessage({
+                        id: 'expense.spam.notAllowed',
+                        defaultMessage: "You can't mark your own expenses as spam",
+                      }),
+                    });
+
+                    return;
+                  }
+
+                  setProcessModal('MARK_AS_SPAM');
+                  setOpen(false);
+                }}
+              >
+                <FlagIcon size={14} />
+                <FormattedMessage id="actions.spam" defaultMessage="Mark as Spam" />
+              </Action>
+            )}
+            {permissions.canApprove && isViewingExpenseInHostContext && (
               <Action
                 loading={processExpense.loading && processExpense.currentAction === 'APPROVE'}
                 disabled={processExpense.loading || isDisabled}
@@ -125,7 +225,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.approve" defaultMessage="Approve" />
               </Action>
             )}
-            {permissions?.canReject && props.isViewingExpenseInHostContext && (
+            {permissions.canReject && isViewingExpenseInHostContext && (
               <Action
                 loading={processExpense.loading && processExpense.currentAction === 'REJECT'}
                 disabled={processExpense.loading || isDisabled}
@@ -138,7 +238,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.reject" defaultMessage="Reject" />
               </Action>
             )}
-            {permissions?.canMarkAsIncomplete && (
+            {permissions.canMarkAsIncomplete && (
               <Action
                 disabled={processExpense.loading || isDisabled}
                 onClick={() => {
@@ -150,7 +250,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
               </Action>
             )}
-            {permissions?.canHold && (
+            {permissions.canHold && (
               <Action
                 disabled={processExpense.loading || isDisabled}
                 onClick={() => {
@@ -162,7 +262,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.hold" defaultMessage="Put On Hold" />
               </Action>
             )}
-            {permissions?.canRelease && (
+            {permissions.canRelease && (
               <Action
                 disabled={processExpense.loading || isDisabled}
                 onClick={() => {
@@ -174,7 +274,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.release" defaultMessage="Release Hold" />
               </Action>
             )}
-            {permissions?.canDelete && (
+            {permissions.canDelete && (
               <Action
                 data-cy="more-actions-delete-expense-btn"
                 onClick={() => showDeleteConfirmMoreActions(true)}
@@ -184,20 +284,18 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </Action>
             )}
-            {permissions?.canEdit && (
-              <Action data-cy="edit-expense-btn" onClick={onEdit} disabled={processExpense.loading || isDisabled}>
-                <IconEdit size="16px" />
-                <FormattedMessage id="Edit" defaultMessage="Edit" />
-              </Action>
-            )}
-            {permissions?.canSeeInvoiceInfo &&
-              [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type) && (
+            {!props.hasAttachedInvoiceFile &&
+              permissions.canSeeInvoiceInfo &&
+              [expenseTypes.INVOICE, expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING].includes(
+                expense?.type,
+              ) && (
                 <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
                   {({ isLoading, downloadInvoice }) => (
                     <Action
                       loading={isLoading}
                       onClick={downloadInvoice}
                       disabled={processExpense.loading || isDisabled}
+                      data-cy="download-expense-invoice-btn"
                     >
                       <IconDownload size="16px" />
                       {isLoading ? (
@@ -209,11 +307,32 @@ const ExpenseMoreActionsButton = ({
                   )}
                 </ExpenseInvoiceDownloadHelper>
               )}
+            {permissions.canDownloadTaxForm &&
+              get(expense, 'receivedTaxForms.nodes', [])
+                .filter(doc => Boolean(doc.documentLink))
+                .map(taxForm => (
+                  <DownloadLegalDocument key={taxForm.id} legalDocument={taxForm} account={expense.payee}>
+                    {({ isDownloading, download }) => (
+                      <Action
+                        key={taxForm.id}
+                        onClick={download}
+                        disabled={isDownloading || processExpense.loading || isDisabled}
+                      >
+                        <FileText size="16px" color="#888" />
+                        <FormattedMessage
+                          defaultMessage="Tax Form ({year})"
+                          id="+ylmVo"
+                          values={{ year: taxForm.year }}
+                        />
+                      </Action>
+                    )}
+                  </DownloadLegalDocument>
+                ))}
             <Action
               onClick={() =>
                 linkAction === 'link'
                   ? router.push(`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`)
-                  : copy(`${getCollectivePageCanonicalURL(expense.account)}/expenses/${expense.legacyId}`)
+                  : copy(getPermalinkUrl(expense.publicId))
               }
               disabled={processExpense.loading || isDisabled}
             >
@@ -224,11 +343,40 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
               )}
             </Action>
-          </Flex>
+            {shouldShowDuplicateExpenseButton(LoggedInUser, expense) && (
+              <Action
+                onClick={() => {
+                  setDuplicateExpenseId(expense.legacyId);
+                  setIsExpenseFlowOpen(true);
+                  onCloneModalOpenChange?.(true);
+                }}
+                disabled={processExpense.loading || isDisabled}
+                data-cy="duplicate-expense-btn"
+              >
+                <Copy size="16px" color="#888" />
+                <FormattedMessage defaultMessage="Duplicate Expense" id="MXaO+R" />
+              </Action>
+            )}
+            {viewTransactionsUrl && (
+              <Action onClick={() => router.push(viewTransactionsUrl)} disabled={processExpense.loading || isDisabled}>
+                <ArrowRightLeft size="16" color="#888" />
+                <FormattedMessage defaultMessage="View Transactions" id="viewTransactions" />
+              </Action>
+            )}
+          </div>
         )}
       </PopupMenu>
       {processModal && (
-        <ConfirmProcessExpenseModal type={processModal} expense={expense} onClose={() => setProcessModal(false)} />
+        <ConfirmProcessExpenseModal
+          type={processModal}
+          open={!!processModal}
+          setOpen={open => {
+            if (!open) {
+              setProcessModal(null);
+            }
+          }}
+          expense={expense}
+        />
       )}
       {hasDeleteConfirm && (
         <ExpenseConfirmDeletion
@@ -237,41 +385,26 @@ const ExpenseMoreActionsButton = ({
           showDeleteConfirmMoreActions={showDeleteConfirmMoreActions}
         />
       )}
+      {isExpenseFlowOpen && (
+        <React.Suspense
+          fallback={<FullscreenFlowLoadingPlaceholder handleOnClose={() => setIsExpenseFlowOpen(false)} />}
+        >
+          <SubmitExpenseFlow
+            onClose={submittedExpense => {
+              setDuplicateExpenseId(null);
+              setIsExpenseFlowOpen(false);
+              onCloneModalOpenChange?.(false);
+              if (submittedExpense) {
+                onExpenseUpdate?.();
+              }
+            }}
+            expenseId={duplicateExpenseId}
+            duplicateExpense={!!duplicateExpenseId}
+          />
+        </React.Suspense>
+      )}
     </React.Fragment>
   );
-};
-
-ExpenseMoreActionsButton.propTypes = {
-  isDisabled: PropTypes.bool,
-  expense: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    legacyId: PropTypes.number.isRequired,
-    type: PropTypes.oneOf(Object.values(expenseTypes)),
-    permissions: PropTypes.shape({
-      canEdit: PropTypes.bool,
-      canSeeInvoiceInfo: PropTypes.bool,
-      canMarkAsIncomplete: PropTypes.bool,
-    }),
-    account: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      parent: PropTypes.shape({
-        slug: PropTypes.string.isRequired,
-      }),
-    }),
-  }),
-  /** Called with an error if anything wrong happens */
-  onError: PropTypes.func,
-  onDelete: PropTypes.func,
-  onModalToggle: PropTypes.func,
-  onEdit: PropTypes.func,
-  linkAction: PropTypes.oneOf(['link', 'copy']),
-  isViewingExpenseInHostContext: PropTypes.bool,
-};
-
-ExpenseMoreActionsButton.defaultProps = {
-  linkAction: 'copy',
-  isViewingExpenseInHostContext: false,
 };
 
 export default ExpenseMoreActionsButton;

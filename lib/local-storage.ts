@@ -3,11 +3,18 @@
  */
 export const LOCAL_STORAGE_KEYS = {
   ACCESS_TOKEN: 'accessToken',
+  TWO_FACTOR_AUTH_TOKEN: 'twoFactorAuthToken',
   GUEST_TOKENS: 'guestTokens',
   HOST_DASHBOARD_FILTER_PREFERENCES: 'hostDashBoardFilterPreferences',
   LAST_DASHBOARD_SLUG: 'lastDashboardSlug',
   DASHBOARD_NAVIGATION_STATE: 'DashboardNavigationState',
   PREFERRED_TWO_FACTOR_METHOD: 'preferredTwoFactorMethod',
+  UPDATES_FORM_STATE: 'updatesFormState',
+  RECENTLY_VISITED: 'recentlyVisited',
+  PLAID_LINK_TOKEN: 'plaidLinkToken',
+  GOCARDLESS_DATA: 'gocardlessData',
+  OSC_TIP_EXPERIMENT_DRAWS: 'oscTipExperimentDraws',
+  NEW_PLATFORM_TIP_FLOW_DRAWS: 'newPlatformTipFlowDraws',
 };
 
 // The below helpers use a try-catch to gracefully fallback in these scenarios:
@@ -28,7 +35,7 @@ export const LOCAL_STORAGE_KEYS = {
 export const getFromLocalStorage = (key: string): string => {
   try {
     return window.localStorage.getItem(key);
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -40,7 +47,7 @@ export const getFromLocalStorage = (key: string): string => {
 export const setLocalStorage = (key: string, value: string): void => {
   try {
     window.localStorage.setItem(key, value);
-  } catch (e) {
+  } catch {
     // Ignore errors
   }
 };
@@ -52,7 +59,7 @@ export const setLocalStorage = (key: string, value: string): void => {
 export const removeFromLocalStorage = (key: string): void => {
   try {
     window.localStorage.removeItem(key);
-  } catch (e) {
+  } catch {
     // Ignore errors
   }
 };

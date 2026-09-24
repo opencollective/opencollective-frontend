@@ -1,26 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import propTypes from '@styled-system/prop-types';
-import { isNil, omitBy, truncate } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
-import Select, {
-  components as ReactSelectComponents,
+import { isNil, omitBy, truncate } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import type {
   ContainerProps,
+  DropdownIndicatorProps,
   GroupHeadingProps,
   OptionProps,
+  Props as ReactSelectProps,
   ValueContainerProps,
 } from 'react-select';
-import styled from 'styled-components';
-import {
-  BorderProps,
-  BorderRadiusProps,
-  layout,
-  LayoutProps,
-  space,
-  SpaceProps,
-  typography,
-  TypographyProps,
-} from 'styled-system';
+import Select, { components as ReactSelectComponents } from 'react-select';
+import { styled } from 'styled-components';
+import type { BorderProps, BorderRadiusProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
+import { layout, space, typography } from 'styled-system';
+
+import injectIntl from '@/lib/injectIntl';
 
 import Container from './Container';
 import { Flex } from './Grid';
@@ -57,7 +52,11 @@ const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
   <ReactSelectComponents.SelectContainer
     {...props}
     innerProps={
-      { ...innerProps, 'data-cy': props.selectProps['data-cy'] || 'select' } as React.HTMLProps<HTMLDivElement>
+      {
+        ...innerProps,
+        'data-cy': props.selectProps['data-cy'] || 'select',
+        'data-testid': props.selectProps['data-testid'] || 'select',
+      } as React.HTMLProps<HTMLDivElement>
     }
   />
 );
@@ -110,6 +109,7 @@ const ValueContainer = ({ children, ...rest }: ValueContainerProps) => {
           <u>
             <FormattedMessage
               defaultMessage="and {selectedCount} others"
+              id="vpMxUJ"
               values={{ selectedCount: selectedCount - 1 }}
             />
           </u>
@@ -118,23 +118,18 @@ const ValueContainer = ({ children, ...rest }: ValueContainerProps) => {
     </ReactSelectComponents.ValueContainer>
   );
 };
-/* eslint-enable react/prop-types */
 
 const STYLES_DISPLAY_NONE = { display: 'none' };
 
 /**
  * Override the default "Caret Down" indicator to use a search icon instead
  */
-const DropdownSearchIndicator = props => {
+const DropdownSearchIndicator = (props: DropdownIndicatorProps) => {
   return props.isDisabled ? null : (
     <ReactSelectComponents.DropdownIndicator {...props}>
       <SearchIcon size={16} fill="#aaaaaa" />
     </ReactSelectComponents.DropdownIndicator>
   );
-};
-
-DropdownSearchIndicator.propTypes = {
-  isDisabled: PropTypes.bool,
 };
 
 const GroupHeading = ({ children, ...props }: GroupHeadingProps) => (
@@ -159,8 +154,8 @@ const GroupHeading = ({ children, ...props }: GroupHeadingProps) => (
 /**
  * A map to override the default components of react-select
  */
-export const customComponents = { SelectContainer, Option, MultiValue, GroupHeading, ValueContainer };
-export const searchableCustomComponents = { ...customComponents, DropdownIndicator: DropdownSearchIndicator };
+const customComponents = { SelectContainer, Option, MultiValue, GroupHeading, ValueContainer };
+const searchableCustomComponents = { ...customComponents, DropdownIndicator: DropdownSearchIndicator };
 
 const getComponents = (components, useSearchIcon) => {
   const baseComponents = useSearchIcon ? searchableCustomComponents : customComponents;
@@ -175,7 +170,7 @@ const getComponents = (components, useSearchIcon) => {
  * Binds our custom theme and wordings to a regular `react-select`'s `Select`.
  * See https://react-select.com for more documentation.
  */
-export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs(
+export const makeStyledSelect = (SelectComponent, { alwaysSearchable = false } = {}) => styled(SelectComponent).attrs(
   ({
     theme,
     intl,
@@ -188,16 +183,17 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     hideDropdownIndicator,
     hideMenu,
     error,
-    styles,
+    styles = {},
     components,
     isSearchable,
     menuPortalTarget,
     selectTheme,
     noOptionsMessage = () => intl.formatMessage(Messages.noOptions),
     options,
-    fontSize,
+    fontSize = '14px',
+    onBlur,
   }) => {
-    isSearchable = isSearchable ?? options?.length > 8;
+    isSearchable = alwaysSearchable || (isSearchable ?? options?.length > 8);
     return {
       isSearchable,
       menuPortalTarget:
@@ -209,7 +205,24 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
       components: getComponents(components, useSearchIcon),
       instanceId: instanceId ? instanceId : inputId,
       theme: selectTheme,
+      onBlur: (event: React.FocusEvent<HTMLInputElement>) => {
+        // Needed for Reect-select to work with Radix UI dialogs
+        // https://github.com/JedWatson/react-select/issues/5732#issuecomment-1742107647
+        const element = event.relatedTarget;
+        if (element && (element.tagName === 'A' || element.tagName === 'BUTTON' || element.tagName === 'INPUT')) {
+          (element as HTMLElement).focus();
+        }
+
+        onBlur?.(event);
+      },
       styles: {
+        valueContainer: baseStyles => {
+          if (styles?.valueContainer) {
+            return { ...baseStyles, ...styles.valueContainer };
+          } else {
+            return baseStyles;
+          }
+        },
         control: (baseStyles, state) => {
           const customStyles: Record<string, unknown> = { borderColor: theme.colors.black[300] };
 
@@ -242,17 +255,23 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           }
         },
         option: (baseStyles, state) => {
-          const customStyles: Record<string, unknown> = { cursor: 'pointer' };
+          const customStyles: Record<string, unknown> = { cursor: state.isDisabled ? 'default' : 'pointer' };
 
           if (state.data.__background__) {
             // Ability to force background by setting a special option prop
             customStyles.background = state.data.__background__;
-          } else if (state.isSelected) {
+            // Interactive content (e.g. create buttons) uses isDisabled to prevent selection
+            // but should not inherit react-select's greyed-out disabled styling
+            if (state.isDisabled) {
+              customStyles.opacity = 1;
+              customStyles.color = 'inherit';
+            }
+          } else if (!state.isDisabled && state.isSelected) {
             customStyles.backgroundColor = theme.colors.primary[200];
             customStyles.color = undefined;
-          } else if (state.isFocused) {
+          } else if (!state.isDisabled && state.isFocused) {
             customStyles.backgroundColor = theme.colors.primary[100];
-          } else {
+          } else if (!state.isDisabled) {
             customStyles['&:hover'] = { backgroundColor: theme.colors.primary[100] };
           }
 
@@ -301,7 +320,15 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
         menuPortal: baseStyles => ({
           ...baseStyles,
           zIndex: 99999,
+          pointerEvents: 'auto',
         }),
+        input: baseStyles => {
+          if (styles?.input) {
+            return { ...baseStyles, ...styles.input };
+          } else {
+            return baseStyles;
+          }
+        },
       },
     };
   },
@@ -315,84 +342,23 @@ export type StyledSelectProps = LayoutProps &
   TypographyProps &
   BorderProps &
   BorderRadiusProps &
-  SpaceProps & {
-    intl: IntlShape;
-    /** Alias for isDisabled */
-    inputId: string;
-    name?: string;
-    placeholder?: React.ReactNode;
-    disabled?: boolean;
-    required?: boolean;
-    useSearchIcon?: boolean;
-    hideDropdownIndicator?: boolean;
-    hideMenu?: boolean;
-    error?: boolean;
-    style?: Record<string, unknown>;
+  SpaceProps &
+  Omit<ReactSelectProps, 'styles' | 'components'> & {
     styles?: Record<string, unknown>;
-    onBlur?: Function;
-    onChange?: Function;
-    formatOptionLabel?: Function;
-    isLoading?: boolean;
-    isSearchable?: boolean;
-    isClearable?: boolean;
-    options?: any;
-    value?: any;
-    defaultValue?: any;
-    menuPlacement?: 'auto' | 'bottom' | 'top';
     components?: Record<string, React.ReactNode | React.Component | React.FunctionComponent>;
-    closeMenuOnSelect?: boolean;
-    hideSelectedOptions?: boolean;
-    isMulti?: boolean;
+    intl?: IntlShape;
+    disabled?: boolean;
+    error?: boolean;
+    inputId?: string;
+    useSearchIcon?: boolean;
   };
 
-type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
+export type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
 
+// @ts-expect-error theme is not properly typed. No time to spend on this as StyledSelect & styled-components are being deprecated.
 const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 
-StyledSelect['propTypes'] = {
-  // Styled-system
-  ...propTypes.typography,
-  ...propTypes.layout,
-  ...propTypes.space,
-  /** The id of the search input */
-  inputId: PropTypes.string.isRequired,
-  /** Define an id prefix for the select components e.g., {your-id}-value */
-  instanceId: PropTypes.string,
-  /** Placeholder for the select value */
-  placeholder: PropTypes.node,
-  /** Whether the component is disabled */
-  disabled: PropTypes.bool,
-  required: PropTypes.bool,
-  /** Alias for `disabled` */
-  isDisabled: PropTypes.bool,
-  /** Rendered when there's no option to show */
-  noOptionsMessage: PropTypes.func,
-  /** If true, a search icon will be used instead of the default caret down */
-  useSearchIcon: PropTypes.bool,
-  /** If true, DropDown indicator (caret) will not be displayed */
-  hideDropdownIndicator: PropTypes.bool,
-  /** If true, options list will not be displayed */
-  hideMenu: PropTypes.bool,
-  /** Default placement of the menu in relation to the control */
-  menuPlacement: PropTypes.oneOf(['bottom', 'top', 'auto']),
-  /** Displays a red border when truthy */
-  error: PropTypes.any,
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
-  /** Default option */
-  defaultValue: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-  styles: PropTypes.object,
-  /** To render menu in a portal */
-  menuPortalTarget: PropTypes.any,
-  /** Compact mode for rending multiple selections correctly **/
-  useCompactMode: PropTypes.bool,
-  name: PropTypes.string,
-};
-
-StyledSelect['defaultProps'] = {
-  fontSize: '14px',
-  styles: {},
-  useCompactMode: false,
-};
-
-export default injectIntl(StyledSelect);
+/**
+ * @deprecated Use `ui/Select` instead
+ */
+export default injectIntl(StyledSelect, { forwardRef: true }) as undefined as StyledSelectCustomComponent;

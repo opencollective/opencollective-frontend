@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { graphql } from '@apollo/client/react/hoc';
-import { partition } from 'lodash';
+import { partition } from 'lodash-es';
 import Head from 'next/head';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../lib/graphql/helpers';
+import { collectiveBannerIframeQuery } from '../lib/graphql/v1/queries';
 import { getRequestIntl } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
 
@@ -65,13 +65,13 @@ const ContributeButton = styled.div`
   cursor: pointer;
   background-image: url(/static/images/buttons/contribute-button-blue.svg);
 
-  :hover {
+  &:hover {
     background-position: 0 -50px;
   }
-  :active {
+  &:active {
     background-position: 0 -100px;
   }
-  :focus {
+  &:focus {
     outline: 0;
   }
 `;
@@ -276,7 +276,6 @@ class BannerIframe extends React.Component {
         <Query
           query={topContributorsQuery}
           variables={{ collectiveSlug: this.props.collectiveSlug }}
-          context={API_V2_CONTEXT}
           onCompleted={this.onSizeUpdate}
         >
           {({ data, error, loading }) =>
@@ -320,7 +319,7 @@ class BannerIframe extends React.Component {
     let style;
     try {
       style = JSON.parse(this.props.style || '{}');
-    } catch (e) {
+    } catch {
       style = {};
     }
 
@@ -364,9 +363,7 @@ class BannerIframe extends React.Component {
                   n: backers.organizations + backers.collectives,
                   collective: collective.name,
                 }}
-                defaultMessage={
-                  '{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}'
-                }
+                defaultMessage="{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}"
               />
             </h2>
             <div className="actions">
@@ -399,7 +396,7 @@ class BannerIframe extends React.Component {
               <FormattedMessage
                 id="collective.section.backers.users.title"
                 values={{ n: backers.users, collective: collective.name }}
-                defaultMessage={'{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}'}
+                defaultMessage="{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}"
               />
             </h2>
 
@@ -431,30 +428,12 @@ class BannerIframe extends React.Component {
   }
 }
 
-const collectiveBannerIframeQuery = gqlV1/* GraphQL */ `
-  query CollectiveBannerIframe($collectiveSlug: String) {
-    Collective(slug: $collectiveSlug) {
-      id
-      name
-      slug
-      currency
-      stats {
-        id
-        backers {
-          id
-          users
-          organizations
-          collectives
-        }
-      }
-    }
-  }
-`;
-
-export const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
+const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
   options({ collectiveSlug, useNewFormat }) {
-    return { skip: !collectiveSlug || useNewFormat };
+    return { context: API_V1_CONTEXT, skip: !collectiveSlug || useNewFormat };
   },
 });
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default addCollectiveBannerIframeData(BannerIframe);

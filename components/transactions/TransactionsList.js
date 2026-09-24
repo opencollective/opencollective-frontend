@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import StyledCard from '../StyledCard';
@@ -14,7 +13,7 @@ const Container = styled.div`
     `}
 `;
 
-const TransactionsList = ({ transactions, collective, displayActions, onMutationSuccess }) => {
+const TransactionsList = ({ transactions, collective, displayActions }) => {
   if (!transactions?.length) {
     return null;
   }
@@ -24,38 +23,12 @@ const TransactionsList = ({ transactions, collective, displayActions, onMutation
       {transactions.map((transaction, idx) => {
         return (
           <Container key={transaction?.id || idx} isFirst={!idx} data-cy="single-transaction">
-            <TransactionItem
-              transaction={transaction}
-              collective={collective}
-              displayActions={displayActions}
-              onMutationSuccess={onMutationSuccess}
-            />
+            <TransactionItem transaction={transaction} collective={collective} displayActions={displayActions} />
           </Container>
         );
       })}
     </StyledCard>
   );
-};
-
-TransactionsList.propTypes = {
-  isLoading: PropTypes.bool,
-  displayActions: PropTypes.bool,
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
-  }),
-  transactions: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }),
-  ),
-  onMutationSuccess: PropTypes.func,
-};
-
-TransactionsList.defaultProps = {
-  view: 'public',
 };
 
 export default TransactionsList;

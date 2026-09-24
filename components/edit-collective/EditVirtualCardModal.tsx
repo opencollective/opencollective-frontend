@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { useFormik } from 'formik';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../../lib/constants/roles';
 import { graphqlAmountValueInCents } from '../../lib/currency-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, VirtualCard, VirtualCardLimitInterval, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
+import { gql } from '../../lib/graphql/helpers';
+import type { Account, VirtualCard, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
@@ -19,22 +20,22 @@ import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../Collecti
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
+import InputAmount from '../InputAmount';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const editVirtualCardMutation = gql`
-  mutation editVirtualCard(
+  mutation EditVirtualCard(
     $virtualCard: VirtualCardReferenceInput!
     $name: String!
     $limitAmount: AmountInput
@@ -63,7 +64,7 @@ const editVirtualCardMutation = gql`
 `;
 
 const createVirtualCardMutation = gql`
-  mutation createVirtualCard(
+  mutation CreateVirtualCard(
     $name: String!
     $limitAmount: AmountInput!
     $limitInterval: VirtualCardLimitInterval!
@@ -164,10 +165,10 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-export type EditVirtualCardModalProps = {
+type EditVirtualCardModalProps = {
   host: Account;
   collective?: Account;
-  virtualCard: VirtualCard;
+  virtualCard?: Omit<VirtualCard, 'publicId'>;
   virtualCardRequest?: VirtualCardRequest;
   onSuccess: (el: React.ReactNode) => void;
   onClose: () => void;
@@ -183,10 +184,9 @@ export default function EditVirtualCardModal({
   modalProps,
   virtualCardRequest,
 }: EditVirtualCardModalProps) {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const { data: policyData, loading: isLoadingPolicy } = useQuery(VirtualCardPoliciesQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       slug: host.slug,
     },
@@ -198,12 +198,8 @@ export default function EditVirtualCardModal({
   const isEditing = virtualCard?.id ? true : false;
   const formMutation = isEditing ? editVirtualCardMutation : createVirtualCardMutation;
 
-  const [submitForm, { loading: isBusy }] = useMutation(formMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitForm, { loading: isBusy }] = useMutation(formMutation);
+  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery);
 
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.hasRole(roles.ADMIN, host);
@@ -217,7 +213,9 @@ export default function EditVirtualCardModal({
       cardName: virtualCard?.name,
       assignee: virtualCard?.assignee,
       limitAmount: canEditLimit ? virtualCard?.spendingLimitAmount : undefined,
-      limitInterval: canEditLimit ? virtualCard?.spendingLimitInterval ?? VirtualCardLimitInterval.MONTHLY : undefined,
+      limitInterval: canEditLimit
+        ? (virtualCard?.spendingLimitInterval ?? VirtualCardLimitInterval.MONTHLY)
+        : undefined,
     },
     async onSubmit(values) {
       const { assignee, cardName, limitAmount, limitInterval, collective } = values;
@@ -228,8 +226,8 @@ export default function EditVirtualCardModal({
           account: isEditing
             ? undefined
             : typeof collective.id === 'string'
-            ? { id: collective.id }
-            : { legacyId: collective.id },
+              ? { id: collective.id }
+              : { legacyId: collective.id },
           name: cardName,
           assignee: { id: assignee.id },
           limitAmount: undefined,
@@ -249,11 +247,12 @@ export default function EditVirtualCardModal({
 
         await submitForm({ variables });
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: (
             <FormattedMessage
               defaultMessage="Error submiting form: {error}"
+              id="FAV3Ng"
               values={{
                 error: e.message,
               }}
@@ -263,7 +262,7 @@ export default function EditVirtualCardModal({
         return;
       }
 
-      onSuccess?.(<FormattedMessage defaultMessage="Card successfully updated" />);
+      onSuccess?.(<FormattedMessage defaultMessage="Card successfully updated" id="Nd9ioQ" />);
       handleClose();
     },
     validate(values: any) {
@@ -303,7 +302,6 @@ export default function EditVirtualCardModal({
       };
     };
   }>(virtualCardsAssignedToCollectiveQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       collectiveSlug: formik.values?.collective?.slug,
       hostSlug: host.slug,
@@ -333,21 +331,27 @@ export default function EditVirtualCardModal({
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <StyledModal width="420px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal onClose={handleClose} {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose} hideCloseIcon={false}>
           {isEditing ? (
-            <FormattedMessage defaultMessage="Edit virtual card" />
+            <FormattedMessage defaultMessage="Edit virtual card" id="TtzWuE" />
           ) : (
-            <FormattedMessage defaultMessage="Create virtual card" />
+            <FormattedMessage defaultMessage="Create virtual card" id="FRM4fb" />
           )}
         </ModalHeader>
         <ModalBody pt={2}>
           <P>
             {isEditing ? (
-              <FormattedMessage defaultMessage="Edit virtual card for a collective with the information below." />
+              <FormattedMessage
+                defaultMessage="Edit virtual card for a collective with the information below."
+                id="9nfFQ7"
+              />
             ) : (
-              <FormattedMessage defaultMessage="Create virtual card for a collective with the information below." />
+              <FormattedMessage
+                defaultMessage="Create virtual card for a collective with the information below."
+                id="NW8fj9"
+              />
             )}
           </P>
           <StyledHr borderColor="black.300" mt={3} />
@@ -358,7 +362,9 @@ export default function EditVirtualCardModal({
                   mb={3}
                   labelFontSize="13px"
                   labelFontWeight="bold"
-                  label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" />}
+                  label={
+                    <FormattedMessage defaultMessage="Which collective will be assigned to this card?" id="goAEwY" />
+                  }
                   htmlFor="collective"
                   error={formik.touched.collective && formik.errors.collective}
                 >
@@ -397,6 +403,7 @@ export default function EditVirtualCardModal({
                     >
                       <FormattedMessage
                         defaultMessage="This collective already has {allCardsCount} other cards assigned to it. {missingReceiptsCardsCount, plural, =0 {} other {# of the {allCardsCount} cards have missing receipts.}}"
+                        id="Ox+jio"
                         values={{
                           allCardsCount: virtualCardsAssignedToCollectiveData.host.allCards.totalCount,
                           missingReceiptsCardsCount:
@@ -405,9 +412,9 @@ export default function EditVirtualCardModal({
                       />
                       <Box mt={3}>
                         <StyledLink
-                          href={`/${host.slug}/admin/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
+                          href={`/dashboard/${host.slug}/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
                         >
-                          <FormattedMessage defaultMessage="View Assigned Cards" />
+                          <FormattedMessage defaultMessage="View Assigned Cards" id="PO4Kx4" />
                         </StyledLink>
                       </Box>
                     </MessageBox>
@@ -418,7 +425,7 @@ export default function EditVirtualCardModal({
             <StyledInputField
               labelFontSize="13px"
               labelFontWeight="bold"
-              label={<FormattedMessage defaultMessage="Who is this card assigned to?" />}
+              label={<FormattedMessage defaultMessage="Who is this card assigned to?" id="agYvVC" />}
               htmlFor="assignee"
               error={formik.touched.assignee && formik.errors.assignee}
             >
@@ -440,7 +447,7 @@ export default function EditVirtualCardModal({
               mt={3}
               labelFontWeight="bold"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Card name" />}
+              label={<FormattedMessage defaultMessage="Card name" id="8oufoc" />}
               htmlFor="cardName"
               error={formik.touched.cardName && formik.errors.cardName}
             >
@@ -449,7 +456,7 @@ export default function EditVirtualCardModal({
                   {...inputProps}
                   name="cardName"
                   id="cardName"
-                  placeholder={intl.formatMessage({ defaultMessage: 'e.g Card for Subscription' })}
+                  placeholder={intl.formatMessage({ defaultMessage: 'e.g Card for Subscription', id: 'vREsbj' })}
                   onChange={formik.handleChange}
                   value={formik.values.cardName}
                   disabled={isBusy}
@@ -462,17 +469,18 @@ export default function EditVirtualCardModal({
               <React.Fragment>
                 <Flex mt={3} width="100%" alignItems="flex-start" justifyContent="space-between">
                   <StyledInputField
-                    flexGrow={1}
+                    flex="1 1 60%"
                     labelFontSize="13px"
                     labelFontWeight="bold"
                     label={
                       <FormattedMessage
                         defaultMessage="Limit Interval <link>(Read More)</link>"
+                        id="vV7hmB"
                         values={{
                           link: getI18nLink({
                             as: Link,
                             openInNewTab: true,
-                            href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                            href: 'https://documentation.opencollective.com/fiscal-hosts/virtual-cards',
                           }),
                         }}
                       />
@@ -497,14 +505,13 @@ export default function EditVirtualCardModal({
                     ml={3}
                     labelFontSize="13px"
                     labelFontWeight="bold"
-                    label={<FormattedMessage defaultMessage="Card Limit" />}
+                    label={<FormattedMessage defaultMessage="Card Limit" id="ehbxf1" />}
                     htmlFor="limitAmount"
                   >
                     {inputProps => (
-                      <StyledInputAmount
+                      <InputAmount
                         {...inputProps}
                         id="limitAmount"
-                        placeholder="0.00"
                         error={formik.touched.limitAmount && Boolean(formik.errors.limitAmount)}
                         currency={currency}
                         prepend={currency}
@@ -524,7 +531,7 @@ export default function EditVirtualCardModal({
                   <Box pt={2}>
                     <ExclamationCircle color="#E03F6A" size={16} />
                     <Span ml={1} color="black.700" fontSize="14px">
-                      {formik.errors.limitAmount}
+                      {typeof formik.errors.limitAmount === 'string' && formik.errors.limitAmount}
                     </Span>
                   </Box>
                 )}
@@ -550,7 +557,7 @@ export default function EditVirtualCardModal({
               {isEditing ? (
                 <FormattedMessage id="actions.update" defaultMessage="Update" />
               ) : (
-                <FormattedMessage defaultMessage="Create virtual card" />
+                <FormattedMessage defaultMessage="Create virtual card" id="FRM4fb" />
               )}
             </StyledButton>
           </Flex>

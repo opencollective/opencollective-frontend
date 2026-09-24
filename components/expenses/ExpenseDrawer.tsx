@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
-import { useApolloClient, useLazyQuery } from '@apollo/client';
+import React from 'react';
+import { useApolloClient, useQuery } from '@apollo/client';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { usePrevious } from '../../lib/hooks/usePrevious';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
-import { getVariableFromProps } from '../../pages/expense';
+import { getVariablesFromQuery } from '../../pages/expense';
+import { EmptyResults } from '../dashboard/EmptyResults';
 import { Drawer } from '../Drawer';
 
 import { expensePageQuery } from './graphql/queries';
@@ -13,22 +16,45 @@ type ExpenseDrawerProps = {
   handleClose: () => void;
   openExpenseLegacyId?: number;
   initialExpenseValues?: any;
+  /**
+   * A set of rules that the expense must pass to be displayed in the drawer, used to address
+   * Insecure Direct Object Reference (IDOR) vulnerabilities.
+   */
+  validate?: {
+    accountSlug?: string;
+    expenseType?: string;
+  };
 };
 
-export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initialExpenseValues }: ExpenseDrawerProps) {
+export default function ExpenseDrawer({
+  openExpenseLegacyId,
+  handleClose,
+  initialExpenseValues,
+  validate,
+}: ExpenseDrawerProps) {
   const client = useApolloClient();
-  const [getExpense, { data, loading, error, startPolling, stopPolling, refetch, fetchMore }] = useLazyQuery(
-    expensePageQuery,
-    {
-      context: API_V2_CONTEXT,
-    },
-  );
+  const { LoggedInUser } = useLoggedInUser();
+  const prevExpenseId = usePrevious(openExpenseLegacyId);
+  const id = openExpenseLegacyId || prevExpenseId;
 
-  useEffect(() => {
-    if (openExpenseLegacyId) {
-      getExpense({ variables: getVariableFromProps({ ExpenseId: openExpenseLegacyId }) });
+  const { data, loading, error, refetch, fetchMore } = useQuery(expensePageQuery, {
+    variables: id ? getVariablesFromQuery({ ExpenseId: id }) : undefined,
+    skip: !id,
+
+    fetchPolicy: 'cache-and-network',
+  });
+  const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
+  const passesValidations = React.useMemo(() => {
+    if (!validate || (!data?.expense && !loading && !error)) {
+      return true;
+    } else {
+      return (
+        data?.expense &&
+        (!validate.accountSlug || validate.accountSlug === data.expense.account.slug) &&
+        (!validate.expenseType || validate.expenseType === data.expense.type)
+      );
     }
-  }, [openExpenseLegacyId]);
+  }, [validate, data, loading, error]);
 
   return (
     <Drawer
@@ -39,18 +65,24 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
       data-cy="expense-drawer"
       className="max-w-3xl"
     >
-      <Expense
-        data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
-        // Making sure to initially set loading to true before the query is called
-        loading={loading || (!data && !error)}
-        error={error}
-        refetch={refetch}
-        client={client}
-        fetchMore={fetchMore}
-        legacyExpenseId={openExpenseLegacyId}
-        startPolling={startPolling}
-        stopPolling={stopPolling}
-      />
+      {passesValidations ? (
+        <Expense
+          data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
+          loading={loading || (!data && !error)}
+          error={error}
+          refetch={refetch}
+          client={client}
+          fetchMore={fetchMore}
+          legacyExpenseId={id}
+          isDrawer
+          onClose={handleClose}
+          enableKeyboardShortcuts={hasKeyboardShortcutsEnabled}
+        />
+      ) : (
+        <div className="flex h-full items-center justify-center">
+          <EmptyResults hasFilters={false} entityType="EXPENSES" />
+        </div>
+      )}
     </Drawer>
   );
 }

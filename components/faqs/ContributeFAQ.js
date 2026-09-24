@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { Box } from '../Grid';
@@ -26,7 +25,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
           values={{
             LearnMoreLink: getI18nLink({
               openInNewTab: true,
-              href: 'https://docs.opencollective.com/help/product/security#payments-security',
+              href: 'https://documentation.opencollective.com/advanced/security-for-accounts',
             }),
           }}
         />
@@ -43,7 +42,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
           values={{
             Link: getI18nLink({
               openInNewTab: true,
-              href: 'https://docs.opencollective.com/help/financial-contributors/platform-tips',
+              href: 'https://documentation.opencollective.com/giving-to-collectives/platform-tips',
             }),
           }}
         />
@@ -97,11 +96,12 @@ const ContributeFAQ = ({ collective, ...props }) => (
     </Entry>
     <Entry>
       <Title>
-        <FormattedMessage defaultMessage="What information is shared with the Collectives?" />
+        <FormattedMessage defaultMessage="What information is shared with the Collectives?" id="Ntwzwf" />
       </Title>
       <Content>
         <FormattedMessage
           defaultMessage="When you contribute to a Collective we share your email address with the Administrators. If you wish to keep your contribution private choose the ‘incognito’ profile. Read our <PrivacyPolicyLink>privacy policy</PrivacyPolicyLink>."
+          id="LfwUBd"
           values={{ PrivacyPolicyLink: getI18nLink({ href: '/privacypolicy', openInNewTab: true, as: Link }) }}
         />
       </Content>
@@ -116,16 +116,14 @@ const ContributeFAQ = ({ collective, ...props }) => (
       <Content>
         <FormattedMessage
           id="ContributeDetails.faq.isIncognito.content"
-          defaultMessage={
-            'Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile.'
-          }
+          defaultMessage={`Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile.`}
         />
       </Content>
     </Entry>
     <Box mt={2}>
       <StyledLink
         as={StyledLink}
-        href="https://docs.opencollective.com/help/financial-contributors/payments#financial-contribution-flow"
+        href="https://documentation.opencollective.com/giving-to-collectives/payment-methods"
         openInNewTab
         fontSize="12px"
         color="black.700"
@@ -136,20 +134,5 @@ const ContributeFAQ = ({ collective, ...props }) => (
     </Box>
   </FAQ>
 );
-
-ContributeFAQ.propTypes = {
-  collective: PropTypes.shape({
-    name: PropTypes.string,
-    contributionPolicy: PropTypes.string,
-    host: PropTypes.shape({
-      name: PropTypes.string,
-      contributionPolicy: PropTypes.string,
-    }),
-    parent: PropTypes.shape({
-      name: PropTypes.string,
-      contributionPolicy: PropTypes.string,
-    }),
-  }),
-};
 
 export default ContributeFAQ;

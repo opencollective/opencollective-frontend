@@ -67,7 +67,7 @@ describe('New users profiles', () => {
       cy.contains('#section-budget a[href^="/xdamman/transactions"]', 'View all contributions').should(
         'have.attr',
         'href',
-        '/xdamman/transactions?kind=ADDED_FUNDS,CONTRIBUTION,PLATFORM_TIP',
+        '/xdamman/transactions?kind=ADDED_FUNDS&kind=CONTRIBUTION&kind=PLATFORM_TIP',
       );
       cy.get('#section-budget [data-cy=single-budget-item]').its('length').should('eq', 3);
       cy.get('#section-budget [data-cy=transaction-item]').its('length').should('eq', 3);

@@ -1,23 +1,25 @@
 import React from 'react';
-import { uniqBy } from 'lodash';
+import { uniqBy } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 
-import { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
+import type { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from './lib/attachments';
 
+import Dropzone from '../Dropzone';
 import { Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
-import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
 import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import AttachedFiles from './AttachedFiles';
 
+type FileInput = { url: string } | File;
+
 type AttachedFilesFormProps = {
-  onChange: (files: any) => void;
+  onChange: (files: FileInput | FileInput[]) => void;
   disabled?: boolean;
-  defaultValue?: any;
+  defaultValue?: FileInput | FileInput[];
   title: React.ReactNode;
   description?: React.ReactNode;
   isMulti?: boolean;
@@ -37,7 +39,13 @@ const AttachedFilesForm = ({
   name,
   openFileViewer,
 }: AttachedFilesFormProps) => {
-  const [files, setFiles] = React.useState(isMulti ? uniqBy(defaultValue, 'url') : defaultValue ? [defaultValue] : []);
+  const [files, setFiles] = React.useState<FileInput[]>(
+    isMulti
+      ? uniqBy(defaultValue as FileInput[], 'url')
+      : (defaultValue as FileInput)
+        ? [defaultValue as FileInput]
+        : [],
+  );
   return (
     <div>
       <Flex alignItems="center" my={16}>
@@ -54,7 +62,7 @@ const AttachedFilesForm = ({
             }}
           />
           &nbsp;
-          <PrivateInfoIcon color="#969BA3" size={12} />
+          <PrivateInfoIcon className="text-muted-foreground" size={12} />
         </Span>
         <StyledHr flex="1" borderColor="black.300" mx={2} />
         {isMulti && files?.length > 0 && (
@@ -63,9 +71,9 @@ const AttachedFilesForm = ({
             kind={kind}
             disabled={disabled}
             onSuccess={data => {
-              const uploadedFiles = [...files, data];
+              const uploadedFiles = [...files, data as FileInput];
               setFiles(uploadedFiles);
-              onChange(data);
+              onChange(data as FileInput | FileInput[]);
             }}
           />
         )}
@@ -80,7 +88,7 @@ const AttachedFilesForm = ({
           files={files}
           openFileViewer={openFileViewer}
           onRemove={idx => {
-            let updatedFiles = null;
+            let updatedFiles: FileInput[] = null;
             if (isMulti) {
               updatedFiles = [...files];
               updatedFiles.splice(idx, 1);
@@ -91,7 +99,7 @@ const AttachedFilesForm = ({
           }}
         />
       ) : (
-        <StyledDropzone
+        <Dropzone
           {...attachmentDropzoneParams}
           name={name}
           kind={kind}

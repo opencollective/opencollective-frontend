@@ -1,8 +1,10 @@
 import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
-import { isObject, omit } from 'lodash';
-import sanitizeHtml from 'sanitize-html';
+import { isArray, isEmpty, isObject, omit, omitBy } from 'lodash-es';
+import memoizeOne from 'memoize-one';
 import { twMerge } from 'tailwind-merge';
+
+import * as whitelabel from './constants/whitelabel-providers';
 
 /**
  * Helper to make it easier to conditionally add and deduplicate Tailwind CSS classes and deduplicate
@@ -20,14 +22,28 @@ export function truncate(str, length) {
   return `${subString.substr(0, subString.lastIndexOf(' '))} …`;
 }
 
+export function truncateMiddle(str, length, divider = '…') {
+  if (!str || typeof str !== 'string' || str.length <= length) {
+    return str;
+  }
+  const splitLength = Math.floor(length / 2);
+  return `${str.slice(0, splitLength - 1)}${divider}${str.slice(-splitLength)}`;
+}
+
 export const isValidUrl = url => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };
+
+/**
+ * Dummy origin used only to decide whether `url` stays same-site when resolved.
+ * Must not depend on WEBSITE_URL (unset in some unit tests / SSR).
+ */
+const RELATIVE_URL_PARSE_BASE = 'https://opencollective.com';
 
 /**
  * Validate a relative path.
@@ -43,8 +59,26 @@ export const isValidUrl = url => {
  * false
  */
 export const isValidRelativeUrl = url => {
-  url = url?.trim();
+  if (typeof url !== 'string') {
+    return false;
+  }
+
+  url = url.trim();
   if (!url) {
+    return false;
+  }
+
+  // WHATWG parsers strip leading C0 controls / DEL, so a NUL-prefixed "//evil.com"
+  // would otherwise look relative here and resolve off-site via `new URL(url, base)`.
+  for (let i = 0; i < url.length; i++) {
+    const code = url.charCodeAt(i);
+    if (code <= 0x1f || code === 0x7f) {
+      return false;
+    }
+  }
+
+  // Some URL parsers treat backslash as a slash (/\evil.com -> //evil.com).
+  if (url.includes('\\')) {
     return false;
   }
 
@@ -52,14 +86,29 @@ export const isValidRelativeUrl = url => {
     // If we're able to construct a URL, it means it's an absolute URL.
     new URL(url);
     return false;
-  } catch (e) {
-    // Prevent URLs like //example.com or /\n/example.com or /\/example.com/
+  } catch {
+    // Prevent URLs like //example.com or / /example.com
     if (url.match(/^[\s\\/]{2,}.+/)) {
       return false;
-    } else {
-      return true;
     }
   }
+
+  try {
+    const parsed = new URL(url, RELATIVE_URL_PARSE_BASE);
+    return parsed.origin === new URL(RELATIVE_URL_PARSE_BASE).origin;
+  } catch {
+    return false;
+  }
+};
+
+export const isTrustedSigninRedirectionUrl = (url: string) => {
+  if (!url) {
+    return false;
+  } else if (url.startsWith('http://') || url.startsWith('https://')) {
+    const parsedUrl = new URL(url);
+    return whitelabel.WHITELABEL_DOMAINS.includes(parsedUrl.origin);
+  }
+  return false;
 };
 
 export const isValidEmail = email => {
@@ -81,23 +130,6 @@ export function parseToBoolean(value, defaultValue = false) {
     return true;
   }
   return defaultValue;
-}
-
-export function getQueryParams() {
-  const urlParams = {};
-  let match;
-  const pl = /\+/g, // Regex for replacing addition symbol with a space
-    search = /([^&=]+)=?([^&]*)/g,
-    decode = function (s) {
-      return decodeURIComponent(s.replace(pl, ' '));
-    },
-    query = window.location.search.substring(1);
-
-  // eslint-disable-next-line no-cond-assign
-  while ((match = search.exec(query))) {
-    urlParams[decode(match[1])] = decode(match[2]);
-  }
-  return urlParams;
 }
 
 export function formatDate(
@@ -197,17 +229,14 @@ export const getWebsiteUrl = () => {
   }
 };
 
-export function compose(...funcs) {
-  const functions = funcs.reverse();
-  return function (...args) {
-    const [firstFunction, ...restFunctions] = functions;
-    let result = firstFunction.apply(null, args);
-    restFunctions.forEach(fnc => {
-      result = fnc.call(null, result);
-    });
-    return result;
+// https://medium.com/@akhilanand.ak01/function-composition-in-javascript-exploring-the-power-of-compose-4114da8b9875
+export const compose = (...functions) => {
+  return input => {
+    return functions.reduceRight((acc, fn) => {
+      return fn(acc);
+    }, input);
   };
-}
+};
 
 /** This function will return true if reportValidity is not supported by the browser, or if it succeed */
 export const reportValidityHTML5 = domNodeOrEvent => {
@@ -239,31 +268,37 @@ export const allSettled = promises => {
   );
 };
 
-/**
- * Returns flat object containing keys with values that are not empty objects.
- * Ex:
- *    flattenObjectDeep({ b: true, c: { d: {}, e: false }})
- *    // {b: true, e: false}
- *
- *    flattenObjectDeep({ c: { d: {} }})
- *    // {}
- */
-
-export const flattenObjectDeep = obj =>
-  Object.keys(obj).reduce(
-    (acc, k) => (typeof obj[k] === 'object' ? { ...acc, ...flattenObjectDeep(obj[k]) } : { ...acc, [k]: obj[k] }),
-    {},
-  );
-
-export const stripHTML = htmlContent => sanitizeHtml(htmlContent, { allowedTags: [], allowedAttributes: {} });
-
 export const omitDeep = (obj, keys) =>
   Object.keys(omit(obj, keys)).reduce(
-    (acc, next) => ({ ...acc, [next]: isObject(obj[next]) ? omitDeep(obj[next], keys) : obj[next] }),
+    (acc, next) => ({
+      ...acc,
+      [next]: isObject(obj[next]) && !isArray(obj[next]) ? omitDeep(obj[next], keys) : obj[next],
+    }),
+    {},
+  );
+export const omitDeepBy = (obj, predicate) =>
+  Object.keys(omitBy(obj, predicate)).reduce(
+    (acc, next) => ({
+      ...acc,
+      [next]: isObject(obj[next]) && !isArray(obj[next]) ? omitDeepBy(obj[next], predicate) : obj[next],
+    }),
     {},
   );
 
-export const getCurrentDateInUTC = () => new Date().toISOString().split('T')[0];
+/** Return all object keys paths */
+export function objectKeys(obj: object, filter = Boolean, parentPath = ''): string[] {
+  const keys = [];
+  Object.entries(obj).forEach(([childKey, child]) => {
+    const childPath = `${parentPath}${isEmpty(parentPath) ? '' : '.'}${childKey}`;
+    if (typeof child === 'object') {
+      keys.push(...objectKeys(child, filter, childPath /* parentPath */));
+    } else {
+      keys.push(childPath);
+    }
+  });
+
+  return keys;
+}
 
 /**
  * Sort options as: All, then by alphabetical order, then "No payment method" or "Other" at the end
@@ -289,3 +324,16 @@ export const sortSelectOptions = (option1, option2) => {
   }
   return option1.label.localeCompare(option2.label);
 };
+
+/**
+ * @returns An array memoizer (one-time, using memoize-one) that, given array of values, returns the same array if all the values are the same.
+ * @example
+ *  const memoizer = getArrayValuesMemoizer();
+ *  memoizer([1, 2, 3]); // [1, 2, 3]
+ *  memoizer([1, 2, 3]); // [1, 2, 3] (memoized)
+ *  memoizer([1, 2, 4]); // [1, 2, 4]
+ */
+export function getArrayValuesMemoizer<T>(): (array: T[]) => T[] {
+  const memoizer = memoizeOne((...values) => values);
+  return (array: T[]) => memoizer(...array);
+}

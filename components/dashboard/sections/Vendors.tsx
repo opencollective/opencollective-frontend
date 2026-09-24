@@ -1,0 +1,589 @@
+import React, { useContext } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import { compact, isEmpty, pick } from 'lodash-es';
+import { AlertTriangle, PlusIcon, User } from 'lucide-react';
+import { useRouter } from 'next/router';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
+
+import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
+import { boolean, limit, offset } from '@/lib/filters/schemas';
+import { gql } from '@/lib/graphql/helpers';
+import type { DashboardVendorsQuery, DashboardVendorsQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import { formatCommunityRelation } from '@/lib/i18n/community-relation';
+
+import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
+import StackedAvatars from '@/components/StackedAvatars';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
+
+import Avatar from '../../Avatar';
+import { i18nWithColon } from '../../I18nFormatters';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import StyledModal from '../../StyledModal';
+import { actionsColumn, DataTable } from '../../table/DataTable';
+import { Button } from '../../ui/Button';
+import { getEffectiveVendorPolicyLabel } from '../../vendors/common';
+import type { VendorFieldsFragment } from '../../vendors/queries';
+import { setVendorArchiveMutation, vendorFieldFragment } from '../../vendors/queries';
+import VendorForm from '../../vendors/VendorForm';
+import { DashboardContext } from '../DashboardContext';
+import DashboardHeader from '../DashboardHeader';
+import { makeAmountFilter } from '../filters/AmountFilter';
+import { Filterbar } from '../filters/Filterbar';
+import { Pagination } from '../filters/Pagination';
+import { searchFilter } from '../filters/SearchFilter';
+import { buildSortFilter } from '../filters/SortFilter';
+import type { DashboardSectionProps } from '../types';
+import { makePushSubpath } from '../utils';
+
+import { AccountDetails } from './community/AccountDetail';
+import { usePersonActions } from './community/common';
+
+enum VendorsTab {
+  ALL = 'ALL',
+  VENDORS = 'VENDORS',
+  ORGANIZATIONS = 'ORGANIZATIONS',
+  ARCHIVED_VENDORS = 'ARCHIVED_VENDORS',
+}
+
+const dashboardVendorsQuery = gql`
+  fragment HostFields on Host {
+    id
+    legacyId
+    name
+    legalName
+    slug
+    type
+    expensePolicy
+    settings
+    currency
+    requiredLegalDocuments
+    policies {
+      id
+      USE_VENDOR_POLICY
+    }
+    features {
+      id
+      MULTI_CURRENCY_EXPENSES
+    }
+    location {
+      id
+      address
+      country
+    }
+    transferwise {
+      id
+      availableCurrencies
+    }
+    supportedPayoutMethods
+    isTrustedHost
+    vendors(
+      searchTerm: $searchTerm
+      isArchived: $isArchived
+      limit: $limit
+      offset: $offset
+      totalContributed: $totalContributed
+      totalExpended: $totalExpended
+      orderBy: $orderBy
+    ) @include(if: $onlyVendors) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        ...VendorFields
+        communityStats(host: { slug: $slug }) {
+          relations
+          transactionSummary {
+            kind
+            debitTotal {
+              valueInCents
+              currency
+            }
+            debitCount
+            creditTotal {
+              valueInCents
+              currency
+            }
+            creditCount
+          }
+        }
+      }
+    }
+  }
+
+  query DashboardVendors(
+    $slug: String!
+    $searchTerm: String
+    $isArchived: Boolean
+    $limit: Int = 20
+    $offset: Int = 0
+    $totalContributed: AmountRangeInput
+    $totalExpended: AmountRangeInput
+    $onlyVendors: Boolean!
+    $orderBy: OrderByInput
+  ) {
+    account(slug: $slug) {
+      id
+      legacyId
+      publicId
+      ... on AccountWithHost {
+        host {
+          id
+          ...HostFields
+        }
+      }
+      ... on Organization {
+        host {
+          id
+          ...HostFields
+        }
+      }
+    }
+    community(
+      host: { slug: $slug }
+      type: [ORGANIZATION]
+      searchTerm: $searchTerm
+      totalContributed: $totalContributed
+      totalExpended: $totalExpended
+      limit: $limit
+      offset: $offset
+      orderBy: $orderBy
+    ) @skip(if: $onlyVendors) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        publicId
+        legacyId
+        slug
+        name
+        legalName
+        type
+        imageUrl
+        communityStats(host: { slug: $slug }) {
+          relations
+          transactionSummary {
+            kind
+            debitTotal {
+              valueInCents
+              currency
+            }
+            debitCount
+            creditTotal {
+              valueInCents
+              currency
+            }
+            creditCount
+          }
+        }
+      }
+    }
+  }
+  ${vendorFieldFragment}
+`;
+
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['NAME', 'CREATED_AT', 'TOTAL_CONTRIBUTED', 'TOTAL_EXPENDED']),
+  defaultValue: {
+    field: 'NAME',
+    direction: 'ASC',
+  },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({
+      defaultMessage: 'Created',
+      id: 'created',
+    }),
+  },
+});
+
+const getColumns = ({ isVendor, host }) => {
+  return [
+    {
+      header: () => <FormattedMessage defaultMessage="Vendor" id="dU1t5Z" />,
+      accessorKey: 'vendor',
+      cell: ({ row, table }) => {
+        const { intl } = table.options.meta;
+        const vendor = row.original;
+        const contact = vendor.vendorInfo?.contact;
+        return (
+          <div className="flex items-center gap-1">
+            <Avatar collective={vendor} size={24} className="mr-1" />
+            {vendor.name}
+            {contact && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <a
+                    href={`mailto:${contact.email}`}
+                    aria-label={contact.name}
+                    className="inline-flex text-muted-foreground"
+                    onClick={event => event.stopPropagation()}
+                  >
+                    <User size={16} aria-hidden="true" />
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {i18nWithColon(<FormattedMessage id="Contact" defaultMessage="Contact" />)}{' '}
+                  <a href={`mailto:${contact.email}`} onClick={event => event.stopPropagation()}>
+                    {contact.name}
+                  </a>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {vendor.vendorInfo?.taxFormRequired && isEmpty(vendor.vendorInfo?.taxFormUrl) && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex text-yellow-600"
+                    aria-label={intl.formatMessage({ defaultMessage: 'Pending tax form', id: 'P6R0T+' })}
+                  >
+                    <AlertTriangle size={16} aria-hidden="true" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <FormattedMessage defaultMessage="Pending tax form" id="P6R0T+" />
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        );
+      },
+    },
+    isVendor && {
+      header: () => <FormattedMessage defaultMessage="Visible to" id="zJePa1" />,
+      accessorKey: 'canBeUsedWithAccounts',
+      cell: ({ cell }) => {
+        const canBeUsedWithAccounts = cell.getValue();
+
+        if (!canBeUsedWithAccounts?.length) {
+          return (
+            <span className="text-muted-foreground">
+              <FormattedMessage defaultMessage="All hosted accounts" id="M7USSD" />
+            </span>
+          );
+        }
+
+        return (
+          <StackedAvatars
+            accounts={canBeUsedWithAccounts}
+            imageSize={24}
+            withHoverCard={{ includeAdminMembership: true }}
+          />
+        );
+      },
+    },
+    isVendor && {
+      header: () => <FormattedMessage defaultMessage="Who can use" id="56SUDL" />,
+      accessorKey: 'useVendorPolicy',
+      cell: ({ row, table }) => {
+        const { intl } = table.options.meta;
+        const vendor = row.original;
+        const { label, isInherited } = getEffectiveVendorPolicyLabel(vendor, host, intl);
+        return (
+          <div className="text-sm">
+            {label}
+            {isInherited && (
+              <span className="ml-1 text-xs text-muted-foreground">
+                <FormattedMessage defaultMessage="(host default)" id="wGmb1I" />
+              </span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'relations',
+      header: () => <FormattedMessage defaultMessage="Roles" id="c35gM5" />,
+      cell: ({ row, table }) => {
+        const { intl } = table.options.meta;
+        const account = row.original;
+        const relations = compact([
+          account.type === 'VENDOR' && 'VENDOR',
+          ...(account.communityStats?.relations || []),
+        ]).filter((relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')));
+        return (
+          <div className="flex flex-wrap gap-1 align-middle">
+            {relations.map(role => (
+              <div
+                key={role}
+                className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
+              >
+                {formatCommunityRelation(intl, role)}
+              </div>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'expenses',
+      header: () => <FormattedMessage defaultMessage="Total Expenses" id="TotalExpenses" />,
+      cell: ({ row }) => {
+        const account = row.original;
+        const summary = account.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+        const total = summary?.debitTotal;
+        const count = summary?.debitCount || 0;
+
+        if (!total || count === 0) {
+          return <span className="text-muted-foreground">—</span>;
+        }
+
+        return (
+          <div className="text-sm">
+            <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+            <span className="ml-1 text-muted-foreground">({count})</span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'contributions',
+      header: () => <FormattedMessage defaultMessage="Total Contributions" id="TotalContributions" />,
+      cell: ({ row }) => {
+        const account = row.original;
+        const summary = account.communityStats?.transactionSummary?.find(s => s.kind === 'ALL');
+        const total = summary?.creditTotal;
+        const count = summary?.creditCount || 0;
+
+        if (!total || count === 0) {
+          return <span className="text-muted-foreground">—</span>;
+        }
+
+        return (
+          <div className="text-sm">
+            <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+            <span className="ml-1 text-muted-foreground">({count})</span>
+          </div>
+        );
+      },
+    },
+    actionsColumn,
+  ].filter(Boolean);
+};
+
+const PAGE_SIZE = 20;
+
+const totalContributed = makeAmountFilter(
+  'totalContributed',
+  defineMessage({ defaultMessage: 'Total Contributed', id: 'TotalContributed' }),
+);
+
+const totalExpended = makeAmountFilter(
+  'totalExpended',
+  defineMessage({ defaultMessage: 'Total Expended', id: 'TotalExpended' }),
+);
+
+const schema = z.object({
+  limit: limit.default(PAGE_SIZE),
+  offset,
+  searchTerm: searchFilter.schema,
+  orderBy: sortFilter.schema,
+  isArchived: boolean.optional().default(false),
+  onlyVendors: boolean.optional().default(false),
+  totalContributed: totalContributed.schema,
+  totalExpended: totalExpended.schema,
+});
+
+type FilterValues = z.infer<typeof schema>;
+
+const filters: FilterComponentConfigs<FilterValues> = {
+  orderBy: sortFilter.filter,
+  searchTerm: searchFilter.filter,
+  totalContributed: totalContributed.filter,
+  totalExpended: totalExpended.filter,
+  isArchived: {
+    labelMsg: defineMessage({ defaultMessage: 'Archived', id: '0HT+Ib' }),
+    hide: () => true,
+  },
+  onlyVendors: {
+    labelMsg: defineMessage({ defaultMessage: 'Only Vendors', id: 'onlyVendors' }),
+    hide: () => true,
+  },
+};
+
+const toVariables = {
+  totalContributed: totalContributed.toVariables,
+  totalExpended: totalExpended.toVariables,
+  orderBy: sortFilter.toVariables,
+};
+
+const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
+  const intl = useIntl();
+  const router = useRouter();
+  const id = React.useMemo(() => subpath[0], [subpath]);
+  const { account } = useContext(DashboardContext);
+  const [createEditVendor, setCreateEditVendor] = React.useState<VendorFieldsFragment | boolean>(false);
+  const views: Views<FilterValues> = [
+    {
+      id: VendorsTab.VENDORS,
+      label: intl.formatMessage({ defaultMessage: 'Managed Vendors', id: '0bs5AI' }),
+      filter: {
+        onlyVendors: true,
+      },
+    },
+    {
+      id: VendorsTab.ORGANIZATIONS,
+      label: intl.formatMessage({ defaultMessage: 'Platform Organizations', id: 'nwgM4C' }),
+      filter: {
+        onlyVendors: false,
+      },
+    },
+    {
+      id: VendorsTab.ARCHIVED_VENDORS,
+      label: intl.formatMessage({ defaultMessage: 'Archived Vendors', id: 'archivedVendors' }),
+      filter: {
+        onlyVendors: true,
+        isArchived: true,
+      },
+    },
+  ];
+  const queryFilter = useQueryFilter<typeof schema, DashboardVendorsQueryVariables>({
+    filters,
+    schema,
+    views,
+    toVariables,
+    meta: {
+      intl,
+      currency: account?.currency,
+    },
+  });
+  const {
+    data,
+    previousData,
+    refetch,
+    loading: queryLoading,
+    error: queryError,
+  } = useQuery<DashboardVendorsQuery>(dashboardVendorsQuery, {
+    variables: {
+      slug: accountSlug,
+      ...queryFilter.variables,
+    },
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const pushSubpath = React.useMemo(() => makePushSubpath(router), [router]);
+  const [archiveVendor] = useMutation(setVendorArchiveMutation);
+  const handleArchiveToggle = React.useCallback(
+    async vendor => {
+      await archiveVendor({
+        variables: { vendor: pick(vendor, ['id']), archive: !vendor.isArchived },
+        refetchQueries: ['CommunityAccountDetail', 'DashboardVendors'],
+      });
+      await refetch();
+    },
+    [archiveVendor, refetch],
+  );
+  const handleDrawer = (vendor: VendorFieldsFragment | string | undefined) => {
+    if (vendor) {
+      pushSubpath(typeof vendor === 'string' ? vendor : vendor.publicId);
+    } else {
+      pushSubpath(undefined);
+      setCreateEditVendor(false);
+    }
+  };
+  const getActions = usePersonActions({
+    accountSlug,
+    hasKYCFeature: false,
+    editVendor: setCreateEditVendor,
+    archiveVendor: handleArchiveToggle,
+  });
+
+  const expectedAccountType = React.useMemo(
+    () => (queryFilter.variables?.onlyVendors ? AccountType.VENDOR : AccountType.ORGANIZATION),
+    [queryFilter.variables],
+  );
+  const host = (data || previousData)?.account?.['host'];
+  const columns = React.useMemo(
+    () => getColumns({ isVendor: expectedAccountType === AccountType.VENDOR, host }),
+    [expectedAccountType, host],
+  );
+  const tableData = React.useMemo(
+    () =>
+      expectedAccountType === AccountType.VENDOR
+        ? (data || previousData)?.account?.['host']?.['vendors']
+        : (data || previousData)?.community,
+    [expectedAccountType, data, previousData],
+  );
+  const loading = queryLoading;
+  const error = queryError;
+
+  if (!isEmpty(id)) {
+    return (
+      <div className="h-full">
+        <AccountDetails
+          account={{ id: subpath[0] }}
+          host={account}
+          onClose={() => pushSubpath('')}
+          expectedAccountType={expectedAccountType}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <DashboardHeader
+        title={<FormattedMessage defaultMessage="Vendors" id="RilevA" />}
+        description={
+          <FormattedMessage
+            id="VendorsAndOrganizations.Description"
+            defaultMessage="Manage all the external organizations you work with as vendors and quickly surface all the activity between your hosted Collectives and other platform Organizations."
+          />
+        }
+        actions={
+          !host ? (
+            <Skeleton className="h-10 w-32" />
+          ) : (
+            <Button size="sm" className="gap-1" onClick={() => setCreateEditVendor(true)}>
+              <span>
+                <FormattedMessage defaultMessage="Create vendor" id="jrCJwo" />
+              </span>
+              <PlusIcon size={20} />
+            </Button>
+          )
+        }
+      />
+      <Filterbar {...queryFilter} hideCounts />
+      {error ? (
+        <MessageBoxGraphqlError error={error} />
+      ) : (
+        <React.Fragment>
+          <DataTable
+            columns={columns}
+            data={tableData?.nodes}
+            emptyMessage={() => <FormattedMessage id="NoVendors" defaultMessage="No vendors" />}
+            loading={loading}
+            onClickRow={row => {
+              handleDrawer(row.original as unknown as VendorFieldsFragment);
+            }}
+            getActions={getActions}
+            mobileTableView
+          />
+          <Pagination queryFilter={queryFilter} total={tableData?.totalCount} />
+        </React.Fragment>
+      )}
+      {createEditVendor && (
+        <StyledModal onClose={() => setCreateEditVendor(false)}>
+          <VendorForm
+            host={host}
+            supportsTaxForm={host.requiredLegalDocuments.includes('US_TAX_FORM')}
+            onSuccess={() => {
+              setCreateEditVendor(false);
+              refetch();
+            }}
+            vendor={typeof createEditVendor === 'boolean' ? undefined : createEditVendor}
+            onCancel={() => setCreateEditVendor(false)}
+            isModal
+          />
+        </StyledModal>
+      )}
+    </div>
+  );
+};
+
+export default Vendors;

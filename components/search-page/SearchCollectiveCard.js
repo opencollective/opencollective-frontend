@@ -1,13 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import { checkUseAlternativeHostFeeNaming } from '@/lib/collective';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from '../Container';
 import Currency from '../Currency';
+import DefinedTerm, { Terms } from '../DefinedTerm';
 import { Box } from '../Grid';
-import { P, Span } from '../Text';
+import { Span } from '../Text';
 
 import StyledCollectiveCard from './StyledCollectiveCard';
 
@@ -30,6 +32,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                   <Span fontSize="12px" fontWeight={400} color="black.700">
                     <FormattedMessage
                       defaultMessage="{ count, plural, one {Collective} other {Collectives}} hosted"
+                      id="X8Pa2K"
                       values={{ count: collective.host.totalHostedCollectives }}
                     />
                   </Span>
@@ -44,17 +47,34 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                   <FormattedMessage id="Currency" defaultMessage="Currency" />
                 </Span>
               </Box>
-              <Box>
-                <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.host.hostFeePercent}%`}</Span>
-                {` `}
-                <Span fontSize="12px" fontWeight={400} color="black.700">
-                  <FormattedMessage defaultMessage="Host Fee" />
-                </Span>
-              </Box>
+              <div className="text-xs text-slate-700">
+                <span>
+                  <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.host.hostFeePercent}%`}</Span>
+                  {` `}
+                  <Span fontSize="12px" fontWeight={400}>
+                    <DefinedTerm
+                      color="black.700"
+                      borderColor="#969ba3"
+                      fontSize="12px"
+                      term={
+                        checkUseAlternativeHostFeeNaming(collective)
+                          ? Terms.ADMINISTRATIVE_CONTRIBUTION
+                          : Terms.HOST_FEE
+                      }
+                    />
+                  </Span>
+                </span>
+                {collective.host.platformContributionAvailable && (
+                  <React.Fragment>
+                    {' + '}
+                    <DefinedTerm color="black.700" borderColor="#969ba3" fontSize="12px" term={Terms.PLATFORM_TIPS} />
+                  </React.Fragment>
+                )}
+              </div>
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <P fontSize="12px" lineHeight="18px">
+              <Container fontSize="12px" lineHeight="18px">
                 {collective.stats?.contributorsCount > 0 && (
                   <Box pb="6px">
                     <Span fontSize="14px" fontWeight={700} color="black.900">
@@ -64,12 +84,13 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                     <Span fontSize="12px" fontWeight={400} color="black.700">
                       <FormattedMessage
                         defaultMessage="Financial {count, plural, one {Contributor} other {Contributors}}"
+                        id="MspQpE"
                         values={{ count: collective.stats.contributorsCount }}
                       />
                     </Span>
                   </Box>
                 )}
-              </P>
+              </Container>
 
               {collective.type !== CollectiveType.ORGANIZATION &&
                 collective.stats.totalAmountReceived.valueInCents > 0 && (
@@ -83,7 +104,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                     </Span>
                     {` `}
                     <Span fontSize="12px" fontWeight={400} color="black.700">
-                      <FormattedMessage defaultMessage="Money raised" />
+                      <FormattedMessage defaultMessage="Money raised" id="ooRGC9" />
                     </Span>
                   </Box>
                 )}
@@ -108,9 +129,9 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
           )}
           {collective.description && (
             <div className="text-xs">
-              <div className="mb-1 mt-2 flex items-center justify-between gap-2">
-                <span className="font-medium uppercase text-slate-700">
-                  <FormattedMessage defaultMessage="About Us" />
+              <div className="mt-2 mb-1 flex items-center justify-between gap-2">
+                <span className="font-medium text-slate-700 uppercase">
+                  <FormattedMessage defaultMessage="About Us" id="ZjDH42" />
                 </span>
                 <hr className="flex-1" />
               </div>
@@ -121,30 +142,6 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
       </Container>
     </StyledCollectiveCard>
   );
-};
-
-SearchCollectiveCard.propTypes = {
-  collective: PropTypes.shape({
-    type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-    currency: PropTypes.string,
-    description: PropTypes.string,
-    isHost: PropTypes.bool,
-    stats: PropTypes.shape({
-      contributorsCount: PropTypes.number,
-      totalAmountReceived: PropTypes.shape({
-        valueInCents: PropTypes.number,
-        currency: PropTypes.string,
-      }),
-      totalAmountSpent: PropTypes.shape({
-        valueInCents: PropTypes.number,
-        currency: PropTypes.string,
-      }),
-    }),
-    host: PropTypes.shape({
-      totalHostedCollectives: PropTypes.number,
-      hostFeePercent: PropTypes.number,
-    }),
-  }).isRequired,
 };
 
 export default injectIntl(SearchCollectiveCard);

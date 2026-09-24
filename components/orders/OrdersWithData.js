@@ -1,21 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
-import { omitBy } from 'lodash';
+import { useQuery } from '@apollo/client';
+import { omitBy } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { parseDateInterval } from '../../lib/date-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
+import { accountHoverCardFields } from '../AccountHoverCard';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
-import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
+import { confirmContributionFieldsFragment } from '../contributions/ConfirmContributionForm';
+import { DisputedContributionsWarning } from '../dashboard/sections/collectives/DisputedContributionsWarning';
+import CreatePendingOrderModal from '../dashboard/sections/contributions/CreatePendingOrderModal';
 import { Box, Flex } from '../Grid';
-import CreatePendingOrderModal from '../host-dashboard/CreatePendingOrderModal';
-import { DisputedContributionsWarning } from '../host-dashboard/DisputedContributionsWarning';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
@@ -77,6 +77,11 @@ const accountOrdersQuery = gql`
           slug
           name
           imageUrl
+          isIncognito
+          ... on Individual {
+            isGuest
+          }
+          ...AccountHoverCardFields
         }
         pendingContributionData {
           expectedAt
@@ -97,6 +102,7 @@ const accountOrdersQuery = gql`
           ... on AccountWithHost {
             bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
           }
+          ...AccountHoverCardFields
         }
         permissions {
           id
@@ -107,6 +113,7 @@ const accountOrdersQuery = gql`
     }
   }
   ${confirmContributionFieldsFragment}
+  ${accountHoverCardFields}
 `;
 
 const ORDERS_PER_PAGE = 15;
@@ -169,8 +176,9 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
   const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
-  const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
+  const queryParams = { variables: queryVariables };
   const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
+
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(data?.account);
@@ -185,15 +193,17 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   return (
     <Box maxWidth={1000} width="100%" m="0 auto">
       <div className="flex flex-wrap justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
+        <h1 className="text-2xl leading-10 font-bold tracking-tight">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         </h1>
-        <SearchBar
-          height="40px"
-          defaultValue={router.query.searchTerm}
-          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          placeholder={intl.formatMessage(messages.searchPlaceholder)}
-        />
+        <div className="w-[276px]">
+          <SearchBar
+            height="40px"
+            defaultValue={router.query.searchTerm}
+            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+            placeholder={intl.formatMessage(messages.searchPlaceholder)}
+          />
+        </div>
       </div>
       <hr className="my-5" />
       <Flex mb={34}>
@@ -225,7 +235,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
             </StyledButton>
             {showCreatePendingOrderModal && (
               <CreatePendingOrderModal
-                host={data.account}
+                hostSlug={data.account.slug}
                 onClose={() => setShowCreatePendingOrderModal(false)}
                 onSuccess={() => refetch()}
               />
@@ -276,16 +286,6 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
       )}
     </Box>
   );
-};
-
-OrdersWithData.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
-  /** If provided, only orders matching this status will be fetched */
-  status: PropTypes.string,
-  /** An optional title to be used instead of "Financial contributions" */
-  title: PropTypes.node,
-  showPlatformTip: PropTypes.bool,
-  canCreatePendingOrder: PropTypes.bool,
 };
 
 export default OrdersWithData;

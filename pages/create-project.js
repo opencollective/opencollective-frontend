@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import CreateProject from '../components/create-project';
 import ErrorPage from '../components/ErrorPage';
@@ -40,7 +39,6 @@ const CreateProjectPage = ({ loadingLoggedInUser, LoggedInUser }) => {
   const slug = router.query.parentCollectiveSlug;
   const skipQuery = !LoggedInUser;
   const { loading, error, data } = useQuery(createProjectPageParentAccountQuery, {
-    context: API_V2_CONTEXT,
     skip: skipQuery,
     variables: { slug },
   });
@@ -54,15 +52,12 @@ const CreateProjectPage = ({ loadingLoggedInUser, LoggedInUser }) => {
   }
 
   return (
-    <Page>
+    <Page showMenuItems={false}>
       <CreateProject parent={data && data.account} />
     </Page>
   );
 };
 
-CreateProjectPage.propTypes = {
-  loadingLoggedInUser: PropTypes.bool.isRequired,
-  LoggedInUser: PropTypes.object,
-};
-
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(CreateProjectPage);

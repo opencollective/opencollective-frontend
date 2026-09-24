@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { useIntl } from 'react-intl';
 import { Scrollchor } from 'react-scrollchor';
@@ -9,17 +8,11 @@ import { getSectionsCategoryDetails, SECTIONS_CATEGORY_ICON } from '../../lib/co
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import Link from '../Link';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
-
-import { NAVBAR_CATEGORIES } from './constants';
-
-const IconIllustration = styled.img.attrs({ alt: '' })`
-  width: 32px;
-  height: 32px;
-`;
 
 const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
   display: block;
@@ -68,7 +61,7 @@ const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
   }
 
   ${props =>
-    props.isSelected &&
+    props.$isSelected &&
     css`
       @media (min-width: 64em) {
         &::after {
@@ -150,8 +143,8 @@ export const NavBarCategory = ({ category, collective }) => {
   const categoryDetails = getSectionsCategoryDetails(intl, collective, category);
   return (
     <Flex>
-      <Flex alignItems="center" mr={2}>
-        <IconIllustration src={categoryDetails.img || SECTIONS_CATEGORY_ICON.CONTRIBUTE} />
+      <Flex alignItems="center" minWidth={32} mr={2}>
+        <Image width={32} height={32} alt="" src={categoryDetails.img || SECTIONS_CATEGORY_ICON.CONTRIBUTE} />
       </Flex>
       <Flex alignItems="center">
         <Span
@@ -169,19 +162,8 @@ export const NavBarCategory = ({ category, collective }) => {
   );
 };
 
-NavBarCategory.propTypes = {
-  category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
-  collective: PropTypes.object.isRequired,
-};
-
 const NavBarScrollContainer = ({ useAnchor, category, children }) =>
   useAnchor ? <Scrollchor to={`#category-${category}`}>{children}</Scrollchor> : children;
-
-NavBarScrollContainer.propTypes = {
-  category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
-  useAnchor: PropTypes.bool,
-  children: PropTypes.node,
-};
 
 const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, links }) => {
   const displayedLinks = links.filter(link => !link.hide);
@@ -191,7 +173,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
       <NavBarScrollContainer category={category} useAnchor={useAnchor}>
         <CategoryContainer
           mr={[0, null, 3]}
-          isSelected={isSelected}
+          $isSelected={isSelected}
           {...getLinkProps(useAnchor, collective, category)}
           onClick={e => {
             // Remove focus to make sure dropdown gets closed
@@ -223,23 +205,6 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
       )}
     </CategoryDropdown>
   );
-};
-
-NavBarCategoryDropdown.propTypes = {
-  category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    type: PropTypes.string,
-  }).isRequired,
-  isSelected: PropTypes.bool,
-  useAnchor: PropTypes.bool,
-  links: PropTypes.arrayOf(
-    PropTypes.shape({
-      route: PropTypes.string,
-      title: PropTypes.node,
-      hide: PropTypes.bool,
-    }),
-  ),
 };
 
 export default NavBarCategoryDropdown;

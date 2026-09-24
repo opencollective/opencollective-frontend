@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
-import { debounce } from 'lodash';
+import { useLazyQuery } from '@apollo/client';
+import { debounce } from 'lodash-es';
 import { FormattedDate } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import Avatar from './Avatar';
 import { Flex } from './Grid';
@@ -13,7 +12,7 @@ import StyledTag from './StyledTag';
 import { Span } from './Text';
 
 const expensesSearchQuery = gql`
-  query ExpensesPickerSearchQuery($account: AccountReferenceInput, $searchTerm: String, $status: ExpenseStatusFilter) {
+  query ExpensesPickerSearch($account: AccountReferenceInput, $searchTerm: String, $status: [ExpenseStatusFilter]) {
     expenses(account: $account, limit: 100, searchTerm: $searchTerm, status: $status) {
       nodes {
         id
@@ -82,7 +81,7 @@ const formatOptionLabel = option => {
 const ExpensesPickerAsync = ({ inputId, noCache, account, status, ...props }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
   const variables = { account: getAccountInput(account), status };
-  const queryParameters = { fetchPolicy, variables, context: API_V2_CONTEXT };
+  const queryParameters = { fetchPolicy, variables };
   const [searchExpenses, { loading, data }] = useLazyQuery(expensesSearchQuery, queryParameters);
   const [searchTerm, setSearchTerm] = React.useState('');
   const options = React.useMemo(() => getOptionsFromExpenses(data?.expenses?.nodes), [data?.expenses?.nodes]);
@@ -107,18 +106,5 @@ const ExpensesPickerAsync = ({ inputId, noCache, account, status, ...props }) =>
     />
   );
 };
-
-ExpensesPickerAsync.propTypes = {
-  /** The id of the search input */
-  inputId: PropTypes.string.isRequired,
-  /** Max number of collectives displayed at the same time */
-  limit: PropTypes.number,
-  /** If true, results won't be cached (Apollo "network-only" mode) */
-  noCache: PropTypes.bool,
-  account: PropTypes.object,
-  status: PropTypes.string,
-};
-
-ExpensesPickerAsync.defaultProps = {};
 
 export default ExpensesPickerAsync;

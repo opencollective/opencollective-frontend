@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { getCollectivePageMetadata, shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
+import { getCollectivePageMetadata, isHiddenAccount, shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -119,8 +118,8 @@ class ConversationsPage extends React.Component {
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.account) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
+      } else if (!data.account || isHiddenAccount(data.account)) {
+        return <ErrorPage error={generateNotFoundError()} log={false} />;
       }
     }
 
@@ -221,6 +220,7 @@ const conversationsPageQuery = gql`
       twitterHandle
       imageUrl
       backgroundImageUrl
+      isSuspended
       ... on AccountWithParent {
         parent {
           id
@@ -241,7 +241,7 @@ const conversationsPageQuery = gql`
       }
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
       }
     }
   }
@@ -254,8 +254,9 @@ const addConversationsPageData = graphql(conversationsPageQuery, {
     // Because this list is updated often, using this option ensures that the list gets
     // properly updated when doing things like redirecting after a conversation delete.
     fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
   },
 });
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(withRouter(addConversationsPageData(ConversationsPage)));

@@ -1,26 +1,23 @@
 import React from 'react';
+import { clsx } from 'clsx';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { formatCurrency } from '../../lib/currency-utils';
-import { Currency } from '../../lib/graphql/types/v2/graphql';
+import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
+import type { Currency } from '../../lib/graphql/types/v2/graphql';
 import theme from '../../lib/theme';
 
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import Image from '../Image';
+import InputAmount from '../InputAmount';
 import StyledButtonSet from '../StyledButtonSet';
-import StyledHr from '../StyledHr';
-import StyledInputAmount from '../StyledInputAmount';
+import StyledCheckbox from '../StyledCheckbox';
 import StyledLinkButton from '../StyledLinkButton';
 import { P } from '../Text';
 
 import { WhyPlatformTipModal } from './WhyPlatformTipModal';
 
 const I18nMessages = defineMessages({
-  NO_THANKS: {
-    id: 'NoThankYou',
-    defaultMessage: 'No thank you',
-  },
   OTHER: {
     id: 'platformFee.Other',
     defaultMessage: 'Other',
@@ -32,6 +29,7 @@ export const enum PlatformTipOption {
   TEN_PERCENT = 'TEN_PERCENT',
   FIFTEEN_PERCENT = 'FIFTEEN_PERCENT',
   TWENTY_PERCENT = 'TWENTY_PERCENT',
+  THIRTY_PERCENT = 'THIRTY_PERCENT',
   OTHER = 'OTHER',
 }
 
@@ -45,12 +43,13 @@ type PlatformTipInputProps = {
 };
 
 function PlatformTipInput(props: PlatformTipInputProps) {
+  const { amount, currency, disabled, onChange, selectedOption, value } = props;
   const intl = useIntl();
 
   const options = React.useMemo(
     () => ({
       [PlatformTipOption.NONE]: {
-        label: intl.formatMessage(I18nMessages.NO_THANKS),
+        label: '0%',
         percent: 0,
       },
       [PlatformTipOption.TEN_PERCENT]: {
@@ -65,6 +64,10 @@ function PlatformTipInput(props: PlatformTipInputProps) {
         label: '20%',
         percent: 0.2,
       },
+      [PlatformTipOption.THIRTY_PERCENT]: {
+        label: '30%',
+        percent: 0.3,
+      },
       [PlatformTipOption.OTHER]: {
         label: intl.formatMessage(I18nMessages.OTHER),
         percent: 0.15,
@@ -74,60 +77,62 @@ function PlatformTipInput(props: PlatformTipInputProps) {
   );
 
   const onOptionChange = React.useCallback(
-    (value: PlatformTipOption) => {
-      if (props.selectedOption === value) {
+    (newSelectedOption: PlatformTipOption) => {
+      if (selectedOption === newSelectedOption) {
         return;
       }
 
-      props.onChange(value, options[value].percent * props.amount);
+      onChange(newSelectedOption, roundCentsAmount(options[newSelectedOption].percent * amount, currency));
     },
-    [props.onChange, props.selectedOption, props.amount, options],
+    [amount, currency, onChange, options, selectedOption],
   );
 
   const onOtherChange = React.useCallback(
     value => {
-      props.onChange(props.selectedOption, value);
+      onChange(selectedOption, value);
     },
-    [props.onChange],
+    [onChange, selectedOption],
   );
 
   React.useEffect(() => {
     const newTipAmount =
-      props.selectedOption === PlatformTipOption.OTHER
-        ? props.value
-        : options[props.selectedOption].percent * props.amount;
+      selectedOption === PlatformTipOption.OTHER
+        ? value
+        : roundCentsAmount(options[selectedOption].percent * amount, currency);
 
-    props.onChange(props.selectedOption, newTipAmount);
-  }, [options, props.amount, props.value, props.selectedOption]);
+    if (newTipAmount !== value) {
+      onChange(selectedOption, newTipAmount);
+    }
+  }, [amount, currency, onChange, options, selectedOption, value]);
 
   return (
     <Box data-cy="platform-tip-input">
       <StyledButtonSet
         data-cy="platform-tip-options"
         flexDirection={['column', 'row']}
-        disabled={props.disabled}
+        disabled={disabled}
         items={[
-          PlatformTipOption.NONE,
           PlatformTipOption.TEN_PERCENT,
           PlatformTipOption.FIFTEEN_PERCENT,
           PlatformTipOption.TWENTY_PERCENT,
+          PlatformTipOption.THIRTY_PERCENT,
           PlatformTipOption.OTHER,
         ]}
-        selected={props.selectedOption}
+        selected={selectedOption}
         onChange={onOptionChange}
       >
         {({ item }) => options[item as number].label}
       </StyledButtonSet>
-      {props.selectedOption === PlatformTipOption.OTHER && (
+      {selectedOption === PlatformTipOption.OTHER && (
         <Flex mt={3} justifyContent="flex-end">
-          <StyledInputAmount
+          <InputAmount
             id="feesOnTop"
             name="platformTip"
             data-cy="platform-tip-other-amount"
-            disabled={props.disabled}
-            currency={props.currency}
+            disabled={disabled}
+            currency={currency}
             onChange={onOtherChange}
-            value={props.value}
+            value={value}
           />
         </Flex>
       )}
@@ -146,15 +151,34 @@ type PlatformTipContainerProps = {
 
 export function PlatformTipContainer(props: PlatformTipContainerProps) {
   const intl = useIntl();
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState(true);
 
   React.useEffect(() => {
-    if (props.step === 'details') {
-      setIsCollapsed(false);
-    } else {
-      setIsCollapsed(true);
-    }
+    setIsCollapsed(true);
   }, [props.step]);
+
+  const percentage = props.value && props.amount && props.amount > 0 ? props.value / props.amount : 0;
+
+  const message = React.useMemo(() => {
+    if (percentage <= 0) {
+      return (
+        <FormattedMessage
+          defaultMessage="You can still support us by spreading the word and keeping in touch with us 💙"
+          id="E/OCaw"
+        />
+      );
+    }
+
+    const tipEmoji = percentage >= 0.2 ? '😍' : percentage >= 0.15 ? '😀' : '🙂';
+
+    return (
+      <FormattedMessage
+        defaultMessage="Thank you for your contribution! <Emoji></Emoji>"
+        id="C8NetX"
+        values={{ Emoji: () => <span className="mx-2">{tipEmoji}</span> }}
+      />
+    );
+  }, [percentage]);
 
   const [isWhyPlatformTipModalOpen, setIsWhyPlatformTipModalOpen] = React.useState(false);
   return (
@@ -171,55 +195,76 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
         <Flex alignItems="center" gap={10}>
           <Image alt="Platform Tip" src="/static/images/platform-tip-jar.png" height={64} width={64} />
           <Box flexGrow={1} fontWeight="500" fontSize="20px">
-            <FormattedMessage defaultMessage="Keep Open Collective Sustainable" />
-            {isCollapsed && <StyledHr my={2} />}
-            {isCollapsed && (
-              <Flex fontSize="14px" gap="20px">
-                <Box data-cy="platform-tip-collapsed">
-                  <FormattedMessage
-                    defaultMessage="Your tip: <bold>{amount}</bold> ({percentage}%)"
-                    values={{
-                      bold: I18nBold,
-                      amount: formatCurrency(props.value, props.currency as Currency, { locale: intl.locale }),
-                      percentage: ((props.value / props.amount) * 100).toFixed(2),
-                    }}
-                  />
-                </Box>
-                <StyledLinkButton onClick={() => setIsCollapsed(false)}>
-                  <FormattedMessage id="Edit" defaultMessage="Edit" />
-                </StyledLinkButton>
-              </Flex>
-            )}
+            <FormattedMessage defaultMessage="Help us keep Open Collective sustainable" id="15EPUo" />
           </Box>
         </Flex>
-        {!isCollapsed && (
+        <P my="12px" fontWeight="400" fontSize="16px">
+          <FormattedMessage
+            defaultMessage="Adding a platform tip helps us to maintain the platform and introduce new features. <Link>Why?</Link>"
+            id="sKMOr5"
+            values={{
+              Link: chunk => {
+                return (
+                  <StyledLinkButton className="italic" onClick={() => setIsWhyPlatformTipModalOpen(true)}>
+                    {chunk}
+                  </StyledLinkButton>
+                );
+              },
+            }}
+          />
+        </P>
+        <div className="flex gap-5">
+          <div>
+            <FormattedMessage
+              defaultMessage="Your tip: <bold>{amount}</bold> ({percentage}%)"
+              id="fWPqud"
+              values={{
+                bold: I18nBold,
+                amount: formatCurrency(props.value, props.currency as Currency, { locale: intl.locale }),
+                percentage: (percentage * 100).toFixed(2),
+              }}
+            />
+          </div>
+          {isCollapsed && props.selectedOption !== PlatformTipOption.NONE && (
+            <StyledLinkButton onClick={() => setIsCollapsed(false)}>
+              <FormattedMessage id="Edit" defaultMessage="Edit" />
+            </StyledLinkButton>
+          )}
+        </div>
+        <div className={clsx('mt-3', { hidden: isCollapsed || props.selectedOption === PlatformTipOption.NONE })}>
+          <PlatformTipInput
+            disabled={!props.amount}
+            amount={props.amount}
+            currency={props.currency}
+            selectedOption={props.selectedOption}
+            value={props.value}
+            onChange={props.onChange}
+          />
+        </div>
+        {(!isCollapsed || props.selectedOption === PlatformTipOption.NONE) && (
           <React.Fragment>
             <P mt="12px" fontWeight="400" fontSize="16px">
-              <FormattedMessage defaultMessage="Adding a platform tip helps us to maintain the platform and introduce new features." />
+              {message}
             </P>
-            <Flex mt="12px">
-              <Box flexGrow={1} fontWeight="700" fontSize="16px">
-                <FormattedMessage defaultMessage="Do you want to add a tip?" />
-              </Box>
-              <P fontStyle="italic">
-                <StyledLinkButton onClick={() => setIsWhyPlatformTipModalOpen(true)}>
-                  <FormattedMessage defaultMessage="Why?" />
-                </StyledLinkButton>
-              </P>
-            </Flex>
-            <Box mt="12px">
-              <PlatformTipInput
-                disabled={!props.amount}
-                amount={props.amount}
-                currency={props.currency}
-                selectedOption={props.selectedOption}
-                value={props.value}
-                onChange={props.onChange}
+            <div className="mt-3">
+              <StyledCheckbox
+                name="accept-payment-method-warning"
+                checked={percentage === 0}
+                onChange={({ checked }) =>
+                  checked
+                    ? props.onChange(PlatformTipOption.NONE, 0)
+                    : props.onChange(
+                        PlatformTipOption.FIFTEEN_PERCENT,
+                        roundCentsAmount(0.15 * props.amount, props.currency),
+                      )
+                }
+                label={
+                  <span className="text-sm">
+                    <FormattedMessage defaultMessage="I don't want to contribute to Open Collective" id="2fKAKF" />
+                  </span>
+                }
               />
-            </Box>
-            <P mt="12px" fontWeight="400" fontSize="16px">
-              <FormattedMessage defaultMessage="Thanks for your help." />
-            </P>
+            </div>
           </React.Fragment>
         )}
       </Box>

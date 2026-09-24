@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Span } from './Text';
 
@@ -14,10 +13,6 @@ const TransactionSign = ({ isCredit }) => {
       {isCredit ? '+' : '-'}
     </Span>
   );
-};
-
-TransactionSign.propTypes = {
-  isCredit: PropTypes.bool,
 };
 
 export default TransactionSign;

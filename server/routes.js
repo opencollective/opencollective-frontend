@@ -1,9 +1,9 @@
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 
 const express = require('express');
 const proxy = require('express-http-proxy');
-const { template, trim } = require('lodash');
+const trim = require('lodash-es/trim').default;
 
 const downloadFileHandler = require('./download-file');
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
@@ -15,16 +15,20 @@ const maxAge = (maxAge = 60) => {
   };
 };
 
-module.exports = (expressApp, nextApp) => {
+module.exports = expressApp => {
   const app = expressApp;
 
   // Support older assets from website
   app.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
 
-  app.get('/static/*', maxAge(86400));
+  app.get('/static/*path', maxAge(86400));
 
-  app.get('/favicon.*', maxAge(300000), (req, res) => {
-    return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
+  // Load the favicon file into memory
+  const faviconPath = path.join(__dirname, '../public/static/images/favicon.ico.png');
+  const favicon = fs.readFileSync(faviconPath);
+  app.get('/favicon.:ext', maxAge(300000), (req, res) => {
+    res.type('image/png');
+    return res.send(favicon);
   });
 
   /* Helper to enable downloading files that are on S3 since Chrome and Firefox does
@@ -38,9 +42,8 @@ module.exports = (expressApp, nextApp) => {
     app.use(
       '/api',
       proxy(baseApiUrl, {
-        parseReqBody: false,
         proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
-          for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
+          for (const key of ['oc-env', 'oc-secret', 'oc-application', 'Content-Type', 'Cookie', 'Authorization']) {
             if (srcReq.headers[key]) {
               proxyReqOpts.headers[key] = srcReq.headers[key];
             }
@@ -56,6 +59,8 @@ module.exports = (expressApp, nextApp) => {
           searchParams.set('api_key', process.env.API_KEY);
           return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
         },
+        // Be consistent to the actual API limit
+        limit: '10mb',
       }),
     );
   }
@@ -83,42 +88,4 @@ module.exports = (expressApp, nextApp) => {
     }
     next();
   });
-
-  app.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', maxAge(86400), (req, res) => {
-    const color = req.query.color === 'blue' ? 'blue' : 'white';
-    res.sendFile(
-      path.join(__dirname, `../public/static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
-    );
-  });
-
-  app.get('/:collectiveSlug/:verb(contribute|donate)/button.js', maxAge(86400), (req, res) => {
-    const content = fs.readFileSync(path.join(__dirname, './templates/button.js'), 'utf8');
-    const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
-    res.setHeader('content-type', 'application/javascript');
-    res.removeHeader('X-Frame-Options');
-    res.send(
-      compiled({
-        collectiveSlug: req.params.collectiveSlug,
-        verb: req.params.verb,
-        host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
-      }),
-    );
-  });
-
-  app.get('/:collectiveSlug/:widget(widget|events|collectives|banner).js', maxAge(86400), (req, res) => {
-    const content = fs.readFileSync(path.join(__dirname, './templates/widget.js'), 'utf8');
-    const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
-    res.setHeader('content-type', 'application/javascript');
-    res.send(
-      compiled({
-        style: '{}',
-        ...req.query,
-        collectiveSlug: req.params.collectiveSlug,
-        widget: req.params.widget,
-        host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
-      }),
-    );
-  });
-
-  return nextApp.getRequestHandler();
 };

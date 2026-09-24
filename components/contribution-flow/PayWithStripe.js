@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { Question } from '@styled-icons/octicons/Question';
+import { HelpCircle } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants/payment-methods';
@@ -14,27 +13,42 @@ import { Span } from '../Text';
 
 import { STRIPE_PAYMENT_ELEMENT_KEY } from './utils';
 
+const STRIPE_REUSABLE_PAYMENT_METHODS_TYPES = [
+  PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT,
+  PAYMENT_METHOD_TYPE.SEPA_DEBIT,
+  PAYMENT_METHOD_TYPE.BACS_DEBIT,
+  PAYMENT_METHOD_TYPE.BANCONTACT,
+  'card', // PAYMENT_METHOD_TYPE.CREDITCARD,
+];
+
+function isReusableStripePaymentMethodType(type) {
+  return STRIPE_REUSABLE_PAYMENT_METHODS_TYPES.map(pmType => pmType.toLowerCase()).includes(type);
+}
+
 export function PayWithStripeForm({
   defaultIsSaved,
   hasSaveCheckBox,
   bilingDetails,
-  paymentIntentId,
+  stripePaymentIntentId,
   paymentIntentClientSecret,
   onChange,
 }) {
   const elements = useElements();
   const stripe = useStripe();
+  const [selectedPaymentMethodType, setSelectedPaymentMethodType] = React.useState('card');
+  const [isSavePaymentMethod, setIsSavePaymentMethod] = React.useState(defaultIsSaved);
 
   const onElementChange = React.useCallback(
     event => {
+      setSelectedPaymentMethodType(event.value.type);
       onChange({
         stepPayment: {
           key: STRIPE_PAYMENT_ELEMENT_KEY,
           paymentMethod: {
-            paymentIntentId,
+            stripePaymentIntentId,
             service: PAYMENT_METHOD_SERVICE.STRIPE,
             type: PAYMENT_METHOD_TYPE.PAYMENT_INTENT,
-            isSavedForLater: defaultIsSaved,
+            isSavedForLater: isReusableStripePaymentMethodType(event.value.type) && isSavePaymentMethod,
           },
           isCompleted: event.complete,
           stripeData: {
@@ -48,17 +62,21 @@ export function PayWithStripeForm({
     [onChange],
   );
 
-  const onSavePaymentMethodToggle = React.useCallback(({ checked }) => {
-    onChange(({ stepPayment }) => ({
-      stepPayment: {
-        ...stepPayment,
-        paymentMethod: {
-          ...stepPayment.paymentMethod,
-          isSavedForLater: checked,
+  const onSavePaymentMethodToggle = React.useCallback(
+    ({ checked }) => {
+      setIsSavePaymentMethod(checked);
+      onChange(({ stepPayment }) => ({
+        stepPayment: {
+          ...stepPayment,
+          paymentMethod: {
+            ...stepPayment.paymentMethod,
+            isSavedForLater: isReusableStripePaymentMethodType(selectedPaymentMethodType) && checked,
+          },
         },
-      },
-    }));
-  });
+      }));
+    },
+    [selectedPaymentMethodType],
+  );
 
   return (
     <React.Fragment>
@@ -72,22 +90,26 @@ export function PayWithStripeForm({
             },
           },
           terms: {
-            bancontact: 'always',
-            card: 'always',
-            ideal: 'always',
-            sepaDebit: 'always',
-            sofort: 'always',
-            auBecsDebit: 'always',
-            usBankAccount: 'always',
+            bancontact: 'auto',
+            card: 'auto',
+            ideal: 'auto',
+            sepaDebit: 'auto',
+            sofort: 'auto',
+            auBecsDebit: 'auto',
+            usBankAccount: 'auto',
+            applePay: 'auto',
+            cashapp: 'auto',
+            googlePay: 'auto',
+            paypal: 'auto',
           },
         }}
         onChange={onElementChange}
       />
 
-      {hasSaveCheckBox && (
+      {hasSaveCheckBox && isReusableStripePaymentMethodType(selectedPaymentMethodType) && (
         <Flex mt={3} alignItems="center" color="black.700">
           <StyledCheckbox
-            defaultChecked={defaultIsSaved}
+            checked={isSavePaymentMethod}
             name="save"
             onChange={onSavePaymentMethodToggle}
             label={<FormattedMessage id="paymentMethod.save" defaultMessage="Remember this payment method" />}
@@ -102,29 +124,17 @@ export function PayWithStripeForm({
                   values={{
                     LearnMoreLink: getI18nLink({
                       openInNewTab: true,
-                      href: 'https://docs.opencollective.com/help/product/security#payments-security',
+                      href: 'https://documentation.opencollective.com/advanced/security-for-accounts',
                     }),
                   }}
                 />
               </Span>
             )}
           >
-            <Question size="1.1em" />
+            <HelpCircle size="1.1em" />
           </StyledTooltip>
         </Flex>
       )}
     </React.Fragment>
   );
 }
-
-PayWithStripeForm.propTypes = {
-  paymentIntentId: PropTypes.string.isRequired,
-  paymentIntentClientSecret: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  bilingDetails: PropTypes.shape({
-    name: PropTypes.string,
-    email: PropTypes.string,
-  }),
-  defaultIsSaved: PropTypes.bool,
-  hasSaveCheckBox: PropTypes.bool,
-};

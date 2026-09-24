@@ -1,4 +1,4 @@
-FROM node:18.17
+FROM node:24.18@sha256:fdddfb3e688158251943d52eba361de991548f6814007acba4917ae6b512d6be
 
 WORKDIR /usr/src/frontend
 
@@ -28,6 +28,9 @@ ENV IMAGES_URL $IMAGES_URL
 
 ARG PDF_SERVICE_URL=https://pdf-staging.opencollective.com
 ENV PDF_SERVICE_URL $PDF_SERVICE_URL
+
+ARG ML_SERVICE_URL=https://ml.opencollective.com
+ENV ML_SERVICE_URL $ML_SERVICE_URL
 
 ARG API_KEY=09u624Pc9F47zoGLlkg1TBSbOl2ydSAq
 ENV API_KEY $API_KEY

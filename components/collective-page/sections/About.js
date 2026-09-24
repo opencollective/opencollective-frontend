@@ -1,9 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
+import { CollectiveType } from '@/lib/constants/collectives';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
+import { editCollectiveLongDescriptionMutation } from '@/lib/graphql/v1/mutations';
+import injectIntl from '@/lib/injectIntl';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -14,7 +16,6 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
-import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 
 // Dynamically load RichTextEditor to download it only if user can edit the page
 const RichTextEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
@@ -30,6 +31,8 @@ const messages = defineMessages({
   },
 });
 
+const editCollectiveLongDescriptionMutationOptions = { context: API_V1_CONTEXT };
+
 /**
  * About section category with editable description
  */
@@ -44,6 +47,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
       <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
         <InlineEditField
           mutation={editCollectiveLongDescriptionMutation}
+          mutationOptions={editCollectiveLongDescriptionMutationOptions}
           values={collective}
           field="longDescription"
           canEdit={canEdit}
@@ -107,25 +111,6 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
       </Container>
     </ContainerSectionContent>
   );
-};
-
-SectionAbout.propTypes = {
-  /** The collective to display description for */
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    longDescription: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    isArchived: PropTypes.bool,
-    settings: PropTypes.object,
-    currency: PropTypes.string,
-  }).isRequired,
-
-  /** Can user edit the description? */
-  canEdit: PropTypes.bool,
-
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
 };
 
 export default React.memo(injectIntl(SectionAbout));

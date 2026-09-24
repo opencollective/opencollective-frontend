@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { hasAccountMoneyManagement } from '@/lib/collective';
+import { CollectiveType } from '@/lib/constants/collectives';
+import { getErrorFromGraphqlException } from '@/lib/errors';
+import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
-import Container from '../../Container';
-import { getI18nLink } from '../../I18nFormatters';
-import StyledButton from '../../StyledButton';
+import MessageBox from '@/components/MessageBox';
+
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 import { withUser } from '../../UserProvider';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
-const deleteCollectiveMutation = gqlV1/* GraphQL */ `
+const deleteCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation DeleteCollective($id: Int!) {
     deleteCollective(id: $id) {
       id
@@ -24,7 +24,7 @@ const deleteCollectiveMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const deleteUserCollectiveMutation = gqlV1/* GraphQL */ `
+const deleteUserCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation DeleteUserCollective($id: Int!) {
     deleteUserCollective(id: $id) {
       id
@@ -32,12 +32,13 @@ const deleteUserCollectiveMutation = gqlV1/* GraphQL */ `
   }
 `;
 
+const { PROJECT, EVENT } = CollectiveType;
+
 const DeleteCollective = ({ collective, ...props }) => {
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
-  const [deleteCollective] = useMutation(deleteCollectiveMutation);
-  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation);
-  const isSelfHosted = collective.host?.id === collective.id;
+  const [deleteCollective] = useMutation(deleteCollectiveMutation, { context: API_V1_CONTEXT });
+  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation, { context: API_V1_CONTEXT });
 
   const handleDelete = async () => {
     try {
@@ -56,98 +57,70 @@ const DeleteCollective = ({ collective, ...props }) => {
   };
 
   const { deleting, error } = deleteStatus;
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
 
   const closeModal = () => setShowModal(false);
 
   return (
-    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={50}>
+    <div className="mb-8 flex flex-col items-start gap-2">
       <SettingsSectionTitle>
         <FormattedMessage
           id="collective.delete.title"
-          defaultMessage={
-            'Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-          }
+          defaultMessage="Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
           values={{ type: collective.type }}
         />
       </SettingsSectionTitle>
-      <P mb={3}>
+      <p className="text-sm">
         <FormattedMessage
           id="collective.delete.description"
-          defaultMessage={
-            '{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} will be deleted, along with all related data.'
-          }
+          defaultMessage="{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} will be deleted, along with all related data."
           values={{ type: collective.type }}
         />
-      </P>
-      {error && (
-        <P my={3} color="#ff5252">
-          {error}
-        </P>
-      )}
-      <StyledButton
+      </p>
+      {error && <MessageBox type="error">{error}</MessageBox>}
+      {!collective.isDeletable && ![EVENT, PROJECT].includes(collective.type) ? (
+        <MessageBox type="warning">
+          <FormattedMessage
+            id="collective.delete.isNotDeletable-message"
+            defaultMessage="{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, contributions, events or paid expenses cannot be deleted. Please archive it instead."
+            values={{ type: collective.type }}
+          />
+        </MessageBox>
+      ) : hasMoneyManagement ? (
+        <MessageBox type="warning">
+          <FormattedMessage
+            id="collective.delete.balance.warning"
+            defaultMessage="You can't delete {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
+            values={{ type: collective.type }}
+          />
+        </MessageBox>
+      ) : !collective.isDeletable && [EVENT, PROJECT].includes(collective.type) ? (
+        <MessageBox type="warning">
+          <FormattedMessage
+            id="collective.event.delete.isNotDeletable-message"
+            defaultMessage="{type, select, EVENT {Events} PROJECT {Projects} other {Accounts}} with transactions, contributions or paid expenses cannot be deleted. Please archive it instead."
+            values={{ type: collective.type }}
+          />
+        </MessageBox>
+      ) : null}
+      <Button
         onClick={() => setShowModal(true)}
         loading={deleting}
-        disabled={collective.isHost || !collective.isDeletable}
-        mb={2}
+        disabled={hasMoneyManagement || !collective.isDeletable}
+        variant="outline"
       >
         <FormattedMessage
           id="collective.delete.title"
-          defaultMessage={
-            'Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-          }
+          defaultMessage="Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
           values={{ type: collective.type }}
         />
-      </StyledButton>
-      {collective.isHost && (
-        <P color="rgb(224, 183, 0)" my={1}>
-          {isSelfHosted ? (
-            <FormattedMessage
-              id="collective.delete.selfHost"
-              defaultMessage={`To delete this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
-              values={{ SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/admin/host` }) }}
-            />
-          ) : (
-            <FormattedMessage
-              id="collective.delete.isHost"
-              defaultMessage={
-                "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
-              }
-              values={{ type: collective.type }}
-            />
-          )}{' '}
-        </P>
-      )}
-      {!collective.isDeletable &&
-        collective.type !== CollectiveType.EVENT &&
-        collective.type !== CollectiveType.PROJECT && (
-          <P color="rgb(224, 183, 0)" my={1}>
-            <FormattedMessage
-              id="collective.delete.isNotDeletable-message"
-              defaultMessage={
-                '{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, contributions, events or paid expenses cannot be deleted. Please archive it instead.'
-              }
-              values={{ type: collective.type }}
-            />{' '}
-          </P>
-        )}
-      {!collective.isDeletable &&
-        (collective.type === CollectiveType.EVENT || collective.type === CollectiveType.PROJECT) && (
-          <P color="rgb(224, 183, 0)" my={1}>
-            <FormattedMessage
-              id="collective.event.delete.isNotDeletable-message"
-              defaultMessage={
-                '{type, select, EVENT {Events} PROJECT {Projects} other {Accounts}} with transactions, contributions or paid expenses cannot be deleted. Please archive it instead.'
-              }
-              values={{ type: collective.type }}
-            />
-          </P>
-        )}
+      </Button>
       {showModal && (
-        <StyledModal width="570px" onClose={closeModal}>
+        <StyledModal onClose={closeModal}>
           <ModalHeader onClose={closeModal}>
             <FormattedMessage
               id="collective.delete.modal.header"
-              defaultMessage={'Delete {name}'}
+              defaultMessage="Delete {name}"
               values={{ name: collective.name }}
             />
           </ModalHeader>
@@ -155,20 +128,17 @@ const DeleteCollective = ({ collective, ...props }) => {
             <P>
               <FormattedMessage
                 id="collective.delete.modal.body"
-                defaultMessage={
-                  'Are you sure you want to delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-                }
+                defaultMessage="Are you sure you want to delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?"
                 values={{ type: collective.type }}
               />
             </P>
           </ModalBody>
-          <ModalFooter>
-            <Container display="flex" justifyContent="flex-end">
-              <StyledButton mx={20} onClick={() => setShowModal(false)}>
-                <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
-              </StyledButton>
-              <StyledButton
-                buttonStyle="primary"
+          <ModalFooter showDivider={false}>
+            <div className="flex justify-between gap-2">
+              <Button variant="outline" onClick={() => setShowModal(false)}>
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+              </Button>
+              <Button
                 data-cy="delete"
                 onClick={() => {
                   setShowModal(false);
@@ -176,19 +146,13 @@ const DeleteCollective = ({ collective, ...props }) => {
                 }}
               >
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-              </StyledButton>
-            </Container>
+              </Button>
+            </div>
           </ModalFooter>
         </StyledModal>
       )}
-    </Container>
+    </div>
   );
-};
-
-DeleteCollective.propTypes = {
-  collective: PropTypes.object.isRequired,
-  refetchLoggedInUser: PropTypes.func,
-  router: PropTypes.object,
 };
 
 export default withUser(withRouter(DeleteCollective));

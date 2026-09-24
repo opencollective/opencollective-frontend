@@ -2,7 +2,7 @@ import { defineMessages } from 'react-intl';
 
 import { VirtualCardRequestStatus } from '../graphql/types/v2/graphql';
 
-export const VirtualCardRequestStatusI18n = defineMessages({
+const VirtualCardRequestStatusI18n = defineMessages({
   [VirtualCardRequestStatus.APPROVED]: {
     id: 'VirtualCardRequest.status.APPROVED',
     defaultMessage: 'Approved',
@@ -16,3 +16,8 @@ export const VirtualCardRequestStatusI18n = defineMessages({
     defaultMessage: 'Pending',
   },
 });
+
+export const i18nVirtualCardRequestStatus = (intl, status) => {
+  const i18nMsg = VirtualCardRequestStatusI18n[status];
+  return i18nMsg ? intl.formatMessage(i18nMsg) : status;
+};

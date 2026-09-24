@@ -2,7 +2,7 @@ import React from 'react';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
 import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import StyledLink from './StyledLink';
 
@@ -21,7 +21,7 @@ const CollapsedDisplayBox = styled.div<DisplayBoxProps>`
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
 
-/* The the padding to apply to the collapse blur; useful in the case of making sure only the blur effect is not applied unnecessarily. For
+/* The padding to apply to the collapse blur; useful in the case of making sure only the blur effect is not applied unnecessarily. For
  * example maxCollapsedHeight=20 and collapsePadding=22 ensure that content is collapsed only when there's more than two lines and if there's
  * only two lines the blur effect is not applied.
  */
@@ -39,7 +39,7 @@ type AutoCollapseProps = {
 export const AutoCollapse = ({ children, maxCollapsedHeight }: AutoCollapseProps) => {
   const [isOpen, setOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(false);
-  const contentRef = React.useRef<HTMLDivElement>();
+  const contentRef = React.useRef<HTMLDivElement>(undefined);
   const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
   const toggleIsOpen = () => setOpen(!isOpen);
@@ -78,7 +78,7 @@ export const AutoCollapse = ({ children, maxCollapsedHeight }: AutoCollapseProps
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <FormattedMessage defaultMessage="Collapse" />
+              <FormattedMessage defaultMessage="Collapse" id="W/V6+Y" />
               <CaretUp size="10px" />
             </React.Fragment>
           )}

@@ -1,12 +1,11 @@
 import React, { useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { truncate } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { truncate } from 'lodash-es';
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import formatMemberRole from '../lib/i18n/member-role';
+import injectIntl from '@/lib/injectIntl';
 
 import { ContributorAvatar } from './Avatar';
 import EditPublicMessagePopup from './EditPublicMessagePopup';
@@ -97,22 +96,22 @@ const ContributorTag = styled(StyledTag)`
  */
 const ContributorCard = ({
   intl,
-  width,
-  height,
+  width = 144,
+  height = 272,
   contributor,
-  currency,
+  currency = 'USD',
   isLoggedUser,
   collectiveId,
-  hideTotalAmountDonated,
+  hideTotalAmountDonated = false,
   ...props
 }) => {
   const { collectiveId: fromCollectiveId, publicMessage, description } = contributor;
   const truncatedPublicMessage = publicMessage && truncate(publicMessage, { length: 50 });
   const truncatedDescription = description && truncate(description, { length: 30 });
   const [showEditMessagePopup, setShowEditMessagePopup] = useState(false);
-  const mainContainerRef = useRef();
+  const mainContainerRef = useRef(undefined);
   return (
-    <MainContainer ref={mainContainerRef} width={width} height={height} {...props}>
+    <MainContainer width={width} height={height} {...props} ref={mainContainerRef}>
       <CollectiveLogoContainer>
         <Box mt={-32}>
           <LinkContributor contributor={contributor}>
@@ -176,46 +175,6 @@ const ContributorCard = ({
       )}
     </MainContainer>
   );
-};
-
-ContributorCard.propTypes = {
-  /** The contributor to display */
-  contributor: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    collectiveId: PropTypes.number,
-    name: PropTypes.string,
-    description: PropTypes.string,
-    collectiveSlug: PropTypes.string,
-    isIncognito: PropTypes.bool,
-    type: PropTypes.oneOf(Object.keys(CollectiveType)),
-    totalAmountDonated: PropTypes.number,
-    image: PropTypes.string,
-    publicMessage: PropTypes.string,
-    roles: PropTypes.arrayOf(PropTypes.string.isRequired),
-    isAdmin: PropTypes.bool.isRequired,
-    isBacker: PropTypes.bool.isRequired,
-    isCore: PropTypes.bool.isRequired,
-  }).isRequired,
-  /** The currency used to show the contributions */
-  currency: PropTypes.string,
-  // Styling props
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** @ignore */
-  intl: PropTypes.object,
-  /** It is the logged user */
-  isLoggedUser: PropTypes.bool,
-  /** Collective id */
-  collectiveId: PropTypes.number,
-  /** True if you want to hide the total amount donated */
-  hideTotalAmountDonated: PropTypes.bool,
-};
-
-ContributorCard.defaultProps = {
-  width: 144,
-  height: 272,
-  currency: 'USD',
-  hideTotalAmountDonated: false,
 };
 
 export default React.memo(injectIntl(ContributorCard));

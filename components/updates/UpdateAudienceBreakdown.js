@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { pick, pickBy, sum } from 'lodash';
+import { pick, pickBy, sum } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -28,12 +27,14 @@ const translatedTypes = defineMessages({
   },
 });
 
-const UpdateAudienceBreakdown = ({ audienceStats, isLoading }) => {
+const UpdateAudienceBreakdown = ({ audienceStats, isLoading = false }) => {
   const intl = useIntl();
   if (isLoading) {
     return <LoadingPlaceholder height={50} />;
-  } else if (!audienceStats || audienceStats?.id.includes('NO_ONE')) {
-    return <FormattedMessage defaultMessage="Your Update will not be sent to anyone." />;
+  } else if (!audienceStats) {
+    return <FormattedMessage defaultMessage="There was an error while loading the audience stats." id="uIHzyf" />;
+  } else if (audienceStats?.id.includes('NO_ONE')) {
+    return <FormattedMessage defaultMessage="Your Update will not be sent to anyone." id="qzsw+D" />;
   }
 
   const typesWithStats = Object.keys(translatedTypes);
@@ -50,7 +51,7 @@ const UpdateAudienceBreakdown = ({ audienceStats, isLoading }) => {
       />
       {hasOnlyTotal ? '.' : ':'}
       {!hasOnlyTotal && (
-        <ul>
+        <ul className="list-inside list-disc">
           {Object.entries(stats).map(([key, count]) => (
             <li key={key}>{intl.formatMessage(translatedTypes[key], { count })}</li>
           ))}
@@ -58,19 +59,6 @@ const UpdateAudienceBreakdown = ({ audienceStats, isLoading }) => {
       )}
     </div>
   );
-};
-
-UpdateAudienceBreakdown.propTypes = {
-  isLoading: PropTypes.bool,
-  audienceStats: PropTypes.shape({
-    id: PropTypes.string,
-    total: PropTypes.number,
-    hosted: PropTypes.number,
-    individuals: PropTypes.number,
-    organizations: PropTypes.number,
-    collectives: PropTypes.number,
-    coreContributors: PropTypes.number,
-  }),
 };
 
 export default UpdateAudienceBreakdown;

@@ -1,0 +1,1213 @@
+import React from 'react';
+import { gql, useMutation } from '@apollo/client';
+import { Formik, useFormikContext } from 'formik';
+import { get, isEmpty, omit, pick, truncate } from 'lodash-es';
+import { BadgeCheck, Pencil, ShieldAlert, Trash2 } from 'lucide-react';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+
+import { AccountTypesWithHost, CollectiveType } from '../../../lib/constants/collectives';
+import { i18nGraphqlException } from '../../../lib/errors';
+import {
+  type EditPayoutMethodMutation,
+  type EditPayoutMethodMutationVariables,
+  ExpenseStatus,
+  type SavePayoutMethodMutation,
+  type SavePayoutMethodMutationVariables,
+} from '../../../lib/graphql/types/v2/graphql';
+import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
+import {
+  NEW_PAYOUT_METHOD_ID,
+  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
+  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
+  PAYEE_SLUG_NEW_VENDOR,
+  PAYEE_SLUG_VENDOR,
+} from '@/components/expenses/lib/constants';
+import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
+import { objectKeys } from '@/lib/utils';
+
+import { ComboSelect } from '@/components/ComboSelect';
+import DateTime from '@/components/DateTime';
+import { FormField } from '@/components/FormField';
+import { useModal } from '@/components/ModalContext';
+import { Badge } from '@/components/ui/Badge';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
+
+import { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
+import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
+import MessageBox from '../../MessageBox';
+import { PayoutMethodLabel } from '../../PayoutMethodLabel';
+import PaypalConnectButton from '../../paypal/PaypalConnectButton';
+import { Button } from '../../ui/Button';
+import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
+import { useToast } from '../../ui/useToast';
+import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
+import { Step } from '../SubmitExpenseFlowSteps';
+import { type ExpenseForm } from '../useExpenseForm';
+
+import { FormSectionContainer } from './FormSectionContainer';
+import { memoWithGetFormProps } from './helper';
+import { updateAccountLegalNameMutation } from './mutations';
+import { privateInfoYouAndHost, privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
+
+const getPayoutMethodHTMLId = (payoutMethodId: string) => `payout-method-option-${payoutMethodId}`;
+
+type PayoutMethodSectionProps = {
+  inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
+} & ReturnType<typeof getFormProps>;
+
+function getFormProps(form: ExpenseForm) {
+  return {
+    ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
+    ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
+    ...pick(form.startOptions, ['isInlineEdit']),
+    ...pick(form.options, [
+      'account',
+      'host',
+      'isHostAdmin',
+      'invitee',
+      'payee',
+      'payoutMethods',
+      'newPayoutMethodTypes',
+      'recentlySubmittedExpenses',
+      'isAdminOfPayee',
+      'isAdminOfPayeeHost',
+      'loggedInAccount',
+      'expense',
+      'isPaypalConnectEnabled',
+    ]),
+  };
+}
+
+// eslint-disable-next-line prefer-arrow-callback
+export const PayoutMethodSection = memoWithGetFormProps(function PayoutMethodSection(props: PayoutMethodSectionProps) {
+  const { inViewChange, ...rest } = props;
+  return (
+    <FormSectionContainer
+      step={Step.PAYOUT_METHOD}
+      inViewChange={inViewChange}
+      title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
+    >
+      <PayoutMethodFormContent {...rest} />
+    </FormSectionContainer>
+  );
+}, getFormProps);
+
+// eslint-disable-next-line prefer-arrow-callback
+export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMethodFormContent(
+  props: ReturnType<typeof getFormProps>,
+) {
+  const [lastUsedPayoutMethod, setLastUsedPayoutMethod] =
+    React.useState<ExpenseForm['options']['payoutMethods'][number]>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const { LoggedInUser } = useLoggedInUser();
+
+  const isLoadingPayee = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
+  const isPickingProfileAdministered = [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(
+    props.payeeSlug,
+  );
+
+  const payoutMethods = React.useMemo(() => {
+    if (!props.payoutMethods) {
+      return [];
+    }
+
+    if (!lastUsedPayoutMethod) {
+      return props.payoutMethods;
+    }
+
+    return [lastUsedPayoutMethod, ...(props.payoutMethods?.filter(p => p.id !== lastUsedPayoutMethod.id) || [])];
+  }, [props.payoutMethods, lastUsedPayoutMethod]);
+
+  const { setFieldValue, setFieldTouched, refresh } = props;
+  React.useEffect(() => {
+    const lastSubmittedExpenseByPayee = (props.recentlySubmittedExpenses?.nodes || [])
+      .filter(e => e && e.payee.slug === props.payeeSlug && e.payoutMethod?.id)
+      .find(() => true);
+    const lastUsedPayoutMethodId = lastSubmittedExpenseByPayee?.payoutMethod?.id;
+    const lastUsed = lastUsedPayoutMethodId && (props.payoutMethods || []).find(p => p.id === lastUsedPayoutMethodId);
+
+    if (lastUsed) {
+      setLastUsedPayoutMethod(lastUsed);
+    } else {
+      setLastUsedPayoutMethod(null);
+    }
+
+    const expensePayoutMethodId = props.expense?.payoutMethod?.id;
+    const isEditingExistingExpensePayoutMethod =
+      expensePayoutMethodId &&
+      (props.payeeSlug === props.expense?.payee?.slug || (props.isInlineEdit && !props.payeeSlug));
+
+    if (!isEditingExistingExpensePayoutMethod) {
+      if (!props.payoutMethodId && lastUsed) {
+        setFieldValue('payoutMethodId', lastUsed?.id);
+      } else if (
+        props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
+        (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
+      ) {
+        setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
+      }
+    }
+
+    if (!props.initialLoading) {
+      setIsLoading(false);
+    }
+  }, [
+    props.initialLoading,
+    props.isInlineEdit,
+    props.payeeSlug,
+    props.recentlySubmittedExpenses,
+    props.expense?.payee?.slug,
+    props.expense?.payoutMethod?.id,
+    setFieldValue,
+    props.payoutMethodId,
+    props.payoutMethods,
+    payoutMethods,
+  ]);
+
+  const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === NEW_PAYOUT_METHOD_ID;
+  const isVendor = props.payeeSlug === PAYEE_SLUG_VENDOR || props.payee?.type === CollectiveType.VENDOR;
+  const hasInviteeInfo =
+    props.invitee &&
+    (('email' in props.invitee && props.invitee.email) ||
+      ('slug' in props.invitee && props.invitee.slug) ||
+      ('organization' in props.invitee && props.invitee.organization?.slug));
+  const hasPayeeOrInviteeInfo = props.payee || hasInviteeInfo;
+  const payeeIsCollectiveFamilyType =
+    props.payee && (AccountTypesWithHost as readonly string[]).includes(props.payee.type);
+  const payeeIsSameHost = props.payee && props.host && 'host' in props.payee && props.payee.host?.id === props.host.id;
+  const hasSuitablePayoutMethodOption = payoutMethods?.length > 0;
+  const payeeHostIsTrusted = props.payee && 'host' in props.payee && props.payee.host?.isTrustedHost;
+
+  const onPaymentMethodDeleted = React.useCallback(
+    async deletedPayoutMethodId => {
+      if (deletedPayoutMethodId === props.payoutMethodId) {
+        setFieldValue('payoutMethodId', '');
+      }
+      await refresh();
+    },
+    [props.payoutMethodId, refresh, setFieldValue],
+  );
+
+  const onPaymentMethodEdited = React.useCallback(
+    async newPayoutMethodId => {
+      await refresh();
+      setFieldValue('payoutMethodId', newPayoutMethodId);
+      // Scroll to the payout method, as it might end up in a different place
+      setTimeout(() => {
+        const payoutMethodElement = document.getElementById(getPayoutMethodHTMLId(newPayoutMethodId));
+        if (payoutMethodElement) {
+          payoutMethodElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    },
+    [refresh, setFieldValue],
+  );
+
+  if (isVendor && !props.isHostAdmin) {
+    if (!props.payee || props.payee?.['hasPayoutMethod']) {
+      return (
+        <MessageBox type="info">
+          <FormattedMessage defaultMessage="The vendor payout method is managed by the host." id="KnF5xM" />
+        </MessageBox>
+      );
+    } else {
+      return (
+        <MessageBox type="error">
+          <FormattedMessage
+            defaultMessage="This vendor is missing payout method information, please contact {hostName} before submitting to this vendor."
+            id="H4wPrV"
+            values={{
+              hostName: props.host?.name,
+            }}
+          />
+        </MessageBox>
+      );
+    }
+  }
+
+  return (
+    <div>
+      {/* Cross-host scenario messages */}
+      {payeeIsCollectiveFamilyType && !payeeIsSameHost && (
+        <React.Fragment>
+          {!payeeHostIsTrusted ? (
+            <MessageBox type="error" mt={2} mb={3} fontSize="12px">
+              <FormattedMessage
+                defaultMessage="This Expense is between different Hosts but the Payer Host is not allowed for this yet."
+                id="GiJCGt"
+              />
+              &nbsp;
+              <FormattedMessage
+                defaultMessage="If it's an issue, contact the Host or Open Collective support."
+                id="ZbcLMU"
+              />
+            </MessageBox>
+          ) : !hasSuitablePayoutMethodOption ? (
+            <MessageBox type="error" mt={2} mb={3} fontSize="12px">
+              <FormattedMessage
+                defaultMessage="This Expense is between different Hosts but the recipient Host doesn't have a suitable Payout Method available ({payoutMethodTypes})."
+                id="eKwDAi"
+                values={{
+                  payoutMethodTypes: props.newPayoutMethodTypes?.join(', ') || '',
+                }}
+              />
+              &nbsp;
+              <FormattedMessage
+                defaultMessage="If it's an issue, contact the Host or Open Collective support."
+                id="ZbcLMU"
+              />
+            </MessageBox>
+          ) : (
+            <MessageBox type="warning" mt={2} mb={3} fontSize="12px">
+              <FormattedMessage
+                defaultMessage="This Expense is between different Hosts. Pick a Payout Method from the recipient Host."
+                id="EgEmmA"
+              />
+            </MessageBox>
+          )}
+        </React.Fragment>
+      )}
+
+      {!isLoading &&
+      !isLoadingPayee &&
+      !isPickingProfileAdministered &&
+      !isVendor &&
+      props.payeeSlug !== PAYEE_SLUG_NEW_VENDOR &&
+      !props.isAdminOfPayee &&
+      !props.isAdminOfPayeeHost &&
+      !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) ? (
+        <MessageBox type="info">
+          {props.expenseTypeOption === ExpenseType.GRANT ? (
+            <FormattedMessage
+              defaultMessage="The person you are inviting to submit this grant request will be asked to provide payout method details."
+              id="lsGVcb"
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
+              id="LHdznY"
+            />
+          )}
+        </MessageBox>
+      ) : props.payeeSlug === PAYEE_SLUG_NEW_VENDOR ? (
+        <MessageBox type="info">
+          <FormattedMessage defaultMessage="Save the vendor information to create a payout method" id="E8oTcs" />
+        </MessageBox>
+      ) : (
+        <RadioGroup
+          id="payoutMethodId"
+          disabled={props.isSubmitting}
+          value={props.payoutMethodId}
+          onValueChange={payoutMethodId => {
+            setFieldValue('payoutMethodId', payoutMethodId);
+            setFieldTouched('payoutMethodId', true);
+          }}
+        >
+          {!(isLoading || isLoadingPayee) &&
+            payoutMethods?.map(p => (
+              <PayoutMethodRadioGroupItem
+                key={p.id}
+                payoutMethod={p}
+                payeeSlug={props.payeeSlug}
+                payee={props.payee}
+                isChecked={p.id === props.payoutMethodId}
+                isEditable
+                onPaymentMethodDeleted={onPaymentMethodDeleted}
+                onPaymentMethodEdited={onPaymentMethodEdited}
+                setNameMismatchReason={reason => setFieldValue('payoutMethodNameDiscrepancyReason', reason)}
+                refresh={props.refresh}
+                account={props.account}
+                disableWarningMessages={
+                  payeeIsCollectiveFamilyType && !LoggedInUser.isAdminOfCollective(props.payee['host'])
+                }
+                disableNameMismatchWarning={payeeIsCollectiveFamilyType && !payeeIsSameHost}
+                isPaypalConnectEnabled={props['isPaypalConnectEnabled']}
+              />
+            ))}
+
+          {(isLoading || isLoadingPayee) && (
+            <RadioGroupCard value="" disabled className="min-w-0">
+              <Skeleton className="h-6 w-full" />
+            </RadioGroupCard>
+          )}
+
+          {!(isLoading || isLoadingPayee) &&
+            props.newPayoutMethodTypes?.length > 0 &&
+            !(isVendor && payoutMethods.length > 0) &&
+            (!payeeIsCollectiveFamilyType ||
+              // Cross-host: let an admin of the recipient host add a new payout method on the host
+              (!payeeIsSameHost && props.isAdminOfPayeeHost)) && (
+              <RadioGroupCard
+                value={NEW_PAYOUT_METHOD_ID}
+                data-cy="add-new-payout-method"
+                checked={isNewPayoutMethodSelected}
+                disabled={isLoading || props.initialLoading || props.isSubmitting || !hasPayeeOrInviteeInfo}
+                showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
+                className="min-w-0"
+                subContent={<NewPayoutMethodOptionWrapper />}
+              >
+                <div>
+                  <div>
+                    <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
+                  </div>
+                  {!hasPayeeOrInviteeInfo && (
+                    <div className="mt-1 text-xs text-gray-500 italic">
+                      <FormattedMessage
+                        defaultMessage="Please fill the “Who is getting paid” section first."
+                        id="gu52Su"
+                      />
+                    </div>
+                  )}
+                </div>
+              </RadioGroupCard>
+            )}
+        </RadioGroup>
+      )}
+    </div>
+  );
+}, getFormProps);
+
+function generatePayoutMethodName(intl: IntlShape, type: PayoutMethodType, data) {
+  switch (type) {
+    case PayoutMethodType.PAYPAL:
+      return data.email;
+    case PayoutMethodType.BANK_ACCOUNT:
+      if (data?.details?.IBAN) {
+        return `IBAN ${data.details.IBAN}`;
+      } else if (data?.details?.accountNumber) {
+        return `A/N ${data.details.accountNumber}`;
+      } else if (data?.details?.clabe) {
+        return `Clabe ${data.details.clabe}`;
+      } else if (data?.details?.bankgiroNumber) {
+        return `BankGiro ${data.details.bankgiroNumber}`;
+      } else if (data?.accountHolderName && data?.currency) {
+        return `${data.accountHolderName} (${data.currency})`;
+      }
+      return intl.formatMessage({ defaultMessage: 'Bank account', id: 'BankAccount' });
+    case PayoutMethodType.OTHER:
+      return truncate(data?.content, { length: 20 }).replace(/\n|\t/g, ' ');
+    default:
+      return type;
+  }
+}
+
+export function NewPayoutMethodOptionWrapper(props?: Partial<NewPayoutMethodOptionProps>) {
+  const form = useFormikContext() as ExpenseForm;
+  return <NewPayoutMethodOption {...props} {...NewPayoutMethodOption.getFormProps(form)} />;
+}
+
+type NewPayoutMethodOptionProps = ReturnType<typeof getNewPayoutMethodOptionFormProps>;
+
+function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
+  return {
+    ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
+    ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
+    ...pick(form.options, [
+      'account',
+      'newPayoutMethodTypes',
+      'payoutMethods',
+      'host',
+      'loggedInAccount',
+      'payee',
+      'isPaypalConnectEnabled',
+    ]),
+  };
+}
+
+// eslint-disable-next-line prefer-arrow-callback
+const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
+  const intl = useIntl();
+  const { toast } = useToast();
+  const [creatingPayoutMethod, setIsCreatingPayoutMethod] = React.useState(false);
+  const disabled = props.isSubmitting;
+
+  const { setFieldValue, setFieldTouched, validateForm, refresh } = props;
+
+  const isNewPaypalConnect = props.isPaypalConnectEnabled && props.newPayoutMethod?.type === PayoutMethodType.PAYPAL;
+
+  // Cross-host: the listed payout methods (and any new one) belong to the recipient host, not the
+  // payee collective, so a host admin completing the draft must create/connect against the host.
+  const payeeHost = props.payee && 'host' in props.payee ? props.payee.host : null;
+  const isCrossHostPayee = Boolean(payeeHost && props.host && payeeHost.id !== props.host.id);
+  const payoutMethodAccount = isCrossHostPayee ? payeeHost : props.payee;
+
+  const [createPayoutMethod] = useMutation<SavePayoutMethodMutation, SavePayoutMethodMutationVariables>(
+    gql`
+      mutation SavePayoutMethod($payoutMethod: PayoutMethodInput!, $payeeSlug: String!) {
+        createPayoutMethod(payoutMethod: $payoutMethod, account: { slug: $payeeSlug }) {
+          id
+        }
+      }
+    `,
+    {
+      variables: {
+        payoutMethod: { ...props.newPayoutMethod },
+        payeeSlug: isCrossHostPayee ? payeeHost.slug : props.payeeSlug,
+      },
+    },
+  );
+
+  const onSaveButtonClick = React.useCallback(async () => {
+    try {
+      setFieldTouched('newPayoutMethod.type');
+      setFieldTouched('newPayoutMethod.data.currency');
+      const formErrors = await validateForm();
+      if (!isEmpty(get(formErrors, 'newPayoutMethod')) || formErrors.payoutMethodNameDiscrepancyReason) {
+        if (formErrors.payoutMethodNameDiscrepancyReason) {
+          setFieldTouched('payoutMethodNameDiscrepancyReason');
+        }
+
+        for (const k of objectKeys(formErrors.newPayoutMethod)) {
+          setFieldTouched(`newPayoutMethod.${k}`);
+        }
+
+        return;
+      }
+      const errors = validatePayoutMethod(props.newPayoutMethod, {
+        isPaypalConnectEnabled: props.isPaypalConnectEnabled,
+      });
+      if (!isEmpty(errors)) {
+        return;
+      }
+      setIsCreatingPayoutMethod(true);
+      const response = await createPayoutMethod();
+      const newPayoutMethodId = response.data.createPayoutMethod.id;
+      await refresh();
+      setFieldValue('payoutMethodId', newPayoutMethodId);
+      setFieldValue('newPayoutMethod', { data: {} });
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Payout method created', id: 'RHYtWe' }),
+      });
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    } finally {
+      setIsCreatingPayoutMethod(false);
+    }
+  }, [createPayoutMethod, intl, props.newPayoutMethod, refresh, setFieldTouched, setFieldValue, toast, validateForm]);
+
+  const onPaypalConnectSuccess = React.useCallback(
+    async ({ payoutMethodId }: { payoutMethodId: string }) => {
+      try {
+        setIsCreatingPayoutMethod(true);
+        await refresh();
+        setFieldValue('payoutMethodId', payoutMethodId);
+        setFieldValue('newPayoutMethod', { data: {} });
+
+        // Scroll to the payout method, as it might end up in a different place
+        setTimeout(() => {
+          const payoutMethodElement = document.getElementById(getPayoutMethodHTMLId(payoutMethodId));
+          if (payoutMethodElement) {
+            payoutMethodElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+
+        toast({
+          variant: 'success',
+          message: (
+            <FormattedMessage defaultMessage="Your PayPal account has been connected." id="PayPal.ConnectSuccess" />
+          ),
+        });
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      } finally {
+        setIsCreatingPayoutMethod(false);
+      }
+    },
+    [intl, setFieldValue, toast, refresh],
+  );
+
+  const onPaypalConnectError = React.useCallback(
+    (err: Error) => {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
+    },
+    [intl, toast],
+  );
+
+  const newPayoutMethodComboOptions = React.useMemo(
+    () =>
+      props.newPayoutMethodTypes.map(m => ({
+        value: m,
+        label: i18nPayoutMethodType(intl, m),
+      })),
+    [intl, props.newPayoutMethodTypes],
+  );
+
+  const onPayoutMethodTypeChange = React.useCallback(
+    value => {
+      setFieldValue('newPayoutMethod.data', {});
+      setFieldValue('newPayoutMethod.type', value as PayoutMethodType);
+    },
+    [setFieldValue],
+  );
+
+  const isLegalNameFuzzyMatched = React.useMemo(() => {
+    const accountHolderName: string = (props.newPayoutMethod.data?.accountHolderName ?? '')?.trim();
+    const payeeLegalName: string = props.payee?.legalName ?? props.payee?.name ?? '';
+    return !accountHolderName || accountHolderName.toLowerCase() === payeeLegalName.trim().toLowerCase();
+  }, [props.newPayoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
+
+  const hasLegalNameMismatch =
+    props.newPayoutMethod.data?.accountHolderName?.length &&
+    props.newPayoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
+    props.payeeSlug &&
+    !props.payeeSlug.startsWith('__') &&
+    props.payeeSlug === props.payee?.slug &&
+    !isLegalNameFuzzyMatched;
+
+  return (
+    <div className="space-y-3 p-2">
+      {creatingPayoutMethod ? (
+        <Skeleton className="h-6 w-full" />
+      ) : (
+        <React.Fragment>
+          <FormField
+            name="newPayoutMethod.type"
+            disabled={disabled}
+            label={intl.formatMessage({ defaultMessage: 'Choose a payout method', id: 'SlAq2H' })}
+            isPrivate
+            privateMessage={
+              props.account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+                ? privateInfoYouCollectiveAndHost
+                : privateInfoYouAndHost
+            }
+          >
+            {({ field }) => (
+              <ComboSelect
+                {...field}
+                data-cy="payout-method-type-select"
+                disabled={disabled}
+                options={newPayoutMethodComboOptions}
+                onChange={onPayoutMethodTypeChange}
+              />
+            )}
+          </FormField>
+
+          {props.newPayoutMethod?.type && (
+            <PayoutMethodForm
+              disabled={disabled}
+              required
+              alwaysSave
+              fieldsPrefix="newPayoutMethod"
+              payoutMethod={props.newPayoutMethod}
+              host={props.host}
+              isPaypalConnectEnabled={Boolean(props.isPaypalConnectEnabled && props.payee)}
+            />
+          )}
+        </React.Fragment>
+      )}
+
+      {hasLegalNameMismatch && (
+        <MessageBox type="warning">
+          <div className="mb-2 font-bold">
+            <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />
+          </div>
+          <div>
+            <FormattedMessage
+              defaultMessage="The legal name in the payee profile is: {legalName}."
+              id="NSammt"
+              values={{
+                legalName: props.payee?.legalName || (
+                  <i>
+                    <FormattedMessage defaultMessage="Unknown" id="Unknown" />
+                  </i>
+                ),
+              }}
+            />
+          </div>
+          <div>
+            <FormattedMessage
+              defaultMessage="The contact name in the payout method is: {accountHolderName}."
+              id="XC+vMa"
+              values={{
+                accountHolderName: props.newPayoutMethod.data?.accountHolderName,
+              }}
+            />
+          </div>
+
+          <p className="mt-4">
+            <FormattedMessage
+              defaultMessage="This mismatch might prevent the host from paying the expense. If needed, please provide a reason for the discrepancy in the Additional Information section or as a comment on the expense."
+              id="9ssyMG"
+            />
+          </p>
+
+          {/* See https://github.com/opencollective/opencollective/issues/8306 */}
+          {/* <FormField
+            className="mt-4"
+            label={intl.formatMessage({
+              defaultMessage: 'Please explain why they are different',
+              id: 'bzGbkJ',
+            })}
+            name="payoutMethodNameDiscrepancyReason"
+          /> */}
+        </MessageBox>
+      )}
+
+      {props.loggedInAccount && props.payee && (
+        <div className="mt-4 flex justify-end">
+          {isNewPaypalConnect ? (
+            <PaypalConnectButton
+              className="w-full"
+              accountId={payoutMethodAccount.id}
+              onSuccess={onPaypalConnectSuccess}
+              onError={onPaypalConnectError}
+              loading={creatingPayoutMethod}
+              disabled={disabled || !get(props.newPayoutMethod, 'data.currency')}
+              currency={
+                get(props.newPayoutMethod, 'data.currency') as unknown as (typeof PayPalSupportedCurrencies)[number]
+              }
+              alias={get(props.newPayoutMethod, 'name')}
+            />
+          ) : (
+            <Button
+              loading={creatingPayoutMethod || props.isSubmitting}
+              disabled={disabled}
+              onClick={onSaveButtonClick}
+              className="w-full"
+            >
+              <FormattedMessage defaultMessage="Save" id="save" />
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}, getNewPayoutMethodOptionFormProps);
+
+type PayoutMethodRadioGroupItemProps = {
+  payoutMethod: ExpenseForm['options']['payoutMethods'][number];
+  payee: ExpenseForm['options']['payee'];
+  payeeSlug: ExpenseForm['values']['payeeSlug'];
+  host?: ExpenseForm['options']['host'];
+  isChecked?: boolean;
+  isEditable?: boolean;
+  isSubmitting?: boolean;
+  archived?: boolean;
+  /** Hide quick actions to correct missing currency or mismatch name */
+  disableWarningMessages?: boolean;
+  /** Hide the legal name mismatch warning (e.g. cross-host payments where the payout method belongs to the recipient Host, not the payee) */
+  disableNameMismatchWarning?: boolean;
+  onPaymentMethodDeleted: (deletedPayoutMethodId) => void;
+  onPaymentMethodEdited: (newPayoutMethodId: string) => void;
+  setNameMismatchReason?: (reason: string) => void;
+  refresh?: () => void;
+  Component?: React.ComponentType<{
+    value?: string;
+    showSubcontent?: boolean;
+    asChild?: boolean;
+    subContent: React.ReactNode;
+  }>;
+  moreActions?: React.ReactNode;
+  account?: ExpenseForm['options']['account'];
+  isPaypalConnectEnabled?: boolean;
+};
+
+export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(props: PayoutMethodRadioGroupItemProps) {
+  const CardComponent = props.Component || RadioGroupCard;
+  const intl = useIntl();
+  const { toast } = useToast();
+
+  // Cross-host: the listed payout method belongs to the recipient host, not the payee collective,
+  // so edits/reconnects must target the host (matches the create flow in NewPayoutMethodOption).
+  const payeeHost = props.payee && 'host' in props.payee ? props.payee.host : null;
+  const payerHost = props.account && 'host' in props.account ? props.account.host : null;
+  const isCrossHostPayee = Boolean(payeeHost && payerHost && payeeHost.id !== payerHost.id);
+  const payoutMethodAccount = isCrossHostPayee ? payeeHost : props.payee;
+
+  const isEditable =
+    props.payoutMethod.type !== PayoutMethodType.ACCOUNT_BALANCE &&
+    props.isEditable &&
+    ('canBeEdited' in props.payoutMethod ? props.payoutMethod.canBeEdited : true);
+  const isMissingCurrency = isEmpty(props.payoutMethod.data?.currency);
+  const isLegalNameFuzzyMatched = React.useMemo(() => {
+    const accountHolderName: string = props.payoutMethod.data?.accountHolderName ?? '';
+    const payeeLegalName: string = props.payee?.legalName ?? props.payee?.name ?? '';
+    return accountHolderName.trim().toLowerCase() === payeeLegalName.trim().toLowerCase();
+  }, [props.payoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
+
+  const hasLegalNameMismatch =
+    props.payoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
+    props.payeeSlug &&
+    !props.payeeSlug.startsWith('__') &&
+    props.payeeSlug === props.payee?.slug &&
+    !isLegalNameFuzzyMatched;
+  const isOpen = props.isChecked;
+
+  const [isEditingPayoutMethod, setIsEditingPayoutMethod] = React.useState(false);
+  const [isLoadingEditPayoutMethod, setIsLoadingEditPayoutMethod] = React.useState(false);
+  const [keepNameDifferent, setKeepNameDifferent] = React.useState(false);
+  const [legalNameUpdated, setLegalNameUpdated] = React.useState(false);
+
+  const [submitLegalNameMutation, { loading }] = useMutation(updateAccountLegalNameMutation, {
+    variables: {
+      account: {
+        id: props.payee?.id,
+        legalName: props.payoutMethod.data?.accountHolderName,
+      },
+    },
+    onCompleted: () => {
+      props.refresh?.();
+    },
+  });
+
+  const onUpdateLegalNameToMatch = React.useCallback(async () => {
+    try {
+      await submitLegalNameMutation();
+      setLegalNameUpdated(true);
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Legal name updated', id: 'aLu6aT' }),
+      });
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    }
+  }, [submitLegalNameMutation, toast, intl]);
+
+  // Connect/edit/delete callbacks
+  const [deletePayoutMethod] = useMutation(gql`
+    mutation DeletePayoutMethod($payoutMethodId: String!) {
+      removePayoutMethod(payoutMethodId: $payoutMethodId) {
+        id
+      }
+    }
+  `);
+
+  const [editPayoutMethod] = useMutation<EditPayoutMethodMutation, EditPayoutMethodMutationVariables>(gql`
+    mutation EditPayoutMethod($payoutMethod: PayoutMethodInput!) {
+      editPayoutMethod(payoutMethod: $payoutMethod) {
+        id
+        name
+        data
+        isSaved
+        type
+      }
+    }
+  `);
+
+  const { showConfirmationModal } = useModal();
+
+  const onDeleteClick = React.useCallback(
+    e => {
+      e.stopPropagation();
+      e.preventDefault();
+      showConfirmationModal({
+        title: props.payoutMethod?.canBeDeleted
+          ? intl.formatMessage({
+              defaultMessage: 'Delete Payout Method?',
+              id: 'weGvmF',
+            })
+          : intl.formatMessage({
+              defaultMessage: 'Permanently archive payout method?',
+              id: 'ArchivePayoutMethod.title',
+            }),
+        description: props.payoutMethod?.canBeDeleted
+          ? intl.formatMessage({
+              defaultMessage: 'Are you sure you want to delete this payout method?',
+              id: 'uR+TjD',
+            })
+          : intl.formatMessage({
+              defaultMessage:
+                'This is permanent. Your account will no longer have access to these details and you will not be able to restore this payout method. The host may still retain the information for legal reasons.',
+              id: 'ArchivePayoutMethod.permanent',
+            }),
+        children: <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />,
+        onConfirm: async () => {
+          try {
+            await deletePayoutMethod({
+              variables: {
+                payoutMethodId: props.payoutMethod?.id,
+              },
+            });
+            await props.onPaymentMethodDeleted(props.payoutMethod.id);
+            toast({
+              variant: 'success',
+              message: props.payoutMethod?.canBeDeleted ? (
+                <FormattedMessage defaultMessage="Payout Method deleted successfully" id="2sVunP" />
+              ) : (
+                <FormattedMessage defaultMessage="Payout Method archived successfully" id="njlj6i" />
+              ),
+            });
+          } catch (e) {
+            toast({
+              variant: 'error',
+              message: i18nGraphqlException(intl, e),
+            });
+          }
+        },
+        confirmLabel: props.payoutMethod?.canBeDeleted
+          ? intl.formatMessage({ defaultMessage: 'Delete Payout Method', id: 'Rs7g0Y' })
+          : intl.formatMessage({ defaultMessage: 'Permanently archive', id: 'ArchivePayoutMethod.confirm' }),
+        variant: 'destructive',
+      });
+    },
+    [intl, deletePayoutMethod, props, showConfirmationModal, toast],
+  );
+
+  const onEditClick = React.useCallback(e => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsEditingPayoutMethod(true);
+  }, []);
+
+  const { onPaymentMethodEdited } = props;
+  const onSaveClick = React.useCallback(
+    async values => {
+      try {
+        setIsLoadingEditPayoutMethod(true);
+        const response = await editPayoutMethod({
+          variables: {
+            payoutMethod: pick(values.editingPayoutMethod, ['id', 'isSaved', 'name', 'data', 'type']),
+          },
+        });
+        toast({
+          variant: 'success',
+          message: <FormattedMessage defaultMessage="Payout Method edit successfully" id="cFfn2l" />,
+        });
+        await onPaymentMethodEdited(response.data.editPayoutMethod.id);
+        setIsEditingPayoutMethod(false);
+        return CONFIRMATION_MODAL_TERMINATE;
+      } catch (e) {
+        toast({
+          variant: 'error',
+          message: i18nGraphqlException(intl, e),
+        });
+      } finally {
+        setIsLoadingEditPayoutMethod(false);
+      }
+    },
+    [editPayoutMethod, intl, onPaymentMethodEdited, toast],
+  );
+
+  return (
+    <Formik
+      onSubmit={onSaveClick}
+      initialValues={{
+        editingPayoutMethod: {
+          ...omit(props.payoutMethod, ['__typename']),
+        },
+      }}
+    >
+      {({ setFieldTouched, setFieldValue, values, submitForm }) => (
+        <CardComponent
+          id={getPayoutMethodHTMLId(props.payoutMethod.id)}
+          value={props.payoutMethod.id}
+          disabled={props.archived}
+          showSubcontent={isOpen}
+          asChild
+          className="min-w-0"
+          subContent={
+            isEditingPayoutMethod ? (
+              <React.Fragment>
+                {isLoadingEditPayoutMethod ? (
+                  <Skeleton className="h-6 w-full" />
+                ) : (
+                  <div className="space-y-2">
+                    <PayoutMethodForm
+                      required
+                      alwaysSave
+                      fieldsPrefix={`editingPayoutMethod`}
+                      payoutMethod={omit(props.payoutMethod, 'id')} // This edit form should always create a new payout method
+                      host={props.host}
+                      isPaypalConnectEnabled={props.isPaypalConnectEnabled}
+                    />
+                    {props.payoutMethod.type !== PayoutMethodType.PAYPAL &&
+                      values.editingPayoutMethod.name !==
+                        generatePayoutMethodName(
+                          intl,
+                          values.editingPayoutMethod.type,
+                          values.editingPayoutMethod.data,
+                        ) && (
+                        <Button
+                          disabled={props.isSubmitting}
+                          loading={props.isSubmitting}
+                          size="xs"
+                          variant="link"
+                          className="p-0"
+                          onClick={() => {
+                            setFieldValue(
+                              `editingPayoutMethod.name`,
+                              generatePayoutMethodName(
+                                intl,
+                                values.editingPayoutMethod.type,
+                                values.editingPayoutMethod.data,
+                              ),
+                            );
+                            setFieldTouched(`editingPayoutMethod.name`, false);
+                          }}
+                        >
+                          <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
+                        </Button>
+                      )}
+                  </div>
+                )}
+
+                <div className="mt-6 flex justify-end gap-2">
+                  <Button
+                    disabled={isLoadingEditPayoutMethod || props.isSubmitting}
+                    variant="secondary"
+                    onClick={() => {
+                      setIsEditingPayoutMethod(false);
+                    }}
+                  >
+                    <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
+                  </Button>
+                  {values.editingPayoutMethod.type === PayoutMethodType.PAYPAL &&
+                  props.isPaypalConnectEnabled &&
+                  !values.editingPayoutMethod.isVerified ? (
+                    <PaypalConnectButton
+                      accountId={payoutMethodAccount.id}
+                      payoutMethodId={values.editingPayoutMethod.id}
+                      onSuccess={async ({ payoutMethodId }) => {
+                        try {
+                          // We have no guarantee that `payoutMethodId` is the same as the payout method we're updating, since the backend
+                          // might return a new one if the linked PayPal account email is different from the one we're editing.
+                          const hasCreatedNewPayoutMethod = values.editingPayoutMethod.id !== payoutMethodId;
+                          setIsLoadingEditPayoutMethod(true);
+                          setIsEditingPayoutMethod(false);
+                          await onPaymentMethodEdited(payoutMethodId);
+                          toast({
+                            variant: 'success',
+                            title: (
+                              <FormattedMessage
+                                defaultMessage="Your PayPal account has been connected."
+                                id="PayPal.ConnectSuccess"
+                              />
+                            ),
+                            duration: hasCreatedNewPayoutMethod ? 30_000 : undefined, // Give it more time to read the message below
+                            message: !hasCreatedNewPayoutMethod ? null : (
+                              <FormattedMessage
+                                defaultMessage="The email associated with the linked account does not match the one you edited, so we've created a new payout method. Feel free to archive the old one if you don't need it anymore."
+                                id="njBTeV"
+                              />
+                            ),
+                          });
+                        } catch (e) {
+                          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+                        } finally {
+                          setIsLoadingEditPayoutMethod(false);
+                        }
+                      }}
+                      onError={(err: Error) => {
+                        toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
+                      }}
+                      loading={isLoadingEditPayoutMethod}
+                      disabled={!get(values.editingPayoutMethod, 'data.currency')}
+                      currency={
+                        get(
+                          values.editingPayoutMethod,
+                          'data.currency',
+                        ) as unknown as (typeof PayPalSupportedCurrencies)[number]
+                      }
+                      alias={get(values.editingPayoutMethod, 'name')}
+                    />
+                  ) : (
+                    <Button loading={isLoadingEditPayoutMethod} onClick={submitForm}>
+                      <FormattedMessage defaultMessage="Save" id="save" />
+                    </Button>
+                  )}
+                </div>
+              </React.Fragment>
+            ) : props.archived ? (
+              <div className="relative rounded-xl bg-muted p-4 text-sm text-muted-foreground">
+                <div>
+                  <FormattedMessage defaultMessage="Connected on" id="jOD/TD" />{' '}
+                  <DateTime value={props.payoutMethod.createdAt} dateStyle="medium" />
+                </div>
+                <div>
+                  <FormattedMessage defaultMessage="Last update" id="transactions.import.lastUpdate" />{' '}
+                  <DateTime value={props.payoutMethod.updatedAt} dateStyle="medium" />
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <PayoutMethodDetailsContainer
+                  payoutMethod={props.payoutMethod}
+                  maxItems={3}
+                  className={props.archived && 'text-gray-500!'}
+                  privateMessage={
+                    props.account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+                      ? privateInfoYouCollectiveAndHost
+                      : privateInfoYouAndHost
+                  }
+                />
+                {isMissingCurrency && !props.disableWarningMessages && (
+                  <div className="mt-2">
+                    <MessageBox type="warning">
+                      <div className="mb-2 font-bold">
+                        <FormattedMessage defaultMessage="Missing currency" id="dkeCt1" />
+                      </div>
+                      <div>
+                        <FormattedMessage
+                          defaultMessage="Your payout method is missing a currency. Please <EditLink>edit</EditLink> your payout method to update it."
+                          id="A1di0H"
+                          values={{
+                            EditLink: chunks => (
+                              <Button
+                                variant="link"
+                                className="inline h-auto p-0 text-xs text-neutral-700 underline"
+                                onClick={onEditClick}
+                              >
+                                {chunks}
+                              </Button>
+                            ),
+                          }}
+                        />
+                      </div>
+                    </MessageBox>
+                  </div>
+                )}
+                {hasLegalNameMismatch && !props.disableWarningMessages && !props.disableNameMismatchWarning && (
+                  <MessageBox type="warning">
+                    <div className="mb-2 font-bold">
+                      <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />
+                    </div>
+                    <div>
+                      <FormattedMessage
+                        defaultMessage="The legal name in the payee profile is: {legalName}."
+                        id="NSammt"
+                        values={{
+                          legalName: props.payee?.legalName,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <FormattedMessage
+                        defaultMessage="The contact name in the payout method is: {accountHolderName}."
+                        id="XC+vMa"
+                        values={{
+                          accountHolderName: props.payoutMethod.data?.accountHolderName,
+                        }}
+                      />
+                    </div>
+
+                    {!keepNameDifferent && (
+                      <React.Fragment>
+                        <div className="mt-4 mb-2 font-bold">
+                          <FormattedMessage
+                            defaultMessage="Would you like to update your legal name to match your payout method contact name?"
+                            id="fEYP7x"
+                          />
+                        </div>
+
+                        <div className="flex gap-4">
+                          <Button
+                            disabled={loading}
+                            loading={loading}
+                            variant="outline"
+                            onClick={onUpdateLegalNameToMatch}
+                          >
+                            <FormattedMessage defaultMessage="Yes, Update and Match" id="qjpM/f" />
+                          </Button>
+                          {props.setNameMismatchReason && (
+                            <Button disabled={loading} variant="outline" onClick={() => setKeepNameDifferent(true)}>
+                              <FormattedMessage defaultMessage="No, Keep Them Different" id="PCBOGA" />
+                            </Button>
+                          )}
+                        </div>
+                      </React.Fragment>
+                    )}
+                    {keepNameDifferent && (
+                      <React.Fragment>
+                        <p className="mt-4">
+                          <FormattedMessage
+                            defaultMessage="This mismatch might prevent the host from paying the expense. If needed, please provide a reason for the discrepancy in the Additional Information section or as a comment on the expense."
+                            id="9ssyMG"
+                          />
+                        </p>
+                        {/* See https://github.com/opencollective/opencollective/issues/8306 */}
+                        {/* <FormField
+                        className="mt-4"
+                        label={intl.formatMessage({
+                          defaultMessage: 'Please explain why they are different',
+                          id: 'bzGbkJ',
+                        })}
+                        name="payoutMethodNameDiscrepancyReason"
+                      >
+                        {({ field }) => (
+                          <Input {...field} onChange={e => props.setNameMismatchReason(e.target.value)} />
+                        )}
+                      </FormField> */}
+                      </React.Fragment>
+                    )}
+                  </MessageBox>
+                )}
+                {legalNameUpdated && !hasLegalNameMismatch && (
+                  <MessageBox type="warning">
+                    <FormattedMessage
+                      defaultMessage="Legal name is updated to match the payout method name."
+                      id="TI6gwx"
+                    />
+                  </MessageBox>
+                )}
+              </div>
+            )
+          }
+        >
+          <div className="flex min-w-0 grow flex-wrap items-center gap-2">
+            <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />
+            {props.archived && (
+              <Badge type="outline" size="xs">
+                <FormattedMessage defaultMessage="Archived" id="Archived" />
+              </Badge>
+            )}
+            {props.payoutMethod.type === PayoutMethodType.PAYPAL && props.payoutMethod.isVerified === true && (
+              <Badge type="success" size="xs" className="flex items-center gap-1">
+                <BadgeCheck size={10} />
+                <FormattedMessage defaultMessage="Verified" id="Verified" />
+              </Badge>
+            )}
+            {props.payoutMethod.type === PayoutMethodType.PAYPAL && props.payoutMethod.isVerified === false && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge type="warning" size="xs" className="flex cursor-help items-center gap-1">
+                    <ShieldAlert size={10} />
+                    <FormattedMessage defaultMessage="Unverified" id="Unverified" />
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <FormattedMessage
+                    defaultMessage="This PayPal account has not been verified via 'Log in with PayPal'.{canEdit, select, true { Edit this payout method to connect and verify.} other {}}"
+                    id="PayPal.Unverified.Tooltip"
+                    values={{ canEdit: isEditable ? 'true' : 'false' }}
+                  />
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+          {!isEditingPayoutMethod && isEditable && (
+            <div className="flex gap-2">
+              {!props.archived && props.isChecked && (
+                <Button
+                  disabled={props.isSubmitting}
+                  onClick={onEditClick}
+                  size="icon-xs"
+                  variant="ghost"
+                  title={intl.formatMessage({ defaultMessage: 'Edit payout method', id: 'EditPayoutMethod' })}
+                >
+                  <Pencil size={16} />
+                </Button>
+              )}
+              {!props.archived && (
+                <Button
+                  disabled={props.isSubmitting}
+                  onClick={onDeleteClick}
+                  size="icon-xs"
+                  variant="ghost"
+                  title={intl.formatMessage({ defaultMessage: 'Remove payout method', id: 'RemovePayoutMethod' })}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              )}
+              {props.moreActions}
+            </div>
+          )}
+        </CardComponent>
+      )}
+    </Formik>
+  );
+};

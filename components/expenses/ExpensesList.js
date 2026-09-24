@@ -1,17 +1,21 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import FlipMove from 'react-flip-move';
+import React, { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { DISABLE_ANIMATIONS } from '../../lib/animations';
+import useKeyboardKey, { ENTER_KEY, J, K } from '../../lib/hooks/useKeyboardKey';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { cn } from '../../lib/utils';
 
 import ExpenseBudgetItem from '../budget/ExpenseBudgetItem';
+import FlipMove from '../FlipMove';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
 
+import { SubmittedExpenseListItem } from './list/SubmittedExpenseListItem';
 import ExpenseDrawer from './ExpenseDrawer';
 
 const ExpenseContainer = styled.div`
@@ -34,50 +38,47 @@ const FooterLabel = styled.span`
 `;
 
 const ExpensesTotal = ({ collective, host, expenses, expenseFieldForTotalAmount }) => {
-  const { total, isApproximate } = React.useMemo(() => {
+  const { total, currency, isApproximate } = React.useMemo(() => {
     let isApproximate = false;
     let total = 0;
+    let currency = collective?.currency || host?.currency;
     for (const expense of expenses) {
       total += expense[expenseFieldForTotalAmount]?.valueInCents || expense.amount;
+      currency = currency || expense[expenseFieldForTotalAmount]?.currency;
       if (expense[expenseFieldForTotalAmount]?.exchangeRate?.isApproximate) {
         isApproximate = true;
       }
     }
 
-    return { total, isApproximate };
+    return { total, currency, isApproximate };
   }, [expenses]);
 
   return (
     <React.Fragment>
       {isApproximate && `~ `}
-      <FormattedMoneyAmount amount={total} currency={collective?.currency || host?.currency} precision={2} />
+      <FormattedMoneyAmount amount={total} currency={currency} precision={2} />
     </React.Fragment>
   );
 };
 
-ExpensesTotal.propTypes = {
-  collective: PropTypes.object,
-  host: PropTypes.object,
-  expenses: PropTypes.array,
-  expenseFieldForTotalAmount: PropTypes.string,
-};
-
 const ExpensesList = ({
-  collective,
-  host,
+  collective = undefined,
+  host = undefined,
   expenses,
-  isLoading,
-  nbPlaceholders,
-  isInverted,
-  suggestedTags,
-  view,
-  onDelete,
-  onProcess,
-  expenseFieldForTotalAmount,
-  useDrawer,
-  setOpenExpenseLegacyId,
-  openExpenseLegacyId,
+  isLoading = false,
+  nbPlaceholders = 10,
+  isInverted = false,
+  view = 'public',
+  onDelete = undefined,
+  onProcess = undefined,
+  expenseFieldForTotalAmount = 'amountInAccountCurrency',
+  useDrawer = false,
+  setOpenExpenseLegacyId = undefined,
+  openExpenseLegacyId = undefined,
+  onDuplicateClick = undefined,
+  displaySummaryFooter = true,
 }) => {
+  const { LoggedInUser } = useLoggedInUser();
   // Initial values for expense in drawer
   const expenseInDrawer = React.useMemo(() => {
     if (openExpenseLegacyId) {
@@ -85,6 +86,46 @@ const ExpensesList = ({
       return expense || null;
     }
   }, [openExpenseLegacyId, expenses]);
+  const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
+
+  const [selectedExpenseIndex, setSelectedExpenseIndex] = React.useState();
+  const navigateIndex = dif => event => {
+    if (hasKeyboardShortcutsEnabled && !openExpenseLegacyId) {
+      event.preventDefault();
+      let nextIndex = (selectedExpenseIndex ?? -1) + dif;
+      if (nextIndex < 0) {
+        nextIndex = 0;
+      }
+      if (nextIndex >= expenses.length) {
+        nextIndex = expenses.length - 1;
+      }
+      setSelectedExpenseIndex(nextIndex);
+    }
+  };
+
+  useKeyboardKey({
+    keyMatch: J,
+    callback: navigateIndex(1),
+  });
+  useKeyboardKey({
+    keyMatch: K,
+    callback: navigateIndex(-1),
+  });
+  useKeyboardKey({
+    keyMatch: ENTER_KEY,
+    callback: () => {
+      if (selectedExpenseIndex !== undefined && hasKeyboardShortcutsEnabled) {
+        setOpenExpenseLegacyId(expenses[selectedExpenseIndex].legacyId);
+      }
+    },
+  });
+  useEffect(() => {
+    const selectedExpense = expenses?.[selectedExpenseIndex];
+    if (selectedExpense) {
+      const expenseElement = document.getElementById(`expense-${selectedExpense?.legacyId}`);
+      expenseElement?.scrollIntoViewIfNeeded?.();
+    }
+  }, [selectedExpenseIndex, expenses]);
 
   if (!expenses?.length && !isLoading) {
     return null;
@@ -92,11 +133,14 @@ const ExpensesList = ({
 
   return (
     <StyledCard>
-      <ExpenseDrawer
-        openExpenseLegacyId={openExpenseLegacyId}
-        handleClose={() => setOpenExpenseLegacyId(null)}
-        initialExpenseValues={expenseInDrawer}
-      />
+      {useDrawer && (
+        <ExpenseDrawer
+          openExpenseLegacyId={openExpenseLegacyId}
+          handleClose={() => setOpenExpenseLegacyId(null)}
+          initialExpenseValues={expenseInDrawer}
+        />
+      )}
+
       {isLoading ? (
         [...new Array(nbPlaceholders)].map((_, idx) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -107,28 +151,42 @@ const ExpensesList = ({
       ) : (
         <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
           {expenses.map((expense, idx) => (
-            <ExpenseContainer key={expense.id} isFirst={!idx} data-cy={`expense-${expense.status}`}>
-              <ExpenseBudgetItem
-                isInverted={isInverted}
-                expense={expense}
-                host={host}
-                showProcessActions
-                view={view}
-                onDelete={onDelete}
-                onProcess={onProcess}
-                suggestedTags={suggestedTags}
-                selected={openExpenseLegacyId === expense.legacyId}
-                expandExpense={e => {
-                  e.preventDefault();
-                  setOpenExpenseLegacyId(expense.legacyId);
-                }}
-                useDrawer={useDrawer}
-              />
-            </ExpenseContainer>
+            <div
+              key={expense.id}
+              id={`expense-${expense.legacyId}`}
+              className={cn(idx && 'border-t border-gray-300')}
+              data-cy={`expense-${expense.status}`}
+            >
+              {view === 'submitter-new' ? (
+                <SubmittedExpenseListItem
+                  expense={expense}
+                  onDuplicateClick={onDuplicateClick}
+                  onClick={() => {
+                    setOpenExpenseLegacyId(expense.legacyId);
+                  }}
+                />
+              ) : (
+                <ExpenseBudgetItem
+                  isInverted={isInverted}
+                  expense={expense}
+                  host={host || expense.host}
+                  showProcessActions
+                  view={view}
+                  onDelete={onDelete}
+                  onProcess={onProcess}
+                  selected={!openExpenseLegacyId && selectedExpenseIndex === idx}
+                  expandExpense={(e, attachmentUrl) => {
+                    e.preventDefault();
+                    setOpenExpenseLegacyId(expense.legacyId, attachmentUrl);
+                  }}
+                  useDrawer={useDrawer}
+                />
+              )}
+            </div>
           ))}
         </FlipMove>
       )}
-      {!isLoading && (
+      {!isLoading && displaySummaryFooter && (
         <FooterContainer>
           <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
             <Flex
@@ -161,44 +219,6 @@ const ExpensesList = ({
       )}
     </StyledCard>
   );
-};
-
-ExpensesList.propTypes = {
-  isLoading: PropTypes.bool,
-  /** Set this to true to invert who's displayed (payee or collective) */
-  isInverted: PropTypes.bool,
-  /** When `isLoading` is true, this sets the number of "loadin" items displayed */
-  nbPlaceholders: PropTypes.number,
-  host: PropTypes.object,
-  view: PropTypes.oneOf(['public', 'admin', 'submitter']),
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  onDelete: PropTypes.func,
-  onProcess: PropTypes.func,
-  /** Defines the field in `expense` that holds the amount. Useful to display the right one based on the context for multi-currency expenses. */
-  expenseFieldForTotalAmount: PropTypes.string,
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
-    currency: PropTypes.string,
-  }),
-  expenses: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      legacyId: PropTypes.number.isRequired,
-    }),
-  ),
-  totalAmount: PropTypes.number,
-  useDrawer: PropTypes.bool,
-  setOpenExpenseLegacyId: PropTypes.func,
-  openExpenseLegacyId: PropTypes.number,
-};
-
-ExpensesList.defaultProps = {
-  nbPlaceholders: 10,
-  view: 'public',
-  expenseFieldForTotalAmount: 'amountInAccountCurrency',
 };
 
 export default ExpensesList;

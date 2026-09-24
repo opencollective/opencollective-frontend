@@ -1,7 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { truncate } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { getApplicableTaxes } from '@opencollective/taxes';
+import { truncate } from 'lodash-es';
+import { TriangleAlert } from 'lucide-react';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import INTERVALS from '../../lib/constants/intervals';
@@ -19,8 +20,8 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 import StyledProgressBar from '../StyledProgressBar';
-import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import Contribute from './Contribute';
 
@@ -54,53 +55,61 @@ const getContributionTypeFromTier = (tier, isPassed) => {
   }
 };
 
-const TierTitle = ({ collective, tier }) => {
+const TierTitle = ({ collective, tier, showAdminUnsupportedWarning = false }) => {
   const name = capitalize(tier.name);
-  if (!tier.useStandalonePage) {
-    return name;
-  } else {
-    return (
-      <StyledTooltip
-        content={() => <FormattedMessage id="ContributeTier.GoToPage" defaultMessage="Go to full details page" />}
-      >
-        <StyledLink
-          as={Link}
-          href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
-          color="black.900"
-          hoverColor="black.900"
-          underlineOnHover
-        >
-          {name}
-        </StyledLink>
-      </StyledTooltip>
-    );
-  }
-};
-
-TierTitle.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
-  tier: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    name: PropTypes.string,
-    useStandalonePage: PropTypes.bool,
-  }),
+  return (
+    <React.Fragment>
+      {showAdminUnsupportedWarning ? (
+        <Tooltip>
+          <TooltipContent>
+            <FormattedMessage
+              defaultMessage="This tier type is disabled by your Fiscal Host. Edit it, or reach out to them for more information."
+              id="FQvzlx"
+            />
+          </TooltipContent>
+          <TooltipTrigger>
+            <div className="text-black-900 flex items-center gap-1 text-red-500 underline decoration-dashed underline-offset-4">
+              <TriangleAlert size={18} />
+              <span>{name}</span>
+            </div>
+          </TooltipTrigger>
+        </Tooltip>
+      ) : !tier.useStandalonePage ? (
+        name
+      ) : (
+        <Tooltip>
+          <TooltipContent>
+            <FormattedMessage id="ContributeTier.GoToPage" defaultMessage="Go to full details page" />
+          </TooltipContent>
+          <TooltipTrigger>
+            <StyledLink
+              as={Link}
+              href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
+              color="inherit"
+              $hoverColor="inherit"
+              $underlineOnHover
+            >
+              {name}
+            </StyledLink>
+          </TooltipTrigger>
+        </Tooltip>
+      )}
+    </React.Fragment>
+  );
 };
 
 const canContribute = (collective, LoggedInUser) => {
   if (!collective.isActive) {
     return false;
   } else if (collective.type === 'EVENT') {
-    return !isPastEvent(collective) || Boolean(LoggedInUser.isAdminOfCollectiveOrHost(collective));
+    return !isPastEvent(collective) || Boolean(LoggedInUser?.isAdminOfCollectiveOrHost(collective));
   } else {
     return true;
   }
 };
 
-const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
+const ContributeTier = ({ collective, tier, isPreview, supportedTierTypes = undefined, isAdmin = false, ...props }) => {
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const { stats } = tier;
   const currency = tier.currency || collective.currency;
@@ -114,6 +123,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
   const canContributeToCollective = canContribute(collective, LoggedInUser);
   const isDisabled = !canContributeToCollective || tierIsExpired || hasNoneLeft;
   const tierLegacyId = tier.legacyId || tier.id;
+  const taxes = getApplicableTaxes(collective, collective.host, tier.type);
 
   let description = tier.description;
   if (!tier.description) {
@@ -128,7 +138,13 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
   return (
     <Contribute
       route={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}/checkout`}
-      title={<TierTitle collective={collective} tier={tier} />}
+      title={
+        <TierTitle
+          collective={collective}
+          tier={tier}
+          showAdminUnsupportedWarning={Boolean(isAdmin && !supportedTierTypes?.includes(tier.type))}
+        />
+      }
       type={tierType}
       buttonText={tier.button}
       contributors={tier.contributors}
@@ -181,7 +197,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                   values={{
                     amount: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
+                        amountClassName="font-bold text-foreground"
                         amount={graphqlAmountValueInCents(amountRaised)}
                         currency={currency}
                         precision={getPrecisionFromAmount(graphqlAmountValueInCents(amountRaised))}
@@ -189,7 +205,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                     ),
                     goalWithInterval: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
+                        amountClassName="font-bold text-foreground"
                         amount={graphqlAmountValueInCents(tier.goal)}
                         currency={currency}
                         interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
@@ -207,65 +223,44 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
           )}
         </Box>
         {!isDisabled && graphqlAmountValueInCents(minAmount) > 0 && (
-          <P mt={3} color="black.700">
+          <div className="mt-3 text-neutral-700">
             {isFlexibleAmount && (
               <Span display="block" fontSize="10px" textTransform="uppercase">
                 <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
               </Span>
             )}
-            <Span display="block" data-cy="amount">
-              <FormattedMoneyAmount
-                amount={graphqlAmountValueInCents(minAmount)}
-                interval={tier.interval && tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                currency={currency}
-                amountStyles={{ fontSize: '24px', lineHeight: '32px', fontWeight: 'bold', color: 'black.900' }}
-                precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
-              />
-            </Span>
-          </P>
+
+            <div className="flex min-h-[36px] flex-col">
+              <Span data-cy="amount">
+                <FormattedMoneyAmount
+                  amount={graphqlAmountValueInCents(minAmount)}
+                  interval={tier.interval && tier.interval !== INTERVALS.flexible ? tier.interval : null}
+                  currency={currency}
+                  amountClassName="text-2xl font-bold text-foreground"
+                  precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
+                />
+                {taxes.length > 0 && ' *'}
+              </Span>
+              {taxes.length > 0 && (
+                <Span fontSize="10px" lineHeight="12px">
+                  *{' '}
+                  {taxes.length > 1 ? (
+                    <FormattedMessage id="ContributeTier.Taxes" defaultMessage="Taxes may apply" />
+                  ) : (
+                    <FormattedMessage
+                      defaultMessage="{taxName} may apply"
+                      id="N9TNT7"
+                      values={{ taxName: taxes[0].type }}
+                    />
+                  )}
+                </Span>
+              )}
+            </div>
+          </div>
         )}
       </Flex>
     </Contribute>
   );
 };
 
-ContributeTier.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    isActive: PropTypes.bool,
-    parentCollective: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
-  }),
-  tier: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    legacyId: PropTypes.number,
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    currency: PropTypes.string,
-    useStandalonePage: PropTypes.bool,
-    interval: PropTypes.string,
-    amountType: PropTypes.string,
-    endsAt: PropTypes.string,
-    button: PropTypes.string,
-    goal: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
-    minimumAmount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
-    amount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
-    maxQuantity: PropTypes.number,
-    availableQuantity: PropTypes.number,
-    stats: PropTypes.shape({
-      totalRecurringDonations: PropTypes.number,
-      totalDonated: PropTypes.number,
-      contributors: PropTypes.object,
-      availableQuantity: PropTypes.number,
-    }),
-    contributors: PropTypes.arrayOf(PropTypes.object),
-  }),
-  /** @ignore */
-  intl: PropTypes.object.isRequired,
-  isPreview: PropTypes.bool,
-};
-
-export default injectIntl(ContributeTier);
+export default ContributeTier;

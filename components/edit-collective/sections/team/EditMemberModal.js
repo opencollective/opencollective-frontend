@@ -1,22 +1,24 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
-import { Delete } from '@styled-icons/material/Delete';
-import { get } from 'lodash';
-import { withRouter } from 'next/router';
+import { useMutation } from '@apollo/client';
+import { get } from 'lodash-es';
+import { Trash } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
+import { getAccountReferenceInput } from '../../../../lib/collective';
 import roles from '../../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
+import { ConnectedAccountService } from '@/lib/graphql/types/v2/graphql';
+import { i18nConnectedAccountService } from '@/lib/i18n/connected-account-service';
 
-import Container from '../../../Container';
-import { Flex } from '../../../Grid';
-import StyledButton from '../../../StyledButton';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
-import StyledTooltip from '../../../StyledTooltip';
-import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
+import { Dialog, DialogContent, DialogHeader, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
+
+import ConfirmationModal from '../../../ConfirmationModal';
+import { Button } from '../../../ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { useToast } from '../../../ui/useToast';
 
 import MemberForm from './MemberForm';
 import { teamSectionQuery } from './queries';
@@ -78,13 +80,20 @@ const removeMemberMutation = gql`
   }
 `;
 
-const EditMemberModal = props => {
-  const { intl, member, collective, canRemove, isLastAdmin, cancelHandler, onEdit } = props;
+const cancelMemberInvitationMutation = gql`
+  mutation CancelMemberInvitation($invitation: MemberInvitationReferenceInput!) {
+    cancelMemberInvitation(invitation: $invitation)
+  }
+`;
 
+const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAdmin, cancelHandler, onEdit }) => {
+  const router = useRouter();
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
-
-  const { addToast } = useToasts();
-
+  const { toast } = useToast();
+  const connectedAccountsByMember =
+    collective.connectedAccounts
+      ?.filter(ca => [ConnectedAccountService.transferwise, ConnectedAccountService.paypal].includes(ca.service))
+      .filter(ca => ca?.createdByAccount?.id === member.account.id) || [];
   const isInvitation = get(member, '__typename') === 'MemberInvitation';
 
   const messages = defineMessages({
@@ -98,21 +107,16 @@ const EditMemberModal = props => {
     },
   });
 
-  const [editMemberAccount, { loading: isEditingMember }] = useMutation(editMemberMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editMemberAccount, { loading: isEditingMember }] = useMutation(editMemberMutation);
 
-  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation }] = useMutation(
-    editMemberInvitationMutation,
-    { context: API_V2_CONTEXT },
-  );
+  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation }] =
+    useMutation(editMemberInvitationMutation);
 
   const [removeMemberAccount, { loading: isRemovingMember }] = useMutation(removeMemberMutation, {
-    context: API_V2_CONTEXT,
     refetchQueries: [
       {
         query: teamSectionQuery,
-        context: API_V2_CONTEXT,
+
         variables: {
           collectiveSlug: get(collective, 'slug'),
           account: { slug: get(collective, 'slug') },
@@ -121,6 +125,24 @@ const EditMemberModal = props => {
     ],
     awaitRefetchQueries: true,
   });
+
+  const [cancelMemberInvitationAccount, { loading: isCancellingInvitation }] = useMutation(
+    cancelMemberInvitationMutation,
+    {
+      refetchQueries: [
+        {
+          query: teamSectionQuery,
+          variables: {
+            collectiveSlug: get(collective, 'slug'),
+            account: { slug: get(collective, 'slug') },
+          },
+        },
+      ],
+      awaitRefetchQueries: true,
+    },
+  );
+
+  const [showRemoveConfirmation, setShowRemoveConfirmation] = React.useState(false);
 
   let submitMemberForm = null;
 
@@ -144,8 +166,8 @@ const EditMemberModal = props => {
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         title: <FormattedMessage id="editTeam.member.edit.success" defaultMessage="Member updated successfully." />,
       });
 
@@ -156,11 +178,10 @@ const EditMemberModal = props => {
       onEdit?.();
       cancelHandler();
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: <FormattedMessage id="editTeam.member.edit.error" defaultMessage="Failed to update member." />,
         message: i18nGraphqlException(intl, error),
-        variant: 'light',
       });
     }
   };
@@ -171,18 +192,16 @@ const EditMemberModal = props => {
     try {
       await editMemberInvitationAccount({
         variables: {
-          memberAccount: {
-            slug: get(member, 'memberAccount.slug'),
-          },
-          account: { slug: get(collective, 'slug') },
+          memberAccount: getAccountReferenceInput(member.account), // There is an alias on invitation.memberAccount, we should get rid of it https://github.com/opencollective/opencollective-frontend/blob/c7418dd99aa44da387c9c2a0e48525c415cc8566/components/edit-collective/sections/team/queries.ts#L87
+          account: getAccountReferenceInput(collective),
           description,
           role,
           since,
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: (
           <FormattedMessage
             id="editTeam.memberInvitation.edit.success"
@@ -194,8 +213,8 @@ const EditMemberModal = props => {
       onEdit?.();
       cancelHandler();
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: (
           <FormattedMessage
             id="editTeam.memberInvitation.edit.error"
@@ -207,65 +226,59 @@ const EditMemberModal = props => {
     }
   };
 
-  const confirmRemoveMember = memberEntry => {
-    const account = memberEntry.account || memberEntry.memberAccount;
-    return window.confirm(
-      intl.formatMessage(messages.removeConfirm, {
-        ...account,
-        hasEmail: Number(account.email),
-      }),
-    );
-  };
-
   const handleRemoveMemberMutation = async () => {
-    if (confirmRemoveMember(member)) {
-      try {
+    try {
+      if (isInvitation) {
+        await cancelMemberInvitationAccount({
+          variables: {
+            invitation: { id: member.id },
+          },
+        });
+      } else {
         await removeMemberAccount({
           variables: {
             memberAccount: {
-              slug: get(member, 'account.slug') || get(member, 'memberAccount.slug'),
+              slug: get(member, 'account.slug'),
             },
             account: { slug: get(collective, 'slug') },
             role: get(member, 'role'),
-            isInvitation,
           },
         });
-
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
-          message: isInvitation ? (
-            <FormattedMessage
-              id="editTeam.memberInvitation.remove.success"
-              defaultMessage="Member invitation removed successfully."
-            />
-          ) : (
-            <FormattedMessage id="editTeam.member.remove.success" defaultMessage="Member removed successfully." />
-          ),
-        });
-
-        if (get(member, 'account.slug') === get(LoggedInUser, 'collective.slug')) {
-          await props.router.push({ pathname: `/${get(collective, 'slug')}` });
-          await refetchLoggedInUser();
-        }
-
-        onEdit?.();
-        cancelHandler();
-      } catch (error) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
-          title: isInvitation ? (
-            <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />
-          ) : (
-            <FormattedMessage
-              id="editTeam.memberInvitation.remove.error"
-              defaultMessage="Failed to remove member invitation."
-            />
-          ),
-          message: i18nGraphqlException(intl, error),
-        });
       }
-    } else {
+
+      toast({
+        variant: 'success',
+        message: isInvitation ? (
+          <FormattedMessage
+            id="editTeam.memberInvitation.remove.success"
+            defaultMessage="Member invitation removed successfully."
+          />
+        ) : (
+          <FormattedMessage id="editTeam.member.remove.success" defaultMessage="Member removed successfully." />
+        ),
+      });
+
+      if (get(member, 'account.slug') === get(LoggedInUser, 'collective.slug')) {
+        await router.push({ pathname: `/${get(collective, 'slug')}` });
+        await refetchLoggedInUser();
+      }
+
+      setShowRemoveConfirmation(false);
+      onEdit?.();
       cancelHandler();
+    } catch (error) {
+      toast({
+        variant: 'error',
+        title: isInvitation ? (
+          <FormattedMessage
+            id="editTeam.memberInvitation.remove.error"
+            defaultMessage="Failed to remove member invitation."
+          />
+        ) : (
+          <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />
+        ),
+        message: i18nGraphqlException(intl, error),
+      });
     }
   };
 
@@ -276,96 +289,116 @@ const EditMemberModal = props => {
   };
 
   return (
-    <Container>
-      <StyledModal width={688} onClose={cancelHandler}>
-        <ModalHeader>
-          <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
-        </ModalHeader>
-        <ModalBody>
-          <MemberForm
-            intl={intl}
-            collectiveImg={get(collective, 'imageUrl')}
-            member={member}
-            bindSubmitForm={bindSubmitForm}
-            triggerSubmit={isInvitation ? handleEditMemberInvitationMutation : handleEditMemberMutation}
-          />
-          <Flex justifyContent="flex-end">
-            {isLastAdmin && member.role === roles.ADMIN ? (
-              <StyledTooltip place="bottom" content={() => intl.formatMessage(messages.cantRemoveLast)}>
-                <StyledButton
-                  mt={4}
-                  disabled={true}
-                  buttonSize="tiny"
-                  buttonStyle="dangerSecondary"
-                  data-cy="remove-member"
-                  onClick={handleRemoveMemberMutation}
-                >
-                  <Flex alignItems="center">
-                    <Delete height={25} />
-                    <FormattedMessage id="Remove" defaultMessage="Remove" />
-                  </Flex>
-                </StyledButton>
-              </StyledTooltip>
-            ) : (
-              <StyledButton
-                mt={4}
-                disabled={!canRemove}
-                buttonSize="tiny"
-                buttonStyle="dangerSecondary"
-                data-cy="remove-member"
-                onClick={handleRemoveMemberMutation}
-                loading={isRemovingMember}
+    <React.Fragment>
+      <Dialog onOpenChange={show => !show && cancelHandler()} open={true}>
+        <DialogPortal>
+          <DialogContent onClose={cancelHandler}>
+            <DialogHeader>
+              <DialogTitle>
+                {isInvitation ? (
+                  <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
+                ) : (
+                  <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
+                )}
+              </DialogTitle>
+            </DialogHeader>
+
+            <MemberForm
+              intl={intl}
+              collectiveImg={get(collective, 'imageUrl')}
+              member={member}
+              bindSubmitForm={bindSubmitForm}
+              triggerSubmit={isInvitation ? handleEditMemberInvitationMutation : handleEditMemberMutation}
+              isPrivateAccount={collective.isPrivate}
+              showPrivateNote={false}
+            />
+            <div className="mt-4 flex justify-between gap-2">
+              <Button
+                autoFocus
+                onClick={cancelHandler}
+                disabled={isEditingMember || isEditingMemberInvitation || isRemovingMember || isCancellingInvitation}
+                data-cy="confirmation-modal-cancel"
+                variant="outline"
               >
-                <Flex alignItems="center">
-                  <Delete height={25} />
-                  <FormattedMessage id="Remove" defaultMessage="Remove" />
-                </Flex>
-              </StyledButton>
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+              </Button>
+              <div className="flex gap-2">
+                {isLastAdmin && member.role === roles.ADMIN ? (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        disabled={true}
+                        data-cy="remove-member"
+                        variant="outlineDestructive"
+                        onClick={() => setShowRemoveConfirmation(true)}
+                      >
+                        <Trash size="18px" />
+                        <FormattedMessage id="Remove" defaultMessage="Remove" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{intl.formatMessage(messages.cantRemoveLast)}</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <Button
+                    variant="outlineDestructive"
+                    disabled={!canRemove}
+                    data-cy="remove-member"
+                    onClick={() => setShowRemoveConfirmation(true)}
+                  >
+                    <Trash size="18px" />
+                    <FormattedMessage id="Remove" defaultMessage="Remove" />
+                  </Button>
+                )}
+                <Button
+                  data-cy="confirmation-modal-continue"
+                  loading={isEditingMember || isEditingMemberInvitation}
+                  disabled={isRemovingMember || isCancellingInvitation}
+                  onClick={handleSubmitForm}
+                  className="w-32"
+                >
+                  <FormattedMessage id="save" defaultMessage="Save" />
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+      {showRemoveConfirmation && (
+        <ConfirmationModal
+          isDanger
+          type="remove"
+          header={<FormattedMessage id="Remove" defaultMessage="Remove" />}
+          onClose={() => setShowRemoveConfirmation(false)}
+          continueHandler={handleRemoveMemberMutation}
+        >
+          <div className="flex flex-col gap-2">
+            <p>
+              <FormattedMessage
+                id="members.remove.confirmation"
+                defaultMessage="Do you really want to remove {name} @{slug}{hasEmail, select, 1 { ({email})} other {}} from {accountName}'s team?"
+                values={{
+                  ...(member.account || member.memberAccount),
+                  hasEmail: (member.account || member.memberAccount).email ? 1 : 0,
+                  accountName: get(collective, 'name'),
+                }}
+              />
+            </p>
+            {connectedAccountsByMember.length > 0 && (
+              <p>
+                <FormattedMessage
+                  id="members.remove.connectedAccountsWarning"
+                  defaultMessage="Please note that your organization relies on token(s) connected by this member to the following service(s): {services}. Make sure you have transferred the ownership of these connections to another admin before removing this member."
+                  values={{
+                    services: connectedAccountsByMember.map(ca => i18nConnectedAccountService(ca.service)).join(', '),
+                  }}
+                />
+              </p>
             )}
-          </Flex>
-        </ModalBody>
-        <ModalFooter mt={5}>
-          <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
-            <StyledButton
-              mx={20}
-              my={1}
-              autoFocus
-              onClick={cancelHandler}
-              disabled={isEditingMember || isEditingMemberInvitation || isRemovingMember}
-              data-cy="confirmation-modal-cancel"
-            >
-              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
-            <StyledButton
-              my={1}
-              buttonStyle="primary"
-              data-cy="confirmation-modal-continue"
-              loading={isEditingMember || isEditingMemberInvitation}
-              disabled={isRemovingMember}
-              onClick={handleSubmitForm}
-            >
-              <FormattedMessage id="save" defaultMessage="Save" />
-            </StyledButton>
-          </Container>
-        </ModalFooter>
-      </StyledModal>
-    </Container>
+          </div>
+        </ConfirmationModal>
+      )}
+    </React.Fragment>
   );
 };
 
-EditMemberModal.propTypes = {
-  collective: PropTypes.object,
-  cancelHandler: PropTypes.func,
-  onEdit: PropTypes.func,
-  intl: PropTypes.object.isRequired,
-  isLastAdmin: PropTypes.bool,
-  member: PropTypes.object,
-  router: PropTypes.object,
-  canRemove: PropTypes.bool,
-};
-
-EditMemberModal.defaultProps = {
-  canRemove: true,
-};
-
-export default withRouter(EditMemberModal);
+export default EditMemberModal;

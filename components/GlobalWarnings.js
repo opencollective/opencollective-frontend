@@ -1,14 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { getDashboardRoute } from '../lib/url-helpers';
 
-import FreezeAccountModal from './host-dashboard/FreezeAccountModal';
+import { Button } from './ui/Button';
 import I18nFormatters from './I18nFormatters';
-import StyledButton from './StyledButton';
-import { P, Span } from './Text';
+import Link from './Link';
+import { P } from './Text';
 
 const GlobalWarningContainer = styled.div`
   width: 100;
@@ -27,7 +27,6 @@ const GlobalWarningContainer = styled.div`
  */
 const GlobalWarnings = ({ collective }) => {
   const { LoggedInUser } = useLoggedInUser();
-  const [hasFreezeModal, setHasFreezeModal] = React.useState(false);
 
   if (collective?.isFrozen) {
     const isLoggedInUserHostAdmin = Boolean(LoggedInUser?.isHostAdmin(collective));
@@ -36,25 +35,18 @@ const GlobalWarnings = ({ collective }) => {
     return (
       <GlobalWarningContainer>
         <P fontWeight="700" lineHeight="20px" mb="6px">
-          <FormattedMessage defaultMessage="Some actions are temporarily limited" />
+          <FormattedMessage defaultMessage="Some actions are temporarily limited" id="KUZzwz" />
         </P>
         <P>
-          <FormattedMessage defaultMessage="Contributions to this page cannot be accepted at this time" />
+          <FormattedMessage defaultMessage="Contributions to this page cannot be accepted at this time" id="3tJstK" />
         </P>
-        {isLoggedInUserHostAdmin && (
-          <StyledButton
-            buttonStyle="warningSecondary"
-            mt={2}
-            onClick={() => {
-              setHasFreezeModal(true);
-            }}
-          >
-            <Span ml={3} fontSize="14px" lineHeight="20px" css={{ verticalAlign: 'middle' }}>
-              <FormattedMessage defaultMessage="Unfreeze Collective" />
-            </Span>
-          </StyledButton>
+        {isLoggedInUserHostAdmin && collective.host && (
+          <Link href={getDashboardRoute(collective.host, `hosted-collectives/${collective.idV2}`)}>
+            <Button variant="outline" className="mt-4">
+              <FormattedMessage defaultMessage="Manage in Dashboard" id="Hz4EBy" />
+            </Button>
+          </Link>
         )}
-        {hasFreezeModal && <FreezeAccountModal collective={collective} onClose={() => setHasFreezeModal(false)} />}
       </GlobalWarningContainer>
     );
   } else if (LoggedInUser && LoggedInUser.isLimited) {
@@ -71,13 +63,6 @@ const GlobalWarnings = ({ collective }) => {
   }
 
   return null;
-};
-
-GlobalWarnings.propTypes = {
-  collective: PropTypes.shape({
-    host: PropTypes.object,
-    isFrozen: PropTypes.bool,
-  }),
 };
 
 export default GlobalWarnings;

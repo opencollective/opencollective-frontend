@@ -1,9 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { useQuery } from '@apollo/client';
+import { defineMessages, FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { isHeavyAccount } from '../../../lib/collective';
+import { gql } from '../../../lib/graphql/helpers';
+import injectIntl from '@/lib/injectIntl';
 
 import { Box } from '../../Grid';
 import Link from '../../Link';
@@ -44,6 +45,7 @@ export const transactionsSectionQuery = gql`
     $hasOrder: Boolean
     $hasExpense: Boolean
     $kind: [TransactionKind]
+    $includeGiftCardTransactions: Boolean
   ) {
     transactions(
       account: { slug: $slug }
@@ -52,7 +54,7 @@ export const transactionsSectionQuery = gql`
       hasExpense: $hasExpense
       kind: $kind
       includeIncognitoTransactions: true
-      includeGiftCardTransactions: true
+      includeGiftCardTransactions: $includeGiftCardTransactions
       includeChildrenTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
@@ -61,14 +63,19 @@ export const transactionsSectionQuery = gql`
   ${transactionsQueryCollectionFragment}
 `;
 
-export const getTransactionsSectionQueryVariables = slug => {
-  return { slug, limit: NB_DISPLAYED, kind: getDefaultKinds() };
+export const getTransactionsSectionQueryVariables = (slug, isHost) => {
+  return {
+    slug,
+    limit: NB_DISPLAYED,
+    kind: getDefaultKinds({ isHost: Boolean(isHost) }),
+    includeGiftCardTransactions: !isHeavyAccount(slug),
+  };
 };
 
 const SectionTransactions = props => {
   const transactionsQueryResult = useQuery(transactionsSectionQuery, {
-    variables: getTransactionsSectionQueryVariables(props.collective.slug),
-    context: API_V2_CONTEXT,
+    variables: getTransactionsSectionQueryVariables(props.collective.slug, props.collective.isHost),
+
     // We keep notifyOnNetworkStatusChange to remove the flash of collectiveHasNoTransactions bug
     // See https://github.com/apollographql/apollo-client/blob/9c80adf65ccbbb88ea5b9313c002f85976c225e3/src/core/ObservableQuery.ts#L274-L304
     notifyOnNetworkStatusChange: true,
@@ -85,7 +92,7 @@ const SectionTransactions = props => {
   }, [filter, props.collective.slug, refetch]);
 
   const { intl, collective } = props;
-  const collectiveHasNoTransactions = !loading && data?.transactions?.totalCount === 0 && filter === FILTERS.ALL;
+  const collectiveHasNoTransactions = !loading && data?.transactions?.nodes.length === 0 && filter === FILTERS.ALL;
 
   return (
     <Box pb={4}>
@@ -123,14 +130,9 @@ const SectionTransactions = props => {
           {loading ? (
             <LoadingPlaceholder height={600} borderRadius={8} />
           ) : (
-            <TransactionsList
-              collective={collective}
-              transactions={data?.transactions?.nodes}
-              displayActions
-              onMutationSuccess={() => refetch()}
-            />
+            <TransactionsList collective={collective} transactions={data?.transactions?.nodes} displayActions />
           )}
-          {data?.transactions.totalCount === 0 && (
+          {data?.transactions?.nodes.length === 0 && (
             <MessageBox type="info">
               <FormattedMessage
                 id="TransactionsList.Empty"
@@ -152,33 +154,6 @@ const SectionTransactions = props => {
       )}
     </Box>
   );
-};
-
-SectionTransactions.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    platformFeePercent: PropTypes.number,
-  }).isRequired,
-
-  /** Whether user is admin of `collective` */
-  isAdmin: PropTypes.bool,
-
-  /** Whether user is root user */
-  isRoot: PropTypes.bool,
-
-  /** @ignore from withData */
-  data: PropTypes.shape({
-    loading: PropTypes.bool,
-    refetch: PropTypes.func,
-    transactions: PropTypes.arrayOf(PropTypes.object),
-  }),
-
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
 };
 
 export default React.memo(injectIntl(SectionTransactions));

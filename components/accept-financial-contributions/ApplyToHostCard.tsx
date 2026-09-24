@@ -1,12 +1,14 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
+import { checkUseAlternativeHostFeeNaming } from '../../lib/collective';
 import { confettiFireworks } from '../../lib/confettis';
-import { Account, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
 import ApplyToHostModal from '../ApplyToHostModal';
+import DefinedTerm, { Terms } from '../DefinedTerm';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCollectiveCard from '../StyledCollectiveCard';
@@ -20,18 +22,24 @@ const StyledCollectiveCardWrapper = styled(StyledCollectiveCard)`
 `;
 
 export default function ApplyToHostCard(props: {
-  host: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>;
+  host: Pick<
+    Host,
+    | 'slug'
+    | 'totalHostedCollectives'
+    | 'description'
+    | 'currency'
+    | 'hostFeePercent'
+    | 'platformContributionAvailable'
+    | 'settings'
+  >;
   collective: Pick<Account, 'slug'>;
-  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   const [showApplyToHostModal, setShowApplyToHostModal] = React.useState(false);
   const router = useRouter();
 
   return (
     <React.Fragment>
-      {/* @ts-ignore StyledCollectiveCard is not typed */}
       <StyledCollectiveCardWrapper
-        /* @ts-ignore StyledCollectiveCard is not typed */
         collective={props.host}
         minWidth={250}
         position="relative"
@@ -45,6 +53,7 @@ export default function ApplyToHostCard(props: {
             <P>
               <FormattedMessage
                 defaultMessage="{ hostedCollectives, plural, one {<b>#</b> Collective} other {<b>#</b> Collectives} } hosted"
+                id="D5tV0Y"
                 values={{
                   hostedCollectives: props.host.totalHostedCollectives,
                   b: chunks => <strong>{chunks}</strong>,
@@ -53,23 +62,41 @@ export default function ApplyToHostCard(props: {
             </P>
             <P mt={2}>
               <FormattedMessage
-                defaultMessage="<b>{ currencyCode  }</b> Currency"
+                defaultMessage="<b>{ currencyCode }</b> Currency"
+                id="yQt2k/"
                 values={{
                   currencyCode: props.host.currency.toUpperCase(),
                   b: chunks => <strong>{chunks}</strong>,
                 }}
               />
             </P>
-            {props.host.hostFeePercent !== null && (
-              <P mt={2}>
-                <FormattedMessage
-                  defaultMessage="<b>{ hostFeePercent }%</b> Host fee"
-                  values={{
-                    hostFeePercent: props.host.hostFeePercent,
-                    b: chunks => <strong>{chunks}</strong>,
-                  }}
-                />
-              </P>
+            {(props.host.hostFeePercent !== null || props.host.platformContributionAvailable) && (
+              <div className="mt-2 text-xs text-slate-700">
+                {props.host.hostFeePercent !== null && (
+                  <span>
+                    <Span fontSize="14px" fontWeight={700} color="black.900">{`${props.host.hostFeePercent}%`}</Span>
+                    {` `}
+                    <Span fontSize="12px" fontWeight={400}>
+                      <DefinedTerm
+                        color="black.700"
+                        borderColor="#969ba3"
+                        fontSize="12px"
+                        term={
+                          checkUseAlternativeHostFeeNaming(props.host)
+                            ? Terms.ADMINISTRATIVE_CONTRIBUTION
+                            : Terms.HOST_FEE
+                        }
+                      />
+                    </Span>
+                  </span>
+                )}
+                {props.host.platformContributionAvailable && (
+                  <React.Fragment>
+                    {props.host.hostFeePercent !== null && ' + '}
+                    <DefinedTerm color="black.700" borderColor="#969ba3" fontSize="12px" term={Terms.PLATFORM_TIPS} />
+                  </React.Fragment>
+                )}
+              </div>
             )}
           </Box>
           {props.host.description !== null && props.host.description.length !== 0 && (
@@ -96,14 +123,13 @@ export default function ApplyToHostCard(props: {
         <Box mx={3} mt={3}>
           <StyledButton
             onClick={() => {
-              props.onHostApplyClick(props.host);
               setShowApplyToHostModal(true);
             }}
             buttonStyle="primary"
             width="100%"
             textTransform="capitalize"
           >
-            <FormattedMessage defaultMessage="Learn more" />
+            <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
           </StyledButton>
         </Box>
       </StyledCollectiveCardWrapper>
@@ -114,7 +140,7 @@ export default function ApplyToHostCard(props: {
           onClose={() => setShowApplyToHostModal(false)}
           onSuccess={() => {
             return router
-              .push(`${props.collective.slug}/accept-financial-contributions/host/success`)
+              .push(`${props.collective.slug}/accept-financial-contributions/host/success?hostSlug=${props.host.slug}`)
               .then(() => window.scrollTo(0, 0))
               .then(() => {
                 confettiFireworks(5000, { zIndex: 3000 });

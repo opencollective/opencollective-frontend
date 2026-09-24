@@ -11,6 +11,8 @@ export const ActivityClasses = {
 export const ActivityTypes = {
   ACTIVATED_COLLECTIVE_AS_HOST: 'activated.collective.as.host',
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT: 'activated.collective.as.independent',
+  ACTIVATED_HOSTING: 'activated.hosting',
+  ACTIVATED_MONEY_MANAGEMENT: 'activated.moneyManagement',
   ACTIVITY_ALL: 'all',
   BACKYOURSTACK_DISPATCH_CONFIRMED: 'backyourstack.dispatch.confirmed',
   COLLECTIVE_APPLY: 'collective.apply',
@@ -30,6 +32,7 @@ export const ActivityTypes = {
   COLLECTIVE_EXPENSE_CREATED: 'collective.expense.created',
   COLLECTIVE_EXPENSE_DELETED: 'collective.expense.deleted',
   COLLECTIVE_EXPENSE_ERROR: 'collective.expense.error',
+  COLLECTIVE_EXPENSE_PAYMENT_ERROR: 'collective.expense.payment.error',
   COLLECTIVE_EXPENSE_INVITE_DRAFTED: 'collective.expense.invite.drafted',
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: 'collective.expense.incomplete',
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM: 'collective.expense.spam',
@@ -62,13 +65,15 @@ export const ActivityTypes = {
   CONTRIBUTION_REJECTED: 'contribution.rejected',
   CONVERSATION_COMMENT_CREATED: 'conversation.comment.created',
   DEACTIVATED_COLLECTIVE_AS_HOST: 'deactivated.collective.as.host',
+  DEACTIVATED_HOSTING: 'deactivated.hosting',
+  DEACTIVATED_MONEY_MANAGEMENT: 'deactivated.moneyManagement',
   EXPENSE_COMMENT_CREATED: 'expense.comment.created',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE: 'order.canceled.archived.collective',
   ORDER_PENDING_CONTRIBUTION_NEW: 'order.new.pendingFinancialContribution',
   ORDER_PENDING_CONTRIBUTION_REMINDER: 'order.reminder.pendingFinancialContribution',
   ORDER_PROCESSING_CRYPTO: 'order.processing.crypto',
   ORDER_PROCESSING: 'order.processing',
-  ORDER_THANKYOU: 'order.thankyou',
+  ORDER_PROCESSED: 'order.processed',
   ORDERS_SUSPICIOUS: 'orders.suspicious',
   ORGANIZATION_COLLECTIVE_CREATED: 'organization.collective.created',
   PAYMENT_CREDITCARD_CONFIRMATION: 'payment.creditcard.confirmation',
@@ -92,15 +97,4 @@ export const ActivityTypes = {
   VIRTUAL_CARD_REQUESTED: 'virtual_card.requested',
   WEBHOOK_PAYPAL_RECEIVED: 'webhook.paypal.received',
   WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
-} as const;
-
-export const ActivityAttribution = {
-  // Activities initiated by this account
-  AUTHORED: 'AUTHORED',
-  // Activities that targeted this account
-  RECEIVED: 'RECEIVED',
-  // Activities where author and target both points to this account (e.g. settings update)
-  SELF: 'SELF',
-  // Activities that happened on accounts hosted by this account
-  HOSTED_ACCOUNTS: 'HOSTED_ACCOUNTS',
 } as const;

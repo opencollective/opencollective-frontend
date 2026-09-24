@@ -32,6 +32,7 @@ export const VirtualCardLimitIntervalDescriptionsI18n = defineMessages({
 export const VirtualCardLimitIntervalI18n = defineMessages({
   [VirtualCardLimitInterval.ALL_TIME]: {
     defaultMessage: 'All time',
+    id: 's+lPP3',
   },
   [VirtualCardLimitInterval.DAILY]: {
     id: 'virtualCard.intervalLimit.daily',

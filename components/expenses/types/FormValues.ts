@@ -1,12 +1,22 @@
-import { ExpenseAttachedFileInput, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import type {
+  AmountInput,
+  ExpenseAttachedFileInput,
+  ExpenseType,
+  PayoutMethodType,
+  UploadFileResult,
+} from '../../../lib/graphql/types/v2/graphql';
 
 export interface ExpenseItemFormValues {
   id?: string;
   incurredAt: Date;
   description: string;
-  amount: number;
+  amountV2: AmountInput;
   url?: string;
   __isNew?: boolean;
+  __parsingResult?: UploadFileResult['parsingResult']['expense'];
+  __isUploading?: boolean;
+  __file?: { name?: string; path?: string };
+  __fromInput?: 'multi';
 }
 
 /**
@@ -24,5 +34,6 @@ export interface ExpenseFormValues {
   invoiceInfo: string;
   currency: string;
   payeeLocation: { address: string; country: string };
+  payoutMethod: { id: string; type: PayoutMethodType; data: Record<string, unknown>; currency: string };
   draft: Omit<ExpenseFormValues, 'draft'>;
 }

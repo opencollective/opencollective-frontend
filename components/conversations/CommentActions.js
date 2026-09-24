@@ -1,17 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
-import { Reply as ReplyIcon } from '@styled-icons/bootstrap/Reply';
+import { useMutation } from '@apollo/client';
 import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { Share2 as ShareIcon } from '@styled-icons/feather/Share2';
 import { X } from '@styled-icons/feather/X';
 import { Edit } from '@styled-icons/material/Edit';
+import { Reply as ReplyIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { usePopper } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
@@ -23,6 +22,8 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
+import { useToast } from '../ui/useToast';
 
 import { CommentMetadata } from './CommentMetadata';
 
@@ -43,6 +44,10 @@ const CommentBtn = styled(StyledButton).attrs({ buttonSize: 'small' })`
   width: 100%;
   text-align: left;
   border: none;
+
+  svg {
+    display: inline-block;
+  }
 
   span {
     margin-left: 12px;
@@ -111,26 +116,11 @@ const ReplyButton = ({ onReplyClick }) => {
   return (
     <React.Fragment>
       <CommentBtn data-cy="reply-comment-btn" onClick={onReplyClick}>
-        <ReplyIcon size="1em" mr={2} />
+        <ReplyIcon size="1em" />
         <FormattedMessage tagName="span" id="Reply" defaultMessage="Reply" />
       </CommentBtn>
     </React.Fragment>
   );
-};
-
-ReplyButton.propTypes = {
-  onReplyClick: PropTypes.func,
-};
-
-AdminActionButtons.propTypes = {
-  comment: PropTypes.object.isRequired,
-  openDeleteConfirmation: PropTypes.func,
-  onEdit: PropTypes.func,
-  closePopup: PropTypes.func,
-  isConversationRoot: PropTypes.bool,
-  canEdit: PropTypes.bool,
-  canDelete: PropTypes.bool,
-  copyLinkToClipboard: PropTypes.func,
 };
 
 const deleteCommentMutation = gql`
@@ -150,8 +140,6 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-const mutationOptions = { context: API_V2_CONTEXT };
-
 const CommentActions = ({
   comment,
   anchorHash,
@@ -165,20 +153,26 @@ const CommentActions = ({
 }) => {
   const intl = useIntl();
   const { copy } = useClipboard();
+  const { toast } = useToast();
   const [isDeleting, setDeleting] = React.useState(null);
   const [showAdminActions, setShowAdminActions] = React.useState(false);
   const [refElement, setRefElement] = React.useState(null);
   const [popperElement, setPopperElement] = React.useState(null);
-  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation, mutationOptions);
+  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation);
   const { styles, attributes, state } = usePopper(refElement, popperElement, {
     placement: 'bottom-end',
     modifiers: REACT_POPPER_MODIFIERS,
   });
 
-  const copyLinkToClipboard = () => {
+  const copyLinkToClipboard = async () => {
     const [baseLink] = window.location.href.split('#');
     const linkWithAnchorHash = `${baseLink}#${anchorHash}`;
-    copy(linkWithAnchorHash);
+    const success = await copy(linkWithAnchorHash);
+    if (!success) {
+      return;
+    }
+
+    toast({ variant: 'success', message: intl.formatMessage({ id: 'Clipboard.Copied', defaultMessage: 'Copied!' }) });
   };
 
   useGlobalBlur(state?.elements.popper, outside => {
@@ -190,14 +184,15 @@ const CommentActions = ({
   return (
     <React.Fragment>
       <div>
-        <StyledButton
+        <Button
           ref={setRefElement}
-          buttonSize="tiny"
+          variant="outline"
+          size="xs"
           data-cy="commnent-actions-trigger"
           onClick={() => setShowAdminActions(!showAdminActions)}
         >
           <DotsHorizontalRounded size="16" />
-        </StyledButton>
+        </Button>
       </div>
 
       {showAdminActions && (
@@ -279,30 +274,6 @@ const CommentActions = ({
       )}
     </React.Fragment>
   );
-};
-
-CommentActions.propTypes = {
-  comment: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    html: PropTypes.string,
-    createdAt: PropTypes.string,
-  }).isRequired,
-  /** needed to copy the comment link */
-  anchorHash: PropTypes.string.isRequired,
-  /** Can current user edit this comment? */
-  canEdit: PropTypes.bool,
-  /** Can current user delete this comment? */
-  canDelete: PropTypes.bool,
-  /** Can current user reply this comment? */
-  canReply: PropTypes.bool,
-  /** Set this to true if the comment is the root comment of a conversation */
-  isConversationRoot: PropTypes.bool,
-  /** Called when comment gets deleted */
-  onDelete: PropTypes.func,
-  /** Called when comment gets deleted */
-  onEditClick: PropTypes.func,
-  /** Called when comment is getting a reply */
-  onReplyClick: PropTypes.func,
 };
 
 export default CommentActions;

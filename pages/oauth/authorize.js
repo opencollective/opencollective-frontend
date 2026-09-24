@@ -1,10 +1,10 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
-import { difference } from 'lodash';
+import { useQuery } from '@apollo/client';
+import { difference } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import EmbeddedPage from '../../components/EmbeddedPage';
@@ -22,6 +22,7 @@ const applicationQuery = gql`
       name
       clientId
       redirectUri
+      preAuthorize2FA
       account {
         id
         name
@@ -55,10 +56,16 @@ const OAuthAuthorizePage = () => {
   const missingParams = REQUIRED_URL_PARAMS.filter(key => !query[key]);
   const skipQuery = missingParams.length;
   const queryVariables = { clientId: query['client_id'] };
-  const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
+  const queryParams = { skip: skipQuery, variables: queryVariables };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
   const isLoading = loadingLoggedInUser || isLoadingAuthorization;
-  const requestedScopes = query.scope ? query.scope.split(',').map(s => s.trim()) : [];
+  // Accept whitespace (OAuth 2.0 compliance) or comma (retro-compatibility)
+  const requestedScopes = query.scope
+    ? query.scope
+        .split(/[\s,]+/)
+        .map(s => s.trim())
+        .filter(Boolean)
+    : [];
   const hasExistingAuthorization = isValidAuthorization(data?.application?.oAuthAuthorization, requestedScopes);
 
   return (
@@ -72,6 +79,7 @@ const OAuthAuthorizePage = () => {
           <MessageBox withIcon type="error">
             <FormattedMessage
               defaultMessage="Missing parameters: {parameters}"
+              id="evYyQx"
               values={{ parameters: missingParams.join(', ') }}
             />
           </MessageBox>
@@ -79,7 +87,16 @@ const OAuthAuthorizePage = () => {
           <MessageBox withIcon type="error">
             <FormattedMessage
               defaultMessage='{field} has invalid value "{value}". Expected: "{expected}"'
+              id="mGSAXe"
               values={{ field: 'response_type', value: query['response_type'], expected: 'code' }}
+            />
+          </MessageBox>
+        ) : query['code_challenge'] && query['code_challenge_method'] !== 'S256' ? (
+          <MessageBox withIcon type="error">
+            <FormattedMessage
+              defaultMessage='{field} has invalid value "{value}". Expected: "{expected}"'
+              id="mGSAXe"
+              values={{ field: 'code_challenge_method', value: query['code_challenge_method'], expected: 'S256' }}
             />
           </MessageBox>
         ) : error ? (
@@ -88,6 +105,8 @@ const OAuthAuthorizePage = () => {
           <ApplicationApproveScreen
             application={data.application}
             redirectUri={query['redirect_uri']}
+            codeChallenge={query['code_challenge']}
+            codeChallengeMethod={query['code_challenge_method']}
             autoApprove={hasExistingAuthorization}
             state={query['state']}
             scope={query['scope']}
@@ -98,4 +117,6 @@ const OAuthAuthorizePage = () => {
   );
 };
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default OAuthAuthorizePage;

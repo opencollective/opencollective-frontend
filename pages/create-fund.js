@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import CreateFund from '../components/create-fund';
 import ErrorPage from '../components/ErrorPage';
@@ -12,14 +11,12 @@ const CreateFundPage = ({ loadingLoggedInUser }) => {
   }
 
   return (
-    <Page>
+    <Page showMenuItems={false}>
       <CreateFund />
     </Page>
   );
 };
 
-CreateFundPage.propTypes = {
-  loadingLoggedInUser: PropTypes.bool.isRequired,
-};
-
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(CreateFundPage);

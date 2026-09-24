@@ -1,40 +1,36 @@
 name: 'CodeQL'
 
+# Security: Do not replace `pull_request` with `pull_request_target` to expose secrets or
+# GITHUB_TOKEN write access to PR code. pull_request_target runs untrusted fork PR code with
+# base-branch privileges.
+
 on:
   push:
     branches:
       - main
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          # We must fetch at least the immediate parents so that if this is
-          # a pull request then we can checkout the head.
-          fetch-depth: 2
+        uses: actions/checkout@v7
 
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: 'package.json'
-          cache: 'npm'
-
-      # If this run was triggered by a pull request event, then checkout
-      # the head of the pull request instead of the merge commit.
-      - run: git checkout HEAD^2
-        if: ${{ github.event_name == 'pull_request' }}
-
-      # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v4
         with:
           languages: javascript
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v4

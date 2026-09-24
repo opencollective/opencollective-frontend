@@ -6,28 +6,74 @@ const { withSentryConfig } = require('@sentry/nextjs');
 const CopyPlugin = require('copy-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const path = require('path');
+const { SENTRY_APPLICATION_KEY } = require('./sentry.constants');
 require('./env');
 const { REWRITES } = require('./rewrites');
 
+/** Limit static/page-data workers on memory-constrained CI/Vercel (see scripts/build_next.sh). */
+function getBuildWorkerCpus() {
+  if (process.env.NEXT_BUILD_CPUS) {
+    return Number(process.env.NEXT_BUILD_CPUS);
+  } else if (process.env.VERCEL || process.env.CI) {
+    return 2;
+  }
+  return undefined;
+}
+
+const buildWorkerCpus = getBuildWorkerCpus();
+
 const nextConfig = {
-  eslint: { ignoreDuringBuilds: true },
-  useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true' || process.env.API_PROXY !== 'true',
+  useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
+  reactStrictMode: true,
+  // Pages Router leaves node_modules external; sanitize-html is CJS and
+  // require()s htmlparser2@12 (ESM-only), which Vercel's runtime cannot load.
+  // Bundle Pages deps like the App Router, and allow webpack CJS↔ESM interop.
+  bundlePagesRouterDependencies: true,
+  transpilePackages: [
+    'sanitize-html',
+    'htmlparser2',
+    'domhandler',
+    'domutils',
+    'domelementtype',
+    'dom-serializer',
+    'entities',
+  ],
+  experimental: {
+    esmExternals: 'loose',
+    ...(buildWorkerCpus !== undefined ? { cpus: buildWorkerCpus } : {}),
+  },
   typescript: {
     ignoreBuildErrors: true,
+  },
+  compiler: {
+    styledComponents: {
+      displayName: ['ci', 'test', 'development', 'e2e'].includes(process.env.OC_ENV),
+    },
   },
   images: {
     disableStaticImages: true,
   },
-  experimental: {
-    outputFileTracingExcludes: {
-      '*': ['node_modules/@swc/core-linux-x64-gnu', 'node_modules/@swc/core-linux-x64-musl'],
-    },
-    outputFileTracingIncludes: {
-      '/_document': ['./.next/language-manifest.json'],
-    },
+  outputFileTracingIncludes: {
+    '/_document': ['./.next/language-manifest.json'],
   },
-  webpack: (config, { webpack, buildId }) => {
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/@swc/core-linux-x64-gnu',
+      'node_modules/@swc/core-linux-x64-musl',
+      'node_modules/canvas/build', // https://github.com/wojtekmaj/react-pdf/issues/1504#issuecomment-2007090872
+    ],
+  },
+  allowedDevOrigins: ['localhost', '127.0.0.1', '::1', '*.ngrok-free.dev'],
+  webpack: (config, { webpack, isServer, dev }) => {
+    config.resolve.alias['@sentry/replay'] = false;
+    config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
+    if (typeof config.cache !== 'boolean') {
+      config.cache = {};
+    }
+    config.cache.type = 'filesystem';
+    config.cache.compression = 'brotli';
+
     config.plugins.push(
       // Ignore __tests__
       new webpack.IgnorePlugin({ resourceRegExp: /[\\/]__tests__[\\/]/ }),
@@ -40,36 +86,44 @@ const nextConfig = {
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
+        ML_SERVICE_URL: null,
+        EXPENSE_CATEGORY_PREDICTION_ORG_SLUGS: '',
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
         NEXT_IMAGES_URL: null,
         REST_URL: null,
         SENTRY_DSN: null,
-        TW_API_COLLECTIVE_SLUG: null,
+        WISE_PLATFORM_COLLECTIVE_SLUG: null,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
+        TURNSTILE_SITEKEY: false,
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
         SENTRY_TRACES_SAMPLE_RATE: null,
         OC_APPLICATION: null,
-      }),
-    );
-
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        'process.env.SENTRY_RELEASE': JSON.stringify(buildId),
+        HEROKU_SLUG_COMMIT: null,
+        LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
+        DISABLE_CONTACT_FORM: false,
       }),
     );
 
     if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
-      // eslint-disable-next-line node/no-unpublished-require
       const CircularDependencyPlugin = require('circular-dependency-plugin');
       config.plugins.push(
         new CircularDependencyPlugin({
           include: /components|pages|server/,
           failOnError: true,
           cwd: process.cwd(),
+          exclude: /node_modules/,
+        }),
+      );
+    }
+
+    if (!dev) {
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'globalThis.__DEV__': false,
         }),
       );
     }
@@ -79,22 +133,15 @@ const nextConfig = {
       new CopyPlugin({
         patterns: [
           {
+            // eslint-disable-next-line n/no-extraneous-require
             from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
             to: path.join(__dirname, 'public/static/cmaps'),
           },
-        ],
-      }),
-    );
-
-    // Copy pdfjs worker to public folder (used by PDFViewer component)
-    // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)
-    // TODO(ESM): Move this to standard ESM
-    config.plugins.push(
-      new CopyPlugin({
-        patterns: [
           {
-            from: require.resolve('pdfjs-dist/build/pdf.worker.min.js'),
-            to: path.join(__dirname, 'public/static/scripts'),
+            // eslint-disable-next-line n/no-extraneous-require
+            from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'build/pdf.worker.min.mjs'),
+            to: path.join(__dirname, 'public/static/scripts/pdf.worker.min.mjs'),
+            info: { minimized: true },
           },
         ],
       }),
@@ -119,9 +166,21 @@ const nextConfig = {
       }),
     );
 
+    // Put the Codecov webpack plugin after all other plugins
+    if (['ci', 'e2e'].includes(process.env.OC_ENV)) {
+      const { codecovWebpackPlugin } = require('@codecov/webpack-plugin');
+      config.plugins.push(
+        codecovWebpackPlugin({
+          enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+          bundleName: 'opencollective-frontend',
+          uploadToken: process.env.CODECOV_TOKEN,
+        }),
+      );
+    }
+
     config.module.rules.push({
       test: /\.md$/,
-      use: ['babel-loader', 'raw-loader', 'markdown-loader'],
+      use: ['raw-loader', 'markdown-loader'],
     });
 
     // Configuration for images
@@ -148,13 +207,13 @@ const nextConfig = {
       },
     });
 
-    // Load images in base64
+    // Load images in base64 (only for very small assets; larger files become URLs)
     config.module.rules.push({
       test: /\.(svg|png|jpg|gif)$/,
       use: {
         loader: 'url-loader',
         options: {
-          limit: 1000000,
+          limit: 8192,
         },
       },
       include: [path.resolve(__dirname, 'components')],
@@ -170,6 +229,19 @@ const nextConfig = {
       include: /node_modules/,
       type: 'javascript/auto',
     });
+
+    if (!isServer && !dev) {
+      config.optimization.splitChunks.cacheGroups.appCommon = {
+        name: 'appCommon',
+        chunks(chunk) {
+          return chunk.name === 'pages/_app';
+        },
+        test(module) {
+          return /node_modules[/\\]/.test(module.nameForCondition() || '');
+        },
+        enforce: true,
+      };
+    }
 
     return config;
   },
@@ -221,29 +293,62 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Legacy security.txt location, see RFC 9116
+      {
+        source: '/security.txt',
+        destination: '/.well-known/security.txt',
+        permanent: true,
+      },
       // Legacy settings (/edit)
       {
         source: '/:slug/edit/:section*',
-        destination: '/:slug/admin/:section*',
+        destination: '/dashboard/:slug/:section*',
         permanent: false,
       },
       {
         source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section*',
-        destination: '/:parentCollectiveSlug/events/:eventSlug/admin/:section*',
+        destination: '/dashboard/:eventSlug/:section*',
         permanent: false,
       },
       // Legacy host dashboard (/host/dashboard)
       {
         source: '/:slug/dashboard/:section*',
-        destination: '/:slug/admin/:section*',
+        destination: '/dashboard/:slug/:section*',
         permanent: false,
       },
-      // Legacy subscriptions
+      // Legacy admin panel
+      {
+        source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
+        destination: '/dashboard/:slug/:section*/:subpath*',
+        permanent: false,
+      },
+      // Legacy manage subscriptions URLs
       {
         source: '/subscriptions',
-        destination: '/manage-contributions',
+        destination: '/dashboard/me/outgoing-contributions',
         permanent: false,
       },
+      {
+        source: '/:slug/subscriptions',
+        destination: '/dashboard/:slug/outgoing-contributions',
+        permanent: false,
+      },
+      {
+        source: '/:slug/recurring-contributions/:tab(recurring|processing)?',
+        destination: '/dashboard/:slug/outgoing-contributions',
+        permanent: false,
+      },
+      {
+        source: '/manage-contributions/:tab(recurring|processing)?',
+        destination: '/dashboard/me/outgoing-contributions',
+        permanent: false,
+      },
+      {
+        source: '/:slug/manage-contributions/:tab(recurring|processing)?',
+        destination: '/dashboard/:slug/outgoing-contributions',
+        permanent: false,
+      },
+      // Update payment method page
       {
         source: '/:collectiveSlug/paymentmethod/:paymentMethodId/update',
         destination: '/paymentmethod/:paymentMethodId/update',
@@ -277,16 +382,30 @@ const nextConfig = {
   },
 };
 
-let exportedConfig = withSentryConfig({
-  ...nextConfig,
-  sentry: {
-    disableServerWebpackPlugin: true,
-    disableClientWebpackPlugin: true,
-  },
-});
+let exportedConfig = nextConfig;
+
+if (process.env.SENTRY_AUTH_TOKEN) {
+  exportedConfig = withSentryConfig(
+    {
+      ...nextConfig,
+      sentry: {
+        hideSourceMaps: true,
+      },
+    },
+    {
+      org: 'open-collective',
+      project: 'oc-frontend',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      applicationKey: SENTRY_APPLICATION_KEY,
+      silent: true,
+    },
+  );
+} else if (process.env.OC_ENV === 'production') {
+  // eslint-disable-next-line no-console
+  console.warn('[!!! WARNING !!!] SENTRY_AUTH_TOKEN not found. Skipping Sentry configuration.');
+}
 
 if (process.env.ANALYZE) {
-  // eslint-disable-next-line node/no-unpublished-require
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: true,
   });

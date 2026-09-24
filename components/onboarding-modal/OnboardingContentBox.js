@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
+
+import injectIntl from '@/lib/injectIntl';
 
 import CollectivePickerAsync from '../../components/CollectivePickerAsync';
 import Container from '../../components/Container';
@@ -35,13 +37,6 @@ class OnboardingContentBox extends React.Component {
     this.state = {
       admins: [],
     };
-
-    this.messages = defineMessages({
-      placeholder: {
-        id: 'onboarding.contact.placeholder',
-        defaultMessage: 'Who do you want to invite?',
-      },
-    });
   }
 
   componentDidMount() {
@@ -151,7 +146,10 @@ class OnboardingContentBox extends React.Component {
                     () => updateAdmins(this.state.admins),
                   );
                 }}
-                placeholder={intl.formatMessage(this.messages['placeholder'])}
+                placeholder={intl.formatMessage({
+                  id: 'onboarding.contact.placeholder',
+                  defaultMessage: 'Who do you want to invite?',
+                })}
               />
             </Flex>
             <P my={2} fontSize="12px" color="black.500" textAlign="center">

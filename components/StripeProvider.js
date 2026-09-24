@@ -4,7 +4,7 @@ import { Elements } from '@stripe/react-stripe-js';
 
 import { getStripe } from '../lib/stripe';
 
-export const StripeLoaderContext = React.createContext({
+const StripeLoaderContext = React.createContext({
   isStripeLoaded: false,
   loadStripe() {},
 });

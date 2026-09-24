@@ -1,12 +1,13 @@
+// use `components/dashboard/filters/Pagination` when `useQueryFilter` is used
 import qs from 'querystring';
 
 import React from 'react';
 import { ChevronLeft } from '@styled-icons/boxicons-regular/ChevronLeft';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { paginationElements } from '../lib/pagination';
 
@@ -124,11 +125,11 @@ type CommonVariantProps = {
 };
 type PageComponentProps = React.PropsWithChildren<{ page: number }>;
 
-type InputPaginationProps = {};
+type InputPaginationProps = object;
 
 function InputPagination(props: InputPaginationProps & CommonVariantProps) {
   const changePage = React.useCallback(
-    ({ target, key }) => {
+    ({ target, key = undefined }) => {
       if (key && key !== 'Enter') {
         return;
       }
@@ -152,6 +153,7 @@ function InputPagination(props: InputPaginationProps & CommonVariantProps) {
           </StyledButton>
         </props.PageComponent>
       )}
+
       <Container display="inline-block" mx={2}>
         <FormattedMessage
           id="Pagination.Count"
@@ -175,7 +177,11 @@ function InputPagination(props: InputPaginationProps & CommonVariantProps) {
                 data-cy="pagination-current"
               />
             ),
-            total: <span data-cy="pagination-total">{props.totalPages || 1}</span>,
+            total: (
+              <span key="total" data-cy="pagination-total">
+                {props.totalPages || 1}
+              </span>
+            ),
           }}
         />
       </Container>

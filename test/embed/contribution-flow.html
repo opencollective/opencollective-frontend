@@ -1,0 +1,159 @@
+<!-- A simple page for testing the embed contribution flow. Simply open it in your preferred browser. -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenCollective Donation Embed Test</title>
+    <style>
+      body {
+        max-width: 80%;
+        margin: 20px auto;
+        padding: 0 20px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        background-color: #f5f5f5;
+      }
+
+      #contributeIframe {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background-color: white;
+      }
+
+      #messages {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      #messages p {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+
+      .size-controls {
+        margin-bottom: 20px;
+      }
+
+      .size-controls button {
+        padding: 8px 16px;
+        margin-right: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s ease;
+      }
+
+      .size-controls button:hover {
+        background-color: #f0f0f0;
+        border-color: #bbb;
+      }
+
+      .size-controls button:active {
+        background-color: #e8e8e8;
+        transform: translateY(1px);
+      }
+
+      iframe {
+        resize: both;
+      }
+
+      .messages-title {
+        margin: 0 0 15px 0;
+        font-size: 1.2em;
+        font-weight: bold;
+      }
+
+      .no-messages {
+        color: #666;
+        font-style: italic;
+      }
+
+      #messagesList li {
+        animation: fadeIn 0.2s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateX(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="size-controls">
+      <button onclick="setSize('mobile')">Mobile (320px)</button>
+      <button onclick="setSize('tablet')">Tablet (768px)</button>
+      <button onclick="setSize('desktop')">Desktop (100%)</button>
+    </div>
+
+    <iframe
+      id="contributeIframe"
+      src="http://localhost:3000/embed/apex/donate"
+      width="100%"
+      height="800px"
+      frameborder="0"
+    ></iframe>
+
+    <div id="messages">
+      <h2 class="messages-title">Channel messaging</h2>
+      <p class="no-messages">No messages exchanged yet</p>
+      <ul id="messagesList"></ul>
+    </div>
+
+    <script>
+      function addMessage(message) {
+        const messagesDiv = document.getElementById('messages');
+        const noMessages = messagesDiv.querySelector('.no-messages');
+        if (noMessages) {
+          noMessages.remove();
+        }
+
+        const messagesList = document.getElementById('messagesList');
+        const messageElement = document.createElement('li');
+        messageElement.textContent = message;
+        messagesList.appendChild(messageElement);
+      }
+
+      function setSize(device) {
+        const iframe = document.getElementById('contributeIframe');
+        switch (device) {
+          case 'mobile':
+            iframe.style.width = '320px';
+            break;
+          case 'tablet':
+            iframe.style.width = '768px';
+            break;
+          case 'desktop':
+            iframe.style.width = '100%';
+            break;
+        }
+      }
+
+      window.addEventListener('message', event => {
+        if (event.origin !== 'http://localhost:3000') return;
+        addMessage(`Message received: ${JSON.stringify(event.data)}`);
+      });
+
+      function sendMessageToIframe(message) {
+        const iframe = document.getElementById('contributeIframe');
+        iframe.contentWindow.postMessage(message, 'http://localhost:3000');
+        addMessage(`Message sent: ${JSON.stringify(message)}`);
+      }
+    </script>
+  </body>
+</html>

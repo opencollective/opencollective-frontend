@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { FlexGrowProps, FlexWrapProps } from 'styled-system';
+import type { FlexGrowProps, FlexWrapProps } from 'styled-system';
 
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
@@ -9,7 +9,10 @@ import { Span } from './Text';
 const FilterButton = styled(StyledButton).attrs({
   buttonSize: 'tiny',
   buttonStyle: 'standard',
-})`
+})<{
+  height: string | number;
+  padding: string | number;
+}>`
   font-size: 14px;
   font-weight: 400;
   height: ${props => props.height};

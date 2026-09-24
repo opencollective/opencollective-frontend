@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
+
+import injectIntl from '@/lib/injectIntl';
 
 import { Flex } from './Grid';
 import InputField from './InputField';
@@ -100,7 +102,7 @@ class RedeemForm extends React.Component {
                 name="name"
                 type="name"
                 defaultValue={name}
-                disabled={LoggedInUser}
+                disabled={Boolean(LoggedInUser)}
                 onChange={value => this.handleChange('name', value)}
               />
               <InputField
@@ -108,7 +110,7 @@ class RedeemForm extends React.Component {
                 name="email"
                 type="email"
                 defaultValue={email}
-                disabled={LoggedInUser}
+                disabled={Boolean(LoggedInUser)}
                 onChange={value => this.handleChange('email', value)}
               />
             </React.Fragment>

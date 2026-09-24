@@ -1,0 +1,216 @@
+import React from 'react';
+import { useQuery } from '@apollo/client';
+import { sum } from 'lodash-es';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
+
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
+import { integer } from '../../../../lib/filters/schemas';
+import type { UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { FEATURES } from '@/lib/allowed-features';
+import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/graphql';
+
+import NotFound from '@/components/NotFound';
+
+import FeatureNotSupported from '../../../FeatureNotSupported';
+import HTMLContent from '../../../HTMLContent';
+import Link from '../../../Link';
+import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { Button } from '../../../ui/Button';
+import { Skeleton } from '../../../ui/Skeleton';
+import { DashboardContext } from '../../DashboardContext';
+import DashboardHeader from '../../DashboardHeader';
+import { EmptyResults } from '../../EmptyResults';
+import { Filterbar } from '../../filters/Filterbar';
+import { orderByFilter } from '../../filters/OrderFilter';
+import { Pagination } from '../../filters/Pagination';
+import { searchFilter } from '../../filters/SearchFilter';
+import { UPDATE_STATUS, updateStatusFilter } from '../../filters/UpdateStatusFilter';
+import type { DashboardSectionProps } from '../../types';
+
+import { UpdateDate, UpdateStatus } from './common';
+import { updatesDashboardMetadataQuery, updatesDashboardQuery } from './queries';
+import SingleUpdateView from './SingleUpdateView';
+import UpdateFormView from './UpdateFormView';
+const PAGE_SIZE = 10;
+
+const schema = z.object({
+  limit: integer.default(PAGE_SIZE),
+  offset: integer.default(0),
+  orderBy: orderByFilter.schema,
+  searchTerm: searchFilter.schema,
+  status: updateStatusFilter.schema,
+});
+
+const UpdatePost = ({ update, account }) => {
+  const reactionCount = update.reactions ? sum(Object.values(update.reactions)) : 0;
+  const commentsCount = update.comments?.totalCount || 0;
+
+  return (
+    <div className="flex flex-col gap-4 rounded-2xl border p-4">
+      <div>
+        <div className="flex justify-between">
+          <Link href={getDashboardRoute(account, `updates/${update.publicId}`)} className="text-xl font-medium">
+            {update.title}
+          </Link>
+          <UpdateStatus update={update} />
+        </div>
+        <div className="text-sm">
+          <UpdateDate update={update} />
+        </div>
+      </div>
+      {update.summary && <HTMLContent content={update.summary} />}
+      <div className="flex items-center gap-2 text-xs text-gray-500">
+        <FormattedMessage
+          id="Interactions.Description"
+          defaultMessage="{comments, plural, one {# comment} other {# comments}} and {reactions, plural, one {# reaction} other {# reactions}}"
+          values={{
+            reactions: reactionCount,
+            comments: commentsCount,
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+type FilterValues = z.infer<typeof schema>;
+
+const filters: FilterComponentConfigs<FilterValues> = {
+  searchTerm: searchFilter.filter,
+  status: updateStatusFilter.filter,
+};
+
+const toVariables: FiltersToVariables<z.infer<typeof schema>, UpdatesDashboardQueryVariables> = {
+  status: updateStatusFilter.toVariables,
+};
+
+const UpdatesList = () => {
+  const { account } = React.useContext(DashboardContext);
+  const intl = useIntl();
+  const {
+    data: metadata,
+    loading: metadataLoading,
+    error: metadataError,
+  } = useQuery(updatesDashboardMetadataQuery, {
+    variables: {
+      slug: account.slug,
+    },
+  });
+
+  const views: Views<z.infer<typeof schema>> = [
+    {
+      id: UPDATE_STATUS.PUBLISHED,
+      label: intl.formatMessage({ defaultMessage: 'Published', id: 'update.status.published' }),
+      count: metadata?.account?.PUBLISHED?.totalCount,
+      filter: {
+        status: UPDATE_STATUS.PUBLISHED,
+      },
+    },
+    {
+      id: UPDATE_STATUS.DRAFTED,
+      label: intl.formatMessage({ defaultMessage: 'Drafts', id: 'update.tabs.drafts' }),
+      count: metadata?.account?.DRAFTS?.totalCount,
+      filter: {
+        status: UPDATE_STATUS.DRAFTED,
+      },
+    },
+  ];
+
+  const queryFilter = useQueryFilter({
+    schema,
+    views,
+    filters,
+    toVariables,
+  });
+  const {
+    data,
+    previousData,
+    loading: queryLoading,
+    error: queryError,
+  } = useQuery(updatesDashboardQuery, {
+    variables: {
+      slug: account.slug,
+      ...queryFilter.variables,
+    },
+  });
+
+  const loading = metadataLoading || queryLoading;
+  const error = metadataError || queryError;
+  const updates = data?.account?.updates;
+
+  if (!loading) {
+    if (!account) {
+      return <NotFound />;
+    } else if (account.features[FEATURES.UPDATES] === CollectiveFeatureStatus.UNSUPPORTED) {
+      return <FeatureNotSupported />;
+    }
+  }
+
+  return (
+    <div className="flex flex-col-reverse xl:flex-row">
+      <div className="flex flex-1 flex-col gap-6">
+        <DashboardHeader
+          title={<FormattedMessage id="updates" defaultMessage="Updates" />}
+          description={
+            <FormattedMessage
+              id="Dashboard.Updates.Subtitle"
+              defaultMessage="Updates from your account that are visible to people following you"
+            />
+          }
+          actions={
+            <Link href={getDashboardRoute(account, 'updates/new')}>
+              <Button size="sm" className="gap-1.5">
+                <FormattedMessage defaultMessage="Create Update" id="IWsAlq" />
+              </Button>
+            </Link>
+          }
+        />
+
+        <Filterbar {...queryFilter} />
+        <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
+          {error ? (
+            <MessageBoxGraphqlError error={error} />
+          ) : loading ? (
+            // eslint-disable-next-line react/no-array-index-key
+            Array.from({ length: 3 }).map((_, index) => <Skeleton className="h-4 w-80" key={index} />)
+          ) : updates?.nodes.length === 0 ? (
+            <EmptyResults
+              hasFilters={queryFilter.hasFilters}
+              entityType="UPDATES"
+              onResetFilters={() => queryFilter.resetFilters({})}
+            />
+          ) : (
+            <React.Fragment>
+              {updates?.nodes?.map(update => (
+                <UpdatePost key={update.publicId} update={update} account={account} />
+              ))}
+              <Pagination total={(data || previousData)?.account?.updates?.totalCount} queryFilter={queryFilter} />
+            </React.Fragment>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+enum UpdateDashboardAction {
+  EDIT = 'edit',
+  NEW = 'new',
+}
+
+const Updates = ({ subpath, accountSlug }: DashboardSectionProps) => {
+  const [action, id] = subpath;
+
+  if (Object.values(UpdateDashboardAction).includes(action as UpdateDashboardAction)) {
+    return <UpdateFormView updateId={action === UpdateDashboardAction.EDIT ? id : null} accountSlug={accountSlug} />;
+  } else if (action) {
+    return <SingleUpdateView updateId={action} />;
+  } else {
+    return <UpdatesList />;
+  }
+};
+
+export default Updates;
