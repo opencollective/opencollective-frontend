@@ -483,7 +483,7 @@ function createClient({ initialState = null, twoFactorAuthContext = null, access
   return new ApolloClient({
     cache,
     link,
-    connectToDevTools: process.browser,
+    devtools: { enabled: process.browser },
     ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
     ssrForceFetchDelay: 100, // See https://www.apollographql.com/docs/react/performance/server-side-rendering/#store-rehydration
   });
