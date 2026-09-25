@@ -103,7 +103,7 @@ const nextConfig = {
         SENTRY_TRACES_SAMPLE_RATE: null,
         OC_APPLICATION: null,
         HEROKU_SLUG_COMMIT: null,
-        LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
+        LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: true,
         DISABLE_CONTACT_FORM: false,
       }),
     );
