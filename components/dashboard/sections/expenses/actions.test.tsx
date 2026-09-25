@@ -11,7 +11,7 @@ import { DuplicateExpenseFlowWrapper } from './actions';
 const mockOnClose = jest.fn();
 
 jest.mock('../../../submit-expense/SubmitExpenseFlow', () => ({
-  SubmitExpenseFlow: ({ onClose }) => {
+  SubmitExpenseFlow: ({ onClose }: { onClose: (submittedExpense: boolean, hasSelectedViewAll: boolean) => void }) => {
     mockOnClose.mockImplementation(onClose);
     return (
       <button type="button" onClick={() => onClose(true, false)}>

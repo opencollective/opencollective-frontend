@@ -62,9 +62,9 @@ const deleteConnectedAccountMutation = gql`
 export default function TransactionsImportSettingsModal({
   hostId,
   transactionsImport,
-  plaidStatus,
+  plaidStatus = 'idle',
   onOpenChange,
-  showPlaidDialog,
+  showPlaidDialog = () => {},
   isOpen,
   hasRequestedSync,
   setHasRequestedSync,
@@ -85,7 +85,7 @@ export default function TransactionsImportSettingsModal({
     'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'institutionAccounts' | 'institutionId'
   > &
     React.ComponentProps<typeof TransactionsImportAssignmentsForm>['transactionsImport'] & {
-      connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
+      connectedAccount?: { id: string } | null;
     };
 }) {
   const { toast } = useToast();
@@ -109,6 +109,10 @@ export default function TransactionsImportSettingsModal({
   }, []);
 
   const handleDisconnect = async () => {
+    if (!transactionsImport.connectedAccount) {
+      return;
+    }
+
     try {
       await deleteConnectedAccount({
         variables: { connectedAccount: { id: transactionsImport.connectedAccount.id } },
@@ -309,6 +313,10 @@ export default function TransactionsImportSettingsModal({
                   <Button
                     loading={isRedirecting}
                     onClick={async () => {
+                      if (!transactionsImport.institutionId) {
+                        return;
+                      }
+
                       try {
                         await redirectToGoCardlessConnect(hostId, transactionsImport.institutionId, {
                           locale: intl.locale ?? 'en',

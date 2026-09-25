@@ -35,7 +35,7 @@ export const TransactionsImportForceSyncButton = ({
   const intl = useIntl();
   const { toast } = useToast();
   const [syncTransactionsImport] = useMutation(syncTransactionsImportMutation);
-  const setHasRequestedSyncTimeout = useRef(null);
+  const setHasRequestedSyncTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevIsSyncing = usePrevious(isSyncing);
 
   // Clear timeout on unmount

@@ -60,15 +60,22 @@ export const offPlatformConnectionsQuery = gql`
   ${TransactionImportListFieldsFragment}
 `;
 
-export const OffPlatformConnections = ({ accountSlug }) => {
+export const OffPlatformConnections = ({
+  accountSlug,
+}: {
+  accountSlug: string;
+  account?: unknown;
+  subpath?: string[];
+  isDashboard?: boolean;
+}) => {
   const intl = useIntl();
   const { toast } = useToast();
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
   const isUpgradeRequired = requiresUpgrade(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
   const queryFilter = useQueryFilter({ schema, filters: {} });
-  const [importsWithSyncRequest, setImportsWithSyncRequest] = React.useState(new Set());
-  const [selectedImportId, setSelectedImportId] = React.useState(null);
+  const [importsWithSyncRequest, setImportsWithSyncRequest] = React.useState<Set<string>>(() => new Set());
+  const [selectedImportId, setSelectedImportId] = React.useState<string | null>(null);
   const [showNewConnectionDialog, setShowNewConnectionDialog] = React.useState(false);
   const { data, loading, refetch, error, startPolling, stopPolling } = useQuery(offPlatformConnectionsQuery, {
     variables: { accountSlug, ...queryFilter.variables },
@@ -78,12 +85,16 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   // Derive from query data so the modal reflects updates (e.g. `lastSyncAt`) while polling
   const selectedImport = React.useMemo(
     () =>
-      selectedImportId ? data?.host?.transactionsImports?.nodes?.find(node => node.id === selectedImportId) : null,
+      selectedImportId
+        ? data?.host?.transactionsImports?.nodes?.find((node: TransactionsImport) => node.id === selectedImportId)
+        : null,
     [data, selectedImportId],
   );
 
   // Poll while a sync was requested or is still running server-side, so `lastSyncAt`/`isSyncing` stay up to date
-  const hasSyncingImports = Boolean(data?.host?.transactionsImports?.nodes?.some(node => node.isSyncing));
+  const hasSyncingImports = Boolean(
+    data?.host?.transactionsImports?.nodes?.some((node: TransactionsImport) => node.isSyncing),
+  );
   const shouldPoll = importsWithSyncRequest.size > 0 || hasSyncingImports;
   React.useEffect(() => {
     if (shouldPoll) {
@@ -92,7 +103,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
     }
   }, [shouldPoll, startPolling, stopPolling]);
   const onPlaidConnectSuccess = React.useCallback(
-    async ({ transactionsImport }) => {
+    async ({ transactionsImport }: { transactionsImport: Pick<TransactionsImport, 'id'> }) => {
       refetch();
       toast({
         variant: 'success',
@@ -108,7 +119,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
     [intl, toast, accountSlug, refetch, router],
   );
   const onPlaidUpdateSuccess = React.useCallback(
-    ({ transactionsImport }) => {
+    ({ transactionsImport }: { transactionsImport: Pick<TransactionsImport, 'source'> }) => {
       toast({
         variant: 'success',
         title: intl.formatMessage(
