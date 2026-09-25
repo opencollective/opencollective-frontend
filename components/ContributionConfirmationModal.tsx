@@ -14,6 +14,10 @@ interface ContributionConfirmationModalProps extends BaseModalProps {
   onSuccess?(...args: unknown[]): unknown;
 }
 
+// Defined at module level: an inline component would get a new identity on every render,
+// making React remount the form inputs (and lose focus/typed keys) whenever the modal re-renders.
+const FormBodyContainer = ({ children }: { children: React.ReactNode }) => <div className="mt-2">{children}</div>;
+
 const ContributionConfirmationModal = ({
   order,
   open,
@@ -51,7 +55,7 @@ const ContributionConfirmationModal = ({
             setOpen(false);
             onSuccess?.();
           }}
-          FormBodyContainer={({ children }) => <div className="mt-2">{children}</div>}
+          FormBodyContainer={FormBodyContainer}
           footer={
             <div className="mt-4 flex flex-wrap justify-center border-t border-slate-100 pt-4 sm:justify-end">
               <Button
