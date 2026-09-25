@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { motion } from 'motion/react';
 import { MoreHorizontal } from 'lucide-react';
+import { motion } from 'motion/react';
 
 import { useScrollShadow } from '../../lib/hooks/useScrollShadow';
 import { cn } from '../../lib/utils';
