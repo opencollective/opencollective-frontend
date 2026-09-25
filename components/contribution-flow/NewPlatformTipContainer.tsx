@@ -1,5 +1,5 @@
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
