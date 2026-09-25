@@ -87,7 +87,7 @@
     "express-ws": "5.0.2",
     "file-saver": "2.0.5",
     "formik": "2.4.9",
-    "framer-motion": "12.40.0",
+    "motion": "12.40.0",
     "graphql": "16.14.2",
     "helmet": "8.3.0",
     "input-otp": "1.5.0",
