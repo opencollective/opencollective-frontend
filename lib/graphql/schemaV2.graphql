@@ -28101,6 +28101,61 @@ type Mutation {
   ): StripeConnectAccountResponse!
 
   """
+  Get the PayPal OAuth URL to initiate the "Log in with PayPal" payout method flow. Scope: "expenses".
+  """
+  getPaypalOAuthUrl(
+    """
+    The account to connect a PayPal payout method for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The URL or path to return to after the OAuth flow (stored in OAuth state)
+    """
+    redirect: String
+
+    """
+    Currency for the payout method (stored in OAuth state)
+    """
+    currency: Currency
+  ): URL!
+
+  """
+  Complete the PayPal OAuth flow and create or update a verified PayPal payout method. Scope: "expenses".
+  """
+  connectPaypalPayoutMethod(
+    """
+    The authorization code returned by PayPal in the OAuth callback
+    """
+    code: NonEmptyString!
+
+    """
+    The OAuth state token from the PayPal authorize URL
+    """
+    state: NonEmptyString!
+
+    """
+    The account to connect a PayPal payout method for
+    """
+    account: AccountReferenceInput!
+
+    """
+    When verifying an existing payout method, pass its reference here
+    """
+    payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Currency for the payout method
+    """
+    currency: Currency!
+
+    """
+    A friendly name for the payout method
+    """
+    name: String
+  ): PaypalConnectPayoutMethodResponse!
+
+  """
   Get the Wise (TransferWise) OAuth URL to initiate the account connection flow for a host. Scope: "connectedAccounts".
   """
   getTransferwiseOAuthUrl(
@@ -31148,6 +31203,18 @@ type StripeConnectAccountResponse {
   The URL to redirect the user to once the connection is complete
   """
   redirectUrl: URL
+}
+
+type PaypalConnectPayoutMethodResponse {
+  """
+  The connected account that was created for this PayPal login
+  """
+  connectedAccount: ConnectedAccount!
+
+  """
+  The payout method that was created or updated
+  """
+  payoutMethod: PayoutMethod!
 }
 
 type TransferwiseConnectAccountResponse {
