@@ -136,9 +136,9 @@ interface CollectiveInterface {
     When true (default), exclude tiers with types that are no longer supported. Use false for edit pages to show all tiers.
     """
     onlyValid: Boolean = true
-  ): [Tier]
+  ): [Tier] @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 
   """
   The list of expense types supported by this account
@@ -205,7 +205,7 @@ interface CollectiveInterface {
   Describes the features enabled and available for this collective
   """
   features: CollectiveFeatures!
-  plan: PlanType
+  plan: PlanType @deprecated(reason: "2026-04-02: Replaced by new pricing")
   contributionPolicy: String
 
   """
@@ -4297,7 +4297,7 @@ type Query {
     """
     If false, only the transactions not linked to an expense (orders/refunds) will be returned
     """
-    includeExpenseTransactions: Boolean
+    includeExpenseTransactions: Boolean = true
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   Transaction(id: Int, uuid: String): Transaction @deprecated(reason: "2025-07-10: Please use GraphQL V2")

@@ -27,7 +27,7 @@ export function getPercentageDifference(current: number, previous?: number) {
   return Math.round(((current - previous) / previous) * 100);
 }
 
-export interface BaseMetricProps {
+interface BaseMetricProps {
   count?: {
     current: number;
     comparison?: number;

@@ -15,8 +15,8 @@ import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCollectivePageCanonicalURL } from '@/lib/url-helpers';
 
 import { CopyID } from '@/components/CopyId';
-import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
+import HeroSocialLinks from '@/components/hosted-account-overview/SocialLinks';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import StackedAvatars from '@/components/StackedAvatars';

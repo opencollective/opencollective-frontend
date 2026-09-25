@@ -1,7 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
 import { Kbd } from '@/components/ui/Kbd';
 
 import type LoggedInUser from './LoggedInUser';
@@ -10,7 +9,6 @@ import type LoggedInUser from './LoggedInUser';
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
   AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
@@ -66,23 +64,6 @@ const OFICO_MEMBER_ORGANIZATIONS = [
  * List of current preview features.
  */
 export const previewFeatures: PreviewFeature[] = [
-  {
-    key: PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN,
-    title: <FormattedMessage defaultMessage="Crowdfunding Redesign" id="uVYlI0" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="Be part of the <strong>crowdfunding redesign effort</strong> and get access to previews of new crowdfunding and profile pages. Experience enhanced profile pages with separate fundraising and storytelling views, clearer relationships between collectives and their projects, improved goal tracking, and better collective narratives that showcase your impact and long-term sustainability.{newLine}{newLine}Check out the <blogPostLink>blog post</blogPostLink> for more details."
-        id="PreviewFeatures.crowdfundingRedesignDescription"
-        values={{
-          ...I18nFormatters,
-          blogPostLink: getI18nLink({ href: 'https://blog.opencollective.com/open-collective-crowdfunding-redesign/' }),
-        }}
-      />
-    ),
-    alwaysEnableInDev: true,
-    publicBeta: true,
-    category: Categories.GENERAL,
-  },
   {
     key: PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS,
     title: <FormattedMessage defaultMessage="Keyboard Shortcuts" id="PreviewFeatures.keyboardShortcutsTitle" />,
