@@ -68,11 +68,14 @@ const nextConfig = {
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
     config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
+    // Keep the cache object built by Next.js (cacheDirectory, version,
+    // buildDependencies, and `maxMemoryGenerations: 0` which disables
+    // webpack's in-memory cache in dev). Replacing it resets those to webpack
+    // defaults, moving the cache to node_modules/.cache and keeping cache
+    // generations in memory across recompiles.
     if (typeof config.cache !== 'boolean') {
-      config.cache = {};
+      config.cache = { ...config.cache, type: 'filesystem', compression: 'brotli' };
     }
-    config.cache.type = 'filesystem';
-    config.cache.compression = 'brotli';
 
     config.plugins.push(
       // Ignore __tests__
