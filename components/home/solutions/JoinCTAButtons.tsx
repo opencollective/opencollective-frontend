@@ -1,6 +1,6 @@
 import React from 'react';
-import { motion, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { motion, useInView } from 'motion/react';
 import { FormattedMessage } from 'react-intl';
 
 import Link from '@/components/Link';
