@@ -269,7 +269,7 @@
     "mocha-junit-reporter": "^2.2.1",
     "npm-run-all2": "^9.0.0",
     "nyc": "^18.0.0",
-    "pdf-parse": "^1.1.1",
+    "pdf-parse": "^2.4.5",
     "postcss": "8.5.28",
     "prettier": "3.9.9",
     "prettier-plugin-tailwindcss": "^0.8.0",
