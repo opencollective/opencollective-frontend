@@ -11,6 +11,7 @@ import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../sectio
 import { budgetSectionContributionsQuery } from '../sections/Budget/ContributionsBudget';
 import { budgetSectionExpenseQuery } from '../sections/Budget/ExpenseBudget';
 import { conversationsSectionQuery, getConversationsSectionQueryVariables } from '../sections/Conversations';
+import { budgetSectionQuery, getBudgetSectionVariables } from '../sections/FinancialOverview';
 import { getTransactionsSectionQueryVariables, transactionsSectionQuery } from '../sections/Transactions';
 import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../sections/Updates';
 
@@ -24,6 +25,12 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
     if (sectionsNames.includes('budget')) {
       const budget = sections.find(el => el.name === 'BUDGET')?.sections.find(el => el.name === 'budget');
       if (budget?.version === 2) {
+        queries.push(
+          client.query({
+            query: budgetSectionQuery,
+            variables: getBudgetSectionVariables(collective),
+          }),
+        );
         queries.push(
           client.query({
             query: budgetSectionExpenseQuery,
