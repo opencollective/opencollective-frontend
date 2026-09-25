@@ -62,9 +62,9 @@ const deleteConnectedAccountMutation = gql`
 export default function TransactionsImportSettingsModal({
   hostId,
   transactionsImport,
-  plaidStatus,
+  plaidStatus = 'idle',
   onOpenChange,
-  showPlaidDialog,
+  showPlaidDialog = () => {},
   isOpen,
   hasRequestedSync,
   setHasRequestedSync,
@@ -85,7 +85,7 @@ export default function TransactionsImportSettingsModal({
     'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'institutionAccounts' | 'institutionId'
   > &
     React.ComponentProps<typeof TransactionsImportAssignmentsForm>['transactionsImport'] & {
-      connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
+      connectedAccount?: { id: string } | null;
     };
 }) {
   const { toast } = useToast();
@@ -96,7 +96,23 @@ export default function TransactionsImportSettingsModal({
   const [deleteConnectedAccount, { loading: isDisconnecting }] = useMutation(deleteConnectedAccountMutation);
   const [deleteTransactionsImport, { loading: isDeleting }] = useMutation(deleteTransactionsImportMutation);
 
+  // If the modal unmounts mid-sync, the sync button can't reset the request flag itself, which would leave
+  // the parent polling forever. Mirror the latest values in refs so the unmount cleanup can clear it.
+  const syncRequestRef = React.useRef({ hasRequestedSync, setHasRequestedSync });
+  syncRequestRef.current = { hasRequestedSync, setHasRequestedSync };
+  React.useEffect(() => {
+    return () => {
+      if (syncRequestRef.current.hasRequestedSync) {
+        syncRequestRef.current.setHasRequestedSync(false);
+      }
+    };
+  }, []);
+
   const handleDisconnect = async () => {
+    if (!transactionsImport.connectedAccount) {
+      return;
+    }
+
     try {
       await deleteConnectedAccount({
         variables: { connectedAccount: { id: transactionsImport.connectedAccount.id } },
@@ -297,6 +313,10 @@ export default function TransactionsImportSettingsModal({
                   <Button
                     loading={isRedirecting}
                     onClick={async () => {
+                      if (!transactionsImport.institutionId) {
+                        return;
+                      }
+
                       try {
                         await redirectToGoCardlessConnect(hostId, transactionsImport.institutionId, {
                           locale: intl.locale ?? 'en',

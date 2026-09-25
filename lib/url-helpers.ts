@@ -173,7 +173,7 @@ export const getPersonalTokenSettingsRoute = (account, token) => {
   return getDashboardRoute(account, `for-developers/personal-tokens/${token.publicId}`);
 };
 
-export const getOffPlatformTransactionsRoute = (hostSlug: string, importId = null) => {
+export const getOffPlatformTransactionsRoute = (hostSlug: string, importId: string | null = null) => {
   const base = `/dashboard/${hostSlug}/off-platform-transactions`;
   if (importId) {
     const params = new URLSearchParams();

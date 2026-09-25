@@ -10,10 +10,12 @@ import type { ButtonProps } from '../../../ui/Button';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
-const syncTransactionsImportMutation = gql`
+export const syncTransactionsImportMutation = gql`
   mutation SyncTransactionsImport($transactionImport: TransactionsImportReferenceInput!) {
     syncTransactionsImport(transactionImport: $transactionImport) {
       id
+      isSyncing
+      lastSyncAt
     }
   }
 `;
@@ -33,7 +35,7 @@ export const TransactionsImportForceSyncButton = ({
   const intl = useIntl();
   const { toast } = useToast();
   const [syncTransactionsImport] = useMutation(syncTransactionsImportMutation);
-  const setHasRequestedSyncTimeout = useRef(null);
+  const setHasRequestedSyncTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevIsSyncing = usePrevious(isSyncing);
 
   // Clear timeout on unmount
@@ -45,14 +47,16 @@ export const TransactionsImportForceSyncButton = ({
     };
   }, []);
 
-  // Reset wasClickedRecently when sync is done
+  // Reset hasRequestedSync when sync is done
   React.useEffect(() => {
     if (prevIsSyncing && !isSyncing) {
       if (setHasRequestedSyncTimeout.current) {
         clearTimeout(setHasRequestedSyncTimeout.current);
+        setHasRequestedSyncTimeout.current = null;
       }
+      setHasRequestedSync(false);
     }
-  }, [toast, intl, isSyncing, prevIsSyncing]);
+  }, [isSyncing, prevIsSyncing, setHasRequestedSync]);
 
   return (
     <Button
