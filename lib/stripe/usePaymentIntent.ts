@@ -67,7 +67,7 @@ export default function usePaymentIntent({
   React.useEffect(() => {
     async function load() {
       if (typeof window.Stripe === 'undefined') {
-        await loadScriptAsync('https://js.stripe.com/v3/');
+        await loadScriptAsync('https://js.stripe.com/dahlia/stripe.js');
       }
 
       const abortController = (abort.current = new AbortController());
