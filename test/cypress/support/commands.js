@@ -144,27 +144,32 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
   const user = { email, newsletterOptIn: false };
   return signinRequest(user, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
-    return graphqlQuery(token, {
-      operationName: 'CreateCollective',
-      query: gqlV1 /* GraphQL */ `
-        mutation CreateCollective($collective: CollectiveInputType!) {
-          createCollective(collective: $collective) {
-            id
-            slug
-            name
-            description
-            longDescription
-            website
-            imageUrl
-            settings
-          }
-        }
-      `,
-      context: API_V1_CONTEXT,
-      variables: { collective: { location: {}, name: 'TestOrg', slug: '', type, ...params } },
-    }).then(({ body }) => {
-      return body.data.createCollective;
-    });
+    return getLoggedInUserFromToken(token)
+      .then(loggedInUser => completeProfileIfRequired({ token, loggedInUser, completeProfile: true }))
+      .then(() =>
+        graphqlQuery(token, {
+          operationName: 'CreateCollective',
+          query: gqlV1 /* GraphQL */ `
+            mutation CreateCollective($collective: CollectiveInputType!) {
+              createCollective(collective: $collective) {
+                id
+                slug
+                name
+                description
+                longDescription
+                website
+                imageUrl
+                settings
+              }
+            }
+          `,
+          context: API_V1_CONTEXT,
+          variables: { collective: { location: {}, name: 'TestOrg', slug: '', type, ...params } },
+        }),
+      )
+      .then(({ body }) => {
+        return body.data.createCollective;
+      });
   });
 });
 
