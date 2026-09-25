@@ -247,6 +247,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     });
 
     const paymentElement = elements.create('payment', {
+      layout: 'tabs',
       paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
       terms: {
         bancontact: 'always',
