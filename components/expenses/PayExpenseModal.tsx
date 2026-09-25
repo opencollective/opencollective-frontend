@@ -644,7 +644,6 @@ const PayExpenseModal = ({
                       currencyDisplay="FULL"
                       value={formik.values.paymentProcessorFeeInHostCurrency}
                       min={0}
-                      max={formik.values.expenseAmountInHostCurrency || 100000000}
                       onChange={value => formik.setFieldValue('paymentProcessorFeeInHostCurrency', value)}
                     />
                   )}
