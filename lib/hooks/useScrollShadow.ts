@@ -1,6 +1,6 @@
 import { type RefObject, useEffect, useState } from 'react';
-import type { MotionValue } from 'framer-motion';
-import { useScroll, useTransform } from 'framer-motion';
+import type { MotionValue } from 'motion/react';
+import { useScroll, useTransform } from 'motion/react';
 
 /**
  * Returns `--scroll-shadow-left` and `--scroll-shadow-right` CSS custom properties

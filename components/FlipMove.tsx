@@ -1,6 +1,6 @@
 import React, { Children, isValidElement } from 'react';
-import type { HTMLMotionProps } from 'framer-motion';
-import { AnimatePresence, motion } from 'framer-motion';
+import type { HTMLMotionProps } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import type { ReactElement, ReactNode } from 'react';
 
 const DEFAULT_DURATION_MS = 350;
