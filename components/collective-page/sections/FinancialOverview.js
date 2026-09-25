@@ -14,7 +14,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import ContributionsBudget from './Budget/ContributionsBudget';
 import ExpenseBudget from './Budget/ExpenseBudget';
 
-const budgetSectionQuery = gql`
+export const budgetSectionQuery = gql`
   query BudgetSection($slug: String!, $heavyAccount: Boolean!) {
     account(slug: $slug) {
       id
@@ -50,16 +50,18 @@ const budgetSectionQuery = gql`
   }
 `;
 
+export const getBudgetSectionVariables = collective => ({
+  slug: collective.slug,
+  heavyAccount: isHeavyAccount(collective.slug),
+});
+
 /**
  * The budget section. Shows the expenses, the latest transactions and some statistics
  * abut the global budget of the collective.
  */
 const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
-    variables: {
-      slug: collective.slug,
-      heavyAccount: isHeavyAccount(collective.slug),
-    },
+    variables: getBudgetSectionVariables(collective),
   });
   const { data, refetch } = budgetQueryResult;
 
