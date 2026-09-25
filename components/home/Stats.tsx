@@ -3,13 +3,14 @@ import Image from 'next/image';
 import { defineMessages, useIntl } from 'react-intl';
 
 // Hardcoded stats from 2025-09-03, based on host's with "isTrustedHost"=true
+// `plus` marks lower bounds ("10K+"). Values are formatted with the page locale.
 const stats = {
-  organizations: '41',
-  collectives: '10K+',
-  moneyManaged: '$40M',
-  expensesPaid: '116K+',
-  contributionsReceived: '1M+',
-  transactionsRecorded: '6M+',
+  organizations: { value: 41 },
+  collectives: { value: 10_000, plus: true },
+  moneyManaged: { value: 40_000_000, currency: 'USD' },
+  expensesPaid: { value: 116_000, plus: true },
+  contributionsReceived: { value: 1_000_000, plus: true },
+  transactionsRecorded: { value: 6_000_000, plus: true },
 };
 const messages = defineMessages({
   title: {
@@ -43,7 +44,15 @@ const messages = defineMessages({
 });
 
 const Stats = () => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatNumber } = useIntl();
+  const formatStat = ({ value, plus, currency }: { value: number; plus?: boolean; currency?: string }) => {
+    const formatted = formatNumber(value, {
+      notation: 'compact',
+      maximumSignificantDigits: 3,
+      ...(currency && { style: 'currency', currency }),
+    });
+    return plus ? `${formatted}+` : formatted;
+  };
 
   return (
     <section className="px-4 pt-4 pb-8 sm:pb-12 lg:pb-16">
@@ -70,7 +79,7 @@ const Stats = () => {
               {/* Top Row */}
               <div className="text-center">
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
-                  {stats.organizations}
+                  {formatStat(stats.organizations)}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.organizations)}
@@ -78,7 +87,7 @@ const Stats = () => {
               </div>
               <div className="text-center">
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
-                  {stats.collectives}
+                  {formatStat(stats.collectives)}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.collectives)}
@@ -86,7 +95,7 @@ const Stats = () => {
               </div>
               <div className="text-center">
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
-                  {stats.moneyManaged}
+                  {formatStat(stats.moneyManaged)}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.moneyManaged)}
@@ -96,7 +105,7 @@ const Stats = () => {
               {/* Bottom Row */}
               <div className="text-center lg:pt-8">
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
-                  {stats.expensesPaid}
+                  {formatStat(stats.expensesPaid)}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.expensesPaid)}
@@ -104,7 +113,7 @@ const Stats = () => {
               </div>
               <div className="text-center lg:pt-8">
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
-                  {stats.contributionsReceived}
+                  {formatStat(stats.contributionsReceived)}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.contributionsReceived)}
@@ -112,7 +121,7 @@ const Stats = () => {
               </div>
               <div className="text-center lg:pt-8">
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
-                  {stats.transactionsRecorded}
+                  {formatStat(stats.transactionsRecorded)}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.transactionsRecorded)}
