@@ -218,13 +218,13 @@ jobs:
         run: npx cypress install
 
       - name: Download Next.js build
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: frontend-next
           path: /tmp/frontend-next
 
       - name: Download service dist artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: e2e-service-dists
           path: /tmp/e2e-service-dists
