@@ -143,7 +143,7 @@
   },
   "resolutions": {
     "@radix-ui/react-dismissable-layer": "^1.0.5",
-    "@radix-ui/react-focus-scope": "1.1.12"
+    "@radix-ui/react-focus-scope": "1.1.16"
   },
   "scripts": {
     "build": "npm-run-all build:next build:server build:updates",
