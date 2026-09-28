@@ -15,7 +15,7 @@ on:
 
 jobs:
   lockfile-lint:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 5
 
     steps:
