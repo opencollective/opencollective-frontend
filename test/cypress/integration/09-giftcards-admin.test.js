@@ -24,7 +24,6 @@ describe('Gift cards admin', () => {
     cy.get('#giftcard-amount').type('{selectall}542');
     cy.get('.deliver-type-selector label[data-name="manual"] .radio-btn').click();
     cy.get('#giftcard-numberOfGiftCards').type(`{selectall}${numberOfGiftCards}`);
-    cy.getByDataCy('checkbox-accept-payment-method-warning').click();
     cy.getByDataCy('submit-new-gift-cards').click();
 
     // Success page
