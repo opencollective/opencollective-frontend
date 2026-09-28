@@ -32,7 +32,7 @@ env:
 
 jobs:
   lint:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
 
     timeout-minutes: 15
 
@@ -58,7 +58,7 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
 
   prettier:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
 
     timeout-minutes: 15
 
@@ -82,7 +82,7 @@ jobs:
       - run: npm run prettier:check
 
   depcheck:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ${{ vars.CI_RUNNER_LARGE || vars.CI_RUNNER || 'ubuntu-latest' }}
 
     timeout-minutes: 15
 
@@ -98,7 +98,7 @@ jobs:
       - run: npm run depcheck
 
   ts-unused-exports:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
 
     timeout-minutes: 15
 
@@ -114,7 +114,7 @@ jobs:
       - run: npm run ts-unused-exports
 
   check-langs:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
 
     timeout-minutes: 15
 
@@ -130,7 +130,7 @@ jobs:
       - run: npm run langs:check
 
   build:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
 
     timeout-minutes: 15
 
@@ -174,7 +174,7 @@ jobs:
           retention-days: 1
 
   test:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
 
     timeout-minutes: 15
 
@@ -209,7 +209,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   typescript:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
 
     steps:
