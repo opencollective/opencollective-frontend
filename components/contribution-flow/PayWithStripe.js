@@ -82,6 +82,7 @@ export function PayWithStripeForm({
     <React.Fragment>
       <PaymentElement
         options={{
+          layout: 'tabs',
           paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
           defaultValues: {
             billingDetails: {

@@ -158,7 +158,7 @@ class UpdatePaymentPage extends React.Component {
 
     if (response.setupIntent) {
       const stripe = await getStripe();
-      const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
+      const result = await stripe.confirmCardSetup(response.setupIntent.client_secret);
       if (result.error) {
         this.setState({ submitting: false, error: result.error.message, showCreditCardForm: false });
       }
