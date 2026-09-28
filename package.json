@@ -237,7 +237,7 @@
     "cypress-multi-reporters": "^2.0.5",
     "cypress-real-events": "^1.12.0",
     "cypress-terminal-report": "^7.3.3",
-    "dot-path-value": "^0.0.12",
+    "dot-path-value": "^0.1.0",
     "esbuild": "0.28.2",
     "eslint": "^10.0.0",
     "eslint-config-opencollective": "^7.1.0",
