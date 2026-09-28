@@ -111,6 +111,8 @@ describe('host dashboard', () => {
       cy.contains(`Create vendor: ${vendorName}`).click();
       cy.contains(`I confirm that`).click();
       cy.get('[data-cy="add-funds-submit-btn"]').click();
+      cy.contains('[data-cy="funds-added"]', 'Funds Added ✅');
+      cy.get('[data-cy="add-platform-tip-btn"]').click();
 
       cy.getByDataCy(`collective-${collectiveSlug}`).within(() => {
         cy.getByDataCy('more-actions-btn').click();
