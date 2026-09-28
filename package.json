@@ -162,7 +162,7 @@
     "depcheck": "npx @opencollective/depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production main",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging main",
-    "dev": "node server",
+    "dev": "node --max-old-space-size=8192 server",
     "docs:generate:contribution-flow": "tsx ./scripts/docs/contribution-flow.js",
     "git:clean": "cross-env ./scripts/git_clean.sh",
     "graphql:codegen": "graphql-codegen --config scripts/config/graphql-codegen.ts",
