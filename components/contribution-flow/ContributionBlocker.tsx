@@ -1,5 +1,5 @@
 import React from 'react';
-import type { IntlShape } from 'react-intl';
+import type { IntlShape, MessageDescriptor } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { FEATURES } from '../../lib/allowed-features';
@@ -26,7 +26,7 @@ export const CONTRIBUTION_BLOCKER = {
   NO_CUSTOM_CONTRIBUTION: 'NO_CUSTOM_CONTRIBUTION',
 };
 
-const msg = defineMessages({
+const msg: Record<string, MessageDescriptor> = defineMessages({
   [CONTRIBUTION_BLOCKER.DISABLED]: {
     defaultMessage: 'This account cannot receive financial contributions at this time',
     id: 'ZN02TE',

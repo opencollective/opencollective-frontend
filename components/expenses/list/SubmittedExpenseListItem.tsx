@@ -2,6 +2,7 @@ import React from 'react';
 import { clsx } from 'clsx';
 import { includes, truncate } from 'lodash-es';
 import { Check, Copy, Ellipsis, Link } from 'lucide-react';
+import type { MessageValue } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { ExpensePageExpenseFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
@@ -28,7 +29,19 @@ type SubmittedExpenseListItemProps = {
   onDuplicateClick: (expenseId: number) => void;
 };
 
-const I18nMessages = defineMessages({
+const I18nMessages = defineMessages<{
+  readonly DESCRIPTION_LINE: {
+    readonly account: MessageValue;
+    readonly payoutMethod: MessageValue;
+    readonly submittedAt: MessageValue;
+    readonly submitter: MessageValue;
+  };
+  readonly DESCRIPTION_LINE_NO_PAYOUT_METHOD: {
+    readonly account: MessageValue;
+    readonly submittedAt: MessageValue;
+    readonly submitter: MessageValue;
+  };
+}>({
   DESCRIPTION_LINE: {
     defaultMessage: 'From {submitter} to {account} • {payoutMethod} • {submittedAt}',
     id: 'pqeIM+',
@@ -57,6 +70,50 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
     [props.expense.legacyId, props.onDuplicateClick],
   );
 
+  const descriptionValues = {
+    submittedAt: <DateTime value={props.expense.createdAt} />,
+    payoutMethod: (
+      <PayoutMethodLabel
+        iconSize={14}
+        className="inline-flex min-h-0 max-w-[150px] items-baseline overflow-hidden"
+        showIcon
+        payoutMethod={props.expense.payoutMethod}
+      />
+    ),
+    submitter: (
+      <AccountHoverCard
+        account={props.expense.payee}
+        trigger={
+          <span className="inline-flex" title={props.expense.payee.name}>
+            &nbsp;
+            <LinkCollective noTitle className="inline-flex hover:underline" collective={props.expense.payee}>
+              <Avatar collective={props.expense.payee} radius={16} />
+              &nbsp;
+              {truncate(props.expense.payee.name, { length: 40 })}
+            </LinkCollective>
+            &nbsp;
+          </span>
+        }
+      />
+    ),
+    account: (
+      <AccountHoverCard
+        account={props.expense.account}
+        trigger={
+          <span className="inline-flex">
+            &nbsp;
+            <LinkCollective noTitle className="inline-flex hover:underline" collective={props.expense.account}>
+              <Avatar collective={props.expense.account} radius={16} />
+              &nbsp;
+              {props.expense.account.name}
+            </LinkCollective>
+            &nbsp;
+          </span>
+        }
+      />
+    ),
+  };
+
   return (
     <div
       role="button"
@@ -79,57 +136,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
               {...(props.expense.payoutMethod
                 ? I18nMessages.DESCRIPTION_LINE
                 : I18nMessages.DESCRIPTION_LINE_NO_PAYOUT_METHOD)}
-              values={{
-                submittedAt: <DateTime value={props.expense.createdAt} />,
-                payoutMethod: (
-                  <PayoutMethodLabel
-                    iconSize={14}
-                    className="inline-flex min-h-0 max-w-[150px] items-baseline overflow-hidden"
-                    showIcon
-                    payoutMethod={props.expense.payoutMethod}
-                  />
-                ),
-                submitter: (
-                  <AccountHoverCard
-                    account={props.expense.payee}
-                    trigger={
-                      <span className="inline-flex" title={props.expense.payee.name}>
-                        &nbsp;
-                        <LinkCollective
-                          noTitle
-                          className="inline-flex hover:underline"
-                          collective={props.expense.payee}
-                        >
-                          <Avatar collective={props.expense.payee} radius={16} />
-                          &nbsp;
-                          {truncate(props.expense.payee.name, { length: 40 })}
-                        </LinkCollective>
-                        &nbsp;
-                      </span>
-                    }
-                  />
-                ),
-                account: (
-                  <AccountHoverCard
-                    account={props.expense.account}
-                    trigger={
-                      <span className="inline-flex">
-                        &nbsp;
-                        <LinkCollective
-                          noTitle
-                          className="inline-flex hover:underline"
-                          collective={props.expense.account}
-                        >
-                          <Avatar collective={props.expense.account} radius={16} />
-                          &nbsp;
-                          {props.expense.account.name}
-                        </LinkCollective>
-                        &nbsp;
-                      </span>
-                    }
-                  />
-                ),
-              }}
+              values={descriptionValues}
             />
           </span>
         </div>

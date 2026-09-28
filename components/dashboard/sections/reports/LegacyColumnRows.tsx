@@ -1,5 +1,6 @@
 import React from 'react';
 import { CornerDownRight } from 'lucide-react';
+import type { MessageValue } from 'react-intl';
 import { defineMessage, useIntl } from 'react-intl';
 
 import { TransactionKind } from '../../../../lib/graphql/types/v2/graphql';
@@ -9,7 +10,7 @@ import { InfoTooltipIcon } from '../../../InfoTooltipIcon';
 
 import { TransactionReportRowLabel } from './TransactionRowLabel';
 
-const legacyColumnHelpMessage = defineMessage({
+const legacyColumnHelpMessage = defineMessage<{ readonly date: MessageValue; readonly kind: string }>({
   defaultMessage:
     'This amount is included in the originating transactions above. As of {date} {kind, select, HOST_FEE_SHARE {Platform fees} PAYMENT_PROCESSOR_FEE {Payment processor fees} HOST_FEE {Host fees} TAX {Taxes} other {these}} are split into their own transaction kind.',
   id: 'YDaVYt',

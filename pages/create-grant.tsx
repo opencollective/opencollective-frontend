@@ -2,6 +2,7 @@ import React from 'react';
 import { type ApolloClient, gql } from '@apollo/client';
 import type { NextPageContext } from 'next';
 import { useRouter } from 'next/router';
+import type { MessageValue } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '@/lib/apollo-client';
@@ -30,7 +31,7 @@ import Custom404 from './404';
 
 const NAVBAR_CALLS_TO_ACTION = { hasSubmitExpense: false, hasRequestGrant: false };
 
-const CreateGrantPageI18n = defineMessages({
+const CreateGrantPageI18n = defineMessages<{ readonly TITLE: { readonly account: MessageValue } }>({
   TITLE: {
     defaultMessage: 'Grant application to {account}',
     id: 'miGVdq',

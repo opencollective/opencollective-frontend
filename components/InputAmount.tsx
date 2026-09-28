@@ -200,12 +200,10 @@ const InputAmount = ({
   const [isEditing, setEditing] = React.useState(false);
   const intl = useIntl();
 
+  const minMaxValidityValues = { min: (min / 100).toFixed(precision), max: (max / 100).toFixed(precision) };
   const minMaxValidityMsg = intl.formatMessage(
     max !== MAX_VALIDATION_LIMIT ? RICH_ERROR_MESSAGES.notInRange : RICH_ERROR_MESSAGES.min,
-    {
-      min: (min / 100).toFixed(precision),
-      max: (max / 100).toFixed(precision),
-    },
+    minMaxValidityValues,
   );
 
   const dispatchValue = (e, parsedValue) => {

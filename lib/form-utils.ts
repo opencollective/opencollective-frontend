@@ -1,10 +1,25 @@
 import { get, set } from 'lodash-es';
+import type { MessageValue, NoMessageValues } from 'react-intl';
 import { defineMessages } from 'react-intl';
 import { isEmail, isURL } from 'validator';
 
 import { createError, ERROR, formatErrorMessage } from './errors';
 
-export const RICH_ERROR_MESSAGES = defineMessages({
+export const RICH_ERROR_MESSAGES = defineMessages<{
+  readonly minLength: { readonly count: MessageValue };
+  readonly minLengthExact: { readonly count: MessageValue };
+  readonly maxLength: { readonly count: MessageValue };
+  readonly min: { readonly min: MessageValue };
+  readonly minExact: { readonly min: MessageValue };
+  readonly max: { readonly max: MessageValue };
+  readonly notInRange: { readonly max: MessageValue; readonly min: MessageValue };
+  readonly format: NoMessageValues;
+  readonly invalidEmail: NoMessageValues;
+  readonly invalidUrl: NoMessageValues;
+  readonly enum: { readonly options: MessageValue };
+  readonly invalidValue: NoMessageValues;
+  readonly requiredValue: NoMessageValues;
+}>({
   minLength: {
     id: 'FormError.minLengthRich',
     defaultMessage: 'Please use more than {count} characters',

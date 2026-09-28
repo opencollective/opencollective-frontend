@@ -1,6 +1,7 @@
 import React from 'react';
 import { isEmpty, orderBy, partition, round, toNumber } from 'lodash-es';
 import type { GetServerSideProps } from 'next';
+import type { MessageValue } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
@@ -200,7 +201,7 @@ const contributionPageQueryHelper = getSSRQueryHelpers<{ legacyId: number; colle
 // ts-unused-exports:disable-next-line
 export const getServerSideProps: GetServerSideProps = contributionPageQueryHelper.getServerSideProps;
 
-const messages = defineMessages({
+const messages = defineMessages<{ readonly title: { readonly id: MessageValue; readonly title: MessageValue } }>({
   title: {
     id: 'OrderPage.title',
     defaultMessage: '{title} · Contribution #{id}',

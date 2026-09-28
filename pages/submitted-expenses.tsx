@@ -1,6 +1,7 @@
 import React from 'react';
 import { has, isNil, omitBy } from 'lodash-es';
 import type { InferGetServerSidePropsType } from 'next';
+import type { MessageValue } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
@@ -22,7 +23,7 @@ import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import { EXPENSE_DIRECTION } from '@/components/expenses/filters/DirectionFilter';
 
-const messages = defineMessages({
+const messages = defineMessages<{ readonly title: { readonly collectiveName: MessageValue } }>({
   title: {
     id: 'ExpensesPage.title',
     defaultMessage: '{collectiveName} · Expenses',

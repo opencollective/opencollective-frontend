@@ -34,7 +34,8 @@ export function buildOrderByFilter<T extends [OrderFilterKey, ...OrderFilterKey[
       labelMsg: defineMessage({ id: 'OrderBy', defaultMessage: 'Order by' }),
       static: true,
       StandaloneComponent: buildOrderByFilterComponent(schema, i18nLabels),
-      valueRenderer: ({ value, intl }) => intl.formatMessage(i18nLabels[value]),
+      // The generic indexed access is deferred, which the react-intl 12 overloads cannot resolve: widen to a plain descriptor
+      valueRenderer: ({ value, intl }) => intl.formatMessage(i18nLabels[value] as MessageDescriptor),
     },
   };
 }

@@ -65,7 +65,7 @@ export const getCustomZodErrorMap =
       if (error.exact) {
         message =
           error.type === 'number'
-            ? intl.formatMessage(RICH_ERROR_MESSAGES.minExact, { count: error.minimum as number })
+            ? intl.formatMessage(RICH_ERROR_MESSAGES.minExact, { min: error.minimum as number })
             : intl.formatMessage(RICH_ERROR_MESSAGES.minLengthExact, { count: error.minimum as number });
       } else {
         message =
