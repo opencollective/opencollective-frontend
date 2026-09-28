@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useInView } from 'framer-motion';
+import { useInView } from 'motion/react';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '@/lib/utils';
