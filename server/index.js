@@ -1,5 +1,7 @@
 require('../env');
 
+const { EventEmitter } = require('node:events');
+const http = require('node:http');
 const next = require('next');
 const express = require('express');
 const helmet = require('helmet');
@@ -18,6 +20,7 @@ const { serviceLimiterMiddleware, increaseServiceLevel } = require('./service-li
 const { parseToBooleanDefaultFalse } = require('./utils');
 
 const app = express();
+const server = http.createServer(app);
 
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
 
@@ -25,7 +28,11 @@ const dev = process.env.NODE_ENV === 'development';
 const port = process.env.PORT;
 const hostname = process.env.HOSTNAME;
 // Next.js 16 defaults to Turbopack; keep webpack for our custom next.config.js plugins.
-const nextApp = next({ dev, hostname, port, webpack: true });
+// Next.js gets its own channel for WebSocket upgrades (e.g. hot reload), so it
+// never closes the Hyperwatch stream (workaround for Next.js 16.3)
+const nextUpgrades = new EventEmitter();
+const forwardUpgradeToNext = (req, socket, head) => nextUpgrades.emit('upgrade', req, socket, head);
+const nextApp = next({ dev, hostname, port, webpack: true, httpServer: nextUpgrades });
 const nextRequestHandler = nextApp.getRequestHandler();
 
 const workers = process.env.WEB_CONCURRENCY || 1;
@@ -46,7 +53,10 @@ const start = id =>
     // but we should ensure this goes to the default Next.js handler
     app.get('/__nextjs_original-stack-frame', nextApp.getRequestHandler());
 
-    await hyperwatch(app);
+    const hyperwatchMounted = await hyperwatch(app, { server, fallback: forwardUpgradeToNext });
+    if (!hyperwatchMounted) {
+      server.on('upgrade', forwardUpgradeToNext);
+    }
 
     await rateLimiter(app);
 
@@ -90,10 +100,7 @@ const start = id =>
 
     app.use(loggerMiddleware.errorLogger);
 
-    app.listen(port, err => {
-      if (err) {
-        throw err;
-      }
+    server.listen(port, () => {
       logger.info(`Ready on http://localhost:${port}, Worker #${id}`);
 
       // Wait 30 seconds before reaching service level 50 or desiredServiceLevel
