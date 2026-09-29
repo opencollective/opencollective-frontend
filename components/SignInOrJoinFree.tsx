@@ -82,8 +82,7 @@ type SignupMutationProps = {
 
 /** Full internal props: own props + all HOC-injected props */
 type InternalProps = SignInOrJoinFreeProps &
-  Pick<UserContextValue, 'login'> &
-  { intl: IntlShape } & { router: NextRouter } & SignupMutationProps;
+  Pick<UserContextValue, 'login'> & { intl: IntlShape } & { router: NextRouter } & SignupMutationProps;
 
 type SignInOrJoinFreeState = {
   form: SignInOrJoinFreeForm;
