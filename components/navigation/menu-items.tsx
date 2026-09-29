@@ -20,8 +20,8 @@ export const newMarketingTopbarItems: MenuGroupItem[] = [
       { label: defineMessage({ defaultMessage: 'Explore', id: 'Explore' }), href: '/search' },
       {
         label: defineMessage({
-          defaultMessage: 'About',
-          id: 'collective.about.title',
+          defaultMessage: 'About Us',
+          id: 'ZjDH42',
         }),
         href: '/about',
       },
@@ -132,7 +132,7 @@ export const legacyTopBarItems: MenuGroupItem[] = [
         href: 'https://blog.opencollective.com/',
       },
       {
-        label: defineMessage({ id: 'collective.about.title', defaultMessage: 'About' }),
+        label: defineMessage({ id: 'ZjDH42', defaultMessage: 'About Us' }),
         href: '/about',
       },
     ],
@@ -211,7 +211,7 @@ export const legacyFooterItems: MenuGroupItem[] = [
     label: defineMessage({ id: 'Tags.ORGANIZATION', defaultMessage: 'Organization' }),
     items: [
       {
-        label: defineMessage({ id: 'collective.about.title', defaultMessage: 'About' }),
+        label: defineMessage({ id: 'ZjDH42', defaultMessage: 'About Us' }),
         href: '/about',
       },
       {
