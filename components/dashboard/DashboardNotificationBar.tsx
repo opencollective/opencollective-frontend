@@ -2,6 +2,7 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import { ArrowRight } from 'lucide-react';
+import type { MessageValue, NoMessageValues } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { hasPlatformSubscription, isCollectiveAccount, type WorkspaceAccount } from '@/lib/account';
@@ -13,7 +14,12 @@ import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
 import Link from '@/components/Link';
 import NotificationBar from '@/components/NotificationBar';
 
-const messages = defineMessages({
+const messages = defineMessages<{
+  readonly collectiveIsArchived: { readonly name: MessageValue };
+  readonly collectiveIsArchivedDescription: { readonly type: MessageValue };
+  readonly userIsArchived: NoMessageValues;
+  readonly userIsArchivedDescription: NoMessageValues;
+}>({
   collectiveIsArchived: {
     id: 'collective.isArchived',
     defaultMessage: '{name} has been archived.',
@@ -93,7 +99,7 @@ const getNotification = (
     } else {
       return {
         type: 'warning',
-        title: intl.formatMessage(messages.collectiveIsArchived, { name: account.name }),
+        title: intl.formatMessage(messages.collectiveIsArchived, { name: account.name ?? '' }),
         description: intl.formatMessage(messages.collectiveIsArchivedDescription, {
           type: account.type.toLowerCase(),
         }),

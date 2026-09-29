@@ -51,7 +51,7 @@ type SignInOrJoinFreeProps = {
   email?: string | null;
   form?: SignInOrJoinFreeForm;
   defaultForm?: SignInOrJoinFreeForm;
-  routes?: { signin: string; join: string };
+  routes?: { signin?: string; join?: string };
   signInLabel?: React.ReactNode;
   hideFooter?: boolean;
   isOAuth?: boolean;
