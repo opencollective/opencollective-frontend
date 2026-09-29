@@ -139,7 +139,7 @@ const getNotification = (
               />
             </span>
             <Link
-              href={getDashboardRoute(account, `/host?hostApplicationId=${hostApplication.id}`)}
+              href={getDashboardRoute(account, `host?hostApplicationId=${hostApplication.id}`)}
               className="ml-1 inline-flex items-center underline hover:no-underline"
             >
               <FormattedMessage

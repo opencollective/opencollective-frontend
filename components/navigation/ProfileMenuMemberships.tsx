@@ -76,11 +76,17 @@ interface WorkspaceLineProps {
   workspace: WorkspaceAccount;
 }
 
+/** Private accounts stay visible to anyone who can open a dashboard section for them. */
+const ROLES_THAT_SEE_PRIVATE = [MemberRole.ADMIN, MemberRole.ACCOUNTANT, MemberRole.COMMUNITY_MANAGER];
+
+const canSeePrivateWorkspace = (user: LoggedInUser | undefined, workspace: { isPrivate?: boolean; slug?: string }) =>
+  !workspace.isPrivate || !user || user.hasRole(ROLES_THAT_SEE_PRIVATE, workspace);
+
 const WorkspaceLine = ({ user, workspace, closeDrawer }: WorkspaceLineProps) => {
   const canSeeDashboard = user.canSeeDashboard(workspace);
 
   // Not supposed to happen since already filtered in `filterActiveWorkspaces`
-  if (!canSeeDashboard && workspace.isPrivate) {
+  if (!canSeePrivateWorkspace(user, workspace)) {
     return null;
   }
 
@@ -141,7 +147,7 @@ const filterActiveWorkspaces = (workspaces: WorkspaceAccount[], user?: LoggedInU
     if (TYPES_NOT_LISTED.includes(w.type)) {
       return false;
     }
-    if (w.isPrivate && user && !user.hasRole([MemberRole.ADMIN, MemberRole.ACCOUNTANT], w)) {
+    if (!canSeePrivateWorkspace(user, w)) {
       return false;
     }
     return true;
