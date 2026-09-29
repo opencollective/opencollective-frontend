@@ -273,7 +273,8 @@ export function buildComboSelectFilter<
           {...props}
         />
       ),
-      valueRenderer: ({ value, intl }) => intl.formatMessage(i18nLabels[value]),
+      // The generic indexed access is deferred, which the react-intl 12 overloads cannot resolve: widen to a plain descriptor
+      valueRenderer: ({ value, intl }) => intl.formatMessage(i18nLabels[value] as MessageDescriptor),
     },
   };
 }

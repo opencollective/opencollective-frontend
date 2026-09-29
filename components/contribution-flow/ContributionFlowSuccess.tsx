@@ -5,7 +5,7 @@ import type { PaymentIntentResult } from '@stripe/stripe-js';
 import { get, uniqBy } from 'lodash-es';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
-import type { IntlShape } from 'react-intl';
+import type { IntlShape, MessageValue } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -70,7 +70,10 @@ const ShareLink = styled(StyledLink).attrs({
   }
 `;
 
-const successMsgs = defineMessages({
+const successMsgs = defineMessages<{
+  readonly default: { readonly collective: MessageValue };
+  readonly event: { readonly event: MessageValue };
+}>({
   default: {
     id: 'order.created.tweet',
     defaultMessage: "I've just contributed to {collective}. Consider supporting them too — every little helps!",

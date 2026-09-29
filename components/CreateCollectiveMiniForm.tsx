@@ -2,6 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { assign, cloneDeep, get, pick } from 'lodash-es';
+import type { MessageValue, NoMessageValues } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -67,7 +68,22 @@ const SaveButtonMessage = defineMessages({
   },
 });
 
-const msg = defineMessages({
+const msg = defineMessages<{
+  readonly emailTitle: NoMessageValues;
+  readonly adminEmail: NoMessageValues;
+  readonly adminName: NoMessageValues;
+  readonly legalName: NoMessageValues;
+  readonly displayName: NoMessageValues;
+  readonly website: NoMessageValues;
+  readonly contactName: NoMessageValues;
+  readonly contactEmail: NoMessageValues;
+  readonly cancel: NoMessageValues;
+  readonly save: NoMessageValues;
+  readonly invalidEmail: NoMessageValues;
+  readonly invalidWebsite: NoMessageValues;
+  readonly invalidName: NoMessageValues;
+  readonly examples: { readonly examples: MessageValue };
+}>({
   emailTitle: {
     id: 'User.EmailAddress',
     defaultMessage: 'Email address',

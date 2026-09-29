@@ -1,4 +1,4 @@
-import type { IntlShape } from 'react-intl';
+import type { IntlShape, MessageTag, MessageValue } from 'react-intl';
 import { defineMessage, defineMessages } from 'react-intl';
 
 import { formatCurrency, type Options as FormatCurrencyOptions } from '../currency-utils';
@@ -36,7 +36,13 @@ function getSpendingLimitIntervalShortString(intl: IntlShape, spendingLimitInter
   return intl.formatMessage(VirtualCardSpendingLimitShortI18n[spendingLimitInterval]);
 }
 
-const SpendingLimitShortI18n = defineMessage({
+const SpendingLimitShortI18n = defineMessage<{
+  readonly LimitAmount: MessageTag;
+  readonly LimitInterval: MessageTag;
+  readonly spendingLimitAmount: MessageValue;
+  readonly spendingLimitInterval: string;
+  readonly spendingLimitIntervalShort: MessageValue;
+}>({
   id: 'VirtualCard.SpendingLimit.Short',
   defaultMessage: `{ spendingLimitInterval, select, ALL_TIME {<LimitAmount>{ spendingLimitAmount }</LimitAmount>} PER_AUTHORIZATION {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval> per use</LimitInterval>} other {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>} }`,
 });
@@ -57,7 +63,16 @@ export function getSpendingLimitShortString(
   });
 }
 
-const AvailableLimitShortI18n = defineMessage({
+const AvailableLimitShortI18n = defineMessage<{
+  readonly AmountSeparator: MessageTag;
+  readonly AvailableAmount: MessageTag;
+  readonly LimitAmount: MessageTag;
+  readonly LimitInterval: MessageTag;
+  readonly availableLimitAmount: MessageValue;
+  readonly spendingLimitAmount: MessageValue;
+  readonly spendingLimitInterval: string;
+  readonly spendingLimitIntervalShort: MessageValue;
+}>({
   id: 'VirtualCard.AvailableLimit.Short',
   defaultMessage: `{ spendingLimitInterval, select, ALL_TIME {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount>} PER_AUTHORIZATION {<AvailableAmount>{ spendingLimitAmount }</AvailableAmount><LimitInterval> per use</LimitInterval>} other {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>} }`,
 });
@@ -83,7 +98,16 @@ export function getAvailableLimitShortString(
   });
 }
 
-const AvailableLimitI18n = defineMessage({
+const AvailableLimitI18n = defineMessage<{
+  readonly AmountSeparator: MessageTag;
+  readonly AvailableAmount: MessageTag;
+  readonly LimitAmount: MessageTag;
+  readonly LimitInterval: MessageTag;
+  readonly availableLimitAmount: MessageValue;
+  readonly spendingLimitAmount: MessageValue;
+  readonly spendingLimitInterval: string;
+  readonly spendingLimitIntervalShort: MessageValue;
+}>({
   id: 'VirtualCard.AvailableLimit',
   defaultMessage: `{ spendingLimitInterval, select, ALL_TIME {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount>} PER_AUTHORIZATION {Limited to <AvailableAmount>{ spendingLimitAmount }</AvailableAmount><LimitInterval> per use</LimitInterval>} other {Avl. <AvailableAmount>{ availableLimitAmount }</AvailableAmount> <AmountSeparator>of</AmountSeparator> <LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>} }`,
 });

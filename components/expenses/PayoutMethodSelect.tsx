@@ -3,7 +3,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
 import { get, groupBy, isEmpty, truncate } from 'lodash-es';
 import memoizeOne from 'memoize-one';
-import type { IntlShape } from 'react-intl';
+import type { IntlShape, MessageValue, NoMessageValues } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { AccountTypesWithHost } from '../../lib/constants/collectives';
@@ -23,7 +23,12 @@ import { Span } from '../Text';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
-const newPayoutMethodMsg = defineMessages({
+const newPayoutMethodMsg = defineMessages<{
+  readonly [PayoutMethodType.PAYPAL]: NoMessageValues;
+  readonly [PayoutMethodType.BANK_ACCOUNT]: NoMessageValues;
+  readonly [PayoutMethodType.OTHER]: NoMessageValues;
+  readonly _default: { readonly pmType: MessageValue };
+}>({
   [PayoutMethodType.PAYPAL]: {
     id: 'PayoutMethod.New.PayPal',
     defaultMessage: 'New PayPal account',
@@ -143,7 +148,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
           {newPayoutMethodMsg[payoutMethod.type]
             ? this.props.intl.formatMessage(newPayoutMethodMsg[payoutMethod.type])
             : payoutMethod.type
-              ? this.props.intl.formatMessage(newPayoutMethodMsg._default, { type: payoutMethod.type })
+              ? this.props.intl.formatMessage(newPayoutMethodMsg._default, { pmType: payoutMethod.type })
               : this.props.intl.formatMessage({ defaultMessage: 'New payout method', id: 'vJEJ0J' })}
         </React.Fragment>
       );

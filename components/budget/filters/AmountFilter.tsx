@@ -1,5 +1,5 @@
 import React from 'react';
-import type { IntlShape } from 'react-intl';
+import type { IntlShape, MessageValue, NoMessageValues } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
@@ -7,7 +7,11 @@ import type { Currency } from '../../../lib/graphql/types/v2/graphql';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 
-const OPTION_LABELS = defineMessages({
+const OPTION_LABELS = defineMessages<{
+  readonly ALL: NoMessageValues;
+  readonly rangeFrom: { readonly minAmount: MessageValue };
+  readonly rangeFromTo: { readonly maxAmount: MessageValue; readonly minAmount: MessageValue };
+}>({
   ALL: {
     id: 'Amount.AllShort',
     defaultMessage: 'All',

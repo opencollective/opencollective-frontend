@@ -1,13 +1,23 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
 import Image from 'next/image';
+import type { MessageTag, NoMessageValues } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
 import Link from '../Link';
 import { Button } from '../ui/Button';
 
-const messages = defineMessages({
+const messages = defineMessages<{
+  readonly title: { readonly OficoLink: MessageTag };
+  readonly description: NoMessageValues;
+  readonly learnMore: NoMessageValues;
+  readonly 'fiscalHosting.hosts.OSC': NoMessageValues;
+  readonly 'fiscalHosting.hosts.OCE': NoMessageValues;
+  readonly 'fiscalHosting.hosts.giftcollective': NoMessageValues;
+  readonly 'fiscalHosting.hosts.socialchangenestcollective': NoMessageValues;
+  readonly 'fiscalHosting.hosts.raft': NoMessageValues;
+}>({
   title: {
     defaultMessage: 'Stewarded by <OficoLink></OficoLink>',
     id: 'OficoMembers.title',
