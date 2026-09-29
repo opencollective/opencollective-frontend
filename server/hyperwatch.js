@@ -1,6 +1,5 @@
 const hyperwatch = require('@hyperwatch/hyperwatch');
 const expressBasicAuth = require('express-basic-auth');
-const expressWs = require('express-ws');
 
 const logger = require('./logger');
 const redisProvider = require('./redis-provider');
@@ -14,9 +13,9 @@ const {
   REDIS_URL: redisServerUrl,
 } = process.env;
 
-const load = async app => {
+const load = async (app, { server, fallback }) => {
   if (parseToBooleanDefaultFalse(enabled) !== true) {
-    return;
+    return false;
   }
 
   const { input, lib, modules, pipeline, cache } = hyperwatch;
@@ -48,14 +47,15 @@ const load = async app => {
   // Mount Hyperwatch API and Websocket
 
   if (secret) {
-    // We need to setup express-ws here to make Hyperwatch's websocket works
-    expressWs(app);
-    const hyperwatchBasicAuth = expressBasicAuth({
-      users: { [username || 'opencollective']: secret },
-      challenge: true,
+    hyperwatch.app.mount(app, {
+      server,
+      path: path || '/_hyperwatch',
+      middleware: expressBasicAuth({
+        users: { [username || 'opencollective']: secret },
+        challenge: true,
+      }),
+      fallback,
     });
-    app.use(path || '/_hyperwatch', hyperwatchBasicAuth, hyperwatch.app.api);
-    app.use(path || '/_hyperwatch', hyperwatchBasicAuth, hyperwatch.app.websocket);
   }
 
   // Configure input
@@ -108,6 +108,8 @@ const load = async app => {
   modules.start();
 
   pipeline.start();
+
+  return Boolean(secret);
 };
 
 module.exports = load;
