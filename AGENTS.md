@@ -13,4 +13,6 @@ Tailwind+ShadCN (primary), Styled Components/Styled System (legacy; do not add n
 
 ## Quality
 
-From this repo: `npm run type:check`, `npm run lint:quiet`, `npm run prettier:check` (fix: `prettier:write`). Tests: Jest (`npm run test`); E2E Cypress. Schema/codegen: `npm run graphql:update` (API must be running).
+From this repo: `npm run type:check`, `npm run lint:quiet`, `npm run prettier:check` (fix: `prettier:write`), npm run `ts-unused-exports`.
+Tests: Jest (`npm run test`); E2E Cypress.
+Schema/codegen: `npm run graphql:update` (API must be running).
