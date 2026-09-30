@@ -184,21 +184,6 @@ interface CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` as key for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
 
   """
@@ -669,7 +654,7 @@ enum SocialLinkType {
 }
 
 """
-A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+A field whose value is an HTTP or HTTPS URL as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
 """
 scalar URL
 
@@ -718,29 +703,6 @@ type PaymentMethodType {
     hasActiveSubscription: Boolean
   ): [OrderType]
   currency: String
-}
-
-"""
-Provides rich information about a payment methods batch
-"""
-type PaymentMethodBatchInfo {
-  id: String!
-  count: Int!
-
-  """
-  The batch name, or null for unbatched payment methods
-  """
-  name: String
-}
-
-"""
-A list of PaymentMethod with pagination info
-"""
-type PaginatedPaymentMethod {
-  paymentMethods: [PaymentMethodType]
-  total: Int
-  limit: Int
-  offset: Int
 }
 
 """
@@ -828,7 +790,6 @@ type CollectiveFeatures {
   ALIPAY: CollectiveFeatureStatus
   STRIPE_PAYMENT_INTENT: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
-  EMIT_GIFT_CARDS: CollectiveFeatureStatus
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
@@ -2031,25 +1992,6 @@ type Collective implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
-
-  """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccountType]
@@ -2299,25 +2241,6 @@ type Event implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -2571,25 +2494,6 @@ type Fund implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
-
-  """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccountType]
@@ -2839,25 +2743,6 @@ type Organization implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -3111,25 +2996,6 @@ type Platform implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
-
-  """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccountType]
@@ -3379,25 +3245,6 @@ type Project implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -3950,25 +3797,6 @@ type User implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
-
-  """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccountType]
@@ -4222,25 +4050,6 @@ type Vendor implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
-
-  """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccountType]
@@ -4338,7 +4147,7 @@ type Query {
     limit: Int
     offset: Int
   ): [Member] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
-  PaymentMethod(id: Int, code: String): PaymentMethodType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
+  PaymentMethod(id: Int): PaymentMethodType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 
   """
   Search for collectives. Results are returned with best matches first.
@@ -4525,63 +4334,6 @@ type Mutation {
     token: String!
     data: StripeCreditCardDataInputType!
   ): PaymentMethodType
-  createGiftCards(
-    CollectiveId: Int!
-    PaymentMethodId: Int
-
-    """
-    A list of emails to generate gift cards for (only if numberOfGiftCards is not provided)
-    """
-    emails: [String]
-
-    """
-    Number of gift cards to generate (only if emails is not provided)
-    """
-    numberOfGiftCards: Int
-
-    """
-    An optional currency. If not provided, will use the collective currency.
-    """
-    currency: String
-
-    """
-    The amount as an Integer with cents.
-    """
-    amount: Int
-
-    """
-    Batch name for the created gift cards.
-    """
-    batch: String
-    monthlyLimitPerMember: Int
-
-    """
-    Limit this payment method to make donations to collectives having those tags
-    """
-    limitedToTags: [String]
-
-    """
-    Limit this payment method to make donations to the collectives hosted by those hosts
-    """
-    limitedToHostCollectiveIds: [Int]
-
-    """
-    Set `limitedToHostCollectiveIds` to open-source collectives only
-    """
-    limitedToOpenSourceCollectives: Boolean
-
-    """
-    A custom message attached to the email that will be sent for this gift card
-    """
-    description: String
-
-    """
-    A custom message that will be sent in the invitation email
-    """
-    customMessage: String
-    expiryDate: String
-  ): [PaymentMethodType]
-  claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType!
 
   """
   Edits (by replacing) the admin-level webhooks for a collective.

@@ -237,9 +237,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
       <div className="w-full">
-        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
-          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
-        )}
+        {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <DashboardErrorBoundary>
           <AccountSettings account={account} section={section} />
@@ -251,9 +249,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
       <div className="mx-auto w-full max-w-(--breakpoint-md)">
-        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
-          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
-        )}
+        {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
         <DashboardErrorBoundary>
           <AccountSettings account={account} section={section} />
         </DashboardErrorBoundary>

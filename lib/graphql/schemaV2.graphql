@@ -40,7 +40,7 @@ enum ApplicationType {
 }
 
 """
-A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+A field whose value is an HTTP or HTTPS URL as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
 """
 scalar URL
 
@@ -7493,7 +7493,6 @@ type CollectiveFeatures {
   ALIPAY: CollectiveFeatureStatus
   STRIPE_PAYMENT_INTENT: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
-  EMIT_GIFT_CARDS: CollectiveFeatureStatus
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
@@ -9977,7 +9976,7 @@ type ExpensePermissions {
   """
   Whether the current user can edit the expense
   """
-  canEdit: Boolean!
+  canEdit: Boolean! @deprecated(reason: "2026-09-15: Use the granular permissions instead.")
 
   """
   Whether the current user can edit the expense title

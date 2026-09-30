@@ -1,23 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { get } from 'lodash-es';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
-import Container from '../Container';
-import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { ALL_SECTIONS } from '../dashboard/constants';
 import ActivityLog from '../dashboard/sections/ActivityLog';
 import AuthorizedApps from '../dashboard/sections/AuthorizedApps';
 import ForDevelopers from '../dashboard/sections/ForDevelopers';
-import { Flex } from '../Grid';
-import Link from '../Link';
-import StyledLink from '../StyledLink';
-import { Button } from '../ui/Button';
 
 // Actions
 import Archive from './actions/Archive';
@@ -30,7 +21,6 @@ import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
 import FiscalHost from './sections/FiscalHost';
 import FiscalHosting from './sections/FiscalHosting';
-import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
 import Info from './sections/Info';
@@ -93,47 +83,6 @@ class EditCollectiveForm extends React.Component {
 
       case ALL_SECTIONS.TICKETS:
         return <Tickets collective={collective} />;
-
-      case ALL_SECTIONS.GIFT_CARDS:
-        return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
-
-      case 'gift-cards-create':
-      case 'gift-cards-send':
-        return (
-          <Flex mt={3} flexDirection="column">
-            <Container
-              mb={4}
-              pb={4}
-              borderBottom="1px solid #E8E9EB"
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              flexWrap="wrap"
-            >
-              <Link href={`/dashboard/${collective.slug}/gift-cards`} data-cy="back-to-giftcards-list">
-                <Button variant="outline">
-                  <ArrowBack size="1em" />{' '}
-                  <FormattedMessage id="giftCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
-                </Button>
-              </Link>
-
-              <StyledLink
-                href="https://documentation.opencollective.com/giving-to-collectives/giving-as-a-company/gift-cards#faq"
-                openInNewTab
-              >
-                <InfoCircle size="1em" />
-                &nbsp;
-                <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
-              </StyledLink>
-            </Container>
-            <CreateGiftCardsForm
-              collectiveId={collective.id}
-              collectiveSlug={collective.slug}
-              collectiveSettings={collective.settings}
-              currency={collective.currency}
-            />
-          </Flex>
-        );
 
       case ALL_SECTIONS.WEBHOOKS:
         return <Webhooks collectiveSlug={collective.slug} />;
