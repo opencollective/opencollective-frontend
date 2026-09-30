@@ -23,7 +23,6 @@ import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
 import { AccountTrustBadge } from './AccountTrustBadge';
 import Avatar from './Avatar';
-import FollowButton from './FollowButton';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Link from './Link';
 import Spinner from './Spinner';
@@ -100,7 +99,6 @@ type AccountHoverCardProps = {
   };
   infoItems?: InfoItemProps[];
   hoverCardContentProps?: React.ComponentProps<typeof Content>;
-  displayFollowButton?: boolean;
 };
 
 const userContextualMembershipsQuery = gql`
@@ -299,7 +297,6 @@ export const AccountHoverCard = ({
   account,
   includeAdminMembership: { accountSlug, hostSlug } = {},
   hoverCardContentProps,
-  displayFollowButton,
 }: AccountHoverCardProps) => {
   const [open, setOpen] = React.useState(false);
   const context = React.useContext(DashboardContext);
@@ -373,8 +370,6 @@ export const AccountHoverCard = ({
               ) : (
                 <Avatar collective={account} radius={64} />
               )}
-
-              {displayFollowButton && <FollowButton account={account} isHoverCard />}
             </div>
 
             <div className="overflow-hidden">
