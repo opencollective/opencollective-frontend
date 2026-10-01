@@ -42,6 +42,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import DateTime from '../../../DateTime';
+import { Button } from '../../../ui/Button';
 import { ALL_SECTIONS } from '../../constants';
 import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
@@ -148,31 +149,35 @@ export function TaxableCountry({ accountType, taxableCountry, isUSEntity, isLoad
       <FormattedMessage defaultMessage="Country of incorporation" id="TaxableCountry.incorporation" />
     );
 
+  const usPersonStatus =
+    isUSEntity !== null && isUSEntity !== undefined ? (
+      <span className="text-muted-foreground">
+        {' · '}
+        <FormattedMessage
+          defaultMessage="US person: {value}"
+          id="TaxableCountry.USPersonStatus"
+          values={{
+            value: isUSEntity ? (
+              <FormattedMessage defaultMessage="Yes" id="a5msuh" />
+            ) : (
+              <FormattedMessage defaultMessage="No" id="oUWADl" />
+            ),
+          }}
+        />
+      </span>
+    ) : null;
+
   const value = isLoading ? (
     <Skeleton className="h-4 w-1/2" />
   ) : taxableCountry ? (
     <span>
       {getFlagEmoji(taxableCountry)} {getCountryDisplayName(intl, taxableCountry)}
+      {usPersonStatus}
     </span>
   ) : (
     <span className="text-muted-foreground">
       <FormattedMessage defaultMessage="Not provided yet" id="TaxableCountry.notProvidedYet" />
-      {isUSEntity !== null && isUSEntity !== undefined && (
-        <span>
-          {' · '}
-          <FormattedMessage
-            defaultMessage="US person: {value}"
-            id="TaxableCountry.USPersonStatus"
-            values={{
-              value: isUSEntity ? (
-                <FormattedMessage defaultMessage="Yes" id="a5msuh" />
-              ) : (
-                <FormattedMessage defaultMessage="No" id="oUWADl" />
-              ),
-            }}
-          />
-        </span>
-      )}
+      {usPersonStatus}
     </span>
   );
 
@@ -184,7 +189,18 @@ export function TaxableCountry({ accountType, taxableCountry, isUSEntity, isLoad
           {value}
           <Tooltip delayDuration={100}>
             <TooltipTrigger asChild>
-              <HelpCircle size={14} className="shrink-0 cursor-help text-muted-foreground" />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={intl.formatMessage({
+                  defaultMessage: 'How is this determined?',
+                  id: 'TaxableCountry.tooltipTrigger',
+                })}
+                className="h-5 w-5 shrink-0 cursor-help text-muted-foreground hover:bg-transparent hover:text-muted-foreground"
+              >
+                <HelpCircle size={14} />
+              </Button>
             </TooltipTrigger>
             <TooltipContent className="z-[9999] max-w-xs text-left">
               <FormattedMessage
