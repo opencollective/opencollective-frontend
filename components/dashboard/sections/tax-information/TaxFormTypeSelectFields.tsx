@@ -1,5 +1,6 @@
 import React from 'react';
 import { pick } from 'lodash-es';
+import { FormattedMessage } from 'react-intl';
 
 import MessageBox from '../../../MessageBox';
 import { ButtonSet } from '../../../ui/ButtonSet';
@@ -65,8 +66,10 @@ export const TaxFormTypeSelectFields = ({
         />
         {usPersonLocked && (
           <MessageBox type="info" className="mt-3">
-            Your US person or entity status is already on file and cannot be changed here. If your situation has changed,
-            please contact your fiscal host to resubmit a tax form.
+            <FormattedMessage
+              defaultMessage="Your US person or entity status is already on file and cannot be changed here. If your situation has changed, please contact your fiscal host to resubmit a tax form."
+              id="taxForm.usPersonLocked.hint"
+            />
           </MessageBox>
         )}
       </div>
