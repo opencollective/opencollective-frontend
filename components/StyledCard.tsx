@@ -23,7 +23,7 @@ import {
   typography,
 } from 'styled-system';
 
-import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
+import { shouldForwardPropExcept } from '@/lib/styled_components_utils';
 
 type StyledCardProps = BackgroundProps &
   BorderProps &
@@ -35,16 +35,10 @@ type StyledCardProps = BackgroundProps &
   ShadowProps &
   ColorProps;
 
-// Props that should not be forwarded to the DOM
-const FILTERED_PROPS = new Set([
-  'borderWidth',
-  'borderStyle',
-  'borderColor',
-  'borderRadius',
-  'overflowX',
-  'overflowY',
-  'boxShadow',
-]);
+const cardProps = compose(flexbox, typography, background, border, shadow, color, layout, position, space);
+
+// Style props should not be forwarded to the DOM, nor to components passed with `as`
+const FILTERED_PROPS = new Set(cardProps.propNames);
 
 /**
  * A simple styled-component to contain content in a card UI using styled-system.
@@ -54,7 +48,7 @@ const FILTERED_PROPS = new Set([
  */
 const StyledCard = styled.div
   .withConfig({
-    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+    shouldForwardProp: shouldForwardPropExcept(FILTERED_PROPS),
   })
   .attrs<StyledCardProps>(props => ({
     bg: props.bg ?? 'white.full',
@@ -64,7 +58,7 @@ const StyledCard = styled.div
     borderRadius: props.borderRadius ?? '8px',
     overflowX: props.overflowX ?? 'hidden',
     overflowY: props.overflowY ?? 'hidden',
-  }))<StyledCardProps>(compose(flexbox, typography, background, border, shadow, color, layout, position, space));
+  }))<StyledCardProps>(cardProps);
 
 /** @component */
 export default StyledCard;

@@ -13,7 +13,19 @@ import type {
   SpaceProps,
   TypographyProps,
 } from 'styled-system';
-import { background, border, color, flexbox, layout, position, shadow, size, space, typography } from 'styled-system';
+import {
+  background,
+  border,
+  color,
+  compose,
+  flexbox,
+  layout,
+  position,
+  shadow,
+  size,
+  space,
+  typography,
+} from 'styled-system';
 
 import type {
   ClearProps,
@@ -33,7 +45,7 @@ import {
   whiteSpace,
   wordBreak,
 } from '../lib/styled-system-custom-properties';
-import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
+import { shouldForwardPropExcept } from '@/lib/styled_components_utils';
 
 export type ContainerProps = FlexboxProps &
   BackgroundProps &
@@ -57,23 +69,32 @@ export type ContainerProps = FlexboxProps &
     css?: CSSProp;
   };
 
+// Style props should not be forwarded to the DOM, nor to components passed with `as`
 const FILTERED_PROPS = new Set([
-  'display',
-  'width',
-  'height',
-  'overflow',
-  'borderWidth',
-  'borderStyle',
-  'borderColor',
-  'borderRadius',
-  'overflowX',
-  'overflowY',
-  'boxShadow',
-  'textAlign',
+  ...compose(
+    flexbox,
+    background,
+    border,
+    shadow,
+    clear,
+    color,
+    cursor,
+    float,
+    overflow,
+    pointerEvents,
+    position,
+    layout,
+    space,
+    size,
+    typography,
+    whiteSpace,
+    wordBreak,
+  ).propNames,
+  'clearfix',
 ]);
 
 const Container = styled.div.withConfig({
-  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: shouldForwardPropExcept(FILTERED_PROPS),
 })<ContainerProps>`
   box-sizing: border-box;
 
