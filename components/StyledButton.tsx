@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ForwardRefExoticComponent } from 'react';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 import type {
   BackgroundProps,
   BorderProps,

@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import { isNil, omitBy } from 'lodash-es';
 import { X } from 'lucide-react';
 import { useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 import type { LayoutProps, SpaceProps } from 'styled-system';
 import { margin } from 'styled-system';
 

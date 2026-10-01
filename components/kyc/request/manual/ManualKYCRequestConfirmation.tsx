@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { ArrowLeft, FileText as FileTextIcon, Info, MapPin, Shield, User } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import type z from 'zod';
+import type { z } from 'zod';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';

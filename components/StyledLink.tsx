@@ -1,6 +1,6 @@
 import { themeGet } from '@styled-system/theme-get';
 import type React from 'react';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 import type { BorderProps, ColorProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { background, border, color, layout, space, system, typography } from 'styled-system';
 

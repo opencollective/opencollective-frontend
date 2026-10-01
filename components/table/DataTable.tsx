@@ -11,7 +11,7 @@ import type {
 } from '@tanstack/react-table';
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { cva } from 'class-variance-authority';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { isEqual, omitBy } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
