@@ -1,6 +1,6 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 
 export const accountPaymentIntentsCountsQuery = gql`
   query AccountPaymentIntentsCounts($account: AccountReferenceInput!, $host: AccountReferenceInput!) {
@@ -97,7 +97,7 @@ export const accountPaymentIntentsQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const paymentIntentDetailsQuery = gql`
@@ -228,5 +228,5 @@ export const paymentIntentDetailsQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;

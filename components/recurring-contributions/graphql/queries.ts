@@ -1,12 +1,12 @@
 import { gql } from '../../../lib/graphql/helpers';
 
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
-import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
-export const paymentMethodFragment = gql`
-  fragment UpdatePaymentMethodFragment on PaymentMethod {
+export const updatePaymentMethodFragment = gql`
+  fragment UpdatePaymentMethod on PaymentMethod {
     id
     name
     data
@@ -24,14 +24,14 @@ export const paymentMethodFragment = gql`
   }
 `;
 
-export const managedOrderFragment = gql`
+export const managedOrderFieldsFragment = gql`
   fragment ManagedOrderFields on Order {
     id
     legacyId
     publicId
     nextChargeDate
     paymentMethod {
-      ...UpdatePaymentMethodFragment
+      ...UpdatePaymentMethod
     }
     manualPaymentProvider {
       id
@@ -188,9 +188,9 @@ export const managedOrderFragment = gql`
       code
     }
   }
-  ${accountHoverCardFields}
-  ${paymentMethodFragment}
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountHoverCardFieldsFragment}
+  ${updatePaymentMethodFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 export const manageContributionsQuery = gql`
@@ -228,5 +228,5 @@ export const manageContributionsQuery = gql`
     }
   }
   ${accountNavbarFieldsFragment}
-  ${managedOrderFragment}
+  ${managedOrderFieldsFragment}
 `;
