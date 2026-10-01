@@ -106,14 +106,16 @@ export const TaxInformationForm = ({
   const { LoggedInUser } = useLoggedInUser();
   const [hasPreviewModal, setHasPreviewModal] = React.useState(false);
   const [schema, setSchema] = React.useState(BaseFormSchema);
+  // The US person/entity status is already stored on the account (from a previously
+  // submitted tax form or the expense form). It is locked so a new submission cannot
+  // contradict the stored tax form - users must contact their fiscal host to change it.
+  const isUSPersonLocked = !isNil(data?.account?.isUSEntity);
   const initialValues = React.useMemo(
     () => ({
       type: null,
       // Pre-select the US person/entity answer from the account's stored
       // isUSEntity (e.g. set from a previously submitted tax form or the
-      // expense form). The user can still change it: the form type is
-      // re-derived from the answer and the submitted answer updates
-      // isUSEntity via submitLegalDocument.
+      // expense form). The form type is re-derived from this answer.
       isUSPersonOrEntity: data?.account?.isUSEntity ?? null,
       submitterType: null,
       email: LoggedInUser.email,
@@ -170,6 +172,7 @@ export const TaxInformationForm = ({
                   <Form className="flex-1">
                     <TaxFormTypeSelectFields
                       values={formik.values}
+                      usPersonLocked={isUSPersonLocked}
                       onChange={values => {
                         const form = FORMS[values.formType];
                         if (!form) {
