@@ -1,10 +1,10 @@
 import { gql } from '../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
 
 export type { VendorFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 
-export const vendorFieldFragment = gql`
+export const vendorFieldsFragment = gql`
   fragment VendorFields on Vendor {
     id
     publicId
@@ -77,7 +77,7 @@ export const vendorFieldFragment = gql`
 
     useVendorPolicy
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const createVendorMutation = gql`
@@ -87,7 +87,7 @@ export const createVendorMutation = gql`
       ...VendorFields
     }
   }
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 export const setVendorArchiveMutation = gql`
@@ -97,5 +97,5 @@ export const setVendorArchiveMutation = gql`
       ...VendorFields
     }
   }
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;

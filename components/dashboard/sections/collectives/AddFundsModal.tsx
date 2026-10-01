@@ -33,7 +33,7 @@ import { Switch } from '@/components/ui/Switch';
 import { quickCreateVendorCollectivePickerOptions } from '@/components/vendors/QuickCreateVendorCollectiveOption';
 import { useQuickCreateVendor } from '@/components/vendors/useQuickCreateVendor';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import {
   BalanceAccountingCategoryPicker,
   getBalanceAccountingCategoryOption,
@@ -367,7 +367,7 @@ const addFundsAccountQuery = gql`
   }
   ${addFundsTierFieldsFragment}
   ${addFundsAccountQueryHostFieldsFragment}
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 type FundDetails = {

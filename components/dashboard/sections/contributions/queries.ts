@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client/core';
 
-import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
+import { managedOrderFieldsFragment } from '../../../recurring-contributions/graphql/queries';
 
 export const hostCancelContributionModalQuery = gql`
   query HostCancelContributionModal($order: OrderReferenceInput!) {
@@ -69,7 +69,7 @@ export const hostCancelOrderMutation = gql`
       ...ManagedOrderFields
     }
   }
-  ${managedOrderFragment}
+  ${managedOrderFieldsFragment}
 `;
 
 export const dashboardOrdersQuery = gql`
@@ -142,5 +142,5 @@ export const dashboardOrdersQuery = gql`
       }
     }
   }
-  ${managedOrderFragment}
+  ${managedOrderFieldsFragment}
 `;

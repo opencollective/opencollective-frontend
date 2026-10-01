@@ -22,13 +22,13 @@ const I18nMessages = defineMessages({
   },
 });
 
-const CreateWebAuthnRegistrationOptionsMutation = gql`
+const createWebAuthnRegistrationOptionsMutation = gql`
   mutation CreateWebAuthnRegistrationOptions($account: AccountReferenceInput!) {
     createWebAuthnRegistrationOptions(account: $account)
   }
 `;
 
-const AddTwoFactorAuthToIndividualMutation = gql`
+const addTwoFactorAuthToIndividualMutation = gql`
   mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
     addTwoFactorAuthTokenToIndividual(account: $account, token: $token, type: WEBAUTHN) {
       account {
@@ -59,9 +59,9 @@ export function DevicesSettings(props: DevicesSettingsProps) {
   const twoFactorMethods = props.userTwoFactorAuthenticationMethods.filter(m => m.method === TwoFactorMethod.WEBAUTHN);
   const { toast } = useToast();
 
-  const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation);
+  const [createPublicKeyRequestOptions] = useMutation(createWebAuthnRegistrationOptionsMutation);
 
-  const [addWebauthnDevice] = useMutation(AddTwoFactorAuthToIndividualMutation);
+  const [addWebauthnDevice] = useMutation(addTwoFactorAuthToIndividualMutation);
 
   const startWebauthnDeviceRegistration = React.useCallback(async () => {
     const response = await createPublicKeyRequestOptions({
