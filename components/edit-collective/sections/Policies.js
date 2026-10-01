@@ -1061,50 +1061,53 @@ const Policies = ({ collective }) => {
               )}
           </Container>
         )}
-        <Container>
-          <SettingsSectionTitle>
-            <FormattedMessage defaultMessage="Vendors" id="RilevA" />
-          </SettingsSectionTitle>
-          <P mb={3}>
-            <FormattedMessage defaultMessage="Who can attribute financial activities to vendors:" id="gQQN76" />
-          </P>
-          <RadioGroup
-            className="mb-1"
-            value={formik.values.policies?.USE_VENDOR_POLICY ?? 'HOST_AND_COLLECTIVE_ADMINS'}
-            onValueChange={value => {
-              const newPolicies = cloneDeep(formik.values.policies);
-              set(newPolicies, 'USE_VENDOR_POLICY', value);
-              formik.setFieldValue('policies', newPolicies);
-            }}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="HOST_ADMINS" id="USE_VENDOR_POLICY-HOST_ADMINS" />
-              <Label htmlFor="USE_VENDOR_POLICY-HOST_ADMINS" className="font-normal">
-                <FormattedMessage
-                  defaultMessage="Only Admins of {orgName}"
-                  id="0x4xsj"
-                  values={{ orgName: collective.name }}
-                />
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="HOST_AND_COLLECTIVE_ADMINS" id="USE_VENDOR_POLICY-HOST_AND_COLLECTIVE_ADMINS" />
-              <Label htmlFor="USE_VENDOR_POLICY-HOST_AND_COLLECTIVE_ADMINS" className="font-normal">
-                <FormattedMessage
-                  defaultMessage="{orgName} admins and collective admins"
-                  id="IaKZQb"
-                  values={{ orgName: collective.name }}
-                />
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="ALL_SUBMITTERS" id="USE_VENDOR_POLICY-ALL_SUBMITTERS" />
-              <Label htmlFor="USE_VENDOR_POLICY-ALL_SUBMITTERS" className="font-normal">
-                <FormattedMessage defaultMessage="Anybody" id="d6b55T" />
-              </Label>
-            </div>
-          </RadioGroup>
-        </Container>
+        {/* Vendors: matches the Vendors menu item, which is gated by hasMoneyManagement */}
+        {hasMoneyManagement && (
+          <Container>
+            <SettingsSectionTitle>
+              <FormattedMessage defaultMessage="Vendors" id="RilevA" />
+            </SettingsSectionTitle>
+            <P mb={3}>
+              <FormattedMessage defaultMessage="Who can attribute financial activities to vendors:" id="gQQN76" />
+            </P>
+            <RadioGroup
+              className="mb-1"
+              value={formik.values.policies?.USE_VENDOR_POLICY ?? 'HOST_AND_COLLECTIVE_ADMINS'}
+              onValueChange={value => {
+                const newPolicies = cloneDeep(formik.values.policies);
+                set(newPolicies, 'USE_VENDOR_POLICY', value);
+                formik.setFieldValue('policies', newPolicies);
+              }}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="HOST_ADMINS" id="USE_VENDOR_POLICY-HOST_ADMINS" />
+                <Label htmlFor="USE_VENDOR_POLICY-HOST_ADMINS" className="font-normal">
+                  <FormattedMessage
+                    defaultMessage="Only Admins of {orgName}"
+                    id="0x4xsj"
+                    values={{ orgName: collective.name }}
+                  />
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="HOST_AND_COLLECTIVE_ADMINS" id="USE_VENDOR_POLICY-HOST_AND_COLLECTIVE_ADMINS" />
+                <Label htmlFor="USE_VENDOR_POLICY-HOST_AND_COLLECTIVE_ADMINS" className="font-normal">
+                  <FormattedMessage
+                    defaultMessage="{orgName} admins and collective admins"
+                    id="IaKZQb"
+                    values={{ orgName: collective.name }}
+                  />
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="ALL_SUBMITTERS" id="USE_VENDOR_POLICY-ALL_SUBMITTERS" />
+                <Label htmlFor="USE_VENDOR_POLICY-ALL_SUBMITTERS" className="font-normal">
+                  <FormattedMessage defaultMessage="Anybody" id="d6b55T" />
+                </Label>
+              </div>
+            </RadioGroup>
+          </Container>
+        )}
         {isTaxFormsSupported && (
           <Container>
             <SettingsSectionTitle>
