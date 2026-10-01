@@ -7,7 +7,7 @@ import { styled } from 'styled-components';
 import type { ColorProps, FlexboxProps, GridProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { border, color, compose, flexbox, grid, layout, space, typography } from 'styled-system';
 
-import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
+import { shouldForwardPropExcept } from '@/lib/styled_components_utils';
 
 const boxProps = compose(space, color, layout, typography, flexbox, grid, border);
 
@@ -21,10 +21,11 @@ type BoxProps = SpaceProps &
     css?: string | object;
   };
 
-const FILTERED_PROPS = new Set(['display', 'width', 'height']);
+// Style props should not be forwarded to the DOM, nor to components passed with `as`
+const FILTERED_PROPS = new Set([...boxProps.propNames, 'gap']);
 
 export const Box = styled.div.withConfig({
-  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: shouldForwardPropExcept(FILTERED_PROPS),
 })<BoxProps>(
   {
     boxSizing: 'border-box',
@@ -47,7 +48,7 @@ export const Flex = styled(Box)<FlexProps>(
 Flex.displayName = 'Flex';
 
 export const Grid = styled.div.withConfig({
-  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: shouldForwardPropExcept(FILTERED_PROPS),
 })<BoxProps>(
   {
     boxSizing: 'border-box',

@@ -15,9 +15,9 @@ import type {
   SpaceProps,
   TypographyProps,
 } from 'styled-system';
-import { borders, color, display, flexbox, layout, shadow, space, typography } from 'styled-system';
+import { borders, color, compose, display, flexbox, layout, shadow, space, typography } from 'styled-system';
 
-import { defaultShouldForwardProp } from '../lib/styled_components_utils';
+import { shouldForwardPropExcept } from '../lib/styled_components_utils';
 import type { WhiteSpaceProps } from '../lib/styled-system-custom-properties';
 import { whiteSpace } from '../lib/styled-system-custom-properties';
 import type { MessageType } from '../lib/theme/variants/message';
@@ -49,10 +49,14 @@ type MessageBoxProps = MessageProps & {
   css?: any;
 };
 
-const FILTERED_PROPS = new Set(['display', 'width', 'height', 'type']);
+// Style props should not be forwarded to the DOM, nor to components passed with `as`
+const FILTERED_PROPS = new Set([
+  ...compose(borders, shadow, display, layout, space, typography, color, flexbox, whiteSpace).propNames,
+  'type',
+]);
 
 const Message = styled.div.withConfig({
-  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: shouldForwardPropExcept(FILTERED_PROPS),
 })<MessageProps>`
   border: 0.6px solid;
   border-radius: 12px;

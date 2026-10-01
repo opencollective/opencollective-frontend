@@ -1,8 +1,8 @@
 import { styled } from 'styled-components';
-import { bottom, flex, height, left, position, right, top } from 'styled-system';
+import { bottom, compose, flex, height, left, position, right, top } from 'styled-system';
 
 import { pointerEvents } from '../lib/styled-system-custom-properties';
-import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
+import { shouldForwardPropExcept } from '@/lib/styled_components_utils';
 
 import { Box } from './Grid';
 
@@ -27,10 +27,17 @@ const sm = hidden('sm');
 const md = hidden('md');
 const lg = hidden('lg');
 
-const FILTERED_PROPS = new Set(['xs', 'sm', 'md', 'lg']);
+// Style props should not be forwarded to the DOM, nor to components passed with `as`
+const FILTERED_PROPS = new Set([
+  ...compose(bottom, height, left, pointerEvents, position, right, top, flex).propNames,
+  'xs',
+  'sm',
+  'md',
+  'lg',
+]);
 
 const Hide = styled(Box).withConfig({
-  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: shouldForwardPropExcept(FILTERED_PROPS),
 })<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean }>`
   ${xs}
   ${sm}

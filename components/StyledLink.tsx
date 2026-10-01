@@ -2,9 +2,9 @@ import { themeGet } from '@styled-system/theme-get';
 import type React from 'react';
 import { css, styled } from 'styled-components';
 import type { BorderProps, ColorProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
-import { background, border, color, layout, space, system, typography } from 'styled-system';
+import { background, border, color, compose, layout, space, system, typography } from 'styled-system';
 
-import { defaultShouldForwardProp } from '../lib/styled_components_utils';
+import { shouldForwardPropExcept } from '../lib/styled_components_utils';
 import { textDecoration, whiteSpace } from '../lib/styled-system-custom-properties';
 import type { ButtonSize, ButtonStyle } from '../lib/theme/variants/button';
 import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
@@ -25,7 +25,9 @@ type StyledLinkProps = BorderProps &
     $hoverColor?: string;
   };
 
+// Style props should not be forwarded to the DOM, nor to components passed with `as`
 const FILTERED_PROPS = new Set([
+  ...compose(border, color, layout, space, typography, textDecoration, whiteSpace, background).propNames,
   'buttonStyle',
   'buttonSize',
   'openInNewTab',
@@ -41,7 +43,7 @@ const FILTERED_PROPS = new Set([
  */
 const StyledLink = styled.a
   .withConfig({
-    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+    shouldForwardProp: shouldForwardPropExcept(FILTERED_PROPS),
   })
   .attrs<StyledLinkProps>(props => {
     const base = {
