@@ -13,7 +13,7 @@ import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import LinkCollective from '@/components/LinkCollective';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import { useHasBalanceCategoriesPreview } from '../../../accounting/BalanceAccountingCategoryPicker';
 import { getCategoryLabel } from '../../../AccountingCategorySelect';
 import Avatar from '../../../Avatar';
@@ -247,7 +247,7 @@ const transactionQuery = gql`
       paymentProcessorUrl
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export function TransactionDrawer({ open, onOpenChange, onCloseAutoFocus, transactionId, getActions }) {

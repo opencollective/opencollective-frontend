@@ -9,7 +9,7 @@ import { cn } from '../../../lib/utils';
 
 import { Skeleton } from '@/components/ui/Skeleton';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 
@@ -64,7 +64,7 @@ export function ExpenseAccountItem(props: ExpenseAccountItemProps) {
           }
         }
       }
-      ${accountHoverCardFields}
+      ${accountHoverCardFieldsFragment}
     `,
     {
       variables: {

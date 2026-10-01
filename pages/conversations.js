@@ -230,7 +230,7 @@ const conversationsPageQuery = gql`
         }
       }
       conversations(tag: $tag) {
-        ...ConversationListFragment
+        ...ConversationList
       }
       conversationsTags {
         id

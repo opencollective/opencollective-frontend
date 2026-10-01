@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 
 const TIERS_INFO_LINK = 'https://documentation.opencollective.com/collectives/raising-money/setting-goals-and-tiers';
 
-const HostApplySuccessQuery = gql`
+const hostApplySuccessQuery = gql`
   query HostApplySuccess($slug: String!) {
     account(slug: $slug, throwIfMissing: true) {
       id
@@ -33,7 +33,7 @@ const HostApplySuccessQuery = gql`
 `;
 
 export const SuccessPage = ({ collective, hostSlug }) => {
-  const { data, error, loading } = useQuery(HostApplySuccessQuery, {
+  const { data, error, loading } = useQuery(hostApplySuccessQuery, {
     variables: { slug: collective.slug },
   });
 

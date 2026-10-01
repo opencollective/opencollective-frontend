@@ -37,7 +37,7 @@ import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
 import { Switch } from '../../ui/Switch';
 import { useToast } from '../../ui/useToast';
 
-import { getSettingsQuery } from './EditCollectivePage';
+import { collectiveSettingsEditQuery } from './EditCollectivePage';
 import SettingsSectionTitle from './SettingsSectionTitle';
 
 const EXPENSE_POLICY_MAX_LENGTH = 16000; // max in database is ~15,500
@@ -207,7 +207,7 @@ const Policies = ({ collective }) => {
   const isTaxFormsSupported = isFeatureSupported(account, FEATURES.TAX_FORMS);
 
   // GraphQL
-  const { loading, data } = useQuery(getSettingsQuery, {
+  const { loading, data } = useQuery(collectiveSettingsEditQuery, {
     variables: { slug: collective.slug },
   });
   const [updateCategories, { loading: isSubmittingCategories, error: categoriesError }] =

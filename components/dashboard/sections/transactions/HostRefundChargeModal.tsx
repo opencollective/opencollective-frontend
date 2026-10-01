@@ -19,7 +19,7 @@ import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 import { cn } from '../../../../lib/utils';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { FormField } from '../../../FormField';
@@ -148,7 +148,7 @@ const hostRefundChargeTransactionQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 const hostRefundChargeMutation = gql`
