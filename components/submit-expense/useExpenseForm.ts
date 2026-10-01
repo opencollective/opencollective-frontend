@@ -14,7 +14,7 @@ import { useIntl } from 'react-intl';
 import type { ZodObjectDef } from 'zod';
 import { z } from 'zod';
 
-import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
+import { CollectiveType } from '../../lib/constants/collectives';
 import { getPayoutProfiles, standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import type {
   Amount,
@@ -57,6 +57,7 @@ import {
   PAYEE_SLUG_NEW_VENDOR,
   PAYEE_SLUG_VENDOR,
 } from '../expenses/lib/constants';
+import { getAvailablePayoutMethods, getSupportedPayoutMethods } from '../expenses/lib/payout-methods';
 import { computeExpenseAmounts } from '../expenses/lib/utils';
 import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
@@ -1496,7 +1497,6 @@ async function buildFormOptions(
 
       const userCanUseVendors = options.isHostAdmin || ('vendors' in host && host.vendors?.['totalCount'] > 0);
       options.showVendorsOption = isInviteePayeeFlow ? false : userCanUseVendors;
-      options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
       options.accountingCategories = host.accountingCategories.nodes;
@@ -1504,21 +1504,9 @@ async function buildFormOptions(
       if (startOptions.duplicateExpense && expense?.payee?.type === CollectiveType.VENDOR) {
         options.vendorsForAccount = [...options.vendorsForAccount, expense.payee as ExpenseVendorFieldsFragment];
       }
-    } else {
-      options.supportedPayoutMethods = [PayoutMethodType.OTHER, PayoutMethodType.BANK_ACCOUNT];
     }
 
-    if (payeeHost && host && payeeHost.id === host.id) {
-      options.supportedPayoutMethods = [PayoutMethodType.ACCOUNT_BALANCE];
-    } else {
-      options.supportedPayoutMethods = options.supportedPayoutMethods.filter(
-        t => t !== PayoutMethodType.CREDIT_CARD && t !== PayoutMethodType.ACCOUNT_BALANCE,
-      );
-    }
-
-    if (payee && (AccountTypesWithHost as readonly string[]).includes(payee.type)) {
-      options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
-    }
+    options.supportedPayoutMethods = getSupportedPayoutMethods(host, payee);
 
     if (account?.supportedExpenseTypes) {
       options.supportedExpenseTypes = account.supportedExpenseTypes;
@@ -1539,42 +1527,19 @@ async function buildFormOptions(
       );
       options.isAdminOfPayeeHost = isAdminOfPayeeHost;
       if (payee && payee.type !== CollectiveType.VENDOR && (options.isAdminOfPayee || isAdminOfPayeeHost)) {
-        // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
-        if (payee['host'] && host && payee['host'].id !== host.id) {
-          options.payoutMethods = payee['host'].payoutMethods?.filter(p =>
-            options.supportedPayoutMethods.includes(p.type),
-          );
-        } else {
-          // Add ACCOUNT_BALANCE payout method if it's supported and available for the payee
-          options.payoutMethods = options.payoutProfiles
-            ?.find(p => p.slug === payee?.slug)
-            ?.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type))
-            .map(pm => {
-              if (pm.type === PayoutMethodType.ACCOUNT_BALANCE && host) {
-                return { ...pm, data: { currency: host.currency } };
-              }
-              return pm;
-            });
-
-          // Add ACCOUNT_BALANCE payout method if it's supported but not available for the payee
-          if (
-            options.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
-            host &&
-            !options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
-          ) {
-            options.payoutMethods = [
-              ...(options.payoutMethods || []),
-              {
-                id: NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID,
-                type: PayoutMethodType.ACCOUNT_BALANCE,
-                data: { currency: host.currency },
-                isSaved: true,
-              },
-            ];
-          }
-        }
+        options.payoutMethods = getAvailablePayoutMethods({
+          host,
+          payee,
+          payoutMethods: options.payoutProfiles?.find(profile => profile.slug === payee.slug)?.payoutMethods,
+          supportedPayoutMethods: options.supportedPayoutMethods,
+        });
       } else if (payee && payee.type === CollectiveType.VENDOR) {
-        options.payoutMethods = payee.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type));
+        options.payoutMethods = getAvailablePayoutMethods({
+          host,
+          payee,
+          payoutMethods: payee.payoutMethods,
+          supportedPayoutMethods: options.supportedPayoutMethods,
+        });
       }
 
       // Filter out ACCOUNT_BALANCE from the list of payout methods, since we add it manually to the default list
