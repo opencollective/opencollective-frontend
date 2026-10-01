@@ -1,5 +1,5 @@
 import type React from 'react';
-import styled, { keyframes } from 'styled-components';
+import { keyframes, styled } from 'styled-components';
 import type { BorderProps, LayoutProps, SpaceProps } from 'styled-system';
 import { border, layout, space } from 'styled-system';
 

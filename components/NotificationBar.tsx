@@ -1,7 +1,7 @@
 import React from 'react';
 import { Close } from '@styled-icons/material/Close';
 import { themeGet } from '@styled-system/theme-get';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 
 import Container from './Container';
 import { Flex } from './Grid';

@@ -4,7 +4,7 @@ import { FormikContext } from 'formik';
 import { isEmpty } from 'lodash-es';
 import { Shield } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import z from 'zod';
+import { z } from 'zod';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';

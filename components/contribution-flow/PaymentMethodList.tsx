@@ -5,7 +5,7 @@ import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { themeGet } from '@styled-system/theme-get';
 import { get, isEmpty, pick, set } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { gql } from '../../lib/graphql/helpers';

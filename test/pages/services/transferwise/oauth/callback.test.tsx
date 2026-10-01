@@ -34,7 +34,6 @@ jest.mock('react-intl', () => ({
   defineMessage: (message: unknown) => message,
 }));
 
-// eslint-disable-next-line react/display-name
 jest.mock('@/components/AuthenticatedPage', () => ({ __esModule: true, default: ({ children }) => children }));
 
 jest.mock('@/lib/confettis', () => ({ confettiFireworks: jest.fn() }));

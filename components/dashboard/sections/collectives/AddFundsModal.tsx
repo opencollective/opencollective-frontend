@@ -6,7 +6,7 @@ import { Form, Formik } from 'formik';
 import { get, isEmpty } from 'lodash-es';
 import { ArrowLeft, Lock, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 
 import { getLegacyIdForCollective } from '../../../../lib/collective';
 import { formatCurrency } from '../../../../lib/currency-utils';
