@@ -1137,7 +1137,13 @@ const Policies = ({ collective }) => {
 
                 <RadioGroup
                   disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
-                  value={formik.values.policies?.TAX_FORM_THRESHOLDS?.US === 0 ? 'ALWAYS' : 'THRESHOLD'}
+                  value={
+                    isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.US)
+                      ? ''
+                      : formik.values.policies.TAX_FORM_THRESHOLDS.US === 0
+                        ? 'ALWAYS'
+                        : 'THRESHOLD'
+                  }
                   onValueChange={value => {
                     const newPolicies = cloneDeep(formik.values.policies);
                     if (value === 'ALWAYS') {
@@ -1162,27 +1168,24 @@ const Policies = ({ collective }) => {
                   </div>
                 </RadioGroup>
 
-                {formik.values.policies?.TAX_FORM_THRESHOLDS?.US !== 0 && (
-                  <div className="mt-3">
-                    <InputAmount
-                      className="max-w-[11em] sm:max-w-1/3"
-                      suffix={<FormattedMessage defaultMessage="/ calendar year" id="3Pps87" />}
-                      disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
-                      currency={data?.account?.currency || collective.currency || 'USD'}
-                      currencyDisplay="CODE"
-                      value={
-                        isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.US)
-                          ? 600e2
-                          : formik.values.policies?.TAX_FORM_THRESHOLDS?.US
-                      }
-                      onChange={value => {
-                        const newPolicies = cloneDeep(formik.values.policies);
-                        set(newPolicies, 'TAX_FORM_THRESHOLDS.US', !isNil(value) ? value : 600e2);
-                        formik.setFieldValue('policies', newPolicies);
-                      }}
-                    />
-                  </div>
-                )}
+                {!isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.US) &&
+                  formik.values.policies.TAX_FORM_THRESHOLDS.US !== 0 && (
+                    <div className="mt-3">
+                      <InputAmount
+                        className="max-w-[11em] sm:max-w-1/3"
+                        suffix={<FormattedMessage defaultMessage="/ calendar year" id="3Pps87" />}
+                        disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
+                        currency={data?.account?.currency || collective.currency || 'USD'}
+                        currencyDisplay="CODE"
+                        value={formik.values.policies.TAX_FORM_THRESHOLDS.US}
+                        onChange={value => {
+                          const newPolicies = cloneDeep(formik.values.policies);
+                          set(newPolicies, 'TAX_FORM_THRESHOLDS.US', !isNil(value) ? value : 600e2);
+                          formik.setFieldValue('policies', newPolicies);
+                        }}
+                      />
+                    </div>
+                  )}
               </div>
 
               {/* Non-US entities */}
@@ -1201,7 +1204,13 @@ const Policies = ({ collective }) => {
 
                 <RadioGroup
                   disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
-                  value={formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US === 0 ? 'ALWAYS' : 'THRESHOLD'}
+                  value={
+                    isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US)
+                      ? ''
+                      : formik.values.policies.TAX_FORM_THRESHOLDS.NON_US === 0
+                        ? 'ALWAYS'
+                        : 'THRESHOLD'
+                  }
                   onValueChange={value => {
                     const newPolicies = cloneDeep(formik.values.policies);
                     if (value === 'ALWAYS') {
@@ -1226,27 +1235,24 @@ const Policies = ({ collective }) => {
                   </div>
                 </RadioGroup>
 
-                {formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US !== 0 && (
-                  <div className="mt-3">
-                    <InputAmount
-                      className="max-w-[11em] sm:max-w-1/3"
-                      suffix={<FormattedMessage defaultMessage="/ calendar year" id="3Pps87" />}
-                      disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
-                      currency={data?.account?.currency || collective.currency || 'USD'}
-                      currencyDisplay="CODE"
-                      value={
-                        isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US)
-                          ? 600e2
-                          : formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US
-                      }
-                      onChange={value => {
-                        const newPolicies = cloneDeep(formik.values.policies);
-                        set(newPolicies, 'TAX_FORM_THRESHOLDS.NON_US', !isNil(value) ? value : 600e2);
-                        formik.setFieldValue('policies', newPolicies);
-                      }}
-                    />
-                  </div>
-                )}
+                {!isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US) &&
+                  formik.values.policies.TAX_FORM_THRESHOLDS.NON_US !== 0 && (
+                    <div className="mt-3">
+                      <InputAmount
+                        className="max-w-[11em] sm:max-w-1/3"
+                        suffix={<FormattedMessage defaultMessage="/ calendar year" id="3Pps87" />}
+                        disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
+                        currency={data?.account?.currency || collective.currency || 'USD'}
+                        currencyDisplay="CODE"
+                        value={formik.values.policies.TAX_FORM_THRESHOLDS.NON_US}
+                        onChange={value => {
+                          const newPolicies = cloneDeep(formik.values.policies);
+                          set(newPolicies, 'TAX_FORM_THRESHOLDS.NON_US', !isNil(value) ? value : 600e2);
+                          formik.setFieldValue('policies', newPolicies);
+                        }}
+                      />
+                    </div>
+                  )}
               </div>
 
               {/* Exclude PayPal expenses from threshold calculations */}
