@@ -13,7 +13,7 @@ import type {
 } from 'styled-system';
 import { background, border, color, layout, position, space, typography, variant } from 'styled-system';
 
-import { defaultShouldForwardProp } from '../lib/styled_components_utils';
+import { shouldForwardPropExcept } from '../lib/styled_components_utils';
 import type { TextTransformProps } from '../lib/styled-system-custom-properties';
 import { textTransform } from '../lib/styled-system-custom-properties';
 
@@ -67,7 +67,7 @@ const TAG_TYPE_VARIANTS = {
 const FILTERED_PROPS = new Set(['display', 'width', 'height', 'type', 'variant']);
 
 const StyledTagBase = styled.div.withConfig({
-  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: shouldForwardPropExcept(FILTERED_PROPS),
 })<
   TypographyProps &
     SpaceProps &

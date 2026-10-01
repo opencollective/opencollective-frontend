@@ -4,7 +4,7 @@ import { flexbox } from 'styled-system';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
-import { defaultShouldForwardProp } from '../lib/styled_components_utils';
+import { shouldForwardPropExcept } from '../lib/styled_components_utils';
 
 export const DropdownContent = styled.div`
   display: none;
@@ -122,7 +122,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
     </div>
   );
 }).withConfig({
-  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !flexbox.propNames.includes(prop),
+  shouldForwardProp: shouldForwardPropExcept(new Set(flexbox.propNames)),
 })`
   ${flexbox}
   ${props =>
