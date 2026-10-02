@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
-import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Form, Formik } from 'formik';
+import { ArrowLeft, ArrowRight, Info } from 'lucide-react';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import spdxLicenses from 'spdx-license-list';
@@ -24,13 +23,12 @@ import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import CollectiveTagsInput from '../CollectiveTagsInput';
 import Container from '../Container';
+import { FormField } from '../FormField';
 import { Box, Flex, Grid } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
-import StyledButton from '../StyledButton';
-import StyledCheckbox from '../StyledCheckbox';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
@@ -40,6 +38,7 @@ import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P, Span } from '../Text';
 import { Alert, AlertDescription } from '../ui/Alert';
+import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { FormSectionTitle } from '../ui/FormSectionTitle';
 
@@ -255,7 +254,7 @@ const ApplicationForm = ({
           ) : (
             <Formik initialValues={initialValues} onSubmit={submit} validate={validate}>
               {formik => {
-                const { values, touched, setFieldValue, setValues, handleSubmit } = formik;
+                const { values, touched, setFieldValue, setValues } = formik;
 
                 const handleSlugChange = e => {
                   if (!touched.slug) {
@@ -731,24 +730,22 @@ const ApplicationForm = ({
                         <FormSectionTitle>
                           <FormattedMessage {...i18nLabels.legalEntityTitle} />
                         </FormSectionTitle>
-                        <StyledInputFormikField name="applicationData.hasLegalEntity">
+                        <FormField name="applicationData.hasLegalEntity">
                           {({ field }) => (
-                            <div className="flex items-start gap-2">
+                            <label className="flex cursor-pointer items-start gap-2 text-sm leading-normal">
                               <Checkbox
-                                id={field.id}
-                                checked={!!field.value}
+                                name={field.name}
+                                checked={Boolean(field.value)}
                                 onCheckedChange={checked => setFieldValue(field.name, checked === true)}
                               />
-                              <label
-                                htmlFor={field.id}
-                                className="cursor-pointer text-sm leading-5 font-normal text-foreground"
-                              >
+                              <span>
                                 <FormattedMessage {...i18nLabels.hasLegalEntity} />
-                              </label>
-                            </div>
+                              </span>
+                            </label>
                           )}
-                        </StyledInputFormikField>
+                        </FormField>
                         <Alert variant="info" className="mt-3">
+                          <Info className="h-5 w-5" />
                           <AlertDescription>
                             <FormattedMessage {...i18nLabels.hasLegalEntityNotice} />
                           </AlertDescription>
@@ -762,30 +759,30 @@ const ApplicationForm = ({
                         <Box mr={3}>
                           <StyledInputFormikField name="termsOfServiceOC" required>
                             {({ field }) => (
-                              <StyledCheckbox
-                                size="16px"
-                                name={field.name}
-                                required={field.required}
-                                checked={field.value}
-                                onChange={({ checked }) => setFieldValue(field.name, checked)}
-                                error={field.error}
-                                label={
-                                  <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
-                                    <FormattedMessage
-                                      id="OC.tos.label"
-                                      defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective."
-                                      values={{
-                                        TOSLink: getI18nLink({
-                                          href: '/tos',
-                                          color: '#6F5AFA',
-                                          openInNewTab: true,
-                                          onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
-                                        }),
-                                      }}
-                                    />
-                                  </P>
-                                }
-                              />
+                              <label className="flex cursor-pointer items-start gap-2 text-sm leading-normal">
+                                <Checkbox
+                                  name={field.name}
+                                  checked={Boolean(field.value)}
+                                  onCheckedChange={checked => setFieldValue(field.name, checked === true)}
+                                />
+                                <span>
+                                  <FormattedMessage
+                                    id="OC.tos.label"
+                                    defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective."
+                                    values={{
+                                      TOSLink: chunks => (
+                                        <Link
+                                          href="/tos"
+                                          openInNewTab
+                                          className="text-primary underline-offset-4 hover:underline"
+                                        >
+                                          {chunks}
+                                        </Link>
+                                      ),
+                                    }}
+                                  />
+                                </span>
+                              </label>
                             )}
                           </StyledInputFormikField>
                         </Box>
@@ -794,32 +791,22 @@ const ApplicationForm = ({
 
                     <Flex justifyContent="center" mb={48}>
                       <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={'32px'} maxWidth={672} px={48} flex="1">
-                        <StyledButton
-                          buttonStyle="purpleSecondary"
-                          buttonSize="large"
-                          textAlign="center"
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="lg"
                           onClick={() => {
                             setInitialValues({ ...initialValues, ...values });
                             window && window.history.back();
                           }}
                         >
-                          <ArrowLeft2 size="14px" />
-                          &nbsp;
+                          <ArrowLeft size={16} />
                           <FormattedMessage id="Back" defaultMessage="Back" />
-                        </StyledButton>
-                        <StyledButton
-                          type="submit"
-                          textAlign="center"
-                          buttonSize="large"
-                          buttonStyle="purple"
-                          onSubmit={handleSubmit}
-                          loading={submitting}
-                          data-cy="ccf-form-submit"
-                        >
+                        </Button>
+                        <Button type="submit" size="lg" loading={submitting} data-cy="ccf-form-submit">
                           <FormattedMessage id="actions.submitApplication" defaultMessage="Submit application" />
-                          &nbsp;
-                          <ArrowRight2 size="14px" />
-                        </StyledButton>
+                          <ArrowRight size={16} />
+                        </Button>
                       </Grid>
                     </Flex>
                   </Form>
