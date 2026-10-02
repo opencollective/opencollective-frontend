@@ -68,12 +68,14 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlat
   );
 
   // If an interval has been set (either from the tier defaults, or form an URL param) and the
-  // collective doesn't support it, we reset the interval
+  // collective doesn't support it, we reset the interval. Tiers with a fixed interval are never
+  // reset, as there would be no way to restore it (the interval selector is not displayed).
   React.useEffect(() => {
     if (
       selectedInterval &&
       selectedInterval !== INTERVALS.oneTime &&
-      ((!isFixedInterval && !supportsRecurring) || amount === 0)
+      !isFixedInterval &&
+      (!supportsRecurring || amount === 0)
     ) {
       dispatchChange('interval', INTERVALS.oneTime);
     }
