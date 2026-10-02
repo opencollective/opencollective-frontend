@@ -68,7 +68,7 @@ const createOrganizationSchema = z.object({
     website: z.preprocess(val => (val === '' ? undefined : val), z.string().url().optional()),
     currency: z.string().length(3),
   }),
-  individual: z.object({ id: z.number() }),
+  individual: z.object({ id: z.string() }),
   roleDescription: z.string().max(255).optional(),
 });
 

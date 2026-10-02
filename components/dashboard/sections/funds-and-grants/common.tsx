@@ -5,6 +5,7 @@ import { Check, Copy, Filter, MinusCircle, MoreHorizontal, PanelRightOpen } from
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { hasHosting } from '@/lib/account';
 import { CollectiveType } from '@/lib/constants/collectives';
 import useProcessExpense from '@/lib/expenses/useProcessExpense';
 import { type Expense, ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
@@ -168,7 +169,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
                   router.push(
                     getDashboardRoute(
                       account,
-                      `${account.hasHosting ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}${account.hasHosting ? '&sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL' : ''}`,
+                      `${hasHosting(account) ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}${hasHosting(account) ? '&sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL' : ''}`,
                     ),
                   )
                 }
@@ -245,7 +246,7 @@ function BeneficiaryCell({ grant }) {
 
   const previousGrantsLink = getDashboardRoute(
     dashboardAccount,
-    `${dashboardAccount.hasHosting ? 'hosted-grants' : 'grants'}?sort[field]=CREATED_AT&sort[direction]=DESC&fromAccount=${beneficiary.slug}${dashboardAccount.hasHosting ? `&status=ALL` : ''}`,
+    `${hasHosting(dashboardAccount) ? 'hosted-grants' : 'grants'}?sort[field]=CREATED_AT&sort[direction]=DESC&fromAccount=${beneficiary.slug}${hasHosting(dashboardAccount) ? `&status=ALL` : ''}`,
   );
 
   return (

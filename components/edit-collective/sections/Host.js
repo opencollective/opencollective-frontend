@@ -107,12 +107,11 @@ class Host extends React.Component {
   }
 
   getAdministratedHosts = memoizeOne(LoggedInUser => {
-    return (
-      LoggedInUser?.memberOf
-        ?.filter(membership => membership.role === 'ADMIN' && membership.collective.hasHosting)
-        .map(membership => membership.collective)
-        .filter(Boolean) || []
-    );
+    // `memberOf` is slim (id/slug only); hosting info lives on the workspaces.
+    // Mapped to the v1 shape (numeric `id`) expected by `SelectOwnFiscalHost` and the v1 `editCollective` mutation.
+    return (LoggedInUser?.workspaces || [])
+      .filter(workspace => workspace.hasHosting && LoggedInUser.hasRole('ADMIN', workspace))
+      .map(workspace => ({ id: workspace.legacyId, slug: workspace.slug, name: workspace.name }));
   });
 
   render() {

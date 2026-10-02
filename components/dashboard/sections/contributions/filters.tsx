@@ -13,7 +13,7 @@ import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { orderChargeDateFilter, orderCreateDateFilter } from '../../filters/DateFilter';
-import { paymentMethodFilter } from '../../filters/PaymentMethodFilter';
+import { paymentMethodFilter, PaymentMethodFilterMeta } from '../../filters/PaymentMethodFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 
@@ -59,13 +59,12 @@ export const ContributionAccountingCategoryKinds = [
   AccountingCategoryKind.ADDED_FUNDS,
 ] as const;
 
-export type FilterMeta = {
+export type FilterMeta = PaymentMethodFilterMeta & {
   currency?: Currency;
   accountSlug?: string;
   hostSlug?: string;
   includeUncategorized?: boolean;
   accountingCategoryKinds?: readonly AccountingCategoryKind[];
-  manualPaymentProviders?: Array<{ id: string; name: string }>;
 };
 
 type GraphQLQueryVariables = DashboardOrdersQueryVariables;

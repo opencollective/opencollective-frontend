@@ -111,7 +111,7 @@ describe('signin with 2FA', () => {
         secret = generateSecret({ length: 64 });
         return await cy.enableTwoFactorAuth({
           userEmail: user.email,
-          userSlug: user.collective.slug,
+          userSlug: user.slug,
           secret: secret,
         });
       })

@@ -25,7 +25,7 @@ export function useSetupGuide(): [boolean | undefined, (open: boolean) => Promis
       setShowSetupGuide(open);
       await editAccountSetting({
         variables: {
-          account: { legacyId: LoggedInUser.collective.id },
+          account: { legacyId: LoggedInUser.legacyId },
           key: `showSetupGuide.id${account.legacyId}`,
           value: open,
         },

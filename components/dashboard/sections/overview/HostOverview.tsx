@@ -167,7 +167,9 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
       />
       <ConvertedAccountMessage account={account} />
       <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
-      {hasMoneyManagement && account.platformSubscription && <PlatformBillingCollapsibleCard />}
+      {hasMoneyManagement && 'platformSubscription' in account && account.platformSubscription && (
+        <PlatformBillingCollapsibleCard />
+      )}
 
       <HostTodoList />
 

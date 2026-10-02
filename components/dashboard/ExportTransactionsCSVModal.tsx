@@ -306,7 +306,7 @@ const ExportTransactionsCSVModal = ({
       accountFromFilter: queryFilter.values?.account,
       accountName: account?.name,
       accountSlug: account?.slug,
-      loggedInUserCollectiveName: LoggedInUser?.collective?.name,
+      loggedInUserCollectiveName: LoggedInUser?.name,
     }),
   );
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
@@ -325,7 +325,7 @@ const ExportTransactionsCSVModal = ({
           accountFromFilter: queryFilter.values?.account,
           accountName: account?.name,
           accountSlug: account?.slug,
-          loggedInUserCollectiveName: LoggedInUser?.collective?.name,
+          loggedInUserCollectiveName: LoggedInUser?.name,
         }),
       );
     }
@@ -518,7 +518,7 @@ const ExportTransactionsCSVModal = ({
             accountFromFilter: queryFilter.values?.account,
             accountName: account?.name,
             accountSlug: account?.slug,
-            loggedInUserCollectiveName: LoggedInUser?.collective?.name,
+            loggedInUserCollectiveName: LoggedInUser?.name,
             presetName: customFields[preset].name,
           }),
         );
@@ -528,7 +528,7 @@ const ExportTransactionsCSVModal = ({
             accountFromFilter: queryFilter.values?.account,
             accountName: account?.name,
             accountSlug: account?.slug,
-            loggedInUserCollectiveName: LoggedInUser?.collective?.name,
+            loggedInUserCollectiveName: LoggedInUser?.name,
           }),
         );
       }

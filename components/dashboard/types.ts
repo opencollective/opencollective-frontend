@@ -1,8 +1,8 @@
-import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type { WorkspaceAccount } from '@/lib/account';
 
 export type DashboardSectionProps = {
   accountSlug: string;
-  account?: DashboardQuery['account'];
+  account?: WorkspaceAccount | null;
   subpath?: string[];
   isDashboard?: boolean;
 };

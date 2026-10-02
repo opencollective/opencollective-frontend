@@ -6,7 +6,6 @@ import { styled } from 'styled-components';
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 import { getEnvVar } from '@/lib/env-utils';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import injectIntl from '@/lib/injectIntl';
 import { parseToBoolean } from '@/lib/utils';
 
 import { legacyTopBarItems, newMarketingTopbarItems } from './navigation/menu-items';
@@ -15,7 +14,6 @@ import Container from './Container';
 import { Box, Flex } from './Grid';
 import { HideGlobalScroll } from './HideGlobalScroll';
 import Link from './Link';
-import { withUser } from './UserProvider';
 
 const ListItem = styled.li`
   list-style: none;
@@ -114,4 +112,4 @@ const TopBarMobileMenu = ({ closeMenu }) => {
   );
 };
 
-export default injectIntl(withUser(TopBarMobileMenu));
+export default TopBarMobileMenu;

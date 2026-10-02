@@ -8,6 +8,7 @@ import { gql } from '../../../../lib/graphql/helpers';
 import { OppositeAccountScope, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { hasHosting } from '@/lib/account';
 import { isMulti } from '@/lib/filters/schemas';
 import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
@@ -153,7 +154,6 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
-    manualPaymentProviders: account.manualPaymentProviders ?? account.host?.manualPaymentProviders ?? undefined,
   };
 
   const queryFilter = useQueryFilter({
@@ -171,7 +171,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostFinancialContributionsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: hasHosting(account) ? queryFilter.values.hostContext : undefined,
       ...(hasIncomingOutgoingReorg && { oppositeAccountScope: OppositeAccountScope.EXTERNAL }),
     },
 
@@ -210,7 +210,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
-            {account.hasHosting && (
+            {hasHosting(account) && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}
@@ -220,7 +220,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
           </div>
         }
         description={
-          account.hasHosting ? (
+          hasHosting(account) ? (
             <FormattedMessage
               defaultMessage="Contributions made to your Organization and Collectives you host."
               id="To33FZ"

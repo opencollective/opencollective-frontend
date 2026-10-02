@@ -25,6 +25,12 @@ import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import { P, Span } from '../Text';
 
+/** Public URLs of the accounts the user administers. Uses workspaces since `memberOf` is slim (id/slug only). */
+const getAdministratedCollectiveURLs = LoggedInUser =>
+  (LoggedInUser.workspaces || [])
+    .filter(workspace => LoggedInUser.hasRole('ADMIN', workspace))
+    .map(workspace => getCollectivePageCanonicalURL(workspace));
+
 const ContactForm = () => {
   const intl = useIntl();
   const router = useRouter();
@@ -78,14 +84,7 @@ const ContactForm = () => {
     onSubmit: values => {
       setIsSubmitting(true);
       if (values.relatedCollectives.length === 0 && LoggedInUser) {
-        setFieldValue(
-          'relatedCollectives',
-          LoggedInUser.memberOf.map(member => {
-            if (member.role === 'ADMIN') {
-              return getCollectivePageCanonicalURL(member.collective);
-            }
-          }),
-        );
+        setFieldValue('relatedCollectives', getAdministratedCollectiveURLs(LoggedInUser));
       }
       sendContactMessage(values)
         .then(() => {
@@ -101,14 +100,9 @@ const ContactForm = () => {
 
   useEffect(() => {
     if (LoggedInUser) {
-      setFieldValue('name', LoggedInUser.collective.name);
+      setFieldValue('name', LoggedInUser.name);
       setFieldValue('email', LoggedInUser.email);
-      setFieldValue(
-        'relatedCollectives',
-        LoggedInUser.memberOf
-          .filter(member => member.role === 'ADMIN')
-          .map(member => getCollectivePageCanonicalURL(member.collective)),
-      );
+      setFieldValue('relatedCollectives', getAdministratedCollectiveURLs(LoggedInUser));
     }
   }, [LoggedInUser]);
 

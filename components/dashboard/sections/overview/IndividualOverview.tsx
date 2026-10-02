@@ -16,6 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
@@ -24,7 +25,8 @@ import { AccountTodoList } from './TodoList';
 import { useSetupGuide } from './useSetupGuide';
 import { WelcomeIndividual } from './Welcome';
 
-const Home = ({ accountSlug, account }: DashboardSectionProps) => {
+const Home = ({ accountSlug }: DashboardSectionProps) => {
+  const { account } = React.useContext(DashboardContext);
   const router = useRouter();
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showWelcomeGuide, handleSetupGuideToggle] = useSetupGuide();

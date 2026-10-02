@@ -40,10 +40,11 @@ class OnboardingContentBox extends React.Component {
   }
 
   componentDidMount() {
-    const member = this.props.LoggedInUser.memberOf.filter(member => member.collective.id === this.props.collective.id);
-    this.setState({
-      admins: [{ role: 'ADMIN', member: this.props.LoggedInUser.collective, id: member[0].id }],
-    });
+    // The v1 editCollectiveMembers mutation needs the logged-in user's own (numeric) membership id, not the first admin's
+    const { collective, LoggedInUser } = this.props;
+    const membershipId = collective.admins?.find(admin => admin.member?.id === LoggedInUser.legacyId)?.id;
+    const admins = [{ id: membershipId, role: 'ADMIN', member: LoggedInUser.toV1Collective() }];
+    this.setState({ admins }, () => this.props.updateAdmins(admins));
   }
 
   removeAdmin = collective => {
@@ -103,14 +104,14 @@ class OnboardingContentBox extends React.Component {
             </Flex>
             <Flex px={3} width="100%" flexWrap="wrap" data-cy="profile-card">
               <OnboardingProfileCard
-                key={this.props.LoggedInUser.collective.id}
-                collective={this.props.LoggedInUser.collective}
+                key={this.props.LoggedInUser.legacyId}
+                collective={this.props.LoggedInUser.toV1Collective()}
               />
               {this.props.memberInvitations.map(admin => (
                 <OnboardingProfileCard key={admin.memberAccount.id} collective={admin.memberAccount} isPending />
               ))}
               {admins
-                .filter(admin => admin.member.id !== this.props.LoggedInUser.collective.id)
+                .filter(admin => admin.member.id !== this.props.LoggedInUser.legacyId)
                 .map(admin => (
                   <OnboardingProfileCard
                     key={admin.member.id}
