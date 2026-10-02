@@ -334,6 +334,8 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
   const isIndividual = isIndividualAccount(collective) && !collective.isHost;
   const budgetQueryResult = useQuery(getBudgetSectionQuery(Boolean(collective.host), isIndividual), {
     variables: getBudgetSectionQueryVariables(collective.slug, isIndividual, collective.host, collective.isHost),
+    // Revalidate on mount so newly submitted expenses appear without a manual refresh
+    fetchPolicy: 'cache-and-network',
   });
   const { data, refetch } = budgetQueryResult;
 
