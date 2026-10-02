@@ -231,7 +231,6 @@
     "circular-dependency-plugin": "^5.2.2",
     "commitizen": "^4.3.2",
     "cross-env": "^10.0.0",
-    "css-loader": "^7.1.2",
     "cypress": "^15.16.0",
     "cypress-mailpit": "^2.0.0",
     "cypress-multi-reporters": "^2.0.5",

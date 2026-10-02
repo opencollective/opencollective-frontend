@@ -595,10 +595,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.PAYMENT_RECEIPTS,
           if: (isIndividual || isOrganization || isFund) && !account.isPrivate,
         },
-        {
-          section: ALL_SECTIONS.GIFT_CARDS,
-          if: isFeatureEnabled(account, FEATURES.EMIT_GIFT_CARDS) && !isAccountantOnly,
-        },
         // Sections for individual accounts
         {
           section: ALL_SECTIONS.NOTIFICATIONS,

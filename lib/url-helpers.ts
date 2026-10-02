@@ -55,15 +55,6 @@ export const expenseInvoiceUrl = expenseId => {
   return `${PDF_SERVICE_URL}/expenses/${expenseId}/invoice.pdf`;
 };
 
-/**
- * `POST` endpoint to generate printable gift cards.
- *
- * @param {string} filename - filename **with** extension
- */
-export const giftCardsDownloadUrl = filename => {
-  return `${PDF_SERVICE_URL}/gift-cards/${filename}`;
-};
-
 // ---- Routes to external services ----
 
 /**

@@ -86,8 +86,6 @@ export const LEGACY_SECTIONS = {
 export const LEGACY_SETTINGS_SECTIONS = {
   HOST: 'host',
   INFO: 'info',
-  GIFT_CARDS: 'gift-cards',
-  CREATE_GIFT_CARDS: 'gift-cards-create',
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',
   FISCAL_HOSTING: 'fiscal-hosting',
@@ -243,10 +241,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.TIERS]: {
     id: 'Tiers',
     defaultMessage: 'Tiers',
-  },
-  [ALL_SECTIONS.GIFT_CARDS]: {
-    id: 'editCollective.menu.giftCards',
-    defaultMessage: 'Gift Cards',
   },
   [ALL_SECTIONS.WEBHOOKS]: {
     id: 'editCollective.menu.webhooks',

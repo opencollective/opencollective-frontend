@@ -132,7 +132,6 @@ const IGNORED: Record<string, readonly string[]> = {
     'Fields.slug', // "Slug" - terme technique identique
     'Fields.type', // "Type" - identique
     'gegfoA', // "Conversation" - identique
-    'giftCards.description', // "DESCRIPTION" - identique
     'GM/hd6', // "Invitation" - identique
     'goal.type.label', // "Type" - identique
     'header.options', // "Options" - identique

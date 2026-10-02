@@ -15,8 +15,8 @@ import injectIntl from '@/lib/injectIntl';
 
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import HappyBackground from '../components/gift-cards/HappyBackground';
 import { Box, Flex } from '../components/Grid';
+import HappyBackground from '../components/HappyBackground';
 import Link from '../components/Link';
 import LinkCollective from '../components/LinkCollective';
 import Loading from '../components/Loading';

@@ -23,11 +23,9 @@ module.exports = {
         'components/collective-page/hero/HeroTotalCollectiveContributionsWithData.js',
         'components/CollectivePickerAsync.js',
         'components/CreateCollectiveMiniForm.tsx',
-        'components/CreateGiftCardsForm.js',
         'components/edit-collective/actions/Archive.js',
         'components/edit-collective/actions/Delete.js',
         'components/edit-collective/EditUserEmailForm.js',
-        'components/edit-collective/sections/GiftCards.tsx',
         'components/edit-collective/sections/PaymentReceipts.tsx',
         'components/edit-collective/sections/Webhooks.tsx',
         'components/EditPublicMessagePopup.js',
@@ -39,8 +37,6 @@ module.exports = {
         'lib/graphql/v1/mutations.js',
         'lib/graphql/v1/queries.js',
         'pages/contribute.js',
-        'pages/redeem.js',
-        'pages/redeemed.tsx',
         'pages/updatePaymentMethod.js',
         // The following documents use gql and gqlV1 at the same time, gqlV1 will not be linted
         // grep -rl " = gqlV1" ./components ./lib ./pages | xargs grep -rl "gql\`" | sort

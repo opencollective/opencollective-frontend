@@ -52,14 +52,6 @@ export function normalizeLocation(href: string): string {
       /(\/email\/unsubscribe\/)[^/]+\/[^/]+\/([^/]+)\/[^/]+(.*)/,
       '$1[email]/[slug]/$2/[token]$3',
     );
-  } else if (pathname.match(/\/[^/]+\/redeem\/.*/)) {
-    url.pathname = pathname.replace(/\/[^/]+\/redeem\/[^/]+(.*)/, '/[slug]/redeem/[code]$1');
-  } else if (pathname.startsWith('/redeem/')) {
-    url.pathname = pathname.replace(/\/redeem\/[^/]+(.*)/, '/redeem/[code]$1');
-  } else if (pathname.match(/\/[^/]+\/redeemed\/.*/)) {
-    url.pathname = pathname.replace(/\/[^/]+\/redeemed\/[^/]+(.*)/, '/[slug]/redeemed/[code]$1');
-  } else if (pathname.startsWith('/redeemed/')) {
-    url.pathname = pathname.replace(/\/redeemed\/[^/]+(.*)/, '/redeemed/[code]$1');
   }
 
   return url.href;

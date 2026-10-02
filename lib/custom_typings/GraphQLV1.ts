@@ -31,22 +31,3 @@ export type GraphQLV1Collective = {
     balance?: number;
   };
 };
-
-export interface GraphQLV1PaymentMethod {
-  id: string;
-  uuid: string;
-  currency: string;
-  name: string;
-  service: string;
-  type: string;
-  batch: string;
-  data: any;
-  initialBalance: number;
-  monthlyLimitPerMember: number;
-  balance: number;
-  expiryDate: string;
-  isConfirmed: boolean;
-  createdAt: string;
-  description: string;
-  collective: GraphQLV1Collective;
-}
