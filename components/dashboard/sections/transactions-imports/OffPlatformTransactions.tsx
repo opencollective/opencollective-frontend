@@ -27,6 +27,8 @@ import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } 
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
+import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import { getI18nLink } from '@/components/I18nFormatters';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import StackedAvatars from '@/components/StackedAvatars';
@@ -38,7 +40,6 @@ import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
-import StyledLink from '../../../StyledLink';
 import { actionsColumn, DataTable, stickyColumnVariants } from '../../../table/DataTable';
 import {
   MultiPagesRowSelectionInitialState,
@@ -310,6 +311,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   const isUpgradeRequired = requiresUpgrade(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
 
   const [focus, setFocus] = React.useState<{ rowId: string; noteForm?: boolean } | null>(null);
+  const [openMatch, setOpenMatch] = React.useState<{ type: 'expense' | 'contribution'; legacyId: number } | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
   const apolloClient = useApolloClient();
   const [pollInterval, setPollInterval] = React.useState<number>(0); // Do not poll by default
@@ -508,8 +510,8 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                 getActions={getActions}
                 openDrawer={row => setFocus({ rowId: row.original.id })}
                 onClickRow={(row, _, e) => {
-                  // Ignore click when on checkbox or "Note" icon
-                  if (!(e.target as Element).closest('button')) {
+                  // Ignore click when on checkbox, "Note" icon or links (e.g. Match column)
+                  if (!(e.target as Element).closest('a, button')) {
                     setFocus({ rowId: row.original.id });
                   }
                 }}
@@ -651,29 +653,33 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                     cell: ({ row }) => {
                       if (row.original.expense) {
                         return (
-                          <StyledLink
-                            className="flex items-center gap-1"
-                            href={`/${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
+                          <Button
+                            variant="link"
+                            className="h-auto p-0"
+                            onClick={() => setOpenMatch({ type: 'expense', legacyId: row.original.expense.legacyId })}
                           >
                             <FormattedMessage
                               id="E9pJQz"
                               defaultMessage="Expense #{id}"
                               values={{ id: row.original.expense.legacyId }}
                             />
-                          </StyledLink>
+                          </Button>
                         );
                       } else if (row.original.order) {
                         return (
-                          <StyledLink
-                            className="flex items-center gap-1"
-                            href={`/${row.original.order.toAccount.slug}/contributions/${row.original.order.legacyId}`}
+                          <Button
+                            variant="link"
+                            className="h-auto p-0"
+                            onClick={() =>
+                              setOpenMatch({ type: 'contribution', legacyId: row.original.order.legacyId })
+                            }
                           >
                             <FormattedMessage
                               id="Siv4wU"
                               defaultMessage="Contribution #{id}"
                               values={{ id: row.original.order.legacyId }}
                             />
-                          </StyledLink>
+                          </Button>
                         );
                       } else {
                         return '-';
@@ -715,6 +721,16 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
         rowIndex={selectedRowIdx}
         autoFocusNoteForm={focus?.noteForm}
       />
+      {openMatch?.type === 'expense' ? (
+        <ExpenseDrawer openExpenseLegacyId={openMatch.legacyId} handleClose={() => setOpenMatch(null)} />
+      ) : openMatch?.type === 'contribution' ? (
+        <ContributionDrawer
+          open
+          onClose={() => setOpenMatch(null)}
+          orderId={openMatch.legacyId}
+          getActions={() => ({})}
+        />
+      ) : null}
     </div>
   );
 };
