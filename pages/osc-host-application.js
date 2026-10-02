@@ -94,6 +94,7 @@ const formValues = {
     extraLicenseInfo: '',
     amountOfMembers: '',
     linksToPreviousEvents: '',
+    hasLegalEntity: false,
   },
   termsOfServiceOC: false,
   inviteMembers: [],
