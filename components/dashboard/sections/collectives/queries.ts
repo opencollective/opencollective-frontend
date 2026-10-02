@@ -1,8 +1,8 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 
-export const HostApplicationFields = gql`
+export const hostApplicationFieldsFragment = gql`
   fragment HostApplicationFields on HostApplication {
     id
     publicId
@@ -78,10 +78,10 @@ export const HostApplicationFields = gql`
     }
   }
 
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
-const processApplicationAccountFields = gql`
+const processApplicationAccountFieldsFragment = gql`
   fragment ProcessHostApplicationFields on AccountWithHost {
     isActive
     approvedAt
@@ -157,7 +157,7 @@ export const hostApplicationsQuery = gql`
       }
     }
   }
-  ${HostApplicationFields}
+  ${hostApplicationFieldsFragment}
 `;
 
 export const processApplicationMutation = gql`
@@ -190,11 +190,11 @@ export const processApplicationMutation = gql`
       }
     }
   }
-  ${processApplicationAccountFields}
-  ${HostApplicationFields}
+  ${processApplicationAccountFieldsFragment}
+  ${hostApplicationFieldsFragment}
 `;
 
-export const hostedCollectiveFields = gql`
+export const hostedCollectiveFieldsFragment = gql`
   fragment HostedCollectiveFields on Account {
     id
     publicId
@@ -344,7 +344,7 @@ export const hostedCollectiveFields = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const hostedCollectivesMetadataQuery = gql`
@@ -446,7 +446,7 @@ export const hostedCollectivesQuery = gql`
     }
   }
 
-  ${hostedCollectiveFields}
+  ${hostedCollectiveFieldsFragment}
 `;
 
 export const hostedCollectiveDetailQuery = gql`
@@ -519,7 +519,7 @@ export const hostedCollectiveDetailQuery = gql`
     }
   }
 
-  ${hostedCollectiveFields}
+  ${hostedCollectiveFieldsFragment}
 `;
 
 export const allCollectivesQuery = gql`
@@ -556,5 +556,5 @@ export const allCollectivesQuery = gql`
     }
   }
 
-  ${hostedCollectiveFields}
+  ${hostedCollectiveFieldsFragment}
 `;

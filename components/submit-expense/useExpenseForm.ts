@@ -61,8 +61,8 @@ import { computeExpenseAmounts } from '../expenses/lib/utils';
 import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
-import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
+import { accountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
@@ -607,8 +607,8 @@ const expenseFormSchemaQuery = gql`
     }
   }
 
-  ${accountHoverCardFields}
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountHoverCardFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 type ExpenseFormOptions = {

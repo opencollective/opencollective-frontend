@@ -24,7 +24,7 @@ import { KYCTabPeopleDashboard } from '@/components/kyc/dashboard/KYCTabPeopleDa
 import StyledModal from '@/components/StyledModal';
 import Tabs from '@/components/Tabs';
 import { Badge } from '@/components/ui/Badge';
-import { setVendorArchiveMutation, vendorFieldFragment } from '@/components/vendors/queries';
+import { setVendorArchiveMutation, vendorFieldsFragment } from '@/components/vendors/queries';
 import VendorForm from '@/components/vendors/VendorForm';
 
 import Avatar from '../../../Avatar';
@@ -65,7 +65,7 @@ const convertOrganizationMutation = gql`
       ...VendorFields
     }
   }
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 type AccountDetailsProps = {

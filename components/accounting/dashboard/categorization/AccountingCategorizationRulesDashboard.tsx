@@ -8,7 +8,7 @@ import type { z } from 'zod';
 import { i18nGraphqlException } from '@/lib/errors';
 import type { HostContributionCategoryRulesQuery } from '@/lib/graphql/types/v2/graphql';
 
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import { DashboardContext } from '@/components/dashboard/DashboardContext';
 import { useFormikZod } from '@/components/FormikZod';
 import LoadingGrid from '@/components/LoadingGrid';
@@ -43,7 +43,7 @@ const hostContributionCategoryRulesQuery = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 export function AccountingCategorizationRulesDashboard() {

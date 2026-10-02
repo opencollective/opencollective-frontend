@@ -14,7 +14,7 @@ import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import {
-  expenseHostFields,
+  expenseHostFieldsFragment,
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
 } from '../../../expenses/graphql/fragments';
@@ -73,8 +73,8 @@ const communityExpensesQuery = gql`
       limit
       nodes {
         id
-        ...ExpensesListFieldsFragment
-        ...ExpensesListAdminFieldsFragment
+        ...ExpensesListFields
+        ...ExpensesListAdminFields
       }
     }
     host(slug: $hostSlug) {
@@ -84,7 +84,7 @@ const communityExpensesQuery = gql`
   }
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 const communityExpensesMetaQuery = gql`

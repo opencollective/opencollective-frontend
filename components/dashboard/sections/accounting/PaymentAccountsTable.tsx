@@ -9,7 +9,7 @@ import { ManualPaymentProviderType } from '../../../../lib/graphql/types/v2/grap
 
 import { getManualPaymentProviderIconComponent } from '@/components/manual-payment-provider/ManualPaymentProviderIcon';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import HTMLContent from '../../../HTMLContent';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
@@ -91,7 +91,7 @@ const paymentAccountsQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 const setConnectedAccountBalanceCategoryMutation = gql`

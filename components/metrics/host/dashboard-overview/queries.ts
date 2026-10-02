@@ -1,6 +1,6 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 
 export const hostMetricsOverviewSectionQuery = gql`
   query HostMetricsOverviewSection(
@@ -153,5 +153,5 @@ export const hostMetricsOverviewSectionQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
