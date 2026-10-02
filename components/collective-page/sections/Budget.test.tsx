@@ -12,13 +12,13 @@ const useQueryMock = jest.fn(() => ({
   data: undefined,
   loading: true,
   refetch: jest.fn(),
-}));
+})) as jest.Mock;
 
 jest.mock('@apollo/client', () => {
   const actual = jest.requireActual('@apollo/client');
   return {
     ...actual,
-    useQuery: (...args) => useQueryMock(...args),
+    useQuery: (...args: unknown[]) => useQueryMock(...args),
   };
 });
 
@@ -49,8 +49,8 @@ describe('SectionBudget', () => {
     );
 
     const budgetQuery = getBudgetSectionQuery(true, false);
-    const budgetCall = useQueryMock.mock.calls.find(([query]) => query === budgetQuery);
+    const budgetCall = useQueryMock.mock.calls.find(call => call[0] === budgetQuery);
     expect(budgetCall).toBeDefined();
-    expect(budgetCall[1]).toEqual(expect.objectContaining({ fetchPolicy: 'cache-and-network' }));
+    expect(budgetCall?.[1]).toEqual(expect.objectContaining({ fetchPolicy: 'cache-and-network' }));
   });
 });

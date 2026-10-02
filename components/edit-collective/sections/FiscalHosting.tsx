@@ -63,22 +63,34 @@ export const ToggleMoneyManagementButton = ({
   const intl = useIntl();
   const { toast } = useToast();
   const { showConfirmationModal } = useModal();
-  const [editMoneyManagementAndHosting, { loading: mutating, data: mutationData }] = useMutation(
-    editMoneyManagementAndHostingMutation,
-    {
-      refetchQueries,
+  const [optimisticState, setOptimisticState] = React.useState<{
+    hasHosting?: boolean;
+    hasMoneyManagement?: boolean;
+  } | null>(null);
+  const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
+    refetchQueries,
+    onCompleted: data => {
+      const updated = data?.editOrganizationMoneyManagementAndHosting;
+      if (updated) {
+        setOptimisticState({
+          hasHosting: updated.hasHosting,
+          hasMoneyManagement: updated.hasMoneyManagement,
+        });
+      }
     },
-  );
+  });
   const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },
   });
 
+  // Clear retained mutation state when the account catches up, so newer props are never overridden.
+  React.useEffect(() => {
+    setOptimisticState(null);
+  }, [account.hasHosting, account.hasMoneyManagement, account.isHost]);
+
   const totalHostedAccounts = data?.host?.totalHostedAccounts;
-  const updatedAccount = mutationData?.editOrganizationMoneyManagementAndHosting;
-  const hasHosting = updatedAccount?.hasHosting ?? account.hasHosting;
-  const hasMoneyManagement = updatedAccount
-    ? Boolean(updatedAccount.hasMoneyManagement)
-    : hasAccountMoneyManagement(account);
+  const hasHosting = optimisticState?.hasHosting ?? account.hasHosting;
+  const hasMoneyManagement = optimisticState?.hasMoneyManagement ?? hasAccountMoneyManagement(account);
 
   const handleMoneyManagementUpdate = async ({ activate }) => {
     if (activate) {
@@ -180,23 +192,35 @@ export const ToggleFiscalHostingButton = ({
   const intl = useIntl();
   const { toast } = useToast();
   const { showConfirmationModal } = useModal();
+  const [optimisticState, setOptimisticState] = React.useState<{
+    hasHosting?: boolean;
+    hasMoneyManagement?: boolean;
+  } | null>(null);
   const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },
   });
 
+  // Clear retained mutation state when the account catches up, so newer props are never overridden.
+  React.useEffect(() => {
+    setOptimisticState(null);
+  }, [account.hasHosting, account.hasMoneyManagement, account.isHost]);
+
   const totalHostedAccounts = data?.host?.totalHostedAccounts;
 
-  const [editMoneyManagementAndHosting, { loading: mutating, data: mutationData }] = useMutation(
-    editMoneyManagementAndHostingMutation,
-    {
-      refetchQueries,
+  const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
+    refetchQueries,
+    onCompleted: data => {
+      const updated = data?.editOrganizationMoneyManagementAndHosting;
+      if (updated) {
+        setOptimisticState({
+          hasHosting: updated.hasHosting,
+          hasMoneyManagement: updated.hasMoneyManagement,
+        });
+      }
     },
-  );
-  const updatedAccount = mutationData?.editOrganizationMoneyManagementAndHosting;
-  const hasHosting = updatedAccount?.hasHosting ?? account.hasHosting;
-  const hasMoneyManagement = updatedAccount
-    ? Boolean(updatedAccount.hasMoneyManagement)
-    : hasAccountMoneyManagement(account);
+  });
+  const hasHosting = optimisticState?.hasHosting ?? account.hasHosting;
+  const hasMoneyManagement = optimisticState?.hasMoneyManagement ?? hasAccountMoneyManagement(account);
 
   const handleFiscalHostUpdate = async ({ activate }) => {
     if (activate) {

@@ -99,7 +99,9 @@ export default function TransactionsImportSettingsModal({
   // If the modal unmounts mid-sync, the sync button can't reset the request flag itself, which would leave
   // the parent polling forever. Mirror the latest values in refs so the unmount cleanup can clear it.
   const syncRequestRef = React.useRef({ hasRequestedSync, setHasRequestedSync });
-  syncRequestRef.current = { hasRequestedSync, setHasRequestedSync };
+  React.useEffect(() => {
+    syncRequestRef.current = { hasRequestedSync, setHasRequestedSync };
+  }, [hasRequestedSync, setHasRequestedSync]);
   React.useEffect(() => {
     return () => {
       if (syncRequestRef.current.hasRequestedSync) {
@@ -312,6 +314,7 @@ export default function TransactionsImportSettingsModal({
                   </p>
                   <Button
                     loading={isRedirecting}
+                    disabled={!transactionsImport.institutionId}
                     onClick={async () => {
                       if (!transactionsImport.institutionId) {
                         return;
