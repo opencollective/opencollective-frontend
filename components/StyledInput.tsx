@@ -1,5 +1,5 @@
 import { themeGet } from '@styled-system/theme-get';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 import type {
   BackgroundProps,
   BorderProps,

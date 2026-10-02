@@ -1,5 +1,5 @@
 import { get } from 'lodash-es';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 
 import type { StyledInputProps } from './StyledInput';
 import StyledInput from './StyledInput';

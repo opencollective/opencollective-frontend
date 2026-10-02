@@ -3,7 +3,7 @@ import { FormikContext } from 'formik';
 import { isEmpty } from 'lodash-es';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import z from 'zod';
+import { z } from 'zod';
 
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/graphql';
 

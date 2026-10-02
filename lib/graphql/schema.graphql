@@ -1,3 +1,8 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
 """
 Collective interface
 """
@@ -72,7 +77,7 @@ interface CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  List of all collectives that are related to this collective with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST/FOLLOWER)
+  List of all collectives that are related to this collective with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST)
   """
   members(
     limit: Int = 100
@@ -89,7 +94,7 @@ interface CollectiveInterface {
   ): [Member]
 
   """
-  List of all collectives that this collective is a member of with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST/FOLLOWER)
+  List of all collectives that this collective is a member of with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST)
   """
   memberOf(
     limit: Int
@@ -519,7 +524,6 @@ enum ContributorRole {
   CONTRIBUTOR
   BACKER
   ATTENDEE
-  FOLLOWER
   CONNECTED_COLLECTIVE
   ACCOUNTANT
 }
@@ -872,6 +876,11 @@ type Policies {
   Contribution threshold to enforce contributor info. This resolver can be called from the collective or the host, when resolved through the collective the thresholds are returned in the collective currency
   """
   CONTRIBUTOR_INFO_THRESHOLDS: CONTRIBUTOR_INFO_THRESHOLDS
+
+  """
+  Tax form thresholds for US and non-US entities in cents (0 means always collect)
+  """
+  TAX_FORM_THRESHOLDS: TAX_FORM_THRESHOLDS
 }
 
 type EXPENSE_POLICIES {
@@ -1687,6 +1696,23 @@ type CONTRIBUTOR_INFO_THRESHOLDS {
   address: Int
 }
 
+type TAX_FORM_THRESHOLDS {
+  """
+  Threshold in cents for US entities (0 means always collect)
+  """
+  US: Int
+
+  """
+  Threshold in cents for non-US entities (0 means always collect)
+  """
+  NON_US: Int
+
+  """
+  Whether expenses paid through PayPal are included in threshold calculations
+  """
+  includePayPalExpenses: Boolean
+}
+
 """
 The results from searching for collectives with pagination info
 """
@@ -1891,7 +1917,7 @@ type Collective implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -1904,7 +1930,7 @@ type Collective implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -2142,7 +2168,7 @@ type Event implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -2155,7 +2181,7 @@ type Event implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -2393,7 +2419,7 @@ type Fund implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -2406,7 +2432,7 @@ type Fund implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -2644,7 +2670,7 @@ type Organization implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -2657,7 +2683,7 @@ type Organization implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -2895,7 +2921,7 @@ type Platform implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -2908,7 +2934,7 @@ type Platform implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -3146,7 +3172,7 @@ type Project implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -3159,7 +3185,7 @@ type Project implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -3696,7 +3722,7 @@ type User implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -3709,7 +3735,7 @@ type User implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -3949,7 +3975,7 @@ type Vendor implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -3962,7 +3988,7 @@ type Vendor implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int

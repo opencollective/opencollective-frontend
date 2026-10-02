@@ -1,6 +1,8 @@
 import React from 'react';
 import { pick } from 'lodash-es';
+import { FormattedMessage } from 'react-intl';
 
+import MessageBox from '../../../MessageBox';
 import { ButtonSet } from '../../../ui/ButtonSet';
 
 import { SubmitterType, TaxFormType } from './common';
@@ -18,9 +20,16 @@ type TaxFormTypeSelectFieldsValues = {
 export const TaxFormTypeSelectFields = ({
   values,
   onChange,
+  usPersonLocked = false,
 }: {
   values: TaxFormTypeSelectFieldsValues;
   onChange: (values: Partial<TaxFormTypeSelectFieldsValues>) => void;
+  /**
+   * When the account already has a stored US person/entity status (from a previously
+   * submitted tax form), the answer is locked so the stored form and the account data
+   * cannot drift apart. Users must contact their fiscal host to change it.
+   */
+  usPersonLocked?: boolean;
 }) => {
   const dispatchChanges = (newValues: Partial<TaxFormTypeSelectFieldsValues>) => {
     const newState = { ...pick(values, ['formType', 'isUSPersonOrEntity', 'submitterType']), ...newValues };
@@ -48,12 +57,21 @@ export const TaxFormTypeSelectFields = ({
         <HintText>US citizen, resident, green card holder, or US-incorporated entity.</HintText>
         <ButtonSet
           selected={values.isUSPersonOrEntity}
+          disabled={usPersonLocked}
           onChange={value => dispatchChanges({ isUSPersonOrEntity: value })}
           options={[
             { label: 'Yes', value: true },
             { label: 'No', value: false },
           ]}
         />
+        {usPersonLocked && (
+          <MessageBox type="info" className="mt-3">
+            <FormattedMessage
+              defaultMessage="Your US person or entity status is already on file and cannot be changed here. If your situation has changed, please contact your fiscal host to resubmit a tax form."
+              id="taxForm.usPersonLocked.hint"
+            />
+          </MessageBox>
+        )}
       </div>
       {values.isUSPersonOrEntity !== null && (
         <div className="mt-4">

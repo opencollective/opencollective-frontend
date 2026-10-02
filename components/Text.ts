@@ -1,8 +1,8 @@
 import type React from 'react';
 import type { CSSProp } from 'styled-components';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 import type { ColorProps, DisplayProps, SpaceProps, TypographyProps } from 'styled-system';
-import { color, display, space, typography } from 'styled-system';
+import { color, compose, display, space, typography } from 'styled-system';
 
 import type {
   CursorProps,
@@ -12,7 +12,7 @@ import type {
   WordBreakProps,
 } from '../lib/styled-system-custom-properties';
 import { cursor, overflowWrap, textTransform, whiteSpace, wordBreak } from '../lib/styled-system-custom-properties';
-import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
+import { shouldForwardPropExcept } from '@/lib/styled_components_utils';
 
 type TextProps = ColorProps &
   DisplayProps &
@@ -27,18 +27,16 @@ type TextProps = ColorProps &
     css?: CSSProp;
   };
 
+// Style props should not be forwarded to the DOM, nor to components passed with `as`
 const CUSTOM_TEXT_PROPS = new Set([
-  'fontSize',
-  'letterSpacing',
+  ...compose(color, display, space, typography, textTransform, whiteSpace, overflowWrap, wordBreak, cursor).propNames,
   'textDecoration',
-  'whiteSpace',
-  'textAlign',
-  'wordBreak',
+  'truncateOverflow',
 ]);
 
 export const P = styled.p
   .withConfig({
-    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !CUSTOM_TEXT_PROPS.has(prop),
+    shouldForwardProp: shouldForwardPropExcept(CUSTOM_TEXT_PROPS),
   })
   .attrs<TextProps>(props => ({
     // Overrides default margin Y to avoid global styles

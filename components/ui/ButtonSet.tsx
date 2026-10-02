@@ -13,6 +13,7 @@ export function ButtonSet<OptionValue>({
   selected,
   onChange,
   error,
+  disabled,
   className,
   getKey = (value: OptionValue) => value.toString(),
 }: {
@@ -20,6 +21,7 @@ export function ButtonSet<OptionValue>({
   selected: OptionValue;
   onChange: (value: OptionValue) => void;
   error?: boolean;
+  disabled?: boolean;
   className?: ClassValue;
   getKey?: (value: OptionValue) => string;
 }) {
@@ -29,8 +31,9 @@ export function ButtonSet<OptionValue>({
         <Button
           key={getKey(option.value)}
           type="button"
+          disabled={disabled}
           variant={selected === option.value ? 'default' : 'outline'}
-          onClick={() => selected !== option.value && onChange(option.value)}
+          onClick={() => !disabled && selected !== option.value && onChange(option.value)}
           className={cn({ 'border-red-500': error })}
         >
           {option.label}

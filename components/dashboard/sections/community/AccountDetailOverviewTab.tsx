@@ -33,7 +33,7 @@ import { transactionsTableQuery } from '../transactions/queries';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
 
-import { AccountDetailView, RichActivityDate } from './common';
+import { AccountDetailView, RichActivityDate, TaxableCountry } from './common';
 import { communityAccountOverviewQuery } from './queries';
 
 const recentTransactionsSchema = z.object({
@@ -217,6 +217,12 @@ export const AccountDetailsOverviewTab = ({
                   </span>
                 )
               }
+            />
+            <TaxableCountry
+              accountType={account?.type || expectedAccountType}
+              taxableCountry={account?.taxableCountry}
+              isUSEntity={account?.isUSEntity}
+              isLoading={isLoading}
             />
             {account?.socialLinks?.length > 0 && (
               <DataListItem

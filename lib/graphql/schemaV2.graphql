@@ -211,6 +211,16 @@ interface Account {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -2003,7 +2013,6 @@ enum MemberRole {
   MEMBER
   COMMUNITY_MANAGER
   FUNDRAISER @deprecated(reason: "2022-09-12: This role does not exist anymore")
-  FOLLOWER
   ACCOUNTANT
   CONNECTED_ACCOUNT
 }
@@ -3047,6 +3056,16 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -3138,7 +3157,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -7581,6 +7600,11 @@ type Policies {
   Contribution threshold to enforce contributor info. This resolver can be called from the collective or the host, when resolved through the collective the thresholds are returned in the collective currency
   """
   CONTRIBUTOR_INFO_THRESHOLDS: CONTRIBUTOR_INFO_THRESHOLDS
+
+  """
+  Tax form thresholds for US and non-US entities in cents (0 means always collect)
+  """
+  TAX_FORM_THRESHOLDS: TAX_FORM_THRESHOLDS
 }
 
 type EXPENSE_POLICIES {
@@ -7648,6 +7672,23 @@ enum UseVendorPolicy {
 type CONTRIBUTOR_INFO_THRESHOLDS {
   legalName: Int
   address: Int
+}
+
+type TAX_FORM_THRESHOLDS {
+  """
+  Threshold in cents for US entities (0 means always collect)
+  """
+  US: Int
+
+  """
+  Threshold in cents for non-US entities (0 means always collect)
+  """
+  NON_US: Int
+
+  """
+  Whether expenses paid through PayPal are included in threshold calculations
+  """
+  includePayPalExpenses: Boolean
 }
 
 type ActivitySubscription {
@@ -10531,6 +10572,16 @@ type Bot implements Account {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -10622,7 +10673,7 @@ type Bot implements Account {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -11590,6 +11641,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -11681,7 +11742,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -13239,6 +13300,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -13330,7 +13401,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -14597,6 +14668,16 @@ type Individual implements Account {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -14688,7 +14769,7 @@ type Individual implements Account {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -15981,6 +16062,16 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -16072,7 +16163,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -17442,6 +17533,16 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -17533,7 +17634,7 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -18610,6 +18711,16 @@ type Vendor implements Account & AccountWithContributions {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -18701,7 +18812,7 @@ type Vendor implements Account & AccountWithContributions {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -22965,6 +23076,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -23056,7 +23177,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -24181,6 +24302,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
   """
   legalName: String
+
+  """
+  Whether the account is a US person or entity. Scope: "account".
+  """
+  isUSEntity: Boolean
+
+  """
+  The country the account is taxable in (residence for individuals, incorporation for organizations), set from the US tax form (W-9 / W-8BEN / W-8BEN-E) submitted by the account. Scope: "account".
+  """
+  taxableCountry: String
   description: String
   longDescription: String
   tags: [String]
@@ -24272,7 +24403,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -27033,26 +27164,6 @@ type Mutation {
   ): [ManualPaymentProvider!]!
 
   """
-  Follows a given Collective. Scope: "account"
-  """
-  followAccount(
-    """
-    user will follow this account
-    """
-    account: AccountReferenceInput!
-  ): FollowAccountResult!
-
-  """
-  Unfollows a given Collective. Scope: "account"
-  """
-  unfollowAccount(
-    """
-    account to unfollow
-    """
-    account: AccountReferenceInput!
-  ): UnfollowAccountResult!
-
-  """
   Edit the public message for the given Member of a Collective. Scope: "account".
   """
   editPublicMessage(
@@ -28670,6 +28781,11 @@ input AccountUpdateInput {
   id: String!
   name: String
   legalName: String
+
+  """
+  Whether the account is a US person or entity.
+  """
+  isUSEntity: Boolean
   slug: String
   description: String
   image: URL
@@ -28745,6 +28861,7 @@ input PoliciesInput {
   USE_VENDOR_POLICY: UseVendorPolicy
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
   CONTRIBUTOR_INFO_THRESHOLDS: PoliciesContributorInfoThresholdsInput
+  TAX_FORM_THRESHOLDS: PoliciesTaxFormThresholdsInput
 }
 
 input PoliciesExpensePolicies {
@@ -28775,6 +28892,12 @@ input PoliciesExpenseCategorizationInput {
 input PoliciesContributorInfoThresholdsInput {
   legalName: Int
   address: Int
+}
+
+input PoliciesTaxFormThresholdsInput {
+  US: Int
+  NON_US: Int
+  includePayPalExpenses: Boolean
 }
 
 type SendMessageResult {
@@ -29935,16 +30058,6 @@ input ManualPaymentProviderUpdateInput {
   The balance/clearing accounting category to attribute payments through this provider to. Pass null to unset.
   """
   balanceAccountingCategory: AccountingCategoryReferenceInput
-}
-
-type FollowAccountResult {
-  individual: Individual!
-  member: Member!
-}
-
-type UnfollowAccountResult {
-  individual: Individual!
-  member: Member
 }
 
 input OAuthAuthorizationReferenceInput {

@@ -1,5 +1,5 @@
 import { has } from 'lodash-es';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 
 /**
  * A background for the gift card redeem(ed) pages

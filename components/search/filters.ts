@@ -1,5 +1,5 @@
 import { ArrowRightLeft, Coins, FileText, Megaphone, MessageCircle, Receipt, Users } from 'lucide-react';
-import z from 'zod';
+import { z } from 'zod';
 
 export enum SearchEntity {
   ALL = 'ALL',
