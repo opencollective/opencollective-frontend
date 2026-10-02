@@ -30,17 +30,15 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
 import StyledHr from '../StyledHr';
-import StyledInput from '../StyledInput';
-import StyledInputFormikField from '../StyledInputFormikField';
-import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
-import StyledSelect from '../StyledSelect';
-import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P, Span } from '../Text';
 import { Alert, AlertDescription } from '../ui/Alert';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { FormSectionTitle } from '../ui/FormSectionTitle';
+import { Input, InputGroup } from '../ui/Input';
+import { DefaultCommandSelect } from '../ui/Select';
+import { Textarea } from '../ui/Textarea';
 
 import CollapseSection from './CollapseSection';
 import ProjectTypeSelect from './ProjectTypeSelect';
@@ -300,42 +298,29 @@ const ApplicationForm = ({
                       {!LoggedInUser && (
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
                           <Box>
-                            <StyledInputFormikField
+                            <FormField
                               label={intl.formatMessage(i18nLabels.name)}
-                              labelFontSize="16px"
-                              labelProps={{ fontWeight: '600' }}
-                              disabled={!!LoggedInUser}
                               name="user.name"
-                              htmlFor="name"
-                              my={2}
+                              placeholder="Thomas Anderson"
+                              disabled={!!LoggedInUser}
                               required
-                            >
-                              {({ field }) => (
-                                <StyledInput type="text" placeholder="Thomas Anderson" px="7px" {...field} />
-                              )}
-                            </StyledInputFormikField>
+                            />
                           </Box>
                           <Box>
-                            <StyledInputFormikField
+                            <FormField
                               label={intl.formatMessage(i18nLabels.email)}
-                              labelFontSize="16px"
-                              labelProps={{ fontWeight: '600' }}
-                              disabled={!!LoggedInUser}
                               name="user.email"
-                              htmlFor="email"
                               type="email"
+                              placeholder="tanderson@gmail.com"
+                              disabled={!!LoggedInUser}
                               required
-                            >
-                              {({ field }) => (
-                                <StyledInput type="email" placeholder="tanderson@gmail.com" px="7px" {...field} />
-                              )}
-                            </StyledInputFormikField>
-                            <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                              <FormattedMessage
-                                id="OCFHostApplication.applicationForm.emailInstruction"
-                                defaultMessage="We will use this email to create your account."
-                              />
-                            </P>
+                              hint={
+                                <FormattedMessage
+                                  id="OCFHostApplication.applicationForm.emailInstruction"
+                                  defaultMessage="We will use this email to create your account."
+                                />
+                              }
+                            />
                           </Box>
                         </Grid>
                       )}
@@ -343,40 +328,41 @@ const ApplicationForm = ({
                         <React.Fragment>
                           <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} mb={3}>
                             <Box>
-                              <StyledInputFormikField
+                              <FormField
                                 label={intl.formatMessage(i18nLabels.nameLabel)}
-                                labelFontSize="16px"
-                                labelProps={{ fontWeight: '600' }}
                                 name="collective.name"
-                                htmlFor="initiativeName"
+                                placeholder="e.g Agora Collective"
                                 required
-                                onChange={handleSlugChange}
                               >
                                 {({ field }) => (
-                                  <StyledInput type="text" placeholder="e.g Agora Collective" px="7px" {...field} />
+                                  <Input
+                                    type="text"
+                                    placeholder="e.g Agora Collective"
+                                    {...field}
+                                    onChange={e => {
+                                      field.onChange(e);
+                                      handleSlugChange(e);
+                                    }}
+                                  />
                                 )}
-                              </StyledInputFormikField>
+                              </FormField>
                             </Box>
                             <Box>
-                              <StyledInputFormikField
+                              <FormField
                                 label={intl.formatMessage(i18nLabels.slug)}
-                                helpText={<FormattedMessage defaultMessage="This can be edited later" id="03Q893" />}
-                                labelFontSize="16px"
-                                labelProps={{ fontWeight: '600' }}
                                 name="collective.slug"
-                                htmlFor="slug"
                                 required
+                                hint={<FormattedMessage defaultMessage="This can be edited later" id="03Q893" />}
                               >
                                 {({ field }) => (
-                                  <StyledInputGroup
+                                  <InputGroup
                                     prepend="opencollective.com/"
                                     placeholder="agora"
                                     {...field}
                                     onChange={e => setFieldValue('collective.slug', e.target.value)}
-                                    prependProps={{ color: '#9D9FA3' }}
                                   />
                                 )}
-                              </StyledInputFormikField>
+                              </FormField>
                               <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
                                 <FormattedMessage
                                   id="createCollective.form.suggestedLabel"
@@ -386,54 +372,42 @@ const ApplicationForm = ({
                             </Box>
                           </Grid>
                           <Box mb={3}>
-                            <StyledInputFormikField
+                            <FormField
                               name="collective.description"
-                              htmlFor="description"
-                              labelFontSize="16px"
-                              labelProps={{ fontWeight: '600' }}
                               label={intl.formatMessage(i18nLabels.descriptionLabel)}
                               required
-                              data-cy="ccf-form-description"
+                              hint={intl.formatMessage(i18nLabels.descriptionHint)}
                             >
                               {({ field }) => (
-                                <StyledTextarea
+                                <Textarea
                                   {...field}
                                   rows={3}
-                                  width="100%"
                                   maxLength={150}
                                   showCount
-                                  fontSize="14px"
                                   placeholder={intl.formatMessage(i18nLabels.descriptionPlaceholder)}
+                                  data-cy="ccf-form-description"
                                 />
                               )}
-                            </StyledInputFormikField>
-                            <P fontSize="13px" lineHeight="20px" color="black.600" mt="6px">
-                              {intl.formatMessage(i18nLabels.descriptionHint)}
-                            </P>
+                            </FormField>
                           </Box>
                           <Box>
-                            <StyledInputFormikField
-                              name="collective.tags"
-                              htmlFor="tags"
-                              labelFontSize="16px"
-                              labelProps={{ fontWeight: '600' }}
-                              label={intl.formatMessage(i18nLabels.tagsLabel)}
-                              data-cy="ccf-form-tags"
-                            >
-                              {({ field }) => (
-                                <CollectiveTagsInput
-                                  {...field}
-                                  defaultValue={field.value}
-                                  onChange={tags => {
-                                    setFieldValue(
-                                      'collective.tags',
-                                      tags.map(t => t.value),
-                                    );
-                                  }}
-                                  suggestedTags={popularTags}
-                                />
-                              )}
-                            </StyledInputFormikField>
+                            <div data-cy="ccf-form-tags">
+                              <FormField name="collective.tags" label={intl.formatMessage(i18nLabels.tagsLabel)}>
+                                {({ field }) => (
+                                  <CollectiveTagsInput
+                                    {...field}
+                                    defaultValue={field.value}
+                                    onChange={tags => {
+                                      setFieldValue(
+                                        'collective.tags',
+                                        tags.map(t => t.value),
+                                      );
+                                    }}
+                                    suggestedTags={popularTags}
+                                  />
+                                )}
+                              </FormField>
+                            </div>
                           </Box>
                         </React.Fragment>
                       )}
@@ -457,7 +431,7 @@ const ApplicationForm = ({
                         </P>
                       </Box>
 
-                      <StyledInputFormikField name="applicationData.typeOfProject" htmlFor="typeOfProject" required>
+                      <FormField name="applicationData.typeOfProject" required>
                         {({ field }) => {
                           return (
                             <ProjectTypeSelect
@@ -478,7 +452,7 @@ const ApplicationForm = ({
                             />
                           );
                         }}
-                      </StyledInputFormikField>
+                      </FormField>
 
                       <CollapseSection
                         title={intl.formatMessage(i18nLabels.aboutYourCodeTitle, {
@@ -496,74 +470,60 @@ const ApplicationForm = ({
                       >
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
                           <Box>
-                            <StyledInputFormikField
+                            <FormField
                               label={intl.formatMessage(i18nLabels.repositoryUrl)}
-                              labelFontSize="16px"
-                              labelProps={{ fontWeight: '600' }}
                               name="applicationData.repositoryUrl"
-                              htmlFor="repositoryUrl"
                               required={values.applicationData.typeOfProject === 'CODE' || undefined}
+                              hint={
+                                <FormattedMessage
+                                  id="HostApplication.repositoryUrlHint"
+                                  defaultMessage="Can be GitHub, GitLab or any URL"
+                                />
+                              }
                             >
                               {({ field }) => (
-                                <StyledInputGroup
+                                <InputGroup
                                   type="url"
                                   placeholder="https://github.com"
                                   {...field}
                                   onChange={e => setFieldValue('applicationData.repositoryUrl', e.target.value)}
                                 />
                               )}
-                            </StyledInputFormikField>
-                            <P fontSize="13px" lineHeight="20px" color="black.600" mt="6px">
-                              <FormattedMessage
-                                id="HostApplication.repositoryUrlHint"
-                                defaultMessage="Can be GitHub, GitLab or any URL"
-                              />
-                            </P>
+                            </FormField>
                           </Box>
 
-                          <StyledInputFormikField
+                          <FormField
                             label={intl.formatMessage(i18nLabels.repositoryLicense)}
-                            labelFontSize="16px"
-                            labelProps={{ fontWeight: '600' }}
                             name="applicationData.licenseSpdxId"
-                            htmlFor="licenseSpdxId"
                           >
-                            {({ field }) => {
-                              return (
-                                <StyledSelect
-                                  inputId={field.id}
-                                  options={spdxLicenseList}
-                                  {...field}
-                                  value={spdxLicenseList.find(option => option.value === field.value)}
-                                  onChange={({ value }) => {
-                                    setFieldValue('applicationData.licenseSpdxId', value);
-                                  }}
-                                />
-                              );
-                            }}
-                          </StyledInputFormikField>
+                            {({ field }) => (
+                              <DefaultCommandSelect
+                                name={field.name}
+                                placeholder={intl.formatMessage(i18nLabels.licensePlaceholder)}
+                                searchPlaceholder={intl.formatMessage(i18nLabels.licenseSearchPlaceholder)}
+                                emptyResultLabel={intl.formatMessage(i18nLabels.licenseEmptyResultLabel)}
+                                options={spdxLicenseList}
+                                value={field.value || ''}
+                                setValue={value => setFieldValue(field.name, value)}
+                              />
+                            )}
+                          </FormField>
                         </Grid>
 
                         <Box mt={20}>
-                          <StyledInputFormikField
+                          <FormField
                             name="applicationData.extraLicenseInfo"
-                            htmlFor="extraLicenseInformation"
-                            labelFontSize="16px"
-                            labelProps={{ fontWeight: '600' }}
                             label={intl.formatMessage(i18nLabels.extraLicenseInfo)}
+                            hint={<FormattedMessage {...i18nLabels.extraLicenseInfoHelpText} />}
                           >
                             {({ field }) => (
-                              <StyledTextarea
+                              <Textarea
                                 {...field}
                                 rows={4}
-                                fontSize="14px"
                                 placeholder={intl.formatMessage(i18nLabels.extraLicenseInfoHelpText)}
                               />
                             )}
-                          </StyledInputFormikField>
-                          <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
-                            <FormattedMessage {...i18nLabels.extraLicenseInfoHelpText} />
-                          </P>
+                          </FormField>
                         </Box>
                       </CollapseSection>
 
@@ -583,45 +543,36 @@ const ApplicationForm = ({
                       >
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
                           <Box>
-                            <StyledInputFormikField
+                            <FormField
                               label={intl.formatMessage(i18nLabels.amountOfMembers)}
-                              labelFontSize="16px"
-                              labelProps={{ fontWeight: '600' }}
                               name="applicationData.amountOfMembers"
-                              htmlFor="amountOfMembers"
                               required={values.applicationData.typeOfProject === 'COMMUNITY' || undefined}
                             >
                               {({ field }) => (
-                                <StyledInputGroup
+                                <InputGroup
                                   placeholder="0-10"
                                   {...field}
                                   onChange={e => setFieldValue('applicationData.amountOfMembers', e.target.value)}
                                 />
                               )}
-                            </StyledInputFormikField>
+                            </FormField>
                           </Box>
                         </Grid>
 
                         <Box mt={20}>
-                          <StyledInputFormikField
+                          <FormField
                             name="applicationData.previousEvents"
-                            htmlFor="previousEvents"
-                            labelFontSize="16px"
-                            labelProps={{ fontWeight: '600' }}
                             label={intl.formatMessage(i18nLabels.linksToPreviousEvents)}
+                            hint={<FormattedMessage {...i18nLabels.linksToPreviousEventsHelpText} />}
                           >
                             {({ field }) => (
-                              <StyledTextarea
+                              <Textarea
                                 {...field}
                                 rows={4}
-                                fontSize="14px"
                                 placeholder={intl.formatMessage(i18nLabels.linksToPreviousEventsPlaceholder)}
                               />
                             )}
-                          </StyledInputFormikField>
-                          <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
-                            <FormattedMessage {...i18nLabels.linksToPreviousEventsHelpText} />
-                          </P>
+                          </FormField>
                         </Box>
                       </CollapseSection>
 
@@ -702,28 +653,22 @@ const ApplicationForm = ({
                         )}
                       </Box>
                       <Box mt={24}>
-                        <StyledInputFormikField
+                        <FormField
                           name="message"
-                          htmlFor="apply-create-message"
                           required={true}
-                          labelFontSize="16px"
-                          labelProps={{ fontWeight: '600' }}
                           label={intl.formatMessage(i18nLabels.tellUsMoreLabel)}
-                          data-cy="ccf-form-message"
+                          hint={<FormattedMessage {...i18nLabels.tellUsMoreHelpText} />}
                         >
                           {({ field }) => (
-                            <StyledTextarea
+                            <Textarea
                               {...field}
                               rows={6}
-                              fontSize="14px"
                               maxLength={3000}
                               placeholder={intl.formatMessage(i18nLabels.tellUsMorePlaceholder)}
+                              data-cy="ccf-form-message"
                             />
                           )}
-                        </StyledInputFormikField>
-                        <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
-                          <FormattedMessage {...i18nLabels.tellUsMoreHelpText} />
-                        </P>
+                        </FormField>
                       </Box>
 
                       <div className="mt-8">
@@ -757,11 +702,12 @@ const ApplicationForm = ({
                       </Box>
                       <Container display="flex" alignSelf="flex-start" alignItems="center" my={2}>
                         <Box mr={3}>
-                          <StyledInputFormikField name="termsOfServiceOC" required>
+                          <FormField name="termsOfServiceOC" required>
                             {({ field }) => (
                               <label className="flex cursor-pointer items-start gap-2 text-sm leading-normal">
                                 <Checkbox
                                   name={field.name}
+                                  data-cy="checkbox-termsOfServiceOC"
                                   checked={Boolean(field.value)}
                                   onCheckedChange={checked => setFieldValue(field.name, checked === true)}
                                 />
@@ -784,7 +730,7 @@ const ApplicationForm = ({
                                 </span>
                               </label>
                             )}
-                          </StyledInputFormikField>
+                          </FormField>
                         </Box>
                       </Container>
                     </Container>
