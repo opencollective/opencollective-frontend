@@ -1145,7 +1145,7 @@ const Policies = ({ collective }) => {
                   disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
                   value={
                     isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.US)
-                      ? ''
+                      ? 'THRESHOLD'
                       : formik.values.policies.TAX_FORM_THRESHOLDS.US === 0
                         ? 'ALWAYS'
                         : 'THRESHOLD'
@@ -1182,14 +1182,7 @@ const Policies = ({ collective }) => {
                       disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
                       currency={data?.account?.currency || collective.currency || 'USD'}
                       currencyDisplay="CODE"
-                      // When no custom threshold is set, display the statutory post-2026
-                      // default as a placeholder only. `value` stays undefined so nothing is
-                      // persisted until the host explicitly sets a threshold.
-                      defaultValue={
-                        isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.US)
-                          ? DEFAULT_US_TAX_FORM_THRESHOLD_POST_2026
-                          : undefined
-                      }
+                      placeholder={`${DEFAULT_US_TAX_FORM_THRESHOLD_POST_2026 / 100}.00`}
                       value={
                         isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.US)
                           ? undefined
@@ -1235,7 +1228,7 @@ const Policies = ({ collective }) => {
                   disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
                   value={
                     isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US)
-                      ? ''
+                      ? 'THRESHOLD'
                       : formik.values.policies.TAX_FORM_THRESHOLDS.NON_US === 0
                         ? 'ALWAYS'
                         : 'THRESHOLD'
@@ -1272,11 +1265,7 @@ const Policies = ({ collective }) => {
                       disabled={isUpgradeRequiredForTaxForms || isSettingPolicies}
                       currency={data?.account?.currency || collective.currency || 'USD'}
                       currencyDisplay="CODE"
-                      defaultValue={
-                        isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US)
-                          ? DEFAULT_US_TAX_FORM_THRESHOLD_POST_2026
-                          : undefined
-                      }
+                      placeholder={`${DEFAULT_US_TAX_FORM_THRESHOLD_POST_2026 / 100}.00`}
                       value={
                         isNil(formik.values.policies?.TAX_FORM_THRESHOLDS?.NON_US)
                           ? undefined
