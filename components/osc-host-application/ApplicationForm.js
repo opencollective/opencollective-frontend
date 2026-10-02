@@ -39,6 +39,9 @@ import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P, Span } from '../Text';
+import { Alert, AlertDescription } from '../ui/Alert';
+import { Checkbox } from '../ui/Checkbox';
+import { FormSectionTitle } from '../ui/FormSectionTitle';
 
 import CollapseSection from './CollapseSection';
 import ProjectTypeSelect from './ProjectTypeSelect';
@@ -723,6 +726,34 @@ const ApplicationForm = ({
                           <FormattedMessage {...i18nLabels.tellUsMoreHelpText} />
                         </P>
                       </Box>
+
+                      <div className="mt-8">
+                        <FormSectionTitle>
+                          <FormattedMessage {...i18nLabels.legalEntityTitle} />
+                        </FormSectionTitle>
+                        <StyledInputFormikField name="applicationData.hasLegalEntity">
+                          {({ field }) => (
+                            <div className="flex items-start gap-2">
+                              <Checkbox
+                                id={field.id}
+                                checked={!!field.value}
+                                onCheckedChange={checked => setFieldValue(field.name, checked === true)}
+                              />
+                              <label
+                                htmlFor={field.id}
+                                className="cursor-pointer text-sm leading-5 font-normal text-foreground"
+                              >
+                                <FormattedMessage {...i18nLabels.hasLegalEntity} />
+                              </label>
+                            </div>
+                          )}
+                        </StyledInputFormikField>
+                        <Alert variant="info" className="mt-3">
+                          <AlertDescription>
+                            <FormattedMessage {...i18nLabels.hasLegalEntityNotice} />
+                          </AlertDescription>
+                        </Alert>
+                      </div>
 
                       <Box mb={2} mt={40}>
                         <StyledHr />
