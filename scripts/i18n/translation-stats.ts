@@ -198,7 +198,6 @@ const IGNORED: Record<string, readonly string[]> = {
     'Location.online', // "Online" - identisch
     'Logo', // "Logo" - identisch
     'LseLoM', // "Spam" - identisch
-    'Member.Role.FOLLOWER', // "Follower" - Social-Media-Begriff
     'OptionalFieldLabel', // "{field} (optional)" - optional identisch
     'order.status', // "Status" - identisch
     'Parameter', // "Parameter" - identisch

@@ -64,9 +64,8 @@ const PublicMessageEditButton = styled.button`
 const getMainContributorRole = contributor => {
   // Order of the if / else if makes the priority to decide which role we want to
   // show first. The priority order should be:
-  // ADMIN > BACKER > *
-  // Everything that comes after follower is considered same priority so we just
-  // take the first role in the list.
+  // ADMIN > MEMBER > CONTRIBUTOR > BACKER > *
+  // Other roles have the same priority, so take the first role in the list.
   if (contributor.isAdmin) {
     return roles.ADMIN;
   } else if (contributor.isCore) {

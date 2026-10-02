@@ -154,12 +154,7 @@ const UpdatesList = () => {
       <div className="flex flex-1 flex-col gap-6">
         <DashboardHeader
           title={<FormattedMessage id="updates" defaultMessage="Updates" />}
-          description={
-            <FormattedMessage
-              id="Dashboard.Updates.Subtitle"
-              defaultMessage="Updates from your account that are visible to people following you"
-            />
-          }
+          description={<FormattedMessage id="USDg2A" defaultMessage="Create and manage updates." />}
           actions={
             <Link href={getDashboardRoute(account, 'updates/new')}>
               <Button size="sm" className="gap-1.5">
