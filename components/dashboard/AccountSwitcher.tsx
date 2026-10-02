@@ -26,6 +26,7 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '../ui/Sidebar';
 
 import { ROOT_PROFILE_KEY } from './constants';
+import { DashboardContext } from './DashboardContext';
 
 const CREATE_NEW_LINKS = {
   ORGANIZATION: '/signup/organization',
@@ -51,7 +52,7 @@ const EMPTY_GROUP_STATE = {
   },
 };
 
-const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
+const getGroupedAdministratedAccounts = memoizeOne((loggedInUser): Record<string, any[]> => {
   const isAdministratedAccount = m =>
     ['ADMIN', 'ACCOUNTANT', 'COMMUNITY_MANAGER'].includes(m.role) && !m.collective.isIncognito;
   let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.collective) || [];
@@ -77,6 +78,49 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   }
   return groupedAccounts;
 });
+
+/**
+ * Returns true when `account` already appears in the grouped accounts, either at the top level or
+ * as a child of one of them.
+ */
+export const isAccountInGroupedAccounts = (
+  groupedAccounts: Record<string, any[]>,
+  account: { slug?: string | null },
+): boolean => {
+  if (!account?.slug) {
+    return false;
+  }
+  return Object.values(groupedAccounts).some(
+    accounts =>
+      accounts.some(a => a.slug === account.slug) ||
+      accounts.some(a => a.children?.some((child: { slug: string }) => child.slug === account.slug)),
+  );
+};
+
+/**
+ * Ensures the currently active account appears in the grouped accounts. The active account is not
+ * necessarily part of `memberOf`: events and projects inherit their admins from their parent, and it
+ * may also have just been created.
+ */
+export const includeActiveAccountInGroups = (
+  groupedAccounts: Record<string, any[]>,
+  activeAccount: { slug?: string | null; type?: string } | null | undefined,
+  loggedInUserCollective?: { slug?: string | null } | null,
+): Record<string, any[]> => {
+  if (
+    !activeAccount?.slug ||
+    activeAccount.type === 'ROOT' ||
+    activeAccount.slug === loggedInUserCollective?.slug ||
+    isAccountInGroupedAccounts(groupedAccounts, activeAccount)
+  ) {
+    return groupedAccounts;
+  }
+
+  return {
+    ...groupedAccounts,
+    [activeAccount.type]: [...(groupedAccounts[activeAccount.type] || []), activeAccount],
+  };
+};
 
 const generateOptionDescription = (collective: GraphQLV1Collective, LoggedInUser: LoggedInUser) => {
   if (LoggedInUser && !LoggedInUser.isAdminOfCollective(collective)) {
@@ -205,17 +249,23 @@ const MenuEntry = ({
   );
 };
 
-const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
+const AccountSwitcher = () => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
+  const { account: dashboardAccount, activeSlug } = React.useContext(DashboardContext);
 
   const [open, setOpen] = React.useState(false);
   const loggedInUserCollective = LoggedInUser?.collective;
 
-  const groupedAccounts = getGroupedAdministratedAccounts(LoggedInUser);
+  let groupedAccounts = getGroupedAdministratedAccounts(LoggedInUser);
+  // The active account is not necessarily part of `memberOf`: events and projects inherit their
+  // admins from their parent, and it may also have just been created. Make sure it is listed so the
+  // user can see it and switch back to it.
+  groupedAccounts = includeActiveAccountInGroups(groupedAccounts, dashboardAccount, loggedInUserCollective);
   const rootAccounts = flatten(Object.values(groupedAccounts));
   const allAdministratedAccounts = [...rootAccounts, ...flatten(rootAccounts.map(a => a.children))];
-  const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
+  const activeAccount =
+    dashboardAccount || allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
   const handleClose = () => setOpen(false);
   const { isMobile, state } = useSidebar();
 
