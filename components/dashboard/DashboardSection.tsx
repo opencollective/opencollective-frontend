@@ -88,7 +88,19 @@ import { DashboardContext } from './DashboardContext';
 import DashboardErrorBoundary from './DashboardErrorBoundary';
 import DashboardHeader from './DashboardHeader';
 
-const DASHBOARD_COMPONENTS = {
+/**
+ * Props passed to dashboard section components. Kept explicit so JSX checking
+ * does not depend on inferring a union of dozens of component types (where an
+ * extra prop like `subpath` fails against the inferred intersection).
+ */
+type DashboardComponentProps = {
+  accountSlug: string;
+  account: any;
+  subpath?: string[];
+  isDashboard?: boolean;
+};
+
+const DASHBOARD_COMPONENTS: Record<string, React.ComponentType<DashboardComponentProps>> = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
   [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
   [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
