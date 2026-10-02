@@ -13,6 +13,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
     type
     name
     legalName
+    isUSEntity
     hasTwoFactorAuth
     location {
       id
@@ -43,6 +44,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
           type
           name
           legalName
+          isUSEntity
           isActive
           isHost
           policies {

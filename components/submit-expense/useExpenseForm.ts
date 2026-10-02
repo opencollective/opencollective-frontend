@@ -386,6 +386,7 @@ const expenseFormSchemaQuery = gql`
       PAYPAL_PAYOUTS
       CHART_OF_ACCOUNTS
       PAYPAL_CONNECT
+      TAX_FORMS
     }
   }
 
@@ -575,6 +576,7 @@ const expenseFormSchemaQuery = gql`
     slug
     name
     legalName
+    isUSEntity
     type
     isAdmin
     payoutMethods {
