@@ -22,22 +22,17 @@ import { i18nLabels } from '../../lib/i18n/custom-application-form';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import CollectiveTagsInput from '../CollectiveTagsInput';
-import Container from '../Container';
 import { FormField } from '../FormField';
-import { Box, Flex, Grid } from '../Grid';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import MessageBox from '../MessageBox';
 import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
-import StyledHr from '../StyledHr';
-import StyledLink from '../StyledLink';
-import { H1, H4, P, Span } from '../Text';
 import { Alert, AlertDescription } from '../ui/Alert';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { FormSectionTitle } from '../ui/FormSectionTitle';
 import { Input, InputGroup } from '../ui/Input';
 import { DefaultCommandSelect } from '../ui/Select';
+import { Separator } from '../ui/Separator';
 import { Textarea } from '../ui/Textarea';
 
 import CollapseSection from './CollapseSection';
@@ -194,51 +189,48 @@ const ApplicationForm = ({
 
   return (
     <React.Fragment>
-      <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
-        <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
-          <Box width={'160px'} height={'160px'} mb="24px">
+      <div className="mt-6 flex flex-col items-center justify-center sm:mt-12">
+        <div className="flex flex-col items-center justify-center sm:flex-row">
+          <div className="mb-6 h-40 w-40">
             <NextIllustration
               alt="Open Source Collective logotype"
               src="/static/images/osc-logo.png"
               width={160}
               height={160}
             />
-          </Box>
-          <Box textAlign={['center', 'left']} width={['288px', '488px']} mb={4} ml={[null, '24px']}>
-            <H1
-              fontSize="32px"
-              lineHeight="40px"
-              letterSpacing="-0.008em"
-              color="black.900"
-              textAlign={['center', 'left']}
-              mb="14px"
-            >
+          </div>
+          <div className="mb-4 w-72 text-center sm:ml-6 sm:w-[488px] sm:text-left">
+            <h1 className="mb-3.5 text-[32px] leading-10 font-semibold tracking-tight text-foreground">
               <FormattedMessage id="HostApplication.header" defaultMessage="Apply with your Collective" />
-            </H1>
-            <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
+            </h1>
+            <p className="text-base leading-6 font-medium text-muted-foreground">
               <FormattedMessage
                 id="HostApplication.form.subheading"
                 defaultMessage="Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
-                    <StyledLink href="https://docs.oscollective.org/how-to-apply" openInNewTab color="purple.500">
+                    <Link
+                      href="https://docs.oscollective.org/how-to-apply"
+                      openInNewTab
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
                       <FormattedMessage id="HostApplication.form.readFaqs" defaultMessage="Visit our docs" />
-                    </StyledLink>
+                    </Link>
                   ),
                 }}
               />
-            </P>
-          </Box>
-        </Flex>
-      </Flex>
-      <Flex justifyContent="center">
-        <Flex flexDirection="column" flex={'1'} maxWidth="993px">
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-center">
+        <div className="flex max-w-[993px] flex-1 flex-col">
           {error && (
-            <Flex alignItems="center" justifyContent="center">
-              <MessageBox type="error" withIcon mb={[1, 3]}>
-                {i18nGraphqlException(intl, error)}
-              </MessageBox>
-            </Flex>
+            <div className="flex items-center justify-center">
+              <Alert variant="destructive" className="mb-3">
+                <AlertDescription>{i18nGraphqlException(intl, error)}</AlertDescription>
+              </Alert>
+            </div>
           )}
           {loadingCollective ? (
             <LoadingPlaceholder
@@ -279,25 +271,13 @@ const ApplicationForm = ({
 
                 return (
                   <Form data-cy="ccf-form">
-                    <Container
-                      justifyContent="center"
-                      flexDirection="column"
-                      mb={4}
-                      mt={[3, 0]}
-                      border="1px solid #DCDEE0"
-                      padding={['16px', '32px']}
-                      display="flex"
-                      borderRadius="8px"
-                    >
-                      <Flex alignItems="center" justifyContent="stretch" gap={12} mb={3}>
-                        <H4 fontSize="18px" lineHeight="24px" color="black.900">
-                          <FormattedMessage id="HostApplication.form.mainInfo" defaultMessage="Main info" />
-                        </H4>
-                        <StyledHr flex="1" />
-                      </Flex>
+                    <div className="mt-3 mb-4 flex flex-col rounded-lg border border-border p-4 sm:mt-0 sm:p-8">
+                      <FormSectionTitle>
+                        <FormattedMessage id="HostApplication.form.mainInfo" defaultMessage="Main info" />
+                      </FormSectionTitle>
                       {!LoggedInUser && (
-                        <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
-                          <Box>
+                        <div className="grid grid-cols-1 gap-3 py-2 sm:grid-cols-2">
+                          <div>
                             <FormField
                               label={intl.formatMessage(i18nLabels.name)}
                               name="user.name"
@@ -305,8 +285,8 @@ const ApplicationForm = ({
                               disabled={!!LoggedInUser}
                               required
                             />
-                          </Box>
-                          <Box>
+                          </div>
+                          <div>
                             <FormField
                               label={intl.formatMessage(i18nLabels.email)}
                               name="user.email"
@@ -321,13 +301,13 @@ const ApplicationForm = ({
                                 />
                               }
                             />
-                          </Box>
-                        </Grid>
+                          </div>
+                        </div>
                       )}
                       {!canApplyWithCollective && (
                         <React.Fragment>
-                          <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} mb={3}>
-                            <Box>
+                          <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
                               <FormField
                                 label={intl.formatMessage(i18nLabels.nameLabel)}
                                 name="collective.name"
@@ -346,8 +326,8 @@ const ApplicationForm = ({
                                   />
                                 )}
                               </FormField>
-                            </Box>
-                            <Box>
+                            </div>
+                            <div>
                               <FormField
                                 label={intl.formatMessage(i18nLabels.slug)}
                                 name="collective.slug"
@@ -363,15 +343,15 @@ const ApplicationForm = ({
                                   />
                                 )}
                               </FormField>
-                              <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                              <p className="mt-1.5 text-xs leading-4 text-muted-foreground">
                                 <FormattedMessage
                                   id="createCollective.form.suggestedLabel"
                                   defaultMessage="Suggested"
                                 />
-                              </P>
-                            </Box>
-                          </Grid>
-                          <Box mb={3}>
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mb-3">
                             <FormField
                               name="collective.description"
                               label={intl.formatMessage(i18nLabels.descriptionLabel)}
@@ -389,8 +369,8 @@ const ApplicationForm = ({
                                 />
                               )}
                             </FormField>
-                          </Box>
-                          <Box>
+                          </div>
+                          <div>
                             <div data-cy="ccf-form-tags">
                               <FormField name="collective.tags" label={intl.formatMessage(i18nLabels.tagsLabel)}>
                                 {({ field }) => (
@@ -408,28 +388,22 @@ const ApplicationForm = ({
                                 )}
                               </FormField>
                             </div>
-                          </Box>
+                          </div>
                         </React.Fragment>
                       )}
 
-                      <Box mb={3} mt={'40px'}>
-                        <Flex alignItems="center" justifyContent="stretch" gap={12} mb={3}>
-                          <H4 fontSize="18px" lineHeight="24px" color="black.900">
-                            <FormattedMessage
-                              id="HostApplication.form.typeOfProject"
-                              defaultMessage="Type of Project"
-                            />
-                          </H4>
-                          <StyledHr flex="1" />
-                        </Flex>
+                      <div className="mt-10 mb-3">
+                        <FormSectionTitle>
+                          <FormattedMessage id="HostApplication.form.typeOfProject" defaultMessage="Type of Project" />
+                        </FormSectionTitle>
 
-                        <P fontSize="14px" lineHeight="20px">
+                        <p className="text-sm leading-5 text-muted-foreground">
                           <FormattedMessage
                             id="HostApplication.form.typeOfProject.description"
                             defaultMessage="Open Source Collective hosts open source software projects and adjacent communities (meetup groups, educational programs and mentorship schemes etc). What is the primary focus of your project?"
                           />
-                        </P>
-                      </Box>
+                        </p>
+                      </div>
 
                       <FormField name="applicationData.typeOfProject" required>
                         {({ field }) => {
@@ -458,9 +432,9 @@ const ApplicationForm = ({
                         title={intl.formatMessage(i18nLabels.aboutYourCodeTitle, {
                           optional:
                             values.applicationData.typeOfProject === 'COMMUNITY' ? (
-                              <Span fontWeight={400} color="black.700">
+                              <span className="font-normal text-muted-foreground">
                                 (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
-                              </Span>
+                              </span>
                             ) : null,
                         })}
                         isExpanded={codeSectionExpanded}
@@ -468,8 +442,8 @@ const ApplicationForm = ({
                         imageSrc="/static/images/night-sky.png"
                         subtitle={intl.formatMessage(i18nLabels.aboutYourCodeSubtitle)}
                       >
-                        <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
-                          <Box>
+                        <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
+                          <div>
                             <FormField
                               label={intl.formatMessage(i18nLabels.repositoryUrl)}
                               name="applicationData.repositoryUrl"
@@ -490,7 +464,7 @@ const ApplicationForm = ({
                                 />
                               )}
                             </FormField>
-                          </Box>
+                          </div>
 
                           <FormField
                             label={intl.formatMessage(i18nLabels.repositoryLicense)}
@@ -508,9 +482,9 @@ const ApplicationForm = ({
                               />
                             )}
                           </FormField>
-                        </Grid>
+                        </div>
 
-                        <Box mt={20}>
+                        <div className="mt-5">
                           <FormField
                             name="applicationData.extraLicenseInfo"
                             label={intl.formatMessage(i18nLabels.extraLicenseInfo)}
@@ -524,16 +498,16 @@ const ApplicationForm = ({
                               />
                             )}
                           </FormField>
-                        </Box>
+                        </div>
                       </CollapseSection>
 
                       <CollapseSection
                         title={intl.formatMessage(i18nLabels.aboutYourCommunityTitle, {
                           optional:
                             values.applicationData.typeOfProject === 'CODE' ? (
-                              <Span fontWeight={400} color="black.700">
+                              <span className="font-normal text-muted-foreground">
                                 (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
-                              </Span>
+                              </span>
                             ) : null,
                         })}
                         isExpanded={communitySectionExpanded}
@@ -541,8 +515,8 @@ const ApplicationForm = ({
                         imageSrc="/static/images/community.png"
                         subtitle={intl.formatMessage(i18nLabels.aboutYourCommunitySubtitle)}
                       >
-                        <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
-                          <Box>
+                        <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
+                          <div>
                             <FormField
                               label={intl.formatMessage(i18nLabels.amountOfMembers)}
                               name="applicationData.amountOfMembers"
@@ -556,10 +530,10 @@ const ApplicationForm = ({
                                 />
                               )}
                             </FormField>
-                          </Box>
-                        </Grid>
+                          </div>
+                        </div>
 
-                        <Box mt={20}>
+                        <div className="mt-5">
                           <FormField
                             name="applicationData.previousEvents"
                             label={intl.formatMessage(i18nLabels.linksToPreviousEvents)}
@@ -573,29 +547,26 @@ const ApplicationForm = ({
                               />
                             )}
                           </FormField>
-                        </Box>
+                        </div>
                       </CollapseSection>
 
-                      <Flex alignItems="center" justifyContent="stretch" gap={12} mt={32} mb={3}>
-                        <H4 fontSize="18px" lineHeight="24px" color="black.900">
-                          <FormattedMessage id="HostApplication.form.team" defaultMessage="Your team" />
-                        </H4>
-                        <StyledHr flex="1" />
-                      </Flex>
+                      <FormSectionTitle className="mt-8">
+                        <FormattedMessage id="HostApplication.form.team" defaultMessage="Your team" />
+                      </FormSectionTitle>
 
-                      <Box mb={2}>
-                        <H4 fontSize="16px" lineHeight="24px" color="black.800" mb={0}>
+                      <div className="mb-2">
+                        <h4 className="text-base leading-6 font-semibold text-foreground">
                           <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
                           {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
-                            <Span fontWeight="300" fontSize="11px" color="black.700" letterSpacing="0.06em">
+                            <span className="text-xs font-light tracking-wider text-muted-foreground">
                               {` (${1 + values.inviteMembers?.length}/${
                                 host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
                               })`}
-                            </Span>
+                            </span>
                           )}
-                        </H4>
+                        </h4>
 
-                        <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
+                        <div className="flex w-full flex-wrap" data-cy="profile-card">
                           {LoggedInUser ? (
                             <OnboardingProfileCard
                               key={LoggedInUser.collective.id}
@@ -616,12 +587,12 @@ const ApplicationForm = ({
                               }
                             />
                           ))}
-                        </Flex>
+                        </div>
 
-                        <Box>
-                          <H4 mt={2} fontSize="16px" color="black.800">
+                        <div>
+                          <h4 className="mt-2 text-base font-semibold text-foreground">
                             <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
-                          </H4>
+                          </h4>
                           <CollectivePickerAsync
                             inputId="onboarding-admin-picker"
                             creatable
@@ -641,18 +612,20 @@ const ApplicationForm = ({
                               ]);
                             }}
                           />
-                        </Box>
+                        </div>
                         {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
-                          <MessageBox type="info" mt={3} fontSize="13px">
-                            <FormattedMessage
-                              defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
-                              id="GTK0Wf"
-                              values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
-                            />
-                          </MessageBox>
+                          <Alert variant="info" className="mt-3">
+                            <AlertDescription>
+                              <FormattedMessage
+                                defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                                id="GTK0Wf"
+                                values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                              />
+                            </AlertDescription>
+                          </Alert>
                         )}
-                      </Box>
-                      <Box mt={24}>
+                      </div>
+                      <div className="mt-6">
                         <FormField
                           name="message"
                           required={true}
@@ -669,7 +642,7 @@ const ApplicationForm = ({
                             />
                           )}
                         </FormField>
-                      </Box>
+                      </div>
 
                       <div className="mt-8">
                         <FormSectionTitle>
@@ -697,46 +670,42 @@ const ApplicationForm = ({
                         </Alert>
                       </div>
 
-                      <Box mb={2} mt={40}>
-                        <StyledHr />
-                      </Box>
-                      <Container display="flex" alignSelf="flex-start" alignItems="center" my={2}>
-                        <Box mr={3}>
-                          <FormField name="termsOfServiceOC" required>
-                            {({ field }) => (
-                              <label className="flex cursor-pointer items-start gap-2 text-sm leading-normal">
-                                <Checkbox
-                                  name={field.name}
-                                  data-cy="checkbox-termsOfServiceOC"
-                                  checked={Boolean(field.value)}
-                                  onCheckedChange={checked => setFieldValue(field.name, checked === true)}
+                      <Separator className="mt-10 mb-2" />
+                      <div className="my-2 flex items-center">
+                        <FormField name="termsOfServiceOC" required>
+                          {({ field }) => (
+                            <label className="flex cursor-pointer items-start gap-2 text-sm leading-normal">
+                              <Checkbox
+                                name={field.name}
+                                data-cy="checkbox-termsOfServiceOC"
+                                checked={Boolean(field.value)}
+                                onCheckedChange={checked => setFieldValue(field.name, checked === true)}
+                              />
+                              <span>
+                                <FormattedMessage
+                                  id="OC.tos.label"
+                                  defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective."
+                                  values={{
+                                    TOSLink: chunks => (
+                                      <Link
+                                        href="/tos"
+                                        openInNewTab
+                                        className="text-primary underline-offset-4 hover:underline"
+                                      >
+                                        {chunks}
+                                      </Link>
+                                    ),
+                                  }}
                                 />
-                                <span>
-                                  <FormattedMessage
-                                    id="OC.tos.label"
-                                    defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective."
-                                    values={{
-                                      TOSLink: chunks => (
-                                        <Link
-                                          href="/tos"
-                                          openInNewTab
-                                          className="text-primary underline-offset-4 hover:underline"
-                                        >
-                                          {chunks}
-                                        </Link>
-                                      ),
-                                    }}
-                                  />
-                                </span>
-                              </label>
-                            )}
-                          </FormField>
-                        </Box>
-                      </Container>
-                    </Container>
+                              </span>
+                            </label>
+                          )}
+                        </FormField>
+                      </div>
+                    </div>
 
-                    <Flex justifyContent="center" mb={48}>
-                      <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={'32px'} maxWidth={672} px={48} flex="1">
+                    <div className="mb-12 flex justify-center">
+                      <div className="grid w-full max-w-[672px] flex-1 grid-cols-1 gap-8 px-12 sm:grid-cols-2">
                         <Button
                           type="button"
                           variant="outline"
@@ -753,15 +722,15 @@ const ApplicationForm = ({
                           <FormattedMessage id="actions.submitApplication" defaultMessage="Submit application" />
                           <ArrowRight size={16} />
                         </Button>
-                      </Grid>
-                    </Flex>
+                      </div>
+                    </div>
                   </Form>
                 );
               }}
             </Formik>
           )}
-        </Flex>
-      </Flex>
+        </div>
+      </div>
     </React.Fragment>
   );
 };
