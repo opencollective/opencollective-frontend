@@ -97,8 +97,8 @@ const fillRequiredFields = () => {
   fireEvent.change(screen.getByLabelText(/what does your collective do/i), { target: { value: 'We do things' } });
   fireEvent.click(screen.getByRole('radio', { name: /my project is primarily concerned/i }));
   fireEvent.change(screen.getByLabelText(/tell us a little about your project/i), { target: { value: 'Hello' } });
-  // Legacy StyledCheckbox renders its container as role="button" (label is not associated with the input)
-  fireEvent.click(screen.getByRole('button', { name: /i agree with the terms of service/i }));
+  // ui/Checkbox + wrapping label (modern design system)
+  fireEvent.click(screen.getByRole('checkbox', { name: /i agree with the terms of service/i }));
 };
 
 const submitForm = () => fireEvent.submit(document.querySelector('form[data-cy="ccf-form"]'));
@@ -117,6 +117,22 @@ describe('ApplicationForm - applicationData.hasLegalEntity', () => {
     expect(screen.getByRole('checkbox', { name: /existing legal entity/i })).not.toBeChecked();
     expect(screen.getByText(/before signing contracts or sending invoices/i)).toBeInTheDocument();
     expect(screen.getByText(/before signing contracts or sending invoices/i)).toBeVisible();
+  });
+
+  it('renders the navigation buttons and inline links', () => {
+    renderForm();
+
+    expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /submit application/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /visit our docs/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /terms of service/i })).toBeInTheDocument();
+  });
+
+  it('toggles the code section with the expand button', () => {
+    renderForm();
+
+    fireEvent.click(screen.getAllByRole('button', { name: /expand/i })[0]);
+    expect(screen.getByRole('button', { name: /show less/i })).toBeInTheDocument();
   });
 
   it('submits applicationData.hasLegalEntity as true when checked', async () => {
