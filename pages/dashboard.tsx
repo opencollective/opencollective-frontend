@@ -66,8 +66,6 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
   } else if (loggedInUser?.isAccountantOnly(account) && account.hasHosting) {
     return ALL_SECTIONS.PAY_DISBURSEMENTS;
-  } else if (loggedInUser?.isAccountantOnly(account)) {
-    return ALL_SECTIONS.PAYMENT_RECEIPTS;
   } else {
     return ALL_SECTIONS.OVERVIEW;
   }
@@ -230,7 +228,7 @@ function getBlocker(LoggedInUser, account, section) {
   // Check permissions
   const isAdmin = LoggedInUser.isAdminOfCollective(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
-    if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
+    if (!isAdmin && !LoggedInUser.isAccountantOnly(account)) {
       return (
         <FormattedMessage
           defaultMessage="You need to be logged in as an admin or accountant to view this page"
