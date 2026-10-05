@@ -11,6 +11,8 @@ module.exports = defineConfig({
   video: true,
   chromeWebSecurity: false,
   scrollBehavior: 'center',
+  // Cypress 16 types without delay by default (was 10ms): some forms re-render in a loop when typed into that fast
+  keystrokeDelay: 10,
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
   expose: {
     MAILPIT_URL: process.env.MAILPIT_URL || 'http://localhost:1080',
