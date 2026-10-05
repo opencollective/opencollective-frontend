@@ -54,7 +54,7 @@ import { FieldGroup } from './PayoutBankInformationForm';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
-const quoteExpenseQuery = gql`
+export const quoteExpenseQuery = gql`
   query QuoteExpense($id: String!) {
     expense(expense: { id: $id }) {
       id
@@ -513,10 +513,9 @@ const PayExpenseModal = ({
     [intl],
   );
 
-  const amountBatched = quoteQuery.data?.expense.host?.transferwise.amountBatched;
-  const amountInBalance = quoteQuery.data?.expense.host?.transferwise.balances.find(
-    balance => balance.currency === amountBatched?.currency,
-  );
+  const quoteTransferwise = quoteQuery.data?.expense?.host?.transferwise;
+  const amountBatched = quoteTransferwise?.amountBatched;
+  const amountInBalance = quoteTransferwise?.balances?.find(balance => balance.currency === amountBatched?.currency);
   const hasFunds =
     canQuote &&
     amountInBalance &&

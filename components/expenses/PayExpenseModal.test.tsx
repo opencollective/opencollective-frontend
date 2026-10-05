@@ -15,8 +15,9 @@ import { ThemeProvider } from 'styled-components';
 import theme from '../../lib/theme';
 
 import { balanceAccountingCategoryPickerQuery } from '../accounting/BalanceAccountingCategoryPicker';
+import { TooltipProvider } from '../ui/Tooltip';
 
-import PayExpenseModal from './PayExpenseModal';
+import PayExpenseModal, { quoteExpenseQuery } from './PayExpenseModal';
 
 const pickerMock = {
   request: {
@@ -118,5 +119,83 @@ describe('PayExpenseModal balance category picker', () => {
       expect(screen.getByText('1030 - Stripe Clearing')).toBeInTheDocument();
     });
     expect(screen.queryByText('1051 - Mercury Checking')).not.toBeInTheDocument();
+  });
+});
+
+const wiseHost = {
+  ...host,
+  transferwise: { __typename: 'TransferWise', id: 'tw-1' },
+} as unknown as React.ComponentProps<typeof PayExpenseModal>['host'];
+
+const bankExpense = {
+  ...expense,
+  payoutMethod: { id: 'pm-1', type: 'BANK_ACCOUNT', data: {} },
+} as unknown as React.ComponentProps<typeof PayExpenseModal>['expense'];
+
+const quoteMockWith = (transferwise: unknown) => ({
+  request: {
+    query: quoteExpenseQuery,
+    variables: { id: 'expense-1' },
+  },
+  result: {
+    data: {
+      expense: {
+        __typename: 'Expense',
+        id: 'expense-1',
+        currency: 'USD',
+        reference: null,
+        amountInHostCurrency: { __typename: 'Amount', exchangeRate: null },
+        host: { __typename: 'Host', id: 'host-1', transferwise },
+        quote: {
+          __typename: 'ExpenseQuote',
+          paymentProcessorFeeAmount: { __typename: 'Amount', valueInCents: 0, currency: 'USD' },
+          sourceAmount: { __typename: 'Amount', valueInCents: 10000, currency: 'USD' },
+          estimatedDeliveryAt: null,
+          notices: [],
+        },
+      },
+    },
+  },
+});
+
+const renderPayModal = (
+  hostProp: React.ComponentProps<typeof PayExpenseModal>['host'],
+  quoteMock: ReturnType<typeof quoteMockWith>,
+) =>
+  render(
+    <IntlProvider locale="en">
+      <ThemeProvider theme={theme}>
+        <TooltipProvider delayDuration={0} skipDelayDuration={0}>
+          <MockedProvider mocks={[quoteMock] as never[]} addTypename>
+            <PayExpenseModal
+              expense={bankExpense}
+              collective={{ currency: 'USD' } as never}
+              host={hostProp}
+              onClose={jest.fn()}
+              onSubmit={jest.fn()}
+              canPayWithAutomaticPayment={true}
+            />
+          </MockedProvider>
+        </TooltipProvider>
+      </ThemeProvider>
+    </IntlProvider>,
+  );
+
+describe('PayExpenseModal when Wise data is unavailable', () => {
+  it('does not crash when the quote query returns transferwise: null', async () => {
+    renderPayModal(wiseHost, quoteMockWith(null));
+
+    expect(await screen.findByText('Pay expense')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Not Enough Funds')).not.toBeInTheDocument());
+  });
+
+  it('does not crash when balances is null (eg. non-admin or Wise error)', async () => {
+    renderPayModal(
+      wiseHost,
+      quoteMockWith({ __typename: 'TransferWise', id: 'tw-1', amountBatched: null, balances: null }),
+    );
+
+    expect(await screen.findByText('Pay expense')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Not Enough Funds')).not.toBeInTheDocument());
   });
 });
