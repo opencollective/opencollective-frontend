@@ -152,7 +152,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
-      if: !isAccountantOnly,
     },
     {
       section: ALL_SECTIONS.SEARCH,
@@ -311,7 +310,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.GRANTS,
         },
         {
-          if: showReceivedGrantRequests,
+          if: showReceivedGrantRequests && !isAccountantOnly,
           section: ALL_SECTIONS.APPROVE_GRANT_REQUESTS,
         },
         {
@@ -503,7 +502,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         isHostedType &&
         hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
         account.isApproved &&
-        !isCommunityManagerOnly,
+        !isCommunityManagerOnly &&
+        !isAccountantOnly,
       section: ALL_SECTIONS.VIRTUAL_CARDS,
       Icon: CreditCard,
     },

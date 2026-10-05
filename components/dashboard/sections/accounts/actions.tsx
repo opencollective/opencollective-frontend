@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import type { GetActions } from '../../../../lib/actions/types';
 import type { DashboardAccountsQueryFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { AccountType } from '../../../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
 
 import { useModal } from '../../../ModalContext';
@@ -13,6 +14,7 @@ import { AddFundsModalAccount, ExpenseFlowModal } from './common';
 import InternalTransferModal from './InternalTransferModal';
 
 export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment>({ accounts = null } = {}) {
+  const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
   const { showModal } = useModal();
@@ -21,7 +23,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
     if (!account) {
       return {};
     }
-
+    const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
     const isAllowedAddFunds =
       Boolean(account.permissions?.addFunds?.allowed) && 'parent' in account ? account.parent.isHost : account.isHost;
 
@@ -36,7 +38,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
         {
           key: 'transfer',
           label: intl.formatMessage({ defaultMessage: 'New internal transfer', id: 'v4unZI' }),
-          if: accounts?.length > 1 && !isPlatformAccount,
+          if: accounts?.length > 1 && !isPlatformAccount && !isAccountantOnly,
           onClick: () => {
             showModal(
               InternalTransferModal,
@@ -53,7 +55,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
         {
           key: 'add-funds',
           label: 'Add funds',
-          if: isAllowedAddFunds && !isPlatformAccount,
+          if: isAllowedAddFunds && !isPlatformAccount && !isAccountantOnly,
           Icon: Banknote,
           onClick: () => {
             showModal(
@@ -67,7 +69,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
           key: 'submit-expense',
           label: 'Submit Payment Request',
           Icon: Receipt,
-          if: !isPlatformAccount,
+          if: !isPlatformAccount && !isAccountantOnly,
           onClick: () => {
             showModal(ExpenseFlowModal, { collective: account }, 'submit-payment-request');
           },
@@ -110,12 +112,14 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
         {
           key: 'view-activity',
           label: intl.formatMessage({ defaultMessage: 'View Activity Logs', id: 'xnLFq2' }),
+          if: !isAccountantOnly,
           Icon: Logs,
           onClick: () => router.push(getDashboardRoute(dashboardBaseAccount, `activity-log?account=${account.slug}`)),
         },
         {
           key: 'archive',
           label: intl.formatMessage({ defaultMessage: 'Archive', id: 'collective.archive.confirm.btn' }),
+          if: !isAccountantOnly,
           Icon: Archive,
           onClick: () => router.push(getDashboardRoute(account, `advanced`)),
         },

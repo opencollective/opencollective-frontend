@@ -14,6 +14,7 @@ import type {
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { useDrawer } from '@/lib/hooks/useDrawer';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
@@ -38,6 +39,7 @@ import { useAccountActions } from './actions';
 import { AddFundsModalAccount, cols } from './common';
 import InternalTransferModal from './InternalTransferModal';
 import { accountsMetadataQuery, accountsQuery } from './queries';
+
 const COLLECTIVES_PER_PAGE = 20;
 
 const schema = z.object({
@@ -55,6 +57,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 };
 
 const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
+  const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
   const { data: metadata } = useQuery(accountsMetadataQuery, {
@@ -63,6 +66,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   });
   const { account } = useContext(DashboardContext);
   const openAccountId = subpath[0];
+  const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
 
   const pushSubpath = subpath => {
     router.push(
@@ -143,50 +147,52 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
           />
         }
         actions={
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="xs" variant="outline" className="gap-1">
-                  <FormattedMessage id="Accounts.Add" defaultMessage="Add Account" />
-                  <ChevronDown className="text-muted-foreground" size={16} />
+          !isAccountantOnly && (
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="xs" variant="outline" className="gap-1">
+                    <FormattedMessage id="Accounts.Add" defaultMessage="Add Account" />
+                    <ChevronDown className="text-muted-foreground" size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href={`/${accountSlug}/projects/create`}>
+                      <FormattedMessage defaultMessage="New project" id="lJMkin" />
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/${accountSlug}/events/create`}>
+                      <FormattedMessage defaultMessage="New event" id="C+Npdp" />
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {activeAccounts?.length > 1 && (
+                <Button
+                  size="xs"
+                  variant="outline"
+                  onClick={() => {
+                    showModal(InternalTransferModal, { parentAccount: data?.account }, 'internal-transfer-modal');
+                  }}
+                >
+                  <FormattedMessage defaultMessage="New internal transfer" id="v4unZI" />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href={`/${accountSlug}/projects/create`}>
-                    <FormattedMessage defaultMessage="New project" id="lJMkin" />
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href={`/${accountSlug}/events/create`}>
-                    <FormattedMessage defaultMessage="New event" id="C+Npdp" />
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {activeAccounts?.length > 1 && (
-              <Button
-                size="xs"
-                variant="outline"
-                onClick={() => {
-                  showModal(InternalTransferModal, { parentAccount: data?.account }, 'internal-transfer-modal');
-                }}
-              >
-                <FormattedMessage defaultMessage="New internal transfer" id="v4unZI" />
-              </Button>
-            )}
-            {isAllowedAddFunds && (
-              <Button
-                size="xs"
-                variant="outline"
-                onClick={() =>
-                  showModal(AddFundsModalAccount, { collective: data?.account, host: data?.host }, 'add-funds-modal')
-                }
-              >
-                <FormattedMessage defaultMessage="Add funds" id="sx0aSl" />
-              </Button>
-            )}
-          </div>
+              )}
+              {isAllowedAddFunds && (
+                <Button
+                  size="xs"
+                  variant="outline"
+                  onClick={() =>
+                    showModal(AddFundsModalAccount, { collective: data?.account, host: data?.host }, 'add-funds-modal')
+                  }
+                >
+                  <FormattedMessage defaultMessage="Add funds" id="sx0aSl" />
+                </Button>
+              )}
+            </div>
+          )
         }
       >
         <div className="mt-2 w-full max-w-xs space-y-1 rounded-lg border p-3">
