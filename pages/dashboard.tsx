@@ -230,7 +230,7 @@ function getBlocker(LoggedInUser, account, section) {
   // Check permissions
   const isAdmin = LoggedInUser.isAdminOfCollective(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
-    if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
+    if (!isAdmin && !LoggedInUser.isAccountantOnly(account)) {
       return (
         <FormattedMessage
           defaultMessage="You need to be logged in as an admin or accountant to view this page"
