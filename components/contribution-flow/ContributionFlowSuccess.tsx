@@ -175,6 +175,7 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
   const [paymentIntentResult, setPaymentIntentResult] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const successTrackedRef = useRef(false);
+  const redirectInitiatedRef = useRef(false);
 
   const trackSuccess = useCallback(() => {
     if (successTrackedRef.current || !order) {
@@ -237,9 +238,11 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
   }, [paymentIntentResult, intl]);
 
   useEffect(() => {
-    if (!order || !stripeErrorMessage) {
+    if (!order || !stripeErrorMessage || redirectInitiatedRef.current) {
       return;
     }
+
+    redirectInitiatedRef.current = true;
 
     const tierSlug = order.tier?.slug;
     const path = tierSlug
@@ -261,17 +264,18 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
       );
     }
 
-    router.push(url.toString());
+    router.replace(url.toString());
   }, [order, stripeErrorMessage, router]);
 
   useEffect(() => {
     // Wait for the payment intent check so we never send a failed payment to the external redirect
-    if (!order || !loaded || stripeErrorMessage) {
+    if (!order || !loaded || stripeErrorMessage || redirectInitiatedRef.current) {
       return;
     }
 
     const redirect = getQueryStringParam(router.query.redirect);
     if (redirect && isValidExternalRedirect(redirect)) {
+      redirectInitiatedRef.current = true;
       followOrderRedirectUrl(router, collective, order, redirect, {
         shouldRedirectParent: parseToBoolean(getQueryStringParam(router.query.shouldRedirectParent)),
       });
