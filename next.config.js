@@ -94,6 +94,7 @@ const nextConfig = {
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
+        VERCEL_ENV: null,
         NEXT_IMAGES_URL: null,
         REST_URL: null,
         SENTRY_DSN: null,
