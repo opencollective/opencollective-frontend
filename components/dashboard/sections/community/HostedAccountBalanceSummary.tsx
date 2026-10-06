@@ -1,15 +1,49 @@
 import React from 'react';
+import { useQuery } from '@apollo/client';
 import { ArrowRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
+import { z } from 'zod';
+
+import { gql } from '@/lib/graphql/helpers';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
+import { Filterbar } from '@/components/dashboard/filters/Filterbar';
+import { periodFilter } from '@/components/dashboard/filters/PeriodFilter';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 
 import ComparisonChart from '../overview/ComparisonChart';
 
 import type { AccountDetailData } from './queries';
+import { PeriodFilterType } from '../../filters/PeriodCompareFilter/schema';
 
 const BALANCE_COLOR = '#16a34a';
+
+// Balance time series for the picked date range: the range from the filter is
+// injected into this query, which feeds the chart.
+const accountDetailBalanceTimeSeriesQuery = gql`
+  query AccountDetailBalanceTimeSeries($accountId: String!, $dateFrom: DateTime, $dateTo: DateTime) {
+    account(id: $accountId) {
+      id
+      stats {
+        balanceTimeSeries(dateFrom: $dateFrom, dateTo: $dateTo, includeChildren: true) {
+          timeUnit
+          dateFrom
+          dateTo
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const balanceFilterSchema = z.object({ period: periodFilter.schema });
 
 type AmountLike = { valueInCents?: number | null; currency?: string | null } | null | undefined;
 
@@ -59,8 +93,29 @@ export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: Hosted
   const stats = account?.stats;
   const isChild = Boolean(account?.parent?.id);
 
+  const queryFilter = useQueryFilter({
+    schema: balanceFilterSchema,
+    toVariables: { period: periodFilter.toVariables },
+    defaultFilterValues: {
+      period: { type: PeriodFilterType.ALL_TIME },
+    },
+    filters: { period: periodFilter.filter },
+    skipRouter: true,
+  });
+
+  const balanceSeriesQuery = useQuery(accountDetailBalanceTimeSeriesQuery, {
+    variables: { accountId: account?.id, ...queryFilter.variables },
+    skip: !account?.id,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const balanceSeries = balanceSeriesQuery.data?.account?.stats?.balanceTimeSeries;
+
   return (
-    <DashboardContentCard title={<FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />}>
+    <DashboardContentCard
+      title={<FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />}
+      action={<Filterbar hideSeparator {...queryFilter} />}
+    >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Metric
           label={<FormattedMessage defaultMessage="Current Balance" id="PkACGs" />}
@@ -80,9 +135,9 @@ export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: Hosted
           onClick={() => onOpenMoneyView?.('PAYOUTS')}
         />
       </div>
-      {stats?.balanceTimeSeries?.nodes?.length ? (
+      {balanceSeries?.nodes?.length ? (
         <div className="relative h-[220px]">
-          <ComparisonChart current={stats.balanceTimeSeries} color={BALANCE_COLOR} currency={currency} expanded />
+          <ComparisonChart current={balanceSeries} color={BALANCE_COLOR} currency={currency} expanded />
         </div>
       ) : null}
     </DashboardContentCard>
