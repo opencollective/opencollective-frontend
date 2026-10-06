@@ -18,8 +18,8 @@ describe('Personal Token', () => {
     cy.log('Starts with an empty state');
     cy.contains('[data-cy="personal-tokens-list"]', "You don't have any token yet");
 
-    cy.log('Create a first token using the message link');
-    cy.getByDataCy('create-token-link').click();
+    cy.log('Create a first token');
+    cy.getByDataCy('create-personal-token-btn').click();
     cy.get('input[name=name]').type('My first token');
     cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('transactions{enter}');
     cy.get('input[name=expiresAt]').type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}`);
@@ -48,7 +48,7 @@ describe('Personal Token', () => {
     cy.getByDataCy('go-back-link').click();
     cy.contains('[data-cy="personal-token"]', 'My first token (edited)');
 
-    cy.log('Create a second token using the button');
+    cy.log('Create a second token');
     cy.getByDataCy('create-personal-token-btn').click();
     cy.get('input[name=name]').type('My second token');
     cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('account{enter}');
@@ -85,7 +85,7 @@ describe('Personal Token', () => {
       secret: secret,
     });
 
-    cy.getByDataCy('create-token-link').click();
+    cy.getByDataCy('create-personal-token-btn').click();
     cy.get('input[name=name]').type('My first token with 2fa');
     cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('transactions{enter}');
     cy.get('input[name=expiresAt]').type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}`);

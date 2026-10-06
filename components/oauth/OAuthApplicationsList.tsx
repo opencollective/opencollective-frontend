@@ -128,24 +128,6 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
           <p className="font-medium">
             <FormattedMessage defaultMessage="You don't have any app yet" id="v8bmup" />
           </p>
-          <p className="text-sm text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="You can create apps that integrate with the Open Collective platform. <CreateAppLink>Create an app</CreateAppLink> using the Open Collective's API."
-              id="1lIftz"
-              values={{
-                CreateAppLink: children => (
-                  <button
-                    type="button"
-                    data-cy="create-app-link"
-                    className="text-primary hover:underline"
-                    onClick={() => setShowCreateApplicationModal(true)}
-                  >
-                    {children}
-                  </button>
-                ),
-              }}
-            />
-          </p>
         </div>
       ) : (
         <DataTable

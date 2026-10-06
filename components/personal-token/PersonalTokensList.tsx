@@ -146,24 +146,6 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
           <p className="font-medium">
             <FormattedMessage defaultMessage="You don't have any token yet" id="1SzDWu" />
           </p>
-          <p className="text-sm text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="You can create personal token that integrate with the Open Collective platform. <CreateTokenLink>Create Personal Token</CreateTokenLink>."
-              id="oG4/dR"
-              values={{
-                CreateTokenLink: children => (
-                  <button
-                    type="button"
-                    data-cy="create-token-link"
-                    className="text-primary hover:underline"
-                    onClick={() => setShowCreatePersonalTokenModal(true)}
-                  >
-                    {children}
-                  </button>
-                ),
-              }}
-            />
-          </p>
         </div>
       ) : (
         <DataTable
