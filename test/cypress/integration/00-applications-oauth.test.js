@@ -13,7 +13,7 @@ describe('OAuth Applications', () => {
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
     cy.log('Starts with an empty state');
-    cy.contains('[data-cy="oauth-apps-list"]', "You don't have any app yet");
+    cy.contains('[data-cy="oauth-apps-list"]', "You don't have any apps yet");
 
     cy.log('Create a first app');
     cy.getByDataCy('create-app-btn').click();

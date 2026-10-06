@@ -40,8 +40,8 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
       type="delete"
       header={
         <FormattedMessage
-          defaultMessage="Delete token {name}"
-          id="WzSLvB"
+          defaultMessage={'Delete token "{name}"'}
+          id="U6f+Dh"
           values={{ name: personalToken.name || '' }}
         />
       }

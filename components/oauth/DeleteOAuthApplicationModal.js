@@ -40,7 +40,11 @@ const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
       isDanger
       type="delete"
       header={
-        <FormattedMessage defaultMessage="Delete application {name}" id="M5dGYy" values={{ name: application.name }} />
+        <FormattedMessage
+          defaultMessage={'Delete application "{name}"'}
+          id="8jowO7"
+          values={{ name: application.name }}
+        />
       }
       {...props}
       continueHandler={async () => {
@@ -50,7 +54,7 @@ const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
           toast({
             variant: 'success',
             message: intl.formatMessage(
-              { defaultMessage: 'Application {name} deleted', id: 'vAzArE' },
+              { defaultMessage: 'Application "{name}" deleted', id: '3fCFOj' },
               { name: application.name },
             ),
           });

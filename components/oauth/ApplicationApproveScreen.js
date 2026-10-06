@@ -60,11 +60,11 @@ const SCOPES_INFO = {
     icon: <Users size={16} />,
   },
   expenses: {
-    label: <FormattedMessage defaultMessage="Create and manage expenses, payout methods." id="SQT1u9" />,
+    label: <FormattedMessage defaultMessage="Create and manage expenses and payout methods." id="o2F35h" />,
     icon: <Receipt size={16} />,
   },
   orders: {
-    label: <FormattedMessage defaultMessage="Create and manage contributions, payment methods." id="Ny7kBI" />,
+    label: <FormattedMessage defaultMessage="Create and manage contributions and payment methods." id="1DP5IT" />,
     icon: <Coins size={16} />,
   },
   transactions: {
@@ -88,7 +88,7 @@ const SCOPES_INFO = {
     icon: <Webhook size={16} />,
   },
   host: {
-    label: <FormattedMessage defaultMessage="Administrate fiscal hosts." id="iHkkt+" />,
+    label: <FormattedMessage defaultMessage="Manage fiscal hosts." id="rjCjIT" />,
     icon: <Network size={16} />,
   },
   exportRequests: {
@@ -310,8 +310,8 @@ export const ApplicationApproveScreen = ({
               {difference(filteredScopes, ['email']).length > 0 && (
                 <MessageBox type="info" mt={40} fontSize="13px">
                   <FormattedMessage
-                    defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile."
-                    id="FmF1MA"
+                    defaultMessage="These permissions are granted to all the accounts you administer, including your personal profile."
+                    id="PwFJzT"
                   />
                 </MessageBox>
               )}

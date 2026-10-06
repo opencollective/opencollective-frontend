@@ -129,7 +129,7 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
           onClick={() => setShowCreatePersonalTokenModal(true)}
         >
           <Plus size={16} />
-          <FormattedMessage defaultMessage="Create Personal token" id="MMyZfL" />
+          <FormattedMessage defaultMessage="Create personal token" id="aZlmi3" />
         </Button>
         {showCreatePersonalToken && (
           <CreatePersonalTokenModal
@@ -146,7 +146,7 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed p-8 text-center">
           <KeyRound size={24} className="text-muted-foreground" />
           <p className="font-medium">
-            <FormattedMessage defaultMessage="You don't have any token yet" id="1SzDWu" />
+            <FormattedMessage defaultMessage="You don't have any tokens yet" id="l+5/7O" />
           </p>
         </div>
       ) : (

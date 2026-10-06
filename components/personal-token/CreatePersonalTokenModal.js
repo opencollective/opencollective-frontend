@@ -56,7 +56,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, disabled, ...pr
   return (
     <StyledModal onClose={onClose} data-cy="create-personal-token-modal" {...props}>
       <ModalHeader>
-        <FormattedMessage defaultMessage="Create Personal token" id="MMyZfL" />
+        <FormattedMessage defaultMessage="Create personal token" id="aZlmi3" />
       </ModalHeader>
       <Formik
         initialValues={INITIAL_VALUES}
@@ -91,7 +91,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, disabled, ...pr
             <ModalBody mt="36px">
               <StyledInputFormikField
                 name="name"
-                label={intl.formatMessage({ defaultMessage: 'Token Name', id: 'w0wvhm' })}
+                label={intl.formatMessage({ defaultMessage: 'Token name', id: 'xQXSru' })}
                 labelProps={LABEL_STYLES}
                 required
               >
@@ -107,13 +107,13 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, disabled, ...pr
               </StyledInputFormikField>
               <StyledInputFormikField
                 name="scope"
-                label="Scopes"
+                label={intl.formatMessage({ defaultMessage: 'Scopes', id: 'joDyyj' })}
                 labelProps={LABEL_STYLES}
                 mt={20}
                 hint={intl.formatMessage(
                   {
-                    defaultMessage: 'Scopes define the access for personal tokens. <Link>More info</Link>.',
-                    id: 'OL9S0O',
+                    defaultMessage: 'Scopes define what this token can access. <Link>More info</Link>.',
+                    id: 'MVWXez',
                   },
                   {
                     Link: getI18nLink({

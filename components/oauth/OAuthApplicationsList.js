@@ -126,7 +126,7 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed p-8 text-center">
           <AppWindow size={24} className="text-muted-foreground" />
           <p className="font-medium">
-            <FormattedMessage defaultMessage="You don't have any app yet" id="v8bmup" />
+            <FormattedMessage defaultMessage="You don't have any apps yet" id="P773cj" />
           </p>
         </div>
       ) : (
