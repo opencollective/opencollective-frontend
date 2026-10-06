@@ -305,16 +305,12 @@ export enum AccountDetailView {
 }
 
 /** Account types shown with the hosted account profile flow (vs. the community/people/vendors flow) */
-const HOSTED_ACCOUNT_TYPES: AccountType[] = [
+export const HOSTED_ACCOUNT_TYPES: AccountType[] = [
   AccountType.COLLECTIVE,
   AccountType.FUND,
   AccountType.PROJECT,
   AccountType.EVENT,
 ];
-
-export function isHostedAccountType(type?: AccountType): boolean {
-  return HOSTED_ACCOUNT_TYPES.includes(type);
-}
 
 type CommunityAccount =
   PeopleHostDashboardQuery['community']['nodes'][number] | DashboardVendorsQuery['community']['nodes'][number];

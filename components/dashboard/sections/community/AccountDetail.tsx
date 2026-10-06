@@ -57,7 +57,7 @@ import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { AccountDetailManagedDisbursementsTab } from './AccountDetailManagedDisbursementsTab';
 import { AccountDetailsOverviewTab } from './AccountDetailOverviewTab';
 import { AccountDetailTransactionsTab } from './AccountDetailTransactionsTab';
-import { AccountDetailView, getCollectiveTypeIcon, isHostedAccountType, KYCStatusBadge, TaxFormBadge } from './common';
+import { AccountDetailView, getCollectiveTypeIcon, HOSTED_ACCOUNT_TYPES, KYCStatusBadge, TaxFormBadge } from './common';
 import { type AccountDetailData, type AccountDetailHost, communityAccountDetailQuery } from './queries';
 
 const convertOrganizationMutation = gql`
@@ -116,7 +116,9 @@ export function AccountDetails(props: AccountDetailsProps) {
   // accounts); the flow is derived from the account itself.
   const account = query.data?.account as AccountDetailData | undefined;
   const host = query.data?.host as AccountDetailHost | undefined;
-  const isHostedAccount = isHostedAccountType(account?.type);
+  // Whether the queried account belongs to the hosted account profile flow
+  // (collectives/funds/projects/events) vs the community flow (people/vendors).
+  const isHostedAccount = HOSTED_ACCOUNT_TYPES.includes(account?.type);
   const isLoading = query.loading || !query.data;
   const refetch = () => query.refetch();
   const taxForms = host?.hostedLegalDocuments;
