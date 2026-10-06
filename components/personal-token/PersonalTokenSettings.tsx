@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { pick } from 'lodash-es';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Check, Copy } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -10,6 +10,7 @@ import { styled } from 'styled-components';
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
+import useClipboard from '../../lib/hooks/useClipboard';
 
 import { Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -24,6 +25,7 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import { H3, H4, P, Span } from '../Text';
+import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { useToast } from '../ui/useToast';
 import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
@@ -70,8 +72,9 @@ const CodeContainer = styled(Span)`
 
 const ObfuscatedClientSecret = ({ secret }) => {
   const [show, setShow] = React.useState(false);
+  const { isCopied, copy } = useClipboard();
   return (
-    <P>
+    <div className="flex flex-wrap items-center gap-2">
       {show && <CodeContainer data-cy="unhidden-secret">{secret}</CodeContainer>}
       <StyledLink data-cy="show-secret-btn" as="button" color="blue.600" onClick={() => setShow(!show)}>
         {show ? (
@@ -80,7 +83,15 @@ const ObfuscatedClientSecret = ({ secret }) => {
           <FormattedMessage defaultMessage="Show" id="K7AkdL" />
         )}
       </StyledLink>
-    </P>
+      <Button data-cy="copy-token-btn" size="xs" variant="outline" onClick={() => copy(secret)}>
+        {isCopied ? <Check size={14} /> : <Copy size={14} />}
+        {isCopied ? (
+          <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
+        ) : (
+          <FormattedMessage id="Clipboard.CopyShort" defaultMessage="Copy" />
+        )}
+      </Button>
+    </div>
   );
 };
 
@@ -132,7 +143,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
               },
               {
                 Link: getI18nLink({
-                  href: 'https://documentation.opencollective.com/development/api',
+                  href: 'https://developers.opencollective.com/',
                   openInNewTab: true,
                 }),
               },
@@ -207,7 +218,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                     },
                     {
                       Link: getI18nLink({
-                        href: 'https://documentation.opencollective.com/development/api',
+                        href: 'https://developers.opencollective.com/',
                         openInNewTab: true,
                       }),
                     },

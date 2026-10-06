@@ -115,12 +115,8 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
           </h2>
           <p className="text-sm text-muted-foreground">
             <FormattedMessage
-              defaultMessage="Personal tokens are used to authenticate with the API. They are not tied to a specific application. Pass it as {headerName} HTTP header or {queryParam} query parameter in the URL."
-              id="QZRYxh"
-              values={{
-                headerName: <code>Personal-Token</code>,
-                queryParam: <code>personalToken</code>,
-              }}
+              defaultMessage="Personal tokens are used to authenticate with the API. They are not tied to a specific application."
+              id="N2aQSA"
             />
           </p>
         </div>
