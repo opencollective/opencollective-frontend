@@ -43,6 +43,9 @@ function walk(dir, filelist = []) {
         return;
       }
       walk(fullPath, filelist);
+    } else if (file === 'graphql-audit.test.js') {
+      // Its fixtures break the rules on purpose
+      return;
     } else if (FILE_EXTENSIONS.some(ext => file.endsWith(ext))) {
       filelist.push(fullPath);
     }
@@ -94,12 +97,33 @@ function checkHocNameRule(file, i, line) {
   }
 }
 
+// Returns the contents of the gql template opening on line i, and the line where it closes
+function readTemplate(lines, i) {
+  const openLine = lines[i];
+  const rest = openLine.substring(openLine.search(/gql(V1)?`/)).replace(/^gql(V1)?`/, '');
+  const sameLineEnd = rest.indexOf('`');
+  if (sameLineEnd !== -1) {
+    return { block: rest.substring(0, sameLineEnd), end: i };
+  }
+  let block = `${rest}\n`;
+  for (let j = i + 1; j < lines.length; j++) {
+    const end = lines[j].indexOf('`');
+    if (end !== -1) {
+      return { block: block + lines[j].substring(0, end), end: j };
+    }
+    block += `${lines[j]}\n`;
+  }
+  return { block, end: lines.length - 1 };
+}
+
 // --- Main audit logic ---
 function auditFile(file) {
   const content = fs.readFileSync(file, 'utf8');
   const lines = content.split('\n');
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    // Last line consumed by a multi-line block; every rule runs on line i before skipping past it
+    let next = i;
 
     // HOC assignment rule (handle multi-line)
     if (enabledRules.hoc && line.includes('graphql(')) {
@@ -110,27 +134,14 @@ function auditFile(file) {
         j++;
       }
       checkHocNameRule(file, i, hocBlock);
-      if (j > i + 1) {
-        i = j - 1;
-      }
+      next = Math.max(next, j - 1);
     }
 
     // GraphQL operation name rule
-    if (enabledRules.operation && line.match(/gql(V1)?`/)) {
-      let block = `${line.substring(line.indexOf('gql'))}\n`;
-      let j = i + 1;
-      let closed = false;
-      for (; j < lines.length; j++) {
-        block += `${lines[j]}\n`;
-        if (lines[j].includes('`')) {
-          closed = true;
-          break;
-        }
-      }
+    if (enabledRules.operation && /gql(V1)?`/.test(line)) {
+      const { block, end } = readTemplate(lines, i);
       checkOperationNameRule(file, i, block);
-      if (closed) {
-        i = j;
-      }
+      next = Math.max(next, end);
     }
 
     // GraphQL variable name rule
@@ -154,6 +165,8 @@ function auditFile(file) {
         }
       }
     }
+
+    i = next;
   }
 }
 
