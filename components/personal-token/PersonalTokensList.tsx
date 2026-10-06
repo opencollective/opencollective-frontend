@@ -62,7 +62,13 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
               {row.original.name ?? <FormattedMessage defaultMessage="Unnamed token" id="3IwVoe" />}
             </Link>
             {row.original.scope?.length > 0 && (
-              <p className="truncate text-sm text-muted-foreground">{row.original.scope.join(', ')}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="Scopes: {scopes}"
+                  id="kb8W30"
+                  values={{ scopes: row.original.scope.join(', ') }}
+                />
+              </p>
             )}
           </div>
         </div>
