@@ -53,10 +53,15 @@ import { useLegalDocumentActions } from '../legal-documents/actions';
 import LegalDocumentDrawer from '../legal-documents/LegalDocumentDrawer';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 
+import { AccountDetailAboutTab } from './AccountDetailAboutTab';
+import { AccountDetailAccountsTab } from './AccountDetailAccountsTab';
 import { ActivitiesTab } from './AccountDetailActivitiesTab';
+import { AccountDetailAgreementsTab } from './AccountDetailAgreementsTab';
+import { AccountDetailExpectedFundsTab } from './AccountDetailExpectedFundsTab';
 import { AccountDetailManagedDisbursementsTab } from './AccountDetailManagedDisbursementsTab';
 import { AccountDetailsOverviewTab } from './AccountDetailOverviewTab';
 import { AccountDetailTransactionsTab } from './AccountDetailTransactionsTab';
+import { AccountDetailUpdatesTab } from './AccountDetailUpdatesTab';
 import { AccountDetailView, getCollectiveTypeIcon, HOSTED_ACCOUNT_TYPES, KYCStatusBadge, TaxFormBadge } from './common';
 import { type AccountDetailData, type AccountDetailHost, communityAccountDetailQuery } from './queries';
 
@@ -364,6 +369,17 @@ export function AccountDetails(props: AccountDetailsProps) {
       )}
       {selectedTab === AccountDetailView.KYC && (
         <KYCTabPeopleDashboard requestedByAccount={dashboardAccount} verifyAccount={props.account} />
+      )}
+      {selectedTab === AccountDetailView.ABOUT && <AccountDetailAboutTab account={account} />}
+      {selectedTab === AccountDetailView.UPDATES && <AccountDetailUpdatesTab account={account} />}
+      {selectedTab === AccountDetailView.ACCOUNTS && (
+        <AccountDetailAccountsTab account={account} host={host} loading={isLoading} onEdit={refetch} />
+      )}
+      {selectedTab === AccountDetailView.EXPECTED_FUNDS && (
+        <AccountDetailExpectedFundsTab account={account} hostSlug={dashboardAccount.slug} />
+      )}
+      {selectedTab === AccountDetailView.AGREEMENTS && (
+        <AccountDetailAgreementsTab account={account} hostSlug={dashboardAccount.slug} />
       )}
     </React.Fragment>
   );
