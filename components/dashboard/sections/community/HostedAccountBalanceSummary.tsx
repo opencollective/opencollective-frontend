@@ -61,13 +61,13 @@ const Metric = ({
   </div>
 );
 
-type HostedAccountOverviewCardProps = {
+type HostedAccountBalanceSummaryProps = {
   account?: AccountDetailData;
   hostSlug: string;
   onOpenMoneyView?: (view: 'CONTRIBUTIONS' | 'PAYOUTS') => void;
 };
 
-export function HostedAccountOverviewCard({ account, hostSlug, onOpenMoneyView }: HostedAccountOverviewCardProps) {
+export function HostedAccountBalanceSummary({ account, hostSlug, onOpenMoneyView }: HostedAccountBalanceSummaryProps) {
   const intl = useIntl();
   const currency = account?.currency;
   const stats = account?.stats;
