@@ -524,6 +524,10 @@ const AboutCard = ({
   const [invitationToCancel, setInvitationToCancel] = React.useState(null);
   const [cancelMemberInvitation] = useMutation(cancelMemberInvitationMutation);
   const admins = account?.members?.nodes || [];
+  // Individuals show the accounts they administer ("Admin of") instead of admins.
+  const isAdminOf = account?.type === AccountType.INDIVIDUAL;
+  const adminOf = account && 'adminOf' in account ? account.adminOf?.nodes || [] : [];
+  const displayedMembers = isAdminOf ? adminOf : admins;
   const pendingInvitations = (account as any)?.memberInvitations || [];
   const isHostedCollective = Boolean(host?.id && account?.host?.id === host?.id);
   const canManageInvitationsAsHostAdmin = Boolean(
@@ -532,7 +536,7 @@ const AboutCard = ({
     LoggedInUser?.isHostAdmin(account) &&
     !LoggedInUser?.isAdminOfCollective(account),
   );
-  if (!account?.description && admins.length === 0 && pendingInvitations.length === 0) {
+  if (!account?.description && displayedMembers.length === 0 && pendingInvitations.length === 0) {
     return null;
   }
   return (
@@ -545,12 +549,18 @@ const AboutCard = ({
               value={<span className="text-foreground">{account.description}</span>}
             />
           )}
-          {(admins.length > 0 || pendingInvitations.length > 0) && (
+          {(displayedMembers.length > 0 || pendingInvitations.length > 0) && (
             <DataListItem
-              label={<FormattedMessage defaultMessage="Admins" id="Admins" />}
+              label={
+                isAdminOf ? (
+                  <FormattedMessage defaultMessage="Admin of" id="AdminOf" />
+                ) : (
+                  <FormattedMessage defaultMessage="Admins" id="Admins" />
+                )
+              }
               value={
                 <div className="flex flex-wrap items-baseline gap-2" data-cy="admins-list">
-                  {admins.map(admin => (
+                  {displayedMembers.map(admin => (
                     <Badge key={admin.id} size="sm" type="outline" className="truncate text-nowrap">
                       <LinkCollective
                         collective={admin.account}
