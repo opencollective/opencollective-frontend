@@ -16,7 +16,7 @@ describe('Personal Token', () => {
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
     cy.log('Starts with an empty state');
-    cy.contains('[data-cy="personal-tokens-list"]', "You don't have any token yet");
+    cy.contains('[data-cy="personal-tokens-list"]', "You don't have any tokens yet");
 
     cy.log('Create a first token');
     cy.getByDataCy('create-personal-token-btn').click();

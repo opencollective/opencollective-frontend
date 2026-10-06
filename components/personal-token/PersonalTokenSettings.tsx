@@ -126,7 +126,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
           </Flex>
           <StyledCard maxWidth="600px" p={3} mt={4}>
             <H4 fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb="20px">
-              <FormattedMessage defaultMessage="Personal Token" id="hAcvJ3" />
+              <FormattedMessage defaultMessage="Personal token" id="AbUTPk" />
             </H4>
             <Flex flexWrap="wrap" justifyContent="space-between">
               <Flex flexDirection="column" width="100%" data-cy="personalToken-token">
@@ -137,9 +137,9 @@ const PersonalTokenSettings = ({ backPath, id }) => {
           <P mb={4} mt="10px" fontSize={12} color="black.700" letter-spacing="-0.4px">
             {intl.formatMessage(
               {
-                id: 'token.docs',
+                id: 'QPInl0',
                 defaultMessage:
-                  'Pass this code as Personal-Token HTTP header or personalToken query parameter in the URL. <Link>More info</Link>.',
+                  'Pass this token as the Personal-Token HTTP header or the personalToken query parameter. <Link>More info</Link>.',
               },
               {
                 Link: getI18nLink({
@@ -208,13 +208,13 @@ const PersonalTokenSettings = ({ backPath, id }) => {
 
                 <StyledInputFormikField
                   name="scope"
-                  label="Scopes"
+                  label={intl.formatMessage({ defaultMessage: 'Scopes', id: 'joDyyj' })}
                   labelProps={LABEL_STYLES}
                   mt={20}
                   hint={intl.formatMessage(
                     {
-                      defaultMessage: 'Scopes define the access for personal tokens. <Link>More info</Link>.',
-                      id: 'OL9S0O',
+                      defaultMessage: 'Scopes define what this token can access. <Link>More info</Link>.',
+                      id: 'MVWXez',
                     },
                     {
                       Link: getI18nLink({
