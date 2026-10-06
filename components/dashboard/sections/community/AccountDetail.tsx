@@ -46,6 +46,7 @@ import type { DashboardContextType } from '../../DashboardContext';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { makeReplaceSubpath } from '../../utils';
+import { MoreActionsMenu } from '../collectives/common';
 import { useContributionActions } from '../contributions/actions';
 import { useLegalDocumentActions } from '../legal-documents/actions';
 import LegalDocumentDrawer from '../legal-documents/LegalDocumentDrawer';
@@ -55,8 +56,22 @@ import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { AccountDetailManagedDisbursementsTab } from './AccountDetailManagedDisbursementsTab';
 import { AccountDetailsOverviewTab } from './AccountDetailOverviewTab';
 import { AccountDetailTransactionsTab } from './AccountDetailTransactionsTab';
-import { AccountDetailView, getCollectiveTypeIcon, KYCStatusBadge, TaxFormBadge } from './common';
-import { communityAccountDetailQuery } from './queries';
+import {
+  AccountDetailView,
+  getCollectiveTypeIcon,
+  type HostedAccountPanelProps,
+  isHostedAccountType,
+  KYCStatusBadge,
+  type MoneyMovementsView,
+  TaxFormBadge,
+} from './common';
+import {
+  communityAccountDetailQuery,
+  type HostedAccountDetailData,
+  type HostedAccountDetailQuery,
+  hostedAccountDetailQuery,
+  type HostedAccountDetailQueryVariables,
+} from './queries';
 
 const convertOrganizationMutation = gql`
   mutation ConvertOrganizationToVendor($organization: AccountReferenceInput!, $host: AccountReferenceInput!) {
@@ -75,11 +90,21 @@ type AccountDetailsProps = {
   expectedAccountType?: AccountType;
 };
 
+// Hosted account panels are registered here as they are migrated over from
+// components/hosted-account-overview/ (that folder stays read-only until deletion).
+const hostedTabPanels: Partial<Record<AccountDetailView, React.ComponentType<HostedAccountPanelProps>>> = {};
+
 export function AccountDetails(props: AccountDetailsProps) {
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const intl = useIntl();
   const router = useRouter();
+  // Hosted collectives/funds/projects/events use the hosted account profile flow
+  // (migrated from components/hosted-account-overview/HostedAccountProfile).
+  const isHostedAccount = isHostedAccountType(props.expectedAccountType);
   const selectedTab = router.query?.subpath?.[1] || AccountDetailView.OVERVIEW;
+
+  const [moneyMovementsView, setMoneyMovementsView] = React.useState<MoneyMovementsView | undefined>(undefined);
+
   const setSelectedTab = React.useCallback(
     (tab: AccountDetailView) => {
       if (selectedTab !== tab) {
@@ -90,6 +115,14 @@ export function AccountDetails(props: AccountDetailsProps) {
     [router, props.account.id, selectedTab],
   );
 
+  const openTab = React.useCallback(
+    (tab: AccountDetailView, view?: MoneyMovementsView) => {
+      setMoneyMovementsView(view);
+      setSelectedTab(tab);
+    },
+    [setSelectedTab],
+  );
+
   const { toast } = useToast();
   const [openExpenseId, setOpenExpenseId] = React.useState(null);
   const [openContributionId, setOpenContributionId] = React.useState(null);
@@ -98,23 +131,46 @@ export function AccountDetails(props: AccountDetailsProps) {
   const [openLegalDocument, setOpenLegalDocument] = React.useState(false);
   const [displayArchiveConfirmation, setDisplayArchiveConfirmation] = React.useState(false);
 
-  const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
+  // One shell, two flows: community (people/vendors) and hosted account profile.
+  const communityQuery = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
     variables: {
       accountId: props.account.id,
       hostSlug: dashboardAccount.slug,
     },
+    skip: isHostedAccount,
   });
-  const isLoading = query.loading || !query.data;
-  const account = query.data?.account;
-  const taxForms = query.data?.host?.hostedLegalDocuments;
+  const hostedQuery = useQuery<HostedAccountDetailQuery, HostedAccountDetailQueryVariables>(hostedAccountDetailQuery, {
+    variables: { hostSlug: dashboardAccount.slug, accountId: props.account.id },
+    skip: !isHostedAccount,
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  // `account` is the community-flow account; the hosted flow uses `hostedAccount`.
+  const account = communityQuery.data?.account;
+  const hostedAccount = hostedQuery.data?.account as HostedAccountDetailData | undefined;
+  const headerAccount = isHostedAccount ? hostedAccount : account;
+  const taxForms = communityQuery.data?.host?.hostedLegalDocuments;
+  const queryError = isHostedAccount ? hostedQuery.error : communityQuery.error;
+  const isLoading = isHostedAccount
+    ? hostedQuery.loading && !hostedQuery.data
+    : communityQuery.loading || !communityQuery.data;
+  const refetch = React.useCallback(
+    () => (isHostedAccount ? hostedQuery.refetch() : communityQuery.refetch()),
+    [isHostedAccount, hostedQuery, communityQuery],
+  );
+
   const [archiveVendor] = useMutation(setVendorArchiveMutation);
   const [convertOrganizationToVendor] = useMutation(convertOrganizationMutation);
   const isUpgradeRequired = requiresUpgrade(dashboardAccount, FEATURES.TAX_FORMS);
-  const getLegalDocumentActions = useLegalDocumentActions(query.data?.host, query.refetch, isUpgradeRequired);
+  const getLegalDocumentActions = useLegalDocumentActions(
+    communityQuery.data?.host,
+    communityQuery.refetch,
+    isUpgradeRequired,
+  );
   const getContributionActions = useContributionActions({
     accountSlug: account?.slug ?? '',
     hostSlug: dashboardAccount.slug,
-    refetchList: query.refetch,
+    refetchList: communityQuery.refetch,
   });
 
   const handleSetArchive = React.useCallback(
@@ -123,9 +179,9 @@ export function AccountDetails(props: AccountDetailsProps) {
         variables: { vendor: pick(vendor, ['id']), archive: !vendor.isArchived },
         refetchQueries: ['CommunityAccountDetail', 'DashboardVendors'],
       });
-      await query.refetch();
+      await communityQuery.refetch();
     },
-    [archiveVendor, query],
+    [archiveVendor, communityQuery],
   );
 
   const handleConvertOrganizationToVendor = React.useCallback(async () => {
@@ -139,11 +195,11 @@ export function AccountDetails(props: AccountDetailsProps) {
       });
       setEditVendor(result.data.convertOrganizationToVendor);
       setDisplayConvertToVendor(false);
-      await query.refetch();
+      await communityQuery.refetch();
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
-  }, [convertOrganizationToVendor, account, dashboardAccount, toast, intl, query]);
+  }, [convertOrganizationToVendor, account, dashboardAccount, toast, intl, communityQuery]);
 
   const handleTransactionTableRowClick = React.useCallback<TransactionsTableProps['onClickRow']>(
     row => {
@@ -159,7 +215,7 @@ export function AccountDetails(props: AccountDetailsProps) {
     [setOpenContributionId, setOpenExpenseId],
   );
 
-  const tabs = React.useMemo(
+  const communityTabs = React.useMemo(
     () =>
       [
         {
@@ -170,7 +226,7 @@ export function AccountDetails(props: AccountDetailsProps) {
           id: AccountDetailView.TRANSACTIONS,
           label: <FormattedMessage defaultMessage="Money Movement" id="MoneyMovement" />,
         },
-        query.data?.account?.type === CollectiveType.INDIVIDUAL && {
+        communityQuery.data?.account?.type === CollectiveType.INDIVIDUAL && {
           id: AccountDetailView.FINANCIAL_CONTROLS,
           label: <FormattedMessage defaultMessage="Managed Disbursements" id="ManagedDisbursements" />,
         },
@@ -178,26 +234,71 @@ export function AccountDetails(props: AccountDetailsProps) {
           id: AccountDetailView.ACTIVITIES,
           label: <FormattedMessage defaultMessage="Activities" id="Activities" />,
         },
-        ...(query.data?.account?.type === CollectiveType.INDIVIDUAL && isFeatureEnabled(dashboardAccount, FEATURES.KYC)
+        ...(communityQuery.data?.account?.type === CollectiveType.INDIVIDUAL &&
+        isFeatureEnabled(dashboardAccount, FEATURES.KYC)
           ? [
               {
                 id: AccountDetailView.KYC,
                 label: 'KYC',
                 count: Object.values(
-                  query.data?.account && 'kycStatus' in query.data.account ? query.data.account.kycStatus : {},
+                  communityQuery.data?.account && 'kycStatus' in communityQuery.data.account
+                    ? communityQuery.data.account.kycStatus
+                    : {},
                 ).filter(kyc => !!kyc?.['status']).length,
               },
             ]
           : []),
       ].filter(Boolean),
-    [query.data, dashboardAccount],
+    [communityQuery.data, dashboardAccount],
   );
+
+  const hostedTabs = React.useMemo(
+    () => [
+      {
+        id: AccountDetailView.OVERVIEW,
+        label: <FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />,
+      },
+      {
+        id: AccountDetailView.ACCOUNTS,
+        label: <FormattedMessage defaultMessage="Accounts" id="FvanT6" />,
+        // +1 for the synthetic "main account" row shown alongside children.
+        count: hostedAccount ? (hostedAccount.childrenAccounts?.nodes?.length || 0) + 1 : undefined,
+      },
+      {
+        id: AccountDetailView.PAYMENT_INTENTS,
+        label: <FormattedMessage defaultMessage="Money Movements" id="MoneyMovements" />,
+      },
+      {
+        id: AccountDetailView.EXPECTED_FUNDS,
+        label: <FormattedMessage defaultMessage="Expected Funds" id="ExpectedFunds" />,
+      },
+      {
+        id: AccountDetailView.AGREEMENTS,
+        label: <FormattedMessage defaultMessage="Agreements" id="Agreements" />,
+        count: hostedQuery.data?.host?.hostedAccountAgreements?.totalCount,
+      },
+      {
+        id: AccountDetailView.UPDATES,
+        label: <FormattedMessage defaultMessage="Updates" id="updates" />,
+        count: hostedAccount?.updates?.totalCount,
+      },
+      {
+        id: AccountDetailView.ABOUT,
+        label: <FormattedMessage defaultMessage="About" id="collective.about.title" />,
+      },
+      { id: AccountDetailView.ACTIVITIES, label: <FormattedMessage defaultMessage="Activities" id="Activities" /> },
+    ],
+    [hostedAccount, hostedQuery.data?.host?.hostedAccountAgreements?.totalCount],
+  );
+
+  const tabs = isHostedAccount ? hostedTabs : communityTabs;
+  const HostedTabPanel = isHostedAccount ? hostedTabPanels[selectedTab as AccountDetailView] : undefined;
 
   const handleTabChange = React.useCallback(
     (tab: AccountDetailView) => {
-      setSelectedTab(tab);
+      openTab(tab);
     },
-    [setSelectedTab],
+    [openTab],
   );
 
   const legalName = account?.legalName !== account?.name && account?.legalName;
@@ -205,6 +306,18 @@ export function AccountDetails(props: AccountDetailsProps) {
 
   const rejectedExpensesCount = account?.rejectedExpenses?.totalCount || 0;
   const spamExpensesCount = account?.spamExpenses?.totalCount || 0;
+
+  // Hosted flow: redirecting a child to its parent (as in HostedAccountProfile)
+  const parentPublicId = hostedAccount?.parent?.publicId;
+  React.useEffect(() => {
+    if (isHostedAccount && parentPublicId) {
+      makeReplaceSubpath(router)(`${parentPublicId}/${selectedTab}`);
+    }
+  }, [isHostedAccount, parentPublicId, selectedTab, router]);
+
+  if (isHostedAccount && parentPublicId) {
+    return null;
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -222,56 +335,75 @@ export function AccountDetails(props: AccountDetailsProps) {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <Avatar collective={account} size={60} />
+                <Avatar collective={headerAccount} size={60} />
                 <div className="flex flex-col">
                   <div>
-                    {account.name || account.slug}
+                    {headerAccount?.name || headerAccount?.slug}
                     {legalName && <span className="ml-1 font-semibold text-muted-foreground">{`(${legalName})`}</span>}
                   </div>
                   <div className="flex flex-wrap items-center gap-1">
                     <Badge size="sm" type="outline" className="gap-1 rounded-full">
-                      {getCollectiveTypeIcon(account?.type || props.expectedAccountType, { size: 12 })}
-                      {formatCollectiveType(intl, account?.type || props.expectedAccountType)}
+                      {getCollectiveTypeIcon(headerAccount?.type || props.expectedAccountType, { size: 12 })}
+                      {formatCollectiveType(intl, headerAccount?.type || props.expectedAccountType)}
                     </Badge>
-                    {'isArchived' in account && account.isArchived && (
-                      <Badge size="sm" type="neutral" className="gap-1 rounded-full">
-                        <FormattedMessage defaultMessage="Archived" id="AccountStatus.Archived" />
-                      </Badge>
-                    )}
-                    {account?.type === CollectiveType.INDIVIDUAL &&
-                      isFeatureEnabled(dashboardAccount, FEATURES.KYC) && (
-                        <KYCStatusBadge
-                          kycStatus={
-                            query.data?.account && 'kycStatus' in query.data.account ? query.data.account.kycStatus : {}
-                          }
+                    {isHostedAccount ? (
+                      <React.Fragment>
+                        {hostedAccount?.isFrozen && (
+                          <Badge size="sm" type="info">
+                            <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+                          </Badge>
+                        )}
+                        {hostedAccount?.isPrivate && (
+                          <Badge size="sm" type="outline">
+                            <FormattedMessage defaultMessage="Private" id="Private" />
+                          </Badge>
+                        )}
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        {'isArchived' in account && account.isArchived && (
+                          <Badge size="sm" type="neutral" className="gap-1 rounded-full">
+                            <FormattedMessage defaultMessage="Archived" id="AccountStatus.Archived" />
+                          </Badge>
+                        )}
+                        {account?.type === CollectiveType.INDIVIDUAL &&
+                          isFeatureEnabled(dashboardAccount, FEATURES.KYC) && (
+                            <KYCStatusBadge
+                              kycStatus={
+                                communityQuery.data?.account && 'kycStatus' in communityQuery.data.account
+                                  ? communityQuery.data.account.kycStatus
+                                  : {}
+                              }
+                            />
+                          )}
+                        <TaxFormBadge
+                          taxForms={taxForms}
+                          host={communityQuery.data?.host}
+                          onClick={() => setOpenLegalDocument(true)}
                         />
-                      )}
-                    <TaxFormBadge
-                      taxForms={taxForms}
-                      host={query.data?.host}
-                      onClick={() => setOpenLegalDocument(true)}
-                    />
-                    {rejectedExpensesCount > 0 && (
-                      <Badge size="sm" type={'error'}>
-                        <FormattedMessage
-                          defaultMessage="{count} rejected expenses"
-                          id="RejectedExpensesCount"
-                          values={{
-                            count: rejectedExpensesCount,
-                          }}
-                        />
-                      </Badge>
-                    )}
-                    {spamExpensesCount > 0 && (
-                      <Badge size="sm" type={'error'}>
-                        <FormattedMessage
-                          defaultMessage="{count} spam expenses"
-                          id="SpamExpensesCount"
-                          values={{
-                            count: spamExpensesCount,
-                          }}
-                        />
-                      </Badge>
+                        {rejectedExpensesCount > 0 && (
+                          <Badge size="sm" type={'error'}>
+                            <FormattedMessage
+                              defaultMessage="{count} rejected expenses"
+                              id="RejectedExpensesCount"
+                              values={{
+                                count: rejectedExpensesCount,
+                              }}
+                            />
+                          </Badge>
+                        )}
+                        {spamExpensesCount > 0 && (
+                          <Badge size="sm" type={'error'}>
+                            <FormattedMessage
+                              defaultMessage="{count} spam expenses"
+                              id="SpamExpensesCount"
+                              values={{
+                                count: spamExpensesCount,
+                              }}
+                            />
+                          </Badge>
+                        )}
+                      </React.Fragment>
                     )}
                   </div>
                 </div>
@@ -281,11 +413,13 @@ export function AccountDetails(props: AccountDetailsProps) {
         }
         actions={
           <React.Fragment>
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/${account?.slug}`}>
-                <FormattedMessage defaultMessage="View Profile" id="viewProfile" />
-              </Link>
-            </Button>
+            {(!isHostedAccount || (hostedAccount && !hostedAccount.isPrivate)) && (
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/${headerAccount?.slug}`}>
+                  <FormattedMessage defaultMessage="View Profile" id="viewProfile" />
+                </Link>
+              </Button>
+            )}
             <CopyID
               tooltipLabel={<FormattedMessage defaultMessage="Copy URL" id="P8QaSQ" />}
               value={typeof window !== 'undefined' && window.location.href}
@@ -295,90 +429,119 @@ export function AccountDetails(props: AccountDetailsProps) {
             >
               <FormattedMessage defaultMessage="Copy URL" id="P8QaSQ" />
             </CopyID>
-            {account?.type === CollectiveType.VENDOR && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" data-cy="more-actions-btn">
+            {isHostedAccount ? (
+              hostedAccount &&
+              hostedQuery.data?.host?.id === hostedAccount.host?.id && (
+                <MoreActionsMenu collective={hostedAccount} onEdit={refetch}>
+                  <Button size="sm" variant="outline" data-cy="more-actions-btn">
                     <FormattedMessage defaultMessage="More Actions" id="A7ugfn" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    data-cy="actions-edit-vendor"
+                </MoreActionsMenu>
+              )
+            ) : (
+              <React.Fragment>
+                {account?.type === CollectiveType.VENDOR && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" data-cy="more-actions-btn">
+                        <FormattedMessage defaultMessage="More Actions" id="A7ugfn" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        data-cy="actions-edit-vendor"
+                        onClick={() => {
+                          setEditVendor(account as unknown as VendorFieldsFragment);
+                        }}
+                        disabled={!communityQuery.data?.host}
+                      >
+                        <Pencil className="mr-2" size="16" />
+                        <FormattedMessage id="Edit" defaultMessage="Edit" />
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        data-cy="actions-archive-vendor"
+                        onClick={() => {
+                          setDisplayArchiveConfirmation(true);
+                        }}
+                      >
+                        <Archive className="mr-2" size="16" />
+                        {(account as unknown as VendorFieldsFragment).isArchived ? (
+                          <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage="Unarchive" />
+                        ) : (
+                          <FormattedMessage id="collective.archive.confirm.btn" defaultMessage="Archive" />
+                        )}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                {canBeConvertedToVendor && (
+                  <Button
+                    size="sm"
                     onClick={() => {
-                      setEditVendor(account as unknown as VendorFieldsFragment);
-                    }}
-                    disabled={!query.data?.host}
-                  >
-                    <Pencil className="mr-2" size="16" />
-                    <FormattedMessage id="Edit" defaultMessage="Edit" />
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    data-cy="actions-archive-vendor"
-                    onClick={() => {
-                      setDisplayArchiveConfirmation(true);
+                      setDisplayConvertToVendor(true);
                     }}
                   >
-                    <Archive className="mr-2" size="16" />
-                    {(account as unknown as VendorFieldsFragment).isArchived ? (
-                      <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage="Unarchive" />
-                    ) : (
-                      <FormattedMessage id="collective.archive.confirm.btn" defaultMessage="Archive" />
-                    )}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            {canBeConvertedToVendor && (
-              <Button
-                size="sm"
-                onClick={() => {
-                  setDisplayConvertToVendor(true);
-                }}
-              >
-                <FormattedMessage defaultMessage="Convert to Vendor" id="ConvertToVendor" />
-              </Button>
+                    <FormattedMessage defaultMessage="Convert to Vendor" id="ConvertToVendor" />
+                  </Button>
+                )}
+              </React.Fragment>
             )}
           </React.Fragment>
         }
       />
       <div className="mt-4 flex flex-grow flex-col gap-4">
-        {query.error ? (
-          <MessageBoxGraphqlError error={query.error} />
+        {queryError ? (
+          <MessageBoxGraphqlError error={queryError} />
         ) : (
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
-            {selectedTab === AccountDetailView.OVERVIEW && (
-              <AccountDetailsOverviewTab
-                query={query}
-                expectedAccountType={props.expectedAccountType}
-                handleTransactionTableRowClick={handleTransactionTableRowClick}
-                handleTabChange={handleTabChange}
-                onEditVendor={() => setEditVendor(account as unknown as VendorFieldsFragment)}
-              />
-            )}
-            {selectedTab === AccountDetailView.TRANSACTIONS && account && (
-              <AccountDetailTransactionsTab
-                account={account}
-                hostSlug={dashboardAccount.slug}
-                handleTransactionTableRowClick={handleTransactionTableRowClick}
-              />
-            )}
-            {selectedTab === AccountDetailView.ACTIVITIES && (
-              <ActivitiesTab account={account} host={dashboardAccount} setOpenExpenseId={setOpenExpenseId} />
-            )}
-            {selectedTab === AccountDetailView.FINANCIAL_CONTROLS && (
-              <AccountDetailManagedDisbursementsTab
-                query={query}
-                openExpenseLegacyId={openExpenseId}
-                setOpenExpenseLegacyId={setOpenExpenseId}
-              />
-            )}
-            {selectedTab === AccountDetailView.KYC && (
-              <KYCTabPeopleDashboard requestedByAccount={dashboardAccount} verifyAccount={props.account} />
+            {isHostedAccount ? (
+              HostedTabPanel && (
+                <HostedTabPanel
+                  account={hostedAccount}
+                  host={hostedQuery.data?.host}
+                  hostSlug={dashboardAccount.slug}
+                  loading={isLoading}
+                  openTab={openTab}
+                  refetch={refetch}
+                  moneyMovementsView={moneyMovementsView}
+                />
+              )
+            ) : (
+              <React.Fragment>
+                {selectedTab === AccountDetailView.OVERVIEW && (
+                  <AccountDetailsOverviewTab
+                    query={communityQuery}
+                    expectedAccountType={props.expectedAccountType}
+                    handleTransactionTableRowClick={handleTransactionTableRowClick}
+                    handleTabChange={handleTabChange}
+                    onEditVendor={() => setEditVendor(account as unknown as VendorFieldsFragment)}
+                  />
+                )}
+                {selectedTab === AccountDetailView.TRANSACTIONS && account && (
+                  <AccountDetailTransactionsTab
+                    account={account}
+                    hostSlug={dashboardAccount.slug}
+                    handleTransactionTableRowClick={handleTransactionTableRowClick}
+                  />
+                )}
+                {selectedTab === AccountDetailView.ACTIVITIES && (
+                  <ActivitiesTab account={account} host={dashboardAccount} setOpenExpenseId={setOpenExpenseId} />
+                )}
+                {selectedTab === AccountDetailView.FINANCIAL_CONTROLS && (
+                  <AccountDetailManagedDisbursementsTab
+                    query={communityQuery}
+                    openExpenseLegacyId={openExpenseId}
+                    setOpenExpenseLegacyId={setOpenExpenseId}
+                  />
+                )}
+                {selectedTab === AccountDetailView.KYC && (
+                  <KYCTabPeopleDashboard requestedByAccount={dashboardAccount} verifyAccount={props.account} />
+                )}
+              </React.Fragment>
             )}
           </React.Fragment>
         )}
@@ -394,15 +557,15 @@ export function AccountDetails(props: AccountDetailsProps) {
           getActions={getContributionActions}
         />
       )}
-      {editVendor && query.data?.host && (
+      {editVendor && communityQuery.data?.host && (
         <StyledModal onClose={() => setEditVendor(null)}>
           <VendorForm
-            host={query.data.host}
-            supportsTaxForm={query.data.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)}
+            host={communityQuery.data.host}
+            supportsTaxForm={communityQuery.data.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)}
             vendor={editVendor}
             onSuccess={() => {
               setEditVendor(null);
-              query.refetch();
+              communityQuery.refetch();
             }}
             onCancel={() => setEditVendor(null)}
             isModal
@@ -448,11 +611,11 @@ export function AccountDetails(props: AccountDetailsProps) {
           </p>
         </ConfirmationModal>
       )}
-      {query.data?.host && taxForms?.nodes?.[0] && (
+      {communityQuery.data?.host && taxForms?.nodes?.[0] && (
         <LegalDocumentDrawer
           open={openLegalDocument}
           onClose={() => setOpenLegalDocument(false)}
-          host={query.data.host}
+          host={communityQuery.data.host}
           document={taxForms.nodes[0]}
           getActions={getLegalDocumentActions}
         />
