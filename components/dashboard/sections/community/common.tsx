@@ -48,8 +48,6 @@ import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from '../legal-documents/LegalDocumentStatusBadge';
 
-import type { AccountDetailData, AccountDetailHost } from './queries';
-
 type UsePersonActionsOptions = {
   accountSlug: string;
   hasKYCFeature: boolean;
@@ -305,22 +303,6 @@ export enum AccountDetailView {
   UPDATES = 'updates',
   ABOUT = 'about',
 }
-
-export type MoneyMovementsView = 'ALL' | 'CONTRIBUTIONS' | 'PAYOUTS';
-
-/**
- * Uniform props for hosted account panels (migrated from
- * components/hosted-account-overview/, which stays read-only until deletion).
- */
-export type HostedAccountPanelProps = {
-  account?: AccountDetailData;
-  host?: AccountDetailHost;
-  hostSlug: string;
-  loading: boolean;
-  openTab: (tab: AccountDetailView, view?: MoneyMovementsView) => void;
-  refetch: () => void;
-  moneyMovementsView?: MoneyMovementsView;
-};
 
 /** Account types shown with the hosted account profile flow (vs. the community/people/vendors flow) */
 const HOSTED_ACCOUNT_TYPES: AccountType[] = [
