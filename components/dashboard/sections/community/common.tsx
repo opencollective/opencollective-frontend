@@ -48,6 +48,8 @@ import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from '../legal-documents/LegalDocumentStatusBadge';
 
+import type { HostedAccountDetailData, HostedAccountDetailQuery } from './queries';
+
 type UsePersonActionsOptions = {
   accountSlug: string;
   hasKYCFeature: boolean;
@@ -295,6 +297,41 @@ export enum AccountDetailView {
   ACTIVITIES = 'activities',
   KYC = 'kyc',
   FINANCIAL_CONTROLS = 'financial-controls',
+  // Hosted account views (migrated from components/hosted-account-overview/)
+  ACCOUNTS = 'accounts',
+  PAYMENT_INTENTS = 'payment-intents',
+  EXPECTED_FUNDS = 'expected-funds',
+  AGREEMENTS = 'agreements',
+  UPDATES = 'updates',
+  ABOUT = 'about',
+}
+
+export type MoneyMovementsView = 'ALL' | 'CONTRIBUTIONS' | 'PAYOUTS';
+
+/**
+ * Uniform props for hosted account panels (migrated from
+ * components/hosted-account-overview/, which stays read-only until deletion).
+ */
+export type HostedAccountPanelProps = {
+  account?: HostedAccountDetailData;
+  host?: HostedAccountDetailQuery['host'];
+  hostSlug: string;
+  loading: boolean;
+  openTab: (tab: AccountDetailView, view?: MoneyMovementsView) => void;
+  refetch: () => void;
+  moneyMovementsView?: MoneyMovementsView;
+};
+
+/** Account types shown with the hosted account profile flow (vs. the community/people/vendors flow) */
+const HOSTED_ACCOUNT_TYPES: AccountType[] = [
+  AccountType.COLLECTIVE,
+  AccountType.FUND,
+  AccountType.PROJECT,
+  AccountType.EVENT,
+];
+
+export function isHostedAccountType(type?: AccountType): boolean {
+  return HOSTED_ACCOUNT_TYPES.includes(type);
 }
 
 type CommunityAccount =
