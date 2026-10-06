@@ -167,7 +167,6 @@ const HostedAccountDetailsCard = ({
           </Button>
         ) : null
       }
-      className="grow-1"
     >
       <DataList className="text-sm">
         <DataListItem
@@ -279,7 +278,6 @@ const CommunityDetailsCard = ({
           </Button>
         ) : null
       }
-      className="grow-1"
     >
       <DataList className="text-sm">
         <DataListItem
@@ -431,10 +429,7 @@ const PlatformActivityCard = ({
     .filter(Boolean)
     .sort((a, b) => +new Date(b.clearedAt || b.createdAt) - +new Date(a.clearedAt || a.createdAt))[0];
   return (
-    <DashboardContentCard
-      title={<FormattedMessage defaultMessage="Platform Activity" id="PlatformActivity" />}
-      className="grow-1"
-    >
+    <DashboardContentCard title={<FormattedMessage defaultMessage="Platform Activity" id="PlatformActivity" />}>
       <DataList className="text-sm">
         {isHostedAccount && (
           <DataListItem
@@ -555,7 +550,7 @@ const AboutCard = ({
                 isAdminOf ? (
                   <FormattedMessage defaultMessage="Admin of" id="AdminOf" />
                 ) : (
-                  <FormattedMessage defaultMessage="Admins" id="Admins" />
+                  <FormattedMessage defaultMessage="Administrators" id="Administrators" />
                 )
               }
               value={
@@ -754,7 +749,7 @@ export const AccountDetailsOverviewTab = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-row gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {isHostedAccount ? (
           <HostedAccountDetailsCard account={account} host={host} onEditSettings={() => setEditSettingsOpen(true)} />
         ) : (
