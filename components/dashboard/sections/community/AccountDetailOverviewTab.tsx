@@ -45,7 +45,7 @@ import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
 
 import { AccountDetailView, HOSTED_ACCOUNT_TYPES, TaxableCountry } from './common';
-import { HostedAccountOverviewCard } from './HostedAccountOverviewCard';
+import { HostedAccountBalanceSummary } from './HostedAccountBalanceSummary';
 import { type AccountDetailData, type AccountDetailHost, communityAccountOverviewQuery } from './queries';
 
 const recentTransactionsSchema = z.object({
@@ -907,7 +907,7 @@ export const AccountDetailsOverviewTab = ({
       </div>
       <AboutCard account={account} host={host} refetch={query.refetch} />
       {isHostedAccount && (
-        <HostedAccountOverviewCard
+        <HostedAccountBalanceSummary
           account={account}
           hostSlug={query.variables.hostSlug}
           onOpenMoneyView={() => handleTabChange(AccountDetailView.PAYMENT_INTENTS)}
