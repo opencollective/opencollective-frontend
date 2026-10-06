@@ -15,8 +15,8 @@ describe('OAuth Applications', () => {
     cy.log('Starts with an empty state');
     cy.contains('[data-cy="oauth-apps-list"]', "You don't have any app yet");
 
-    cy.log('Create a first app using the message link');
-    cy.getByDataCy('create-app-link').click();
+    cy.log('Create a first app');
+    cy.getByDataCy('create-app-btn').click();
     cy.get('input[name=name]').type('My first App');
     cy.get('textarea[name=description]').type('A very accurate description');
     cy.get('input[name=redirectUri]').type('https://example.com/callback');
@@ -42,7 +42,7 @@ describe('OAuth Applications', () => {
     cy.getByDataCy('go-back-link').click();
     cy.getByDataCy('oauth-app').contains('My first App (edited)');
 
-    cy.log('Create another app using the button');
+    cy.log('Create another app');
     cy.getByDataCy('create-app-btn').click();
     cy.get('input[name=name]').type('My second App');
     cy.get('textarea[name=description]').type('A very accurate description');
@@ -79,7 +79,7 @@ describe('OAuth Applications', () => {
         secret: secret,
       });
 
-      cy.getByDataCy('create-app-link').click();
+      cy.getByDataCy('create-app-btn').click();
       cy.get('input[name=name]').type('My App created with 2FA enabled');
       cy.get('textarea[name=description]').type('A very accurate description');
       cy.get('input[name=redirectUri]').type('https://example.com/callback');
