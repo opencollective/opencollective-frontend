@@ -909,7 +909,6 @@ export const AccountDetailsOverviewTab = ({
       {isHostedAccount && (
         <HostedAccountBalanceSummary
           account={account}
-          hostSlug={query.variables.hostSlug}
           onOpenMoneyView={() => handleTabChange(AccountDetailView.PAYMENT_INTENTS)}
         />
       )}
