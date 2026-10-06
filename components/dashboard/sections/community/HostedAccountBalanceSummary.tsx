@@ -1,27 +1,15 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
 import { ArrowRight } from 'lucide-react';
-import { FormattedMessage, useIntl } from 'react-intl';
-
-import dayjs from '@/lib/dayjs';
-import type {
-  HostedAccountFinancialActivityQuery,
-  HostedAccountFinancialActivityQueryVariables,
-} from '@/lib/graphql/types/v2/graphql';
+import { FormattedMessage } from 'react-intl';
 
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
-import { buildKindActivity } from '@/components/hosted-account-overview/financialActivity';
-// Transitional imports: chart and financial activity helpers are copied over
-// from hosted-account-overview later.
-import { HostedAccountOverviewChart } from '@/components/hosted-account-overview/HostedAccountOverviewChart';
-import { hostedAccountFinancialActivityQuery } from '@/components/hosted-account-overview/queries';
+
+import ComparisonChart from '../overview/ComparisonChart';
 
 import type { AccountDetailData } from './queries';
 
-const BALANCE_COLOR = '#f59e0b';
-const RECEIVED_COLOR = '#14b8a6';
-const SPENT_COLOR = '#dc2626';
+const BALANCE_COLOR = '#16a34a';
 
 type AmountLike = { valueInCents?: number | null; currency?: string | null } | null | undefined;
 
@@ -63,64 +51,13 @@ const Metric = ({
 
 type HostedAccountBalanceSummaryProps = {
   account?: AccountDetailData;
-  hostSlug: string;
   onOpenMoneyView?: (view: 'CONTRIBUTIONS' | 'PAYOUTS') => void;
 };
 
-export function HostedAccountBalanceSummary({ account, hostSlug, onOpenMoneyView }: HostedAccountBalanceSummaryProps) {
-  const intl = useIntl();
+export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: HostedAccountBalanceSummaryProps) {
   const currency = account?.currency;
   const stats = account?.stats;
   const isChild = Boolean(account?.parent?.id);
-
-  const metricsDateRange = React.useMemo(
-    () => ({ from: '2015-01-01T00:00:00.000Z', to: dayjs.utc().toISOString() }),
-    [],
-  );
-  const financialActivityQuery = useQuery<
-    HostedAccountFinancialActivityQuery,
-    HostedAccountFinancialActivityQueryVariables
-  >(hostedAccountFinancialActivityQuery, {
-    variables: {
-      hostSlug,
-      dateRange: metricsDateRange,
-      timeUnit: 'MONTH' as HostedAccountFinancialActivityQueryVariables['timeUnit'],
-      accountFilter: { mainAccount: { eq: { id: account?.id } } },
-      groupByAccount: false,
-    },
-    skip: !account?.id || !hostSlug,
-    fetchPolicy: 'cache-and-network',
-  });
-
-  const metricsRows = React.useMemo(
-    () => financialActivityQuery.data?.host?.metrics?.consolidated?.rows ?? [],
-    [financialActivityQuery.data],
-  );
-  const metricsCurrency = financialActivityQuery.data?.host?.currency ?? currency;
-  const receivedTimeSeries = React.useMemo(
-    () =>
-      buildKindActivity(metricsRows, {
-        amountMeasure: 'amountReceived',
-        countMeasure: 'contributionsCount',
-        timeUnit: 'MONTH',
-        dateFrom: metricsDateRange.from,
-        dateTo: metricsDateRange.to,
-        currency: metricsCurrency,
-      }).timeSeries,
-    [metricsRows, metricsDateRange, metricsCurrency],
-  );
-  const spentTimeSeries = React.useMemo(
-    () =>
-      buildKindActivity(metricsRows, {
-        amountMeasure: 'amountSpent',
-        countMeasure: 'payoutsCount',
-        timeUnit: 'MONTH',
-        dateFrom: metricsDateRange.from,
-        dateTo: metricsDateRange.to,
-        currency: metricsCurrency,
-      }).timeSeries,
-    [metricsRows, metricsDateRange, metricsCurrency],
-  );
 
   return (
     <DashboardContentCard title={<FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />}>
@@ -143,28 +80,11 @@ export function HostedAccountBalanceSummary({ account, hostSlug, onOpenMoneyView
           onClick={() => onOpenMoneyView?.('PAYOUTS')}
         />
       </div>
-      <div className="h-72 w-full">
-        <HostedAccountOverviewChart
-          currency={currency as any}
-          series={[
-            {
-              name: intl.formatMessage({ defaultMessage: 'Balance', id: 'Balance' }),
-              color: BALANCE_COLOR,
-              data: stats?.balanceTimeSeries,
-            },
-            {
-              name: intl.formatMessage({ defaultMessage: 'Received by account', id: 'C22hxu' }),
-              color: RECEIVED_COLOR,
-              data: receivedTimeSeries,
-            },
-            {
-              name: intl.formatMessage({ defaultMessage: 'Spent by account', id: 'bXI/iJ' }),
-              color: SPENT_COLOR,
-              data: spentTimeSeries,
-            },
-          ]}
-        />
-      </div>
+      {stats?.balanceTimeSeries?.nodes?.length ? (
+        <div className="relative h-[220px]">
+          <ComparisonChart current={stats.balanceTimeSeries} color={BALANCE_COLOR} currency={currency} expanded />
+        </div>
+      ) : null}
     </DashboardContentCard>
   );
 }
