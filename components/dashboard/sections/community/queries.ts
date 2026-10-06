@@ -3,8 +3,8 @@ import { gql } from '@apollo/client';
 import type {
   AccountWithHost,
   AccountWithParent,
+  CommunityAccountDetailQuery,
   HostedAccountProfileQuery,
-  HostedAccountProfileQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
@@ -201,7 +201,7 @@ export const communityAccountDetailQuery = gql`
       isUSEntity
       type
       createdAt
-      imageUrl
+      # imageUrl comes from ...HostedCollectiveFields (resized variant)
       hasPublicProfile
       ... on Organization {
         canBeVendorOf(host: { slug: $hostSlug })
@@ -304,6 +304,77 @@ export const communityAccountDetailQuery = gql`
           }
         }
       }
+      # Hosted account fields (migrated from components/hosted-account-overview/queries.ts)
+      description
+      longDescription
+      updates(includeChildren: true, onlyPublishedUpdates: true, limit: 0) {
+        totalCount
+      }
+      stats {
+        id
+        balanceTimeSeries(timeUnit: MONTH, includeChildren: true) {
+          timeUnit
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+          }
+        }
+      }
+      firstTransaction: transactions(
+        limit: 1
+        offset: 0
+        orderBy: { field: CREATED_AT, direction: ASC }
+        includeChildrenTransactions: true
+      ) {
+        nodes {
+          id
+          ...CommunityAccountDetailTransaction
+        }
+      }
+      recentContributions: transactions(
+        limit: 5
+        offset: 0
+        type: CREDIT
+        kind: [CONTRIBUTION, ADDED_FUNDS]
+        includeChildrenTransactions: true
+      ) {
+        nodes {
+          id
+          ...CommunityAccountDetailTransaction
+        }
+      }
+      recentPayouts: transactions(
+        limit: 5
+        offset: 0
+        type: DEBIT
+        kind: [EXPENSE]
+        includeChildrenTransactions: true
+      ) {
+        nodes {
+          id
+          ...CommunityAccountDetailTransaction
+        }
+      }
+      # Extra fields on children (merged with HostedCollectiveFields' childrenAccounts):
+      # the host enables the same row actions (MoreActionsMenu) as the main account.
+      childrenAccounts {
+        nodes {
+          id
+          ... on AccountWithHost {
+            host {
+              id
+              legacyId
+              name
+              slug
+              imageUrl
+            }
+          }
+        }
+      }
+      ...HostedCollectiveFields
     }
     host(slug: $hostSlug) {
       id
@@ -338,6 +409,12 @@ export const communityAccountDetailQuery = gql`
         id
         USE_VENDOR_POLICY
       }
+      # Hosted account fields (migrated from components/hosted-account-overview/queries.ts)
+      type
+      hostFeePercent
+      hostedAccountAgreements(accounts: [{ id: $accountId }], includeChildren: true, limit: 0) {
+        totalCount
+      }
     }
 
     firstActivity: activities(
@@ -362,11 +439,50 @@ export const communityAccountDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+
+  fragment CommunityAccountDetailTransaction on Transaction {
+    id
+    clearedAt
+    createdAt
+    type
+    kind
+    description
+    amount {
+      valueInCents
+      currency
+    }
+    netAmount {
+      valueInCents
+      currency
+    }
+    account {
+      id
+      slug
+      name
+      imageUrl
+    }
+    oppositeAccount {
+      id
+      slug
+      name
+      imageUrl
+    }
+    expense {
+      id
+      legacyId
+    }
+    order {
+      id
+      legacyId
+    }
+  }
+
   ${kycVerificationFields}
   ${legalDocumentFields}
   ${communityAccountDetailActivityFields}
   ${vendorFieldFragment}
+  # AccountHoverCardFields is embedded in hostedCollectiveFields (kept once in the document)
+  ${hostedCollectiveFields}
 `;
 
 export const communityAccountOverviewQuery = gql`
@@ -442,151 +558,14 @@ export const communityAccountActivitiesQuery = gql`
   ${communityAccountDetailActivityFields}
 `;
 
-// Field-identical copy of `hostedAccountProfileQuery` from
-// components/hosted-account-overview/queries.ts (that folder stays read-only until deletion).
-// The operation is renamed to keep GraphQL operation names unique for codegen; the generated
-// `HostedAccountProfileQuery` types apply until the next `npm run graphql:update` generates
-// `HostedAccountDetailQuery`.
-export type HostedAccountDetailQuery = HostedAccountProfileQuery;
-export type HostedAccountDetailQueryVariables = HostedAccountProfileQueryVariables;
-
-export type HostedAccountDetailData = NonNullable<HostedAccountDetailQuery['account']> &
+// Interim data types for the unified detail query: the generated `CommunityAccountDetailQuery`
+// predates the hosted account fields merged into the document above. After the next
+// `npm run graphql:update` these collapse to the generated types (drop the
+// `HostedAccountProfileQuery` half, which disappears with hosted-account-overview).
+export type AccountDetailData = NonNullable<CommunityAccountDetailQuery['account']> &
+  NonNullable<HostedAccountProfileQuery['account']> &
   Partial<AccountWithHost> &
   Partial<AccountWithParent>;
 
-export const hostedAccountDetailQuery = gql`
-  query HostedAccountDetail($hostSlug: String!, $accountId: String!) {
-    host(slug: $hostSlug) {
-      id
-      slug
-      name
-      currency
-      type
-      hostFeePercent
-      hostedAccountAgreements(accounts: [{ id: $accountId }], includeChildren: true, limit: 0) {
-        totalCount
-      }
-    }
-    account(id: $accountId) {
-      id
-      description
-      longDescription
-      updates(includeChildren: true, onlyPublishedUpdates: true, limit: 0) {
-        totalCount
-      }
-      socialLinks {
-        type
-        url
-      }
-      location {
-        id
-        address
-        country
-      }
-      stats {
-        id
-        balanceTimeSeries(timeUnit: MONTH, includeChildren: true) {
-          timeUnit
-          nodes {
-            date
-            amount {
-              valueInCents
-              currency
-            }
-          }
-        }
-      }
-      firstTransaction: transactions(
-        limit: 1
-        offset: 0
-        orderBy: { field: CREATED_AT, direction: ASC }
-        includeChildrenTransactions: true
-      ) {
-        nodes {
-          id
-          ...HostedAccountDetailTransaction
-        }
-      }
-      recentContributions: transactions(
-        limit: 5
-        offset: 0
-        type: CREDIT
-        kind: [CONTRIBUTION, ADDED_FUNDS]
-        includeChildrenTransactions: true
-      ) {
-        nodes {
-          id
-          ...HostedAccountDetailTransaction
-        }
-      }
-      recentPayouts: transactions(
-        limit: 5
-        offset: 0
-        type: DEBIT
-        kind: [EXPENSE]
-        includeChildrenTransactions: true
-      ) {
-        nodes {
-          id
-          ...HostedAccountDetailTransaction
-        }
-      }
-      # Extra fields on children (merged with HostedCollectiveFields' childrenAccounts):
-      # the host enables the same row actions (MoreActionsMenu) as the main account.
-      childrenAccounts {
-        nodes {
-          id
-          ... on AccountWithHost {
-            host {
-              id
-              legacyId
-              name
-              slug
-              imageUrl
-            }
-          }
-        }
-      }
-      ...HostedCollectiveFields
-    }
-  }
-
-  fragment HostedAccountDetailTransaction on Transaction {
-    id
-    clearedAt
-    createdAt
-    type
-    kind
-    description
-    amount {
-      valueInCents
-      currency
-    }
-    netAmount {
-      valueInCents
-      currency
-    }
-    account {
-      id
-      slug
-      name
-      imageUrl
-    }
-    oppositeAccount {
-      id
-      slug
-      name
-      imageUrl
-    }
-    expense {
-      id
-      legacyId
-    }
-    order {
-      id
-      legacyId
-    }
-  }
-
-  ${hostedCollectiveFields}
-`;
+export type AccountDetailHost = NonNullable<CommunityAccountDetailQuery['host']> &
+  NonNullable<HostedAccountProfileQuery['host']>;
