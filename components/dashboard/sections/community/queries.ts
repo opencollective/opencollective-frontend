@@ -1,9 +1,17 @@
 import { gql } from '@apollo/client';
 
+import type {
+  AccountWithHost,
+  AccountWithParent,
+  HostedAccountProfileQuery,
+  HostedAccountProfileQueryVariables,
+} from '@/lib/graphql/types/v2/graphql';
+
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
 import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
 import { vendorFieldFragment } from '@/components/vendors/queries';
 
+import { hostedCollectiveFields } from '../collectives/queries';
 import { legalDocumentFields } from '../legal-documents/HostDashboardTaxForms';
 
 export const peopleHostDashboardQuery = gql`
@@ -432,4 +440,153 @@ export const communityAccountActivitiesQuery = gql`
   }
   ${accountHoverCardFields}
   ${communityAccountDetailActivityFields}
+`;
+
+// Field-identical copy of `hostedAccountProfileQuery` from
+// components/hosted-account-overview/queries.ts (that folder stays read-only until deletion).
+// The operation is renamed to keep GraphQL operation names unique for codegen; the generated
+// `HostedAccountProfileQuery` types apply until the next `npm run graphql:update` generates
+// `HostedAccountDetailQuery`.
+export type HostedAccountDetailQuery = HostedAccountProfileQuery;
+export type HostedAccountDetailQueryVariables = HostedAccountProfileQueryVariables;
+
+export type HostedAccountDetailData = NonNullable<HostedAccountDetailQuery['account']> &
+  Partial<AccountWithHost> &
+  Partial<AccountWithParent>;
+
+export const hostedAccountDetailQuery = gql`
+  query HostedAccountDetail($hostSlug: String!, $accountId: String!) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      name
+      currency
+      type
+      hostFeePercent
+      hostedAccountAgreements(accounts: [{ id: $accountId }], includeChildren: true, limit: 0) {
+        totalCount
+      }
+    }
+    account(id: $accountId) {
+      id
+      description
+      longDescription
+      updates(includeChildren: true, onlyPublishedUpdates: true, limit: 0) {
+        totalCount
+      }
+      socialLinks {
+        type
+        url
+      }
+      location {
+        id
+        address
+        country
+      }
+      stats {
+        id
+        balanceTimeSeries(timeUnit: MONTH, includeChildren: true) {
+          timeUnit
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+          }
+        }
+      }
+      firstTransaction: transactions(
+        limit: 1
+        offset: 0
+        orderBy: { field: CREATED_AT, direction: ASC }
+        includeChildrenTransactions: true
+      ) {
+        nodes {
+          id
+          ...HostedAccountDetailTransaction
+        }
+      }
+      recentContributions: transactions(
+        limit: 5
+        offset: 0
+        type: CREDIT
+        kind: [CONTRIBUTION, ADDED_FUNDS]
+        includeChildrenTransactions: true
+      ) {
+        nodes {
+          id
+          ...HostedAccountDetailTransaction
+        }
+      }
+      recentPayouts: transactions(
+        limit: 5
+        offset: 0
+        type: DEBIT
+        kind: [EXPENSE]
+        includeChildrenTransactions: true
+      ) {
+        nodes {
+          id
+          ...HostedAccountDetailTransaction
+        }
+      }
+      # Extra fields on children (merged with HostedCollectiveFields' childrenAccounts):
+      # the host enables the same row actions (MoreActionsMenu) as the main account.
+      childrenAccounts {
+        nodes {
+          id
+          ... on AccountWithHost {
+            host {
+              id
+              legacyId
+              name
+              slug
+              imageUrl
+            }
+          }
+        }
+      }
+      ...HostedCollectiveFields
+    }
+  }
+
+  fragment HostedAccountDetailTransaction on Transaction {
+    id
+    clearedAt
+    createdAt
+    type
+    kind
+    description
+    amount {
+      valueInCents
+      currency
+    }
+    netAmount {
+      valueInCents
+      currency
+    }
+    account {
+      id
+      slug
+      name
+      imageUrl
+    }
+    oppositeAccount {
+      id
+      slug
+      name
+      imageUrl
+    }
+    expense {
+      id
+      legacyId
+    }
+    order {
+      id
+      legacyId
+    }
+  }
+
+  ${hostedCollectiveFields}
 `;
