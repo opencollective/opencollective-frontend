@@ -48,7 +48,7 @@ import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from '../legal-documents/LegalDocumentStatusBadge';
 
-import type { HostedAccountDetailData, HostedAccountDetailQuery } from './queries';
+import type { AccountDetailData, AccountDetailHost } from './queries';
 
 type UsePersonActionsOptions = {
   accountSlug: string;
@@ -313,8 +313,8 @@ export type MoneyMovementsView = 'ALL' | 'CONTRIBUTIONS' | 'PAYOUTS';
  * components/hosted-account-overview/, which stays read-only until deletion).
  */
 export type HostedAccountPanelProps = {
-  account?: HostedAccountDetailData;
-  host?: HostedAccountDetailQuery['host'];
+  account?: AccountDetailData;
+  host?: AccountDetailHost;
   hostSlug: string;
   loading: boolean;
   openTab: (tab: AccountDetailView, view?: MoneyMovementsView) => void;
