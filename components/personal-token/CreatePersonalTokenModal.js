@@ -117,7 +117,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, disabled, ...pr
                   },
                   {
                     Link: getI18nLink({
-                      href: 'https://documentation.opencollective.com/development/personel-tokens',
+                      href: 'https://developers.opencollective.com/',
                       openInNewTab: true,
                     }),
                   },
