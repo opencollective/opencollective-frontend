@@ -115,8 +115,8 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
           </h2>
           <p className="text-sm text-muted-foreground">
             <FormattedMessage
-              defaultMessage="Personal tokens are used to authenticate with the API. They are not tied to a specific application."
-              id="N2aQSA"
+              defaultMessage="Personal tokens let you use the API as yourself, without creating an OAuth app."
+              id="w/64oW"
             />
           </p>
         </div>
