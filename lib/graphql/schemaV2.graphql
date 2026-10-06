@@ -5137,6 +5137,11 @@ type PlatformBilling {
   dueDate: DateTime!
   base: PlatformBillingBase!
   additional: PlatformBillingAdditional!
+
+  """
+  Crowdfunding fee charged on contributions for plans without platform tips
+  """
+  crowdfunding: PlatformBillingCrowdfunding!
   totalAmount: Amount!
   expenses: [Expense!]!
 }
@@ -5198,6 +5203,23 @@ type PlatformBillingAdditional {
 type PlatformBillingAdditionalUtilizationCharges {
   activeCollectives: Amount!
   expensesPaid: Amount!
+}
+
+type PlatformBillingCrowdfunding {
+  """
+  Crowdfunding contributions subject to the fee during the billing period
+  """
+  totalAmount: Amount!
+
+  """
+  The fee percentage applied to crowdfunding contributions
+  """
+  feePercent: Float!
+
+  """
+  The resulting crowdfunding fee
+  """
+  fee: Amount!
 }
 
 input PlatformBillingPeriodInput {
