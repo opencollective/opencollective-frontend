@@ -57,15 +57,7 @@ import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { AccountDetailManagedDisbursementsTab } from './AccountDetailManagedDisbursementsTab';
 import { AccountDetailsOverviewTab } from './AccountDetailOverviewTab';
 import { AccountDetailTransactionsTab } from './AccountDetailTransactionsTab';
-import {
-  AccountDetailView,
-  getCollectiveTypeIcon,
-  type HostedAccountPanelProps,
-  isHostedAccountType,
-  KYCStatusBadge,
-  type MoneyMovementsView,
-  TaxFormBadge,
-} from './common';
+import { AccountDetailView, getCollectiveTypeIcon, isHostedAccountType, KYCStatusBadge, TaxFormBadge } from './common';
 import { type AccountDetailData, type AccountDetailHost, communityAccountDetailQuery } from './queries';
 
 const convertOrganizationMutation = gql`
@@ -85,17 +77,11 @@ type AccountDetailsProps = {
   expectedAccountType?: AccountType;
 };
 
-// Hosted account panels are registered here as they are migrated over from
-// components/hosted-account-overview/ (that folder stays read-only until deletion).
-const hostedTabPanels: Partial<Record<AccountDetailView, React.ComponentType<HostedAccountPanelProps>>> = {};
-
 export function AccountDetails(props: AccountDetailsProps) {
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const intl = useIntl();
   const router = useRouter();
   const selectedTab = router.query?.subpath?.[1] || AccountDetailView.OVERVIEW;
-
-  const [moneyMovementsView, setMoneyMovementsView] = React.useState<MoneyMovementsView | undefined>(undefined);
 
   const setSelectedTab = React.useCallback(
     (tab: AccountDetailView) => {
@@ -105,14 +91,6 @@ export function AccountDetails(props: AccountDetailsProps) {
       }
     },
     [router, props.account.id, selectedTab],
-  );
-
-  const openTab = React.useCallback(
-    (tab: AccountDetailView, view?: MoneyMovementsView) => {
-      setMoneyMovementsView(view);
-      setSelectedTab(tab);
-    },
-    [setSelectedTab],
   );
 
   const { toast } = useToast();
@@ -197,9 +175,9 @@ export function AccountDetails(props: AccountDetailsProps) {
 
   const handleTabChange = React.useCallback(
     (tab: AccountDetailView) => {
-      openTab(tab);
+      setSelectedTab(tab);
     },
-    [openTab],
+    [setSelectedTab],
   );
 
   // The tab bar adapts to the flow; values come straight from the single detail query.
@@ -354,20 +332,7 @@ export function AccountDetails(props: AccountDetailsProps) {
     </React.Fragment>
   );
 
-  const HostedTabPanel = isHostedAccount ? hostedTabPanels[selectedTab as AccountDetailView] : undefined;
-  const tabPanel = isHostedAccount ? (
-    HostedTabPanel && (
-      <HostedTabPanel
-        account={account}
-        host={host}
-        hostSlug={dashboardAccount.slug}
-        loading={isLoading}
-        openTab={openTab}
-        refetch={refetch}
-        moneyMovementsView={moneyMovementsView}
-      />
-    )
-  ) : (
+  const tabPanel = (
     <React.Fragment>
       {selectedTab === AccountDetailView.OVERVIEW && (
         <AccountDetailsOverviewTab
