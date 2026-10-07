@@ -301,6 +301,7 @@ export enum AccountDetailView {
   // Hosted account views (migrated from components/hosted-account-overview/)
   ACCOUNTS = 'accounts',
   PAYMENT_INTENTS = 'payment-intents',
+  PAYMENT_REQUESTS = 'payment-requests',
   EXPECTED_FUNDS = 'expected-funds',
   AGREEMENTS = 'agreements',
   UPDATES = 'updates',
