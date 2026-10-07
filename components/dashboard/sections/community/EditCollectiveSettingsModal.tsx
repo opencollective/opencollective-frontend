@@ -12,7 +12,6 @@ import { i18nGraphqlException } from '@/lib/errors';
 import { i18nExpenseType } from '@/lib/i18n/expense';
 
 import { useFormikZod } from '@/components/FormikZod';
-import HeroSocialLinks from '@/components/hosted-account-overview/SocialLinks';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LocationAddress from '@/components/LocationAddress';
 import { Badge } from '@/components/ui/Badge';
@@ -23,7 +22,8 @@ import { InputGroup } from '@/components/ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/useToast';
 
-import type { HostedAccountProfileData } from './types';
+import type { AccountDetailData } from './queries';
+import HeroSocialLinks from './SocialLinks';
 
 const editFeeStructureMutation = gql`
   mutation EditCollectiveSettingsFee(
@@ -85,7 +85,7 @@ const DISPLAYED_EXPENSE_TYPES = [EXPENSE_TYPE.INVOICE, EXPENSE_TYPE.RECEIPT, EXP
 type EditCollectiveSettingsModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  account?: HostedAccountProfileData;
+  account?: AccountDetailData;
   host?: { id?: string; hostFeePercent?: number | null } | null;
 };
 

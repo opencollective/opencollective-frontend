@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { capitalize } from 'lodash-es';
 import type { LucideProps } from 'lucide-react';
 import {
   Archive,
@@ -28,7 +27,6 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
 
@@ -42,10 +40,8 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/H
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
-import DateTime from '../../../DateTime';
 import { Button } from '../../../ui/Button';
 import { ALL_SECTIONS } from '../../constants';
-import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from '../legal-documents/LegalDocumentStatusBadge';
 
@@ -448,38 +444,3 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
     [intl, showModal, router, opts, LoggedInUser],
   );
 }
-
-type ActivityType = NonNullable<CommunityAccountDetailQuery['firstActivity']['nodes'][0]>;
-
-export const RichActivityDate = ({
-  date,
-  activity,
-}: {
-  date: string | null | undefined;
-  activity?: ActivityType | null;
-}) => {
-  const intl = useIntl();
-  if (!date) {
-    return null;
-  } else if (!activity) {
-    return <DateTime value={date} dateStyle="long" />;
-  }
-
-  return (
-    <Tooltip delayDuration={100}>
-      <TooltipTrigger asChild>
-        <div className="inline-flex cursor-help items-center gap-1.5">
-          <span className="border-b border-dashed border-muted-foreground/40">
-            <DateTime value={date} dateStyle="long" />
-          </span>
-          <HelpCircle size={14} className="shrink-0 text-muted-foreground" />
-        </div>
-      </TooltipTrigger>
-      <TooltipContent className="z-[9999] max-w-xs text-left">
-        {ActivityDescriptionI18n[activity.type]
-          ? intl.formatMessage(ActivityDescriptionI18n[activity.type], getActivityVariables(intl, activity))
-          : capitalize(activity.type.replace(/_/g, ' '))}
-      </TooltipContent>
-    </Tooltip>
-  );
-};

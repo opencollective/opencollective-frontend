@@ -21,10 +21,6 @@ import { getCollectivePageCanonicalURL } from '@/lib/url-helpers';
 import { CopyID } from '@/components/CopyId';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
-// Transitional import: EditCollectiveSettingsModal is copied over from hosted-account-overview later.
-import { EditCollectiveSettingsModal } from '@/components/hosted-account-overview/EditCollectiveSettingsModal';
-// Transitional import: SocialLinks is copied over from hosted-account-overview later.
-import HeroSocialLinks from '@/components/hosted-account-overview/SocialLinks';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
@@ -45,8 +41,10 @@ import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
 
 import { AccountDetailView, HOSTED_ACCOUNT_TYPES, type MoneyMovementsView, TaxableCountry } from './common';
+import { EditCollectiveSettingsModal } from './EditCollectiveSettingsModal';
 import { HostedFinancialSummaryCard } from './HostedFinancialSummaryCard';
 import { type AccountDetailData, type AccountDetailHost, communityAccountOverviewQuery } from './queries';
+import HeroSocialLinks from './SocialLinks';
 
 const recentTransactionsSchema = z.object({
   limit: limit.default(5),
