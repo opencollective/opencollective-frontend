@@ -72,7 +72,7 @@ import {
   type MoneyMovementsView,
   TaxFormBadge,
 } from './common';
-import { type AccountDetailData, type AccountDetailHost, communityAccountDetailQuery } from './queries';
+import { communityAccountDetailQuery } from './queries';
 
 const convertOrganizationMutation = gql`
   mutation ConvertOrganizationToVendor($organization: AccountReferenceInput!, $host: AccountReferenceInput!) {
@@ -128,12 +128,8 @@ export function AccountDetails(props: AccountDetailsProps) {
     },
   );
 
-  // A single detail query serves both flows (community people/vendors and hosted
-  // accounts); the flow is derived from the account itself.
-  const account = query.data?.account as AccountDetailData | undefined;
-  const host = query.data?.host as AccountDetailHost | undefined;
-  // Whether the queried account belongs to the hosted account profile flow
-  // (collectives/funds/projects/events) vs the community flow (people/vendors).
+  const account = query.data?.account;
+  const host = query.data?.host;
   const isHostedAccount = HOSTED_ACCOUNT_TYPES.includes(account?.type);
   const isLoading = query.loading || !query.data;
   const refetch = () => query.refetch();
@@ -282,7 +278,7 @@ export function AccountDetails(props: AccountDetailsProps) {
   const spamExpensesCount = account?.spamExpenses?.totalCount || 0;
 
   // Redirecting a child to its parent (hosted account flow)
-  const parentPublicId = account?.parent?.publicId;
+  const parentPublicId = 'parent' in account && account?.parent?.publicId;
   React.useEffect(() => {
     if (parentPublicId) {
       makeReplaceSubpath(router)(`${parentPublicId}/${selectedTab}`);
@@ -295,6 +291,7 @@ export function AccountDetails(props: AccountDetailsProps) {
 
   const moreActions = isHostedAccount ? (
     account &&
+    'host' in account &&
     host?.id === account.host?.id && (
       <MoreActionsMenu collective={account} onEdit={refetch}>
         <Button size="sm" variant="outline" data-cy="more-actions-btn">

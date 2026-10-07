@@ -40,10 +40,15 @@ import { transactionsTableQuery } from '../transactions/queries';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
 
-import { AccountDetailView, HOSTED_ACCOUNT_TYPES, type MoneyMovementsView, TaxableCountry } from './common';
+import { AccountDetailView, isHostedAccountData, type MoneyMovementsView, TaxableCountry } from './common';
 import { EditCollectiveSettingsModal } from './EditCollectiveSettingsModal';
 import { HostedFinancialSummaryCard } from './HostedFinancialSummaryCard';
-import { type AccountDetailData, type AccountDetailHost, communityAccountOverviewQuery } from './queries';
+import {
+  type AccountDetailData,
+  type AccountDetailHost,
+  communityAccountOverviewQuery,
+  type HostedAccountDetailData,
+} from './queries';
 import HeroSocialLinks from './SocialLinks';
 
 const recentTransactionsSchema = z.object({
@@ -136,7 +141,7 @@ const HostedAccountDetailsCard = ({
   host,
   onEditSettings,
 }: {
-  account?: AccountDetailData;
+  account?: HostedAccountDetailData;
   host?: AccountDetailHost;
   onEditSettings?: () => void;
 }) => {
@@ -467,7 +472,7 @@ const PlatformActivityCard = ({
           <DataListItem
             label={<FormattedMessage defaultMessage="Accepted On" id="AcceptedOn" />}
             value={
-              account?.approvedAt ? (
+              account && 'approvedAt' in account && account.approvedAt ? (
                 <FormattedDate value={account.approvedAt} dateStyle="long" />
               ) : (
                 <FormattedMessage defaultMessage="Not Hosted" id="OARQHL" />
@@ -523,7 +528,7 @@ const AboutCard = ({
   const adminOf = account && 'adminOf' in account ? account.adminOf?.nodes || [] : [];
   const displayedMembers = isAdminOf ? adminOf : admins;
   const pendingInvitations = (account as any)?.memberInvitations || [];
-  const isHostedCollective = Boolean(host?.id && account?.host?.id === host?.id);
+  const isHostedCollective = Boolean(host?.id && account && 'host' in account && account.host?.id === host?.id);
   const canManageInvitationsAsHostAdmin = Boolean(
     isHostedCollective &&
     admins.length === 0 &&
@@ -867,7 +872,7 @@ export const AccountDetailsOverviewTab = ({
   const isLoading = query.loading;
   const account = query.data?.account as AccountDetailData | undefined;
   const host = query.data?.host as AccountDetailHost | undefined;
-  const isHostedAccount = HOSTED_ACCOUNT_TYPES.includes(account?.type);
+  const isHostedAccount = isHostedAccountData(account);
   const relations = compact(account?.communityStats?.relations).filter(
     (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes(CommunityRelationType.PAYEE)),
   );
@@ -922,12 +927,15 @@ export const AccountDetailsOverviewTab = ({
           handleTransactionTableRowClick={handleTransactionTableRowClick}
         />
       )}
-      <EditCollectiveSettingsModal
-        open={isEditSettingsOpen}
-        onOpenChange={setEditSettingsOpen}
-        account={account}
-        host={host}
-      />
+      {/* Only reachable from the hosted Details card, so `account` is narrowed here. */}
+      {isHostedAccount && (
+        <EditCollectiveSettingsModal
+          open={isEditSettingsOpen}
+          onOpenChange={setEditSettingsOpen}
+          account={account}
+          host={host}
+        />
+      )}
     </div>
   );
 };

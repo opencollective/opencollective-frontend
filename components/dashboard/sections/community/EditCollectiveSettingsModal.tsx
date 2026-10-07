@@ -22,7 +22,7 @@ import { InputGroup } from '@/components/ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/useToast';
 
-import type { AccountDetailData } from './queries';
+import type { HostedAccountDetailData } from './queries';
 import HeroSocialLinks from './SocialLinks';
 
 const editFeeStructureMutation = gql`
@@ -85,7 +85,7 @@ const DISPLAYED_EXPENSE_TYPES = [EXPENSE_TYPE.INVOICE, EXPENSE_TYPE.RECEIPT, EXP
 type EditCollectiveSettingsModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  account?: AccountDetailData;
+  account?: HostedAccountDetailData;
   host?: { id?: string; hostFeePercent?: number | null } | null;
 };
 
