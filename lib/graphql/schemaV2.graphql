@@ -2013,7 +2013,6 @@ enum MemberRole {
   MEMBER
   COMMUNITY_MANAGER
   FUNDRAISER @deprecated(reason: "2022-09-12: This role does not exist anymore")
-  FOLLOWER
   ACCOUNTANT
   CONNECTED_ACCOUNT
 }
@@ -3158,7 +3157,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -7083,9 +7082,9 @@ type AccountStats {
   ): TimeSeriesAmount!
 
   """
-  Total amount disbursed time series
+  Total amount spent time series
   """
-  totalAmountDisbursedTimeSeries(
+  totalAmountSpentTimeSeries(
     """
     The start date of the time series
     """
@@ -8384,7 +8383,7 @@ type HostMetricsTimeSeries {
   hostFees: TimeSeriesAmount!
 
   """
-  History of the share of host fees collected owed to Open Collective Inc.
+  History of the share of host fees collected owed to the platform (OFi Technologies LLC).
   """
   hostFeeShare: TimeSeriesAmountWithSettlement!
 
@@ -10749,7 +10748,7 @@ type Bot implements Account {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -11818,7 +11817,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -13477,7 +13476,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -14845,7 +14844,7 @@ type Individual implements Account {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -16239,7 +16238,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -17710,7 +17709,7 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -18888,7 +18887,7 @@ type Vendor implements Account & AccountWithContributions {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -23257,7 +23256,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -24483,7 +24482,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
 
   """
-  Get all members (admins, members, backers, followers)
+  Get all members (admins, members, backers)
   """
   members(
     limit: Int! = 100
@@ -26210,7 +26209,7 @@ type Mutation {
   ): Account!
 
   """
-  Create WebAuthn public key registration request options
+  Create WebAuthn public key registration request options. Session only (OAuth/Personal tokens are not allowed).
   """
   createWebAuthnRegistrationOptions(
     """
@@ -26220,7 +26219,7 @@ type Mutation {
   ): JSON!
 
   """
-  Add 2FA to the Individual if it does not have it. Scope: "account".
+  Add 2FA to the Individual if it does not have it. Session only (OAuth/Personal tokens are not allowed).
   """
   addTwoFactorAuthTokenToIndividual(
     """
@@ -26240,7 +26239,7 @@ type Mutation {
   ): AddTwoFactorAuthTokenToIndividualResponse!
 
   """
-  Remove 2FA from the Individual if it has been enabled. Scope: "account".
+  Remove 2FA from the Individual if it has been enabled. Session only (OAuth/Personal tokens are not allowed).
   """
   removeTwoFactorAuthTokenFromIndividual(
     """
@@ -26266,7 +26265,7 @@ type Mutation {
   ): Individual!
 
   """
-  Edit 2FA method
+  Edit 2FA method. Session only (OAuth/Personal tokens are not allowed).
   """
   editTwoFactorAuthenticationMethod(
     """
@@ -26306,6 +26305,26 @@ type Mutation {
   ): Account!
 
   """
+  Archive an account and its children: unhosts it, cancels its active contributions and its unprocessed expenses. Scope: "account".
+  """
+  archiveAccount(
+    """
+    Reference to the Account to be archived.
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
+  Unarchive an account. Scope: "account".
+  """
+  unarchiveAccount(
+    """
+    Reference to the Account to be unarchived.
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
   Adds or removes a policy on a given account. Scope: "account".
   """
   deleteAccount(
@@ -26332,7 +26351,7 @@ type Mutation {
   ): SendMessageResult
 
   """
-  Regenerate two factor authentication recovery codes
+  Regenerate two factor authentication recovery codes. Session only (OAuth/Personal tokens are not allowed).
   """
   regenerateRecoveryCodes: [String!]
 
@@ -27005,7 +27024,7 @@ type Mutation {
   createIncognitoProfile: Individual!
 
   """
-  Set password to Individual. Scope: "account". 2FA.
+  Set password to Individual. Session only (OAuth/Personal tokens are not allowed). 2FA.
   """
   setPassword(
     """
@@ -27242,26 +27261,6 @@ type Mutation {
     """
     providers: [ManualPaymentProviderReferenceInput!]!
   ): [ManualPaymentProvider!]!
-
-  """
-  Follows a given Collective. Scope: "account"
-  """
-  followAccount(
-    """
-    user will follow this account
-    """
-    account: AccountReferenceInput!
-  ): FollowAccountResult!
-
-  """
-  Unfollows a given Collective. Scope: "account"
-  """
-  unfollowAccount(
-    """
-    account to unfollow
-    """
-    account: AccountReferenceInput!
-  ): UnfollowAccountResult!
 
   """
   Edit the public message for the given Member of a Collective. Scope: "account".
@@ -28610,11 +28609,6 @@ type Mutation {
     """
     subscription: PlatformSubscriptionInput
   ): Account!
-
-  """
-  Send In-App Survey response
-  """
-  sendSurveyResponse(surveyKey: String!, responseId: String!, score: Int!, text: String, okToContact: Boolean): Boolean
 
   """
   Requests an account to be verified using a KYC provider
@@ -30158,16 +30152,6 @@ input ManualPaymentProviderUpdateInput {
   The balance/clearing accounting category to attribute payments through this provider to. Pass null to unset.
   """
   balanceAccountingCategory: AccountingCategoryReferenceInput
-}
-
-type FollowAccountResult {
-  individual: Individual!
-  member: Member!
-}
-
-type UnfollowAccountResult {
-  individual: Individual!
-  member: Member
 }
 
 input OAuthAuthorizationReferenceInput {
