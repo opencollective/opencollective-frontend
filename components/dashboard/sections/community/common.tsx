@@ -12,6 +12,7 @@ import {
   Receipt,
   Store,
   User,
+  UserRoundGroup,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -67,6 +68,8 @@ export const getCollectiveTypeIcon = (
     case CollectiveType.USER:
     case AccountType.INDIVIDUAL:
       return <User {...props} />;
+    case AccountType.COLLECTIVE:
+      return <UserRoundGroup {...props} />;
   }
 };
 
