@@ -130,7 +130,7 @@ export function ConvertToOrganizationModal({ open, setOpen, collective }: Conver
                   className="w-full"
                   placeholder={intl.formatMessage(
                     { id: 'examples', defaultMessage: 'e.g., {examples}' },
-                    { examples: 'Open Collective Inc.' },
+                    { examples: 'OFi Technologies LLC' },
                   )}
                 />
               )}

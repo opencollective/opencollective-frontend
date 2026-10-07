@@ -8309,7 +8309,7 @@ type HostMetricsTimeSeries {
   hostFees: TimeSeriesAmount!
 
   """
-  History of the share of host fees collected owed to Open Collective Inc.
+  History of the share of host fees collected owed to the platform (OFi Technologies LLC).
   """
   hostFeeShare: TimeSeriesAmountWithSettlement!
 
