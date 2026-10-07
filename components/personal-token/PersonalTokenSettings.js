@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { pick } from 'lodash-es';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Check, Copy } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -10,6 +10,7 @@ import { styled } from 'styled-components';
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
+import useClipboard from '../../lib/hooks/useClipboard';
 
 import { Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -24,6 +25,7 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import { H3, H4, P, Span } from '../Text';
+import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { useToast } from '../ui/useToast';
 import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
@@ -70,8 +72,9 @@ const CodeContainer = styled(Span)`
 
 const ObfuscatedClientSecret = ({ secret }) => {
   const [show, setShow] = React.useState(false);
+  const { isCopied, copy } = useClipboard();
   return (
-    <P>
+    <div className="flex flex-wrap items-center gap-2">
       {show && <CodeContainer data-cy="unhidden-secret">{secret}</CodeContainer>}
       <StyledLink data-cy="show-secret-btn" as="button" color="blue.600" onClick={() => setShow(!show)}>
         {show ? (
@@ -80,7 +83,15 @@ const ObfuscatedClientSecret = ({ secret }) => {
           <FormattedMessage defaultMessage="Show" id="K7AkdL" />
         )}
       </StyledLink>
-    </P>
+      <Button data-cy="copy-token-btn" size="xs" variant="outline" onClick={() => copy(secret)}>
+        {isCopied ? <Check size={14} /> : <Copy size={14} />}
+        {isCopied ? (
+          <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
+        ) : (
+          <FormattedMessage id="Clipboard.CopyShort" defaultMessage="Copy" />
+        )}
+      </Button>
+    </div>
   );
 };
 
@@ -115,7 +126,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
           </Flex>
           <StyledCard maxWidth="600px" p={3} mt={4}>
             <H4 fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb="20px">
-              <FormattedMessage defaultMessage="Personal Token" id="hAcvJ3" />
+              <FormattedMessage defaultMessage="Personal token" id="AbUTPk" />
             </H4>
             <Flex flexWrap="wrap" justifyContent="space-between">
               <Flex flexDirection="column" width="100%" data-cy="personalToken-token">
@@ -126,13 +137,13 @@ const PersonalTokenSettings = ({ backPath, id }) => {
           <P mb={4} mt="10px" fontSize={12} color="black.700" letter-spacing="-0.4px">
             {intl.formatMessage(
               {
-                id: 'token.docs',
+                id: 'QPInl0',
                 defaultMessage:
-                  'Pass this code as Personal-Token HTTP header or personalToken query parameter in the URL. <Link>More info</Link>.',
+                  'Pass this token as the Personal-Token HTTP header or the personalToken query parameter. <Link>More info</Link>.',
               },
               {
                 Link: getI18nLink({
-                  href: 'https://documentation.opencollective.com/development/api',
+                  href: 'https://developers.opencollective.com/',
                   openInNewTab: true,
                 }),
               },
@@ -197,17 +208,17 @@ const PersonalTokenSettings = ({ backPath, id }) => {
 
                 <StyledInputFormikField
                   name="scope"
-                  label="Scopes"
+                  label={intl.formatMessage({ defaultMessage: 'Scopes', id: 'joDyyj' })}
                   labelProps={LABEL_STYLES}
                   mt={20}
                   hint={intl.formatMessage(
                     {
-                      defaultMessage: 'Scopes define the access for personal tokens. <Link>More info</Link>.',
-                      id: 'OL9S0O',
+                      defaultMessage: 'Scopes define what this token can access. <Link>More info</Link>.',
+                      id: 'MVWXez',
                     },
                     {
                       Link: getI18nLink({
-                        href: 'https://documentation.opencollective.com/development/api',
+                        href: 'https://developers.opencollective.com/',
                         openInNewTab: true,
                       }),
                     },

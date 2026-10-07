@@ -1,22 +1,18 @@
 import React from 'react';
-import { NetworkStatus, useQuery } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import { useQuery } from '@apollo/client';
+import { KeyRound, Plus } from 'lucide-react';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { gql } from '../../lib/graphql/helpers';
 import { getPersonalTokenSettingsRoute } from '../../lib/url-helpers';
 
-import Avatar from '../Avatar';
-import { Box, Flex, Grid } from '../Grid';
-import Image from '../Image';
+import DateTime from '../DateTime';
 import Link from '../Link';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
-import StyledButton from '../StyledButton';
-import StyledCard from '../StyledCard';
-import StyledHr from '../StyledHr';
-import StyledLink from '../StyledLink';
-import { H3, P } from '../Text';
+import { DataTable } from '../table/DataTable';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
 
 import CreatePersonalTokenModal from './CreatePersonalTokenModal';
 
@@ -34,6 +30,8 @@ const personalTokenQuery = gql`
           id
           publicId
           name
+          scope
+          expiresAt
         }
       }
     }
@@ -41,28 +39,98 @@ const personalTokenQuery = gql`
 `;
 
 const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => {
+  const intl = useIntl();
   const variables = { slug: account.slug, limit: 12, offset: offset };
   const [showCreatePersonalToken, setShowCreatePersonalTokenModal] = React.useState(false);
-  const { data, loading, error, networkStatus } = useQuery(personalTokenQuery, {
-    variables,
-  });
+  const { data, loading, error } = useQuery(personalTokenQuery, { variables });
+  const tokens = data?.individual?.personalTokens;
 
-  const showLoadingState = loading || networkStatus === NetworkStatus.refetch;
+  const columns = [
+    {
+      header: intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' }),
+      accessorKey: 'name',
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500">
+            <KeyRound size={18} />
+          </div>
+          <div className="min-w-0">
+            <Link
+              href={getPersonalTokenSettingsRoute(data.individual, row.original)}
+              className="font-medium text-foreground hover:underline"
+            >
+              {row.original.name ?? <FormattedMessage defaultMessage="Unnamed token" id="3IwVoe" />}
+            </Link>
+            {row.original.scope?.length > 0 && (
+              <p className="truncate text-sm text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="Scopes: {scopes}"
+                  id="kb8W30"
+                  values={{ scopes: row.original.scope.join(', ') }}
+                />
+              </p>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'actions',
+      meta: { align: 'right' },
+      cell: ({ row }) => {
+        const { expiresAt } = row.original;
+        return (
+          <div className="flex items-center justify-end gap-3">
+            {expiresAt &&
+              (new Date(expiresAt) < new Date() ? (
+                <Badge type="error" size="sm">
+                  <FormattedMessage defaultMessage="Expired" id="RahCRH" />
+                </Badge>
+              ) : (
+                <span className="text-sm whitespace-nowrap text-muted-foreground">
+                  <FormattedMessage
+                    defaultMessage="Expires {date}"
+                    id="/VQpyO"
+                    values={{ date: <DateTime value={expiresAt} dateStyle="medium" /> }}
+                  />
+                </span>
+              ))}
+            <Button asChild size="xs" variant="outline">
+              <Link href={getPersonalTokenSettingsRoute(data.individual, row.original)}>
+                <FormattedMessage id="Settings" defaultMessage="Settings" />
+              </Link>
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
-    <div data-cy="personal-tokens-list">
-      <Flex width="100%" alignItems="center">
-        <H3 fontSize="18px" fontWeight="700">
-          <FormattedMessage defaultMessage="Personal Tokens" id="IPdwXJ" />
-        </H3>
-        <StyledHr mx={2} flex="1" borderColor="black.400" />
-        <StyledButton
+    <div data-cy="personal-tokens-list" className="flex flex-col gap-4">
+      <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+        <div>
+          <h2 className="text-lg font-semibold">
+            <FormattedMessage defaultMessage="Personal Tokens" id="IPdwXJ" />
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            <FormattedMessage
+              defaultMessage="Personal tokens let you use the API as yourself, without creating an OAuth app."
+              id="w/64oW"
+            />
+          </p>
+        </div>
+        <Button
           data-cy="create-personal-token-btn"
-          buttonSize="tiny"
+          size="sm"
+          variant="outline"
+          className="shrink-0"
+          disabled={!data?.individual}
           onClick={() => setShowCreatePersonalTokenModal(true)}
         >
-          + <FormattedMessage defaultMessage="Create Personal token" id="MMyZfL" />
-        </StyledButton>
+          <Plus size={16} />
+          <FormattedMessage defaultMessage="Create personal token" id="aZlmi3" />
+        </Button>
         {showCreatePersonalToken && (
           <CreatePersonalTokenModal
             account={data?.individual}
@@ -71,84 +139,36 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
             disabled={!data?.individual}
           />
         )}
-      </Flex>
-      <P my={2} color="black.700">
-        <FormattedMessage
-          defaultMessage="Personal tokens are used to authenticate with the API. They are not tied to a specific application. Pass it as {headerName} HTTP header or {queryParam} query parameter in the URL."
-          id="QZRYxh"
-          values={{
-            headerName: <code>Personal-Token</code>,
-            queryParam: <code>personalToken</code>,
-          }}
+      </div>
+      {error ? (
+        <MessageBoxGraphqlError error={error} />
+      ) : !loading && !tokens?.totalCount ? (
+        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed p-8 text-center">
+          <KeyRound size={24} className="text-muted-foreground" />
+          <p className="font-medium">
+            <FormattedMessage defaultMessage="You don't have any tokens yet" id="l+5/7O" />
+          </p>
+        </div>
+      ) : (
+        <DataTable
+          loading={loading}
+          nbPlaceholders={3}
+          data={tokens?.nodes}
+          columns={columns}
+          hideHeader
+          mobileTableView
+          getRowDataCy={() => 'personal-token'}
         />
-      </P>
-      <Box my={4}>
-        {error ? (
-          <MessageBoxGraphqlError error={error} />
-        ) : !showLoadingState && !data.individual.personalTokens.totalCount ? (
-          <StyledCard p="24px">
-            <Flex>
-              <Flex flex="0 0 64px" height="64px" justifyContent="center" alignItems="center">
-                <Image src="/static/icons/apps.png" width={52} height={52} alt="" />
-              </Flex>
-              <Flex flexDirection="column" ml={3}>
-                <P fontSize="14px" fontWeight="700" lineHeight="20px" mb="12px">
-                  <FormattedMessage defaultMessage="You don't have any token yet" id="1SzDWu" />
-                </P>
-                <P fontSize="12px" lineHeight="18px" color="black.700">
-                  <FormattedMessage
-                    defaultMessage="You can create personal token that integrate with the Open Collective platform. <CreateTokenLink>Create Personal Token</CreateTokenLink>."
-                    id="oG4/dR"
-                    values={{
-                      CreateTokenLink: children => (
-                        <StyledLink
-                          data-cy="create-token-link"
-                          as="button"
-                          color="blue.500"
-                          onClick={() => setShowCreatePersonalTokenModal(true)}
-                        >
-                          {children}
-                        </StyledLink>
-                      ),
-                    }}
-                  />
-                </P>
-              </Flex>
-            </Flex>
-          </StyledCard>
-        ) : (
-          <Grid gridTemplateColumns={['1fr', null, null, '1fr 1fr', '1fr 1fr 1fr']} gridGap="46px">
-            {showLoadingState
-              ? Array.from({ length: variables.limit }, (_, index) => <LoadingPlaceholder key={index} height="64px" />)
-              : data.individual.personalTokens.nodes.map(token => (
-                  <Flex key={token.id} data-cy="personal-token" alignItems="center">
-                    <Box mr={24}>
-                      <Avatar radius={64} collective={data.individual} />
-                    </Box>
-                    <Flex flexDirection="column">
-                      <P fontSize="18px" lineHeight="26px" fontWeight="500" color="black.900">
-                        {token.name ?? <FormattedMessage defaultMessage="Unnamed token" id="3IwVoe" />}
-                      </P>
-                      <P mt="10px" fontSize="14px">
-                        <Link href={getPersonalTokenSettingsRoute(data.individual, token)}>
-                          <FormattedMessage id="Settings" defaultMessage="Settings" />
-                        </Link>
-                      </P>
-                    </Flex>
-                  </Flex>
-                ))}
-          </Grid>
-        )}
-      </Box>
-      {data?.individual?.personalTokens?.totalCount > variables.limit && (
-        <Flex mt={5} justifyContent="center">
+      )}
+      {tokens?.totalCount > variables.limit && (
+        <div className="flex justify-center">
           <Pagination
-            total={data.individual.personalTokens.totalCount}
+            total={tokens.totalCount}
             limit={variables.limit}
             offset={variables.offset}
             ignoredQueryParams={['slug', 'section']}
           />
-        </Flex>
+        </div>
       )}
     </div>
   );
