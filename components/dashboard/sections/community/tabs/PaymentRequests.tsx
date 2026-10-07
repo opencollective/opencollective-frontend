@@ -7,7 +7,7 @@ import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../../lib/filters/filter-types';
 import type {
   Account,
   AccountHoverCardFieldsFragment,
@@ -16,11 +16,11 @@ import type {
   Host,
   HostDashboardExpensesQuery,
   HostDashboardExpensesQueryVariables,
-} from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatusFilter } from '../../../../lib/graphql/types/v2/graphql';
-import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import formatCollectiveType from '../../../../lib/i18n/collective-type';
-import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
+} from '../../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter } from '../../../../../lib/graphql/types/v2/graphql';
+import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
+import formatCollectiveType from '../../../../../lib/i18n/collective-type';
+import i18nPayoutMethodType from '../../../../../lib/i18n/payout-method-type';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { limit } from '@/lib/filters/schemas';
 import { gql } from '@/lib/graphql/helpers';
@@ -29,31 +29,31 @@ import { i18nExpenseType } from '@/lib/i18n/expense';
 import { ExpenseAccountingCategoryPill } from '@/components/expenses/ExpenseAccountingCategoryPill';
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 
-import Avatar from '../../../Avatar';
-import DateTime from '../../../DateTime';
+import Avatar from '../../../../Avatar';
+import DateTime from '../../../../DateTime';
 import {
   expenseHostFields,
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
-} from '../../../expenses/graphql/fragments';
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import LinkCollective from '../../../LinkCollective';
-import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { ColumnHeader } from '../../../table/ColumnHeader';
-import { actionsColumn, DataTable } from '../../../table/DataTable';
-import { DashboardContext } from '../../DashboardContext';
-import { EmptyResults } from '../../EmptyResults';
-import { expenseKYCStatusFilter } from '../../filters/ExpenseKYCStatusFilter';
-import { Filterbar } from '../../filters/Filterbar';
-import { Pagination } from '../../filters/Pagination';
-import { useExpenseActions } from '../expenses/actions';
-import type { FilterMeta as CommonFilterMeta } from '../expenses/filters';
+} from '../../../../expenses/graphql/fragments';
+import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
+import LinkCollective from '../../../../LinkCollective';
+import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
+import { ColumnHeader } from '../../../../table/ColumnHeader';
+import { actionsColumn, DataTable } from '../../../../table/DataTable';
+import { DashboardContext } from '../../../DashboardContext';
+import { EmptyResults } from '../../../EmptyResults';
+import { expenseKYCStatusFilter } from '../../../filters/ExpenseKYCStatusFilter';
+import { Filterbar } from '../../../filters/Filterbar';
+import { Pagination } from '../../../filters/Pagination';
+import { useExpenseActions } from '../../expenses/actions';
+import type { FilterMeta as CommonFilterMeta } from '../../expenses/filters';
 import {
   ExpenseAccountingCategoryKinds,
   filters as commonFilters,
   schema as commonSchema,
   toVariables as commonToVariables,
-} from '../expenses/filters';
+} from '../../expenses/filters';
 
 type HostExpensesQueryNode = NonNullable<HostDashboardExpensesQuery['expenses']['nodes']>[number];
 
@@ -405,17 +405,13 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   kycStatus: expenseKYCStatusFilter.filter,
 };
 
-type AccountDetailPaymentRequestsTabProps = {
+type PaymentRequestsProps = {
   account: CommunityAccountDetailQuery['account'];
   hostSlug: string;
   onOpenExpense: (legacyId: number | null) => void;
 };
 
-export function AccountDetailPaymentRequestsTab({
-  account,
-  hostSlug,
-  onOpenExpense,
-}: AccountDetailPaymentRequestsTabProps) {
+export function PaymentRequests({ account, hostSlug, onOpenExpense }: PaymentRequestsProps) {
   const intl = useIntl();
   const { account: dashboardAccount } = useContext(DashboardContext);
 

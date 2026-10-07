@@ -33,23 +33,22 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 import { getEffectiveVendorPolicyLabel, VendorContactTag } from '@/components/vendors/common';
 
-import Avatar from '../../../Avatar';
-import DateTime from '../../../DateTime';
-import { Metric } from '../overview/Metric';
-import { transactionsTableQuery } from '../transactions/queries';
-import type { TransactionsTableProps } from '../transactions/TransactionsTable';
-import TransactionsTable from '../transactions/TransactionsTable';
-
-import { AccountDetailView, isHostedAccountData, type MoneyMovementsView, TaxableCountry } from './common';
-import { EditCollectiveSettingsModal } from './EditCollectiveSettingsModal';
-import { HostedFinancialSummaryCard } from './HostedFinancialSummaryCard';
+import Avatar from '../../../../Avatar';
+import DateTime from '../../../../DateTime';
+import { Metric } from '../../overview/Metric';
+import { transactionsTableQuery } from '../../transactions/queries';
+import type { TransactionsTableProps } from '../../transactions/TransactionsTable';
+import TransactionsTable from '../../transactions/TransactionsTable';
+import { AccountDetailView, isHostedAccountData, type MoneyMovementsView, TaxableCountry } from '../common';
+import { EditCollectiveSettingsModal } from '../EditCollectiveSettingsModal';
+import { HostedFinancialSummaryCard } from '../HostedFinancialSummaryCard';
 import {
   type AccountDetailData,
   type AccountDetailHost,
   communityAccountOverviewQuery,
   type HostedAccountDetailData,
-} from './queries';
-import HeroSocialLinks from './SocialLinks';
+} from '../queries';
+import HeroSocialLinks from '../SocialLinks';
 
 const recentTransactionsSchema = z.object({
   limit: limit.default(5),
@@ -856,7 +855,7 @@ const FinancialSummaryCard = ({
   );
 };
 
-export const AccountDetailsOverviewTab = ({
+export const Overview = ({
   query,
   expectedAccountType,
   handleTabChange,

@@ -15,7 +15,7 @@ import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { DataTable } from '@/components/table/DataTable';
 
-import type { AccountDetailData } from './queries';
+import type { AccountDetailData } from '../queries';
 
 const UPDATES_LIMIT = 25;
 
@@ -100,11 +100,11 @@ const columns: ColumnDef<UpdateRow>[] = [
   },
 ];
 
-type AccountDetailUpdatesTabProps = {
+type UpdatesProps = {
   account?: AccountDetailData;
 };
 
-export function AccountDetailUpdatesTab({ account }: AccountDetailUpdatesTabProps) {
+export function Updates({ account }: UpdatesProps) {
   const queryFilter = useQueryFilter({
     schema: z.object({ limit: integer.default(UPDATES_LIMIT), offset: integer.default(0) }),
     filters: {},

@@ -20,7 +20,7 @@ import {
 } from '@/components/dashboard/sections/contributions/filters';
 import { dashboardOrdersQuery } from '@/components/dashboard/sections/contributions/queries';
 
-import type { AccountDetailData } from './queries';
+import type { AccountDetailData } from '../queries';
 
 const schema = baseSchema.extend({
   expectedDate: expectedDateFilter.schema,
@@ -83,12 +83,12 @@ const expectedFundsMetadataQuery = gql`
   }
 `;
 
-type AccountDetailExpectedFundsTabProps = {
+type ExpectedFundsProps = {
   account?: AccountDetailData;
   hostSlug: string;
 };
 
-export function AccountDetailExpectedFundsTab({ account, hostSlug }: AccountDetailExpectedFundsTabProps) {
+export function ExpectedFunds({ account, hostSlug }: ExpectedFundsProps) {
   const intl = useIntl();
 
   const views: Views<FilterValues> = [

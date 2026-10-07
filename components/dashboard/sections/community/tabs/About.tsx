@@ -11,14 +11,14 @@ import StyledLink from '@/components/StyledLink';
 import { Badge } from '@/components/ui/Badge';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
-import type { AccountDetailData } from './queries';
-import HeroSocialLinks from './SocialLinks';
+import type { AccountDetailData } from '../queries';
+import HeroSocialLinks from '../SocialLinks';
 
-type AccountDetailAboutTabProps = {
+type AboutProps = {
   account?: AccountDetailData;
 };
 
-export function AccountDetailAboutTab({ account }: AccountDetailAboutTabProps) {
+export function About({ account }: AboutProps) {
   const admins = account?.members?.nodes || [];
   const hasLongDescription = !isEmptyHTMLValue(account?.longDescription);
 

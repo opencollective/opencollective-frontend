@@ -53,17 +53,17 @@ import { useLegalDocumentActions } from '../legal-documents/actions';
 import LegalDocumentDrawer from '../legal-documents/LegalDocumentDrawer';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 
-import { AccountDetailAboutTab } from './AccountDetailAboutTab';
-import { AccountDetailAccountsTab } from './AccountDetailAccountsTab';
-import { ActivitiesTab } from './AccountDetailActivitiesTab';
-import { AccountDetailAgreementsTab } from './AccountDetailAgreementsTab';
-import { AccountDetailExpectedFundsTab } from './AccountDetailExpectedFundsTab';
-import { AccountDetailManagedDisbursementsTab } from './AccountDetailManagedDisbursementsTab';
-import { AccountDetailMoneyMovementsTab } from './AccountDetailMoneyMovementsTab';
-import { AccountDetailsOverviewTab } from './AccountDetailOverviewTab';
-import { AccountDetailPaymentRequestsTab } from './AccountDetailPaymentRequestsTab';
-import { AccountDetailTransactionsTab } from './AccountDetailTransactionsTab';
-import { AccountDetailUpdatesTab } from './AccountDetailUpdatesTab';
+import { About } from './tabs/About';
+import { Accounts } from './tabs/Accounts';
+import { Activities } from './tabs/Activities';
+import { Agreements } from './tabs/Agreements';
+import { ExpectedFunds } from './tabs/ExpectedFunds';
+import { ManagedDisbursements } from './tabs/ManagedDisbursements';
+import { MoneyMovements } from './tabs/MoneyMovements';
+import { Overview } from './tabs/Overview';
+import { PaymentRequests } from './tabs/PaymentRequests';
+import { Transactions } from './tabs/Transactions';
+import { Updates } from './tabs/Updates';
 import {
   AccountDetailView,
   getCollectiveTypeIcon,
@@ -278,7 +278,7 @@ export function AccountDetails(props: AccountDetailsProps) {
   const spamExpensesCount = account?.spamExpenses?.totalCount || 0;
 
   // Redirecting a child to its parent (hosted account flow)
-  const parentPublicId = 'parent' in account && account?.parent?.publicId;
+  const parentPublicId = account && 'parent' in account && account.parent?.publicId;
   React.useEffect(() => {
     if (parentPublicId) {
       makeReplaceSubpath(router)(`${parentPublicId}/${selectedTab}`);
@@ -354,7 +354,7 @@ export function AccountDetails(props: AccountDetailsProps) {
   const tabPanel = (
     <React.Fragment>
       {selectedTab === AccountDetailView.OVERVIEW && (
-        <AccountDetailsOverviewTab
+        <Overview
           query={query}
           expectedAccountType={props.expectedAccountType}
           handleTransactionTableRowClick={handleTransactionTableRowClick}
@@ -363,14 +363,14 @@ export function AccountDetails(props: AccountDetailsProps) {
         />
       )}
       {selectedTab === AccountDetailView.TRANSACTIONS && !isHostedAccount && account && (
-        <AccountDetailTransactionsTab
+        <Transactions
           account={account}
           hostSlug={dashboardAccount.slug}
           handleTransactionTableRowClick={handleTransactionTableRowClick}
         />
       )}
       {selectedTab === AccountDetailView.PAYMENT_INTENTS && isHostedAccount && account && (
-        <AccountDetailMoneyMovementsTab
+        <MoneyMovements
           account={account}
           hostSlug={dashboardAccount.slug}
           initialView={moneyMovementsView}
@@ -378,17 +378,13 @@ export function AccountDetails(props: AccountDetailsProps) {
         />
       )}
       {selectedTab === AccountDetailView.PAYMENT_REQUESTS && isHostedAccount && account && (
-        <AccountDetailPaymentRequestsTab
-          account={account}
-          hostSlug={dashboardAccount.slug}
-          onOpenExpense={setOpenExpenseId}
-        />
+        <PaymentRequests account={account} hostSlug={dashboardAccount.slug} onOpenExpense={setOpenExpenseId} />
       )}
       {selectedTab === AccountDetailView.ACTIVITIES && (
-        <ActivitiesTab account={account} host={dashboardAccount} setOpenExpenseId={setOpenExpenseId} />
+        <Activities account={account} host={dashboardAccount} setOpenExpenseId={setOpenExpenseId} />
       )}
       {selectedTab === AccountDetailView.FINANCIAL_CONTROLS && (
-        <AccountDetailManagedDisbursementsTab
+        <ManagedDisbursements
           query={query}
           openExpenseLegacyId={openExpenseId}
           setOpenExpenseLegacyId={setOpenExpenseId}
@@ -397,16 +393,16 @@ export function AccountDetails(props: AccountDetailsProps) {
       {selectedTab === AccountDetailView.KYC && (
         <KYCTabPeopleDashboard requestedByAccount={dashboardAccount} verifyAccount={props.account} />
       )}
-      {selectedTab === AccountDetailView.ABOUT && <AccountDetailAboutTab account={account} />}
-      {selectedTab === AccountDetailView.UPDATES && <AccountDetailUpdatesTab account={account} />}
+      {selectedTab === AccountDetailView.ABOUT && <About account={account} />}
+      {selectedTab === AccountDetailView.UPDATES && <Updates account={account} />}
       {selectedTab === AccountDetailView.ACCOUNTS && (
-        <AccountDetailAccountsTab account={account} host={host} loading={isLoading} onEdit={refetch} />
+        <Accounts account={account} host={host} loading={isLoading} onEdit={refetch} />
       )}
       {selectedTab === AccountDetailView.EXPECTED_FUNDS && (
-        <AccountDetailExpectedFundsTab account={account} hostSlug={dashboardAccount.slug} />
+        <ExpectedFunds account={account} hostSlug={dashboardAccount.slug} />
       )}
       {selectedTab === AccountDetailView.AGREEMENTS && (
-        <AccountDetailAgreementsTab account={account} hostSlug={dashboardAccount.slug} />
+        <Agreements account={account} hostSlug={dashboardAccount.slug} />
       )}
     </React.Fragment>
   );
