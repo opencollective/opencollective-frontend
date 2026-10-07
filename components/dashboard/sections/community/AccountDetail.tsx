@@ -59,10 +59,18 @@ import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { AccountDetailAgreementsTab } from './AccountDetailAgreementsTab';
 import { AccountDetailExpectedFundsTab } from './AccountDetailExpectedFundsTab';
 import { AccountDetailManagedDisbursementsTab } from './AccountDetailManagedDisbursementsTab';
+import { AccountDetailMoneyMovementsTab } from './AccountDetailMoneyMovementsTab';
 import { AccountDetailsOverviewTab } from './AccountDetailOverviewTab';
 import { AccountDetailTransactionsTab } from './AccountDetailTransactionsTab';
 import { AccountDetailUpdatesTab } from './AccountDetailUpdatesTab';
-import { AccountDetailView, getCollectiveTypeIcon, HOSTED_ACCOUNT_TYPES, KYCStatusBadge, TaxFormBadge } from './common';
+import {
+  AccountDetailView,
+  getCollectiveTypeIcon,
+  HOSTED_ACCOUNT_TYPES,
+  KYCStatusBadge,
+  type MoneyMovementsView,
+  TaxFormBadge,
+} from './common';
 import { type AccountDetailData, type AccountDetailHost, communityAccountDetailQuery } from './queries';
 
 const convertOrganizationMutation = gql`
@@ -105,6 +113,8 @@ export function AccountDetails(props: AccountDetailsProps) {
   const [displayConvertToVendor, setDisplayConvertToVendor] = React.useState(false);
   const [openLegalDocument, setOpenLegalDocument] = React.useState(false);
   const [displayArchiveConfirmation, setDisplayArchiveConfirmation] = React.useState(false);
+  // Seeds the hosted Money Movements tab from overview links (e.g. "total received" -> Contributions).
+  const [moneyMovementsView, setMoneyMovementsView] = React.useState<MoneyMovementsView | undefined>(undefined);
 
   const query = useQuery<CommunityAccountDetailQuery, CommunityAccountDetailQueryVariables>(
     communityAccountDetailQuery,
@@ -181,7 +191,8 @@ export function AccountDetails(props: AccountDetailsProps) {
   );
 
   const handleTabChange = React.useCallback(
-    (tab: AccountDetailView) => {
+    (tab: AccountDetailView, view?: MoneyMovementsView) => {
+      setMoneyMovementsView(view);
       setSelectedTab(tab);
     },
     [setSelectedTab],
@@ -260,7 +271,6 @@ export function AccountDetails(props: AccountDetailsProps) {
     ].filter(Boolean);
   }, [account, host, isHostedAccount, dashboardAccount]);
 
-  const legalName = account?.legalName !== account?.name && account?.legalName;
   const canBeConvertedToVendor = account?.type === 'ORGANIZATION' ? account['canBeVendorOf'] : false;
 
   const rejectedExpensesCount = account?.rejectedExpenses?.totalCount || 0;
@@ -350,10 +360,18 @@ export function AccountDetails(props: AccountDetailsProps) {
           onEditVendor={() => setEditVendor(account as unknown as VendorFieldsFragment)}
         />
       )}
-      {selectedTab === AccountDetailView.TRANSACTIONS && account && (
+      {selectedTab === AccountDetailView.TRANSACTIONS && !isHostedAccount && account && (
         <AccountDetailTransactionsTab
           account={account}
           hostSlug={dashboardAccount.slug}
+          handleTransactionTableRowClick={handleTransactionTableRowClick}
+        />
+      )}
+      {selectedTab === AccountDetailView.PAYMENT_INTENTS && isHostedAccount && account && (
+        <AccountDetailMoneyMovementsTab
+          account={account}
+          hostSlug={dashboardAccount.slug}
+          initialView={moneyMovementsView}
           handleTransactionTableRowClick={handleTransactionTableRowClick}
         />
       )}
