@@ -12,20 +12,41 @@ import { Filterbar } from '@/components/dashboard/filters/Filterbar';
 import { periodFilter } from '@/components/dashboard/filters/PeriodFilter';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 
+import { PeriodFilterType } from '../../filters/PeriodCompareFilter/schema';
 import ComparisonChart from '../overview/ComparisonChart';
 
 import type { AccountDetailData } from './queries';
-import { PeriodFilterType } from '../../filters/PeriodCompareFilter/schema';
 
 const BALANCE_COLOR = '#16a34a';
 
-// Balance time series for the picked date range: the range from the filter is
-// injected into this query, which feeds the chart.
-const accountDetailBalanceTimeSeriesQuery = gql`
-  query AccountDetailBalanceTimeSeries($accountId: String!, $dateFrom: DateTime, $dateTo: DateTime) {
+// Balance summary stats for the picked date range: the range from the filter is
+// injected into this query, which feeds the metrics and the chart.
+const accountDetailBalanceSummaryQuery = gql`
+  query AccountDetailBalanceSummary($accountId: String!, $dateFrom: DateTime, $dateTo: DateTime) {
     account(id: $accountId) {
       id
       stats {
+        balance(dateTo: $dateTo) {
+          valueInCents
+          currency
+        }
+        consolidatedBalance: balance(includeChildren: true, dateTo: $dateTo) {
+          valueInCents
+          currency
+        }
+        consolidatedTotalNetAmountRaised: totalAmountReceived(
+          net: true
+          includeChildren: true
+          dateFrom: $dateFrom
+          dateTo: $dateTo
+        ) {
+          valueInCents
+          currency
+        }
+        consolidatedTotalAmountSpent: totalAmountSpent(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo) {
+          valueInCents
+          currency
+        }
         balanceTimeSeries(dateFrom: $dateFrom, dateTo: $dateTo, includeChildren: true) {
           timeUnit
           dateFrom
@@ -90,7 +111,6 @@ type HostedAccountBalanceSummaryProps = {
 
 export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: HostedAccountBalanceSummaryProps) {
   const currency = account?.currency;
-  const stats = account?.stats;
   const isChild = Boolean(account?.parent?.id);
 
   const queryFilter = useQueryFilter({
@@ -103,13 +123,14 @@ export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: Hosted
     skipRouter: true,
   });
 
-  const balanceSeriesQuery = useQuery(accountDetailBalanceTimeSeriesQuery, {
+  const balanceSeriesQuery = useQuery(accountDetailBalanceSummaryQuery, {
     variables: { accountId: account?.id, ...queryFilter.variables },
     skip: !account?.id,
     fetchPolicy: 'cache-and-network',
   });
 
-  const balanceSeries = balanceSeriesQuery.data?.account?.stats?.balanceTimeSeries;
+  const stats = balanceSeriesQuery.data?.account?.stats;
+  const balanceSeries = stats?.balanceTimeSeries;
 
   return (
     <DashboardContentCard
@@ -118,18 +139,20 @@ export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: Hosted
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Metric
-          label={<FormattedMessage defaultMessage="Current Balance" id="PkACGs" />}
+          label={
+            <FormattedMessage defaultMessage="Balance at end of this period, including starting balance" id="hi/nhW" />
+          }
           amount={isChild ? stats?.balance : stats?.consolidatedBalance}
           currency={currency}
         />
         <Metric
-          label={<FormattedMessage defaultMessage="Received by Account (all-time)" id="26sbkf" />}
+          label={<FormattedMessage defaultMessage="Total amount received this period" id="2kY5p6" />}
           amount={stats?.consolidatedTotalNetAmountRaised}
           currency={currency}
           onClick={() => onOpenMoneyView?.('CONTRIBUTIONS')}
         />
         <Metric
-          label={<FormattedMessage defaultMessage="Disbursed by account (all-time)" id="3wX8nB" />}
+          label={<FormattedMessage defaultMessage="Total amount spent this period" id="6ctWuQ" />}
           amount={stats?.consolidatedTotalAmountSpent}
           currency={currency}
           onClick={() => onOpenMoneyView?.('PAYOUTS')}

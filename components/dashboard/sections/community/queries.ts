@@ -310,19 +310,6 @@ export const communityAccountDetailQuery = gql`
       updates(includeChildren: true, onlyPublishedUpdates: true, limit: 0) {
         totalCount
       }
-      stats {
-        id
-        balanceTimeSeries(timeUnit: MONTH, includeChildren: true) {
-          timeUnit
-          nodes {
-            date
-            amount {
-              valueInCents
-              currency
-            }
-          }
-        }
-      }
       firstTransaction: transactions(
         limit: 1
         offset: 0
