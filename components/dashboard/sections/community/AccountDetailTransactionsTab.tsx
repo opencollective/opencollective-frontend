@@ -5,11 +5,7 @@ import { z } from 'zod';
 
 import type { FiltersToVariables } from '@/lib/filters/filter-types';
 import { limit, offset } from '@/lib/filters/schemas';
-import type {
-  CommunityAccountDetailQuery,
-  CommunityTransactionSummary,
-  TransactionsTableQueryVariables,
-} from '@/lib/graphql/types/v2/graphql';
+import type { CommunityAccountDetailQuery, TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '@/lib/url-helpers';
@@ -37,6 +33,8 @@ import { transactionsTableQuery } from '../transactions/queries';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
 import type { TransactionsTableQueryNode } from '../transactions/types';
+
+import { accountMoneyMovementsSummaryQuery, getCountForView } from './common';
 
 const schema = z.object({
   limit: limit.default(15),
@@ -97,18 +95,6 @@ type AccountDetailTransactionsTabProps = {
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
 };
 
-const getCountForView = (
-  view: { id: TransactionsView; filter: { kind?: TransactionKind[] }; label: string },
-  transactionSummary?: CommunityTransactionSummary[],
-) => {
-  const summaries = transactionSummary?.filter(summary => view.filter?.kind?.includes(summary.kind as TransactionKind));
-  if (!summaries || summaries.length === 0) {
-    return view;
-  }
-  const count = summaries.reduce((acc, summary) => acc + summary.creditCount + summary.debitCount, 0);
-  return { ...view, count };
-};
-
 export function AccountDetailTransactionsTab({
   account,
   hostSlug,
@@ -116,7 +102,13 @@ export function AccountDetailTransactionsTab({
 }: AccountDetailTransactionsTabProps) {
   const intl = useIntl();
   const { account: dashboardAccount } = React.useContext(DashboardContext);
-  const pendingExpenseCount = account?.pendingExpenses?.totalCount || 0;
+  const { data: summaryData } = useQuery(accountMoneyMovementsSummaryQuery, {
+    variables: { accountId: account?.id, hostSlug },
+    skip: !account?.id || !hostSlug,
+    fetchPolicy: 'cache-and-network',
+  });
+  const transactionSummary = summaryData?.account?.communityStats?.transactionSummary;
+  const pendingExpenseCount = summaryData?.account?.pendingExpenses?.totalCount || 0;
 
   const redirectRelatedTransactionsTo = getDashboardRoute(
     dashboardAccount,
@@ -185,13 +177,8 @@ export function AccountDetailTransactionsTab({
   );
 
   const viewsWithCount = React.useMemo(
-    () =>
-      views.map(view => {
-        const transactionSummary =
-          account && 'communityStats' in account ? account.communityStats?.transactionSummary : undefined;
-        return getCountForView(view, transactionSummary);
-      }),
-    [views, account],
+    () => views.map(view => getCountForView(view, transactionSummary)),
+    [views, transactionSummary],
   );
 
   return (

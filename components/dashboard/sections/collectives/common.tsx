@@ -21,7 +21,10 @@ import type { IntlShape } from 'react-intl';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
-import type { AccountWithHost, HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  CommunityAccountDetailQuery,
+  HostedCollectiveFieldsFragment,
+} from '../../../../lib/graphql/types/v2/graphql';
 import { MemberRole } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
@@ -437,7 +440,7 @@ export const MoreActionsMenu = ({
   onEdit,
   openCollectiveDetails,
 }: {
-  collective: HostedCollectiveFieldsFragment & Partial<AccountWithHost>;
+  collective: CommunityAccountDetailQuery['account'];
   children: React.ReactNode;
   onEdit?: () => void;
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
@@ -603,7 +606,7 @@ export const MoreActionsMenu = ({
       </DropdownMenu>
       {openModal && (
         <React.Fragment>
-          {openModal === 'ADD_FUNDS' && (
+          {openModal === 'ADD_FUNDS' && 'host' in collective && (
             <AddFundsModal
               host={collective.host}
               collective={collective}
@@ -611,7 +614,7 @@ export const MoreActionsMenu = ({
               onSuccess={onEdit}
             />
           )}
-          {openModal === 'ADD_EXPENSE' && (
+          {openModal === 'ADD_EXPENSE' && 'host' in collective && (
             <HostCreateExpenseModal
               open
               setOpen={() => setOpenModal(null)}
@@ -622,7 +625,7 @@ export const MoreActionsMenu = ({
           {openModal === 'FREEZE' && (
             <FreezeAccountModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
           )}
-          {openModal === 'UNHOST' && (
+          {openModal === 'UNHOST' && 'host' in collective && (
             <UnhostAccountModal
               collective={collective}
               host={collective.host}
@@ -630,7 +633,7 @@ export const MoreActionsMenu = ({
               onSuccess={onEdit}
             />
           )}
-          {openModal === 'ADD_AGREEMENT' && (
+          {openModal === 'ADD_AGREEMENT' && 'host' in collective && (
             <AddAgreementModal
               account={collective}
               hostLegacyId={collective.host.legacyId}

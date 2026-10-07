@@ -16,7 +16,7 @@ import TransactionsTable from '../transactions/TransactionsTable';
 
 import { AccountDetailView, type MoneyMovementsView } from './common';
 import { HostedAccountBalanceSummary } from './HostedAccountBalanceSummary';
-import type { AccountDetailData } from './queries';
+import type { HostedAccountDetailData } from './queries';
 
 const recentTransactionsSchema = z.object({
   limit: limit.default(5),
@@ -41,7 +41,7 @@ const hostedFinancialSummarySeriesQuery = gql`
             }
           }
         }
-        totalAmountDisbursedTimeSeries(includeChildren: true) {
+        totalAmountSpentTimeSeries(includeChildren: true) {
           timeUnit
           dateFrom
           dateTo
@@ -59,7 +59,7 @@ const hostedFinancialSummarySeriesQuery = gql`
 `;
 
 type HostedFinancialSummaryCardProps = {
-  account?: AccountDetailData;
+  account?: HostedAccountDetailData;
   hostSlug: string;
   loading: boolean;
   handleTabChange: (tab: string, view?: MoneyMovementsView) => void;
@@ -127,7 +127,7 @@ export function HostedFinancialSummaryCard({
   });
 
   const receivedSeries = seriesQuery.data?.account?.stats?.totalAmountReceivedTimeSeries;
-  const disbursedSeries = seriesQuery.data?.account?.stats?.totalAmountDisbursedTimeSeries;
+  const spentSeries = seriesQuery.data?.account?.stats?.totalAmountSpentTimeSeries;
 
   const recentCredits = recentCreditsQuery.data?.transactions;
   const recentDebits = recentDebitsQuery.data?.transactions;
@@ -165,10 +165,10 @@ export function HostedFinancialSummaryCard({
             amount={{ current: stats?.consolidatedTotalAmountSpent }}
             color="#dc2626"
             timeseries={
-              disbursedSeries
+              spentSeries
                 ? {
-                    current: disbursedSeries,
-                    currency: disbursedSeries?.nodes[0]?.amount?.currency,
+                    current: spentSeries,
+                    currency: spentSeries?.nodes[0]?.amount?.currency,
                   }
                 : undefined
             }

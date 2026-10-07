@@ -15,7 +15,7 @@ import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import { PeriodFilterType } from '../../filters/PeriodCompareFilter/schema';
 import ComparisonChart from '../overview/ComparisonChart';
 
-import type { AccountDetailData } from './queries';
+import type { HostedAccountDetailData } from './queries';
 
 const BALANCE_COLOR = '#16a34a';
 
@@ -105,13 +105,14 @@ const Metric = ({
 );
 
 type HostedAccountBalanceSummaryProps = {
-  account?: AccountDetailData;
+  account?: HostedAccountDetailData;
   onOpenMoneyView?: (view: 'CONTRIBUTIONS' | 'PAYOUTS') => void;
 };
 
 export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: HostedAccountBalanceSummaryProps) {
   const currency = account?.currency;
-  const isChild = Boolean(account?.parent?.id);
+  // `parent` only exists on projects and events (the `AccountWithParent` facet).
+  const isChild = Boolean(account && 'parent' in account && account.parent?.id);
 
   const queryFilter = useQueryFilter({
     schema: balanceFilterSchema,

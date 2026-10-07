@@ -18,14 +18,16 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
+import { gql } from '@/lib/graphql/helpers';
 import type {
   CommunityAccountDetailQuery,
+  CommunityTransactionSummary,
   DashboardVendorsQuery,
   KycStatusFieldsFragment,
   PeopleHostDashboardQuery,
   VendorFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
-import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, KycProvider, TransactionKind } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
@@ -44,6 +46,8 @@ import { Button } from '../../../ui/Button';
 import { ALL_SECTIONS } from '../../constants';
 import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from '../legal-documents/LegalDocumentStatusBadge';
+
+import type { AccountDetailData, HostedAccountDetailData } from './queries';
 
 type UsePersonActionsOptions = {
   accountSlug: string;
@@ -312,8 +316,63 @@ export const HOSTED_ACCOUNT_TYPES: AccountType[] = [
   AccountType.EVENT,
 ];
 
+/** Narrows `AccountDetailData` to the hosted account flow. See `HostedAccountDetailData`. */
+export const isHostedAccountData = (
+  account: AccountDetailData | null | undefined,
+): account is HostedAccountDetailData => Boolean(account && HOSTED_ACCOUNT_TYPES.includes(account.type));
+
 /** Views of the hosted account Money Movements tab, used to seed the tab from overview links. */
 export type MoneyMovementsView = 'ALL' | 'CONTRIBUTIONS' | 'PAYOUTS';
+
+/**
+ * Per-tab metadata for the Transactions / Money Movements tabs: the pending
+ * payment-request count and the per-kind summary behind the view badges. Each
+ * tab fetches this for itself rather than the shell query carrying it for every
+ * tab. Shared by both tabs together with `getCountForView`.
+ */
+export const accountMoneyMovementsSummaryQuery = gql`
+  query AccountMoneyMovementsSummary($accountId: String!, $hostSlug: String!) {
+    account(id: $accountId) {
+      id
+      pendingExpenses: expenses(
+        status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
+        direction: SUBMITTED
+        host: { slug: $hostSlug }
+      ) {
+        totalCount
+      }
+      communityStats(host: { slug: $hostSlug }) {
+        id
+        transactionSummary {
+          kind
+          debitCount
+          creditCount
+          debitTotal {
+            valueInCents
+            currency
+          }
+          creditTotal {
+            valueInCents
+            currency
+          }
+        }
+      }
+    }
+  }
+`;
+
+/** Adds a `count` to a Money Movements / Transactions view based on the per-kind summary. */
+export const getCountForView = <TView extends { filter?: { kind?: TransactionKind[] } }>(
+  view: TView,
+  transactionSummary?: CommunityTransactionSummary[],
+): TView & { count?: number } => {
+  const summaries = transactionSummary?.filter(summary => view.filter?.kind?.includes(summary.kind as TransactionKind));
+  if (!summaries || summaries.length === 0) {
+    return view;
+  }
+  const count = summaries.reduce((acc, summary) => acc + summary.creditCount + summary.debitCount, 0);
+  return { ...view, count };
+};
 
 type CommunityAccount =
   PeopleHostDashboardQuery['community']['nodes'][number] | DashboardVendorsQuery['community']['nodes'][number];

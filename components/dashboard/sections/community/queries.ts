@@ -1,11 +1,6 @@
 import { gql } from '@apollo/client';
 
-import type {
-  AccountWithHost,
-  AccountWithParent,
-  CommunityAccountDetailQuery,
-  HostedAccountProfileQuery,
-} from '@/lib/graphql/types/v2/graphql';
+import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
 import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
@@ -215,15 +210,7 @@ export const communityAccountDetailQuery = gql`
         country
         address
       }
-      isVerified
       isArchived
-      pendingExpenses: expenses(
-        status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
-        direction: SUBMITTED
-        host: { slug: $hostSlug }
-      ) {
-        totalCount
-      }
       spamExpenses: expenses(status: [SPAM], direction: SUBMITTED, host: { slug: $hostSlug }) {
         totalCount
       }
@@ -233,19 +220,6 @@ export const communityAccountDetailQuery = gql`
       communityStats(host: { slug: $hostSlug }) {
         id
         relations
-        transactionSummary {
-          kind
-          debitCount
-          creditCount
-          debitTotal {
-            valueInCents
-            currency
-          }
-          creditTotal {
-            valueInCents
-            currency
-          }
-        }
       }
       ... on Individual {
         email
@@ -257,13 +231,7 @@ export const communityAccountDetailQuery = gql`
         adminOf: memberOf(role: [ADMIN], accountType: [ORGANIZATION, VENDOR, COLLECTIVE, FUND]) {
           nodes {
             id
-            role
-            createdAt
             account {
-              id
-              slug
-              name
-              type
               ...AccountHoverCardFields
             }
           }
@@ -271,38 +239,6 @@ export const communityAccountDetailQuery = gql`
       }
       ... on Vendor {
         ...VendorFields
-      }
-      admins: members(role: [ADMIN]) {
-        nodes {
-          id
-          role
-          description
-          createdAt
-          account {
-            id
-            ...AccountHoverCardFields
-          }
-        }
-      }
-      memberOf {
-        nodes {
-          id
-          role
-          account {
-            id
-            type
-            ...AccountHoverCardFields
-            ... on AccountWithHost {
-              host {
-                id
-                slug
-                name
-                type
-                imageUrl
-              }
-            }
-          }
-        }
       }
       # Hosted account fields (migrated from components/hosted-account-overview/queries.ts)
       description
@@ -365,7 +301,6 @@ export const communityAccountDetailQuery = gql`
     }
     host(slug: $hostSlug) {
       id
-      publicId
       legacyId
       slug
       name
@@ -380,49 +315,14 @@ export const communityAccountDetailQuery = gql`
           ...LegalDocumentFields
         }
       }
-      features {
-        id
-        MULTI_CURRENCY_EXPENSES
-      }
       requiredLegalDocuments
-      currency
-      transferwise {
-        id
-        availableCurrencies
-      }
-      supportedPayoutMethods
-      isTrustedHost
       policies {
         id
         USE_VENDOR_POLICY
       }
-      # Hosted account fields (migrated from components/hosted-account-overview/queries.ts)
-      type
       hostFeePercent
       hostedAccountAgreements(accounts: [{ id: $accountId }], includeChildren: true, limit: 0) {
         totalCount
-      }
-    }
-
-    firstActivity: activities(
-      host: { slug: $hostSlug }
-      account: [{ id: $accountId }]
-      orderBy: { field: CREATED_AT, direction: ASC }
-      limit: 1
-    ) {
-      nodes {
-        ...CommunityAccountDetailActivityFields
-      }
-    }
-
-    lastActivity: activities(
-      host: { slug: $hostSlug }
-      account: [{ id: $accountId }]
-      orderBy: { field: CREATED_AT, direction: DESC }
-      limit: 1
-    ) {
-      nodes {
-        ...CommunityAccountDetailActivityFields
       }
     }
   }
@@ -432,41 +332,20 @@ export const communityAccountDetailQuery = gql`
     clearedAt
     createdAt
     type
-    kind
-    description
-    amount {
-      valueInCents
-      currency
-    }
     netAmount {
       valueInCents
       currency
     }
-    account {
-      id
-      slug
-      name
-      imageUrl
-    }
-    oppositeAccount {
-      id
-      slug
-      name
-      imageUrl
-    }
     expense {
-      id
       legacyId
     }
     order {
-      id
       legacyId
     }
   }
 
   ${kycVerificationFields}
   ${legalDocumentFields}
-  ${communityAccountDetailActivityFields}
   ${vendorFieldFragment}
   # AccountHoverCardFields is embedded in hostedCollectiveFields (kept once in the document)
   ${hostedCollectiveFields}
@@ -545,14 +424,17 @@ export const communityAccountActivitiesQuery = gql`
   ${communityAccountDetailActivityFields}
 `;
 
-// Interim data types for the unified detail query: the generated `CommunityAccountDetailQuery`
-// predates the hosted account fields merged into the document above. After the next
-// `npm run graphql:update` these collapse to the generated types (drop the
-// `HostedAccountProfileQuery` half, which disappears with hosted-account-overview).
-export type AccountDetailData = NonNullable<CommunityAccountDetailQuery['account']> &
-  NonNullable<HostedAccountProfileQuery['account']> &
-  Partial<AccountWithHost> &
-  Partial<AccountWithParent>;
+export type AccountDetailData = NonNullable<CommunityAccountDetailQuery['account']>;
 
-export type AccountDetailHost = NonNullable<CommunityAccountDetailQuery['host']> &
-  NonNullable<HostedAccountProfileQuery['host']>;
+export type AccountDetailHost = NonNullable<CommunityAccountDetailQuery['host']>;
+
+/**
+ * `AccountDetailData` narrowed to the hosted account flow (collectives, funds,
+ * projects, events), which is where the `AccountWithHost` facets (`host`,
+ * `hostFeePercent`, `hostFeesStructure`, `approvedAt`) live. `parent` only exists
+ * on projects and events.
+ */
+export type HostedAccountDetailData = Extract<
+  AccountDetailData,
+  { __typename?: 'Collective' | 'Fund' | 'Project' | 'Event' }
+>;
