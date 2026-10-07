@@ -315,6 +315,9 @@ export const HOSTED_ACCOUNT_TYPES: AccountType[] = [
   AccountType.EVENT,
 ];
 
+/** Views of the hosted account Money Movements tab, used to seed the tab from overview links. */
+export type MoneyMovementsView = 'ALL' | 'CONTRIBUTIONS' | 'PAYOUTS';
+
 type CommunityAccount =
   PeopleHostDashboardQuery['community']['nodes'][number] | DashboardVendorsQuery['community']['nodes'][number];
 

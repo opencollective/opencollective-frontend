@@ -44,7 +44,7 @@ import { transactionsTableQuery } from '../transactions/queries';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
 
-import { AccountDetailView, HOSTED_ACCOUNT_TYPES, TaxableCountry } from './common';
+import { AccountDetailView, HOSTED_ACCOUNT_TYPES, type MoneyMovementsView, TaxableCountry } from './common';
 import { HostedFinancialSummaryCard } from './HostedFinancialSummaryCard';
 import { type AccountDetailData, type AccountDetailHost, communityAccountOverviewQuery } from './queries';
 
@@ -862,7 +862,7 @@ export const AccountDetailsOverviewTab = ({
 }: {
   query: QueryResult<CommunityAccountDetailQuery>;
   expectedAccountType: AccountType;
-  handleTabChange: (tab: string) => void;
+  handleTabChange: (tab: string, moneyMovementsView?: MoneyMovementsView) => void;
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
   onEditVendor?: () => void;
 }) => {
