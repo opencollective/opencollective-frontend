@@ -146,7 +146,7 @@ export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: Hosted
           currency={currency}
         />
         <Metric
-          label={<FormattedMessage defaultMessage="Total amount received this period" id="2kY5p6" />}
+          label={<FormattedMessage defaultMessage="Total amount received this period" id="2kY5p5" />}
           amount={stats?.consolidatedTotalNetAmountRaised}
           currency={currency}
           onClick={() => onOpenMoneyView?.('CONTRIBUTIONS')}
