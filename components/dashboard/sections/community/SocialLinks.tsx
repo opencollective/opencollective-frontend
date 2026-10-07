@@ -1,10 +1,10 @@
 import React from 'react';
 
-import type { SocialLink } from '../../lib/graphql/types/v2/graphql';
-import { iconForSocialLinkType } from '../../lib/social-links';
+import type { SocialLink } from '@/lib/graphql/types/v2/graphql';
+import { iconForSocialLinkType } from '@/lib/social-links';
 import { cn } from '@/lib/utils';
 
-import Link from '../Link';
+import Link from '@/components/Link';
 
 type HeroSocialLinksProps = {
   socialLinks: SocialLink[];

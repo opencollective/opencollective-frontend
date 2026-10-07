@@ -3,8 +3,6 @@ import { FormattedMessage } from 'react-intl';
 
 import Avatar from '@/components/Avatar';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
-// Transitional import: SocialLinks is copied over from hosted-account-overview later.
-import HeroSocialLinks from '@/components/hosted-account-overview/SocialLinks';
 import HTMLContent, { isEmptyHTMLValue } from '@/components/HTMLContent';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
@@ -14,6 +12,7 @@ import { Badge } from '@/components/ui/Badge';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
 import type { AccountDetailData } from './queries';
+import HeroSocialLinks from './SocialLinks';
 
 type AccountDetailAboutTabProps = {
   account?: AccountDetailData;
