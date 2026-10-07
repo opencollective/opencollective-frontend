@@ -30,7 +30,7 @@ import AccountSettings from './sections/AccountSettings';
 import AllCollectives from './sections/collectives/AllCollectives';
 import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
-import PeopleRouter from './sections/community/People';
+import PeopleRouter from './sections/People';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import IncompleteContributions from './sections/contributions/IncompleteContributions';

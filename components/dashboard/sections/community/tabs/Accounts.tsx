@@ -12,9 +12,9 @@ import { DataTable } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 
-import type { AccountDetailData } from './queries';
+import type { AccountDetailData } from '../queries';
 
-type AccountDetailAccountsTabProps = {
+type AccountsProps = {
   account?: AccountDetailData;
   host?: { id?: string } | null;
   loading?: boolean;
@@ -53,7 +53,7 @@ const typeColumn = {
   },
 };
 
-export function AccountDetailAccountsTab({ account, host, loading, onEdit }: AccountDetailAccountsTabProps) {
+export function Accounts({ account, host, loading, onEdit }: AccountsProps) {
   const intl = useIntl();
   const children = account?.childrenAccounts?.nodes || [];
 

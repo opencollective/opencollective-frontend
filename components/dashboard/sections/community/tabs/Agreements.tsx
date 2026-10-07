@@ -16,7 +16,7 @@ import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import ConfirmationModal from '@/components/NewConfirmationModal';
 import { useToast } from '@/components/ui/useToast';
 
-import type { AccountDetailData } from './queries';
+import type { AccountDetailData } from '../queries';
 
 const NB_AGREEMENTS = 100;
 const NB_PLACEHOLDERS = 5;
@@ -49,12 +49,12 @@ const deleteAgreementMutation = gql`
   }
 `;
 
-type AccountDetailAgreementsTabProps = {
+type AgreementsProps = {
   account?: AccountDetailData;
   hostSlug: string;
 };
 
-export function AccountDetailAgreementsTab({ account, hostSlug }: AccountDetailAgreementsTabProps) {
+export function Agreements({ account, hostSlug }: AgreementsProps) {
   const intl = useIntl();
   const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();

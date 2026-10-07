@@ -18,29 +18,29 @@ import { sortSelectOptions } from '@/lib/utils';
 
 import { IndividualKYCStatus } from '@/components/kyc/IndividualKYCStatus';
 
-import Avatar from '../../../Avatar';
-import { CopyID } from '../../../CopyId';
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { actionsColumn, DataTable } from '../../../table/DataTable';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
-import { DashboardContext } from '../../DashboardContext';
-import DashboardHeader from '../../DashboardHeader';
-import { EmptyResults } from '../../EmptyResults';
-import ExportContributorsCSVButton from '../../ExportContributorsCSVButton';
-import { makeAmountFilter } from '../../filters/AmountFilter';
-import ComboSelectFilter from '../../filters/ComboSelectFilter';
-import { Filterbar } from '../../filters/Filterbar';
-import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
-import { Pagination } from '../../filters/Pagination';
-import { searchFilter } from '../../filters/SearchFilter';
-import { buildSortFilter } from '../../filters/SortFilter';
-import type { DashboardSectionProps } from '../../types';
-import { makePushSubpath, makeReplaceSubpath } from '../../utils';
+import Avatar from '../../Avatar';
+import { CopyID } from '../../CopyId';
+import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import { actionsColumn, DataTable } from '../../table/DataTable';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
+import { DashboardContext } from '../DashboardContext';
+import DashboardHeader from '../DashboardHeader';
+import { EmptyResults } from '../EmptyResults';
+import ExportContributorsCSVButton from '../ExportContributorsCSVButton';
+import { makeAmountFilter } from '../filters/AmountFilter';
+import ComboSelectFilter from '../filters/ComboSelectFilter';
+import { Filterbar } from '../filters/Filterbar';
+import { hostedAccountFilter } from '../filters/HostedAccountFilter';
+import { Pagination } from '../filters/Pagination';
+import { searchFilter } from '../filters/SearchFilter';
+import { buildSortFilter } from '../filters/SortFilter';
+import type { DashboardSectionProps } from '../types';
+import { makePushSubpath, makeReplaceSubpath } from '../utils';
 
-import { AccountDetails } from './AccountDetail';
-import { usePersonActions } from './common';
-import { peopleHostDashboardQuery } from './queries';
+import { AccountDetails } from './community/AccountDetail';
+import { usePersonActions } from './community/common';
+import { peopleHostDashboardQuery } from './community/queries';
 
 const totalContributedFilter = makeAmountFilter(
   'totalContributed',

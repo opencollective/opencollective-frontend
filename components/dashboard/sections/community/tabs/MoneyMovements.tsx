@@ -14,26 +14,25 @@ import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 
-import { DashboardContext } from '../../DashboardContext';
-import { EmptyResults } from '../../EmptyResults';
-import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
-import { amountFilter } from '../../filters/AmountFilter';
-import { dateFilter } from '../../filters/DateFilter';
-import { Filterbar } from '../../filters/Filterbar';
-import { searchFilter } from '../../filters/SearchFilter';
-import { buildSortFilter } from '../../filters/SortFilter';
-import { useTransactionActions } from '../transactions/actions';
+import { DashboardContext } from '../../../DashboardContext';
+import { EmptyResults } from '../../../EmptyResults';
+import { accountingCategoryFilter } from '../../../filters/AccountingCategoryFilter';
+import { amountFilter } from '../../../filters/AmountFilter';
+import { dateFilter } from '../../../filters/DateFilter';
+import { Filterbar } from '../../../filters/Filterbar';
+import { searchFilter } from '../../../filters/SearchFilter';
+import { buildSortFilter } from '../../../filters/SortFilter';
+import { useTransactionActions } from '../../transactions/actions';
 import {
   filters as commonFilters,
   schema as commonSchema,
   toVariables as commonToVariables,
-} from '../transactions/filters';
-import { transactionsTableQuery } from '../transactions/queries';
-import type { TransactionsTableProps } from '../transactions/TransactionsTable';
-import TransactionsTable from '../transactions/TransactionsTable';
-import type { TransactionsTableQueryNode } from '../transactions/types';
-
-import { accountMoneyMovementsSummaryQuery, getCountForView, type MoneyMovementsView } from './common';
+} from '../../transactions/filters';
+import { transactionsTableQuery } from '../../transactions/queries';
+import type { TransactionsTableProps } from '../../transactions/TransactionsTable';
+import TransactionsTable from '../../transactions/TransactionsTable';
+import type { TransactionsTableQueryNode } from '../../transactions/types';
+import { accountMoneyMovementsSummaryQuery, getCountForView, type MoneyMovementsView } from '../common';
 
 const schema = z.object({
   limit: limit.default(15),
@@ -79,19 +78,19 @@ const filters = {
   expenseType: commonFilters.expenseType,
 };
 
-type AccountDetailMoneyMovementsTabProps = {
+type MoneyMovementsProps = {
   account: CommunityAccountDetailQuery['account'];
   hostSlug: string;
   initialView?: MoneyMovementsView;
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
 };
 
-export function AccountDetailMoneyMovementsTab({
+export function MoneyMovements({
   account,
   hostSlug,
   initialView,
   handleTransactionTableRowClick,
-}: AccountDetailMoneyMovementsTabProps) {
+}: MoneyMovementsProps) {
   const intl = useIntl();
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const { data: summaryData } = useQuery(accountMoneyMovementsSummaryQuery, {
