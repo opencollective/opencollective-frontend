@@ -45,7 +45,7 @@ import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
 
 import { AccountDetailView, HOSTED_ACCOUNT_TYPES, TaxableCountry } from './common';
-import { HostedAccountBalanceSummary } from './HostedAccountBalanceSummary';
+import { HostedFinancialSummaryCard } from './HostedFinancialSummaryCard';
 import { type AccountDetailData, type AccountDetailHost, communityAccountOverviewQuery } from './queries';
 
 const recentTransactionsSchema = z.object({
@@ -652,7 +652,6 @@ const FinancialSummaryCard = ({
   loading,
   handleTabChange,
   handleTransactionTableRowClick,
-  isHostedAccount,
 }: {
   account?: AccountDetailData;
   hostSlug: string;
@@ -660,11 +659,10 @@ const FinancialSummaryCard = ({
   loading: boolean;
   handleTabChange: (tab: string) => void;
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
-  isHostedAccount: boolean;
 }) => {
   const intl = useIntl();
 
-  const overviewQuery = useQuery<CommunityAccountOverviewQuery>(communityAccountOverviewQuery, {
+  const communityQuery = useQuery<CommunityAccountOverviewQuery>(communityAccountOverviewQuery, {
     variables: {
       accountId: account?.id,
       hostSlug,
@@ -686,9 +684,7 @@ const FinancialSummaryCard = ({
 
   const recentCreditsQuery = useQuery(transactionsTableQuery, {
     variables: {
-      // Hosted accounts read transactions where the account is either side;
-      // community accounts read transactions originating from the account.
-      ...(isHostedAccount ? { account: [{ id: account?.id }] } : { fromAccount: { id: account?.id } }),
+      fromAccount: { id: account?.id },
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
       includeChildrenTransactions: false,
@@ -703,9 +699,7 @@ const FinancialSummaryCard = ({
 
   const recentDebitsQuery = useQuery(transactionsTableQuery, {
     variables: {
-      // Hosted accounts read transactions where the account is either side;
-      // community accounts read transactions originating from the account.
-      ...(isHostedAccount ? { account: [{ id: account?.id }] } : { fromAccount: { id: account?.id } }),
+      fromAccount: { id: account?.id },
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
       includeChildrenTransactions: false,
@@ -718,13 +712,13 @@ const FinancialSummaryCard = ({
     notifyOnNetworkStatusChange: true,
   });
 
-  const isLoading = loading || overviewQuery.loading;
+  const isLoading = loading || communityQuery.loading;
   const name =
     account?.name ||
     account?.legalName ||
     account?.slug ||
     formatCollectiveType(intl, account?.type || expectedAccountType);
-  const overviewAccount = overviewQuery.data?.account;
+  const overviewAccount = communityQuery.data?.account;
 
   const allTransactionSummaries = overviewAccount?.communityStats?.transactionSummary ?? [];
   const transactionSummary = allTransactionSummaries.find(s => s.kind === 'ALL');
@@ -741,141 +735,121 @@ const FinancialSummaryCard = ({
   const recentDebits = recentDebitsQuery.data?.transactions;
 
   return (
-    <React.Fragment>
-      {isHostedAccount && (
-        <HostedAccountBalanceSummary
-          account={account}
-          onOpenMoneyView={() => handleTabChange(AccountDetailView.PAYMENT_INTENTS)}
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Metric
+          className="order-1 xl:order-1"
+          label={<FormattedMessage defaultMessage="Received from {name}" id="ReceivedFrom" values={{ name }} />}
+          noTimeseriesLabel={
+            <FormattedMessage
+              defaultMessage="No contributions from {name}"
+              id="Metric.NoContributions"
+              values={{ name }}
+            />
+          }
+          loading={isLoading}
+          showTimeSeries
+          expanded
+          amount={{ current: totalContributed }}
+          count={{ current: chargeCount }}
+          timeseries={
+            credits
+              ? {
+                  current: credits,
+                  currency: credits?.nodes[0]?.amount?.currency,
+                }
+              : undefined
+          }
         />
-      )}
-      <div className="flex flex-col gap-4">
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-          <Metric
-            className="order-1 xl:order-1"
-            label={
-              isHostedAccount ? (
-                <FormattedMessage defaultMessage="Received by {name}" id="ReceivedBy" values={{ name }} />
-              ) : (
-                <FormattedMessage defaultMessage="Received from {name}" id="ReceivedFrom" values={{ name }} />
+        <Metric
+          className="order-3 xl:order-2"
+          label={<FormattedMessage defaultMessage="Disbursed to {name}" id="DisbursedTo" values={{ name }} />}
+          noTimeseriesLabel={
+            <FormattedMessage
+              defaultMessage="No disbursements to {name}"
+              id="Metric.NoDisbursements"
+              values={{ name }}
+            />
+          }
+          loading={isLoading}
+          showTimeSeries
+          expanded
+          amount={{ current: totalPaid }}
+          count={{ current: submittedExpensesCount }}
+          color="#dc2626"
+          timeseries={
+            debits
+              ? {
+                  current: debits,
+                  currency: debits?.nodes[0]?.amount?.currency,
+                }
+              : undefined
+          }
+        />
+        <div className="order-2 flex flex-col gap-2 xl:order-3">
+          <h3 className="text-sm font-medium text-slate-800">
+            <FormattedMessage defaultMessage="Recently Received" id="RecentlyReceived" />
+          </h3>
+          <TransactionsTable
+            transactions={recentCredits}
+            loading={recentCreditsQuery.loading}
+            nbPlaceholders={5}
+            queryFilter={recentCreditsQueryFilter}
+            refetchList={recentCreditsQuery.refetch}
+            hideHeader
+            hidePagination
+            meta={{
+              timeStyle: null,
+            }}
+            onClickRow={handleTransactionTableRowClick}
+            columns={['date', 'account', 'amount', 'currency']}
+            footer={
+              recentCredits?.nodes?.length > 0 && (
+                <div className="flex min-h-[49px] w-full items-center justify-center border-t">
+                  <button
+                    onClick={() => handleTabChange(AccountDetailView.TRANSACTIONS)}
+                    className="font-normal text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    <FormattedMessage defaultMessage="View more" id="34Up+l" />
+                  </button>
+                </div>
               )
             }
-            noTimeseriesLabel={
-              <FormattedMessage
-                defaultMessage="No contributions from {name}"
-                id="Metric.NoContributions"
-                values={{ name }}
-              />
-            }
-            loading={isLoading}
-            showTimeSeries
-            expanded
-            amount={{ current: totalContributed }}
-            count={{ current: chargeCount }}
-            timeseries={
-              credits
-                ? {
-                    current: credits,
-                    currency: credits?.nodes[0]?.amount?.currency,
-                  }
-                : undefined
-            }
           />
-          <Metric
-            className="order-3 xl:order-2"
-            label={
-              isHostedAccount ? (
-                <FormattedMessage defaultMessage="Disbursed by {name}" id="DisbursedBy" values={{ name }} />
-              ) : (
-                <FormattedMessage defaultMessage="Disbursed to {name}" id="DisbursedTo" values={{ name }} />
+        </div>
+        <div className="order-4 flex flex-col gap-2 xl:order-4">
+          <h3 className="text-sm font-medium text-slate-800">
+            <FormattedMessage defaultMessage="Recently Disbursed" id="RecentlyDisbursed" />
+          </h3>
+          <TransactionsTable
+            transactions={recentDebits}
+            loading={recentDebitsQuery.loading}
+            nbPlaceholders={5}
+            queryFilter={recentDebitsQueryFilter}
+            refetchList={recentDebitsQuery.refetch}
+            hideHeader
+            hidePagination
+            meta={{
+              timeStyle: null,
+            }}
+            onClickRow={handleTransactionTableRowClick}
+            columns={['date', 'account', 'amount', 'currency']}
+            footer={
+              recentDebits?.nodes?.length > 0 && (
+                <div className="flex min-h-[49px] w-full items-center justify-center border-t">
+                  <button
+                    onClick={() => handleTabChange(AccountDetailView.TRANSACTIONS)}
+                    className="font-normal text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    <FormattedMessage defaultMessage="View more" id="34Up+l" />
+                  </button>
+                </div>
               )
             }
-            noTimeseriesLabel={
-              <FormattedMessage
-                defaultMessage="No disbursements to {name}"
-                id="Metric.NoDisbursements"
-                values={{ name }}
-              />
-            }
-            loading={isLoading}
-            showTimeSeries
-            expanded
-            amount={{ current: totalPaid }}
-            count={{ current: submittedExpensesCount }}
-            color="#dc2626"
-            timeseries={
-              debits
-                ? {
-                    current: debits,
-                    currency: debits?.nodes[0]?.amount?.currency,
-                  }
-                : undefined
-            }
           />
-          <div className="order-2 flex flex-col gap-2 xl:order-3">
-            <h3 className="text-sm font-medium text-slate-800">
-              <FormattedMessage defaultMessage="Recently Received" id="RecentlyReceived" />
-            </h3>
-            <TransactionsTable
-              transactions={recentCredits}
-              loading={recentCreditsQuery.loading}
-              nbPlaceholders={5}
-              queryFilter={recentCreditsQueryFilter}
-              refetchList={recentCreditsQuery.refetch}
-              hideHeader
-              hidePagination
-              meta={{
-                timeStyle: null,
-              }}
-              onClickRow={handleTransactionTableRowClick}
-              columns={['date', 'account', 'amount', 'currency']}
-              footer={
-                recentCredits?.nodes?.length > 0 && (
-                  <div className="flex min-h-[49px] w-full items-center justify-center border-t">
-                    <button
-                      onClick={() => handleTabChange(AccountDetailView.TRANSACTIONS)}
-                      className="font-normal text-muted-foreground hover:text-foreground hover:underline"
-                    >
-                      <FormattedMessage defaultMessage="View more" id="34Up+l" />
-                    </button>
-                  </div>
-                )
-              }
-            />
-          </div>
-          <div className="order-4 flex flex-col gap-2 xl:order-4">
-            <h3 className="text-sm font-medium text-slate-800">
-              <FormattedMessage defaultMessage="Recently Disbursed" id="RecentlyDisbursed" />
-            </h3>
-            <TransactionsTable
-              transactions={recentDebits}
-              loading={recentDebitsQuery.loading}
-              nbPlaceholders={5}
-              queryFilter={recentDebitsQueryFilter}
-              refetchList={recentDebitsQuery.refetch}
-              hideHeader
-              hidePagination
-              meta={{
-                timeStyle: null,
-              }}
-              onClickRow={handleTransactionTableRowClick}
-              columns={['date', 'account', 'amount', 'currency']}
-              footer={
-                recentDebits?.nodes?.length > 0 && (
-                  <div className="flex min-h-[49px] w-full items-center justify-center border-t">
-                    <button
-                      onClick={() => handleTabChange(AccountDetailView.TRANSACTIONS)}
-                      className="font-normal text-muted-foreground hover:text-foreground hover:underline"
-                    >
-                      <FormattedMessage defaultMessage="View more" id="34Up+l" />
-                    </button>
-                  </div>
-                )
-              }
-            />
-          </div>
         </div>
       </div>
-    </React.Fragment>
+    </div>
   );
 };
 
@@ -932,16 +906,24 @@ export const AccountDetailsOverviewTab = ({
         />
       </div>
       <AboutCard account={account} host={host} refetch={query.refetch} />
-
-      <FinancialSummaryCard
-        account={account}
-        hostSlug={query.variables.hostSlug}
-        expectedAccountType={expectedAccountType}
-        loading={query.loading}
-        handleTabChange={handleTabChange}
-        handleTransactionTableRowClick={handleTransactionTableRowClick}
-        isHostedAccount={isHostedAccount}
-      />
+      {isHostedAccount ? (
+        <HostedFinancialSummaryCard
+          account={account}
+          hostSlug={query.variables.hostSlug}
+          loading={query.loading}
+          handleTabChange={handleTabChange}
+          handleTransactionTableRowClick={handleTransactionTableRowClick}
+        />
+      ) : (
+        <FinancialSummaryCard
+          account={account}
+          hostSlug={query.variables.hostSlug}
+          expectedAccountType={expectedAccountType}
+          loading={query.loading}
+          handleTabChange={handleTabChange}
+          handleTransactionTableRowClick={handleTransactionTableRowClick}
+        />
+      )}
       <EditCollectiveSettingsModal
         open={isEditSettingsOpen}
         onOpenChange={setEditSettingsOpen}
