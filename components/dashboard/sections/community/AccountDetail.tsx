@@ -61,6 +61,7 @@ import { AccountDetailExpectedFundsTab } from './AccountDetailExpectedFundsTab';
 import { AccountDetailManagedDisbursementsTab } from './AccountDetailManagedDisbursementsTab';
 import { AccountDetailMoneyMovementsTab } from './AccountDetailMoneyMovementsTab';
 import { AccountDetailsOverviewTab } from './AccountDetailOverviewTab';
+import { AccountDetailPaymentRequestsTab } from './AccountDetailPaymentRequestsTab';
 import { AccountDetailTransactionsTab } from './AccountDetailTransactionsTab';
 import { AccountDetailUpdatesTab } from './AccountDetailUpdatesTab';
 import {
@@ -215,6 +216,10 @@ export function AccountDetails(props: AccountDetailsProps) {
         {
           id: AccountDetailView.PAYMENT_INTENTS,
           label: <FormattedMessage defaultMessage="Money Movements" id="MoneyMovements" />,
+        },
+        {
+          id: AccountDetailView.PAYMENT_REQUESTS,
+          label: <FormattedMessage defaultMessage="Payment Requests" id="PaymentRequests" />,
         },
         {
           id: AccountDetailView.EXPECTED_FUNDS,
@@ -373,6 +378,13 @@ export function AccountDetails(props: AccountDetailsProps) {
           hostSlug={dashboardAccount.slug}
           initialView={moneyMovementsView}
           handleTransactionTableRowClick={handleTransactionTableRowClick}
+        />
+      )}
+      {selectedTab === AccountDetailView.PAYMENT_REQUESTS && isHostedAccount && account && (
+        <AccountDetailPaymentRequestsTab
+          account={account}
+          hostSlug={dashboardAccount.slug}
+          onOpenExpense={setOpenExpenseId}
         />
       )}
       {selectedTab === AccountDetailView.ACTIVITIES && (
