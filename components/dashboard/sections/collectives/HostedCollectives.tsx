@@ -18,7 +18,6 @@ import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure'
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import { Drawer } from '../../../Drawer';
-import { HostedAccountProfile } from '../../../hosted-account-overview/HostedAccountProfile';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
@@ -370,19 +369,16 @@ const HostedCollectives = (props: DashboardSectionProps) => {
   const pushSubpath = makePushSubpath(router);
   const collectiveId = props.subpath?.[0];
   if (hasAccountProfile && collectiveId) {
-    if (router.query?.usedetails) {
-      return (
-        <div className="h-full">
-          <AccountDetails
-            account={{ id: collectiveId }}
-            host={account}
-            onClose={() => pushSubpath('')}
-            expectedAccountType={AccountType.COLLECTIVE}
-          />
-        </div>
-      );
-    }
-    return <HostedAccountProfile hostSlug={props.accountSlug} accountId={collectiveId} />;
+    return (
+      <div className="h-full">
+        <AccountDetails
+          account={{ id: collectiveId }}
+          host={account}
+          onClose={() => pushSubpath('')}
+          expectedAccountType={AccountType.COLLECTIVE}
+        />
+      </div>
+    );
   }
   return <HostedCollectivesList {...props} />;
 };
