@@ -551,7 +551,7 @@ const AboutCard = ({
                 isAdminOf ? (
                   <FormattedMessage defaultMessage="Admin of" id="AdminOf" />
                 ) : (
-                  <FormattedMessage defaultMessage="Administrators" id="Administrators" />
+                  <FormattedMessage defaultMessage="Administrators" id="administrators" />
                 )
               }
               value={
@@ -686,7 +686,9 @@ const FinancialSummaryCard = ({
 
   const recentCreditsQuery = useQuery(transactionsTableQuery, {
     variables: {
-      fromAccount: { id: account?.id },
+      // Hosted accounts read transactions where the account is either side;
+      // community accounts read transactions originating from the account.
+      ...(isHostedAccount ? { account: [{ id: account?.id }] } : { fromAccount: { id: account?.id } }),
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
       includeChildrenTransactions: false,
@@ -701,7 +703,9 @@ const FinancialSummaryCard = ({
 
   const recentDebitsQuery = useQuery(transactionsTableQuery, {
     variables: {
-      fromAccount: { id: account?.id },
+      // Hosted accounts read transactions where the account is either side;
+      // community accounts read transactions originating from the account.
+      ...(isHostedAccount ? { account: [{ id: account?.id }] } : { fromAccount: { id: account?.id } }),
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
       includeChildrenTransactions: false,
@@ -748,7 +752,13 @@ const FinancialSummaryCard = ({
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           <Metric
             className="order-1 xl:order-1"
-            label={<FormattedMessage defaultMessage="Received from {name}" id="ReceivedFrom" values={{ name }} />}
+            label={
+              isHostedAccount ? (
+                <FormattedMessage defaultMessage="Received by {name}" id="ReceivedBy" values={{ name }} />
+              ) : (
+                <FormattedMessage defaultMessage="Received from {name}" id="ReceivedFrom" values={{ name }} />
+              )
+            }
             noTimeseriesLabel={
               <FormattedMessage
                 defaultMessage="No contributions from {name}"
@@ -772,7 +782,13 @@ const FinancialSummaryCard = ({
           />
           <Metric
             className="order-3 xl:order-2"
-            label={<FormattedMessage defaultMessage="Disbursed to {name}" id="DisbursedTo" values={{ name }} />}
+            label={
+              isHostedAccount ? (
+                <FormattedMessage defaultMessage="Disbursed by {name}" id="DisbursedBy" values={{ name }} />
+              ) : (
+                <FormattedMessage defaultMessage="Disbursed to {name}" id="DisbursedTo" values={{ name }} />
+              )
+            }
             noTimeseriesLabel={
               <FormattedMessage
                 defaultMessage="No disbursements to {name}"
