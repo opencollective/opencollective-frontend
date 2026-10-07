@@ -7061,9 +7061,9 @@ type AccountStats {
   ): TimeSeriesAmount!
 
   """
-  Total amount disbursed time series
+  Total amount spent time series
   """
-  totalAmountDisbursedTimeSeries(
+  totalAmountSpentTimeSeries(
     """
     The start date of the time series
     """
