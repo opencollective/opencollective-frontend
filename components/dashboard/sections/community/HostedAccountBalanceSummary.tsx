@@ -131,6 +131,7 @@ export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: Hosted
 
   const stats = balanceSeriesQuery.data?.account?.stats;
   const balanceSeries = stats?.balanceTimeSeries;
+  const isAllTime = queryFilter.variables?.['dateTo'] === undefined;
 
   return (
     <DashboardContentCard
@@ -140,7 +141,11 @@ export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: Hosted
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Metric
           label={
-            <FormattedMessage defaultMessage="Balance at end of this period, including starting balance" id="hi/nhW" />
+            isAllTime ? (
+              <FormattedMessage defaultMessage="Current balance" id="kuYpoI" />
+            ) : (
+              <FormattedMessage defaultMessage="Estimated balance at the end of this period" id="WwO4zc" />
+            )
           }
           amount={isChild ? stats?.balance : stats?.consolidatedBalance}
           currency={currency}

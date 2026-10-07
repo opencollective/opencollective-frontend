@@ -392,7 +392,7 @@ export function AccountDetails(props: AccountDetailsProps) {
       </button>
       <DashboardHeader
         title={
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 overflow-hidden">
             {isLoading ? (
               <React.Fragment>
                 <Skeleton className="aspect-square size-9" />
@@ -401,11 +401,8 @@ export function AccountDetails(props: AccountDetailsProps) {
             ) : (
               <React.Fragment>
                 <Avatar collective={account} size={60} />
-                <div className="flex flex-col">
-                  <div>
-                    {account?.name || account?.slug}
-                    {legalName && <span className="ml-1 font-semibold text-muted-foreground">{`(${legalName})`}</span>}
-                  </div>
+                <div className="flex flex-col overflow-hidden">
+                  <div className="text-ellipsis">{account?.name || account?.slug}</div>
                   <div className="flex flex-wrap items-center gap-1">
                     <Badge size="sm" type="outline" className="gap-1 rounded-full">
                       {getCollectiveTypeIcon(account?.type, { size: 12 })}

@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { limit, offset } from '@/lib/filters/schemas';
+import { gql } from '@/lib/graphql/helpers';
 import { TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import formatCollectiveType from '@/lib/i18n/collective-type';
@@ -22,6 +23,40 @@ const recentTransactionsSchema = z.object({
   offset,
   openTransactionId: z.coerce.string().optional(),
 });
+
+const hostedFinancialSummarySeriesQuery = gql`
+  query HostedFinancialSummarySeries($accountId: String!) {
+    account(id: $accountId) {
+      id
+      stats {
+        totalAmountReceivedTimeSeries(includeChildren: true) {
+          timeUnit
+          dateFrom
+          dateTo
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+          }
+        }
+        totalAmountDisbursedTimeSeries(includeChildren: true) {
+          timeUnit
+          dateFrom
+          dateTo
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 type HostedFinancialSummaryCardProps = {
   account?: AccountDetailData;
@@ -85,6 +120,15 @@ export function HostedFinancialSummaryCard({
     notifyOnNetworkStatusChange: true,
   });
 
+  const seriesQuery = useQuery(hostedFinancialSummarySeriesQuery, {
+    variables: { accountId: account?.id },
+    skip: !account?.id,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const receivedSeries = seriesQuery.data?.account?.stats?.totalAmountReceivedTimeSeries;
+  const disbursedSeries = seriesQuery.data?.account?.stats?.totalAmountDisbursedTimeSeries;
+
   const recentCredits = recentCreditsQuery.data?.transactions;
   const recentDebits = recentDebitsQuery.data?.transactions;
 
@@ -100,14 +144,34 @@ export function HostedFinancialSummaryCard({
             className="order-1 xl:order-1"
             label={<FormattedMessage defaultMessage="Received by {name}" id="ReceivedBy" values={{ name }} />}
             loading={loading}
+            showTimeSeries
+            expanded
             amount={{ current: stats?.consolidatedTotalNetAmountRaised }}
+            timeseries={
+              receivedSeries
+                ? {
+                    current: receivedSeries,
+                    currency: receivedSeries?.nodes[0]?.amount?.currency,
+                  }
+                : undefined
+            }
           />
           <Metric
             className="order-3 xl:order-2"
             label={<FormattedMessage defaultMessage="Disbursed by {name}" id="DisbursedBy" values={{ name }} />}
             loading={loading}
+            showTimeSeries
+            expanded
             amount={{ current: stats?.consolidatedTotalAmountSpent }}
             color="#dc2626"
+            timeseries={
+              disbursedSeries
+                ? {
+                    current: disbursedSeries,
+                    currency: disbursedSeries?.nodes[0]?.amount?.currency,
+                  }
+                : undefined
+            }
           />
           <div className="order-2 flex flex-col gap-2 xl:order-3">
             <h3 className="text-sm font-medium text-slate-800">
