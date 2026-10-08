@@ -41,6 +41,7 @@ export function FormField({
   required?: boolean;
   min?: number;
   max?: number;
+  maxLength?: number;
   inputType?: string;
   type?: string;
   disabled?: boolean;
@@ -82,6 +83,7 @@ export function FormField({
               disabled: props.disabled,
               min: props.min,
               max: props.max,
+              maxLength: props.maxLength,
               required: props.required,
               error: hasError,
               placeholder,
