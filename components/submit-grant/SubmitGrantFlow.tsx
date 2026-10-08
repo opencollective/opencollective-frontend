@@ -29,7 +29,6 @@ import {
   useExpenseForm,
   YesNoOption,
 } from '../submit-expense/useExpenseForm';
-import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
 import { Input } from '../ui/Input';
@@ -229,7 +228,6 @@ type SubmitGrantDialogContentProps = {
 
 function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const { toast } = useToast();
-  const { LoggedInUser } = useLoggedInUser();
   const [nextClickCount, setNextClickCount] = React.useState(0); // This form has not been designed to use `formik.submitCount`, so we keep track of submissions in a different variables to surfacee validation issues.
   const intl = useIntl();
   const formRef = React.useRef<HTMLFormElement>(undefined);
@@ -252,13 +250,11 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
       toast({
         variant: 'success',
         title: <FormattedMessage defaultMessage="Grant Request submitted" id="m/bWLw" />,
-        message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
-        duration: 20000,
       });
 
       props.onGrantSubmitted(result.data.expense.legacyId);
     },
-    [LoggedInUser, props, toast],
+    [props, toast],
   );
 
   const expenseForm = useExpenseForm({

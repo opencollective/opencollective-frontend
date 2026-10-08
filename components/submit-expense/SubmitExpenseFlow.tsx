@@ -4,11 +4,9 @@ import { X } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nGraphqlException } from '@/lib/errors';
 import { useNavigationWarning } from '@/lib/hooks/useNavigationWarning';
 
-import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '../ui/Dialog';
 import { useToast } from '../ui/useToast';
@@ -48,7 +46,6 @@ const I18nMessages = defineMessages({
  */
 export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
 
   const { toast } = useToast();
 
@@ -87,8 +84,6 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           toast({
             variant: 'success',
             title: <FormattedMessage defaultMessage="Expense edited" id="yTblGN" />,
-            message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
-            duration: 20000,
           });
           break;
         }
@@ -96,8 +91,6 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           toast({
             variant: 'success',
             title: <FormattedMessage defaultMessage="Expense invite sent" id="Fhue1N" />,
-            message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
-            duration: 20000,
           });
           break;
         }
@@ -105,14 +98,12 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           toast({
             variant: 'success',
             title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-            message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
-            duration: 20000,
           });
           break;
         }
       }
     },
-    [LoggedInUser, toast],
+    [toast],
   );
 
   /**
