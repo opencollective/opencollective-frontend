@@ -1,6 +1,6 @@
 import { randomSlug } from '../support/faker';
 
-const env = Cypress.env('OC_ENV');
+const env = Cypress.expose('OC_ENV');
 
 describe('apply to host', () => {
   it('as a new collective', () => {

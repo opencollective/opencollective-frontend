@@ -1,5 +1,7 @@
-Resolve ... <!-- If there's an issue associated with this pull request, add a link here. Otherwise, omit this line. -->
-Require ... <!-- If this PR depends on another PR (usually from the API), add a link here. Otherwise, omit this line. -->
+<!-- If there's an issue associated with this pull request, add a link here. Otherwise, omit this line. -->
+<!-- Resolve ... -->
+<!-- If this PR depends on another PR (usually from the API), add a link here. Otherwise, omit this line. -->
+<!-- Require ... -->
 
 # Description
 
