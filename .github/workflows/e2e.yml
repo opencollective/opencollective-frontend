@@ -74,7 +74,7 @@ jobs:
 
     services:
       redis:
-        image: redis@sha256:8aee6591ee8c2b26e9e01ad4913fbc804ea6b79a9bc675ee1824d80ea5dd9856
+        image: redis@sha256:2c2dff791878316e3b083188be0d578423b24813cdda5de0e80ea4f7b3e6bfd6
         ports:
           - 6379:6379
         options: --entrypoint redis-server
