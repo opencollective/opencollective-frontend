@@ -1,6 +1,56 @@
 # E2E (end-to-end) tests
 
-We use [Cypress](https://www.cypress.io/) for E2E (end-to-end) tests.
+This is the canonical reproduction guide. Runner READMEs link here:
+
+- Playwright (pilot, Chromium): [`test/playwright/README.md`](../test/playwright/README.md)
+- Cypress (existing suite): [`test/cypress/README.md`](../test/cypress/README.md)
+
+## Playwright fresh reproduction (Linux pilot)
+
+One shared launcher provisions a fresh disposable Linux environment and runs a
+selected Chromium journey through the real frontend, API, database, images and
+PDF services. Local runs and CI use the same contract.
+
+Prerequisites (one-time): built frontend/API/images/PDF (`npm run build` in
+each repo), `npx playwright install chromium`, and running Postgres, Mailpit,
+and an S3-compatible store. The launcher starts its own disposable Redis and
+validates the rest. Focused non-Stripe runs need no Stripe credentials.
+
+```bash
+cd opencollective-frontend
+./test/playwright/run-local.sh --spec test/playwright/smoke.spec.ts
+```
+
+What a fresh run does:
+
+- Preflights tools, checkouts, builds, and infrastructure before changing state.
+- Restores the selected API revision's development dump plus that revision's
+  migrations into the same explicitly owned disposable database (default
+  `opencollective_pw_e2e`; protected/developer/shared/staging/production names
+  are rejected).
+- Starts services with the CI runtime contract (`TZ=UTC OC_ENV=ci NODE_ENV=test
+E2E_TEST=1`) and the established E2E stubs.
+- Verifies semantic readiness (database/seed/migrations, frontend-to-API
+  routing, mail, object store, images/PDF) with five-minute per-service
+  deadlines before browser execution.
+- Runs the selected spec with Chromium, writes a replay manifest with exact
+  service revisions, lockfile/build identities, seed hash, runtime/browser
+  versions, selection, and non-secret config, then stops only owned processes.
+
+Evidence per run lives under `test/playwright/.artifacts/<run-id>/`
+(manifest plus owned service logs) alongside `test/playwright/report/` and
+`test/playwright/test-results/` (traces/screenshots/videos on failure).
+`--keep-on-failure` retains owned processes for inspection and prints the
+explicit cleanup command.
+
+Agents: use the exact launcher command above with explicit `--api-dir`,
+`--frontend-dir`, `--images-dir`, `--pdf-dir` when running from a worktree.
+See `test/playwright/README.md` for worktree paths and artifact locations.
+
+## Cypress (existing suite)
+
+We use [Cypress](https://www.cypress.io/) for the existing E2E coverage, which
+remains required while migration proceeds.
 
 ## Running the E2E tests in development environment
 

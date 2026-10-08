@@ -14,5 +14,11 @@ Tailwind+ShadCN (primary), Styled Components/Styled System (legacy; do not add n
 ## Quality
 
 From this repo: `npm run type:check`, `npm run lint:quiet`, `npm run prettier:check` (fix: `prettier:write`), npm run `ts-unused-exports`.
-Tests: Jest (`npm run test`); E2E Cypress.
+Tests: Jest (`npm run test`); E2E Cypress + Playwright pilot (`docs/e2e.md`, `test/playwright/README.md`).
 Schema/codegen: `npm run graphql:update` (API must be running).
+
+## Playwright E2E (pilot)
+
+Fresh Linux reproduction: `./test/playwright/run-local.sh --spec test/playwright/smoke.spec.ts`.
+Uses disposable `opencollective_pw_e2e` by default; explicit service paths via `--api-dir/--frontend-dir/--images-dir/--pdf-dir` for worktrees.
+Evidence: `test/playwright/.artifacts/<run-id>/replay-manifest.json` plus owned service logs.
