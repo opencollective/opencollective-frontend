@@ -10,7 +10,7 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { useAgreementActions } from '@/components/agreements/actions';
 import AgreementDrawer from '@/components/agreements/AgreementDrawer';
 import AgreementsTable from '@/components/agreements/AgreementsTable';
-import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '@/components/agreements/fragments';
+import { agreementViewFieldsFragment } from '@/components/agreements/fragments';
 import FilesViewerModal from '@/components/FilesViewerModal';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import ConfirmationModal from '@/components/NewConfirmationModal';
@@ -36,10 +36,10 @@ const hostedAccountAgreementsQuery = gql`
       }
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${agreementViewFieldsFragment}
 `;
 
-const DELETE_AGREEMENT_MUTATION = gql`
+const deleteAgreementMutation = gql`
   mutation HostedAccountDeleteAgreement($id: String!) {
     deleteAgreement(agreement: { id: $id }) {
       id
@@ -61,7 +61,7 @@ export function HostedAccountAgreementsTab({ account, hostSlug }: HostedAccountA
   const [isEditing, setIsEditing] = React.useState(false);
   const [filePreview, setFilePreview] = React.useState<Agreement | null>(null);
   const [agreementToDelete, setAgreementToDelete] = React.useState<Agreement | null>(null);
-  const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION);
+  const [deleteAgreement] = useMutation(deleteAgreementMutation);
 
   const { data, error, loading, variables, refetch } = useQuery(hostedAccountAgreementsQuery, {
     variables: { hostSlug, account: account?.slug ? [{ slug: account.slug }] : [], limit: NB_AGREEMENTS, offset: 0 },

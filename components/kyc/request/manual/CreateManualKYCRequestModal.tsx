@@ -18,7 +18,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Textarea } from '@/components/ui/Textarea';
 import { toast } from '@/components/ui/useToast';
 
-import { kycVerificationFields } from '../../graphql';
+import { kycVerificationFieldsFragment } from '../../graphql';
 import { KYCRequestAccountCard } from '../KYCRequestAccountCard';
 
 type CreateManualKYCRequestModalProps = {
@@ -50,7 +50,7 @@ export function CreateManualKYCRequestModal(props: CreateManualKYCRequestModalPr
           ...KYCVerificationFields
         }
       }
-      ${kycVerificationFields}
+      ${kycVerificationFieldsFragment}
     `,
     {
       refetchQueries: props.refetchQueries,

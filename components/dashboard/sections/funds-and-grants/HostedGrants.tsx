@@ -16,7 +16,7 @@ import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import { DataTable } from '@/components/table/DataTable';
@@ -110,7 +110,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
         }
       }
 
-      ${accountHoverCardFields}
+      ${accountHoverCardFieldsFragment}
     `,
     {
       variables: { hostSlug, withHoverCard: true },

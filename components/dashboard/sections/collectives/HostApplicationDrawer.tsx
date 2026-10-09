@@ -32,7 +32,7 @@ import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { type Toast, useToast } from '../../../ui/useToast';
 
 import AcceptRejectButtons from './AcceptRejectButtons';
-import { HostApplicationFields, processApplicationMutation } from './queries';
+import { hostApplicationFieldsFragment, processApplicationMutation } from './queries';
 
 const ValidatedRepositoryInfo = dynamic(() => import('./ValidatedRepositoryInfo'));
 
@@ -188,7 +188,7 @@ function HostApplication({
       }
 
       ${commentFieldsFragment}
-      ${HostApplicationFields}
+      ${hostApplicationFieldsFragment}
     `,
     {
       fetchPolicy: 'cache-and-network',

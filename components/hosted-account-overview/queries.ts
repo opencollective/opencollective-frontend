@@ -1,6 +1,6 @@
 import { gql } from '@/lib/graphql/helpers';
 
-import { hostedCollectiveFields } from '@/components/dashboard/sections/collectives/queries';
+import { hostedCollectiveFieldsFragment } from '@/components/dashboard/sections/collectives/queries';
 
 export const hostedAccountProfileQuery = gql`
   query HostedAccountProfile($hostSlug: String!, $accountId: String!) {
@@ -136,7 +136,7 @@ export const hostedAccountProfileQuery = gql`
     }
   }
 
-  ${hostedCollectiveFields}
+  ${hostedCollectiveFieldsFragment}
 `;
 
 export const hostedAccountFinancialActivityQuery = gql`
