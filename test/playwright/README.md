@@ -35,14 +35,14 @@ Stop other servers on ports 3000, 3060, 3001, 3002 first.
 cd /workspace/opencollective-frontend
 
 # Fresh disposable database (default opencollective_pw_e2e), semantic readiness, smoke
-./test/playwright/run-local.sh --spec test/playwright/smoke.spec.ts
+./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts
 
 # Title filter / workers / explicit checkouts (worktrees and nested CI layouts supported)
-./test/playwright/run-local.sh --spec test/playwright/smoke.spec.ts --grep "switches language" --workers 1
+./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --grep "switches language" --workers 1
 ./test/playwright/run-local.sh --api-dir /workspace/opencollective-api --frontend-dir "$(pwd)"
 
 # Keep owned processes on failure for inspection (prints cleanup command)
-./test/playwright/run-local.sh --spec test/playwright/smoke.spec.ts --keep-on-failure
+./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --keep-on-failure
 ```
 
 What the launcher does: preflights tools/checkouts/builds/infrastructure before

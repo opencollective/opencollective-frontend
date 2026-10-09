@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * Fresh-environment smoke (ticket 02).
+ * Fresh-environment smoke.
  *
  * One independent Chromium journey through the real frontend/API/database.
  * No mutable prerequisites, no inbox cleanup, no shared session: safe to run

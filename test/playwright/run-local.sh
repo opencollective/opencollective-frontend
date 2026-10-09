@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Fresh Linux Playwright smoke launcher (ticket 02).
+# Fresh Linux Playwright smoke launcher.
 #
 # One shared local/CI lifecycle: preflight, fresh disposable database,
 # semantic readiness, one Chromium smoke journey, replay manifest, owned teardown.
 #
 # Fresh reproduction is the default. Every run restores the selected API
 # revision's development dump + migrations into an explicitly owned disposable
-# database. Reuse/iteration mode does not exist yet (ticket 03); joining an
+# database. Reuse/iteration mode is not supported yet; joining an
 # existing environment without reset is unsupported and will fail closed.
 #
 # Usage:
-#   test/playwright/run-local.sh --spec test/playwright/smoke.spec.ts
-#   test/playwright/run-local.sh --spec test/playwright/smoke.spec.ts --grep "switches language"
+#   test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts
+#   test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --grep "switches language"
 #   PLAYWRIGHT_WORKERS=2 test/playwright/run-local.sh
 #
 # Canonical guide: docs/e2e.md. Runner details: test/playwright/README.md.
@@ -22,7 +22,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRONTEND_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # --- Defaults (CI contract) ---
-SPEC="${PLAYWRIGHT_SPEC:-test/playwright/smoke.spec.ts}"
+SPEC="${PLAYWRIGHT_SPEC:-test/playwright/specs/smoke.spec.ts}"
 GREP="${PLAYWRIGHT_GREP:-}"
 WORKERS="${PLAYWRIGHT_WORKERS:-1}"
 HEADED=false

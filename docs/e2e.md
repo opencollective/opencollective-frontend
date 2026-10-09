@@ -18,7 +18,7 @@ validates the rest. Focused non-Stripe runs need no Stripe credentials.
 
 ```bash
 cd opencollective-frontend
-./test/playwright/run-local.sh --spec test/playwright/smoke.spec.ts
+./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts
 ```
 
 What a fresh run does:
