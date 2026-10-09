@@ -31,7 +31,7 @@ on:
       spec:
         description: Playwright spec for this job; later pilot journeys reuse this job via this input
         required: false
-        default: test/playwright/specs/smoke.spec.ts
+        default: test/playwright/specs
         type: string
       grep:
         description: Title filter passed to Playwright as -g (empty runs the whole spec)
