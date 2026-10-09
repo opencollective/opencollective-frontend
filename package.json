@@ -160,7 +160,7 @@
     "playwright:install": "playwright install chromium",
     "playwright:test": "cross-env TZ=UTC playwright test",
     "test:playwright": "cross-env TZ=UTC playwright test",
-    "test:playwright:smoke": "cross-env TZ=UTC playwright test test/playwright/smoke.spec.ts",
+    "test:playwright:smoke": "cross-env TZ=UTC playwright test test/playwright/specs/smoke.spec.ts",
     "depcheck": "npx @opencollective/depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production main",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging main",

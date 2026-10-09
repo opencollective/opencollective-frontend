@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright E2E configuration (ticket 02: fresh Linux smoke).
+ * Playwright E2E configuration: Chromium-only pilot.
  *
  * Chromium only for the pilot. Services are owned and started by
  * test/playwright/run-local.sh (the shared local/CI launcher), not by
@@ -12,7 +12,7 @@ import { defineConfig, devices } from '@playwright/test';
 const workers = process.env.PLAYWRIGHT_WORKERS ? Number(process.env.PLAYWRIGHT_WORKERS) : 1;
 
 export default defineConfig({
-  testDir: './test/playwright',
+  testDir: './test/playwright/specs',
   testMatch: '**/*.spec.ts',
   timeout: 60_000,
   expect: {
