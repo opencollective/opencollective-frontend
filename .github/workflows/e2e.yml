@@ -74,10 +74,10 @@ jobs:
 
     services:
       redis:
-        image: redis:8
+        image: valkey/valkey:9.1
         ports:
           - 6379:6379
-        options: --entrypoint redis-server
+        options: --entrypoint valkey-server
       postgres:
         image: postgres:16.15
         env:
