@@ -701,6 +701,10 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
                   value={recurrenceEndAt}
                   onChange={e => setRecurrenceEndAtEdit(e.target.value)}
                 />
+                {(props.form.touched.recurrenceEndAt || props.form.submitCount > 0) &&
+                  props.form.errors.recurrenceEndAt && (
+                    <p className="mt-1 text-sm text-red-600">{props.form.errors.recurrenceEndAt}</p>
+                  )}
               </React.Fragment>
             )}
 
@@ -708,8 +712,8 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
               <Button
                 disabled={props.form.initialLoading || props.form.isSubmitting}
                 onClick={() => {
-                  props.form.setFieldValue('recurrenceEndAt', recurrenceEndAtEdit);
-                  props.form.setFieldValue('recurrenceFrequency', recurrenceFrequencyEdit);
+                  props.form.setFieldValue('recurrenceEndAt', recurrenceEndAtEdit, false);
+                  props.form.setFieldValue('recurrenceFrequency', recurrenceFrequencyEdit, false);
                   setIsEdittingRecurrence(false);
                 }}
                 variant="outline"
