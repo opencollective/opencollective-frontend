@@ -31,9 +31,9 @@ fi
 # ---- Variables ----
 
 if [ "$1" == "staging" ]; then
-  DEPLOY_ORIGIN_URL="https://git.heroku.com/oc-staging-frontend.git"
+  HEROKU_APP="oc-staging-frontend"
 elif [ "$1" == "production" ]; then
-  DEPLOY_ORIGIN_URL="https://git.heroku.com/oc-prod-frontend.git"
+  HEROKU_APP="oc-prod-frontend"
 else
   echo "Unknwown remote $1"
   exit 1
@@ -41,6 +41,8 @@ fi
 
 PUSH_TO_SLACK=true # Setting this to false will echo the message instead of pushing to Slack
 SLACK_CHANNEL="CEZUS9WH3"
+
+DEPLOY_ORIGIN_URL="https://git.heroku.com/${HEROKU_APP}.git"
 
 LOCAL_ORIGIN="origin"
 PRE_DEPLOY_ORIGIN="predeploy-${1}"
@@ -50,7 +52,6 @@ PRE_DEPLOY_BRANCH="main"
 
 GIT_LOG_FORMAT_SHELL='short'
 GIT_LOG_FORMAT_SLACK='format:<https://github.com/opencollective/opencollective-frontend/commit/%H|[%ci]> *%an* %n_%<(80,trunc)%s_%n'
-GIT_LOG_COMPARISON="$PRE_DEPLOY_ORIGIN/$PRE_DEPLOY_BRANCH..$LOCAL_ORIGIN/$LOCAL_BRANCH"
 
 # ---- Utils ----
 
@@ -76,15 +77,37 @@ function exit_success()
   exit 0
 }
 
-# ---- Ensure we have a reference to the remote ----
-
-git remote add $PRE_DEPLOY_ORIGIN $DEPLOY_ORIGIN_URL &> /dev/null
+function get_deployed_commit()
+{
+  # Commit of the current Heroku release. Unlike the Heroku git remote, this is also
+  # correct when the app is deployed by the GitHub integration or rolled back.
+  local token slug_id
+  command -v heroku &> /dev/null || return 1
+  token=$(heroku auth:token 2> /dev/null) || return 1
+  slug_id=$(heroku releases:info -a "$HEROKU_APP" --json 2> /dev/null | node -e "process.stdout.write(JSON.parse(require('fs').readFileSync(0)).slug?.id ?? '')") || return 1
+  [ -n "$slug_id" ] || return 1
+  curl -s --fail \
+    -H "Authorization: Bearer $token" \
+    -H "Accept: application/vnd.heroku+json; version=3" \
+    "https://api.heroku.com/apps/$HEROKU_APP/slugs/$slug_id" \
+    | node -e "process.stdout.write(JSON.parse(require('fs').readFileSync(0)).commit ?? '')"
+}
 
 # ---- Show the commits about to be pushed ----
 
-# Update deploy remote
 echo "ℹ️  Fetching remote $1 state..."
-git fetch $PRE_DEPLOY_ORIGIN $PRE_DEPLOY_BRANCH > /dev/null
+git fetch $LOCAL_ORIGIN $LOCAL_BRANCH &> /dev/null
+DEPLOYED_COMMIT=$(get_deployed_commit)
+
+if [ -n "$DEPLOYED_COMMIT" ] && git cat-file -e "$DEPLOYED_COMMIT^{commit}" &> /dev/null; then
+  GIT_LOG_COMPARISON="$DEPLOYED_COMMIT..$LOCAL_ORIGIN/$LOCAL_BRANCH"
+else
+  # Fallback on the Heroku git remote, which is only up to date when deploying with `git push`
+  echo "⚠️  Could not get the deployed commit from the Heroku CLI (is it installed and logged in?), using the Heroku git remote instead."
+  git remote add $PRE_DEPLOY_ORIGIN $DEPLOY_ORIGIN_URL &> /dev/null
+  git fetch $PRE_DEPLOY_ORIGIN $PRE_DEPLOY_BRANCH > /dev/null
+  GIT_LOG_COMPARISON="$PRE_DEPLOY_ORIGIN/$PRE_DEPLOY_BRANCH..$LOCAL_ORIGIN/$LOCAL_BRANCH"
+fi
 
 echo ""
 echo "-------------- New commits --------------"
