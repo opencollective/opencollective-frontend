@@ -178,7 +178,11 @@ traces. Authentication is supplied through isolated browser storage, avoiding
 sign-in URL tokens and shared sign-in IP counters. Scenario attachments contain
 only references and attempt metadata. The launcher redacts JWTs and fixture
 credentials from trace archives and textual reports/logs before handoff or
-upload, preserving trace resources and the original failed attempt. Do not
+upload, preserving trace resources and the original failed attempt. An incomplete
+archive is retained with private permissions under
+`test/playwright/.environments/.private-artifacts/<run-id>/` and excluded from
+uploaded evidence; `redaction-status.json` identifies it. Other artifacts still
+get scrubbed, and an existing failure/cancellation exit code is preserved. Do not
 attach authentication handles or raw fixture responses to evidence.
 
 ### Independence and interruption checks
