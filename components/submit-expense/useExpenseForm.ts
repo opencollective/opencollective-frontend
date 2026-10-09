@@ -851,19 +851,9 @@ function buildFormSchema(
     recurrenceEndAt: z
       .string()
       .nullish()
-      .refine(
-        recurrenceEndAt => {
-          if (!values.recurrenceFrequency || values.recurrenceFrequency === RecurrenceFrequencyOption.NONE) {
-            return true;
-          }
-          if (!recurrenceEndAt) {
-            return true; // No end date means open-ended recurrence
-          }
-          const endsAt = dayjs(recurrenceEndAt);
-          return endsAt.isValid() && endsAt.isAfter(dayjs().startOf('day'));
-        },
-        { message: 'End date must be in the future' },
-      ),
+      .refine(recurrenceEndAt => isValidRecurrenceEndAt(values.recurrenceFrequency, recurrenceEndAt), {
+        message: 'End date must be in the future',
+      }),
     referenceCurrency: z
       .nativeEnum(Currency)
       .optional()
@@ -1739,6 +1729,25 @@ const getPayeeForInvite = (values: ExpenseFormValues) => {
     return values.inviteeNewOrganization;
   }
 };
+
+/**
+ * A recurrence end date is optional (leaving it empty means an open-ended recurrence), but when set
+ * it must be a valid date in the future. This is the rule used by the form schema and by the
+ * recurrence editor (`SummarySection`) to validate the values before saving them.
+ */
+export function isValidRecurrenceEndAt(
+  recurrenceFrequency?: RecurrenceFrequencyOption | null,
+  recurrenceEndAt?: string | null,
+): boolean {
+  if (!recurrenceFrequency || recurrenceFrequency === RecurrenceFrequencyOption.NONE) {
+    return true;
+  }
+  if (!recurrenceEndAt) {
+    return true; // No end date means open-ended recurrence
+  }
+  const endsAt = dayjs(recurrenceEndAt);
+  return endsAt.isValid() && endsAt.isAfter(dayjs().startOf('day'));
+}
 
 /**
  * Builds the `recurring` input for the `createExpense` mutation from the form values.
