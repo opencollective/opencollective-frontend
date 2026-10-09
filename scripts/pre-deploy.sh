@@ -3,10 +3,11 @@
 # Description
 # ===========
 #
-# Pre-deploy hook. Does the following:
-#   1. Shows the commits about to be pushed
+# Deploy script. Does the following:
+#   1. Shows the commits about to be pushed (stops there if there are none)
 #   2. Ask for confirmation (exit with 1 if not confirming)
 #   3. Notify Slack
+#   4. Push origin/main to Heroku
 #
 #
 # Developing
@@ -74,7 +75,11 @@ function confirm()
 function exit_success()
 {
   echo "🚀  Deploying now..."
-  exit 0
+  if [ "$1" == "staging" ]; then
+    PUSH_FLAGS="--force"
+  fi
+  git push $PUSH_FLAGS $DEPLOY_ORIGIN_URL "$LOCAL_ORIGIN/$LOCAL_BRANCH:refs/heads/$PRE_DEPLOY_BRANCH"
+  exit $?
 }
 
 function get_deployed_commit()
@@ -109,6 +114,11 @@ else
   GIT_LOG_COMPARISON="$PRE_DEPLOY_ORIGIN/$PRE_DEPLOY_BRANCH..$LOCAL_ORIGIN/$LOCAL_BRANCH"
 fi
 
+if [ -z "$(git rev-list -n 1 $GIT_LOG_COMPARISON)" ]; then
+  echo "✅  $1 is already up to date with $LOCAL_ORIGIN/$LOCAL_BRANCH ($(git rev-parse --short $LOCAL_ORIGIN/$LOCAL_BRANCH)), nothing to deploy."
+  exit 0
+fi
+
 echo ""
 echo "-------------- New commits --------------"
 git --no-pager log --pretty="${GIT_LOG_FORMAT_SHELL}" $GIT_LOG_COMPARISON
@@ -129,7 +139,7 @@ if [ -z "$OC_SLACK_DEPLOY_WEBHOOK" ]; then
   # Emit a warning as we don't want the deploy to crash just because we
   # havn't setup a Slack token. Get yours on https://api.slack.com/custom-integrations/legacy-tokens
   echo "ℹ️  OC_SLACK_DEPLOY_WEBHOOK is not set, I will not notify Slack about this deploy 😞  (please do it manually)"
-  exit_success
+  exit_success $1
 fi
 
 ESCAPED_CHANGELOG=$(
@@ -176,4 +186,4 @@ else
 fi
 
 # Always exit with 0 to continue the deploy even if slack notification failed
-exit_success
+exit_success $1
