@@ -108,9 +108,7 @@ jobs:
         run: |
           sudo apt-get install \
           `# Cypress dependencies - see https://docs.cypress.io/app/get-started/install-cypress#UbuntuDebian` \
-          libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb \
-          `# Postgres client` \
-          postgresql-client-16
+          libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb
 
       - name: Setup S3 bucket
         env:
@@ -256,7 +254,10 @@ jobs:
 
       # Seed DB
 
+      # Run pg_restore & co from the postgres:16 image, matching the PostgreSQL 16 service whatever client the runner ships
       - name: Setup DB
+        env:
+          USE_DOCKER: true
         run: ./scripts/setup_db.sh
 
       # Run tests
