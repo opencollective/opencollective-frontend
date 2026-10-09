@@ -108,6 +108,17 @@ export const platformBillingFragment = gql`
         }
       }
     }
+    crowdfunding {
+      totalAmount {
+        valueInCents
+        currency
+      }
+      feePercent
+      fee {
+        valueInCents
+        currency
+      }
+    }
     totalAmount {
       valueInCents
       currency
