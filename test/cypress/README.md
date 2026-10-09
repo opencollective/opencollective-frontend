@@ -1,8 +1,8 @@
 # Cypress E2E tests
 
-End-to-end tests live in `test/cypress/integration/`. They exercise the full stack (frontend, API, images, PDF, Postgres, Redis, Mailpit, MinIO).
+End-to-end tests live in `test/cypress/integration/`. They exercise the full stack (frontend, API, images, PDF, Postgres, Valkey, Mailpit, MinIO).
 
-For local runs in the monorepo or devcontainer, use [`run-local.sh`](./run-local.sh). It builds a production-like stack (`OC_ENV=ci`), starts Redis and all services, runs Cypress, and tears down on exit. CI uses [`.github/workflows/e2e.yml`](../../.github/workflows/e2e.yml) and [`scripts/run_e2e_tests.sh`](../../scripts/run_e2e_tests.sh) instead.
+For local runs in the monorepo or devcontainer, use [`run-local.sh`](./run-local.sh). It builds a production-like stack (`OC_ENV=ci`), starts Valkey and all services, runs Cypress, and tears down on exit. CI uses [`.github/workflows/e2e.yml`](../../.github/workflows/e2e.yml) and [`scripts/run_e2e_tests.sh`](../../scripts/run_e2e_tests.sh) instead.
 
 ## One-time setup
 
@@ -21,7 +21,7 @@ cd ../opencollective-pdf && npm run build
 cd opencollective-frontend && npm run cypress:install
 ```
 
-**Infrastructure** - Postgres, Mailpit, and MinIO must already be running (provided by the devcontainer compose, or locally on the usual ports). Install `redis-server` if missing; the script starts its own instance on port `6380`.
+**Infrastructure** - Postgres, Mailpit, and MinIO must already be running (provided by the devcontainer compose, or locally on the usual ports). Install Valkey if missing (`apt-get install valkey-server`, `brew install valkey`; `redis-server` also works); the script starts its own instance on port `6380`.
 
 ## Running tests
 
@@ -44,7 +44,7 @@ Service logs: `logs/cypress-e2e-*.log` at the workspace root.
 
 ### What the script handles
 
-- Redis on port `6380` (persistence disabled; override with `REDIS_URL`)
+- Valkey on port `6380` (persistence disabled; override with `REDIS_URL`)
 - Host detection for Postgres, Mailpit, and MinIO (devcontainer vs localhost)
 - `opencollective_e2e` database (override with `PG_DATABASE`)
 - Chromium when available, otherwise Electron
@@ -81,7 +81,7 @@ To mirror GitHub Actions exactly, use `scripts/run_e2e_tests.sh` with `scripts/s
 | Symptom                              | Fix                                                                  |
 | ------------------------------------ | -------------------------------------------------------------------- |
 | Port already in use                  | Stop dev servers (`npx pm2 stop all`)                                |
-| Redis is required                    | `apt-get install redis-server`                                       |
+| Valkey (or Redis) is required        | `apt-get install valkey-server` or `brew install valkey`             |
 | Frontend / API is not built          | `npm run build` in the relevant repo                                 |
 | Cypress failed to verify server      | Check `logs/cypress-e2e-*.log`                                       |
 | Stripe specs fail                    | Need Stripe CLI + `STRIPE_WEBHOOK_KEY`; skip `40-stripe-*` otherwise |
