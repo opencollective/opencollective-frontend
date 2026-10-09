@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import { getErrorFromGraphqlException } from '@/lib/errors';
-import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
+import { gql } from '@/lib/graphql/helpers';
 
 import { adminPanelQuery } from '../../dashboard/queries';
 import MessageBox from '../../MessageBox';
@@ -13,18 +13,18 @@ import { P } from '../../Text';
 import { Button } from '../../ui/Button';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
-const archiveCollectiveMutation = gqlV1 /* GraphQL */ `
-  mutation ArchiveCollective($id: Int!) {
-    archiveCollective(id: $id) {
+const archiveAccountMutation = gql`
+  mutation ArchiveAccount($account: AccountReferenceInput!) {
+    archiveAccount(account: $account) {
       id
       isArchived
     }
   }
 `;
 
-const unarchiveCollectiveMutation = gqlV1 /* GraphQL */ `
-  mutation UnarchiveCollective($id: Int!) {
-    unarchiveCollective(id: $id) {
+const unarchiveAccountMutation = gql`
+  mutation UnarchiveAccount($account: AccountReferenceInput!) {
+    unarchiveAccount(account: $account) {
       id
       isArchived
     }
@@ -45,20 +45,14 @@ const ArchiveCollective = ({ collective }) => {
   const adminPanelMutationParams = {
     refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug } }],
   };
-  const [archiveCollective] = useMutation(archiveCollectiveMutation, {
-    ...adminPanelMutationParams,
-    context: API_V1_CONTEXT,
-  });
-  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation, {
-    ...adminPanelMutationParams,
-    context: API_V1_CONTEXT,
-  });
+  const [archiveAccount] = useMutation(archiveAccountMutation, adminPanelMutationParams);
+  const [unarchiveAccount] = useMutation(unarchiveAccountMutation, adminPanelMutationParams);
 
   const handleArchiveCollective = async ({ id }) => {
     setModal({ type: 'Archive', show: false });
     try {
       setArchiveStatus({ ...archiveStatus, processing: true });
-      await archiveCollective({ variables: { id } });
+      await archiveAccount({ variables: { account: { legacyId: id } } });
       setArchiveStatus({
         ...archiveStatus,
         processing: false,
@@ -74,7 +68,7 @@ const ArchiveCollective = ({ collective }) => {
     setModal({ type: 'Unarchive', show: false });
     try {
       setArchiveStatus({ ...archiveStatus, processing: true });
-      await unarchiveCollective({ variables: { id } });
+      await unarchiveAccount({ variables: { account: { legacyId: id } } });
       setArchiveStatus({
         ...archiveStatus,
         processing: false,
