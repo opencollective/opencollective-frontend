@@ -238,6 +238,10 @@ guard_pg_database() {
       exit 2
       ;;
   esac
+  if ! [[ "$name" =~ ^opencollective_pw_e2e(_[a-z0-9_]+)?$ ]]; then
+    echo "ERROR: disposable Playwright database must be opencollective_pw_e2e or opencollective_pw_e2e_<suffix>." >&2
+    exit 2
+  fi
   if [[ -z "$name" ]]; then
     echo "ERROR: PG database name is empty." >&2
     exit 2
@@ -282,6 +286,7 @@ fail() {
 REGISTRY_DIR="$FRONTEND_DIR/test/playwright/.environments"
 RECORD_FILE="$REGISTRY_DIR/$PG_DATABASE.json"
 USERS_DIR="$REGISTRY_DIR/$PG_DATABASE.users"
+FIXTURE_OWNER_FILE="$REGISTRY_DIR/$PG_DATABASE.credentials"
 
 record_api_url() {
   jq -r '.apiUrl // empty' "$RECORD_FILE" 2>/dev/null
@@ -393,7 +398,7 @@ update_record_phase() {
 }
 
 remove_owner_record() {
-  rm -f "$RECORD_FILE"
+  rm -f "$RECORD_FILE" "$FIXTURE_OWNER_FILE"
   rm -rf "$USERS_DIR"
 }
 
@@ -593,7 +598,7 @@ EOF
       HEADED=true
     fi
   fi
-  if [[ ! -f "$FRONTEND_DIR/$SPEC" && ! -f "$SPEC" ]]; then
+  if [[ ! -e "$FRONTEND_DIR/$SPEC" && ! -e "$SPEC" ]]; then
     fail "replay spec not found: $SPEC (recorded selection; override with --spec)"
     exit 2
   fi
@@ -605,7 +610,7 @@ preflight() {
   # redis-server is only required when this run may start its own disposable
   # Redis (no REDIS_URL). With REDIS_URL the Redis is supplied infrastructure
   # (e.g. the pinned CI service container) and is never owned or reset here.
-  local tools=(node npm psql pg_restore redis-cli curl jq git)
+  local tools=(node npm python3 psql pg_restore redis-cli curl jq git)
   if [[ -z "${REDIS_URL:-}" ]]; then
     tools+=(redis-server)
   fi
@@ -798,9 +803,23 @@ start_services() {
   export OC_ENV=ci
   export NODE_ENV=test
   export E2E_TEST=1
+  # Keep launcher credentials outside uploaded evidence. Reuse reads this same
+  # private ownership proof; fresh/replay generate a new ephemeral token.
+  (umask 077; node - "$FIXTURE_OWNER_FILE" "$RUN_ID" "$PG_DATABASE" <<'NODE'
+const fs = require('fs');
+const crypto = require('crypto');
+const [file, ownerRunId, database] = process.argv.slice(2);
+fs.writeFileSync(file, JSON.stringify({ownerRunId, database, token: crypto.randomBytes(32).toString('hex')}), {mode: 0o600});
+fs.chmodSync(file, 0o600);
+NODE
+  )
+  export E2E_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
+  export PLAYWRIGHT_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
+  export PLAYWRIGHT_RUN_ID="$RUN_ID"
   export PG_DATABASE
   export MAILPIT_CLIENT=true
   export WEBSITE_URL API_URL IMAGES_URL PDF_SERVICE_URL
+  export API_KEY="${API_KEY:-dvl-1510egmf4a23d80342403fb599qd}"
   export AWS_KEY="${AWS_KEY:-user}"
   export AWS_SECRET="${AWS_SECRET:-password}"
   export AWS_S3_BUCKET="${AWS_S3_BUCKET:-opencollective-e2e}"
@@ -864,6 +883,15 @@ semantic_readiness() {
   wait_for_service "Mailpit/API" "$MAILPIT_URL/api/v1/messages" || return 1
   if ! curl -sf "$AWS_S3_ENDPOINT/health/ready" >/dev/null 2>&1 && ! curl -sf "$AWS_S3_ENDPOINT/minio/health/ready" >/dev/null 2>&1; then
     fail "object store at $AWS_S3_ENDPOINT failed readiness. See $ARTIFACTS_DIR/db-restore.log"
+    return 1
+  fi
+  # The authenticated fixture route proves ownership and the built recipe
+  # transport are available before any browser journey starts. Missing auth
+  # must fail closed, even on a correctly launched disposable stack.
+  local fixture_status
+  fixture_status="$(curl -s -o /dev/null -w '%{http_code}' -X POST "$API_URL/e2e/fixtures" -H 'Content-Type: application/json' -d '{}' || true)"
+  if [[ "$fixture_status" != "401" ]]; then
+    fail "fixture endpoint is unavailable or unguarded (HTTP $fixture_status). Rebuild the companion API branch and launch an owned disposable database."
     return 1
   fi
   # Seed/migration sanity: run-owned DB answers with the restored baseline.
@@ -999,6 +1027,7 @@ JOINED=false
 on_exit() {
   local ec=$?
   trap - EXIT INT TERM
+  redact_artifacts || ec=1
   if [[ "$MANIFEST_WRITTEN" != true && -d "${ARTIFACTS_DIR:-}" ]]; then
     if [[ "$INTERRUPTED" == true ]]; then
       write_manifest "null" "interrupted" || true
@@ -1014,6 +1043,10 @@ on_exit() {
     cleanup_owned
   fi
   exit "$ec"
+}
+
+redact_artifacts() {
+  python3 "$FRONTEND_DIR/test/playwright/redact-artifacts.py" "$ARTIFACTS_DIR" "$FIXTURE_OWNER_FILE"
 }
 
 run_playwright() {
@@ -1084,6 +1117,7 @@ fresh_main() {
   run_playwright
   pw_exit=$?
   set -e
+  redact_artifacts || pw_exit=1
 
   if [[ $pw_exit -eq 0 ]]; then
     status="passed"
@@ -1123,7 +1157,7 @@ reuse_main() {
   trap 'INTERRUPTED=true; exit 143' TERM
   PHASE="preflight"
   local missing=()
-  for tool in node npx curl jq; do
+  for tool in node npx python3 curl jq; do
     command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
   done
   if [[ ${#missing[@]} -gt 0 ]]; then
@@ -1151,7 +1185,14 @@ reuse_main() {
   fi
   OWNER_RUN_ID="$owner"
   WEBSITE_URL="$(jq -r '.websiteUrl // empty' "$RECORD_FILE")"
-  export WEBSITE_URL
+  API_URL="$api"
+  if [[ ! -r "$FIXTURE_OWNER_FILE" ]]; then
+    fail "fixture ownership proof missing. Start a fresh environment with the companion API build."
+    exit 2
+  fi
+  export WEBSITE_URL API_URL
+  export PLAYWRIGHT_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
+  export PLAYWRIGHT_RUN_ID="$RUN_ID"
   register_joiner
   JOINED=true
   echo "> Reuse mode: attached to live environment '$PG_DATABASE' (owner $owner)."
@@ -1165,6 +1206,7 @@ reuse_main() {
   run_playwright
   pw_exit=$?
   set -e
+  redact_artifacts || pw_exit=1
   PHASE="done"
   deregister_joiner
   JOINED=false
