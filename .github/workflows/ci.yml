@@ -246,3 +246,15 @@ jobs:
       images-ref: ${{ needs.e2e-prepare.outputs.images-ref }}
       pdf-ref: ${{ needs.e2e-prepare.outputs.pdf-ref }}
     secrets: inherit
+
+  # Playwright pilot (ticket 04): observational only, not in required checks.
+  # Cypress above keeps protecting coverage; this job reports the smoke plus
+  # original-attempt evidence without masking failures.
+  e2e-playwright:
+    needs: [build, e2e-prepare]
+    uses: ./.github/workflows/e2e-playwright.yml
+    with:
+      api-ref: ${{ needs.e2e-prepare.outputs.api-ref }}
+      images-ref: ${{ needs.e2e-prepare.outputs.images-ref }}
+      pdf-ref: ${{ needs.e2e-prepare.outputs.pdf-ref }}
+    secrets: inherit
