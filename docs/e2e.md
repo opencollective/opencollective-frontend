@@ -38,8 +38,8 @@ E2E_TEST=1`) and the established E2E stubs.
   versions, selection, and non-secret config, then stops only owned processes.
 
 Evidence per run lives under `test/playwright/.artifacts/<run-id>/`
-(manifest plus owned service logs) alongside `test/playwright/report/` and
-`test/playwright/test-results/` (traces/screenshots/videos on failure).
+(manifest, owned service logs, and that attempt's HTML/JSON/JUnit reports
+plus traces/screenshots/videos on failure — no shared-path overwrite).
 `--keep-on-failure` retains owned processes for inspection and prints the
 explicit cleanup command.
 
@@ -78,6 +78,31 @@ owned environment):
 Agents: use the exact launcher command above with explicit `--api-dir`,
 `--frontend-dir`, `--images-dir`, `--pdf-dir` when running from a worktree.
 See `test/playwright/README.md` for worktree paths and artifact locations.
+
+### Playwright CI (pilot, observational)
+
+`CI / e2e-playwright / playwright smoke` runs the smoke through the same
+shared launcher on every PR and main push, reusing the prepared
+same-revision builds. It is observational: Cypress checks stay required
+until pilot adoption, and the Playwright job reports real
+test/setup/interruption outcomes without masking failures. Duplicate pilot
+cost is not steady-state cost.
+
+- Workers share one services stack (`PLAYWRIGHT_WORKERS`, default 1; raise
+  only from measured CPU/memory/service capacity). Retries default to 0
+  locally and in benchmarks; routine CI allows at most 1
+  (`PLAYWRIGHT_RETRIES`; larger values are rejected) so first-attempt
+  failures, recoveries, and final failures stay distinguishable.
+- Every attempt uploads its run-specific `test/playwright/.artifacts/`
+  directory (replay manifest, sanitized service logs, HTML/JSON/JUnit
+  reports, original traces/screenshots/videos). Failure/recovery evidence
+  is retained 14 days, successful evidence 7 days; expiry deletes only CI
+  artifacts, never local scenario or provider records.
+- Later pilot journeys reuse the same job via its `spec`/`grep` inputs; no
+  new scheduling framework is needed. Live Stripe stays in Cypress.
+- Fork PRs run credential-free (this workflow uses no secrets) and report
+  that full live coverage is unavailable; reviewed trusted coverage on the
+  same revision is required before adoption or Cypress retirement.
 
 ## Cypress (existing suite)
 
