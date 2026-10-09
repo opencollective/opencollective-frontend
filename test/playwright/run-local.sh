@@ -1027,7 +1027,10 @@ JOINED=false
 on_exit() {
   local ec=$?
   trap - EXIT INT TERM
-  redact_artifacts || ec=1
+  if ! redact_artifacts; then
+    # Evidence trouble must not replace the original failure/cancellation code.
+    [[ $ec -ne 0 ]] || ec=1
+  fi
   if [[ "$MANIFEST_WRITTEN" != true && -d "${ARTIFACTS_DIR:-}" ]]; then
     if [[ "$INTERRUPTED" == true ]]; then
       write_manifest "null" "interrupted" || true
@@ -1046,7 +1049,7 @@ on_exit() {
 }
 
 redact_artifacts() {
-  python3 "$FRONTEND_DIR/test/playwright/redact-artifacts.py" "$ARTIFACTS_DIR" "$FIXTURE_OWNER_FILE"
+  python3 "$FRONTEND_DIR/test/playwright/redact-artifacts.py" "$ARTIFACTS_DIR" "$FIXTURE_OWNER_FILE" "$REGISTRY_DIR/.private-artifacts/$RUN_ID"
 }
 
 run_playwright() {
@@ -1117,7 +1120,9 @@ fresh_main() {
   run_playwright
   pw_exit=$?
   set -e
-  redact_artifacts || pw_exit=1
+  if ! redact_artifacts; then
+    [[ $pw_exit -ne 0 ]] || pw_exit=1
+  fi
 
   if [[ $pw_exit -eq 0 ]]; then
     status="passed"
@@ -1206,7 +1211,9 @@ reuse_main() {
   run_playwright
   pw_exit=$?
   set -e
-  redact_artifacts || pw_exit=1
+  if ! redact_artifacts; then
+    [[ $pw_exit -ne 0 ]] || pw_exit=1
+  fi
   PHASE="done"
   deregister_joiner
   JOINED=false
