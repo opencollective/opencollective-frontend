@@ -74,12 +74,12 @@ jobs:
 
     services:
       redis:
-        image: redis@sha256:2c2dff791878316e3b083188be0d578423b24813cdda5de0e80ea4f7b3e6bfd6
+        image: redis
         ports:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:16.15@sha256:65b16a8b326e0cfbdf33fa7e783f2a0cb352a61448616ccccfd616ef42aa0f65
+        image: postgres:16.15
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
