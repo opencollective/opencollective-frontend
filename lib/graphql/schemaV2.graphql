@@ -1137,7 +1137,7 @@ interface Account {
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -4000,7 +4000,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -4254,7 +4254,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   hostContributionsReport(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostExpensesReports
 
   """
-  Applications for this host
+  Applications for this host. Scope: "applications".
   """
   hostApplications(
     """
@@ -4289,7 +4289,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   ): HostApplicationCollection!
 
   """
-  Pending applications for this host
+  Pending applications for this host. Scope: "applications".
   """
   pendingApplications(
     """
@@ -6240,11 +6240,19 @@ type HostApplication {
   """
   updatedAt: DateTime!
   status: HostApplicationStatus
+
+  """
+  The application message. Scope: "applications".
+  """
   message: String
+
+  """
+  Application custom data. Unfiltered for admins with scope "applications", allow-listed otherwise.
+  """
   customData: JSON
 
   """
-  Returns the list of comments for this host application, or `null` if user is not allowed to see them
+  Returns the list of comments for this host application, or `null` if user is not allowed to see them. Scope: "applications".
   """
   comments(
     """
@@ -7011,6 +7019,51 @@ type AccountStats {
   Total amount received time series
   """
   totalAmountReceivedTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Return the net amount (with payment processor fees removed)
+    """
+    net: Boolean = false
+
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+
+    """
+    Calculate amount for the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+
+    """
+    An optional currency. If not provided, will use the collective currency.
+    """
+    currency: Currency
+  ): TimeSeriesAmount!
+
+  """
+  Total amount spent time series
+  """
+  totalAmountSpentTimeSeries(
     """
     The start date of the time series
     """
@@ -11518,7 +11571,7 @@ type Bot implements Account {
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -12587,7 +12640,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -14246,7 +14299,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -15612,7 +15665,7 @@ type Individual implements Account {
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -17006,7 +17059,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -18479,7 +18532,7 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -19657,7 +19710,7 @@ type Vendor implements Account & AccountWithContributions {
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -21357,6 +21410,10 @@ type Query {
     status: [VirtualCardRequestStatus]
     collective: [AccountReferenceInput]
   ): VirtualCardRequestCollection!
+
+  """
+  Fetch a host application. Scope: "applications".
+  """
   hostApplication(hostApplication: HostApplicationReferenceInput): HostApplication
 
   """
@@ -24022,7 +24079,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """
@@ -25248,7 +25305,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   permissions: AccountPermissions!
 
   """
-  Host application requests. Scope: "host".
+  Host application requests. Scope: "applications".
   """
   hostApplicationRequests(
     """

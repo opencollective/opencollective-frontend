@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { capitalize } from 'lodash-es';
 import type { LucideProps } from 'lucide-react';
 import {
   Archive,
@@ -12,22 +11,24 @@ import {
   Receipt,
   Store,
   User,
+  UserRoundGroup,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
+import { gql } from '@/lib/graphql/helpers';
 import type {
   CommunityAccountDetailQuery,
+  CommunityTransactionSummary,
   DashboardVendorsQuery,
   KycStatusFieldsFragment,
   PeopleHostDashboardQuery,
   VendorFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
-import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, KycProvider, TransactionKind } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
 
@@ -41,12 +42,12 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/H
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
-import DateTime from '../../../DateTime';
 import { Button } from '../../../ui/Button';
 import { ALL_SECTIONS } from '../../constants';
-import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 import { LegalDocumentServiceBadge } from '../legal-documents/LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from '../legal-documents/LegalDocumentStatusBadge';
+
+import type { AccountDetailData, HostedAccountDetailData } from './queries';
 
 type UsePersonActionsOptions = {
   accountSlug: string;
@@ -67,6 +68,8 @@ export const getCollectiveTypeIcon = (
     case CollectiveType.USER:
     case AccountType.INDIVIDUAL:
       return <User {...props} />;
+    case AccountType.COLLECTIVE:
+      return <UserRoundGroup {...props} />;
   }
 };
 
@@ -295,7 +298,81 @@ export enum AccountDetailView {
   ACTIVITIES = 'activities',
   KYC = 'kyc',
   FINANCIAL_CONTROLS = 'financial-controls',
+  // Hosted account views (migrated from components/hosted-account-overview/)
+  ACCOUNTS = 'accounts',
+  PAYMENT_INTENTS = 'payment-intents',
+  PAYMENT_REQUESTS = 'payment-requests',
+  EXPECTED_FUNDS = 'expected-funds',
+  AGREEMENTS = 'agreements',
+  UPDATES = 'updates',
+  ABOUT = 'about',
 }
+
+/** Account types shown with the hosted account profile flow (vs. the community/people/vendors flow) */
+export const HOSTED_ACCOUNT_TYPES: AccountType[] = [
+  AccountType.COLLECTIVE,
+  AccountType.FUND,
+  AccountType.PROJECT,
+  AccountType.EVENT,
+];
+
+/** Narrows `AccountDetailData` to the hosted account flow. See `HostedAccountDetailData`. */
+export const isHostedAccountData = (
+  account: AccountDetailData | null | undefined,
+): account is HostedAccountDetailData => Boolean(account && HOSTED_ACCOUNT_TYPES.includes(account.type));
+
+/** Views of the hosted account Money Movements tab, used to seed the tab from overview links. */
+export type MoneyMovementsView = 'ALL' | 'CONTRIBUTIONS' | 'PAYOUTS';
+
+/**
+ * Per-tab metadata for the Transactions / Money Movements tabs: the pending
+ * payment-request count and the per-kind summary behind the view badges. Each
+ * tab fetches this for itself rather than the shell query carrying it for every
+ * tab. Shared by both tabs together with `getCountForView`.
+ */
+export const accountMoneyMovementsSummaryQuery = gql`
+  query AccountMoneyMovementsSummary($accountId: String!, $hostSlug: String!) {
+    account(id: $accountId) {
+      id
+      pendingExpenses: expenses(
+        status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
+        direction: SUBMITTED
+        host: { slug: $hostSlug }
+      ) {
+        totalCount
+      }
+      communityStats(host: { slug: $hostSlug }) {
+        id
+        transactionSummary {
+          kind
+          debitCount
+          creditCount
+          debitTotal {
+            valueInCents
+            currency
+          }
+          creditTotal {
+            valueInCents
+            currency
+          }
+        }
+      }
+    }
+  }
+`;
+
+/** Adds a `count` to a Money Movements / Transactions view based on the per-kind summary. */
+export const getCountForView = <TView extends { filter?: { kind?: TransactionKind[] } }>(
+  view: TView,
+  transactionSummary?: CommunityTransactionSummary[],
+): TView & { count?: number } => {
+  const summaries = transactionSummary?.filter(summary => view.filter?.kind?.includes(summary.kind as TransactionKind));
+  if (!summaries || summaries.length === 0) {
+    return view;
+  }
+  const count = summaries.reduce((acc, summary) => acc + summary.creditCount + summary.debitCount, 0);
+  return { ...view, count };
+};
 
 type CommunityAccount =
   PeopleHostDashboardQuery['community']['nodes'][number] | DashboardVendorsQuery['community']['nodes'][number];
@@ -426,38 +503,3 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
     [intl, showModal, router, opts, LoggedInUser],
   );
 }
-
-type ActivityType = NonNullable<CommunityAccountDetailQuery['firstActivity']['nodes'][0]>;
-
-export const RichActivityDate = ({
-  date,
-  activity,
-}: {
-  date: string | null | undefined;
-  activity?: ActivityType | null;
-}) => {
-  const intl = useIntl();
-  if (!date) {
-    return null;
-  } else if (!activity) {
-    return <DateTime value={date} dateStyle="long" />;
-  }
-
-  return (
-    <Tooltip delayDuration={100}>
-      <TooltipTrigger asChild>
-        <div className="inline-flex cursor-help items-center gap-1.5">
-          <span className="border-b border-dashed border-muted-foreground/40">
-            <DateTime value={date} dateStyle="long" />
-          </span>
-          <HelpCircle size={14} className="shrink-0 text-muted-foreground" />
-        </div>
-      </TooltipTrigger>
-      <TooltipContent className="z-[9999] max-w-xs text-left">
-        {ActivityDescriptionI18n[activity.type]
-          ? intl.formatMessage(ActivityDescriptionI18n[activity.type], getActivityVariables(intl, activity))
-          : capitalize(activity.type.replace(/_/g, ' '))}
-      </TooltipContent>
-    </Tooltip>
-  );
-};

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import type { ColumnDef } from '@tanstack/react-table';
 import { compact, isString, omit } from 'lodash-es';
@@ -11,14 +11,13 @@ import { HostedCollectiveTypes } from '@/lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
 import type { HostedCollectiveFieldsFragment, HostedCollectivesQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import { HostFeeStructure } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, HostFeeStructure } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Drawer } from '@/components/Drawer';
-import { HostedAccountProfile } from '@/components/hosted-account-overview/HostedAccountProfile';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { useModal } from '@/components/ModalContext';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
@@ -42,10 +41,12 @@ import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
+import { makePushSubpath } from '../../utils';
 import CollectiveDetails from '../collectives/CollectiveDetails';
 import { cols, type HostedCollectivesDataTableMeta } from '../collectives/common';
 import { metricFilterConfigs, metricFilterSchema, metricFilterToVariables } from '../collectives/metric-filters';
 import { hostedCollectivesQuery } from '../collectives/queries';
+import { AccountDetails } from '../community/AccountDetail';
 
 import { CreateFundModal } from './CreateFundModal';
 
@@ -348,11 +349,24 @@ function HostedFundsList({ accountSlug: hostSlug, subpath }: DashboardSectionPro
 }
 
 export function HostedFunds(props: DashboardSectionProps) {
+  const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
+  const { account } = useContext(DashboardContext);
   const hasAccountProfile = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOSTED_ACCOUNT_OVERVIEW);
   const accountId = props.subpath?.[0];
+  const pushSubpath = makePushSubpath(router);
+
   if (hasAccountProfile && accountId) {
-    return <HostedAccountProfile hostSlug={props.accountSlug} accountId={accountId} />;
+    return (
+      <div className="h-full">
+        <AccountDetails
+          account={{ id: accountId }}
+          host={account}
+          onClose={() => pushSubpath('')}
+          expectedAccountType={AccountType.COLLECTIVE}
+        />
+      </div>
+    );
   }
   return <HostedFundsList {...props} />;
 }
