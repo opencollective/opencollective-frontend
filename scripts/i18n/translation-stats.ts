@@ -176,18 +176,22 @@ const IGNORED: Record<string, readonly string[]> = {
     'Bb2ain', // "Global ({percent}%)" - identisch
     'Changelog', // "Changelog" - etabliertes Lehnwort in de.json
     'Collective.Hero.Host', // "{FiscalHost}: {hostName}" - Komponente übersetzt FiscalHost
+    'community', // "Community" - etabliertes Lehnwort
     'community.openSource', // "Open Source" - Standardbegriff
     'company.blog', // "Blog" - identisch
     'contributions.id', // "#" - identisch
     'ContributionType.Ticket', // "Ticket" - identisch
     'Dashboard', // "Dashboard" - durchgängig in de.json als Lehnwort
     'Details', // "Details" - identisch
+    'editCollective.fiscalHosting', // "Fiscal Hosting" - Produktbegriff
     'editCollective.menu.webhooks', // "Webhooks" - Fachbegriff
     'expense.status', // "Status" - identisch
     'Fields.id', // "ID" - identisch
     'Fields.name', // "Name" - identisch
     'Fields.slug', // "Slug" - Fachbegriff
     'Fields.status', // "Status" - identisch
+    'Fiscalhost', // "Fiscal Host" - Produktbegriff
+    'helpAndSupport.fiscalHosts', // "Fiscal Hosts" - Produktbegriff
     'FormField.optional', // "optional" - identisch
     'forms.optional', // "Optional" - identisch
     'HostApplication.ProjectTypeSelect.code', // "Code" - identisch
@@ -223,6 +227,7 @@ const IGNORED: Record<string, readonly string[]> = {
     'Timezone.UTC', // "UTC" - identisch
     'transactions.import.status', // "Status" - identisch
     'tzMNF3', // "Status" - identisch
+    'updates', // "Updates" - etabliertes Lehnwort
     'VirtualCards.CVV', // "CVV" - identisch
     'VirtualCards.Status', // "Status" - identisch
     'webhook.index', // "Webhook #{index}" - Fachbegriff
