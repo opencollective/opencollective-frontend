@@ -1,21 +1,16 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { FlaskConical, Settings, X } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
-import DismissibleMessage from '../../../DismissibleMessage';
-import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
-import Image from '../../../Image';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
 import {
   DropdownMenu,
@@ -23,7 +18,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
-import { Popover, PopoverAnchor, PopoverContent } from '../../../ui/Popover';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
@@ -53,7 +47,6 @@ export const schema = z.object({
 export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
   const { LoggedInUser } = useLoggedInUser();
   const { account } = React.useContext(DashboardContext);
-  const [showFeedbackModal, setShowFeedbackModal] = React.useState(false);
   const [showSetupGuide, handleSetupGuideToggle] = useSetupGuide();
   const router = useRouter();
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
@@ -198,59 +191,6 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
         actions={
           !isAccountantOnly && (
             <div className="flex gap-2">
-              <Popover open>
-                <PopoverAnchor>
-                  <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setShowFeedbackModal(true)}>
-                    <FlaskConical size={16} />
-                    <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
-                  </Button>
-                </PopoverAnchor>
-                <DismissibleMessage messageId={HELP_MESSAGE.COLLECTIVE_OVERVIEW_WELCOME}>
-                  {({ dismiss }) => (
-                    <PopoverContent align="end" sideOffset={8} className="animate-in fade-in">
-                      <div>
-                        <div className="mb-2 flex items-start gap-3">
-                          <Image
-                            className="h-12 w-12 shrink-0"
-                            alt="Illustration of plant"
-                            width={48}
-                            height={48}
-                            src="/static/images/dashboard.png"
-                            aria-hidden="true"
-                          />
-                          <AlertTitle className="text-lg leading-tight text-balance">
-                            <FormattedMessage
-                              id="PreviewFeatures.CollectiveOverview.Welcome.Title"
-                              defaultMessage="Welcome to your new Collective Overview"
-                            />
-                          </AlertTitle>
-                        </div>
-
-                        <AlertDescription className="mt-1 max-w-prose space-y-2">
-                          <p>
-                            <FormattedMessage
-                              id="PreviewFeatures.CollectiveOverview.Welcome.Description"
-                              defaultMessage="We’ve created this space for you to keep on top of everything happening in your Collective, please let us know how we can make it better!"
-                            />
-                          </p>
-                        </AlertDescription>
-                        <Button size="sm" variant="outline" className="mt-2 w-full" onClick={dismiss}>
-                          <FormattedMessage id="Close" defaultMessage="Close" />
-                        </Button>
-                      </div>
-
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        className="absolute top-1 right-1 text-muted-foreground"
-                        onClick={dismiss}
-                      >
-                        <X size={16} />
-                      </Button>
-                    </PopoverContent>
-                  )}
-                </DismissibleMessage>
-              </Popover>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon-sm" variant="outline">
@@ -320,12 +260,6 @@ export function DefaultOverview({ accountSlug }: DashboardSectionProps) {
           </div>
         )}
       </div>
-      <FeedbackModal
-        open={showFeedbackModal}
-        setOpen={setShowFeedbackModal}
-        feedbackKey={FEEDBACK_KEY.COLLECTIVE_OVERVIEW}
-        title={<FormattedMessage defaultMessage="Give feedback on the Collective Overview" id="3eBgsu" />}
-      />
     </div>
   );
 }

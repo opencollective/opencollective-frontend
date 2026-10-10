@@ -257,6 +257,50 @@ export function BillingProjection(props: BillingProjectionProps) {
           </div>
         )}
 
+        {billing.crowdfunding.feePercent > 0 && (
+          <div className="flex items-center justify-between border-b py-4">
+            <div>
+              <div className="text-sm leading-5 font-medium">
+                <FormattedMessage defaultMessage="Crowdfunding fee" id="HK+rTh" />
+              </div>
+              <div className="text-xs leading-4 text-slate-700">
+                <FormattedMessage
+                  defaultMessage="{feePercent}% of {amount} in crowdfunding contributions"
+                  id="R40Psk"
+                  values={{
+                    feePercent: billing.crowdfunding.feePercent,
+                    amount: (
+                      <FormattedMoneyAmount
+                        showCurrencyCode={false}
+                        amount={billing.crowdfunding.totalAmount.valueInCents}
+                        currency={billing.crowdfunding.totalAmount.currency}
+                      />
+                    ),
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 font-bold">
+              <FormattedMoneyAmount
+                showCurrencyCode={false}
+                amount={billing.crowdfunding.fee.valueInCents}
+                currency={billing.crowdfunding.fee.currency}
+              />
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info size={16} />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-64">
+                  <FormattedMessage
+                    defaultMessage="Your plan does not include platform tips. A fee is charged instead on contributions received by card, PayPal or bank transfer, net of refunds."
+                    id="zivv1n"
+                  />
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+        )}
+
         <div className="mt-4 flex items-center justify-end gap-2">
           <div className="text-base">
             <FormattedMessage

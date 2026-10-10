@@ -74,12 +74,12 @@ jobs:
 
     services:
       redis:
-        image: redis@sha256:6f81e8915c60b065a524e6967e0ad1c639ba6efa84d669f823683ea04d9150ee
+        image: redis@sha256:2c2dff791878316e3b083188be0d578423b24813cdda5de0e80ea4f7b3e6bfd6
         ports:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:16.15@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
+        image: postgres:16.15@sha256:65b16a8b326e0cfbdf33fa7e783f2a0cb352a61448616ccccfd616ef42aa0f65
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -108,9 +108,7 @@ jobs:
         run: |
           sudo apt-get install \
           `# Cypress dependencies - see https://docs.cypress.io/app/get-started/install-cypress#UbuntuDebian` \
-          libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb \
-          `# Postgres client` \
-          postgresql-client-16
+          libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb
 
       - name: Setup S3 bucket
         env:
@@ -256,7 +254,10 @@ jobs:
 
       # Seed DB
 
+      # Run pg_restore & co from the postgres:16 image, matching the PostgreSQL 16 service whatever client the runner ships
       - name: Setup DB
+        env:
+          USE_DOCKER: true
         run: ./scripts/setup_db.sh
 
       # Run tests

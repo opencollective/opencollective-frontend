@@ -838,7 +838,10 @@ function buildFormSchema(
         }
 
         return v.length > 0;
-      }, requiredMessage),
+      }, requiredMessage)
+      .refine(v => !v || v.length <= 255, {
+        message: 'Expense description is too long (max 255 characters).',
+      }),
     reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
     privateMessage: z.string().optional().nullable(),

@@ -109,20 +109,6 @@ function completeProfileIfRequired({ token, loggedInUser, completeProfile, name 
 }
 
 /**
- * Returns all the email sent by the API
- */
-Cypress.Commands.add('getInbox', () => {
-  return cy
-    .request({
-      url: `${Cypress.env('MAILDEV_URL')}/email`,
-      method: 'GET',
-    })
-    .then(({ body }) => {
-      return body;
-    });
-});
-
-/**
  * Open an email on Mailpit. Resolves the email message.
  *
  * API must be configured to use maildev

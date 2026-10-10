@@ -45,10 +45,8 @@ import Avatar from '../Avatar';
 import Link from '../Link';
 import { CustomPaymentMethodInstructions } from '../manual-payment-provider/CustomPaymentMethodInstructions';
 import { getManualPaymentProviderIconComponent } from '../manual-payment-provider/ManualPaymentProviderIcon';
-import { Survey, SURVEY_KEY } from '../Survey';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { toast } from '../ui/useToast';
 
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
@@ -174,14 +172,12 @@ class ContributionFlowSuccess extends React.Component<
   {
     paymentIntentResult: PaymentIntentResult | null;
     loaded: boolean;
-    surveyShown: boolean;
     successTracked: boolean;
   }
 > {
   state = {
     paymentIntentResult: null,
     loaded: false,
-    surveyShown: false,
     successTracked: false,
   };
 
@@ -210,19 +206,9 @@ class ContributionFlowSuccess extends React.Component<
       router: { query: queryParams },
       data: { order },
       intl,
-      LoggedInUser,
     } = this.props;
 
     this.trackSuccess();
-
-    // Show survey for logged-in users on non-pending orders (only once)
-    if (LoggedInUser && order && order.status !== ORDER_STATUS.PENDING && !this.state?.surveyShown) {
-      this.setState({ surveyShown: true });
-      toast({
-        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
-        duration: 20000,
-      });
-    }
 
     const paymentIntentResult = this.state?.paymentIntentResult;
     if (order && paymentIntentResult) {
