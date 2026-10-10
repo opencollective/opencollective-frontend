@@ -251,6 +251,7 @@ const TRUSTED_DOMAINS = [
   'oficonsortium.org',
   'giftcollective.nz',
   'metagov.org',
+  'mangabaka.org',
 ];
 
 export const isTrustedRedirectURL = (url: URL) => {
