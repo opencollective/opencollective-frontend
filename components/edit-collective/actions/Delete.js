@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { getErrorFromGraphqlException } from '@/lib/errors';
-import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
+import { gql } from '@/lib/graphql/helpers';
 
 import MessageBox from '@/components/MessageBox';
 
@@ -16,17 +16,9 @@ import { Button } from '../../ui/Button';
 import { withUser } from '../../UserProvider';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
-const deleteCollectiveMutation = gqlV1 /* GraphQL */ `
-  mutation DeleteCollective($id: Int!) {
-    deleteCollective(id: $id) {
-      id
-    }
-  }
-`;
-
-const deleteUserCollectiveMutation = gqlV1 /* GraphQL */ `
-  mutation DeleteUserCollective($id: Int!) {
-    deleteUserCollective(id: $id) {
+const deleteAccountMutation = gql`
+  mutation DeleteAccount($account: AccountReferenceInput!) {
+    deleteAccount(account: $account) {
       id
     }
   }
@@ -37,16 +29,13 @@ const { PROJECT, EVENT } = CollectiveType;
 const DeleteCollective = ({ collective, ...props }) => {
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
-  const [deleteCollective] = useMutation(deleteCollectiveMutation, { context: API_V1_CONTEXT });
-  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation, { context: API_V1_CONTEXT });
+  const [deleteAccount] = useMutation(deleteAccountMutation);
 
   const handleDelete = async () => {
     try {
       setDeleteStatus({ ...deleteStatus, deleting: true });
-      if (collective.type === 'USER') {
-        await deleteUserCollective({ variables: { id: collective.id } });
-      } else {
-        await deleteCollective({ variables: { id: collective.id } });
+      await deleteAccount({ variables: { account: { legacyId: collective.id } } });
+      if (collective.type !== 'USER') {
         await props.refetchLoggedInUser();
       }
       await props.router.push(`/deleteCollective/confirmed?type=${collective.type}`);
