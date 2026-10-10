@@ -99,7 +99,7 @@ OSC is a tech-first nonprofit. We are one node in a growing international networ
 
 ### Learn more
 
-- OSC's [Website](https://www.oscollective.org/), [mission & values](https://docs.oscollective.org/mission-values-and-strategy), and [strategy](https://blog.opencollective.com/open-source-collectives-strategy-2022-2025/)
+- OSC's [Website](https://www.oscollective.org/), [mission & values](https://docs.oscollective.org/about-osc/what-is-osc), and [strategy](https://blog.opencollective.com/open-source-collectives-strategy-2022-2025/)
 - [What is Open Source Collective (video)](https://www.youtube.com/watch?v=ubfYuAMm3_c)
 - [What is Open Collective (video)](https://www.youtube.com/@OpenCollective)
 - [Our documentation](https://docs.oscollective.org/)
