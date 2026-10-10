@@ -35,7 +35,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import UploadedFilePreview from '../../UploadedFilePreview';
 import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
 import { Step } from '../SubmitExpenseFlowSteps';
-import { type ExpenseForm, generateGrantTitle, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
+import {
+  type ExpenseForm,
+  generateGrantTitle,
+  isValidRecurrenceEndAt,
+  RecurrenceFrequencyOption,
+  YesNoOption,
+} from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 
@@ -597,6 +603,9 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
 
   const recurrenceFrequency = isEditingRecurrence ? recurrenceFrequencyEdit : props.form.values.recurrenceFrequency;
   const recurrenceEndAt = isEditingRecurrence ? recurrenceEndAtEdit : props.form.values.recurrenceEndAt;
+  // The end date error is only surfaced once the field is touched or the form has been submitted
+  const recurrenceEndAtError =
+    (props.form.touched.recurrenceEndAt || props.form.submitCount > 0) && props.form.errors.recurrenceEndAt;
 
   return (
     <div className="mt-4">
@@ -700,7 +709,14 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
                   type="date"
                   value={recurrenceEndAt}
                   onChange={e => setRecurrenceEndAtEdit(e.target.value)}
+                  aria-invalid={Boolean(recurrenceEndAtError)}
+                  aria-describedby={recurrenceEndAtError ? 'expenseRecurrenceEndAt-error' : undefined}
                 />
+                {recurrenceEndAtError && (
+                  <p id="expenseRecurrenceEndAt-error" className="mt-1 text-sm text-red-600">
+                    {recurrenceEndAtError}
+                  </p>
+                )}
               </React.Fragment>
             )}
 
@@ -708,9 +724,22 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
               <Button
                 disabled={props.form.initialLoading || props.form.isSubmitting}
                 onClick={() => {
-                  props.form.setFieldValue('recurrenceEndAt', recurrenceEndAtEdit);
-                  props.form.setFieldValue('recurrenceFrequency', recurrenceFrequencyEdit);
-                  setIsEdittingRecurrence(false);
+                  const isRecurrenceEndAtValid = isValidRecurrenceEndAt(recurrenceFrequencyEdit, recurrenceEndAtEdit);
+                  // Save both values at once and validate them, so an invalid end date gets a form error
+                  props.form.setValues(
+                    values => ({
+                      ...values,
+                      recurrenceFrequency: recurrenceFrequencyEdit,
+                      recurrenceEndAt: recurrenceEndAtEdit,
+                    }),
+                    true,
+                  );
+                  if (isRecurrenceEndAtValid) {
+                    setIsEdittingRecurrence(false);
+                  } else {
+                    // Keep the editor open: the end date error is only rendered inside it
+                    props.form.setFieldTouched('recurrenceEndAt', true, false);
+                  }
                 }}
                 variant="outline"
               >

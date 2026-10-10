@@ -33,6 +33,7 @@ import type {
   InviteExpenseFromDashboardMutationVariables,
   LocationInput,
   MakeOptional,
+  RecurringExpenseInput,
   RecurringExpenseInterval,
 } from '../../lib/graphql/types/v2/graphql';
 import {
@@ -189,6 +190,7 @@ type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setF
   setFieldValue: <F extends Path<ExpenseFormValues>>(
     field: F,
     value: PathValue<ExpenseFormValues, F>,
+    shouldValidate?: boolean,
   ) => Promise<void> | Promise<FormikErrors<ExpenseFormValues>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getFieldProps: <F extends Path<ExpenseFormValues>>(field: F) => FieldInputProps<any>;
@@ -845,6 +847,13 @@ function buildFormSchema(
     reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
     privateMessage: z.string().optional().nullable(),
+    recurrenceFrequency: z.nativeEnum(RecurrenceFrequencyOption).optional(),
+    recurrenceEndAt: z
+      .string()
+      .nullish()
+      .refine(recurrenceEndAt => isValidRecurrenceEndAt(values.recurrenceFrequency, recurrenceEndAt), {
+        message: 'End date must be in the future',
+      }),
     referenceCurrency: z
       .nativeEnum(Currency)
       .optional()
@@ -1721,6 +1730,47 @@ const getPayeeForInvite = (values: ExpenseFormValues) => {
   }
 };
 
+/**
+ * A recurrence end date is optional (leaving it empty means an open-ended recurrence), but when set
+ * it must be a valid date in the future. This is the rule used by the form schema and by the
+ * recurrence editor (`SummarySection`) to validate the values before saving them.
+ */
+export function isValidRecurrenceEndAt(
+  recurrenceFrequency?: RecurrenceFrequencyOption | null,
+  recurrenceEndAt?: string | null,
+): boolean {
+  if (!recurrenceFrequency || recurrenceFrequency === RecurrenceFrequencyOption.NONE) {
+    return true;
+  }
+  if (!recurrenceEndAt) {
+    return true; // No end date means open-ended recurrence
+  }
+  const endsAt = dayjs(recurrenceEndAt);
+  return endsAt.isValid() && endsAt.isAfter(dayjs().startOf('day'));
+}
+
+/**
+ * Builds the `recurring` input for the `createExpense` mutation from the form values.
+ *
+ * An empty end date means open-ended recurrence (`endsAt: null`). Invalid dates are
+ * defensively mapped to `null`: `dayjs(undefined).toDate()` returns the current time,
+ * which previously created recurring expenses that could never recur.
+ */
+export function getRecurringExpenseInput(
+  recurrenceFrequency?: RecurrenceFrequencyOption,
+  recurrenceEndAt?: string,
+): RecurringExpenseInput | undefined {
+  if (!recurrenceFrequency || recurrenceFrequency === RecurrenceFrequencyOption.NONE) {
+    return undefined;
+  }
+
+  const endsAt = recurrenceEndAt ? dayjs(recurrenceEndAt) : null;
+  return {
+    interval: recurrenceFrequency as unknown as RecurringExpenseInterval,
+    endsAt: endsAt && endsAt.isValid() ? endsAt.toDate() : null,
+  };
+}
+
 type ExpenseFormStartOptions = {
   duplicateExpense?: boolean;
   expenseId?: number;
@@ -1962,10 +2012,7 @@ export function useExpenseForm(opts: {
                 expenseCreateInput: expenseInput,
                 ...(values.recurrenceFrequency !== RecurrenceFrequencyOption.NONE
                   ? {
-                      recurring: {
-                        interval: values.recurrenceFrequency as unknown as RecurringExpenseInterval,
-                        endsAt: dayjs(values.recurrenceEndAt).toDate(),
-                      },
+                      recurring: getRecurringExpenseInput(values.recurrenceFrequency, values.recurrenceEndAt),
                     }
                   : {}),
               },
