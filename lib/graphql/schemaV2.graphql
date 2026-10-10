@@ -26249,6 +26249,26 @@ type Mutation {
   ): Account!
 
   """
+  Archive an account and its children: unhosts it, cancels its active contributions and its unprocessed expenses. Scope: "account".
+  """
+  archiveAccount(
+    """
+    Reference to the Account to be archived.
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
+  Unarchive an account. Scope: "account".
+  """
+  unarchiveAccount(
+    """
+    Reference to the Account to be unarchived.
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
   Adds or removes a policy on a given account. Scope: "account".
   """
   deleteAccount(
