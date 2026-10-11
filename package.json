@@ -247,7 +247,7 @@
     "eslint-plugin-n": "18.4.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.0",
-    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
     "eslint-plugin-styled-components-a11y": "^2.2.1",
     "file-loader": "^6.2.0",
     "globals": "^17.0.0",
