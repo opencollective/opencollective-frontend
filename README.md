@@ -118,15 +118,18 @@ entrypoints remain supported; the parent workspace keeps separate installs.
 Remote Cache uses GitHub OIDC and the existing `TURBO_TEAM` Actions variable.
 In Vercel team Settings → Build and Deployment → OIDC Policies for CLI Access,
 create Turborepo CLI policies for `opencollective/opencollective-api` and
-`opencollective/opencollective-frontend`, restricted to the `main` branch. These
-repository policies must cover CI and E2E workflows; frontend also uses the
-`e2e-prepare.yml` reusable workflow. Leave the audience at its default.
+`opencollective/opencollective-frontend`. Keep each policy restricted to its
+repository and CI/E2E workflows, including frontend's `e2e-prepare.yml` reusable
+workflow. Allow repository branch pushes and pull-request claims; remove any
+main-only branch restriction. API E2E runs on branch pushes. Leave the audience
+at its default. Update existing policies instead of adding overlapping ones.
 
 Jobs grant `id-token: write`. Vercel's setup action exchanges GitHub's OIDC token
 for a short-lived `TURBO_TOKEN` before Turbo runs and revokes it when the job ends.
 No `TURBO_TOKEN` repository secret is required. Authentication and remote cache
-reads/writes run only on trusted pushes to `main`; PRs and runs without
-`TURBO_TEAM` use local caching. An OIDC policy mismatch fails the setup step.
+reads/writes run on repository branch pushes and PRs whose head repository
+matches the workflow repository. Fork PRs, tag pushes, other events, and runs
+without `TURBO_TEAM` use local caching. An OIDC policy mismatch fails the setup step.
 Cache entries include source, lockfile, environment configuration, and declared
 outputs.
 

@@ -28,7 +28,13 @@ permissions:
 env:
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   TURBO_AGENT_GUIDANCE: 'false'
-  TURBO_CACHE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TURBO_TEAM != '' && 'local:rw,remote:rw' || 'local:rw' }}
+  # Repository branch pushes and same-repository PRs share the remote cache.
+  # Fork PRs, tag pushes, and runs without TURBO_TEAM stay local.
+  TURBO_CACHE: >-
+    ${{ vars.TURBO_TEAM != '' &&
+        ((github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')) ||
+         (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) &&
+        'local:rw,remote:rw' || 'local:rw' }}
   TZ: UTC
   OC_ENV: ci
   NODE_ENV: test
