@@ -21,7 +21,7 @@ cd ../opencollective-pdf && npm run build
 cd opencollective-frontend && npm run cypress:install
 ```
 
-**Infrastructure** - Postgres, Mailpit, and MinIO must already be running (provided by the devcontainer compose, or locally on the usual ports). Install Valkey if missing (`apt-get install valkey-server`, `brew install valkey`; `redis-server` also works); the script starts its own instance on port `6380`.
+**Infrastructure** - Postgres, Mailpit, and MinIO must already be running (provided by the devcontainer compose, or locally on the usual ports). Install Valkey if missing (`apt-get install valkey-server`, `brew install valkey`); Redis works too. The script needs a server and its CLI (`valkey-server` and `valkey-cli`, or `redis-server` and `redis-cli`) and starts its own instance on port `6380`.
 
 ## Running tests
 
