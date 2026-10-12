@@ -1,7 +1,6 @@
 import React from 'react';
-import type { ApolloCache, MutationFunction } from '@apollo/client';
-import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, get, pick } from 'lodash-es';
+import { useApolloClient, useQuery } from '@apollo/client';
+import { cloneDeep, invert } from 'lodash-es';
 import { Info, PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
@@ -12,10 +11,9 @@ import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { WebhookEvents } from '../../../lib/constants/notificationEvents';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
-import { compose } from '../../../lib/utils';
-import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
+import type { ActivityType, EditCollectiveWebhooksQuery } from '@/lib/graphql/types/v2/graphql';
 import injectIntl from '@/lib/injectIntl';
 
 import { getI18nLink } from '../../I18nFormatters';
@@ -85,16 +83,26 @@ const WEBHOOK_EVENT_GROUPS = defineMessages({
   },
 });
 
+// The UI uses the activity values (e.g. `collective.expense.created`), GraphQL v2 uses the enum names
+const ACTIVITY_TYPE_BY_EVENT: Record<string, string> = Object.fromEntries(
+  Object.entries(WebhookEvents).map(([key, value]) => [value, key === 'ALL' ? 'ACTIVITY_ALL' : key]),
+);
+const EVENT_BY_ACTIVITY_TYPE = invert(ACTIVITY_TYPE_BY_EVENT);
+
+const toActivityType = (type: string) => (ACTIVITY_TYPE_BY_EVENT[type] ?? type) as ActivityType;
+const fromActivityType = (activityType: string) => EVENT_BY_ACTIVITY_TYPE[activityType] ?? activityType;
+
+const cleanWebhookUrl = value => {
+  return value ? value.trim().replace(/https?:\/\//, '') : '';
+};
+
 interface Notification {
   id?: string;
   type: string;
-  active?: boolean;
   webhookUrl: string;
 }
 
-interface EditWebhooksResponse {
-  editWebhooks: Notification[];
-}
+type WebhooksAccount = EditCollectiveWebhooksQuery['account'];
 
 interface OwnProps {
   collectiveSlug: string;
@@ -102,11 +110,9 @@ interface OwnProps {
 
 interface Props extends OwnProps {
   intl: IntlShape;
-  data: { Collective: GraphQLV1Collective; loading: boolean };
-  editWebhooks: (args: {
-    collectiveId: number;
-    notifications: Notification[];
-  }) => Promise<{ data: EditWebhooksResponse }>;
+  data: { account: WebhooksAccount; loading: boolean };
+  webhooks: Notification[];
+  saveWebhooks: (webhooks: Notification[]) => Promise<Notification[]>;
 }
 
 interface State {
@@ -136,16 +142,14 @@ class Webhooks extends React.Component<Props, State> {
   }
 
   getWebhooksFromProps = props => {
-    return get(props, 'data.Collective.notifications', EMPTY_WEBHOOKS);
+    return props.webhooks;
   };
 
   validateWebhookUrl = value => {
     return isURL(value);
   };
 
-  cleanWebhookUrl = value => {
-    return value ? value.trim().replace(/https?:\/\//, '') : '';
-  };
+  cleanWebhookUrl = cleanWebhookUrl;
 
   getUnsupportedWebhookEvents = (collective): Set<string> => {
     const removeSet = new Set([WebhookEvents.COLLECTIVE_TRANSACTION_CREATED]); // Deprecating this event, see https://github.com/opencollective/opencollective/issues/7162
@@ -240,11 +244,10 @@ class Webhooks extends React.Component<Props, State> {
   handleSubmit = async () => {
     this.setState({ status: 'loading' });
     const { webhooks } = this.state;
-    const notifications = webhooks.map(webhook => pick(webhook, ['type', 'webhookUrl', 'id']));
 
     try {
-      const result = await this.props.editWebhooks({ collectiveId: this.props.data.Collective.id, notifications });
-      this.setState({ modified: false, status: 'saved', webhooks: cloneDeep(result.data.editWebhooks) });
+      const savedWebhooks = await this.props.saveWebhooks(webhooks);
+      this.setState({ modified: false, status: 'saved', webhooks: cloneDeep(savedWebhooks) });
       setTimeout(() => {
         this.setState({ status: null });
       }, 3000);
@@ -302,7 +305,7 @@ class Webhooks extends React.Component<Props, State> {
                 inputId={`event-type-select-${index}`}
                 minWidth={300}
                 isSearchable={false}
-                options={this.getEventsOptions(data.Collective)}
+                options={this.getEventsOptions(data.account)}
                 value={{ label: i18nWebhookEventType(intl, webhook.type), value: webhook.type }}
                 onChange={({ value }) => this.editWebhook(index, 'type', value)}
               />
@@ -319,7 +322,7 @@ class Webhooks extends React.Component<Props, State> {
               )}
             </div>
           </div>
-          {data.Collective.isHost &&
+          {data.account.isHost &&
             [WebhookEvents.COLLECTIVE_EXPENSE_CREATED, WebhookEvents.COLLECTIVE_TRANSACTION_CREATED].includes(
               webhook.type,
             ) && (
@@ -376,7 +379,7 @@ class Webhooks extends React.Component<Props, State> {
             <FormattedMessage
               defaultMessage="Webhooks for {collective}"
               id="RHr16v"
-              values={{ collective: data.Collective.name || `@${data.Collective.slug}` }}
+              values={{ collective: data.account.name || `@${data.account.slug}` }}
             />
           </h3>
           <Button onClick={this.addWebhook}>
@@ -415,76 +418,120 @@ class Webhooks extends React.Component<Props, State> {
   }
 }
 
-const editCollectiveWebhooksQuery = gqlV1 /* GraphQL */ `
-  query EditCollectiveWebhooks($collectiveSlug: String) {
-    Collective(slug: $collectiveSlug) {
+const editCollectiveWebhooksQuery = gql`
+  query EditCollectiveWebhooks($slug: String!) {
+    account(slug: $slug) {
       id
       name
       type
       slug
       isHost
       features {
+        id
         RECEIVE_EXPENSES
         FUNDS_GRANTS_MANAGEMENT
         VIRTUAL_CARDS
         RECEIVE_FINANCIAL_CONTRIBUTIONS
         UPDATES
       }
-      notifications(channel: "webhook") {
-        id
-        type
-        active
-        webhookUrl
+      webhooks(limit: 100) {
+        nodes {
+          id
+          activityType
+          webhookUrl
+        }
       }
     }
   }
 `;
 
-const editCollectiveWebhooksMutation = gqlV1 /* GraphQL */ `
-  mutation EditCollectiveWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
-    editWebhooks(collectiveId: $collectiveId, notifications: $notifications) {
+const createWebhookMutation = gql`
+  mutation CreateWebhook($webhook: WebhookCreateInput!) {
+    createWebhook(webhook: $webhook) {
       id
-      type
-      active
-      webhookUrl
     }
   }
 `;
 
-const addEditCollectiveWebhooksData = graphql<Props, GraphQLV1Collective, { collectiveSlug: string }>(
-  editCollectiveWebhooksQuery,
-  {
-    options: {
-      context: API_V1_CONTEXT,
-    },
-  },
-);
+const updateWebhookMutation = gql`
+  mutation UpdateWebhook($webhook: WebhookUpdateInput!) {
+    updateWebhook(webhook: $webhook) {
+      id
+    }
+  }
+`;
 
-const addEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation, {
-  options: {
-    context: API_V1_CONTEXT,
-  },
-  props: ({ mutate, ownProps }: { mutate: MutationFunction; ownProps: OwnProps }) => ({
-    editWebhooks: (variables: { collectiveId: number; notifications: Notification[] }) =>
-      mutate({
-        variables,
-        update: (cache: ApolloCache<GraphQLV1Collective>, { data }: { data: EditWebhooksResponse }) => {
-          const queryResult = cache.readQuery<{ Collective: GraphQLV1Collective }, { collectiveSlug: string }>({
-            query: editCollectiveWebhooksQuery,
-            variables: { collectiveSlug: ownProps.collectiveSlug },
+const deleteWebhookMutation = gql`
+  mutation DeleteWebhook($webhook: WebhookReferenceInput!) {
+    deleteWebhook(webhook: $webhook) {
+      id
+    }
+  }
+`;
+
+const getWebhooksFromAccount = (account: WebhooksAccount): Notification[] =>
+  account?.webhooks.nodes.map(webhook => ({
+    id: webhook.id,
+    type: fromActivityType(webhook.activityType),
+    webhookUrl: webhook.webhookUrl,
+  })) ?? EMPTY_WEBHOOKS;
+
+const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
+  const client = useApolloClient();
+  const { data, loading, refetch } = useQuery(editCollectiveWebhooksQuery, {
+    variables: { slug: props.collectiveSlug },
+  });
+  const webhooks = React.useMemo(() => getWebhooksFromAccount(data?.account), [data?.account]);
+
+  // Applies the difference between the saved webhooks and the edited list
+  const saveWebhooks = async (editedWebhooks: Notification[]) => {
+    const savedWebhooks = new Map(webhooks.map(webhook => [webhook.id, webhook]));
+    const keptIds = new Set(editedWebhooks.map(webhook => webhook.id).filter(Boolean));
+    let error;
+    try {
+      for (const webhook of webhooks) {
+        if (!keptIds.has(webhook.id)) {
+          await client.mutate({ mutation: deleteWebhookMutation, variables: { webhook: { id: webhook.id } } });
+        }
+      }
+
+      for (const webhook of editedWebhooks) {
+        const values = {
+          activityType: toActivityType(webhook.type),
+          webhookUrl: `https://${cleanWebhookUrl(webhook.webhookUrl)}`,
+        };
+        const saved = savedWebhooks.get(webhook.id);
+        if (!saved) {
+          await client.mutate({
+            mutation: createWebhookMutation,
+            variables: { webhook: { account: { id: data.account.id }, ...values } },
           });
+        } else if (
+          saved.type !== webhook.type ||
+          cleanWebhookUrl(saved.webhookUrl) !== cleanWebhookUrl(webhook.webhookUrl)
+        ) {
+          await client.mutate({
+            mutation: updateWebhookMutation,
+            variables: { webhook: { id: webhook.id, ...values } },
+          });
+        }
+      }
+    } catch (e) {
+      error = e;
+    }
 
-          if (queryResult) {
-            cache.writeQuery<{ Collective: GraphQLV1Collective & { notifications: Notification[] } }>({
-              query: editCollectiveWebhooksQuery,
-              data: { Collective: { ...queryResult.Collective, notifications: data.editWebhooks } },
-            });
-          }
-        },
-      }),
-  }),
-});
+    // Always reload, as some changes may have been saved before an error
+    const result = await refetch();
+    if (error) {
+      throw error;
+    }
 
-const addGraphql = compose(addEditCollectiveWebhooksData, addEditCollectiveWebhooksMutation);
+    return getWebhooksFromAccount(result.data.account);
+  };
 
-export default injectIntl(addGraphql(Webhooks));
+  return (
+    <Webhooks {...props} data={{ account: data?.account, loading }} webhooks={webhooks} saveWebhooks={saveWebhooks} />
+  );
+};
+
+export default injectIntl(WebhooksWithData);
