@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import type { FiltersToVariables } from '@/lib/filters/filter-types';
 import { limit, offset } from '@/lib/filters/schemas';
+import { gql } from '@/lib/graphql/helpers';
 import type { CommunityAccountDetailQuery, TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
@@ -32,7 +33,7 @@ import { transactionsTableQuery } from '../../transactions/queries';
 import type { TransactionsTableProps } from '../../transactions/TransactionsTable';
 import TransactionsTable from '../../transactions/TransactionsTable';
 import type { TransactionsTableQueryNode } from '../../transactions/types';
-import { accountMoneyMovementsSummaryQuery, getCountForView, type MoneyMovementsView } from '../common';
+import { type MoneyMovementsView } from '../common';
 
 const schema = z.object({
   limit: limit.default(15),
@@ -85,6 +86,57 @@ type MoneyMovementsProps = {
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
 };
 
+/**
+ * Per-tab metadata for Money Movements: the pending payment-request count and
+ * one total per view preset. The preset totals are scoped exactly like the
+ * table query (`account` = both sides of the account's money movements), so the
+ * badges match the rows rather than the `FromCollectiveId`-keyed community
+ * summary used by the community Transactions tab.
+ */
+const accountDetailMoneyMovementsMetadataQuery = gql`
+  query AccountDetailMoneyMovementsMetadata($accountId: String!, $hostSlug: String!) {
+    account(id: $accountId) {
+      id
+      pendingExpenses: expenses(
+        status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
+        direction: SUBMITTED
+        host: { slug: $hostSlug }
+      ) {
+        totalCount
+      }
+    }
+    ALL: transactions(
+      account: [{ id: $accountId }]
+      host: { slug: $hostSlug }
+      includeIncognitoTransactions: true
+      includeChildrenTransactions: false
+      includeDebts: true
+    ) {
+      totalCount
+    }
+    CONTRIBUTIONS: transactions(
+      account: [{ id: $accountId }]
+      host: { slug: $hostSlug }
+      includeIncognitoTransactions: true
+      includeChildrenTransactions: false
+      includeDebts: true
+      kind: [ADDED_FUNDS, CONTRIBUTION]
+    ) {
+      totalCount
+    }
+    PAYOUTS: transactions(
+      account: [{ id: $accountId }]
+      host: { slug: $hostSlug }
+      includeIncognitoTransactions: true
+      includeChildrenTransactions: false
+      includeDebts: true
+      kind: [EXPENSE]
+    ) {
+      totalCount
+    }
+  }
+`;
+
 export function MoneyMovements({
   account,
   hostSlug,
@@ -93,13 +145,12 @@ export function MoneyMovements({
 }: MoneyMovementsProps) {
   const intl = useIntl();
   const { account: dashboardAccount } = React.useContext(DashboardContext);
-  const { data: summaryData } = useQuery(accountMoneyMovementsSummaryQuery, {
+  const { data: metadata } = useQuery(accountDetailMoneyMovementsMetadataQuery, {
     variables: { accountId: account?.id, hostSlug },
     skip: !account?.id || !hostSlug,
     fetchPolicy: 'cache-and-network',
   });
-  const transactionSummary = summaryData?.account?.communityStats?.transactionSummary;
-  const pendingExpenseCount = summaryData?.account?.pendingExpenses?.totalCount || 0;
+  const pendingExpenseCount = metadata?.account?.pendingExpenses?.totalCount || 0;
 
   const redirectRelatedTransactionsTo = getDashboardRoute(
     dashboardAccount,
@@ -177,9 +228,11 @@ export function MoneyMovements({
     [defaultGetActions],
   );
 
+  // One total per preset (the metadata query aliases match the view ids); a
+  // loaded `0` displays, `undefined` keeps the badge in its loading state.
   const viewsWithCount = React.useMemo(
-    () => views.map(view => getCountForView(view, transactionSummary)),
-    [views, transactionSummary],
+    () => views.map(view => ({ ...view, count: metadata?.[view.id]?.totalCount })),
+    [views, metadata],
   );
 
   return (
