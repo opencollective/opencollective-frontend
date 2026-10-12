@@ -1193,6 +1193,7 @@
   "convertToCollective.description": "Wandle {name} in ein Kollektiv um. Dadurch kannst du Geldverwaltung und Fiscal Hosting nicht mehr nutzen und musst dich bei einem Fiscal Host bewerben.",
   "convertToCollective.error.title": "Umwandlung fehlgeschlagen",
   "convertToCollective.success": "Erfolgreich in Kollektiv umgewandelt",
+  "convertToOrg.block.archived": "This account has been archived. Please unarchive it before converting to an Organization.",
   "convertToOrg.block.balanceNotEmpty": "Dieses Konto hat noch einen Kontostand. Bitte leere es, bevor du es in eine Organisation umwandelst.",
   "convertToOrg.block.hosted": "Du musst deinen Fiscal Host verlassen, bevor du in eine Organisation umwandelst.",
   "convertToOrg.button": "In Organisation umwandeln",
