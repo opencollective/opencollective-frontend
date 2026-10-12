@@ -163,8 +163,11 @@ jobs:
           rsync -a --exclude cache/ .next/ /tmp/frontend-next/
           test -f /tmp/frontend-next/BUILD_ID
           test -f /tmp/frontend-next/routes-manifest.json
-          # The build also writes the pdf.js worker and cMaps to public/ (gitignored, see next.config.js):
-          # without them, PDF previews fail in the e2e jobs that reuse this build.
+          # `npm run build` also writes outside .next/: next.config.js copies the pdf.js worker and cMaps into
+          # public/static/ (gitignored). Production builds and serves from the same directory (server/index.js
+          # starts Next from the project root), so it serves them from there. The e2e jobs don't build: they
+          # start from a fresh checkout and get only what this artifact carries, so these generated files must
+          # travel with .next/ (restored in e2e.yml), or the e2e server answers 404 for the worker.
           mkdir -p /tmp/frontend-next/_generated-public/static/scripts
           cp public/static/scripts/pdf.worker.min.mjs /tmp/frontend-next/_generated-public/static/scripts/
           rsync -a public/static/cmaps /tmp/frontend-next/_generated-public/static/

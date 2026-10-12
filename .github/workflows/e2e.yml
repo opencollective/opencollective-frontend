@@ -238,6 +238,8 @@ jobs:
           rsync -a --exclude _generated-public/ "${next_root}/" .next/
           test -f .next/BUILD_ID
           test -f .next/routes-manifest.json
+          # Put back the files the build generated in public/ (see "Stage Next.js build" in ci.yml), so this
+          # checkout serves what production serves from its build directory
           rsync -a "${next_root}/_generated-public/" public/
           test -f public/static/scripts/pdf.worker.min.mjs
 
