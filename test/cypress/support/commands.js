@@ -808,10 +808,25 @@ function getTokenFromRedirectUrl(url) {
 }
 
 /**
+ * Obtain a session token for authenticated API fixture requests.
  * @param {object} user - should have `email` and `id` set
  */
 export function signinRequestAndReturnToken(user, redirect) {
-  return signinRequest(user, redirect, true).then(({ body }) => getTokenFromRedirectUrl(body.redirect));
+  return signinRequest(user, redirect, true)
+    .then(({ body }) => {
+      const loginToken = getTokenFromRedirectUrl(body.redirect);
+      return cy.request({
+        url: '/api/users/exchange-login-token',
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          authorization: `Bearer ${loginToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: {},
+      });
+    })
+    .then(({ body }) => body.token);
 }
 
 function graphqlQuery(token, body) {
