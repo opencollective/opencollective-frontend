@@ -68,10 +68,12 @@ import {
   AccountDetailView,
   getCollectiveTypeIcon,
   HOSTED_ACCOUNT_TYPES,
+  isHostedAccountData,
   KYCStatusBadge,
   type MoneyMovementsView,
   TaxFormBadge,
 } from './common';
+import { EditCollectiveSettingsModal } from './EditCollectiveSettingsModal';
 import { communityAccountDetailQuery } from './queries';
 
 const convertOrganizationMutation = gql`
@@ -114,6 +116,8 @@ export function AccountDetails(props: AccountDetailsProps) {
   const [displayConvertToVendor, setDisplayConvertToVendor] = React.useState(false);
   const [openLegalDocument, setOpenLegalDocument] = React.useState(false);
   const [displayArchiveConfirmation, setDisplayArchiveConfirmation] = React.useState(false);
+  // Shared by the Overview tab's Details pencil and the header More Actions item.
+  const [isEditSettingsOpen, setEditSettingsOpen] = React.useState(false);
   // Seeds the hosted Money Movements tab from overview links (e.g. "total received" -> Contributions).
   const [moneyMovementsView, setMoneyMovementsView] = React.useState<MoneyMovementsView | undefined>(undefined);
 
@@ -360,6 +364,7 @@ export function AccountDetails(props: AccountDetailsProps) {
           handleTransactionTableRowClick={handleTransactionTableRowClick}
           handleTabChange={handleTabChange}
           onEditVendor={() => setEditVendor(account as unknown as VendorFieldsFragment)}
+          onEditSettings={() => setEditSettingsOpen(true)}
         />
       )}
       {selectedTab === AccountDetailView.TRANSACTIONS && !isHostedAccount && account && (
@@ -575,6 +580,15 @@ export function AccountDetails(props: AccountDetailsProps) {
             <FormattedMessage defaultMessage="This action can be reverted at any time." id="YgQ5Yy" />
           </p>
         </ConfirmationModal>
+      )}
+      {/* Only rendered for hosted accounts, so `account` is narrowed here. */}
+      {isHostedAccountData(account) && (
+        <EditCollectiveSettingsModal
+          open={isEditSettingsOpen}
+          onOpenChange={setEditSettingsOpen}
+          account={account}
+          host={host}
+        />
       )}
       {host && taxForms?.nodes?.[0] && (
         <LegalDocumentDrawer

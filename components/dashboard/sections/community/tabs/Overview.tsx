@@ -40,7 +40,6 @@ import { transactionsTableQuery } from '../../transactions/queries';
 import type { TransactionsTableProps } from '../../transactions/TransactionsTable';
 import TransactionsTable from '../../transactions/TransactionsTable';
 import { AccountDetailView, isHostedAccountData, type MoneyMovementsView, TaxableCountry } from '../common';
-import { EditCollectiveSettingsModal } from '../EditCollectiveSettingsModal';
 import { HostedFinancialSummaryCard } from '../HostedFinancialSummaryCard';
 import {
   type AccountDetailData,
@@ -861,12 +860,15 @@ export const Overview = ({
   handleTabChange,
   handleTransactionTableRowClick,
   onEditVendor,
+  onEditSettings,
 }: {
   query: QueryResult<CommunityAccountDetailQuery>;
   expectedAccountType: AccountType;
   handleTabChange: (tab: string, moneyMovementsView?: MoneyMovementsView) => void;
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
   onEditVendor?: () => void;
+  /** Opens the shared edit-settings modal, mounted by the `AccountDetails` shell. */
+  onEditSettings?: () => void;
 }) => {
   const isLoading = query.loading;
   const account = query.data?.account as AccountDetailData | undefined;
@@ -876,7 +878,6 @@ export const Overview = ({
     (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes(CommunityRelationType.PAYEE)),
   );
 
-  const [isEditSettingsOpen, setEditSettingsOpen] = React.useState(false);
   const openInteraction = React.useCallback(
     (tx: RecentTransaction) => {
       handleTransactionTableRowClick({
@@ -890,7 +891,7 @@ export const Overview = ({
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {isHostedAccount ? (
-          <HostedAccountDetailsCard account={account} host={host} onEditSettings={() => setEditSettingsOpen(true)} />
+          <HostedAccountDetailsCard account={account} host={host} onEditSettings={onEditSettings} />
         ) : (
           <CommunityDetailsCard
             account={account}
@@ -924,15 +925,6 @@ export const Overview = ({
           loading={query.loading}
           handleTabChange={handleTabChange}
           handleTransactionTableRowClick={handleTransactionTableRowClick}
-        />
-      )}
-      {/* Only reachable from the hosted Details card, so `account` is narrowed here. */}
-      {isHostedAccount && (
-        <EditCollectiveSettingsModal
-          open={isEditSettingsOpen}
-          onOpenChange={setEditSettingsOpen}
-          account={account}
-          host={host}
         />
       )}
     </div>
