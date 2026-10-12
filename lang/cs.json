@@ -1193,6 +1193,7 @@
   "convertToCollective.description": "Convert {name} to a Collective. This will prevent you from using money management and fiscal hosting capabilities, and you will have to apply to a Fiscal Host.",
   "convertToCollective.error.title": "Conversion failed",
   "convertToCollective.success": "Successfully converted to Collective",
+  "convertToOrg.block.archived": "This account has been archived. Please unarchive it before converting to an Organization.",
   "convertToOrg.block.balanceNotEmpty": "This account has a balance. Please empty it before converting to an Organization.",
   "convertToOrg.block.hosted": "You must leave your Fiscal Host before converting to an Organization.",
   "convertToOrg.button": "Convert to Organization",

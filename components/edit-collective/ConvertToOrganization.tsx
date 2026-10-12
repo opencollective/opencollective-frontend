@@ -13,8 +13,10 @@ import { Button } from '../ui/Button';
 import SettingsSectionTitle from './sections/SettingsSectionTitle';
 import { ConvertToOrganizationModal } from './ConvertToOrganizationModal';
 
-const getBlockReason = (collective: GraphQLV1Collective): 'HOSTED' | 'BALANCE_NOT_EMPTY' | null => {
-  if (collective.host) {
+const getBlockReason = (collective: GraphQLV1Collective): 'ARCHIVED' | 'HOSTED' | 'BALANCE_NOT_EMPTY' | null => {
+  if (collective.isArchived) {
+    return 'ARCHIVED';
+  } else if (collective.host) {
     return 'HOSTED';
   } else if (collective.stats?.balance > 0) {
     return 'BALANCE_NOT_EMPTY';
@@ -26,19 +28,19 @@ export function ConvertToOrganization({ collective }: { collective: GraphQLV1Col
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { account } = React.useContext(DashboardContext); // The convert to organization modal needs an Account from GraphQL V2
+  const blockReason = getBlockReason(collective);
 
   // Check for query parameter to auto-open modal
   React.useEffect(() => {
-    if (parseToBoolean(router.query.convertToOrg)) {
+    if (parseToBoolean(router.query.convertToOrg) && !blockReason) {
       setIsModalOpen(true);
       // Remove query parameter from URL without reloading
       router.replace({ pathname: router.pathname, query: omit(router.query, 'convertToOrg') }, undefined, {
         shallow: true,
       });
     }
-  }, [router.query.convertToOrg, router]);
+  }, [router.query.convertToOrg, router, blockReason]);
 
-  const blockReason = getBlockReason(collective);
   return (
     <div className="mb-8 flex flex-col items-start gap-2">
       <SettingsSectionTitle>
@@ -53,7 +55,12 @@ export function ConvertToOrganization({ collective }: { collective: GraphQLV1Col
       </p>
       {blockReason && (
         <MessageBox type="warning">
-          {blockReason === 'BALANCE_NOT_EMPTY' ? (
+          {blockReason === 'ARCHIVED' ? (
+            <FormattedMessage
+              defaultMessage="This account has been archived. Please unarchive it before converting to an Organization."
+              id="convertToOrg.block.archived"
+            />
+          ) : blockReason === 'BALANCE_NOT_EMPTY' ? (
             <FormattedMessage
               defaultMessage="This account has a balance. Please empty it before converting to an Organization."
               id="convertToOrg.block.balanceNotEmpty"

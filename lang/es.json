@@ -1193,6 +1193,7 @@
   "convertToCollective.description": "Convertir {name} en un Colectivo. Esto te impedirá utilizar las funciones de gestión financiera y hosting fiscal, y tendrás que solicitar un Anfitrión Fiscal.",
   "convertToCollective.error.title": "Conversión fallida",
   "convertToCollective.success": "Conversión exitosa a Colectivo",
+  "convertToOrg.block.archived": "This account has been archived. Please unarchive it before converting to an Organization.",
   "convertToOrg.block.balanceNotEmpty": "Esta cuenta tiene saldo. Por favor, vacíala antes de convertirla en una Organización.",
   "convertToOrg.block.hosted": "Debes abandonar tu Anfitrión Fiscal antes de convertirte en una Organización.",
   "convertToOrg.button": "Convertir a Organización",
