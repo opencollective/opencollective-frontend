@@ -853,7 +853,6 @@ function submitExpense(options: {
           cy.getByDataCy('expense-frequency').click();
           cy.root().closest('html').contains('[data-cy="expense-frequency-option"]', 'Monthly').click();
           cy.get('#expenseRecurrenceEndAt').click().type('2125-09-29');
-          cy.contains('Save changes').click();
           cy.contains(
             'Once submitted, you will also be prompted to review and submit a copy of this expense every month. The prompts will stop on Sep 29, 2125',
           ).should('exist');
