@@ -8,6 +8,7 @@ import {
   Mail,
   MoreHorizontal,
   Pause,
+  Pencil,
   Play,
   Receipt,
   ReceiptText,
@@ -438,11 +439,14 @@ export const MoreActionsMenu = ({
   collective,
   children,
   onEdit,
+  onEditSettings,
   openCollectiveDetails,
 }: {
   collective: CommunityAccountDetailQuery['account'];
   children: React.ReactNode;
   onEdit?: () => void;
+  /** Shows an "Edit" item opening the hosted edit-settings modal (AccountDetails header). */
+  onEditSettings?: () => void;
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }) => {
   const router = useRouter();
@@ -465,6 +469,15 @@ export const MoreActionsMenu = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-[240px]" align="end">
+          {onEditSettings && (
+            <React.Fragment>
+              <DropdownMenuItem className="cursor-pointer" data-cy="actions-edit-settings" onClick={onEditSettings}>
+                <Pencil className="mr-2" size="16" />
+                <FormattedMessage id="Edit" defaultMessage="Edit" />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </React.Fragment>
+          )}
           {openCollectiveDetails && (
             <React.Fragment>
               <DropdownMenuItem className="cursor-pointer" onClick={() => openCollectiveDetails(collective)}>

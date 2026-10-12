@@ -297,7 +297,7 @@ export function AccountDetails(props: AccountDetailsProps) {
     account &&
     'host' in account &&
     host?.id === account.host?.id && (
-      <MoreActionsMenu collective={account} onEdit={refetch}>
+      <MoreActionsMenu collective={account} onEdit={refetch} onEditSettings={() => setEditSettingsOpen(true)}>
         <Button size="sm" variant="outline" data-cy="more-actions-btn">
           <FormattedMessage defaultMessage="More Actions" id="A7ugfn" />
         </Button>
