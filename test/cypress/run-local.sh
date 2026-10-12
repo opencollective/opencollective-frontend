@@ -85,14 +85,23 @@ REDIS_STARTED_BY_SCRIPT=false
 REDIS_PORT="${REDIS_PORT:-6380}"
 REDIS_DATA_DIR="$ROOT/logs/redis-e2e"
 
+# Production runs Valkey (Heroku Key-Value Store); Redis works too, its commands are compatible.
+if command -v valkey-server >/dev/null 2>&1 && command -v valkey-cli >/dev/null 2>&1; then
+  REDIS_SERVER=valkey-server
+  REDIS_CLI=valkey-cli
+else
+  REDIS_SERVER=redis-server
+  REDIS_CLI=redis-cli
+fi
+
 ensure_redis() {
-  if ! command -v redis-server >/dev/null 2>&1 || ! command -v redis-cli >/dev/null 2>&1; then
-    echo "Redis is required. Install redis-server (e.g. apt-get install redis-server)." >&2
+  if ! command -v "$REDIS_SERVER" >/dev/null 2>&1 || ! command -v "$REDIS_CLI" >/dev/null 2>&1; then
+    echo "Valkey (or Redis) is required. Install it (e.g. apt-get install valkey-server, or brew install valkey)." >&2
     exit 1
   fi
 
   if [[ -n "$USER_REDIS_URL" ]]; then
-    if ! redis-cli -u "$USER_REDIS_URL" ping >/dev/null 2>&1; then
+    if ! "$REDIS_CLI" -u "$USER_REDIS_URL" ping >/dev/null 2>&1; then
       echo "Redis is not reachable at $USER_REDIS_URL" >&2
       exit 1
     fi
@@ -101,11 +110,11 @@ ensure_redis() {
   fi
 
   mkdir -p "$REDIS_DATA_DIR"
-  if redis-cli -p "$REDIS_PORT" ping >/dev/null 2>&1; then
-    echo "> Using existing Redis on port $REDIS_PORT"
+  if "$REDIS_CLI" -p "$REDIS_PORT" ping >/dev/null 2>&1; then
+    echo "> Using existing $REDIS_SERVER on port $REDIS_PORT"
   else
-    echo "> Starting Redis on port $REDIS_PORT (data dir: $REDIS_DATA_DIR, persistence disabled)"
-    redis-server --daemonize yes --port "$REDIS_PORT" --dir "$REDIS_DATA_DIR" --save ""
+    echo "> Starting $REDIS_SERVER on port $REDIS_PORT (data dir: $REDIS_DATA_DIR, persistence disabled)"
+    "$REDIS_SERVER" --daemonize yes --port "$REDIS_PORT" --dir "$REDIS_DATA_DIR" --save ""
     REDIS_STARTED_BY_SCRIPT=true
   fi
   export REDIS_URL="redis://localhost:${REDIS_PORT}"
@@ -161,7 +170,7 @@ cleanup() {
     kill "$pid" 2>/dev/null || true
   done
   if [[ "$REDIS_STARTED_BY_SCRIPT" == true ]]; then
-    redis-cli -p "$REDIS_PORT" shutdown nosave 2>/dev/null || true
+    "$REDIS_CLI" -p "$REDIS_PORT" shutdown nosave 2>/dev/null || true
   fi
 }
 trap cleanup EXIT
