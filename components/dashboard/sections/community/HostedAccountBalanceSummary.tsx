@@ -73,11 +73,14 @@ const Metric = ({
   amount,
   currency,
   onClick,
+  signed = false,
 }: {
   label: React.ReactNode;
   amount?: AmountLike;
   currency?: string;
   onClick?: () => void;
+  /** Render the raw signed value (e.g. balances can be negative) instead of its absolute value. */
+  signed?: boolean;
 }) => (
   <div className="flex flex-col gap-1">
     <button
@@ -92,7 +95,7 @@ const Metric = ({
     <span className="text-2xl font-semibold text-foreground">
       {amount && typeof amount.valueInCents === 'number' ? (
         <FormattedMoneyAmount
-          amount={Math.abs(amount.valueInCents)}
+          amount={signed ? amount.valueInCents : Math.abs(amount.valueInCents)}
           currency={(amount.currency || currency) as any}
           showCurrencyCode
           precision={2}
@@ -150,11 +153,13 @@ export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: Hosted
           }
           amount={isChild ? stats?.balance : stats?.consolidatedBalance}
           currency={currency}
+          signed
         />
         <Metric
           label={<FormattedMessage defaultMessage="Total amount received this period" id="2kY5p5" />}
           amount={stats?.consolidatedTotalNetAmountRaised}
           currency={currency}
+          signed
           onClick={() => onOpenMoneyView?.('CONTRIBUTIONS')}
         />
         <Metric
