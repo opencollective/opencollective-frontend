@@ -110,13 +110,20 @@ Turbo compilation graph and always refreshes Cloudflare IP ranges afterward.
 Development and database/E2E tasks are not cached. Standalone `npm ci` and Heroku
 entrypoints remain supported; the parent workspace keeps separate installs.
 
-To enable Vercel Remote Cache, add a GitHub Actions repository/organization secret
-`TURBO_TOKEN` containing a Vercel token authorized for Remote Cache, and the Actions
-variable `TURBO_TEAM` containing the team's slug. Both repositories can use the
-same team. Trusted pushes to `main` read and write the remote cache; PRs (including
-forks and Dependabot) run without remote credentials. Missing credentials use local
-caching. No Vercel project deployment is required. Cache entries include source,
-lockfile, environment configuration, and declared outputs.
+Remote Cache uses GitHub OIDC and the existing `TURBO_TEAM` Actions variable.
+In Vercel team Settings → Build and Deployment → OIDC Policies for CLI Access,
+create Turborepo CLI policies for `opencollective/opencollective-api` and
+`opencollective/opencollective-frontend`, restricted to the `main` branch. These
+repository policies must cover CI and E2E workflows; frontend also uses the
+`e2e-prepare.yml` reusable workflow. Leave the audience at its default.
+
+Jobs grant `id-token: write`. Vercel's setup action exchanges GitHub's OIDC token
+for a short-lived `TURBO_TOKEN` before Turbo runs and revokes it when the job ends.
+No `TURBO_TOKEN` repository secret is required. Authentication and remote cache
+reads/writes run only on trusted pushes to `main`; PRs and runs without
+`TURBO_TEAM` use local caching. An OIDC policy mismatch fails the setup step.
+Cache entries include source, lockfile, environment configuration, and declared
+outputs.
 
 See https://turborepo.dev/docs/crafting-your-repository/constructing-ci and
-https://vercel.com/docs/monorepos/remote-caching.
+https://vercel.com/docs/monorepos/remote-caching/external-ci-cd#create-an-oidc-policy.

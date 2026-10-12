@@ -16,9 +16,16 @@ on:
         description: Resolved opencollective-pdf commit SHA
         value: ${{ jobs.prepare.outputs.pdf-ref }}
 
+permissions:
+  contents: read
+  id-token: write
+
 # Reusable workflows do not inherit env from ci.yml. OC_ENV=ci skips the API
 # postinstall DB restore, which needs Postgres that this job does not run.
 env:
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_AGENT_GUIDANCE: 'false'
+  TURBO_CACHE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TURBO_TEAM != '' && 'local:rw,remote:rw' || 'local:rw' }}
   CI: true
   OC_ENV: ci
 
@@ -81,6 +88,12 @@ jobs:
         working-directory: opencollective-pdf
         if: steps.pdf-node-modules.outputs.cache-hit != 'true'
         run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Set up Turborepo Remote Cache
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && env.TURBO_TEAM != '' }}
+        uses: vercel/setup-turborepo-remote-cache-action@49d7b1b46ba4c9251e1977986bfe18336feabc8f # v1.1.0
+        with:
+          team: ${{ env.TURBO_TEAM }}
 
       - name: Build API, images, and PDF
         run: |

@@ -14,15 +14,18 @@ on:
       - synchronize
       - reopened
 
+permissions:
+  contents: read
+  id-token: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
-  TURBO_TOKEN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.TURBO_TOKEN || '' }}
-  TURBO_TEAM: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TURBO_TEAM || '' }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   TURBO_AGENT_GUIDANCE: 'false'
-  TURBO_CACHE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.TURBO_TOKEN != '' && vars.TURBO_TEAM != '' && 'local:rw,remote:rw' || 'local:rw' }}
+  TURBO_CACHE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TURBO_TEAM != '' && 'local:rw,remote:rw' || 'local:rw' }}
   TZ: UTC
   OC_ENV: ci
   NODE_ENV: test

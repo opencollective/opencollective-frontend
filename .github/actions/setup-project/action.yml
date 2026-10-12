@@ -25,3 +25,9 @@ runs:
       shell: bash
       if: steps.node-modules.outputs.cache-hit != 'true'
       run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit --no-fund
+
+    - name: Set up Turborepo Remote Cache
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && env.TURBO_TEAM != '' }}
+      uses: vercel/setup-turborepo-remote-cache-action@49d7b1b46ba4c9251e1977986bfe18336feabc8f # v1.1.0
+      with:
+        team: ${{ env.TURBO_TEAM }}
