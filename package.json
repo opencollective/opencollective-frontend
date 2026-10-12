@@ -144,14 +144,14 @@
     "@radix-ui/react-focus-scope": "1.2.0"
   },
   "scripts": {
-    "build": "npm-run-all build:next build:server build:updates",
+    "build": "npm run turbo -- run build:finalize",
     "build:e2e": "cross-env NODE_ENV=development OC_ENV=e2e npm run build",
     "build:clean": "shx rm -rf dist .next",
     "build:langs": "npm run langs:update",
     "build:next": "cross-env scripts/build_next.sh",
     "build:server": "cross-env scripts/build_server.sh",
     "build:updates": "tsx scripts/update-cloudflare-ips.ts dist/server/cloudflare-ips.json",
-    "clean": "npm-run-all build:clean test:clean",
+    "clean": "npm run turbo -- run build:clean test:clean",
     "commit": "git-cz",
     "cypress:open": "cross-env TZ=UTC cypress open --e2e",
     "cypress:run": "cross-env TZ=UTC cypress run",
@@ -164,15 +164,15 @@
     "docs:generate:contribution-flow": "tsx ./scripts/docs/contribution-flow.js",
     "git:clean": "cross-env ./scripts/git_clean.sh",
     "graphql:codegen": "graphql-codegen --config scripts/config/graphql-codegen.ts",
-    "graphql:get-schema": "npm-run-all graphql:updateV1 graphql:updateV2",
-    "graphql:update": "npm-run-all graphql:updateV1 graphql:updateV2 graphql:codegen",
+    "graphql:get-schema": "npm run turbo -- run graphql:updateV1 graphql:updateV2",
+    "graphql:update": "npm run turbo -- run graphql:refresh",
     "graphql:updateV1": "tsx ./scripts/update-gql-schemas.js http://localhost:3060/graphql/v1 lib/graphql/schema.graphql && prettier lib/graphql/schema.graphql --write",
     "graphql:updateV2": "tsx ./scripts/update-gql-schemas.js http://localhost:3060/graphql/v2 lib/graphql/schemaV2.graphql && prettier lib/graphql/schemaV2.graphql --write",
     "heroku-cleanup": "rm -rf .next/cache && find node_modules/@next -depth -maxdepth 1 -type d -name 'swc*' -exec rm -rf {} \\; -prune",
     "langs:build": "formatjs extract \"{components,lib,pages}/**/*.{js,ts,tsx}\" --ignore='**/*.d.ts' --out-file \"dist/messages/messages.json\" --throws",
     "langs:check": "cross-env scripts/i18n/check-translations.sh",
     "langs:translate": "tsx scripts/i18n/translate.js",
-    "langs:update": "npm-run-all langs:build langs:translate",
+    "langs:update": "npm run turbo -- run langs:translate",
     "langs:update-progress": "tsx scripts/i18n/update-translation-progress.ts && prettier --write lib/constants/locales.js",
     "lint": "eslint . --cache --cache-strategy content",
     "lint:fix": "npm run lint -- --fix",
@@ -199,7 +199,23 @@
     "ts-unused-exports": "ts-unused-exports tsconfig.json --ignoreFiles=lib/graphql/types/",
     "type:check": "node_modules/typescript/bin/tsc --noEmit",
     "type:check:7": "node_modules/typescript-7/bin/tsc --noEmit",
-    "jest": "cross-env NODE_ENV=test TZ=UTC jest"
+    "jest": "cross-env NODE_ENV=test TZ=UTC jest",
+    "format:check": "npm run prettier:check",
+    "format": "npm run prettier:write",
+    "build:finalize": "npm run build:updates",
+    "graphql:refresh": "npm run graphql:codegen",
+    "dev:local": "npm run dev",
+    "build:next:local": "npm run build:next",
+    "build:server:local": "npm run build:server",
+    "type:check:local": "npm run type:check",
+    "test:local": "npm run test",
+    "test:jest:local": "npm run test:jest",
+    "build:local": "npm run build:updates",
+    "dev:environment": "EXTRA_ENV=\"$OC_DEV_ENV_FRONTEND\" npm run dev",
+    "dev:environment:local": "npm run dev:environment",
+    "turbo": "turbo --single-package --root-turbo-json=turbo.standalone.json",
+    "test:watch:local": "npm run test:watch",
+    "build:prepare": "tsx scripts/prepare-build.ts"
   },
   "devDependencies": {
     "@codecov/webpack-plugin": "^2.0.0",
@@ -264,7 +280,6 @@
     "markdown-loader": "^8.0.0",
     "mkdirp": "^3.0.1",
     "mocha-junit-reporter": "^2.2.1",
-    "npm-run-all2": "^9.0.0",
     "nyc": "^18.0.0",
     "pdf-parse": "^2.4.5",
     "postcss": "8.5.29",
@@ -283,7 +298,8 @@
     "typescript-7": "npm:typescript@rc",
     "typescript-eslint": "^8.60.1",
     "url-loader": "^4.1.1",
-    "webpack": "^5.91.0"
+    "webpack": "^5.91.0",
+    "turbo": "2.11.7"
   },
   "husky": {
     "hooks": {
@@ -317,7 +333,8 @@
       "cypress-multi-reporters",
       "@jest/globals",
       "cross-env",
-      "@graphql-codegen/client-preset"
+      "@graphql-codegen/client-preset",
+      "turbo"
     ]
   },
   "overrides": {
@@ -333,5 +350,6 @@
     "canvas@3.2.3": true,
     "husky@4.3.8": true,
     "unrs-resolver@1.12.2": true
-  }
+  },
+  "packageManager": "npm@11.19.0"
 }

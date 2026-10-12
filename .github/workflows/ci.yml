@@ -19,6 +19,10 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
+  TURBO_TOKEN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.TURBO_TOKEN || '' }}
+  TURBO_TEAM: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TURBO_TEAM || '' }}
+  TURBO_AGENT_GUIDANCE: 'false'
+  TURBO_CACHE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.TURBO_TOKEN != '' && vars.TURBO_TEAM != '' && 'local:rw,remote:rw' || 'local:rw' }}
   TZ: UTC
   OC_ENV: ci
   NODE_ENV: test
@@ -45,15 +49,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - name: Restore ESLint cache
-        uses: actions/cache@v6
-        with:
-          path: .eslintcache
-          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-eslint-${{ hashFiles('eslint.config.mjs', 'package-lock.json') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-eslint-${{ hashFiles('eslint.config.mjs', 'package-lock.json') }}-
-
-      - run: npm run lint:quiet
+      - run: npm run turbo -- run lint:quiet
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
@@ -71,15 +67,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - name: Restore Prettier cache
-        uses: actions/cache@v6
-        with:
-          path: .prettiercache
-          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-prettier-${{ hashFiles('.prettierrc', 'package-lock.json') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-prettier-${{ hashFiles('.prettierrc', 'package-lock.json') }}-
-
-      - run: npm run prettier:check
+      - run: npm run turbo -- run prettier:check
 
   depcheck:
     runs-on: ${{ vars.CI_RUNNER_LARGE || vars.CI_RUNNER || 'ubuntu-latest' }}
@@ -95,7 +83,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run depcheck
+      - run: npm run turbo -- run depcheck
 
   ts-unused-exports:
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
@@ -111,7 +99,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run ts-unused-exports
+      - run: npm run turbo -- run ts-unused-exports
 
   check-langs:
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
@@ -127,7 +115,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run langs:check
+      - run: npm run turbo -- run langs:check
 
   build:
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
@@ -152,7 +140,7 @@ jobs:
             ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('package-lock.json') }}-
 
       - name: Build
-        run: PRESERVE_NEXT_CACHE=true npm run build
+        run: PRESERVE_NEXT_CACHE=true npm run turbo -- run build:finalize
 
       # Stage to a non-hidden directory so upload-artifact cannot drop `.next`.
       # Copy only; leave workspace `.next/cache` for the cache post-save step.
@@ -189,11 +177,11 @@ jobs:
 
       - name: Test
         if: github.event_name != 'push' || github.ref != 'refs/heads/main'
-        run: npm run test:jest -- --reporters=default --reporters=jest-junit
+        run: npm run turbo -- run test:jest -- --reporters=default --reporters=jest-junit
 
       - name: Test with coverage
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: npm run test:coverage
+        run: npm run turbo -- run test:coverage
 
       - name: Report coverage
         if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
@@ -222,15 +210,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - name: Restore TypeScript incremental cache
-        uses: actions/cache@v6
-        with:
-          path: tsconfig.tsbuildinfo
-          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-tsc-${{ hashFiles('tsconfig.json', 'package-lock.json') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-tsc-${{ hashFiles('tsconfig.json', 'package-lock.json') }}-
-
-      - run: npm run type:check
+      - run: npm run turbo -- run type:check
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 

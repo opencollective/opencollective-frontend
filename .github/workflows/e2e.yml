@@ -22,6 +22,10 @@ on:
         type: string
 
 env:
+  TURBO_TOKEN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.TURBO_TOKEN || '' }}
+  TURBO_TEAM: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TURBO_TEAM || '' }}
+  TURBO_AGENT_GUIDANCE: 'false'
+  TURBO_CACHE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.TURBO_TOKEN != '' && vars.TURBO_TEAM != '' && 'local:rw,remote:rw' || 'local:rw' }}
   TZ: UTC
   OC_ENV: ci
   NODE_ENV: test
