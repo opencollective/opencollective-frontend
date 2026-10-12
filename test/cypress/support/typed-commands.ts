@@ -224,8 +224,10 @@ function uploadFile(
           ].join('\r\n'),
         })
         .then(({ body }) => {
-          expect(body.url, 'uploaded file url').to.be.a('string');
-          return body.url as string;
+          if (typeof body.url !== 'string') {
+            throw new Error(`Upload of ${fileName} returned no file URL: ${JSON.stringify(body)}`);
+          }
+          return body.url;
         });
     });
   });
