@@ -52,7 +52,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run turbo -- run lint:quiet
+      - run: npm run lint:quiet
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
@@ -70,7 +70,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run turbo -- run prettier:check
+      - run: npm run prettier:check
 
   depcheck:
     runs-on: ${{ vars.CI_RUNNER_LARGE || vars.CI_RUNNER || 'ubuntu-latest' }}
@@ -86,7 +86,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run turbo -- run depcheck
+      - run: npm run depcheck
 
   ts-unused-exports:
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
@@ -102,7 +102,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run turbo -- run ts-unused-exports
+      - run: npm run ts-unused-exports
 
   check-langs:
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
@@ -118,7 +118,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run turbo -- run langs:check
+      - run: npm run langs:check
 
   build:
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
@@ -180,11 +180,11 @@ jobs:
 
       - name: Test
         if: github.event_name != 'push' || github.ref != 'refs/heads/main'
-        run: npm run turbo -- run test:jest -- --reporters=default --reporters=jest-junit
+        run: npm run test:jest -- --reporters=default --reporters=jest-junit
 
       - name: Test with coverage
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: npm run turbo -- run test:coverage
+        run: npm run test:coverage
 
       - name: Report coverage
         if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
@@ -213,7 +213,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run turbo -- run type:check
+      - run: npm run type:check
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 

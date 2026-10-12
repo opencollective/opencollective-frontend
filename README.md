@@ -104,8 +104,13 @@ If you have any questions, ping us on [Discord](https://discord.opencollective.c
 
 ### Turborepo tasks and CI cache
 
-Run tasks locally with `npm run turbo -- run lint type:check format:check`,
-`npm run turbo -- run test`, or `npm run build`. The build command runs the
+Use the usual commands: `npm run dev`, `npm run build`, `npm run lint`,
+`npm run type:check`, `npm run format:check`, and `npm test`. These entrypoints
+run through Turbo by default. Forward runner arguments as usual, for example
+`npm test -- path/to/test.ts`. Internal `:task` scripts contain the underlying
+commands so workspace orchestration never recursively invokes Turbo. For advanced
+Turbo options, use `npm run turbo -- run lint:task type:check:task --dry=json`.
+The build command runs the
 Turbo compilation graph and always refreshes Cloudflare IP ranges afterward.
 Development and database/E2E tasks are not cached. Standalone `npm ci` and Heroku
 entrypoints remain supported; the parent workspace keeps separate installs.

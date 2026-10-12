@@ -1,14 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "tasks": {
-    "build": {
-      "cache": false,
-      "passThroughEnv": ["*"]
-    },
-    "build:e2e": {
-      "cache": false,
-      "passThroughEnv": ["*"]
-    },
     "build:clean": {
       "cache": false,
       "passThroughEnv": ["*"]
@@ -185,24 +177,16 @@
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "depcheck": {
+    "depcheck:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "dev": {
+    "dev:task": {
       "cache": false,
       "passThroughEnv": ["*"],
       "persistent": true
     },
     "graphql:codegen": {
-      "cache": false,
-      "passThroughEnv": ["*"]
-    },
-    "graphql:get-schema": {
-      "cache": false,
-      "passThroughEnv": ["*"]
-    },
-    "graphql:update": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
@@ -218,7 +202,7 @@
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "langs:check": {
+    "langs:check:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -245,15 +229,11 @@
       "passThroughEnv": ["*"],
       "dependsOn": ["langs:build"]
     },
-    "langs:update": {
-      "cache": false,
-      "passThroughEnv": ["*"]
-    },
     "langs:update-progress": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "lint": {
+    "lint:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -275,11 +255,11 @@
       "outputs": [],
       "cache": true
     },
-    "lint:fix": {
+    "lint:fix:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "lint:quiet": {
+    "lint:quiet:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -301,7 +281,7 @@
       "outputs": [],
       "cache": true
     },
-    "prettier:check": {
+    "prettier:check:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -338,7 +318,7 @@
       "passThroughEnv": ["*"],
       "persistent": true
     },
-    "test": {
+    "test:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -412,12 +392,12 @@
       "outputs": ["coverage/**", "junit.xml", "test-results.xml"],
       "cache": true
     },
-    "test:watch": {
+    "test:watch:task": {
       "cache": false,
       "passThroughEnv": ["*"],
       "persistent": true
     },
-    "test:coverage": {
+    "test:coverage:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -495,27 +475,27 @@
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "test:e2e": {
+    "test:e2e:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "test:e2e:0": {
+    "test:e2e:0:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "test:e2e:1": {
+    "test:e2e:1:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "test:e2e:2": {
+    "test:e2e:2:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "test:e2e:3": {
+    "test:e2e:3:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "test:jest": {
+    "test:jest:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -589,11 +569,11 @@
       "outputs": ["coverage/**", "junit.xml", "test-results.xml"],
       "cache": true
     },
-    "test:update": {
+    "test:update:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "ts-unused-exports": {
+    "ts-unused-exports:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -615,7 +595,7 @@
       "outputs": [],
       "cache": true
     },
-    "type:check": {
+    "type:check:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -637,7 +617,7 @@
       "outputs": [],
       "cache": true
     },
-    "type:check:7": {
+    "type:check:7:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -659,7 +639,7 @@
       "outputs": [],
       "cache": true
     },
-    "format:check": {
+    "format:check:task": {
       "inputs": [
         "$TURBO_DEFAULT$",
         "package-lock.json",
@@ -681,7 +661,7 @@
       "outputs": [],
       "cache": true
     },
-    "format": {
+    "format:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
@@ -700,11 +680,15 @@
       "persistent": true,
       "passThroughEnv": ["*"]
     },
-    "clean": {
+    "build:prepare": {
       "cache": false,
       "passThroughEnv": ["*"]
     },
-    "build:prepare": {
+    "prettier:write:task": {
+      "cache": false,
+      "passThroughEnv": ["*"]
+    },
+    "prettier:task": {
       "cache": false,
       "passThroughEnv": ["*"]
     }
