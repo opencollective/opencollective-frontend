@@ -80,7 +80,7 @@ export type Account = {
   githubHandle?: Maybe<Scalars['String']['output']>;
   /** Whether this account has a public profile that can be linked to */
   hasPublicProfile: Scalars['Boolean']['output'];
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   /** The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g) */
   id: Scalars['String']['output'];
@@ -1687,7 +1687,7 @@ export type Bot = Account & {
   githubHandle?: Maybe<Scalars['String']['output']>;
   /** Whether this account has a public profile that can be linked to */
   hasPublicProfile: Scalars['Boolean']['output'];
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   id: Scalars['String']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
@@ -2238,7 +2238,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   hostAgreements?: Maybe<AgreementCollection>;
   /** Returns the Fiscal Host application */
   hostApplication?: Maybe<HostApplication>;
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   /** Fees percentage that the host takes for this collective */
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
@@ -4461,7 +4461,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   hostAgreements?: Maybe<AgreementCollection>;
   /** Returns the Fiscal Host application */
   hostApplication?: Maybe<HostApplication>;
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   /** Fees percentage that the host takes for this collective */
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
@@ -5936,7 +5936,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   hostAgreements?: Maybe<AgreementCollection>;
   /** Returns the Fiscal Host application */
   hostApplication?: Maybe<HostApplication>;
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   /** Fees percentage that the host takes for this collective */
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
@@ -6613,9 +6613,9 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   hasPublicProfile: Scalars['Boolean']['output'];
   /** Returns true if the account has started the process to resume contributions */
   hasResumeContributionsProcessStarted: Scalars['Boolean']['output'];
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
-  /** Applications for this host */
+  /** Applications for this host. Scope: "applications". */
   hostApplications: HostApplicationCollection;
   /** EXPERIMENTAL (this may change or be removed) */
   hostContributionsReport?: Maybe<HostExpensesReports>;
@@ -6724,7 +6724,7 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
    */
   paypalClientId?: Maybe<Scalars['String']['output']>;
   /**
-   * Pending applications for this host
+   * Pending applications for this host. Scope: "applications".
    * @deprecated 2023-08-25: Deprecated in favour of host.hostApplications(status: PENDING).
    */
   pendingApplications: HostApplicationCollection;
@@ -7455,14 +7455,16 @@ export type HostApplication = {
   __typename?: 'HostApplication';
   /** The account who applied to this host */
   account: Account;
-  /** Returns the list of comments for this host application, or `null` if user is not allowed to see them */
+  /** Returns the list of comments for this host application, or `null` if user is not allowed to see them. Scope: "applications". */
   comments?: Maybe<CommentCollection>;
   /** The date on which the item was created */
   createdAt: Scalars['DateTime']['output'];
+  /** Application custom data. Unfiltered for admins with scope "applications", allow-listed otherwise. */
   customData?: Maybe<Scalars['JSON']['output']>;
   /** The host the collective applied to */
   host: Host;
   id: Scalars['String']['output'];
+  /** The application message. Scope: "applications". */
   message?: Maybe<Scalars['String']['output']>;
   /** The resource public id (ie: ha_xxxxxxxx) */
   publicId: Scalars['String']['output'];
@@ -7647,7 +7649,7 @@ export type HostMetricsTimeSeries = {
   dateFrom?: Maybe<Scalars['DateTime']['output']>;
   /** The end date of the time series */
   dateTo?: Maybe<Scalars['DateTime']['output']>;
-  /** History of the share of host fees collected owed to Open Collective Inc. */
+  /** History of the share of host fees collected owed to the platform (OFi Technologies LLC). */
   hostFeeShare: TimeSeriesAmountWithSettlement;
   /** History of the host fees collected */
   hostFees: TimeSeriesAmount;
@@ -8390,7 +8392,7 @@ export type Individual = Account & {
   hasTwoFactorAuth?: Maybe<Scalars['Boolean']['output']>;
   /** If the individual is a host account, this will return the matching Host object */
   host?: Maybe<Host>;
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   id: Scalars['String']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
@@ -9565,7 +9567,7 @@ export type Mutation = {
   inviteMember: MemberInvitation;
   /** Creates and invites admins to an existing Account. Scope: "account". */
   inviteMembers: Array<MemberInvitation>;
-  /** [Root only] Merge two accounts, returns the result account */
+  /** [Root only] Merge two accounts, returns the result account. Both accounts must have the same type, except PROJECT accounts that can be merged into a COLLECTIVE hosted by the same host. */
   mergeAccounts: MergeAccountsResponse;
   /** Moves an expense from one account within a Collective to another */
   moveExpense: Expense;
@@ -11463,7 +11465,7 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   hasResumeContributionsProcessStarted: Scalars['Boolean']['output'];
   /** If the organization is a host account, this will return the matching Host object */
   host?: Maybe<Host>;
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   id: Scalars['String']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
@@ -12746,7 +12748,7 @@ export type Platform = Account & AccountWithHost & AccountWithParent & {
   hostAgreements?: Maybe<AgreementCollection>;
   /** Returns the Fiscal Host application */
   hostApplication?: Maybe<HostApplication>;
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   /** Fees percentage that the host takes for this collective */
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
@@ -13617,7 +13619,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   hostAgreements?: Maybe<AgreementCollection>;
   /** Returns the Fiscal Host application */
   hostApplication?: Maybe<HostApplication>;
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   /** Fees percentage that the host takes for this collective */
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
@@ -14168,6 +14170,7 @@ export type Query = {
   exportRequests: ExportRequestCollection;
   fund?: Maybe<Fund>;
   host?: Maybe<Host>;
+  /** Fetch a host application. Scope: "applications". */
   hostApplication?: Maybe<HostApplication>;
   hosts?: Maybe<HostCollection>;
   individual?: Maybe<Individual>;
@@ -16193,7 +16196,7 @@ export type Vendor = Account & AccountWithContributions & {
   hasPublicProfile: Scalars['Boolean']['output'];
   /** Returns true if the account has started the process to resume contributions */
   hasResumeContributionsProcessStarted: Scalars['Boolean']['output'];
-  /** Host application requests. Scope: "host". */
+  /** Host application requests. Scope: "applications". */
   hostApplicationRequests: HostApplicationCollection;
   id: Scalars['String']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
@@ -17393,17 +17396,6 @@ export type DeleteUpdateMutationVariables = Exact<{
 
 
 export type DeleteUpdateMutation = { __typename?: 'Mutation', deleteUpdate: { __typename?: 'Update', id: string } };
-
-export type SendSurveyResponseMutationVariables = Exact<{
-  surveyKey: Scalars['String']['input'];
-  responseId: Scalars['String']['input'];
-  score: Scalars['Int']['input'];
-  text?: InputMaybe<Scalars['String']['input']>;
-  okToContact?: InputMaybe<Scalars['Boolean']['input']>;
-}>;
-
-
-export type SendSurveyResponseMutation = { __typename?: 'Mutation', sendSurveyResponse?: boolean | null };
 
 export type FindAFiscalHostQueryVariables = Exact<{
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>>;
@@ -169431,7 +169423,6 @@ export const HostExpenseModalCurrencyExchangeRateDocument = {"kind":"Document","
 export const PaypalPlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PaypalPlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tier"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"TierReferenceInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"amount"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AmountInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"frequency"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ContributionFrequency"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrderReferenceInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"paypalPlan"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"account"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"Argument","name":{"kind":"Name","value":"tier"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tier"}}},{"kind":"Argument","name":{"kind":"Name","value":"amount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"amount"}}},{"kind":"Argument","name":{"kind":"Name","value":"frequency"},"value":{"kind":"Variable","name":{"kind":"Name","value":"frequency"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<PaypalPlanQuery, PaypalPlanQueryVariables>;
 export const EditAccountSettingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"EditAccountSettings"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"key"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountSettingsKey"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"value"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"JSON"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"editAccountSetting"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"account"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"Argument","name":{"kind":"Name","value":"key"},"value":{"kind":"Variable","name":{"kind":"Name","value":"key"}}},{"kind":"Argument","name":{"kind":"Name","value":"value"},"value":{"kind":"Variable","name":{"kind":"Name","value":"value"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"settings"}}]}}]}}]} as unknown as DocumentNode<EditAccountSettingsMutation, EditAccountSettingsMutationVariables>;
 export const DeleteUpdateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteUpdate"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteUpdate"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteUpdateMutation, DeleteUpdateMutationVariables>;
-export const SendSurveyResponseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SendSurveyResponse"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"surveyKey"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"responseId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"score"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"text"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"okToContact"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendSurveyResponse"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"surveyKey"},"value":{"kind":"Variable","name":{"kind":"Name","value":"surveyKey"}}},{"kind":"Argument","name":{"kind":"Name","value":"responseId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"responseId"}}},{"kind":"Argument","name":{"kind":"Name","value":"score"},"value":{"kind":"Variable","name":{"kind":"Name","value":"score"}}},{"kind":"Argument","name":{"kind":"Name","value":"text"},"value":{"kind":"Variable","name":{"kind":"Name","value":"text"}}},{"kind":"Argument","name":{"kind":"Name","value":"okToContact"},"value":{"kind":"Variable","name":{"kind":"Name","value":"okToContact"}}}]}]}}]} as unknown as DocumentNode<SendSurveyResponseMutation, SendSurveyResponseMutationVariables>;
 export const FindAFiscalHostDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FindAFiscalHost"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tags"}},"type":{"kind":"ListType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"country"}},"type":{"kind":"ListType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CountryISO"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"currency"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"searchTerm"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hosts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tag"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tags"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"tagSearchOperator"},"value":{"kind":"EnumValue","value":"OR"}},{"kind":"Argument","name":{"kind":"Name","value":"country"},"value":{"kind":"Variable","name":{"kind":"Name","value":"country"}}},{"kind":"Argument","name":{"kind":"Name","value":"currency"},"value":{"kind":"Variable","name":{"kind":"Name","value":"currency"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchTerm"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchTerm"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"legacyId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"settings"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"height"},"value":{"kind":"IntValue","value":"96"}}]},{"kind":"Field","name":{"kind":"Name","value":"backgroundImageUrl"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"height"},"value":{"kind":"IntValue","value":"208"}}]},{"kind":"Field","name":{"kind":"Name","value":"longDescription"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"totalHostedCollectives"}},{"kind":"Field","name":{"kind":"Name","value":"hostFeePercent"}},{"kind":"Field","name":{"kind":"Name","value":"platformContributionAvailable"}},{"kind":"Field","name":{"kind":"Name","value":"isTrustedHost"}},{"kind":"Field","name":{"kind":"Name","value":"isFirstPartyHost"}},{"kind":"Field","name":{"kind":"Name","value":"isVerified"}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}},{"kind":"Field","name":{"kind":"Name","value":"tags"}}]}}]}}]}}]} as unknown as DocumentNode<FindAFiscalHostQuery, FindAFiscalHostQueryVariables>;
 export const HostApplySuccessDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HostApplySuccess"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"slug"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"slug"}}},{"kind":"Argument","name":{"kind":"Name","value":"throwIfMissing"},"value":{"kind":"BooleanValue","value":true}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"hostApplicationRequests"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"100"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<HostApplySuccessQuery, HostApplySuccessQueryVariables>;
 export const BalanceAccountingCategoryPickerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"BalanceAccountingCategoryPicker"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"hostSlug"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrderReferenceInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"expense"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ExpenseReferenceInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"host"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"hostSlug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","alias":{"kind":"Name","value":"balanceAccountingCategories"},"name":{"kind":"Name","value":"accountingCategories"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"kind"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"BALANCE_ACCOUNT"},{"kind":"EnumValue","value":"CLEARING_ACCOUNT"}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"friendlyName"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"suggestedBalanceAccountingCategories"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"account"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}},{"kind":"Argument","name":{"kind":"Name","value":"expense"},"value":{"kind":"Variable","name":{"kind":"Name","value":"expense"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<BalanceAccountingCategoryPickerQuery, BalanceAccountingCategoryPickerQueryVariables>;
