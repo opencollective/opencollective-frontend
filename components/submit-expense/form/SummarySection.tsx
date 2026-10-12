@@ -35,13 +35,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import UploadedFilePreview from '../../UploadedFilePreview';
 import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
 import { Step } from '../SubmitExpenseFlowSteps';
-import {
-  type ExpenseForm,
-  generateGrantTitle,
-  isValidRecurrenceEndAt,
-  RecurrenceFrequencyOption,
-  YesNoOption,
-} from '../useExpenseForm';
+import { type ExpenseForm, generateGrantTitle, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 
@@ -595,17 +589,22 @@ const PayoutMethodSummarySection = React.memo(function PayoutMethodSummarySectio
   );
 });
 
-function RecurrenceOptionBox(props: { form: ExpenseForm }) {
+/**
+ * Recurrence settings are bound directly to the form values: there is no intermediate "draft" state
+ * to save, so whatever is displayed here is what gets submitted.
+ */
+export function RecurrenceOptionBox(props: { form: ExpenseForm }) {
   const intl = useIntl();
-  const [isEditingRecurrence, setIsEdittingRecurrence] = React.useState(false);
-  const [recurrenceFrequencyEdit, setRecurrenceFrequencyEdit] = React.useState(props.form.values.recurrenceFrequency);
-  const [recurrenceEndAtEdit, setRecurrenceEndAtEdit] = React.useState(props.form.values.recurrenceEndAt);
+  const [hasOpenedEditor, setHasOpenedEditor] = React.useState(false);
 
-  const recurrenceFrequency = isEditingRecurrence ? recurrenceFrequencyEdit : props.form.values.recurrenceFrequency;
-  const recurrenceEndAt = isEditingRecurrence ? recurrenceEndAtEdit : props.form.values.recurrenceEndAt;
+  const recurrenceFrequency = props.form.values.recurrenceFrequency;
+  const recurrenceEndAt = props.form.values.recurrenceEndAt;
+  const isRecurring = Boolean(recurrenceFrequency && recurrenceFrequency !== RecurrenceFrequencyOption.NONE);
   // The end date error is only surfaced once the field is touched or the form has been submitted
   const recurrenceEndAtError =
     (props.form.touched.recurrenceEndAt || props.form.submitCount > 0) && props.form.errors.recurrenceEndAt;
+  // Always reveal the fields when there is an error to display, as it is only rendered next to them
+  const isEditingRecurrence = hasOpenedEditor || Boolean(recurrenceEndAtError);
 
   return (
     <div className="mt-4">
@@ -613,17 +612,16 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
         <div className="mb-4 font-bold">
           <FormattedMessage defaultMessage="Expense Recurrence" id="JnFWfB" />
         </div>
-        {!recurrenceFrequency ||
-          (recurrenceFrequency === 'none' && (
-            <div>
-              <FormattedMessage
-                defaultMessage="This expense will be submitted as a one-time expense. To make this a recurring expense, please specify the frequency."
-                id="4j+TF1"
-              />
-            </div>
-          ))}
+        {!isRecurring && (
+          <div>
+            <FormattedMessage
+              defaultMessage="This expense will be submitted as a one-time expense. To make this a recurring expense, please specify the frequency."
+              id="4j+TF1"
+            />
+          </div>
+        )}
 
-        {recurrenceFrequency && recurrenceFrequency !== 'none' && (
+        {isRecurring && (
           <div>
             <span>
               <FormattedMessage
@@ -651,7 +649,7 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
         {!isEditingRecurrence && (
           <Button
             disabled={props.form.initialLoading || props.form.isSubmitting}
-            onClick={() => setIsEdittingRecurrence(true)}
+            onClick={() => setHasOpenedEditor(true)}
             className="mt-2 p-0 text-sm"
             size="xs"
             variant="link"
@@ -669,7 +667,9 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
             <Select
               value={recurrenceFrequency}
               disabled={props.form.initialLoading || props.form.isSubmitting}
-              onValueChange={newValue => setRecurrenceFrequencyEdit(newValue as RecurrenceFrequencyOption)}
+              onValueChange={newValue =>
+                props.form.setFieldValue('recurrenceFrequency', newValue as RecurrenceFrequencyOption)
+              }
             >
               <SelectTrigger data-cy="expense-frequency">
                 <div className="flex items-center gap-2 overflow-hidden">
@@ -698,7 +698,7 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
               </SelectContent>
             </Select>
 
-            {recurrenceFrequency && recurrenceFrequency !== 'none' && (
+            {isRecurring && (
               <React.Fragment>
                 <Label htmlFor="expenseRecurrenceEndAt" className="mt-4 mb-2 block">
                   <FormattedMessage defaultMessage="End Date" id="EndDate" />
@@ -707,8 +707,11 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
                   id="expenseRecurrenceEndAt"
                   disabled={props.form.initialLoading || props.form.isSubmitting}
                   type="date"
-                  value={recurrenceEndAt}
-                  onChange={e => setRecurrenceEndAtEdit(e.target.value)}
+                  value={recurrenceEndAt ?? ''}
+                  onChange={e => {
+                    props.form.setFieldValue('recurrenceEndAt', e.target.value);
+                    props.form.setFieldTouched('recurrenceEndAt', true, false);
+                  }}
                   aria-invalid={Boolean(recurrenceEndAtError)}
                   aria-describedby={recurrenceEndAtError ? 'expenseRecurrenceEndAt-error' : undefined}
                 />
@@ -719,44 +722,6 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
                 )}
               </React.Fragment>
             )}
-
-            <div className="mt-4 flex gap-2">
-              <Button
-                disabled={props.form.initialLoading || props.form.isSubmitting}
-                onClick={() => {
-                  const isRecurrenceEndAtValid = isValidRecurrenceEndAt(recurrenceFrequencyEdit, recurrenceEndAtEdit);
-                  // Save both values at once and validate them, so an invalid end date gets a form error
-                  props.form.setValues(
-                    values => ({
-                      ...values,
-                      recurrenceFrequency: recurrenceFrequencyEdit,
-                      recurrenceEndAt: recurrenceEndAtEdit,
-                    }),
-                    true,
-                  );
-                  if (isRecurrenceEndAtValid) {
-                    setIsEdittingRecurrence(false);
-                  } else {
-                    // Keep the editor open: the end date error is only rendered inside it
-                    props.form.setFieldTouched('recurrenceEndAt', true, false);
-                  }
-                }}
-                variant="outline"
-              >
-                <FormattedMessage defaultMessage="Save changes" id="X0ha1a" />
-              </Button>
-              <Button
-                disabled={props.form.initialLoading || props.form.isSubmitting}
-                onClick={() => {
-                  setRecurrenceEndAtEdit(props.form.values.recurrenceEndAt);
-                  setRecurrenceFrequencyEdit(props.form.values.recurrenceFrequency);
-                  setIsEdittingRecurrence(false);
-                }}
-                variant="outline"
-              >
-                <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
-              </Button>
-            </div>
           </div>
         )}
       </MessageBox>

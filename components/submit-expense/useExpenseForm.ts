@@ -190,7 +190,6 @@ type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setF
   setFieldValue: <F extends Path<ExpenseFormValues>>(
     field: F,
     value: PathValue<ExpenseFormValues, F>,
-    shouldValidate?: boolean,
   ) => Promise<void> | Promise<FormikErrors<ExpenseFormValues>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getFieldProps: <F extends Path<ExpenseFormValues>>(field: F) => FieldInputProps<any>;
@@ -852,7 +851,7 @@ function buildFormSchema(
       .string()
       .nullish()
       .refine(recurrenceEndAt => isValidRecurrenceEndAt(values.recurrenceFrequency, recurrenceEndAt), {
-        message: 'End date must be in the future',
+        message: intl.formatMessage({ defaultMessage: 'End date must be in the future', id: 'd1V3ET' }),
       }),
     referenceCurrency: z
       .nativeEnum(Currency)
