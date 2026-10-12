@@ -223,7 +223,10 @@ function uploadFile(
             '',
           ].join('\r\n'),
         })
-        .then(({ body }) => body.url);
+        .then(({ body }) => {
+          expect(body.url, 'uploaded file url').to.be.a('string');
+          return body.url as string;
+        });
     });
   });
 }
