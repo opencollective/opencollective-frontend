@@ -4,7 +4,13 @@
 import type { Message, MessageSummary } from 'cypress-mailpit/dist/src/types';
 
 import { fakeTag as gql } from '../../../lib/graphql/helpers';
-import type { AccountReferenceInput, AmountInput, ExpenseType, UseVendorPolicy } from '@/lib/graphql/types/v2/graphql';
+import type {
+  AccountReferenceInput,
+  AmountInput,
+  ExpenseType,
+  UploadedFileKind,
+  UseVendorPolicy,
+} from '@/lib/graphql/types/v2/graphql';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
 
@@ -78,6 +84,7 @@ declare global {
           name: string;
           data: Record<string, unknown>;
         };
+        attachedFiles?: { url: string }[];
       }): Chainable<{ legacyId: number }>;
 
       draftExpenseAndInviteUser(params: {
@@ -103,6 +110,8 @@ declare global {
       ): Chainable<{ id: string; legacyId: number; slug: string }>;
 
       createVendor: typeof createVendor;
+
+      uploadFile: typeof uploadFile;
 
       graphqlQueryV2(
         query: string,
@@ -175,6 +184,46 @@ function createVendor(
       variables: { hostSlug, vendor },
     }).then(({ body }) => {
       return body.data.createVendor;
+    });
+  });
+}
+
+Cypress.Commands.add('uploadFile', uploadFile);
+/**
+ * Uploads a fixture through the API (like the file dropzones do) and returns the uploaded file URL.
+ * The fixture is sent in a text body, so it must be ASCII (like `pdf/preview.pdf`).
+ */
+function uploadFile(
+  file: { fixture: string; kind: UploadedFileKind | `${UploadedFileKind}`; mimeType: string },
+  userEmail: string,
+): Cypress.Chainable<string> {
+  const fileName = file.fixture.split('/').pop();
+  const boundary = 'cypress-upload-boundary';
+  return cy.fixture(file.fixture, 'utf8').then(content => {
+    return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+      return cy
+        .request({
+          url: '/api/images',
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${token}`,
+            'Content-Type': `multipart/form-data; boundary=${boundary}`,
+          },
+          body: [
+            `--${boundary}`,
+            'Content-Disposition: form-data; name="kind"',
+            '',
+            file.kind,
+            `--${boundary}`,
+            `Content-Disposition: form-data; name="file"; filename="${fileName}"`,
+            `Content-Type: ${file.mimeType}`,
+            '',
+            content,
+            `--${boundary}--`,
+            '',
+          ].join('\r\n'),
+        })
+        .then(({ body }) => body.url);
     });
   });
 }

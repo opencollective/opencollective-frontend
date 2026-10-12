@@ -65,6 +65,31 @@ describe('Expense flow', () => {
         .should('contain', '$10.00');
     });
 
+    it('Previews a PDF attachment', () => {
+      cy.uploadFile(
+        { fixture: 'pdf/preview.pdf', kind: 'EXPENSE_ATTACHED_FILE', mimeType: 'application/pdf' },
+        user.email,
+      ).then(fileUrl => {
+        cy.createExpense({
+          type: 'INVOICE',
+          userEmail: user.email,
+          account: { legacyId: collective.id },
+          payee: { legacyId: user.CollectiveId },
+          description: 'Expense with a PDF attachment',
+          attachedFiles: [{ url: fileUrl }],
+        }).then(expenseWithPdf => {
+          cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/${expenseWithPdf.legacyId}` });
+        });
+      });
+
+      cy.contains('[data-cy="download-expense-invoice-btn"]', 'preview.pdf').click();
+      // The page and its text layer only render if the pdf.js worker loads and matches the API version,
+      // otherwise PDFViewer shows its error message instead
+      cy.get('.react-pdf__Page canvas').should('be.visible');
+      cy.contains('.react-pdf__Page__textContent', 'Open Collective PDF preview');
+      cy.contains('Failed to load PDF file.').should('not.exist');
+    });
+
     it('Approve, unapprove, reject and pay actions on expense', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
       cy.get('[data-cy="expense-status-msg"]').contains('Pending');
