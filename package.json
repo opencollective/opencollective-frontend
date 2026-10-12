@@ -204,17 +204,8 @@
     "format": "npm run prettier:write",
     "build:finalize": "npm run build:updates",
     "graphql:refresh": "npm run graphql:codegen",
-    "dev:local": "npm run dev",
-    "build:next:local": "npm run build:next",
-    "build:server:local": "npm run build:server",
-    "type:check:local": "npm run type:check",
-    "test:local": "npm run test",
-    "test:jest:local": "npm run test:jest",
-    "build:local": "npm run build:updates",
     "dev:environment": "EXTRA_ENV=\"$OC_DEV_ENV_FRONTEND\" npm run dev",
-    "dev:environment:local": "npm run dev:environment",
     "turbo": "turbo --single-package --root-turbo-json=turbo.standalone.json",
-    "test:watch:local": "npm run test:watch",
     "build:prepare": "tsx scripts/prepare-build.ts"
   },
   "devDependencies": {

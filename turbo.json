@@ -701,57 +701,9 @@
       "persistent": true,
       "passThroughEnv": ["*"]
     },
-    "dev:local": {
-      "cache": false,
-      "passThroughEnv": ["*"],
-      "persistent": true,
-      "dependsOn": ["//#taxes:link:packages"]
-    },
-    "build:next:local": {
-      "cache": false,
-      "passThroughEnv": ["*"],
-      "dependsOn": ["//#taxes:link:packages", "build:prepare"]
-    },
-    "build:server:local": {
-      "dependsOn": ["build:next:local"],
-      "cache": false,
-      "passThroughEnv": ["*"]
-    },
-    "type:check:local": {
-      "cache": false,
-      "passThroughEnv": ["*"],
-      "dependsOn": ["//#taxes:link:packages"]
-    },
-    "test:local": {
-      "cache": false,
-      "passThroughEnv": ["*"],
-      "dependsOn": ["//#taxes:link:packages"]
-    },
-    "test:jest:local": {
-      "cache": false,
-      "passThroughEnv": ["*"],
-      "dependsOn": ["//#taxes:link:packages"]
-    },
-    "build:local": {
-      "cache": false,
-      "passThroughEnv": ["*"],
-      "dependsOn": ["build:server:local"]
-    },
-    "dev:environment:local": {
-      "cache": false,
-      "persistent": true,
-      "passThroughEnv": ["*"],
-      "dependsOn": ["//#taxes:link:packages"]
-    },
     "clean": {
       "cache": false,
       "passThroughEnv": ["*"]
-    },
-    "test:watch:local": {
-      "cache": false,
-      "persistent": true,
-      "passThroughEnv": ["*"],
-      "dependsOn": ["//#taxes:link:packages"]
     },
     "build:prepare": {
       "cache": false,
