@@ -92,6 +92,18 @@ type Contracts = {
     scenario: GraphScenario;
   };
   /**
+   * Actors `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense). Accounts `host`,
+   * `collective` (no expense policy), optional `project` under it. Expenses: optional `pending` (invoice).
+   * URLs `expenses`, `policies`, optional `projectNewExpense`.
+   */
+  'expense-management': {
+    inputs: {
+      expense?: { description: string; items: Array<{ description: string; amount: number }> };
+      project?: boolean;
+    };
+    scenario: GraphScenario;
+  };
+  /**
    * Actors `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`. Accounts `host`, `collective`, `payee`.
    * Expenses: `draft`. URLs: `draft` (the invitation link).
    */
@@ -106,6 +118,7 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'account-conversation': accountScenario,
   'expense-submission': graphScenario,
   'expense-draft-invite': graphScenario,
+  'expense-management': graphScenario,
 };
 
 type Recipe = keyof Contracts;

@@ -31,6 +31,8 @@ type ExpenseSubmission = {
   title: string;
   /** Apply 20% VAT (the paying Account must be subject to VAT). */
   vat?: boolean;
+  /** Also ask to be prompted for a copy of this expense every month, until Sep 29, 2125. */
+  recurring?: boolean;
 };
 
 const INVITEE_PAYOUT_NOTICE =
@@ -271,6 +273,18 @@ export async function submitExpense(page: Page, submission: ExpenseSubmission) {
   await expect(summary.getByText('Payout Method', { exact: true }).first().locator('..')).toContainText(
     'payoutMethod' in payee ? payee.payoutMethod.name : INVITEE_PAYOUT_NOTICE,
   );
+
+  if (submission.recurring) {
+    const recurrence = summary.getByText('Expense Recurrence').locator('..');
+    await recurrence.getByText('Edit recurrence frequency').click();
+    await recurrence.getByTestId('expense-frequency').click();
+    await page.getByTestId('expense-frequency-option').filter({ hasText: 'Monthly' }).click();
+    await recurrence.locator('#expenseRecurrenceEndAt').fill('2125-09-29');
+    await recurrence.getByText('Save changes').click();
+    await expect(recurrence).toContainText(
+      'Once submitted, you will also be prompted to review and submit a copy of this expense every month. The prompts will stop on Sep 29, 2125',
+    );
+  }
 
   await page.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
   await expect(page.getByText('has been submitted successfully!')).toBeVisible();
