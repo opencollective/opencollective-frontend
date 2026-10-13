@@ -98,11 +98,14 @@ function get_deployed_commit()
   # correct when the app is deployed by the GitHub integration or rolled back.
   # The latest release is not always the current one: a pending or failed release
   # (release phase) leaves the previous release serving traffic.
-  local token slug_id
+  # Returns 1 when the Heroku CLI is unavailable, 2 when no current release is found.
+  local token releases slug_id
   command -v heroku &> /dev/null || return 1
   token=$(heroku auth:token 2> /dev/null) || return 1
-  slug_id=$(heroku releases -a "$HEROKU_APP" --json -n 20 2> /dev/null | node -e "process.stdout.write(JSON.parse(require('fs').readFileSync(0)).find(release => release.current)?.slug?.id ?? '')") || return 1
-  [ -n "$slug_id" ] || return 1
+  # 1000 is the largest page the Heroku API returns
+  releases=$(heroku releases -a "$HEROKU_APP" --json -n 1000 2> /dev/null) || return 1
+  slug_id=$(node -e "process.stdout.write(JSON.parse(require('fs').readFileSync(0)).find(release => release.current)?.slug?.id ?? '')" <<< "$releases") || return 1
+  [ -n "$slug_id" ] || return 2
   curl -s --fail \
     -H "Authorization: Bearer $token" \
     -H "Accept: application/vnd.heroku+json; version=3" \
@@ -118,6 +121,11 @@ if ! git fetch $LOCAL_ORIGIN $LOCAL_BRANCH &> /dev/null; then
   exit 1
 fi
 DEPLOYED_COMMIT=$(get_deployed_commit)
+if [ $? -eq 2 ]; then
+  # Falling back on the Heroku git remote could report "nothing to deploy" while older code runs
+  echo "❌  Could not find the current release of $HEROKU_APP in its latest 1000 releases."
+  exit 1
+fi
 
 if [ -n "$DEPLOYED_COMMIT" ] && git cat-file -e "$DEPLOYED_COMMIT^{commit}" &> /dev/null; then
   GIT_LOG_COMPARISON="$DEPLOYED_COMMIT..$LOCAL_ORIGIN/$LOCAL_BRANCH"
