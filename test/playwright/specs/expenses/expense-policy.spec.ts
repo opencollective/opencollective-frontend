@@ -14,8 +14,13 @@ async function writeExpensePolicies(page: Page, policies: { invoice: string; rei
   // Policies belong to this attempt's Collective: nothing was written before the admin does.
   await expect(invoice).toHaveText('');
   await expect(reimbursement).toHaveText('');
-  await invoice.fill(policies.invoice);
-  await reimbursement.fill(policies.reimbursement);
+  // Text for the second editor has landed in the first when typed straight after it: type again until both hold theirs.
+  await expect(async () => {
+    await invoice.fill(policies.invoice);
+    await reimbursement.fill(policies.reimbursement);
+    await expect(invoice).toHaveText(policies.invoice, { timeout: 1_000 });
+    await expect(reimbursement).toHaveText(policies.reimbursement, { timeout: 1_000 });
+  }).toPass();
   await page.getByTestId('submit-policy-btn').click();
   await expect(
     page.getByTestId('toast-notification').filter({ hasText: 'Policies updated successfully' }),
