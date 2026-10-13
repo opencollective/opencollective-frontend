@@ -172,3 +172,23 @@ expense and Project) or `expense-submission`, and `helpers/downloads.ts`
 (`downloadPdf`: attempt-owned download path, text of the PDF rendered by the
 local PDF service). Coverage mapping, differences from Cypress and timings are
 in the canonical [guide](../../docs/e2e.md#expense-management-journeys-playwright-pilot).
+
+## Vendor picker journeys
+
+`specs/vendors/` holds the picker half of the vendor pilot: which vendors the
+expense form, the grant form and the Add Funds dialog offer, depending on the
+vendor's scope and host, the host and vendor policies, and who is asking; plus
+a grant request submitted to a scoped beneficiary.
+
+```bash
+./test/playwright/run-local.sh --spec test/playwright/specs/vendors --workers 3
+./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-policy.spec.ts --grep "submitter without any role"
+```
+
+They use the `vendor-host` recipe (an attempt-owned host with its policy,
+Collectives, a Project, a second host, and named vendors in
+`scenario.vendors`) and `helpers/vendor-picker.ts`, whose `expectVendorChoices`
+only reports a vendor as withheld after seeing one that must be offered.
+Coverage mapping, differences from Cypress, product behavior the journeys
+deliberately do not assert, and timings are in the canonical
+[guide](../../docs/e2e.md#vendor-picker-journeys-playwright-pilot).
