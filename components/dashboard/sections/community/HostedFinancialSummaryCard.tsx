@@ -137,7 +137,7 @@ export function HostedFinancialSummaryCard({
     <React.Fragment>
       <HostedAccountBalanceSummary
         account={account}
-        onOpenMoneyView={view => handleTabChange(AccountDetailView.PAYMENT_INTENTS, view)}
+        onOpenMoneyView={view => handleTabChange(AccountDetailView.MONEY_MOVEMENTS, view)}
       />
       <div className="flex flex-col gap-4">
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -195,7 +195,7 @@ export function HostedFinancialSummaryCard({
                 recentCredits?.nodes?.length > 0 && (
                   <div className="flex min-h-[49px] w-full items-center justify-center border-t">
                     <button
-                      onClick={() => handleTabChange(AccountDetailView.PAYMENT_INTENTS, 'CONTRIBUTIONS')}
+                      onClick={() => handleTabChange(AccountDetailView.MONEY_MOVEMENTS, 'CONTRIBUTIONS')}
                       className="font-normal text-muted-foreground hover:text-foreground hover:underline"
                     >
                       <FormattedMessage defaultMessage="View more" id="34Up+l" />
@@ -226,7 +226,7 @@ export function HostedFinancialSummaryCard({
                 recentDebits?.nodes?.length > 0 && (
                   <div className="flex min-h-[49px] w-full items-center justify-center border-t">
                     <button
-                      onClick={() => handleTabChange(AccountDetailView.PAYMENT_INTENTS, 'PAYOUTS')}
+                      onClick={() => handleTabChange(AccountDetailView.MONEY_MOVEMENTS, 'PAYOUTS')}
                       className="font-normal text-muted-foreground hover:text-foreground hover:underline"
                     >
                       <FormattedMessage defaultMessage="View more" id="34Up+l" />

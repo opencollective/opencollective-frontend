@@ -86,6 +86,9 @@ const convertOrganizationMutation = gql`
   ${vendorFieldFragment}
 `;
 
+/** Old tab subpath of the Money Movements tab, kept working for existing links. */
+const LEGACY_MONEY_MOVEMENTS_SUBPATH = 'payment-intents';
+
 type AccountDetailsProps = {
   onClose: () => void;
   account?: AccountReferenceInput;
@@ -97,7 +100,12 @@ export function AccountDetails(props: AccountDetailsProps) {
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const intl = useIntl();
   const router = useRouter();
-  const selectedTab = router.query?.subpath?.[1] || AccountDetailView.OVERVIEW;
+  const rawTab = router.query?.subpath?.[1] as string | undefined;
+  // Legacy URL compat: the Money Movements tab used to live under `payment-intents`.
+  const selectedTab =
+    rawTab === LEGACY_MONEY_MOVEMENTS_SUBPATH
+      ? AccountDetailView.MONEY_MOVEMENTS
+      : rawTab || AccountDetailView.OVERVIEW;
 
   const setSelectedTab = React.useCallback(
     (tab: AccountDetailView) => {
@@ -214,7 +222,7 @@ export function AccountDetails(props: AccountDetailsProps) {
           count: account ? (account.childrenAccounts?.nodes?.length || 0) + 1 : undefined,
         },
         {
-          id: AccountDetailView.PAYMENT_INTENTS,
+          id: AccountDetailView.MONEY_MOVEMENTS,
           label: <FormattedMessage defaultMessage="Money Movements" id="MoneyMovements" />,
         },
         {
@@ -288,6 +296,13 @@ export function AccountDetails(props: AccountDetailsProps) {
       makeReplaceSubpath(router)(`${parentPublicId}/${selectedTab}`);
     }
   }, [parentPublicId, selectedTab, router]);
+
+  // Canonicalize legacy Money Movements URLs.
+  React.useEffect(() => {
+    if (rawTab === LEGACY_MONEY_MOVEMENTS_SUBPATH) {
+      makeReplaceSubpath(router)(`${props.account.id}/${AccountDetailView.MONEY_MOVEMENTS}`);
+    }
+  }, [rawTab, props.account.id, router]);
 
   if (parentPublicId) {
     return null;
@@ -374,7 +389,7 @@ export function AccountDetails(props: AccountDetailsProps) {
           handleTransactionTableRowClick={handleTransactionTableRowClick}
         />
       )}
-      {selectedTab === AccountDetailView.PAYMENT_INTENTS && isHostedAccount && account && (
+      {selectedTab === AccountDetailView.MONEY_MOVEMENTS && isHostedAccount && account && (
         <MoneyMovements
           account={account}
           hostSlug={dashboardAccount.slug}
