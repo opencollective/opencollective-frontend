@@ -9,7 +9,7 @@ import { withRequiredProviders } from '../../../test/providers';
 
 import { toast } from '../../ui/useToast';
 
-import Webhooks, { deleteWebhookMutation, editCollectiveWebhooksQuery } from './Webhooks';
+import Webhooks, { createWebhookMutation, deleteWebhookMutation, editCollectiveWebhooksQuery } from './Webhooks';
 
 jest.mock('../../ui/useToast', () => ({ toast: jest.fn() }));
 
@@ -54,6 +54,8 @@ const renderWebhooks = mocks =>
   );
 
 describe('Webhooks', () => {
+  beforeEach(() => jest.mocked(toast).mockClear());
+
   it('lists the webhooks of the account', async () => {
     renderWebhooks([
       { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, result: { data: { account } } },
@@ -89,5 +91,47 @@ describe('Webhooks', () => {
     );
     expect(screen.getByRole('button', { name: /Save/ })).toBeInTheDocument();
     expect(screen.queryByText('Network error')).not.toBeInTheDocument();
+  });
+
+  it('does not create a webhook again when the reload after saving it fails', async () => {
+    const newNode = {
+      __typename: 'Webhook',
+      id: 'webhook-2',
+      activityType: 'ACTIVITY_ALL',
+      webhookUrl: 'https://example.com/new',
+    };
+    const createRequest = {
+      query: createWebhookMutation,
+      variables: {
+        webhook: { account: { id: 'account-1' }, activityType: 'ACTIVITY_ALL', webhookUrl: 'https://example.com/new' },
+      },
+    };
+    renderWebhooks([
+      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, result: { data: { account } } },
+      { request: createRequest, result: { data: { createWebhook: { __typename: 'Webhook', id: 'webhook-2' } } } },
+      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, error: new Error('Network error') },
+      // Second save: only the reload is mocked, any mutation would fail with "No more mocked responses"
+      {
+        request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
+        result: {
+          data: {
+            account: { ...account, webhooks: { ...account.webhooks, nodes: [...account.webhooks.nodes, newNode] } },
+          },
+        },
+      },
+    ]);
+
+    await screen.findByDisplayValue('example.com/hook');
+    fireEvent.click(screen.getByRole('button', { name: /New Webhook/ }));
+    fireEvent.change(screen.getAllByRole('textbox').at(-1), { target: { value: 'example.com/new' } });
+    fireEvent.click(screen.getByRole('button', { name: /Save/ }));
+
+    await waitFor(() => expect(toast).toHaveBeenCalledWith(expect.objectContaining({ message: 'Network error' })));
+    expect(toast).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole('button', { name: /Save/ }));
+    expect(await screen.findByText('Saved')).toBeInTheDocument();
+    expect(toast).toHaveBeenCalledTimes(1);
+    expect(screen.getByDisplayValue('example.com/new')).toBeInTheDocument();
   });
 });
