@@ -446,7 +446,7 @@ export const editCollectiveWebhooksQuery = gql`
   }
 `;
 
-const createWebhookMutation = gql`
+export const createWebhookMutation = gql`
   mutation CreateWebhook($webhook: WebhookCreateInput!) {
     createWebhook(webhook: $webhook) {
       id
@@ -490,11 +490,14 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
   const saveWebhooks = async (editedWebhooks: Notification[]) => {
     const savedWebhooks = new Map(webhooks.map(webhook => [webhook.id, webhook]));
     const keptIds = new Set(editedWebhooks.map(webhook => webhook.id).filter(Boolean));
+    // What the server holds after each successful mutation, in case the reload fails
+    const persistedNodes = new Map(account.webhooks.nodes.map(node => [node.id, node]));
     let saveError;
     try {
       for (const webhook of webhooks) {
         if (!keptIds.has(webhook.id)) {
           await client.mutate({ mutation: deleteWebhookMutation, variables: { webhook: { id: webhook.id } } });
+          persistedNodes.delete(webhook.id);
         }
       }
 
@@ -505,10 +508,12 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
         };
         const saved = savedWebhooks.get(webhook.id);
         if (!saved) {
-          await client.mutate({
+          const result = await client.mutate({
             mutation: createWebhookMutation,
             variables: { webhook: { account: { id: account.id }, ...values } },
           });
+          const id = result.data.createWebhook.id;
+          persistedNodes.set(id, { __typename: 'Webhook', id, ...values });
         } else if (
           saved.type !== webhook.type ||
           cleanWebhookUrl(saved.webhookUrl) !== cleanWebhookUrl(webhook.webhookUrl)
@@ -517,6 +522,7 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
             mutation: updateWebhookMutation,
             variables: { webhook: { id: webhook.id, ...values } },
           });
+          persistedNodes.set(webhook.id, { __typename: 'Webhook', id: webhook.id, ...values });
         }
       }
     } catch (e) {
@@ -528,6 +534,12 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
     try {
       result = await refetch();
     } catch (refetchError) {
+      // Show what was saved, so that saving again does not repeat the mutations that succeeded
+      client.writeQuery({
+        query: editCollectiveWebhooksQuery,
+        variables: { slug: props.collectiveSlug },
+        data: { account: { ...account, webhooks: { ...account.webhooks, nodes: [...persistedNodes.values()] } } },
+      });
       throw saveError ?? refetchError;
     }
     if (saveError) {
