@@ -52,8 +52,8 @@ export class Mailbox {
       message =>
         message.To.some(({ Address }) => Address === recipient) &&
         message.Subject.includes(subject) &&
-        // Same machine as the mail server; the margin only absorbs timestamp rounding.
-        Date.parse(message.Created) >= this.openedAt - 1000,
+        // Mailpit runs on the same machine and clock, and records when it received the message to the millisecond.
+        Date.parse(message.Created) >= this.openedAt,
     );
   }
 

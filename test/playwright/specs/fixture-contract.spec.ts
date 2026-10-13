@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 
 import { expect, test } from '../fixtures';
+import { scenarioEvidence } from '../fixtures/transport';
 
 test('fixture authorization fails closed', async ({ recipes }) => {
   const unauthorized = await fetch(recipes.endpoint, {
@@ -45,4 +46,25 @@ test('concurrent requests recover the committed result after a discarded respons
   const conflict = await recipes.request('account-profile', { name: 'Conflicting Account' }, 'recover');
   expect(conflict.status).toBe(409);
   expect((await conflict.json()).error.code).toBe('REQUEST_CONFLICT');
+});
+
+test('scenario evidence holds named references and no credential, whatever key carries it', async ({ recipes }) => {
+  const scenario = await recipes.arrange('account-profile', { name: 'Evidence Account' }, 'evidence');
+  const evidence = JSON.stringify(
+    scenarioEvidence({
+      ...scenario,
+      apiKey: 'secret-at-the-top',
+      user: { ...scenario.user, password: 'secret-in-a-handle' },
+      urls: { ...scenario.urls, profile: `${scenario.urls.profile}?key=secret-in-a-link` },
+    } as typeof scenario),
+  );
+  expect(evidence).not.toContain('secret-');
+  expect(evidence).not.toContain(scenario.auth.token);
+  expect(JSON.parse(evidence)).toMatchObject({
+    recipe: 'account-profile',
+    attempt: recipes.attempt,
+    account: scenario.account,
+    user: scenario.user,
+    urls: scenario.urls,
+  });
 });
