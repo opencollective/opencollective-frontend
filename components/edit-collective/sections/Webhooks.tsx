@@ -19,6 +19,7 @@ import injectIntl from '@/lib/injectIntl';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
@@ -418,7 +419,7 @@ class Webhooks extends React.Component<Props, State> {
   }
 }
 
-const editCollectiveWebhooksQuery = gql`
+export const editCollectiveWebhooksQuery = gql`
   query EditCollectiveWebhooks($slug: String!) {
     account(slug: $slug) {
       id
@@ -434,7 +435,7 @@ const editCollectiveWebhooksQuery = gql`
         RECEIVE_FINANCIAL_CONTRIBUTIONS
         UPDATES
       }
-      webhooks(limit: 100) {
+      webhooks(limit: 1000) {
         nodes {
           id
           activityType
@@ -478,7 +479,7 @@ const getWebhooksFromAccount = (account: WebhooksAccount): Notification[] =>
 
 const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
   const client = useApolloClient();
-  const { data, loading, refetch } = useQuery(editCollectiveWebhooksQuery, {
+  const { data, loading, error, refetch } = useQuery(editCollectiveWebhooksQuery, {
     variables: { slug: props.collectiveSlug },
   });
   const webhooks = React.useMemo(() => getWebhooksFromAccount(data?.account), [data?.account]);
@@ -487,7 +488,7 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
   const saveWebhooks = async (editedWebhooks: Notification[]) => {
     const savedWebhooks = new Map(webhooks.map(webhook => [webhook.id, webhook]));
     const keptIds = new Set(editedWebhooks.map(webhook => webhook.id).filter(Boolean));
-    let error;
+    let saveError;
     try {
       for (const webhook of webhooks) {
         if (!keptIds.has(webhook.id)) {
@@ -517,17 +518,21 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
         }
       }
     } catch (e) {
-      error = e;
+      saveError = e;
     }
 
     // Always reload, as some changes may have been saved before an error
     const result = await refetch();
-    if (error) {
-      throw error;
+    if (saveError) {
+      throw saveError;
     }
 
     return getWebhooksFromAccount(result.data.account);
   };
+
+  if (error) {
+    return <MessageBoxGraphqlError error={error} />;
+  }
 
   return (
     <Webhooks {...props} data={{ account: data?.account, loading }} webhooks={webhooks} saveWebhooks={saveWebhooks} />
