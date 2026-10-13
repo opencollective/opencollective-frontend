@@ -2,12 +2,16 @@ import '@testing-library/jest-dom';
 
 import React from 'react';
 import { MockedProvider } from '@apollo/client/testing';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { GraphQLError } from 'graphql';
 
 import { withRequiredProviders } from '../../../test/providers';
 
-import Webhooks, { editCollectiveWebhooksQuery } from './Webhooks';
+import { toast } from '../../ui/useToast';
+
+import Webhooks, { deleteWebhookMutation, editCollectiveWebhooksQuery } from './Webhooks';
+
+jest.mock('../../ui/useToast', () => ({ toast: jest.fn() }));
 
 const SLUG = 'my-collective';
 
@@ -65,5 +69,25 @@ describe('Webhooks', () => {
       },
     ]);
     expect(await screen.findByText('You need to be logged in to manage webhooks')).toBeInTheDocument();
+  });
+
+  it('reports the save error and keeps the form when the reload after it fails', async () => {
+    renderWebhooks([
+      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, result: { data: { account } } },
+      {
+        request: { query: deleteWebhookMutation, variables: { webhook: { id: 'webhook-1' } } },
+        result: { errors: [new GraphQLError('Webhook could not be deleted')] },
+      },
+      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, error: new Error('Network error') },
+    ]);
+
+    fireEvent.click(await screen.findByTitle('Remove webhook'));
+    fireEvent.click(screen.getByRole('button', { name: /Save/ }));
+
+    await waitFor(() =>
+      expect(toast).toHaveBeenCalledWith(expect.objectContaining({ message: 'Webhook could not be deleted' })),
+    );
+    expect(screen.getByRole('button', { name: /Save/ })).toBeInTheDocument();
+    expect(screen.queryByText('Network error')).not.toBeInTheDocument();
   });
 });
