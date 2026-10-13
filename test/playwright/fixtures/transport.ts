@@ -48,6 +48,10 @@ const graphScenario = z.object({
   expenses: z.record(
     z.object({ id: z.string(), legacyId: z.number(), description: z.string(), status: z.string(), url: z.string() }),
   ),
+  /** Vendors arranged by the vendor recipes; other recipes arrange none. */
+  vendors: z
+    .record(z.object({ id: z.string(), legacyId: z.number(), slug: z.string(), name: z.string(), type: z.string() }))
+    .default({}),
   urls: z.record(z.string()),
 });
 
@@ -67,8 +71,11 @@ export type GraphScenario = Envelope & {
   actors: Record<string, { id: string; legacyId: number; slug: string; name: string; email: string; token: string }>;
   accounts: Record<string, { id: string; legacyId: number; slug: string; name: string; type: string }>;
   expenses: Record<string, { id: string; legacyId: number; description: string; status: string; url: string }>;
+  vendors: Record<string, { id: string; legacyId: number; slug: string; name: string; type: string }>;
   urls: Record<string, string>;
 };
+
+type UseVendorPolicy = 'HOST_ADMINS' | 'HOST_AND_COLLECTIVE_ADMINS' | 'ALL_SUBMITTERS';
 
 /** Inputs and result of each named API recipe (`server/e2e` in the API). Add a recipe by adding its entry here and in `schemas`. */
 type Contracts = {
@@ -111,6 +118,35 @@ type Contracts = {
     inputs: { description: string; currency: 'USD' | 'EUR'; items: Array<{ description: string; amount: number }> };
     scenario: GraphScenario;
   };
+  /**
+   * Actors `hostAdmin`, `collectiveAdmin`, optional `outsider` (no role anywhere), `otherHostAdmin`,
+   * `otherCollectiveAdmin`. Accounts `host`, `collective` (admin: `collectiveAdmin`), optional `collective2`
+   * (admin: `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by
+   * `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`). Vendors by `label`. URLs
+   * `hostedCollectives` (host dashboard).
+   */
+  'vendor-host': {
+    inputs: {
+      /** Who may use the host's vendors; omitted, the host has no policy (product default: host admins only). */
+      useVendorPolicy?: UseVendorPolicy;
+      grants?: boolean;
+      secondCollective?: boolean;
+      project?: boolean;
+      outsider?: boolean;
+      otherHost?: { admin: 'hostAdmin' | 'otherHostAdmin'; collective?: boolean };
+      vendors?: Array<{
+        label: string;
+        /** Host holding the vendor; `host` unless stated. */
+        host?: 'host' | 'otherHost';
+        /** Accounts the vendor can be used with; empty or omitted means every Account of its host. */
+        usableWith?: Array<'host' | 'collective' | 'collective2' | 'project' | 'otherHost' | 'otherCollective'>;
+        /** The vendor's own policy; omitted, it follows its host's. */
+        useVendorPolicy?: UseVendorPolicy;
+        payoutMethod?: boolean;
+      }>;
+    };
+    scenario: GraphScenario;
+  };
 };
 
 const schemas: Record<Recipe, z.ZodTypeAny> = {
@@ -119,6 +155,7 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'expense-submission': graphScenario,
   'expense-draft-invite': graphScenario,
   'expense-management': graphScenario,
+  'vendor-host': graphScenario,
 };
 
 type Recipe = keyof Contracts;
