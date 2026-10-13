@@ -9,7 +9,12 @@ import { withRequiredProviders } from '../../../test/providers';
 
 import { toast } from '../../ui/useToast';
 
-import Webhooks, { createWebhookMutation, deleteWebhookMutation, editCollectiveWebhooksQuery } from './Webhooks';
+import Webhooks, {
+  createWebhookMutation,
+  deleteWebhookMutation,
+  editCollectiveWebhooksQuery,
+  updateWebhookMutation,
+} from './Webhooks';
 
 jest.mock('../../ui/useToast', () => ({ toast: jest.fn() }));
 
@@ -133,5 +138,49 @@ describe('Webhooks', () => {
     expect(await screen.findByText('Saved')).toBeInTheDocument();
     expect(toast).toHaveBeenCalledTimes(1);
     expect(screen.getByDisplayValue('example.com/new')).toBeInTheDocument();
+  });
+
+  it('keeps an http URL when only the activity changes', async () => {
+    const httpAccount = {
+      ...account,
+      webhooks: {
+        ...account.webhooks,
+        nodes: [{ ...account.webhooks.nodes[0], webhookUrl: 'http://example.com/hook' }],
+      },
+    };
+    const updatedNode = {
+      __typename: 'Webhook',
+      id: 'webhook-1',
+      activityType: 'ACTIVITY_ALL',
+      webhookUrl: 'http://example.com/hook',
+    };
+    renderWebhooks([
+      {
+        request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
+        result: { data: { account: httpAccount } },
+      },
+      {
+        request: {
+          query: updateWebhookMutation,
+          variables: {
+            webhook: { id: 'webhook-1', activityType: 'ACTIVITY_ALL', webhookUrl: 'http://example.com/hook' },
+          },
+        },
+        result: { data: { updateWebhook: { __typename: 'Webhook', id: 'webhook-1' } } },
+      },
+      {
+        request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
+        result: { data: { account: { ...httpAccount, webhooks: { ...httpAccount.webhooks, nodes: [updatedNode] } } } },
+      },
+    ]);
+
+    await screen.findByDisplayValue('example.com/hook');
+    fireEvent.keyDown(screen.getByLabelText('Activity'), { key: 'ArrowDown' });
+    fireEvent.click(await screen.findByRole('option', { name: 'All' }));
+    fireEvent.click(screen.getByRole('button', { name: /Save/ }));
+
+    // An https URL would not match the mocked mutation and fail the save
+    expect(await screen.findByText('Saved')).toBeInTheDocument();
+    expect(toast).not.toHaveBeenCalled();
   });
 });
