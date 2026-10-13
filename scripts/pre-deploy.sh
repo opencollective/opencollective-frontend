@@ -72,7 +72,7 @@ function confirm()
   return 1
 }
 
-function exit_success()
+function exit_if_push_is_noop()
 {
   # A push only creates a release when it moves the Heroku git ref. After a rollback the ref can
   # already point to origin/main while an older release runs: the push would then deploy nothing.
@@ -83,7 +83,10 @@ function exit_success()
     echo "   Roll forward from the Heroku dashboard or with \`heroku releases:rollback <version> -a $HEROKU_APP\` (this also restores that release's config vars)."
     exit 1
   fi
+}
 
+function exit_success()
+{
   echo "🚀  Deploying now..."
   if [ "$1" == "staging" ]; then
     PUSH_FLAGS="--force"
@@ -150,6 +153,9 @@ if [ -z "$NEXT_COMMIT" ]; then
   echo "✅  $1 is already up to date with $LOCAL_ORIGIN/$LOCAL_BRANCH ($(git rev-parse --short $LOCAL_ORIGIN/$LOCAL_BRANCH)), nothing to deploy."
   exit 0
 fi
+
+# Before confirming and notifying Slack, so a deploy that cannot happen is not announced
+exit_if_push_is_noop
 
 echo ""
 echo "-------------- New commits --------------"
