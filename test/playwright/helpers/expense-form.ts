@@ -99,12 +99,17 @@ export async function chooseExpenseType(page: Page, kind: ExpenseKind, { attachI
   }
 }
 
-/** Opens an emailed (or otherwise shared) expense invitation and starts completing it. */
-export async function openInvitation(page: Page, link: string) {
-  await page.goto(link);
+/** On an open expense invitation: checks what the recipient is told and offered, and starts completing it. */
+export async function continueInvitation(page: Page) {
   await expect(page.getByText('You have been invited to submit an expense')).toBeVisible();
   await expect(page.getByText('Decline invitation')).toBeVisible();
   await page.getByText('Continue submission').click();
+}
+
+/** Opens an emailed (or otherwise shared) expense invitation and starts completing it. */
+export async function openInvitation(page: Page, link: string) {
+  await page.goto(link);
+  await continueInvitation(page);
 }
 
 /**
@@ -157,6 +162,13 @@ async function choosePayee(page: Page, payee: Payee) {
   }
 }
 
+/** Drops a local image onto an item's receipt zone and waits until the product has stored it. */
+export async function attachReceipt(item: Locator, name: string) {
+  await dropFiles(item.getByText('Drag & drop'), [imageFile(name)]);
+  await expect(item.getByText('Clear')).toBeVisible();
+  await expectStoredUpload(item.getByRole('link', { name: 'Uploaded file preview' }));
+}
+
 async function fillItem(
   item: Locator,
   kind: ExpenseKind,
@@ -166,9 +178,7 @@ async function fillItem(
   await item.getByLabel('Date').fill(values.date);
   await item.getByLabel('Amount').fill(values.amount);
   if (kind === 'reimbursement') {
-    await dropFiles(item.getByText('Drag & drop'), [imageFile(values.receipt)]);
-    await expect(item.getByText('Clear')).toBeVisible();
-    await expectStoredUpload(item.getByRole('link', { name: 'Uploaded file preview' }));
+    await attachReceipt(item, values.receipt);
   }
 }
 

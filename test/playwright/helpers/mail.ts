@@ -120,3 +120,12 @@ export async function expenseInvitationLink(
   );
   return link;
 }
+
+/**
+ * The one-click link the product emails to someone who asks to sign in with
+ * their address `to`, as a path relative to the site.
+ */
+export async function emailedSignInLink(mail: Mailbox, { to }: { to: string }): Promise<string> {
+  const message = await mail.waitForMessage({ to, subject: 'Open Collective: Sign In' });
+  return linkIn(message, 'One-click Sign In');
+}

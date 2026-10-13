@@ -93,6 +93,8 @@ type Contracts = {
       secondCollective?: boolean;
       payeeOrganization?: boolean;
       priorExpense?: boolean;
+      /** What the prior expense is; a `RECEIPT` (reimbursement) has a stored receipt on its item. Invoice unless stated. */
+      priorExpenseType?: 'INVOICE' | 'RECEIPT';
       invitee?: boolean;
       inviteeOrganization?: boolean;
     };
