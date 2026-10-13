@@ -139,10 +139,10 @@ in the canonical [guide](../../docs/e2e.md#expense-submission-journeys-playwrigh
 ## Expense invitation journeys
 
 `specs/expenses/invite-*.spec.ts` holds the invitation journeys of the expense
-pilot: an existing Organization, a logged-out recipient and a person without an
-account, each for invoices and reimbursements. The invitation is sent through
-the form, delivered over local SMTP and followed from Mailpit in a second
-browser.
+pilot: an existing Organization, a logged-out recipient who signs in and a
+person without an account, each for invoices and reimbursements. The
+invitation is sent through the form, delivered over local SMTP, followed from
+Mailpit in a second browser and completed there.
 
 ```bash
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses --grep "invitation" --workers 3
@@ -158,19 +158,20 @@ canonical [guide](../../docs/e2e.md#expense-invitation-journeys-playwright-pilot
 `process-expense`, `expense-policy`, `edit-expense`, `recurring-expense` and
 `duplicate-expense` specs in the same directory hold the management journeys:
 approve/unapprove/reject, deletion, invoice PDF download, expense policies
-(including a Project inheriting its parent's), title and item edits,
-recurrence and duplication.
+(including a Project inheriting its parent's), title and item edits of an
+invoice and of a reimbursement, recurrence and duplication.
 
 ```bash
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses --workers 3 \
-  --grep "Collective admin|Project|pending expense|recur every month|duplicates"
+  --grep "Collective admin|Project|pending (invoice|reimbursement)|recur every month|duplicates"
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/process-expense.spec.ts --grep "downloads the generated invoice"
 ```
 
 They use the `expense-management` recipe (Collective admin, optional pending
-expense and Project) or `expense-submission`, and `helpers/downloads.ts`
+expense and Project) or `expense-submission`, `helpers/downloads.ts`
 (`downloadPdf`: attempt-owned download path, text of the PDF rendered by the
-local PDF service). Coverage mapping, differences from Cypress and timings are
+local PDF service) and `helpers/api.ts` (`queryAs`, for the saved recurrence
+that no page shows). Coverage mapping, differences from Cypress and timings are
 in the canonical [guide](../../docs/e2e.md#expense-management-journeys-playwright-pilot).
 
 ## Vendor picker journeys

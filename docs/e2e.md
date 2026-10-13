@@ -199,7 +199,7 @@ test.describe('paying Collective subject to VAT', () => {
 
 | Recipe                 | Options (all default to off)                                                                                                                                                        | Actors                                                                                                  | Accounts, expenses, URLs                                                                                                                                                                                                                                                                                                                                                                          |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `invitee`, `inviteeOrganization`                                                           | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin`    | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending invoice by the submitter on `collective`, with a saved payout method); URLs `collective`, `newExpense`, `submittedExpenses`                                                                                                                            |
+| `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `priorExpenseType`, `invitee`, `inviteeOrganization`                                       | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin`    | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending, by the submitter on `collective`, with a saved payout method: an invoice, or with `priorExpenseType: 'RECEIPT'` a reimbursement whose item has a stored receipt); URLs `collective`, `newExpense`, `submittedExpenses`                                |
 | `expense-draft-invite` | `description`, `currency`, `items` (required)                                                                                                                                       | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                                                 | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                                                                                                                                                                                                                  |
 | `expense-management`   | `expense: { description, items }`, `project`                                                                                                                                        | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                                                                         |
 | `vendor-host`          | `useVendorPolicy`, `grants`, `secondCollective`, `project`, `outsider`, `otherHost: { admin, collective }`, `vendors: [{ label, host, usableWith, useVendorPolicy, payoutMethod }]` | `hostAdmin`, `collectiveAdmin`, `outsider` (no role anywhere), `otherHostAdmin`, `otherCollectiveAdmin` | `host` (no vendor policy unless `useVendorPolicy`), `collective` (admin `collectiveAdmin`), `collective2` (admin `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`); vendors by `label` in `scenario.vendors`; URLs `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard) |
@@ -208,15 +208,23 @@ Each request owns a new active fiscal host, so no journey adds Collectives or
 expenses to a seeded host. Recipes arrange starting state and prior history
 only, at model level inside the receipt transaction: they send no mail and run
 no mutation. Whatever a journey is about (submitting, creating a legal entity,
-tax, currency) goes through the browser.
+tax, currency) goes through the browser. One prerequisite lives outside the
+database: the receipt of a prior reimbursement is a real image in the uploads
+bucket, because the product only accepts and shows a receipt it has stored.
+Its object key is derived from the request identity, so repeating a request
+overwrites its own file and a rolled-back request leaves an unreferenced file
+under a `pw-` prefix that names it.
 
-To add a recipe: in the API, register `defineRecipe({ inputs, build })` in
-`server/e2e/recipes.ts` (inputs are a strict zod schema; `build` composes the
-builders in `server/e2e/builders.ts` and returns references), then add its
-inputs to `Contracts` and its result schema to `schemas` in
-`test/playwright/fixtures/transport.ts`. Recipes that return the multi-party
-shape need no other frontend change. Every actor carries a private session
-token; scenario attachments drop all of them.
+To add a recipe: in the API, write `defineRecipe({ inputs, build })` in the
+file of its behaviour group under `server/e2e/` (`expense-recipes.ts`,
+`vendor-recipes.ts`, or a new sibling), whose exported map
+`server/e2e/recipes.ts` spreads into the registry. Inputs are a strict zod
+schema; `build` composes the builders in `server/e2e/builders.ts` and returns
+references. Then add its inputs to `Contracts` and its result schema to
+`schemas` in `test/playwright/fixtures/transport.ts`. Recipes that return the
+multi-party shape need no other frontend change. Every actor carries a private
+session token, which never reaches a scenario attachment (see
+[what is attached](#what-an-attempt-attaches)).
 
 A journey with a second party opens another browser with
 `openBrowserAs('<actor label>')`, or `openBrowserAs(null)` for a logged-out
@@ -235,7 +243,10 @@ tied to the attempt in three ways:
   or `mail.address('<label>')` for someone who has no account yet. The helper
   matches the exact delivered address; outside production the API rewrites
   `a@b.com` to `emailbcc+a-at-b.com@opencollective.com`.
-- **Time.** Only messages delivered after the attempt started count.
+- **Time.** Only messages Mailpit received after the attempt opened its
+  mailbox count. The `mail` fixture opens it before the journey's first step,
+  and Mailpit runs on the same machine and clock as the tests, locally and in
+  CI, so no margin is applied.
 - **Uniqueness.** `mail.waitForMessage({ to, subject })` polls until one such
   message exists and fails if several match, so a subject must be specific
   enough (product subjects usually name an Account of the scenario). Never
@@ -255,8 +266,8 @@ test('invited Organization follows its emailed invitation', async ({ page, scena
 });
 ```
 
-Add a helper next to `expenseInvitationLink` for each new kind of message
-rather than reading Mailpit from a spec. Each attempt that waited for mail
+Add a helper next to `expenseInvitationLink` and `emailedSignInLink` for each
+new kind of message rather than reading Mailpit from a spec. Each attempt that waited for mail
 attaches `mail-timings` (recipient, subject, wait in ms). The launcher exports
 `MAILPIT_URL` in fresh and `--reuse` runs; the helper refuses to guess it.
 Recipes still send no mail: the message a journey asserts on is always caused
@@ -270,8 +281,20 @@ download under the attempt's own output directory (`testInfo.outputPath`, a
 different directory for every test, retry and run, kept with the run's
 artifacts) and returns the suggested file name and the document text, so
 journeys assert on what the real local PDF service rendered. `test/playwright/helpers/expense-form.ts` drives the
-new-expense form. Each attempt attaches `fixture-timings` (wall time of every
-arrangement) next to `scenario`, so reports separate setup from execution.
+new-expense form (`submitExpense` for the whole form; `sendExpense`,
+`attachReceipt`, `addPayoutMethod`, `chooseExpenseType` and `openInvitation`
+for journeys that start from a prefilled one). `helpers/notifications.ts` has
+the `toast` locator and `helpers/attempt.ts` has `attemptTag` (a short suffix
+for names a journey invents) and `isolationProbe` (see
+[below](#independence-and-interruption-checks)).
+
+Outcomes are asserted where a user sees them. `helpers/api.ts` has
+`queryAs(actor, query, variables)` for the rare persisted outcome that no page
+shows: it asks the product's GraphQL API with that actor's own session and
+permissions, from Node, after the browser has done the work. Its one use is
+the recurrence saved with a submitted expense. Do not use it to replace an
+assertion the UI can make, to arrange state (recipes do that), or to act for
+the user.
 
 Recipe authors add the smallest needed domain graph under `server/e2e/`
 in the API and extend the typed transport. Reuse model/domain validation and
@@ -282,23 +305,29 @@ an advisory transaction lock, with bounded database waits. A disconnected
 request rolls back when observed before commit; a response lost after commit
 recovers the durable receipt. Validation/setup failures roll back database
 writes. Side effects that cannot roll back must use scenario identities and
-report identifiable retained leftovers; do not add deletion registries.
+report identifiable retained leftovers; do not add deletion registries. The
+stored receipt of a prior reimbursement (`createStoredReceipt`) is the one
+such side effect today.
 
 Safe reuse is deliberate. Read-only journeys can use Playwright's base `test`
 and the existing public homepage or seeded Account pages without arranging a
 user. A recipe may reuse a proven read-only parent or host connection if the
 journey cannot mutate its permissions, balance, payment configuration or other
 shared state. A host-admin or financial journey needs its own writable graph.
-The current two recipes demonstrate avoiding an unnecessary host graph rather
-than copying a full host per case. Keep assertions on the scenario's Account,
+The two account recipes (`account-profile`, `account-conversation`) demonstrate
+avoiding an unnecessary host graph; the four multi-party recipes
+(`expense-submission`, `expense-draft-invite`, `expense-management`,
+`vendor-host`) each own a host because their journeys submit to it, change its
+policies or read its vendors. Keep assertions on the scenario's Account,
 conversation and recipients. Namespace uploads and cache/rate keys by the owning
 identity when a journey needs them. Never reset the global database, cache,
 mail inbox or storage between tests, and retain scenario records after failures.
 
 The transport uses Node fetch to keep fixture authorization out of browser
 traces. Authentication is supplied through isolated browser storage, avoiding
-sign-in URL tokens and shared sign-in IP counters. Scenario attachments contain
-only references and attempt metadata. The launcher redacts JWTs and fixture
+sign-in URL tokens and shared sign-in IP counters (the journeys about
+signing in use the sign-in form). Scenario attachments contain only named
+references and attempt metadata ([what is attached](#what-an-attempt-attaches)). The launcher redacts JWTs and fixture
 credentials from trace archives and textual reports/logs before handoff or
 upload, preserving trace resources and the original failed attempt. An incomplete
 archive is retained with private permissions under
@@ -306,6 +335,44 @@ archive is retained with private permissions under
 uploaded evidence; `redaction-status.json` identifies it. Other artifacts still
 get scrubbed, and an existing failure/cancellation exit code is preserved. Do not
 attach authentication handles or raw fixture responses to evidence.
+
+### What an attempt attaches
+
+- `scenario`: the references the recipe returned, assembled from named fields
+  only (`scenarioEvidence` in `fixtures/transport.ts`): the recipe name,
+  attempt identity and request ID; for each actor its ids, slug, name and
+  email; for each Account, vendor and expense its ids, slug or description,
+  name, type or status; and each URL's path without its query string. Session
+  tokens and anything else a recipe returns are not copied, so a new
+  credential field cannot leak by being forgotten; add a field to
+  `scenarioEvidence` when evidence needs it.
+- `fixture-timings`: wall time of every arrangement, so reports separate setup
+  from execution.
+- `mail-timings`: for each awaited message, the recipient, the subject
+  searched for and the wait.
+
+### Product behaviours the journeys wait for
+
+Some forms settle after they look ready. Each row below cost a first-attempt
+failure while the pilot was written. The journeys wait for a condition, or
+repeat a step the way a user would; none waits for time. Reuse the named
+helper, or the same wait, in a new journey over the same form.
+
+| Behaviour                                                                                                                                  | What the journey does                                                | Where                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------------- |
+| The payee section preselects the user's own profile once it has loaded, even over a choice made just before                                | Waits for a checked option, then chooses and checks the choice holds | `openVendorPicker`, `choosePayee` (`helpers/`)     |
+| "Invite someone to submit an expense" sits in a picker entry marked as disabled, in a menu that is still positioning itself                | Clicks without the enabled check, again until the contact form opens | `choosePayee`                                      |
+| The currency list of a new payout method has closed by itself while still opening, leaving no selection (seen once, on an invitation form) | Opens the list again until the currency is chosen                    | `addPayoutMethod`                                  |
+| An expense type chosen right after a payout method was saved has not stayed chosen (seen once)                                             | Chooses it again until it holds                                      | `chooseExpenseType`                                |
+| The "Sign In" link of an invitation only carries its return address after the form has settled                                             | Waits for the link's target before clicking                          | `invite-organization-logged-out.spec.ts`           |
+| The grant form resets its items once after a beneficiary is picked                                                                         | Fills the items again until the summary opens                        | `grant-beneficiary.spec.ts`                        |
+| Two rich-text editors filled one straight after the other: the text for the second has landed in the first                                 | Types both again until each holds its own text, then saves           | `writeExpensePolicies` in `expense-policy.spec.ts` |
+| Saving an edited expense before the exchange rate of a converted item has arrived is refused without a message                             | Waits for the rate to be shown                                       | `edit-expense.spec.ts`                             |
+| The duplicate form asks for its options twice; submitting before the second answer is refused without a message                            | Waits for the second answer                                          | `duplicate-expense.spec.ts`                        |
+| An expense page reached through a link inside the app loads more data after showing its buttons and re-renders without an open dialog      | Opens the expense by its address                                     | `process-expense.spec.ts`                          |
+| A dashboard settings page opened by its address, in a browser that has already loaded the dashboard, can stay on its loading indicator     | Goes through the dashboard menu (Settings → Policies), like a user   | `vendor-settings.spec.ts`                          |
+| The expected funds dialog asks for the receiving Collective's details a moment after it is chosen                                          | Waits for that answer before choosing the source                     | `vendor-creation.spec.ts`                          |
+| A working button sits in a list entry marked as disabled                                                                                   | Checks it is visible, then clicks without the enabled check          | `vendor-creation.spec.ts` (expected funds)         |
 
 ### Independence and interruption checks
 
@@ -327,7 +394,10 @@ PLAYWRIGHT_ISOLATION_PROBE=1 ./test/playwright/run-local.sh --reuse --spec test/
 ```
 
 The isolation probe is opt-in and deliberately reports a failed first attempt
-(or a flaky recovery with one retry). Routine CI leaves it unset. Run each
+(or a flaky recovery with one retry). Routine CI leaves it unset. A journey
+takes part by calling `isolationProbe(testInfo, '<what the failed attempt
+leaves behind>')` from `helpers/attempt.ts` right after its first real change;
+with one retry, the retried attempt must then pass on prerequisites of its own. Run each
 mutable spec with a fresh launcher as well to verify standalone reproduction.
 
 Focused API HTTP checks against a retained owned stack cover missing attempt
@@ -458,14 +528,14 @@ of the Cypress expense pilot (`test/cypress/integration/27-expenses.test.ts`,
 `Invite` blocks), which stays unchanged and runnable. Six Cypress tests map to
 six journeys:
 
-| Cypress test                                                                                                         | Playwright journey (`specs/expenses/`)                                                                                                               |
-| -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Invoices › Create › Invite › User can submit invoice expense invite to existing organization                         | `invite-organization.spec.ts` › invited Organization follows its emailed invoice invitation and submits the expense                                  |
-| Reimbursements › Invite › User can submit reimbursement expense invite to existing organization                      | `invite-organization.spec.ts` › invited Organization follows its emailed reimbursement invitation and submits the expense                            |
-| Invoices › Create › Invite › User can submit invoice expense invite to existing organization initially logged out    | `invite-organization-logged-out.spec.ts` › logged-out visitor opening an Organization's emailed invoice invitation is sent to sign in and back       |
-| Reimbursements › Invite › User can submit reimbursement expense invite to existing organization initially logged out | `invite-organization-logged-out.spec.ts` › logged-out visitor opening an Organization's emailed reimbursement invitation is sent to sign in and back |
-| Invoices › Create › Invite › User can submit invoice expense invite to new user                                      | `invite-new-user.spec.ts` › person without an account follows their emailed invoice invitation and submits the expense without signing in            |
-| Reimbursements › Invite › User can submit reimbursement expense invite to new user                                   | `invite-new-user.spec.ts` › person without an account follows their emailed reimbursement invitation and submits the expense without signing in      |
+| Cypress test                                                                                                         | Playwright journey (`specs/expenses/`)                                                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Invoices › Create › Invite › User can submit invoice expense invite to existing organization                         | `invite-organization.spec.ts` › invited Organization follows its emailed invoice invitation and submits the expense                                               |
+| Reimbursements › Invite › User can submit reimbursement expense invite to existing organization                      | `invite-organization.spec.ts` › invited Organization follows its emailed reimbursement invitation and submits the expense                                         |
+| Invoices › Create › Invite › User can submit invoice expense invite to existing organization initially logged out    | `invite-organization-logged-out.spec.ts` › logged-out admin of an invited Organization signs in from its emailed invoice invitation and submits the expense       |
+| Reimbursements › Invite › User can submit reimbursement expense invite to existing organization initially logged out | `invite-organization-logged-out.spec.ts` › logged-out admin of an invited Organization signs in from its emailed reimbursement invitation and submits the expense |
+| Invoices › Create › Invite › User can submit invoice expense invite to new user                                      | `invite-new-user.spec.ts` › person without an account follows their emailed invoice invitation and submits the expense without signing in                         |
+| Reimbursements › Invite › User can submit reimbursement expense invite to new user                                   | `invite-new-user.spec.ts` › person without an account follows their emailed reimbursement invitation and submits the expense without signing in                   |
 
 Every journey keeps the inviter's side as it was: a user who administers
 nothing opens "New expense", fills the whole form (items, BRL conversion,
@@ -480,6 +550,9 @@ sees the invitation with its decline option and continues:
   invoice) and submits.
 - **Logged out.** Without a session the invitation is still readable; the
   sign-in link offered in the payee section leads to `/signin?next=<invitation>`.
+  The Organization's admin enters their address in the sign-in form, comes
+  back to the same invitation signed in, sees it again with its decline
+  option, and completes it exactly as in the first variant.
 - **New user.** The form shows the name and email the inviter entered and
   offers to sign in; the person adds an unsaved payout method, picks the type
   (asking for a generated invoice) and submits without signing in.
@@ -500,13 +573,19 @@ Where the journeys differ from the Cypress source, and why:
   reuses the browser. The recipient gets a separate context
   (`openBrowserAs`), so the inviter's session is still there to check the outcome.
 - **Outcome check added.** Cypress stops at "has been submitted
-  successfully!". The two completing journeys also reopen the expense as the
-  inviter and check that it is pending with the invited payee.
-- **Logged-out variant stops at sign-in, as in the source.** The ticket asks
-  for sign-in and a completed submission in every variant; the Cypress test
-  ends at the redirect to `/signin?next=...`, so signing in and submitting from
-  there would be new coverage and is not claimed. Signed-in completion is the
-  first variant.
+  successfully!". Every journey also reopens the expense as the inviter and
+  checks that it is pending with the invited payee.
+- **Logged-out variant goes on past sign-in (ticket, beyond the source).** The
+  Cypress test ends at the redirect to `/signin?next=...`. The ticket asks for
+  sign-in and a completed submission in every variant, so the journey signs
+  in through the form and submits. Asking to sign in makes the product email
+  a one-click link; outside production the API also answers the form with
+  that link for `*test*@opencollective.com` addresses, so the browser follows
+  it without anyone opening the mail (the Cypress `login` command relies on
+  the same answer). The journey therefore does both: the browser lands back
+  on the invitation, and the sign-in message delivered to this attempt's
+  admin is read from Mailpit and checked to lead back to the same invitation.
+  No session is injected for this visitor.
 - **Which sign-in link.** Cypress force-clicks the first "Log In" on the page,
   the top-bar link hidden behind the full-screen form. The journey uses the
   "Sign In" link the form offers, which has the same target. That link only
@@ -527,7 +606,7 @@ Focused reproduction:
 
 # One journey, fresh
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-new-user.spec.ts --grep "emailed invoice"
-./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-organization-logged-out.spec.ts
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-organization-logged-out.spec.ts --grep "emailed reimbursement"
 
 # One journey against a retained populated stack and inbox
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/invite-organization.spec.ts --grep "emailed reimbursement"
@@ -542,7 +621,9 @@ PLAYWRIGHT_ISOLATION_PROBE=1 ./test/playwright/run-local.sh --reuse \
 After the probe, the failed attempt's `scenario` attachment names its
 Collective and `inviteeAdmin`: its expense is still a draft without a payout
 method and its mailbox holds exactly its one invitation, while the retry's
-expense is pending.
+expense is pending. The logged-out journey's probe fails after the sign-in:
+the failed attempt's admin has an invitation and a sign-in message, the
+retry's admin has their own pair.
 
 Timings, measured on an 8-CPU Linux VM with retries disabled. Setup is the
 `fixture-timings` attachment (one recipe request per journey). Mail wait is the
@@ -557,18 +638,21 @@ workers.
 | ----------------------------------- | ----------- | --------------- | --------------- | ------------ | -------------------------------- | ------------ |
 | Organization submits, invoice       | 0.47 s      | 0.12 s          | 9.2 s           | 0.05 s       | 0.02 s                           | 11.6 s       |
 | Organization submits, reimbursement | 0.48 s      | 0.13 s          | 9.7 s           | 0.06 s       | 0.02 s                           | 10.4 s       |
-| logged out, invoice                 | 0.45 s      | 0.12 s          | 6.3 s           | 0.09 s       | 0.02 s                           | 7.7 s        |
-| logged out, reimbursement           | 0.48 s      | 0.13 s          | 7.1 s           | 0.06 s       | 0.02 s                           | 8.2 s        |
+| logged out, signs in, invoice       | 0.46 s      | 0.23 s          | 11.1 s          | 0.21 s       | 0.12 s                           | 14.0 s       |
+| logged out, signs in, reimbursement | 0.47 s      | 0.30 s          | 10.4 s          | 0.05 s       | 0.17 s                           | 12.2 s       |
 | new user, invoice                   | 0.50 s      | 0.12 s          | 7.9 s           | 0.06 s       | 0.13 s (first lookup of the run) | 9.5 s        |
 | new user, reimbursement             | 0.44 s      | 0.12 s          | 8.7 s           | 0.05 s       | 0.02 s                           | 9.3 s        |
 
 The invitation is in the inbox 10-40 ms after the form confirms once the stack
 is warm, so mail delivery is not a measurable part of these journeys; almost
-all the time is the inviter filling the form. The six journeys take about 55 s
-of test time when each runs alone and 46-67 s summed inside a shared run. The
-whole 20-test selection takes 57 s of Playwright time with three workers, 67 s
-with two and 106 s with one, after roughly 55 s of launcher startup on a fresh
-stack. The Cypress timing supplied for the pilot (04:38) covers all 28 tests of
+all the time is the inviter filling the form. The two logged-out rows were
+measured again after those journeys were extended to sign in and submit (their
+mail wait covers both the invitation and the sign-in message; shared is the
+median over fresh runs of the 56-test selection with 3, 2 and 3 workers). The
+six journeys take about 65 s of test time when each runs alone and about 67 s
+summed inside a shared run. When this group was added, the whole 20-test
+selection took 57 s of Playwright time with three workers, 67 s with two and
+106 s with one, after roughly 55 s of launcher startup on a fresh stack. The Cypress timing supplied for the pilot (04:38) covers all 28 tests of
 the original file, so it is not a like-for-like comparison for this group.
 
 The measuring VM caps the session at 1228 processes and threads. The selection
@@ -581,7 +665,7 @@ workers on such a machine; the cap is not a property of the journeys.
 `test/playwright/specs/expenses/` also carries the rest of the Cypress expense
 pilot (`test/cypress/integration/27-expenses.test.ts`: `Actions on expense`,
 `Recurring`, `Duplicate` and `Edit` blocks), which stays unchanged and
-runnable. Thirteen Cypress tests map to eleven journeys:
+runnable. Thirteen Cypress tests map to thirteen journeys:
 
 | Cypress test                                                                            | Playwright journey (`specs/expenses/`)                                                                                             |
 | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -590,10 +674,10 @@ runnable. Thirteen Cypress tests map to eleven journeys:
 | Actions on expense › Downloads PDF                                                      | `process-expense.spec.ts` › Collective admin downloads the generated invoice of an expense as a PDF                                |
 | Actions on expense › Displays expense policy                                            | `expense-policy.spec.ts` › Collective admin writes expense policies in the dashboard and submitters see them on the expense form   |
 | Actions on expense › Projects inherit and display expense policy from parent collective | `expense-policy.spec.ts` › Collective with a Project › expense form of a Project shows the expense policy of its parent Collective |
-| Invoices › Edit invoice expense › Edits title                                           | `edit-expense.spec.ts` › submitter renames their pending expense                                                                   |
-| Reimbursements › Edit reimbursement expense › Edits title                               | the same journey (see "Editing" below)                                                                                             |
-| Invoices › Edit invoice expense › Edits items                                           | `edit-expense.spec.ts` › submitter edits the items of their pending expense and switches its reference currency                    |
-| Reimbursements › Edit reimbursement expense › Edits items                               | the same journey (see "Editing" below)                                                                                             |
+| Invoices › Edit invoice expense › Edits title                                           | `edit-expense.spec.ts` › pending invoice › submitter renames it                                                                    |
+| Reimbursements › Edit reimbursement expense › Edits title                               | `edit-expense.spec.ts` › pending reimbursement › submitter renames it                                                              |
+| Invoices › Edit invoice expense › Edits items                                           | `edit-expense.spec.ts` › pending invoice › submitter edits its items and switches its reference currency                           |
+| Reimbursements › Edit reimbursement expense › Edits items                               | `edit-expense.spec.ts` › pending reimbursement › submitter edits its items and switches its reference currency                     |
 | Invoices › Recurring › User can setup recurring invoice expense                         | `recurring-expense.spec.ts` › user submits an invoice set to recur every month                                                     |
 | Reimbursements › Recurring › User can setup recurring reimbursement expense             | `recurring-expense.spec.ts` › user submits a reimbursement set to recur every month                                                |
 | Invoices › Duplicate › Duplicates an invoice expense                                    | `duplicate-expense.spec.ts` › user duplicates an expense they submitted and sends the copy as an invoice                           |
@@ -607,8 +691,10 @@ actions", then "Page not found" on the expense URL; policies typed into the
 dashboard and shown on the expense form; title set to "New title"; item 1
 renamed, a `€100.00` item added, reference currency switched from the
 preselected USD to EUR, giving `€11.00 EUR` (from `$10.00 USD`), `€100.00 EUR`
-and a `€111.00 EUR` total at the fixed 1.1 exchange rate; a monthly recurrence
-ending on Sep 29, 2125 confirmed in the summary before submitting; a duplicate
+and a `€111.00 EUR` total at the fixed 1.1 exchange rate, on an invoice and on
+a reimbursement (which keeps its receipt and gets one uploaded for the new
+item); a monthly recurrence ending on Sep 29, 2125 confirmed in the summary
+before submitting and found saved afterwards; a duplicate
 opened from the submitted expenses list, given a type, a date and (for a
 reimbursement) a receipt, then submitted. Invoice files and receipts are real
 local files stored through the API.
@@ -629,28 +715,37 @@ Where the journeys differ from the Cypress source, and why:
   with the `expense-management` recipe (or `expense-submission` with
   `priorExpense` for editing and duplicating). Policy text contains the
   attempt's Collective slug, and the policy journeys first check that both
-  policy fields start empty.
+  policy fields start empty. Typed one straight after the other, the text for
+  the second policy editor has landed in the first; `writeExpensePolicies`
+  types both again until each editor holds its own text, then saves.
 - **No payment.** The Cypress title says "Approve, unapprove, reject and pay";
   nothing is paid in it, and nothing is paid here.
 - **Deletion.** Added: the expense is listed for its Collective before the
-  journey starts and is absent from that list after deletion, next to the
-  source's "Page not found".
+  journey starts; after deletion that list has loaded, says it has no expense
+  to show and does not hold it, next to the source's "Page not found".
 - **Policies.** Cypress types the same sentence into the invoice and the
   reimbursement policy and only looks at the invoice one. The first journey
   uses two different texts and checks each under its expense type. The Project
   journey arranges the Project up front instead of creating it after the
   policy edit; inheritance is read at display time, so the order does not
   change what is tested.
-- **Editing.** Ticket and Cypress titles say both types, but the Cypress
-  reimbursement variant creates its expense without a type, so both variants
-  edit an invoice with identical steps. They are carried as one journey per
-  behavior. Editing a real reimbursement (with receipts on its items) is not
-  covered by either suite. The submitter here is not an admin of the
+- **Editing covers both types (ticket, beyond the source).** Ticket and
+  Cypress titles say both types, but the Cypress reimbursement variant creates
+  its expense without a type, so both of its variants edit an invoice. The
+  journeys run on a pending invoice and on a pending reimbursement
+  (`priorExpenseType: 'RECEIPT'`): the page names the type, the
+  reimbursement's item shows its stored receipt, the edit form still holds
+  that receipt, the new item gets one uploaded through the form, and both
+  items show a receipt after saving. The submitter is not an admin of the
   Collective, as in the source.
-- **Recurrence.** As in the source, the recurrence is configured and its
-  confirmation sentence checked before submitting. The submitted expense page
-  shows nothing about recurrence and no later prompt is produced, so nothing
-  further is observable through the product.
+- **Recurrence is checked after submission (ticket, beyond the source).** As
+  in the source, the recurrence is configured and its confirmation sentence
+  checked before submitting. The submitted expense page shows nothing about
+  recurrence and no later prompt is produced in the journey's lifetime, so the
+  journey then asks the GraphQL API as the submitter (`queryAs`) for the
+  expenses they created: exactly one, pending, with this title, recurring
+  every month until 2125-09-29. This is the suite's only assertion made
+  outside the browser.
 - **Duplicate data.** Cypress asserts nothing about the copy. The journey
   checks what the form carried over before touching it (paying Collective,
   payee, saved payout method, item description and amount, title, tag; the
@@ -674,22 +769,23 @@ Where the journeys differ from the Cypress source, and why:
 Focused reproduction:
 
 ```bash
-# The eleven journeys, fresh
+# The thirteen journeys, fresh
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses --workers 3 \
-  --grep "Collective admin|Project|pending expense|recur every month|duplicates"
+  --grep "Collective admin|Project|pending (invoice|reimbursement)|recur every month|duplicates"
 
 # One journey, fresh
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/process-expense.spec.ts --grep "downloads the generated invoice"
-./test/playwright/run-local.sh --spec test/playwright/specs/expenses/edit-expense.spec.ts --grep "edits the items"
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/edit-expense.spec.ts --grep "pending reimbursement submitter edits"
 
 # One journey against a retained populated stack
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/expense-policy.spec.ts --grep "expense form of a Project"
 
-# First attempts fail after a real unapproval, download, policy save or
-# duplicate; each retry arranges a new graph and must start from a pending
-# expense without comments, empty policies, or a single listed expense.
+# First attempts fail after a real unapproval, download, policy save,
+# duplicate, item edit or recurring submission; each retry arranges a new graph
+# and must start from a pending expense without comments, empty policies, a
+# single listed expense, an unedited expense, or a submitter with no expense.
 PLAYWRIGHT_ISOLATION_PROBE=1 ./test/playwright/run-local.sh --reuse --retries 1 --workers 2 \
-  --spec test/playwright/specs/expenses --grep "Collective admin|duplicates"
+  --spec test/playwright/specs/expenses --grep "Collective admin|duplicates|edits its items|recur every month"
 ```
 
 After the probe, a failed attempt's download stays in its own
@@ -703,29 +799,34 @@ download journey. "Alone" is one journey on a fresh stack, where the first
 recipe request also warms the API (about 0.4 s); "shared" is the median over
 three fresh runs of the whole selection with 3, 2 and 3 workers.
 
-| Journey                           | Setup alone | Execution alone | Setup shared | Total shared |
-| --------------------------------- | ----------- | --------------- | ------------ | ------------ |
-| approve, unapprove, reject        | 0.49 s      | 3.6 s           | 0.06 s       | 4.3 s        |
-| delete rejected expense           | 0.51 s      | 4.0 s           | 0.06 s       | 4.8 s        |
-| download invoice PDF              | 0.50 s      | 2.0 s           | 0.06 s       | 2.0 s        |
-| write and display policies        | 0.47 s      | 3.8 s           | 0.08 s       | 5.7 s        |
-| Project shows parent policy       | 0.46 s      | 2.8 s           | 0.09 s       | 3.6 s        |
-| rename expense                    | 0.52 s      | 1.9 s           | 0.08 s       | 2.8 s        |
-| edit items and reference currency | 0.54 s      | 2.6 s           | 0.16 s       | 3.7 s        |
-| recurring invoice                 | 0.50 s      | 6.1 s           | 0.06 s       | 8.0 s        |
-| recurring reimbursement           | 0.50 s      | 7.0 s           | 0.05 s       | 7.9 s        |
-| duplicate as invoice              | 0.50 s      | 2.7 s           | 0.07 s       | 4.1 s        |
-| duplicate as reimbursement        | 0.46 s      | 2.8 s           | 0.08 s       | 4.0 s        |
+| Journey                                         | Setup alone | Execution alone | Setup shared | Total shared |
+| ----------------------------------------------- | ----------- | --------------- | ------------ | ------------ |
+| approve, unapprove, reject                      | 0.49 s      | 3.6 s           | 0.06 s       | 4.3 s        |
+| delete rejected expense                         | 0.51 s      | 4.0 s           | 0.06 s       | 4.8 s        |
+| download invoice PDF                            | 0.50 s      | 2.0 s           | 0.06 s       | 2.0 s        |
+| write and display policies                      | 0.47 s      | 3.8 s           | 0.08 s       | 5.7 s        |
+| Project shows parent policy                     | 0.46 s      | 2.8 s           | 0.09 s       | 3.6 s        |
+| rename invoice                                  | 0.45 s      | 2.2 s           | 0.18 s       | 2.9 s        |
+| edit invoice items and reference currency       | 0.45 s      | 2.7 s           | 0.07 s       | 3.6 s        |
+| rename reimbursement                            | 0.46 s      | 2.0 s           | 0.08 s       | 2.6 s        |
+| edit reimbursement items and reference currency | 0.48 s      | 2.5 s           | 0.12 s       | 3.6 s        |
+| recurring invoice                               | 0.45 s      | 6.2 s           | 0.06 s       | 6.5 s        |
+| recurring reimbursement                         | 0.44 s      | 6.3 s           | 0.04 s       | 6.6 s        |
+| duplicate as invoice                            | 0.50 s      | 2.7 s           | 0.07 s       | 4.1 s        |
+| duplicate as reimbursement                      | 0.46 s      | 2.8 s           | 0.08 s       | 4.0 s        |
 
 Arranging a host, Collective, admin, expense and Project costs 0.04-0.36 s per
 journey once the API is warm (median 0.07 s), a few percent of even the
 shortest journey.
-The eleven journeys take about 45 s of test time when each runs alone and
-about 51 s summed inside a shared run. The whole 31-test selection takes 74 s
+The editing and recurring rows were measured again after the reimbursement
+journeys and the saved-recurrence check were added (shared: median over fresh
+runs of the 56-test selection with 3, 2 and 3 workers). The thirteen journeys
+take about 50 s of test time when each runs alone and about 54 s summed inside
+a shared run. When this group was added, the whole 31-test selection took 74 s
 of Playwright time with three workers, 86 s with two and 148 s with one, after
 roughly 55 s of launcher startup on a fresh stack. The Cypress timing supplied
 for the pilot (04:38) covers all 28 tests of the original file, which the
-three expense groups now cover with 26 Playwright journeys.
+three expense groups now cover with 28 Playwright journeys.
 
 ## Vendor picker journeys (Playwright pilot)
 
@@ -799,16 +900,19 @@ Where the journeys differ from the Cypress source, and why:
 - **Project journeys rely on the preloaded list.** From a Project's form,
   typing the name of a vendor scoped to the parent Collective returns nothing
   from the API search; the vendor stays listed because the picker also filters
-  its preloaded five. This is not asserted and is reported with this group.
-- **Add Funds.** The source types the usable vendor's name and then checks the
-  other vendor is not shown; that vendor would not match the search whatever
-  its scope. The journey keeps exactly that (search by name, the vendor is
-  offered, the other is not listed) and is named for what it shows. Scope does
-  not restrict this picker for the people who can open it: the API drops the
-  scope filter for host admins, and a search matching both vendors lists both
-  (observed). The source uses a fixed 150 ms wait and typing delay here; the
-  journey waits for the answer to its search. No funds are added, as in the
-  source.
+  its preloaded five. This is not asserted.
+- **Add Funds: the "hides" half is not carried over.** The source types the
+  usable vendor's name and then checks that a vendor scoped to another
+  Collective is not shown. That vendor does not match the typed name, so it
+  would be missing whatever its scope, and the check cannot fail. Nor is
+  there a scope outcome to assert in its place: only host admins can open
+  this dialog, and for them the API does not filter this picker by scope (a
+  search matching both vendors lists both, observed). The journey keeps what
+  the test does show: the host admin searches the vendor scoped to the
+  Collective by name and is offered it. It arranges that one vendor and no
+  second Collective. The source uses a fixed 150 ms wait and typing delay
+  here; the journey waits for the answer to its search. No funds are added,
+  as in the source.
 - **One journey for two identical tests.** "non-admin: shows the usable
   vendor..." and "admin of collective A only sees A-scoped vendors..." build
   the same graph and assert the same two names.
@@ -881,7 +985,7 @@ and 3 workers.
 | admin of a Collective on another host         | 0.46 s      | 1.9 s           | 0.11 s       | 2.4 s        |
 | grant beneficiary offered                     | 0.44 s      | 1.8 s           | 0.05 s       | 2.1 s        |
 | grant request submitted                       | 0.45 s      | 3.0 s           | 0.06 s       | 3.8 s        |
-| Add Funds source                              | 0.46 s      | 2.8 s           | 0.09 s       | 2.9 s        |
+| Add Funds source                              | 0.46 s      | 2.7 s           | 0.09 s       | 2.9 s        |
 
 Arranging one or two hosts, their Collectives, actors and up to three vendors
 costs 0.03-0.20 s per journey once the API is warm (median 0.05 s), a few
@@ -983,7 +1087,7 @@ Where the journeys differ from the Cypress source, and why:
   its loading indicator although its data has arrived (4 of about 45 loads of
   a host's policies page while writing the journey; none of 20 through the
   menu). The journey goes through Settings → Policies in the dashboard menu,
-  like a user. Reported with this group.
+  like a user.
 - **Arranged, not created through the API.** As in the picker journeys, the
   host, Collective, admins, policy and starting vendors come from one recipe
   request; names are unique per attempt (`<label> <attempt tag>` for arranged
@@ -1046,20 +1150,20 @@ the journey tables above. Both files are unchanged and still run with Cypress.
 
 `27-expenses.test.ts` (28 tests):
 
-| Cypress block                                   | Tests | Journeys | Section                                      |
-| ----------------------------------------------- | ----- | -------- | -------------------------------------------- |
-| new expense when logged out                     | 2     | 2        | Expense submission                           |
-| Actions on expense                              | 5     | 5        | Expense management                           |
-| Invoices › Create (new user, returning user)    | 2     | 2        | Expense submission                           |
-| Invoices › Create › Invite                      | 3     | 3        | Expense invitation                           |
-| Invoices › Create › Recurring, Duplicate        | 2     | 2        | Expense management                           |
-| Invoices › Create › Legal entity payee, Taxes   | 2     | 2        | Expense submission                           |
-| Invoices › Edit invoice expense                 | 2     | 2        | Expense management                           |
-| Reimbursements (new user, returning user)       | 2     | 2        | Expense submission                           |
-| Reimbursements › Invite                         | 3     | 3        | Expense invitation                           |
-| Reimbursements › Recurring, Duplicate           | 2     | 2        | Expense management                           |
-| Reimbursements › Edit reimbursement expense     | 2     | 0        | Expense management (consolidated, see below) |
-| Submitting a draft keeps the requested currency | 1     | 1        | Expense submission                           |
+| Cypress block                                   | Tests | Journeys | Section            |
+| ----------------------------------------------- | ----- | -------- | ------------------ |
+| new expense when logged out                     | 2     | 2        | Expense submission |
+| Actions on expense                              | 5     | 5        | Expense management |
+| Invoices › Create (new user, returning user)    | 2     | 2        | Expense submission |
+| Invoices › Create › Invite                      | 3     | 3        | Expense invitation |
+| Invoices › Create › Recurring, Duplicate        | 2     | 2        | Expense management |
+| Invoices › Create › Legal entity payee, Taxes   | 2     | 2        | Expense submission |
+| Invoices › Edit invoice expense                 | 2     | 2        | Expense management |
+| Reimbursements (new user, returning user)       | 2     | 2        | Expense submission |
+| Reimbursements › Invite                         | 3     | 3        | Expense invitation |
+| Reimbursements › Recurring, Duplicate           | 2     | 2        | Expense management |
+| Reimbursements › Edit reimbursement expense     | 2     | 2        | Expense management |
+| Submitting a draft keeps the requested currency | 1     | 1        | Expense submission |
 
 `41-vendor-visibility.test.ts` (23 tests):
 
@@ -1067,7 +1171,7 @@ the journey tables above. Both files are unchanged and still run with Cypress.
 | ----------------------------------- | ----- | -------- | --------------------------------------- |
 | vendor picker on expense submission | 13    | 12       | Vendor picker (consolidated, see below) |
 | vendor picker on grant submission   | 2     | 2        | Vendor picker                           |
-| Add Funds source picker             | 1     | 1        | Vendor picker                           |
+| Add Funds source picker             | 1     | 1        | Vendor picker (in part, see below)      |
 | inline vendor creation defaults     | 4     | 4        | Vendor creation and settings            |
 | vendor settings dashboard           | 3     | 3        | Vendor creation and settings            |
 
@@ -1075,26 +1179,35 @@ the journey tables above. Both files are unchanged and still run with Cypress.
 | ---------------------------- | ------------- | ------------------- |
 | Expense submission           | 9             | 9                   |
 | Expense invitation           | 6             | 6                   |
-| Expense management           | 13            | 11                  |
+| Expense management           | 13            | 13                  |
 | Vendor picker                | 16            | 15                  |
 | Vendor creation and settings | 7             | 7                   |
-| Total                        | 51            | 48                  |
+| Total                        | 51            | 50                  |
 
-The three recorded consolidations, each explained in its section:
+One consolidation and one partial mapping are recorded, each explained in its
+section:
 
-- "Reimbursements › Edit reimbursement expense › Edits title" and "› Edits
-  items" run the same steps on the same invoice as the invoice variants (the
-  source never creates a reimbursement there); one journey each covers both.
 - "non-admin: shows the usable vendor and hides one scoped to a different
   collective in the same picker" and "admin of collective A only sees A-scoped
   vendors when paying from A" build the same graph and assert the same names;
   one journey covers both.
+- "Add Funds source picker › shows the usable vendor and hides one scoped to a
+  different collective in the source dropdown": the journey carries the
+  "shows" half. The "hides" half cannot fail in the source and has no scope
+  outcome behind it for the host admins who use that dialog.
+
+Eight journeys go further than their Cypress test because the tickets ask for
+it: both logged-out invitation journeys sign in and submit, the four editing
+journeys cover a real reimbursement next to the invoice, and both recurring
+journeys check the saved recurrence.
 
 Nothing else is left out. Steps the journeys do not repeat because the source
 does not test them (no expense is paid, no funds are added, no expected funds
-are recorded, the recurrence is only configured) are listed in the sections.
-With the five journeys of the fixture and smoke specs, the Playwright
-selection holds 53 tests.
+are recorded) are listed in the sections. With the six tests of the fixture,
+account and smoke specs, the Playwright selection holds 56 tests. On the
+8-CPU Linux VM used throughout, with retries disabled, it takes 110-123 s of
+Playwright time with three workers, 133 s with two and 217 s with one, after
+roughly 55 s of launcher startup on a fresh stack.
 
 ## Cypress (existing suite)
 
