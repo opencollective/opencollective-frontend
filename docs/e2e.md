@@ -200,6 +200,7 @@ test.describe('paying Collective subject to VAT', () => {
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `invitee`, `inviteeOrganization` | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin` | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending invoice by the submitter on `collective`, with a saved payout method); URLs `collective`, `newExpense`, `submittedExpenses` |
 | `expense-draft-invite` | `description`, `currency`, `items` (required)                                                                             | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                                              | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                                                                                       |
+| `expense-management`   | `expense: { description, items }`, `project`                                                                              | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                          | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                              |
 
 Each request owns a new active fiscal host, so no journey adds Collectives or
 expenses to a seeded host. Recipes arrange starting state and prior history
@@ -261,7 +262,12 @@ by the journey.
 
 `test/playwright/helpers/uploads.ts` provides genuine local files for
 `setInputFiles` and for drag-and-drop zones, and asserts that a preview points
-at the stored file. `test/playwright/helpers/expense-form.ts` drives the
+at the stored file. `test/playwright/helpers/downloads.ts` has
+`downloadPdf(trigger, testInfo)`: it clicks the control, saves the browser
+download under the attempt's own output directory (`testInfo.outputPath`, a
+different directory for every test, retry and run, kept with the run's
+artifacts) and returns the suggested file name and the document text, so
+journeys assert on what the real local PDF service rendered. `test/playwright/helpers/expense-form.ts` drives the
 new-expense form. Each attempt attaches `fixture-timings` (wall time of every
 arrangement) next to `scenario`, so reports separate setup from execution.
 
@@ -567,6 +573,157 @@ The measuring VM caps the session at 1228 processes and threads. The selection
 peaks near 1080 with three workers and exceeds the cap with four, which shows
 as `Target crashed` when a journey opens its second browser. Stay at three
 workers on such a machine; the cap is not a property of the journeys.
+
+## Expense management journeys (Playwright pilot)
+
+`test/playwright/specs/expenses/` also carries the rest of the Cypress expense
+pilot (`test/cypress/integration/27-expenses.test.ts`: `Actions on expense`,
+`Recurring`, `Duplicate` and `Edit` blocks), which stays unchanged and
+runnable. Thirteen Cypress tests map to eleven journeys:
+
+| Cypress test                                                                            | Playwright journey (`specs/expenses/`)                                                                                             |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Actions on expense › Approve, unapprove, reject and pay actions on expense              | `process-expense.spec.ts` › Collective admin approves, unapproves and rejects an expense, leaving a comment for each reversal      |
+| Actions on expense › Delete expense                                                     | `process-expense.spec.ts` › Collective admin deletes a rejected expense, which is then no longer available                         |
+| Actions on expense › Downloads PDF                                                      | `process-expense.spec.ts` › Collective admin downloads the generated invoice of an expense as a PDF                                |
+| Actions on expense › Displays expense policy                                            | `expense-policy.spec.ts` › Collective admin writes expense policies in the dashboard and submitters see them on the expense form   |
+| Actions on expense › Projects inherit and display expense policy from parent collective | `expense-policy.spec.ts` › Collective with a Project › expense form of a Project shows the expense policy of its parent Collective |
+| Invoices › Edit invoice expense › Edits title                                           | `edit-expense.spec.ts` › submitter renames their pending expense                                                                   |
+| Reimbursements › Edit reimbursement expense › Edits title                               | the same journey (see "Editing" below)                                                                                             |
+| Invoices › Edit invoice expense › Edits items                                           | `edit-expense.spec.ts` › submitter edits the items of their pending expense and switches its reference currency                    |
+| Reimbursements › Edit reimbursement expense › Edits items                               | the same journey (see "Editing" below)                                                                                             |
+| Invoices › Recurring › User can setup recurring invoice expense                         | `recurring-expense.spec.ts` › user submits an invoice set to recur every month                                                     |
+| Reimbursements › Recurring › User can setup recurring reimbursement expense             | `recurring-expense.spec.ts` › user submits a reimbursement set to recur every month                                                |
+| Invoices › Duplicate › Duplicates an invoice expense                                    | `duplicate-expense.spec.ts` › user duplicates an expense they submitted and sends the copy as an invoice                           |
+| Reimbursements › Duplicate › Duplicates an reimbursement expense                        | `duplicate-expense.spec.ts` › user duplicates an expense they submitted and sends the copy as a reimbursement                      |
+
+The transitions, edits and submissions go through the browser exactly as in
+the source: status `Pending` → `Approved` → `Pending` (reason "Unapproved
+once") → `Approved` → `Pending` ("Unapproved twice") → `Rejected` ("Rejected
+once") with each reason shown as a comment; reject, delete through "More
+actions", then "Page not found" on the expense URL; policies typed into the
+dashboard and shown on the expense form; title set to "New title"; item 1
+renamed, a `€100.00` item added, reference currency switched from the
+preselected USD to EUR, giving `€11.00 EUR` (from `$10.00 USD`), `€100.00 EUR`
+and a `€111.00 EUR` total at the fixed 1.1 exchange rate; a monthly recurrence
+ending on Sep 29, 2125 confirmed in the summary before submitting; a duplicate
+opened from the submitted expenses list, given a type, a date and (for a
+reimbursement) a receipt, then submitted. Invoice files and receipts are real
+local files stored through the API.
+
+The downloaded invoice is produced by the real local PDF service, saved under
+the attempt's own output directory and read back as text. The journey checks
+the suggested name (`Expense-<id>-<collective slug>-invoice-<date>.pdf`) and
+that the document names this attempt's expense number and title, Collective,
+payee, billed host, item line and total. The API's stub for PDFs attached to
+emails is untouched and not involved.
+
+Where the journeys differ from the Cypress source, and why:
+
+- **Own graph per journey.** Cypress creates one user and one Collective for
+  the five `Actions on expense` tests, so the policy written by one test is
+  still there for the next, and hangs everything on the seeded `e2e-host` or
+  `apex`. Every journey arranges its own host, Collective, admin and expense
+  with the `expense-management` recipe (or `expense-submission` with
+  `priorExpense` for editing and duplicating). Policy text contains the
+  attempt's Collective slug, and the policy journeys first check that both
+  policy fields start empty.
+- **No payment.** The Cypress title says "Approve, unapprove, reject and pay";
+  nothing is paid in it, and nothing is paid here.
+- **Deletion.** Added: the expense is listed for its Collective before the
+  journey starts and is absent from that list after deletion, next to the
+  source's "Page not found".
+- **Policies.** Cypress types the same sentence into the invoice and the
+  reimbursement policy and only looks at the invoice one. The first journey
+  uses two different texts and checks each under its expense type. The Project
+  journey arranges the Project up front instead of creating it after the
+  policy edit; inheritance is read at display time, so the order does not
+  change what is tested.
+- **Editing.** Ticket and Cypress titles say both types, but the Cypress
+  reimbursement variant creates its expense without a type, so both variants
+  edit an invoice with identical steps. They are carried as one journey per
+  behavior. Editing a real reimbursement (with receipts on its items) is not
+  covered by either suite. The submitter here is not an admin of the
+  Collective, as in the source.
+- **Recurrence.** As in the source, the recurrence is configured and its
+  confirmation sentence checked before submitting. The submitted expense page
+  shows nothing about recurrence and no later prompt is produced, so nothing
+  further is observable through the product.
+- **Duplicate data.** Cypress asserts nothing about the copy. The journey
+  checks what the form carried over before touching it (paying Collective,
+  payee, saved payout method, item description and amount, title, tag; the
+  date is not copied) and that the list then holds two pending expenses with
+  the title and `$10.00`, the original still an invoice.
+- **Download control.** Cypress force-clicks the first
+  `download-expense-invoice-btn`; the journey clicks the visible "Download
+  generated invoice" button. Cypress computes the date in the file name from
+  the expense's creation time; the journey checks the name's shape with this
+  attempt's expense number and Collective slug.
+- **Direct navigation before acting.** Opening the expense through its link
+  in the Collective's expense list and clicking "Reject" straight away lost the
+  reason dialog once during development: the expense page loaded more data
+  after showing its buttons and re-rendered without the open dialog. The
+  journeys load the expense URL directly, as Cypress does, and have not shown
+  this since.
+- **Dropped setup.** For recurring and duplicate tests the Cypress `beforeEach`
+  also creates a second Collective, an Organization and a hosted Collective
+  for the user and wipes the shared inbox. None of that is used.
+
+Focused reproduction:
+
+```bash
+# The eleven journeys, fresh
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses --workers 3 \
+  --grep "Collective admin|Project|pending expense|recur every month|duplicates"
+
+# One journey, fresh
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/process-expense.spec.ts --grep "downloads the generated invoice"
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/edit-expense.spec.ts --grep "edits the items"
+
+# One journey against a retained populated stack
+./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/expense-policy.spec.ts --grep "expense form of a Project"
+
+# First attempts fail after a real unapproval, download, policy save or
+# duplicate; each retry arranges a new graph and must start from a pending
+# expense without comments, empty policies, or a single listed expense.
+PLAYWRIGHT_ISOLATION_PROBE=1 ./test/playwright/run-local.sh --reuse --retries 1 --workers 2 \
+  --spec test/playwright/specs/expenses --grep "Collective admin|duplicates"
+```
+
+After the probe, a failed attempt's download stays in its own
+`test-results/<test>-chromium/downloads/` directory and the retry's copy in
+`<test>-chromium-retry1/downloads/`, each naming a different expense.
+
+Timings, measured on an 8-CPU Linux VM with retries disabled. Setup is the
+`fixture-timings` attachment (one recipe request per journey); execution is
+the rest of the test's reported duration and includes the PDF service for the
+download journey. "Alone" is one journey on a fresh stack, where the first
+recipe request also warms the API (about 0.4 s); "shared" is the median over
+three fresh runs of the whole selection with 3, 2 and 3 workers.
+
+| Journey                           | Setup alone | Execution alone | Setup shared | Total shared |
+| --------------------------------- | ----------- | --------------- | ------------ | ------------ |
+| approve, unapprove, reject        | 0.49 s      | 3.6 s           | 0.06 s       | 4.3 s        |
+| delete rejected expense           | 0.51 s      | 4.0 s           | 0.06 s       | 4.8 s        |
+| download invoice PDF              | 0.50 s      | 2.0 s           | 0.06 s       | 2.0 s        |
+| write and display policies        | 0.47 s      | 3.8 s           | 0.08 s       | 5.7 s        |
+| Project shows parent policy       | 0.46 s      | 2.8 s           | 0.09 s       | 3.6 s        |
+| rename expense                    | 0.52 s      | 1.9 s           | 0.08 s       | 2.8 s        |
+| edit items and reference currency | 0.54 s      | 2.6 s           | 0.16 s       | 3.7 s        |
+| recurring invoice                 | 0.50 s      | 6.1 s           | 0.06 s       | 8.0 s        |
+| recurring reimbursement           | 0.50 s      | 7.0 s           | 0.05 s       | 7.9 s        |
+| duplicate as invoice              | 0.50 s      | 2.7 s           | 0.07 s       | 4.1 s        |
+| duplicate as reimbursement        | 0.46 s      | 2.8 s           | 0.08 s       | 4.0 s        |
+
+Arranging a host, Collective, admin, expense and Project costs 0.04-0.36 s per
+journey once the API is warm (median 0.07 s), a few percent of even the
+shortest journey.
+The eleven journeys take about 45 s of test time when each runs alone and
+about 51 s summed inside a shared run. The whole 31-test selection takes 74 s
+of Playwright time with three workers, 86 s with two and 148 s with one, after
+roughly 55 s of launcher startup on a fresh stack. The Cypress timing supplied
+for the pilot (04:38) covers all 28 tests of the original file, which the
+three expense groups now cover with 26 Playwright journeys.
 
 ## Cypress (existing suite)
 
