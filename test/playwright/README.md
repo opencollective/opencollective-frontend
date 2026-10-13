@@ -192,3 +192,26 @@ only reports a vendor as withheld after seeing one that must be offered.
 Coverage mapping, differences from Cypress, product behavior the journeys
 deliberately do not assert, and timings are in the canonical
 [guide](../../docs/e2e.md#vendor-picker-journeys-playwright-pilot).
+
+## Vendor creation and settings journeys
+
+`specs/vendors/vendor-creation.spec.ts` and `vendor-settings.spec.ts` hold the
+other half of the vendor pilot: a host admin creating a vendor from the Add
+Funds dialog, the expense form, the expected funds dialog and the grant form,
+then editing a vendor's scope and policy, creating one on the vendors
+dashboard, and changing the host's vendor policy in the host settings.
+
+```bash
+./test/playwright/run-local.sh --workers 3 --spec test/playwright/specs/vendors \
+  --grep "created|limits a vendor|take up a vendor policy"
+./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-settings.spec.ts --grep "take up a vendor policy"
+```
+
+They use the `vendor-host` recipe (which also returns the host dashboard URLs
+`vendors` and `expectedFunds`), `createVendorInline` in
+`helpers/vendor-picker.ts`, `helpers/vendor-dashboard.ts` for the vendor's
+settings form, and `openBrowserAs` to show the outcome in the Collective
+admin's own picker. Coverage mapping, differences from Cypress, timings, and
+the reconciliation of both pilot Cypress files with all Playwright journeys are
+in the canonical
+[guide](../../docs/e2e.md#vendor-creation-and-settings-journeys-playwright-pilot).
