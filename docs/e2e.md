@@ -196,10 +196,10 @@ test.describe('paying Collective subject to VAT', () => {
 });
 ```
 
-| Recipe                 | Options (all default to off)                                                                       | Actors                                                                               | Accounts, expenses, URLs                                                                                                                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `invitee` | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee` | `host`, `collective`, `collective2`, `organization`; expense `prior` (pending invoice by the submitter on `collective`, with a saved payout method); URLs `collective`, `newExpense`, `submittedExpenses` |
-| `expense-draft-invite` | `description`, `currency`, `items` (required)                                                      | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                              | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                          |
+| Recipe                 | Options (all default to off)                                                                                              | Actors                                                                                               | Accounts, expenses, URLs                                                                                                                                                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `invitee`, `inviteeOrganization` | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin` | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending invoice by the submitter on `collective`, with a saved payout method); URLs `collective`, `newExpense`, `submittedExpenses` |
+| `expense-draft-invite` | `description`, `currency`, `items` (required)                                                                             | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                                              | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                                                                                       |
 
 Each request owns a new active fiscal host, so no journey adds Collectives or
 expenses to a seeded host. Recipes arrange starting state and prior history
@@ -214,6 +214,50 @@ inputs to `Contracts` and its result schema to `schemas` in
 `test/playwright/fixtures/transport.ts`. Recipes that return the multi-party
 shape need no other frontend change. Every actor carries a private session
 token; scenario attachments drop all of them.
+
+A journey with a second party opens another browser with
+`openBrowserAs('<actor label>')`, or `openBrowserAs(null)` for a logged-out
+visitor. It returns a page in a separate context that shares no storage with
+`page` and closes with the attempt; traces and failure evidence cover it too.
+
+### Mail
+
+Journeys read real SMTP deliveries from the shared Mailpit inbox through the
+`mail` fixture (`test/playwright/helpers/mail.ts`). The inbox is never cleared
+and keeps mail from other attempts, retries and earlier runs, so a lookup is
+tied to the attempt in three ways:
+
+- **Recipient.** Look up an address the attempt owns: a recipe actor's `email`
+  (recipes derive it from the attempt identity, so a retry gets new addresses)
+  or `mail.address('<label>')` for someone who has no account yet. The helper
+  matches the exact delivered address; outside production the API rewrites
+  `a@b.com` to `emailbcc+a-at-b.com@opencollective.com`.
+- **Time.** Only messages delivered after the attempt started count.
+- **Uniqueness.** `mail.waitForMessage({ to, subject })` polls until one such
+  message exists and fails if several match, so a subject must be specific
+  enough (product subjects usually name an Account of the scenario). Never
+  match a shared recipient such as `testuser+admin@opencollective.com`.
+
+```ts
+const test = scenarioTest('expense-submission', { inputs: { inviteeOrganization: true }, actor: 'submitter' });
+
+test('invited Organization follows its emailed invitation', async ({ page, scenario, mail, openBrowserAs }) => {
+  // ... the submitter invites scenario.accounts.inviteeOrganization through the form
+  const link = await expenseInvitationLink(mail, {
+    to: scenario.actors.inviteeAdmin.email,
+    account: scenario.accounts.collective,
+  });
+  const invited = await openBrowserAs('inviteeAdmin');
+  await invited.goto(link);
+});
+```
+
+Add a helper next to `expenseInvitationLink` for each new kind of message
+rather than reading Mailpit from a spec. Each attempt that waited for mail
+attaches `mail-timings` (recipient, subject, wait in ms). The launcher exports
+`MAILPIT_URL` in fresh and `--reuse` runs; the helper refuses to guess it.
+Recipes still send no mail: the message a journey asserts on is always caused
+by the journey.
 
 `test/playwright/helpers/uploads.ts` provides genuine local files for
 `setInputFiles` and for drag-and-drop zones, and asserts that a preview points
@@ -338,7 +382,8 @@ Where the journeys differ from the Cypress source, and why:
   has no such check, so that would be new coverage rather than migration.
 - **Invitation step.** The invited profile receives a real invitation email at
   its attempt-owned address. Reading that email and completing the invitation
-  belongs to the invitation journeys, as in the Cypress source.
+  belongs to the [invitation journeys](#expense-invitation-journeys-playwright-pilot),
+  as in the Cypress source.
 - **Draft.** Cypress creates the draft with `draftExpenseAndInviteUser` and
   discards the email. The recipe writes the same draft state without sending
   mail; the Organization admin then completes it in the browser. The journey
@@ -397,6 +442,131 @@ workers, 38 s with three and 45 s with two, after roughly 55 s of launcher
 startup on a fresh stack. The Cypress timing supplied for the pilot (04:38)
 covers all 28 tests of the original file, so it is not a like-for-like
 comparison for this group.
+
+## Expense invitation journeys (Playwright pilot)
+
+`test/playwright/specs/expenses/invite-*.spec.ts` carries the invitation part
+of the Cypress expense pilot (`test/cypress/integration/27-expenses.test.ts`,
+`Invite` blocks), which stays unchanged and runnable. Six Cypress tests map to
+six journeys:
+
+| Cypress test                                                                                                         | Playwright journey (`specs/expenses/`)                                                                                                               |
+| -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Invoices › Create › Invite › User can submit invoice expense invite to existing organization                         | `invite-organization.spec.ts` › invited Organization follows its emailed invoice invitation and submits the expense                                  |
+| Reimbursements › Invite › User can submit reimbursement expense invite to existing organization                      | `invite-organization.spec.ts` › invited Organization follows its emailed reimbursement invitation and submits the expense                            |
+| Invoices › Create › Invite › User can submit invoice expense invite to existing organization initially logged out    | `invite-organization-logged-out.spec.ts` › logged-out visitor opening an Organization's emailed invoice invitation is sent to sign in and back       |
+| Reimbursements › Invite › User can submit reimbursement expense invite to existing organization initially logged out | `invite-organization-logged-out.spec.ts` › logged-out visitor opening an Organization's emailed reimbursement invitation is sent to sign in and back |
+| Invoices › Create › Invite › User can submit invoice expense invite to new user                                      | `invite-new-user.spec.ts` › person without an account follows their emailed invoice invitation and submits the expense without signing in            |
+| Reimbursements › Invite › User can submit reimbursement expense invite to new user                                   | `invite-new-user.spec.ts` › person without an account follows their emailed reimbursement invitation and submits the expense without signing in      |
+
+Every journey keeps the inviter's side as it was: a user who administers
+nothing opens "New expense", fills the whole form (items, BRL conversion,
+receipts, attachments, title, tag, summary figures) with "Invite someone" as
+the payee, and submits. The invitation then travels through the API's normal
+mailer over local SMTP to Mailpit; the journey finds it through the `mail`
+fixture and opens its "OK, let's go!" link in a second browser. The recipient
+sees the invitation with its decline option and continues:
+
+- **Existing Organization.** Its admin, signed in, adds and saves a payout
+  method, picks the type (attaching an invoice file and reference for an
+  invoice) and submits.
+- **Logged out.** Without a session the invitation is still readable; the
+  sign-in link offered in the payee section leads to `/signin?next=<invitation>`.
+- **New user.** The form shows the name and email the inviter entered and
+  offers to sign in; the person adds an unsaved payout method, picks the type
+  (asking for a generated invoice) and submits without signing in.
+
+Where the journeys differ from the Cypress source, and why:
+
+- **Mail ownership.** Cypress deletes the whole inbox before every test and
+  takes the first message tagged with the recipient whose subject contains
+  "wants to pay you" or "to send funds to". The journeys never clear the inbox
+  and accept only the single message delivered after the attempt started to an
+  address that exists for this attempt alone, with a subject naming the
+  attempt's Collective, whose link points at an expense of that Collective.
+- **Own graph.** The Collective hangs on an attempt-owned host instead of the
+  seeded `e2e-host`; the invited Organization and its admin come from the
+  `inviteeOrganization` recipe option; the new user's address comes from
+  `mail.address()`. Sending and accepting the invitation are never arranged.
+- **Second browser instead of logout.** Cypress logs the inviter out and
+  reuses the browser. The recipient gets a separate context
+  (`openBrowserAs`), so the inviter's session is still there to check the outcome.
+- **Outcome check added.** Cypress stops at "has been submitted
+  successfully!". The two completing journeys also reopen the expense as the
+  inviter and check that it is pending with the invited payee.
+- **Logged-out variant stops at sign-in, as in the source.** The ticket asks
+  for sign-in and a completed submission in every variant; the Cypress test
+  ends at the redirect to `/signin?next=...`, so signing in and submitting from
+  there would be new coverage and is not claimed. Signed-in completion is the
+  first variant.
+- **Which sign-in link.** Cypress force-clicks the first "Log In" on the page,
+  the top-bar link hidden behind the full-screen form. The journey uses the
+  "Sign In" link the form offers, which has the same target. That link only
+  carries the invitation as its return target after the form settles
+  (`LoginBtn` computes it on mount without re-rendering), so the journey waits
+  for the target before clicking.
+- **New user's details.** Cypress looks for the name and email as page text;
+  they are prefilled input values, which the journey asserts.
+- **Dropped setup.** The Cypress `beforeEach` creates a second Collective, an
+  Organization and a hosted Collective for the inviter that these tests never
+  use.
+
+Focused reproduction:
+
+```bash
+# The six journeys, fresh
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses --grep "invitation" --workers 3
+
+# One journey, fresh
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-new-user.spec.ts --grep "emailed invoice"
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-organization-logged-out.spec.ts
+
+# One journey against a retained populated stack and inbox
+./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/invite-organization.spec.ts --grep "emailed reimbursement"
+
+# First attempt fails with its invitation delivered and unanswered; the retry
+# arranges new parties and must find its own message. Run another invitation
+# spec with --reuse at the same time to check they do not interfere.
+PLAYWRIGHT_ISOLATION_PROBE=1 ./test/playwright/run-local.sh --reuse \
+  --spec test/playwright/specs/expenses/invite-organization.spec.ts --retries 1
+```
+
+After the probe, the failed attempt's `scenario` attachment names its
+Collective and `inviteeAdmin`: its expense is still a draft without a payout
+method and its mailbox holds exactly its one invitation, while the retry's
+expense is pending.
+
+Timings, measured on an 8-CPU Linux VM with retries disabled. Setup is the
+`fixture-timings` attachment (one recipe request per journey). Mail wait is the
+`mail-timings` attachment: from the inviter's confirmation to the message being
+found in Mailpit. Execution is the rest of the reported duration and covers
+both browsers. "Alone" is one journey on a fresh stack, where the first recipe
+request and the first inbox lookup also warm the API and Mailpit; "shared" is
+the median over three fresh runs of the whole selection with 3, 2 and 1
+workers.
+
+| Journey                             | Setup alone | Mail wait alone | Execution alone | Setup shared | Mail wait shared                 | Total shared |
+| ----------------------------------- | ----------- | --------------- | --------------- | ------------ | -------------------------------- | ------------ |
+| Organization submits, invoice       | 0.47 s      | 0.12 s          | 9.2 s           | 0.05 s       | 0.02 s                           | 11.6 s       |
+| Organization submits, reimbursement | 0.48 s      | 0.13 s          | 9.7 s           | 0.06 s       | 0.02 s                           | 10.4 s       |
+| logged out, invoice                 | 0.45 s      | 0.12 s          | 6.3 s           | 0.09 s       | 0.02 s                           | 7.7 s        |
+| logged out, reimbursement           | 0.48 s      | 0.13 s          | 7.1 s           | 0.06 s       | 0.02 s                           | 8.2 s        |
+| new user, invoice                   | 0.50 s      | 0.12 s          | 7.9 s           | 0.06 s       | 0.13 s (first lookup of the run) | 9.5 s        |
+| new user, reimbursement             | 0.44 s      | 0.12 s          | 8.7 s           | 0.05 s       | 0.02 s                           | 9.3 s        |
+
+The invitation is in the inbox 10-40 ms after the form confirms once the stack
+is warm, so mail delivery is not a measurable part of these journeys; almost
+all the time is the inviter filling the form. The six journeys take about 55 s
+of test time when each runs alone and 46-67 s summed inside a shared run. The
+whole 20-test selection takes 57 s of Playwright time with three workers, 67 s
+with two and 106 s with one, after roughly 55 s of launcher startup on a fresh
+stack. The Cypress timing supplied for the pilot (04:38) covers all 28 tests of
+the original file, so it is not a like-for-like comparison for this group.
+
+The measuring VM caps the session at 1228 processes and threads. The selection
+peaks near 1080 with three workers and exceeds the cap with four, which shows
+as `Target crashed` when a journey opens its second browser. Stay at three
+workers on such a machine; the cap is not a property of the journeys.
 
 ## Cypress (existing suite)
 

@@ -135,3 +135,22 @@ They use `scenarioTest` with the `expense-submission` and `expense-draft-invite`
 recipes, `helpers/expense-form.ts` and `helpers/uploads.ts`. Coverage mapping
 against the Cypress suite, differences, and setup versus execution timings are
 in the canonical [guide](../../docs/e2e.md#expense-submission-journeys-playwright-pilot).
+
+## Expense invitation journeys
+
+`specs/expenses/invite-*.spec.ts` holds the invitation journeys of the expense
+pilot: an existing Organization, a logged-out recipient and a person without an
+account, each for invoices and reimbursements. The invitation is sent through
+the form, delivered over local SMTP and followed from Mailpit in a second
+browser.
+
+```bash
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses --grep "invitation" --workers 3
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-new-user.spec.ts --grep "emailed invoice"
+```
+
+They use the `mail` fixture (`helpers/mail.ts`: attempt-owned recipients, the
+shared inbox is never cleared), `openBrowserAs` for the recipient's browser and
+the `inviteeOrganization` option of the `expense-submission` recipe. Mail
+correlation rules, coverage mapping, differences and timings are in the
+canonical [guide](../../docs/e2e.md#expense-invitation-journeys-playwright-pilot).
