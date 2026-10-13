@@ -33,6 +33,8 @@ test('submitter edits the items of their pending expense and switches its refere
   await expect(page.getByTestId('reference-currency-option-USD')).toBeChecked();
   await page.getByTestId('reference-currency-option-EUR').click();
   await expect(page.getByTestId('reference-currency-option-EUR')).toBeChecked();
+  // The first item is now converted; saving before its rate arrives fails validation without any message.
+  await expect(page.getByRole('button', { name: '1 USD = 1.1 EUR' })).toBeVisible();
   await page.locator('form').getByRole('button', { name: 'Save' }).click();
   await expect(page.getByTestId('toast-notification').filter({ hasText: 'Expense edited' })).toBeVisible();
 
