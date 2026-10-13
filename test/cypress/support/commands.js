@@ -573,7 +573,7 @@ Cypress.Commands.add('waitForLoggedIn', params => {
  */
 Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail, userSlug, secret } = {}) => {
   let authToken;
-  return signinRequestAndReturnToken({ email: userEmail, slug: userSlug }, null).then(token => {
+  return signinRequestAndReturnSessionToken({ email: userEmail, slug: userSlug }).then(token => {
     authToken = token;
     return graphqlQueryV2(authToken, {
       operationName: 'AccountHasTwoFactorAuth',
@@ -800,6 +800,22 @@ function signinRequest(user, redirect, sendLink) {
     },
     body: JSON.stringify({ user, redirect, createProfile: true, sendLink }),
   });
+}
+
+/**
+ * Signs in like the signin page does: the login link token is exchanged for a session token,
+ * which session-only mutations (2FA management, passwords) require.
+ */
+function signinRequestAndReturnSessionToken(user) {
+  return signinRequestAndReturnToken(user, null).then(loginToken =>
+    cy
+      .request({
+        url: '/api/users/exchange-login-token',
+        method: 'POST',
+        headers: { Accept: 'application/json', authorization: `Bearer ${loginToken}` },
+      })
+      .then(({ body }) => body.token),
+  );
 }
 
 function getTokenFromRedirectUrl(url) {
