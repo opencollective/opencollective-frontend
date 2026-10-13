@@ -1,16 +1,16 @@
 name: Checkout E2E stack
-description: Checkout API (matching branch or pinned ref), images, and PDF for frontend E2E
+description: Checkout API, images, and PDF using pinned refs or matching branches
 inputs:
   api-ref:
     description: Pin API checkout to this SHA or ref. If empty, resolve a matching branch then main.
     required: false
     default: ''
   images-ref:
-    description: Pin images checkout to this SHA or ref. If empty, use the default branch.
+    description: Pin images checkout to this SHA or ref. If empty, resolve a matching branch then main.
     required: false
     default: ''
   pdf-ref:
-    description: Pin PDF checkout to this SHA or ref. If empty, use the default branch.
+    description: Pin PDF checkout to this SHA or ref. If empty, resolve a matching branch then main.
     required: false
     default: ''
   github-token:
@@ -30,86 +30,73 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Resolve API ref
-      id: resolve-api-ref
+    - name: Resolve stack refs
+      id: resolve-refs
       shell: bash
       env:
         API_REF_INPUT: ${{ inputs.api-ref }}
+        IMAGES_REF_INPUT: ${{ inputs.images-ref }}
+        PDF_REF_INPUT: ${{ inputs.pdf-ref }}
       run: |
         set -euo pipefail
-        if [ -n "${API_REF_INPUT}" ]; then
-          echo "api-ref=${API_REF_INPUT}" >> "${GITHUB_OUTPUT}"
-          echo "Using pinned API ref ${API_REF_INPUT}"
-          exit 0
-        fi
-
         BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-        REPO_URL="https://github.com/opencollective/opencollective-api.git"
 
-        # Do not add another Authorization extraheader: actions/checkout already
-        # sets one on the runner, and a second header makes GitHub return 400.
-        resolve() {
-          git ls-remote --heads "${REPO_URL}" "refs/heads/${1}" \
-            | awk -v ref="refs/heads/${1}" '$2 == ref { print $1 }'
+        # actions/checkout already configures authentication; do not add another
+        # Authorization extraheader when resolving companion branches.
+        resolve_head() {
+          git ls-remote --heads "$1" "refs/heads/${2}" \
+            | awk -v ref="refs/heads/${2}" '$2 == ref { print $1 }'
         }
 
-        SHA="$(resolve "${BRANCH}")"
-        if [ -z "${SHA}" ] && [ "${BRANCH}" != "main" ]; then
-          echo "No matching API branch '${BRANCH}', falling back to main"
-          SHA="$(resolve main)"
-        fi
-        if [ -z "${SHA}" ]; then
-          echo "Failed to resolve opencollective-api ref" >&2
-          exit 1
-        fi
+        resolve_ref() {
+          local service="$1" repository="$2" pinned="$3"
+          local sha
+          if [ -n "$pinned" ]; then
+            sha="$pinned"
+            echo "Using pinned $service ref $sha"
+          else
+            sha="$(resolve_head "$repository" "$BRANCH")"
+            if [ -z "$sha" ] && [ "$BRANCH" != "main" ]; then
+              echo "No matching $service branch '$BRANCH', falling back to main"
+              sha="$(resolve_head "$repository" main)"
+            fi
+            if [ -z "$sha" ]; then
+              echo "Failed to resolve opencollective-$service ref" >&2
+              return 1
+            fi
+            echo "Resolved $service ref $sha"
+          fi
+          echo "$service-ref=$sha" >> "$GITHUB_OUTPUT"
+        }
 
-        echo "api-ref=${SHA}" >> "${GITHUB_OUTPUT}"
-        echo "Resolved API ref ${SHA}"
+        resolve_ref api https://github.com/opencollective/opencollective-api.git "$API_REF_INPUT"
+        resolve_ref images https://github.com/opencollective/opencollective-images.git "$IMAGES_REF_INPUT"
+        resolve_ref pdf https://github.com/opencollective/opencollective-pdf.git "$PDF_REF_INPUT"
 
     - name: Checkout (api)
       uses: actions/checkout@v7
       with:
         repository: opencollective/opencollective-api
         path: opencollective-api
-        ref: ${{ steps.resolve-api-ref.outputs.api-ref }}
+        ref: ${{ steps.resolve-refs.outputs.api-ref }}
         token: ${{ inputs.github-token }}
         persist-credentials: false
 
     - name: Checkout (images)
-      if: ${{ inputs.images-ref == '' }}
       uses: actions/checkout@v7
       with:
         repository: opencollective/opencollective-images
         path: opencollective-images
-        token: ${{ inputs.github-token }}
-        persist-credentials: false
-
-    - name: Checkout (images - pinned)
-      if: ${{ inputs.images-ref != '' }}
-      uses: actions/checkout@v7
-      with:
-        repository: opencollective/opencollective-images
-        path: opencollective-images
-        ref: ${{ inputs.images-ref }}
+        ref: ${{ steps.resolve-refs.outputs.images-ref }}
         token: ${{ inputs.github-token }}
         persist-credentials: false
 
     - name: Checkout (PDF)
-      if: ${{ inputs.pdf-ref == '' }}
       uses: actions/checkout@v7
       with:
         repository: opencollective/opencollective-pdf
         path: opencollective-pdf
-        token: ${{ inputs.github-token }}
-        persist-credentials: false
-
-    - name: Checkout (PDF - pinned)
-      if: ${{ inputs.pdf-ref != '' }}
-      uses: actions/checkout@v7
-      with:
-        repository: opencollective/opencollective-pdf
-        path: opencollective-pdf
-        ref: ${{ inputs.pdf-ref }}
+        ref: ${{ steps.resolve-refs.outputs.pdf-ref }}
         token: ${{ inputs.github-token }}
         persist-credentials: false
 

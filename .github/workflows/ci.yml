@@ -14,11 +14,24 @@ on:
       - synchronize
       - reopened
 
+permissions:
+  contents: read
+  id-token: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_AGENT_GUIDANCE: 'false'
+  # Repository branch pushes and same-repository PRs share the remote cache.
+  # Fork PRs, tag pushes, and runs without TURBO_TEAM stay local.
+  TURBO_CACHE: >-
+    ${{ vars.TURBO_TEAM != '' &&
+        ((github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')) ||
+         (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) &&
+        'local:rw,remote:rw' || 'local:rw' }}
   TZ: UTC
   OC_ENV: ci
   NODE_ENV: test
@@ -45,14 +58,6 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - name: Restore ESLint cache
-        uses: actions/cache@v6
-        with:
-          path: .eslintcache
-          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-eslint-${{ hashFiles('eslint.config.mjs', 'package-lock.json') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-eslint-${{ hashFiles('eslint.config.mjs', 'package-lock.json') }}-
-
       - run: npm run lint:quiet
         env:
           NODE_OPTIONS: --max-old-space-size=4096
@@ -70,14 +75,6 @@ jobs:
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
-
-      - name: Restore Prettier cache
-        uses: actions/cache@v6
-        with:
-          path: .prettiercache
-          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-prettier-${{ hashFiles('.prettierrc', 'package-lock.json') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-prettier-${{ hashFiles('.prettierrc', 'package-lock.json') }}-
 
       - run: npm run prettier:check
 
@@ -152,7 +149,7 @@ jobs:
             ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('package-lock.json') }}-
 
       - name: Build
-        run: PRESERVE_NEXT_CACHE=true npm run build
+        run: PRESERVE_NEXT_CACHE=true npm run turbo -- run build:finalize
 
       # Stage to a non-hidden directory so upload-artifact cannot drop `.next`.
       # Copy only; leave workspace `.next/cache` for the cache post-save step.
@@ -221,14 +218,6 @@ jobs:
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
-
-      - name: Restore TypeScript incremental cache
-        uses: actions/cache@v6
-        with:
-          path: tsconfig.tsbuildinfo
-          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-tsc-${{ hashFiles('tsconfig.json', 'package-lock.json') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-tsc-${{ hashFiles('tsconfig.json', 'package-lock.json') }}-
 
       - run: npm run type:check
         env:

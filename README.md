@@ -101,3 +101,37 @@ To add new files or dependencies to this exported package, have a look at [scrip
 ## Discussion
 
 If you have any questions, ping us on [Discord](https://discord.opencollective.com).
+
+### Turborepo tasks and CI cache
+
+Use the usual commands: `npm run dev`, `npm run build`, `npm run lint`,
+`npm run type:check`, `npm run format:check`, and `npm test`. These entrypoints
+run through Turbo by default. Forward runner arguments as usual, for example
+`npm test -- path/to/test.ts`. Internal `:task` scripts contain the underlying
+commands so workspace orchestration never recursively invokes Turbo. For advanced
+Turbo options, use `npm run turbo -- run lint:task type:check:task --dry=json`.
+The build command runs the
+Turbo compilation graph and always refreshes Cloudflare IP ranges afterward.
+Development and database/E2E tasks are not cached. Standalone `npm ci` and Heroku
+entrypoints remain supported; the parent workspace keeps separate installs.
+
+Remote Cache uses GitHub OIDC and the existing `TURBO_TEAM` Actions variable.
+In Vercel team Settings → Build and Deployment → OIDC Policies for CLI Access,
+create Turborepo CLI policies for `opencollective/opencollective-api` and
+`opencollective/opencollective-frontend`. Keep each policy restricted to its
+repository and CI/E2E workflows, including frontend's `e2e-prepare.yml` reusable
+workflow. Allow repository branch pushes and pull-request claims; remove any
+main-only branch restriction. API E2E runs on branch pushes. Leave the audience
+at its default. Update existing policies instead of adding overlapping ones.
+
+Jobs grant `id-token: write`. Vercel's setup action exchanges GitHub's OIDC token
+for a short-lived `TURBO_TOKEN` before Turbo runs and revokes it when the job ends.
+No `TURBO_TOKEN` repository secret is required. Authentication and remote cache
+reads/writes run on repository branch pushes and PRs whose head repository
+matches the workflow repository. Fork PRs, tag pushes, other events, and runs
+without `TURBO_TEAM` use local caching. An OIDC policy mismatch fails the setup step.
+Cache entries include source, lockfile, environment configuration, and declared
+outputs.
+
+See https://turborepo.dev/docs/crafting-your-repository/constructing-ci and
+https://vercel.com/docs/monorepos/remote-caching/external-ci-cd#create-an-oidc-policy.
