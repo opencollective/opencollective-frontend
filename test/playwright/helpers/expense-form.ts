@@ -19,7 +19,9 @@ type Payee =
   /** Create an Organization inline and get paid through it. */
   | { legalEntity: { legalName: string; name: string; slug: string }; payoutMethod: NewPayoutMethod }
   /** Invite an existing profile, who will provide the payout details. */
-  | { invitee: { slug: string } };
+  | { invitee: { slug: string } }
+  /** Invite someone who has no profile yet, by name and email address. */
+  | { invitee: { name: string; email: string } };
 
 type ExpenseSubmission = {
   kind: ExpenseKind;
@@ -95,6 +97,21 @@ export async function chooseExpenseType(page: Page, kind: ExpenseKind, { attachI
   }
 }
 
+/** Opens an emailed (or otherwise shared) expense invitation and starts completing it. */
+export async function openInvitation(page: Page, link: string) {
+  await page.goto(link);
+  await expect(page.getByText('You have been invited to submit an expense')).toBeVisible();
+  await expect(page.getByText('Decline invitation')).toBeVisible();
+  await page.getByText('Continue submission').click();
+}
+
+/**
+ * What the invitation form offers a visitor without a session: a link to sign
+ * in and come back to the same invitation.
+ */
+export const signInFromInvitation = (page: Page) =>
+  section(page, 'WHO_IS_GETTING_PAID').getByRole('link', { name: 'Sign In' });
+
 async function choosePayee(page: Page, payee: Payee) {
   const gettingPaid = section(page, 'WHO_IS_GETTING_PAID');
   if ('legalEntity' in payee) {
@@ -116,11 +133,25 @@ async function choosePayee(page: Page, payee: Payee) {
     const option = gettingPaid.locator(`button[role="radio"][value="${payee.profile.slug}"]`);
     await option.click();
     await expect(option).toBeChecked();
-  } else {
+  } else if ('slug' in payee.invitee) {
     await gettingPaid.getByText('Invite someone').click();
     await gettingPaid.getByRole('combobox').click();
     await page.keyboard.type(payee.invitee.slug);
     await pickProfile(page, payee.invitee.slug);
+  } else {
+    await gettingPaid.getByText('Invite someone').click();
+    await gettingPaid.getByRole('combobox').click();
+    // The picker lists this button inside a disabled option, which only means the option cannot be selected.
+    // Forcing the click skips the wait for the menu to stop moving, so repeat it until the contact form opens.
+    const inviteByEmail = page.getByRole('button', { name: 'Invite someone to submit an expense' });
+    await expect(async () => {
+      if (await inviteByEmail.isVisible()) {
+        await inviteByEmail.click({ force: true, timeout: 2_000 });
+      }
+      await expect(gettingPaid.getByLabel('Contact name')).toBeVisible({ timeout: 2_000 });
+    }).toPass();
+    await gettingPaid.getByLabel('Contact name').fill(payee.invitee.name);
+    await gettingPaid.getByLabel('Email address').fill(payee.invitee.email);
   }
 }
 

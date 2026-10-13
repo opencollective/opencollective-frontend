@@ -75,8 +75,9 @@ type Contracts = {
   'account-profile': { inputs: { name: string }; scenario: AccountScenario };
   'account-conversation': { inputs: { name: string }; scenario: AccountScenario };
   /**
-   * Actors `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), optional `invitee`.
-   * Accounts `host`, `collective`, optional `collective2`, `organization`. Expenses: optional `prior`.
+   * Actors `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), optional `invitee`,
+   * `inviteeAdmin`. Accounts `host`, `collective`, optional `collective2`, `organization`,
+   * `inviteeOrganization` (administered by `inviteeAdmin` only). Expenses: optional `prior`.
    * URLs `collective`, `newExpense`, `submittedExpenses`.
    */
   'expense-submission': {
@@ -86,6 +87,7 @@ type Contracts = {
       payeeOrganization?: boolean;
       priorExpense?: boolean;
       invitee?: boolean;
+      inviteeOrganization?: boolean;
     };
     scenario: GraphScenario;
   };

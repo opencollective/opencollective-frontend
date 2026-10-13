@@ -1195,7 +1195,9 @@ reuse_main() {
     fail "fixture ownership proof missing. Start a fresh environment with the companion API build."
     exit 2
   fi
-  export WEBSITE_URL API_URL
+  # The owner's inbox: journeys read their own mail from it and never clear it.
+  MAILPIT_URL="$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")"
+  export WEBSITE_URL API_URL MAILPIT_URL
   export PLAYWRIGHT_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
   export PLAYWRIGHT_RUN_ID="$RUN_ID"
   register_joiner
