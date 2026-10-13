@@ -29,7 +29,11 @@ export async function openVendorPicker(page: Page, account: Account, form: 'expe
     await page.goto(`/${account.slug}/expenses/new`);
   }
   const payee = page.locator(form === 'grant' ? '#WHO_WILL_RECEIVE_FUNDS' : '#WHO_IS_GETTING_PAID');
-  await payee.getByText(form === 'grant' ? 'A beneficiary' : 'A vendor').click();
+  // The form preselects the user's own profile once it has loaded, even over a choice made before that.
+  await expect(payee.getByRole('radio', { checked: true })).toBeVisible();
+  const vendor = payee.getByRole('radio', { name: form === 'grant' ? 'A beneficiary' : 'A vendor' });
+  await vendor.click();
+  await expect(vendor).toBeChecked();
   await payee.getByRole('combobox').click();
   await expect(optionList(page, 'payee')).toBeVisible();
 }
