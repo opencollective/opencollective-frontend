@@ -63,13 +63,19 @@ export async function addPayoutMethod(page: Page, payoutMethod: NewPayoutMethod)
   await expect(addNew).toHaveAttribute('data-state', 'checked');
   await payout.getByTestId('payout-method-type-select').click();
   await page.getByTestId('select-option').filter({ hasText: 'Other' }).click();
-  await payout.getByTestId('currency-picker').click();
-  await page
+  const currency = payout.getByTestId('currency-picker');
+  const currencyOption = page
     .getByTestId('select-content')
     .getByTestId('select-option')
-    .filter({ hasText: payoutMethod.currency })
-    .click();
-  await expect(payout.getByTestId('currency-picker')).toContainText(payoutMethod.currency);
+    .filter({ hasText: payoutMethod.currency });
+  // The list has closed by itself while it was still opening, leaving no selection: open it again until one is made.
+  await expect(async () => {
+    if (!(await currencyOption.isVisible())) {
+      await currency.click({ timeout: 2_000 });
+    }
+    await currencyOption.click({ timeout: 2_000 });
+    await expect(currency).toContainText(payoutMethod.currency, { timeout: 2_000 });
+  }).toPass();
   await payout.getByLabel('Info', { exact: true }).fill(payoutMethod.details);
   const alias = payout.locator('[id="input-newPayoutMethod.name"]');
   await alias.fill(payoutMethod.name);
@@ -85,8 +91,12 @@ export async function addPayoutMethod(page: Page, payoutMethod: NewPayoutMethod)
 export async function chooseExpenseType(page: Page, kind: ExpenseKind, { attachInvoice }: { attachInvoice: boolean }) {
   const type = section(page, 'TYPE_OF_EXPENSE');
   const label = kind === 'invoice' ? 'Invoice' : 'Reimbursement';
-  await type.getByRole('radio', { name: label }).click();
-  await expect(type.getByRole('radio', { name: label })).toBeChecked();
+  const choice = type.getByRole('radio', { name: label });
+  // A choice made while the form is still settling after the payout method has been lost: make it again until it holds.
+  await expect(async () => {
+    await choice.click({ timeout: 2_000 });
+    await expect(choice).toBeChecked({ timeout: 2_000 });
+  }).toPass();
   if (kind === 'invoice' && attachInvoice) {
     await type.getByText('Yes, I have an invoice').click();
     await type.getByText('Attach your invoice file').setInputFiles(imageFile('invoice0.jpg'));
