@@ -454,7 +454,7 @@ export const createWebhookMutation = gql`
   }
 `;
 
-const updateWebhookMutation = gql`
+export const updateWebhookMutation = gql`
   mutation UpdateWebhook($webhook: WebhookUpdateInput!) {
     updateWebhook(webhook: $webhook) {
       id
@@ -502,11 +502,13 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
       }
 
       for (const webhook of editedWebhooks) {
+        const saved = savedWebhooks.get(webhook.id);
+        const isUrlEdited = !saved || cleanWebhookUrl(saved.webhookUrl) !== cleanWebhookUrl(webhook.webhookUrl);
         const values = {
           activityType: toActivityType(webhook.type),
-          webhookUrl: `https://${cleanWebhookUrl(webhook.webhookUrl)}`,
+          // The input only takes https URLs, but keep the saved scheme (e.g. http) when the URL is not edited
+          webhookUrl: isUrlEdited ? `https://${cleanWebhookUrl(webhook.webhookUrl)}` : saved.webhookUrl,
         };
-        const saved = savedWebhooks.get(webhook.id);
         if (!saved) {
           const result = await client.mutate({
             mutation: createWebhookMutation,
@@ -514,10 +516,7 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
           });
           const id = result.data.createWebhook.id;
           persistedNodes.set(id, { __typename: 'Webhook', id, ...values });
-        } else if (
-          saved.type !== webhook.type ||
-          cleanWebhookUrl(saved.webhookUrl) !== cleanWebhookUrl(webhook.webhookUrl)
-        ) {
+        } else if (saved.type !== webhook.type || isUrlEdited) {
           await client.mutate({
             mutation: updateWebhookMutation,
             variables: { webhook: { id: webhook.id, ...values } },
