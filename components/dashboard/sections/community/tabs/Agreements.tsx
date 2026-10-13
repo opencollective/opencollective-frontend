@@ -16,13 +16,15 @@ import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import ConfirmationModal from '@/components/NewConfirmationModal';
 import { useToast } from '@/components/ui/useToast';
 
-import type { HostedAccountProfileData } from './types';
+import type { AccountDetailData } from '../queries';
 
 const NB_AGREEMENTS = 100;
 const NB_PLACEHOLDERS = 5;
 
-const hostedAccountAgreementsQuery = gql`
-  query HostedAccountAgreements($hostSlug: String!, $account: [AccountReferenceInput], $limit: Int!, $offset: Int!) {
+// Field-identical copy of the queries from
+// components/hosted-account-overview/HostedAccountAgreementsTab.tsx (operations renamed for codegen).
+const accountDetailAgreementsQuery = gql`
+  query AccountDetailAgreements($hostSlug: String!, $account: [AccountReferenceInput], $limit: Int!, $offset: Int!) {
     host(slug: $hostSlug) {
       id
       legacyId
@@ -39,20 +41,20 @@ const hostedAccountAgreementsQuery = gql`
   ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
 `;
 
-const DELETE_AGREEMENT_MUTATION = gql`
-  mutation HostedAccountDeleteAgreement($id: String!) {
+const deleteAgreementMutation = gql`
+  mutation AccountDetailDeleteAgreement($id: String!) {
     deleteAgreement(agreement: { id: $id }) {
       id
     }
   }
 `;
 
-type HostedAccountAgreementsTabProps = {
-  account?: HostedAccountProfileData;
+type AgreementsProps = {
+  account?: AccountDetailData;
   hostSlug: string;
 };
 
-export function HostedAccountAgreementsTab({ account, hostSlug }: HostedAccountAgreementsTabProps) {
+export function Agreements({ account, hostSlug }: AgreementsProps) {
   const intl = useIntl();
   const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();
@@ -61,9 +63,9 @@ export function HostedAccountAgreementsTab({ account, hostSlug }: HostedAccountA
   const [isEditing, setIsEditing] = React.useState(false);
   const [filePreview, setFilePreview] = React.useState<Agreement | null>(null);
   const [agreementToDelete, setAgreementToDelete] = React.useState<Agreement | null>(null);
-  const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION);
+  const [deleteAgreement] = useMutation(deleteAgreementMutation);
 
-  const { data, error, loading, variables, refetch } = useQuery(hostedAccountAgreementsQuery, {
+  const { data, error, loading, variables, refetch } = useQuery(accountDetailAgreementsQuery, {
     variables: { hostSlug, account: account?.slug ? [{ slug: account.slug }] : [], limit: NB_AGREEMENTS, offset: 0 },
     skip: !account?.slug,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',

@@ -15,7 +15,7 @@ export const vendorFieldFragment = gql`
     hasPublicProfile
     description
     tags
-    imageUrl
+    imageUrl(height: 96)
     isArchived
     createdAt
     features {

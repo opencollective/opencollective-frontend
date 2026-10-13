@@ -3,7 +3,6 @@ import { FormattedMessage } from 'react-intl';
 
 import Avatar from '@/components/Avatar';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
-import HeroSocialLinks from '@/components/hosted-account-overview/SocialLinks';
 import HTMLContent, { isEmptyHTMLValue } from '@/components/HTMLContent';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
@@ -12,13 +11,14 @@ import StyledLink from '@/components/StyledLink';
 import { Badge } from '@/components/ui/Badge';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
-import type { HostedAccountProfileData } from './types';
+import type { AccountDetailData } from '../queries';
+import HeroSocialLinks from '../SocialLinks';
 
-type HostedAccountAboutTabProps = {
-  account?: HostedAccountProfileData;
+type AboutProps = {
+  account?: AccountDetailData;
 };
 
-export function HostedAccountAboutTab({ account }: HostedAccountAboutTabProps) {
+export function About({ account }: AboutProps) {
   const admins = account?.members?.nodes || [];
   const hasLongDescription = !isEmptyHTMLValue(account?.longDescription);
 

@@ -1,6 +1,16 @@
 import { generateSecret, generateSync } from 'otplib';
 
+import { signinRequestAndReturnToken } from '../support/commands';
+import { defaultTestUserEmail } from '../support/data';
+
 describe('signin', () => {
+  it('exchanges the login token for a session token in API fixtures', () => {
+    signinRequestAndReturnToken({ email: defaultTestUserEmail }, null).then(token => {
+      const payload = JSON.parse(Cypress.Buffer.from(token.split('.')[1], 'base64').toString());
+      expect(payload.scope).to.equal('session');
+    });
+  });
+
   it('redirects directly when using a dev test account', () => {
     cy.visit('/signin?next=/testuseradmin');
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');

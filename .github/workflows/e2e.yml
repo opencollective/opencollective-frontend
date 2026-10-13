@@ -235,9 +235,13 @@ jobs:
             next_root="${next_root}/frontend-next"
           fi
           mkdir -p .next
-          rsync -a "${next_root}/" .next/
+          rsync -a --exclude _generated-public/ "${next_root}/" .next/
           test -f .next/BUILD_ID
           test -f .next/routes-manifest.json
+          # Put back the files the build generated in public/ (see "Stage Next.js build" in ci.yml), so this
+          # checkout serves what production serves from its build directory
+          rsync -a "${next_root}/_generated-public/" public/
+          test -f public/static/scripts/pdf.worker.min.mjs
 
           stack_root=/tmp/e2e-service-dists
           if [ ! -d "${stack_root}/opencollective-api/dist" ] && [ -d "${stack_root}/e2e-service-dists/opencollective-api/dist" ]; then

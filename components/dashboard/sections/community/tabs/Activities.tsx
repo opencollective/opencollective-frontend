@@ -10,12 +10,11 @@ import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { InfoTooltipIcon } from '@/components/InfoTooltipIcon';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
-import { Pagination } from '../../filters/Pagination';
-import TimelineItem from '../overview/TimelineItem';
+import { Pagination } from '../../../filters/Pagination';
+import TimelineItem from '../../overview/TimelineItem';
+import { communityAccountActivitiesQuery } from '../queries';
 
-import { communityAccountActivitiesQuery } from './queries';
-
-export function ActivitiesTab({ account, host, setOpenExpenseId }) {
+export function Activities({ account, host, setOpenExpenseId }) {
   const pagination = useQueryFilter({
     schema: z.object({ limit: integer.default(15), offset: integer.default(0) }),
     filters: {},

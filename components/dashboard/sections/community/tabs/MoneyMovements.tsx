@@ -5,11 +5,8 @@ import { z } from 'zod';
 
 import type { FiltersToVariables } from '@/lib/filters/filter-types';
 import { limit, offset } from '@/lib/filters/schemas';
-import type {
-  CommunityAccountDetailQuery,
-  CommunityTransactionSummary,
-  TransactionsTableQueryVariables,
-} from '@/lib/graphql/types/v2/graphql';
+import { gql } from '@/lib/graphql/helpers';
+import type { CommunityAccountDetailQuery, TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '@/lib/url-helpers';
@@ -18,25 +15,25 @@ import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 
-import { DashboardContext } from '../../DashboardContext';
-import { EmptyResults } from '../../EmptyResults';
-import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
-import { amountFilter } from '../../filters/AmountFilter';
-import { dateFilter } from '../../filters/DateFilter';
-import { Filterbar } from '../../filters/Filterbar';
-import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
-import { searchFilter } from '../../filters/SearchFilter';
-import { buildSortFilter } from '../../filters/SortFilter';
-import { useTransactionActions } from '../transactions/actions';
+import { DashboardContext } from '../../../DashboardContext';
+import { EmptyResults } from '../../../EmptyResults';
+import { accountingCategoryFilter } from '../../../filters/AccountingCategoryFilter';
+import { amountFilter } from '../../../filters/AmountFilter';
+import { dateFilter } from '../../../filters/DateFilter';
+import { Filterbar } from '../../../filters/Filterbar';
+import { searchFilter } from '../../../filters/SearchFilter';
+import { buildSortFilter } from '../../../filters/SortFilter';
+import { useTransactionActions } from '../../transactions/actions';
 import {
   filters as commonFilters,
   schema as commonSchema,
   toVariables as commonToVariables,
-} from '../transactions/filters';
-import { transactionsTableQuery } from '../transactions/queries';
-import type { TransactionsTableProps } from '../transactions/TransactionsTable';
-import TransactionsTable from '../transactions/TransactionsTable';
-import type { TransactionsTableQueryNode } from '../transactions/types';
+} from '../../transactions/filters';
+import { transactionsTableQuery } from '../../transactions/queries';
+import type { TransactionsTableProps } from '../../transactions/TransactionsTable';
+import TransactionsTable from '../../transactions/TransactionsTable';
+import type { TransactionsTableQueryNode } from '../../transactions/types';
+import { type MoneyMovementsView } from '../common';
 
 const schema = z.object({
   limit: limit.default(15),
@@ -54,7 +51,6 @@ const schema = z.object({
   type: z.nativeEnum(TransactionType).optional(),
   kind: commonSchema.shape.kind,
   openTransactionId: z.coerce.string().optional(),
-  account: hostedAccountFilter.schema,
   accountingCategory: accountingCategoryFilter.schema,
   group: commonSchema.shape.group,
   isRefund: commonSchema.shape.isRefund,
@@ -67,7 +63,6 @@ type FilterValues = z.infer<typeof schema>;
 const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables> = {
   date: commonToVariables.date,
   amount: commonToVariables.amount,
-  account: hostedAccountFilter.toVariables,
 };
 
 const filters = {
@@ -77,7 +72,6 @@ const filters = {
   amount: commonFilters.amount,
   type: commonFilters.type,
   kind: commonFilters.kind,
-  account: hostedAccountFilter.filter,
   accountingCategory: accountingCategoryFilter.filter,
   group: commonFilters.group,
   isRefund: commonFilters.isRefund,
@@ -85,38 +79,79 @@ const filters = {
   expenseType: commonFilters.expenseType,
 };
 
-enum TransactionsView {
-  ALL = 'ALL',
-  PAYOUTS = 'PAYOUTS',
-  CONTRIBUTIONS = 'CONTRIBUTIONS',
-}
-
-type AccountDetailTransactionsTabProps = {
+type MoneyMovementsProps = {
   account: CommunityAccountDetailQuery['account'];
   hostSlug: string;
+  initialView?: MoneyMovementsView;
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
 };
 
-const getCountForView = (
-  view: { id: TransactionsView; filter: { kind?: TransactionKind[] }; label: string },
-  transactionSummary?: CommunityTransactionSummary[],
-) => {
-  const summaries = transactionSummary?.filter(summary => view.filter?.kind?.includes(summary.kind as TransactionKind));
-  if (!summaries || summaries.length === 0) {
-    return view;
+/**
+ * Per-tab metadata for Money Movements: the pending payment-request count and
+ * one total per view preset. The preset totals are scoped exactly like the
+ * table query (`account` = both sides of the account's money movements), so the
+ * badges match the rows rather than the `FromCollectiveId`-keyed community
+ * summary used by the community Transactions tab.
+ */
+const accountDetailMoneyMovementsMetadataQuery = gql`
+  query AccountDetailMoneyMovementsMetadata($accountId: String!, $hostSlug: String!) {
+    account(id: $accountId) {
+      id
+      # Payment requests *against* the hosted account: it is the one paying.
+      pendingExpenses: expenses(
+        status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
+        direction: RECEIVED
+        host: { slug: $hostSlug }
+      ) {
+        totalCount
+      }
+    }
+    ALL: transactions(
+      account: [{ id: $accountId }]
+      host: { slug: $hostSlug }
+      includeIncognitoTransactions: true
+      includeChildrenTransactions: false
+      includeDebts: true
+    ) {
+      totalCount
+    }
+    CONTRIBUTIONS: transactions(
+      account: [{ id: $accountId }]
+      host: { slug: $hostSlug }
+      includeIncognitoTransactions: true
+      includeChildrenTransactions: false
+      includeDebts: true
+      kind: [ADDED_FUNDS, CONTRIBUTION]
+    ) {
+      totalCount
+    }
+    PAYOUTS: transactions(
+      account: [{ id: $accountId }]
+      host: { slug: $hostSlug }
+      includeIncognitoTransactions: true
+      includeChildrenTransactions: false
+      includeDebts: true
+      kind: [EXPENSE]
+    ) {
+      totalCount
+    }
   }
-  const count = summaries.reduce((acc, summary) => acc + summary.creditCount + summary.debitCount, 0);
-  return { ...view, count };
-};
+`;
 
-export function AccountDetailTransactionsTab({
+export function MoneyMovements({
   account,
   hostSlug,
+  initialView,
   handleTransactionTableRowClick,
-}: AccountDetailTransactionsTabProps) {
+}: MoneyMovementsProps) {
   const intl = useIntl();
   const { account: dashboardAccount } = React.useContext(DashboardContext);
-  const pendingExpenseCount = account?.pendingExpenses?.totalCount || 0;
+  const { data: metadata } = useQuery(accountDetailMoneyMovementsMetadataQuery, {
+    variables: { accountId: account?.id, hostSlug },
+    skip: !account?.id || !hostSlug,
+    fetchPolicy: 'cache-and-network',
+  });
+  const pendingExpenseCount = metadata?.account?.pendingExpenses?.totalCount || 0;
 
   const redirectRelatedTransactionsTo = getDashboardRoute(
     dashboardAccount,
@@ -126,17 +161,17 @@ export function AccountDetailTransactionsTab({
   const views = React.useMemo(
     () => [
       {
-        id: TransactionsView.ALL,
+        id: 'ALL' as MoneyMovementsView,
         label: intl.formatMessage({ defaultMessage: 'All', id: 'All' }),
         filter: {},
       },
       {
-        id: TransactionsView.CONTRIBUTIONS,
+        id: 'CONTRIBUTIONS' as MoneyMovementsView,
         label: intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' }),
         filter: { kind: [TransactionKind.ADDED_FUNDS, TransactionKind.CONTRIBUTION] },
       },
       {
-        id: TransactionsView.PAYOUTS,
+        id: 'PAYOUTS' as MoneyMovementsView,
         label: intl.formatMessage({ defaultMessage: 'Payouts', id: 'Payouts' }),
         filter: { kind: [TransactionKind.EXPENSE] },
       },
@@ -144,20 +179,30 @@ export function AccountDetailTransactionsTab({
     [intl],
   );
 
+  // Seeds the view picked from the overview cards ("received" -> Contributions,
+  // "spent" -> Payouts). Re-applied whenever the tab is opened from a different link.
+  const defaultFilterValues = React.useMemo(
+    () => views.find(view => view.id === initialView)?.filter,
+    [views, initialView],
+  );
+
   const queryFilter = useQueryFilter<typeof schema, TransactionsTableQueryVariables>({
     schema,
     toVariables,
     filters,
     views,
+    defaultFilterValues,
     skipRouter: true,
     meta: {
       hostSlug: hostSlug,
     },
   });
 
+  // The account is a hosted account: show every transaction it is involved in,
+  // on either side, rather than only the ones it originates (fromAccount).
   const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
     variables: {
-      fromAccount: { id: account?.id },
+      account: [{ id: account?.id }],
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
       includeChildrenTransactions: false,
@@ -184,14 +229,11 @@ export function AccountDetailTransactionsTab({
     [defaultGetActions],
   );
 
+  // One total per preset (the metadata query aliases match the view ids); a
+  // loaded `0` displays, `undefined` keeps the badge in its loading state.
   const viewsWithCount = React.useMemo(
-    () =>
-      views.map(view => {
-        const transactionSummary =
-          account && 'communityStats' in account ? account.communityStats?.transactionSummary : undefined;
-        return getCountForView(view, transactionSummary);
-      }),
-    [views, account],
+    () => views.map(view => ({ ...view, count: metadata?.[view.id]?.totalCount })),
+    [views, metadata],
   );
 
   return (
@@ -208,7 +250,7 @@ export function AccountDetailTransactionsTab({
                   <Link
                     href={getDashboardRoute(
                       dashboardAccount,
-                      `pay-disbursements?sort%5Bfield%5D=CREATED_AT&sort%5Bdirection%5D=DESC&fromAccounts=${account.slug}&status=PENDING&status=APPROVED&status=ON_HOLD&status=INCOMPLETE&status=ERROR`,
+                      `pay-disbursements?sort%5Bfield%5D=CREATED_AT&sort%5Bdirection%5D=DESC&account=${account.slug}&status=PENDING&status=APPROVED&status=ON_HOLD&status=INCOMPLETE&status=ERROR`,
                     )}
                     className="text-blue-600 underline"
                   >

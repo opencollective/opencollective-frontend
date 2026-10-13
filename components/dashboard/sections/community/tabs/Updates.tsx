@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '@/lib/filters/schemas';
+import { gql } from '@/lib/graphql/helpers';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '@/components/Avatar';
@@ -14,10 +15,37 @@ import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { DataTable } from '@/components/table/DataTable';
 
-import { hostedAccountUpdatesQuery } from './queries';
-import type { HostedAccountProfileData } from './types';
+import type { AccountDetailData } from '../queries';
 
 const UPDATES_LIMIT = 25;
+
+// Field-identical copy of `hostedAccountUpdatesQuery` from
+// components/hosted-account-overview/queries.ts (operation renamed for codegen).
+const accountDetailUpdatesQuery = gql`
+  query AccountDetailUpdates($accountId: String!, $limit: Int!, $offset: Int!) {
+    account(id: $accountId) {
+      id
+      updates(includeChildren: true, onlyPublishedUpdates: true, limit: $limit, offset: $offset) {
+        totalCount
+        limit
+        offset
+        nodes {
+          id
+          slug
+          title
+          publishedAt
+          account {
+            id
+            slug
+            name
+            imageUrl
+            type
+          }
+        }
+      }
+    }
+  }
+`;
 
 type UpdateRow = {
   id: string;
@@ -72,18 +100,18 @@ const columns: ColumnDef<UpdateRow>[] = [
   },
 ];
 
-type HostedAccountUpdatesTabProps = {
-  account?: HostedAccountProfileData;
+type UpdatesProps = {
+  account?: AccountDetailData;
 };
 
-export function HostedAccountUpdatesTab({ account }: HostedAccountUpdatesTabProps) {
+export function Updates({ account }: UpdatesProps) {
   const queryFilter = useQueryFilter({
     schema: z.object({ limit: integer.default(UPDATES_LIMIT), offset: integer.default(0) }),
     filters: {},
     skipRouter: true,
   });
 
-  const { data, loading, error } = useQuery(hostedAccountUpdatesQuery, {
+  const { data, loading, error } = useQuery(accountDetailUpdatesQuery, {
     variables: { accountId: account?.id, ...queryFilter.variables },
     skip: !account?.id,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { compact, isString, omit } from 'lodash-es';
 import { PlusIcon } from 'lucide-react';
@@ -10,7 +10,7 @@ import { CollectiveType, HostedCollectiveTypes } from '../../../../lib/constants
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import type { Account, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountType, HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -18,11 +18,11 @@ import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure'
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import { Drawer } from '../../../Drawer';
-import { HostedAccountProfile } from '../../../hosted-account-overview/HostedAccountProfile';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportHostedCollectivesCSVModal from '../../ExportHostedCollectivesCSVModal';
@@ -42,6 +42,7 @@ import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
+import { AccountDetails } from '../community/AccountDetail';
 
 import CollectiveDetails from './CollectiveDetails';
 import type { HostedCollectivesDataTableMeta } from './common';
@@ -361,10 +362,23 @@ const HostedCollectivesList = ({ accountSlug: hostSlug, subpath }: DashboardSect
 
 const HostedCollectives = (props: DashboardSectionProps) => {
   const { LoggedInUser } = useLoggedInUser();
+  const router = useRouter();
+  const { account } = useContext(DashboardContext);
   const hasAccountProfile = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOSTED_ACCOUNT_OVERVIEW);
+
+  const pushSubpath = makePushSubpath(router);
   const collectiveId = props.subpath?.[0];
   if (hasAccountProfile && collectiveId) {
-    return <HostedAccountProfile hostSlug={props.accountSlug} accountId={collectiveId} />;
+    return (
+      <div className="h-full">
+        <AccountDetails
+          account={{ id: collectiveId }}
+          host={account}
+          onClose={() => pushSubpath('')}
+          expectedAccountType={AccountType.COLLECTIVE}
+        />
+      </div>
+    );
   }
   return <HostedCollectivesList {...props} />;
 };
