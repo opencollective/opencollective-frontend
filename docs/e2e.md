@@ -16,6 +16,23 @@ each repo), `npx playwright install chromium`, and running Postgres, Mailpit,
 and an S3-compatible store. The launcher starts its own disposable Redis and
 validates the rest. Focused non-Stripe runs need no Stripe credentials.
 
+Journeys that upload files need two more things the launcher cannot verify.
+Build the frontend with the CI environment, because `DISABLE_MOCK_UPLOADS` is
+compiled into the bundle and a plain local build replaces every upload with a
+placeholder image:
+
+```bash
+TZ=UTC OC_ENV=ci NODE_ENV=test WEBSITE_URL=http://localhost:3000 API_URL=http://localhost:3060 \
+  PDF_SERVICE_URL=http://localhost:3002 API_KEY=dvl-1510egmf4a23d80342403fb599qd \
+  DISABLE_MOCK_UPLOADS=1 npm run build
+```
+
+The object store must also contain the `opencollective-e2e` bucket. CI creates
+it in the workflow; locally run `scripts/dev/init-local-s3.ts` from the API
+with the launcher's `AWS_*` values once (it only adds missing buckets). Upload
+journeys fail with a message naming the mocked upload, or with the API's upload
+error in `api.log`, when either is missing.
+
 ```bash
 cd opencollective-frontend
 ./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts
@@ -82,7 +99,8 @@ See `test/playwright/README.md` for worktree paths and artifact locations.
 ### Playwright CI (pilot, observational)
 
 `CI / e2e-playwright / playwright smoke` runs the smoke, fixture contract checks,
-and both independent mutable journeys through the same
+both independent Account journeys and the expense submission journeys (every
+`*.spec.ts` under `test/playwright/specs/`, including subdirectories) through the same
 shared launcher on every PR and main push, reusing the prepared
 same-revision builds. It is observational: Cypress checks stay required
 until pilot adoption, and the Playwright job reports real
@@ -108,10 +126,11 @@ cost is not steady-state cost.
 ## Authoring independent Playwright fixtures
 
 Use `test/playwright/fixtures` for mutable journeys. The API owns the named
-`account-profile` and `account-conversation` recipes; both return a committed
+recipes. `account-profile` and `account-conversation` both return a committed
 user, an Account with an admin membership, URLs and an authentication handle.
 The conversation recipe enables conversations. Neither journey needs a fiscal
-host, so setup creates no host or unrelated payment graph. Frontend authors
+host, so setup creates no host or unrelated payment graph. Journeys with
+several parties or a hosted Collective use the multi-party recipes below. Frontend authors
 need no API factories, table names or SQL.
 
 ```ts
@@ -151,7 +170,58 @@ launcher fails readiness if the guarded route is unavailable. Both repositories
 use the same branch name so the existing CI stack checkout selects the matching
 API branch; merge the API companion before the frontend branch reaches main.
 
-Recipe authors add the smallest needed domain graph in `server/e2e/recipes.ts`
+### Multi-party recipes, actors and logged-out journeys
+
+Journeys with several parties use `scenarioTest(recipe, { inputs, actor })`.
+Every multi-party recipe returns the same shape, keyed by the role labels the
+recipe documents: `scenario.actors`, `scenario.accounts`, `scenario.expenses`
+and `scenario.urls`. `actor` names who the browser starts signed in as;
+`actor: null` starts logged out while the scenario is still arranged. Override
+`inputs` or `actor` for a file or a describe block with `test.use`.
+
+```ts
+import { expect, scenarioTest } from '../../fixtures';
+import { submitExpense } from '../../helpers/expense-form';
+
+const test = scenarioTest('expense-submission', { inputs: {}, actor: 'submitter' });
+
+test.describe('paying Collective subject to VAT', () => {
+  test.use({ inputs: { collective: { country: 'BE', vat: { type: 'OWN', number: 'FRXX999999999' } } } });
+
+  test('user submits an invoice with value-added tax', async ({ page, scenario }) => {
+    await page.goto(scenario.urls.submittedExpenses);
+    await page.getByRole('button', { name: 'New expense' }).click();
+    await submitExpense(page, { kind: 'invoice', account: scenario.accounts.collective, vat: true /* ... */ });
+  });
+});
+```
+
+| Recipe                 | Options (all default to off)                                                                       | Actors                                                                               | Accounts, expenses, URLs                                                                                                                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `invitee` | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee` | `host`, `collective`, `collective2`, `organization`; expense `prior` (pending invoice by the submitter on `collective`, with a saved payout method); URLs `collective`, `newExpense`, `submittedExpenses` |
+| `expense-draft-invite` | `description`, `currency`, `items` (required)                                                      | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                              | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                          |
+
+Each request owns a new active fiscal host, so no journey adds Collectives or
+expenses to a seeded host. Recipes arrange starting state and prior history
+only, at model level inside the receipt transaction: they send no mail and run
+no mutation. Whatever a journey is about (submitting, creating a legal entity,
+tax, currency) goes through the browser.
+
+To add a recipe: in the API, register `defineRecipe({ inputs, build })` in
+`server/e2e/recipes.ts` (inputs are a strict zod schema; `build` composes the
+builders in `server/e2e/builders.ts` and returns references), then add its
+inputs to `Contracts` and its result schema to `schemas` in
+`test/playwright/fixtures/transport.ts`. Recipes that return the multi-party
+shape need no other frontend change. Every actor carries a private session
+token; scenario attachments drop all of them.
+
+`test/playwright/helpers/uploads.ts` provides genuine local files for
+`setInputFiles` and for drag-and-drop zones, and asserts that a preview points
+at the stored file. `test/playwright/helpers/expense-form.ts` drives the
+new-expense form. Each attempt attaches `fixture-timings` (wall time of every
+arrangement) next to `scenario`, so reports separate setup from execution.
+
+Recipe authors add the smallest needed domain graph under `server/e2e/`
 in the API and extend the typed transport. Reuse model/domain validation and
 small shared factory helpers under `server/`; keep legacy factory wrappers
 compatible and never import `test/` into the server build. Commit the receipt
@@ -225,6 +295,108 @@ These checks refuse a database that differs from the ownership proof. They are
 explicit opt-in because the ordinary API test harness owns `opencollective_test`
 and must never run its reset hooks against a shared browser stack. Startup
 rejection checks run normally with `npm run test -- test/server/routes/e2e-fixtures.test.ts`.
+
+## Expense submission journeys (Playwright pilot)
+
+`test/playwright/specs/expenses/` carries the submission part of the Cypress
+expense pilot (`test/cypress/integration/27-expenses.test.ts`), which stays
+unchanged and runnable. Nine Cypress tests map to nine journeys:
+
+| Cypress test                                                                                                                        | Playwright journey (`specs/expenses/`)                                                                                                     |
+| ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| new expense when logged out › shows the login screen                                                                                | `logged-out.spec.ts` › logged-out visitor is asked to sign in before submitting an expense                                                 |
+| new expense when logged out › shows Submit Expense button on collective page and redirects to login                                 | `logged-out.spec.ts` › logged-out visitor reaches sign-in from the Submit Expense button of a Collective                                   |
+| Invoices › Create › New user can submit invoice expense to collective hosted by e2e-host                                            | `submit-first-expense.spec.ts` › new user submits a first invoice to a Collective they do not administer                                   |
+| Reimbursements › New user can submit reimbursement expense to collective hosted by e2e-host                                         | `submit-first-expense.spec.ts` › new user submits a first reimbursement to a Collective they do not administer                             |
+| Invoices › Create › User can submit invoice expense to previously submitted collective                                              | `submit-returning-expense.spec.ts` › returning submitter requests invoice payment for their Organization, then invites another payee       |
+| Reimbursements › User can submit reimbursement expense to previously submitted collective                                           | `submit-returning-expense.spec.ts` › returning submitter requests reimbursement payment for their Organization, then invites another payee |
+| Invoices › Create › Legal entity payee › User without administered accounts can create a legal entity and submit an invoice expense | `submit-invoice-variants.spec.ts` › user without administered accounts creates a legal entity and submits an invoice through it            |
+| Invoices › Create › Taxes › User can submit invoice expense with taxes                                                              | `submit-invoice-variants.spec.ts` › paying Collective subject to VAT › user submits an invoice with value-added tax                        |
+| Submitting a draft keeps the requested currency › keeps the expense in USD when the selected payout method is in EUR                | `draft-currency.spec.ts` › invited Organization submits a USD draft with a EUR payout method and the expense stays in USD                  |
+
+Every submission keeps the original form path and outcomes: paying Account and
+payee selection, a new saved payout method, invoice file and reference or
+per-item receipts, two items with the second in BRL converted to the USD
+reference currency, two additional attachments, title and tag, every summary
+figure (`$125.00`, `$550.00` for `R$500.00`, `$675.00`; `$135.00` VAT and
+`$810.00` with tax), and the success confirmation. The converted amounts rely
+on the fixed 1.1 exchange rate of an environment without a Fixer key. Uploads
+are real local files stored through the API.
+
+Where the journeys differ from the Cypress source, and why:
+
+- **Own host and actors.** Cypress hangs its Collectives on the seeded
+  `e2e-host` / `opensource` hosts, creates them as `testuser+admin` and invites
+  the seeded user `piamancini`. Each journey owns its host, Collectives, users
+  and invitee instead, so nothing is added to shared accounts.
+- **"Previously submitted" flow.** The Cypress test arranges one earlier expense
+  to a first Collective, then submits to a second Collective and never looks at
+  the earlier one. The journey keeps exactly that flow (Organization payee,
+  second payout method, then an invitation by profile) and only adds a check
+  that the earlier expense is listed before starting. It does not assert that a
+  previously used Account or payout method is preselected or offered: the source
+  has no such check, so that would be new coverage rather than migration.
+- **Invitation step.** The invited profile receives a real invitation email at
+  its attempt-owned address. Reading that email and completing the invitation
+  belongs to the invitation journeys, as in the Cypress source.
+- **Draft.** Cypress creates the draft with `draftExpenseAndInviteUser` and
+  discards the email. The recipe writes the same draft state without sending
+  mail; the Organization admin then completes it in the browser. The journey
+  additionally opens the submitted expense and checks it is pending in
+  `$125.00 USD`, where Cypress stops at the confirmation.
+- **Dropped setup.** The Cypress `beforeEach` also gives every user an
+  Organization and a hosted Collective that most tests never use, and wipes the
+  shared inbox. Journeys arrange an Organization only where it is the payee and
+  never clear mail. The first-submission and VAT journeys therefore run as a
+  user who administers nothing.
+- **Waits.** The fixed 100 ms and 400 ms pauses are replaced by waiting for the
+  control or value the pause was covering.
+
+Focused reproduction:
+
+```bash
+# The whole group, fresh
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses --workers 3
+
+# One journey, fresh
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/submit-first-expense.spec.ts --grep "first reimbursement"
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/draft-currency.spec.ts
+
+# One journey against a retained populated stack
+./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/submit-returning-expense.spec.ts --grep "requests invoice payment"
+
+# First attempt fails after a real submission; the retry arranges a new host, users and prior expense
+PLAYWRIGHT_ISOLATION_PROBE=1 ./test/playwright/run-local.sh --reuse \
+  --spec test/playwright/specs/expenses/submit-returning-expense.spec.ts --retries 1
+```
+
+Timings, measured on an 8-CPU Linux VM with retries disabled. Setup is the
+`fixture-timings` attachment (one recipe request per journey); execution is
+the rest of the test's reported duration. "Alone" is one journey on a fresh
+stack, where the first recipe request also warms the API (about 0.5 s);
+"shared" is the median over three fresh runs of the whole selection with 4, 2
+and 3 workers.
+
+| Journey                            | Setup alone | Execution alone | Setup shared                      | Total shared |
+| ---------------------------------- | ----------- | --------------- | --------------------------------- | ------------ |
+| logged-out: asked to sign in       | 0.51 s      | 1.0 s           | 0.07 s                            | 1.9 s        |
+| logged-out: Submit Expense button  | 0.51 s      | 1.3 s           | 0.09 s                            | 1.9 s        |
+| first invoice                      | 0.46 s      | 5.6 s           | 0.06 s                            | 9.1 s        |
+| first reimbursement                | 0.55 s      | 5.8 s           | 0.06 s                            | 7.1 s        |
+| returning submitter, invoice       | 0.57 s      | 9.8 s           | 0.11 s                            | 13.9 s       |
+| returning submitter, reimbursement | 0.52 s      | 10.2 s          | 0.10 s                            | 10.5 s       |
+| legal entity                       | 0.56 s      | 10.3 s          | 0.06 s                            | 11.1 s       |
+| invoice with VAT                   | 0.55 s      | 6.0 s           | 0.09 s                            | 7.0 s        |
+| draft keeps USD                    | 0.51 s      | 5.3 s           | 0.87 s (first request of the run) | 10.5 s       |
+
+Arranging a host, Collectives, users and prior history costs 0.06-0.15 s per
+journey once the API is warm, under 2% of a submission journey. The nine
+journeys take about 60 s of test time when each runs alone and 73 s summed
+inside a shared run; the whole 14-test selection finishes in 34 s with four
+workers, 38 s with three and 45 s with two, after roughly 55 s of launcher
+startup on a fresh stack. The Cypress timing supplied for the pilot (04:38)
+covers all 28 tests of the original file, so it is not a like-for-like
+comparison for this group.
 
 ## Cypress (existing suite)
 
