@@ -20,7 +20,7 @@ import {
 } from '@/components/dashboard/sections/contributions/filters';
 import { dashboardOrdersQuery } from '@/components/dashboard/sections/contributions/queries';
 
-import type { HostedAccountProfileData } from './types';
+import type { AccountDetailData } from '../queries';
 
 const schema = baseSchema.extend({
   expectedDate: expectedDateFilter.schema,
@@ -39,8 +39,10 @@ const filters = {
   expectedDate: expectedDateFilter.filter,
 };
 
+// Field-identical copy of `expectedFundsMetadataQuery` from
+// components/hosted-account-overview/HostedAccountExpectedFundsTab.tsx (operation renamed for codegen).
 const expectedFundsMetadataQuery = gql`
-  query HostedAccountExpectedFundsMetadata($slug: String!) {
+  query AccountDetailExpectedFundsMetadata($slug: String!) {
     account(slug: $slug) {
       id
       PENDING: orders(
@@ -81,12 +83,12 @@ const expectedFundsMetadataQuery = gql`
   }
 `;
 
-type HostedAccountExpectedFundsTabProps = {
-  account?: HostedAccountProfileData;
+type ExpectedFundsProps = {
+  account?: AccountDetailData;
   hostSlug: string;
 };
 
-export function HostedAccountExpectedFundsTab({ account, hostSlug }: HostedAccountExpectedFundsTabProps) {
+export function ExpectedFunds({ account, hostSlug }: ExpectedFundsProps) {
   const intl = useIntl();
 
   const views: Views<FilterValues> = [

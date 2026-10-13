@@ -12,10 +12,10 @@ import { DataTable } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 
-import type { HostedAccountFieldsData } from './types';
+import type { AccountDetailData } from '../queries';
 
-type HostedAccountAccountsTabProps = {
-  account?: HostedAccountFieldsData;
+type AccountsProps = {
+  account?: AccountDetailData;
   host?: { id?: string } | null;
   loading?: boolean;
   onEdit?: () => void;
@@ -53,7 +53,7 @@ const typeColumn = {
   },
 };
 
-export function HostedAccountAccountsTab({ account, host, loading, onEdit }: HostedAccountAccountsTabProps) {
+export function Accounts({ account, host, loading, onEdit }: AccountsProps) {
   const intl = useIntl();
   const children = account?.childrenAccounts?.nodes || [];
 

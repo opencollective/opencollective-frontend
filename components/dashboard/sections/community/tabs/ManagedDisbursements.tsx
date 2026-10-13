@@ -12,26 +12,26 @@ import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
-import ExpensesList from '../../../expenses/ExpensesList';
+import ExpensesList from '../../../../expenses/ExpensesList';
 import {
   expenseHostFields,
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
-} from '../../../expenses/graphql/fragments';
-import { EmptyResults } from '../../EmptyResults';
-import { accountFilter } from '../../filters/AccountFilter';
-import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
-import { amountFilter } from '../../filters/AmountFilter';
-import { dateFilter } from '../../filters/DateFilter';
-import { Filterbar } from '../../filters/Filterbar';
-import { Pagination } from '../../filters/Pagination';
-import { searchFilter } from '../../filters/SearchFilter';
-import { buildSortFilter } from '../../filters/SortFilter';
+} from '../../../../expenses/graphql/fragments';
+import { EmptyResults } from '../../../EmptyResults';
+import { accountFilter } from '../../../filters/AccountFilter';
+import { accountingCategoryFilter } from '../../../filters/AccountingCategoryFilter';
+import { amountFilter } from '../../../filters/AmountFilter';
+import { dateFilter } from '../../../filters/DateFilter';
+import { Filterbar } from '../../../filters/Filterbar';
+import { Pagination } from '../../../filters/Pagination';
+import { searchFilter } from '../../../filters/SearchFilter';
+import { buildSortFilter } from '../../../filters/SortFilter';
 import {
   filters as commonFilters,
   schema as commonSchema,
   toVariables as commonToVariables,
-} from '../expenses/filters';
+} from '../../expenses/filters';
 
 const communityExpensesQuery = gql`
   query CommunityAccountExpenses(
@@ -161,7 +161,7 @@ const filterConfigs = {
   },
 };
 
-export const AccountDetailManagedDisbursementsTab = ({
+export const ManagedDisbursements = ({
   query,
   openExpenseLegacyId,
   setOpenExpenseLegacyId,

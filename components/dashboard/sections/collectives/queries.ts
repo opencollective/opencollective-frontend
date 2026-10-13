@@ -272,7 +272,21 @@ export const hostedCollectiveFields = gql`
         legacyId
         name
         slug
+        type
+        currency
         imageUrl(height: 96)
+        policies {
+          id
+          publicId
+          REQUIRE_2FA_FOR_ADMINS
+        }
+      }
+    }
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
+        hasPublicProfile
       }
     }
     ... on AccountWithContributions {

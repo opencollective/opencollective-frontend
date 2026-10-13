@@ -8,6 +8,7 @@ import {
   Mail,
   MoreHorizontal,
   Pause,
+  Pencil,
   Play,
   Receipt,
   ReceiptText,
@@ -21,7 +22,10 @@ import type { IntlShape } from 'react-intl';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
-import type { AccountWithHost, HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  CommunityAccountDetailQuery,
+  HostedCollectiveFieldsFragment,
+} from '../../../../lib/graphql/types/v2/graphql';
 import { MemberRole } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
@@ -435,11 +439,14 @@ export const MoreActionsMenu = ({
   collective,
   children,
   onEdit,
+  onEditSettings,
   openCollectiveDetails,
 }: {
-  collective: HostedCollectiveFieldsFragment & Partial<AccountWithHost>;
+  collective: CommunityAccountDetailQuery['account'];
   children: React.ReactNode;
   onEdit?: () => void;
+  /** Shows an "Edit" item opening the hosted edit-settings modal (AccountDetails header). */
+  onEditSettings?: () => void;
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }) => {
   const router = useRouter();
@@ -462,6 +469,15 @@ export const MoreActionsMenu = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-[240px]" align="end">
+          {onEditSettings && (
+            <React.Fragment>
+              <DropdownMenuItem className="cursor-pointer" data-cy="actions-edit-settings" onClick={onEditSettings}>
+                <Pencil className="mr-2" size="16" />
+                <FormattedMessage id="Edit" defaultMessage="Edit" />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </React.Fragment>
+          )}
           {openCollectiveDetails && (
             <React.Fragment>
               <DropdownMenuItem className="cursor-pointer" onClick={() => openCollectiveDetails(collective)}>
@@ -603,7 +619,7 @@ export const MoreActionsMenu = ({
       </DropdownMenu>
       {openModal && (
         <React.Fragment>
-          {openModal === 'ADD_FUNDS' && (
+          {openModal === 'ADD_FUNDS' && 'host' in collective && (
             <AddFundsModal
               host={collective.host}
               collective={collective}
@@ -611,7 +627,7 @@ export const MoreActionsMenu = ({
               onSuccess={onEdit}
             />
           )}
-          {openModal === 'ADD_EXPENSE' && (
+          {openModal === 'ADD_EXPENSE' && 'host' in collective && (
             <HostCreateExpenseModal
               open
               setOpen={() => setOpenModal(null)}
@@ -622,7 +638,7 @@ export const MoreActionsMenu = ({
           {openModal === 'FREEZE' && (
             <FreezeAccountModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
           )}
-          {openModal === 'UNHOST' && (
+          {openModal === 'UNHOST' && 'host' in collective && (
             <UnhostAccountModal
               collective={collective}
               host={collective.host}
@@ -630,7 +646,7 @@ export const MoreActionsMenu = ({
               onSuccess={onEdit}
             />
           )}
-          {openModal === 'ADD_AGREEMENT' && (
+          {openModal === 'ADD_AGREEMENT' && 'host' in collective && (
             <AddAgreementModal
               account={collective}
               hostLegacyId={collective.host.legacyId}
