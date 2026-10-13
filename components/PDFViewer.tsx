@@ -14,7 +14,9 @@ import Loading from './Loading';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
-pdfjs.GlobalWorkerOptions.workerSrc = '/static/scripts/pdf.worker.min.mjs';
+// The worker is served from a fixed URL with a one-day cache: the version query makes a react-pdf upgrade fetch
+// the matching worker instead of a cached one, which pdf.js would refuse.
+pdfjs.GlobalWorkerOptions.workerSrc = `/static/scripts/pdf.worker.min.mjs?v=${pdfjs.version}`;
 
 const DocumentContainer = styled.div`
   .pdf-page {

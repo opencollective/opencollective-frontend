@@ -132,18 +132,22 @@ const nextConfig = {
       );
     }
 
+    // The worker and cMaps must come from the pdfjs-dist that react-pdf uses: another dependency can hoist a
+    // different major (pdf-parse pulls pdfjs-dist 5), and pdf.js refuses a worker whose version differs from its API.
+    const reactPdfPdfjsDir = path.dirname(
+      // eslint-disable-next-line n/no-extraneous-require
+      require.resolve('pdfjs-dist/package.json', { paths: [path.dirname(require.resolve('react-pdf/package.json'))] }),
+    );
     // Copying cMaps to get non-latin characters to work in PDFs (https://github.com/wojtekmaj/react-pdf#support-for-non-latin-characters)
     config.plugins.push(
       new CopyPlugin({
         patterns: [
           {
-            // eslint-disable-next-line n/no-extraneous-require
-            from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
+            from: path.join(reactPdfPdfjsDir, 'cmaps'),
             to: path.join(__dirname, 'public/static/cmaps'),
           },
           {
-            // eslint-disable-next-line n/no-extraneous-require
-            from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'build/pdf.worker.min.mjs'),
+            from: path.join(reactPdfPdfjsDir, 'build/pdf.worker.min.mjs'),
             to: path.join(__dirname, 'public/static/scripts/pdf.worker.min.mjs'),
             info: { minimized: true },
           },
