@@ -97,9 +97,10 @@ const accountDetailMoneyMovementsMetadataQuery = gql`
   query AccountDetailMoneyMovementsMetadata($accountId: String!, $hostSlug: String!) {
     account(id: $accountId) {
       id
+      # Payment requests *against* the hosted account: it is the one paying.
       pendingExpenses: expenses(
         status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
-        direction: SUBMITTED
+        direction: RECEIVED
         host: { slug: $hostSlug }
       ) {
         totalCount
@@ -249,7 +250,7 @@ export function MoneyMovements({
                   <Link
                     href={getDashboardRoute(
                       dashboardAccount,
-                      `pay-disbursements?sort%5Bfield%5D=CREATED_AT&sort%5Bdirection%5D=DESC&fromAccounts=${account.slug}&status=PENDING&status=APPROVED&status=ON_HOLD&status=INCOMPLETE&status=ERROR`,
+                      `pay-disbursements?sort%5Bfield%5D=CREATED_AT&sort%5Bdirection%5D=DESC&account=${account.slug}&status=PENDING&status=APPROVED&status=ON_HOLD&status=INCOMPLETE&status=ERROR`,
                     )}
                     className="text-blue-600 underline"
                   >
