@@ -1,9 +1,11 @@
 import { expect, scenarioTest } from '../../fixtures';
+import { isolationProbe } from '../../helpers/attempt';
 import {
   addPayoutMethod,
   chooseExpenseType,
   continueInvitation,
   openInvitation,
+  sendExpense,
   signInFromInvitation,
   submitExpense,
 } from '../../helpers/expense-form';
@@ -17,7 +19,7 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
     scenario,
     mail,
     openBrowserAs,
-  }) => {
+  }, testInfo) => {
     const { inviteeAdmin } = scenario.actors;
     const { collective, inviteeOrganization } = scenario.accounts;
     await page.goto(scenario.urls.submittedExpenses);
@@ -46,6 +48,10 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
     await expect(visitor).toHaveURL(invitation);
     const emailedLink = new URL(await emailedSignInLink(mail, { to: inviteeAdmin.email }), 'http://site');
     expect(emailedLink.searchParams.get('next')).toBe(invitation);
+    isolationProbe(
+      testInfo,
+      'leave a signed-in admin with an unanswered invitation behind and retry with new parties.',
+    );
 
     // Back on the invitation, now signed in, the admin completes it for the Organization.
     await continueInvitation(visitor);
@@ -56,8 +62,7 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
       save: true,
     });
     await chooseExpenseType(visitor, kind, { attachInvoice: true });
-    await visitor.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
-    await expect(visitor.getByText('has been submitted successfully!')).toBeVisible();
+    await sendExpense(visitor);
 
     // The inviter finds their draft turned into the Organization's submitted expense.
     await page.goto(invitation.split('?')[0]);

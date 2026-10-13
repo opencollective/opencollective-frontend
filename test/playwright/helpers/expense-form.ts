@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
+import { toast } from './notifications';
 import { dropFiles, expectStoredUpload, imageFile } from './uploads';
 
 type ExpenseKind = 'invoice' | 'reimbursement';
@@ -39,8 +40,6 @@ const INVITEE_PAYOUT_NOTICE =
   'The person you are inviting to submit this expense will be asked to provide payout method details.';
 
 const section = (page: Page, id: string) => page.locator(`#${id}`);
-
-const toast = (page: Page, message: string) => page.getByTestId('toast-notification').filter({ hasText: message });
 
 /**
  * Picks a profile in a searchable picker by its exact handle. Options render in
@@ -185,6 +184,12 @@ async function fillItem(
   }
 }
 
+/** Submits the open expense form, new, duplicated or invited, and waits for the product to confirm it. */
+export async function sendExpense(page: Page) {
+  await page.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
+  await expect(page.getByText('has been submitted successfully!')).toBeVisible();
+}
+
 /**
  * Completes the new-expense form the way a submitter does and submits it:
  * two items (the second in BRL, converted to the USD reference currency),
@@ -299,7 +304,6 @@ export async function submitExpense(page: Page, submission: ExpenseSubmission) {
     );
   }
 
-  await page.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
-  await expect(page.getByText('has been submitted successfully!')).toBeVisible();
+  await sendExpense(page);
   await page.getByRole('button', { name: 'View all expenses' }).click();
 }

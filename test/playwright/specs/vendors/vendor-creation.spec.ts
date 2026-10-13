@@ -1,22 +1,27 @@
 import type { Page } from '@playwright/test';
 
 import { expect, scenarioTest } from '../../fixtures';
+import type { GraphScenario } from '../../fixtures/transport';
+import { attemptTag, isolationProbe } from '../../helpers/attempt';
 import { expectScopedTo, openVendorEditForm } from '../../helpers/vendor-dashboard';
-import { createVendorInline, openAddFundsSourcePicker, openVendorPicker } from '../../helpers/vendor-picker';
+import {
+  createVendorInline,
+  openAddFundsSourcePicker,
+  openVendorPicker,
+  type Vendor,
+} from '../../helpers/vendor-picker';
 
 // Every journey creates a vendor where a host admin runs into needing one, then reads what was saved in the
 // vendor's settings on the host's vendors dashboard.
 const test = scenarioTest('vendor-host', { inputs: {}, actor: 'hostAdmin' });
 
-type Scenario = Parameters<Parameters<typeof test>[2]>[0]['scenario'];
-
 /** A name no other attempt uses, short enough to be shown whole in pickers. */
-const newVendor = (scenario: Scenario, prefix: string) => ({
-  name: `${prefix} ${scenario.attempt.nonce.slice(0, 8)}`,
+const newVendor = (scenario: GraphScenario, prefix: string): Vendor => ({
+  name: `${prefix} ${attemptTag(scenario.attempt)}`,
 });
 
 /** The vendor's settings limit it to the Collective it was created for and leave who can use it to the host. */
-async function expectSavedForCollective(page: Page, scenario: Scenario, vendor: { name: string }) {
+async function expectSavedForCollective(page: Page, scenario: GraphScenario, vendor: Vendor) {
   const form = await openVendorEditForm(page, scenario.urls.vendors, vendor);
   await expectScopedTo(form, scenario.accounts.collective);
   await expect(form.locator('#useVendorPolicy-inherit')).toBeChecked();
@@ -30,9 +35,7 @@ test('vendor created while adding funds to a Collective is scoped to that Collec
   await openAddFundsSourcePicker(page, scenario.urls.hostedCollectives, scenario.accounts.collective);
   await createVendorInline(page, vendor, { picker: 'addFundsSource' });
   await expect(page.getByTestId('add-funds-source')).toContainText(vendor.name);
-  if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-    throw new Error('Intentional isolation probe: leave a created vendor behind and retry on a host without vendors.');
-  }
+  isolationProbe(testInfo, 'leave a created vendor behind and retry on a host without vendors.');
 
   await expectSavedForCollective(page, scenario, vendor);
 });

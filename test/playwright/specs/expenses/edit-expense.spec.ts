@@ -1,5 +1,7 @@
 import { expect, scenarioTest } from '../../fixtures';
+import { isolationProbe } from '../../helpers/attempt';
 import { attachReceipt } from '../../helpers/expense-form';
+import { toast } from '../../helpers/notifications';
 import { expectStoredUpload } from '../../helpers/uploads';
 
 const test = scenarioTest('expense-submission', { inputs: { priorExpense: true }, actor: 'submitter' });
@@ -22,7 +24,7 @@ for (const { kind, priorExpenseType, label } of [
       await expect(page.getByText(`${label} #${scenario.expenses.prior.legacyId}`, { exact: true })).toBeVisible();
     });
 
-    test('submitter edits its items and switches its reference currency', async ({ page, scenario }) => {
+    test('submitter edits its items and switches its reference currency', async ({ page, scenario }, testInfo) => {
       await page.goto(scenario.expenses.prior.url);
       await expect(page.getByTestId('expense-items-total-amount')).toHaveText('$10.00 USD');
       const items = page.getByTestId('expense-summary-item');
@@ -56,7 +58,8 @@ for (const { kind, priorExpenseType, label } of [
       // The first item is now converted; saving before its rate arrives fails validation without any message.
       await expect(page.getByRole('button', { name: '1 USD = 1.1 EUR' })).toBeVisible();
       await page.locator('form').getByRole('button', { name: 'Save' }).click();
-      await expect(page.getByTestId('toast-notification').filter({ hasText: 'Expense edited' })).toBeVisible();
+      await expect(toast(page, 'Expense edited')).toBeVisible();
+      isolationProbe(testInfo, 'leave an edited expense behind and retry with one nobody has edited.');
 
       await expect(items).toHaveCount(2);
       await expect(items.nth(0).getByTestId('expense-summary-item-description')).toHaveText('New item description');

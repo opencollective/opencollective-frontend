@@ -1,4 +1,5 @@
 import { expect, scenarioTest } from '../../fixtures';
+import { isolationProbe } from '../../helpers/attempt';
 import { expectVendorChoices, openVendorPicker, pickVendor, searchVendors } from '../../helpers/vendor-picker';
 
 const test = scenarioTest('vendor-host', {
@@ -46,9 +47,7 @@ test.describe('as the admin of the granting Collective', () => {
     await page.getByRole('button', { name: 'Submit Grant Request' }).click();
 
     await expect(page.getByText(/Grant request #\d+ has been submitted successfully!/)).toBeVisible();
-    if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-      throw new Error('Intentional isolation probe: leave a submitted grant behind and retry on a new Collective.');
-    }
+    isolationProbe(testInfo, 'leave a submitted grant behind and retry on a new Collective.');
     await expect(page.getByText(/Grant #\d+/)).toBeVisible();
     await expect(page.getByText('Grant to a scoped beneficiary')).toBeVisible();
   });

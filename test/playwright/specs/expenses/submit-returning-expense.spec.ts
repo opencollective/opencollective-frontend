@@ -1,4 +1,5 @@
 import { expect, scenarioTest } from '../../fixtures';
+import { isolationProbe } from '../../helpers/attempt';
 import { submitExpense } from '../../helpers/expense-form';
 
 const test = scenarioTest('expense-submission', {
@@ -29,11 +30,7 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
       title: organizationTitle,
     });
     await expect(page.getByText(organizationTitle)).toBeVisible();
-    if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-      throw new Error(
-        'Intentional isolation probe: leave a submitted expense behind and retry with fresh prerequisites.',
-      );
-    }
+    isolationProbe(testInfo, 'leave a submitted expense behind and retry with fresh prerequisites.');
 
     const invitationTitle = `${kind} invitation from ${submitter.slug}`;
     await page.getByRole('button', { name: 'New expense' }).click();

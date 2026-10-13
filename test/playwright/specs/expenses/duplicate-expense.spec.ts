@@ -1,6 +1,6 @@
 import { expect, scenarioTest } from '../../fixtures';
-import { chooseExpenseType } from '../../helpers/expense-form';
-import { dropFiles, expectStoredUpload, imageFile } from '../../helpers/uploads';
+import { isolationProbe } from '../../helpers/attempt';
+import { attachReceipt, chooseExpenseType, sendExpense } from '../../helpers/expense-form';
 
 const test = scenarioTest('expense-submission', { inputs: { priorExpense: true }, actor: 'submitter' });
 
@@ -45,22 +45,15 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
     await chooseExpenseType(page, kind, { attachInvoice: true });
     await item.getByLabel('Date').fill('2025-09-29');
     if (kind === 'reimbursement') {
-      await dropFiles(item.getByText('Drag & drop'), [imageFile('receipt0.jpg')]);
-      await expect(item.getByText('Clear')).toBeVisible();
-      await expectStoredUpload(item.getByRole('link', { name: 'Uploaded file preview' }));
+      await attachReceipt(item, 'receipt0.jpg');
     }
 
-    await page.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
-    await expect(page.getByText('has been submitted successfully!')).toBeVisible();
+    await sendExpense(page);
     await page.getByRole('button', { name: 'View all expenses' }).click();
 
     // The copy is a second pending expense with the same title and amount; the original is untouched.
     await expect(submitted).toHaveCount(2);
-    if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-      throw new Error(
-        'Intentional isolation probe: leave a duplicated expense behind and retry with a single fresh one.',
-      );
-    }
+    isolationProbe(testInfo, 'leave a duplicated expense behind and retry with a single fresh one.');
     for (const row of await submitted.all()) {
       await expect(row).toContainText('$10.00');
     }

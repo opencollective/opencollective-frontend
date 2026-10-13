@@ -1,8 +1,10 @@
 import { expect, scenarioTest } from '../../fixtures';
+import { attemptTag } from '../../helpers/attempt';
 import {
   addPayoutMethod,
   chooseExpenseType,
   openInvitation,
+  sendExpense,
   signInFromInvitation,
   submitExpense,
 } from '../../helpers/expense-form';
@@ -19,7 +21,7 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
   }) => {
     const { collective } = scenario.accounts;
     // Nobody holds this address: the invitation is the first the platform hears of this person.
-    const newPayee = { name: `New payee ${scenario.attempt.nonce.slice(0, 8)}`, email: mail.address('new-payee') };
+    const newPayee = { name: `New payee ${attemptTag(scenario.attempt)}`, email: mail.address('new-payee') };
 
     await page.goto(scenario.urls.submittedExpenses);
     await page.getByRole('button', { name: 'New expense' }).click();
@@ -46,8 +48,7 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
       save: false,
     });
     await chooseExpenseType(invited, kind, { attachInvoice: false });
-    await invited.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
-    await expect(invited.getByText('has been submitted successfully!')).toBeVisible();
+    await sendExpense(invited);
 
     // The inviter finds their draft turned into the payee's submitted expense.
     await page.goto(invitation.split('?')[0]);

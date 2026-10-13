@@ -1,7 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
-type Vendor = { name: string };
-type Account = { slug: string };
+import type { Account, Vendor } from './vendor-picker';
 
 /** A vendor's row in the list of the vendors dashboard, which must be open. */
 export const vendorRow = (page: Page, vendor: Vendor) => page.getByRole('row').filter({ hasText: vendor.name });

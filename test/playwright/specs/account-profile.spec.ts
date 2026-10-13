@@ -1,4 +1,5 @@
 import { expect, test } from '../fixtures';
+import { isolationProbe } from '../helpers/attempt';
 
 test('Account admin edits and persists its public profile', async ({ page, scenario }, testInfo) => {
   await page.goto(scenario.urls.info);
@@ -11,9 +12,7 @@ test('Account admin edits and persists its public profile', async ({ page, scena
   await page.getByTestId('public-profile-link').click();
   await expect(page.getByTestId('collective-title')).toHaveText(name);
   await expect(page.getByText(description, { exact: true })).toBeVisible();
-  if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-    throw new Error('Intentional isolation probe: leave the first attempt mutated and retry in a replacement worker.');
-  }
+  isolationProbe(testInfo, 'leave the first attempt mutated and retry in a replacement worker.');
   await page.reload();
   await expect(page.getByTestId('collective-title')).toHaveText(name);
 });

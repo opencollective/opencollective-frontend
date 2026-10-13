@@ -1,4 +1,5 @@
 import { expect, scenarioTest } from '../../fixtures';
+import { attemptTag } from '../../helpers/attempt';
 import { submitExpense } from '../../helpers/expense-form';
 
 const test = scenarioTest('expense-submission', { inputs: {}, actor: 'submitter' });
@@ -7,8 +8,8 @@ test('user without administered accounts creates a legal entity and submits an i
   page,
   scenario,
 }) => {
-  const { submitter } = scenario.actors;
-  const slug = submitter.slug.replace(/submitter$/, 'entity');
+  // The handle of the Organization the journey creates: nobody else has it, on a fresh or a populated stack.
+  const slug = `pw-entity-${attemptTag(scenario.attempt)}`;
   const title = `Invoice from ${slug}`;
   await page.goto(scenario.urls.submittedExpenses);
   await page.getByRole('button', { name: 'New expense' }).click();
