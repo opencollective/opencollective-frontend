@@ -26,6 +26,7 @@ const accountDetailBalanceSummaryQuery = gql`
     account(id: $accountId) {
       id
       stats {
+        id
         balance(dateTo: $dateTo) {
           valueInCents
           currency

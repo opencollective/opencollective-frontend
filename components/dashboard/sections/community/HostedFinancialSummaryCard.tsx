@@ -29,6 +29,7 @@ const hostedFinancialSummarySeriesQuery = gql`
     account(id: $accountId) {
       id
       stats {
+        id
         totalAmountReceivedTimeSeries(includeChildren: true) {
           timeUnit
           dateFrom
