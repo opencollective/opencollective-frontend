@@ -363,7 +363,7 @@ export function HostedFunds(props: DashboardSectionProps) {
           account={{ id: accountId }}
           host={account}
           onClose={() => pushSubpath('')}
-          expectedAccountType={AccountType.COLLECTIVE}
+          expectedAccountType={AccountType.FUND}
         />
       </div>
     );
