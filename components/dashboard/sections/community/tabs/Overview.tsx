@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { i18nGraphqlException } from '@/lib/errors';
 import { limit, offset } from '@/lib/filters/schemas';
 import type { CommunityAccountDetailQuery, CommunityAccountOverviewQuery } from '@/lib/graphql/types/v2/graphql';
-import { AccountType, CommunityRelationType, TransactionType } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, CommunityRelationType, TransactionKind, TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import formatCollectiveType from '@/lib/i18n/collective-type';
@@ -117,16 +117,18 @@ const InteractionValue = ({
     <span>
       <DateTime value={tx.clearedAt || tx.createdAt} dateStyle="long" />
       {' • '}
-      {tx.type === 'CREDIT' ? (
+      {/* Label from the transaction kind: CREDIT means opposite things for hosted
+          accounts (money in) and community accounts (money out). */}
+      {tx.kind === TransactionKind.EXPENSE ? (
         <FormattedMessage
-          defaultMessage="Made a <link>{amount} contribution {ref}</link>"
-          id="A6QI7z"
+          defaultMessage="Made a <link>{amount} payout {ref}</link>"
+          id="BtoPiB"
           values={{ amount, ref, link }}
         />
       ) : (
         <FormattedMessage
-          defaultMessage="Made a <link>{amount} payout {ref}</link>"
-          id="BtoPiB"
+          defaultMessage="Made a <link>{amount} contribution {ref}</link>"
+          id="A6QI7z"
           values={{ amount, ref, link }}
         />
       )}

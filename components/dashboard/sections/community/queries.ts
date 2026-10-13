@@ -251,18 +251,21 @@ export const communityAccountDetailQuery = gql`
         offset: 0
         orderBy: { field: CREATED_AT, direction: ASC }
         includeChildrenTransactions: true
+        host: { slug: $hostSlug }
       ) {
         nodes {
           id
           ...CommunityAccountDetailTransaction
         }
       }
+      # Kind-scoped (not type-scoped): a hosted account contributes on CREDIT and
+      # pays out on DEBIT, while community accounts do the opposite.
       recentContributions: transactions(
         limit: 5
         offset: 0
-        type: CREDIT
         kind: [CONTRIBUTION, ADDED_FUNDS]
         includeChildrenTransactions: true
+        host: { slug: $hostSlug }
       ) {
         nodes {
           id
@@ -272,9 +275,9 @@ export const communityAccountDetailQuery = gql`
       recentPayouts: transactions(
         limit: 5
         offset: 0
-        type: DEBIT
         kind: [EXPENSE]
         includeChildrenTransactions: true
+        host: { slug: $hostSlug }
       ) {
         nodes {
           id
@@ -332,6 +335,7 @@ export const communityAccountDetailQuery = gql`
     clearedAt
     createdAt
     type
+    kind
     netAmount {
       valueInCents
       currency
