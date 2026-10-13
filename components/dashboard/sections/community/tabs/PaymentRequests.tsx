@@ -349,7 +349,7 @@ const accountPaymentRequestsMetadataQuery = gql`
       host: { slug: $hostSlug }
       account: $account
       includeChildrenExpenses: $includeChildrenExpenses
-      status: [PENDING, UNVERIFIED]
+      status: [PENDING]
     ) {
       totalCount
     }
