@@ -122,7 +122,10 @@ export const signInFromInvitation = (page: Page) =>
 async function choosePayee(page: Page, payee: Payee) {
   const gettingPaid = section(page, 'WHO_IS_GETTING_PAID');
   if ('legalEntity' in payee) {
+    // The section preselects the user's own profile once it has loaded the profiles they can be paid through.
+    await expect(gettingPaid.getByRole('radio', { checked: true })).toBeVisible();
     // Only offered to a user who administers no other profile.
+    await expect(gettingPaid.getByText('I would like to get paid through a legal entity')).toBeVisible();
     await expect(gettingPaid.getByText('An account I administer')).toHaveCount(0);
     await gettingPaid.getByText('I would like to get paid through a legal entity').click();
     await gettingPaid.getByText('Country of Incorporation').locator('..').getByRole('combobox').click();

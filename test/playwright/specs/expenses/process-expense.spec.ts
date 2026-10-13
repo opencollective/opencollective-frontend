@@ -22,6 +22,8 @@ test('Collective admin approves, unapproves and rejects an expense, leaving a co
   const status = page.getByTestId('expense-status-msg');
   const comments = page.getByTestId('comment-body');
   await expect(status).toHaveText('Pending');
+  // The comment form comes with the loaded discussion: nobody has commented yet.
+  await expect(page.getByTestId('comment-form')).toBeVisible();
   await expect(comments).toHaveCount(0);
 
   await page.getByTestId('approve-button').click();
@@ -65,6 +67,8 @@ test('Collective admin deletes a rejected expense, which is then no longer avail
   await page.getByTestId('more-actions-delete-expense-btn').click();
   await page.getByTestId('confirmation-modal-continue').click();
   await expect(page).toHaveURL(scenario.urls.expenses);
+  // It was the Collective's only expense: once loaded, the list says it has none to show.
+  await expect(page.getByTestId('zero-expense-message')).toBeVisible();
   await expect(page.getByTestId(`expense-container-${expense.legacyId}`)).toHaveCount(0);
 
   await page.goto(expense.url);
