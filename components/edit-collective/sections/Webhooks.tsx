@@ -462,7 +462,7 @@ const updateWebhookMutation = gql`
   }
 `;
 
-const deleteWebhookMutation = gql`
+export const deleteWebhookMutation = gql`
   mutation DeleteWebhook($webhook: WebhookReferenceInput!) {
     deleteWebhook(webhook: $webhook) {
       id
@@ -479,10 +479,12 @@ const getWebhooksFromAccount = (account: WebhooksAccount): Notification[] =>
 
 const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
   const client = useApolloClient();
-  const { data, loading, error, refetch } = useQuery(editCollectiveWebhooksQuery, {
+  const { data, previousData, loading, error, refetch } = useQuery(editCollectiveWebhooksQuery, {
     variables: { slug: props.collectiveSlug },
   });
-  const webhooks = React.useMemo(() => getWebhooksFromAccount(data?.account), [data?.account]);
+  // Keep the last loaded account if a refetch fails, so the form and its edits stay on screen
+  const account = data?.account ?? previousData?.account;
+  const webhooks = React.useMemo(() => getWebhooksFromAccount(account), [account]);
 
   // Applies the difference between the saved webhooks and the edited list
   const saveWebhooks = async (editedWebhooks: Notification[]) => {
@@ -505,7 +507,7 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
         if (!saved) {
           await client.mutate({
             mutation: createWebhookMutation,
-            variables: { webhook: { account: { id: data.account.id }, ...values } },
+            variables: { webhook: { account: { id: account.id }, ...values } },
           });
         } else if (
           saved.type !== webhook.type ||
@@ -521,8 +523,13 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
       saveError = e;
     }
 
-    // Always reload, as some changes may have been saved before an error
-    const result = await refetch();
+    // Always reload, as some changes may have been saved before an error, but report the save error first
+    let result;
+    try {
+      result = await refetch();
+    } catch (refetchError) {
+      throw saveError ?? refetchError;
+    }
     if (saveError) {
       throw saveError;
     }
@@ -530,13 +537,11 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
     return getWebhooksFromAccount(result.data.account);
   };
 
-  if (error) {
+  if (error && !account) {
     return <MessageBoxGraphqlError error={error} />;
   }
 
-  return (
-    <Webhooks {...props} data={{ account: data?.account, loading }} webhooks={webhooks} saveWebhooks={saveWebhooks} />
-  );
+  return <Webhooks {...props} data={{ account, loading }} webhooks={webhooks} saveWebhooks={saveWebhooks} />;
 };
 
 export default injectIntl(WebhooksWithData);
