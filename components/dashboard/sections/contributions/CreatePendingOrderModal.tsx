@@ -2,13 +2,13 @@ import React from 'react';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import dayjs from 'dayjs';
 import { Form, Formik, useFormikContext } from 'formik';
 import { cloneDeep, debounce, groupBy, map, omit, pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../../lib/currency-utils';
+import dayjs from '../../../../lib/dayjs';
 import { requireFields, verifyEmailPattern } from '../../../../lib/form-utils';
 import { gql } from '../../../../lib/graphql/helpers';
 import type { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
@@ -416,7 +416,7 @@ const CreatePendingContributionForm = ({ organization, onClose, error, edit }: C
         value: dayjs(edit.pendingContributionData.expectedAt),
         label: intl.formatMessage(
           { defaultMessage: 'Around {date}', id: 'Fields.expectedAt.date' },
-          { date: dayjs(edit.pendingContributionData.expectedAt).format('MMMM D, YYYY') },
+          { date: dayjs(edit.pendingContributionData.expectedAt).utc().format('MMMM D, YYYY') },
         ),
       });
     }
@@ -735,7 +735,7 @@ const CreatePendingContributionForm = ({ organization, onClose, error, edit }: C
               <FormattedMessage
                 id="Fields.expectedAt.date"
                 defaultMessage="Around {date}"
-                values={{ date: dayjs(values.expectedAt).format('DD/MM/YYYY') }}
+                values={{ date: dayjs(values.expectedAt).utc().format('DD/MM/YYYY') }}
               />
             )
           }
@@ -743,17 +743,17 @@ const CreatePendingContributionForm = ({ organization, onClose, error, edit }: C
         >
           {({ form, field }) =>
             isCustomExpectedAt ? (
-              <StyledInputField htmlFor="CreatePendingContribution-expectedAt-custom">
+              <StyledInputField htmlFor="CreatePendingContribution-expectedAt">
                 {inputProps => (
                   <StyledInput
                     {...inputProps}
                     type="date"
                     width="100%"
                     data-cy="create-pending-contribution-expectedAt-custom"
-                    value={values.expectedAt ? dayjs(values.expectedAt).format('YYYY-MM-DD') : ''}
+                    value={values.expectedAt ? dayjs(values.expectedAt).utc().format('YYYY-MM-DD') : ''}
                     onChange={e =>
-                      // Consider the picked date as an approximate date, stored at 12:00 UTC so that
-                      // it's displayed on the same day for most timezones
+                      // The expected date is a calendar day: store it at 12:00 UTC and format the input in UTC,
+                      // so the picked day is preserved whatever the viewer's timezone is
                       setFieldValue(field.name, e.target.value ? `${e.target.value}T12:00:00.000Z` : null)
                     }
                     error={field.error}
