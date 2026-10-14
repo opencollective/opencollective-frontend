@@ -1,8 +1,8 @@
 // RFC 011 audit script for GraphQL best practices
-// Usage: node scripts/graphql-audit.js [-o] [-v] [-h]
+// Usage: tsx scripts/graphql-audit.ts [-o] [-v] [-h]
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const SRC_DIR = './';
 const FILE_EXTENSIONS = ['.js', '.ts', '.tsx'];
@@ -32,7 +32,7 @@ if (args.length) {
 
 let errorCount = 0;
 
-function walk(dir, filelist = []) {
+function walk(dir: string, filelist: string[] = []): string[] {
   fs.readdirSync(dir).forEach(file => {
     const fullPath = path.join(dir, file);
     if (fs.statSync(fullPath).isDirectory()) {
@@ -43,7 +43,7 @@ function walk(dir, filelist = []) {
         return;
       }
       walk(fullPath, filelist);
-    } else if (file === 'graphql-audit.test.js') {
+    } else if (file === 'graphql-audit.test.ts') {
       // Its fixtures break the rules on purpose
       return;
     } else if (FILE_EXTENSIONS.some(ext => file.endsWith(ext))) {
@@ -53,8 +53,15 @@ function walk(dir, filelist = []) {
   return filelist;
 }
 
+// A `gql` or `gqlV1` tag, optionally annotated (`gqlV1 /* GraphQL */`), followed by its backtick or by the end of
+// the line when the template opens on the next one
+const GQL_TAG = /\bgql(?:V1)?\s*(?:\/\*\s*GraphQL\s*\*\/\s*)?(`|$)/;
+
+// A `graphql()` HOC call, with optional type arguments (`graphql<Props>(`)
+const HOC_CALL = /\bgraphql\s*[<(]/;
+
 // --- Rule: GraphQL operation name ---
-function checkOperationNameRule(file, i, block) {
+function checkOperationNameRule(file: string, i: number, block: string) {
   const declRegex = /^\s*(fragment|query|mutation)\s+([A-Za-z0-9_]+)/gm;
   let m;
   while ((m = declRegex.exec(block)) !== null) {
@@ -72,7 +79,7 @@ function checkOperationNameRule(file, i, block) {
 }
 
 // --- Rule: GraphQL variable name ---
-function checkVariableNameRule(file, i, varName) {
+function checkVariableNameRule(file: string, i: number, varName: string) {
   // RFC 011: camelCase and ends with Mutation, Query, or Fragment
   if (!/^[a-z][a-zA-Z0-9]*(Mutation|Query|Fragment)$/.test(varName)) {
     console.log(`[Variable Name] ${file}:${i + 1} -> "${varName}"`);
@@ -81,10 +88,9 @@ function checkVariableNameRule(file, i, varName) {
 }
 
 // --- Rule: GraphQL HOC variable name ---
-function checkHocNameRule(file, i, line) {
-  // Match any variable assigned to graphql(...)
-  const hocAssignRegex = /const\s+([a-zA-Z0-9_]+)\s*=\s*graphql\(([^)]*)\)/;
-  const match = line.match(hocAssignRegex);
+function checkHocNameRule(file: string, i: number, line: string) {
+  // Match any variable assigned to graphql(...) or graphql<...>(...)
+  const match = line.match(/const\s+([a-zA-Z0-9_]+)\s*=\s*graphql\s*[<(]/);
   if (match) {
     const varName = match[1];
     // Accept any PascalCase name prefixed with 'add' and ending with allowed suffix
@@ -97,16 +103,27 @@ function checkHocNameRule(file, i, line) {
   }
 }
 
-// Returns the contents of the gql template opening on line i, and the line where it closes
-function readTemplate(lines, i) {
-  const openLine = lines[i];
-  const rest = openLine.substring(openLine.search(/gql(V1)?`/)).replace(/^gql(V1)?`/, '');
+// Returns the contents of the gql template whose tag is on line i, and the line where it closes. Null when the tag
+// is not followed by a template.
+function readTemplate(lines: string[], i: number): { block: string; end: number } | null {
+  const tag = lines[i].match(GQL_TAG);
+  let start = i;
+  let rest = lines[i].substring(tag.index + tag[0].length);
+  if (!tag[1]) {
+    // The backtick opens the next line
+    const opening = lines[i + 1]?.match(/^\s*`/);
+    if (!opening) {
+      return null;
+    }
+    start = i + 1;
+    rest = lines[start].substring(opening[0].length);
+  }
   const sameLineEnd = rest.indexOf('`');
   if (sameLineEnd !== -1) {
-    return { block: rest.substring(0, sameLineEnd), end: i };
+    return { block: rest.substring(0, sameLineEnd), end: start };
   }
   let block = `${rest}\n`;
-  for (let j = i + 1; j < lines.length; j++) {
+  for (let j = start + 1; j < lines.length; j++) {
     const end = lines[j].indexOf('`');
     if (end !== -1) {
       return { block: block + lines[j].substring(0, end), end: j };
@@ -117,7 +134,7 @@ function readTemplate(lines, i) {
 }
 
 // --- Main audit logic ---
-function auditFile(file) {
+function auditFile(file: string) {
   const content = fs.readFileSync(file, 'utf8');
   const lines = content.split('\n');
   for (let i = 0; i < lines.length; i++) {
@@ -127,7 +144,7 @@ function auditFile(file) {
 
     // HOC assignment rule (handle multi-line). It only reads ahead: the call can hold an inline gql template,
     // which the operation name rule must still reach on its own line.
-    if (enabledRules.hoc && line.includes('graphql(')) {
+    if (enabledRules.hoc && HOC_CALL.test(line)) {
       let hocBlock = line;
       let j = i + 1;
       while (j < lines.length && !/\);?\s*$/.test(hocBlock)) {
@@ -138,10 +155,12 @@ function auditFile(file) {
     }
 
     // GraphQL operation name rule
-    if (enabledRules.operation && /gql(V1)?`/.test(line)) {
-      const { block, end } = readTemplate(lines, i);
-      checkOperationNameRule(file, i, block);
-      next = Math.max(next, end);
+    if (enabledRules.operation && GQL_TAG.test(line)) {
+      const template = readTemplate(lines, i);
+      if (template) {
+        checkOperationNameRule(file, i, template.block);
+        next = Math.max(next, template.end);
+      }
     }
 
     // GraphQL variable name rule
