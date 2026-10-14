@@ -133,7 +133,9 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-custom-amount-input').type('{selectall}50');
 
       cy.getByDataCy('recurring-contribution-update-order-button').scrollIntoView().click();
-      cy.getByDataCy('toast-notification').contains('Amount is less than minimum value allowed for this Tier.');
+      cy.getByDataCy('toast-notification').contains(
+        'The amount you set is below minimum tier value, it should be at least $100.00',
+      );
     });
   });
 
