@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { SearchEntity } from './filters';
 
 /** Entities that the PostgreSQL backend can search. Unsupported entities must not be requested. */
-const POSTGRES_SUPPORTED_ENTITIES = new Set<SearchEntity>([SearchEntity.ACCOUNTS]);
+const POSTGRES_SUPPORTED_ENTITIES = new Set<SearchEntity>([SearchEntity.ACCOUNTS, SearchEntity.HOST_APPLICATIONS]);
 
 /** Limits enforced by the PostgreSQL backend */
 export const POSTGRES_SEARCH_LIMITS = { MAX_LIMIT: 50, MAX_OFFSET: 5000 } as const;
