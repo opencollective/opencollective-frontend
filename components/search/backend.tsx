@@ -15,6 +15,7 @@ const POSTGRES_SUPPORTED_ENTITIES = new Set<SearchEntity>([
   SearchEntity.ACCOUNTS,
   SearchEntity.HOST_APPLICATIONS,
   SearchEntity.ORDERS,
+  SearchEntity.UPDATES,
 ]);
 
 /** Limits enforced by the PostgreSQL backend */
