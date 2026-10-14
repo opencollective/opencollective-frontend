@@ -69,6 +69,22 @@ describe('scripts/graphql-audit', () => {
     ]);
   });
 
+  it('checks a template written inline in a multi-line HOC call', () => {
+    const source = [
+      'const addAccountQuery = graphql(',
+      '  gql`',
+      '    query GetBadQuery {',
+      '      me { id }',
+      '    }',
+      '  `,',
+      '  { options: { context: API_V2_CONTEXT } },',
+      ');',
+    ].join('\n');
+    const expected = ['[Operation Name] fixture.ts:2 -> "GetBadQuery"'];
+    expect(audit(source)).toEqual({ status: 1, violations: expected });
+    expect(audit(source, ['-o'])).toEqual({ status: 1, violations: expected });
+  });
+
   it('restricts the run to the rules given as flags', () => {
     const source = 'const BadName = gql`query GoodName { me { id } }`;';
     expect(audit(source, ['-o'])).toEqual({ status: 0, violations: [] });

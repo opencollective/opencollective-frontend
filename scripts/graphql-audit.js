@@ -125,7 +125,8 @@ function auditFile(file) {
     // Last line consumed by a multi-line block; every rule runs on line i before skipping past it
     let next = i;
 
-    // HOC assignment rule (handle multi-line)
+    // HOC assignment rule (handle multi-line). It only reads ahead: the call can hold an inline gql template,
+    // which the operation name rule must still reach on its own line.
     if (enabledRules.hoc && line.includes('graphql(')) {
       let hocBlock = line;
       let j = i + 1;
@@ -134,7 +135,6 @@ function auditFile(file) {
         j++;
       }
       checkHocNameRule(file, i, hocBlock);
-      next = Math.max(next, j - 1);
     }
 
     // GraphQL operation name rule
