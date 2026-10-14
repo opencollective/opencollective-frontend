@@ -417,6 +417,7 @@ export default function OrderPage(props) {
                               value={order.pendingContributionData.expectedAt}
                               dateStyle={'medium'}
                               timeStyle={undefined}
+                              timeZone="UTC"
                             />
                             <span className="font-bold tracking-[0.06em] uppercase">
                               &nbsp;
@@ -428,6 +429,7 @@ export default function OrderPage(props) {
                             value={order.pendingContributionData.expectedAt}
                             dateStyle={'medium'}
                             timeStyle={undefined}
+                            timeZone="UTC"
                           />
                         )}
                       </OrderDetails>

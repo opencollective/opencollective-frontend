@@ -1887,6 +1887,7 @@
   "Fields.description": "Descripción",
   "Fields.displayName": "Nombre para mostrar",
   "Fields.expectedAt": "¿Cuándo se espera que lleguen estos fondos?",
+  "Fields.expectedAt.customDate": "Pick a date",
   "Fields.expectedAt.date": "Alrededor del {date}",
   "Fields.firstContributionDate": "Primera fecha de colaboración",
   "Fields.firstExpenseDate": "Primera fecha de gastos",

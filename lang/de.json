@@ -1887,6 +1887,7 @@
   "Fields.description": "Beschreibung",
   "Fields.displayName": "Anzeigename",
   "Fields.expectedAt": "Wann werden diese Mittel voraussichtlich zur Verfügung stehen?",
+  "Fields.expectedAt.customDate": "Pick a date",
   "Fields.expectedAt.date": "Um den {date}",
   "Fields.firstContributionDate": "Erstes Beitragsdatum",
   "Fields.firstExpenseDate": "Erstes Ausgabendatum",

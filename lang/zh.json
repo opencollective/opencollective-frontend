@@ -1887,6 +1887,7 @@
   "Fields.description": "描述",
   "Fields.displayName": "显示名称",
   "Fields.expectedAt": "预计这些资金何时到位？",
+  "Fields.expectedAt.customDate": "Pick a date",
   "Fields.expectedAt.date": "约 {date}",
   "Fields.firstContributionDate": "First Contribution Date",
   "Fields.firstExpenseDate": "First Expense Date",
