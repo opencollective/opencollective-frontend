@@ -9575,7 +9575,7 @@ export type Mutation = {
   inviteMember: MemberInvitation;
   /** Creates and invites admins to an existing Account. Scope: "account". */
   inviteMembers: Array<MemberInvitation>;
-  /** [Root only] Merge two accounts, returns the result account */
+  /** [Root only] Merge two accounts, returns the result account. Both accounts must have the same type, except PROJECT accounts that can be merged into a COLLECTIVE hosted by the same host. */
   mergeAccounts: MergeAccountsResponse;
   /** Moves an expense from one account within a Collective to another */
   moveExpense: Expense;

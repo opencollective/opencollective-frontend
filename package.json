@@ -268,7 +268,7 @@
     "nyc": "^18.0.0",
     "pdf-parse": "^2.4.5",
     "postcss": "8.5.29",
-    "prettier": "3.9.9",
+    "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "prop-types": "^15.8.1",
     "raf": "^3.4.1",
