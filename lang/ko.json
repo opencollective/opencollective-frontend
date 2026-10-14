@@ -3743,6 +3743,7 @@
   "Search": "검색",
   "search.banks.placeholder": "Search banks by name or BIC...",
   "search.clear": "Clear search",
+  "search.narrowSearch": "Only the first {count} results can be browsed. Add more words or select a workspace to narrow your search.",
   "search.noResults": "No results",
   "search.placeholder": "검색...",
   "searchFilter.host": "재정 호스트",

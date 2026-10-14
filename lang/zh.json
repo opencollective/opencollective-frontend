@@ -3743,6 +3743,7 @@
   "Search": "搜索",
   "search.banks.placeholder": "Search banks by name or BIC...",
   "search.clear": "清除搜索",
+  "search.narrowSearch": "Only the first {count} results can be browsed. Add more words or select a workspace to narrow your search.",
   "search.noResults": "No results",
   "search.placeholder": "搜索...",
   "searchFilter.host": "财务托管方",

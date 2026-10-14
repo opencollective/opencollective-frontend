@@ -4,6 +4,7 @@ import { SearchIcon } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { SearchBackend } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
@@ -17,6 +18,7 @@ import { DashboardContext } from '../dashboard/DashboardContext';
 import { EmptyResults } from '../dashboard/EmptyResults';
 import { Pagination } from '../dashboard/filters/Pagination';
 import Link from '../Link';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Spinner from '../Spinner';
 import { BASE_INPUT_CLASS } from '../ui/Input';
 import { Skeleton } from '../ui/Skeleton';
@@ -28,6 +30,14 @@ import { LoadingResult } from './result/LoadingResult';
 import { OrderResult } from './result/OrderResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
+import {
+  getSearchBackendVariables,
+  isEntitySupportedByBackend,
+  NarrowSearchMessage,
+  POSTGRES_SEARCH_LIMITS,
+  SearchBackendSelector,
+  useSearchBackend,
+} from './backend';
 import { SearchEntity } from './filters';
 import { useGetLinkProps } from './lib';
 import { searchPageQuery } from './queries';
@@ -43,6 +53,8 @@ export const SearchResults = () => {
       ? { slug: account.slug, type: 'account' }
       : undefined;
 
+  const searchBackend = useSearchBackend();
+  const { backend } = searchBackend;
   const queryFilter = useQueryFilter({
     schema: z.object({
       workspace: z.string().optional(),
@@ -63,7 +75,11 @@ export const SearchResults = () => {
           }
         }
       },
-      limit: (limit, key, meta, values) => {
+      limit: (requestedLimit, key, meta, values) => {
+        const limit =
+          backend === SearchBackend.POSTGRES
+            ? Math.min(requestedLimit, POSTGRES_SEARCH_LIMITS.MAX_LIMIT)
+            : requestedLimit;
         const defaultEntityLimit = {
           defaultLimit: 0, // TODO: should be enough? Seems to be a bug with defaultLimit
           accountsLimit: 0,
@@ -134,22 +150,36 @@ export const SearchResults = () => {
     setInput(queryFilter.values.searchTerm || '');
   }, [queryFilter.values.searchTerm]);
 
-  const { data, loading } = useQuery(searchPageQuery, {
+  // Entities and page sizes that the selected backend doesn't support can't be selected
+  useEffect(() => {
+    if (!isEntitySupportedByBackend(queryFilter.values.entity, backend)) {
+      queryFilter.setFilter('entity', SearchEntity.ALL);
+    } else if (backend === SearchBackend.POSTGRES && queryFilter.values.limit > POSTGRES_SEARCH_LIMITS.MAX_LIMIT) {
+      queryFilter.setFilter('limit', POSTGRES_SEARCH_LIMITS.MAX_LIMIT);
+    }
+  }, [backend, queryFilter.values.entity, queryFilter.values.limit]);
+
+  const { data, loading, error } = useQuery(searchPageQuery, {
     variables: {
-      ...queryFilter.variables,
+      ...getSearchBackendVariables(
+        {
+          ...queryFilter.variables,
+          includeAccounts: true,
+          includeTransactions: true,
+          includeExpenses: true,
+          includeOrders: true,
+          includeUpdates: true,
+          includeComments: true,
+          includeHostApplications: true,
+        },
+        backend,
+      ),
       imageHeight: 72,
-      includeAccounts: true,
-      includeTransactions: true,
-      includeExpenses: true,
-      includeOrders: true,
-      includeUpdates: true,
-      includeComments: true,
-      includeHostApplications: true,
     },
     notifyOnNetworkStatusChange: true,
 
     fetchPolicy: 'cache-and-network',
-    skip: !queryFilter.values.searchTerm,
+    skip: !queryFilter.values.searchTerm || !searchBackend.isBackendReady,
   });
 
   const handleKeyDown = React.useCallback(
@@ -166,14 +196,23 @@ export const SearchResults = () => {
 
   const isLoading = loading;
 
-  let totalCount =
-    data?.search.results.accounts.collection.totalCount +
-    data?.search.results.expenses.collection.totalCount +
-    data?.search.results.orders?.collection.totalCount +
-    data?.search.results.transactions?.collection.totalCount +
-    data?.search.results.comments?.collection.totalCount +
-    data?.search.results.updates?.collection.totalCount;
-  totalCount = isNaN(totalCount) ? undefined : totalCount;
+  const results = data?.search.results;
+  const totalCount = results
+    ? [results.accounts, results.expenses, results.orders, results.transactions, results.comments, results.updates]
+        .map(result => result?.collection.totalCount || 0)
+        .reduce((total, count) => total + count, 0)
+    : undefined;
+  const tabs = [
+    { id: SearchEntity.ALL, count: totalCount },
+    { id: SearchEntity.ACCOUNTS, count: results?.accounts?.collection.totalCount },
+    { id: SearchEntity.EXPENSES, count: results?.expenses?.collection.totalCount },
+    { id: SearchEntity.ORDERS, count: results?.orders?.collection.totalCount },
+    { id: SearchEntity.TRANSACTIONS, count: results?.transactions?.collection.totalCount },
+    { id: SearchEntity.COMMENTS, count: results?.comments?.collection.totalCount },
+    { id: SearchEntity.UPDATES, count: results?.updates?.collection.totalCount },
+  ]
+    .filter(tab => isEntitySupportedByBackend(tab.id, backend))
+    .map(tab => ({ ...tab, label: i18nSearchEntity(intl, tab.id) }));
 
   return (
     <div className="space-y-4">
@@ -189,240 +228,141 @@ export const SearchResults = () => {
           autoFocus
           onKeyDown={handleKeyDown}
         />
-        {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
+        {isLoading && <Spinner size={16} className="shrink-0 text-muted-foreground" />}
+        <SearchBackendSelector {...searchBackend} />
       </div>
       <div>
         <Tabs
           selectedId={queryFilter.values.entity}
           onChange={val => queryFilter.setFilter('entity', val as SearchEntity)}
-          tabs={[
-            {
-              id: SearchEntity.ALL,
-              label: i18nSearchEntity(intl, SearchEntity.ALL),
-              count: totalCount,
-            },
-            {
-              id: SearchEntity.ACCOUNTS,
-              label: i18nSearchEntity(intl, SearchEntity.ACCOUNTS),
-              count: data?.search.results.accounts.collection.totalCount,
-            },
-            {
-              id: SearchEntity.EXPENSES,
-              label: i18nSearchEntity(intl, SearchEntity.EXPENSES),
-              count: data?.search.results.expenses.collection.totalCount,
-            },
-            {
-              id: SearchEntity.ORDERS,
-              label: i18nSearchEntity(intl, SearchEntity.ORDERS),
-              count: data?.search.results.orders?.collection.totalCount,
-            },
-            {
-              id: SearchEntity.TRANSACTIONS,
-              label: i18nSearchEntity(intl, SearchEntity.TRANSACTIONS),
-              count: data?.search.results.transactions?.collection.totalCount,
-            },
-            {
-              id: SearchEntity.COMMENTS,
-              label: i18nSearchEntity(intl, SearchEntity.COMMENTS),
-              count: data?.search.results.comments?.collection.totalCount,
-            },
-            {
-              id: SearchEntity.UPDATES,
-              label: i18nSearchEntity(intl, SearchEntity.UPDATES),
-              count: data?.search.results.updates?.collection.totalCount,
-            },
-          ]}
+          tabs={tabs}
         />
       </div>
+      {error && <MessageBoxGraphqlError error={error} />}
       <div className="py-1">
-        <SearchResultsList data={data} queryFilter={queryFilter} totalCount={totalCount} loading={loading} />
+        <SearchResultsList
+          data={data}
+          queryFilter={queryFilter}
+          totalCount={totalCount}
+          loading={loading}
+          backend={backend}
+        />
       </div>
     </div>
   );
 };
+type SearchResultsListGroup = {
+  entity: Exclude<SearchEntity, SearchEntity.ALL | SearchEntity.DASHBOARD_TOOL>;
+  result?: { maxScore?: number; collection: { totalCount: number; nodes: any[] } }; // eslint-disable-line @typescript-eslint/no-explicit-any
+  renderNode: (node) => React.ReactNode;
+  filterNodes?: (nodes) => any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+};
 
-function SearchResultsList({ data, queryFilter, totalCount, loading }) {
+function SearchResultsList({ data, queryFilter, totalCount, loading, backend }) {
   const { LoggedInUser } = useLoggedInUser();
+  const results = data?.search.results;
+  const allGroups: SearchResultsListGroup[] = [
+    {
+      entity: SearchEntity.ACCOUNTS,
+      result: results?.accounts,
+      renderNode: account => <AccountResult account={account} highlights={results.accounts.highlights?.[account.id]} />,
+    },
+    {
+      entity: SearchEntity.EXPENSES,
+      result: results?.expenses,
+      renderNode: expense => <ExpenseResult expense={expense} highlights={results.expenses.highlights?.[expense.id]} />,
+    },
+    {
+      entity: SearchEntity.ORDERS,
+      result: results?.orders,
+      renderNode: order => <OrderResult order={order} highlights={results.orders.highlights?.[order.id]} />,
+    },
+    {
+      entity: SearchEntity.TRANSACTIONS,
+      result: results?.transactions,
+      renderNode: transaction => (
+        <TransactionResult transaction={transaction} highlights={results.transactions.highlights?.[transaction.id]} />
+      ),
+    },
+    {
+      entity: SearchEntity.UPDATES,
+      result: results?.updates,
+      renderNode: update => <UpdateResult update={update} highlights={results.updates.highlights?.[update.id]} />,
+    },
+    {
+      entity: SearchEntity.COMMENTS,
+      result: results?.comments,
+      // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
+      filterNodes: nodes => nodes?.filter(comment => getCommentUrl(comment, LoggedInUser)),
+      renderNode: comment => <CommentResult comment={comment} highlights={results.comments.highlights?.[comment.id]} />,
+    },
+  ];
+  const groups = allGroups.filter(group => isEntitySupportedByBackend(group.entity, backend));
 
-  switch (queryFilter.values.entity) {
-    case SearchEntity.ALL:
-      if (loading) {
-        return (
-          <div className="space-y-3 text-sm">
-            <p className="font-medium text-muted-foreground"> </p>
-            <div className="flex flex-col gap-2">
-              {Array.from({ length: queryFilter.values.limit }, (_, i) => i + 1).map(id => (
-                <div key={`skeleton-${id}`} className="flex items-center gap-2 py-2">
-                  <Skeleton className="size-9 shrink-0 rounded-md" />
-                  <div className="flex flex-1 flex-col gap-2">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
-      if (!totalCount) {
-        return <EmptyResults isEmptySearch={totalCount !== 0} hasFilters={false} />;
-      }
+  if (queryFilter.values.entity === SearchEntity.ALL) {
+    if (loading) {
       return (
-        <div className="space-y-8">
-          <SearchResultsGroup
-            entity={SearchEntity.ACCOUNTS}
-            totalCount={data?.search.results.accounts.collection.totalCount}
-            nodes={data?.search.results.accounts.collection.nodes}
-            renderNode={account => (
-              <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
-            )}
-            queryFilter={queryFilter}
-          />
-          <SearchResultsGroup
-            entity={SearchEntity.EXPENSES}
-            totalCount={data?.search.results.expenses.collection.totalCount}
-            nodes={data?.search.results.expenses.collection.nodes}
-            renderNode={expense => (
-              <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
-            )}
-            queryFilter={queryFilter}
-          />
-
-          <SearchResultsGroup
-            entity={SearchEntity.ORDERS}
-            totalCount={data?.search.results.orders.collection.totalCount}
-            nodes={data?.search.results.orders.collection.nodes}
-            renderNode={order => (
-              <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
-            )}
-            queryFilter={queryFilter}
-          />
-
-          <SearchResultsGroup
-            entity={SearchEntity.TRANSACTIONS}
-            totalCount={data?.search.results.transactions.collection.totalCount}
-            nodes={data?.search.results.transactions.collection.nodes}
-            renderNode={transaction => (
-              <TransactionResult
-                transaction={transaction}
-                highlights={data.search.results.transactions.highlights[transaction.id]}
-              />
-            )}
-            queryFilter={queryFilter}
-          />
-
-          <SearchResultsGroup
-            entity={SearchEntity.UPDATES}
-            totalCount={data?.search.results.updates.collection.totalCount}
-            nodes={data?.search.results.updates.collection.nodes}
-            renderNode={update => (
-              <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
-            )}
-            queryFilter={queryFilter}
-          />
-          <SearchResultsGroup
-            entity={SearchEntity.COMMENTS}
-            totalCount={data?.search.results.comments.collection.totalCount}
-            nodes={data?.search.results.comments.collection.nodes.filter(comment =>
-              getCommentUrl(comment, LoggedInUser),
-            )} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
-            renderNode={comment => (
-              <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
-            )}
-            queryFilter={queryFilter}
-          />
+        <div className="space-y-3 text-sm">
+          <p className="font-medium text-muted-foreground"> </p>
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: queryFilter.values.limit }, (_, i) => i + 1).map(id => (
+              <div key={`skeleton-${id}`} className="flex items-center gap-2 py-2">
+                <Skeleton className="size-9 shrink-0 rounded-md" />
+                <div className="flex flex-1 flex-col gap-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       );
-    case SearchEntity.ACCOUNTS:
-      return (
-        <SearchResultsGroup
-          entity={SearchEntity.ACCOUNTS}
-          totalCount={data?.search.results.accounts.collection.totalCount}
-          nodes={data?.search.results.accounts.collection.nodes}
-          onStandaloneTab
-          loading={loading}
-          renderNode={account => (
-            <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
-          )}
-          queryFilter={queryFilter}
-        />
-      );
-    case SearchEntity.EXPENSES:
-      return (
-        <SearchResultsGroup
-          entity={SearchEntity.EXPENSES}
-          totalCount={data?.search.results.expenses.collection.totalCount}
-          nodes={data?.search.results.expenses.collection.nodes}
-          onStandaloneTab
-          loading={loading}
-          renderNode={expense => (
-            <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
-          )}
-          queryFilter={queryFilter}
-        />
-      );
-    case SearchEntity.ORDERS:
-      return (
-        <SearchResultsGroup
-          entity={SearchEntity.ORDERS}
-          totalCount={data?.search.results.orders.collection.totalCount}
-          nodes={data?.search.results.orders.collection.nodes}
-          onStandaloneTab
-          loading={loading}
-          renderNode={order => (
-            <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
-          )}
-          queryFilter={queryFilter}
-        />
-      );
-    case SearchEntity.COMMENTS:
-      return (
-        <SearchResultsGroup
-          entity={SearchEntity.COMMENTS}
-          totalCount={data?.search.results.comments.collection.totalCount}
-          nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
-          onStandaloneTab
-          loading={loading}
-          renderNode={comment => (
-            <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
-          )}
-          queryFilter={queryFilter}
-        />
-      );
-    case SearchEntity.TRANSACTIONS:
-      return (
-        <SearchResultsGroup
-          entity={SearchEntity.TRANSACTIONS}
-          totalCount={data?.search.results.transactions.collection.totalCount}
-          nodes={data?.search.results.transactions.collection.nodes}
-          onStandaloneTab
-          loading={loading}
-          renderNode={transaction => (
-            <TransactionResult
-              transaction={transaction}
-              highlights={data.search.results.transactions.highlights[transaction.id]}
-            />
-          )}
-          queryFilter={queryFilter}
-        />
-      );
-    case SearchEntity.UPDATES:
-      return (
-        <SearchResultsGroup
-          entity={SearchEntity.UPDATES}
-          totalCount={data?.search.results.updates.collection.totalCount}
-          nodes={data?.search.results.updates.collection.nodes}
-          onStandaloneTab
-          loading={loading}
-          renderNode={update => (
-            <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
-          )}
-          queryFilter={queryFilter}
-        />
-      );
-    default:
-      return <div>Some other results</div>;
+    }
+    if (!totalCount) {
+      return <EmptyResults isEmptySearch={totalCount !== 0} hasFilters={false} />;
+    }
+
+    // With PostgreSQL, scores are comparable across entities: show the best matches first
+    const sortedGroups =
+      backend === SearchBackend.POSTGRES
+        ? [...groups].sort((a, b) => (b.result?.maxScore || 0) - (a.result?.maxScore || 0))
+        : groups;
+
+    return (
+      <div className="space-y-8">
+        {sortedGroups.map(group => (
+          <SearchResultsGroup
+            key={group.entity}
+            entity={group.entity}
+            totalCount={group.result?.collection.totalCount}
+            nodes={
+              group.filterNodes ? group.filterNodes(group.result?.collection.nodes) : group.result?.collection.nodes
+            }
+            renderNode={group.renderNode}
+            queryFilter={queryFilter}
+          />
+        ))}
+      </div>
+    );
   }
+
+  const group = groups.find(group => group.entity === queryFilter.values.entity);
+  if (!group) {
+    return null;
+  }
+
+  return (
+    <SearchResultsGroup
+      entity={group.entity}
+      totalCount={group.result?.collection.totalCount}
+      nodes={group.filterNodes ? group.filterNodes(group.result?.collection.nodes) : group.result?.collection.nodes}
+      onStandaloneTab
+      loading={loading}
+      renderNode={group.renderNode}
+      queryFilter={queryFilter}
+      backend={backend}
+    />
+  );
 }
 
 type SearchResultsGroupProps<
@@ -438,6 +378,7 @@ type SearchResultsGroupProps<
   entity: E;
   loading?: boolean;
   queryFilter: useQueryFilterReturnType<any, any>;
+  backend?: SearchBackend;
 };
 
 function SearchResultsGroup<E extends Exclude<keyof SearchEntityNodeMap, SearchEntity.DASHBOARD_TOOL>>({
@@ -448,6 +389,7 @@ function SearchResultsGroup<E extends Exclude<keyof SearchEntityNodeMap, SearchE
   entity,
   loading,
   queryFilter,
+  backend,
 }: SearchResultsGroupProps<E>) {
   const intl = useIntl();
   const { getLinkProps } = useGetLinkProps();
@@ -500,7 +442,21 @@ function SearchResultsGroup<E extends Exclude<keyof SearchEntityNodeMap, SearchE
             </span>
           </button>
         )}
-        {onStandaloneTab && <Pagination className="mt-4" total={totalCount} queryFilter={queryFilter} />}
+        {onStandaloneTab &&
+          (backend === SearchBackend.POSTGRES ? (
+            <React.Fragment>
+              {/* Exact totals, but pages are only available up to the maximum offset */}
+              <Pagination
+                className="mt-4"
+                total={Math.min(totalCount, POSTGRES_SEARCH_LIMITS.MAX_OFFSET + queryFilter.values.limit)}
+                maxLimit={POSTGRES_SEARCH_LIMITS.MAX_LIMIT}
+                queryFilter={queryFilter}
+              />
+              {totalCount > POSTGRES_SEARCH_LIMITS.MAX_OFFSET + queryFilter.values.limit && <NarrowSearchMessage />}
+            </React.Fragment>
+          ) : (
+            <Pagination className="mt-4" total={totalCount} queryFilter={queryFilter} />
+          ))}
       </div>
     </div>
   );

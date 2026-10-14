@@ -3743,6 +3743,7 @@
   "Search": "Rechercher",
   "search.banks.placeholder": "Rechercher des banques par nom ou BIC...",
   "search.clear": "Effacer la recherche",
+  "search.narrowSearch": "Only the first {count} results can be browsed. Add more words or select a workspace to narrow your search.",
   "search.noResults": "Aucun résultat",
   "search.placeholder": "Rechercher...",
   "searchFilter.host": "Hôtes fiscaux",

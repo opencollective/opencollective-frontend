@@ -5,6 +5,7 @@ import { pick } from 'lodash-es';
 import { ChevronRight, SearchIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { SearchBackend } from '../../lib/graphql/types/v2/graphql';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
@@ -15,6 +16,7 @@ import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { getMenuItems } from '../dashboard/menu-items';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Spinner from '../Spinner';
 import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { DialogTitle } from '../ui/Dialog';
@@ -29,6 +31,14 @@ import { OrderResult } from './result/OrderResult';
 import { PageResult } from './result/PageResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
+import {
+  getSearchBackendVariables,
+  isEntitySupportedByBackend,
+  NarrowSearchMessage,
+  POSTGRES_SEARCH_LIMITS,
+  SearchBackendSelector,
+  useSearchBackend,
+} from './backend';
 import { ContextPill } from './ContextPill';
 import { EntityFilterItem } from './EntityFilterItem';
 import { entityFilterOptions, schema, SearchEntity } from './filters';
@@ -37,15 +47,7 @@ import { RecentVisits } from './RecentVisits';
 import { SearchCommandGroup } from './SearchCommandGroup';
 import { SearchCommandItem } from './SearchCommandItem';
 import { SearchCommandLegend } from './SearchCommandLegend';
-import type { DashboardPage, SearchHighlights } from './types';
-
-const getMaxScore = (highlights: Record<string, SearchHighlights> | undefined): number => {
-  if (!highlights) {
-    return 0;
-  }
-  const scores = Object.values(highlights).map(h => h.score);
-  return scores.length > 0 ? Math.max(...scores) : 0;
-};
+import type { DashboardPage } from './types';
 
 export const SearchCommand = ({ open, setOpen }) => {
   const intl = useIntl();
@@ -64,6 +66,8 @@ export const SearchCommand = ({ open, setOpen }) => {
   }, [workspace]);
 
   const [input, setInput] = React.useState('');
+  const searchBackend = useSearchBackend();
+  const { backend } = searchBackend;
   const queryFilter = useQueryFilter({
     schema,
     filters: {},
@@ -152,17 +156,29 @@ export const SearchCommand = ({ open, setOpen }) => {
     }
   }, [open, account?.slug]);
 
+  // Entities that the selected backend doesn't support can't be selected
+  useEffect(() => {
+    if (!isEntitySupportedByBackend(queryFilter.values.entity, backend)) {
+      queryFilter.setFilter('entity', SearchEntity.ALL);
+    }
+  }, [backend, queryFilter.values.entity]);
+
   const {
     data,
     loading,
+    error,
     fetchMore,
     variables: usedVariables,
   } = useQuery(searchCommandQuery, {
-    variables: { ...queryFilter.variables, imageHeight: 72, __infiniteScroll: true },
+    variables: {
+      ...getSearchBackendVariables(queryFilter.variables, backend),
+      imageHeight: 72,
+      __infiniteScroll: true,
+    },
     notifyOnNetworkStatusChange: true,
 
     fetchPolicy: 'cache-and-network',
-    skip: !queryFilter.values.searchTerm,
+    skip: !queryFilter.values.searchTerm || !searchBackend.isBackendReady,
   });
 
   // Track if we're loading more results
@@ -252,10 +268,14 @@ export const SearchCommand = ({ open, setOpen }) => {
         entities.push(SearchEntity.HOST_APPLICATIONS);
       }
 
-      return Object.values(pick(entityFilterOptions, entities));
+      return Object.values(pick(entityFilterOptions, entities)).filter(opt =>
+        isEntitySupportedByBackend(opt.value, backend),
+      );
     }
-    return Object.values(pick(entityFilterOptions, [SearchEntity.ACCOUNTS, SearchEntity.UPDATES]));
-  }, [queryFilter.values.workspace, defaultContext?.type]);
+    return Object.values(pick(entityFilterOptions, [SearchEntity.ACCOUNTS, SearchEntity.UPDATES])).filter(opt =>
+      isEntitySupportedByBackend(opt.value, backend),
+    );
+  }, [queryFilter.values.workspace, defaultContext?.type, backend]);
 
   const filteredGoToPages = React.useMemo(() => {
     if (!queryFilter.values.workspace || !input || queryFilter.values.entity !== SearchEntity.ALL) {
@@ -298,7 +318,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         entity: SearchEntity.ACCOUNTS,
         totalCount: data?.search.results.accounts?.collection.totalCount,
         nodes: data?.search.results.accounts?.collection.nodes,
-        maxScore: getMaxScore(data?.search.results.accounts?.highlights),
+        maxScore: data?.search.results.accounts?.maxScore || 0,
         renderNode: account => (
           <AccountResult account={account} highlights={data?.search.results.accounts?.highlights[account.id]} />
         ),
@@ -307,7 +327,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         entity: SearchEntity.EXPENSES,
         totalCount: data?.search.results.expenses?.collection.totalCount,
         nodes: data?.search.results.expenses?.collection.nodes,
-        maxScore: getMaxScore(data?.search.results.expenses?.highlights),
+        maxScore: data?.search.results.expenses?.maxScore || 0,
         renderNode: expense => (
           <ExpenseResult expense={expense} highlights={data?.search.results.expenses?.highlights[expense.id]} />
         ),
@@ -316,7 +336,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         entity: SearchEntity.HOST_APPLICATIONS,
         totalCount: data?.search.results.hostApplications?.collection.totalCount,
         nodes: data?.search.results.hostApplications?.collection.nodes,
-        maxScore: getMaxScore(data?.search.results.hostApplications?.highlights),
+        maxScore: data?.search.results.hostApplications?.maxScore || 0,
         renderNode: hostApplication => (
           <HostApplicationResult
             hostApplication={hostApplication}
@@ -328,7 +348,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         entity: SearchEntity.ORDERS,
         totalCount: data?.search.results.orders?.collection.totalCount,
         nodes: data?.search.results.orders?.collection.nodes,
-        maxScore: getMaxScore(data?.search.results.orders?.highlights),
+        maxScore: data?.search.results.orders?.maxScore || 0,
         renderNode: order => (
           <OrderResult order={order} highlights={data?.search.results.orders?.highlights[order.id]} />
         ),
@@ -337,7 +357,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         entity: SearchEntity.TRANSACTIONS,
         totalCount: data?.search.results.transactions?.collection.totalCount,
         nodes: data?.search.results.transactions?.collection.nodes,
-        maxScore: getMaxScore(data?.search.results.transactions?.highlights),
+        maxScore: data?.search.results.transactions?.maxScore || 0,
         renderNode: transaction => (
           <TransactionResult
             transaction={transaction}
@@ -349,7 +369,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         entity: SearchEntity.UPDATES,
         totalCount: data?.search.results.updates?.collection.totalCount,
         nodes: data?.search.results.updates?.collection.nodes,
-        maxScore: getMaxScore(data?.search.results.updates?.highlights),
+        maxScore: data?.search.results.updates?.maxScore || 0,
         renderNode: update => (
           <UpdateResult update={update} highlights={data?.search.results.updates?.highlights[update.id]} />
         ),
@@ -358,7 +378,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         entity: SearchEntity.COMMENTS,
         totalCount: data?.search.results.comments?.collection.totalCount,
         nodes: data?.search.results.comments?.collection.nodes?.filter(comment => getCommentUrl(comment, LoggedInUser)),
-        maxScore: getMaxScore(data?.search.results.comments?.highlights),
+        maxScore: data?.search.results.comments?.maxScore || 0,
         renderNode: comment => (
           <CommentResult comment={comment} highlights={data?.search.results.comments?.highlights[comment.id]} />
         ),
@@ -368,7 +388,27 @@ export const SearchCommand = ({ open, setOpen }) => {
     return [...entityResultGroups].sort((a, b) => b.maxScore - a.maxScore);
   }, [hasData, data, LoggedInUser]);
 
-  const showNoResults = debouncedInput !== '' && !isLoading && filteredGoToPages.length === 0 && !hasSearchResults;
+  const showNoResults =
+    debouncedInput !== '' && !isLoading && !error && filteredGoToPages.length === 0 && !hasSearchResults;
+
+  // The PostgreSQL backend doesn't serve results beyond a maximum offset
+  const infiniteScrollCollection = isInfiniteScrollEnabled
+    ? data?.search?.results?.[
+        {
+          [SearchEntity.ACCOUNTS]: 'accounts',
+          [SearchEntity.EXPENSES]: 'expenses',
+          [SearchEntity.ORDERS]: 'orders',
+          [SearchEntity.TRANSACTIONS]: 'transactions',
+          [SearchEntity.UPDATES]: 'updates',
+          [SearchEntity.COMMENTS]: 'comments',
+          [SearchEntity.HOST_APPLICATIONS]: 'hostApplications',
+        }[queryFilter.values.entity]
+      ]?.collection
+    : null;
+  const hasReachedMaxOffset =
+    backend === SearchBackend.POSTGRES &&
+    (infiniteScrollCollection?.nodes?.length || 0) > POSTGRES_SEARCH_LIMITS.MAX_OFFSET &&
+    infiniteScrollCollection.totalCount > infiniteScrollCollection.nodes.length;
 
   // Handle infinite scroll
   const handleScroll = useCallback(
@@ -401,7 +441,9 @@ export const SearchCommand = ({ open, setOpen }) => {
         const collection = results[resultKey]?.collection;
         const currentOffset = collection?.nodes.length || 0;
         const totalCount = collection?.totalCount || 0;
-        const shouldLoadMore = currentOffset < totalCount;
+        const shouldLoadMore =
+          currentOffset < totalCount &&
+          (backend !== SearchBackend.POSTGRES || currentOffset <= POSTGRES_SEARCH_LIMITS.MAX_OFFSET);
 
         if (shouldLoadMore) {
           setIsLoadingMore(true);
@@ -415,7 +457,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         }
       }
     },
-    [isInfiniteScrollEnabled, data, isLoadingMore, loading, fetchMore, queryFilter.values.entity],
+    [isInfiniteScrollEnabled, data, isLoadingMore, loading, fetchMore, queryFilter.values.entity, backend],
   );
 
   return (
@@ -453,7 +495,17 @@ export const SearchCommand = ({ open, setOpen }) => {
           placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
           className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
         />
-        {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
+        {isLoading && (
+          <Spinner
+            size={16}
+            className={
+              searchBackend.canSelectBackend
+                ? 'shrink-0 text-muted-foreground'
+                : 'absolute right-4 text-muted-foreground'
+            }
+          />
+        )}
+        <SearchBackendSelector {...searchBackend} />
       </div>
 
       <CommandList ref={listRef} onScroll={handleScroll} className="max-h-[600px] border-t-0 border-b">
@@ -569,6 +621,14 @@ export const SearchCommand = ({ open, setOpen }) => {
             <span className="text-sm text-muted-foreground">
               <FormattedMessage defaultMessage="Loading more..." id="jZ5QcA" />
             </span>
+          </div>
+        )}
+
+        {hasReachedMaxOffset && !isLoadingMore && <NarrowSearchMessage className="px-3 py-4 text-center" />}
+
+        {error && debouncedInput !== '' && !isLoading && (
+          <div className="p-3">
+            <MessageBoxGraphqlError error={error} />
           </div>
         )}
 

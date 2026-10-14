@@ -3743,6 +3743,7 @@
   "Search": "Zoeken",
   "search.banks.placeholder": "Search banks by name or BIC...",
   "search.clear": "Wis zoekopdracht",
+  "search.narrowSearch": "Only the first {count} results can be browsed. Add more words or select a workspace to narrow your search.",
   "search.noResults": "No results",
   "search.placeholder": "Zoeken...",
   "searchFilter.host": "Fiscal hosts",

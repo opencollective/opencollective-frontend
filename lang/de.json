@@ -3743,6 +3743,7 @@
   "Search": "Suchen",
   "search.banks.placeholder": "Banken nach Name oder BIC suchen …",
   "search.clear": "Suche löschen",
+  "search.narrowSearch": "Only the first {count} results can be browsed. Add more words or select a workspace to narrow your search.",
   "search.noResults": "Keine Ergebnisse",
   "search.placeholder": "Suchen …",
   "searchFilter.host": "Fiscal Hosts",

@@ -21026,12 +21026,17 @@ type Query {
     searchTerm: String!
 
     """
-    Limit the scope of the search to this account and its children
+    The backend to use for this search
+    """
+    backend: SearchBackend! = OPENSEARCH
+
+    """
+    Limit the scope of the search to this account and its children. When used with `host`, results must match both.
     """
     account: AccountReferenceInput
 
     """
-    Limit the scope of the search to this host and its hosted accounts
+    Limit the scope of the search to this host and its hosted accounts. When used with `account`, results must match both.
     """
     host: AccountReferenceInput
 
@@ -25724,7 +25729,16 @@ type SearchResults {
 
 type SearchResultsAccounts {
   collection: AccountCollection!
+
+  """
+  Highest score among all the matching results, regardless of the requested page
+  """
   maxScore: Float!
+
+  """
+  Score of each result of the page, in the same order as the collection nodes
+  """
+  scores: [SearchResultScore!]!
 
   """
   Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
@@ -25732,9 +25746,33 @@ type SearchResultsAccounts {
   highlights: JSONObject
 }
 
+"""
+The score of a search result
+"""
+type SearchResultScore {
+  """
+  The GraphQL ID of the result (same as the node ID)
+  """
+  id: String!
+
+  """
+  Relevance score. With the PostgreSQL backend, scores are comparable across entity types: band * 1000 (5: exact identifier, 4: exact name/title, 3: all words, 2: account name prefix, 1: account name typo) + 500 for accounts + a bonus below 500.
+  """
+  score: Float!
+}
+
 type SearchResultsComments {
   collection: CommentCollection!
+
+  """
+  Highest score among all the matching results, regardless of the requested page
+  """
   maxScore: Float!
+
+  """
+  Score of each result of the page, in the same order as the collection nodes
+  """
+  scores: [SearchResultScore!]!
 
   """
   Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
@@ -25744,7 +25782,16 @@ type SearchResultsComments {
 
 type SearchResultsExpenses {
   collection: ExpenseCollection!
+
+  """
+  Highest score among all the matching results, regardless of the requested page
+  """
   maxScore: Float!
+
+  """
+  Score of each result of the page, in the same order as the collection nodes
+  """
+  scores: [SearchResultScore!]!
 
   """
   Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
@@ -25754,7 +25801,16 @@ type SearchResultsExpenses {
 
 type SearchResultsHostApplications {
   collection: HostApplicationCollection!
+
+  """
+  Highest score among all the matching results, regardless of the requested page
+  """
   maxScore: Float!
+
+  """
+  Score of each result of the page, in the same order as the collection nodes
+  """
+  scores: [SearchResultScore!]!
 
   """
   Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
@@ -25764,7 +25820,16 @@ type SearchResultsHostApplications {
 
 type SearchResultsOrders {
   collection: OrderCollection!
+
+  """
+  Highest score among all the matching results, regardless of the requested page
+  """
   maxScore: Float!
+
+  """
+  Score of each result of the page, in the same order as the collection nodes
+  """
+  scores: [SearchResultScore!]!
 
   """
   Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
@@ -25774,7 +25839,16 @@ type SearchResultsOrders {
 
 type SearchResultsTiers {
   collection: TierCollection!
+
+  """
+  Highest score among all the matching results, regardless of the requested page
+  """
   maxScore: Float!
+
+  """
+  Score of each result of the page, in the same order as the collection nodes
+  """
+  scores: [SearchResultScore!]!
 
   """
   Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
@@ -25784,7 +25858,16 @@ type SearchResultsTiers {
 
 type SearchResultsTransactions {
   collection: TransactionCollection!
+
+  """
+  Highest score among all the matching results, regardless of the requested page
+  """
   maxScore: Float!
+
+  """
+  Score of each result of the page, in the same order as the collection nodes
+  """
+  scores: [SearchResultScore!]!
 
   """
   Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
@@ -25794,12 +25877,36 @@ type SearchResultsTransactions {
 
 type SearchResultsUpdates {
   collection: UpdateCollection!
+
+  """
+  Highest score among all the matching results, regardless of the requested page
+  """
   maxScore: Float!
+
+  """
+  Score of each result of the page, in the same order as the collection nodes
+  """
+  scores: [SearchResultScore!]!
 
   """
   Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
   """
   highlights: JSONObject
+}
+
+"""
+The backend used to run a search
+"""
+enum SearchBackend {
+  """
+  OpenSearch cluster (default)
+  """
+  OPENSEARCH
+
+  """
+  [Preview] PostgreSQL: exact totals and numbered pages (up to 50 results per page and offset 5000), search terms up to 200 characters and 12 words. Not all entities are supported yet: requesting an unsupported one returns an error.
+  """
+  POSTGRES
 }
 
 input TransactionReferenceInput {

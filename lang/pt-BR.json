@@ -3743,6 +3743,7 @@
   "Search": "Buscar",
   "search.banks.placeholder": "Buscar bancos por nome ou BIC...",
   "search.clear": "Limpar pesquisa",
+  "search.narrowSearch": "Only the first {count} results can be browsed. Add more words or select a workspace to narrow your search.",
   "search.noResults": "Nenhum resultado",
   "search.placeholder": "Buscar...",
   "searchFilter.host": "Administradores Fiscais",
