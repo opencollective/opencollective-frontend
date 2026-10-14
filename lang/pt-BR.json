@@ -1887,6 +1887,7 @@
   "Fields.description": "Descrição",
   "Fields.displayName": "Nome de exibição",
   "Fields.expectedAt": "Qual é a data esperada de chegada destes fundos?",
+  "Fields.expectedAt.customDate": "Pick a date",
   "Fields.expectedAt.date": "Por volta de {date}",
   "Fields.firstContributionDate": "Data da primeira contribuição",
   "Fields.firstExpenseDate": "Data da primeira despesa",
