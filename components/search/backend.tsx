@@ -13,6 +13,7 @@ import { SearchEntity } from './filters';
 /** Entities that the PostgreSQL backend can search. Unsupported entities must not be requested. */
 const POSTGRES_SUPPORTED_ENTITIES = new Set<SearchEntity>([
   SearchEntity.ACCOUNTS,
+  SearchEntity.COMMENTS,
   SearchEntity.EXPENSES,
   SearchEntity.HOST_APPLICATIONS,
   SearchEntity.ORDERS,
