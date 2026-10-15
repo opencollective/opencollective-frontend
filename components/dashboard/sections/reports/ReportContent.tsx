@@ -23,6 +23,16 @@ export function ReportContent({
 }) {
   const intl = useIntl();
 
+  // `buildReport` returns null when the API has no data for the requested period
+  // (e.g. a period before the account's first transaction)
+  if (!report) {
+    return (
+      <p className="p-4 text-center text-muted-foreground">
+        <FormattedMessage defaultMessage="No transactions this period" id="7Dxdw8" />
+      </p>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 px-0">
