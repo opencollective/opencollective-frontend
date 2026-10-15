@@ -258,7 +258,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
 
       {isLoading ? (
         <Skeleton className="h-48 w-full" />
-      ) : billing?.expenses?.length === 0 ? null : (
+      ) : !billing?.expenses?.length ? null : (
         <React.Fragment>
           <div className="mt-8 mb-4 flex items-center gap-4">
             <div className="font-bold">
