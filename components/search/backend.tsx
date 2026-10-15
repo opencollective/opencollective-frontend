@@ -17,6 +17,7 @@ const POSTGRES_SUPPORTED_ENTITIES = new Set<SearchEntity>([
   SearchEntity.EXPENSES,
   SearchEntity.HOST_APPLICATIONS,
   SearchEntity.ORDERS,
+  SearchEntity.TRANSACTIONS,
   SearchEntity.UPDATES,
 ]);
 
