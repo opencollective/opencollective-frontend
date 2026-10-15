@@ -105,6 +105,18 @@ interface Notification {
 
 type WebhooksAccount = EditCollectiveWebhooksQuery['account'];
 
+/** A save that failed part-way: the edited webhooks, with the ids of those created before the error */
+class WebhooksSaveError extends Error {
+  error: unknown;
+  webhooks: Notification[];
+
+  constructor(error: unknown, webhooks: Notification[]) {
+    super(error instanceof Error ? error.message : String(error));
+    this.error = error;
+    this.webhooks = webhooks;
+  }
+}
+
 interface OwnProps {
   collectiveSlug: string;
 }
@@ -137,6 +149,10 @@ class Webhooks extends React.Component<Props, State> {
   }
 
   componentDidUpdate(oldProps) {
+    // A reload never replaces unsaved edits (a failed save keeps them; a successful one sets the form itself)
+    if (this.state.modified) {
+      return;
+    }
     if (this.getWebhooksFromProps(oldProps) !== this.getWebhooksFromProps(this.props)) {
       this.setState({ webhooks: cloneDeep(this.getWebhooksFromProps(this.props)) });
     }
@@ -253,9 +269,15 @@ class Webhooks extends React.Component<Props, State> {
         this.setState({ status: null });
       }, 3000);
     } catch (e) {
-      const message = getErrorFromGraphqlException(e).message;
+      const message = getErrorFromGraphqlException(e instanceof WebhooksSaveError ? e.error : e).message;
       toast({ variant: 'error', message });
-      this.setState({ status: null });
+      // Keep the edits that were not saved, with the ids of the webhooks that were created, so saving again
+      // retries only what failed
+      if (e instanceof WebhooksSaveError) {
+        this.setState({ status: null, webhooks: cloneDeep(e.webhooks) });
+      } else {
+        this.setState({ status: null });
+      }
     }
   };
 
@@ -492,6 +514,8 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
     const keptIds = new Set(editedWebhooks.map(webhook => webhook.id).filter(Boolean));
     // What the server holds after each successful mutation, in case the reload fails
     const persistedNodes = new Map(account.webhooks.nodes.map(node => [node.id, node]));
+    // The form after an error: the edits, with the ids of the webhooks created so far
+    const formWebhooks = editedWebhooks.map(webhook => ({ ...webhook }));
     let saveError;
     try {
       for (const webhook of webhooks) {
@@ -501,7 +525,7 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
         }
       }
 
-      for (const webhook of editedWebhooks) {
+      for (const webhook of formWebhooks) {
         const saved = savedWebhooks.get(webhook.id);
         const isUrlEdited = !saved || cleanWebhookUrl(saved.webhookUrl) !== cleanWebhookUrl(webhook.webhookUrl);
         const values = {
@@ -516,6 +540,7 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
           });
           const id = result.data.createWebhook.id;
           persistedNodes.set(id, { __typename: 'Webhook', id, ...values });
+          webhook.id = id;
         } else if (saved.type !== webhook.type || isUrlEdited) {
           await client.mutate({
             mutation: updateWebhookMutation,
@@ -539,10 +564,10 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
         variables: { slug: props.collectiveSlug },
         data: { account: { ...account, webhooks: { ...account.webhooks, nodes: [...persistedNodes.values()] } } },
       });
-      throw saveError ?? refetchError;
+      throw new WebhooksSaveError(saveError ?? refetchError, formWebhooks);
     }
     if (saveError) {
-      throw saveError;
+      throw new WebhooksSaveError(saveError, formWebhooks);
     }
 
     return getWebhooksFromAccount(result.data.account);

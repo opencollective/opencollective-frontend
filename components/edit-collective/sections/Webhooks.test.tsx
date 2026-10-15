@@ -140,6 +140,66 @@ describe('Webhooks', () => {
     expect(screen.getByDisplayValue('example.com/new')).toBeInTheDocument();
   });
 
+  it('keeps the edits that failed when the reload after saving fails too, and saves them again', async () => {
+    const createRequest = url => ({
+      query: createWebhookMutation,
+      variables: { webhook: { account: { id: 'account-1' }, activityType: 'ACTIVITY_ALL', webhookUrl: url } },
+    });
+    const node = (id, url) => ({ __typename: 'Webhook', id, activityType: 'ACTIVITY_ALL', webhookUrl: url });
+    const secondCreate = jest.fn(() => ({ data: { createWebhook: { __typename: 'Webhook', id: 'webhook-3' } } }));
+    renderWebhooks([
+      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, result: { data: { account } } },
+      {
+        request: createRequest('https://example.com/first'),
+        result: { data: { createWebhook: { __typename: 'Webhook', id: 'webhook-2' } } },
+      },
+      {
+        request: createRequest('https://example.com/second'),
+        result: { errors: [new GraphQLError('Webhook could not be created')] },
+      },
+      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, error: new Error('Network error') },
+      // Second save: only the failed creation is retried, the first webhook already exists
+      { request: createRequest('https://example.com/second'), result: secondCreate },
+      {
+        request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
+        result: {
+          data: {
+            account: {
+              ...account,
+              webhooks: {
+                ...account.webhooks,
+                nodes: [
+                  ...account.webhooks.nodes,
+                  node('webhook-2', 'https://example.com/first'),
+                  node('webhook-3', 'https://example.com/second'),
+                ],
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    await screen.findByDisplayValue('example.com/hook');
+    fireEvent.click(screen.getByRole('button', { name: /New Webhook/ }));
+    fireEvent.change(screen.getAllByRole('textbox').at(-1), { target: { value: 'example.com/first' } });
+    fireEvent.click(screen.getByRole('button', { name: /New Webhook/ }));
+    fireEvent.change(screen.getAllByRole('textbox').at(-1), { target: { value: 'example.com/second' } });
+    fireEvent.click(screen.getByRole('button', { name: /Save/ }));
+
+    await waitFor(() =>
+      expect(toast).toHaveBeenCalledWith(expect.objectContaining({ message: 'Webhook could not be created' })),
+    );
+    expect(screen.getByDisplayValue('example.com/first')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('example.com/second')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /Save/ }));
+    expect(await screen.findByText('Saved')).toBeInTheDocument();
+    expect(secondCreate).toHaveBeenCalledTimes(1);
+    expect(toast).toHaveBeenCalledTimes(1);
+    expect(screen.getByDisplayValue('example.com/second')).toBeInTheDocument();
+  });
+
   it('keeps an http URL when only the activity changes', async () => {
     const httpAccount = {
       ...account,
