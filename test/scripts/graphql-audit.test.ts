@@ -180,6 +180,24 @@ describe('scripts/graphql-audit', () => {
     expect(result).toEqual({ status: 0, violations: [] });
   });
 
+  it('checks variables declared with a type annotation', () => {
+    const result = audit(
+      [
+        'const BAD_NAME: DocumentNode = gql`query Account { me { id } }`;',
+        'const accountQuery: TypedDocumentNode<Data> = gql`query Other { me { id } }`;',
+      ].join('\n'),
+      ['-v'],
+    );
+    expect(result).toEqual({ status: 1, violations: ['[Variable Name] fixture.ts:1 -> "BAD_NAME"'] });
+  });
+
+  it('rejects unknown flags instead of checking nothing', () => {
+    expect(audit('const BadName = gql`query GoodName { me { id } }`;', ['--operation'])).toEqual({
+      status: 2,
+      violations: [],
+    });
+  });
+
   it('restricts the run to the rules given as flags', () => {
     const source = 'const BadName = gql`query GoodName { me { id } }`;';
     expect(audit(source, ['-o'])).toEqual({ status: 0, violations: [] });

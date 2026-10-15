@@ -30,6 +30,11 @@ if (args.length) {
     if (arg === '-h') {
       enabledRules.hoc = true;
     }
+    if (!['-o', '-v', '-h'].includes(arg)) {
+      // An unknown flag would otherwise disable every rule and pass without checking anything
+      console.error(`Unknown flag "${arg}". Usage: tsx scripts/graphql-audit.ts [-o] [-v] [-h]`);
+      process.exit(2);
+    }
   }
 }
 
@@ -185,7 +190,8 @@ function auditFile(file: string) {
 
     // GraphQL variable name rule
     if (enabledRules.variable) {
-      const varAssignMatch = line.match(/(?:const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*gql(V1)?/);
+      // An optional type annotation (`const accountQuery: DocumentNode = gql`) sits between the name and `=`
+      const varAssignMatch = line.match(/(?:const|let|var)\s+([a-zA-Z0-9_]+)\s*(?::[^=]+)?=\s*gql(V1)?\b/);
       if (varAssignMatch) {
         const varName = varAssignMatch[1];
         let foundTemplate = false;
