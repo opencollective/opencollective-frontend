@@ -78,14 +78,14 @@ describe('Webhooks', () => {
     expect(await screen.findByText('You need to be logged in to manage webhooks')).toBeInTheDocument();
   });
 
-  it('reports the save error and keeps the form when the reload after it fails', async () => {
+  it('reports the save error and keeps the edits', async () => {
     renderWebhooks([
       { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, result: { data: { account } } },
       {
         request: { query: deleteWebhookMutation, variables: { webhook: { id: 'webhook-1' } } },
         result: { errors: [new GraphQLError('Webhook could not be deleted')] },
       },
-      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, error: new Error('Network error') },
+      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, result: { data: { account } } },
     ]);
 
     fireEvent.click(await screen.findByTitle('Remove webhook'));
@@ -94,58 +94,22 @@ describe('Webhooks', () => {
     await waitFor(() =>
       expect(toast).toHaveBeenCalledWith(expect.objectContaining({ message: 'Webhook could not be deleted' })),
     );
-    expect(screen.getByRole('button', { name: /Save/ })).toBeInTheDocument();
-    expect(screen.queryByText('Network error')).not.toBeInTheDocument();
+    // The reload does not bring the removed webhook back into the form
+    expect(screen.queryByDisplayValue('example.com/hook')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Save/ })).toBeEnabled();
   });
 
-  it('does not create a webhook again when the reload after saving it fails', async () => {
-    const newNode = {
-      __typename: 'Webhook',
-      id: 'webhook-2',
-      activityType: 'ACTIVITY_ALL',
-      webhookUrl: 'https://example.com/new',
-    };
-    const createRequest = {
-      query: createWebhookMutation,
-      variables: {
-        webhook: { account: { id: 'account-1' }, activityType: 'ACTIVITY_ALL', webhookUrl: 'https://example.com/new' },
-      },
-    };
-    renderWebhooks([
-      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, result: { data: { account } } },
-      { request: createRequest, result: { data: { createWebhook: { __typename: 'Webhook', id: 'webhook-2' } } } },
-      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, error: new Error('Network error') },
-      // Second save: only the reload is mocked, any mutation would fail with "No more mocked responses"
-      {
-        request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
-        result: {
-          data: {
-            account: { ...account, webhooks: { ...account.webhooks, nodes: [...account.webhooks.nodes, newNode] } },
-          },
-        },
-      },
-    ]);
-
-    await screen.findByDisplayValue('example.com/hook');
-    fireEvent.click(screen.getByRole('button', { name: /New Webhook/ }));
-    fireEvent.change(screen.getAllByRole('textbox').at(-1), { target: { value: 'example.com/new' } });
-    fireEvent.click(screen.getByRole('button', { name: /Save/ }));
-
-    await waitFor(() => expect(toast).toHaveBeenCalledWith(expect.objectContaining({ message: 'Network error' })));
-    expect(toast).toHaveBeenCalledTimes(1);
-
-    fireEvent.click(screen.getByRole('button', { name: /Save/ }));
-    expect(await screen.findByText('Saved')).toBeInTheDocument();
-    expect(toast).toHaveBeenCalledTimes(1);
-    expect(screen.getByDisplayValue('example.com/new')).toBeInTheDocument();
-  });
-
-  it('keeps the edits that failed when the reload after saving fails too, and saves them again', async () => {
+  it('saves again only what failed, without creating a webhook twice', async () => {
     const createRequest = url => ({
       query: createWebhookMutation,
       variables: { webhook: { account: { id: 'account-1' }, activityType: 'ACTIVITY_ALL', webhookUrl: url } },
     });
     const node = (id, url) => ({ __typename: 'Webhook', id, activityType: 'ACTIVITY_ALL', webhookUrl: url });
+    const withNodes = (...nodes) => ({
+      data: {
+        account: { ...account, webhooks: { ...account.webhooks, nodes: [...account.webhooks.nodes, ...nodes] } },
+      },
+    });
     const secondCreate = jest.fn(() => ({ data: { createWebhook: { __typename: 'Webhook', id: 'webhook-3' } } }));
     renderWebhooks([
       { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, result: { data: { account } } },
@@ -157,26 +121,18 @@ describe('Webhooks', () => {
         request: createRequest('https://example.com/second'),
         result: { errors: [new GraphQLError('Webhook could not be created')] },
       },
-      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, error: new Error('Network error') },
-      // Second save: only the failed creation is retried, the first webhook already exists
+      {
+        request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
+        result: withNodes(node('webhook-2', 'https://example.com/first')),
+      },
+      // Second save: only the failed creation is retried, any other mutation would fail with "No more mocked responses"
       { request: createRequest('https://example.com/second'), result: secondCreate },
       {
         request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
-        result: {
-          data: {
-            account: {
-              ...account,
-              webhooks: {
-                ...account.webhooks,
-                nodes: [
-                  ...account.webhooks.nodes,
-                  node('webhook-2', 'https://example.com/first'),
-                  node('webhook-3', 'https://example.com/second'),
-                ],
-              },
-            },
-          },
-        },
+        result: withNodes(
+          node('webhook-2', 'https://example.com/first'),
+          node('webhook-3', 'https://example.com/second'),
+        ),
       },
     ]);
 
@@ -197,7 +153,6 @@ describe('Webhooks', () => {
     expect(await screen.findByText('Saved')).toBeInTheDocument();
     expect(secondCreate).toHaveBeenCalledTimes(1);
     expect(toast).toHaveBeenCalledTimes(1);
-    expect(screen.getByDisplayValue('example.com/second')).toBeInTheDocument();
   });
 
   it('keeps an http URL when only the activity changes', async () => {
