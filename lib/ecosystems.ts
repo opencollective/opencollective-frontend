@@ -77,6 +77,8 @@ export type EcosystemsRepositorySnapshot = {
   license: string | null;
   /** Repository topics (e.g. GitHub topics) */
   topics: string[];
+  /** Owner kind as reported by ecosyste.ms (`user` for personal accounts, `organization`) */
+  ownerKind: string | null;
   archived: boolean | null;
   /** Repository creation date */
   createdAt: string | null;
@@ -117,6 +119,7 @@ export function toRepositorySnapshot(entry: EcosystemsRepoSummary): EcosystemsRe
     isFork: repository?.fork ?? null,
     license: repository?.license ?? null,
     topics: repository?.topics ?? [],
+    ownerKind: entry.owner?.kind ?? null,
     archived: repository?.archived ?? null,
     createdAt: repository?.created_at ?? null,
     lastCommitAt: repository?.pushed_at ?? null,

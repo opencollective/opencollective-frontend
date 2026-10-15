@@ -21,29 +21,45 @@ export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
   const { toast } = useToast();
   const intl = useIntl();
 
-  const callWith =
-    (...args) =>
-    async () => {
-      setLoading(true);
-      setError(undefined);
-      setData(undefined);
+  // Keep the latest `fn`/options in refs so `call`/`callWith` can keep a stable identity across
+  // renders (callers may depend on them, e.g. in effect dependency arrays).
+  const fnRef = React.useRef(fn);
+  fnRef.current = fn;
+  const toastRef = React.useRef(toast);
+  toastRef.current = toast;
+  const intlRef = React.useRef(intl);
+  intlRef.current = intl;
+  const useErrorToastRef = React.useRef(useErrorToast);
+  useErrorToastRef.current = useErrorToast;
 
-      try {
-        const response = await fn(...args);
-        setData(response);
-      } catch (e) {
-        setError(e);
-        // eslint-disable-next-line no-console
-        console.error(e);
-        if (useErrorToast) {
-          toast({ variant: 'error', message: formatErrorMessage(intl, getErrorFromGraphqlException(e)) });
+  const callWith = React.useCallback(
+    (...args: Parameters<T>) =>
+      async () => {
+        setLoading(true);
+        setError(undefined);
+        setData(undefined);
+
+        try {
+          const response = await fnRef.current(...args);
+          setData(response);
+        } catch (e) {
+          setError(e);
+          // eslint-disable-next-line no-console
+          console.error(e);
+          if (useErrorToastRef.current) {
+            toastRef.current({
+              variant: 'error',
+              message: formatErrorMessage(intlRef.current, getErrorFromGraphqlException(e)),
+            });
+          }
+        } finally {
+          setLoading(false);
         }
-      } finally {
-        setLoading(false);
-      }
-    };
+      },
+    [],
+  );
 
-  const call = (...args) => callWith(...args)();
+  const call = React.useCallback((...args: Parameters<T>) => callWith(...args)(), [callWith]);
 
   return { loading, call, callWith, data, error };
 };
