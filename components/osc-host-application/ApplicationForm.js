@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { ArrowLeft, ArrowRight, Info } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Info, X } from 'lucide-react';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import spdxLicenses from 'spdx-license-list';
@@ -21,13 +21,14 @@ import { gql } from '../../lib/graphql/helpers';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { i18nLabels } from '../../lib/i18n/custom-application-form';
 
+import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { FormField } from '../FormField';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
 import { Alert, AlertDescription } from '../ui/Alert';
+import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { FormSectionTitle } from '../ui/FormSectionTitle';
@@ -136,6 +137,7 @@ const ApplicationForm = ({
   popularTags,
 }) => {
   const intl = useIntl();
+  const removeLabel = intl.formatMessage({ id: 'Remove', defaultMessage: 'Remove' });
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
 
   const [codeSectionExpanded, setCodeSectionExpanded] = useState(false);
@@ -641,26 +643,46 @@ const ApplicationForm = ({
                           )}
                         </h4>
 
-                        <div className="flex w-full flex-wrap" data-cy="profile-card">
-                          {LoggedInUser ? (
-                            <OnboardingProfileCard
-                              key={LoggedInUser.collective.id}
-                              collective={LoggedInUser.collective}
-                            />
-                          ) : (
-                            values.user?.name && <OnboardingProfileCard key="0" collective={values.user} />
+                        <div className="flex w-full flex-wrap items-center gap-2" data-cy="profile-card">
+                          {(LoggedInUser || values.user?.name) && (
+                            <Badge size="sm" type="outline" className="truncate text-nowrap" data-cy="admin-badge">
+                              <Avatar
+                                collective={LoggedInUser ? LoggedInUser.collective : values.user}
+                                radius={16}
+                                displayTitle={false}
+                              />
+                              <span className="truncate" data-cy="name-of-admins">
+                                {LoggedInUser ? LoggedInUser.collective.name : values.user.name}
+                              </span>
+                            </Badge>
                           )}
                           {values.inviteMembers?.map(invite => (
-                            <OnboardingProfileCard
+                            <Badge
                               key={invite.memberAccount.id}
-                              collective={invite.memberAccount}
-                              removeAdmin={() =>
-                                setFieldValue(
-                                  'inviteMembers',
-                                  values.inviteMembers.filter(i => i.memberAccount.id !== invite.memberAccount.id),
-                                )
-                              }
-                            />
+                              size="sm"
+                              type="outline"
+                              className="gap-1 pr-1"
+                              data-cy="admin-badge"
+                            >
+                              <Avatar collective={invite.memberAccount} radius={16} displayTitle={false} />
+                              <span className="truncate" data-cy="name-of-admins">
+                                {invite.memberAccount.name}
+                              </span>
+                              <button
+                                type="button"
+                                data-cy="remove-user"
+                                aria-label={`${removeLabel} ${invite.memberAccount.name}`}
+                                className="rounded-full p-0.5 transition-colors hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-ring"
+                                onClick={() =>
+                                  setFieldValue(
+                                    'inviteMembers',
+                                    values.inviteMembers.filter(i => i.memberAccount.id !== invite.memberAccount.id),
+                                  )
+                                }
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
                           ))}
                         </div>
 

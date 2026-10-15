@@ -12,7 +12,7 @@
 import '@testing-library/jest-dom';
 
 import React from 'react';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 
 import { withRequiredProviders } from '../../test/providers';
 
@@ -39,7 +39,6 @@ jest.mock('@apollo/client', () => {
 
 jest.mock('../collectives/HomeNextIllustration', () => () => <img alt="mock" />);
 jest.mock('../CollectivePickerAsync', () => () => <div data-testid="collective-picker-mock" />);
-jest.mock('../onboarding-modal/OnboardingProfileCard', () => () => <div data-testid="profile-card-mock" />);
 
 jest.mock('../../lib/ecosystems', () => ({
   ...jest.requireActual('../../lib/ecosystems'),
@@ -421,5 +420,47 @@ describe('ApplicationForm - collective.tags field', () => {
     submitForm();
     await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
     expect(mockMutate.mock.calls[0][0].variables.collective.tags).toEqual([]);
+  });
+});
+
+// ─── Your Team ───────────────────────────────────────────────────────────────
+
+describe('ApplicationForm - Your Team', () => {
+  const invitedAdmin = {
+    role: 'ADMIN',
+    memberAccount: { id: 'a1', name: 'Amazing New User', slug: 'amazing-new-user', type: 'USER' },
+  };
+  const initialValuesWithInvites = { ...initialValues, inviteMembers: [invitedAdmin] };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMutate.mockResolvedValue({ data: { createCollective: null } });
+  });
+
+  it('lists the current user and the invited admins as badges', async () => {
+    renderForm({ initialValues: initialValuesWithInvites });
+    fillRequiredFields();
+
+    const team = document.querySelector('[data-cy="profile-card"]');
+    expect(team.querySelectorAll('[data-cy="admin-badge"]')).toHaveLength(2);
+    expect(within(team).getByText('Thomas Anderson')).toBeInTheDocument();
+    expect(within(team).getByText('Amazing New User')).toBeInTheDocument();
+    // Only invited admins can be removed
+    expect(within(team).queryByRole('button', { name: /remove thomas anderson/i })).not.toBeInTheDocument();
+    expect(within(team).getByRole('button', { name: /remove amazing new user/i })).toBeInTheDocument();
+  });
+
+  it('removes an invited admin from its badge', async () => {
+    renderForm({ initialValues: initialValuesWithInvites });
+    fillRequiredFields();
+
+    fireEvent.click(screen.getByRole('button', { name: /remove amazing new user/i }));
+
+    const team = document.querySelector('[data-cy="profile-card"]');
+    expect(within(team).queryByText('Amazing New User')).not.toBeInTheDocument();
+
+    submitForm();
+    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+    expect(mockMutate.mock.calls[0][0].variables.inviteMembers).toEqual([]);
   });
 });
