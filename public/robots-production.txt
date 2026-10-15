@@ -27,3 +27,7 @@ Disallow: /
 
 User-agent: BLEXBot
 Disallow: /
+
+User-agent: *
+Disallow: /search$
+Disallow: /search?
