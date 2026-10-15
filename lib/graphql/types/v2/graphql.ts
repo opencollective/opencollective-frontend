@@ -177,6 +177,8 @@ export type Account = {
   virtualCardMerchants?: Maybe<AccountCollection>;
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
+  /** Webhooks registered on this account. Only available to admins. Scope: "webhooks". */
+  webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
 };
@@ -512,6 +514,13 @@ export type AccountVirtualCardsArgs = {
   orderBy?: InputMaybe<ChronologicalOrderInput>;
   state?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<VirtualCardStatus>>>;
+};
+
+
+/** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
+export type AccountWebhooksArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 export enum AccountCacheType {

@@ -762,6 +762,21 @@ interface Account {
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+
+  """
+  Webhooks registered on this account. Only available to admins. Scope: "webhooks".
+  """
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     """
     The number of results to fetch (default 10, max 1000)
@@ -3640,6 +3655,17 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -4083,17 +4109,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 
   """
   Number of unique financial contributors.
@@ -5831,139 +5846,29 @@ enum OppositeAccountScope {
 }
 
 """
-A collection of "Expenses"
+A collection of webhooks
 """
-type ExpenseCollection implements Collection {
+type WebhookCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
-  nodes: [Expense]
-  totalAmount: ExpenseCollectionTotalAmount
-
-  """
-  The accounts that are payees of the expenses in this collection (scoped to the main query arguments), regardless of pagination. Returns a paginated and searchable collection.
-  """
-  payees(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Search term to filter by name or slug
-    """
-    searchTerm: String
-  ): AccountCollection!
-}
-
-type ExpenseCollectionTotalAmount {
-  amount(currency: Currency = USD): Amount
-  amountsByCurrency: [Amount]
+  nodes: [Webhook]
 }
 
 """
-Describes the role of the filtered account/host in an expense. Controls which side the account, accounts, and host/hostContext arguments apply to.
+An webhook attached to an account
 """
-enum ExpenseDirection {
-  """
-  Submitted: The account is the one who submitted the expense and possibly the beneficiary.
-  """
-  SUBMITTED
+type Webhook {
+  id: String!
 
   """
-  Received: The account is the one who received the expense and the one who's paying for it.
+  The resource public id (ie: not_xxxxxxxx)
   """
-  RECEIVED
-}
-
-"""
-Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
-"""
-enum ExpenseStatusFilter {
-  DRAFT
-  UNVERIFIED
-  PENDING
-  INCOMPLETE
-  APPROVED
-  REJECTED
-  PROCESSING
-  ERROR
-  PAID
-  SCHEDULED_FOR_PAYMENT
-  SPAM
-  CANCELED
-  INVITE_DECLINED
-
-  """
-  Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
-  """
-  READY_TO_PAY
-
-  """
-  Only expenses that are on hold
-  """
-  ON_HOLD
-}
-
-enum PayoutMethodType {
-  OTHER
-  PAYPAL
-  BANK_ACCOUNT
-  ACCOUNT_BALANCE
-  CREDIT_CARD
-  STRIPE
-}
-
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
-
-"""
-Defines role of the last comment author
-"""
-enum LastCommentBy {
-  """
-  Expense Submitter
-  """
-  USER
-
-  """
-  Last comment author is not an admin of the expense payee (FromCollectiveId)
-  """
-  NON_FROM_ACCOUNT_ADMIN
-
-  """
-  Fiscal Host Admin
-  """
-  HOST_ADMIN
-
-  """
-  Not a Fiscal Host Admin
-  """
-  NON_HOST_ADMIN
-
-  """
-  Collective Admin
-  """
-  COLLECTIVE_ADMIN
-}
-
-input ExpenseActivityFilter {
-  """
-  Activities triggered by this individual
-  """
-  individual: AccountReferenceInput
-
-  """
-  The type(s) of activities to filter by
-  """
-  type: [ActivityType!]
+  publicId: String!
+  legacyId: Int! @deprecated(reason: "2026-02-25: use publicId")
+  activityType: ActivityType
+  webhookUrl: URL
+  account: Account!
 }
 
 enum ActivityType {
@@ -6130,6 +6035,142 @@ enum ActivityType {
   KYC_REQUESTED
   KYC_REVOKED
   KYC_VERIFIED
+}
+
+"""
+A collection of "Expenses"
+"""
+type ExpenseCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Expense]
+  totalAmount: ExpenseCollectionTotalAmount
+
+  """
+  The accounts that are payees of the expenses in this collection (scoped to the main query arguments), regardless of pagination. Returns a paginated and searchable collection.
+  """
+  payees(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Search term to filter by name or slug
+    """
+    searchTerm: String
+  ): AccountCollection!
+}
+
+type ExpenseCollectionTotalAmount {
+  amount(currency: Currency = USD): Amount
+  amountsByCurrency: [Amount]
+}
+
+"""
+Describes the role of the filtered account/host in an expense. Controls which side the account, accounts, and host/hostContext arguments apply to.
+"""
+enum ExpenseDirection {
+  """
+  Submitted: The account is the one who submitted the expense and possibly the beneficiary.
+  """
+  SUBMITTED
+
+  """
+  Received: The account is the one who received the expense and the one who's paying for it.
+  """
+  RECEIVED
+}
+
+"""
+Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
+"""
+enum ExpenseStatusFilter {
+  DRAFT
+  UNVERIFIED
+  PENDING
+  INCOMPLETE
+  APPROVED
+  REJECTED
+  PROCESSING
+  ERROR
+  PAID
+  SCHEDULED_FOR_PAYMENT
+  SPAM
+  CANCELED
+  INVITE_DECLINED
+
+  """
+  Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
+  """
+  READY_TO_PAY
+
+  """
+  Only expenses that are on hold
+  """
+  ON_HOLD
+}
+
+enum PayoutMethodType {
+  OTHER
+  PAYPAL
+  BANK_ACCOUNT
+  ACCOUNT_BALANCE
+  CREDIT_CARD
+  STRIPE
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+Defines role of the last comment author
+"""
+enum LastCommentBy {
+  """
+  Expense Submitter
+  """
+  USER
+
+  """
+  Last comment author is not an admin of the expense payee (FromCollectiveId)
+  """
+  NON_FROM_ACCOUNT_ADMIN
+
+  """
+  Fiscal Host Admin
+  """
+  HOST_ADMIN
+
+  """
+  Not a Fiscal Host Admin
+  """
+  NON_HOST_ADMIN
+
+  """
+  Collective Admin
+  """
+  COLLECTIVE_ADMIN
+}
+
+input ExpenseActivityFilter {
+  """
+  Activities triggered by this individual
+  """
+  individual: AccountReferenceInput
+
+  """
+  The type(s) of activities to filter by
+  """
+  type: [ActivityType!]
 }
 
 """
@@ -8164,32 +8205,6 @@ type KYCVerificationPermissions {
   Whether this KYC Verification can be revoked by the logged in user
   """
   canRevokeKYCVerification: Boolean!
-}
-
-"""
-A collection of webhooks
-"""
-type WebhookCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Webhook]
-}
-
-"""
-An webhook attached to an account
-"""
-type Webhook {
-  id: String!
-
-  """
-  The resource public id (ie: not_xxxxxxxx)
-  """
-  publicId: String!
-  legacyId: Int! @deprecated(reason: "2026-02-25: use publicId")
-  activityType: ActivityType
-  webhookUrl: URL
-  account: Account!
 }
 
 """
@@ -11231,6 +11246,17 @@ type Bot implements Account {
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -11676,17 +11702,6 @@ type Bot implements Account {
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 }
 
 """
@@ -12300,6 +12315,17 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -12745,17 +12771,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -13959,6 +13974,17 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -14404,17 +14430,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -15327,6 +15342,17 @@ type Individual implements Account {
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -15770,17 +15796,6 @@ type Individual implements Account {
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 
   """
   Company slugs the user is part of.
@@ -16721,6 +16736,17 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -17164,17 +17190,6 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 
   """
   Number of unique financial contributors.
@@ -18192,6 +18207,17 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -18637,17 +18663,6 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -19370,6 +19385,17 @@ type Vendor implements Account & AccountWithContributions {
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -19815,17 +19841,6 @@ type Vendor implements Account & AccountWithContributions {
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 
   """
   Number of unique financial contributors.
@@ -23739,6 +23754,17 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -24184,17 +24210,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -24965,6 +24980,17 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     createdBy: [AccountReferenceInput]
   ): OrderCollection!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): WebhookCollection!
   expenses(
     direction: ExpenseDirection
 
@@ -25410,17 +25436,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     accounts: [AccountReferenceInput!]
   ): KYCVerificationCollection!
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
