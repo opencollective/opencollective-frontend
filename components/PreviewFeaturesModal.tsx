@@ -2,24 +2,15 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import type { PreviewFeature } from '../lib/preview-features';
 
+import { editAccountSettingsMutation } from './edit-collective/mutations';
 import CommentIcon from './icons/CommentIcon';
 import { Badge } from './ui/Badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
 import { Switch } from './ui/Switch';
 import Link from './Link';
-
-const editAccountSettingsMutation = gql`
-  mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
-    editAccountSetting(account: $account, key: $key, value: $value) {
-      id
-      settings
-    }
-  }
-`;
 
 const FeatureListItem = ({
   feature,

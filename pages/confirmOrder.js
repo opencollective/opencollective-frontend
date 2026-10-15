@@ -136,8 +136,8 @@ class ConfirmOrderPage extends React.Component {
   }
 }
 
-const confirmOrderMutation = gql`
-  mutation ConfirmOrder($order: OrderReferenceInput!) {
+const confirmOrderPageMutation = gql`
+  mutation ConfirmOrderPage($order: OrderReferenceInput!) {
     confirmOrder(order: $order) {
       order {
         id
@@ -157,7 +157,7 @@ const confirmOrderMutation = gql`
   }
 `;
 
-const addConfirmOrderMutation = graphql(confirmOrderMutation, {
+const addConfirmOrderMutation = graphql(confirmOrderPageMutation, {
   name: 'confirmOrder',
 });
 

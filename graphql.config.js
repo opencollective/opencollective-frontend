@@ -2,6 +2,8 @@ module.exports = {
   projects: {
     default: {
       schema: 'lib/graphql/schemaV2.graphql',
+      // Every gql document, so that unique-operation-name and unique-fragment-name can compare them
+      documents: ['{components,lib,pages,test}/**/*.{js,jsx,ts,tsx}', '!lib/graphql/types/**'],
       extensions: {
         endpoints: {
           dev: 'http://localhost:3060/graphql/v2',

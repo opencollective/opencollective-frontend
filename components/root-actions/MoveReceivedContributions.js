@@ -22,8 +22,8 @@ import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
 import { useToast } from '../ui/useToast';
 
-const moveOrdersMutation = gql`
-  mutation MoveOrders($orders: [OrderReferenceInput!]!, $tier: TierReferenceInput) {
+const moveOrdersToTierMutation = gql`
+  mutation MoveOrdersToTier($orders: [OrderReferenceInput!]!, $tier: TierReferenceInput) {
     moveOrders(orders: $orders, tier: $tier) {
       id
       legacyId
@@ -121,7 +121,7 @@ const MoveReceivedContributions = () => {
   const tiersOptions = React.useMemo(() => getTiersOptions(tiersNodes, accountSettings), [tiersNodes, accountSettings]);
 
   // Move contributions mutation
-  const [submitMoveContributions] = useMutation(moveOrdersMutation);
+  const [submitMoveContributions] = useMutation(moveOrdersToTierMutation);
   const moveContributions = async () => {
     try {
       // Prepare variables
