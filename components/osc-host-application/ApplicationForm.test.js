@@ -10,7 +10,7 @@
 import '@testing-library/jest-dom';
 
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { withRequiredProviders } from '../../test/providers';
 
@@ -40,7 +40,14 @@ jest.mock('../CollectivePickerAsync', () => () => <div data-testid="collective-p
 jest.mock('../CollectiveTagsInput', () => () => <div data-testid="collective-tags-input-mock" />);
 jest.mock('../onboarding-modal/OnboardingProfileCard', () => () => <div data-testid="profile-card-mock" />);
 
+jest.mock('../../lib/ecosyste.ms', () => ({
+  ...jest.requireActual('../../lib/ecosyste.ms'),
+  fetchEcosystemsRepositoryInfo: jest.fn(),
+}));
+
 // ─── Imports (after mocks) ────────────────────────────────────────────────────
+
+import { fetchEcosystemsRepositoryInfo } from '../../lib/ecosyste.ms';
 
 import ApplicationForm from './ApplicationForm';
 
@@ -159,5 +166,132 @@ describe('ApplicationForm - applicationData.hasLegalEntity', () => {
     const { applicationData } = mockMutate.mock.calls[0][0].variables;
     expect(applicationData.hasLegalEntity).toBe(false);
     expect(screen.getByRole('checkbox', { name: /existing legal entity/i })).not.toBeChecked();
+  });
+});
+
+// ─── ecosyste.ms repository info ──────────────────────────────────────────────
+
+const ECOSYSTEMS_REPO_ENTRY = {
+  packages: [
+    {
+      name: 'my-package',
+      ecosystem: 'npm',
+      maintainers: [{ login: 'betree', name: null }],
+      dependent_packages_count: 4,
+      dependent_repos_count: 12,
+      first_release_published_at: '2020-01-01T00:00:00.000Z',
+      latest_release_published_at: '2026-01-01T00:00:00.000Z',
+    },
+  ],
+  repository: {
+    full_name: 'foo/bar',
+    owner: 'foo',
+    description: 'A test repository',
+    stargazers_count: 42,
+    forks_count: 7,
+    fork: false,
+    license: 'mit',
+    archived: true,
+    created_at: '2016-12-12T04:36:39.000Z',
+    pushed_at: '2026-10-11T11:24:07.000Z',
+    commit_stats: { total_commits: 120, total_committers: 8, last_synced_commit: 'abc123' },
+  },
+  contributors: { total_committers: 8 },
+  issues: { issues_count: 3 },
+  owner: { login: 'foo' },
+};
+
+const REPOSITORY_INFO_DEBOUNCE_MS = 800; // Must match ApplicationForm.js
+
+const changeRepositoryUrl = url =>
+  fireEvent.change(screen.getByLabelText(/repository url/i), { target: { value: url } });
+
+const flushRepositoryInfoDebounce = async () => {
+  await act(async () => {
+    jest.advanceTimersByTime(REPOSITORY_INFO_DEBOUNCE_MS);
+  });
+  // Flush the fetch promise chain and the effects that expose the result to the form
+  await act(async () => {});
+};
+
+describe('ApplicationForm - ecosyste.ms repository info', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    mockMutate.mockResolvedValue({ data: { createCollective: null } });
+    fetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('fetches the repository info when the repository URL value changes', async () => {
+    renderForm();
+
+    changeRepositoryUrl('https://github.com/foo/bar');
+    await flushRepositoryInfoDebounce();
+
+    expect(fetchEcosystemsRepositoryInfo).toHaveBeenCalledWith('https://github.com/foo/bar');
+  });
+
+  it('does not fetch for empty or invalid URLs', async () => {
+    renderForm();
+
+    changeRepositoryUrl('not-a-url');
+    await flushRepositoryInfoDebounce();
+    changeRepositoryUrl('');
+    await flushRepositoryInfoDebounce();
+
+    expect(fetchEcosystemsRepositoryInfo).not.toHaveBeenCalled();
+  });
+
+  it('stores a compact ecosyste.ms snapshot in applicationData on submit', async () => {
+    renderForm();
+    fillRequiredFields();
+    changeRepositoryUrl('https://github.com/foo/bar');
+    await flushRepositoryInfoDebounce();
+
+    submitForm();
+    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+
+    const { applicationData } = mockMutate.mock.calls[0][0].variables;
+    expect(applicationData.ecosystemsRepositoryInfo).toEqual({
+      fullName: 'foo/bar',
+      owner: 'foo',
+      description: 'A test repository',
+      stars: 42,
+      forks: 7,
+      isFork: false,
+      license: 'mit',
+      archived: true,
+      createdAt: '2016-12-12T04:36:39.000Z',
+      lastCommitAt: '2026-10-11T11:24:07.000Z',
+      lastCommitSha: 'abc123',
+      commitStats: { totalCommits: 120, totalCommitters: 8 },
+      packages: [
+        {
+          name: 'my-package',
+          ecosystem: 'npm',
+          maintainers: [{ login: 'betree', name: null }],
+          dependentPackagesCount: 4,
+          dependentReposCount: 12,
+          firstReleasePublishedAt: '2020-01-01T00:00:00.000Z',
+          latestReleasePublishedAt: '2026-01-01T00:00:00.000Z',
+        },
+      ],
+    });
+  });
+
+  it('omits the snapshot when the repository info was not fetched', async () => {
+    renderForm();
+    fillRequiredFields();
+    changeRepositoryUrl('https://github.com/foo/bar');
+
+    submitForm();
+    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+
+    const { applicationData } = mockMutate.mock.calls[0][0].variables;
+    expect(applicationData.ecosystemsRepositoryInfo).toBeUndefined();
   });
 });
