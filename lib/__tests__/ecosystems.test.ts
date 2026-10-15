@@ -36,7 +36,7 @@ const REPO_ENTRY: EcosystemsRepoSummary = {
   },
   contributors: { total_committers: 8 },
   issues: { issues_count: 3 },
-  owner: { login: 'foo' },
+  owner: { login: 'foo', kind: 'organization' },
 };
 
 describe('lib/ecosystems', () => {
@@ -52,6 +52,7 @@ describe('lib/ecosystems', () => {
         isFork: false,
         license: 'mit',
         topics: ['opencollective', 'react'],
+        ownerKind: 'organization',
         archived: true,
         createdAt: '2016-12-12T04:36:39.000Z',
         lastCommitAt: '2026-10-11T11:24:07.000Z',
@@ -94,6 +95,7 @@ describe('lib/ecosystems', () => {
         isFork: null,
         license: null,
         topics: [],
+        ownerKind: null,
         archived: null,
         createdAt: null,
         lastCommitAt: null,

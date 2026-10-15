@@ -192,14 +192,14 @@ const ECOSYSTEMS_REPO_ENTRY = {
     fork: false,
     license: 'mit',
     topics: ['opencollective', 'react'],
-    archived: true,
+    archived: false,
     created_at: '2016-12-12T04:36:39.000Z',
     pushed_at: '2026-10-11T11:24:07.000Z',
     commit_stats: { total_commits: 120, total_committers: 8, last_synced_commit: 'abc123' },
   },
   contributors: { total_committers: 8 },
   issues: { issues_count: 3 },
-  owner: { login: 'foo' },
+  owner: { login: 'foo', kind: 'organization' },
 };
 
 const REPOSITORY_INFO_DEBOUNCE_MS = 800; // Must match ApplicationForm.js
@@ -247,6 +247,33 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
     expect(fetchEcosystemsRepositoryInfo).not.toHaveBeenCalled();
   });
 
+  it('shows a loading state in the repository URL field and blocks submission while the lookup is pending', async () => {
+    renderForm();
+    fillRequiredFields();
+
+    changeRepositoryUrl('https://github.com/foo/bar');
+
+    // The lookup is pending (debounce + request): the field shows a spinner and the form cannot be submitted
+    const loadingIndicator = () => document.querySelector('[data-cy="ccf-form-repository-url-loading"]');
+    const submitButton = () => screen.getByRole('button', { name: /submit application/i });
+    expect(loadingIndicator()).toBeInTheDocument();
+    expect(submitButton()).toBeDisabled();
+
+    // Let Formik's async submission run while the lookup is still pending
+    submitForm();
+    await act(async () => {});
+    expect(mockMutate).not.toHaveBeenCalled();
+
+    await flushRepositoryInfoDebounce();
+
+    // Once the lookup settled, the field is no longer loading and the form can be submitted
+    expect(loadingIndicator()).not.toBeInTheDocument();
+    expect(submitButton()).toBeEnabled();
+
+    submitForm();
+    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+  });
+
   it('stores a compact ecosyste.ms snapshot in applicationData on submit', async () => {
     renderForm();
     fillRequiredFields();
@@ -266,7 +293,8 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
       isFork: false,
       license: 'mit',
       topics: ['opencollective', 'react'],
-      archived: true,
+      ownerKind: 'organization',
+      archived: false,
       createdAt: '2016-12-12T04:36:39.000Z',
       lastCommitAt: '2026-10-11T11:24:07.000Z',
       lastCommitSha: 'abc123',
@@ -285,16 +313,23 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
     });
   });
 
-  it('omits the snapshot when the repository info was not fetched', async () => {
-    renderForm();
-    fillRequiredFields();
-    changeRepositoryUrl('https://github.com/foo/bar');
+  it('omits the snapshot when the repository info could not be fetched', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      fetchEcosystemsRepositoryInfo.mockRejectedValue(new Error('failed to fetch'));
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
 
-    submitForm();
-    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+      submitForm();
+      await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
 
-    const { applicationData } = mockMutate.mock.calls[0][0].variables;
-    expect(applicationData.ecosystemsRepositoryInfo).toBeUndefined();
+      const { applicationData } = mockMutate.mock.calls[0][0].variables;
+      expect(applicationData.ecosystemsRepositoryInfo).toBeUndefined();
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });
 
@@ -423,6 +458,163 @@ describe('ApplicationForm - collective.tags field', () => {
   });
 });
 
+// ─── Application rules ───────────────────────────────────────────────────────
+
+const weakRepositoryEntry = (overrides = {}) => ({
+  ...ECOSYSTEMS_REPO_ENTRY,
+  packages: [],
+  repository: {
+    ...ECOSYSTEMS_REPO_ENTRY.repository,
+    commitStats: { total_commits: 3, total_committers: 1, last_synced_commit: 'abc123' },
+    forks_count: 0,
+  },
+  ...overrides,
+});
+
+const rulesPanel = () => document.querySelector('[data-cy="ccf-form-rules"]');
+const fieldRules = field => document.querySelector(`[data-cy="ccf-form-rules-${field}"]`);
+const submitButton = () => screen.getByRole('button', { name: /submit application/i });
+
+describe('ApplicationForm - application rules', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMutate.mockResolvedValue({ data: { createCollective: null } });
+    fetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
+  });
+
+  it('shows warnings next to the fields they relate to, without blocking the submission', async () => {
+    renderForm();
+    fillRequiredFields();
+
+    // Warnings are anchored to their field, and the submission panel only carries errors
+    expect(within(fieldRules('team')).getByText(/at least one more admin/i)).toBeInTheDocument();
+    expect(within(fieldRules('message')).getByText(/tell us more about your project/i)).toBeInTheDocument();
+    expect(rulesPanel()).toBeNull();
+    expect(submitButton()).toBeEnabled();
+
+    submitForm();
+    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+  });
+
+  it('does not block when the repository cannot be found', async () => {
+    jest.useFakeTimers();
+    try {
+      fetchEcosystemsRepositoryInfo.mockResolvedValue({ ...ECOSYSTEMS_REPO_ENTRY, repository: null });
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // A repository we cannot find is a warning next to its field, never a blocker
+      expect(within(fieldRules('repositoryUrl')).getByText(/couldn't find this repository/i)).toBeInTheDocument();
+      expect(rulesPanel()).toBeNull();
+      expect(submitButton()).toBeEnabled();
+
+      submitForm();
+      await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('blocks the submission on a hard error', async () => {
+    jest.useFakeTimers();
+    try {
+      fetchEcosystemsRepositoryInfo.mockResolvedValue(weakRepositoryEntry({ owner: { login: 'foo', kind: 'user' } }));
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // Weak project on a personal account: combined hard error
+      expect(within(rulesPanel()).getByText(/not able to accept your project at this time/i)).toBeInTheDocument();
+      expect(submitButton()).toBeDisabled();
+
+      submitForm();
+      await waitFor(() => expect(mockMutate).not.toHaveBeenCalled());
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('blocks a project with an error (no manual-review bypass)', async () => {
+    jest.useFakeTimers();
+    try {
+      fetchEcosystemsRepositoryInfo.mockResolvedValue(
+        weakRepositoryEntry({ owner: { login: 'foo', kind: 'organization' } }),
+      );
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // The no-community error blocks the submission, with no escape hatch to bypass it
+      expect(within(rulesPanel()).getByText(/platforms like Ko-Fi, Patreon/i)).toBeInTheDocument();
+      expect(submitButton()).toBeDisabled();
+      expect(within(rulesPanel()).queryByRole('checkbox')).not.toBeInTheDocument();
+
+      submitForm();
+      await waitFor(() => expect(mockMutate).not.toHaveBeenCalled());
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('requires the copyright confirmation for copyright-sensitive projects', async () => {
+    renderForm();
+    fillRequiredFields();
+    fireEvent.change(screen.getByLabelText(/collective name/i), { target: { value: 'Prysm - M3U IPTV player' } });
+
+    // The warning and its confirmation sit next to the application message
+    const messageRules = fieldRules('message');
+    expect(within(messageRules).getByText(/I confirm that this project/i)).toBeInTheDocument();
+    expect(submitButton()).toBeDisabled();
+
+    fireEvent.click(within(messageRules).getByRole('checkbox', { name: /I confirm that this project/i }));
+    expect(submitButton()).toBeEnabled();
+
+    submitForm();
+    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+    const { applicationData } = mockMutate.mock.calls[0][0].variables;
+    expect(applicationData.ruleConfirmations).toEqual(['copyright']);
+  });
+
+  it('mitigates the no-community error when a second admin is invited and the message is substantial', async () => {
+    jest.useFakeTimers();
+    try {
+      fetchEcosystemsRepositoryInfo.mockResolvedValue(
+        weakRepositoryEntry({ owner: { login: 'foo', kind: 'organization' } }),
+      );
+      renderForm({
+        initialValues: {
+          ...initialValues,
+          inviteMembers: [
+            {
+              role: 'ADMIN',
+              memberAccount: { id: 'a1', name: 'Amazing New User', slug: 'amazing-new-user', type: 'USER' },
+            },
+          ],
+        },
+      });
+      fillRequiredFields();
+      fireEvent.change(screen.getByLabelText(/tell us a little about your project/i), {
+        target: { value: 'x'.repeat(250) },
+      });
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // Downgraded to a warning next to the repository URL: submission is not blocked
+      expect(within(fieldRules('repositoryUrl')).getByText(/platforms like Ko-Fi, Patreon/i)).toBeInTheDocument();
+      expect(submitButton()).toBeEnabled();
+
+      submitForm();
+      await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+});
+
 // ─── Your Team ───────────────────────────────────────────────────────────────
 
 describe('ApplicationForm - Your Team', () => {
@@ -462,5 +654,117 @@ describe('ApplicationForm - Your Team', () => {
     submitForm();
     await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
     expect(mockMutate.mock.calls[0][0].variables.inviteMembers).toEqual([]);
+  });
+});
+
+// ─── Rule notes used as the field hint ────────────────────────────────────────
+
+describe('ApplicationForm - rule notes as the field hint', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMutate.mockResolvedValue({ data: { createCollective: null } });
+    fetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
+  });
+
+  it('falls back to the default hint while no rule applies to the repository URL', () => {
+    renderForm();
+
+    expect(screen.getByText(/can be github, gitlab or any url/i)).toBeInTheDocument();
+    expect(fieldRules('repositoryUrl')).toBeNull();
+  });
+
+  it('replaces the default hint with the rule notes once a rule applies', async () => {
+    jest.useFakeTimers();
+    try {
+      fetchEcosystemsRepositoryInfo.mockResolvedValue({ ...ECOSYSTEMS_REPO_ENTRY, repository: null });
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // The rule note is used as the hint, and the default hint is gone (never both)
+      expect(within(fieldRules('repositoryUrl')).getByText(/couldn't find this repository/i)).toBeInTheDocument();
+      expect(screen.queryByText(/can be github, gitlab or any url/i)).not.toBeInTheDocument();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('shows the small-community warning as a hint on the message field', async () => {
+    jest.useFakeTimers();
+    try {
+      fetchEcosystemsRepositoryInfo.mockResolvedValue({
+        ...ECOSYSTEMS_REPO_ENTRY,
+        packages: [],
+        repository: {
+          ...ECOSYSTEMS_REPO_ENTRY.repository,
+          commit_stats: { total_commits: 5, total_committers: 3, last_synced_commit: 'abc123' },
+          forks_count: 3,
+        },
+      });
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // "Tell us about your contributors and users..." is shown on the message field, not the repository URL
+      expect(within(fieldRules('message')).getByText(/tell us about your contributors and users/i)).toBeInTheDocument();
+      expect(fieldRules('repositoryUrl')).toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('shows the early-stage warning as a hint on the message field', async () => {
+    jest.useFakeTimers();
+    try {
+      fetchEcosystemsRepositoryInfo.mockResolvedValue({
+        ...ECOSYSTEMS_REPO_ENTRY,
+        packages: [],
+        repository: {
+          ...ECOSYSTEMS_REPO_ENTRY.repository,
+          created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+          commit_stats: { total_commits: 5, total_committers: 3, last_synced_commit: 'abc123' },
+          forks_count: 3,
+        },
+      });
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // "…tell us about your community and your plans…" is shown on the message field, not the repository URL
+      expect(within(fieldRules('message')).getByText(/appears to be in earlier stages/i)).toBeInTheDocument();
+      expect(fieldRules('repositoryUrl')).toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('shows the personal-account-convert warning without a confirmation checkbox', async () => {
+    jest.useFakeTimers();
+    try {
+      fetchEcosystemsRepositoryInfo.mockResolvedValue({
+        ...ECOSYSTEMS_REPO_ENTRY,
+        packages: [],
+        owner: { login: 'foo', kind: 'user' },
+        repository: {
+          ...ECOSYSTEMS_REPO_ENTRY.repository,
+          commit_stats: { total_commits: 5, total_committers: 10, last_synced_commit: 'abc123' },
+          forks_count: 50,
+        },
+      });
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // Strong project on a personal account: the note is a plain warning, with no "I'm willing to convert" checkbox
+      const repositoryNotes = fieldRules('repositoryUrl');
+      expect(within(repositoryNotes).getByText(/hosted under a personal account/i)).toBeInTheDocument();
+      expect(within(repositoryNotes).queryByRole('checkbox')).not.toBeInTheDocument();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
