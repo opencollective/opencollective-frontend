@@ -8,6 +8,7 @@ import spdxLicenses from 'spdx-license-list';
 
 import { suggestSlug } from '../../lib/collective';
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
+import { fetchEcosystemsRepositoryInfo, toRepositorySnapshot } from '../../lib/ecosyste.ms';
 import { i18nGraphqlException } from '../../lib/errors';
 import {
   requireFields,
@@ -17,6 +18,7 @@ import {
   verifyURLPattern,
 } from '../../lib/form-utils';
 import { gql } from '../../lib/graphql/helpers';
+import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { i18nLabels } from '../../lib/i18n/custom-application-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -97,6 +99,49 @@ const applyToHostMutation = gql`
 const useApplicationMutation = canApplyWithCollective =>
   useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation);
 
+const REPOSITORY_INFO_DEBOUNCE_MS = 800;
+
+const isValidRepositoryUrl = url => {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Invisible component that fetches the ecosyste.ms information for the repository URL
+ * whenever the form value changes (debounced). Wiring only: no UI, the latest result is
+ * exposed to the form through `onRepositoryInfoChange` to be stored in `applicationData`.
+ */
+const RepositoryInfoLoader = ({ repositoryUrl, onRepositoryInfoChange }) => {
+  const { call, data } = useAsyncCall(url => fetchEcosystemsRepositoryInfo(url).then(info => ({ url, info })));
+  // The `call` function is re-created on each render: use refs to only re-fetch when the URL changes
+  const callRef = React.useRef(call);
+  const onRepositoryInfoChangeRef = React.useRef(onRepositoryInfoChange);
+  callRef.current = call;
+  onRepositoryInfoChangeRef.current = onRepositoryInfoChange;
+
+  const url = (repositoryUrl || '').trim();
+
+  React.useEffect(() => {
+    if (!url || !isValidRepositoryUrl(url)) {
+      return undefined;
+    }
+
+    const timeout = setTimeout(() => callRef.current(url), REPOSITORY_INFO_DEBOUNCE_MS);
+    return () => clearTimeout(timeout);
+  }, [url]);
+
+  // Expose the latest result ({ url, info }) to the form, ignoring responses that don't match the current URL
+  React.useEffect(() => {
+    onRepositoryInfoChangeRef.current(data && data.url === url ? data : null);
+  }, [data, url]);
+
+  return null;
+};
+
 const ApplicationForm = ({
   LoggedInUser,
   loadingLoggedInUser,
@@ -115,6 +160,8 @@ const ApplicationForm = ({
 
   const [codeSectionExpanded, setCodeSectionExpanded] = useState(false);
   const [communitySectionExpanded, setCommunitySectionExpanded] = useState(false);
+  // Latest ecosyste.ms info fetched for `applicationData.repositoryUrl` ({ url, info })
+  const [repositoryInfo, setRepositoryInfo] = useState(null);
 
   useEffect(() => {
     const { typeOfProject } = initialValues?.applicationData || {};
@@ -142,6 +189,13 @@ const ApplicationForm = ({
     return errors;
   };
   const submit = async ({ user, collective, applicationData, inviteMembers, message }) => {
+    // Attach a compact snapshot of the ecosyste.ms data fetched for the submitted repository URL
+    const repositoryUrl = (applicationData.repositoryUrl || '').trim();
+    const applicationDataWithRepositoryInfo =
+      repositoryInfo && repositoryInfo.url === repositoryUrl
+        ? { ...applicationData, ecosystemsRepositoryInfo: toRepositorySnapshot(repositoryInfo.info) }
+        : applicationData;
+
     const variables = {
       collective: {
         ...(canApplyWithCollective
@@ -150,7 +204,7 @@ const ApplicationForm = ({
       },
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
-      applicationData,
+      applicationData: applicationDataWithRepositoryInfo,
       inviteMembers: inviteMembers.map(invite => ({
         ...invite,
         memberAccount: { legacyId: invite.memberAccount.id },
@@ -271,6 +325,10 @@ const ApplicationForm = ({
 
                 return (
                   <Form data-cy="ccf-form">
+                    <RepositoryInfoLoader
+                      repositoryUrl={values.applicationData.repositoryUrl}
+                      onRepositoryInfoChange={setRepositoryInfo}
+                    />
                     <div className="mt-3 mb-4 flex flex-col rounded-lg border border-border p-4 sm:mt-0 sm:p-8">
                       <FormSectionTitle>
                         <FormattedMessage id="HostApplication.form.mainInfo" defaultMessage="Main info" />
