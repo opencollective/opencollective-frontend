@@ -99,6 +99,31 @@ describe('Webhooks', () => {
     expect(screen.getByRole('button', { name: /Save/ })).toBeEnabled();
   });
 
+  it('asks to reload the page when the webhooks cannot be reloaded after saving', async () => {
+    renderWebhooks([
+      { request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } }, result: { data: { account } } },
+      {
+        request: { query: deleteWebhookMutation, variables: { webhook: { id: 'webhook-1' } } },
+        result: { data: { deleteWebhook: { __typename: 'Webhook', id: 'webhook-1' } } },
+      },
+      {
+        request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
+        result: { errors: [new GraphQLError('Network error')] },
+      },
+    ]);
+
+    fireEvent.click(await screen.findByTitle('Remove webhook'));
+    fireEvent.click(screen.getByRole('button', { name: /Save/ }));
+
+    await waitFor(() =>
+      expect(toast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'The webhooks could not be reloaded. Please reload the page to see what was saved.',
+        }),
+      ),
+    );
+  });
+
   it('saves again only what failed, without creating a webhook twice', async () => {
     const createRequest = url => ({
       query: createWebhookMutation,
