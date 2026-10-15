@@ -5,11 +5,13 @@ import { get } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { gql } from '../../../lib/graphql/helpers';
+import { ALL_VIRTUAL_CARD_LIMIT_INTERVALS, VirtualCardLimitIntervalI18n } from '../../../lib/virtual-cards/constants';
 
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
+import StyledCheckbox from '../../StyledCheckbox';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import StyledTooltip from '../../StyledTooltip';
@@ -78,6 +80,18 @@ const HostVirtualCards = props => {
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
   );
+  const [allowedSpendingLimitIntervals, setAllowedSpendingLimitIntervals] = React.useState(() =>
+    ALL_VIRTUAL_CARD_LIMIT_INTERVALS.reduce(
+      (acc, interval) => ({
+        ...acc,
+        [interval]: props.collective.settings?.virtualcards?.allowedSpendingLimitIntervals?.[interval] !== false,
+      }),
+      {},
+    ),
+  );
+  const enabledSpendingLimitIntervalsCount = ALL_VIRTUAL_CARD_LIMIT_INTERVALS.filter(
+    interval => allowedSpendingLimitIntervals[interval],
+  ).length;
 
   const handleSettingsUpdate = key => async value => {
     await updateAccountSetting({
@@ -91,6 +105,12 @@ const HostVirtualCards = props => {
       variant: 'success',
       message: <FormattedMessage id="Host.VirtualCards.Settings.Success" defaultMessage="Setting updated" />,
     });
+  };
+
+  const handleSpendingLimitIntervalChange = (interval, checked) => {
+    const value = { ...allowedSpendingLimitIntervals, [interval]: checked };
+    setAllowedSpendingLimitIntervals(value);
+    handleSettingsUpdate('virtualcards.allowedSpendingLimitIntervals')(value);
   };
 
   return (
@@ -238,6 +258,32 @@ const HostVirtualCards = props => {
             </Flex>
           </React.Fragment>
         )}
+
+        <Box mt={4}>
+          <SettingsSectionTitle>
+            <FormattedMessage
+              id="Host.VirtualCards.LimitPolicies.Title"
+              defaultMessage="Limit policies for card requests"
+            />
+          </SettingsSectionTitle>
+          <P mb={2}>
+            <FormattedMessage
+              id="Host.VirtualCards.LimitPolicies.Description"
+              defaultMessage="Choose the limit policies collectives can select when requesting a card. At least one option must stay enabled."
+            />
+          </P>
+          {ALL_VIRTUAL_CARD_LIMIT_INTERVALS.map(interval => (
+            <Box key={interval} mt={2}>
+              <StyledCheckbox
+                name={`virtualcards.allowedSpendingLimitIntervals.${interval}`}
+                label={formatMessage(VirtualCardLimitIntervalI18n[interval])}
+                checked={allowedSpendingLimitIntervals[interval]}
+                disabled={allowedSpendingLimitIntervals[interval] && enabledSpendingLimitIntervalsCount <= 1}
+                onChange={({ checked }) => handleSpendingLimitIntervalChange(interval, checked)}
+              />
+            </Box>
+          ))}
+        </Box>
 
         <StyledInputField
           name="virtualcards.policy"

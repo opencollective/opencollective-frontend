@@ -2300,6 +2300,8 @@
   "Host.VirtualCards.AutoPauseUnusedCards.Description": "Les cartes inutilisées seront suspendues après un nombre de jours d'inactivité défini. Le responsable peut toujours annuler la pause lorsque nécessaire.",
   "Host.VirtualCards.AutoPauseUnusedCards.Title": "Suspendre les cartes inutilisées",
   "Host.VirtualCards.AutoPauseUnusedCardsPeriod.Title": "Durée d'inactivité",
+  "Host.VirtualCards.LimitPolicies.Description": "Choose the limit policies collectives can select when requesting a card. At least one option must stay enabled.",
+  "Host.VirtualCards.LimitPolicies.Title": "Limit policies for card requests",
   "Host.VirtualCards.List.Description": "Facilitez les paiements en créant des cartes virtuelles. Un Collectif peut avoir plusieurs cartes virtuelles. <learnMoreLink>En savoir plus</learnMoreLink>",
   "Host.VirtualCards.Policy.Placeholder": "Par exemple, les délais de transmission des reçus, les frais autorisés, les limites ou les personnes à contacter pour des questions.",
   "Host.VirtualCards.Policy.Save": "Enregistrer la politique",

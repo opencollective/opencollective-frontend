@@ -2300,6 +2300,8 @@
   "Host.VirtualCards.AutoPauseUnusedCards.Description": "Unused cards will be paused after set days of inactivity. The assignee can always un-pause when required.",
   "Host.VirtualCards.AutoPauseUnusedCards.Title": "Pause unused cards",
   "Host.VirtualCards.AutoPauseUnusedCardsPeriod.Title": "Czas Nieaktywności",
+  "Host.VirtualCards.LimitPolicies.Description": "Choose the limit policies collectives can select when requesting a card. At least one option must stay enabled.",
+  "Host.VirtualCards.LimitPolicies.Title": "Limit policies for card requests",
   "Host.VirtualCards.List.Description": "Ułatw sobie płatności, tworząc karty wirtualne. Jeden zbiór może mieć wiele kart wirtualnych. <learnMoreLink>Dowiedz się więcej</learnMoreLink>",
   "Host.VirtualCards.Policy.Placeholder": "Np. terminy składania rachunków, dopuszczalne opłaty, limity lub do kogo należy się kontaktować z pytaniami.",
   "Host.VirtualCards.Policy.Save": "Zapisz politykę",

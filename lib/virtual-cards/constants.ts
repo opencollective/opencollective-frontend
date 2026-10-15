@@ -2,6 +2,20 @@ import { defineMessages } from 'react-intl';
 
 import { VirtualCardLimitInterval, VirtualCardStatus } from '../graphql/types/v2/graphql';
 
+export const ALL_VIRTUAL_CARD_LIMIT_INTERVALS = Object.values(VirtualCardLimitInterval);
+
+/**
+ * Returns the spending limit intervals that collectives can pick when requesting a virtual card from a host.
+ * All intervals are allowed by default: `settings.virtualcards.allowedSpendingLimitIntervals` only disables
+ * the intervals that are explicitly set to `false`.
+ */
+export const getAllowedSpendingLimitIntervals = (settings?: {
+  virtualcards?: { allowedSpendingLimitIntervals?: Partial<Record<VirtualCardLimitInterval, boolean>> };
+}): VirtualCardLimitInterval[] =>
+  ALL_VIRTUAL_CARD_LIMIT_INTERVALS.filter(
+    interval => settings?.virtualcards?.allowedSpendingLimitIntervals?.[interval] !== false,
+  );
+
 export const VirtualCardLimitIntervalDescriptionsI18n = defineMessages({
   [VirtualCardLimitInterval.ALL_TIME]: {
     id: 'virtualCard.intervalLimitDescription.all_time',

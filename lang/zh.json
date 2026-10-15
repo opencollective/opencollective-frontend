@@ -2300,6 +2300,8 @@
   "Host.VirtualCards.AutoPauseUnusedCards.Description": "Unused cards will be paused after set days of inactivity. The assignee can always un-pause when required.",
   "Host.VirtualCards.AutoPauseUnusedCards.Title": "暂停未使用的卡片",
   "Host.VirtualCards.AutoPauseUnusedCardsPeriod.Title": "停用时间",
+  "Host.VirtualCards.LimitPolicies.Description": "Choose the limit policies collectives can select when requesting a card. At least one option must stay enabled.",
+  "Host.VirtualCards.LimitPolicies.Title": "Limit policies for card requests",
   "Host.VirtualCards.List.Description": "通过创建虚拟卡使付款更容易。一个集体可以拥有多个虚拟卡。 <learnMoreLink>了解更多</learnMoreLink>",
   "Host.VirtualCards.Policy.Placeholder": "比如提及收据、获准收费、限额或就问题进行联系的截止日期。",
   "Host.VirtualCards.Policy.Save": "保存策略",
