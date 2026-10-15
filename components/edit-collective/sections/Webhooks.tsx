@@ -440,7 +440,7 @@ const editCollectiveWebhooksQuery = gqlV1 /* GraphQL */ `
   }
 `;
 
-const editCollectiveWebhooksMutation = gqlV1 /* GraphQL */ `
+const editWebhooksMutation = gqlV1 /* GraphQL */ `
   mutation EditWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
     editWebhooks(collectiveId: $collectiveId, notifications: $notifications) {
       id
@@ -460,7 +460,7 @@ const addEditCollectiveWebhooksData = graphql<Props, GraphQLV1Collective, { coll
   },
 );
 
-const addEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation, {
+const addEditWebhooksMutation = graphql(editWebhooksMutation, {
   options: {
     context: API_V1_CONTEXT,
   },
@@ -485,6 +485,6 @@ const addEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation
   }),
 });
 
-const addGraphql = compose(addEditCollectiveWebhooksData, addEditCollectiveWebhooksMutation);
+const addGraphql = compose(addEditCollectiveWebhooksData, addEditWebhooksMutation);
 
 export default injectIntl(addGraphql(Webhooks));
