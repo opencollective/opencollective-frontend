@@ -39,7 +39,6 @@ jest.mock('@apollo/client', () => {
 
 jest.mock('../collectives/HomeNextIllustration', () => () => <img alt="mock" />);
 jest.mock('../CollectivePickerAsync', () => () => <div data-testid="collective-picker-mock" />);
-jest.mock('../CollectiveTagsInput', () => () => <div data-testid="collective-tags-input-mock" />);
 jest.mock('../onboarding-modal/OnboardingProfileCard', () => () => <div data-testid="profile-card-mock" />);
 
 jest.mock('../../lib/ecosystems', () => ({
@@ -295,5 +294,40 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
 
     const { applicationData } = mockMutate.mock.calls[0][0].variables;
     expect(applicationData.ecosystemsRepositoryInfo).toBeUndefined();
+  });
+});
+
+// ─── Tags field ───────────────────────────────────────────────────────────────
+
+describe('ApplicationForm - collective.tags field', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMutate.mockResolvedValue({ data: { createCollective: null } });
+  });
+
+  it('collects typed and suggested tags into collective.tags', async () => {
+    renderForm({ popularTags: ['opensource', 'community'] });
+    fillRequiredFields();
+
+    const tagsInput = screen.getByLabelText(/tags/i);
+    fireEvent.change(tagsInput, { target: { value: 'fintech' } });
+    fireEvent.keyDown(tagsInput, { key: 'Enter' });
+    fireEvent.click(screen.getByRole('button', { name: 'opensource' }));
+
+    submitForm();
+    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+    expect(mockMutate.mock.calls[0][0].variables.collective.tags).toEqual(['fintech', 'opensource']);
+  });
+
+  it('updates collective.tags when a tag is removed', async () => {
+    renderForm({ popularTags: ['opensource'] });
+    fillRequiredFields();
+
+    fireEvent.click(screen.getByRole('button', { name: 'opensource' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Remove opensource' }));
+
+    submitForm();
+    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+    expect(mockMutate.mock.calls[0][0].variables.collective.tags).toEqual([]);
   });
 });
