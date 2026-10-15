@@ -62,8 +62,14 @@ const HOC_CALL = /\bgraphql\s*[<(]/;
 
 // --- Rule: GraphQL operation name ---
 function checkOperationNameRule(file: string, i: number, block: string) {
-  const declRegex = /^\s*(fragment|query|mutation)\s+([A-Za-z0-9_]+)/gm;
+  // RFC 011: every operation has a name, including shorthand `{ ... }` queries
+  const anonymousRegex = /^\s*(?:(query|mutation)\s*[({]|(\{))/gm;
   let m;
+  while ((m = anonymousRegex.exec(block)) !== null) {
+    console.log(`[Operation Name] ${file}:${i + 1} -> anonymous ${m[1] || 'query'}`);
+    errorCount++;
+  }
+  const declRegex = /^\s*(fragment|query|mutation)\s+([A-Za-z0-9_]+)/gm;
   while ((m = declRegex.exec(block)) !== null) {
     const opName = m[2];
     // RFC 011: PascalCase, no Query/Mutation/Fragment suffix, no get/fetch prefix
@@ -145,13 +151,15 @@ function auditFile(file: string) {
     // HOC assignment rule (handle multi-line). It only reads ahead: the call can hold an inline gql template,
     // which the operation name rule must still reach on its own line.
     if (enabledRules.hoc && HOC_CALL.test(line)) {
-      let hocBlock = line;
+      // The assignment can sit alone on the line before (`const addAccountQuery =`)
+      const start = i > 0 && /=\s*$/.test(lines[i - 1]) ? i - 1 : i;
+      let hocBlock = lines.slice(start, i + 1).join('\n');
       let j = i + 1;
       while (j < lines.length && !/\);?\s*$/.test(hocBlock)) {
         hocBlock += `\n${lines[j]}`;
         j++;
       }
-      checkHocNameRule(file, i, hocBlock);
+      checkHocNameRule(file, start, hocBlock);
     }
 
     // GraphQL operation name rule

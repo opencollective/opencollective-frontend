@@ -120,6 +120,47 @@ describe('scripts/graphql-audit', () => {
     expect(result.violations).toEqual([expect.stringContaining('[HOC Name] fixture.ts:1 -> "withAccount"')]);
   });
 
+  it('checks HOCs assigned on the line before the call', () => {
+    const result = audit(
+      [
+        'const withAccount =',
+        '  graphql<Props>(accountQuery);',
+        'const addAccountQuery =',
+        '  graphql(accountQuery, { options: { context: API_V2_CONTEXT } });',
+      ].join('\n'),
+      ['-h'],
+    );
+    expect(result.status).toBe(1);
+    expect(result.violations).toEqual([expect.stringContaining('[HOC Name] fixture.ts:1 -> "withAccount"')]);
+  });
+
+  it('reports operations without a name', () => {
+    const result = audit(
+      [
+        'const meQuery = gql`',
+        '  query {',
+        '    me { id }',
+        '  }',
+        '`;',
+        'const shorthandQuery = gql`{ me { id } }`;',
+        'const editMutation = gql`',
+        '  mutation($id: String!) {',
+        '    editAccount(id: $id) { id }',
+        '  }',
+        '`;',
+      ].join('\n'),
+      ['-o'],
+    );
+    expect(result).toEqual({
+      status: 1,
+      violations: [
+        '[Operation Name] fixture.ts:1 -> anonymous query',
+        '[Operation Name] fixture.ts:6 -> anonymous query',
+        '[Operation Name] fixture.ts:7 -> anonymous mutation',
+      ],
+    });
+  });
+
   it('restricts the run to the rules given as flags', () => {
     const source = 'const BadName = gql`query GoodName { me { id } }`;';
     expect(audit(source, ['-o'])).toEqual({ status: 0, violations: [] });
