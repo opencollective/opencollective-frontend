@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { SearchBackend } from '@/lib/graphql/types/v2/graphql';
 import useLocalStorage from '@/lib/hooks/useLocalStorage';
@@ -62,6 +62,7 @@ export const SearchBackendSelector = ({
   canSelectBackend,
   className,
 }: ReturnType<typeof useSearchBackend> & { className?: string }) => {
+  const intl = useIntl();
   if (!canSelectBackend) {
     return null;
   }
@@ -70,7 +71,7 @@ export const SearchBackendSelector = ({
     <div
       className={cn('flex shrink-0 items-center gap-1 rounded-md border p-0.5 text-xs', className)}
       role="radiogroup"
-      aria-label="Search backend"
+      aria-label={intl.formatMessage({ defaultMessage: 'Search backend', id: 'kjpVKl' })}
     >
       {Object.values(SearchBackend).map(value => (
         <button
