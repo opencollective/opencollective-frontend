@@ -110,6 +110,18 @@ const isValidRepositoryUrl = url => {
   }
 };
 
+const SPDX_LICENSE_ID_BY_LOWER_ID = Object.fromEntries(Object.keys(spdxLicenses).map(id => [id.toLowerCase(), id]));
+
+/** Maps the license identifier reported by the repository host (e.g. `mit`) to the SPDX id used by the license select (e.g. `MIT`) */
+const toSpdxLicenseId = license => SPDX_LICENSE_ID_BY_LOWER_ID[(license || '').trim().toLowerCase()] || null;
+
+/** Cleans up the repository topics (e.g. GitHub topics) for the `collective.tags` field */
+const toRepositoryTags = topics =>
+  (topics || []).reduce((tags, topic) => {
+    const tag = (topic ?? '').toString().trim();
+    return tag && !tags.includes(tag) ? [...tags, tag] : tags;
+  }, []);
+
 const ApplicationForm = ({
   LoggedInUser,
   loadingLoggedInUser,
@@ -157,6 +169,27 @@ const ApplicationForm = ({
       fetchedRepositoryInfo && fetchedRepositoryInfo.url === trimmedRepositoryUrl ? fetchedRepositoryInfo : null,
     );
   }, [fetchedRepositoryInfo, trimmedRepositoryUrl]);
+
+  // A handle on the Formik bag: the field values are only accessible in the render prop below
+  const formikRef = useRef(null);
+
+  // Automate the form filling from the fetched repository info: the license is always derived from
+  // the repository, the repository topics are merged into the tags (existing tags are never removed)
+  useEffect(() => {
+    const formik = formikRef.current;
+    const repository = repositoryInfo?.info?.repository;
+    if (!formik || !repository) {
+      return;
+    }
+
+    formik.setFieldValue('applicationData.licenseSpdxId', toSpdxLicenseId(repository.license));
+    if (!canApplyWithCollective) {
+      // The tags field only exists when applying with a new collective
+      const existingTags = formik.values.collective?.tags || [];
+      const repositoryTags = toRepositoryTags(repository.topics).filter(tag => !existingTags.includes(tag));
+      formik.setFieldValue('collective.tags', [...existingTags, ...repositoryTags]);
+    }
+  }, [repositoryInfo, canApplyWithCollective]);
 
   useEffect(() => {
     const { typeOfProject } = initialValues?.applicationData || {};
@@ -294,6 +327,7 @@ const ApplicationForm = ({
             <Formik initialValues={initialValues} onSubmit={submit} validate={validate}>
               {formik => {
                 const { values, touched, setFieldValue, setValues } = formik;
+                formikRef.current = formik;
 
                 const handleSlugChange = e => {
                   if (!touched.slug) {

@@ -192,6 +192,7 @@ const ECOSYSTEMS_REPO_ENTRY = {
     forks_count: 7,
     fork: false,
     license: 'mit',
+    topics: ['opencollective', 'react'],
     archived: true,
     created_at: '2016-12-12T04:36:39.000Z',
     pushed_at: '2026-10-11T11:24:07.000Z',
@@ -265,6 +266,7 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
       forks: 7,
       isFork: false,
       license: 'mit',
+      topics: ['opencollective', 'react'],
       archived: true,
       createdAt: '2016-12-12T04:36:39.000Z',
       lastCommitAt: '2026-10-11T11:24:07.000Z',
@@ -294,6 +296,96 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
 
     const { applicationData } = mockMutate.mock.calls[0][0].variables;
     expect(applicationData.ecosystemsRepositoryInfo).toBeUndefined();
+  });
+});
+
+// ─── Automatic field population from the repository info ──────────────────────
+
+describe('ApplicationForm - automatic field population from the repository info', () => {
+  const initialValuesWith = applicationData => ({
+    ...initialValues,
+    applicationData: { ...initialValues.applicationData, ...applicationData },
+  });
+
+  const typeManualTag = tag => {
+    const tagsInput = screen.getByLabelText(/tags/i);
+    fireEvent.change(tagsInput, { target: { value: tag } });
+    fireEvent.keyDown(tagsInput, { key: 'Enter' });
+  };
+
+  const submitAndReadVariables = async () => {
+    submitForm();
+    await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+    return mockMutate.mock.calls[0][0].variables;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    mockMutate.mockResolvedValue({ data: { createCollective: null } });
+    fetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('populates the license and the tags from the repository info', async () => {
+    renderForm();
+    fillRequiredFields();
+    changeRepositoryUrl('https://github.com/foo/bar');
+    await flushRepositoryInfoDebounce();
+
+    const { applicationData, collective } = await submitAndReadVariables();
+    expect(applicationData.licenseSpdxId).toBe('MIT');
+    expect(collective.tags).toEqual(['opencollective', 'react']);
+  });
+
+  it('merges the repository topics into the existing tags', async () => {
+    renderForm({ initialValues: initialValuesWith({ licenseSpdxId: 'Apache-2.0' }) });
+    fillRequiredFields();
+    typeManualTag('manual-tag');
+
+    changeRepositoryUrl('https://github.com/foo/bar');
+    await flushRepositoryInfoDebounce();
+
+    const { applicationData, collective } = await submitAndReadVariables();
+    // The license is always derived from the repository, the tags are merged with the existing ones
+    expect(applicationData.licenseSpdxId).toBe('MIT');
+    expect(collective.tags).toEqual(['manual-tag', 'opencollective', 'react']);
+  });
+
+  it('keeps the existing tags when the fetched repository has no license nor topics', async () => {
+    fetchEcosystemsRepositoryInfo.mockResolvedValue({
+      ...ECOSYSTEMS_REPO_ENTRY,
+      repository: { ...ECOSYSTEMS_REPO_ENTRY.repository, license: null, topics: [] },
+    });
+    renderForm({ initialValues: initialValuesWith({ licenseSpdxId: 'Apache-2.0' }) });
+    fillRequiredFields();
+    typeManualTag('manual-tag');
+
+    changeRepositoryUrl('https://github.com/foo/bar');
+    await flushRepositoryInfoDebounce();
+
+    const { applicationData, collective } = await submitAndReadVariables();
+    expect(applicationData.licenseSpdxId).toBeNull();
+    expect(collective.tags).toEqual(['manual-tag']);
+  });
+
+  it('does not match a repository license that is not a known SPDX id', async () => {
+    fetchEcosystemsRepositoryInfo.mockResolvedValue({
+      ...ECOSYSTEMS_REPO_ENTRY,
+      repository: { ...ECOSYSTEMS_REPO_ENTRY.repository, license: 'some-custom-license' },
+    });
+    renderForm();
+    fillRequiredFields();
+
+    changeRepositoryUrl('https://github.com/foo/bar');
+    await flushRepositoryInfoDebounce();
+
+    const { applicationData, collective } = await submitAndReadVariables();
+    expect(applicationData.licenseSpdxId).toBeNull();
+    expect(collective.tags).toEqual(['opencollective', 'react']);
   });
 });
 
