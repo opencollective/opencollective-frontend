@@ -23,7 +23,6 @@ import { i18nLabels } from '../../lib/i18n/custom-application-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
-import CollectiveTagsInput from '../CollectiveTagsInput';
 import { FormField } from '../FormField';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -35,6 +34,7 @@ import { FormSectionTitle } from '../ui/FormSectionTitle';
 import { Input, InputGroup } from '../ui/Input';
 import { DefaultCommandSelect } from '../ui/Select';
 import { Separator } from '../ui/Separator';
+import { TagInput } from '../ui/TagInput';
 import { Textarea } from '../ui/Textarea';
 
 import CollapseSection from './CollapseSection';
@@ -418,15 +418,11 @@ const ApplicationForm = ({
                             <div data-cy="ccf-form-tags">
                               <FormField name="collective.tags" label={intl.formatMessage(i18nLabels.tagsLabel)}>
                                 {({ field }) => (
-                                  <CollectiveTagsInput
-                                    {...field}
-                                    defaultValue={field.value}
-                                    onChange={tags => {
-                                      setFieldValue(
-                                        'collective.tags',
-                                        tags.map(t => t.value),
-                                      );
-                                    }}
+                                  <TagInput
+                                    name={field.name}
+                                    id={field.id}
+                                    value={field.value || []}
+                                    onChange={tags => setFieldValue('collective.tags', tags)}
                                     suggestedTags={popularTags}
                                   />
                                 )}
