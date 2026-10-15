@@ -20,6 +20,8 @@ type RepoMetadata = {
   pushed_at?: string;
   created_at?: string;
   license: string | null;
+  /** Repository topics (e.g. GitHub topics) */
+  topics?: string[] | null;
   archived?: boolean;
   fork?: boolean;
   commit_stats?: RepoCommitStats;
@@ -73,6 +75,8 @@ export type EcosystemsRepositorySnapshot = {
   forks: number | null;
   isFork: boolean | null;
   license: string | null;
+  /** Repository topics (e.g. GitHub topics) */
+  topics: string[];
   archived: boolean | null;
   /** Repository creation date */
   createdAt: string | null;
@@ -112,6 +116,7 @@ export function toRepositorySnapshot(entry: EcosystemsRepoSummary): EcosystemsRe
     forks: repository?.forks_count ?? null,
     isFork: repository?.fork ?? null,
     license: repository?.license ?? null,
+    topics: repository?.topics ?? [],
     archived: repository?.archived ?? null,
     createdAt: repository?.created_at ?? null,
     lastCommitAt: repository?.pushed_at ?? null,
