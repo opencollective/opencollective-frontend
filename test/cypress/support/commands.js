@@ -78,9 +78,9 @@ function completeProfileIfRequired({ token, loggedInUser, completeProfile, name 
   return getIdV2FromReferenceInput({ slug: loggedInUser.collective.slug }, token)
     .then(accountId => {
       return graphqlQueryV2(token, {
-        operationName: 'EditAccount',
+        operationName: 'CompleteProfileForTest',
         query: gql`
-          mutation EditAccount($account: AccountUpdateInput!) {
+          mutation CompleteProfileForTest($account: AccountUpdateInput!) {
             editAccount(account: $account) {
               id
               slug
@@ -167,9 +167,9 @@ Cypress.Commands.add('editAccount', (account, userEmail = defaultTestUserEmail) 
     return getIdV2FromReferenceInput(account, token)
       .then(id => {
         return graphqlQueryV2(token, {
-          operationName: 'EditAccount',
+          operationName: 'EditAccountForTest',
           query: gql`
-            mutation EditAccount($account: AccountUpdateInput!) {
+            mutation EditAccountForTest($account: AccountUpdateInput!) {
               editAccount(account: $account) {
                 id
                 slug
@@ -326,9 +326,9 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
   return signinRequest({ email: userEmail }, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQueryV2(token, {
-      operationName: 'CreateProject',
+      operationName: 'CreateProjectForTest',
       query: gql`
-        mutation CreateProject($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
+        mutation CreateProjectForTest($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
           createProject(project: $project, parent: $parent) {
             id
             name
@@ -576,9 +576,9 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
   return signinRequestAndReturnToken({ email: userEmail, slug: userSlug }, null).then(token => {
     authToken = token;
     return graphqlQueryV2(authToken, {
-      operationName: 'AccountHasTwoFactorAuth',
+      operationName: 'AccountHasTwoFactorAuthForTest',
       query: gql`
-        query AccountHasTwoFactorAuth($slug: String) {
+        query AccountHasTwoFactorAuthForTest($slug: String) {
           individual(slug: $slug) {
             id
             slug
@@ -599,9 +599,9 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
         const token = secret;
 
         return graphqlQueryV2(authToken, {
-          operationName: 'AddTwoFactorAuthToIndividual',
+          operationName: 'AddTwoFactorAuthToIndividualForTest',
           query: gql`
-            mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
+            mutation AddTwoFactorAuthToIndividualForTest($account: AccountReferenceInput!, $token: String!) {
               addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
                 account {
                   id
@@ -667,9 +667,9 @@ Cypress.Commands.add(
     return signinRequest(user, null).then(response => {
       const token = getTokenFromRedirectUrl(response.body.redirect);
       return graphqlQueryV2(token, {
-        operationName: 'CreateCollective',
+        operationName: 'CreateCollectiveForTest',
         query: gql`
-          mutation CreateCollective(
+          mutation CreateCollectiveForTest(
             $collective: CollectiveCreateInput!
             $host: AccountReferenceInput!
             $testPayload: JSON

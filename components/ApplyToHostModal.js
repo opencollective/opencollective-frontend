@@ -99,8 +99,8 @@ const accountFieldsFragment = gql`
   }
 `;
 
-const applyToHostQuery = gql`
-  query ApplyToHost($hostSlug: String!, $collectiveSlug: String!) {
+const applyToHostModalQuery = gql`
+  query ApplyToHostModal($hostSlug: String!, $collectiveSlug: String!) {
     host(slug: $hostSlug) {
       id
       ...ApplyToHostFields
@@ -115,7 +115,7 @@ const applyToHostQuery = gql`
 `;
 
 /**
- * A query similar to `applyToHostQuery`, except we also fetch user's administrated collectives for the picker
+ * A query similar to `applyToHostModalQuery`, except we also fetch user's administrated collectives for the picker
  */
 const applyToHostWithAccountsQuery = gql`
   query ApplyToHostWithAccounts($hostSlug: String!) {
@@ -239,7 +239,7 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
  * This modal triggers a query when mounted
  */
 const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ...props }) => {
-  const query = collective ? applyToHostQuery : applyToHostWithAccountsQuery;
+  const query = collective ? applyToHostModalQuery : applyToHostWithAccountsQuery;
   const { data, loading, error } = useQuery(query, {
     variables: { hostSlug, collectiveSlug: collective?.slug },
     fetchPolicy: 'network-only',

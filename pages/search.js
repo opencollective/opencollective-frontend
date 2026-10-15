@@ -587,8 +587,8 @@ class SearchPage extends React.Component {
   }
 }
 
-const searchPageQuery = gql`
-  query SearchPage(
+const accountsSearchPageQuery = gql`
+  query AccountsSearchPage(
     $term: String!
     $type: [AccountType]
     $country: [CountryISO]
@@ -689,7 +689,7 @@ const searchPageQuery = gql`
   }
 `;
 
-const addSearchPageData = graphql(searchPageQuery, {
+const addSearchPageData = graphql(accountsSearchPageQuery, {
   options: props => ({
     variables: {
       term: props.term,

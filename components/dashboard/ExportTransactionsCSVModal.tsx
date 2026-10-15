@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -44,6 +44,7 @@ import { hasAccountMoneyManagement } from '@/lib/collective';
 import useExportRequest from '@/lib/hooks/useExportRequest';
 
 import ConfirmationModal from '../ConfirmationModal';
+import { editAccountSettingsMutation } from '../edit-collective/mutations';
 import { InfoTooltipIcon } from '../InfoTooltipIcon';
 import Link from '../Link';
 import Spinner from '../Spinner';
@@ -250,15 +251,6 @@ const DownloadLink = ({ url, disabled, children }: { url: string; disabled?: boo
       {children}
     </a>
   );
-
-const editAccountSettingsMutation = gql`
-  mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
-    editAccountSetting(account: $account, key: $key, value: $value) {
-      id
-      settings
-    }
-  }
-`;
 
 type ExportTransactionsCSVModalProps = {
   open?: boolean;

@@ -5,7 +5,6 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { gql } from '../../lib/graphql/helpers';
 import type { Account, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
 import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
@@ -31,15 +30,7 @@ import { TableActionsButton } from '../ui/Table';
 import { useToast } from '../ui/useToast';
 
 import VirtualCardRequestCard from './VirtualCardRequestCard';
-
-const rejectVirtualCardRequestMutation = gql`
-  mutation RejectVirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
-    rejectVirtualCardRequest(virtualCardRequest: $virtualCardRequest) {
-      id
-      status
-    }
-  }
-`;
+import { rejectVirtualCardRequestMutation } from './VirtualCardRequestDrawer';
 
 function VirtualCardRequestTableActions({
   virtualCardRequest,
