@@ -24,7 +24,7 @@ const msg = defineMessages({
 
 const ProjectTypeOption = ({ name, value, label, description, isChecked, onChange, iconSrc }) => {
   return (
-    <label className="-mt-px -ml-px flex flex-1 cursor-pointer items-baseline border-t border-l border-border bg-white p-4">
+    <label className="flex flex-1 cursor-pointer items-baseline rounded-lg border border-border p-4 ring-offset-background transition-[color,box-shadow] duration-300 has-checked:border-transparent has-checked:text-primary has-checked:ring-2 has-checked:ring-primary">
       <input
         type="radio"
         name={name}
@@ -35,7 +35,7 @@ const ProjectTypeOption = ({ name, value, label, description, isChecked, onChang
       />
       <Image src={iconSrc} width={48} height={48} className="mr-3 self-center" />
       <div>
-        <p className="mb-2 text-base font-bold text-foreground">{label}</p>
+        <p className="mb-2 text-base font-bold">{label}</p>
         <p className="text-xs leading-normal font-normal text-muted-foreground">{description}</p>
       </div>
     </label>
@@ -46,9 +46,9 @@ const ProjectTypeSelect = ({ name, value, onChange, error }) => {
   const intl = useIntl();
   return (
     <React.Fragment>
-      <div className="overflow-hidden rounded-lg border border-border">
-        <fieldset onChange={onChange} className="border-none p-0">
-          <div className="flex flex-col overflow-hidden sm:flex-row">
+      <div className="">
+        <fieldset onChange={onChange} className="p-0">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <ProjectTypeOption
               name={name}
               value="CODE"
