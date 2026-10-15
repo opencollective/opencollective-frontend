@@ -489,6 +489,16 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
   // Applies the difference between the saved webhooks and the edited ones. A created webhook gets its id in the form
   // right away, so saving again after an error does not create it twice.
   const saveWebhooks = async (editedWebhooks: Notification[]) => {
+    // Without the reloaded list, saving again could repeat changes that were already saved
+    const reload = () =>
+      refetch().catch(() => {
+        throw new Error(
+          props.intl.formatMessage({
+            defaultMessage: 'The webhooks could not be reloaded. Please reload the page to see what was saved.',
+            id: '+nCy+p',
+          }),
+        );
+      });
     const savedWebhooks = keyBy(webhooks, 'id');
     const editedIds = new Set(editedWebhooks.map(webhook => webhook.id));
     try {
@@ -517,10 +527,10 @@ const WebhooksWithData = (props: OwnProps & { intl: IntlShape }) => {
         }
       }
     } catch (e) {
-      await refetch(); // The changes made before the error were saved
+      await reload(); // The changes made before the error were saved
       throw e;
     }
-    const result = await refetch();
+    const result = await reload();
     return getWebhooksFromAccount(result.data.account);
   };
 
