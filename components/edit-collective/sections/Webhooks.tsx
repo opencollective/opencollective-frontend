@@ -441,7 +441,7 @@ const editCollectiveWebhooksQuery = gqlV1 /* GraphQL */ `
 `;
 
 const editCollectiveWebhooksMutation = gqlV1 /* GraphQL */ `
-  mutation EditCollectiveWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
+  mutation EditWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
     editWebhooks(collectiveId: $collectiveId, notifications: $notifications) {
       id
       type

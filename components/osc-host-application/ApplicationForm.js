@@ -43,8 +43,8 @@ import { H1, H4, P, Span } from '../Text';
 import CollapseSection from './CollapseSection';
 import ProjectTypeSelect from './ProjectTypeSelect';
 
-const createCollectiveWithApplicationDataMutation = gql`
-  mutation CreateCollectiveWithApplicationData(
+const oscCreateCollectiveMutation = gql`
+  mutation OscCreateCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
     $user: IndividualCreateInput
@@ -71,8 +71,8 @@ const createCollectiveWithApplicationDataMutation = gql`
   }
 `;
 
-const applyToHostWithApplicationDataMutation = gql`
-  mutation ApplyToHostWithApplicationData(
+const oscApplyToHostMutation = gql`
+  mutation OscApplyToHost(
     $collective: AccountReferenceInput!
     $host: AccountReferenceInput!
     $message: String
@@ -100,9 +100,7 @@ const applyToHostWithApplicationDataMutation = gql`
 `;
 
 const useApplicationMutation = canApplyWithCollective =>
-  useMutation(
-    canApplyWithCollective ? applyToHostWithApplicationDataMutation : createCollectiveWithApplicationDataMutation,
-  );
+  useMutation(canApplyWithCollective ? oscApplyToHostMutation : oscCreateCollectiveMutation);
 
 const ApplicationForm = ({
   LoggedInUser,
