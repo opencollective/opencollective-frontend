@@ -7,6 +7,8 @@
  * `applicationData` payload sent to `createCollective`.
  */
 
+/* eslint-disable camelcase -- ecosyste.ms API fields are snake_case */
+
 import '@testing-library/jest-dom';
 
 import React from 'react';
@@ -40,14 +42,14 @@ jest.mock('../CollectivePickerAsync', () => () => <div data-testid="collective-p
 jest.mock('../CollectiveTagsInput', () => () => <div data-testid="collective-tags-input-mock" />);
 jest.mock('../onboarding-modal/OnboardingProfileCard', () => () => <div data-testid="profile-card-mock" />);
 
-jest.mock('../../lib/ecosyste.ms', () => ({
-  ...jest.requireActual('../../lib/ecosyste.ms'),
+jest.mock('../../lib/ecosystems', () => ({
+  ...jest.requireActual('../../lib/ecosystems'),
   fetchEcosystemsRepositoryInfo: jest.fn(),
 }));
 
 // ─── Imports (after mocks) ────────────────────────────────────────────────────
 
-import { fetchEcosystemsRepositoryInfo } from '../../lib/ecosyste.ms';
+import { fetchEcosystemsRepositoryInfo } from '../../lib/ecosystems';
 
 import ApplicationForm from './ApplicationForm';
 

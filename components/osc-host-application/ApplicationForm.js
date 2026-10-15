@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { ArrowLeft, ArrowRight, Info } from 'lucide-react';
@@ -8,7 +8,7 @@ import spdxLicenses from 'spdx-license-list';
 
 import { suggestSlug } from '../../lib/collective';
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
-import { fetchEcosystemsRepositoryInfo, toRepositorySnapshot } from '../../lib/ecosyste.ms';
+import { fetchEcosystemsRepositoryInfo, toRepositorySnapshot } from '../../lib/ecosystems';
 import { i18nGraphqlException } from '../../lib/errors';
 import {
   requireFields,
@@ -110,38 +110,6 @@ const isValidRepositoryUrl = url => {
   }
 };
 
-/**
- * Invisible component that fetches the ecosyste.ms information for the repository URL
- * whenever the form value changes (debounced). Wiring only: no UI, the latest result is
- * exposed to the form through `onRepositoryInfoChange` to be stored in `applicationData`.
- */
-const RepositoryInfoLoader = ({ repositoryUrl, onRepositoryInfoChange }) => {
-  const { call, data } = useAsyncCall(url => fetchEcosystemsRepositoryInfo(url).then(info => ({ url, info })));
-  // The `call` function is re-created on each render: use refs to only re-fetch when the URL changes
-  const callRef = React.useRef(call);
-  const onRepositoryInfoChangeRef = React.useRef(onRepositoryInfoChange);
-  callRef.current = call;
-  onRepositoryInfoChangeRef.current = onRepositoryInfoChange;
-
-  const url = (repositoryUrl || '').trim();
-
-  React.useEffect(() => {
-    if (!url || !isValidRepositoryUrl(url)) {
-      return undefined;
-    }
-
-    const timeout = setTimeout(() => callRef.current(url), REPOSITORY_INFO_DEBOUNCE_MS);
-    return () => clearTimeout(timeout);
-  }, [url]);
-
-  // Expose the latest result ({ url, info }) to the form, ignoring responses that don't match the current URL
-  React.useEffect(() => {
-    onRepositoryInfoChangeRef.current(data && data.url === url ? data : null);
-  }, [data, url]);
-
-  return null;
-};
-
 const ApplicationForm = ({
   LoggedInUser,
   loadingLoggedInUser,
@@ -160,8 +128,35 @@ const ApplicationForm = ({
 
   const [codeSectionExpanded, setCodeSectionExpanded] = useState(false);
   const [communitySectionExpanded, setCommunitySectionExpanded] = useState(false);
-  // Latest ecosyste.ms info fetched for `applicationData.repositoryUrl` ({ url, info })
+  // Mirror of the `applicationData.repositoryUrl` field value (Formik values are only accessible in the render prop)
+  const [repositoryUrl, setRepositoryUrl] = useState(initialValues?.applicationData?.repositoryUrl || '');
+  // Latest ecosyste.ms info fetched for the repository URL ({ url, info })
   const [repositoryInfo, setRepositoryInfo] = useState(null);
+  const { call: fetchRepositoryInfo, data: fetchedRepositoryInfo } = useAsyncCall(url =>
+    fetchEcosystemsRepositoryInfo(url).then(info => ({ url, info })),
+  );
+  // `call` is re-created on each render: go through a ref to only re-fetch when the URL changes
+  const fetchRepositoryInfoRef = useRef(fetchRepositoryInfo);
+  fetchRepositoryInfoRef.current = fetchRepositoryInfo;
+
+  const trimmedRepositoryUrl = (repositoryUrl || '').trim();
+
+  // Fetch the ecosyste.ms repository info whenever the repository URL value changes (debounced)
+  useEffect(() => {
+    if (!trimmedRepositoryUrl || !isValidRepositoryUrl(trimmedRepositoryUrl)) {
+      return undefined;
+    }
+
+    const timeout = setTimeout(() => fetchRepositoryInfoRef.current(trimmedRepositoryUrl), REPOSITORY_INFO_DEBOUNCE_MS);
+    return () => clearTimeout(timeout);
+  }, [trimmedRepositoryUrl]);
+
+  // Keep the latest fetch result for submit, ignoring responses that don't match the current URL
+  useEffect(() => {
+    setRepositoryInfo(
+      fetchedRepositoryInfo && fetchedRepositoryInfo.url === trimmedRepositoryUrl ? fetchedRepositoryInfo : null,
+    );
+  }, [fetchedRepositoryInfo, trimmedRepositoryUrl]);
 
   useEffect(() => {
     const { typeOfProject } = initialValues?.applicationData || {};
@@ -325,10 +320,6 @@ const ApplicationForm = ({
 
                 return (
                   <Form data-cy="ccf-form">
-                    <RepositoryInfoLoader
-                      repositoryUrl={values.applicationData.repositoryUrl}
-                      onRepositoryInfoChange={setRepositoryInfo}
-                    />
                     <div className="mt-3 mb-4 flex flex-col rounded-lg border border-border p-4 sm:mt-0 sm:p-8">
                       <FormSectionTitle>
                         <FormattedMessage id="HostApplication.form.mainInfo" defaultMessage="Main info" />
@@ -513,7 +504,10 @@ const ApplicationForm = ({
                                 placeholder="https://github.com"
                                 className="w-full"
                                 {...field}
-                                onChange={e => setFieldValue('applicationData.repositoryUrl', e.target.value)}
+                                onChange={e => {
+                                  setRepositoryUrl(e.target.value);
+                                  setFieldValue('applicationData.repositoryUrl', e.target.value);
+                                }}
                               />
                             )}
                           </FormField>
