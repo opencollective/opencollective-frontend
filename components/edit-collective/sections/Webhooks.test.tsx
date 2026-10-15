@@ -154,6 +154,7 @@ describe('Webhooks', () => {
       activityType: 'ACTIVITY_ALL',
       webhookUrl: 'http://example.com/hook',
     };
+    const updateResult = jest.fn(() => ({ data: { updateWebhook: { __typename: 'Webhook', id: 'webhook-1' } } }));
     renderWebhooks([
       {
         request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
@@ -166,7 +167,7 @@ describe('Webhooks', () => {
             webhook: { id: 'webhook-1', activityType: 'ACTIVITY_ALL', webhookUrl: 'http://example.com/hook' },
           },
         },
-        result: { data: { updateWebhook: { __typename: 'Webhook', id: 'webhook-1' } } },
+        result: updateResult,
       },
       {
         request: { query: editCollectiveWebhooksQuery, variables: { slug: SLUG } },
@@ -182,5 +183,7 @@ describe('Webhooks', () => {
     // An https URL would not match the mocked mutation and fail the save
     expect(await screen.findByText('Saved')).toBeInTheDocument();
     expect(toast).not.toHaveBeenCalled();
+    // The reload alone would also show the updated node: check that the update itself ran
+    expect(updateResult).toHaveBeenCalledTimes(1);
   });
 });
