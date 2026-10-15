@@ -8,11 +8,12 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V1_CONTEXT, gql, gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { isValidEmail } from '../lib/utils';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
 import { Button } from './ui/Button';
+import { createVendorFromMiniFormMutation } from './vendors/queries';
 import InputTypeCountry from './InputTypeCountry';
 import MessageBox from './MessageBox';
 import StyledInput from './StyledInput';
@@ -199,19 +200,6 @@ const createCollectiveMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const createVendorV2Mutation = gql`
-  mutation CreateVendorFromMiniForm($host: AccountReferenceInput!, $vendor: VendorCreateInput!) {
-    createVendor(host: $host, vendor: $vendor) {
-      id
-      legacyId
-      slug
-      name
-      type
-      imageUrl(height: 64)
-    }
-  }
-`;
-
 const createUserMutation = gqlV1 /* GraphQL */ `
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
@@ -289,7 +277,7 @@ const CreateCollectiveMiniForm = ({
   const noAdminFields = isOrganization && excludeAdminFields;
   const useV2VendorMutation = isVendor && Array.isArray(vendorVisibleToAccountIds);
   const mutation = useV2VendorMutation
-    ? createVendorV2Mutation
+    ? createVendorFromMiniFormMutation
     : isUser
       ? createUserMutation
       : createCollectiveMutation;

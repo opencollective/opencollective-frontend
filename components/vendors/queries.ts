@@ -99,3 +99,16 @@ export const setVendorArchiveMutation = gql`
   }
   ${vendorFieldsFragment}
 `;
+
+export const createVendorFromMiniFormMutation = gql`
+  mutation CreateVendorFromMiniForm($host: AccountReferenceInput!, $vendor: VendorCreateInput!) {
+    createVendor(host: $host, vendor: $vendor) {
+      id
+      legacyId
+      slug
+      name
+      type
+      imageUrl(height: 64)
+    }
+  }
+`;
