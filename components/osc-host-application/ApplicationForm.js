@@ -338,17 +338,12 @@ const ApplicationForm = ({
                                   <InputGroup
                                     prepend="opencollective.com/"
                                     placeholder="agora"
+                                    className="w-full"
                                     {...field}
                                     onChange={e => setFieldValue('collective.slug', e.target.value)}
                                   />
                                 )}
                               </FormField>
-                              <p className="mt-1.5 text-xs leading-4 text-muted-foreground">
-                                <FormattedMessage
-                                  id="createCollective.form.suggestedLabel"
-                                  defaultMessage="Suggested"
-                                />
-                              </p>
                             </div>
                           </div>
                           <div className="mb-3">
@@ -443,28 +438,27 @@ const ApplicationForm = ({
                         subtitle={intl.formatMessage(i18nLabels.aboutYourCodeSubtitle)}
                       >
                         <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
-                          <div>
-                            <FormField
-                              label={intl.formatMessage(i18nLabels.repositoryUrl)}
-                              name="applicationData.repositoryUrl"
-                              required={values.applicationData.typeOfProject === 'CODE' || undefined}
-                              hint={
-                                <FormattedMessage
-                                  id="HostApplication.repositoryUrlHint"
-                                  defaultMessage="Can be GitHub, GitLab or any URL"
-                                />
-                              }
-                            >
-                              {({ field }) => (
-                                <InputGroup
-                                  type="url"
-                                  placeholder="https://github.com"
-                                  {...field}
-                                  onChange={e => setFieldValue('applicationData.repositoryUrl', e.target.value)}
-                                />
-                              )}
-                            </FormField>
-                          </div>
+                          <FormField
+                            label={intl.formatMessage(i18nLabels.repositoryUrl)}
+                            name="applicationData.repositoryUrl"
+                            required={values.applicationData.typeOfProject === 'CODE' || undefined}
+                            hint={
+                              <FormattedMessage
+                                id="HostApplication.repositoryUrlHint"
+                                defaultMessage="Can be GitHub, GitLab or any URL"
+                              />
+                            }
+                          >
+                            {({ field }) => (
+                              <InputGroup
+                                type="url"
+                                placeholder="https://github.com"
+                                className="w-full"
+                                {...field}
+                                onChange={e => setFieldValue('applicationData.repositoryUrl', e.target.value)}
+                              />
+                            )}
+                          </FormField>
 
                           <FormField
                             label={intl.formatMessage(i18nLabels.repositoryLicense)}
@@ -516,21 +510,20 @@ const ApplicationForm = ({
                         subtitle={intl.formatMessage(i18nLabels.aboutYourCommunitySubtitle)}
                       >
                         <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
-                          <div>
-                            <FormField
-                              label={intl.formatMessage(i18nLabels.amountOfMembers)}
-                              name="applicationData.amountOfMembers"
-                              required={values.applicationData.typeOfProject === 'COMMUNITY' || undefined}
-                            >
-                              {({ field }) => (
-                                <InputGroup
-                                  placeholder="0-10"
-                                  {...field}
-                                  onChange={e => setFieldValue('applicationData.amountOfMembers', e.target.value)}
-                                />
-                              )}
-                            </FormField>
-                          </div>
+                          <FormField
+                            label={intl.formatMessage(i18nLabels.amountOfMembers)}
+                            name="applicationData.amountOfMembers"
+                            required={values.applicationData.typeOfProject === 'COMMUNITY' || undefined}
+                          >
+                            {({ field }) => (
+                              <InputGroup
+                                placeholder="0-10"
+                                className="w-full"
+                                {...field}
+                                onChange={e => setFieldValue('applicationData.amountOfMembers', e.target.value)}
+                              />
+                            )}
+                          </FormField>
                         </div>
 
                         <div className="mt-5">
@@ -637,6 +630,7 @@ const ApplicationForm = ({
                               {...field}
                               rows={6}
                               maxLength={3000}
+                              className="h-24"
                               placeholder={intl.formatMessage(i18nLabels.tellUsMorePlaceholder)}
                               data-cy="ccf-form-message"
                             />
