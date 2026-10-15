@@ -30,7 +30,7 @@ type PaginationProps = (
   maxLimit?: number;
 };
 
-function SelectLimit({ limit, setLimit, defaultLimit, maxLimit = undefined }) {
+function SelectLimit({ limit, setLimit, defaultLimit, maxLimit }) {
   const options = uniq([20, 40, 60, 80, 100, limit, defaultLimit].filter(Boolean))
     .filter(option => !maxLimit || option <= maxLimit)
     .sort((a, b) => a - b);

@@ -33,14 +33,14 @@ import { OrderResult } from './result/OrderResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
 import {
+  getBackendLimits,
   getSearchBackendVariables,
   isEntitySupportedByBackend,
   NarrowSearchMessage,
-  POSTGRES_SEARCH_LIMITS,
   SearchBackendSelector,
   useSearchBackend,
 } from './backend';
-import { SearchEntity } from './filters';
+import { SEARCH_ENTITY_RESULT_FIELDS, SearchEntity } from './filters';
 import { useGetLinkProps } from './lib';
 import { searchPageQuery } from './queries';
 import type { SearchEntityNodeMap } from './types';
@@ -55,8 +55,6 @@ export const SearchResults = () => {
       ? { slug: account.slug, type: 'account' }
       : undefined;
 
-  const searchBackend = useSearchBackend();
-  const { backend } = searchBackend;
   const queryFilter = useQueryFilter({
     schema: z.object({
       workspace: z.string().optional(),
@@ -77,11 +75,8 @@ export const SearchResults = () => {
           }
         }
       },
-      limit: (requestedLimit, key, meta, values) => {
-        const limit =
-          backend === SearchBackend.POSTGRES
-            ? Math.min(requestedLimit, POSTGRES_SEARCH_LIMITS.MAX_LIMIT)
-            : requestedLimit;
+      // The backend's maximum page size is applied by `getSearchBackendVariables`
+      limit: (limit, key, meta, values) => {
         const defaultEntityLimit = {
           defaultLimit: 0, // TODO: should be enough? Seems to be a bug with defaultLimit
           accountsLimit: 0,
@@ -150,6 +145,8 @@ export const SearchResults = () => {
     defaultFilterValues: { workspace: account?.slug },
     shallow: true,
   });
+  const searchBackend = useSearchBackend(queryFilter);
+  const { backend } = searchBackend;
 
   const [input, setInput] = React.useState(queryFilter.values.searchTerm);
 
@@ -157,15 +154,6 @@ export const SearchResults = () => {
   useEffect(() => {
     setInput(queryFilter.values.searchTerm || '');
   }, [queryFilter.values.searchTerm]);
-
-  // Entities and page sizes that the selected backend doesn't support can't be selected
-  useEffect(() => {
-    if (!isEntitySupportedByBackend(queryFilter.values.entity, backend)) {
-      queryFilter.setFilter('entity', SearchEntity.ALL);
-    } else if (backend === SearchBackend.POSTGRES && queryFilter.values.limit > POSTGRES_SEARCH_LIMITS.MAX_LIMIT) {
-      queryFilter.setFilter('limit', POSTGRES_SEARCH_LIMITS.MAX_LIMIT);
-    }
-  }, [backend, queryFilter.values.entity, queryFilter.values.limit]);
 
   const { data, loading, error } = useQuery(searchPageQuery, {
     variables: {
@@ -248,11 +236,8 @@ export const SearchResults = () => {
           tabs={tabs}
         />
       </div>
-      {visibleErrors.map(graphQLError => (
-        <MessageBoxGraphqlError
-          key={`${graphQLError.path?.join('.')}-${graphQLError.message}`}
-          error={{ graphQLErrors: [graphQLError] }}
-        />
+      {visibleErrors.map(({ key, error }) => (
+        <MessageBoxGraphqlError key={key} error={error} />
       ))}
       <div className="py-1">
         <SearchResultsList
@@ -266,17 +251,6 @@ export const SearchResults = () => {
     </div>
   );
 };
-/** GraphQL field of each entity in `search.results` */
-const ENTITY_RESULT_FIELDS: Partial<Record<SearchEntity, string>> = {
-  [SearchEntity.ACCOUNTS]: 'accounts',
-  [SearchEntity.EXPENSES]: 'expenses',
-  [SearchEntity.ORDERS]: 'orders',
-  [SearchEntity.TRANSACTIONS]: 'transactions',
-  [SearchEntity.COMMENTS]: 'comments',
-  [SearchEntity.UPDATES]: 'updates',
-  [SearchEntity.HOST_APPLICATIONS]: 'hostApplications',
-};
-
 /**
  * Errors to show for the selected tab: errors of other entities only affect their own tab count, so that one failing
  * entity (e.g. a search too broad for PostgreSQL) doesn't hide the results of the others. The "All" tab shows them all.
@@ -284,26 +258,39 @@ const ENTITY_RESULT_FIELDS: Partial<Record<SearchEntity, string>> = {
 const getVisibleErrors = (
   error: ApolloError | undefined,
   entity: SearchEntity,
-): ReadonlyArray<GraphQLFormattedError> => {
+): Array<{ key: string; error: ApolloError | { graphQLErrors: GraphQLFormattedError[] } }> => {
   if (!error) {
     return [];
   } else if (!error.graphQLErrors?.length) {
-    return [error as unknown as GraphQLFormattedError]; // Network error
+    return [{ key: 'network', error }]; // Network error
   }
 
-  const field = ENTITY_RESULT_FIELDS[entity];
-  return error.graphQLErrors.filter(graphQLError => {
-    const [root, results, errorField] = graphQLError.path || [];
-    const isEntityError = root === 'search' && results === 'results' && Boolean(errorField);
-    return entity === SearchEntity.ALL || !isEntityError || errorField === field;
-  });
+  const field = entity === SearchEntity.ALL ? null : SEARCH_ENTITY_RESULT_FIELDS[entity];
+  return error.graphQLErrors
+    .filter(graphQLError => {
+      const [root, results, errorField] = graphQLError.path || [];
+      const isEntityError = root === 'search' && results === 'results' && Boolean(errorField);
+      return !field || !isEntityError || errorField === field;
+    })
+    .map(graphQLError => ({
+      key: `${graphQLError.path?.join('.')}-${graphQLError.message}`,
+      error: { graphQLErrors: [graphQLError] },
+    }));
 };
 
 type SearchResultsListGroup = {
   entity: Exclude<SearchEntity, SearchEntity.ALL | SearchEntity.DASHBOARD_TOOL>;
-  result?: { maxScore?: number; collection: { totalCount: number; nodes: any[] } }; // eslint-disable-line @typescript-eslint/no-explicit-any
+  result?: {
+    maxScore?: number;
+    collection: { totalCount: number; nodes: any[] }; // eslint-disable-line @typescript-eslint/no-explicit-any
+  };
   renderNode: (node) => React.ReactNode;
   filterNodes?: (nodes) => any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+};
+
+const getGroupNodes = (group: SearchResultsListGroup) => {
+  const nodes = group.result?.collection.nodes;
+  return group.filterNodes ? group.filterNodes(nodes) : nodes;
 };
 
 function SearchResultsList({ data, queryFilter, totalCount, loading, backend }) {
@@ -383,9 +370,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading, backend }) 
             key={group.entity}
             entity={group.entity}
             totalCount={group.result?.collection.totalCount}
-            nodes={
-              group.filterNodes ? group.filterNodes(group.result?.collection.nodes) : group.result?.collection.nodes
-            }
+            nodes={getGroupNodes(group)}
             renderNode={group.renderNode}
             queryFilter={queryFilter}
           />
@@ -403,7 +388,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading, backend }) 
     <SearchResultsGroup
       entity={group.entity}
       totalCount={group.result?.collection.totalCount}
-      nodes={group.filterNodes ? group.filterNodes(group.result?.collection.nodes) : group.result?.collection.nodes}
+      nodes={getGroupNodes(group)}
       onStandaloneTab
       loading={loading}
       renderNode={group.renderNode}
@@ -490,22 +475,42 @@ function SearchResultsGroup<E extends Exclude<keyof SearchEntityNodeMap, SearchE
             </span>
           </button>
         )}
-        {onStandaloneTab &&
-          (backend === SearchBackend.POSTGRES ? (
-            <React.Fragment>
-              {/* Exact totals, but pages are only available up to the maximum offset */}
-              <Pagination
-                className="mt-4"
-                total={Math.min(totalCount, POSTGRES_SEARCH_LIMITS.MAX_OFFSET + queryFilter.values.limit)}
-                maxLimit={POSTGRES_SEARCH_LIMITS.MAX_LIMIT}
-                queryFilter={queryFilter}
-              />
-              {totalCount > POSTGRES_SEARCH_LIMITS.MAX_OFFSET + queryFilter.values.limit && <NarrowSearchMessage />}
-            </React.Fragment>
-          ) : (
-            <Pagination className="mt-4" total={totalCount} queryFilter={queryFilter} />
-          ))}
+        {onStandaloneTab && (
+          <SearchResultsPagination totalCount={totalCount} queryFilter={queryFilter} backend={backend} />
+        )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Numbered pages with exact totals. Backends with a maximum offset only paginate up to it, with a message suggesting to
+ * narrow the search for deeper results.
+ */
+function SearchResultsPagination({
+  totalCount,
+  queryFilter,
+  backend,
+}: {
+  totalCount: number;
+  queryFilter: useQueryFilterReturnType<any, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  backend: SearchBackend;
+}) {
+  const { maxLimit, maxOffset } = getBackendLimits(backend);
+  if (maxOffset === undefined) {
+    return <Pagination className="mt-4" total={totalCount} maxLimit={maxLimit} queryFilter={queryFilter} />;
+  }
+
+  const browsableCount = maxOffset + queryFilter.values.limit;
+  return (
+    <React.Fragment>
+      <Pagination
+        className="mt-4"
+        total={Math.min(totalCount, browsableCount)}
+        maxLimit={maxLimit}
+        queryFilter={queryFilter}
+      />
+      {totalCount > browsableCount && <NarrowSearchMessage />}
+    </React.Fragment>
   );
 }
