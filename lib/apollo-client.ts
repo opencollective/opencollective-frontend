@@ -312,6 +312,10 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                // A next page that failed (e.g. a search too broad for PostgreSQL) keeps the results already loaded
+                if (!incoming) {
+                  return existing;
+                }
                 // Infinite scroll mode: append new results to existing ones
                 return {
                   ...incoming,
@@ -338,6 +342,9 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
@@ -362,6 +369,9 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
@@ -386,6 +396,9 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
@@ -410,6 +423,9 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
@@ -434,6 +450,9 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
@@ -458,6 +477,9 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },

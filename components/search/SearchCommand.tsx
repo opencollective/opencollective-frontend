@@ -42,7 +42,7 @@ import { ContextPill } from './ContextPill';
 import { EntityFilterItem } from './EntityFilterItem';
 import type { SearchResultEntity } from './filters';
 import { entityFilterOptions, schema, SEARCH_ENTITY_RESULT_FIELDS, SearchEntity } from './filters';
-import { sortNodesByScore } from './lib';
+import { getVisibleErrors, sortNodesByScore } from './lib';
 import { searchCommandQuery } from './queries';
 import { RecentVisits } from './RecentVisits';
 import { SearchCommandGroup } from './SearchCommandGroup';
@@ -170,7 +170,8 @@ export const SearchCommand = ({ open, setOpen }) => {
       __infiniteScroll: true,
     },
     notifyOnNetworkStatusChange: true,
-
+    // Each entity can fail on its own (e.g. a search too broad for PostgreSQL): keep the results of the others
+    errorPolicy: 'all',
     fetchPolicy: 'cache-and-network',
     skip: !queryFilter.values.searchTerm || !searchBackend.isBackendReady,
   });
@@ -352,8 +353,9 @@ export const SearchCommand = ({ open, setOpen }) => {
     return [...entityResultGroups].sort((a, b) => b.maxScore - a.maxScore);
   }, [hasData, data, LoggedInUser]);
 
+  const visibleErrors = getVisibleErrors(error, queryFilter.values.entity);
   const showNoResults =
-    debouncedInput !== '' && !isLoading && !error && filteredGoToPages.length === 0 && !hasSearchResults;
+    debouncedInput !== '' && !isLoading && !visibleErrors.length && filteredGoToPages.length === 0 && !hasSearchResults;
 
   // The PostgreSQL backend doesn't serve results beyond a maximum offset
   const { maxOffset } = getBackendLimits(backend);
@@ -568,11 +570,13 @@ export const SearchCommand = ({ open, setOpen }) => {
 
         {hasReachedMaxOffset && !isLoadingMore && <NarrowSearchMessage className="px-3 py-4 text-center" />}
 
-        {error && debouncedInput !== '' && !isLoading && (
-          <div className="p-3">
-            <MessageBoxGraphqlError error={error} />
-          </div>
-        )}
+        {debouncedInput !== '' &&
+          !isLoading &&
+          visibleErrors.map(({ key, error }) => (
+            <div key={key} className="p-3">
+              <MessageBoxGraphqlError error={error} />
+            </div>
+          ))}
 
         {showNoResults && (
           <div className="py-6 text-center text-sm text-muted-foreground">

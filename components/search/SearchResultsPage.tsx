@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
-import type { ApolloError } from '@apollo/client';
 import { useQuery } from '@apollo/client';
-import type { GraphQLFormattedError } from 'graphql';
 import { SearchIcon } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -40,8 +38,8 @@ import {
   SearchBackendSelector,
   useSearchBackend,
 } from './backend';
-import { SEARCH_ENTITY_RESULT_FIELDS, SearchEntity } from './filters';
-import { sortNodesByScore, useGetLinkProps } from './lib';
+import { SearchEntity } from './filters';
+import { getVisibleErrors, sortNodesByScore, useGetLinkProps } from './lib';
 import { searchPageQuery } from './queries';
 import type { SearchEntityNodeMap } from './types';
 
@@ -251,33 +249,6 @@ export const SearchResults = () => {
     </div>
   );
 };
-/**
- * Errors to show for the selected tab: errors of other entities only affect their own tab count, so that one failing
- * entity (e.g. a search too broad for PostgreSQL) doesn't hide the results of the others. The "All" tab shows them all.
- */
-const getVisibleErrors = (
-  error: ApolloError | undefined,
-  entity: SearchEntity,
-): Array<{ key: string; error: ApolloError | { graphQLErrors: GraphQLFormattedError[] } }> => {
-  if (!error) {
-    return [];
-  } else if (!error.graphQLErrors?.length) {
-    return [{ key: 'network', error }]; // Network error
-  }
-
-  const field = entity === SearchEntity.ALL ? null : SEARCH_ENTITY_RESULT_FIELDS[entity];
-  return error.graphQLErrors
-    .filter(graphQLError => {
-      const [root, results, errorField] = graphQLError.path || [];
-      const isEntityError = root === 'search' && results === 'results' && Boolean(errorField);
-      return !field || !isEntityError || errorField === field;
-    })
-    .map(graphQLError => ({
-      key: `${graphQLError.path?.join('.')}-${graphQLError.message}`,
-      error: { graphQLErrors: [graphQLError] },
-    }));
-};
-
 type SearchResultsListGroup = {
   entity: Exclude<SearchEntity, SearchEntity.ALL | SearchEntity.DASHBOARD_TOOL>;
   result?: {

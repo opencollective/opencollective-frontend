@@ -1,4 +1,6 @@
 import React, { useCallback } from 'react';
+import type { ApolloError } from '@apollo/client';
+import type { GraphQLFormattedError } from 'graphql';
 
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { Comment, HostApplication, Order, Update } from '@/lib/graphql/types/v2/graphql';
@@ -17,7 +19,7 @@ import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { useWorkspace } from '../WorkspaceProvider';
 
-import { SearchEntity } from './filters';
+import { SEARCH_ENTITY_RESULT_FIELDS, SearchEntity } from './filters';
 import type { SearchEntityNodeMap, SearchHighlights } from './types';
 import { useRecentlyVisited } from './useRecentlyVisited';
 
@@ -174,3 +176,30 @@ export function useGetLinkProps() {
 
   return { getLinkProps };
 }
+
+/**
+ * Errors to show for the selected tab: errors of other entities only affect their own tab count, so that one failing
+ * entity (e.g. a search too broad for PostgreSQL) doesn't hide the results of the others. The "All" tab shows them all.
+ */
+export const getVisibleErrors = (
+  error: ApolloError | undefined,
+  entity: SearchEntity,
+): Array<{ key: string; error: ApolloError | { graphQLErrors: GraphQLFormattedError[] } }> => {
+  if (!error) {
+    return [];
+  } else if (!error.graphQLErrors?.length) {
+    return [{ key: 'network', error }]; // Network error
+  }
+
+  const field = entity === SearchEntity.ALL ? null : SEARCH_ENTITY_RESULT_FIELDS[entity];
+  return error.graphQLErrors
+    .filter(graphQLError => {
+      const [root, results, errorField] = graphQLError.path || [];
+      const isEntityError = root === 'search' && results === 'results' && Boolean(errorField);
+      return !field || !isEntityError || errorField === field;
+    })
+    .map(graphQLError => ({
+      key: `${graphQLError.path?.join('.')}-${graphQLError.message}`,
+      error: { graphQLErrors: [graphQLError] },
+    }));
+};
