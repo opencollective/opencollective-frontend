@@ -40,7 +40,7 @@ import {
 } from './backend';
 import { SearchEntity } from './filters';
 import { getVisibleErrors, sortNodesByScore, useGetLinkProps } from './lib';
-import { searchPageQuery } from './queries';
+import { searchResultsPageQuery } from './queries';
 import type { SearchEntityNodeMap } from './types';
 
 export const SearchResults = () => {
@@ -153,7 +153,7 @@ export const SearchResults = () => {
     setInput(queryFilter.values.searchTerm || '');
   }, [queryFilter.values.searchTerm]);
 
-  const { data, loading, error } = useQuery(searchPageQuery, {
+  const { data, loading, error } = useQuery(searchResultsPageQuery, {
     variables: {
       ...getSearchBackendVariables(
         {

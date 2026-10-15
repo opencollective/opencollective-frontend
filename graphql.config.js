@@ -1,20 +1,7 @@
 module.exports = {
+  // A file goes to the first project whose documents match it: graphqlV1 comes first so that its files are not taken
+  // by the default project's broad glob.
   projects: {
-    default: {
-      schema: 'lib/graphql/schemaV2.graphql',
-      // Every gql document, so that unique-operation-name and unique-fragment-name can compare them
-      documents: ['{components,lib,pages,test}/**/*.{js,jsx,ts,tsx}', '!lib/graphql/types/**'],
-      extensions: {
-        endpoints: {
-          dev: 'http://localhost:3060/graphql/v2',
-          prod: 'https://api.opencollective.com/graphql/v2',
-        },
-        pluckConfig: {
-          globalGqlIdentifierName: 'gql',
-          gqlMagicComment: 'GraphQLV2',
-        },
-      },
-    },
     graphqlV1: {
       schema: 'lib/graphql/schema.graphql',
       documents: [
@@ -50,6 +37,21 @@ module.exports = {
         pluckConfig: {
           globalGqlIdentifierName: 'gqlV1',
           gqlMagicComment: 'GraphQL',
+        },
+      },
+    },
+    default: {
+      schema: 'lib/graphql/schemaV2.graphql',
+      // Every gql document, so that unique-operation-name and unique-fragment-name can compare them
+      documents: ['{components,lib,pages,test}/**/*.{js,jsx,ts,tsx}', '!lib/graphql/types/**'],
+      extensions: {
+        endpoints: {
+          dev: 'http://localhost:3060/graphql/v2',
+          prod: 'https://api.opencollective.com/graphql/v2',
+        },
+        pluckConfig: {
+          globalGqlIdentifierName: 'gql',
+          gqlMagicComment: 'GraphQLV2',
         },
       },
     },
