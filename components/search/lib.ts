@@ -21,6 +21,27 @@ import { SearchEntity } from './filters';
 import type { SearchEntityNodeMap, SearchHighlights } from './types';
 import { useRecentlyVisited } from './useRecentlyVisited';
 
+/**
+ * Orders the nodes of a page by their explicit score (`scores` field of the search results), best first. Scores are
+ * transported independently of highlights by every backend. Keeps the received order when a node has no score (e.g.
+ * an older cached response) and between equal scores.
+ */
+export function sortNodesByScore<N extends { id?: string }>(
+  nodes: N[] | undefined,
+  scores: ReadonlyArray<{ id: string; score: number }> | undefined,
+): N[] | undefined {
+  if (!nodes || !scores?.length) {
+    return nodes;
+  }
+
+  const scoreById = new Map(scores.map(({ id, score }) => [id, score]));
+  if (!nodes.every(node => scoreById.has(node.id))) {
+    return nodes;
+  }
+
+  return [...nodes].sort((a, b) => scoreById.get(b.id) - scoreById.get(a.id));
+}
+
 export function getHighlightsFields<T extends string>(
   highlights: SearchHighlights,
   topFields: readonly T[],

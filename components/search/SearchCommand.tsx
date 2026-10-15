@@ -42,6 +42,7 @@ import { ContextPill } from './ContextPill';
 import { EntityFilterItem } from './EntityFilterItem';
 import type { SearchResultEntity } from './filters';
 import { entityFilterOptions, schema, SEARCH_ENTITY_RESULT_FIELDS, SearchEntity } from './filters';
+import { sortNodesByScore } from './lib';
 import { searchCommandQuery } from './queries';
 import { RecentVisits } from './RecentVisits';
 import { SearchCommandGroup } from './SearchCommandGroup';
@@ -316,7 +317,7 @@ export const SearchCommand = ({ open, setOpen }) => {
       filterNodes?: (nodes: ResultNode<E>[]) => ResultNode<E>[],
     ) => {
       const result = results?.[SEARCH_ENTITY_RESULT_FIELDS[entity]];
-      const nodes: ResultNode<E>[] | undefined = result?.collection.nodes;
+      const nodes = sortNodesByScore<ResultNode<E>>(result?.collection.nodes, result?.scores);
       return {
         entity,
         totalCount: result?.collection.totalCount,

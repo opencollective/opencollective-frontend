@@ -292,6 +292,10 @@ function createInMemoryCache() {
           },
         },
       },
+      // A result's score depends on the search: never normalize it by the result's ID
+      SearchResultScore: {
+        keyFields: false,
+      },
       // Add this for search results pagination
       SearchResults: {
         fields: {
@@ -312,6 +316,7 @@ function createInMemoryCache() {
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -336,6 +341,7 @@ function createInMemoryCache() {
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -359,6 +365,7 @@ function createInMemoryCache() {
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -382,6 +389,7 @@ function createInMemoryCache() {
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -405,6 +413,7 @@ function createInMemoryCache() {
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -428,6 +437,7 @@ function createInMemoryCache() {
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -451,6 +461,7 @@ function createInMemoryCache() {
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],

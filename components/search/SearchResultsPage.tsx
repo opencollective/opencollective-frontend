@@ -41,7 +41,7 @@ import {
   useSearchBackend,
 } from './backend';
 import { SEARCH_ENTITY_RESULT_FIELDS, SearchEntity } from './filters';
-import { useGetLinkProps } from './lib';
+import { sortNodesByScore, useGetLinkProps } from './lib';
 import { searchPageQuery } from './queries';
 import type { SearchEntityNodeMap } from './types';
 
@@ -282,6 +282,7 @@ type SearchResultsListGroup = {
   entity: Exclude<SearchEntity, SearchEntity.ALL | SearchEntity.DASHBOARD_TOOL>;
   result?: {
     maxScore?: number;
+    scores?: ReadonlyArray<{ id: string; score: number }>;
     collection: { totalCount: number; nodes: any[] }; // eslint-disable-line @typescript-eslint/no-explicit-any
   };
   renderNode: (node) => React.ReactNode;
@@ -289,7 +290,7 @@ type SearchResultsListGroup = {
 };
 
 const getGroupNodes = (group: SearchResultsListGroup) => {
-  const nodes = group.result?.collection.nodes;
+  const nodes = sortNodesByScore(group.result?.collection.nodes, group.result?.scores);
   return group.filterNodes ? group.filterNodes(nodes) : nodes;
 };
 
