@@ -33,7 +33,7 @@ describe('getVisibleErrors', () => {
 });
 
 describe('search results cache', () => {
-  const query = gql`
+  const searchCacheTestQuery = gql`
     query SearchCacheTest($offset: Int) {
       search {
         results {
@@ -59,7 +59,7 @@ describe('search results cache', () => {
   });
   const write = (cache, offset: number, expenses) =>
     cache.writeQuery({
-      query,
+      query: searchCacheTestQuery,
       variables: { offset, __infiniteScroll: true },
       data: { search: { __typename: 'SearchResponse', results: { __typename: 'SearchResults', expenses } } },
     });
@@ -69,7 +69,10 @@ describe('search results cache', () => {
     write(cache, 0, page(['a', 'b']));
     write(cache, 2, page(['c']));
     write(cache, 3, null); // Field error on the next page (`errorPolicy: 'all'`)
-    const data = cache.readQuery({ query, variables: { offset: 0, __infiniteScroll: true } }) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const data = cache.readQuery({
+      query: searchCacheTestQuery,
+      variables: { offset: 0, __infiniteScroll: true },
+    }) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(data.search.results.expenses.collection.nodes.map(node => node.id)).toEqual(['a', 'b', 'c']);
   });
 });
