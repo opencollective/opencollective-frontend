@@ -1,13 +1,11 @@
+/* eslint-disable camelcase -- ecosyste.ms API fields are snake_case */
+
 import '@testing-library/jest-dom';
 
-import {
-  EcosystemsRepositorySnapshot,
-  fetchEcosystemsRepositoryInfo,
-  RepoCacheEntry,
-  toRepositorySnapshot,
-} from '../ecosyste.ms';
+import type { EcosystemsRepositorySnapshot, EcosystemsRepoSummary } from '../ecosystems';
+import { fetchEcosystemsRepositoryInfo, toRepositorySnapshot } from '../ecosystems';
 
-const REPO_ENTRY: RepoCacheEntry = {
+const REPO_ENTRY: EcosystemsRepoSummary = {
   packages: [
     {
       name: 'my-package',
@@ -40,7 +38,7 @@ const REPO_ENTRY: RepoCacheEntry = {
   owner: { login: 'foo' },
 };
 
-describe('lib/ecosyste.ms', () => {
+describe('lib/ecosystems', () => {
   describe('toRepositorySnapshot', () => {
     it('projects the repository fields requested for the application data', () => {
       const snapshot = toRepositorySnapshot(REPO_ENTRY);

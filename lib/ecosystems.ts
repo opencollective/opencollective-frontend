@@ -1,7 +1,7 @@
 /**
  * Client for the ecosyste.ms repository data proxied by our API
  * (`GET /api/ecosystems/repository?url=...`). The API replies with a
- * `RepoCacheEntry` - the same structure as the POC in opencollective-tools
+ * `EcosystemsRepoSummary` - the same structure as the POC in opencollective-tools
  * (`lib/ecosyste.ms.ts`), for a single repository URL.
  */
 
@@ -56,7 +56,7 @@ type EcosystemsOwner = {
 };
 
 /** The structure replied by our API for a single repository, as in the opencollective-tools POC */
-export type RepoCacheEntry = {
+export type EcosystemsRepoSummary = {
   packages: EcosystemsPackage[];
   repository: RepoMetadata | null;
   contributors: EcosystemsCommitsRepository | null;
@@ -64,7 +64,7 @@ export type RepoCacheEntry = {
   owner: EcosystemsOwner | null;
 };
 
-/** Compact projection of a `RepoCacheEntry`, stored as `applicationData.ecosystemsRepositoryInfo` */
+/** Compact projection of a `EcosystemsRepoSummary`, stored as `applicationData.ecosystemsRepositoryInfo` */
 export type EcosystemsRepositorySnapshot = {
   fullName: string | null;
   owner: string | null;
@@ -93,7 +93,7 @@ export type EcosystemsRepositorySnapshot = {
   }>;
 };
 
-export async function fetchEcosystemsRepositoryInfo(repositoryUrl: string): Promise<RepoCacheEntry> {
+export async function fetchEcosystemsRepositoryInfo(repositoryUrl: string): Promise<EcosystemsRepoSummary> {
   const response = await fetch(`/api/ecosystems/repository?url=${encodeURIComponent(repositoryUrl)}`);
   const json = await response.json().catch(() => null);
   if (!response.ok) {
@@ -102,7 +102,7 @@ export async function fetchEcosystemsRepositoryInfo(repositoryUrl: string): Prom
   return json;
 }
 
-export function toRepositorySnapshot(entry: RepoCacheEntry): EcosystemsRepositorySnapshot {
+export function toRepositorySnapshot(entry: EcosystemsRepoSummary): EcosystemsRepositorySnapshot {
   const repository = entry.repository;
   return {
     fullName: repository?.full_name ?? null,
