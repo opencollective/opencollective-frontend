@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
+import type { ApolloError } from '@apollo/client';
 import { useQuery } from '@apollo/client';
+import type { GraphQLFormattedError } from 'graphql';
 import { SearchIcon } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -85,9 +87,10 @@ export const SearchResults = () => {
           accountsLimit: 0,
           expensesLimit: 0,
           transactionsLimit: 0,
-          contributionsLimit: 0,
+          ordersLimit: 0,
           updatesLimit: 0,
           commentsLimit: 0,
+          hostApplicationsLimit: 0,
         };
         switch (values.entity) {
           case SearchEntity.ALL:
@@ -112,7 +115,7 @@ export const SearchResults = () => {
           case SearchEntity.ORDERS:
             return {
               ...defaultEntityLimit,
-              contributionsLimit: limit,
+              ordersLimit: limit,
             };
           case SearchEntity.UPDATES:
             return {
@@ -123,6 +126,11 @@ export const SearchResults = () => {
             return {
               ...defaultEntityLimit,
               commentsLimit: limit,
+            };
+          case SearchEntity.HOST_APPLICATIONS:
+            return {
+              ...defaultEntityLimit,
+              hostApplicationsLimit: limit,
             };
         }
       },
@@ -177,7 +185,8 @@ export const SearchResults = () => {
       imageHeight: 72,
     },
     notifyOnNetworkStatusChange: true,
-
+    // Each entity can fail on its own (e.g. a search too broad for PostgreSQL): keep the results of the others
+    errorPolicy: 'all',
     fetchPolicy: 'cache-and-network',
     skip: !queryFilter.values.searchTerm || !searchBackend.isBackendReady,
   });
@@ -195,6 +204,7 @@ export const SearchResults = () => {
   );
 
   const isLoading = loading;
+  const visibleErrors = getVisibleErrors(error, queryFilter.values.entity);
 
   const results = data?.search.results;
   const totalCount = results
@@ -238,7 +248,12 @@ export const SearchResults = () => {
           tabs={tabs}
         />
       </div>
-      {error && <MessageBoxGraphqlError error={error} />}
+      {visibleErrors.map(graphQLError => (
+        <MessageBoxGraphqlError
+          key={`${graphQLError.path?.join('.')}-${graphQLError.message}`}
+          error={{ graphQLErrors: [graphQLError] }}
+        />
+      ))}
       <div className="py-1">
         <SearchResultsList
           data={data}
@@ -251,6 +266,39 @@ export const SearchResults = () => {
     </div>
   );
 };
+/** GraphQL field of each entity in `search.results` */
+const ENTITY_RESULT_FIELDS: Partial<Record<SearchEntity, string>> = {
+  [SearchEntity.ACCOUNTS]: 'accounts',
+  [SearchEntity.EXPENSES]: 'expenses',
+  [SearchEntity.ORDERS]: 'orders',
+  [SearchEntity.TRANSACTIONS]: 'transactions',
+  [SearchEntity.COMMENTS]: 'comments',
+  [SearchEntity.UPDATES]: 'updates',
+  [SearchEntity.HOST_APPLICATIONS]: 'hostApplications',
+};
+
+/**
+ * Errors to show for the selected tab: errors of other entities only affect their own tab count, so that one failing
+ * entity (e.g. a search too broad for PostgreSQL) doesn't hide the results of the others. The "All" tab shows them all.
+ */
+const getVisibleErrors = (
+  error: ApolloError | undefined,
+  entity: SearchEntity,
+): ReadonlyArray<GraphQLFormattedError> => {
+  if (!error) {
+    return [];
+  } else if (!error.graphQLErrors?.length) {
+    return [error as unknown as GraphQLFormattedError]; // Network error
+  }
+
+  const field = ENTITY_RESULT_FIELDS[entity];
+  return error.graphQLErrors.filter(graphQLError => {
+    const [root, results, errorField] = graphQLError.path || [];
+    const isEntityError = root === 'search' && results === 'results' && Boolean(errorField);
+    return entity === SearchEntity.ALL || !isEntityError || errorField === field;
+  });
+};
+
 type SearchResultsListGroup = {
   entity: Exclude<SearchEntity, SearchEntity.ALL | SearchEntity.DASHBOARD_TOOL>;
   result?: { maxScore?: number; collection: { totalCount: number; nodes: any[] } }; // eslint-disable-line @typescript-eslint/no-explicit-any
