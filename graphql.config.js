@@ -23,7 +23,6 @@ module.exports = {
         'components/collective-page/hero/HeroTotalCollectiveContributionsWithData.js',
         'components/CollectivePickerAsync.js',
         'components/CreateCollectiveMiniForm.tsx',
-        'components/edit-collective/actions/Delete.js',
         'components/edit-collective/EditUserEmailForm.js',
         'components/edit-collective/sections/PaymentReceipts.tsx',
         'components/edit-collective/sections/Webhooks.tsx',

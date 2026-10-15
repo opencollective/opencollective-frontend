@@ -11,7 +11,7 @@ import type {
   AccountHoverCardFieldsFragment,
 } from '../../../lib/graphql/types/v2/graphql';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
 
 import { accountFilterQuery } from './AccountFilter';
@@ -26,7 +26,7 @@ const hostsFilterSearchQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 const AccountRenderer = ({

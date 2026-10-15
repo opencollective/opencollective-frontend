@@ -4,10 +4,7 @@ import { isUndefined } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import type {
-  ExpensesListAdminFieldsFragmentFragment,
-  ExpensesListFieldsFragmentFragment,
-} from '../../lib/graphql/types/v2/graphql';
+import type { ExpensesListAdminFieldsFragment, ExpensesListFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import type { AccountingCategorySelectProps } from '../AccountingCategorySelect';
@@ -20,7 +17,7 @@ import { editExpenseCategoryMutation } from './graphql/mutations';
 type ApproveExpenseModalProps = {
   onClose: () => void;
   expense: Pick<
-    ExpensesListFieldsFragmentFragment & ExpensesListAdminFieldsFragmentFragment,
+    ExpensesListFieldsFragment & ExpensesListAdminFieldsFragment,
     'id' | 'type' | 'accountingCategory' | 'description' | 'items' | 'valuesByRole'
   >;
   host: AccountingCategorySelectProps['host'];

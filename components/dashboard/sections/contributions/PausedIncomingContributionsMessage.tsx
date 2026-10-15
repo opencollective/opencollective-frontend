@@ -62,7 +62,7 @@ const pausedContributionsQuery = gql`
   }
 `;
 
-const startResumeContributionsProcess = gql`
+const startResumeContributionsProcessMutation = gql`
   mutation StartResumeContributionsProcess($account: AccountReferenceInput!, $message: String) {
     startResumeOrdersProcess(account: $account, message: $message) {
       id
@@ -93,8 +93,9 @@ export const PausedIncomingContributionsMessage = ({ accountSlug }: PausedIncomi
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
-  const [resumeContributionsProcess, { loading: mutationLoading }] = useMutation(startResumeContributionsProcess);
-
+  const [resumeContributionsProcess, { loading: mutationLoading }] = useMutation(
+    startResumeContributionsProcessMutation,
+  );
   const account = data?.account;
   const pausedCount = account?.pausedIncoming?.totalCount ?? 0;
   const pausedResumableCount = account?.pausedResumable?.totalCount ?? 0;

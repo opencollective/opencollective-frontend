@@ -1108,7 +1108,7 @@ const addCreateOrderMutation = graphql(
   gql`
     mutation CreateOrder($order: OrderCreateInput!) {
       createOrder(order: $order) {
-        ...OrderResponseFragment
+        ...OrderResponse
       }
     }
     ${orderResponseFragment}
@@ -1122,7 +1122,7 @@ const addConfirmOrderMutation = graphql(
   gql`
     mutation ConfirmOrder($order: OrderReferenceInput!, $guestToken: String) {
       confirmOrder(order: $order, guestToken: $guestToken) {
-        ...OrderResponseFragment
+        ...OrderResponse
       }
     }
     ${orderResponseFragment}

@@ -41,7 +41,7 @@ const messages = defineMessages({
   },
 });
 
-const hostFields = gql`
+const hostFieldsFragment = gql`
   fragment ApplyToHostFields on Host {
     id
     legacyId
@@ -65,7 +65,7 @@ const hostFields = gql`
   }
 `;
 
-const accountFields = gql`
+const accountFieldsFragment = gql`
   fragment ApplyToHostAccountFields on Account {
     id
     slug
@@ -110,8 +110,8 @@ const applyToHostQuery = gql`
       ...ApplyToHostAccountFields
     }
   }
-  ${hostFields}
-  ${accountFields}
+  ${hostFieldsFragment}
+  ${accountFieldsFragment}
 `;
 
 /**
@@ -142,8 +142,8 @@ const applyToHostWithAccountsQuery = gql`
       }
     }
   }
-  ${hostFields}
-  ${accountFields}
+  ${hostFieldsFragment}
+  ${accountFieldsFragment}
 `;
 
 const applyToHostMutation = gql`
@@ -166,7 +166,7 @@ const applyToHostMutation = gql`
       }
     }
   }
-  ${hostFields}
+  ${hostFieldsFragment}
 `;
 
 const INITIAL_FORM_VALUES = { message: '', areTosChecked: false, collective: null, inviteMembers: [] };

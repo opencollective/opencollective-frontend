@@ -10,7 +10,7 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { useAgreementActions } from '@/components/agreements/actions';
 import AgreementDrawer from '@/components/agreements/AgreementDrawer';
 import AgreementsTable from '@/components/agreements/AgreementsTable';
-import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '@/components/agreements/fragments';
+import { agreementViewFieldsFragment } from '@/components/agreements/fragments';
 import FilesViewerModal from '@/components/FilesViewerModal';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import ConfirmationModal from '@/components/NewConfirmationModal';
@@ -38,7 +38,7 @@ const accountDetailAgreementsQuery = gql`
       }
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${agreementViewFieldsFragment}
 `;
 
 const deleteAgreementMutation = gql`

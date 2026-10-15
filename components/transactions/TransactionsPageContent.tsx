@@ -231,7 +231,7 @@ export const transactionsPageQuery = gql`
       payoutMethod: $payoutMethod
       includeEditedReversedTransactions: $includeEditedReversedTransactions
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
       kinds
       paymentMethodTypes
       totalCount

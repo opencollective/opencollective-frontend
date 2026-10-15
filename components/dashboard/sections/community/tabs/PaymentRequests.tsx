@@ -32,7 +32,7 @@ import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 import Avatar from '../../../../Avatar';
 import DateTime from '../../../../DateTime';
 import {
-  expenseHostFields,
+  expenseHostFieldsFragment,
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
 } from '../../../../expenses/graphql/fragments';
@@ -307,8 +307,8 @@ const accountPaymentRequestsQuery = gql`
       limit
       nodes {
         id
-        ...ExpensesListFieldsFragment
-        ...ExpensesListAdminFieldsFragment
+        ...ExpensesListFields
+        ...ExpensesListAdminFields
 
         payee {
           grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, account: $account)
@@ -331,7 +331,7 @@ const accountPaymentRequestsQuery = gql`
   }
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 // Account-scoped counterpart of `hostPaymentRequestsMetadataQuery`, so the view

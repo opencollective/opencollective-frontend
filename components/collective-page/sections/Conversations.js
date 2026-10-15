@@ -21,7 +21,7 @@ export const conversationsSectionQuery = gql`
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       conversations(limit: 3) {
-        ...ConversationListFragment
+        ...ConversationList
       }
     }
   }

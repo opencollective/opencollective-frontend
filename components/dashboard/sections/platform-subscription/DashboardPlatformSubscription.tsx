@@ -27,7 +27,7 @@ import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
 import { BillingProjection } from './BillingProjection';
-import { platformBillingFragment, platformSubscriptionFragment } from './fragments';
+import { platformBillingFieldsFragment, platformSubscriptionFieldsFragment } from './fragments';
 import { PlatformPaymentsView } from './PlatformPaymentsView';
 import { PlatformSubscriptionCard } from './PlatformSubscriptionCard';
 
@@ -53,8 +53,8 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
           }
         }
       }
-      ${platformSubscriptionFragment}
-      ${platformBillingFragment}
+      ${platformSubscriptionFieldsFragment}
+      ${platformBillingFieldsFragment}
     `,
     {
       variables: {
