@@ -41,6 +41,7 @@ const oscHostApplicationPageQuery = gql`
     account(slug: "opensource") {
       id
       slug
+      settings
       policies {
         id
         COLLECTIVE_MINIMUM_ADMINS {
@@ -152,7 +153,10 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   }, [collectiveSlug, collective]);
 
   return (
-    <Page title="Open Source Collective application">
+    <Page
+      title="Open Source Collective application"
+      primaryColor={hostData?.account?.settings?.collectivePage?.primaryColor}
+    >
       {step === 'intro' && (
         <TermsOfFiscalSponsorship
           checked={checkedTermsOfFiscalSponsorship}
