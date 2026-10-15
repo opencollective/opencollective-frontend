@@ -2204,7 +2204,7 @@ export function useExpenseForm(opts: {
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
       setFieldValue(
         'expenseItems',
-        formOptions.expense.draft?.items?.map(ei => ({
+        (formOptions.expense.draft?.items ?? []).map(ei => ({
           id: !startOptions.current.duplicateExpense ? ei.id : undefined,
           key: ei.id,
           attachment: ei.url,
@@ -2219,7 +2219,7 @@ export function useExpenseForm(opts: {
     } else {
       setFieldValue(
         'expenseItems',
-        formOptions.expense.items?.map(ei => ({
+        (formOptions.expense.items ?? []).map(ei => ({
           id: !startOptions.current.duplicateExpense ? ei.id : undefined,
           key: ei.id,
           attachment: !startOptions.current.duplicateExpense ? ei.url : null,
