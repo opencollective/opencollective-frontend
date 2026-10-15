@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { upperFirst } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -43,6 +43,9 @@ export const getBackendLimits = (backend: SearchBackend): SearchBackendLimits =>
 export const isEntitySupportedByBackend = (entity: SearchEntity, backend: SearchBackend): boolean =>
   backend !== SearchBackend.POSTGRES || entity === SearchEntity.ALL || POSTGRES_SUPPORTED_ENTITIES.has(entity);
 
+/** Dispatched on `window` when the user selects a search backend, so that every `useSearchBackend` follows it */
+const SEARCH_BACKEND_CHANGE_EVENT = 'searchBackendChange';
+
 /** The search filters that depend on the backend */
 type SearchBackendFilters = {
   values: { entity?: SearchEntity; limit?: number };
@@ -59,10 +62,20 @@ export const useSearchBackend = (queryFilter: SearchBackendFilters) => {
   const canSelectBackend = Boolean(
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_POSTGRES_BACKEND),
   );
-  const [storedBackend, setBackend] = useLocalStorage<SearchBackend>(
+  const [storedBackend, setStoredBackend] = useLocalStorage<SearchBackend>(
     LOCAL_STORAGE_KEYS.SEARCH_BACKEND,
     SearchBackend.OPENSEARCH,
   );
+
+  // The search command and the results page can be mounted together: keep their selected backends in sync
+  useEffect(() => {
+    const onBackendChange = (event: Event) => setStoredBackend((event as CustomEvent<SearchBackend>).detail);
+    window.addEventListener(SEARCH_BACKEND_CHANGE_EVENT, onBackendChange);
+    return () => window.removeEventListener(SEARCH_BACKEND_CHANGE_EVENT, onBackendChange);
+  }, [setStoredBackend]);
+  const setBackend = useCallback((value: SearchBackend) => {
+    window.dispatchEvent(new CustomEvent(SEARCH_BACKEND_CHANGE_EVENT, { detail: value }));
+  }, []);
   const backend =
     canSelectBackend && Object.values(SearchBackend).includes(storedBackend) ? storedBackend : SearchBackend.OPENSEARCH;
 

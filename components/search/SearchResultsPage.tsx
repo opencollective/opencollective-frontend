@@ -166,7 +166,7 @@ export const SearchResults = () => {
           includeOrders: true,
           includeUpdates: true,
           includeComments: true,
-          includeHostApplications: true,
+          includeHostApplications: false, // Host applications are not displayed on this page
         },
         backend,
       ),
