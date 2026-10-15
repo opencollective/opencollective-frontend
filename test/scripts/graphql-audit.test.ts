@@ -161,6 +161,25 @@ describe('scripts/graphql-audit', () => {
     });
   });
 
+  it('does not mistake a selection or an argument object for an anonymous operation', () => {
+    const result = audit(
+      [
+        'const accountsQuery = gql`',
+        '  query Accounts {',
+        '    accounts(orderBy:',
+        '      { field: NAME }',
+        '    ) {',
+        '      nodes { ...AccountFields }',
+        '    }',
+        '  }',
+        '  ${accountFieldsFragment}',
+        '`;',
+      ].join('\n'),
+      ['-o'],
+    );
+    expect(result).toEqual({ status: 0, violations: [] });
+  });
+
   it('restricts the run to the rules given as flags', () => {
     const source = 'const BadName = gql`query GoodName { me { id } }`;';
     expect(audit(source, ['-o'])).toEqual({ status: 0, violations: [] });

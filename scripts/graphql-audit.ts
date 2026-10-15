@@ -4,6 +4,9 @@
 import fs from 'fs';
 import path from 'path';
 
+import type { OperationDefinitionNode } from 'graphql';
+import { Kind, parse } from 'graphql';
+
 const SRC_DIR = './';
 const FILE_EXTENSIONS = ['.js', '.ts', '.tsx'];
 
@@ -62,13 +65,22 @@ const HOC_CALL = /\bgraphql\s*[<(]/;
 
 // --- Rule: GraphQL operation name ---
 function checkOperationNameRule(file: string, i: number, block: string) {
-  // RFC 011: every operation has a name, including shorthand `{ ... }` queries
-  const anonymousRegex = /^\s*(?:(query|mutation)\s*[({]|(\{))/gm;
-  let m;
-  while ((m = anonymousRegex.exec(block)) !== null) {
-    console.log(`[Operation Name] ${file}:${i + 1} -> anonymous ${m[1] || 'query'}`);
+  // RFC 011: every operation has a name, including shorthand `{ ... }` queries. The parser tells an operation from a
+  // selection set; interpolations (`${fragment}`) are dropped first, they only add definitions.
+  let anonymous: string[];
+  try {
+    anonymous = parse(block.replace(/\$\{[^}]*\}/g, ''))
+      .definitions.filter(def => def.kind === Kind.OPERATION_DEFINITION && !def.name)
+      .map(def => (def as OperationDefinitionNode).operation);
+  } catch {
+    // Not parseable on its own (unusual interpolation): fall back to explicit `query`/`mutation` keywords
+    anonymous = [...block.matchAll(/^\s*(query|mutation)\s*[({]/gm)].map(match => match[1]);
+  }
+  for (const operation of anonymous) {
+    console.log(`[Operation Name] ${file}:${i + 1} -> anonymous ${operation}`);
     errorCount++;
   }
+  let m;
   const declRegex = /^\s*(fragment|query|mutation)\s+([A-Za-z0-9_]+)/gm;
   while ((m = declRegex.exec(block)) !== null) {
     const opName = m[2];
