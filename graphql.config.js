@@ -25,7 +25,6 @@ module.exports = {
         'components/CreateCollectiveMiniForm.tsx',
         'components/edit-collective/EditUserEmailForm.js',
         'components/edit-collective/sections/PaymentReceipts.tsx',
-        'components/edit-collective/sections/Webhooks.tsx',
         'components/EditPublicMessagePopup.js',
         'components/MembershipsWithData.js',
         'components/MembersWithData.js',
