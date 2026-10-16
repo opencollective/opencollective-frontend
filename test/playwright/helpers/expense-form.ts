@@ -308,7 +308,6 @@ export async function submitExpense(page: Page, submission: ExpenseSubmission) {
     await recurrence.getByTestId('expense-frequency').click();
     await page.getByTestId('expense-frequency-option').filter({ hasText: 'Monthly' }).click();
     await recurrence.locator('#expenseRecurrenceEndAt').fill('2125-09-29');
-    await recurrence.getByText('Save changes').click();
     await expect(recurrence).toContainText(
       'Once submitted, you will also be prompted to review and submit a copy of this expense every month. The prompts will stop on Sep 29, 2125',
     );
