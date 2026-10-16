@@ -1,5 +1,7 @@
 import 'cypress-mailpit';
 
+import { pick } from 'lodash-es';
+
 import { API_V1_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
 
@@ -10,8 +12,8 @@ import { randomEmail, randomSlug } from './faker';
 import generateToken from './token';
 
 /**
- * Login with an existing account. If not provided in `params`, the email used for
- * authentication will be `defaultTestUserEmail`.
+ * Log in, creating a test account if needed. If not provided in `params`, the
+ * email used for authentication will be `defaultTestUserEmail`.
  *
  * @param {object} params:
  *    - redirect: The redirect URL
@@ -45,7 +47,7 @@ Cypress.Commands.add('logout', () => {
 });
 
 /**
- * Create a new account an SignIn. If no email is provided in `params`, the account
+ * Create a new account and sign in. If no email is provided in `params`, the account
  * will be generated using a random email.
  */
 Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, completeProfile = true } = {}) => {
@@ -791,14 +793,45 @@ function getIdV2FromReferenceInput(account, token) {
  * @param {object} user - should have `email` and `id` set
  */
 function signinRequest(user, redirect, sendLink) {
-  return cy.request({
-    url: '/api/users/signin',
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+  // Setup commands also pass fresh test emails here. Ensure the user exists
+  // without changing existing users or sending an extra login email.
+  return graphqlQuery(null, {
+    operationName: 'CreateUser',
+    query: gqlV1`
+      mutation CreateUser($user: UserInputType!) {
+        createUser(user: $user, sendSignInLink: false, throwIfExists: false) {
+          user {
+            id
+          }
+        }
+      }
+    `,
+    variables: {
+      user: pick(user, [
+        'email',
+        'name',
+        'legalName',
+        'company',
+        'image',
+        'description',
+        'website',
+        'newsletterOptIn',
+        'location',
+      ]),
     },
-    body: JSON.stringify({ user, redirect, createProfile: true, sendLink }),
+  }).then(({ body }) => {
+    if (body.errors?.length) {
+      throw new Error(body.errors.map(error => error.message).join('\n'));
+    }
+    return cy.request({
+      url: '/api/users/signin',
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user, redirect, sendLink }),
+    });
   });
 }
 
