@@ -7,6 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { gql } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import {
+  getAllowedSpendingLimitIntervals,
   VirtualCardLimitIntervalDescriptionsI18n,
   VirtualCardLimitIntervalI18n,
 } from '../../lib/virtual-cards/constants';
@@ -35,7 +36,6 @@ const initialValues = {
   notes: undefined,
   purpose: undefined,
   spendingLimitAmount: undefined,
-  spendingLimitInterval: VirtualCardLimitInterval.MONTHLY,
 };
 
 const requestVirtualCardMutation = gql`
@@ -60,15 +60,23 @@ const RequestVirtualCardModal = props => {
   const hasPolicy = Boolean(props.host?.settings?.virtualcards?.policy);
   const intl = useIntl();
 
-  const virtualCardLimitOptions = Object.keys(VirtualCardLimitInterval).map(interval => ({
+  const allowedSpendingLimitIntervals = getAllowedSpendingLimitIntervals(props.host?.settings);
+  const virtualCardLimitOptions = allowedSpendingLimitIntervals.map(interval => ({
     value: interval,
     label: intl.formatMessage(VirtualCardLimitIntervalI18n[interval]),
   }));
+  const defaultSpendingLimitInterval = allowedSpendingLimitIntervals.includes(VirtualCardLimitInterval.MONTHLY)
+    ? VirtualCardLimitInterval.MONTHLY
+    : (allowedSpendingLimitIntervals[0] ?? VirtualCardLimitInterval.MONTHLY);
 
   const { toast } = useToast();
   const [requestNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(requestVirtualCardMutation);
   const formik = useFormik({
-    initialValues: { ...initialValues, collective: props.collective },
+    initialValues: {
+      ...initialValues,
+      spendingLimitInterval: defaultSpendingLimitInterval,
+      collective: props.collective,
+    },
     async onSubmit(values) {
       const { collective, notes, purpose, spendingLimitAmount, spendingLimitInterval } = values;
       await requestNewVirtualCard({
