@@ -12,7 +12,7 @@ selected Chromium journey through the real frontend, API, database, images and
 PDF services. Local runs and CI use the same contract.
 
 Prerequisites (one-time): Python 3, built frontend/API/images/PDF (`npm run build` in
-each repo), `npx playwright install chromium`, and running Postgres, Mailpit,
+each repo, `npm run build:e2e` in the API), `npx playwright install chromium`, and running Postgres, Mailpit,
 and an S3-compatible store. The launcher starts its own disposable Redis and
 validates the rest. Focused non-Stripe runs need no Stripe credentials.
 

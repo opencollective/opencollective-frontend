@@ -645,8 +645,8 @@ preflight() {
     fail "frontend is not built ($FRONTEND_DIR/.next/BUILD_ID missing). Run: (cd $FRONTEND_DIR && npm run build)"
     exit 2
   fi
-  if [[ ! -f "$API_DIR/dist/e2e.js" ]]; then
-    fail "API is not built ($API_DIR/dist/e2e.js missing). Run: (cd $API_DIR && npm run build)"
+  if [[ ! -f "$API_DIR/dist/e2e/index.js" && ! -f "$API_DIR/dist/e2e.js" ]]; then
+    fail "API is not built ($API_DIR/dist/e2e/index.js missing). Run: (cd $API_DIR && npm run build:e2e)"
     exit 2
   fi
   if [[ ! -e "$IMAGES_DIR/dist/server" ]]; then
