@@ -11,6 +11,7 @@ export const LOCAL_STORAGE_KEYS = {
   PREFERRED_TWO_FACTOR_METHOD: 'preferredTwoFactorMethod',
   UPDATES_FORM_STATE: 'updatesFormState',
   RECENTLY_VISITED: 'recentlyVisited',
+  SEARCH_BACKEND: 'searchBackend',
   PLAID_LINK_TOKEN: 'plaidLinkToken',
   GOCARDLESS_DATA: 'gocardlessData',
   NEW_PLATFORM_TIP_FLOW_DRAWS: 'newPlatformTipFlowDraws',
