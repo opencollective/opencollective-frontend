@@ -94,23 +94,32 @@ const HostVirtualCards = props => {
   ).length;
 
   const handleSettingsUpdate = key => async value => {
-    await updateAccountSetting({
+    const { data } = await updateAccountSetting({
       variables: {
         account: { legacyId: props.collective.id },
         key,
         value,
       },
     });
-    toast({
-      variant: 'success',
-      message: <FormattedMessage id="Host.VirtualCards.Settings.Success" defaultMessage="Setting updated" />,
-    });
+    // `onError` above already surfaces failures; only report success when the mutation returned data.
+    const didUpdate = Boolean(data?.editAccountSetting);
+    if (didUpdate) {
+      toast({
+        variant: 'success',
+        message: <FormattedMessage id="Host.VirtualCards.Settings.Success" defaultMessage="Setting updated" />,
+      });
+    }
+    return didUpdate;
   };
 
-  const handleSpendingLimitIntervalChange = (interval, checked) => {
-    const value = { ...allowedSpendingLimitIntervals, [interval]: checked };
+  const handleSpendingLimitIntervalChange = async (interval, checked) => {
+    const previousValue = allowedSpendingLimitIntervals;
+    const value = { ...previousValue, [interval]: checked };
     setAllowedSpendingLimitIntervals(value);
-    handleSettingsUpdate('virtualcards.allowedSpendingLimitIntervals')(value);
+    const didUpdate = await handleSettingsUpdate('virtualcards.allowedSpendingLimitIntervals')(value);
+    if (!didUpdate) {
+      setAllowedSpendingLimitIntervals(previousValue);
+    }
   };
 
   return (
@@ -278,7 +287,9 @@ const HostVirtualCards = props => {
                 name={`virtualcards.allowedSpendingLimitIntervals.${interval}`}
                 label={formatMessage(VirtualCardLimitIntervalI18n[interval])}
                 checked={allowedSpendingLimitIntervals[interval]}
-                disabled={allowedSpendingLimitIntervals[interval] && enabledSpendingLimitIntervalsCount <= 1}
+                disabled={
+                  updateLoading || (allowedSpendingLimitIntervals[interval] && enabledSpendingLimitIntervalsCount <= 1)
+                }
                 onChange={({ checked }) => handleSpendingLimitIntervalChange(interval, checked)}
               />
             </Box>
