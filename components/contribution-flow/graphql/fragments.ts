@@ -147,11 +147,6 @@ export const orderSuccessFragment = gql`
       legacyId
       name
       slug
-      type
-      amountType
-      amount {
-        valueInCents
-      }
     }
     membership {
       id
@@ -183,9 +178,6 @@ export const orderSuccessFragment = gql`
       stats {
         id
         contributorsCount
-      }
-      ... on AccountWithContributions {
-        platformContributionAvailable
       }
       ... on AccountWithParent {
         parent {
