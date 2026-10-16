@@ -96,6 +96,19 @@ report full live coverage unavailable. Failure/recovery evidence is kept
 Focused non-Stripe runs require no Stripe credentials. Existing Cypress
 coverage and live-integration boundaries are unchanged.
 
+## Building for upload journeys
+
+Build the frontend with the CI environment before running journeys that upload
+files; `DISABLE_MOCK_UPLOADS` is compiled into the bundle:
+
+```bash
+TZ=UTC OC_ENV=ci NODE_ENV=test WEBSITE_URL=http://localhost:3000 API_URL=http://localhost:3060 \
+  PDF_SERVICE_URL=http://localhost:3002 API_KEY=dvl-1510egmf4a23d80342403fb599qd \
+  DISABLE_MOCK_UPLOADS=1 npm run build
+```
+
+The object store needs the `opencollective-e2e` bucket (see the canonical guide).
+
 ## Mutable fixtures
 
 Typed recipes and independent mutable journeys live under `fixtures/` and
@@ -106,3 +119,19 @@ interruption checks are documented in the canonical [guide](../../docs/e2e.md#au
 The companion API branch is required; ordinary Cypress startup does not enable
 the fixture endpoint. Credentials stay outside uploaded evidence and are
 redacted from traces and textual artifacts by the launcher.
+
+## Expense submission journeys
+
+`specs/expenses/` holds the submission journeys of the expense pilot: logged-out
+entry points, first invoice and reimbursement, a returning submitter, inline
+legal entity, invoice VAT and a draft that keeps its currency.
+
+```bash
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses --workers 3
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/submit-first-expense.spec.ts --grep "first invoice"
+```
+
+They use `scenarioTest` with the `expense-submission` and `expense-draft-invite`
+recipes, `helpers/expense-form.ts` and `helpers/uploads.ts`. Coverage mapping
+against the Cypress suite, differences, and setup versus execution timings are
+in the canonical [guide](../../docs/e2e.md#expense-submission-journeys-playwright-pilot).

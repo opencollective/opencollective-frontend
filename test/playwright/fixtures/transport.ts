@@ -4,9 +4,8 @@ import { readFileSync } from 'fs';
 import type { TestInfo } from '@playwright/test';
 import { z } from 'zod';
 
-const recipes = ['account-profile', 'account-conversation'] as const;
-const scenarioSchema = z.object({
-  recipe: z.enum(recipes),
+const envelope = {
+  recipe: z.string(),
   attempt: z.object({
     runId: z.string(),
     testId: z.string(),
@@ -15,20 +14,111 @@ const scenarioSchema = z.object({
     nonce: z.string(),
   }),
   requestId: z.string(),
+};
+
+/** One user administering one unhosted Account. */
+const accountScenario = z.object({
+  ...envelope,
   account: z.object({ id: z.string(), slug: z.string(), name: z.string() }),
   user: z.object({ id: z.string(), email: z.string(), slug: z.string() }),
   urls: z.object({ profile: z.string(), info: z.string(), conversations: z.string(), newConversation: z.string() }),
   auth: z.object({ token: z.string() }),
 });
 
-export type Scenario = z.infer<typeof scenarioSchema>;
-export type Recipe = Scenario['recipe'];
+/**
+ * Shared by every multi-party recipe: references keyed by the role label the
+ * recipe documents (`actors.submitter`, `accounts.collective`, ...). Each actor
+ * carries a private session token; the `actor` option picks who is signed in.
+ */
+const graphScenario = z.object({
+  ...envelope,
+  actors: z.record(
+    z.object({
+      id: z.string(),
+      legacyId: z.number(),
+      slug: z.string(),
+      name: z.string(),
+      email: z.string(),
+      token: z.string(),
+    }),
+  ),
+  accounts: z.record(
+    z.object({ id: z.string(), legacyId: z.number(), slug: z.string(), name: z.string(), type: z.string() }),
+  ),
+  expenses: z.record(
+    z.object({ id: z.string(), legacyId: z.number(), description: z.string(), status: z.string(), url: z.string() }),
+  ),
+  urls: z.record(z.string()),
+});
+
+// Written out rather than inferred: this project compiles without `strict`, where inference makes every field optional.
+type Envelope = {
+  recipe: string;
+  attempt: { runId: string; testId: string; retry: number; workerIndex: number; nonce: string };
+  requestId: string;
+};
+type AccountScenario = Envelope & {
+  account: { id: string; slug: string; name: string };
+  user: { id: string; email: string; slug: string };
+  urls: { profile: string; info: string; conversations: string; newConversation: string };
+  auth: { token: string };
+};
+export type GraphScenario = Envelope & {
+  actors: Record<string, { id: string; legacyId: number; slug: string; name: string; email: string; token: string }>;
+  accounts: Record<string, { id: string; legacyId: number; slug: string; name: string; type: string }>;
+  expenses: Record<string, { id: string; legacyId: number; description: string; status: string; url: string }>;
+  urls: Record<string, string>;
+};
+
+/** Inputs and result of each named API recipe (`server/e2e` in the API). Add a recipe by adding its entry here and in `schemas`. */
+type Contracts = {
+  'account-profile': { inputs: { name: string }; scenario: AccountScenario };
+  'account-conversation': { inputs: { name: string }; scenario: AccountScenario };
+  /**
+   * Actors `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), optional `invitee`.
+   * Accounts `host`, `collective`, optional `collective2`, `organization`. Expenses: optional `prior`.
+   * URLs `collective`, `newExpense`, `submittedExpenses`.
+   */
+  'expense-submission': {
+    inputs: {
+      collective?: { country: string; vat: { type: 'OWN' | 'HOST'; number: string } };
+      secondCollective?: boolean;
+      payeeOrganization?: boolean;
+      priorExpense?: boolean;
+      invitee?: boolean;
+    };
+    scenario: GraphScenario;
+  };
+  /**
+   * Actors `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`. Accounts `host`, `collective`, `payee`.
+   * Expenses: `draft`. URLs: `draft` (the invitation link).
+   */
+  'expense-draft-invite': {
+    inputs: { description: string; currency: 'USD' | 'EUR'; items: Array<{ description: string; amount: number }> };
+    scenario: GraphScenario;
+  };
+};
+
+const schemas: Record<Recipe, z.ZodTypeAny> = {
+  'account-profile': accountScenario,
+  'account-conversation': accountScenario,
+  'expense-submission': graphScenario,
+  'expense-draft-invite': graphScenario,
+};
+
+type Recipe = keyof Contracts;
+export type Inputs<R extends Recipe> = Contracts[R]['inputs'];
+export type Scenario<R extends Recipe = Recipe> = Contracts[R]['scenario'];
+/** Recipes returning the shared multi-party shape. */
+export type GraphRecipe = { [R in Recipe]: Scenario<R> extends GraphScenario ? R : never }[Recipe];
 
 /** One transport per test attempt, with stable request IDs within that attempt. */
 export class FixtureRecipes {
   readonly attempt: Scenario['attempt'];
   private readonly token: string;
   readonly endpoint: string;
+  /** Wall time of every arrangement in this attempt, for attributable setup timings. */
+  readonly timings: Array<{ recipe: Recipe; requestId: string; setupMs: number }> = [];
 
   constructor(testInfo: TestInfo) {
     const ownerFile = process.env.PLAYWRIGHT_FIXTURE_OWNER_FILE;
@@ -47,7 +137,7 @@ export class FixtureRecipes {
     };
   }
 
-  async request(recipe: Recipe, inputs: { name: string }, requestId: string = recipe) {
+  async request<R extends Recipe>(recipe: R, inputs: Inputs<R>, requestId: string = recipe) {
     // Node fetch keeps launcher/authentication secrets outside Playwright traces.
     // Retry only transport failures: the same identity recovers the DB receipt.
     const body = JSON.stringify({ attempt: this.attempt, requestId, recipe, inputs });
@@ -71,7 +161,8 @@ export class FixtureRecipes {
     }
   }
 
-  async arrange(recipe: Recipe, inputs: { name: string }, requestId: string = recipe): Promise<Scenario> {
+  async arrange<R extends Recipe>(recipe: R, inputs: Inputs<R>, requestId: string = recipe): Promise<Scenario<R>> {
+    const startedAt = performance.now();
     const response = await this.request(recipe, inputs, requestId);
     if (!response.ok) {
       const { error } = await response.json();
@@ -79,7 +170,7 @@ export class FixtureRecipes {
         `Fixture ${recipe}/${requestId}: ${error?.code || response.status}: ${error?.message || 'Setup failed'}`,
       );
     }
-    const parsed = scenarioSchema.safeParse(await response.json());
+    const parsed = schemas[recipe].safeParse(await response.json());
     if (
       !parsed.success ||
       parsed.data.recipe !== recipe ||
@@ -88,6 +179,7 @@ export class FixtureRecipes {
     ) {
       throw new Error('Fixture response does not match the typed recipe contract. Rebuild the companion API.');
     }
-    return parsed.data;
+    this.timings.push({ recipe, requestId, setupMs: Math.round(performance.now() - startedAt) });
+    return parsed.data as Scenario<R>;
   }
 }
