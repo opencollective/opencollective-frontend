@@ -11,7 +11,7 @@ runner-specific details.
 Build all services (repeat after relevant code changes):
 
 ```bash
-cd /workspace/opencollective-api && npm run build
+cd /workspace/opencollective-api && npm run build:e2e
 cd /workspace/opencollective-frontend && npm run build
 cd /workspace/opencollective-images && npm run build
 cd /workspace/opencollective-pdf && npm run build

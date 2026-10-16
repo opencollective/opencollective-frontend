@@ -274,7 +274,7 @@ jobs:
           cp -a "${stack_root}/opencollective-api/dist" opencollective-api/dist
           cp -a "${stack_root}/opencollective-images/dist" opencollective-images/dist
           cp -a "${stack_root}/opencollective-pdf/dist" opencollective-pdf/dist
-          test -f opencollective-api/dist/e2e.js
+          test -f opencollective-api/dist/e2e/index.js || test -f opencollective-api/dist/e2e.js
           test -e opencollective-images/dist/server
           test -f opencollective-pdf/dist/server/index.js
 
