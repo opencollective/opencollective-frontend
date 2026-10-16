@@ -17,16 +17,11 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
 import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants/payment-methods';
+import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, roundCentsAmount } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
-import {
-  Experiment,
-  isExperimentEnabled,
-  isOpenSourceCollectiveHost,
-  isOscTipExperiment,
-  platformTipApplies,
-} from '../../lib/experiments/experiments';
+import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
 import { gql } from '../../lib/graphql/helpers';
 import { AccountType } from '../../lib/graphql/types/v2/graphql';
 import { setGuestToken } from '../../lib/guest-accounts';
@@ -161,11 +156,6 @@ class ContributionFlow extends React.Component {
     const currency = tier?.amount?.currency || collective.currency;
     const amount = queryParams.amount || getDefaultTierAmount(tier, collective, currency);
     const quantity = queryParams.quantity || 1;
-    // OSC-only A/B: half of OSC contributors that would otherwise see the tip get the tip step hidden.
-    // Cached on the instance so the variant is stable for the duration of the flow.
-    this.platformTipDisabledByExperiment =
-      isOpenSourceCollectiveHost(collective?.host) &&
-      isExperimentEnabled(Experiment.OPENSOURCE_PLATFORM_TIP_AB, LoggedInUser, { collective });
     this.state = {
       error: null,
       stripe: null,
@@ -215,7 +205,6 @@ class ContributionFlow extends React.Component {
             ? 'new'
             : 'old',
           [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: this.canHavePlatformTips(),
-          [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: this.isOscTipExperiment(),
           [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.collective?.host?.slug,
         },
       });
@@ -228,7 +217,6 @@ class ContributionFlow extends React.Component {
               ? 'new'
               : 'old',
             [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: this.canHavePlatformTips(),
-            [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: this.isOscTipExperiment(),
             [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.collective?.host?.slug,
           },
         });
@@ -328,7 +316,6 @@ class ContributionFlow extends React.Component {
         platformTipBaseAmount && stepDetails.platformTip > 0 ? stepDetails.platformTip / platformTipBaseAmount : 0,
       [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails.isNewPlatformTip ? 'new' : 'old',
       [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: this.canHavePlatformTips(),
-      [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: this.isOscTipExperiment(),
       [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.collective?.host?.slug,
     };
 
@@ -742,16 +729,17 @@ class ContributionFlow extends React.Component {
   getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
   canHavePlatformTips() {
-    if (this.platformTipDisabledByExperiment) {
+    const { tier, collective } = this.props;
+    if (!collective.platformContributionAvailable) {
+      return false;
+    } else if (!tier) {
+      return true;
+    } else if (tier.type === TierTypes.TICKET) {
+      return false;
+    } else if (tier.amountType === AmountTypes.FIXED && !tier.amount?.valueInCents) {
       return false;
     }
-    return platformTipApplies(this.props.collective, this.props.tier);
-  }
-
-  // Whether this contribution is in the OSC platform tip A/B experiment portion.
-  // The arm is read from contributionPlatformTipEnabled (canHavePlatformTips).
-  isOscTipExperiment() {
-    return isOscTipExperiment(this.props.collective, this.props.tier);
+    return true;
   }
 
   checkFormValidity = () => {
@@ -1014,7 +1002,6 @@ class ContributionFlow extends React.Component {
                     }}
                     step={currentStep}
                     showPlatformTip={this.canHavePlatformTips()}
-                    isOscTipExperiment={this.isOscTipExperiment()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     onSignInClick={() => this.setState({ showSignIn: true })}
@@ -1039,7 +1026,6 @@ class ContributionFlow extends React.Component {
                       stepSummary={stepSummary}
                       disabled={this.state.isInitializing || this.state.isNavigating}
                       showPlatformTip={this.canHavePlatformTips()}
-                      isOscTipExperiment={this.isOscTipExperiment()}
                       hostSlug={this.props.collective?.host?.slug}
                     />
                   </Box>
