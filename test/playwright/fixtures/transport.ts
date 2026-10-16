@@ -123,7 +123,7 @@ type Contracts = {
    * `otherCollectiveAdmin`. Accounts `host`, `collective` (admin: `collectiveAdmin`), optional `collective2`
    * (admin: `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by
    * `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`). Vendors by `label`. URLs
-   * `hostedCollectives` (host dashboard).
+   * `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard).
    */
   'vendor-host': {
     inputs: {

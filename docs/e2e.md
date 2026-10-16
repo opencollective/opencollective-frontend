@@ -197,12 +197,12 @@ test.describe('paying Collective subject to VAT', () => {
 });
 ```
 
-| Recipe                 | Options (all default to off)                                                                                                                                                        | Actors                                                                                                  | Accounts, expenses, URLs                                                                                                                                                                                                                                                                                                                            |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `invitee`, `inviteeOrganization`                                                           | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin`    | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending invoice by the submitter on `collective`, with a saved payout method); URLs `collective`, `newExpense`, `submittedExpenses`                                                                              |
-| `expense-draft-invite` | `description`, `currency`, `items` (required)                                                                                                                                       | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                                                 | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                                                                                                                                                                    |
-| `expense-management`   | `expense: { description, items }`, `project`                                                                                                                                        | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                           |
-| `vendor-host`          | `useVendorPolicy`, `grants`, `secondCollective`, `project`, `outsider`, `otherHost: { admin, collective }`, `vendors: [{ label, host, usableWith, useVendorPolicy, payoutMethod }]` | `hostAdmin`, `collectiveAdmin`, `outsider` (no role anywhere), `otherHostAdmin`, `otherCollectiveAdmin` | `host` (no vendor policy unless `useVendorPolicy`), `collective` (admin `collectiveAdmin`), `collective2` (admin `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`); vendors by `label` in `scenario.vendors`; URL `hostedCollectives` |
+| Recipe                 | Options (all default to off)                                                                                                                                                        | Actors                                                                                                  | Accounts, expenses, URLs                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `invitee`, `inviteeOrganization`                                                           | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin`    | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending invoice by the submitter on `collective`, with a saved payout method); URLs `collective`, `newExpense`, `submittedExpenses`                                                                                                                            |
+| `expense-draft-invite` | `description`, `currency`, `items` (required)                                                                                                                                       | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                                                 | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                                                                                                                                                                                                                  |
+| `expense-management`   | `expense: { description, items }`, `project`                                                                                                                                        | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                                                                         |
+| `vendor-host`          | `useVendorPolicy`, `grants`, `secondCollective`, `project`, `outsider`, `otherHost: { admin, collective }`, `vendors: [{ label, host, usableWith, useVendorPolicy, payoutMethod }]` | `hostAdmin`, `collectiveAdmin`, `outsider` (no role anywhere), `otherHostAdmin`, `otherCollectiveAdmin` | `host` (no vendor policy unless `useVendorPolicy`), `collective` (admin `collectiveAdmin`), `collective2` (admin `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`); vendors by `label` in `scenario.vendors`; URLs `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard) |
 
 Each request owns a new active fiscal host, so no journey adds Collectives or
 expenses to a seeded host. Recipes arrange starting state and prior history
@@ -733,8 +733,9 @@ three expense groups now cover with 26 Playwright journeys.
 pilot (`test/cypress/integration/41-vendor-visibility.test.ts`: `vendor picker
 on expense submission`, `vendor picker on grant submission` and `Add Funds
 source picker`), which stays unchanged and runnable. The `inline vendor
-creation defaults` and `vendor settings dashboard` blocks of that file are not
-part of this group. Sixteen Cypress tests map to fifteen journeys:
+creation defaults` and `vendor settings dashboard` blocks of that file are
+covered by the [next group](#vendor-creation-and-settings-journeys-playwright-pilot).
+Sixteen Cypress tests map to fifteen journeys:
 
 | Cypress test                                                                                                            | Playwright journey (`specs/vendors/`)                                                                                              |
 | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -890,6 +891,210 @@ whole 46-test selection takes about 85 s of Playwright time with three
 workers, 106 s with two and 170 s with one, after roughly 55 s of launcher
 startup on a fresh stack. The Cypress timing supplied for the pilot (01:57)
 covers all 23 tests of the original file, of which these journeys cover 16.
+
+## Vendor creation and settings journeys (Playwright pilot)
+
+`specs/vendors/vendor-creation.spec.ts` and `vendor-settings.spec.ts` carry the
+rest of the Cypress vendor pilot
+(`test/cypress/integration/41-vendor-visibility.test.ts`: `inline vendor
+creation defaults` and `vendor settings dashboard`), which stays unchanged and
+runnable. Seven Cypress tests map to seven journeys:
+
+| Cypress test                                                                                                              | Playwright journey (`specs/vendors/`)                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| inline vendor creation defaults › Add Funds modal: created vendor is scoped to the paying collective                      | `vendor-creation.spec.ts` › vendor created while adding funds to a Collective is scoped to that Collective      |
+| inline vendor creation defaults › Expense flow: inline-created vendor is scoped to the paying collective                  | `vendor-creation.spec.ts` › vendor created from the expense form is scoped to the paying Collective             |
+| inline vendor creation defaults › Pending contribution modal: inline-created vendor is scoped to the receiving collective | `vendor-creation.spec.ts` › vendor created while recording expected funds is scoped to the receiving Collective |
+| inline vendor creation defaults › Grant flow: inline-created beneficiary is scoped to the paying collective               | `vendor-creation.spec.ts` › beneficiary created from the grant form is scoped to the granting Collective        |
+| vendor settings dashboard › edits a vendor policy                                                                         | `vendor-settings.spec.ts` › host admin limits a vendor to one Collective and opens it to all submitters         |
+| vendor settings dashboard › created vendor defaults to host policy                                                        | `vendor-settings.spec.ts` › vendor created on the vendors dashboard follows the policy of its host              |
+| vendor settings dashboard › updated host policy applies to vendors that use the host default                              | `vendor-settings.spec.ts` › vendors that follow their host take up a vendor policy changed in the host settings |
+
+Every vendor is created, edited or re-governed through the browser by the host
+admin, and what was saved is read where a user sees it. The creation journeys
+open the new vendor on the host's vendors dashboard and check its settings:
+"In relation to the following selected accounts" is chosen with exactly the
+Collective concerned, and "Host default" is chosen for who can use it. The
+settings journeys reopen the vendor's form after saving, read the vendors
+list ("Who can use"), and then open the expense form as the admin of the
+hosted Collective in a second browser (`openBrowserAs('collectiveAdmin')`):
+the picker that opens offers the vendors the new settings allow and withholds
+a control vendor they do not. No outcome is read from a fixture or the API;
+the UI shows all of them.
+
+Each journey arranges its own host, Collective, admins, starting vendors and
+host policy with the `vendor-host` recipe, which now also returns the host
+dashboard URLs `vendors` and `expectedFunds`. No recipe, builder or pending
+Contribution was added: the source opens the dialog that creates expected
+funds and never submits it, so there is nothing to arrange beyond the host and
+Collective. The one host policy that changes mid-journey belongs to that
+journey's host; no seeded host is touched and no journey reads another's
+vendors (the vendors dashboard and every picker are per host).
+
+`helpers/vendor-picker.ts` gains `createVendorInline` (search the new name,
+wait for the enabled "Create vendor: ..." or "Create beneficiary: ..." option,
+take it, wait for the confirmation toast). `helpers/vendor-dashboard.ts` holds
+`openVendorEditForm`, `expectScopedTo` and `vendorRow`. There are no fixed
+delays.
+
+Where the journeys differ from the Cypress source, and why:
+
+- **Ticket wording versus source: no pending Contribution.** The ticket lists
+  pending Contributions among the prerequisites. The source test never has
+  one, and neither does the journey; the vendor is created from the dialog and
+  the dialog is left unsubmitted, as in the source.
+- **Default policy checked on every creation (added).** The source checks the
+  scope of the four inline-created vendors. The journeys also check each
+  follows the host default, which is what a later host policy change relies on.
+- **"created vendor defaults to host policy" creates the vendor in the
+  browser.** The source creates it with the `createVendor` mutation and only
+  opens its form. The journey creates it with the "Create vendor" form of the
+  vendors dashboard, giving only a name, then reads the default in the list,
+  in the form (`Host default (<host> admins and collective admins)`), and in
+  the Collective admin's picker.
+- **Host policy changed in the host settings, not through the API.** The
+  source calls `setPolicies` mid-test. The journey opens Settings → Policies on
+  the host dashboard, sees the arranged "Only admins of ..." chosen, picks
+  "Anybody" and saves. That page saves all of the host's policies with their
+  current values, which stays within the journey's own host.
+- **Effects for another user (added).** The source reads the edit form only.
+  Each settings journey also shows the result to the Collective admin:
+  after the edit, the edited vendor is offered and an untouched one is not;
+  a vendor created with defaults is offered on a host open to Collective
+  admins while one restricted to host admins is not; after the host opens to
+  all submitters, the vendor following the host is offered (it was not before
+  the change), one open to everybody is offered before and after, and one
+  restricted to host admins stays withheld. These read the list the picker
+  opens with, as the picker journeys' policy checks do.
+- **Expected funds dialog.** The source types the new name, clicks "Create
+  new" (the heading of the group, which does nothing), then "Vendor". The
+  journey clicks the "Create Vendor" button under that heading and fills the
+  "Create new Vendor" dialog. That button sits in a list entry marked as
+  disabled although it works, so the journey checks it is visible and clicks
+  it without Playwright's enabled check. The dialog asks for the receiving
+  Collective's details a moment after it is chosen (the source's typing delay
+  covers that); the journey waits for that answer before creating the vendor.
+  The Collective is picked by its slug rather than a shared display name.
+- **Waiting for creation.** Choosing "Create vendor: ..." creates the vendor
+  at once. The helper waits for "Vendor created" before the journey leaves the
+  page, where the source relies on the next login being slower.
+- **Settings page opened from the menu.** Opened by its address in a browser
+  that has already loaded the dashboard, the settings page sometimes stays on
+  its loading indicator although its data has arrived (4 of about 45 loads of
+  a host's policies page while writing the journey; none of 20 through the
+  menu). The journey goes through Settings → Policies in the dashboard menu,
+  like a user. Reported with this group.
+- **Arranged, not created through the API.** As in the picker journeys, the
+  host, Collective, admins, policy and starting vendors come from one recipe
+  request; names are unique per attempt (`<label> <attempt tag>` for arranged
+  vendors, `<flow> <attempt id>` for created ones) instead of a shared
+  Collective name and a random suffix.
+
+Focused reproduction:
+
+```bash
+# The seven journeys, fresh
+./test/playwright/run-local.sh --workers 3 --spec test/playwright/specs/vendors \
+  --grep "created|limits a vendor|take up a vendor policy"
+
+# One journey, fresh
+./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-creation.spec.ts --grep "recording expected funds"
+./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-settings.spec.ts --grep "take up a vendor policy"
+
+# One journey against a retained populated stack
+./test/playwright/run-local.sh --reuse --spec test/playwright/specs/vendors/vendor-settings.spec.ts --grep "limits a vendor"
+
+# First attempts fail with a created vendor, an edited vendor or a changed host
+# policy behind them; each retry arranges a new host with its own policy and
+# vendors. Run a picker spec with --reuse at the same time to check that its
+# hosts are not affected.
+PLAYWRIGHT_ISOLATION_PROBE=1 ./test/playwright/run-local.sh --reuse --retries 1 \
+  --spec test/playwright/specs/vendors/vendor-settings.spec.ts
+```
+
+Timings, measured on an 8-CPU Linux VM with retries disabled. Setup is the
+`fixture-timings` attachment (one recipe request per journey); execution is
+the rest of the test's reported duration. "Alone" is one journey on a fresh
+stack, where the first recipe request also warms the API (about 0.4 s);
+"shared" is the median over three fresh runs of the whole selection with 3, 2
+and 3 workers.
+
+| Journey                                          | Setup alone | Execution alone | Setup shared | Total shared |
+| ------------------------------------------------ | ----------- | --------------- | ------------ | ------------ |
+| vendor created while adding funds                | 0.43 s      | 3.9 s           | 0.04 s       | 5.1 s        |
+| vendor created from the expense form             | 0.42 s      | 4.1 s           | 0.05 s       | 4.9 s        |
+| vendor created while recording expected funds    | 0.46 s      | 4.6 s           | 0.05 s       | 6.1 s        |
+| beneficiary created from the grant form          | 0.46 s      | 3.8 s           | 0.09 s       | 5.6 s        |
+| vendor limited and opened to all submitters      | 0.44 s      | 5.8 s           | 0.05 s       | 7.2 s        |
+| vendor created on the dashboard follows its host | 0.44 s      | 4.7 s           | 0.09 s       | 5.0 s        |
+| host policy change reaches following vendors     | 0.43 s      | 6.7 s           | 0.05 s       | 6.9 s        |
+
+Arranging the host, Collective, admins and up to three vendors costs
+0.03-0.16 s per journey once the API is warm (median 0.05 s). The settings
+journeys are the longest because each also drives a second browser. The seven
+journeys take about 37 s of test time when each runs alone and about 41 s
+summed inside a shared run. The whole 53-test selection takes about 108 s of
+Playwright time with three workers, 129 s with two and 215 s with one, after
+roughly 55 s of launcher startup on a fresh stack. The Cypress timing supplied
+for the pilot (01:57) covers all 23 tests of the original file; the picker
+journeys cover 16 of them and these journeys the other 7.
+
+## Pilot coverage reconciliation
+
+Every `describe` and `it` of the two pilot Cypress files is accounted for by
+the journey tables above. Both files are unchanged and still run with Cypress.
+
+`27-expenses.test.ts` (28 tests):
+
+| Cypress block                                   | Tests | Journeys | Section                                      |
+| ----------------------------------------------- | ----- | -------- | -------------------------------------------- |
+| new expense when logged out                     | 2     | 2        | Expense submission                           |
+| Actions on expense                              | 5     | 5        | Expense management                           |
+| Invoices › Create (new user, returning user)    | 2     | 2        | Expense submission                           |
+| Invoices › Create › Invite                      | 3     | 3        | Expense invitation                           |
+| Invoices › Create › Recurring, Duplicate        | 2     | 2        | Expense management                           |
+| Invoices › Create › Legal entity payee, Taxes   | 2     | 2        | Expense submission                           |
+| Invoices › Edit invoice expense                 | 2     | 2        | Expense management                           |
+| Reimbursements (new user, returning user)       | 2     | 2        | Expense submission                           |
+| Reimbursements › Invite                         | 3     | 3        | Expense invitation                           |
+| Reimbursements › Recurring, Duplicate           | 2     | 2        | Expense management                           |
+| Reimbursements › Edit reimbursement expense     | 2     | 0        | Expense management (consolidated, see below) |
+| Submitting a draft keeps the requested currency | 1     | 1        | Expense submission                           |
+
+`41-vendor-visibility.test.ts` (23 tests):
+
+| Cypress block                       | Tests | Journeys | Section                                 |
+| ----------------------------------- | ----- | -------- | --------------------------------------- |
+| vendor picker on expense submission | 13    | 12       | Vendor picker (consolidated, see below) |
+| vendor picker on grant submission   | 2     | 2        | Vendor picker                           |
+| Add Funds source picker             | 1     | 1        | Vendor picker                           |
+| inline vendor creation defaults     | 4     | 4        | Vendor creation and settings            |
+| vendor settings dashboard           | 3     | 3        | Vendor creation and settings            |
+
+| Group                        | Cypress tests | Playwright journeys |
+| ---------------------------- | ------------- | ------------------- |
+| Expense submission           | 9             | 9                   |
+| Expense invitation           | 6             | 6                   |
+| Expense management           | 13            | 11                  |
+| Vendor picker                | 16            | 15                  |
+| Vendor creation and settings | 7             | 7                   |
+| Total                        | 51            | 48                  |
+
+The three recorded consolidations, each explained in its section:
+
+- "Reimbursements › Edit reimbursement expense › Edits title" and "› Edits
+  items" run the same steps on the same invoice as the invoice variants (the
+  source never creates a reimbursement there); one journey each covers both.
+- "non-admin: shows the usable vendor and hides one scoped to a different
+  collective in the same picker" and "admin of collective A only sees A-scoped
+  vendors when paying from A" build the same graph and assert the same names;
+  one journey covers both.
+
+Nothing else is left out. Steps the journeys do not repeat because the source
+does not test them (no expense is paid, no funds are added, no expected funds
+are recorded, the recurrence is only configured) are listed in the sections.
+With the five journeys of the fixture and smoke specs, the Playwright
+selection holds 53 tests.
 
 ## Cypress (existing suite)
 

@@ -16,7 +16,14 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
     const submitted = page.getByTestId('expense-PENDING').filter({ hasText: prior.description });
     await expect(submitted).toHaveCount(1);
     await page.locator(`#expense-${prior.legacyId}`).locator('button[aria-haspopup="menu"]').click();
+    // The form asks for its options twice: for the copied expense, then again once it knows the paying
+    // Collective. Submitting before the second answer is refused without a message, so wait for it.
+    const formLoaded = page.waitForResponse(response => {
+      const request = response.request().postDataJSON?.();
+      return request?.operationName === 'ExpenseFormSchema' && request.variables?.collectiveSlug === collective.slug;
+    });
     await page.getByRole('menuitem', { name: 'Duplicate Expense' }).click();
+    await formLoaded;
 
     // The form opens with what the original expense said: parties, payout method, item, title and tag.
     await expect(

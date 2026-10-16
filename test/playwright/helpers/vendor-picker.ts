@@ -97,3 +97,24 @@ export async function expectVendorNotFound(page: Page, vendor: Vendor, { canCrea
 export async function pickVendor(page: Page, vendor: Vendor) {
   await vendorOption(page, 'payee', vendor).click();
 }
+
+/**
+ * In an open picker, as a host admin: searches for a name no vendor has and
+ * takes the offer to create a vendor (or grant beneficiary) called that.
+ */
+export async function createVendorInline(
+  page: Page,
+  vendor: Vendor,
+  { picker = 'payee', as = 'vendor' }: { picker?: Picker; as?: 'vendor' | 'beneficiary' } = {},
+) {
+  await searchVendors(page, vendor.name, picker);
+  // Disabled while the search is running.
+  const create = optionList(page, picker).getByRole('option', { name: `Create ${as}: ${vendor.name}` });
+  await expect(create).toBeEnabled();
+  await create.click();
+  await expect(
+    page
+      .getByTestId('toast-notification')
+      .filter({ hasText: as === 'vendor' ? 'Vendor created' : 'Beneficiary created' }),
+  ).toBeVisible();
+}
