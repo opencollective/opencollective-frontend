@@ -63,7 +63,7 @@ const virtualCardRequestQuery = gql`
   ${accountHoverCardFieldsFragment}
 `;
 
-const rejectVirtualCardRequestMutation = gql`
+export const rejectVirtualCardRequestMutation = gql`
   mutation RejectVirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
     rejectVirtualCardRequest(virtualCardRequest: $virtualCardRequest) {
       id

@@ -274,8 +274,8 @@ export const searchCommandQuery = gql`
   ${searchHostApplicationFieldsFragment}
 `;
 
-export const searchPageQuery = gql`
-  query SearchPage(
+export const searchResultsPageQuery = gql`
+  query SearchResultsPage(
     $searchTerm: String!
     $host: AccountReferenceInput
     $account: AccountReferenceInput

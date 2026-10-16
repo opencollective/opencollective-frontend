@@ -165,8 +165,8 @@ const createCollectiveMutation = gql`
   }
 `;
 
-const tagStatsQuery = gql`
-  query TagStats($host: AccountReferenceInput) {
+const createCollectiveTagStatsQuery = gql`
+  query CreateCollectiveTagStats($host: AccountReferenceInput) {
     tagStats(limit: 6, host: $host) {
       nodes {
         id
@@ -180,7 +180,7 @@ const addCreateCollectiveMutation = graphql(createCollectiveMutation, {
   name: 'createCollective',
 });
 
-const addTagStatsQuery = graphql(tagStatsQuery, {
+const addTagStatsQuery = graphql(createCollectiveTagStatsQuery, {
   options: props => {
     return {
       variables: {

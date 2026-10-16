@@ -12,8 +12,8 @@ import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { useToast } from '../ui/useToast';
 
-const unhostAccountMutation = gql`
-  mutation UnhostAccount($account: AccountReferenceInput!) {
+const rootUnhostAccountMutation = gql`
+  mutation RootUnhostAccount($account: AccountReferenceInput!) {
     removeHost(account: $account) {
       id
       slug
@@ -29,7 +29,7 @@ const unhostAccountMutation = gql`
 
 const UnhostAccountForm = () => {
   const [account, setAccount] = React.useState(null);
-  const [unhostAccount, { loading }] = useMutation(unhostAccountMutation);
+  const [unhostAccount, { loading }] = useMutation(rootUnhostAccountMutation);
   const { toast } = useToast();
   const intl = useIntl();
   return (

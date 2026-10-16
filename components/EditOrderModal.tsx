@@ -23,6 +23,7 @@ import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';
 import type { PaymentMethodOption } from './orders/PaymentMethodPicker';
 import PaymentMethodPicker from './orders/PaymentMethodPicker';
 import { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
+import { cancelRecurringContributionMutation } from './recurring-contributions/graphql/queries';
 import {
   ContributionInterval,
   getPlatformTipOptionFromAmount,
@@ -65,15 +66,6 @@ type EditOrderModalProps = BaseModalProps & {
   action: EditOrderActions;
   onSuccess?: () => void;
 };
-
-const cancelRecurringContributionMutation = gql`
-  mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!, $reasonCode: String!) {
-    cancelOrder(order: $order, reason: $reason, reasonCode: $reasonCode) {
-      id
-      status
-    }
-  }
-`;
 
 const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   const intl = useIntl();
