@@ -1,6 +1,8 @@
 import type { Page } from '@playwright/test';
 
 import { expect, scenarioTest } from '../../fixtures';
+import { isolationProbe } from '../../helpers/attempt';
+import { toast } from '../../helpers/notifications';
 
 const test = scenarioTest('expense-management', {
   inputs: { expense: { description: 'Expense for E2E tests', items: [{ description: 'Some stuff', amount: 1000 }] } },
@@ -22,9 +24,7 @@ async function writeExpensePolicies(page: Page, policies: { invoice: string; rei
     await expect(reimbursement).toHaveText(policies.reimbursement, { timeout: 1_000 });
   }).toPass();
   await page.getByTestId('submit-policy-btn').click();
-  await expect(
-    page.getByTestId('toast-notification').filter({ hasText: 'Policies updated successfully' }),
-  ).toBeVisible();
+  await expect(toast(page, 'Policies updated successfully')).toBeVisible();
 }
 
 test('Collective admin writes expense policies in the dashboard and submitters see them on the expense form', async ({
@@ -41,11 +41,7 @@ test('Collective admin writes expense policies in the dashboard and submitters s
   await page.getByTestId('menu-item-Settings').click();
   await page.getByTestId('menu-item-policies').click();
   await writeExpensePolicies(page, policies);
-  if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-    throw new Error(
-      'Intentional isolation probe: leave a Collective with saved policies behind and retry with one that has none.',
-    );
-  }
+  isolationProbe(testInfo, 'leave a Collective with saved policies behind and retry with one that has none.');
 
   await page.goto(scenario.expenses.pending.url);
   await page.getByTestId('submit-expense-button').click();

@@ -2,17 +2,21 @@ import { type BrowserContext, type Page, test as base } from '@playwright/test';
 
 import { LOCAL_STORAGE_KEYS } from '../../../lib/local-storage';
 
+import { attemptTag } from '../helpers/attempt';
 import { Mailbox } from '../helpers/mail';
 
-import { FixtureRecipes, type GraphRecipe, type GraphScenario, type Inputs, type Scenario } from './transport';
+import {
+  FixtureRecipes,
+  type GraphRecipe,
+  type GraphScenario,
+  type Inputs,
+  type Scenario,
+  scenarioEvidence,
+} from './transport';
 
 export { expect } from '@playwright/test';
 
 type AccountRecipe = 'account-profile' | 'account-conversation';
-
-/** Committed references and attempt metadata only: authentication handles stay out of evidence. */
-const withoutCredentials = (scenario: Scenario) =>
-  JSON.stringify(scenario, (key, value) => (key === 'token' || key === 'auth' ? undefined : value), 2);
 
 /** Browser storage of a visitor holding this session token, or of a logged-out visitor. */
 const storageFor = (session: string | null, baseURL: string) => ({
@@ -54,9 +58,12 @@ export const test = authored.extend<{ recipe: AccountRecipe; scenario: Scenario<
   recipe: ['account-profile', { option: true }],
   scenario: async ({ recipes, recipe }, provide, testInfo) => {
     const scenario = await recipes.arrange(recipe, {
-      name: `Playwright ${recipe} ${recipes.attempt.nonce.slice(0, 8)}`,
+      name: `Playwright ${recipe} ${attemptTag(recipes.attempt)}`,
     });
-    await testInfo.attach('scenario', { body: withoutCredentials(scenario), contentType: 'application/json' });
+    await testInfo.attach('scenario', {
+      body: JSON.stringify(scenarioEvidence(scenario), null, 2),
+      contentType: 'application/json',
+    });
     await provide(scenario);
   },
   session: async ({ scenario }, provide) => {
@@ -94,7 +101,10 @@ export const scenarioTest = <R extends GraphRecipe>(recipe: R, defaults: { input
     actor: [defaults.actor, { option: true }],
     scenario: async ({ recipes, inputs }, provide, testInfo) => {
       const scenario: GraphScenario = await recipes.arrange(recipe, inputs);
-      await testInfo.attach('scenario', { body: withoutCredentials(scenario), contentType: 'application/json' });
+      await testInfo.attach('scenario', {
+        body: JSON.stringify(scenarioEvidence(scenario), null, 2),
+        contentType: 'application/json',
+      });
       await provide(scenario);
     },
     session: async ({ scenario, actor }, provide) => {

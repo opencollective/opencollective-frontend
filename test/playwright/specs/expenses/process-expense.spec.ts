@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 
 import { expect, scenarioTest } from '../../fixtures';
+import { isolationProbe } from '../../helpers/attempt';
 import { downloadPdf } from '../../helpers/downloads';
 
 const test = scenarioTest('expense-management', {
@@ -22,6 +23,8 @@ test('Collective admin approves, unapproves and rejects an expense, leaving a co
   const status = page.getByTestId('expense-status-msg');
   const comments = page.getByTestId('comment-body');
   await expect(status).toHaveText('Pending');
+  // The comment form comes with the loaded discussion: nobody has commented yet.
+  await expect(page.getByTestId('comment-form')).toBeVisible();
   await expect(comments).toHaveCount(0);
 
   await page.getByTestId('approve-button').click();
@@ -30,11 +33,7 @@ test('Collective admin approves, unapproves and rejects an expense, leaving a co
   await confirmWithReason(page, 'Unapproved once');
   await expect(status).toHaveText('Pending');
   await expect(comments.filter({ hasText: 'Unapproved once' })).toBeVisible();
-  if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-    throw new Error(
-      'Intentional isolation probe: leave an unapproved, commented expense behind and retry with a fresh one.',
-    );
-  }
+  isolationProbe(testInfo, 'leave an unapproved, commented expense behind and retry with a fresh one.');
 
   await page.getByTestId('approve-button').click();
   await expect(status).toHaveText('Approved');
@@ -65,6 +64,8 @@ test('Collective admin deletes a rejected expense, which is then no longer avail
   await page.getByTestId('more-actions-delete-expense-btn').click();
   await page.getByTestId('confirmation-modal-continue').click();
   await expect(page).toHaveURL(scenario.urls.expenses);
+  // It was the Collective's only expense: once loaded, the list says it has none to show.
+  await expect(page.getByTestId('zero-expense-message')).toBeVisible();
   await expect(page.getByTestId(`expense-container-${expense.legacyId}`)).toHaveCount(0);
 
   await page.goto(expense.url);
@@ -92,9 +93,5 @@ test('Collective admin downloads the generated invoice of an expense as a PDF', 
   expect(text).toContain(`Bill to\n${scenario.accounts.host.name}`);
   expect(text).toContain('Some stuff USD $10.00 $0.00 $10.00');
   expect(text).toContain('Total USD $10.00');
-  if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-    throw new Error(
-      'Intentional isolation probe: leave a downloaded invoice behind and retry with a fresh expense and download path.',
-    );
-  }
+  isolationProbe(testInfo, 'leave a downloaded invoice behind and retry with a fresh expense and download path.');
 });

@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
+import { toast } from './notifications';
 import { dropFiles, expectStoredUpload, imageFile } from './uploads';
 
 type ExpenseKind = 'invoice' | 'reimbursement';
@@ -40,8 +41,6 @@ const INVITEE_PAYOUT_NOTICE =
 
 const section = (page: Page, id: string) => page.locator(`#${id}`);
 
-const toast = (page: Page, message: string) => page.getByTestId('toast-notification').filter({ hasText: message });
-
 /**
  * Picks a profile in a searchable picker by its exact handle. Options render in
  * a portal outside the form section, and one slug may be the prefix of another.
@@ -64,13 +63,19 @@ export async function addPayoutMethod(page: Page, payoutMethod: NewPayoutMethod)
   await expect(addNew).toHaveAttribute('data-state', 'checked');
   await payout.getByTestId('payout-method-type-select').click();
   await page.getByTestId('select-option').filter({ hasText: 'Other' }).click();
-  await payout.getByTestId('currency-picker').click();
-  await page
+  const currency = payout.getByTestId('currency-picker');
+  const currencyOption = page
     .getByTestId('select-content')
     .getByTestId('select-option')
-    .filter({ hasText: payoutMethod.currency })
-    .click();
-  await expect(payout.getByTestId('currency-picker')).toContainText(payoutMethod.currency);
+    .filter({ hasText: payoutMethod.currency });
+  // The list has closed by itself while it was still opening, leaving no selection: open it again until one is made.
+  await expect(async () => {
+    if (!(await currencyOption.isVisible())) {
+      await currency.click({ timeout: 2_000 });
+    }
+    await currencyOption.click({ timeout: 2_000 });
+    await expect(currency).toContainText(payoutMethod.currency, { timeout: 2_000 });
+  }).toPass();
   await payout.getByLabel('Info', { exact: true }).fill(payoutMethod.details);
   const alias = payout.locator('[id="input-newPayoutMethod.name"]');
   await alias.fill(payoutMethod.name);
@@ -86,8 +91,12 @@ export async function addPayoutMethod(page: Page, payoutMethod: NewPayoutMethod)
 export async function chooseExpenseType(page: Page, kind: ExpenseKind, { attachInvoice }: { attachInvoice: boolean }) {
   const type = section(page, 'TYPE_OF_EXPENSE');
   const label = kind === 'invoice' ? 'Invoice' : 'Reimbursement';
-  await type.getByRole('radio', { name: label }).click();
-  await expect(type.getByRole('radio', { name: label })).toBeChecked();
+  const choice = type.getByRole('radio', { name: label });
+  // A choice made while the form is still settling after the payout method has been lost: make it again until it holds.
+  await expect(async () => {
+    await choice.click({ timeout: 2_000 });
+    await expect(choice).toBeChecked({ timeout: 2_000 });
+  }).toPass();
   if (kind === 'invoice' && attachInvoice) {
     await type.getByText('Yes, I have an invoice').click();
     await type.getByText('Attach your invoice file').setInputFiles(imageFile('invoice0.jpg'));
@@ -99,12 +108,17 @@ export async function chooseExpenseType(page: Page, kind: ExpenseKind, { attachI
   }
 }
 
-/** Opens an emailed (or otherwise shared) expense invitation and starts completing it. */
-export async function openInvitation(page: Page, link: string) {
-  await page.goto(link);
+/** On an open expense invitation: checks what the recipient is told and offered, and starts completing it. */
+export async function continueInvitation(page: Page) {
   await expect(page.getByText('You have been invited to submit an expense')).toBeVisible();
   await expect(page.getByText('Decline invitation')).toBeVisible();
   await page.getByText('Continue submission').click();
+}
+
+/** Opens an emailed (or otherwise shared) expense invitation and starts completing it. */
+export async function openInvitation(page: Page, link: string) {
+  await page.goto(link);
+  await continueInvitation(page);
 }
 
 /**
@@ -117,7 +131,10 @@ export const signInFromInvitation = (page: Page) =>
 async function choosePayee(page: Page, payee: Payee) {
   const gettingPaid = section(page, 'WHO_IS_GETTING_PAID');
   if ('legalEntity' in payee) {
+    // The section preselects the user's own profile once it has loaded the profiles they can be paid through.
+    await expect(gettingPaid.getByRole('radio', { checked: true })).toBeVisible();
     // Only offered to a user who administers no other profile.
+    await expect(gettingPaid.getByText('I would like to get paid through a legal entity')).toBeVisible();
     await expect(gettingPaid.getByText('An account I administer')).toHaveCount(0);
     await gettingPaid.getByText('I would like to get paid through a legal entity').click();
     await gettingPaid.getByText('Country of Incorporation').locator('..').getByRole('combobox').click();
@@ -157,6 +174,13 @@ async function choosePayee(page: Page, payee: Payee) {
   }
 }
 
+/** Drops a local image onto an item's receipt zone and waits until the product has stored it. */
+export async function attachReceipt(item: Locator, name: string) {
+  await dropFiles(item.getByText('Drag & drop'), [imageFile(name)]);
+  await expect(item.getByText('Clear')).toBeVisible();
+  await expectStoredUpload(item.getByRole('link', { name: 'Uploaded file preview' }));
+}
+
 async function fillItem(
   item: Locator,
   kind: ExpenseKind,
@@ -166,10 +190,14 @@ async function fillItem(
   await item.getByLabel('Date').fill(values.date);
   await item.getByLabel('Amount').fill(values.amount);
   if (kind === 'reimbursement') {
-    await dropFiles(item.getByText('Drag & drop'), [imageFile(values.receipt)]);
-    await expect(item.getByText('Clear')).toBeVisible();
-    await expectStoredUpload(item.getByRole('link', { name: 'Uploaded file preview' }));
+    await attachReceipt(item, values.receipt);
   }
+}
+
+/** Submits the open expense form, new, duplicated or invited, and waits for the product to confirm it. */
+export async function sendExpense(page: Page) {
+  await page.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
+  await expect(page.getByText('has been submitted successfully!')).toBeVisible();
 }
 
 /**
@@ -280,13 +308,11 @@ export async function submitExpense(page: Page, submission: ExpenseSubmission) {
     await recurrence.getByTestId('expense-frequency').click();
     await page.getByTestId('expense-frequency-option').filter({ hasText: 'Monthly' }).click();
     await recurrence.locator('#expenseRecurrenceEndAt').fill('2125-09-29');
-    await recurrence.getByText('Save changes').click();
     await expect(recurrence).toContainText(
       'Once submitted, you will also be prompted to review and submit a copy of this expense every month. The prompts will stop on Sep 29, 2125',
     );
   }
 
-  await page.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
-  await expect(page.getByText('has been submitted successfully!')).toBeVisible();
+  await sendExpense(page);
   await page.getByRole('button', { name: 'View all expenses' }).click();
 }

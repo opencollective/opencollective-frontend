@@ -52,8 +52,8 @@ export class Mailbox {
       message =>
         message.To.some(({ Address }) => Address === recipient) &&
         message.Subject.includes(subject) &&
-        // Same machine as the mail server; the margin only absorbs timestamp rounding.
-        Date.parse(message.Created) >= this.openedAt - 1000,
+        // Mailpit runs on the same machine and clock, and records when it received the message to the millisecond.
+        Date.parse(message.Created) >= this.openedAt,
     );
   }
 
@@ -119,4 +119,13 @@ export async function expenseInvitationLink(
     new RegExp(`^/${account.slug}/expenses/\\d+\\?key=`),
   );
   return link;
+}
+
+/**
+ * The one-click link the product emails to someone who asks to sign in with
+ * their address `to`, as a path relative to the site.
+ */
+export async function emailedSignInLink(mail: Mailbox, { to }: { to: string }): Promise<string> {
+  const message = await mail.waitForMessage({ to, subject: 'Open Collective: Sign In' });
+  return linkIn(message, 'One-click Sign In');
 }

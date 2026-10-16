@@ -1,7 +1,10 @@
 import { expect, type Page } from '@playwright/test';
 
-type Vendor = { name: string };
-type Account = { slug: string };
+import { toast } from './notifications';
+
+/** A vendor as journeys name it: an arranged one from `scenario.vendors`, or one the journey creates. */
+export type Vendor = { name: string };
+export type Account = { slug: string };
 
 /** The payee picker of the expense and grant forms, or the source picker of the Add Funds dialog. */
 type Picker = 'payee' | 'addFundsSource';
@@ -112,9 +115,5 @@ export async function createVendorInline(
   const create = optionList(page, picker).getByRole('option', { name: `Create ${as}: ${vendor.name}` });
   await expect(create).toBeEnabled();
   await create.click();
-  await expect(
-    page
-      .getByTestId('toast-notification')
-      .filter({ hasText: as === 'vendor' ? 'Vendor created' : 'Beneficiary created' }),
-  ).toBeVisible();
+  await expect(toast(page, as === 'vendor' ? 'Vendor created' : 'Beneficiary created')).toBeVisible();
 }

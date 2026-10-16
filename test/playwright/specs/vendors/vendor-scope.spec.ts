@@ -1,4 +1,5 @@
 import { scenarioTest } from '../../fixtures';
+import { isolationProbe } from '../../helpers/attempt';
 import { expectVendorChoices, expectVendorNotFound, openVendorPicker } from '../../helpers/vendor-picker';
 
 const test = scenarioTest('vendor-host', { inputs: {}, actor: 'collectiveAdmin' });
@@ -22,9 +23,7 @@ test.describe('vendors scoped to different Collectives of one host', () => {
     const { usableHere, scopedElsewhere } = scenario.vendors;
     await openVendorPicker(page, scenario.accounts.collective);
     await expectVendorChoices(page, { offered: [usableHere], withheld: [scopedElsewhere] });
-    if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-      throw new Error('Intentional isolation probe: retry on a new host with its own vendors, policy and actors.');
-    }
+    isolationProbe(testInfo, 'retry on a new host with its own vendors, policy and actors.');
     await expectVendorNotFound(page, scopedElsewhere, { canCreate: false });
   });
 });

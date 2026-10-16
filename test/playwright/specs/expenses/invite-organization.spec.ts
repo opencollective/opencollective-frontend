@@ -1,5 +1,12 @@
 import { expect, scenarioTest } from '../../fixtures';
-import { addPayoutMethod, chooseExpenseType, openInvitation, submitExpense } from '../../helpers/expense-form';
+import { isolationProbe } from '../../helpers/attempt';
+import {
+  addPayoutMethod,
+  chooseExpenseType,
+  openInvitation,
+  sendExpense,
+  submitExpense,
+} from '../../helpers/expense-form';
 import { expenseInvitationLink } from '../../helpers/mail';
 
 const test = scenarioTest('expense-submission', { inputs: { inviteeOrganization: true }, actor: 'submitter' });
@@ -24,9 +31,7 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
       to: inviteeAdmin.email,
       account: collective,
     });
-    if (process.env.PLAYWRIGHT_ISOLATION_PROBE === '1' && testInfo.retry === 0) {
-      throw new Error('Intentional isolation probe: leave a delivered, unanswered invitation behind and retry.');
-    }
+    isolationProbe(testInfo, 'leave a delivered, unanswered invitation behind and retry.');
     const invited = await openBrowserAs('inviteeAdmin');
     await openInvitation(invited, invitation);
     await addPayoutMethod(invited, {
@@ -36,8 +41,7 @@ for (const kind of ['invoice', 'reimbursement'] as const) {
       save: true,
     });
     await chooseExpenseType(invited, kind, { attachInvoice: true });
-    await invited.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
-    await expect(invited.getByText('has been submitted successfully!')).toBeVisible();
+    await sendExpense(invited);
 
     // The inviter finds their draft turned into the payee's submitted expense.
     await page.goto(invitation.split('?')[0]);

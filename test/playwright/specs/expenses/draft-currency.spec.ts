@@ -1,9 +1,9 @@
 import { expect, scenarioTest } from '../../fixtures';
-import { addPayoutMethod, chooseExpenseType } from '../../helpers/expense-form';
+import { addPayoutMethod, chooseExpenseType, openInvitation, sendExpense } from '../../helpers/expense-form';
 
 const test = scenarioTest('expense-draft-invite', {
   inputs: {
-    description: 'Recurring-like USD draft',
+    description: 'Consulting invoice drafted in USD',
     currency: 'USD',
     items: [{ description: 'Consulting', amount: 12500 }],
   },
@@ -14,9 +14,7 @@ test('invited Organization submits a USD draft with a EUR payout method and the 
   page,
   scenario,
 }) => {
-  await page.goto(scenario.urls.draft);
-  await expect(page.getByText('You have been invited to submit an expense')).toBeVisible();
-  await page.getByText('Continue submission').click();
+  await openInvitation(page, scenario.urls.draft);
 
   // A saved payout method becomes the selected one; its currency differs from the draft's.
   await addPayoutMethod(page, {
@@ -34,8 +32,7 @@ test('invited Organization submits a USD draft with a EUR payout method and the 
   await items.locator('input[name="expenseItems.0.incurredAt"]').fill('2025-09-29');
   await expect(page.locator('#SUMMARY')).toContainText('$125.00 USD');
 
-  await page.locator('form').getByRole('button', { name: 'Submit Expense' }).click();
-  await expect(page.getByText('has been submitted successfully!')).toBeVisible();
+  await sendExpense(page);
 
   // The submitted expense keeps the requested currency.
   await page.goto(scenario.expenses.draft.url);

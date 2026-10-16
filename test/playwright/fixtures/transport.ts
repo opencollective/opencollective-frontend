@@ -93,6 +93,8 @@ type Contracts = {
       secondCollective?: boolean;
       payeeOrganization?: boolean;
       priorExpense?: boolean;
+      /** What the prior expense is; a `RECEIPT` (reimbursement) has a stored receipt on its item. Invoice unless stated. */
+      priorExpenseType?: 'INVOICE' | 'RECEIPT';
       invitee?: boolean;
       inviteeOrganization?: boolean;
     };
@@ -163,6 +165,43 @@ export type Inputs<R extends Recipe> = Contracts[R]['inputs'];
 export type Scenario<R extends Recipe = Recipe> = Contracts[R]['scenario'];
 /** Recipes returning the shared multi-party shape. */
 export type GraphRecipe = { [R in Recipe]: Scenario<R> extends GraphScenario ? R : never }[Recipe];
+
+const pick = <Handle extends object, Key extends keyof Handle>(handle: Handle, keys: Key[]) =>
+  Object.fromEntries(keys.map(key => [key, handle[key]]));
+const only = <Handle extends object, Key extends keyof Handle>(handles: Record<string, Handle>, keys: Key[]) =>
+  Object.fromEntries(Object.entries(handles).map(([label, handle]) => [label, pick(handle, keys)]));
+
+/**
+ * What a `scenario` attachment holds. It is assembled from named, non-secret
+ * fields rather than by removing known secrets from the response, so a
+ * credential a recipe returns under any key is never copied into evidence.
+ * URLs lose their query string, which is where a link would carry a key.
+ */
+export function scenarioEvidence(scenario: Scenario) {
+  const { recipe, attempt, requestId } = scenario;
+  const paths = (urls: Record<string, string>) =>
+    Object.fromEntries(Object.entries(urls).map(([label, url]) => [label, url.split(/[?#]/)[0]]));
+  if ('account' in scenario) {
+    return {
+      recipe,
+      attempt,
+      requestId,
+      account: pick(scenario.account, ['id', 'slug', 'name']),
+      user: pick(scenario.user, ['id', 'email', 'slug']),
+      urls: paths(scenario.urls),
+    };
+  }
+  return {
+    recipe,
+    attempt,
+    requestId,
+    actors: only(scenario.actors, ['id', 'legacyId', 'slug', 'name', 'email']),
+    accounts: only(scenario.accounts, ['id', 'legacyId', 'slug', 'name', 'type']),
+    expenses: only(scenario.expenses, ['id', 'legacyId', 'description', 'status']),
+    vendors: only(scenario.vendors, ['id', 'legacyId', 'slug', 'name', 'type']),
+    urls: paths(scenario.urls),
+  };
+}
 
 /** One transport per test attempt, with stable request IDs within that attempt. */
 export class FixtureRecipes {
