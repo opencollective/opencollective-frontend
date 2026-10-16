@@ -12,8 +12,8 @@ import { randomEmail, randomSlug } from './faker';
 import generateToken from './token';
 
 /**
- * Login with an existing account. If not provided in `params`, the email used for
- * authentication will be `defaultTestUserEmail`.
+ * Log in, creating a test account if needed. If not provided in `params`, the
+ * email used for authentication will be `defaultTestUserEmail`.
  *
  * @param {object} params:
  *    - redirect: The redirect URL
@@ -55,54 +55,21 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, comple
     user.email = randomEmail();
   }
 
-  // Sign-in only accepts existing users. Create the account explicitly without
-  // sending an extra login email, then use the usual E2E sign-in shortcut.
-  return graphqlQuery(null, {
-    operationName: 'CreateUser',
-    query: gqlV1`
-      mutation CreateUser($user: UserInputType!) {
-        createUser(user: $user, sendSignInLink: false) {
-          user {
-            id
-          }
-        }
-      }
-    `,
-    variables: {
-      user: pick(user, [
-        'email',
-        'name',
-        'legalName',
-        'company',
-        'image',
-        'description',
-        'website',
-        'newsletterOptIn',
-        'location',
-      ]),
-    },
-  })
-    .then(({ body }) => {
-      if (body.errors?.length) {
-        throw new Error(body.errors.map(error => error.message).join('\n'));
-      }
-      return signinRequest(user, redirect);
-    })
-    .then(({ body: { redirect } }) => {
-      // Test users are allowed to signin directly with E2E, thus a signin URL
-      // is directly returned by the API. See signin function in
-      // opencollective-api/server/controllers/users.js for more info
-      const token = getTokenFromRedirectUrl(redirect);
-      if (token) {
-        return getLoggedInUserFromToken(token).then(loggedInUser => {
-          return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name }).then(() => {
-            return cy.visit(redirect, visitParams).then(() => loggedInUser);
-          });
+  return signinRequest(user, redirect).then(({ body: { redirect } }) => {
+    // Test users are allowed to signin directly with E2E, thus a signin URL
+    // is directly returned by the API. See signin function in
+    // opencollective-api/server/controllers/users.js for more info
+    const token = getTokenFromRedirectUrl(redirect);
+    if (token) {
+      return getLoggedInUserFromToken(token).then(loggedInUser => {
+        return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name }).then(() => {
+          return cy.visit(redirect, visitParams).then(() => loggedInUser);
         });
-      } else {
-        return cy.visit(redirect, visitParams).then(() => user);
-      }
-    });
+      });
+    } else {
+      return cy.visit(redirect, visitParams).then(() => user);
+    }
+  });
 });
 
 function completeProfileIfRequired({ token, loggedInUser, completeProfile, name }) {
@@ -826,14 +793,45 @@ function getIdV2FromReferenceInput(account, token) {
  * @param {object} user - should have `email` and `id` set
  */
 function signinRequest(user, redirect, sendLink) {
-  return cy.request({
-    url: '/api/users/signin',
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+  // Setup commands also pass fresh test emails here. Ensure the user exists
+  // without changing existing users or sending an extra login email.
+  return graphqlQuery(null, {
+    operationName: 'CreateUser',
+    query: gqlV1`
+      mutation CreateUser($user: UserInputType!) {
+        createUser(user: $user, sendSignInLink: false, throwIfExists: false) {
+          user {
+            id
+          }
+        }
+      }
+    `,
+    variables: {
+      user: pick(user, [
+        'email',
+        'name',
+        'legalName',
+        'company',
+        'image',
+        'description',
+        'website',
+        'newsletterOptIn',
+        'location',
+      ]),
     },
-    body: JSON.stringify({ user, redirect, sendLink }),
+  }).then(({ body }) => {
+    if (body.errors?.length) {
+      throw new Error(body.errors.map(error => error.message).join('\n'));
+    }
+    return cy.request({
+      url: '/api/users/signin',
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user, redirect, sendLink }),
+    });
   });
 }
 
