@@ -899,21 +899,7 @@ function buildFormSchema(
         }
         return true;
       }, requiredMessage),
-    invoiceNumber: z
-      .string()
-      .nullish()
-      .refine(invoiceNumber => {
-        if (
-          [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug)
-        ) {
-          return true;
-        }
-
-        if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
-          return options.isAdminOfPayee || options.payee?.type === CollectiveType.VENDOR ? !!invoiceNumber : true;
-        }
-        return true;
-      }, requiredMessage),
+    invoiceNumber: z.string().nullish(),
     invoiceInfo: z.string().optional(),
     expenseItems: z.array(
       z

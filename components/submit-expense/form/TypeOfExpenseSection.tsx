@@ -7,6 +7,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { ExpenseLockableFields, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
+import {
+  PAYEE_SLUG_INVITE,
+  PAYEE_SLUG_INVITE_EXISTING_USER,
+  PAYEE_SLUG_INVITE_SOMEONE,
+} from '../../expenses/lib/constants';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { FormField } from '@/components/FormField';
@@ -192,7 +197,7 @@ function getInvoiceFormProps(form: ExpenseForm) {
     initialLoading: form.initialLoading,
     isSubmitting: form.isSubmitting,
     ...pick(form.options, ['isAdminOfPayee', 'payee']),
-    ...pick(form.values, ['invoiceFile', 'hasInvoiceOption', 'expenseTypeOption', 'invoiceInfo']),
+    ...pick(form.values, ['invoiceFile', 'hasInvoiceOption', 'expenseTypeOption', 'invoiceInfo', 'payeeSlug']),
   };
 }
 
@@ -272,7 +277,11 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
         <TabsContent value={YesNoOption.YES}>
           <div className="space-y-4">
             <FormField
-              required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
+              required={
+                ![PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
+                  props.payeeSlug,
+                )
+              }
               disabled={props.isSubmitting}
               name="invoiceFile"
               isPrivate
@@ -300,7 +309,7 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
             </FormField>
 
             <FormField
-              required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
+              required={false}
               disabled={props.isSubmitting}
               name="invoiceNumber"
               isPrivate
