@@ -23,7 +23,7 @@ Install the pinned browser once per machine:
 cd /workspace/opencollective-frontend && npm run playwright:install
 ```
 
-Infrastructure (Postgres, Mailpit, S3-compatible store) must already be running.
+Python 3 must be available for credential redaction. Infrastructure (Postgres, Mailpit, S3-compatible store) must already be running.
 The launcher starts its own disposable Redis on port `6380` and validates the
 rest. Non-Stripe smoke runs need no Stripe credentials.
 
@@ -95,3 +95,14 @@ report full live coverage unavailable. Failure/recovery evidence is kept
 
 Focused non-Stripe runs require no Stripe credentials. Existing Cypress
 coverage and live-integration boundaries are unchanged.
+
+## Mutable fixtures
+
+Typed recipes and independent mutable journeys live under `fixtures/` and
+`specs/account-*.spec.ts`. Run all pilot coverage with
+`./test/playwright/run-local.sh --spec test/playwright/specs --workers 2`.
+Fixture authoring, safe reuse, intentional failure/retry checks and API
+interruption checks are documented in the canonical [guide](../../docs/e2e.md#authoring-independent-playwright-fixtures).
+The companion API branch is required; ordinary Cypress startup does not enable
+the fixture endpoint. Credentials stay outside uploaded evidence and are
+redacted from traces and textual artifacts by the launcher.
