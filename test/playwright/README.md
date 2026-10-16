@@ -43,6 +43,15 @@ cd /workspace/opencollective-frontend
 
 # Keep owned processes on failure for inspection (prints cleanup command)
 ./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --keep-on-failure
+
+# Replay a recorded run from fresh matching inputs (validates, then runs fresh)
+./test/playwright/run-local.sh --replay test/playwright/.artifacts/<run-id>/replay-manifest.json
+
+# Join the live owned environment for iteration (no reset; never tears down)
+./test/playwright/run-local.sh --reuse --spec test/playwright/specs/smoke.spec.ts
+
+# Stop a retained owned environment (refuses while other runs use it)
+./test/playwright/run-local.sh --cleanup
 ```
 
 What the launcher does: preflights tools/checkouts/builds/infrastructure before

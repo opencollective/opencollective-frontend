@@ -43,6 +43,38 @@ Evidence per run lives under `test/playwright/.artifacts/<run-id>/`
 `--keep-on-failure` retains owned processes for inspection and prints the
 explicit cleanup command.
 
+### Replay, reuse, inspection, and cleanup
+
+Replay a recorded run from fresh matching inputs (validates service revisions,
+lockfiles, seed, runtime, and browser without modifying checkouts, then runs
+as fresh):
+
+```bash
+./test/playwright/run-local.sh --replay test/playwright/.artifacts/<run-id>/replay-manifest.json
+```
+
+Replay recreates recorded inputs — including a fresh database and fresh live
+provider resources — not historical provider state, and it cannot guarantee
+recurrence of an intermittent failure. Mismatched inputs fail with an
+expected-vs-actual list instead of overwriting local changes.
+
+Join the live owned environment for fast iteration (no database, cache, mail,
+or file reset; populated state stays shared; the run registers as an active
+user so the owner cannot tear the environment down underneath it):
+
+```bash
+./test/playwright/run-local.sh --reuse --spec test/playwright/specs/smoke.spec.ts
+```
+
+Retain a failed stack and clean it up explicitly (cleanup refuses while other
+runs still use the environment, and only affects the retained
+owned environment):
+
+```bash
+./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --keep-on-failure
+./test/playwright/run-local.sh --cleanup
+```
+
 Agents: use the exact launcher command above with explicit `--api-dir`,
 `--frontend-dir`, `--images-dir`, `--pdf-dir` when running from a worktree.
 See `test/playwright/README.md` for worktree paths and artifact locations.

@@ -22,3 +22,4 @@ Schema/codegen: `npm run graphql:update` (API must be running).
 Fresh Linux reproduction: `./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts`.
 Uses disposable `opencollective_pw_e2e` by default; explicit service paths via `--api-dir/--frontend-dir/--images-dir/--pdf-dir` for worktrees.
 Evidence: `test/playwright/.artifacts/<run-id>/replay-manifest.json` plus owned service logs.
+Replay: `--replay <manifest>` (validates inputs, runs fresh). Iteration: `--reuse` (joins live env, no reset). Cleanup: `--cleanup` (refuses while active users remain).
