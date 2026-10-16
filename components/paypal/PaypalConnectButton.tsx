@@ -1,10 +1,18 @@
 import React from 'react';
+import { gql, useMutation } from '@apollo/client';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { addAuthTokenToHeader, getPaypalConnectConfig } from '../../lib/api';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
+import { i18nGraphqlException } from '@/lib/errors';
+import type {
+  ConnectPaypalPayoutMethodMutation,
+  ConnectPaypalPayoutMethodMutationVariables,
+  Currency,
+  GetPaypalOAuthUrlMutation,
+  GetPaypalOAuthUrlMutationVariables,
+} from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
 import PayPalIcon from '../icons/PayPal';
@@ -13,32 +21,52 @@ import { useToast } from '../ui/useToast';
 
 import { PAYPAL_CONNECT_POPUP_MESSAGE } from './constants';
 
-const PAYPAL_CONNECT_SCOPES = 'openid profile email https://uri.paypal.com/services/paypalattributes';
+const getPaypalOAuthUrlMutation = gql`
+  mutation GetPaypalOAuthUrl($account: AccountReferenceInput!, $redirect: String, $currency: Currency) {
+    getPaypalOAuthUrl(account: $account, redirect: $redirect, currency: $currency)
+  }
+`;
 
-const openPaypalPopup = (authorizeUrl: string, clientId: string, redirectUri: string): Window | null => {
-  const url = new URL(authorizeUrl);
-  url.searchParams.set('flowEntry', 'static');
-  url.searchParams.set('client_id', clientId);
-  url.searchParams.set('response_type', 'code');
-  url.searchParams.set('scope', PAYPAL_CONNECT_SCOPES);
-  url.searchParams.set('redirect_uri', redirectUri);
+const connectPaypalPayoutMethodMutation = gql`
+  mutation ConnectPaypalPayoutMethod(
+    $code: NonEmptyString!
+    $state: NonEmptyString!
+    $account: AccountReferenceInput!
+    $currency: Currency!
+    $name: String
+    $payoutMethod: PayoutMethodReferenceInput
+  ) {
+    connectPaypalPayoutMethod(
+      code: $code
+      state: $state
+      account: $account
+      currency: $currency
+      name: $name
+      payoutMethod: $payoutMethod
+    ) {
+      connectedAccount {
+        id
+      }
+      payoutMethod {
+        id
+      }
+    }
+  }
+`;
 
+const openPaypalPopup = (authorizeUrl: string): Window | null => {
   const width = Math.min(500, window.outerWidth);
   const height = Math.min(700, window.outerHeight);
   const left = Math.round(window.screenX + (window.outerWidth - width) / 2);
   const top = Math.round(window.screenY + (window.outerHeight - height) / 2);
 
-  return window.open(
-    url.toString(),
-    'paypalConnect',
-    `popup=1,width=${width},height=${height},left=${left},top=${top}`,
-  );
+  return window.open(authorizeUrl, 'paypalConnect', `popup=1,width=${width},height=${height},left=${left},top=${top}`);
 };
 
 /**
  * Renders a "Connect PayPal" button that opens the "Log in with PayPal" flow
  * in a mini-browser popup (no fullPage param). On approval, the popup posts
- * the auth code back to this window; we then exchange it via the JSON endpoint.
+ * the auth code back to this window; we then exchange it via GraphQL.
  */
 const PaypalConnectButton = ({
   accountId,
@@ -70,18 +98,32 @@ const PaypalConnectButton = ({
   const popupRef = React.useRef<Window | null>(null);
   const cancelRef = React.useRef<(() => void) | null>(null);
 
+  const [getPaypalOAuthUrl] = useMutation<GetPaypalOAuthUrlMutation, GetPaypalOAuthUrlMutationVariables>(
+    getPaypalOAuthUrlMutation,
+  );
+  const [connectPaypalPayoutMethod] = useMutation<
+    ConnectPaypalPayoutMethodMutation,
+    ConnectPaypalPayoutMethodMutationVariables
+  >(connectPaypalPayoutMethodMutation);
+
   const handleConnect = async () => {
     setIsLoading(true);
     try {
-      // Reset per attempt so a prior successful connect does not suppress
-      // closed-popup rejection on a later cancelled flow (see closedPoll).
       hadSuccess.current = false;
-      const config = await getPaypalConnectConfig(accountId);
-      if (!config?.clientId || !config?.redirectUri || !config?.authorizeUrl) {
+      const redirect = window.location.href.replace(/\?.*/, '');
+      const oauthResult = await getPaypalOAuthUrl({
+        variables: {
+          account: { id: accountId },
+          redirect,
+          currency: currency as Currency,
+        },
+      });
+      const authorizeUrl = oauthResult.data?.getPaypalOAuthUrl;
+      if (!authorizeUrl) {
         throw new Error('PayPal Connect is not available at the moment.');
       }
 
-      const popup = openPaypalPopup(config.authorizeUrl, config.clientId, config.redirectUri);
+      const popup = openPaypalPopup(authorizeUrl);
       if (!popup) {
         toast({
           variant: 'error',
@@ -143,26 +185,34 @@ const PaypalConnectButton = ({
         window.addEventListener('message', onMessage);
       });
 
-      const result = await fetch('/api/connected-accounts/paypal/connect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...addAuthTokenToHeader(),
+      const connectResult = await connectPaypalPayoutMethod({
+        variables: {
+          code,
+          state,
+          account: { id: accountId },
+          currency: currency as Currency,
+          name: alias,
+          payoutMethod: payoutMethodId ? { id: payoutMethodId } : undefined,
         },
-        body: JSON.stringify({ code, state, accountId, payoutMethodId, currency, name: alias }),
-      }).then(response => {
-        if (!response.ok) {
-          return response.json().then(json => {
-            throw new Error(json?.error?.message || json?.error || response.statusText);
-          });
-        }
-        hadSuccess.current = true;
-        return response.json() as Promise<{ connectedAccountId: string; payoutMethodId: string }>;
       });
 
-      onSuccess(result);
+      hadSuccess.current = true;
+      const payload = connectResult.data?.connectPaypalPayoutMethod;
+      if (!payload?.connectedAccount?.id || !payload?.payoutMethod?.id) {
+        throw new Error('PayPal connect failed');
+      }
+
+      onSuccess({
+        connectedAccountId: payload.connectedAccount.id,
+        payoutMethodId: payload.payoutMethod.id,
+      });
     } catch (err) {
-      onError(err instanceof Error ? err : new Error(String(err)));
+      const graphQLErrors = (err as { graphQLErrors?: unknown[] })?.graphQLErrors;
+      if (err instanceof Error && !graphQLErrors?.length) {
+        onError(err);
+      } else {
+        onError(new Error(i18nGraphqlException(intl, err)));
+      }
     } finally {
       setIsLoading(false);
       setIsPopupOpen(false);
