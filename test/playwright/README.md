@@ -44,6 +44,10 @@ cd /workspace/opencollective-frontend
 # Keep owned processes on failure for inspection (prints cleanup command)
 ./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --keep-on-failure
 
+# Retries: 0 by default (benchmarks); at most 1 in routine CI
+./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --retries 1
+PLAYWRIGHT_WORKERS=2 PLAYWRIGHT_RETRIES=1 ./test/playwright/run-local.sh
+
 # Replay a recorded run from fresh matching inputs (validates, then runs fresh)
 ./test/playwright/run-local.sh --replay test/playwright/.artifacts/<run-id>/replay-manifest.json
 
@@ -68,12 +72,26 @@ replay manifest, and stops only owned processes.
 Run-specific directory per execution (no shared overwrite):
 
 - `test/playwright/.artifacts/<run-id>/replay-manifest.json` — exact service
-  revisions, lockfile hashes, seed hash, runtime/browser versions, selection,
-  non-secret config, and run identity for fresh replay.
+  revisions, lockfile hashes, seed hash, runtime/browser versions, selection
+  (including retries), non-secret config, and run identity for fresh replay.
 - `test/playwright/.artifacts/<run-id>/*.log` — owned API/frontend/images/PDF
   and db-restore logs (secrets sanitized).
-- `test/playwright/report/` — HTML/JSON/JUnit reports.
-- `test/playwright/test-results/` — traces/screenshots/videos retained on failure.
+- `test/playwright/.artifacts/<run-id>/report/` — HTML/JSON/JUnit reports
+  for this attempt.
+- `test/playwright/.artifacts/<run-id>/test-results/` — traces/screenshots/
+  videos retained on failure (original attempt kept across retries).
+
+`test/playwright/report/` and `test/playwright/test-results/` are only the
+local defaults when running `npx playwright test` directly without the
+launcher (which exports run-specific overrides).
+
+## CI (pilot, observational)
+
+`CI / e2e-playwright / playwright smoke` reuses this launcher with prepared
+same-revision builds; Cypress checks stay required. Later journeys reuse the
+same job via its `spec`/`grep` inputs. Fork runs are credential-free and
+report full live coverage unavailable. Failure/recovery evidence is kept
+14 days, successful evidence 7 days. See `docs/e2e.md`.
 
 Focused non-Stripe runs require no Stripe credentials. Existing Cypress
 coverage and live-integration boundaries are unchanged.

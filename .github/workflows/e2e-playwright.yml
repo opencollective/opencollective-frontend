@@ -1,0 +1,345 @@
+name: E2E Playwright
+
+# Pilot: one observational Chromium job sharing the local launcher contract
+# (test/playwright/run-local.sh). This job is intentionally NOT in branch
+# protection required checks: Cypress (`e2e / e2e (...)`) keeps protecting
+# existing coverage until adoption (ticket 12). Report real Playwright
+# test/setup/interruption outcomes here without masking failures, and do not
+# treat duplicate pilot cost as steady-state cost.
+#
+# Security: Do not switch this workflow to `pull_request_target` to run on fork PRs with secrets.
+# Use `pull_request` (secrets blocked for forks by default) or trusted push/workflow_dispatch instead.
+# This workflow uses no Stripe/live credentials at all: the focused smoke
+# needs none, so fork runs are credential-free by construction and explicitly
+# report full live coverage unavailable.
+
+on:
+  workflow_call:
+    inputs:
+      api-ref:
+        description: opencollective-api commit SHA resolved by e2e-prepare
+        required: true
+        type: string
+      images-ref:
+        description: opencollective-images commit SHA resolved by e2e-prepare
+        required: true
+        type: string
+      pdf-ref:
+        description: opencollective-pdf commit SHA resolved by e2e-prepare
+        required: true
+        type: string
+      spec:
+        description: Playwright spec for this job; later pilot journeys reuse this job via this input
+        required: false
+        default: test/playwright/specs/smoke.spec.ts
+        type: string
+      grep:
+        description: Title filter passed to Playwright as -g (empty runs the whole spec)
+        required: false
+        default: ''
+        type: string
+      workers:
+        description: Browser workers sharing one services stack (tune from measured CPU/memory/service capacity)
+        required: false
+        default: '1'
+        type: string
+      retries:
+        description: Playwright retries; benchmarks use 0, routine CI permits at most 1
+        required: false
+        default: '1'
+        type: string
+
+env:
+  TZ: UTC
+  OC_ENV: ci
+  NODE_ENV: test
+  WEBSITE_URL: http://localhost:3000
+  IMAGES_URL: http://localhost:3001
+  PDF_SERVICE_URL: http://localhost:3002
+  API_URL: http://localhost:3060
+  API_KEY: dvl-1510egmf4a23d80342403fb599qd
+  CI: true
+
+  AWS_KEY: user
+  AWS_SECRET: password
+  AWS_S3_BUCKET: opencollective-e2e
+  AWS_S3_REGION: us-east-1
+  AWS_S3_API_VERSION: latest
+  AWS_S3_ENDPOINT: http://localhost:9000
+  AWS_S3_SSL_ENABLED: false
+  AWS_S3_FORCE_PATH_STYLE: true
+  GRAPHQL_ERROR_DETAILED: true
+  DISABLE_MOCK_UPLOADS: 1
+  E2E_TEST: 1
+  PGHOST: localhost
+  PGUSER: postgres
+  MAILPIT_URL: http://localhost:8025
+  # The pinned redis service below is supplied infrastructure shared by all
+  # browser workers on this job. The launcher validates it and never starts or
+  # shuts down a Redis it does not own.
+  REDIS_URL: redis://localhost:6379
+  FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
+  API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
+  IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
+  PDF_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-pdf
+  TERM: xterm
+
+jobs:
+  playwright:
+    name: playwright smoke
+    runs-on: ubuntu-24.04
+
+    timeout-minutes: 30
+
+    env:
+      PLAYWRIGHT_SPEC: ${{ inputs.spec }}
+      PLAYWRIGHT_GREP: ${{ inputs.grep }}
+      # One shared services/persistent-state stack for all browser workers.
+      # Default 1; raise only from measured machine/service capacity.
+      PLAYWRIGHT_WORKERS: ${{ inputs.workers }}
+      # Benchmarks run with 0; routine CI permits at most 1. The launcher and
+      # playwright.config.ts reject larger values so first-attempt failures,
+      # recovered attempts, and final failures stay distinguishable.
+      PLAYWRIGHT_RETRIES: ${{ inputs.retries }}
+
+    services:
+      redis:
+        # Supplied, pinned Redis (launcher REDIS_URL): shared by the browser
+        # workers on this job, never reset or stopped by the launcher.
+        image: redis@sha256:2c2dff791878316e3b083188be0d578423b24813cdda5de0e80ea4f7b3e6bfd6
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+      postgres:
+        image: postgres:16.15@sha256:65b16a8b326e0cfbdf33fa7e783f2a0cb352a61448616ccccfd616ef42aa0f65
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 2s --health-timeout 5s --health-retries 5
+      rustfs:
+        image: rustfs/rustfs:1.0.0-rc.6@sha256:97171b3d72cd47dc81000f92ea84de25608bfc35a94c965501afaeb5d99f6035
+        ports:
+          - 9000:9000
+        options: --name=rustfs --health-cmd "curl -f http://localhost:9000/health/ready"
+        env:
+          RUSTFS_ACCESS_KEY: user
+          RUSTFS_SECRET_KEY: password
+      mailpit:
+        # Pinned Mailpit for the launcher readiness gate and API SMTP
+        # (localhost:1025). The scratch-built mailpit image has no
+        # curl/wget, so no container healthcheck: the launcher verifies
+        # Mailpit/API readiness with its own five-minute deadlines.
+        image: axllent/mailpit:v1.28.0@sha256:c076638db1e15662150be4fb62b8a6e96ef6ba5bde90c838a0239225854830f7
+        ports:
+          - 8025:8025
+          - 1025:1025
+
+    steps:
+      # man-db trigger on apt install is taking some time
+      - name: Disable man-db update
+        run: sudo rm -f /var/lib/man-db/auto-update
+      - name: Update apt
+        run: sudo apt-get update || exit 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+          `# Postgres client (psql/pg_restore for the launcher DB lifecycle)` \
+          postgresql-client-16 \
+          `# Redis client: the launcher validates the supplied Redis service` \
+          redis-tools
+
+      - name: Setup S3 bucket
+        env:
+          AWS_ACCESS_KEY_ID: user
+          AWS_SECRET_ACCESS_KEY: password
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          aws --endpoint-url http://127.0.0.1:9000 s3api head-bucket --bucket opencollective-e2e 2>/dev/null ||
+            aws --endpoint-url http://127.0.0.1:9000 s3api create-bucket --bucket opencollective-e2e
+
+      - name: Checkout (frontend)
+        uses: actions/checkout@v7
+
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: 'package.json'
+          cache: 'npm'
+
+      - name: Checkout E2E stack
+        uses: ./.github/actions/checkout-e2e-stack
+        with:
+          api-ref: ${{ inputs.api-ref }}
+          images-ref: ${{ inputs.images-ref }}
+          pdf-ref: ${{ inputs.pdf-ref }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore node_modules (api)
+        uses: actions/cache@v6
+        id: api-node-modules
+        with:
+          path: opencollective-api/node_modules
+          key: ${{ runner.os }}-api-node-modules-${{ hashFiles('opencollective-api/package-lock.json') }}
+
+      - name: Install dependencies (api)
+        working-directory: opencollective-api
+        if: steps.api-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Restore node_modules (images)
+        uses: actions/cache@v6
+        id: images-node-modules
+        with:
+          path: opencollective-images/node_modules
+          key: ${{ runner.os }}-images-node-modules-${{ hashFiles('opencollective-images/package-lock.json') }}
+
+      - name: Install dependencies (images)
+        working-directory: opencollective-images
+        if: steps.images-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Restore node_modules (pdf)
+        uses: actions/cache@v6
+        id: pdf-node-modules
+        with:
+          path: opencollective-pdf/node_modules
+          key: ${{ runner.os }}-pdf-node-modules-${{ hashFiles('opencollective-pdf/package-lock.json') }}
+
+      - name: Install dependencies (pdf)
+        working-directory: opencollective-pdf
+        if: steps.pdf-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Restore node_modules (frontend)
+        uses: actions/cache@v6
+        id: node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
+
+      - name: Install dependencies (frontend)
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Restore Playwright browser
+        uses: actions/cache@v6
+        id: playwright-browser
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright system dependencies
+        # Always installed (not cached): fresh runners have no OS packages.
+        run: npx playwright install-deps chromium
+
+      - name: Install Playwright Chromium
+        if: steps.playwright-browser.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      - name: Download Next.js build
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-next
+          path: /tmp/frontend-next
+
+      - name: Download service dist artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: e2e-service-dists
+          path: /tmp/e2e-service-dists
+
+      - name: Restore downloaded builds
+        run: |
+          set -euo pipefail
+
+          next_root=/tmp/frontend-next
+          if [ ! -f "${next_root}/BUILD_ID" ] && [ -f "${next_root}/frontend-next/BUILD_ID" ]; then
+            next_root="${next_root}/frontend-next"
+          fi
+          mkdir -p .next
+          rsync -a "${next_root}/" .next/
+          test -f .next/BUILD_ID
+          test -f .next/routes-manifest.json
+
+          stack_root=/tmp/e2e-service-dists
+          if [ ! -d "${stack_root}/opencollective-api/dist" ] && [ -d "${stack_root}/e2e-service-dists/opencollective-api/dist" ]; then
+            stack_root="${stack_root}/e2e-service-dists"
+          fi
+          rm -rf opencollective-api/dist opencollective-images/dist opencollective-pdf/dist
+          cp -a "${stack_root}/opencollective-api/dist" opencollective-api/dist
+          cp -a "${stack_root}/opencollective-images/dist" opencollective-images/dist
+          cp -a "${stack_root}/opencollective-pdf/dist" opencollective-pdf/dist
+          test -f opencollective-api/dist/e2e.js
+          test -e opencollective-images/dist/server
+          test -f opencollective-pdf/dist/server/index.js
+
+      - name: Report trusted/fork mode
+        run: |
+          if [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
+            echo "Fork PR: credential-free Playwright smoke with no secrets."
+            echo "Full live coverage (including Stripe, which stays in Cypress) is unavailable on forks;"
+            echo "reviewed trusted coverage on the same revision is required for later adoption/retirement."
+          else
+            echo "Trusted run: Playwright smoke against prepared same-revision builds."
+          fi
+
+      # Seed DB, start services, verify readiness, and run the browser journey
+      # through the shared launcher: the same contract as local runs.
+
+      - name: Run Playwright smoke via shared launcher
+        run: ./test/playwright/run-local.sh
+
+      # Report first-attempt failures, recovered attempts, final failures,
+      # and setup/interruption separately from the manifest and the
+      # machine-readable report (setup failures have a manifest but no
+      # results.json; interruptions are recorded as `interrupted`).
+
+      - name: Report Playwright attempt outcome
+        if: ${{ always() }}
+        run: |
+          manifest="$(ls -t test/playwright/.artifacts/*/replay-manifest.json 2>/dev/null | head -n 1 || true)"
+          if [ -z "$manifest" ]; then
+            echo "No replay manifest: the launcher never reached run identity (infrastructure failure before evidence)."
+            exit 0
+          fi
+          echo "Manifest: $manifest"
+          jq -r '"mode=\(.mode) status=\(.status) playwrightExitCode=\(.playwrightExitCode) runId=\(.runId)"' "$manifest"
+          results="$(ls -t test/playwright/.artifacts/*/report/results.json 2>/dev/null | head -n 1 || true)"
+          if [ -z "$results" ]; then
+            echo "No Playwright results.json: browser execution never started (setup failure or interruption; see manifest status)."
+            exit 0
+          fi
+          jq -r '"first-attempt: expected=\(.stats.expected) unexpected=\(.stats.unexpected) flaky=\(.stats.flaky) skipped=\(.stats.skipped)"' "$results"
+          echo "Reading: unexpected=final failures, flaky=recovered on retry (original attempt kept in test-results/), expected=passed first attempt."
+
+      # Every attempt keeps original traces, relevant screenshots, sanitized
+      # service logs, ownership identifiers, HTML/machine-readable reports,
+      # and the replay manifest under run-specific test/playwright/.artifacts/
+      # paths. Setup failures and cancellations upload what is available.
+
+      - name: Upload Playwright evidence (failure/recovery, 14 days)
+        uses: actions/upload-artifact@v7
+        if: ${{ failure() || cancelled() }}
+        with:
+          name: playwright-evidence-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test/playwright/.artifacts
+          # `.artifacts` is dot-prefixed: without this, upload-artifact skips
+          # the whole run directory and reports "No files were found".
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Playwright evidence (success, 7 days)
+        uses: actions/upload-artifact@v7
+        if: ${{ success() }}
+        with:
+          name: playwright-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test/playwright/.artifacts
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7

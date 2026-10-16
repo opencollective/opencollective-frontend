@@ -26,6 +26,7 @@
 #   test/playwright/run-local.sh --reuse --spec test/playwright/specs/smoke.spec.ts
 #   test/playwright/run-local.sh --cleanup
 #   PLAYWRIGHT_WORKERS=2 test/playwright/run-local.sh
+#   PLAYWRIGHT_RETRIES=1 test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts
 #
 # Canonical guide: docs/e2e.md. Runner details: test/playwright/README.md.
 
@@ -44,6 +45,11 @@ if [[ -n "${PLAYWRIGHT_GREP:-}" ]]; then GREP_SET=true; fi
 WORKERS="${PLAYWRIGHT_WORKERS:-1}"
 WORKERS_SET=false
 if [[ -n "${PLAYWRIGHT_WORKERS:-}" ]]; then WORKERS_SET=true; fi
+# Ticket 04: benchmarks run with zero retries; routine CI permits at most one
+# retry so first-attempt failures stay distinguishable from recoveries.
+RETRIES="${PLAYWRIGHT_RETRIES:-0}"
+RETRIES_SET=false
+if [[ -n "${PLAYWRIGHT_RETRIES:-}" ]]; then RETRIES_SET=true; fi
 HEADED=false
 HEADED_SET=false
 KEEP_ON_FAILURE=false
@@ -72,7 +78,8 @@ usage() {
   echo "Options:"
   echo "  --spec PATH            Playwright spec (default: $SPEC)"
   echo "  --grep PATTERN         Title filter passed as -g"
-  echo "  --workers N            Browser workers (default: 1)"
+  echo "  --workers N            Browser workers (default: 1; positive integer)"
+  echo "  --retries N            Playwright retries 0 or 1 (default: 0; CI uses 1 at most)"
   echo "  --headed               Run headed (debugging only)"
   echo "  --keep-on-failure      Retain owned processes/state on failure + print cleanup"
   echo "  --replay MANIFEST      Validate checkouts against a replay manifest, adopt its"
@@ -97,6 +104,8 @@ while [[ $# -gt 0 ]]; do
       GREP="$2"; GREP_SET=true; shift 2 ;;
     --workers)
       WORKERS="$2"; WORKERS_SET=true; shift 2 ;;
+    --retries)
+      RETRIES="$2"; RETRIES_SET=true; shift 2 ;;
     --headed)
       HEADED=true; HEADED_SET=true; shift ;;
     --keep-on-failure)
@@ -142,6 +151,14 @@ if [[ "$CLEANUP_ONLY" == true ]] && [[ "$MODE" != "fresh" ]]; then
 fi
 if [[ "$MODE" == "reuse" && "$KEEP_ON_FAILURE" == true ]]; then
   echo "ERROR: --reuse owns no processes; --keep-on-failure applies to fresh runs only." >&2
+  exit 2
+fi
+if ! [[ "$RETRIES" =~ ^[01]$ ]]; then
+  echo "ERROR: --retries must be 0 or 1 (got '$RETRIES'). Benchmarks use 0; routine CI permits at most 1." >&2
+  exit 2
+fi
+if ! [[ "$WORKERS" =~ ^[1-9][0-9]*$ ]]; then
+  echo "ERROR: --workers must be a positive integer (got '$WORKERS')." >&2
   exit 2
 fi
 
@@ -237,6 +254,13 @@ FRONTEND_LOG="$ARTIFACTS_DIR/frontend.log"
 IMAGES_LOG="$ARTIFACTS_DIR/images.log"
 PDF_LOG="$ARTIFACTS_DIR/pdf.log"
 MANIFEST="$ARTIFACTS_DIR/replay-manifest.json"
+# Ticket 04: Playwright's own reports live inside the run-specific artifacts
+# directory, so every attempt keeps original traces/screenshots/diagnostics
+# without shared-path overwrite. The config honors these overrides; without
+# them it falls back to test/playwright/report/ and test-results/.
+PLAYWRIGHT_REPORT_DIR="$ARTIFACTS_DIR/report"
+PLAYWRIGHT_OUTPUT_DIR="$ARTIFACTS_DIR/test-results"
+export PLAYWRIGHT_REPORT_DIR PLAYWRIGHT_OUTPUT_DIR
 
 sanitize() {
   # Strip likely secret values from logs/manifest diagnostics.
@@ -492,7 +516,7 @@ apply_replay_manifest() {
   check_field "migrationHead" "$(jq -r '.migrationHead // empty' "$manifest")" "$(migration_head "$API_DIR")"
   check_field "npm" "$(jq -r '.npm // empty' "$manifest")" "$(npm --version)"
   check_field "postgres" "$(jq -r '.postgres // empty' "$manifest")" "$(psql --version 2>/dev/null || echo unknown)"
-  check_field "redis" "$(jq -r '.redis // empty' "$manifest")" "$(redis-server --version 2>/dev/null || echo unknown)"
+  check_field "redis" "$(jq -r '.redis // empty' "$manifest")" "$(redis_version)"
   check_field "browserBuild" "$(jq -r '.browserBuild // empty' "$manifest")" "$(chromium_build)"
   # NOTE: recorded service URLs, checkout paths, pgDatabase/pgHost, and the
   # non-secret env block are intentionally NOT compared: host addresses, ports,
@@ -554,6 +578,16 @@ EOF
       WORKERS="$recorded"
     fi
   fi
+  if [[ "$RETRIES_SET" != true ]]; then
+    recorded="$(jq -r '.selection.retries // empty' "$manifest")"
+    if [[ -n "$recorded" && "$recorded" != "null" ]]; then
+      RETRIES="$recorded"
+    fi
+  fi
+  if ! [[ "$RETRIES" =~ ^[01]$ ]]; then
+    echo "ERROR: replay recorded retries '$RETRIES'; only 0 or 1 is supported." >&2
+    exit 2
+  fi
   if [[ "$HEADED_SET" != true ]]; then
     if [[ "$(jq -r '.selection.headed // false' "$manifest")" == true ]]; then
       HEADED=true
@@ -563,13 +597,20 @@ EOF
     fail "replay spec not found: $SPEC (recorded selection; override with --spec)"
     exit 2
   fi
-  echo "> Replaying selection: spec=$SPEC grep=${GREP:-<none>} workers=$WORKERS headed=$HEADED"
+  echo "> Replaying selection: spec=$SPEC grep=${GREP:-<none>} workers=$WORKERS retries=$RETRIES headed=$HEADED"
 }
 
 # --- Preflight (before changing any state) ---
 preflight() {
+  # redis-server is only required when this run may start its own disposable
+  # Redis (no REDIS_URL). With REDIS_URL the Redis is supplied infrastructure
+  # (e.g. the pinned CI service container) and is never owned or reset here.
+  local tools=(node npm psql pg_restore redis-cli curl jq git)
+  if [[ -z "${REDIS_URL:-}" ]]; then
+    tools+=(redis-server)
+  fi
   local missing=()
-  for tool in node npm psql pg_restore redis-cli redis-server curl jq git; do
+  for tool in "${tools[@]}"; do
     command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
   done
   if [[ ${#missing[@]} -gt 0 ]]; then
@@ -836,6 +877,13 @@ git_rev() {
   git -C "$1" rev-parse HEAD 2>/dev/null || echo "unknown"
 }
 
+redis_version() {
+  # Identity evidence for the Redis in play: the launcher's own binary when it
+  # may start one, otherwise the client that reaches the supplied Redis (CI
+  # pins that service container by digest in the workflow).
+  redis-server --version 2>/dev/null || redis-cli --version 2>/dev/null || echo "unknown"
+}
+
 file_sha() {
   sha256sum "$1" 2>/dev/null | awk '{print $1}' || echo "unknown"
 }
@@ -907,8 +955,8 @@ write_manifest() {
   "browser": "chromium (playwright-managed)",
   "browserBuild": "$(chromium_build)",
   "postgres": "$(psql --version 2>/dev/null || echo unknown)",
-  "redis": "$(redis-server --version 2>/dev/null || echo unknown)",
-  "selection": {"spec": "$spec_esc", "grep": "$grep_esc", "workers": "$WORKERS", "headed": $HEADED},
+  "redis": "$(redis_version)",
+  "selection": {"spec": "$spec_esc", "grep": "$grep_esc", "workers": "$WORKERS", "retries": "$RETRIES", "headed": $HEADED},
   "pgDatabase": "$PG_DATABASE",
   "pgHost": "${PG_HOST:-unknown}",
   "websiteUrl": "${WEBSITE_URL:-unknown}",
@@ -969,12 +1017,12 @@ on_exit() {
 }
 
 run_playwright() {
-  echo "> Running Playwright: $SPEC (workers=$WORKERS)"
+  echo "> Running Playwright: $SPEC (workers=$WORKERS retries=$RETRIES)"
   local args=("$SPEC")
   if [[ -n "$GREP" ]]; then
     args+=(-g "$GREP")
   fi
-  args+=(--workers="$WORKERS")
+  args+=(--workers="$WORKERS" --retries="$RETRIES")
   if [[ "$HEADED" == true ]]; then
     args+=(--headed)
   fi
