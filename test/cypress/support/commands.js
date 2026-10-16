@@ -1,5 +1,7 @@
 import 'cypress-mailpit';
 
+import { pick } from 'lodash-es';
+
 import { API_V1_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
 
@@ -45,7 +47,7 @@ Cypress.Commands.add('logout', () => {
 });
 
 /**
- * Create a new account an SignIn. If no email is provided in `params`, the account
+ * Create a new account and sign in. If no email is provided in `params`, the account
  * will be generated using a random email.
  */
 Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, completeProfile = true } = {}) => {
@@ -53,21 +55,54 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, comple
     user.email = randomEmail();
   }
 
-  return signinRequest(user, redirect).then(({ body: { redirect } }) => {
-    // Test users are allowed to signin directly with E2E, thus a signin URL
-    // is directly returned by the API. See signin function in
-    // opencollective-api/server/controllers/users.js for more info
-    const token = getTokenFromRedirectUrl(redirect);
-    if (token) {
-      return getLoggedInUserFromToken(token).then(loggedInUser => {
-        return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name }).then(() => {
-          return cy.visit(redirect, visitParams).then(() => loggedInUser);
+  // Sign-in only accepts existing users. Create the account explicitly without
+  // sending an extra login email, then use the usual E2E sign-in shortcut.
+  return graphqlQuery(null, {
+    operationName: 'CreateUser',
+    query: gqlV1`
+      mutation CreateUser($user: UserInputType!) {
+        createUser(user: $user, sendSignInLink: false) {
+          user {
+            id
+          }
+        }
+      }
+    `,
+    variables: {
+      user: pick(user, [
+        'email',
+        'name',
+        'legalName',
+        'company',
+        'image',
+        'description',
+        'website',
+        'newsletterOptIn',
+        'location',
+      ]),
+    },
+  })
+    .then(({ body }) => {
+      if (body.errors?.length) {
+        throw new Error(body.errors.map(error => error.message).join('\n'));
+      }
+      return signinRequest(user, redirect);
+    })
+    .then(({ body: { redirect } }) => {
+      // Test users are allowed to signin directly with E2E, thus a signin URL
+      // is directly returned by the API. See signin function in
+      // opencollective-api/server/controllers/users.js for more info
+      const token = getTokenFromRedirectUrl(redirect);
+      if (token) {
+        return getLoggedInUserFromToken(token).then(loggedInUser => {
+          return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name }).then(() => {
+            return cy.visit(redirect, visitParams).then(() => loggedInUser);
+          });
         });
-      });
-    } else {
-      return cy.visit(redirect, visitParams).then(() => user);
-    }
-  });
+      } else {
+        return cy.visit(redirect, visitParams).then(() => user);
+      }
+    });
 });
 
 function completeProfileIfRequired({ token, loggedInUser, completeProfile, name }) {
