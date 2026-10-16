@@ -1,0 +1,275 @@
+/**
+ * Tests for GraphQL v2 API proxy
+ * See: https://github.com/opencollective/opencollective-frontend/issues/11772
+ */
+
+import { Readable } from 'stream';
+
+// Mock fetch globally
+global.fetch = jest.fn();
+
+// Set required env vars
+process.env.API_URL = 'https://api.opencollective.com';
+process.env.API_KEY = 'test-api-key';
+
+/**
+ * Create a mock request that works as a stream (for bodyParser: false)
+ */
+function createMockRequest({ method, headers, body }) {
+  const bodyBuffer = Buffer.isBuffer(body) ? body : Buffer.from(body || '');
+  const stream = Readable.from([bodyBuffer]);
+
+  return Object.assign(stream, {
+    method,
+    headers: headers || {},
+  });
+}
+
+/**
+ * Create a mock request that emits a stream error (simulates client disconnect)
+ */
+function createErroringMockRequest({ method, headers, errorMessage }) {
+  const stream = new Readable({
+    read() {
+      // Emit error on next tick to simulate async stream error
+      process.nextTick(() => {
+        this.destroy(new Error(errorMessage || 'Client disconnected'));
+      });
+    },
+  });
+
+  return Object.assign(stream, {
+    method,
+    headers: headers || {},
+  });
+}
+
+/**
+ * Create a mock response
+ */
+function createMockResponse() {
+  const res = {
+    statusCode: 200,
+    headers: {},
+    body: null,
+    setHeader(key, value) {
+      this.headers[key] = value;
+      return this;
+    },
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(data) {
+      this.body = data;
+      return this;
+    },
+    _getJSONData() {
+      return this.body;
+    },
+    _getStatusCode() {
+      return this.statusCode;
+    },
+  };
+  return res;
+}
+
+describe('pages/api/graphql/v2', () => {
+  let handler;
+
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+    // Import fresh for each test
+    handler = require('../v2').default;
+  });
+
+  describe('JSON requests', () => {
+    it('should return 400 for malformed JSON', async () => {
+      const req = createMockRequest({
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          authorization: 'Bearer test-token',
+        },
+        body: '{ invalid json }',
+      });
+
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      // Should return 400 Bad Request, not crash with 500
+      expect(res._getStatusCode()).toBe(400);
+      expect(res._getJSONData()).toEqual({
+        errors: [
+          {
+            message: expect.stringContaining('Invalid JSON'),
+            extensions: { code: 'BAD_REQUEST' },
+          },
+        ],
+      });
+      // Should not have called fetch
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('should return 500 for stream errors (client disconnect)', async () => {
+      const req = createErroringMockRequest({
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          authorization: 'Bearer test-token',
+        },
+        errorMessage: 'Client disconnected',
+      });
+
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      // Should return 500 Internal Server Error with proper message
+      expect(res._getStatusCode()).toBe(500);
+      expect(res._getJSONData()).toEqual({
+        errors: [
+          {
+            message: expect.stringContaining('Error reading request body'),
+            extensions: { code: 'INTERNAL_SERVER_ERROR' },
+          },
+        ],
+      });
+      // Should not have called fetch
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('should forward JSON requests with stringified body', async () => {
+      const mockResponse = { data: { account: { id: '123' } } };
+      global.fetch.mockResolvedValueOnce({
+        json: () => Promise.resolve(mockResponse),
+      });
+
+      const jsonBody = {
+        query: '{ account(slug: "test") { id } }',
+        variables: {},
+      };
+
+      const req = createMockRequest({
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          authorization: 'Bearer test-token',
+        },
+        body: JSON.stringify(jsonBody),
+      });
+
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/graphql/v2'),
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify(jsonBody),
+        }),
+      );
+      expect(res._getJSONData()).toEqual(mockResponse);
+    });
+  });
+
+  describe('multipart requests', () => {
+    it('should forward multipart requests without JSON stringifying the body', async () => {
+      const mockResponse = {
+        data: {
+          uploadFile: {
+            file: { id: 'file-123', url: 'https://example.com/file.pdf' },
+          },
+        },
+      };
+      global.fetch.mockResolvedValueOnce({
+        json: () => Promise.resolve(mockResponse),
+      });
+
+      // Simulate multipart form data request
+      const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
+      const multipartBody = [
+        `--${boundary}`,
+        'Content-Disposition: form-data; name="operations"',
+        '',
+        '{"query":"mutation UploadFile($files: [UploadFileInput!]!) { uploadFile(files: $files) { file { id url } } }","variables":{"files":[{"kind":"EXPENSE_ITEM","file":null}]}}',
+        `--${boundary}`,
+        'Content-Disposition: form-data; name="map"',
+        '',
+        '{"0":["variables.files.0.file"]}',
+        `--${boundary}`,
+        'Content-Disposition: form-data; name="0"; filename="test.pdf"',
+        'Content-Type: application/pdf',
+        '',
+        'PDF file content here',
+        `--${boundary}--`,
+      ].join('\r\n');
+
+      const req = createMockRequest({
+        method: 'POST',
+        headers: {
+          'content-type': `multipart/form-data; boundary=${boundary}`,
+          authorization: 'Bearer test-token',
+        },
+        body: multipartBody,
+      });
+
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      // The key assertion: multipart body should NOT be JSON stringified
+      const fetchCall = global.fetch.mock.calls[0];
+      const sentBody = fetchCall[1].body;
+
+      // For multipart, the body should be a Buffer (raw data), not a JSON string
+      expect(Buffer.isBuffer(sentBody)).toBe(true);
+      expect(sentBody.toString()).toBe(multipartBody);
+
+      // Verify it was NOT JSON stringified (would start with a quote)
+      expect(sentBody.toString()).not.toMatch(/^"/);
+
+      expect(res._getJSONData()).toEqual(mockResponse);
+    });
+
+    it('should preserve multipart content-type header with boundary', async () => {
+      global.fetch.mockResolvedValueOnce({
+        json: () => Promise.resolve({ data: {} }),
+      });
+
+      const boundary = '----TestBoundary';
+      const req = createMockRequest({
+        method: 'POST',
+        headers: {
+          'content-type': `multipart/form-data; boundary=${boundary}`,
+          authorization: 'Bearer test-token',
+        },
+        body: `--${boundary}--`,
+      });
+
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      const fetchCall = global.fetch.mock.calls[0];
+      const headers = fetchCall[1].headers;
+
+      expect(headers['content-type']).toContain('multipart/form-data');
+      expect(headers['content-type']).toContain(boundary);
+    });
+  });
+
+  describe('config', () => {
+    it('should export config with bodyParser disabled', () => {
+      const { config } = require('../v2');
+      expect(config).toEqual({
+        api: {
+          bodyParser: false,
+        },
+      });
+    });
+  });
+});
