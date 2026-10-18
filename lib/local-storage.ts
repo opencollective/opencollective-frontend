@@ -13,7 +13,6 @@ export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED: 'recentlyVisited',
   PLAID_LINK_TOKEN: 'plaidLinkToken',
   GOCARDLESS_DATA: 'gocardlessData',
-  OSC_TIP_EXPERIMENT_DRAWS: 'oscTipExperimentDraws',
   NEW_PLATFORM_TIP_FLOW_DRAWS: 'newPlatformTipFlowDraws',
 };
 

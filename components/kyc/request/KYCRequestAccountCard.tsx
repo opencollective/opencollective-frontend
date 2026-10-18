@@ -11,7 +11,7 @@ import type {
   KycRequestAccountCardQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
 
-import { AccountHoverCard, accountHoverCardFields } from '@/components/AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import Avatar from '@/components/Avatar';
 
 type KYCRequestAccountCardProps = {
@@ -29,7 +29,7 @@ export function KYCRequestAccountCard(props: KYCRequestAccountCardProps) {
         }
       }
 
-      ${accountHoverCardFields}
+      ${accountHoverCardFieldsFragment}
     `,
     {
       variables: {

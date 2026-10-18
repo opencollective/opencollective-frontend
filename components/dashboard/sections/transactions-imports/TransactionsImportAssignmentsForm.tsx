@@ -5,7 +5,7 @@ import { uniqBy } from 'lodash-es';
 import { Building, ChartCandlestick, ChartLine, CreditCard, HandCoins, Landmark, Wallet } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { TransactionsImportAssignmentFieldsFragment } from './lib/graphql';
+import { transactionsImportAssignmentFieldsFragment } from './lib/graphql';
 import { DEFAULT_ASSIGNMENT_ACCOUNT_ID } from './lib/types';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { getAccountReferenceInput } from '@/lib/collective';
@@ -37,7 +37,7 @@ const editTransactionsImportAssignmentsMutation = gql`
       }
     }
   }
-  ${TransactionsImportAssignmentFieldsFragment}
+  ${transactionsImportAssignmentFieldsFragment}
 `;
 
 const setBankAccountBalanceCategoryMutation = gql`

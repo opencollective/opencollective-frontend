@@ -27,7 +27,7 @@ import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
 import { BillingProjection } from './BillingProjection';
-import { platformBillingFragment, platformSubscriptionFragment } from './fragments';
+import { platformBillingFieldsFragment, platformSubscriptionFieldsFragment } from './fragments';
 import { PlatformPaymentsView } from './PlatformPaymentsView';
 import { PlatformSubscriptionCard } from './PlatformSubscriptionCard';
 
@@ -53,8 +53,8 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
           }
         }
       }
-      ${platformSubscriptionFragment}
-      ${platformBillingFragment}
+      ${platformSubscriptionFieldsFragment}
+      ${platformBillingFieldsFragment}
     `,
     {
       variables: {
@@ -258,7 +258,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
 
       {isLoading ? (
         <Skeleton className="h-48 w-full" />
-      ) : billing?.expenses?.length === 0 ? null : (
+      ) : !billing?.expenses?.length ? null : (
         <React.Fragment>
           <div className="mt-8 mb-4 flex items-center gap-4">
             <div className="font-bold">
