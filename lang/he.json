@@ -2300,6 +2300,8 @@
   "Host.VirtualCards.AutoPauseUnusedCards.Description": "Unused cards will be paused after set days of inactivity. The assignee can always un-pause when required.",
   "Host.VirtualCards.AutoPauseUnusedCards.Title": "Pause unused cards",
   "Host.VirtualCards.AutoPauseUnusedCardsPeriod.Title": "Inactivity Duration",
+  "Host.VirtualCards.LimitPolicies.Description": "Choose the limit policies collectives can select when requesting a card. At least one option must stay enabled.",
+  "Host.VirtualCards.LimitPolicies.Title": "Limit policies for card requests",
   "Host.VirtualCards.List.Description": "ביצוע תשלומים בקלות באמצעות יצירת כרטי וירטואלי. כל קבוצה יכולה לנהל מספר כרטיסים. <learnMoreLink>למידע נוסף</learnMoreLink>",
   "Host.VirtualCards.Policy.Placeholder": "למשל דד-לייינים לשליחת קבלות, לאפשר חיובים, מגבלות, או פרטים ליצירת קשר אם יש שאלות.",
   "Host.VirtualCards.Policy.Save": "שמירת תנאי מדיניות",
