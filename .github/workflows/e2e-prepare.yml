@@ -86,7 +86,9 @@ jobs:
         run: |
           set -eu
           fail=0
-          (cd opencollective-api && npm run build) &
+          # The API keeps its E2E entry point out of `build` (it ships to production) and adds it in
+          # `build:e2e`. Branches from before that split only have `build`.
+          (cd opencollective-api && if [ "$(npm pkg get scripts.build:e2e)" != "{}" ]; then npm run build:e2e; else npm run build; fi) &
           api_pid=$!
           (cd opencollective-images && npm run build) &
           images_pid=$!
@@ -105,7 +107,7 @@ jobs:
           cp -a opencollective-api/dist "$stage/opencollective-api/dist"
           cp -a opencollective-images/dist "$stage/opencollective-images/dist"
           cp -a opencollective-pdf/dist "$stage/opencollective-pdf/dist"
-          test -f "$stage/opencollective-api/dist/e2e.js"
+          test -f "$stage/opencollective-api/dist/e2e/index.js" || test -f "$stage/opencollective-api/dist/e2e.js"
           test -e "$stage/opencollective-images/dist/server"
           test -f "$stage/opencollective-pdf/dist/server/index.js"
 

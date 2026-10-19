@@ -1,0 +1,276 @@
+import { createHash, randomUUID } from 'crypto';
+import { readFileSync } from 'fs';
+
+import type { TestInfo } from '@playwright/test';
+import { z } from 'zod';
+
+const envelope = {
+  recipe: z.string(),
+  attempt: z.object({
+    runId: z.string(),
+    testId: z.string(),
+    retry: z.number(),
+    workerIndex: z.number(),
+    nonce: z.string(),
+  }),
+  requestId: z.string(),
+};
+
+/** One user administering one unhosted Account. */
+const accountScenario = z.object({
+  ...envelope,
+  account: z.object({ id: z.string(), slug: z.string(), name: z.string() }),
+  user: z.object({ id: z.string(), email: z.string(), slug: z.string() }),
+  urls: z.object({ profile: z.string(), info: z.string(), conversations: z.string(), newConversation: z.string() }),
+  auth: z.object({ token: z.string() }),
+});
+
+/**
+ * Shared by every multi-party recipe: references keyed by the role label the
+ * recipe documents (`actors.submitter`, `accounts.collective`, ...). Each actor
+ * carries a private session token; the `actor` option picks who is signed in.
+ */
+const graphScenario = z.object({
+  ...envelope,
+  actors: z.record(
+    z.object({
+      id: z.string(),
+      legacyId: z.number(),
+      slug: z.string(),
+      name: z.string(),
+      email: z.string(),
+      token: z.string(),
+    }),
+  ),
+  accounts: z.record(
+    z.object({ id: z.string(), legacyId: z.number(), slug: z.string(), name: z.string(), type: z.string() }),
+  ),
+  expenses: z.record(
+    z.object({ id: z.string(), legacyId: z.number(), description: z.string(), status: z.string(), url: z.string() }),
+  ),
+  /** Vendors arranged by the vendor recipes; other recipes arrange none. */
+  vendors: z
+    .record(z.object({ id: z.string(), legacyId: z.number(), slug: z.string(), name: z.string(), type: z.string() }))
+    .default({}),
+  urls: z.record(z.string()),
+});
+
+// Written out rather than inferred: this project compiles without `strict`, where inference makes every field optional.
+type Envelope = {
+  recipe: string;
+  attempt: { runId: string; testId: string; retry: number; workerIndex: number; nonce: string };
+  requestId: string;
+};
+type AccountScenario = Envelope & {
+  account: { id: string; slug: string; name: string };
+  user: { id: string; email: string; slug: string };
+  urls: { profile: string; info: string; conversations: string; newConversation: string };
+  auth: { token: string };
+};
+export type GraphScenario = Envelope & {
+  actors: Record<string, { id: string; legacyId: number; slug: string; name: string; email: string; token: string }>;
+  accounts: Record<string, { id: string; legacyId: number; slug: string; name: string; type: string }>;
+  expenses: Record<string, { id: string; legacyId: number; description: string; status: string; url: string }>;
+  vendors: Record<string, { id: string; legacyId: number; slug: string; name: string; type: string }>;
+  urls: Record<string, string>;
+};
+
+type UseVendorPolicy = 'HOST_ADMINS' | 'HOST_AND_COLLECTIVE_ADMINS' | 'ALL_SUBMITTERS';
+
+/** Inputs and result of each named API recipe (`server/e2e` in the API). Add a recipe by adding its entry here and in `schemas`. */
+type Contracts = {
+  'account-profile': { inputs: { name: string }; scenario: AccountScenario };
+  'account-conversation': { inputs: { name: string }; scenario: AccountScenario };
+  /**
+   * Actors `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), optional `invitee`,
+   * `inviteeAdmin`. Accounts `host`, `collective`, optional `collective2`, `organization`,
+   * `inviteeOrganization` (administered by `inviteeAdmin` only). Expenses: optional `prior`.
+   * URLs `collective`, `newExpense`, `submittedExpenses`.
+   */
+  'expense-submission': {
+    inputs: {
+      collective?: { country: string; vat: { type: 'OWN' | 'HOST'; number: string } };
+      secondCollective?: boolean;
+      payeeOrganization?: boolean;
+      priorExpense?: boolean;
+      /** What the prior expense is; a `RECEIPT` (reimbursement) has a stored receipt on its item. Invoice unless stated. */
+      priorExpenseType?: 'INVOICE' | 'RECEIPT';
+      invitee?: boolean;
+      inviteeOrganization?: boolean;
+    };
+    scenario: GraphScenario;
+  };
+  /**
+   * Actors `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense). Accounts `host`,
+   * `collective` (no expense policy), optional `project` under it. Expenses: optional `pending` (invoice).
+   * URLs `expenses`, `policies`, optional `projectNewExpense`.
+   */
+  'expense-management': {
+    inputs: {
+      expense?: { description: string; items: Array<{ description: string; amount: number }> };
+      project?: boolean;
+    };
+    scenario: GraphScenario;
+  };
+  /**
+   * Actors `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`. Accounts `host`, `collective`, `payee`.
+   * Expenses: `draft`. URLs: `draft` (the invitation link).
+   */
+  'expense-draft-invite': {
+    inputs: { description: string; currency: 'USD' | 'EUR'; items: Array<{ description: string; amount: number }> };
+    scenario: GraphScenario;
+  };
+  /**
+   * Actors `hostAdmin`, `collectiveAdmin`, optional `outsider` (no role anywhere), `otherHostAdmin`,
+   * `otherCollectiveAdmin`. Accounts `host`, `collective` (admin: `collectiveAdmin`), optional `collective2`
+   * (admin: `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by
+   * `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`). Vendors by `label`. URLs
+   * `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard).
+   */
+  'vendor-host': {
+    inputs: {
+      /** Who may use the host's vendors; omitted, the host has no policy (product default: host admins only). */
+      useVendorPolicy?: UseVendorPolicy;
+      grants?: boolean;
+      secondCollective?: boolean;
+      project?: boolean;
+      outsider?: boolean;
+      otherHost?: { admin: 'hostAdmin' | 'otherHostAdmin'; collective?: boolean };
+      vendors?: Array<{
+        label: string;
+        /** Host holding the vendor; `host` unless stated. */
+        host?: 'host' | 'otherHost';
+        /** Accounts the vendor can be used with; empty or omitted means every Account of its host. */
+        usableWith?: Array<'host' | 'collective' | 'collective2' | 'project' | 'otherHost' | 'otherCollective'>;
+        /** The vendor's own policy; omitted, it follows its host's. */
+        useVendorPolicy?: UseVendorPolicy;
+        payoutMethod?: boolean;
+      }>;
+    };
+    scenario: GraphScenario;
+  };
+};
+
+const schemas: Record<Recipe, z.ZodTypeAny> = {
+  'account-profile': accountScenario,
+  'account-conversation': accountScenario,
+  'expense-submission': graphScenario,
+  'expense-draft-invite': graphScenario,
+  'expense-management': graphScenario,
+  'vendor-host': graphScenario,
+};
+
+type Recipe = keyof Contracts;
+export type Inputs<R extends Recipe> = Contracts[R]['inputs'];
+export type Scenario<R extends Recipe = Recipe> = Contracts[R]['scenario'];
+/** Recipes returning the shared multi-party shape. */
+export type GraphRecipe = { [R in Recipe]: Scenario<R> extends GraphScenario ? R : never }[Recipe];
+
+const pick = <Handle extends object, Key extends keyof Handle>(handle: Handle, keys: Key[]) =>
+  Object.fromEntries(keys.map(key => [key, handle[key]]));
+const only = <Handle extends object, Key extends keyof Handle>(handles: Record<string, Handle>, keys: Key[]) =>
+  Object.fromEntries(Object.entries(handles).map(([label, handle]) => [label, pick(handle, keys)]));
+
+/**
+ * What a `scenario` attachment holds. It is assembled from named, non-secret
+ * fields rather than by removing known secrets from the response, so a
+ * credential a recipe returns under any key is never copied into evidence.
+ * URLs lose their query string, which is where a link would carry a key.
+ */
+export function scenarioEvidence(scenario: Scenario) {
+  const { recipe, attempt, requestId } = scenario;
+  const paths = (urls: Record<string, string>) =>
+    Object.fromEntries(Object.entries(urls).map(([label, url]) => [label, url.split(/[?#]/)[0]]));
+  if ('account' in scenario) {
+    return {
+      recipe,
+      attempt,
+      requestId,
+      account: pick(scenario.account, ['id', 'slug', 'name']),
+      user: pick(scenario.user, ['id', 'email', 'slug']),
+      urls: paths(scenario.urls),
+    };
+  }
+  return {
+    recipe,
+    attempt,
+    requestId,
+    actors: only(scenario.actors, ['id', 'legacyId', 'slug', 'name', 'email']),
+    accounts: only(scenario.accounts, ['id', 'legacyId', 'slug', 'name', 'type']),
+    expenses: only(scenario.expenses, ['id', 'legacyId', 'description', 'status']),
+    vendors: only(scenario.vendors, ['id', 'legacyId', 'slug', 'name', 'type']),
+    urls: paths(scenario.urls),
+  };
+}
+
+/** One transport per test attempt, with stable request IDs within that attempt. */
+export class FixtureRecipes {
+  readonly attempt: Scenario['attempt'];
+  private readonly token: string;
+  readonly endpoint: string;
+  /** Wall time of every arrangement in this attempt, for attributable setup timings. */
+  readonly timings: Array<{ recipe: Recipe; requestId: string; setupMs: number }> = [];
+
+  constructor(testInfo: TestInfo) {
+    const ownerFile = process.env.PLAYWRIGHT_FIXTURE_OWNER_FILE;
+    const runId = process.env.PLAYWRIGHT_RUN_ID;
+    if (!ownerFile || !runId || !process.env.API_URL) {
+      throw new Error('Fixtures require an owned stack. Run test/playwright/run-local.sh (or --reuse).');
+    }
+    this.token = JSON.parse(readFileSync(ownerFile, 'utf8')).token;
+    this.endpoint = `${process.env.API_URL}/e2e/fixtures`;
+    this.attempt = {
+      runId,
+      testId: createHash('sha256').update(testInfo.testId).digest('hex').slice(0, 32),
+      retry: testInfo.retry,
+      workerIndex: testInfo.workerIndex,
+      nonce: randomUUID(),
+    };
+  }
+
+  async request<R extends Recipe>(recipe: R, inputs: Inputs<R>, requestId: string = recipe) {
+    // Node fetch keeps launcher/authentication secrets outside Playwright traces.
+    // Retry only transport failures: the same identity recovers the DB receipt.
+    const body = JSON.stringify({ attempt: this.attempt, requestId, recipe, inputs });
+    for (let tries = 0; ; tries++) {
+      try {
+        const response = await fetch(this.endpoint, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${this.token}`, 'Content-Type': 'application/json' },
+          body,
+          signal: AbortSignal.timeout(30_000),
+        });
+        const content = await response.text();
+        return new Response(content, { status: response.status, headers: response.headers });
+      } catch {
+        if (tries >= 1) {
+          throw new Error(
+            `Fixture transport failed for ${recipe}/${requestId}; retry the same request identity to recover committed setup.`,
+          );
+        }
+      }
+    }
+  }
+
+  async arrange<R extends Recipe>(recipe: R, inputs: Inputs<R>, requestId: string = recipe): Promise<Scenario<R>> {
+    const startedAt = performance.now();
+    const response = await this.request(recipe, inputs, requestId);
+    if (!response.ok) {
+      const { error } = await response.json();
+      throw new Error(
+        `Fixture ${recipe}/${requestId}: ${error?.code || response.status}: ${error?.message || 'Setup failed'}`,
+      );
+    }
+    const parsed = schemas[recipe].safeParse(await response.json());
+    if (
+      !parsed.success ||
+      parsed.data.recipe !== recipe ||
+      parsed.data.requestId !== requestId ||
+      JSON.stringify(parsed.data.attempt) !== JSON.stringify(this.attempt)
+    ) {
+      throw new Error('Fixture response does not match the typed recipe contract. Rebuild the companion API.');
+    }
+    this.timings.push({ recipe, requestId, setupMs: Math.round(performance.now() - startedAt) });
+    return parsed.data as Scenario<R>;
+  }
+}
