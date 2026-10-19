@@ -292,11 +292,8 @@ const ExportTransactionsCSVModal = ({
     [isHostReport, hasBalanceCategoriesPreview],
   );
   const hasAsyncExportsFeature = React.useMemo(
-    () =>
-      account?.type === AccountType.ORGANIZATION &&
-      hasAccountMoneyManagement(account) &&
-      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS),
-    [account, LoggedInUser],
+    () => account?.type === AccountType.ORGANIZATION && hasAccountMoneyManagement(account),
+    [account],
   );
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);

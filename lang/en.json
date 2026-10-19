@@ -3400,8 +3400,6 @@
   "Prepaid": "Prepaid Card",
   "PreviewFeatures": "Preview Features",
   "PreviewFeatures.AdditionalFeatures": "Additional features",
-  "PreviewFeatures.asyncExportsDescription": "Enable background processing for large data exports. Exports will be processed asynchronously and you'll be notified when they're ready to download.",
-  "PreviewFeatures.asyncExportsTitle": "Async Exports",
   "PreviewFeatures.balanceAccountingCategories": "Balance & clearing accounts",
   "PreviewFeatures.balanceAccountingCategoriesDescription": "Attribute payments to balance and clearing accounts from your chart of accounts.",
   "PreviewFeatures.keyboardShortcutsDescription": "Navigate the expense flow more efficiently with keyboard shortcuts. Speed up your workflow and reduce mouse dependency for common actions.",

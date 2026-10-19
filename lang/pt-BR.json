@@ -3400,8 +3400,6 @@
   "Prepaid": "Cartão Pré-pago",
   "PreviewFeatures": "Visualizar recursos",
   "PreviewFeatures.AdditionalFeatures": "Recursos adicionais",
-  "PreviewFeatures.asyncExportsDescription": "Ative o processamento em segundo plano para exportações de dados grandes. As exportações serão processadas de forma assíncrona e você será notificado quando estiverem prontas para download.",
-  "PreviewFeatures.asyncExportsTitle": "Exportações assíncronas",
   "PreviewFeatures.balanceAccountingCategories": "Contas de saldo e compensação",
   "PreviewFeatures.balanceAccountingCategoriesDescription": "Atribua pagamentos a contas de saldo e compensação do seu plano de contas.",
   "PreviewFeatures.keyboardShortcutsDescription": "Navegue pelo fluxo de despesas com mais eficiência usando atalhos de teclado. Agilize o trabalho e reduza a dependência do mouse nas ações comuns.",

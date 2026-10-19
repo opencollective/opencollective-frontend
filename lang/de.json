@@ -3400,8 +3400,6 @@
   "Prepaid": "Prepaid-Karte",
   "PreviewFeatures": "Vorschau-Funktionen",
   "PreviewFeatures.AdditionalFeatures": "Zusätzliche Funktionen",
-  "PreviewFeatures.asyncExportsDescription": "Hintergrundverarbeitung für große Datenexporte aktivieren. Exporte werden asynchron verarbeitet; du wirst benachrichtigt, wenn sie zum Download bereitstehen.",
-  "PreviewFeatures.asyncExportsTitle": "Asynchrone Exporte",
   "PreviewFeatures.balanceAccountingCategories": "Guthaben- und Verrechnungskonten",
   "PreviewFeatures.balanceAccountingCategoriesDescription": "Ordne Zahlungen Guthaben- und Verrechnungskonten aus deinem Kontenplan zu.",
   "PreviewFeatures.keyboardShortcutsDescription": "Navigiere den Ausgabenablauf effizienter mit Tastenkürzeln. Beschleunige deinen Workflow und reduziere die Mausnutzung für häufige Aktionen.",

@@ -637,10 +637,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.EXPORTS,
-          if:
-            isOneOfTypes(account, [ORGANIZATION]) &&
-            hasMoneyManagement &&
-            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS),
+          if: isOneOfTypes(account, [ORGANIZATION]) && hasMoneyManagement,
         },
         {
           section: ALL_SECTIONS.FOR_DEVELOPERS,
