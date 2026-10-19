@@ -291,8 +291,14 @@ const ExportTransactionsCSVModal = ({
       (!hasBalanceCategoriesPreview && BALANCE_CATEGORY_FIELDS.includes(fieldId as CSVField)),
     [isHostReport, hasBalanceCategoriesPreview],
   );
+  // Async exports are available to all collectives, projects and events, plus organizations with money management
   const hasAsyncExportsFeature = React.useMemo(
-    () => account?.type === AccountType.ORGANIZATION && hasAccountMoneyManagement(account),
+    () =>
+      Boolean(
+        account &&
+        ([AccountType.COLLECTIVE, AccountType.PROJECT, AccountType.EVENT].includes(account.type) ||
+          (account.type === AccountType.ORGANIZATION && hasAccountMoneyManagement(account))),
+      ),
     [account],
   );
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
