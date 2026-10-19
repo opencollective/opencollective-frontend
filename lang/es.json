@@ -3745,6 +3745,7 @@
   "Seanpx": "Obligatorio",
   "Search": "Buscar",
   "search.banks.placeholder": "Busca bancos por nombre o BIC...",
+  "search.cappedCount": "{count}+",
   "search.clear": "Borrar la búsqueda",
   "search.narrowSearch": "Only the first {count} results can be browsed. Add more words or select a workspace to narrow your search.",
   "search.noResults": "No hay resultados",

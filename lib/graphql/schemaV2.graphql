@@ -25746,6 +25746,11 @@ type SearchResultsAccounts {
   collection: AccountCollection!
 
   """
+  Whether `collection.totalCount` was capped: there are more matching results than the total, which is a lower bound
+  """
+  totalCountIsCapped: Boolean!
+
+  """
   Highest score among all the matching results, regardless of the requested page
   """
   maxScore: Float!
@@ -25780,6 +25785,11 @@ type SearchResultsComments {
   collection: CommentCollection!
 
   """
+  Whether `collection.totalCount` was capped: there are more matching results than the total, which is a lower bound
+  """
+  totalCountIsCapped: Boolean!
+
+  """
   Highest score among all the matching results, regardless of the requested page
   """
   maxScore: Float!
@@ -25797,6 +25807,11 @@ type SearchResultsComments {
 
 type SearchResultsExpenses {
   collection: ExpenseCollection!
+
+  """
+  Whether `collection.totalCount` was capped: there are more matching results than the total, which is a lower bound
+  """
+  totalCountIsCapped: Boolean!
 
   """
   Highest score among all the matching results, regardless of the requested page
@@ -25818,6 +25833,11 @@ type SearchResultsHostApplications {
   collection: HostApplicationCollection!
 
   """
+  Whether `collection.totalCount` was capped: there are more matching results than the total, which is a lower bound
+  """
+  totalCountIsCapped: Boolean!
+
+  """
   Highest score among all the matching results, regardless of the requested page
   """
   maxScore: Float!
@@ -25835,6 +25855,11 @@ type SearchResultsHostApplications {
 
 type SearchResultsOrders {
   collection: OrderCollection!
+
+  """
+  Whether `collection.totalCount` was capped: there are more matching results than the total, which is a lower bound
+  """
+  totalCountIsCapped: Boolean!
 
   """
   Highest score among all the matching results, regardless of the requested page
@@ -25856,6 +25881,11 @@ type SearchResultsTiers {
   collection: TierCollection!
 
   """
+  Whether `collection.totalCount` was capped: there are more matching results than the total, which is a lower bound
+  """
+  totalCountIsCapped: Boolean!
+
+  """
   Highest score among all the matching results, regardless of the requested page
   """
   maxScore: Float!
@@ -25875,6 +25905,11 @@ type SearchResultsTransactions {
   collection: TransactionCollection!
 
   """
+  Whether `collection.totalCount` was capped: there are more matching results than the total, which is a lower bound
+  """
+  totalCountIsCapped: Boolean!
+
+  """
   Highest score among all the matching results, regardless of the requested page
   """
   maxScore: Float!
@@ -25892,6 +25927,11 @@ type SearchResultsTransactions {
 
 type SearchResultsUpdates {
   collection: UpdateCollection!
+
+  """
+  Whether `collection.totalCount` was capped: there are more matching results than the total, which is a lower bound
+  """
+  totalCountIsCapped: Boolean!
 
   """
   Highest score among all the matching results, regardless of the requested page
