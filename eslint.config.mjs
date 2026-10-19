@@ -189,6 +189,8 @@ export default defineConfig([
       '@graphql-eslint/no-deprecated': 'warn',
       '@graphql-eslint/fields-on-correct-type': 'error',
       '@graphql-eslint/no-duplicate-fields': 'error',
+      '@graphql-eslint/unique-operation-name': 'error',
+      '@graphql-eslint/unique-fragment-name': 'error',
       // GraphQL naming rules from RFC 011 (https://github.com/opencollective/opencollective/blob/main/rfcs/011-graphql.md)
       '@graphql-eslint/no-anonymous-operations': 'error',
       '@graphql-eslint/naming-convention': [

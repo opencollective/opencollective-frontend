@@ -21,7 +21,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { useToast } from '../../../ui/useToast';
 
 import MemberForm from './MemberForm';
-import { teamSectionQuery } from './queries';
+import { cancelMemberInvitationMutation, teamSectionQuery } from './queries';
 
 const editMemberMutation = gql`
   mutation EditMember(
@@ -77,12 +77,6 @@ const removeMemberMutation = gql`
     $isInvitation: Boolean
   ) {
     removeMember(memberAccount: $memberAccount, account: $account, role: $role, isInvitation: $isInvitation)
-  }
-`;
-
-const cancelMemberInvitationMutation = gql`
-  mutation CancelMemberInvitation($invitation: MemberInvitationReferenceInput!) {
-    cancelMemberInvitation(invitation: $invitation)
   }
 `;
 

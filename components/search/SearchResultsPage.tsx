@@ -30,7 +30,7 @@ import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
 import { SearchEntity } from './filters';
 import { useGetLinkProps } from './lib';
-import { searchPageQuery } from './queries';
+import { searchResultsPageQuery } from './queries';
 import type { SearchEntityNodeMap } from './types';
 
 export const SearchResults = () => {
@@ -134,7 +134,7 @@ export const SearchResults = () => {
     setInput(queryFilter.values.searchTerm || '');
   }, [queryFilter.values.searchTerm]);
 
-  const { data, loading } = useQuery(searchPageQuery, {
+  const { data, loading } = useQuery(searchResultsPageQuery, {
     variables: {
       ...queryFilter.variables,
       imageHeight: 72,

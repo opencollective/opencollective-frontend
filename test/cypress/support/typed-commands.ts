@@ -162,9 +162,9 @@ function createVendor(
 ): Cypress.Chainable<{ id: string; legacyId: number; slug: string; name: string }> {
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
     return graphqlQueryV2(token, {
-      operationName: 'CreateVendor',
+      operationName: 'CreateVendorForTest',
       query: gql`
-        mutation CreateVendor($hostSlug: String!, $vendor: VendorCreateInput!) {
+        mutation CreateVendorForTest($hostSlug: String!, $vendor: VendorCreateInput!) {
           createVendor(host: { slug: $hostSlug }, vendor: $vendor) {
             id
             legacyId
