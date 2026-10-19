@@ -33,14 +33,14 @@ import type {
   TransactionsPageQueryVariables,
   TransactionsTableQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
-import { AccountType, ExportRequestType, MemberRole } from '../../lib/graphql/types/v2/graphql';
+import { ExportRequestType } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { cn, parseToBoolean } from '../../lib/utils';
-import { hasAccountMoneyManagement } from '@/lib/collective';
+import { canUseAsyncExports, type ExportRequestAccount } from '@/lib/export-requests';
 import useExportRequest from '@/lib/hooks/useExportRequest';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -264,7 +264,7 @@ type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsQueryVariables>;
-  account?: Pick<Account, 'slug' | 'settings' | 'name' | 'type'>;
+  account?: Pick<Account, 'slug' | 'settings' | 'name' | 'type'> & Pick<ExportRequestAccount, 'parent' | 'host'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
   canCreatePreset?: boolean;
@@ -291,22 +291,12 @@ const ExportTransactionsCSVModal = ({
       (!hasBalanceCategoriesPreview && BALANCE_CATEGORY_FIELDS.includes(fieldId as CSVField)),
     [isHostReport, hasBalanceCategoriesPreview],
   );
-  // Async exports are available to all collectives, projects and events, plus organizations with money
-  // management - but only to viewers who can create export requests (admin/accountant, mirroring the API's
-  // canUseExportRequestsForAccount). Everyone else keeps the synchronous download: `createExportRequest` is
-  // rejected server-side for them anyway, so the async flow would only ever fail.
-  const hasAsyncExportsFeature = React.useMemo(() => {
-    if (!account || !LoggedInUser) {
-      return false;
-    }
-    const supportsAsyncExports =
-      [AccountType.COLLECTIVE, AccountType.PROJECT, AccountType.EVENT].includes(account.type) ||
-      (account.type === AccountType.ORGANIZATION && hasAccountMoneyManagement(account));
-    return (
-      supportsAsyncExports &&
-      (LoggedInUser.isAdminOfCollectiveOrHost(account) || LoggedInUser.hasRole(MemberRole.ACCOUNTANT, account))
-    );
-  }, [account, LoggedInUser]);
+  // Async exports (Generate Export) for viewers who can create export requests - see `canUseAsyncExports`.
+  // Everyone else keeps the synchronous download: `createExportRequest` is rejected server-side for them anyway.
+  const hasAsyncExportsFeature = React.useMemo(
+    () => canUseAsyncExports(LoggedInUser, account),
+    [account, LoggedInUser],
+  );
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
