@@ -33,7 +33,7 @@ import type {
   TransactionsPageQueryVariables,
   TransactionsTableQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
-import { AccountType, ExportRequestType } from '../../lib/graphql/types/v2/graphql';
+import { AccountType, ExportRequestType, MemberRole } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
@@ -291,16 +291,22 @@ const ExportTransactionsCSVModal = ({
       (!hasBalanceCategoriesPreview && BALANCE_CATEGORY_FIELDS.includes(fieldId as CSVField)),
     [isHostReport, hasBalanceCategoriesPreview],
   );
-  // Async exports are available to all collectives, projects and events, plus organizations with money management
-  const hasAsyncExportsFeature = React.useMemo(
-    () =>
-      Boolean(
-        account &&
-        ([AccountType.COLLECTIVE, AccountType.PROJECT, AccountType.EVENT].includes(account.type) ||
-          (account.type === AccountType.ORGANIZATION && hasAccountMoneyManagement(account))),
-      ),
-    [account],
-  );
+  // Async exports are available to all collectives, projects and events, plus organizations with money
+  // management - but only to viewers who can create export requests (admin/accountant, mirroring the API's
+  // canUseExportRequestsForAccount). Everyone else keeps the synchronous download: `createExportRequest` is
+  // rejected server-side for them anyway, so the async flow would only ever fail.
+  const hasAsyncExportsFeature = React.useMemo(() => {
+    if (!account || !LoggedInUser) {
+      return false;
+    }
+    const supportsAsyncExports =
+      [AccountType.COLLECTIVE, AccountType.PROJECT, AccountType.EVENT].includes(account.type) ||
+      (account.type === AccountType.ORGANIZATION && hasAccountMoneyManagement(account));
+    return (
+      supportsAsyncExports &&
+      (LoggedInUser.isAdminOfCollectiveOrHost(account) || LoggedInUser.hasRole(MemberRole.ACCOUNTANT, account))
+    );
+  }, [account, LoggedInUser]);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
