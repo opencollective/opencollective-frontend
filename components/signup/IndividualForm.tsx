@@ -4,6 +4,7 @@ import type { FormikProps } from 'formik';
 import { Form } from 'formik';
 import { omit, pick } from 'lodash-es';
 import { useRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -45,6 +46,27 @@ const emailVerificationFormSchema = z.union([
 type EmailVerificationFormValuesSchema = z.infer<typeof emailVerificationFormSchema>;
 
 const OTP_RESEND_INTERVAL = 30; // seconds
+
+/**
+ * `NOT_FOUND` from the OTP endpoints means the challenge is over: it expired, it was invalidated by
+ * too many wrong codes, or the account has already been verified. There is nothing left to retry,
+ * so tell the caller and send them back to the email step to start again. This is deliberately
+ * distinct from `INVALID_OTP`, which means "wrong code, but you can retry the same session".
+ */
+const showSessionExpiredAndRestart = (
+  toast: ReturnType<typeof useToast>['toast'],
+  intl: IntlShape,
+  nextStep: SignupStepProps['nextStep'],
+) => {
+  toast({
+    variant: 'error',
+    message: intl.formatMessage({
+      defaultMessage: 'This verification link is no longer valid. Please start again.',
+      id: 'signup.otp.sessionExpired',
+    }),
+  });
+  nextStep(SignupSteps.EMAIL_INPUT);
+};
 
 const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
   const [start, setStart] = React.useState<number>(new Date().getTime());
@@ -123,6 +145,8 @@ export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: Signu
           const token = response.token;
           await login(token);
           nextStep();
+        } else if (response.error?.type === 'NOT_FOUND') {
+          showSessionExpiredAndRestart(toast, intl, nextStep);
         } else {
           toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
         }
@@ -145,11 +169,10 @@ export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: Signu
             id: 'signup.otp.resendSuccess',
           }),
         });
+      } else if (response.error?.type === 'NOT_FOUND') {
+        showSessionExpiredAndRestart(toast, intl, nextStep);
       } else {
         toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
-        if (response.error.type === 'OTP_REQUEST_NOT_FOUND') {
-          nextStep(SignupSteps.EMAIL_INPUT);
-        }
       }
     }
   }, [intl, nextStep, toast, router.query.session]);
