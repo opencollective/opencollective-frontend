@@ -81,8 +81,15 @@ export default function SignupPage(props) {
   const [step, setStep] = React.useState<SignupSteps>(
     STEP_URLS[router.query?.step as SignupSteps] ? (router.query?.step as SignupSteps) : steps[0],
   );
+  // `router.query` only settles once Next.js has applied a navigation, so an effect that reads it
+  // right after `nextStep()` still sees the query of the step we just left. This flag is set while
+  // we drive the step ourselves, so the URL-restore effect below cannot send the user back to where
+  // they came from (e.g. back onto the OTP step after a dead challenge already restarted the flow).
+  const isNavigatingToStep = React.useRef(false);
+
   const nextStep = React.useCallback(
     (requestedStep?: SignupSteps, query?: Record<string, string | string[]>) => {
+      isNavigatingToStep.current = true;
       setStep(prev => {
         const nextStep = steps[steps.indexOf(prev) + 1];
         if (!requestedStep && !nextStep) {
@@ -95,7 +102,9 @@ export default function SignupPage(props) {
           const step = requestedStep || nextStep;
           const newQuery = omit(
             { ...props.query, ...pick(router.query, ['next', 'session', 'active', 'host']), ...query },
-            ['step'],
+            // `session` identifies one specific OTP challenge: it is meaningless on the email step
+            // and must not outlive the challenge that created it (dead session, or "Go Back").
+            step === SignupSteps.EMAIL_INPUT ? ['step', 'session'] : ['step'],
           );
           if (
             nextActionFlow &&
@@ -141,10 +150,14 @@ export default function SignupPage(props) {
     } else if (
       !me &&
       !loading &&
+      !isNavigatingToStep.current &&
       step === SignupSteps.EMAIL_INPUT &&
       router.query?.email &&
       router.query?.step === 'verify'
     ) {
+      // Restore the step after a direct load of the verify URL. Skipped while we are the ones
+      // navigating: `router.query` is still the query of the step we just left, so acting on it
+      // here would undo the navigation and put the user back on a challenge that is over.
       nextStep(SignupSteps.VERIFY_OTP);
     }
   }, [me, router, step, steps, nextActionFlow, loading, nextStep]);
