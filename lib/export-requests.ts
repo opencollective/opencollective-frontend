@@ -11,7 +11,7 @@ export type ExportRequestAccount = Pick<Account, 'slug' | 'type'> & {
 };
 
 /** Whether async exports are implemented for this account type (the worker only processes transactions exports). */
-export function supportsAsyncExports(account: ExportRequestAccount): boolean {
+function supportsAsyncExports(account: ExportRequestAccount): boolean {
   return (
     account?.type === AccountType.COLLECTIVE ||
     account?.type === AccountType.PROJECT ||
