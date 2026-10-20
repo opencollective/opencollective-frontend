@@ -16,7 +16,6 @@ export enum PREVIEW_FEATURE_KEYS {
   SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
   SEARCH_POSTGRES_BACKEND = 'SEARCH_POSTGRES_BACKEND',
   SIDEBAR_REORG_INCOMING_OUTGOING = 'SIDEBAR_REORG_INCOMING_OUTGOING',
-  ASYNC_EXPORTS = 'ASYNC_EXPORTS',
   TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
   HOSTED_ACCOUNT_OVERVIEW = 'HOSTED_ACCOUNT_OVERVIEW',
   BALANCE_ACCOUNTING_CATEGORIES = 'BALANCE_ACCOUNTING_CATEGORIES',
@@ -267,19 +266,6 @@ export const previewFeatures: PreviewFeature[] = [
     category: Categories.GENERAL,
     alwaysEnableInDev: true,
     enabledByDefaultFor: ['*'],
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS,
-    title: <FormattedMessage defaultMessage="Async Exports" id="PreviewFeatures.asyncExportsTitle" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="Enable background processing for large data exports. Exports will be processed asynchronously and you'll be notified when they're ready to download."
-        id="PreviewFeatures.asyncExportsDescription"
-      />
-    ),
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
-    category: Categories.HOSTING,
   },
   {
     key: PREVIEW_FEATURE_KEYS.TABLE_QUICK_ACTIONS,

@@ -180,6 +180,9 @@ export const transactionsPageQuery = gql`
           slug
         }
       }
+      ... on Organization {
+        hasMoneyManagement
+      }
       processingOrders: orders(filter: OUTGOING, includeIncognito: true, status: [PENDING, PROCESSING]) {
         totalCount
         nodes {

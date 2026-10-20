@@ -33,14 +33,14 @@ import type {
   TransactionsPageQueryVariables,
   TransactionsTableQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
-import { AccountType, ExportRequestType } from '../../lib/graphql/types/v2/graphql';
+import { ExportRequestType } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { cn, parseToBoolean } from '../../lib/utils';
-import { hasAccountMoneyManagement } from '@/lib/collective';
+import { canUseAsyncExports, type ExportRequestAccount } from '@/lib/export-requests';
 import useExportRequest from '@/lib/hooks/useExportRequest';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -264,7 +264,7 @@ type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsQueryVariables>;
-  account?: Pick<Account, 'slug' | 'settings' | 'name' | 'type'>;
+  account?: Pick<Account, 'slug' | 'settings' | 'name' | 'type'> & Pick<ExportRequestAccount, 'parent' | 'host'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
   canCreatePreset?: boolean;
@@ -291,11 +291,10 @@ const ExportTransactionsCSVModal = ({
       (!hasBalanceCategoriesPreview && BALANCE_CATEGORY_FIELDS.includes(fieldId as CSVField)),
     [isHostReport, hasBalanceCategoriesPreview],
   );
+  // Async exports (Generate Export) for viewers who can create export requests - see `canUseAsyncExports`.
+  // Everyone else keeps the synchronous download: `createExportRequest` is rejected server-side for them anyway.
   const hasAsyncExportsFeature = React.useMemo(
-    () =>
-      account?.type === AccountType.ORGANIZATION &&
-      hasAccountMoneyManagement(account) &&
-      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS),
+    () => canUseAsyncExports(LoggedInUser, account),
     [account, LoggedInUser],
   );
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');

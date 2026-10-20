@@ -3400,8 +3400,6 @@
   "Prepaid": "Carte prépayée",
   "PreviewFeatures": "Fonctionnalités expérimentales",
   "PreviewFeatures.AdditionalFeatures": "Fonctionnalités supplémentaires",
-  "PreviewFeatures.asyncExportsDescription": "Activez le traitement en arrière-plan pour les exports de données volumineux. Les exports seront traités de manière asynchrone et vous serez notifié lorsqu'ils seront prêts à être téléchargés.",
-  "PreviewFeatures.asyncExportsTitle": "Exports asynchrones",
   "PreviewFeatures.balanceAccountingCategories": "Comptes de solde et de compensation",
   "PreviewFeatures.balanceAccountingCategoriesDescription": "Imputez les paiements aux comptes de solde et de compensation de votre plan comptable.",
   "PreviewFeatures.keyboardShortcutsDescription": "Naviguez plus efficacement dans le flux de dépenses avec les raccourcis clavier. Accélérez votre flux de travail et réduisez la dépendance à la souris pour les actions courantes.",
