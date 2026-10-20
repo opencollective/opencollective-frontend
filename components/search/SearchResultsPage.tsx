@@ -9,7 +9,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { getCommentUrl } from '../../lib/url-helpers';
-import { i18nSearchEntity } from '@/lib/i18n/search';
+import { i18nSearchCount, i18nSearchEntity } from '@/lib/i18n/search';
 import { cn } from '@/lib/utils';
 
 import Tabs from '@/components/Tabs';
@@ -193,19 +193,24 @@ export const SearchResults = () => {
   const visibleErrors = getVisibleErrors(error, queryFilter.values.entity);
 
   const results = data?.search.results;
-  const totalCount = results
+  const allResults = results
     ? [results.accounts, results.expenses, results.orders, results.transactions, results.comments, results.updates]
-        .map(result => result?.collection.totalCount || 0)
-        .reduce((total, count) => total + count, 0)
     : undefined;
+  const totalCount = allResults
+    ?.map(result => result?.collection.totalCount || 0)
+    .reduce((total, count) => total + count, 0);
+  const tabCount = (result?: { totalCountIsCapped?: boolean; collection: { totalCount?: number } }) => ({
+    count: result?.collection.totalCount,
+    isCountCapped: result?.totalCountIsCapped,
+  });
   const tabs = [
-    { id: SearchEntity.ALL, count: totalCount },
-    { id: SearchEntity.ACCOUNTS, count: results?.accounts?.collection.totalCount },
-    { id: SearchEntity.EXPENSES, count: results?.expenses?.collection.totalCount },
-    { id: SearchEntity.ORDERS, count: results?.orders?.collection.totalCount },
-    { id: SearchEntity.TRANSACTIONS, count: results?.transactions?.collection.totalCount },
-    { id: SearchEntity.COMMENTS, count: results?.comments?.collection.totalCount },
-    { id: SearchEntity.UPDATES, count: results?.updates?.collection.totalCount },
+    { id: SearchEntity.ALL, count: totalCount, isCountCapped: allResults?.some(result => result?.totalCountIsCapped) },
+    { id: SearchEntity.ACCOUNTS, ...tabCount(results?.accounts) },
+    { id: SearchEntity.EXPENSES, ...tabCount(results?.expenses) },
+    { id: SearchEntity.ORDERS, ...tabCount(results?.orders) },
+    { id: SearchEntity.TRANSACTIONS, ...tabCount(results?.transactions) },
+    { id: SearchEntity.COMMENTS, ...tabCount(results?.comments) },
+    { id: SearchEntity.UPDATES, ...tabCount(results?.updates) },
   ]
     .filter(tab => isEntitySupportedByBackend(tab.id, backend))
     .map(tab => ({ ...tab, label: i18nSearchEntity(intl, tab.id) }));
@@ -254,6 +259,7 @@ type SearchResultsListGroup = {
   result?: {
     maxScore?: number;
     scores?: ReadonlyArray<{ id: string; score: number }>;
+    totalCountIsCapped?: boolean;
     collection: { totalCount: number; nodes: any[] }; // eslint-disable-line @typescript-eslint/no-explicit-any
   };
   renderNode: (node) => React.ReactNode;
@@ -342,6 +348,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading, backend }) 
             key={group.entity}
             entity={group.entity}
             totalCount={group.result?.collection.totalCount}
+            isTotalCountCapped={group.result?.totalCountIsCapped}
             nodes={getGroupNodes(group)}
             renderNode={group.renderNode}
             queryFilter={queryFilter}
@@ -360,6 +367,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading, backend }) 
     <SearchResultsGroup
       entity={group.entity}
       totalCount={group.result?.collection.totalCount}
+      isTotalCountCapped={group.result?.totalCountIsCapped}
       nodes={getGroupNodes(group)}
       onStandaloneTab
       loading={loading}
@@ -377,6 +385,8 @@ type SearchResultsGroupProps<
   >,
 > = {
   totalCount?: number;
+  /** `totalCount` is a lower bound: there are more matches */
+  isTotalCountCapped?: boolean;
   nodes?: SearchEntityNodeMap[E][];
   renderNode: (node: SearchEntityNodeMap[E]) => React.ReactNode;
   onStandaloneTab?: boolean;
@@ -395,6 +405,7 @@ function SearchResultsGroup<E extends Exclude<keyof SearchEntityNodeMap, SearchE
   loading,
   queryFilter,
   backend,
+  isTotalCountCapped,
 }: SearchResultsGroupProps<E>) {
   const intl = useIntl();
   const { getLinkProps } = useGetLinkProps();
@@ -440,7 +451,7 @@ function SearchResultsGroup<E extends Exclude<keyof SearchEntityNodeMap, SearchE
               {intl.formatMessage(
                 { id: 'SearchResults.SeeMore', defaultMessage: 'See {count} more {label}' },
                 {
-                  count: moreCount.toLocaleString(),
+                  count: i18nSearchCount(intl, moreCount, isTotalCountCapped),
                   label: label.toLowerCase(),
                 },
               )}

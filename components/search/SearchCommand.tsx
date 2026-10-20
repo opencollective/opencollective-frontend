@@ -322,6 +322,7 @@ export const SearchCommand = ({ open, setOpen }) => {
       return {
         entity,
         totalCount: result?.collection.totalCount,
+        isTotalCountCapped: result?.totalCountIsCapped,
         nodes: filterNodes && nodes ? filterNodes(nodes) : nodes,
         maxScore: result?.maxScore || 0,
         renderNode: (node: ResultNode<E>) => renderNode(node, result?.highlights?.[node.id]),
@@ -547,6 +548,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                 key={group.entity}
                 entity={group.entity}
                 totalCount={group.totalCount}
+                isTotalCountCapped={group.isTotalCountCapped}
                 input={debouncedInput}
                 queryFilter={queryFilter}
                 setOpen={setOpen}

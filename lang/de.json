@@ -3743,6 +3743,7 @@
   "Seanpx": "Erforderlich",
   "Search": "Suchen",
   "search.banks.placeholder": "Banken nach Name oder BIC suchen …",
+  "search.cappedCount": "{count}+",
   "search.clear": "Suche löschen",
   "search.narrowSearch": "Only the first {count} results can be browsed. Add more words or select a workspace to narrow your search.",
   "search.noResults": "Keine Ergebnisse",

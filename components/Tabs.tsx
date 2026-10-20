@@ -4,6 +4,7 @@ import { isNil } from 'lodash-es';
 import { useIntl } from 'react-intl';
 
 import { useWindowResize, VIEWPORTS } from '../lib/hooks/useWindowResize';
+import { i18nSearchCount } from '../lib/i18n/search';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
 
@@ -19,7 +20,8 @@ const abbreviateNumber = number => {
   }
 };
 
-const Count = ({ count, selected }: { count?: number; selected?: boolean }) => {
+const Count = ({ count, isCapped, selected }: { count?: number; isCapped?: boolean; selected?: boolean }) => {
+  const intl = useIntl();
   if (isNil(count)) {
     return null;
   }
@@ -30,13 +32,14 @@ const Count = ({ count, selected }: { count?: number; selected?: boolean }) => {
         selected ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground',
       )}
     >
-      {abbreviateNumber(count)}
+      {isCapped ? i18nSearchCount(intl, count, true) : abbreviateNumber(count)}
     </span>
   );
 };
 
 type TabsProps = {
-  tabs: readonly { id: string; label: React.ReactNode | string; count?: number }[];
+  /** `isCountCapped`: the count is a lower bound, displayed unabbreviated with a "+" (e.g. "10,000+") */
+  tabs: readonly { id: string; label: React.ReactNode | string; count?: number; isCountCapped?: boolean }[];
   selectedId?: string;
   onChange?: (value: string) => void;
   variant?: 'horizontal' | 'vertical';
@@ -58,7 +61,7 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps) => {
           {tabs.map(tab => {
             return (
               <SelectItem value={tab.id} key={tab.id} className="">
-                <span>{tab.label}</span> <Count count={tab.count} />
+                <span>{tab.label}</span> <Count count={tab.count} isCapped={tab.isCountCapped} />
               </SelectItem>
             );
           })}
@@ -80,7 +83,11 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps) => {
               )}
             >
               <div className="font-bold">{tab.label}</div>
-              {!isNil(tab.count) && !isNaN(tab.count) && <div className="text-xs text-slate-600">({tab.count})</div>}
+              {!isNil(tab.count) && !isNaN(tab.count) && (
+                <div className="text-xs text-slate-600">
+                  ({tab.isCountCapped ? i18nSearchCount(intl, tab.count, true) : tab.count})
+                </div>
+              )}
             </button>
           );
         })}
@@ -105,7 +112,7 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps) => {
                   : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground/80',
               )}
             >
-              {tab.label} <Count count={tab.count} selected={selected} />
+              {tab.label} <Count count={tab.count} isCapped={tab.isCountCapped} selected={selected} />
             </button>
           );
         })}

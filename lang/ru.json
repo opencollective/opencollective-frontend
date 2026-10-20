@@ -3743,6 +3743,7 @@
   "Seanpx": "Required",
   "Search": "Поиск",
   "search.banks.placeholder": "Search banks by name or BIC...",
+  "search.cappedCount": "{count}+",
   "search.clear": "Clear search",
   "search.narrowSearch": "Only the first {count} results can be browsed. Add more words or select a workspace to narrow your search.",
   "search.noResults": "No results",
