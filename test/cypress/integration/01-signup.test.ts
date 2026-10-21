@@ -587,6 +587,15 @@ describe('signup OTP failure and redirection flows', () => {
     cy.location('search').should('not.include', 'session');
   });
 
+  it('restores the code step when a verification URL is loaded directly', () => {
+    const email = randomGmailEmail();
+
+    // A shared or bookmarked link: the page derives the step from the URL instead of a signup
+    cy.visit(`/signup/verify?email=${encodeURIComponent(email)}&session=e2e-otp`, visitParams);
+
+    assertOtpChallengeFor(email);
+  });
+
   it('keeps the organization flow when the verification session dies', () => {
     const email = randomGmailEmail();
     stubVerifyEmail([SESSION_OVER_RESPONSE]);

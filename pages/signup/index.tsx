@@ -83,9 +83,11 @@ export default function SignupPage(props) {
   );
   // `router.query` only settles once Next.js has applied a navigation, so an effect that reads it
   // right after `nextStep()` still sees the query of the step we just left. This flag is set while
-  // we drive the step ourselves, so the URL-restore effect below cannot send the user back to where
-  // they came from (e.g. back onto the OTP step after a dead challenge already restarted the flow).
+  // we drive the step ourselves, and cleared again as soon as the route has actually changed, so
+  // the URL-restore effect below cannot undo our own navigation - while a later URL change (the
+  // browser's back/forward, a link to a verification URL) still restores the step.
   const isNavigatingToStep = React.useRef(false);
+  const previousAsPath = React.useRef(router.asPath);
 
   const nextStep = React.useCallback(
     (requestedStep?: SignupSteps, query?: Record<string, string | string[]>) => {
@@ -130,6 +132,14 @@ export default function SignupPage(props) {
 
   const me = data?.me;
   React.useLayoutEffect(() => {
+    // Drop our own-navigation marker once the route has settled. This runs *before* the restore
+    // check below on purpose: the pass that still sees the pending navigation stays suppressed,
+    // while every later pass (back/forward, a link to a verification URL) restores again.
+    if (previousAsPath.current !== router.asPath) {
+      previousAsPath.current = router.asPath;
+      isNavigatingToStep.current = false;
+    }
+
     if (router.query.step === 'organization' || router.query.organization === 'true') {
       setNextActionFlow(NEXT_ACTION_FLOWS.ORGANIZATION);
     } else if (router.query.step === 'collective' || router.query.collective === 'true') {
@@ -160,7 +170,7 @@ export default function SignupPage(props) {
       // here would undo the navigation and put the user back on a challenge that is over.
       nextStep(SignupSteps.VERIFY_OTP);
     }
-  }, [me, router, step, steps, nextActionFlow, loading, nextStep]);
+  }, [me, router, router.asPath, step, steps, nextActionFlow, loading, nextStep]);
 
   const progress = React.useMemo(() => (steps.indexOf(step) + 1) / steps.length, [step, steps]);
 
