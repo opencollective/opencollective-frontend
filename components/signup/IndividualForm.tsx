@@ -30,20 +30,34 @@ import { useToast } from '../ui/useToast';
 import type { SignupStepProps } from './common';
 import { SignupSteps } from './common';
 
-const emailVerificationFormSchema = z.union([
-  z.object({
-    email: z.string().email().min(5).max(128),
-    captcha: isCaptchaEnabled()
-      ? z.object({ token: z.string().nonempty(), provider: z.string().nonempty() })
-      : z.undefined(),
-  }),
-  z.object({
-    email: z.string().email().min(5).max(128),
-    otp: z.string().min(6).max(6).toUpperCase(),
-  }),
-]);
+const emailFieldSchema = z.string().email().min(5).max(128);
+const otpFieldSchema = z.string().min(6).max(6).toUpperCase();
+const captchaFieldSchema = z.object({ token: z.string().nonempty(), provider: z.string().nonempty() });
 
-type EmailVerificationFormValuesSchema = z.infer<typeof emailVerificationFormSchema>;
+/**
+ * Both steps share one Formik form that never remounts, so validation has to follow the step: a
+ * value left over from the other step must never satisfy it. As a union this let a stale `otp`
+ * through on the email step (skipping the captcha), and a stale `captcha` through on the code step
+ * (with no code at all).
+ */
+const schemaForStep = (step: SignupSteps) =>
+  z
+    .object({
+      email: emailFieldSchema,
+      otp: otpFieldSchema.optional(),
+      captcha: (isCaptchaEnabled() ? captchaFieldSchema : z.undefined()).optional(),
+    })
+    .superRefine((values, ctx) => {
+      if (step === SignupSteps.VERIFY_OTP) {
+        if (!values.otp) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['otp'], message: 'Required' });
+        }
+      } else if (isCaptchaEnabled() && !values.captcha) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['captcha'], message: 'Required' });
+      }
+    });
+
+type EmailVerificationFormValuesSchema = z.infer<ReturnType<typeof schemaForStep>>;
 
 const OTP_RESEND_INTERVAL = 30; // seconds
 
@@ -179,7 +193,7 @@ export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: Signu
 
   return (
     <FormikZod<EmailVerificationFormValuesSchema>
-      schema={emailVerificationFormSchema}
+      schema={schemaForStep(step)}
       onSubmit={onSubmit}
       initialValues={{ email: router.query?.email as string }}
       innerRef={formikRef}

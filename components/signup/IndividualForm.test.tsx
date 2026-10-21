@@ -1,8 +1,10 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-import { resendOTP, verifyEmail } from '@/lib/api';
+import { resendOTP, signup, verifyEmail } from '@/lib/api';
 import { withRequiredProviders } from '../../test/providers';
+
+import { isCaptchaEnabled } from '../Captcha';
 
 import type { SignupStepProps } from './common';
 import { SignupSteps } from './common';
@@ -33,9 +35,10 @@ jest.mock('@/lib/hooks/useLoggedInUser', () => ({
 jest.mock('../ui/useToast', () => ({ useToast: () => ({ toast: jest.fn() }) }));
 
 jest.mock('../Captcha', () => ({
-  isCaptchaEnabled: () => false,
+  __esModule: true,
+  default: () => null,
+  isCaptchaEnabled: jest.fn(() => false),
   resetCaptcha: jest.fn(),
-  Captcha: () => null,
 }));
 
 /** The OTP field renders through `input-otp`, which exposes no accessible role - locate by slot. */
@@ -60,6 +63,7 @@ describe('IndividualForm - EmailVerificationSteps error handling', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(isCaptchaEnabled).mockReturnValue(false);
   });
 
   describe('when verify-email reports the challenge is over (NOT_FOUND)', () => {
@@ -115,6 +119,31 @@ describe('IndividualForm - EmailVerificationSteps error handling', () => {
 
       await waitFor(() => expect(resendOTP).toHaveBeenCalledWith({ email: 'jane@example.com', sessionId: 'sess-1' }));
       await waitFor(() => expect(nextStep).toHaveBeenCalledWith(SignupSteps.EMAIL_INPUT));
+    });
+  });
+
+  describe('when the email step is shown again after a dead challenge', () => {
+    it('does not accept a leftover code in place of the captcha', async () => {
+      // The form is shared by both steps and never remounts, so the code typed on the code step is
+      // still in Formik state. The email step must not validate through it.
+      jest.mocked(isCaptchaEnabled).mockReturnValue(true);
+      jest.mocked(verifyEmail).mockResolvedValue({ error: { type: 'INVALID_OTP', message: 'Invalid OTP' } });
+      jest.mocked(signup).mockResolvedValue({ success: true, sessionId: 'sess-1' });
+      const nextStep = jest.fn();
+      const { rerender } = render(
+        withRequiredProviders(<EmailVerificationSteps step={SignupSteps.VERIFY_OTP} nextStep={nextStep} />),
+      );
+
+      await act(async () => {
+        fireEvent.change(getOtpInput(), { target: { value: '023456' } });
+      });
+      rerender(withRequiredProviders(<EmailVerificationSteps step={SignupSteps.EMAIL_INPUT} nextStep={nextStep} />));
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+      });
+
+      expect(signup).not.toHaveBeenCalled();
     });
   });
 });
