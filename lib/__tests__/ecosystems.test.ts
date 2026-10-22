@@ -34,7 +34,7 @@ const REPO_ENTRY: EcosystemsRepoSummary = {
     pushed_at: '2026-10-11T11:24:07.000Z',
     commit_stats: { total_commits: 120, total_committers: 8, last_synced_commit: 'abc123' },
   },
-  contributors: { total_committers: 8 },
+  contributors: { total_committers: 8, total_bot_committers: 2 },
   issues: { issues_count: 3 },
   owner: { login: 'foo', kind: 'organization' },
 };
@@ -57,7 +57,7 @@ describe('lib/ecosystems', () => {
         createdAt: '2016-12-12T04:36:39.000Z',
         lastCommitAt: '2026-10-11T11:24:07.000Z',
         lastCommitSha: 'abc123',
-        commitStats: { totalCommits: 120, totalCommitters: 8 },
+        commitStats: { totalCommits: 120, totalCommitters: 8, botCommitters: 2 },
         packages: [
           {
             name: 'my-package',
@@ -75,6 +75,32 @@ describe('lib/ecosystems', () => {
       };
 
       expect(snapshot).toEqual(expected);
+    });
+
+    it('counts human committers only, excluding bots, and keeps the bot count', () => {
+      const snapshot = toRepositorySnapshot({
+        ...REPO_ENTRY,
+        repository: {
+          ...REPO_ENTRY.repository,
+          commit_stats: { total_commits: 120, total_committers: 5, last_synced_commit: 'abc123' },
+        },
+        packages: [
+          {
+            ...REPO_ENTRY.packages[0],
+            repo_metadata: {
+              commit_stats: { total_commits: 120, total_committers: 9, last_synced_commit: 'abc123' },
+            },
+          },
+        ],
+        contributors: {
+          total_committers: 12,
+          total_bot_committers: 4,
+          past_year_total_committers: 8,
+          past_year_total_bot_committers: 2,
+        },
+      });
+
+      expect(snapshot.commitStats).toEqual({ totalCommits: 120, totalCommitters: 9, botCommitters: 4 });
     });
 
     it('supports entries without repository or packages', () => {
