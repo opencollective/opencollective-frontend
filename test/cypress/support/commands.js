@@ -9,7 +9,7 @@ import { CreditCards } from '../../stripe-helpers';
 
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
-import { getApiUrl } from './helpers';
+import { getApiKeyParams, getApiUrl } from './helpers';
 import generateToken from './token';
 
 /**
@@ -867,6 +867,7 @@ function graphqlQuery(token, body) {
   body.operationName && cy.log(`GraphQL: ${body.operationName}`);
   return cy.request({
     url: `${getApiUrl()}/graphql/v1`,
+    qs: getApiKeyParams(),
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -881,6 +882,7 @@ export function graphqlQueryV2(token, body) {
   body.operationName && cy.log(`GraphQL: ${body.operationName}`);
   return cy.request({
     url: `${getApiUrl()}/graphql/v2`,
+    qs: getApiKeyParams(),
     method: 'POST',
     headers: {
       Accept: 'application/json',
