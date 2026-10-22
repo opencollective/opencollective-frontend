@@ -1,31 +1,12 @@
-import React, { Fragment, useState } from 'react';
-import { themeGet } from '@styled-system/theme-get';
+import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import { defineMessages, useIntl } from 'react-intl';
-import { styled } from 'styled-components';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { escapeInput } from '../../lib/utils';
 
-import Container from '../Container';
-import { Box } from '../Grid';
-import StyledCard from '../StyledCard';
-import StyledInput from '../StyledInput';
-import StyledRadioList from '../StyledRadioList';
-import { H4 } from '../Text';
+import { Input } from '../ui/Input';
 
 import GithubRepositoryEntry from './GithubRepositoryEntry';
-
-const SearchIcon = styled(Search)`
-  color: ${themeGet('colors.black.300')};
-`;
-
-const RepositoryEntryContainer = styled(Container)`
-  cursor: pointer;
-  border-bottom: 1px solid ${themeGet('colors.black.200')};
-  &:hover {
-    background: ${themeGet('colors.black.50')};
-  }
-`;
 
 const messages = defineMessages({
   filterByName: { id: 'Filter.ByName', defaultMessage: 'Filter by name' },
@@ -34,74 +15,62 @@ const messages = defineMessages({
 /**
  * Component for displaying list of public repositories
  */
-const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
+const GithubRepositories = ({ repositories, setGithubInfo }) => {
   const { formatMessage } = useIntl();
-  const [search, setSearch] = useState();
+  const [search, setSearch] = useState('');
+  const [selectedName, setSelectedName] = useState(null);
 
-  if (search) {
-    const test = new RegExp(escapeInput(search), 'i');
-    repositories = repositories.filter(repository => repository.name.match(test));
-  }
+  const filteredRepositories = search
+    ? repositories.filter(repository => repository.name.match(new RegExp(escapeInput(search), 'i')))
+    : repositories;
 
-  const showSearch = true; // repositories.length >= 5;
+  const selectRepository = repository => {
+    setSelectedName(repository.name);
+    setGithubInfo({
+      handle: `${repository.owner.login}/${repository.name}`,
+      licenseSpdxId: repository.license?.spdx_id,
+    });
+  };
 
   return (
-    <Fragment>
-      <StyledCard>
-        {showSearch && (
-          <Container
-            display="flex"
-            borderBottom="1px solid"
-            borderColor="black.200"
-            px={[2, 4]}
-            py={1}
-            alignItems="center"
-          >
-            <SearchIcon size="16" />
-            <StyledInput
-              bare
-              type="text"
-              fontSize="14px"
-              lineHeight="20px"
-              placeholder={formatMessage(messages.filterByName)}
-              onChange={({ target }) => {
-                setSearch(target.value);
-              }}
-              ml={2}
-            />
-          </Container>
-        )}
+    <div className="overflow-hidden rounded-lg border border-border">
+      <div className="flex items-center gap-2 border-b border-border px-3">
+        <Search className="size-4 shrink-0 text-muted-foreground" />
+        <Input
+          type="text"
+          className="h-11 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+          placeholder={formatMessage(messages.filterByName)}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
 
-        {repositories.length === 0 && (
-          <Container my={3}>
-            <H4 textAlign="center" fontSize="0.85rem" color="black.400">
-              No repository match
-            </H4>
-          </Container>
-        )}
-        <Box maxHeight="420px" overflow="auto">
-          <StyledRadioList
-            {...fieldProps}
-            options={repositories}
-            onChange={({ value }) => {
-              setGithubInfo({
-                handle: `${value.owner.login}/${value.name}`,
-                licenseSpdxId: value.license?.spdx_id,
-              });
-            }}
-            keyGetter="name"
-          >
-            {({ value, radio }) => {
-              return (
-                <RepositoryEntryContainer px={[2, 4]} py={3}>
-                  <GithubRepositoryEntry radio={radio} value={value} />
-                </RepositoryEntryContainer>
-              );
-            }}
-          </StyledRadioList>
-        </Box>
-      </StyledCard>
-    </Fragment>
+      {filteredRepositories.length === 0 ? (
+        <p className="p-6 text-center text-sm text-muted-foreground">
+          <FormattedMessage id="GithubRepositories.noMatch" defaultMessage="No repository match" />
+        </p>
+      ) : (
+        <div className="max-h-[420px] overflow-auto">
+          {filteredRepositories.map(repository => (
+            <label
+              key={repository.name}
+              className="flex cursor-pointer items-start gap-3 border-b border-border px-4 py-3 last:border-b-0 hover:bg-accent has-checked:bg-accent"
+            >
+              <input
+                type="radio"
+                name="repository"
+                value={repository.name}
+                checked={selectedName === repository.name}
+                onChange={() => selectRepository(repository)}
+                data-cy="radio-select"
+                className="mt-1 accent-primary"
+              />
+              <GithubRepositoryEntry value={repository} />
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

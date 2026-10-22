@@ -184,7 +184,6 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
               },
             });
           }}
-          router={router}
           nextDisabled={!initialValues.applicationData.repositoryUrl}
         />
       )}
