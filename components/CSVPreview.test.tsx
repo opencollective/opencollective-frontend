@@ -4,13 +4,23 @@ import { render, screen } from '@testing-library/react';
 import { LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { withRequiredProviders } from '../test/providers';
 
-import CSVPreview, { CSV_PREVIEW_MAX_ROWS } from './CSVPreview';
+import CSVPreview, { CSV_PREVIEW_MAX_BYTES, CSV_PREVIEW_MAX_ROWS } from './CSVPreview';
 
 const REST_URL = 'https://rest.test';
 const SETTLEMENT_CSV_URL = `${REST_URL}/v2/platform-tips/transactions.csv?kind=PLATFORM_TIP&fetchAll=1`;
 
 const mockFetchResponse = (body: string, status = 200) => {
   global.fetch = jest.fn().mockResolvedValue({ ok: status >= 200 && status < 300, status, text: async () => body });
+};
+
+/** Mocks a response whose body is read as a stream of the given chunks */
+const mockStreamedFetchResponse = (chunks: string[]) => {
+  const encoder = new TextEncoder();
+  const reader = { read: jest.fn(), cancel: jest.fn().mockResolvedValue(undefined) };
+  chunks.forEach(chunk => reader.read.mockResolvedValueOnce({ done: false, value: encoder.encode(chunk) }));
+  reader.read.mockResolvedValue({ done: true, value: undefined });
+  global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200, body: { getReader: () => reader } });
+  return reader;
 };
 
 const renderPreview = (url: string) =>
@@ -67,6 +77,37 @@ describe('CSVPreview', () => {
     expect(await screen.findByText(/Showing the first 500 rows/)).toBeInTheDocument();
     expect(screen.getByRole('cell', { name: `row-${CSV_PREVIEW_MAX_ROWS - 1}` })).toBeInTheDocument();
     expect(screen.queryByRole('cell', { name: `row-${CSV_PREVIEW_MAX_ROWS}` })).not.toBeInTheDocument();
+  });
+
+  it('stops reading large files once the preview rows are available', async () => {
+    const chunks = Array.from({ length: 20 }, (_, chunkIdx) =>
+      Array.from({ length: 100 }, (_, idx) => `row-${chunkIdx * 100 + idx},${idx}\n`).join(''),
+    );
+    const reader = mockStreamedFetchResponse(['label,value\n', ...chunks]);
+    renderPreview(SETTLEMENT_CSV_URL);
+
+    expect(await screen.findByText(/Showing the first 500 rows/)).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: `row-${CSV_PREVIEW_MAX_ROWS - 1}` })).toBeInTheDocument();
+    expect(reader.read.mock.calls.length).toBeLessThan(chunks.length);
+    expect(reader.cancel).toHaveBeenCalled();
+  });
+
+  it('parses quoted values split across chunks', async () => {
+    mockStreamedFetchResponse(['name,note\n"Tip","first', ' line\nsecond line"\n', 'Fee,-1.00\n']);
+    renderPreview(SETTLEMENT_CSV_URL);
+
+    expect(await screen.findByRole('cell', { name: 'Fee' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: /first line\s+second line/ })).toBeInTheDocument();
+    expect(screen.getByText('2 rows')).toBeInTheDocument();
+  });
+
+  it('renders the fallback when the preview rows are not found within the size limit', async () => {
+    const reader = mockStreamedFetchResponse([`label,value\n"${'x'.repeat(CSV_PREVIEW_MAX_BYTES)}`, 'never read']);
+    renderPreview(SETTLEMENT_CSV_URL);
+
+    expect(await screen.findByTestId('fallback')).toBeInTheDocument();
+    expect(reader.read).toHaveBeenCalledTimes(1);
+    expect(reader.cancel).toHaveBeenCalled();
   });
 
   it('renders the fallback when the file cannot be fetched', async () => {

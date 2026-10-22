@@ -446,12 +446,12 @@ export async function downloadLegalDocument(legalDocument, account, prompt2fa) {
 }
 
 /**
- * Fetch the content of a CSV file from the REST service, as text
+ * Fetch a file from the REST service. Resolves with the response, so the body can be streamed.
  */
-export async function fetchCSVContentFromRESTService(
+export async function fetchFromRESTService(
   url: string,
   { isAuthenticated = true, signal = undefined }: { isAuthenticated?: boolean; signal?: AbortSignal } = {},
-): Promise<string> {
+): Promise<Response> {
   const fetchParams: RequestInit = { method: 'GET', signal };
   const accessToken = isAuthenticated && getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
   if (accessToken) {
@@ -468,19 +468,20 @@ export async function fetchCSVContentFromRESTService(
     throw createError(ERROR.NETWORK);
   }
 
-  const content = response && (await response.text());
   if (!response?.ok) {
+    const content = response && (await response.text());
     throw createError(ERROR.UNKNOWN, { message: content });
   }
 
-  return content;
+  return response;
 }
 
 /**
  * Fetch a CSV file, usually from the REST service
  */
 export async function fetchCSVFileFromRESTService(url, filename, { isAuthenticated = true } = {}) {
-  const content = await fetchCSVContentFromRESTService(url, { isAuthenticated });
+  const response = await fetchFromRESTService(url, { isAuthenticated });
+  const content = await response.text();
   return exportFile('text/csv;charset=utf-8', `${filename}.csv`, content);
 }
 
