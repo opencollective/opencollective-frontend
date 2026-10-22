@@ -104,6 +104,8 @@ const constructSortByQuery = sortByValue => {
     query = { field: 'ACTIVITY', direction: 'DESC' };
   } else if (sortByValue === 'RANK') {
     query = { field: 'RANK', direction: 'DESC' };
+  } else if (sortByValue === 'HOST_RANK') {
+    query = { field: 'HOST_RANK', direction: 'DESC' };
   } else if (sortByValue === 'CREATED_AT.DESC') {
     query = { field: 'CREATED_AT', direction: 'DESC' };
   } else if (sortByValue === 'CREATED_AT.ASC') {
@@ -136,15 +138,33 @@ const FilterButton = styled(StyledButton).attrs({
     `}
 `;
 
+/**
+ * Explicit `sortBy` from the URL wins (except `HOST_RANK`, which only applies to hosts). Otherwise: relevancy
+ * when there's a search term, host rank (first-party > trusted > verified > active hosted collectives) when
+ * browsing hosts, and activity for everything else.
+ */
+const getDefaultSortBy = ({ sortBy, term, isHost }) => {
+  if (sortBy && (sortBy !== 'HOST_RANK' || isHost)) {
+    return sortBy;
+  } else if (term) {
+    return 'RANK';
+  } else if (isHost) {
+    return 'HOST_RANK';
+  } else {
+    return 'ACTIVITY';
+  }
+};
+
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
+    const isHost = isNil(query.isHost) ? undefined : parseToBoolean(query.isHost);
     return {
       term: query.q || '',
       type: normalizeSearchTypes(query.type),
-      isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
+      isHost,
       onlyOpenToApplications: isNil(query.onlyOpenToApplications) ? true : parseToBoolean(query.onlyOpenToApplications),
       country: query.country || null,
-      sortBy: query.sortBy || (query.q ? 'RANK' : 'ACTIVITY'),
+      sortBy: getDefaultSortBy({ sortBy: query.sortBy, term: query.q, isHost }),
       tag: query.tag?.length > 0 ? query.tag.split(',') : [],
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
@@ -299,6 +319,7 @@ class SearchPage extends React.Component {
     const showTagFilterSection = (accounts?.nodes?.length > 0 || tags.length > 0) && tagStats?.nodes?.length > 0;
     const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
     const sortOptions = [
+      this.props.isHost ? getSortOption('HOST_RANK') : undefined,
       getSortOption('ACTIVITY'),
       this.props.term ? getSortOption('RANK') : undefined,
       getSortOption('CREATED_AT.DESC'),
