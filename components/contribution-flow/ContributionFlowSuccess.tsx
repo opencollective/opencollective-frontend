@@ -200,18 +200,25 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
     let cancelled = false;
 
     const loadPaymentIntent = async () => {
-      const clientSecret = getQueryStringParam(router.query.payment_intent_client_secret);
-      if (clientSecret) {
-        const stripeAccount = getQueryStringParam(router.query.stripeAccount);
-        const stripe = await getStripe(null, stripeAccount);
-        const result = await stripe.retrievePaymentIntent(clientSecret);
-        if (!cancelled) {
-          setPaymentIntentResult(result);
+      try {
+        const clientSecret = getQueryStringParam(router.query.payment_intent_client_secret);
+        if (clientSecret) {
+          const stripeAccount = getQueryStringParam(router.query.stripeAccount);
+          const stripe = await getStripe(null, stripeAccount);
+          const result = await stripe.retrievePaymentIntent(clientSecret);
+          if (!cancelled) {
+            setPaymentIntentResult(result);
+          }
         }
-      }
-
-      if (!cancelled) {
-        setLoaded(true);
+      } catch (e) {
+        // The payment status is unknown (e.g. Stripe.js failed to load): don't send the contributor back to the
+        // payment step, as the payment may have gone through. Fall back to the order status instead.
+        // eslint-disable-next-line no-console
+        console.error('Failed to retrieve the Stripe payment intent', e);
+      } finally {
+        if (!cancelled) {
+          setLoaded(true);
+        }
       }
     };
 

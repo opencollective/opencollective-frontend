@@ -150,4 +150,29 @@ describe('ContributionFlowSuccess', () => {
 
     expect(mockPush).toHaveBeenCalledTimes(1);
   });
+
+  it('still follows the external redirect when the payment intent lookup fails', async () => {
+    mockRouter = {
+      isReady: true,
+      query: {
+        OrderId: 'order-id',
+        payment_intent_client_secret: 'pi_secret_123',
+        redirect: 'https://example.com/test',
+      },
+      push: mockPush,
+      replace: mockReplace,
+    };
+
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    mockRetrievePaymentIntent.mockRejectedValue(new Error('Network error'));
+
+    render(withRequiredProviders(<ContributionFlowSuccess collective={collective} isEmbed={false} />));
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledTimes(1);
+    });
+
+    expect(mockPush).toHaveBeenCalledWith(expect.objectContaining({ pathname: '/external-redirect' }));
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
 });
