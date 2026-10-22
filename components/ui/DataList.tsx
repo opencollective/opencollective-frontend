@@ -17,7 +17,10 @@ export function DataListItemValue({
   showValueAsTitle?: boolean;
 }) {
   return (
-    <dd className={cn('max-w-fit break-words', className)} title={showValueAsTitle ? String(children) : undefined}>
+    <dd
+      className={cn('max-w-fit min-w-0 break-words', className)}
+      title={showValueAsTitle ? String(children) : undefined}
+    >
       {children}
     </dd>
   );

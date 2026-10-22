@@ -35,6 +35,8 @@ type EcosystemsPackage = {
   dependent_repos_count?: number;
   first_release_published_at?: string | null;
   latest_release_published_at?: string | null;
+  /** Repository metadata attached to the package by ecosyste.ms */
+  repo_metadata?: { commit_stats?: RepoCommitStats } | null;
 };
 
 type EcosystemsCommitsRepository = {
@@ -42,6 +44,9 @@ type EcosystemsCommitsRepository = {
   full_name?: string;
   total_commits?: number;
   total_committers?: number;
+  total_bot_committers?: number;
+  past_year_total_committers?: number;
+  past_year_total_bot_committers?: number;
 };
 
 type EcosystemsIssuesRepository = {
@@ -85,7 +90,13 @@ export type EcosystemsRepositorySnapshot = {
   /** Date of the last commit/push activity */
   lastCommitAt: string | null;
   lastCommitSha: string | null;
-  commitStats: { totalCommits: number; totalCommitters: number } | null;
+  commitStats: {
+    totalCommits: number;
+    /** Human committers only, bot accounts are reported separately */
+    totalCommitters: number;
+    /** Bot committers reported by the commits API, when available */
+    botCommitters?: number;
+  } | null;
   packages: Array<{
     name: string;
     ecosystem: string;
@@ -108,8 +119,37 @@ export async function fetchEcosystemsRepositoryInfo(repositoryUrl: string): Prom
   return json;
 }
 
+/** Human committers across every ecosyste.ms source (the repository record, the package metadata
+ * and the commits API, minus the bots it reports separately). Mirrors `maxHumanCommitters` in
+ * `opencollective-tools/osc/application-rules.ts`. */
+function maxHumanCommitters(entry: EcosystemsRepoSummary): number | null {
+  const counts = [entry.repository?.commit_stats?.total_committers];
+
+  for (const pkg of entry.packages || []) {
+    counts.push(pkg.repo_metadata?.commit_stats?.total_committers);
+  }
+
+  if (entry.contributors) {
+    if (typeof entry.contributors.total_committers === 'number') {
+      counts.push(entry.contributors.total_committers - (entry.contributors.total_bot_committers || 0));
+    }
+    if (typeof entry.contributors.past_year_total_committers === 'number') {
+      counts.push(
+        entry.contributors.past_year_total_committers - (entry.contributors.past_year_total_bot_committers || 0),
+      );
+    }
+  }
+
+  const valid = counts.filter((count): count is number => typeof count === 'number');
+  return valid.length > 0 ? Math.max(...valid) : null;
+}
+
 export function toRepositorySnapshot(entry: EcosystemsRepoSummary): EcosystemsRepositorySnapshot {
   const repository = entry.repository;
+  const totalCommitters = maxHumanCommitters(entry);
+  const botCommitters = entry.contributors?.total_bot_committers;
+  const hasCommitStats = totalCommitters !== null || typeof botCommitters === 'number';
+
   return {
     fullName: repository?.full_name ?? null,
     owner: repository?.owner ?? null,
@@ -124,10 +164,11 @@ export function toRepositorySnapshot(entry: EcosystemsRepoSummary): EcosystemsRe
     createdAt: repository?.created_at ?? null,
     lastCommitAt: repository?.pushed_at ?? null,
     lastCommitSha: repository?.commit_stats?.last_synced_commit ?? null,
-    commitStats: repository?.commit_stats
+    commitStats: hasCommitStats
       ? {
-          totalCommits: repository.commit_stats.total_commits,
-          totalCommitters: repository.commit_stats.total_committers,
+          totalCommits: repository?.commit_stats?.total_commits ?? 0,
+          totalCommitters: totalCommitters ?? 0,
+          ...(typeof botCommitters === 'number' && { botCommitters }),
         }
       : null,
     packages: (entry.packages || []).map(pkg => ({
