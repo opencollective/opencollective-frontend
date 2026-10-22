@@ -38,7 +38,6 @@ jest.mock('@apollo/client', () => {
 });
 
 jest.mock('../collectives/HomeNextIllustration', () => () => <img alt="mock" />);
-jest.mock('../CollectivePickerAsync', () => () => <div data-testid="collective-picker-mock" />);
 
 jest.mock('../../lib/ecosystems', () => ({
   ...jest.requireActual('../../lib/ecosystems'),

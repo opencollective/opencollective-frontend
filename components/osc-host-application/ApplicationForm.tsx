@@ -23,7 +23,6 @@ import { i18nLabels } from '../../lib/i18n/custom-application-form';
 import { cn, isLocalEmail, isValidEmail } from '@/lib/utils';
 
 import Avatar from '../Avatar';
-import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { FormField } from '../FormField';
 import Link from '../Link';
@@ -38,6 +37,7 @@ import { Input, InputGroup } from '../ui/Input';
 import { DefaultCommandSelect } from '../ui/Select';
 import { TagInput } from '../ui/TagInput';
 import { Textarea } from '../ui/Textarea';
+import { UserPicker } from '../UserPicker';
 
 import {
   CONFIRMATION_MESSAGES,
@@ -337,9 +337,16 @@ const ApplicationForm = ({
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
       applicationData: applicationDataWithRules,
-      inviteMembers: inviteMembers.map(invite =>
-        invite.memberAccount ? { ...invite, memberAccount: { legacyId: invite.memberAccount.id } } : invite,
-      ),
+      inviteMembers: inviteMembers.map(invite => {
+        if (!invite.memberAccount) {
+          return invite;
+        }
+        const { id, legacyId } = invite.memberAccount;
+        return {
+          ...invite,
+          memberAccount: typeof id === 'string' ? { id } : { legacyId: id ?? legacyId },
+        };
+      }),
       message,
     };
 
@@ -912,6 +919,8 @@ const ApplicationForm = ({
                               const inviteKey = getInviteKey(invite);
                               const inviteName =
                                 invite.memberAccount?.name || invite.memberInfo?.name || invite.memberInfo?.email;
+                              const inviteEmail = invite.memberInfo?.email;
+                              const showInviteEmail = Boolean(inviteEmail) && inviteEmail !== inviteName;
                               return (
                                 <Badge
                                   key={inviteKey}
@@ -928,8 +937,8 @@ const ApplicationForm = ({
                                   <span className="truncate" data-cy="name-of-admins">
                                     {inviteName}
                                   </span>
-                                  {!invite.memberAccount && invite.memberInfo?.email && (
-                                    <span className="truncate text-muted-foreground">({invite.memberInfo.email})</span>
+                                  {!invite.memberAccount && showInviteEmail && (
+                                    <span className="truncate text-muted-foreground">({inviteEmail})</span>
                                   )}
                                   <button
                                     type="button"
@@ -954,24 +963,15 @@ const ApplicationForm = ({
                           <h4 className="text-base font-semibold text-foreground">
                             <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
                           </h4>
-                          <CollectivePickerAsync
-                            inputId="onboarding-admin-picker"
-                            creatable
-                            collective={null}
-                            types={['USER']}
-                            data-cy="admin-picker"
-                            filterResults={collectives =>
-                              collectives.filter(
-                                collective =>
-                                  !values.inviteMembers.some(invite => invite.memberAccount?.id === collective.id),
-                              )
+                          <UserPicker
+                            onSelect={selection =>
+                              setFieldValue('inviteMembers', [...values.inviteMembers, { role: 'ADMIN', ...selection }])
                             }
-                            onChange={option => {
-                              setFieldValue('inviteMembers', [
-                                ...values.inviteMembers,
-                                { role: 'ADMIN', memberAccount: option.value },
-                              ]);
-                            }}
+                            excludedIds={values.inviteMembers.map(invite => invite.memberAccount?.id).filter(Boolean)}
+                            excludedEmails={values.inviteMembers
+                              .map(invite => invite.memberInfo?.email?.toLowerCase())
+                              .filter(Boolean)}
+                            data-cy="admin-picker"
                           />
 
                           {suggestedAdmins.length > 0 && (
