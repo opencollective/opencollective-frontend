@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { AlertTriangle, ArrowLeft, ArrowRight, Info, Mail, UserPlus, X, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Info, Lock, Mail, UserPlus, X, XCircle } from 'lucide-react';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import spdxLicenses from 'spdx-license-list';
@@ -190,6 +190,8 @@ const ApplicationForm = ({
   const [communitySectionExpanded, setCommunitySectionExpanded] = useState(false);
   // Mirror of the `applicationData.repositoryUrl` field value (Formik values are only accessible in the render prop)
   const [repositoryUrl, setRepositoryUrl] = useState(initialValues?.applicationData?.repositoryUrl || '');
+  // Repositories picked through the GitHub flow are verified and must not be changed in the form
+  const isRepositoryUrlLocked = Boolean(initialValues?.applicationData?.useGithubValidation);
   // Latest ecosyste.ms info fetched for the repository URL ({ url, info })
   const [repositoryInfo, setRepositoryInfo] = useState(null);
   const {
@@ -714,13 +716,28 @@ const ApplicationForm = ({
                                   label={intl.formatMessage(i18nLabels.repositoryUrl)}
                                   name="applicationData.repositoryUrl"
                                   required={values.applicationData.typeOfProject === 'CODE' || undefined}
-                                  hint={ruleNotes(
-                                    'repositoryUrl',
-                                    <FormattedMessage
-                                      id="HostApplication.repositoryUrlHint"
-                                      defaultMessage="Can be GitHub, GitLab or any URL"
-                                    />,
-                                  )}
+                                  hint={
+                                    <div className="flex flex-col gap-1">
+                                      {isRepositoryUrlLocked && (
+                                        <span className="flex items-center gap-1.5">
+                                          <Lock className="size-3.5 shrink-0" />
+                                          <FormattedMessage
+                                            id="HostApplication.form.repositoryUrl.locked"
+                                            defaultMessage="This repository was verified with GitHub and can't be changed."
+                                          />
+                                        </span>
+                                      )}
+                                      {ruleNotes(
+                                        'repositoryUrl',
+                                        isRepositoryUrlLocked ? null : (
+                                          <FormattedMessage
+                                            id="HostApplication.repositoryUrlHint"
+                                            defaultMessage="Can be GitHub, GitLab or any URL"
+                                          />
+                                        ),
+                                      )}
+                                    </div>
+                                  }
                                 >
                                   {({ field }) => (
                                     <InputGroup
@@ -728,6 +745,7 @@ const ApplicationForm = ({
                                       placeholder="https://github.com"
                                       className="w-full"
                                       aria-busy={isRepositoryInfoLoading}
+                                      disabled={isRepositoryUrlLocked}
                                       append={
                                         isRepositoryInfoLoading ? (
                                           <div className="px-3 py-2">
@@ -737,11 +755,22 @@ const ApplicationForm = ({
                                               data-cy="ccf-form-repository-url-loading"
                                             />
                                           </div>
+                                        ) : isRepositoryUrlLocked ? (
+                                          <div className="px-3 py-2">
+                                            <Lock
+                                              size={16}
+                                              className="text-muted-foreground"
+                                              data-cy="ccf-form-repository-url-locked"
+                                            />
+                                          </div>
                                         ) : undefined
                                       }
                                       appendClassName="px-0 py-0 bg-background"
                                       {...field}
                                       onChange={e => {
+                                        if (isRepositoryUrlLocked) {
+                                          return;
+                                        }
                                         setRepositoryUrl(e.target.value);
                                         setFieldValue('applicationData.repositoryUrl', e.target.value);
                                       }}

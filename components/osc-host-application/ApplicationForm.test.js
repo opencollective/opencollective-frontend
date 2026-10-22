@@ -657,6 +657,43 @@ describe('ApplicationForm - Your Team', () => {
   });
 });
 
+// ─── GitHub verified repository ───────────────────────────────────────────────
+
+describe('ApplicationForm - GitHub verified repository', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMutate.mockResolvedValue({ data: { createCollective: null } });
+  });
+
+  const lockedInitialValues = {
+    ...initialValues,
+    applicationData: {
+      ...initialValues.applicationData,
+      typeOfProject: 'CODE',
+      repositoryUrl: 'https://github.com/foo/bar',
+      useGithubValidation: true,
+    },
+  };
+
+  it('locks the repository URL when it was picked with GitHub', () => {
+    renderForm({ initialValues: lockedInitialValues });
+
+    expect(screen.getByLabelText(/repository url/i)).toBeDisabled();
+    expect(screen.getByText(/verified with github and can't be changed/i)).toBeInTheDocument();
+  });
+
+  it('keeps the repository URL editable without the GitHub validation flag', () => {
+    renderForm({
+      initialValues: {
+        ...lockedInitialValues,
+        applicationData: { ...lockedInitialValues.applicationData, useGithubValidation: false },
+      },
+    });
+
+    expect(screen.getByLabelText(/repository url/i)).not.toBeDisabled();
+  });
+});
+
 // ─── Suggested admins from repository committers ─────────────────────────────
 
 describe('ApplicationForm - suggested admins', () => {
