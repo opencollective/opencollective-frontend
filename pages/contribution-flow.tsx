@@ -56,10 +56,13 @@ const ContributionFlowPage = ({ collectiveSlug, tierId, error }: ContributionFlo
     if (!account) {
       return;
     }
+    const step = router.query.step ?? '';
+    // Tier routes need their tier and `checkout` segments, which `verb` alone doesn't carry
+    const path = tier ? `/contribute/${tier.slug}-${tier.legacyId}/checkout/${step}` : `/${router.query.verb}/${step}`;
     const queryParameters = {
-      ...omit(router.query, ['verb', 'step', 'collectiveSlug']),
+      ...omit(router.query, ['verb', 'step', 'collectiveSlug', ...(tier ? ['tierSlug', 'tierId'] : [])]),
     };
-    addParentToURLIfMissing(router, account, `/${router.query.verb}/${router.query.step ?? ''}`, queryParameters);
+    addParentToURLIfMissing(router, account, path, queryParameters);
   }, [account]);
 
   React.useEffect(() => {
