@@ -446,19 +446,25 @@ export async function downloadLegalDocument(legalDocument, account, prompt2fa) {
 }
 
 /**
- * Fetch a CSV file, usually from the REST service
+ * Fetch the content of a CSV file from the REST service, as text
  */
-export async function fetchCSVFileFromRESTService(url, filename, { isAuthenticated = true } = {}) {
-  const fetchParams = { method: 'GET' };
-  if (isAuthenticated) {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    fetchParams['headers'] = { Authorization: `Bearer ${accessToken}` };
+export async function fetchCSVContentFromRESTService(
+  url: string,
+  { isAuthenticated = true, signal = undefined }: { isAuthenticated?: boolean; signal?: AbortSignal } = {},
+): Promise<string> {
+  const fetchParams: RequestInit = { method: 'GET', signal };
+  const accessToken = isAuthenticated && getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+  if (accessToken) {
+    fetchParams.headers = { Authorization: `Bearer ${accessToken}` };
   }
 
   let response;
   try {
     response = await fetch(url, fetchParams);
-  } catch {
+  } catch (e) {
+    if (signal?.aborted) {
+      throw e;
+    }
     throw createError(ERROR.NETWORK);
   }
 
@@ -467,6 +473,14 @@ export async function fetchCSVFileFromRESTService(url, filename, { isAuthenticat
     throw createError(ERROR.UNKNOWN, { message: content });
   }
 
+  return content;
+}
+
+/**
+ * Fetch a CSV file, usually from the REST service
+ */
+export async function fetchCSVFileFromRESTService(url, filename, { isAuthenticated = true } = {}) {
+  const content = await fetchCSVContentFromRESTService(url, { isAuthenticated });
   return exportFile('text/csv;charset=utf-8', `${filename}.csv`, content);
 }
 
