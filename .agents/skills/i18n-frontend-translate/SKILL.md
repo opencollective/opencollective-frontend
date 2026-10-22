@@ -30,7 +30,7 @@ description: Batches translation of locale JSON using show-untranslated and set-
 3. **Per string**:
    - Read the line: `{id}: {english}`.
    - If meaning, audience, or UI role is unclear, **find context** before translating (see below).
-   - If the string **should stay English** in this locale (same word in both languages, standard loanword, product name, etc.), **do not** run `set-translation`. Add the **message id** to `IGNORED['<locale>']` in `scripts/i18n/translation-stats.ts` so it stops appearing in the report. Keep a short inline comment per entry (e.g. why it is not translated). Ignore matching is by **id**, not by English value.
+   - If the string **should stay English** in this locale (same word in both languages, standard loanword, product name, etc.), **do not** run `set-translation`. Add the **message id** to `IGNORED['<locale>']` in `scripts/i18n/translation-stats.ts` so it stops appearing in the report, with a short reason (e.g. why it is not translated). Ignore matching is by **id**, not by English value. To add several at once, write a `{ "<id>": "<reason>" }` JSON file and run `npx tsx scripts/i18n/apply-translations.ts <locale> --ignore ignored.json`.
    - Otherwise produce the target-language string that matches instructions and preserves placeholders/markup, then apply:
 
    ```bash

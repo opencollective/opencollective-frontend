@@ -1,8 +1,13 @@
 import * as fs from 'fs';
 
+import { fileURLToPath } from 'node:url';
+
+import { addIgnoredEntries, readIgnoredEntries } from '../../lib/i18n/ignored-ids';
 import { validateTranslation } from '../../lib/i18n/translation-validation';
 
 import { loadEnglishMessages, loadLocaleMessages, writeLocaleMessages } from './translation-stats.js';
+
+const TRANSLATION_STATS_PATH = fileURLToPath(new URL('./translation-stats.ts', import.meta.url));
 
 const USAGE = [
   'Usage:',
@@ -69,6 +74,26 @@ function apply(locale: string, messages: Record<string, string>, translations: R
   }
 }
 
+function ignore(locale: string, entries: Record<string, string>): void {
+  const knownIds = new Set(Object.keys(loadEnglishMessages()));
+  const source = fs.readFileSync(TRANSLATION_STATS_PATH, 'utf8');
+  const result = addIgnoredEntries(source, locale, entries, knownIds);
+  fs.writeFileSync(TRANSLATION_STATS_PATH, result.source, 'utf8');
+  console.log(`Ignored ${result.added.length} ${locale} message id(s)`);
+  if (result.errors.length) {
+    result.errors.forEach(error => console.error(error));
+    console.error(`Skipped ${result.errors.length} invalid id(s)`);
+    process.exit(1);
+  }
+}
+
+function diffIgnored(locale: string, basePath: string, headPath: string): void {
+  const base = readIgnoredEntries(fs.readFileSync(basePath, 'utf8'), locale);
+  const head = readIgnoredEntries(fs.readFileSync(headPath, 'utf8'), locale);
+  const added = Object.fromEntries(Object.entries(head).filter(([id]) => base[id] === undefined));
+  console.log(JSON.stringify(added, null, 2));
+}
+
 function main(): void {
   const [localeArg, ...rest] = process.argv.slice(2);
   if (!localeArg || !rest.length) {
@@ -86,6 +111,10 @@ function main(): void {
   if (rest[0] === '--check') {
     const baseIndex = rest.indexOf('--base');
     check(locale, messages, baseIndex === -1 ? undefined : rest[baseIndex + 1]);
+  } else if (rest[0] === '--ignore') {
+    ignore(locale, readJsonFile(rest[1]));
+  } else if (rest[0] === '--diff-ignored') {
+    diffIgnored(locale, rest[1], rest[2]);
   } else if (rest[0] === '--carry-over') {
     const en = loadEnglishMessages();
     const previous = readJsonFile(rest[1]);

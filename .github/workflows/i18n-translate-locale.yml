@@ -2,8 +2,10 @@ name: i18n Translate Locale
 
 # Translates one locale with Claude. Called by `i18n-translate.yml`.
 #
-# Security: the `agent` job only gets read access and hands its changes over as a patch. The
-# `publish` job checks the patch against an allowlist and re-validates translations before pushing.
+# Security: the `agent` job only gets read access and hands its changes over as data: a patch of
+# `lang/<locale>.json` and the ids to add to IGNORED. The `publish` job never runs code from the agent:
+# it checks the patch, writes IGNORED entries and progress with the repository scripts, re-validates
+# translations, and only then uses its write token to push.
 #
 # Secrets: ANTHROPIC_API_KEY (required), SLACK_WEBHOOK_URL (optional), OC_AGENT_APP_PRIVATE_KEY with
 # the OC_AGENT_APP_ID variable (optional: pull requests opened with GITHUB_TOKEN do not trigger CI).
@@ -22,7 +24,7 @@ env:
   LOCALE: ${{ inputs.locale }}
   BRANCH: i18n/${{ inputs.locale }}
   MAX_STRINGS: 300
-  ALLOWED_FILES: lang/${{ inputs.locale }}.json scripts/i18n/translation-stats.ts lib/constants/locales.js
+  LOCALE_FILE: lang/${{ inputs.locale }}.json
 
 jobs:
   agent:
@@ -74,8 +76,12 @@ jobs:
           previous_pr=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
           if [ -n "$previous_pr" ]; then
             git fetch --depth=1 origin "$BRANCH"
-            git show "FETCH_HEAD:lang/$LOCALE.json" > "$DATA_DIR/previous.json"
+            git show "FETCH_HEAD:$LOCALE_FILE" > "$DATA_DIR/previous.json"
             npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --carry-over "$DATA_DIR/previous.json" || true
+            git show "FETCH_HEAD:scripts/i18n/translation-stats.ts" > "$DATA_DIR/previous-translation-stats.ts"
+            npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --diff-ignored \
+              scripts/i18n/translation-stats.ts "$DATA_DIR/previous-translation-stats.ts" > "$DATA_DIR/previous-ignored.json"
+            npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --ignore "$DATA_DIR/previous-ignored.json" || true
             gh pr diff "$previous_pr" > "$DATA_DIR/previous-pr.diff"
           fi
 
@@ -83,8 +89,11 @@ jobs:
           wc -l < "$DATA_DIR/untranslated-all.txt" | tr -d ' ' > "$DATA_DIR/untranslated-total.txt"
           head -n "$MAX_STRINGS" "$DATA_DIR/untranslated-all.txt" > "$DATA_DIR/untranslated.txt"
           npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --check 2> "$DATA_DIR/invalid.txt" > /dev/null || true
-          gh pr list --state merged --search 'i18n in:title sort:updated-desc' --limit 15 \
-            --json number,title,url,mergedAt > "$DATA_DIR/recent-i18n-prs.json"
+          # Human fixes often name the language rather than the locale (or none), so match on the file.
+          gh pr list --state merged --search 'i18n in:title sort:updated-desc' --limit 50 \
+            --json number,title,url,mergedAt,author,files \
+            --jq "[.[] | select(any(.files[]; .path == \"$LOCALE_FILE\"))
+              | {number, title, url, mergedAt, author: .author.login}] | .[:15]" > "$DATA_DIR/recent-i18n-prs.json"
 
           untranslated=$(wc -l < "$DATA_DIR/untranslated.txt" | tr -d ' ')
           invalid=$(grep -c ': ' "$DATA_DIR/invalid.txt" || true)
@@ -128,17 +137,16 @@ jobs:
         run: |
           set -euo pipefail
           if [ -n "${RESULT:-}" ]; then printf '%s' "$RESULT" > "$OUT_DIR/result.json"; else echo '{}' > "$OUT_DIR/result.json"; fi
-          git add -A
-          # Drop anything outside the allowlist (tool caches, scratch files). `publish` enforces it again.
-          for file in $(git diff --cached --name-only --no-renames); do
-            case " $ALLOWED_FILES " in
-              *" $file "*) ;;
-              *) echo "::warning::Ignoring change outside the allowlist: $file"; git reset -q -- "$file" ;;
-            esac
-          done
-          git diff --cached --binary --no-renames > "$OUT_DIR/changes.patch"
-          git diff --cached --stat
-          if [ -s "$OUT_DIR/changes.patch" ]; then
+          # Hand over translations and IGNORED ids as data only; `publish` regenerates the rest.
+          git show HEAD:scripts/i18n/translation-stats.ts > "$RUNNER_TEMP/translation-stats.base.ts"
+          npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --diff-ignored \
+            "$RUNNER_TEMP/translation-stats.base.ts" scripts/i18n/translation-stats.ts > "$OUT_DIR/ignored.json"
+          git status --porcelain -- . ":!$LOCALE_FILE" ':!scripts/i18n/translation-stats.ts' ':!lib/constants/locales.js' |
+            while read -r line; do echo "::warning::Ignoring change outside the allowlist: $line"; done
+          git diff --binary --no-renames -- "$LOCALE_FILE" > "$OUT_DIR/changes.patch"
+          git diff --stat -- "$LOCALE_FILE"
+          echo "IGNORED additions: $(jq length "$OUT_DIR/ignored.json")"
+          if [ -s "$OUT_DIR/changes.patch" ] || [ "$(jq length "$OUT_DIR/ignored.json")" != 0 ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -173,7 +181,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          token: ${{ steps.app-token.outputs.token || github.token }}
+          persist-credentials: false
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -190,25 +198,30 @@ jobs:
         run: |
           set -euo pipefail
           patch="$RUNNER_TEMP/out/changes.patch"
-          # --numstat only lists rename/copy destinations, so require plain deletes and additions.
-          if grep -Eq '^(rename|copy) from ' "$patch"; then
-            echo "::error::Patch contains renames or copies"
-            exit 1
+          ignored="$RUNNER_TEMP/out/ignored.json"
+          if [ -s "$patch" ]; then
+            # --numstat only lists rename/copy destinations, so require plain deletes and additions.
+            if grep -Eq '^(rename|copy) from ' "$patch"; then
+              echo "::error::Patch contains renames or copies"
+              exit 1
+            fi
+            for file in $(git apply --numstat "$patch" | cut -f3); do
+              if [ "$file" != "$LOCALE_FILE" ]; then
+                echo "::error::Patch changes a file other than $LOCALE_FILE: $file"
+                exit 1
+              fi
+            done
+            git apply "$patch"
           fi
-          for file in $(git apply --numstat "$patch" | cut -f3); do
-            case " $ALLOWED_FILES " in
-              *" $file "*) ;;
-              *) echo "::error::Patch changes a file outside the allowlist: $file"; exit 1 ;;
-            esac
-          done
-          git apply --index "$patch"
+          jq -e 'type == "object" and all(.[]; type == "string")' "$ignored" > /dev/null
+          npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --ignore "$ignored"
 
-          git show "HEAD:lang/$LOCALE.json" > "$RUNNER_TEMP/base.json"
+          git show "HEAD:$LOCALE_FILE" > "$RUNNER_TEMP/base.json"
           npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --check --base "$RUNNER_TEMP/base.json"
           npx tsx scripts/i18n/show-untranslated.ts "$LOCALE" | wc -l | xargs echo "Remaining untranslated:"
           npm run langs:update-progress
           npx eslint scripts/i18n/translation-stats.ts
-          npx prettier --check scripts/i18n/translation-stats.ts lib/constants/locales.js
+          npx prettier --check "$LOCALE_FILE" scripts/i18n/translation-stats.ts lib/constants/locales.js
 
       - name: Push branch and open pull request
         id: pr
@@ -228,10 +241,9 @@ jobs:
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898283+github-actions[bot]@users.noreply.github.com'
-          # shellcheck disable=SC2086 # ALLOWED_FILES is a space-separated list
-          git add -- $ALLOWED_FILES
+          git add -- "$LOCALE_FILE" scripts/i18n/translation-stats.ts lib/constants/locales.js
           git commit -q -m "$title"
-          git push --force origin "HEAD:refs/heads/$BRANCH"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/$BRANCH"
 
           url=$(gh pr list --head "$BRANCH" --state open --json url --jq '.[0].url // empty')
           if [ -n "$url" ]; then

@@ -9,7 +9,7 @@ All files are in `${DATA_DIR}`:
 - `untranslated.txt`: every remaining `{id}: {english}` line, already capped at ${MAX_STRINGS} lines for this run. `untranslated-total.txt` has the full backlog size.
 - `invalid.txt`: existing `${LOCALE}` translations that break placeholders, tags, or contain invisible characters. Fix them too.
 - `recent-i18n-prs.json`: recently merged i18n pull requests for this locale, including human corrections. Read the diffs of the most relevant ones with `gh pr diff <number>` and follow their terminology.
-- `previous-pr.diff` (only when an earlier run's pull request is still open): its translations were already carried over into `lang/${LOCALE}.json`. Re-apply its `IGNORED.${LOCALE}` additions to `scripts/i18n/translation-stats.ts` unless they are wrong.
+- `previous-pr.diff` (only when an earlier run's pull request is still open): its translations and `IGNORED` additions were already carried over. Review them and fix any that are wrong.
 
 ## Task
 
@@ -23,10 +23,17 @@ All files are in `${DATA_DIR}`:
 
    The script rejects entries with changed `{placeholders}`, changed `<tags>`, invalid ICU syntax, or invisible characters such as zero-width spaces or soft hyphens. Fix every reported entry and re-apply until it exits cleanly.
 
-4. For strings that should stay English (identical word, loanword, brand, format-only string), add the **message id** to `IGNORED['${LOCALE}']` in `scripts/i18n/translation-stats.ts` with a short comment, like the existing entries. Do not translate those ids.
+4. For strings that should stay English (identical word, loanword, brand, format-only string), write `{ "<id>": "<short reason>" }` to `${DATA_DIR}/ignored.json` and add them to `IGNORED['${LOCALE}']` with:
+
+   ```bash
+   npx tsx scripts/i18n/apply-translations.ts ${LOCALE} --ignore ${DATA_DIR}/ignored.json
+   ```
+
+   Do not translate those ids. Reasons follow the existing entries, e.g. `"Avatar" - loanword identical`.
+
 5. Run `npx tsx scripts/i18n/show-untranslated.ts ${LOCALE}` to confirm that every id from `untranslated.txt` is gone, then `npm run langs:update-progress` once.
 
-Only edit `lang/${LOCALE}.json`, `scripts/i18n/translation-stats.ts`, and `lib/constants/locales.js`. Do not commit, push, or open a pull request: a later workflow step validates your changes and opens the pull request.
+Change files only through these scripts. A later workflow step keeps only the `lang/${LOCALE}.json` translations and the `IGNORED['${LOCALE}']` additions, validates them, and opens the pull request: do not commit, push, or open one yourself.
 
 ## Result
 
