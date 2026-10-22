@@ -132,9 +132,18 @@ const UploadedFilePreview = ({
     } else {
       return {
         as: 'div',
+        role: 'button',
+        tabIndex: 0,
         onClick: e => {
           e.stopPropagation();
           openFileViewer(url);
+        },
+        onKeyDown: e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            openFileViewer(url);
+          }
         },
       };
     }
