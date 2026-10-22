@@ -314,6 +314,11 @@ export function loadLocaleMessages(locale: string): Record<string, string> | nul
   return loadJson(localePath);
 }
 
+export function writeLocaleMessages(locale: string, data: Record<string, string>): void {
+  // Preserve key order from the parsed file (insertion order) to minimize diffs.
+  fs.writeFileSync(path.join(LANG_DIR, `${locale}.json`), `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+}
+
 export function getLocaleTranslationStats(locale: string): TranslationStats | null {
   const en = loadEnglishMessages();
   if (locale === 'en') {

@@ -37,7 +37,13 @@ description: Batches translation of locale JSON using show-untranslated and set-
    npx tsx scripts/i18n/set-translation.ts <locale> <id> "Translation text"
    ```
 
-   Quote the translation so the shell does not split words.
+   Quote the translation so the shell does not split words. For many strings, write a `{ "<id>": "translation" }` JSON file and apply it in one call instead:
+
+   ```bash
+   npx tsx scripts/i18n/apply-translations.ts <locale> translations.json
+   ```
+
+   Both scripts reject translations that change `{placeholders}` or `<tags>`, break ICU syntax, or add invisible characters (zero-width spaces, soft hyphens, bidi controls). Fix the reported ids and apply again.
 
 4. **Repeat** step 2 until show-untranslated returns nothing (or the user stops).
 
@@ -79,10 +85,11 @@ Use when the English line alone is ambiguous (button vs heading, legal vs casual
 
 ## Scripts reference
 
-| Script / npm script                 | Role                                                                                                                         |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `scripts/i18n/show-untranslated.ts` | Lists `{id}: english` where locale value still equals English, minus per-locale `IGNORED` message ids. Optional `--limit N`. |
-| `scripts/i18n/set-translation.ts`   | Writes one key: `set-translation.ts <locale> <id> "text"`                                                                    |
-| `npm run langs:update-progress`     | Recomputes per-locale completion % and writes `lib/constants/locales.js`. Run once when done.                                |
+| Script / npm script                  | Role                                                                                                                         |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/i18n/show-untranslated.ts`  | Lists `{id}: english` where locale value still equals English, minus per-locale `IGNORED` message ids. Optional `--limit N`. |
+| `scripts/i18n/set-translation.ts`    | Writes one key: `set-translation.ts <locale> <id> "text"`                                                                    |
+| `scripts/i18n/apply-translations.ts` | Writes a JSON batch: `apply-translations.ts <locale> <file.json>`. `--check` lists invalid existing translations.            |
+| `npm run langs:update-progress`      | Recomputes per-locale completion % and writes `lib/constants/locales.js`. Run once when done.                                |
 
-Show-untranslated and set-translation are invoked with `npx tsx` from the repository root.
+These scripts are invoked with `npx tsx` from the repository root.
