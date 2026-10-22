@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { AlertTriangle, ArrowLeft, ArrowRight, Info, X, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Info, Mail, UserPlus, X, XCircle } from 'lucide-react';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import spdxLicenses from 'spdx-license-list';
@@ -20,7 +20,7 @@ import {
 import { gql } from '../../lib/graphql/helpers';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { i18nLabels } from '../../lib/i18n/custom-application-form';
-import { cn } from '@/lib/utils';
+import { cn, isLocalEmail, isValidEmail } from '@/lib/utils';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -125,6 +125,9 @@ const toRepositoryTags = topics =>
     const tag = (topic ?? '').toString().trim();
     return tag && !tags.includes(tag) ? [...tags, tag] : tags;
   }, []);
+
+/** Stable key for invited admins, whether they were picked by account or invited by email */
+const getInviteKey = invite => invite?.memberAccount?.id || invite?.memberInfo?.email;
 
 /**
  * Application rule notes displayed next to the form field they relate to (warnings and
@@ -308,7 +311,12 @@ const ApplicationForm = ({
     const repositoryUrl = (applicationData.repositoryUrl || '').trim();
     const applicationDataWithRepositoryInfo =
       repositoryInfo && repositoryInfo.url === repositoryUrl
-        ? { ...applicationData, ecosystemsRepositoryInfo: toRepositorySnapshot(repositoryInfo.info) }
+        ? {
+            ...applicationData,
+            ecosystemsRepositoryInfo: toRepositorySnapshot(repositoryInfo.info, {
+              applicantEmail: user?.email || LoggedInUser?.email,
+            }),
+          }
         : applicationData;
 
     // Keep a record of what the applicant confirmed, for the host review
@@ -327,10 +335,9 @@ const ApplicationForm = ({
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
       applicationData: applicationDataWithRules,
-      inviteMembers: inviteMembers.map(invite => ({
-        ...invite,
-        memberAccount: { legacyId: invite.memberAccount.id },
-      })),
+      inviteMembers: inviteMembers.map(invite =>
+        invite.memberAccount ? { ...invite, memberAccount: { legacyId: invite.memberAccount.id } } : invite,
+      ),
       message,
     };
 
@@ -461,6 +468,46 @@ const ApplicationForm = ({
                     fallback
                   );
                 };
+
+                const applicantEmail = (values.user?.email || LoggedInUser?.email || '').trim().toLowerCase();
+                const invitedEmails = new Set(
+                  (values.inviteMembers || [])
+                    .map(invite => (invite.memberInfo?.email || invite.memberAccount?.email)?.trim().toLowerCase())
+                    .filter(Boolean),
+                );
+                const suggestedAdmins = [];
+                const suggestedEmails = new Set();
+                for (const committer of repositoryInfo?.info?.contributors?.past_year_committers || []) {
+                  const email = committer.email?.trim();
+                  const normalizedEmail = email?.toLowerCase();
+                  if (
+                    !email ||
+                    !normalizedEmail ||
+                    !isValidEmail(email) ||
+                    isLocalEmail(email) ||
+                    normalizedEmail === applicantEmail ||
+                    invitedEmails.has(normalizedEmail) ||
+                    suggestedEmails.has(normalizedEmail)
+                  ) {
+                    continue;
+                  }
+                  suggestedEmails.add(normalizedEmail);
+                  suggestedAdmins.push({ ...committer, email });
+                  if (suggestedAdmins.length >= 5) {
+                    break;
+                  }
+                }
+                const addSuggestedAdmin = committer =>
+                  setFieldValue('inviteMembers', [
+                    ...values.inviteMembers,
+                    {
+                      role: 'ADMIN',
+                      memberInfo: {
+                        name: committer.name || committer.login || committer.email,
+                        email: committer.email,
+                      },
+                    },
+                  ]);
 
                 const handleSlugChange = e => {
                   if (!touched.slug) {
@@ -832,34 +879,46 @@ const ApplicationForm = ({
                                 </span>
                               </Badge>
                             )}
-                            {values.inviteMembers?.map(invite => (
-                              <Badge
-                                key={invite.memberAccount.id}
-                                size="sm"
-                                type="outline"
-                                className="gap-1 pr-1"
-                                data-cy="admin-badge"
-                              >
-                                <Avatar collective={invite.memberAccount} radius={16} displayTitle={false} />
-                                <span className="truncate" data-cy="name-of-admins">
-                                  {invite.memberAccount.name}
-                                </span>
-                                <button
-                                  type="button"
-                                  data-cy="remove-user"
-                                  aria-label={`${removeLabel} ${invite.memberAccount.name}`}
-                                  className="rounded-full p-0.5 transition-colors hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-ring"
-                                  onClick={() =>
-                                    setFieldValue(
-                                      'inviteMembers',
-                                      values.inviteMembers.filter(i => i.memberAccount.id !== invite.memberAccount.id),
-                                    )
-                                  }
+                            {values.inviteMembers?.map(invite => {
+                              const inviteKey = getInviteKey(invite);
+                              const inviteName =
+                                invite.memberAccount?.name || invite.memberInfo?.name || invite.memberInfo?.email;
+                              return (
+                                <Badge
+                                  key={inviteKey}
+                                  size="sm"
+                                  type="outline"
+                                  className="max-w-full gap-1 pr-1"
+                                  data-cy="admin-badge"
                                 >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </Badge>
-                            ))}
+                                  {invite.memberAccount ? (
+                                    <Avatar collective={invite.memberAccount} radius={16} displayTitle={false} />
+                                  ) : (
+                                    <Mail className="size-3.5 shrink-0 text-muted-foreground" />
+                                  )}
+                                  <span className="truncate" data-cy="name-of-admins">
+                                    {inviteName}
+                                  </span>
+                                  {!invite.memberAccount && invite.memberInfo?.email && (
+                                    <span className="truncate text-muted-foreground">({invite.memberInfo.email})</span>
+                                  )}
+                                  <button
+                                    type="button"
+                                    data-cy="remove-user"
+                                    aria-label={`${removeLabel} ${inviteName}`}
+                                    className="rounded-full p-0.5 transition-colors hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-ring"
+                                    onClick={() =>
+                                      setFieldValue(
+                                        'inviteMembers',
+                                        values.inviteMembers.filter(i => getInviteKey(i) !== inviteKey),
+                                      )
+                                    }
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </Badge>
+                              );
+                            })}
                           </div>
                         </div>
                         <div className="flex flex-col gap-1">
@@ -875,7 +934,7 @@ const ApplicationForm = ({
                             filterResults={collectives =>
                               collectives.filter(
                                 collective =>
-                                  !values.inviteMembers.some(invite => invite.memberAccount.id === collective.id),
+                                  !values.inviteMembers.some(invite => invite.memberAccount?.id === collective.id),
                               )
                             }
                             onChange={option => {
@@ -885,6 +944,36 @@ const ApplicationForm = ({
                               ]);
                             }}
                           />
+
+                          {suggestedAdmins.length > 0 && (
+                            <div className="mt-2 flex flex-col gap-2" data-cy="suggested-admins">
+                              <p className="text-sm text-muted-foreground">
+                                <FormattedMessage
+                                  id="HostApplication.form.suggestedAdmins"
+                                  defaultMessage="Suggested admins from past-year repository contributors"
+                                />
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {suggestedAdmins.map(committer => (
+                                  <Button
+                                    key={committer.email}
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-auto max-w-full gap-1.5 py-1.5"
+                                    onClick={() => addSuggestedAdmin(committer)}
+                                    data-cy="suggested-admin"
+                                  >
+                                    <UserPlus className="size-3.5 shrink-0" />
+                                    <span className="truncate">
+                                      {committer.name || committer.login || committer.email}
+                                    </span>
+                                    <span className="truncate text-muted-foreground">({committer.email})</span>
+                                  </Button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
 
                           {ruleNotes('team')}
                         </div>
