@@ -1,6 +1,8 @@
+import { getApiUrl } from '../../../lib/utils';
+
 describe('Search docs on from help page', () => {
   it('Should search docs', () => {
-    cy.intercept('GET', '/api/docs/search?*', { fixture: 'docs-search-results.json' }).as('searchDocs');
+    cy.intercept('GET', `${getApiUrl()}/docs/search?*`, { fixture: 'docs-search-results.json' }).as('searchDocs');
     cy.visit('/help');
     cy.getByDataCy('search-input').click();
     cy.getByDataCy('search-result-popup').contains('Type something to search');
@@ -12,7 +14,7 @@ describe('Search docs on from help page', () => {
   });
 
   it('Should search docs and show no results', () => {
-    cy.intercept('GET', '/api/docs/search?*', {
+    cy.intercept('GET', `${getApiUrl()}/docs/search?*`, {
       items: [],
     }).as('searchDocs');
     cy.visit('/help');
@@ -27,7 +29,7 @@ describe('Search docs on from help page', () => {
   });
 
   it('Should search docs, show no results, and show error', () => {
-    cy.intercept('GET', '/api/docs/search?*', {
+    cy.intercept('GET', `${getApiUrl()}/docs/search?*`, {
       forceNetworkError: true,
     }).as('searchDocs');
     cy.visit('/help');

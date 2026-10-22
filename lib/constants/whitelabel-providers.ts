@@ -1,4 +1,4 @@
-import { ProfileMenuIcons } from '@/components/navigation/Icons';
+import { ProfileMenuIcons } from './profile-menu-icons';
 
 const env = process.env.OC_ENV || process.env.NODE_ENV || 'development';
 

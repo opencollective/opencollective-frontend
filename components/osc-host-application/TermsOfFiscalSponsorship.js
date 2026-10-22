@@ -4,6 +4,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../lib/api';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getApiUrl } from '../../lib/utils';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
@@ -33,7 +34,7 @@ const _callRedirectToGithub = async collectiveSlug => {
     ...(collectiveSlug ? { CollectiveId: collectiveSlug } : null),
   });
 
-  const response = await fetch(`/api/connected-accounts/github/oauthUrl?${urlParams.toString()}`, {
+  const response = await fetch(`${getApiUrl()}/connected-accounts/github/oauthUrl?${urlParams.toString()}`, {
     method: 'GET',
     headers: addAuthTokenToHeader(),
   });

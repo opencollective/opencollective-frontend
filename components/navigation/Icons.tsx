@@ -1,14 +1,9 @@
 import type { LucideIcon } from 'lucide-react';
 import { BookOpen, ExternalLink, FileText, Home, LifeBuoy, Mailbox } from 'lucide-react';
 
-export const ProfileMenuIcons = {
-  BookOpen: 'BookOpen',
-  ExternalLink: 'ExternalLink',
-  Home: 'Home',
-  Mailbox: 'Mailbox',
-  LifeBuoy: 'LifeBuoy',
-  FileText: 'FileText',
-};
+import { ProfileMenuIcons } from '../../lib/constants/profile-menu-icons';
+
+export { ProfileMenuIcons };
 
 export const ProfileMenuIconsMap: Record<keyof typeof ProfileMenuIcons, LucideIcon> = {
   BookOpen,

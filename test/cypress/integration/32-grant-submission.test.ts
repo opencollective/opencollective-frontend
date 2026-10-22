@@ -1,3 +1,5 @@
+import { getApiUrl } from '../../../lib/utils';
+
 describe('Grant Submission Flow', () => {
   beforeEach(() => {
     cy.signup()
@@ -104,7 +106,7 @@ describe('Grant Submission Flow', () => {
     cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
       cy.contains('A beneficiary').click();
       const beneficiaryName = 'A beneficiary name';
-      cy.intercept('POST', '/api/graphql/v1', req => {
+      cy.intercept('POST', `${getApiUrl()}/graphql/v1`, req => {
         if (req.body?.operationName === 'CollectivePickerSearch' && req.body?.variables?.term === beneficiaryName) {
           req.alias = 'collectivePickerSearch';
         }

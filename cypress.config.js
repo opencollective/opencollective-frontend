@@ -17,6 +17,7 @@ module.exports = defineConfig({
   expose: {
     MAILPIT_URL: process.env.MAILPIT_URL || 'http://localhost:1080',
     OC_ENV: process.env.OC_ENV,
+    API_URL: process.env.API_URL || 'http://localhost:3060',
   },
   fixturesFolder: 'test/cypress/fixtures',
   screenshotsFolder: 'test/cypress/screenshots',

@@ -4,8 +4,8 @@ import { X } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader, getPaypalConnectConfig } from '../../lib/api';
+import { cn, getApiUrl } from '../../lib/utils';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
-import { cn } from '@/lib/utils';
 
 import PayPalIcon from '../icons/PayPal';
 import { Button } from '../ui/Button';
@@ -143,7 +143,7 @@ const PaypalConnectButton = ({
         window.addEventListener('message', onMessage);
       });
 
-      const result = await fetch('/api/connected-accounts/paypal/connect', {
+      const result = await fetch(`${getApiUrl()}/connected-accounts/paypal/connect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
