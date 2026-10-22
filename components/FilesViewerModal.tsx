@@ -11,6 +11,7 @@ import { css, styled } from 'styled-components';
 import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hooks/useKeyboardKey';
 import { generateDownloadUrlForFileUrl } from '../lib/image-utils';
 import { getFileExtensionFromUrl } from '../lib/url-helpers';
+import { getWebsiteUrl } from '../lib/utils';
 
 import { Button as UIButton } from './ui/Button';
 import { Dialog, DialogOverlay } from './ui/Dialog';
@@ -44,7 +45,8 @@ type ViewerFile = {
  */
 const getFileKind = (file: ViewerFile): 'csv' | 'pdf' | 'image' | 'other' => {
   const contentType = file.info?.type || file.type;
-  const extension = getFileExtensionFromUrl(file.url);
+  // Relative URLs (e.g. `/api/files/...`) are resolved against this website to read their extension
+  const extension = getFileExtensionFromUrl(new URL(file.url, getWebsiteUrl()).toString());
   if (contentType === 'text/csv' || extension === 'csv') {
     return 'csv';
   } else if (contentType === 'application/pdf' || extension === 'pdf') {

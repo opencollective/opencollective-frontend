@@ -31,6 +31,16 @@ describe('FilesViewerModal', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
+  it('previews relative CSV links without file info as a table', async () => {
+    renderModal([{ url: '/api/files/report.csv', name: 'report.csv' }]);
+
+    expect(await screen.findByRole('cell', { name: 'TIP' })).toBeInTheDocument();
+    expect(global.fetch).toHaveBeenCalledWith(
+      `${window.location.origin}/api/files/report.csv`,
+      expect.objectContaining({ credentials: 'same-origin' }),
+    );
+  });
+
   it('shows a fallback card for files that cannot be previewed', () => {
     renderModal([{ url: 'https://example.com/files/report', name: 'Report.docx', type: 'application/msword' }]);
 
