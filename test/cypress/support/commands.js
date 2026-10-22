@@ -4,12 +4,12 @@ import { pick } from 'lodash-es';
 
 import { API_V1_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
-import { getApiUrl } from '../../../lib/utils';
 
 import { CreditCards } from '../../stripe-helpers';
 
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
+import { getApiUrl } from './helpers';
 import generateToken from './token';
 
 /**

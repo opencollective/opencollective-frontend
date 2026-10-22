@@ -1,4 +1,4 @@
-import { getApiUrl } from '../../../lib/utils';
+import { getApiUrl } from '../support/helpers';
 
 describe('Create collective from Github', () => {
   it('Should submit create github page', () => {

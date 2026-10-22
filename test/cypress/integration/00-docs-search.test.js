@@ -1,4 +1,4 @@
-import { getApiUrl } from '../../../lib/utils';
+import { getApiUrl } from '../support/helpers';
 
 describe('Search docs on from help page', () => {
   it('Should search docs', () => {

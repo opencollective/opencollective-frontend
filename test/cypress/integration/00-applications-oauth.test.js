@@ -1,6 +1,6 @@
 import { generateSecret, generateSync } from 'otplib';
 
-import { getApiUrl } from '../../../lib/utils';
+import { getApiUrl } from '../support/helpers';
 
 describe('OAuth Applications', () => {
   let user, clientId, clientSecret;

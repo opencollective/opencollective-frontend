@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio';
 
 import mockRecaptcha from '../mocks/recaptcha';
 import { randomGmailEmail, randomSlug } from '../support/faker';
+import { getApiUrl } from '../support/helpers';
 
 const visitParams = { onBeforeLoad: mockRecaptcha };
 
@@ -58,7 +59,7 @@ const fillOrganizationForm = ({
 
 /** Full page reload: wait for UserProvider before the org form's hidden fields are populated. */
 const visitOrganizationSignupAsLoggedInUser = (query = '') => {
-  cy.intercept('POST', '/api/graphql/v1', req => {
+  cy.intercept('POST', `${getApiUrl()}/graphql/v1`, req => {
     if (req.body?.operationName === 'LoggedInUser') {
       req.alias = 'loggedInUser';
     }
@@ -399,23 +400,23 @@ const INVALID_OTP_MESSAGE = 'The OTP code is invalid or has expired.';
 const SESSION_EXPIRED_MESSAGE = 'This verification link is no longer valid. Please start again.';
 
 /**
- * Stub `POST /api/users/signup` so the code step is reached without spending the API's per-IP
+ * Stub `POST {API_URL}/users/signup` so the code step is reached without spending the API's per-IP
  * rate-limit budget on real signups.
  */
 const stubSignup = (response: StubbedResponse = { statusCode: 200, body: { success: true, sessionId: 'e2e-otp' } }) =>
-  cy.intercept('POST', '/api/users/signup', response).as('signupRequest');
+  cy.intercept('POST', `${getApiUrl()}/users/signup`, response).as('signupRequest');
 
-/** Replay `responses` in order on `POST /api/users/verify-email`, holding the last one for extra calls. */
+/** Replay `responses` in order on `POST {API_URL}/users/verify-email`, holding the last one for extra calls. */
 const stubVerifyEmail = (responses: StubbedResponse[]) => {
   let calls = 0;
-  cy.intercept('POST', '/api/users/verify-email', req => {
+  cy.intercept('POST', `${getApiUrl()}/users/verify-email`, req => {
     req.reply(responses[Math.min(calls, responses.length - 1)]);
     calls += 1;
   }).as('verifyEmail');
 };
 
 const stubResendOtp = (response: StubbedResponse) =>
-  cy.intercept('POST', '/api/users/resend-otp', response).as('resendOtp');
+  cy.intercept('POST', `${getApiUrl()}/users/resend-otp`, response).as('resendOtp');
 
 /** Walk through the real signup form to land on the OTP code step. */
 const startOtpChallenge = (email: string, { path = '/signup' } = {}) => {

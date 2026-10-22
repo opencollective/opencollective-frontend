@@ -1,5 +1,8 @@
 import { flatten } from 'lodash-es';
 
+/** Base URL of the API, as exposed in `cypress.config.js` */
+export const getApiUrl = () => Cypress.expose('API_URL');
+
 /** Helper to loop on specific test */
 // keep for future use?
 // ts-unused-exports:disable-next-line

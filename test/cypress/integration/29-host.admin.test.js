@@ -1,8 +1,7 @@
-import { getApiUrl } from '../../../lib/utils';
-
 import { Sections } from '../../../components/collective-page/_constants';
 
 import { randomSlug, randStr } from '../support/faker';
+import { getApiUrl } from '../support/helpers';
 
 const scrollToSection = section => {
   // Wait for collective page to load before disabling smooth scroll

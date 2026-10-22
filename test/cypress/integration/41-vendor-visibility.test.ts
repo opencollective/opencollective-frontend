@@ -4,6 +4,7 @@ import { fakeTag as gql } from '../../../lib/graphql/helpers';
 import type { UseVendorPolicy } from '../../../lib/graphql/types/v2/graphql';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from '../support/commands';
+import { getApiUrl } from '../support/helpers';
 
 const NEW_VENDOR_NAME = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -493,7 +494,7 @@ describe('vendor visibility', () => {
 
   describe('inline vendor creation defaults', () => {
     const aliasPickerSearch = (alias: string, term: string) =>
-      cy.intercept('POST', '/api/graphql/v1', req => {
+      cy.intercept('POST', `${getApiUrl()}/graphql/v1`, req => {
         if (req.body?.operationName === 'CollectivePickerSearch' && req.body?.variables?.term?.includes(term)) {
           req.alias = alias;
         }

@@ -1,7 +1,6 @@
-import { getApiUrl } from '../../../lib/utils';
-
 import { CreditCards } from '../../stripe-helpers';
 import mockRecaptcha from '../mocks/recaptcha';
+import { getApiUrl } from '../support/helpers';
 
 const donateRoute = '/apex/donate';
 const visitParams = { onBeforeLoad: mockRecaptcha };
