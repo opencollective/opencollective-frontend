@@ -529,6 +529,46 @@ export function EcosystemsRepositoryInfo({
     });
   }
 
+  if (repository.applicantIsContributor !== undefined) {
+    rows.push({
+      key: 'applicantContributor',
+      label: (
+        <FormattedMessage
+          id="HostApplication.customData.ecosystems.applicantContributor"
+          defaultMessage="Applicant contributor"
+        />
+      ),
+      value: (
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge size="xs" type={repository.applicantIsContributor ? 'success' : 'neutral'}>
+            {repository.applicantIsContributor ? (
+              <FormattedMessage id="a5msuh" defaultMessage="Yes" />
+            ) : (
+              <FormattedMessage id="oUWADl" defaultMessage="No" />
+            )}
+          </Badge>
+          {repository.applicantContribution && (
+            <span className="text-muted-foreground">
+              {repository.applicantContribution.name ||
+                repository.applicantContribution.login ||
+                repository.applicantContribution.email}
+              {typeof repository.applicantContribution.count === 'number' && (
+                <React.Fragment>
+                  {' · '}
+                  <FormattedMessage
+                    id="HostApplication.customData.ecosystems.pastYearCommits"
+                    defaultMessage="{count, plural, one {# commit in the past year} other {# commits in the past year}}"
+                    values={{ count: repository.applicantContribution.count }}
+                  />
+                </React.Fragment>
+              )}
+            </span>
+          )}
+        </div>
+      ),
+    });
+  }
+
   if (repository.archived || repository.isFork) {
     rows.push({
       key: 'status',

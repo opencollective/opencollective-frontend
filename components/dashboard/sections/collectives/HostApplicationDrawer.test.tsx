@@ -71,6 +71,8 @@ const ECOSYSTEMS_SNAPSHOT: EcosystemsRepositorySnapshot = {
   lastCommitAt: '2026-01-01T00:00:00.000Z',
   lastCommitSha: 'abcdef0123456789',
   commitStats: { totalCommits: 150, totalCommitters: 7, botCommitters: 2 },
+  applicantIsContributor: true,
+  applicantContribution: { login: 'jane', name: 'Jane Doe', email: 'jane@example.com', count: 12 },
   packages: [
     {
       name: 'bar',
@@ -243,6 +245,10 @@ describe('EcosystemsRepositoryInfo', () => {
     const lastCommitRow = screen.getByText('Last commit').closest('div');
     expect(within(lastCommitRow).getByText(/\(.+ ago\)/)).toBeInTheDocument();
     expect(screen.getByText('Scanning APK files for URIs, endpoints & secrets.')).toBeInTheDocument();
+    expect(screen.getByText('Applicant contributor')).toBeInTheDocument();
+    expect(screen.getByText('Yes')).toBeInTheDocument();
+    expect(screen.getByText(/Jane Doe/)).toBeInTheDocument();
+    expect(screen.getByText(/12 commits in the past year/)).toBeInTheDocument();
     expect(screen.getByText('Fork')).toBeInTheDocument();
     expect(screen.getByText('bar')).toBeInTheDocument();
   });

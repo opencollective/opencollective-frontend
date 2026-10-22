@@ -5,6 +5,8 @@
  * (`lib/ecosyste.ms.ts`), for a single repository URL.
  */
 
+import { isLocalEmail } from './utils';
+
 type RepoCommitStats = {
   total_commits: number;
   total_committers: number;
@@ -39,6 +41,13 @@ type EcosystemsPackage = {
   repo_metadata?: { commit_stats?: RepoCommitStats } | null;
 };
 
+type EcosystemsCommitter = {
+  name?: string | null;
+  email?: string | null;
+  login?: string | null;
+  count?: number;
+};
+
 type EcosystemsCommitsRepository = {
   status?: string | null;
   full_name?: string;
@@ -47,6 +56,8 @@ type EcosystemsCommitsRepository = {
   total_bot_committers?: number;
   past_year_total_committers?: number;
   past_year_total_bot_committers?: number;
+  committers?: EcosystemsCommitter[] | null;
+  past_year_committers?: EcosystemsCommitter[] | null;
 };
 
 type EcosystemsIssuesRepository = {
@@ -97,6 +108,15 @@ export type EcosystemsRepositorySnapshot = {
     /** Bot committers reported by the commits API, when available */
     botCommitters?: number;
   } | null;
+  /** Whether the past-year committer list was available and the applicant was checked against it */
+  applicantIsContributor?: boolean;
+  /** The applicant's past-year commit activity in this repository, matched by email */
+  applicantContribution?: {
+    login: string | null;
+    name: string | null;
+    email: string;
+    count: number | null;
+  } | null;
   packages: Array<{
     name: string;
     ecosystem: string;
@@ -144,11 +164,39 @@ function maxHumanCommitters(entry: EcosystemsRepoSummary): number | null {
   return valid.length > 0 ? Math.max(...valid) : null;
 }
 
-export function toRepositorySnapshot(entry: EcosystemsRepoSummary): EcosystemsRepositorySnapshot {
+type RepositorySnapshotOptions = {
+  /** Email of the applicant, used to match them against the past-year committers */
+  applicantEmail?: string | null;
+};
+
+export function toRepositorySnapshot(
+  entry: EcosystemsRepoSummary,
+  options: RepositorySnapshotOptions = {},
+): EcosystemsRepositorySnapshot {
   const repository = entry.repository;
   const totalCommitters = maxHumanCommitters(entry);
   const botCommitters = entry.contributors?.total_bot_committers;
   const hasCommitStats = totalCommitters !== null || typeof botCommitters === 'number';
+  const applicantEmail = options.applicantEmail?.trim().toLowerCase();
+  const pastYearCommitters = entry.contributors?.past_year_committers;
+
+  let applicantIsContributor: boolean | undefined;
+  let applicantContribution: EcosystemsRepositorySnapshot['applicantContribution'];
+  if (Array.isArray(pastYearCommitters) && applicantEmail && !isLocalEmail(applicantEmail)) {
+    const contribution = pastYearCommitters.find(committer => {
+      const email = committer.email?.trim();
+      return email && !isLocalEmail(email) && email.toLowerCase() === applicantEmail;
+    });
+    applicantIsContributor = Boolean(contribution);
+    applicantContribution = contribution
+      ? {
+          login: contribution.login ?? null,
+          name: contribution.name ?? null,
+          email: contribution.email.trim(),
+          count: typeof contribution.count === 'number' ? contribution.count : null,
+        }
+      : null;
+  }
 
   return {
     fullName: repository?.full_name ?? null,
@@ -171,6 +219,7 @@ export function toRepositorySnapshot(entry: EcosystemsRepoSummary): EcosystemsRe
           ...(typeof botCommitters === 'number' && { botCommitters }),
         }
       : null,
+    ...(applicantIsContributor !== undefined && { applicantIsContributor, applicantContribution }),
     packages: (entry.packages || []).map(pkg => ({
       name: pkg.name,
       ecosystem: pkg.ecosystem,

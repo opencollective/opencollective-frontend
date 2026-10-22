@@ -103,6 +103,63 @@ describe('lib/ecosystems', () => {
       expect(snapshot.commitStats).toEqual({ totalCommits: 120, totalCommitters: 9, botCommitters: 4 });
     });
 
+    it('detects the applicant in the past-year committers by email', () => {
+      const snapshot = toRepositorySnapshot(
+        {
+          ...REPO_ENTRY,
+          contributors: {
+            ...REPO_ENTRY.contributors,
+            past_year_committers: [
+              { name: 'Jane Doe', email: 'JANE@example.com', login: 'jane', count: 12 },
+              { name: 'No Email', email: null, login: 'no-email', count: 3 },
+            ],
+          },
+        },
+        { applicantEmail: ' jane@example.com ' },
+      );
+
+      expect(snapshot.applicantIsContributor).toBe(true);
+      expect(snapshot.applicantContribution).toEqual({
+        login: 'jane',
+        name: 'Jane Doe',
+        email: 'JANE@example.com',
+        count: 12,
+      });
+    });
+
+    it('reports when the applicant is not a past-year committer', () => {
+      const snapshot = toRepositorySnapshot(
+        {
+          ...REPO_ENTRY,
+          contributors: { ...REPO_ENTRY.contributors, past_year_committers: [] },
+        },
+        { applicantEmail: 'nobody@example.com' },
+      );
+
+      expect(snapshot.applicantIsContributor).toBe(false);
+      expect(snapshot.applicantContribution).toBeNull();
+    });
+
+    it('ignores .local email addresses', () => {
+      const entry = {
+        ...REPO_ENTRY,
+        contributors: {
+          ...REPO_ENTRY.contributors,
+          past_year_committers: [{ name: 'Local Dev', email: 'dev@build.local', login: 'dev', count: 2 }],
+        },
+      };
+
+      // A .local applicant is not matched at all
+      const localApplicantSnapshot = toRepositorySnapshot(entry, { applicantEmail: 'dev@build.local' });
+      expect(localApplicantSnapshot).not.toHaveProperty('applicantIsContributor');
+      expect(localApplicantSnapshot).not.toHaveProperty('applicantContribution');
+
+      // A .local committer is not considered for a regular applicant
+      expect(toRepositorySnapshot(entry, { applicantEmail: 'jane@example.com' })).toEqual(
+        expect.objectContaining({ applicantIsContributor: false, applicantContribution: null }),
+      );
+    });
+
     it('supports entries without repository or packages', () => {
       const snapshot = toRepositorySnapshot({
         packages: [],
