@@ -2365,6 +2365,7 @@
   "HostApplication.form.mainInfo": "Huvudinformation",
   "HostApplication.form.publicInformation": "Denna information är offentlig. Lägg inte till någon personlig information som namn eller adresser i detta fält.",
   "HostApplication.form.readFaqs": "Visit our docs",
+  "HostApplication.form.repositoryUrl.locked": "This repository was verified with GitHub and can't be changed.",
   "HostApplication.form.subheading": "Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}",
   "HostApplication.form.suggestedAdmins": "Suggested admins from past-year repository contributors",
   "HostApplication.form.team": "Ditt team",

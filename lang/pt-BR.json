@@ -2365,6 +2365,7 @@
   "HostApplication.form.mainInfo": "Informações principais",
   "HostApplication.form.publicInformation": "Esta informação é pública. Não adicione informações pessoais, como nomes ou endereços neste campo.",
   "HostApplication.form.readFaqs": "Visite nossa documentação",
+  "HostApplication.form.repositoryUrl.locked": "This repository was verified with GitHub and can't be changed.",
   "HostApplication.form.subheading": "Apresente o seu coletivo. Inclua o máximo de contexto possível para que possamos oferecer o melhor serviço que pudermos! Alguma dúvida? {faqLink}",
   "HostApplication.form.suggestedAdmins": "Suggested admins from past-year repository contributors",
   "HostApplication.form.team": "Sua equipe",

@@ -2365,6 +2365,7 @@
   "HostApplication.form.mainInfo": "主要信息",
   "HostApplication.form.publicInformation": "此信息是公开的。请不要添加任何个人信息，如此字段中的姓名或地址。",
   "HostApplication.form.readFaqs": "Visit our docs",
+  "HostApplication.form.repositoryUrl.locked": "This repository was verified with GitHub and can't be changed.",
   "HostApplication.form.subheading": "Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}",
   "HostApplication.form.suggestedAdmins": "Suggested admins from past-year repository contributors",
   "HostApplication.form.team": "你的团队",
