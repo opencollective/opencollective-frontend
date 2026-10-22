@@ -657,6 +657,62 @@ describe('ApplicationForm - Your Team', () => {
   });
 });
 
+// ─── Suggested admins from repository committers ─────────────────────────────
+
+describe('ApplicationForm - suggested admins', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMutate.mockResolvedValue({ data: { createCollective: null } });
+    fetchEcosystemsRepositoryInfo.mockResolvedValue({
+      ...ECOSYSTEMS_REPO_ENTRY,
+      contributors: {
+        ...ECOSYSTEMS_REPO_ENTRY.contributors,
+        past_year_committers: [
+          { name: 'Jane Doe', email: 'jane@example.com', login: 'jane', count: 12 },
+          { name: 'No Email', email: null, login: 'no-email', count: 3 },
+          { name: 'Bad Email', email: 'not-an-email', login: 'bad', count: 1 },
+          { name: 'Local Dev', email: 'dev@build.local', login: 'local', count: 2 },
+          { name: 'Thomas Anderson', email: 'tanderson@example.com', login: 'neo', count: 5 },
+        ],
+      },
+    });
+  });
+
+  it('suggests committers with a valid email and invites them by email in one click', async () => {
+    jest.useFakeTimers();
+    try {
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      const suggestions = document.querySelector('[data-cy="suggested-admins"]');
+      expect(suggestions).toBeInTheDocument();
+      expect(within(suggestions).getByText('Jane Doe')).toBeInTheDocument();
+      expect(within(suggestions).getByText('(jane@example.com)')).toBeInTheDocument();
+      expect(within(suggestions).queryByText('No Email')).not.toBeInTheDocument();
+      expect(within(suggestions).queryByText('Bad Email')).not.toBeInTheDocument();
+      expect(within(suggestions).queryByText('Local Dev')).not.toBeInTheDocument();
+      expect(within(suggestions).queryByText('Thomas Anderson')).not.toBeInTheDocument();
+
+      fireEvent.click(within(suggestions).getByRole('button', { name: /jane doe/i }));
+
+      const team = document.querySelector('[data-cy="profile-card"]');
+      expect(within(team).getByText('Jane Doe')).toBeInTheDocument();
+      expect(within(team).getByText('(jane@example.com)')).toBeInTheDocument();
+      expect(within(suggestions).queryByText('Jane Doe')).not.toBeInTheDocument();
+
+      submitForm();
+      await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+      expect(mockMutate.mock.calls[0][0].variables.inviteMembers).toEqual([
+        { role: 'ADMIN', memberInfo: { name: 'Jane Doe', email: 'jane@example.com' } },
+      ]);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+});
+
 // ─── Rule notes used as the field hint ────────────────────────────────────────
 
 describe('ApplicationForm - rule notes as the field hint', () => {
