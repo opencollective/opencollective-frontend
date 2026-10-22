@@ -22,8 +22,8 @@ import { useToast } from '../ui/useToast';
 import { PAYPAL_CONNECT_POPUP_MESSAGE } from './constants';
 
 const getPaypalOAuthUrlMutation = gql`
-  mutation PaypalOAuthUrl($account: AccountReferenceInput!, $redirect: String, $currency: Currency) {
-    getPaypalOAuthUrl(account: $account, redirect: $redirect, currency: $currency)
+  mutation PaypalOAuthUrl($account: AccountReferenceInput!, $currency: Currency) {
+    getPaypalOAuthUrl(account: $account, currency: $currency)
   }
 `;
 
@@ -110,11 +110,9 @@ const PaypalConnectButton = ({
     setIsLoading(true);
     try {
       hadSuccess.current = false;
-      const redirect = window.location.href.replace(/\?.*/, '');
       const oauthResult = await getPaypalOAuthUrl({
         variables: {
           account: { id: accountId },
-          redirect,
           currency: currency as Currency,
         },
       });

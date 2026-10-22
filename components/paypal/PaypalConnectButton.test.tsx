@@ -205,6 +205,9 @@ describe('PaypalConnectButton', () => {
       });
 
       await waitFor(() => expect(mockConnectPaypalPayoutMethod).toHaveBeenCalled());
+      expect(mockGetPaypalOAuthUrl).toHaveBeenCalledWith({
+        variables: { account: { id: 'account-123' }, currency: 'USD' },
+      });
       expect(mockConnectPaypalPayoutMethod).toHaveBeenCalledWith({
         variables: {
           code: 'auth_code_123',
