@@ -80,7 +80,7 @@ const successMsgs = defineMessages<{
   },
 });
 
-const orderSuccessQuery = gql`
+export const orderSuccessQuery = gql`
   query NewContributionFlowOrderSuccess($order: OrderReferenceInput!) {
     order(order: $order) {
       id

@@ -116,7 +116,7 @@ const createIncognitoProfileMutation = gql`
     }
   }
 `;
-const createOrderMutation = gql`
+export const createOrderMutation = gql`
   mutation CreateOrder($order: OrderCreateInput!) {
     createOrder(order: $order) {
       ...OrderResponse
