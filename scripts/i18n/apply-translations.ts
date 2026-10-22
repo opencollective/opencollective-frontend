@@ -14,7 +14,9 @@ const USAGE = [
   '  tsx scripts/i18n/apply-translations.ts <locale> <translations.json>',
   '    Validates and writes a batch of `{ "<id>": "<translation>" }`. Invalid entries are skipped and reported.',
   '  tsx scripts/i18n/apply-translations.ts <locale> --check [--base <previous-locale.json>]',
-  '    Validates every translated entry, or only the entries that changed since --base.',
+  '    Validates every translated entry, or only the entries that changed since --base. With --base, also',
+  '    rejects deleted translations, translations reset to English (unless the id is in IGNORED), and new ids',
+  '    missing from English.',
   '  tsx scripts/i18n/apply-translations.ts <locale> --carry-over <previous-locale.json>',
   '    Re-applies translations from an earlier version of the locale file for strings that still match English.',
 ].join('\n');
