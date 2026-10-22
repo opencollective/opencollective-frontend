@@ -1,202 +1,177 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft, ArrowRight, XCircle } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { getGithubRepos } from '../../lib/api';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
-import { Box, Flex, Grid } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
-import Loading from '../Loading';
-import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
-import StyledInputField from '../StyledInputField';
-import StyledLink from '../StyledLink';
-import { H1, P } from '../Text';
+import Spinner from '../Spinner';
+import { Alert, AlertDescription } from '../ui/Alert';
+import { Button } from '../ui/Button';
 
 import GithubRepositories from './GithubRepositories';
 
-class ConnectGithub extends React.Component {
-  static propTypes = {
-    router: PropTypes.object.isRequired,
-    setGithubInfo: PropTypes.func.isRequired,
-    nextDisabled: PropTypes.bool,
-  };
+const ConnectGithub = ({ setGithubInfo, nextDisabled }) => {
+  const router = useRouter();
+  const [repositories, setRepositories] = useState([]);
+  const [loadingRepos, setLoadingRepos] = useState(true);
+  const [error, setError] = useState(null);
 
-  constructor(props) {
-    super(props);
+  const { token, collectiveSlug } = router.query;
+  const nextLinkPath = collectiveSlug
+    ? `/opensource/apply/form?collectiveSlug=${collectiveSlug}`
+    : '/opensource/apply/form';
 
-    this.state = {
-      loadingRepos: false,
-      repositories: [],
-      error: null,
-    };
-  }
-
-  async componentDidMount() {
-    this.setState({ loadingRepos: true });
-
-    try {
-      const repositories = await getGithubRepos(this.props.router.query.token);
-      if (repositories.length !== 0) {
-        this.setState({ repositories, loadingRepos: false });
-      } else {
-        this.setState({
-          loadingRepos: false,
-          error: "We couldn't find any repositories with at least 100 stars linked to this account",
-        });
-      }
-    } catch (error) {
-      this.setState({
-        loadingRepos: false,
-        error: error.toString(),
-      });
+  useEffect(() => {
+    if (!token) {
+      setLoadingRepos(false);
+      return undefined;
     }
-  }
 
-  render() {
-    const { repositories, loadingRepos, error } = this.state;
-    const { query } = this.props.router;
-    const nextLinkPath = query.collectiveSlug
-      ? `/opensource/apply/form?collectiveSlug=${query.collectiveSlug}`
-      : '/opensource/apply/form';
+    let cancelled = false;
+    setLoadingRepos(true);
+    setError(null);
 
-    return (
-      <Flex flexDirection="column" m={[3, 0]} mb={4}>
-        <Flex flexDirection="column" my={[2, 4]}>
-          <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
-            <Box width={'160px'} height={'160px'}>
-              <NextIllustration
-                alt="Open Source Collective logotype"
-                src="/static/images/osc-logo.png"
-                width={160}
-                height={160}
-              />
-            </Box>
-            <Box textAlign={['center', 'left']} width={['288px', '404px']} ml={[null, '24px']}>
-              <H1
-                fontSize="32px"
-                lineHeight="40px"
-                letterSpacing="-0.008em"
-                color="black.900"
-                textAlign={['center', 'left']}
-                mb="14px"
-                data-cy="connect-github-header"
-              >
-                <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
-              </H1>
-              <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
-                <FormattedMessage
-                  id="collective.subtitle.seeRepo"
-                  defaultMessage="Don't see the repository you're looking for? {helplink}."
-                  values={{
-                    helplink: (
-                      <StyledLink
-                        href="https://docs.oscollective.org/how-to-apply/github-verification#github-verification-troubleshooting"
-                        openInNewTab
-                        color="purple.500"
-                      >
-                        <FormattedMessage id="getHelp" defaultMessage="Get help" />
-                      </StyledLink>
-                    ),
-                  }}
-                />
-              </P>
-              <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
-                <FormattedMessage
-                  defaultMessage="Want to apply using an <AltVerificationLink>alternative verification criteria</AltVerificationLink>? <ApplyLink>Click here</ApplyLink>."
-                  id="kwIdJS"
-                  values={{
-                    ApplyLink: getI18nLink({
-                      as: Link,
-                      href: nextLinkPath,
-                      color: 'purple.500',
-                    }),
-                    AltVerificationLink: getI18nLink({
-                      openInNewTab: true,
-                      href: 'https://docs.oscollective.org/how-to-apply/manual-verification',
-                      color: 'purple.500',
-                    }),
-                  }}
-                />
-              </P>
-            </Box>
-          </Flex>
-        </Flex>
-        {error && (
-          <Flex alignItems="center" justifyContent="center">
-            <MessageBox type="error" withIcon mb={[1, 3]}>
-              {error}
-            </MessageBox>
-          </Flex>
-        )}
-        {loadingRepos && (
-          <Box pb={4}>
-            <Loading />
-          </Box>
-        )}
+    getGithubRepos(token)
+      .then(repos => {
+        if (cancelled) {
+          return;
+        }
+        if (repos.length !== 0) {
+          setRepositories(repos);
+        } else {
+          setError("We couldn't find any repositories with at least 100 stars linked to this account");
+        }
+      })
+      .catch(error => {
+        if (!cancelled) {
+          setError(error.toString());
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoadingRepos(false);
+        }
+      });
 
-        {repositories.length !== 0 && (
-          <Flex justifyContent="center" px={[2, 4]} width={1}>
-            <Grid
-              gridTemplateColumns={['1fr', 'repeat(4, minmax(0, 1fr))']}
-              gridGap={'48px'}
-              maxWidth="1200px"
-              position="relative"
-              flexGrow={1}
-            >
-              <Box gridColumn={[null, '1/4', '1/4', '2/4']}>
-                <StyledInputField htmlFor="collective">
-                  {fieldProps => (
-                    <GithubRepositories
-                      {...fieldProps}
-                      repositories={repositories}
-                      setGithubInfo={githubInfo => this.props.setGithubInfo(githubInfo)}
-                    />
-                  )}
-                </StyledInputField>
-                <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={'32px'} my={4}>
-                  <StyledButton
-                    buttonStyle="purpleSecondary"
-                    buttonSize="large"
-                    textAlign="center"
-                    onClick={() => window && window.history.back()}
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  return (
+    <div className="mt-6 flex flex-col items-center sm:mt-12">
+      <div className="flex flex-col items-center justify-center sm:flex-row">
+        <div className="mb-6 h-40 w-40">
+          <NextIllustration
+            alt="Open Source Collective logotype"
+            src="/static/images/osc-logo.png"
+            width={160}
+            height={160}
+          />
+        </div>
+        <div className="mb-4 w-72 text-center sm:ml-6 sm:w-[488px] sm:text-left">
+          <h1
+            data-cy="connect-github-header"
+            className="mb-3.5 text-[32px] leading-10 font-semibold tracking-tight text-foreground"
+          >
+            <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
+          </h1>
+          <p className="mb-2 text-base leading-6 font-medium text-muted-foreground">
+            <FormattedMessage
+              id="collective.subtitle.seeRepo"
+              defaultMessage="Don't see the repository you're looking for? {helplink}."
+              values={{
+                helplink: (
+                  <Link
+                    href="https://docs.oscollective.org/how-to-apply/github-verification#github-verification-troubleshooting"
+                    openInNewTab
+                    className="text-primary underline-offset-4 hover:underline"
                   >
-                    ←&nbsp;
-                    <FormattedMessage id="Back" defaultMessage="Back" />
-                  </StyledButton>
-                  <StyledButton
-                    textAlign="center"
-                    buttonSize="large"
-                    buttonStyle="purple"
-                    disabled={this.props.nextDisabled}
-                    onClick={() => {
-                      this.props.router.push(nextLinkPath);
-                    }}
-                    data-cy="connect-github-continue"
+                    <FormattedMessage id="getHelp" defaultMessage="Get help" />
+                  </Link>
+                ),
+              }}
+            />
+          </p>
+          <p className="text-base leading-6 font-medium text-muted-foreground">
+            <FormattedMessage
+              defaultMessage="Want to apply using an <AltVerificationLink>alternative verification criteria</AltVerificationLink>? <ApplyLink>Click here</ApplyLink>."
+              id="kwIdJS"
+              values={{
+                ApplyLink: chunks => (
+                  <Link href={nextLinkPath} className="text-primary underline-offset-4 hover:underline">
+                    {chunks}
+                  </Link>
+                ),
+                AltVerificationLink: chunks => (
+                  <Link
+                    openInNewTab
+                    href="https://docs.oscollective.org/how-to-apply/manual-verification"
+                    className="text-primary underline-offset-4 hover:underline"
                   >
-                    <FormattedMessage id="Pagination.Next" defaultMessage="Next" /> &nbsp;→
-                  </StyledButton>
-                </Grid>
-              </Box>
-              <GithubRepositoriesFAQ
-                display={['none', 'block']}
-                width={1}
-                flexGrow={1}
-                alignSelf="flex-start"
-                position="sticky"
-                top={0}
-                pt={3}
-              />
-            </Grid>
-          </Flex>
-        )}
-      </Flex>
-    );
-  }
-}
+                    {chunks}
+                  </Link>
+                ),
+              }}
+            />
+          </p>
+        </div>
+      </div>
 
-export default withRouter(ConnectGithub);
+      {error && (
+        <Alert variant="destructive" className="mt-4 w-full max-w-[672px]">
+          <XCircle className="size-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {loadingRepos ? (
+        <div className="mt-8 flex justify-center">
+          <Spinner size={32} />
+        </div>
+      ) : (
+        repositories.length > 0 && (
+          <div className="mx-auto mt-8 grid w-full max-w-[1200px] grid-cols-1 gap-8 px-4 sm:px-0 lg:grid-cols-4 lg:gap-12">
+            <div className="lg:col-span-2 lg:col-start-2">
+              <GithubRepositories repositories={repositories} setGithubInfo={setGithubInfo} />
+              <div className="mt-4 grid grid-cols-1 gap-8 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.history.back();
+                    }
+                  }}
+                >
+                  <ArrowLeft size={16} />
+                  <FormattedMessage id="Back" defaultMessage="Back" />
+                </Button>
+                <Button
+                  type="button"
+                  size="lg"
+                  disabled={nextDisabled}
+                  onClick={() => router.push(nextLinkPath)}
+                  data-cy="connect-github-continue"
+                >
+                  <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+                  <ArrowRight size={16} />
+                </Button>
+              </div>
+            </div>
+            <div className="lg:col-span-1 lg:col-start-4">
+              <GithubRepositoriesFAQ className="lg:sticky lg:top-0" />
+            </div>
+          </div>
+        )
+      )}
+    </div>
+  );
+};
+
+export default ConnectGithub;
