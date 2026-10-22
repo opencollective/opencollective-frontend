@@ -114,6 +114,36 @@ describe('ContributionFlowSuccess', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
+  it('keeps embedded contributions on the embed route when the stripe payment fails', async () => {
+    mockRouter = {
+      isReady: true,
+      query: {
+        OrderId: 'order-id',
+        payment_intent_client_secret: 'pi_secret_123',
+        useTheme: 'true',
+        backgroundColor: '#ff0000',
+      },
+      push: mockPush,
+      replace: mockReplace,
+    };
+
+    mockRetrievePaymentIntent.mockResolvedValue({
+      error: { message: 'Your card was declined.' },
+    });
+
+    render(withRequiredProviders(<ContributionFlowSuccess collective={collective} isEmbed />));
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledTimes(1);
+    });
+
+    const redirectUrl = new URL(mockReplace.mock.calls[0][0]);
+    expect(redirectUrl.pathname).toBe('/embed/collective-slug/donate/payment');
+    expect(redirectUrl.searchParams.get('error')).toBe('Your card was declined.');
+    expect(redirectUrl.searchParams.get('useTheme')).toBe('true');
+    expect(redirectUrl.searchParams.get('backgroundColor')).toBe('#ff0000');
+  });
+
   it('follows external redirect only once even when router reference changes', async () => {
     mockRouter = {
       isReady: true,

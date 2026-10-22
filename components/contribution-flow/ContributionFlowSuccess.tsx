@@ -49,6 +49,7 @@ import { Button } from '../ui/Button';
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
+import { EMBED_DISPLAY_PARAMS } from './query-parameters';
 import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
 
 const ShareLink = styled(StyledLink).attrs({
@@ -250,15 +251,33 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
     redirectInitiatedRef.current = true;
 
     const tierSlug = order.tier?.slug;
-    const path = tierSlug
-      ? `/${order.toAccount.slug}/contribute/${tierSlug}-${order.tier.legacyId}/checkout/payment`
-      : `/${order.toAccount.slug}/donate/payment`;
+    let path;
+    if (isEmbed) {
+      // Same routes as the embed branch of `getRoute` in the contribution flow
+      const accountRoute = getCollectivePageRoute(order.toAccount);
+      path = tierSlug
+        ? `/embed${accountRoute}/contribute/${tierSlug}-${order.tier.legacyId}/payment`
+        : `/embed${accountRoute}/donate/payment`;
+    } else {
+      path = tierSlug
+        ? `/${order.toAccount.slug}/contribute/${tierSlug}-${order.tier.legacyId}/checkout/payment`
+        : `/${order.toAccount.slug}/donate/payment`;
+    }
 
     const url = new URL(path, window.location.origin);
     url.searchParams.set('error', stripeErrorMessage);
     url.searchParams.set('interval', getIntervalFromGQLV2Frequency(order.frequency));
     url.searchParams.set('amount', order.amount.value.toString());
     url.searchParams.set('contributeAs', order.fromAccount.slug);
+
+    if (isEmbed) {
+      EMBED_DISPLAY_PARAMS.forEach(key => {
+        const value = getQueryStringParam(router.query[key]);
+        if (value) {
+          url.searchParams.set(key, value);
+        }
+      });
+    }
 
     const redirect = getQueryStringParam(router.query.redirect);
     if (redirect) {
@@ -270,7 +289,7 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
     }
 
     router.replace(url.toString());
-  }, [order, stripeErrorMessage, router]);
+  }, [order, stripeErrorMessage, router, isEmbed]);
 
   useEffect(() => {
     // Wait for the payment intent check so we never send a failed payment to the external redirect
