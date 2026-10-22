@@ -52,6 +52,7 @@ import ContributionSummary from './ContributionSummary';
 import { PlatformTipOption } from './PlatformTipContainer';
 import {
   ContributionFlowUrlQueryHelper,
+  EMBED_DISPLAY_PARAMS,
   EmbedContributionFlowUrlQueryHelper,
   stepsDataToUrlParamsData,
 } from './query-parameters';
@@ -397,6 +398,10 @@ const ContributionFlow = ({
         returnUrl.searchParams.set('OrderId', order.id);
         returnUrl.searchParams.set('stripeAccount', stripeData?.stripe?.stripeAccount);
         const queryParams = getQueryParams();
+        if (isEmbed) {
+          const displayParams = getQueryHelper().encode(omitBy(pick(queryParams, EMBED_DISPLAY_PARAMS), isNil));
+          Object.entries(displayParams).forEach(([key, value]) => returnUrl.searchParams.set(key, value));
+        }
         if (queryParams.redirect) {
           returnUrl.searchParams.set('redirect', queryParams.redirect);
           if (queryParams.shouldRedirectParent) {
@@ -429,7 +434,7 @@ const ContributionFlow = ({
         return handleSuccess(order);
       }
     },
-    [getQueryParams, getRoute, handleSuccess],
+    [getQueryHelper, getQueryParams, getRoute, handleSuccess, isEmbed],
   );
   const handleStripeError = useCallback(
     async (order, stripeError, email, guestToken) => {
