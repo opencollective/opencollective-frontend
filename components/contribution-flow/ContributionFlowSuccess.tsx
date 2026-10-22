@@ -24,6 +24,7 @@ import {
   blueskyShareURL,
   followOrderRedirectUrl,
   getCollectivePageRoute,
+  getQueryStringParam,
   linkedInShareURL,
   mastodonShareURL,
   threadsShareURL,
@@ -87,9 +88,6 @@ const orderSuccessQuery = gql`
   }
   ${orderSuccessFragment}
 `;
-
-const getQueryStringParam = (param: string | string[] | undefined): string | undefined =>
-  Array.isArray(param) ? param[0] : param;
 
 const isAccountFediverse = account => {
   return (

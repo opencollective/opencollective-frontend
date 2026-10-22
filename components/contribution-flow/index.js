@@ -27,7 +27,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
-import { followOrderRedirectUrl, getCollectivePageRoute } from '../../lib/url-helpers';
+import { followOrderRedirectUrl, getCollectivePageRoute, getQueryStringParam } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -67,7 +67,6 @@ import {
   NEW_CREDIT_CARD_KEY,
   STRIPE_PAYMENT_ELEMENT_KEY,
 } from './utils';
-const getQueryStringParam = param => (Array.isArray(param) ? param[0] : param);
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
   max-width: 450px;

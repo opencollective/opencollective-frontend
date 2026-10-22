@@ -270,6 +270,10 @@ export const isTrustedRedirectURL = (url: URL) => {
   });
 };
 
+/** Next.js router query values can be arrays when a param is repeated: only keep the first value */
+export const getQueryStringParam = (param: string | string[] | undefined): string | undefined =>
+  Array.isArray(param) ? param[0] : param;
+
 export const addParentToURLIfMissing = (router, account, url = '', queryParams = undefined, options = {}) => {
   if (
     [CollectiveType.EVENT, CollectiveType.PROJECT].includes(account?.type) &&
