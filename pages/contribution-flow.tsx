@@ -62,14 +62,12 @@ const ContributionFlowPage = ({ collectiveSlug, tierId, error }: ContributionFlo
     addParentToURLIfMissing(router, account, `/${router.query.verb}/${router.query.step ?? ''}`, queryParameters);
   }, [account]);
 
-  const accountHost = account?.host;
-
   React.useEffect(() => {
     const supportedPaymentMethods = get(account, 'host.supportedPaymentMethods', []);
     if (supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
       loadStripe();
     }
-  }, [account, accountHost, loadStripe]);
+  }, [account, loadStripe]);
 
   React.useEffect(() => {
     if (LoggedInUser && !me) {

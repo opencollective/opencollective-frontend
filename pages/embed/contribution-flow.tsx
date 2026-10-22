@@ -49,7 +49,6 @@ const EmbedContributionFlowPage = ({ collectiveSlug, tierId, error, queryParams 
   const account = data?.account;
   const tier = data?.tier;
   const me = data?.me;
-  const accountHost = account?.host;
   const prevLoggedInUserRef = React.useRef(LoggedInUser);
 
   const postMessage = React.useCallback((event: string, payload: unknown = null) => {
@@ -90,11 +89,11 @@ const EmbedContributionFlowPage = ({ collectiveSlug, tierId, error, queryParams 
   }, []);
 
   React.useEffect(() => {
-    const supportedPaymentMethods = get(data, 'account.host.supportedPaymentMethods', []);
+    const supportedPaymentMethods = get(account, 'host.supportedPaymentMethods', []);
     if (supportedPaymentMethods.includes(PaymentMethodLegacyType.CREDIT_CARD)) {
       loadStripe();
     }
-  }, [data, accountHost, loadStripe]);
+  }, [account, loadStripe]);
 
   React.useEffect(() => {
     if (LoggedInUser && !prevLoggedInUserRef.current) {
