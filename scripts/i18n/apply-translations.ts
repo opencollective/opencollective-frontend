@@ -33,13 +33,40 @@ function reportErrors(invalid: Array<{ id: string; errors: string[] }>): void {
   }
 }
 
+/** Translations that were dropped since `base`: deleted ids, values reset to English, or unknown ids. */
+function findRegressions(
+  locale: string,
+  en: Record<string, string>,
+  messages: Record<string, string>,
+  base: Record<string, string>,
+): Array<{ id: string; errors: string[] }> {
+  const ignored = readIgnoredEntries(fs.readFileSync(TRANSLATION_STATS_PATH, 'utf8'), locale);
+  const regressions = Object.keys(base)
+    .filter(id => en[id] !== undefined && base[id] !== en[id])
+    .flatMap(id => {
+      if (messages[id] === undefined) {
+        return [{ id, errors: ['translation was deleted'] }];
+      } else if (messages[id] === en[id] && ignored[id] === undefined) {
+        return [{ id, errors: ['translation was reverted to English'] }];
+      }
+      return [];
+    });
+  const unknown = Object.keys(messages)
+    .filter(id => en[id] === undefined && base[id] === undefined)
+    .map(id => ({ id, errors: ['unknown message id'] }));
+  return [...regressions, ...unknown];
+}
+
 function check(locale: string, messages: Record<string, string>, basePath?: string): void {
   const en = loadEnglishMessages();
   const base = basePath ? readJsonFile(basePath) : {};
-  const invalid = Object.keys(messages)
-    .filter(id => en[id] !== undefined && messages[id] !== en[id] && (!basePath || messages[id] !== base[id]))
-    .map(id => ({ id, errors: validateTranslation(en[id], messages[id]) }))
-    .filter(({ errors }) => errors.length);
+  const invalid = [
+    ...(basePath ? findRegressions(locale, en, messages, base) : []),
+    ...Object.keys(messages)
+      .filter(id => en[id] !== undefined && messages[id] !== en[id] && (!basePath || messages[id] !== base[id]))
+      .map(id => ({ id, errors: validateTranslation(en[id], messages[id]) }))
+      .filter(({ errors }) => errors.length),
+  ];
 
   if (invalid.length) {
     reportErrors(invalid);
