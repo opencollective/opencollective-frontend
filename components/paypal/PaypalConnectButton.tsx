@@ -10,8 +10,8 @@ import type {
   ConnectPaypalPayoutMethodMutation,
   ConnectPaypalPayoutMethodMutationVariables,
   Currency,
-  GetPaypalOAuthUrlMutation,
-  GetPaypalOAuthUrlMutationVariables,
+  PaypalOAuthUrlMutation,
+  PaypalOAuthUrlMutationVariables,
 } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
@@ -22,7 +22,7 @@ import { useToast } from '../ui/useToast';
 import { PAYPAL_CONNECT_POPUP_MESSAGE } from './constants';
 
 const getPaypalOAuthUrlMutation = gql`
-  mutation GetPaypalOAuthUrl($account: AccountReferenceInput!, $redirect: String, $currency: Currency) {
+  mutation PaypalOAuthUrl($account: AccountReferenceInput!, $redirect: String, $currency: Currency) {
     getPaypalOAuthUrl(account: $account, redirect: $redirect, currency: $currency)
   }
 `;
@@ -98,7 +98,7 @@ const PaypalConnectButton = ({
   const popupRef = React.useRef<Window | null>(null);
   const cancelRef = React.useRef<(() => void) | null>(null);
 
-  const [getPaypalOAuthUrl] = useMutation<GetPaypalOAuthUrlMutation, GetPaypalOAuthUrlMutationVariables>(
+  const [getPaypalOAuthUrl] = useMutation<PaypalOAuthUrlMutation, PaypalOAuthUrlMutationVariables>(
     getPaypalOAuthUrlMutation,
   );
   const [connectPaypalPayoutMethod] = useMutation<

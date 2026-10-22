@@ -22,7 +22,7 @@ jest.mock('@apollo/client', () => {
     ...actual,
     useMutation: jest.fn((document: { definitions?: Array<{ name?: { value?: string } }> }) => {
       const name = document?.definitions?.[0]?.name?.value;
-      if (name === 'GetPaypalOAuthUrl') {
+      if (name === 'PaypalOAuthUrl') {
         return [mockGetPaypalOAuthUrl, { loading: false }];
       }
       return [mockConnectPaypalPayoutMethod, { loading: false }];
