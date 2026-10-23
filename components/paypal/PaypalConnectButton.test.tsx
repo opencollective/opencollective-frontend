@@ -10,8 +10,15 @@ import { withRequiredProviders } from '../../test/providers';
 import { PAYPAL_CONNECT_POPUP_MESSAGE } from './constants';
 import PaypalConnectButton from './PaypalConnectButton';
 
-const DEFAULT_AUTHORIZE_URL =
-  'https://www.paypal.com/connect?client_id=test-client-id&redirect_uri=https%3A%2F%2Fexample.com%2Fredirect&flowEntry=static&response_type=code&scope=openid';
+// Mirrors the URL built by the API (`getRedirectUrl` in `opencollective-api/server/paymentProviders/paypal/index.ts`)
+const DEFAULT_AUTHORIZE_URL = `https://www.paypal.com/connect?${new URLSearchParams([
+  ['flowEntry', 'static'],
+  ['client_id', 'test-client-id'],
+  ['response_type', 'code'],
+  ['scope', 'openid profile email https://uri.paypal.com/services/paypalattributes'],
+  ['redirect_uri', 'https://example.com/redirect'],
+  ['state', 'test-state'],
+])}`;
 
 const mockGetPaypalOAuthUrl = jest.fn();
 const mockConnectPaypalPayoutMethod = jest.fn();
