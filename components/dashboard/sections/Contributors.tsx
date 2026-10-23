@@ -25,10 +25,7 @@ import { orderByFilter } from '../filters/OrderFilter';
 import { Pagination } from '../filters/Pagination';
 import type { DashboardSectionProps } from '../types';
 
-// type FilterMemberRole = MemberRole.FOLLOWER | MemberRole.BACKER | MemberRole.CONTRIBUTOR
-
 enum FilterMemberRole {
-  FOLLOWER = MemberRole.FOLLOWER,
   BACKER = MemberRole.BACKER,
   ATTENDEE = MemberRole.ATTENDEE,
 }
@@ -82,7 +79,6 @@ const tierFilter: FilterConfig<z.infer<typeof TierReferenceSchema>> = {
 
 enum ContributorsTab {
   ALL = 'ALL',
-  FOLLOWERS = 'FOLLOWERS',
   BACKERS = 'BACKERS',
 }
 
@@ -114,10 +110,7 @@ const dashboardContributorsMetadataQuery = gql`
           }
         }
       }
-      ALL: members(role: [BACKER, FOLLOWER, ATTENDEE]) {
-        totalCount
-      }
-      FOLLOWERS: members(role: [FOLLOWER]) {
+      ALL: members(role: [BACKER, ATTENDEE]) {
         totalCount
       }
       BACKERS: members(role: [BACKER]) {
@@ -223,10 +216,6 @@ const getColumns = ({ intl, activeViewId }) => {
     return [account, role, tier, since];
   }
 
-  if (activeViewId === ContributorsTab.FOLLOWERS) {
-    return [account, since];
-  }
-
   return [account, tier, since];
 };
 
@@ -257,14 +246,6 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
       count: metadata?.account?.[ContributorsTab.BACKERS]?.totalCount,
       filter: {
         role: [FilterMemberRole.BACKER],
-      },
-    },
-    {
-      id: ContributorsTab.FOLLOWERS,
-      label: intl.formatMessage({ defaultMessage: 'Followers', id: 'pzTOmv' }),
-      count: metadata?.account?.[ContributorsTab.FOLLOWERS]?.totalCount,
-      filter: {
-        role: [FilterMemberRole.FOLLOWER],
       },
     },
   ];
@@ -323,7 +304,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   } = useQuery(dashboardContributorsQuery, {
     variables: {
       slug: accountSlug,
-      role: [MemberRole.FOLLOWER, MemberRole.BACKER, MemberRole.ATTENDEE],
+      role: [MemberRole.BACKER, MemberRole.ATTENDEE],
       ...queryFilter.variables,
     },
   });

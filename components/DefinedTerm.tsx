@@ -129,7 +129,11 @@ const TranslatedDefinitions = defineMessages({
   },
 });
 
-const GiftCardLearnMoreLink = msg => <Link href="/gift-cards">{msg}</Link>;
+const GiftCardLearnMoreLink = msg => (
+  <Link href="https://documentation.opencollective.com/giving-to-collectives/giving-as-a-company/gift-cards">
+    {msg}
+  </Link>
+);
 
 const PlatformTipsLearnMoreLink = chunks => (
   <a

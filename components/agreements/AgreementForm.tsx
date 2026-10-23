@@ -23,11 +23,11 @@ import { H4 } from '../Text';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
-import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from './fragments';
+import { agreementViewFieldsFragment } from './fragments';
 
 const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
 
-const AGREEMENT_MUTATION_FIELDS_FRAGMENT = gql`
+const agreementMutationFieldsFragment = gql`
   fragment AgreementMutationFields on Agreement {
     id
     ...AgreementViewFields
@@ -41,10 +41,10 @@ const AGREEMENT_MUTATION_FIELDS_FRAGMENT = gql`
       }
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${agreementViewFieldsFragment}
 `;
 
-const ADD_AGREEMENT_MUTATION = gql`
+const addAgreementMutation = gql`
   mutation AddAgreement(
     $host: AccountReferenceInput!
     $account: AccountReferenceInput!
@@ -65,10 +65,10 @@ const ADD_AGREEMENT_MUTATION = gql`
       ...AgreementMutationFields
     }
   }
-  ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
+  ${agreementMutationFieldsFragment}
 `;
 
-const EDIT_AGREEMENT_MUTATION = gql`
+const editAgreementMutation = gql`
   mutation EditAgreement(
     $agreement: AgreementReferenceInput!
     $title: NonEmptyString!
@@ -81,7 +81,7 @@ const EDIT_AGREEMENT_MUTATION = gql`
       ...AgreementMutationFields
     }
   }
-  ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
+  ${agreementMutationFieldsFragment}
 `;
 
 const ActionButtons = ({ formik, onCancel, ...props }) => (
@@ -136,7 +136,7 @@ const AgreementForm = ({
   const initialValues = cloneDeep(agreement || { account });
   const drawerActionsContainer = useDrawerActionsContainer();
   const isEditing = Boolean(agreement);
-  const mutation = isEditing ? EDIT_AGREEMENT_MUTATION : ADD_AGREEMENT_MUTATION;
+  const mutation = isEditing ? editAgreementMutation : addAgreementMutation;
   const [submitAgreement] = useMutation(mutation);
   return (
     <div>

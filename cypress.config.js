@@ -3,7 +3,6 @@ const fs = require('fs');
 const { getTextFromPdfContent } = require('./test/cypress/scripts/get-text-from-pdf-content.ts');
 
 module.exports = defineConfig({
-  experimentalMemoryManagement: true,
   viewportWidth: 1200,
   viewportHeight: 1660,
   projectId: 'yt5kwm',
@@ -12,14 +11,12 @@ module.exports = defineConfig({
   video: true,
   chromeWebSecurity: false,
   scrollBehavior: 'center',
+  // Cypress 16 types without delay by default (was 10ms): some forms re-render in a loop when typed into that fast
+  keystrokeDelay: 10,
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
   expose: {
     MAILPIT_URL: process.env.MAILPIT_URL || 'http://localhost:1080',
-  },
-  env: {
-    codeCoverage: {
-      url: '/__coverage__',
-    },
+    OC_ENV: process.env.OC_ENV,
   },
   fixturesFolder: 'test/cypress/fixtures',
   screenshotsFolder: 'test/cypress/screenshots',

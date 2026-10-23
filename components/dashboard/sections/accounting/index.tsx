@@ -18,7 +18,7 @@ import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { FEATURES, isFeatureEnabled, requiresUpgrade } from '@/lib/allowed-features';
 
 import { AccountingCategorizationRulesDashboard } from '@/components/accounting/dashboard/categorization/AccountingCategorizationRulesDashboard.tsx';
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect.tsx';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect.tsx';
 import Tabs from '@/components/Tabs';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../../ConfirmationModal';
@@ -58,7 +58,7 @@ const accountingCategoriesQuery = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 // TODO adapt for host types other than organization
@@ -80,7 +80,7 @@ const editAccountingCategoryMutation = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 function categoryToEditableFields(category: AccountingCategory) {

@@ -10,6 +10,7 @@ import { withRequiredProviders } from '../../../test/providers';
 import {
   editMoneyManagementAndHostingMutation,
   fiscalHostingQuery,
+  ToggleFiscalHostingButton,
   ToggleMoneyManagementButton,
 } from './FiscalHosting';
 
@@ -65,6 +66,25 @@ const buildActivateMutationSuccessMock = () => ({
         isHost: false,
         hasMoneyManagement: true,
         hasHosting: false,
+        settings: {},
+      },
+    },
+  },
+});
+
+const buildActivateHostingMutationSuccessMock = () => ({
+  request: {
+    query: editMoneyManagementAndHostingMutation,
+    variables: { organization: { id: mockAccountId }, hasHosting: true },
+  },
+  result: {
+    data: {
+      editOrganizationMoneyManagementAndHosting: {
+        __typename: 'Organization',
+        id: mockAccountId,
+        isHost: true,
+        hasMoneyManagement: true,
+        hasHosting: true,
         settings: {},
       },
     },
@@ -131,5 +151,53 @@ describe('ToggleMoneyManagementButton', () => {
     await waitFor(() => {
       expect(mockToast).not.toHaveBeenCalled();
     });
+  });
+
+  it('switches from Activate to Deactivate after money management is turned on', async () => {
+    const user = userEvent.setup();
+    render(
+      withRequiredProviders(
+        <MockedProvider mocks={[buildFiscalHostingQueryMock(), buildActivateMutationSuccessMock()]} addTypename={false}>
+          <ToggleMoneyManagementButton account={mockAccount} />
+        </MockedProvider>,
+      ),
+    );
+
+    const activateButton = await screen.findByRole('button', { name: 'Activate' });
+    await user.click(activateButton);
+
+    expect(await screen.findByRole('button', { name: 'Deactivate' })).toBeInTheDocument();
+  });
+});
+
+describe('ToggleFiscalHostingButton', () => {
+  beforeEach(() => {
+    mockToast.mockClear();
+  });
+
+  it('switches from Activate to Deactivate after fiscal hosting is turned on', async () => {
+    const user = userEvent.setup();
+    const account = {
+      ...mockAccount,
+      hasMoneyManagement: true,
+      hasHosting: false,
+      isHost: false,
+    };
+
+    render(
+      withRequiredProviders(
+        <MockedProvider
+          mocks={[buildFiscalHostingQueryMock(), buildActivateHostingMutationSuccessMock()]}
+          addTypename={false}
+        >
+          <ToggleFiscalHostingButton account={account} />
+        </MockedProvider>,
+      ),
+    );
+
+    const activateButton = await screen.findByRole('button', { name: 'Activate' });
+    await user.click(activateButton);
+
+    expect(await screen.findByRole('button', { name: 'Deactivate' })).toBeInTheDocument();
   });
 });

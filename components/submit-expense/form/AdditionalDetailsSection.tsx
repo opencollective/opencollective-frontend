@@ -56,6 +56,7 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
           props.isSubmitting
         }
         name="title"
+        maxLength={255}
         placeholder={intl.formatMessage({ defaultMessage: 'Mention a brief expense title', id: 'Te2Yc2' })}
         label={<FormattedMessage defaultMessage="Title" id="Title" />}
       />

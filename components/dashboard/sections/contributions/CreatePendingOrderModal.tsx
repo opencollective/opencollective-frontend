@@ -2,13 +2,13 @@ import React from 'react';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import dayjs from 'dayjs';
 import { Form, Formik, useFormikContext } from 'formik';
 import { cloneDeep, debounce, groupBy, map, omit, pick } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../../lib/currency-utils';
+import dayjs from '../../../../lib/dayjs';
 import { requireFields, verifyEmailPattern } from '../../../../lib/form-utils';
 import { gql } from '../../../../lib/graphql/helpers';
 import type { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
@@ -34,6 +34,7 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import type { BaseModalProps } from '../../../ModalContext';
 import StyledHr from '../../../StyledHr';
 import StyledInput from '../../../StyledInput';
+import StyledInputField from '../../../StyledInputField';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledInputPercentage from '../../../StyledInputPercentage';
 import StyledSelect from '../../../StyledSelect';
@@ -45,7 +46,7 @@ import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMess
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
-import { vendorFieldFragment } from '../../../vendors/queries';
+import { vendorFieldsFragment } from '../../../vendors/queries';
 
 const EDITABLE_FIELDS = [
   'amount',
@@ -61,6 +62,9 @@ const EDITABLE_FIELDS = [
   'paymentMethod',
   'tax',
 ];
+
+// Sentinel value for the "Pick a date" option of the expected date select
+const CUSTOM_EXPECTED_AT = '__custom__';
 
 const debouncedLazyQuery = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
@@ -128,7 +132,7 @@ const createPendingContributionModalQuery = gql`
     }
   }
 
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 const createPendingContributionModalCollectiveQuery = gql`
@@ -293,6 +297,7 @@ const CreatePendingContributionForm = ({ organization, onClose, error, edit }: C
   const formik = useFormikContext<any>();
   const { values, isSubmitting, setFieldValue } = formik;
   const intl = useIntl();
+  const [isCustomExpectedAt, setIsCustomExpectedAt] = React.useState(false);
   const hostHasHostFee = isFeatureEnabled(organization, FEATURES.CHARGE_HOSTING_FEES);
   const canAddHostFee = hostHasHostFee && values.toAccount?.type !== AccountType.ORGANIZATION;
   const [getCollectiveInfo, { data, loading: collectiveLoading }] = useLazyQuery(
@@ -374,45 +379,57 @@ const CreatePendingContributionForm = ({ organization, onClose, error, edit }: C
     };
   });
 
-  const expectedAtOptions = [
-    {
-      value: dayjs().add(1, 'month'),
-      label: intl.formatMessage(
-        { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
-        { n: 1 },
-      ),
-    },
-    {
-      value: dayjs().add(3, 'month'),
-      label: intl.formatMessage(
-        { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
-        { n: 3 },
-      ),
-    },
-    {
-      value: dayjs().add(6, 'month'),
-      label: intl.formatMessage(
-        { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
-        { n: 6 },
-      ),
-    },
-    {
-      value: dayjs().add(1, 'year'),
-      label: intl.formatMessage(
-        { defaultMessage: 'Within {n} {n, plural, one {year} other {years}}', id: 'bBxR0J' },
-        { n: 1 },
-      ),
-    },
-  ];
-  if (edit?.pendingContributionData?.expectedAt) {
-    expectedAtOptions.push({
-      value: dayjs(edit.pendingContributionData.expectedAt),
-      label: intl.formatMessage(
-        { defaultMessage: 'Around {date}', id: 'Fields.expectedAt.date' },
-        { date: dayjs(edit.pendingContributionData.expectedAt).format('MMMM D, YYYY') },
-      ),
+  // Options are memoized so that the selected option's value remains stable across re-renders
+  const expectedAtOptions = React.useMemo(() => {
+    const options: Array<{ value: dayjs.Dayjs | string; label: string }> = [
+      {
+        value: dayjs().add(1, 'month'),
+        label: intl.formatMessage(
+          { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
+          { n: 1 },
+        ),
+      },
+      {
+        value: dayjs().add(3, 'month'),
+        label: intl.formatMessage(
+          { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
+          { n: 3 },
+        ),
+      },
+      {
+        value: dayjs().add(6, 'month'),
+        label: intl.formatMessage(
+          { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
+          { n: 6 },
+        ),
+      },
+      {
+        value: dayjs().add(1, 'year'),
+        label: intl.formatMessage(
+          { defaultMessage: 'Within {n} {n, plural, one {year} other {years}}', id: 'bBxR0J' },
+          { n: 1 },
+        ),
+      },
+    ];
+    if (edit?.pendingContributionData?.expectedAt) {
+      options.push({
+        value: dayjs(edit.pendingContributionData.expectedAt),
+        label: intl.formatMessage(
+          { defaultMessage: 'Around {date}', id: 'Fields.expectedAt.date' },
+          { date: dayjs(edit.pendingContributionData.expectedAt).utc().format('MMMM D, YYYY') },
+        ),
+      });
+    }
+    options.push({
+      value: CUSTOM_EXPECTED_AT,
+      label: intl.formatMessage({ defaultMessage: 'Pick a date', id: 'Fields.expectedAt.customDate' }),
     });
-  }
+    return options;
+  }, [intl, edit?.pendingContributionData?.expectedAt]);
+
+  const selectedExpectedAtOption =
+    expectedAtOptions.find(option => values.expectedAt && dayjs(values.expectedAt).isSame(option.value)) ||
+    (isCustomExpectedAt ? expectedAtOptions.find(option => option.value === CUSTOM_EXPECTED_AT) : undefined);
   const paymentMethodOptions = Object.keys(i18nPendingOrderPaymentMethodTypes).map(key => ({
     label: intl.formatMessage(i18nPendingOrderPaymentMethodTypes[key]),
     value: key,
@@ -713,27 +730,52 @@ const CreatePendingContributionForm = ({ organization, onClose, error, edit }: C
           mt={3}
           label={<FormattedMessage id="Fields.expectedAt" defaultMessage="When are these funds expected to arrive?" />}
           hint={
-            values.expectedAt && (
+            values.expectedAt &&
+            !isCustomExpectedAt && (
               <FormattedMessage
                 id="Fields.expectedAt.date"
                 defaultMessage="Around {date}"
-                values={{ date: dayjs(values.expectedAt).format('DD/MM/YYYY') }}
+                values={{ date: dayjs(values.expectedAt).utc().format('DD/MM/YYYY') }}
               />
             )
           }
           required
         >
-          {({ form, field }) => (
-            <StyledSelect
-              inputId={field.id}
-              data-cy="create-pending-contribution-expectedAt"
-              error={field.error}
-              onBlur={() => form.setFieldTouched(field.name, true)}
-              onChange={({ value }) => form.setFieldValue(field.name, value)}
-              options={expectedAtOptions}
-              value={expectedAtOptions.find(option => dayjs(values.expectedAt).isSame(option.value))}
-            />
-          )}
+          {({ form, field }) =>
+            isCustomExpectedAt ? (
+              <StyledInputField htmlFor="CreatePendingContribution-expectedAt">
+                {inputProps => (
+                  <StyledInput
+                    {...inputProps}
+                    type="date"
+                    width="100%"
+                    data-cy="create-pending-contribution-expectedAt-custom"
+                    value={values.expectedAt ? dayjs(values.expectedAt).utc().format('YYYY-MM-DD') : ''}
+                    onChange={e =>
+                      // The expected date is a calendar day: store it at 12:00 UTC and format the input in UTC,
+                      // so the picked day is preserved whatever the viewer's timezone is
+                      setFieldValue(field.name, e.target.value ? `${e.target.value}T12:00:00.000Z` : null)
+                    }
+                    error={field.error}
+                  />
+                )}
+              </StyledInputField>
+            ) : (
+              <StyledSelect
+                inputId={field.id}
+                data-cy="create-pending-contribution-expectedAt"
+                error={field.error}
+                onBlur={() => form.setFieldTouched(field.name, true)}
+                onChange={option => {
+                  const isCustomDate = option.value === CUSTOM_EXPECTED_AT;
+                  setIsCustomExpectedAt(isCustomDate);
+                  form.setFieldValue(field.name, isCustomDate ? null : option.value);
+                }}
+                options={expectedAtOptions}
+                value={selectedExpectedAtOption}
+              />
+            )
+          }
         </Field>
         <Field
           name="paymentMethod"

@@ -132,7 +132,6 @@ const IGNORED: Record<string, readonly string[]> = {
     'Fields.slug', // "Slug" - terme technique identique
     'Fields.type', // "Type" - identique
     'gegfoA', // "Conversation" - identique
-    'giftCards.description', // "DESCRIPTION" - identique
     'GM/hd6', // "Invitation" - identique
     'goal.type.label', // "Type" - identique
     'header.options', // "Options" - identique
@@ -198,7 +197,6 @@ const IGNORED: Record<string, readonly string[]> = {
     'Location.online', // "Online" - identisch
     'Logo', // "Logo" - identisch
     'LseLoM', // "Spam" - identisch
-    'Member.Role.FOLLOWER', // "Follower" - Social-Media-Begriff
     'OptionalFieldLabel', // "{field} (optional)" - optional identisch
     'order.status', // "Status" - identisch
     'Parameter', // "Parameter" - identisch

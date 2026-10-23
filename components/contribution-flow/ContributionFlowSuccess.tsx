@@ -14,7 +14,6 @@ import { track } from '../../lib/analytics/plausible';
 import { AnalyticsProperty } from '../../lib/analytics/properties';
 import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
-import { isOscTipExperiment } from '../../lib/experiments/experiments';
 import { gql } from '../../lib/graphql/helpers';
 import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { iconForSocialLinkType } from '../../lib/social-links';
@@ -45,10 +44,8 @@ import Avatar from '../Avatar';
 import Link from '../Link';
 import { CustomPaymentMethodInstructions } from '../manual-payment-provider/CustomPaymentMethodInstructions';
 import { getManualPaymentProviderIconComponent } from '../manual-payment-provider/ManualPaymentProviderIcon';
-import { Survey, SURVEY_KEY } from '../Survey';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { toast } from '../ui/useToast';
 
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
@@ -174,14 +171,12 @@ class ContributionFlowSuccess extends React.Component<
   {
     paymentIntentResult: PaymentIntentResult | null;
     loaded: boolean;
-    surveyShown: boolean;
     successTracked: boolean;
   }
 > {
   state = {
     paymentIntentResult: null,
     loaded: false,
-    surveyShown: false,
     successTracked: false,
   };
 
@@ -210,19 +205,9 @@ class ContributionFlowSuccess extends React.Component<
       router: { query: queryParams },
       data: { order },
       intl,
-      LoggedInUser,
     } = this.props;
 
     this.trackSuccess();
-
-    // Show survey for logged-in users on non-pending orders (only once)
-    if (LoggedInUser && order && order.status !== ORDER_STATUS.PENDING && !this.state?.surveyShown) {
-      this.setState({ surveyShown: true });
-      toast({
-        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
-        duration: 20000,
-      });
-    }
 
     const paymentIntentResult = this.state?.paymentIntentResult;
     if (order && paymentIntentResult) {
@@ -279,10 +264,7 @@ class ContributionFlowSuccess extends React.Component<
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS, {
       props: {
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: order.data?.isNewPlatformTipFlow ? 'new' : 'old',
-        // Within the OSC experiment portion, platformTipEligible IS the arm: true = shown (control),
-        // false = hidden (test). Combine with contributionIsOscTipExperiment to read the experiment.
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(order.platformTipEligible),
-        [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: isOscTipExperiment(order.toAccount, order.tier),
         [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: get(order, 'toAccount.host.slug'),
       },
     });
@@ -561,7 +543,7 @@ const orderSuccessQuery = gql`
   query NewContributionFlowOrderSuccess($order: OrderReferenceInput!) {
     order(order: $order) {
       id
-      ...OrderSuccessFragment
+      ...OrderSuccess
     }
   }
   ${orderSuccessFragment}

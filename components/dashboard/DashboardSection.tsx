@@ -30,7 +30,6 @@ import AccountSettings from './sections/AccountSettings';
 import AllCollectives from './sections/collectives/AllCollectives';
 import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
-import PeopleRouter from './sections/community/People';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import IncompleteContributions from './sections/contributions/IncompleteContributions';
@@ -58,6 +57,7 @@ import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
+import PeopleRouter from './sections/People';
 import { DashboardPlatformSubscription } from './sections/platform-subscription/DashboardPlatformSubscription';
 import Reports from './sections/reports/Reports';
 import Search from './sections/search/Search';
@@ -88,7 +88,19 @@ import { DashboardContext } from './DashboardContext';
 import DashboardErrorBoundary from './DashboardErrorBoundary';
 import DashboardHeader from './DashboardHeader';
 
-const DASHBOARD_COMPONENTS = {
+/**
+ * Props passed to dashboard section components. Kept explicit so JSX checking
+ * does not depend on inferring a union of dozens of component types (where an
+ * extra prop like `subpath` fails against the inferred intersection).
+ */
+type DashboardComponentProps = {
+  accountSlug: string;
+  account: any;
+  subpath?: string[];
+  isDashboard?: boolean;
+};
+
+const DASHBOARD_COMPONENTS: Record<string, React.ComponentType<DashboardComponentProps>> = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
   [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
   [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
@@ -237,9 +249,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
       <div className="w-full">
-        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
-          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
-        )}
+        {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <DashboardErrorBoundary>
           <AccountSettings account={account} section={section} />
@@ -251,9 +261,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
       <div className="mx-auto w-full max-w-(--breakpoint-md)">
-        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
-          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
-        )}
+        {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
         <DashboardErrorBoundary>
           <AccountSettings account={account} section={section} />
         </DashboardErrorBoundary>

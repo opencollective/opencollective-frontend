@@ -51,7 +51,6 @@ const defaults = {
   DISABLE_CONTACT_FORM: false,
   NEW_PRICING: true,
   NEW_PLATFORM_TIP_FLOW_ROLLOUT_PERCENTAGE: 50,
-  OSC_PLATFORM_TIP_ROLLOUT_PERCENTAGE: 50,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {

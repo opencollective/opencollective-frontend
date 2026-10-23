@@ -65,16 +65,6 @@ module.exports = expressApp => {
     );
   }
 
-  // This is used by Cypress to collect server side coverage
-  if (process.env.OC_ENV === 'e2e' || process.env.E2E_TEST) {
-    app.get('/__coverage__', (req, res) => {
-      res.json({
-        coverage: global.__coverage__ || null,
-      });
-      global.__coverage__ = {};
-    });
-  }
-
   // Correct slug links that end or start with hyphen
   app.use((req, res, next) => {
     if (req.path) {

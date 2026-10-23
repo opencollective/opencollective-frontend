@@ -19,7 +19,7 @@ import { Skeleton } from '../../../ui/Skeleton';
 
 import { collectiveBalanceQuery } from './queries';
 
-function CollapsibleAccountsList({ accounts, label }) {
+function CollapsibleAccountsList({ accounts, label, showSettingsLink }) {
   const totalBalance = accounts.reduce((acc, child) => acc + child.stats.balance.valueInCents, 0);
   return (
     <div className="rounded-xl border bg-background">
@@ -56,7 +56,9 @@ function CollapsibleAccountsList({ accounts, label }) {
         <CollapsibleContent>
           <div className="flex flex-col gap-4 border-t p-3">
             {accounts.length > 0 &&
-              accounts.map(child => <AccountBalanceRow className="" key={child.slug} account={child} />)}
+              accounts.map(child => (
+                <AccountBalanceRow className="" key={child.slug} account={child} showSettingsLink={showSettingsLink} />
+              ))}
           </div>
         </CollapsibleContent>
       </Collapsible>
@@ -64,45 +66,46 @@ function CollapsibleAccountsList({ accounts, label }) {
   );
 }
 
-export function Accounts({ accountSlug }) {
+export function Accounts({ accountSlug, isAccountantOnly }) {
   const { data, loading, error } = useQuery(collectiveBalanceQuery, {
     variables: { slug: accountSlug },
-
     fetchPolicy: 'cache-and-network',
   });
 
   const activeChildAccounts = data?.account.childrenAccounts?.nodes.filter(child => !child.isArchived);
-
   const events = activeChildAccounts?.filter(
     child => child.type === 'EVENT' && (dayjs(child.endsAt).isAfter(dayjs()) || child.stats.balance.valueInCents > 0),
   );
   const projects = activeChildAccounts?.filter(child => child.type === 'PROJECT');
+
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
         <div className="text-lg font-bold">
           <FormattedMessage defaultMessage="Accounts" id="FvanT6" />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="xs" variant="outline" className="gap-1">
-              <FormattedMessage id="order.new" defaultMessage="New" />
-              <ChevronDown className="text-muted-foreground" size={16} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <Link href={`/${accountSlug}/projects/create`}>
-                <FormattedMessage defaultMessage="New project" id="lJMkin" />
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href={`/${accountSlug}/events/create`}>
-                <FormattedMessage defaultMessage="New event" id="C+Npdp" />
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {!isAccountantOnly && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="xs" variant="outline" className="gap-1">
+                <FormattedMessage id="order.new" defaultMessage="New" />
+                <ChevronDown className="text-muted-foreground" size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href={`/${accountSlug}/projects/create`}>
+                  <FormattedMessage defaultMessage="New project" id="lJMkin" />
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/${accountSlug}/events/create`}>
+                  <FormattedMessage defaultMessage="New event" id="C+Npdp" />
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
       <div className="space-y-4">
         <div className="space-y-2 rounded-xl border bg-background p-3">
@@ -116,7 +119,13 @@ export function Accounts({ accountSlug }) {
           ) : error ? (
             <MessageBoxGraphqlError error={error} />
           ) : (
-            data && <AccountBalanceRow account={data?.account} showDashboardLink={false} />
+            data && (
+              <AccountBalanceRow
+                account={data?.account}
+                showDashboardLink={false}
+                showSettingsLink={!isAccountantOnly}
+              />
+            )
           )}
         </div>
 
@@ -124,17 +133,22 @@ export function Accounts({ accountSlug }) {
           <CollapsibleAccountsList
             accounts={projects}
             label={<FormattedMessage id="Projects" defaultMessage="Projects" />}
+            showSettingsLink={!isAccountantOnly}
           />
         )}
         {events?.length > 0 && (
-          <CollapsibleAccountsList accounts={events} label={<FormattedMessage id="Events" defaultMessage="Events" />} />
+          <CollapsibleAccountsList
+            accounts={events}
+            label={<FormattedMessage id="Events" defaultMessage="Events" />}
+            showSettingsLink={!isAccountantOnly}
+          />
         )}
       </div>
     </div>
   );
 }
 
-const AccountBalanceRow = ({ account, className = undefined, showDashboardLink = true }) => {
+const AccountBalanceRow = ({ account, className = undefined, showDashboardLink = true, showSettingsLink = true }) => {
   return (
     <div className={`group flex items-center justify-between gap-2 text-sm ${className}`}>
       <AccountHoverCard
@@ -190,11 +204,13 @@ const AccountBalanceRow = ({ account, className = undefined, showDashboardLink =
                 </Link>
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem asChild>
-              <Link href={getDashboardRoute(account, 'info')}>
-                <FormattedMessage id="Settings" defaultMessage="Settings" />
-              </Link>
-            </DropdownMenuItem>
+            {showSettingsLink && (
+              <DropdownMenuItem asChild>
+                <Link href={getDashboardRoute(account, 'info')}>
+                  <FormattedMessage id="Settings" defaultMessage="Settings" />
+                </Link>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

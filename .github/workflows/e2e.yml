@@ -74,12 +74,11 @@ jobs:
 
     services:
       redis:
-        image: redis@sha256:6f81e8915c60b065a524e6967e0ad1c639ba6efa84d669f823683ea04d9150ee
+        image: valkey/valkey:9.1
         ports:
           - 6379:6379
-        options: --entrypoint redis-server
       postgres:
-        image: postgres:16.15@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
+        image: postgres:16.15
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -108,9 +107,7 @@ jobs:
         run: |
           sudo apt-get install \
           `# Cypress dependencies - see https://docs.cypress.io/app/get-started/install-cypress#UbuntuDebian` \
-          libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb \
-          `# Postgres client` \
-          postgresql-client-16
+          libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb
 
       - name: Setup S3 bucket
         env:
@@ -238,9 +235,13 @@ jobs:
             next_root="${next_root}/frontend-next"
           fi
           mkdir -p .next
-          rsync -a "${next_root}/" .next/
+          rsync -a --exclude _generated-public/ "${next_root}/" .next/
           test -f .next/BUILD_ID
           test -f .next/routes-manifest.json
+          # Put back the files the build generated in public/ (see "Stage Next.js build" in ci.yml), so this
+          # checkout serves what production serves from its build directory
+          rsync -a "${next_root}/_generated-public/" public/
+          test -f public/static/scripts/pdf.worker.min.mjs
 
           stack_root=/tmp/e2e-service-dists
           if [ ! -d "${stack_root}/opencollective-api/dist" ] && [ -d "${stack_root}/e2e-service-dists/opencollective-api/dist" ]; then
@@ -250,13 +251,16 @@ jobs:
           cp -a "${stack_root}/opencollective-api/dist" opencollective-api/dist
           cp -a "${stack_root}/opencollective-images/dist" opencollective-images/dist
           cp -a "${stack_root}/opencollective-pdf/dist" opencollective-pdf/dist
-          test -f opencollective-api/dist/e2e.js
+          test -f opencollective-api/dist/e2e/index.js || test -f opencollective-api/dist/e2e.js
           test -e opencollective-images/dist/server
           test -f opencollective-pdf/dist/server/index.js
 
       # Seed DB
 
+      # Run pg_restore & co from the postgres:16 image, matching the PostgreSQL 16 service whatever client the runner ships
       - name: Setup DB
+        env:
+          USE_DOCKER: true
         run: ./scripts/setup_db.sh
 
       # Run tests

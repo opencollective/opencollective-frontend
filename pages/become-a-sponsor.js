@@ -1,7 +1,6 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
-import GiftOfGivingSection from '../components/become-a-sponsor/GiftOfGivingSection';
 import MoreFeaturesSection from '../components/become-a-sponsor/MoreFeaturesSection';
 import SupportCommunitiesSection from '../components/become-a-sponsor/SupportCommunitiesSection';
 import SupportProjectsSection from '../components/become-a-sponsor/SupportProjectsSection';
@@ -23,7 +22,6 @@ const BecomeASponsor = () => {
       <SupportCommunitiesSection />
       <TransparencySection />
       <MoreFeaturesSection />
-      <GiftOfGivingSection />
     </Page>
   );
 };

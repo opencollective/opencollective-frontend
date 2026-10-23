@@ -55,15 +55,6 @@ export const expenseInvoiceUrl = expenseId => {
   return `${PDF_SERVICE_URL}/expenses/${expenseId}/invoice.pdf`;
 };
 
-/**
- * `POST` endpoint to generate printable gift cards.
- *
- * @param {string} filename - filename **with** extension
- */
-export const giftCardsDownloadUrl = filename => {
-  return `${PDF_SERVICE_URL}/gift-cards/${filename}`;
-};
-
 // ---- Routes to external services ----
 
 /**
@@ -173,7 +164,7 @@ export const getPersonalTokenSettingsRoute = (account, token) => {
   return getDashboardRoute(account, `for-developers/personal-tokens/${token.publicId}`);
 };
 
-export const getOffPlatformTransactionsRoute = (hostSlug: string, importId = null) => {
+export const getOffPlatformTransactionsRoute = (hostSlug: string, importId: string | null = null) => {
   const base = `/dashboard/${hostSlug}/off-platform-transactions`;
   if (importId) {
     const params = new URLSearchParams();

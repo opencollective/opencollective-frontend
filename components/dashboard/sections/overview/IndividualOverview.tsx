@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { Megaphone, Settings, X } from 'lucide-react';
+import React from 'react';
+import { Settings, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
 
 import DismissibleMessage from '../../../DismissibleMessage';
-import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
 import Image from '../../../Image';
 import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
@@ -26,7 +25,6 @@ import { WelcomeIndividual } from './Welcome';
 
 const Home = ({ accountSlug, account }: DashboardSectionProps) => {
   const router = useRouter();
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showWelcomeGuide, handleSetupGuideToggle] = useSetupGuide();
   const slug = router.query?.as || accountSlug;
 
@@ -103,10 +101,6 @@ const Home = ({ accountSlug, account }: DashboardSectionProps) => {
                     />
                   </p>
                 </AlertDescription>
-                <Button variant="outline" className="mt-2 gap-2 xl:w-full" onClick={() => setShowFeedbackModal(true)}>
-                  <Megaphone size={16} />
-                  <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
-                </Button>
               </div>
 
               <button
@@ -119,7 +113,6 @@ const Home = ({ accountSlug, account }: DashboardSectionProps) => {
           )}
         </DismissibleMessage>
       </div>
-      <FeedbackModal open={showFeedbackModal} setOpen={setShowFeedbackModal} feedbackKey={FEEDBACK_KEY.DASHBOARD} />
     </div>
   );
 };

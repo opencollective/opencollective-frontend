@@ -15,6 +15,10 @@ coverage
 test/cypress/screenshots
 test/cypress/videos
 test/cypress/downloads
+test/playwright/.artifacts
+test/playwright/.environments
+test/playwright/report
+test/playwright/test-results
 dist
 stage
 *.swp

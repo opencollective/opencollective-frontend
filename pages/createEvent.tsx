@@ -9,7 +9,7 @@ import { generateNotFoundError } from '@/lib/errors';
 import { loadGoogleMaps } from '@/lib/google-maps';
 import type { CreateEventPageQuery, CreateEventPageQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { getCollectivePageRoute } from '@/lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
 
 import Body from '@/components/Body';
 import CollectiveNavbar from '@/components/collective-navbar';
@@ -23,6 +23,7 @@ import Footer from '@/components/navigation/Footer';
 import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useToast } from '@/components/ui/useToast';
 
 const createEventPageQuery = gql`
   query CreateEventPage($slug: String!) {
@@ -49,8 +50,9 @@ const createEventPageQuery = gql`
 
 function CreateEventPage({ parentCollectiveSlug }: { parentCollectiveSlug: string }) {
   const intl = useIntl();
-  const { loadingLoggedInUser, LoggedInUser } = useLoggedInUser();
+  const { loadingLoggedInUser, LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const router = useRouter();
+  const { toast } = useToast();
   const [isLoadingGoogleMaps, setIsLoadingGoogleMaps] = React.useState(true);
   const {
     data,
@@ -71,15 +73,18 @@ function CreateEventPage({ parentCollectiveSlug }: { parentCollectiveSlug: strin
 
   const handleCreateEvent = React.useCallback(
     async createdEvent => {
-      await router.push({
-        pathname: `/${parentCollectiveSlug}/events/${createdEvent.slug}`,
-        query: {
-          status: 'eventCreated',
-        },
+      // Refresh the logged in user so the new event (inherited from its parent) is available in the
+      // account switcher without a full page reload.
+      await refetchLoggedInUser();
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Your Event has been created.', id: 'event.created' }),
       });
+      // Send the user to the dashboard of the event they just created, where they can manage it.
+      await router.push(getDashboardRoute(createdEvent));
       window.scrollTo(0, 0);
     },
-    [router],
+    [router, refetchLoggedInUser, intl, toast],
   );
 
   if (error) {

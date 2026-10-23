@@ -20,7 +20,7 @@ import { MatchCreditDialog } from '../MatchCreditDialog';
 import { MatchDebitDialog } from '../MatchDebitDialog';
 import { UnlinkTransactionImportRowDialog } from '../UnlinkTransactionImportRowDialog';
 
-import { updateTransactionsImportRows } from './graphql';
+import { updateTransactionsImportRowsMutation } from './graphql';
 
 const getOptimisticResponse = (
   host,
@@ -78,7 +78,7 @@ export const useTransactionsImportActions = ({
   const { toast } = useToast();
   const intl = useIntl();
   const [updatingRows, setUpdatingRows] = React.useState<Array<string>>([]);
-  const [updateRows] = useMutation(updateTransactionsImportRows);
+  const [updateRows] = useMutation(updateTransactionsImportRowsMutation);
   const { showModal, hideModal } = useModal();
 
   const setRowsStatus = async (

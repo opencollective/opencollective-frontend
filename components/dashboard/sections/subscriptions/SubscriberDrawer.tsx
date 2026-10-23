@@ -133,6 +133,25 @@ const platformBillingsColumns = [
                     />
                   </div>
                 )}
+                {billingData.crowdfunding?.fee > 0 && (
+                  <div>
+                    <FormattedMessage
+                      defaultMessage="Crowdfunding fee ({feePercent}%): {amount}"
+                      id="GKeHBO"
+                      values={{
+                        feePercent: billingData.crowdfunding.feePercent,
+                        amount: (
+                          <FormattedMoneyAmount
+                            amount={billingData.crowdfunding.fee}
+                            currency="USD"
+                            precision={2}
+                            showCurrencyCode={false}
+                          />
+                        ),
+                      }}
+                    />
+                  </div>
+                )}
               </TooltipContent>
             </Tooltip>
           )}

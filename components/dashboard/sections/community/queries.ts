@@ -1,10 +1,13 @@
 import { gql } from '@apollo/client';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
-import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
-import { vendorFieldFragment } from '@/components/vendors/queries';
+import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
 
-import { legalDocumentFields } from '../legal-documents/HostDashboardTaxForms';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
+import { kycStatusFieldsFragment, kycVerificationFieldsFragment } from '@/components/kyc/graphql';
+import { vendorFieldsFragment } from '@/components/vendors/queries';
+
+import { hostedCollectiveFieldsFragment } from '../collectives/queries';
+import { legalDocumentFieldsFragment } from '../legal-documents/HostDashboardTaxForms';
 
 export const peopleHostDashboardQuery = gql`
   query PeopleHostDashboard(
@@ -72,10 +75,10 @@ export const peopleHostDashboardQuery = gql`
       }
     }
   }
-  ${kycStatusFields}
+  ${kycStatusFieldsFragment}
 `;
 
-const communityAccountDetailActivityFields = gql`
+const communityAccountDetailActivityFieldsFragment = gql`
   fragment CommunityAccountDetailActivityFields on Activity {
     id
     type
@@ -189,9 +192,11 @@ export const communityAccountDetailQuery = gql`
       slug
       name
       legalName
+      taxableCountry
+      isUSEntity
       type
       createdAt
-      imageUrl
+      # imageUrl comes from ...HostedCollectiveFields (resized variant)
       hasPublicProfile
       ... on Organization {
         canBeVendorOf(host: { slug: $hostSlug })
@@ -205,15 +210,7 @@ export const communityAccountDetailQuery = gql`
         country
         address
       }
-      isVerified
       isArchived
-      pendingExpenses: expenses(
-        status: [PENDING, APPROVED, ON_HOLD, INCOMPLETE, ERROR]
-        direction: SUBMITTED
-        host: { slug: $hostSlug }
-      ) {
-        totalCount
-      }
       spamExpenses: expenses(status: [SPAM], direction: SUBMITTED, host: { slug: $hostSlug }) {
         totalCount
       }
@@ -223,19 +220,6 @@ export const communityAccountDetailQuery = gql`
       communityStats(host: { slug: $hostSlug }) {
         id
         relations
-        transactionSummary {
-          kind
-          debitCount
-          creditCount
-          debitTotal {
-            valueInCents
-            currency
-          }
-          creditTotal {
-            valueInCents
-            currency
-          }
-        }
       }
       ... on Individual {
         email
@@ -247,13 +231,7 @@ export const communityAccountDetailQuery = gql`
         adminOf: memberOf(role: [ADMIN], accountType: [ORGANIZATION, VENDOR, COLLECTIVE, FUND]) {
           nodes {
             id
-            role
-            createdAt
             account {
-              id
-              slug
-              name
-              type
               ...AccountHoverCardFields
             }
           }
@@ -262,42 +240,70 @@ export const communityAccountDetailQuery = gql`
       ... on Vendor {
         ...VendorFields
       }
-      admins: members(role: [ADMIN]) {
+      # Hosted account fields (migrated from components/hosted-account-overview/queries.ts)
+      description
+      longDescription
+      updates(includeChildren: true, onlyPublishedUpdates: true, limit: 0) {
+        totalCount
+      }
+      firstTransaction: transactions(
+        limit: 1
+        offset: 0
+        orderBy: { field: CREATED_AT, direction: ASC }
+        includeChildrenTransactions: true
+        host: { slug: $hostSlug }
+      ) {
         nodes {
           id
-          role
-          description
-          createdAt
-          account {
-            id
-            ...AccountHoverCardFields
-          }
+          ...CommunityAccountDetailTransaction
         }
       }
-      memberOf {
+      # Kind-scoped (not type-scoped): a hosted account contributes on CREDIT and
+      # pays out on DEBIT, while community accounts do the opposite.
+      recentContributions: transactions(
+        limit: 5
+        offset: 0
+        kind: [CONTRIBUTION, ADDED_FUNDS]
+        includeChildrenTransactions: true
+        host: { slug: $hostSlug }
+      ) {
         nodes {
           id
-          role
-          account {
-            id
-            type
-            ...AccountHoverCardFields
-            ... on AccountWithHost {
-              host {
-                id
-                slug
-                name
-                type
-                imageUrl
-              }
+          ...CommunityAccountDetailTransaction
+        }
+      }
+      recentPayouts: transactions(
+        limit: 5
+        offset: 0
+        kind: [EXPENSE]
+        includeChildrenTransactions: true
+        host: { slug: $hostSlug }
+      ) {
+        nodes {
+          id
+          ...CommunityAccountDetailTransaction
+        }
+      }
+      # Extra fields on children (merged with HostedCollectiveFields' childrenAccounts):
+      # the host enables the same row actions (MoreActionsMenu) as the main account.
+      childrenAccounts {
+        nodes {
+          id
+          ... on AccountWithHost {
+            host {
+              id
+              legacyId
+              name
+              slug
+              imageUrl
             }
           }
         }
       }
+      ...HostedCollectiveFields
     }
     host(slug: $hostSlug) {
       id
-      publicId
       legacyId
       slug
       name
@@ -312,51 +318,41 @@ export const communityAccountDetailQuery = gql`
           ...LegalDocumentFields
         }
       }
-      features {
-        id
-        MULTI_CURRENCY_EXPENSES
-      }
       requiredLegalDocuments
-      currency
-      transferwise {
-        id
-        availableCurrencies
-      }
-      supportedPayoutMethods
-      isTrustedHost
       policies {
         id
         USE_VENDOR_POLICY
       }
-    }
-
-    firstActivity: activities(
-      host: { slug: $hostSlug }
-      account: [{ id: $accountId }]
-      orderBy: { field: CREATED_AT, direction: ASC }
-      limit: 1
-    ) {
-      nodes {
-        ...CommunityAccountDetailActivityFields
-      }
-    }
-
-    lastActivity: activities(
-      host: { slug: $hostSlug }
-      account: [{ id: $accountId }]
-      orderBy: { field: CREATED_AT, direction: DESC }
-      limit: 1
-    ) {
-      nodes {
-        ...CommunityAccountDetailActivityFields
+      hostFeePercent
+      hostedAccountAgreements(accounts: [{ id: $accountId }], includeChildren: true, limit: 0) {
+        totalCount
       }
     }
   }
-  ${accountHoverCardFields}
-  ${kycVerificationFields}
-  ${legalDocumentFields}
-  ${communityAccountDetailActivityFields}
-  ${vendorFieldFragment}
+
+  fragment CommunityAccountDetailTransaction on Transaction {
+    id
+    clearedAt
+    createdAt
+    type
+    kind
+    netAmount {
+      valueInCents
+      currency
+    }
+    expense {
+      legacyId
+    }
+    order {
+      legacyId
+    }
+  }
+
+  ${kycVerificationFieldsFragment}
+  ${legalDocumentFieldsFragment}
+  ${vendorFieldsFragment}
+  # AccountHoverCardFields is embedded in hostedCollectiveFieldsFragment (kept once in the document)
+  ${hostedCollectiveFieldsFragment}
 `;
 
 export const communityAccountOverviewQuery = gql`
@@ -428,6 +424,21 @@ export const communityAccountActivitiesQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
-  ${communityAccountDetailActivityFields}
+  ${accountHoverCardFieldsFragment}
+  ${communityAccountDetailActivityFieldsFragment}
 `;
+
+export type AccountDetailData = NonNullable<CommunityAccountDetailQuery['account']>;
+
+export type AccountDetailHost = NonNullable<CommunityAccountDetailQuery['host']>;
+
+/**
+ * `AccountDetailData` narrowed to the hosted account flow (collectives, funds,
+ * projects, events), which is where the `AccountWithHost` facets (`host`,
+ * `hostFeePercent`, `hostFeesStructure`, `approvedAt`) live. `parent` only exists
+ * on projects and events.
+ */
+export type HostedAccountDetailData = Extract<
+  AccountDetailData,
+  { __typename?: 'Collective' | 'Fund' | 'Project' | 'Event' }
+>;

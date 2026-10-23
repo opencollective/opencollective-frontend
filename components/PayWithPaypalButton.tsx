@@ -227,7 +227,7 @@ const paypalPlanQuery = gql`
   }
 `;
 
-const addPaypalPlan = graphql(paypalPlanQuery, {
+const addPaypalPlanQuery = graphql(paypalPlanQuery, {
   // We only need a plan if using an interval
   skip: props => !props.interval || props.interval === INTERVALS.oneTime,
   options: (props: any) => ({
@@ -248,4 +248,4 @@ const addPaypalPlan = graphql(paypalPlanQuery, {
   }),
 });
 
-export default addPaypalPlan(injectIntl(PayWithPaypalButton));
+export default addPaypalPlanQuery(injectIntl(PayWithPaypalButton));

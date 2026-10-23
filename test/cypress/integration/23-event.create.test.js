@@ -26,12 +26,10 @@ describe('event.create.test.js', () => {
     cy.get('#location [data-cy="location-address"]').contains('Paris');
     cy.get('#location [data-cy="location-address"]').contains('FR');
     cy.contains('button', 'Create Event').click();
-    cy.getByDataCy('notification-bar').contains('Your Event has been created');
-    cy.get('#location .address').contains('Paris'); // The collective page is still using the legacy Location component
-    cy.get('#location .address').contains('75007');
+    cy.checkToast({ variant: 'success', message: 'Your Event has been created.' });
+    cy.location('pathname').should('match', /^\/dashboard\//);
 
     // Go to "Edit Tickets"
-    cy.get('[data-cy="go-to-dashboard-btn"]').click();
     cy.getByDataCy('menu-item-tickets').click();
     cy.getByDataCy('create-ticket').click();
     cy.get('[data-cy=name]').type('Free ticket');
@@ -48,6 +46,8 @@ describe('event.create.test.js', () => {
     cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('public-profile-link').click();
+    cy.get('#location .address').contains('Paris'); // The collective page is still using the legacy Location component
+    cy.get('#location .address').contains('75007');
 
     // Check collective page
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 2);

@@ -23,6 +23,8 @@ type DateTimeProps = {
   dateStyle?: 'full' | 'long' | 'medium' | 'short';
   timeStyle?: 'full' | 'long' | 'medium' | 'short' | null | undefined;
   omitTimeIfMidnight?: boolean;
+  /** The timezone used to render the date (defaults to the viewer's timezone) */
+  timeZone?: string;
   className?: string;
 };
 
@@ -30,7 +32,7 @@ type DateTimeProps = {
  * A wrapper around `FormattedDate` + HTML `<time>` with sensible defaults.
  * Displays the full date and time in the user's locale and in UTC in the title.
  */
-const DateTime = ({ value, dateStyle, timeStyle, omitTimeIfMidnight, ...props }: DateTimeProps) => {
+const DateTime = ({ value, dateStyle, timeStyle, omitTimeIfMidnight, timeZone, ...props }: DateTimeProps) => {
   const intl = useIntl();
   const [title, setTitle] = React.useState();
   const date = React.useMemo(() => getDateFromValue(value), [value]);
@@ -47,7 +49,7 @@ const DateTime = ({ value, dateStyle, timeStyle, omitTimeIfMidnight, ...props }:
       onMouseEnter={() => setTitle(generateDateTitle(intl, date))}
       suppressHydrationWarning
     >
-      <FormattedDate dateStyle={dateStyle || 'long'} timeStyle={timeStyle} value={date} />
+      <FormattedDate dateStyle={dateStyle || 'long'} timeStyle={timeStyle} value={date} timeZone={timeZone} />
     </time>
   );
 };

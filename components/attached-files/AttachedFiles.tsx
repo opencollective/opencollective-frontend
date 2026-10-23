@@ -28,7 +28,7 @@ const AttachedFiles = ({ files, onRemove, openFileViewer, size = 88 }: AttachedF
             <UploadedFilePreview
               size={size}
               url={file.url}
-              fileName={file.name || getDefaultFileName(intl, idx, files.length)}
+              fileName={file.name || getDefaultFileName(intl, idx, files.length, file.url)}
               fileSize={file.size}
               fileType={file.type}
               showFileName

@@ -11,8 +11,21 @@ Tailwind+ShadCN (primary), Styled Components/Styled System (legacy; do not add n
 - Reuse existing i18n strings (workspace skill `search-i18n-translations`). English source: `lang/en.json`. After i18n source changes, `npm run build:langs` and `npm run langs:check`.
 - New UI: Tailwind/ShadCN and Lucide, not styled-components or Styled Icons.
 
+## Cross-repository features
+
+When a feature also changes `opencollective-api`, use the same branch name in both repositories and push both branches. E2E CI in either repository automatically checks out the matching branch in the other repository when available, falling back to `main` otherwise.
+
 ## Quality
 
 From this repo: `npm run type:check`, `npm run lint:quiet`, `npm run prettier:check` (fix: `prettier:write`), npm run `ts-unused-exports`.
-Tests: Jest (`npm run test`); E2E Cypress.
+Tests: Jest (`npm run test`); E2E Cypress + Playwright pilot (`docs/e2e.md`, `test/playwright/README.md`).
 Schema/codegen: `npm run graphql:update` (API must be running).
+
+## Playwright E2E (pilot)
+
+Fresh Linux reproduction: `./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts`.
+Uses disposable `opencollective_pw_e2e` by default; explicit service paths via `--api-dir/--frontend-dir/--images-dir/--pdf-dir` for worktrees.
+Evidence: `test/playwright/.artifacts/<run-id>/replay-manifest.json` plus owned service logs.
+Replay: `--replay <manifest>` (validates inputs, runs fresh). Iteration: `--reuse` (joins live env, no reset). Cleanup: `--cleanup` (refuses while active users remain).
+Mutable journeys: `test/playwright/fixtures` (`test`, `scenarioTest`) with API recipes; pilot specs in `test/playwright/specs/**`. Upload journeys need a frontend built with `DISABLE_MOCK_UPLOADS=1` (`docs/e2e.md`).
+CI pilot (`CI / e2e-playwright / playwright smoke`): observational, same launcher; failure evidence 14d, success 7d.

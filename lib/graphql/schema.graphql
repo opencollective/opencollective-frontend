@@ -72,7 +72,7 @@ interface CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  List of all collectives that are related to this collective with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST/FOLLOWER)
+  List of all collectives that are related to this collective with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST)
   """
   members(
     limit: Int = 100
@@ -89,7 +89,7 @@ interface CollectiveInterface {
   ): [Member]
 
   """
-  List of all collectives that this collective is a member of with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST/FOLLOWER)
+  List of all collectives that this collective is a member of with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST)
   """
   memberOf(
     limit: Int
@@ -184,21 +184,6 @@ interface CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` as key for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
 
   """
@@ -534,7 +519,6 @@ enum ContributorRole {
   CONTRIBUTOR
   BACKER
   ATTENDEE
-  FOLLOWER
   CONNECTED_COLLECTIVE
   ACCOUNTANT
 }
@@ -669,7 +653,7 @@ enum SocialLinkType {
 }
 
 """
-A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+A field whose value is an HTTP or HTTPS URL as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
 """
 scalar URL
 
@@ -718,29 +702,6 @@ type PaymentMethodType {
     hasActiveSubscription: Boolean
   ): [OrderType]
   currency: String
-}
-
-"""
-Provides rich information about a payment methods batch
-"""
-type PaymentMethodBatchInfo {
-  id: String!
-  count: Int!
-
-  """
-  The batch name, or null for unbatched payment methods
-  """
-  name: String
-}
-
-"""
-A list of PaymentMethod with pagination info
-"""
-type PaginatedPaymentMethod {
-  paymentMethods: [PaymentMethodType]
-  total: Int
-  limit: Int
-  offset: Int
 }
 
 """
@@ -828,7 +789,6 @@ type CollectiveFeatures {
   ALIPAY: CollectiveFeatureStatus
   STRIPE_PAYMENT_INTENT: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
-  EMIT_GIFT_CARDS: CollectiveFeatureStatus
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
@@ -911,6 +871,11 @@ type Policies {
   Contribution threshold to enforce contributor info. This resolver can be called from the collective or the host, when resolved through the collective the thresholds are returned in the collective currency
   """
   CONTRIBUTOR_INFO_THRESHOLDS: CONTRIBUTOR_INFO_THRESHOLDS
+
+  """
+  Tax form thresholds for US and non-US entities in cents (0 means always collect)
+  """
+  TAX_FORM_THRESHOLDS: TAX_FORM_THRESHOLDS
 }
 
 type EXPENSE_POLICIES {
@@ -1726,6 +1691,23 @@ type CONTRIBUTOR_INFO_THRESHOLDS {
   address: Int
 }
 
+type TAX_FORM_THRESHOLDS {
+  """
+  Threshold in cents for US entities (0 means always collect)
+  """
+  US: Int
+
+  """
+  Threshold in cents for non-US entities (0 means always collect)
+  """
+  NON_US: Int
+
+  """
+  Whether expenses paid through PayPal are included in threshold calculations
+  """
+  includePayPalExpenses: Boolean
+}
+
 """
 The results from searching for collectives with pagination info
 """
@@ -1930,7 +1912,7 @@ type Collective implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -1943,7 +1925,7 @@ type Collective implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -2029,25 +2011,6 @@ type Collective implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -2200,7 +2163,7 @@ type Event implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -2213,7 +2176,7 @@ type Event implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -2299,25 +2262,6 @@ type Event implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -2470,7 +2414,7 @@ type Fund implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -2483,7 +2427,7 @@ type Fund implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -2569,25 +2513,6 @@ type Fund implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -2740,7 +2665,7 @@ type Organization implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -2753,7 +2678,7 @@ type Organization implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -2839,25 +2764,6 @@ type Organization implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -3010,7 +2916,7 @@ type Platform implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -3023,7 +2929,7 @@ type Platform implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -3109,25 +3015,6 @@ type Platform implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -3280,7 +3167,7 @@ type Project implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -3293,7 +3180,7 @@ type Project implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -3379,25 +3266,6 @@ type Project implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -3849,7 +3717,7 @@ type User implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -3862,7 +3730,7 @@ type User implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -3948,25 +3816,6 @@ type User implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
-
-  """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
@@ -4121,7 +3970,7 @@ type Vendor implements CollectiveInterface {
   hostCollective: CollectiveInterface
 
   """
-  Get all the members of this collective (admins, members, backers, followers)
+  Get all the members of this collective (admins, members, backers)
   """
   members(
     limit: Int = 100
@@ -4134,7 +3983,7 @@ type Vendor implements CollectiveInterface {
   ): [Member]
 
   """
-  Get all the collective this collective is a member of (as a member, backer, follower, etc.)
+  Get all the collective this collective is a member of (as a member, backer, etc.)
   """
   memberOf(
     limit: Int
@@ -4222,25 +4071,6 @@ type Vendor implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
-  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
-  """
-  giftCardsBatches: [PaymentMethodBatchInfo]
-
-  """
-  Get the gift cards created by this collective. RemoteUser must be a collective admin.
-  """
-  createdGiftCards(
-    limit: Int
-    offset: Int
-    batch: String
-
-    """
-    Whether the gift card has been claimed or not
-    """
-    isConfirmed: Boolean
-  ): PaginatedPaymentMethod
-
-  """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccountType]
@@ -4301,25 +4131,6 @@ type Query {
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   Transaction(id: Int, uuid: String): Transaction @deprecated(reason: "2025-07-10: Please use GraphQL V2")
-
-  """
-  Returns all public hosts that are open for applications
-  """
-  allHosts(
-    """
-    Fetch all collectives that match at least one of the tags
-    """
-    tags: [String]
-
-    """
-    Filter hosts by currency
-    """
-    currency: String
-    limit: Int = 10
-    offset: Int = 0
-    onlyOpenHosts: Boolean = true
-    minNbCollectivesHosted: Int! = 0
-  ): CollectiveSearchResults @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -4338,7 +4149,7 @@ type Query {
     limit: Int
     offset: Int
   ): [Member] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
-  PaymentMethod(id: Int, code: String): PaymentMethodType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
+  PaymentMethod(id: Int): PaymentMethodType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 
   """
   Search for collectives. Results are returned with best matches first.
@@ -4438,6 +4249,7 @@ enum TypeOfCollective {
   PROJECT
   FUND
   VENDOR
+  PLATFORM
 }
 
 """
@@ -4525,63 +4337,6 @@ type Mutation {
     token: String!
     data: StripeCreditCardDataInputType!
   ): PaymentMethodType
-  createGiftCards(
-    CollectiveId: Int!
-    PaymentMethodId: Int
-
-    """
-    A list of emails to generate gift cards for (only if numberOfGiftCards is not provided)
-    """
-    emails: [String]
-
-    """
-    Number of gift cards to generate (only if emails is not provided)
-    """
-    numberOfGiftCards: Int
-
-    """
-    An optional currency. If not provided, will use the collective currency.
-    """
-    currency: String
-
-    """
-    The amount as an Integer with cents.
-    """
-    amount: Int
-
-    """
-    Batch name for the created gift cards.
-    """
-    batch: String
-    monthlyLimitPerMember: Int
-
-    """
-    Limit this payment method to make donations to collectives having those tags
-    """
-    limitedToTags: [String]
-
-    """
-    Limit this payment method to make donations to the collectives hosted by those hosts
-    """
-    limitedToHostCollectiveIds: [Int]
-
-    """
-    Set `limitedToHostCollectiveIds` to open-source collectives only
-    """
-    limitedToOpenSourceCollectives: Boolean
-
-    """
-    A custom message attached to the email that will be sent for this gift card
-    """
-    description: String
-
-    """
-    A custom message that will be sent in the invitation email
-    """
-    customMessage: String
-    expiryDate: String
-  ): [PaymentMethodType]
-  claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType!
 
   """
   Edits (by replacing) the admin-level webhooks for a collective.
@@ -4597,26 +4352,6 @@ type Mutation {
     """
     notifications: [NotificationInputType]
   ): [NotificationType]
-
-  """
-  Activate a collective as Host.
-  """
-  activateCollectiveAsHost(
-    """
-    ID of the collective (Organization or User)
-    """
-    id: Int!
-  ): CollectiveInterface
-
-  """
-  Deactivate a collective as Host.
-  """
-  deactivateCollectiveAsHost(
-    """
-    ID of the collective (Organization or User)
-    """
-    id: Int!
-  ): CollectiveInterface
 }
 
 """

@@ -33,6 +33,7 @@ import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../.
 import { hasAccountMoneyManagement, isIndividualAccount, isOrganizationAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import { canUseAsyncExports } from '../../lib/export-requests';
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
@@ -152,7 +153,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
-      if: !isAccountantOnly,
     },
     {
       section: ALL_SECTIONS.SEARCH,
@@ -311,7 +311,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.GRANTS,
         },
         {
-          if: showReceivedGrantRequests,
+          if: showReceivedGrantRequests && !isAccountantOnly,
           section: ALL_SECTIONS.APPROVE_GRANT_REQUESTS,
         },
         {
@@ -503,7 +503,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         isHostedType &&
         hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
         account.isApproved &&
-        !isCommunityManagerOnly,
+        !isCommunityManagerOnly &&
+        !isAccountantOnly,
       section: ALL_SECTIONS.VIRTUAL_CARDS,
       Icon: CreditCard,
     },
@@ -595,10 +596,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.PAYMENT_RECEIPTS,
           if: (isIndividual || isOrganization || isFund) && !account.isPrivate,
         },
-        {
-          section: ALL_SECTIONS.GIFT_CARDS,
-          if: isFeatureEnabled(account, FEATURES.EMIT_GIFT_CARDS) && !isAccountantOnly,
-        },
         // Sections for individual accounts
         {
           section: ALL_SECTIONS.NOTIFICATIONS,
@@ -641,10 +638,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.EXPORTS,
-          if:
-            isOneOfTypes(account, [ORGANIZATION]) &&
-            hasMoneyManagement &&
-            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS),
+          if: canUseAsyncExports(LoggedInUser, account),
         },
         {
           section: ALL_SECTIONS.FOR_DEVELOPERS,

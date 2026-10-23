@@ -11,6 +11,7 @@ export const accountTaxInformationQuery = gql`
       name
       legalName
       type
+      isUSEntity
       usTaxForms: legalDocuments(type: US_TAX_FORM) {
         id
         year

@@ -97,14 +97,6 @@ exports.REWRITES = [
     destination: '/update',
   },
   {
-    source: '/:collectiveSlug?/redeem/:code?',
-    destination: '/redeem',
-  },
-  {
-    source: '/:collectiveSlug?/redeemed/:code?',
-    destination: '/redeemed',
-  },
-  {
     source: '/paymentmethod/:paymentMethodId/update',
     destination: '/updatePaymentMethod',
   },
@@ -353,11 +345,6 @@ exports.REWRITES = [
   {
     source: `/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
-  },
-  // Marketing Pages
-  {
-    source: `/:pageSlug(gift-of-giving|gift-cards)`,
-    destination: '/marketingPage',
   },
   // New accept financial contributions flow
   {

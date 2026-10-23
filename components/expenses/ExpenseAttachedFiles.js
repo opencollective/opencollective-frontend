@@ -20,7 +20,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer = undefined }) =
           <UploadedFilePreview
             size={88}
             url={file.url}
-            fileName={file.name || getDefaultFileName(intl, idx, files.length)}
+            fileName={file.name || getDefaultFileName(intl, idx, files.length, file.url)}
             fileSize={file.info?.size}
             showFileName
             openFileViewer={openFileViewer}

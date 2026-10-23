@@ -5,6 +5,10 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import StyledTooltip from '../../../StyledTooltip';
 
 export const BalancesBreakdown = ({ balances }) => {
+  if (!balances?.length) {
+    return null;
+  }
+
   return (
     <div>
       {balances.map(({ valueInCents, currency }) => (

@@ -31,7 +31,7 @@ import ChangeTierWarningModal from './ChangeTierWarningModal';
 import CustomFields, { buildCustomFieldsConfig } from './CustomFields';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlatformTip, isOscTipExperiment }) => {
+const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlatformTip }) => {
   const intl = useIntl();
   const amount = stepDetails?.amount;
   const currency = tier?.amount.currency || collective.currency;
@@ -68,12 +68,14 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlat
   );
 
   // If an interval has been set (either from the tier defaults, or form an URL param) and the
-  // collective doesn't support it, we reset the interval
+  // collective doesn't support it, we reset the interval. Tiers with a fixed interval are never
+  // reset, as there would be no way to restore it (the interval selector is not displayed).
   React.useEffect(() => {
     if (
       selectedInterval &&
       selectedInterval !== INTERVALS.oneTime &&
-      ((!isFixedInterval && !supportsRecurring) || amount === 0)
+      !isFixedInterval &&
+      (!supportsRecurring || amount === 0)
     ) {
       dispatchChange('interval', INTERVALS.oneTime);
     }
@@ -85,11 +87,10 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlat
         [AnalyticsProperty.CONTRIBUTION_STEP]: 'details',
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails.isNewPlatformTip ? 'new' : 'old',
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: showPlatformTip,
-        [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: isOscTipExperiment,
         [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: collective?.host?.slug,
       },
     });
-  }, [stepDetails.isNewPlatformTip, showPlatformTip, isOscTipExperiment, collective?.host?.slug]);
+  }, [stepDetails.isNewPlatformTip, showPlatformTip, collective?.host?.slug]);
 
   return (
     <Box width={1}>

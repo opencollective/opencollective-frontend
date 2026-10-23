@@ -119,7 +119,7 @@ const MergeAccountsForm = () => {
               onChange={option => setToAccount(option?.value || null)}
               filterResults={accounts => (!fromAccount ? accounts : accounts.filter(a => a.id !== fromAccount.id))}
               collective={toAccount}
-              types={fromAccount ? [fromAccount.type] : undefined}
+              types={fromAccount ? getMergeTargetTypes(fromAccount.type) : undefined}
               includeAllVendors
               isClearable
               noCache // Don't cache to prevent showing merged collectives
@@ -192,5 +192,9 @@ const getMergeCTA = (fromAccount, toAccount) => {
     return `Merge @${fromAccount.slug} into @${toAccount.slug}`;
   }
 };
+
+const getMergeTargetTypes = fromAccountType =>
+  // Projects can also be merged into collectives hosted by the same host
+  fromAccountType === 'PROJECT' ? [fromAccountType, 'COLLECTIVE'] : [fromAccountType];
 
 export default MergeAccountsForm;

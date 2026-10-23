@@ -33,6 +33,7 @@ import type {
   InviteExpenseFromDashboardMutationVariables,
   LocationInput,
   MakeOptional,
+  RecurringExpenseInput,
   RecurringExpenseInterval,
 } from '../../lib/graphql/types/v2/graphql';
 import {
@@ -62,8 +63,8 @@ import { computeExpenseAmounts } from '../expenses/lib/utils';
 import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
-import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
+import { accountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
@@ -387,6 +388,7 @@ const expenseFormSchemaQuery = gql`
       PAYPAL_PAYOUTS
       CHART_OF_ACCOUNTS
       PAYPAL_CONNECT
+      TAX_FORMS
     }
   }
 
@@ -576,6 +578,7 @@ const expenseFormSchemaQuery = gql`
     slug
     name
     legalName
+    isUSEntity
     type
     isAdmin
     payoutMethods {
@@ -608,8 +611,8 @@ const expenseFormSchemaQuery = gql`
     }
   }
 
-  ${accountHoverCardFields}
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountHoverCardFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 type ExpenseFormOptions = {
@@ -837,10 +840,20 @@ function buildFormSchema(
         }
 
         return v.length > 0;
-      }, requiredMessage),
+      }, requiredMessage)
+      .refine(v => !v || v.length <= 255, {
+        message: 'Expense description is too long (max 255 characters).',
+      }),
     reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
     privateMessage: z.string().optional().nullable(),
+    recurrenceFrequency: z.nativeEnum(RecurrenceFrequencyOption).optional(),
+    recurrenceEndAt: z
+      .string()
+      .nullish()
+      .refine(recurrenceEndAt => isValidRecurrenceEndAt(values.recurrenceFrequency, recurrenceEndAt), {
+        message: intl.formatMessage({ defaultMessage: 'End date must be in the future', id: 'd1V3ET' }),
+      }),
     referenceCurrency: z
       .nativeEnum(Currency)
       .optional()
@@ -887,21 +900,7 @@ function buildFormSchema(
         }
         return true;
       }, requiredMessage),
-    invoiceNumber: z
-      .string()
-      .nullish()
-      .refine(invoiceNumber => {
-        if (
-          [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug)
-        ) {
-          return true;
-        }
-
-        if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
-          return options.isAdminOfPayee || options.payee?.type === CollectiveType.VENDOR ? !!invoiceNumber : true;
-        }
-        return true;
-      }, requiredMessage),
+    invoiceNumber: z.string().nullish(),
     invoiceInfo: z.string().optional(),
     expenseItems: z.array(
       z
@@ -1681,6 +1680,47 @@ const getPayeeForInvite = (values: ExpenseFormValues) => {
   }
 };
 
+/**
+ * A recurrence end date is optional (leaving it empty means an open-ended recurrence), but when set
+ * it must be a valid date in the future. This is the rule used by the form schema and by the
+ * recurrence editor (`SummarySection`) to validate the values before saving them.
+ */
+export function isValidRecurrenceEndAt(
+  recurrenceFrequency?: RecurrenceFrequencyOption | null,
+  recurrenceEndAt?: string | null,
+): boolean {
+  if (!recurrenceFrequency || recurrenceFrequency === RecurrenceFrequencyOption.NONE) {
+    return true;
+  }
+  if (!recurrenceEndAt) {
+    return true; // No end date means open-ended recurrence
+  }
+  const endsAt = dayjs(recurrenceEndAt);
+  return endsAt.isValid() && endsAt.isAfter(dayjs().startOf('day'));
+}
+
+/**
+ * Builds the `recurring` input for the `createExpense` mutation from the form values.
+ *
+ * An empty end date means open-ended recurrence (`endsAt: null`). Invalid dates are
+ * defensively mapped to `null`: `dayjs(undefined).toDate()` returns the current time,
+ * which previously created recurring expenses that could never recur.
+ */
+export function getRecurringExpenseInput(
+  recurrenceFrequency?: RecurrenceFrequencyOption,
+  recurrenceEndAt?: string,
+): RecurringExpenseInput | undefined {
+  if (!recurrenceFrequency || recurrenceFrequency === RecurrenceFrequencyOption.NONE) {
+    return undefined;
+  }
+
+  const endsAt = recurrenceEndAt ? dayjs(recurrenceEndAt) : null;
+  return {
+    interval: recurrenceFrequency as unknown as RecurringExpenseInterval,
+    endsAt: endsAt && endsAt.isValid() ? endsAt.toDate() : null,
+  };
+}
+
 type ExpenseFormStartOptions = {
   duplicateExpense?: boolean;
   expenseId?: number;
@@ -1922,10 +1962,7 @@ export function useExpenseForm(opts: {
                 expenseCreateInput: expenseInput,
                 ...(values.recurrenceFrequency !== RecurrenceFrequencyOption.NONE
                   ? {
-                      recurring: {
-                        interval: values.recurrenceFrequency as unknown as RecurringExpenseInterval,
-                        endsAt: dayjs(values.recurrenceEndAt).toDate(),
-                      },
+                      recurring: getRecurringExpenseInput(values.recurrenceFrequency, values.recurrenceEndAt),
                     }
                   : {}),
               },
@@ -2118,7 +2155,7 @@ export function useExpenseForm(opts: {
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
       setFieldValue(
         'expenseItems',
-        formOptions.expense.draft?.items?.map(ei => ({
+        (formOptions.expense.draft?.items ?? []).map(ei => ({
           id: !startOptions.current.duplicateExpense ? ei.id : undefined,
           key: ei.id,
           attachment: ei.url,
@@ -2133,7 +2170,7 @@ export function useExpenseForm(opts: {
     } else {
       setFieldValue(
         'expenseItems',
-        formOptions.expense.items?.map(ei => ({
+        (formOptions.expense.items ?? []).map(ei => ({
           id: !startOptions.current.duplicateExpense ? ei.id : undefined,
           key: ei.id,
           attachment: !startOptions.current.duplicateExpense ? ei.url : null,

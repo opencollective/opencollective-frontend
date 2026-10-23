@@ -11,7 +11,7 @@ export const TransactionImportLastSyncAtBadge = ({
   transactionsImport,
 }: {
   transactionsImport: Pick<TransactionsImport, 'isSyncing' | 'lastSyncAt'> & {
-    connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
+    connectedAccount?: { id: string } | null;
   };
 }) => {
   const intl = useIntl();

@@ -163,6 +163,14 @@ jobs:
           rsync -a --exclude cache/ .next/ /tmp/frontend-next/
           test -f /tmp/frontend-next/BUILD_ID
           test -f /tmp/frontend-next/routes-manifest.json
+          # `npm run build` also writes outside .next/: next.config.js copies the pdf.js worker and cMaps into
+          # public/static/ (gitignored). Production builds and serves from the same directory (server/index.js
+          # starts Next from the project root), so it serves them from there. The e2e jobs don't build: they
+          # start from a fresh checkout and get only what this artifact carries, so these generated files must
+          # travel with .next/ (restored in e2e.yml), or the e2e server answers 404 for the worker.
+          mkdir -p /tmp/frontend-next/_generated-public/static/scripts
+          cp public/static/scripts/pdf.worker.min.mjs /tmp/frontend-next/_generated-public/static/scripts/
+          rsync -a public/static/cmaps /tmp/frontend-next/_generated-public/static/
 
       - name: Upload Next.js build
         uses: actions/upload-artifact@v7
@@ -204,9 +212,10 @@ jobs:
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          report_type: test_results
 
   typescript:
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
@@ -240,6 +249,18 @@ jobs:
   e2e:
     needs: [build, e2e-prepare]
     uses: ./.github/workflows/e2e.yml
+    with:
+      api-ref: ${{ needs.e2e-prepare.outputs.api-ref }}
+      images-ref: ${{ needs.e2e-prepare.outputs.images-ref }}
+      pdf-ref: ${{ needs.e2e-prepare.outputs.pdf-ref }}
+    secrets: inherit
+
+  # Playwright pilot (ticket 04): observational only, not in required checks.
+  # Cypress above keeps protecting coverage; this job reports the smoke plus
+  # original-attempt evidence without masking failures.
+  e2e-playwright:
+    needs: [build, e2e-prepare]
+    uses: ./.github/workflows/e2e-playwright.yml
     with:
       api-ref: ${{ needs.e2e-prepare.outputs.api-ref }}
       images-ref: ${{ needs.e2e-prepare.outputs.images-ref }}

@@ -127,14 +127,23 @@ const UploadedFilePreview = ({
   const getContainerAttributes = () => {
     if (isPrivate || !url) {
       return { as: 'div' };
-    } else if (isText || !openFileViewer) {
+    } else if (!openFileViewer) {
       return { href: url, target: '_blank', rel: 'noopener noreferrer', as: url.startsWith('/') ? Link : StyledLink };
     } else {
       return {
         as: 'div',
+        role: 'button',
+        tabIndex: 0,
         onClick: e => {
           e.stopPropagation();
           openFileViewer(url);
+        },
+        onKeyDown: e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            openFileViewer(url);
+          }
         },
       };
     }

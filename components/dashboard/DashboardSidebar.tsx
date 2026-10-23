@@ -33,16 +33,13 @@ import {
   SidebarRail,
   useSidebar,
 } from '../ui/Sidebar';
-import { useWorkspace } from '../WorkspaceProvider';
 
 import AccountSwitcher from './AccountSwitcher';
 import { DashboardContext } from './DashboardContext';
 import { getMenuItems } from './menu-items';
 
 export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
-  const { workspace } = useWorkspace();
   const { account, selectedSection, subpath } = React.useContext(DashboardContext);
-  const activeSlug = workspace?.slug;
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const { setOpenMobile, isMobile } = useSidebar();
@@ -63,7 +60,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader>
-        <AccountSwitcher activeSlug={activeSlug} />
+        <AccountSwitcher />
       </SidebarHeader>
 
       <SidebarContent className="justify-between">

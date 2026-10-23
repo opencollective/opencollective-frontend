@@ -78,7 +78,6 @@ export const getActivityVariables = (
       collective={activity.account}
       truncateNameLength={30}
       withHoverCard
-      hoverCardProps={{ displayFollowButton: true }}
       className="font-medium hover:underline"
     />
   ),

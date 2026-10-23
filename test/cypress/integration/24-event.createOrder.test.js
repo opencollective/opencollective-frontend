@@ -26,7 +26,7 @@ describe('event.createOrder page', () => {
     createEvent('Free Ticket Event');
 
     // Create Ticket
-    cy.contains('a', 'Create Ticket').click();
+    cy.getByDataCy('menu-item-tickets').click();
     cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Free ticket');
     cy.get('input[data-cy=amount]').type('0');
@@ -52,7 +52,7 @@ describe('event.createOrder page', () => {
     createEvent('Paying Ticket Event');
 
     // Create Ticket
-    cy.contains('a', 'Create Ticket').click();
+    cy.getByDataCy('menu-item-tickets').click();
     cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Paying Ticket');
     cy.get('input[data-cy=amount]').type('10');
@@ -83,7 +83,7 @@ describe('event.createOrder page', () => {
     createEvent('Flexible Paying Ticket Event');
 
     // Create Ticket
-    cy.contains('a', 'Create Ticket').click();
+    cy.getByDataCy('menu-item-tickets').click();
     cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Flexible Paying Ticket');
     cy.get('[data-cy=amountType]').click();
@@ -124,7 +124,7 @@ describe('event.createOrder page', () => {
     // Create event
     createEvent('Test Event with VAT');
 
-    cy.contains('a', 'Create Ticket').click();
+    cy.getByDataCy('menu-item-tickets').click();
 
     // Create tickets
     cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();

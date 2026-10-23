@@ -86,7 +86,7 @@ export default function InternalTransferModal({
     if (data?.account?.currency && formikRef.current) {
       formikRef.current.setFieldValue('amount.currency', data.account.currency);
     }
-  }, [data?.accout]);
+  }, [data?.account]);
 
   const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation);
 
@@ -247,7 +247,11 @@ export default function InternalTransferModal({
                             <Button
                               variant="ghost"
                               onClick={() =>
-                                availableBalance && setFieldValue('amount.valueInCents', availableBalance.valueInCents)
+                                availableBalance &&
+                                setFieldValue('amount', {
+                                  valueInCents: availableBalance.valueInCents,
+                                  currency: availableBalance.currency,
+                                })
                               }
                             >
                               <FormattedMessage defaultMessage="Use all" id="balance.useAll" />

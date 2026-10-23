@@ -122,7 +122,9 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       //   parsedUrl.pathname = '/signin';
       //   redirect = parsedUrl;
       // }
-      const nextUrl = new URL(redirect, process.env.WEBSITE_URL);
+      // Vercel preview deploys don't set WEBSITE_URL, which then defaults to localhost
+      const baseUrl = process.env.VERCEL_ENV === 'preview' ? window.location.origin : process.env.WEBSITE_URL;
+      const nextUrl = new URL(redirect, baseUrl);
       await this.props.router.replace(nextUrl.toString());
       window.scroll(0, 0);
     }

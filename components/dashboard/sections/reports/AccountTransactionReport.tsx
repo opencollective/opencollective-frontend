@@ -1,13 +1,12 @@
 import React, { Fragment } from 'react';
 import { useQuery } from '@apollo/client';
-import { ChevronDown, FlaskConical, Megaphone } from 'lucide-react';
+import { ChevronDown, FlaskConical } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { boolean } from '../../../../lib/filters/schemas';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
-import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
 import Loading from '../../../Loading';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -167,8 +166,6 @@ const TransactionReport = ({ accountSlug, subpath }: DashboardSectionProps) => {
 export default TransactionReport;
 
 const PreviewFeatureConfigButton = ({ layout, setLayout }) => {
-  const [feedbackModalOpen, setFeedbackModalOpen] = React.useState(false);
-
   React.useEffect(() => {
     const localStorageLayout = localStorage.getItem('host-reports-layout');
     if (localStorageLayout) {
@@ -212,18 +209,9 @@ const PreviewFeatureConfigButton = ({ layout, setLayout }) => {
                 <Label htmlFor={TestLayout.DEBITCREDIT}>Debit/credit columns</Label>
               </div>
             </RadioGroup>
-            <Button variant="outline" className="gap-2" onClick={() => setFeedbackModalOpen(true)}>
-              <Megaphone size={16} /> <FormattedMessage defaultMessage="Give feedback" id="GiveFeedback" />
-            </Button>
           </div>
         </PopoverContent>
       </Popover>
-      <FeedbackModal
-        title={<FormattedMessage defaultMessage="Give feedback on the new Transactions Report" id="9XNEey" />}
-        feedbackKey={FEEDBACK_KEY.ACCOUNT_REPORTS}
-        open={feedbackModalOpen}
-        setOpen={setFeedbackModalOpen}
-      />
     </React.Fragment>
   );
 };

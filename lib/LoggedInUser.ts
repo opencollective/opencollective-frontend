@@ -229,6 +229,15 @@ class LoggedInUser {
    * Returns true if the logged in user is an accountant of the collective, and nothing else
    */
   isAccountantOnly(collective) {
+    const parent = collective?.['parentCollective'] || collective?.['parent'];
+    if (
+      parent &&
+      !this.isAdminOfCollective(parent) &&
+      !this.isAdminOfCollective(collective) &&
+      this.hasRole(MemberRole.ACCOUNTANT, parent)
+    ) {
+      return true;
+    }
     return !this.isAdminOfCollective(collective) && this.hasRole(MemberRole.ACCOUNTANT, collective);
   }
 

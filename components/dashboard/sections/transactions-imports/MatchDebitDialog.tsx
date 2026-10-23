@@ -16,7 +16,7 @@ import type {
   TransactionsImportRow,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { updateTransactionsImportRows } from './lib/graphql';
+import { updateTransactionsImportRowsMutation } from './lib/graphql';
 import { getMatchInfo } from './lib/match';
 import { ExpenseMetaStatuses } from '@/lib/expense';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
@@ -33,7 +33,7 @@ import MessageBox from '@/components/MessageBox';
 import OrderStatusTag from '@/components/orders/OrderStatusTag';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
@@ -155,7 +155,7 @@ const findExpenseMatchForOffPlatformDebitQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 const findContributionsMatchForOffPlatformDebitQuery = gql`
@@ -227,7 +227,7 @@ const findContributionsMatchForOffPlatformDebitQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 const getDefaultFilterValues = (
@@ -387,7 +387,7 @@ export const MatchDebitDialog = ({
   const intl = useIntl();
   const [activeViewId, setActiveViewId] = React.useState(TabType.EXPENSES_UNPAID);
   const matchInfo = getMatchInfo(row, selectedExpense, selectedContribution);
-  const [updateRows] = useMutation(updateTransactionsImportRows);
+  const [updateRows] = useMutation(updateTransactionsImportRowsMutation);
   const queryFilter = useMatchDebitDialogQueryFilter(activeViewId, row, host, accounts);
 
   // Query for expenses
