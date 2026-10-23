@@ -55,11 +55,19 @@ describe('UserPicker', () => {
     expect(onSelect).toHaveBeenCalledWith({ memberAccount: user });
   });
 
-  it('returns an email invite when pressing Enter and no user is found', () => {
+  it('returns an email invite when pressing Enter and no user is found', async () => {
+    jest.useFakeTimers();
+    (useQuery as jest.Mock).mockImplementation((query, options) =>
+      options?.skip ? { data: undefined, loading: false } : { data: { accounts: { nodes: [] } }, loading: false },
+    );
+
     const { onSelect } = renderPicker();
     openPicker();
     const searchInput = screen.getByPlaceholderText(/search by name, slug or email/i);
     fireEvent.change(searchInput, { target: { value: 'new.person@example.com' } });
+    await act(async () => {
+      jest.advanceTimersByTime(300);
+    });
 
     expect(screen.getByText(/invite by email: new.person@example.com/i)).toBeInTheDocument();
     fireEvent.keyDown(searchInput, { key: 'Enter', code: 'Enter' });

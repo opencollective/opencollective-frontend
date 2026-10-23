@@ -281,6 +281,7 @@ export default function HostApplicationDrawer({
                 'data-cy': 'host-application-view-collective',
               },
             ],
+            secondary: [],
           }
         : {},
     [account, intl],

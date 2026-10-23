@@ -48,4 +48,34 @@ describe('useAsyncCall', () => {
     expect(secondFn).toHaveBeenCalledWith('arg');
     expect(result.current.data).toBe('second');
   });
+
+  it('ignores stale responses from superseded calls', async () => {
+    let resolveFirst: (value: string) => void;
+    const firstPromise = new Promise<string>(resolve => {
+      resolveFirst = resolve;
+    });
+
+    const fn = jest
+      .fn()
+      .mockImplementationOnce(() => firstPromise)
+      .mockResolvedValueOnce('second');
+
+    const { result } = renderHook(() => useAsyncCall(fn), { wrapper });
+
+    let firstCall: Promise<void>;
+    await act(async () => {
+      firstCall = result.current.call();
+      await result.current.call();
+    });
+
+    expect(result.current.data).toBe('second');
+
+    await act(async () => {
+      resolveFirst('first');
+      await firstCall;
+    });
+
+    expect(result.current.data).toBe('second');
+    expect(result.current.loading).toBe(false);
+  });
 });

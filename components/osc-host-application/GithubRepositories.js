@@ -18,14 +18,14 @@ const messages = defineMessages({
 const GithubRepositories = ({ repositories, setGithubInfo }) => {
   const { formatMessage } = useIntl();
   const [search, setSearch] = useState('');
-  const [selectedName, setSelectedName] = useState(null);
+  const [selectedFullName, setSelectedFullName] = useState(null);
 
   const filteredRepositories = search
     ? repositories.filter(repository => repository.name.match(new RegExp(escapeInput(search), 'i')))
     : repositories;
 
   const selectRepository = repository => {
-    setSelectedName(repository.name);
+    setSelectedFullName(repository.full_name);
     setGithubInfo({
       handle: `${repository.owner.login}/${repository.name}`,
       licenseSpdxId: repository.license?.spdx_id,
@@ -53,14 +53,14 @@ const GithubRepositories = ({ repositories, setGithubInfo }) => {
         <div className="max-h-[420px] overflow-auto">
           {filteredRepositories.map(repository => (
             <label
-              key={repository.name}
+              key={repository.full_name}
               className="flex cursor-pointer items-start gap-3 border-b border-border px-4 py-3 last:border-b-0 hover:bg-accent has-checked:bg-accent"
             >
               <input
                 type="radio"
                 name="repository"
-                value={repository.name}
-                checked={selectedName === repository.name}
+                value={repository.full_name}
+                checked={selectedFullName === repository.full_name}
                 onChange={() => selectRepository(repository)}
                 data-cy="radio-select"
                 className="mt-1 accent-primary"

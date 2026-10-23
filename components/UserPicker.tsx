@@ -81,19 +81,25 @@ export function UserPicker({
 
   useDebouncedSearch(setDebouncedSearch, search, { delay: 300, noDelayEmpty: true });
 
-  const { data, loading } = useQuery<UserPickerSearchData, UserPickerSearchVariables>(userPickerSearchQuery, {
-    variables: { searchTerm: debouncedSearch, limit: 10 },
-    skip: !debouncedSearch,
-    fetchPolicy: 'cache-first',
-  });
-
   const trimmedSearch = search.trim();
   const normalizedSearch = trimmedSearch.toLowerCase();
   const isEmail = Boolean(isValidEmail(trimmedSearch));
+  const searchTerm = isEmail ? '' : debouncedSearch;
+
+  const { data, loading } = useQuery<UserPickerSearchData, UserPickerSearchVariables>(userPickerSearchQuery, {
+    variables: { searchTerm, limit: 10 },
+    skip: !searchTerm,
+    fetchPolicy: 'cache-first',
+  });
+
+  const isSearchSettled = isEmail || (Boolean(trimmedSearch) && debouncedSearch === trimmedSearch && !loading);
+  const isSearching = Boolean(trimmedSearch) && !isEmail && !isSearchSettled;
   const showEmailInvite = isEmail && !excludedEmails.includes(normalizedSearch);
-  const users = (data?.accounts?.nodes || []).filter(
-    user => !excludedIds.some(excludedId => String(excludedId) === String(user.id)),
-  );
+  const users = isSearchSettled
+    ? (data?.accounts?.nodes || []).filter(
+        user => !excludedIds.some(excludedId => String(excludedId) === String(user.id)),
+      )
+    : [];
 
   const handleOpenChange = nextOpen => {
     setOpen(nextOpen);
@@ -150,7 +156,7 @@ export function UserPicker({
             data-cy="user-picker-search"
           />
           <CommandList>
-            {loading ? (
+            {isSearching ? (
               <CommandLoading>
                 <FormattedMessage id="UserPicker.loading" defaultMessage="Searching..." />
               </CommandLoading>
