@@ -15,7 +15,7 @@ const DEFAULT_AUTHORIZE_URL = `https://www.paypal.com/connect?${new URLSearchPar
   ['flowEntry', 'static'],
   ['client_id', 'test-client-id'],
   ['response_type', 'code'],
-  ['scope', 'openid profile email https://uri.paypal.com/services/paypalattributes'],
+  ['scope', 'openid profile email address https://uri.paypal.com/services/paypalattributes'],
   ['redirect_uri', 'https://example.com/redirect'],
   ['state', 'test-state'],
 ])}`;
