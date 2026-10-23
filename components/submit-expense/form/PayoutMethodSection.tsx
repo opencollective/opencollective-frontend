@@ -30,6 +30,7 @@ import { objectKeys } from '@/lib/utils';
 
 import { ComboSelect } from '@/components/ComboSelect';
 import DateTime from '@/components/DateTime';
+import type { usePayoutMethodForm } from '@/components/expenses/usePayoutMethodForm';
 import { FormField } from '@/components/FormField';
 import { useModal } from '@/components/ModalContext';
 import { Badge } from '@/components/ui/Badge';
@@ -59,9 +60,12 @@ type PayoutMethodSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
 } & ReturnType<typeof getFormProps>;
 
-function getFormProps(form: ExpenseForm) {
+type PayoutMethodFormContext = ExpenseForm | ReturnType<typeof usePayoutMethodForm>;
+
+function getFormProps(form: PayoutMethodFormContext) {
   return {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
+    onPayoutMethodDeleted: 'onPayoutMethodDeleted' in form ? form.onPayoutMethodDeleted : undefined,
     ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
     ...pick(form.startOptions, ['isInlineEdit']),
     ...pick(form.options, [
@@ -122,7 +126,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     return [lastUsedPayoutMethod, ...(props.payoutMethods?.filter(p => p.id !== lastUsedPayoutMethod.id) || [])];
   }, [props.payoutMethods, lastUsedPayoutMethod]);
 
-  const { setFieldValue, setFieldTouched, refresh } = props;
+  const { setFieldValue, setFieldTouched, refresh, onPayoutMethodDeleted } = props;
   React.useEffect(() => {
     const lastSubmittedExpenseByPayee = (props.recentlySubmittedExpenses?.nodes || [])
       .filter(e => e && e.payee.slug === props.payeeSlug && e.payoutMethod?.id)
@@ -184,12 +188,13 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   const onPaymentMethodDeleted = React.useCallback(
     async deletedPayoutMethodId => {
+      onPayoutMethodDeleted?.(deletedPayoutMethodId);
       if (deletedPayoutMethodId === props.payoutMethodId) {
         setFieldValue('payoutMethodId', '');
       }
       await refresh();
     },
-    [props.payoutMethodId, refresh, setFieldValue],
+    [props.payoutMethodId, refresh, setFieldValue, onPayoutMethodDeleted],
   );
 
   const onPaymentMethodEdited = React.useCallback(
@@ -396,13 +401,13 @@ function generatePayoutMethodName(intl: IntlShape, type: PayoutMethodType, data)
 }
 
 export function NewPayoutMethodOptionWrapper(props?: Partial<NewPayoutMethodOptionProps>) {
-  const form = useFormikContext() as ExpenseForm;
+  const form = useFormikContext() as PayoutMethodFormContext;
   return <NewPayoutMethodOption {...props} {...NewPayoutMethodOption.getFormProps(form)} />;
 }
 
 type NewPayoutMethodOptionProps = ReturnType<typeof getNewPayoutMethodOptionFormProps>;
 
-function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
+function getNewPayoutMethodOptionFormProps(form: PayoutMethodFormContext) {
   return {
     ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
@@ -680,10 +685,10 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
 }, getNewPayoutMethodOptionFormProps);
 
 type PayoutMethodRadioGroupItemProps = {
-  payoutMethod: ExpenseForm['options']['payoutMethods'][number];
-  payee: ExpenseForm['options']['payee'];
-  payeeSlug: ExpenseForm['values']['payeeSlug'];
-  host?: ExpenseForm['options']['host'];
+  payoutMethod: ReturnType<typeof getFormProps>['payoutMethods'][number];
+  payee: ReturnType<typeof getFormProps>['payee'];
+  payeeSlug: ReturnType<typeof getFormProps>['payeeSlug'];
+  host?: ReturnType<typeof getFormProps>['host'];
   isChecked?: boolean;
   isEditable?: boolean;
   isSubmitting?: boolean;
@@ -703,7 +708,7 @@ type PayoutMethodRadioGroupItemProps = {
     subContent: React.ReactNode;
   }>;
   moreActions?: React.ReactNode;
-  account?: ExpenseForm['options']['account'];
+  account?: ReturnType<typeof getFormProps>['account'];
   isPaypalConnectEnabled?: boolean;
 };
 

@@ -15,6 +15,7 @@ import {
   type CurrencyExchangeRateInput,
   type Expense,
   ExpenseLockableFields,
+  ExpenseStatus,
   ExpenseType,
   PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
@@ -59,6 +60,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 import { toast } from '../ui/useToast';
 
 import { editExpenseMutation, moveExpenseMutation } from './graphql/mutations';
+import { usePayoutMethodForm } from './usePayoutMethodForm';
 
 const RenderFormFields = ({ field, onSubmit, expense, handleClose }) => {
   switch (field) {
@@ -71,7 +73,12 @@ const RenderFormFields = ({ field, onSubmit, expense, handleClose }) => {
     case 'expenseDetails':
       return <EditExpenseDetails onSubmit={onSubmit} expense={expense} />;
     case 'payoutMethod':
-      return <EditPayoutMethod onSubmit={onSubmit} expense={expense} />;
+      // Drafts may submit an invitation through the edit mutation and still need the full form.
+      return expense.status === ExpenseStatus.DRAFT ? (
+        <EditDraftPayoutMethod onSubmit={onSubmit} expense={expense} />
+      ) : (
+        <EditPayoutMethod onSubmit={onSubmit} expense={expense} />
+      );
     case 'payee':
       return <EditPayee onSubmit={onSubmit} expense={expense} />;
     case 'paidBy':
@@ -302,6 +309,20 @@ const EditPayee = ({ expense, onSubmit }) => {
 };
 
 const EditPayoutMethod = ({ expense, onSubmit }) => {
+  const intl = useIntl();
+  const expenseForm = usePayoutMethodForm(expense, onSubmit);
+  return (
+    <FormikProvider value={expenseForm}>
+      <Form className="space-y-4">
+        {expenseForm.error && <MessageBox type="error">{i18nGraphqlException(intl, expenseForm.error)}</MessageBox>}
+        <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
+        <EditExpenseActionButtons disabled={expenseForm.initialLoading} />
+      </Form>
+    </FormikProvider>
+  );
+};
+
+const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
