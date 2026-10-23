@@ -73,6 +73,7 @@ const HTMLContent = styled(
     collapsePadding = 1,
     hideViewMoreLink = false,
     openLinksInNewTab = false,
+    openImageLinksInNewTab = false,
     readMoreMessage,
     ...props
   }) => {
@@ -121,7 +122,7 @@ const HTMLContent = styled(
                 }
               } else if (node.tagName.toLowerCase() === 'a') {
                 // Open links in new tab
-                if (openLinksInNewTab) {
+                if (openLinksInNewTab || (openImageLinksInNewTab && node.querySelector('img'))) {
                   node.setAttribute('target', '_blank');
                   node.setAttribute('rel', 'noopener noreferrer');
                 }
