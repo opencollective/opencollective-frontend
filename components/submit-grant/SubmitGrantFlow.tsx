@@ -126,7 +126,7 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
           }
         }}
       >
-        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden sm:bg-[#F8FAFC]">
+        <div className="flex h-dvh max-w-screen min-w-screen flex-col overflow-hidden sm:bg-[#F8FAFC]">
           <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
             <span className="text-xl leading-7 font-bold text-slate-800">
               {!submittedGrantId && (
