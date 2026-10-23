@@ -5,6 +5,7 @@ import memoizeOne from 'memoize-one';
 import { twMerge } from 'tailwind-merge';
 
 import * as whitelabel from './constants/whitelabel-providers';
+import { getEnvVar } from './env-utils';
 
 /**
  * Helper to make it easier to conditionally add and deduplicate Tailwind CSS classes and deduplicate
@@ -227,6 +228,15 @@ export const getWebsiteUrl = () => {
   } else {
     return process.env.WEBSITE_URL;
   }
+};
+
+export const getApiUrl = (): string => {
+  const result = getEnvVar('API_URL');
+  if (!result) {
+    throw new Error('API_URL is not set');
+  }
+
+  return result;
 };
 
 // https://medium.com/@akhilanand.ak01/function-composition-in-javascript-exploring-the-power-of-compose-4114da8b9875

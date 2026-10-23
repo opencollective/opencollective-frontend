@@ -1,6 +1,7 @@
 import { Sections } from '../../../components/collective-page/_constants';
 
 import { randomSlug, randStr } from '../support/faker';
+import { getApiUrl } from '../support/helpers';
 
 const scrollToSection = section => {
   // Wait for collective page to load before disabling smooth scroll
@@ -101,7 +102,7 @@ describe('host dashboard', () => {
       cy.get('[data-cy="add-funds-amount"]').type('{selectall}20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       const vendorName = randStr();
-      cy.intercept('POST', '/api/graphql/v1', req => {
+      cy.intercept('POST', `${getApiUrl()}/graphql/v1`, req => {
         if (req.body?.operationName === 'CollectivePickerSearch' && req.body?.variables?.term === vendorName) {
           req.alias = 'collectivePickerSearch';
         }

@@ -34,6 +34,7 @@ jest.mock('../I18nFormatters', () => ({
 // ─── Imports (after mocks) ────────────────────────────────────────────────────
 
 import { addAuthTokenToHeader } from '../../lib/api';
+import { getApiUrl } from '../../lib/utils';
 
 import TermsOfFiscalSponsorship from './TermsOfFiscalSponsorship';
 
@@ -75,7 +76,7 @@ describe('TermsOfFiscalSponsorship - redirectToGithub', () => {
     });
 
     const [url, options] = fetchMock.mock.calls[0];
-    expect(url).toContain('/api/connected-accounts/github/oauthUrl');
+    expect(url).toContain(`${getApiUrl()}/connected-accounts/github/oauthUrl`);
     expect(options.headers).toEqual(expect.objectContaining({ Authorization: 'Bearer test-session-jwt' }));
   });
 

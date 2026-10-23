@@ -1,5 +1,11 @@
 import { flatten } from 'lodash-es';
 
+/** Base URL of the API, as exposed in `cypress.config.js` */
+export const getApiUrl = () => Cypress.expose('API_URL');
+
+/** Query params for fixture requests sent directly to the API, to bypass its rate limiter like the former proxy did */
+export const getApiKeyParams = () => ({ api_key: Cypress.expose('API_KEY') });
+
 /** Helper to loop on specific test */
 // keep for future use?
 // ts-unused-exports:disable-next-line

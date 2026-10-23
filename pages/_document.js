@@ -14,7 +14,7 @@ import { v4 as uuid } from 'uuid';
 import { APOLLO_STATE_PROP_NAME } from '../lib/apollo-client';
 import { getTokenFromCookie } from '../lib/auth';
 import { getIntlProps, getLocaleMessages } from '../lib/i18n/request';
-import { parseToBoolean } from '../lib/utils';
+import { getApiUrl, parseToBoolean } from '../lib/utils';
 import { getCSPHeader } from '../server/content-security-policy';
 
 import { SSRIntlProvider } from '../components/intl/SSRIntlProvider';
@@ -95,7 +95,7 @@ export default class IntlDocument extends Document {
 
       const initialProps = await Document.getInitialProps(ctx);
 
-      const preconnectOrigins = [process.env.API_URL, process.env.IMAGES_URL]
+      const preconnectOrigins = [getApiUrl(), process.env.IMAGES_URL]
         .filter(Boolean)
         .map(url => {
           try {
@@ -141,6 +141,7 @@ export default class IntlDocument extends Document {
     // They can later be read with getEnvVar()
     // Please, NEVER SECRETS!
     props.__NEXT_DATA__.env = pick(process.env, [
+      'API_URL',
       'IMAGES_URL',
       'PAYPAL_ENVIRONMENT',
       'STRIPE_KEY',

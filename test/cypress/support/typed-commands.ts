@@ -13,6 +13,7 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
+import { getApiUrl } from './helpers';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -203,7 +204,7 @@ function uploadFile(
     return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
       return cy
         .request({
-          url: '/api/images',
+          url: `${getApiUrl()}/images`,
           method: 'POST',
           headers: {
             authorization: `Bearer ${token}`,
