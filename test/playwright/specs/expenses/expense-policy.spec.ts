@@ -1,0 +1,69 @@
+import type { Page } from '@playwright/test';
+
+import { expect, scenarioTest } from '../../fixtures';
+import { isolationProbe } from '../../helpers/attempt';
+import { toast } from '../../helpers/notifications';
+
+const test = scenarioTest('expense-management', {
+  inputs: { expense: { description: 'Expense for E2E tests', items: [{ description: 'Some stuff', amount: 1000 }] } },
+  actor: 'admin',
+});
+
+/** Writes both expense policies of a Collective on its dashboard policies page, which must be open. */
+async function writeExpensePolicies(page: Page, policies: { invoice: string; reimbursement: string }) {
+  const invoice = page.getByTestId('invoice-expense-policy-input').locator('trix-editor');
+  const reimbursement = page.getByTestId('receipt-expense-policy-input').locator('trix-editor');
+  // Policies belong to this attempt's Collective: nothing was written before the admin does.
+  await expect(invoice).toHaveText('');
+  await expect(reimbursement).toHaveText('');
+  // Text for the second editor has landed in the first when typed straight after it: type again until both hold theirs.
+  await expect(async () => {
+    await invoice.fill(policies.invoice);
+    await reimbursement.fill(policies.reimbursement);
+    await expect(invoice).toHaveText(policies.invoice, { timeout: 1_000 });
+    await expect(reimbursement).toHaveText(policies.reimbursement, { timeout: 1_000 });
+  }).toPass();
+  await page.getByTestId('submit-policy-btn').click();
+  await expect(toast(page, 'Policies updated successfully')).toBeVisible();
+}
+
+test('Collective admin writes expense policies in the dashboard and submitters see them on the expense form', async ({
+  page,
+  scenario,
+}, testInfo) => {
+  const { collective } = scenario.accounts;
+  const policies = {
+    invoice: `Invoice policy of ${collective.slug}`,
+    reimbursement: `Reimbursement policy of ${collective.slug}`,
+  };
+  await page.goto(scenario.expenses.pending.url);
+  await page.getByTestId('go-to-dashboard-btn').click();
+  await page.getByTestId('menu-item-Settings').click();
+  await page.getByTestId('menu-item-policies').click();
+  await writeExpensePolicies(page, policies);
+  isolationProbe(testInfo, 'leave a Collective with saved policies behind and retry with one that has none.');
+
+  await page.goto(scenario.expenses.pending.url);
+  await page.getByTestId('submit-expense-button').click();
+  await expect(page.getByTestId('collective-invoice-policy')).toContainText(policies.invoice);
+  await page.locator('#TYPE_OF_EXPENSE').getByRole('radio', { name: 'Reimbursement' }).click();
+  await expect(page.getByTestId('collective-receipt-policy')).toContainText(policies.reimbursement);
+  await expect(page.getByTestId('collective-invoice-policy')).toHaveCount(0);
+});
+
+test.describe('Collective with a Project', () => {
+  test.use({ inputs: { project: true } });
+
+  test('expense form of a Project shows the expense policy of its parent Collective', async ({ page, scenario }) => {
+    const { collective } = scenario.accounts;
+    const policies = {
+      invoice: `Invoice policy of ${collective.slug}`,
+      reimbursement: `Reimbursement policy of ${collective.slug}`,
+    };
+    await page.goto(scenario.urls.policies);
+    await writeExpensePolicies(page, policies);
+
+    await page.goto(scenario.urls.projectNewExpense);
+    await expect(page.getByTestId('collective-invoice-policy')).toContainText(policies.invoice);
+  });
+});

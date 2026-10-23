@@ -10,6 +10,7 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
 import { CollectiveType } from '@/lib/constants/collectives';
+import { canUseAsyncExports } from '@/lib/export-requests';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { getDashboardRoute, getProfileCompletionRoute } from '@/lib/url-helpers';
@@ -228,7 +229,10 @@ function getBlocker(LoggedInUser, account, section) {
   // Check permissions
   const isAdmin = LoggedInUser.isAdminOfCollective(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
-    if (!isAdmin && !LoggedInUser.isAccountantOnly(account)) {
+    // The Exports section follows the export-request permissions (host admins and host accountants
+    // included): those users generate exports that deep-link to this page.
+    const canAccessExports = section === ALL_SECTIONS.EXPORTS && canUseAsyncExports(LoggedInUser, account);
+    if (!isAdmin && !LoggedInUser.isAccountantOnly(account) && !canAccessExports) {
       return (
         <FormattedMessage
           defaultMessage="You need to be logged in as an admin or accountant to view this page"

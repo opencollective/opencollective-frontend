@@ -33,6 +33,7 @@ import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../.
 import { hasAccountMoneyManagement, isIndividualAccount, isOrganizationAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import { canUseAsyncExports } from '../../lib/export-requests';
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
@@ -637,10 +638,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.EXPORTS,
-          if:
-            isOneOfTypes(account, [ORGANIZATION]) &&
-            hasMoneyManagement &&
-            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS),
+          if: canUseAsyncExports(LoggedInUser, account),
         },
         {
           section: ALL_SECTIONS.FOR_DEVELOPERS,

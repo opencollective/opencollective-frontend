@@ -76,10 +76,17 @@ const accountTransactionsMetaDataQuery = gql`
       }
       ... on AccountWithHost {
         host {
+          slug
           manualPaymentProviders {
             id
             name
           }
+        }
+      }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
         }
       }
       ... on Host {

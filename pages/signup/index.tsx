@@ -81,8 +81,17 @@ export default function SignupPage(props) {
   const [step, setStep] = React.useState<SignupSteps>(
     STEP_URLS[router.query?.step as SignupSteps] ? (router.query?.step as SignupSteps) : steps[0],
   );
+  // `router.query` only settles once Next.js has applied a navigation, so an effect that reads it
+  // right after `nextStep()` still sees the query of the step we just left. This flag is set while
+  // we drive the step ourselves, and cleared again as soon as the route has actually changed, so
+  // the URL-restore effect below cannot undo our own navigation - while a later URL change (the
+  // browser's back/forward, a link to a verification URL) still restores the step.
+  const isNavigatingToStep = React.useRef(false);
+  const previousAsPath = React.useRef(router.asPath);
+
   const nextStep = React.useCallback(
     (requestedStep?: SignupSteps, query?: Record<string, string | string[]>) => {
+      isNavigatingToStep.current = true;
       setStep(prev => {
         const nextStep = steps[steps.indexOf(prev) + 1];
         if (!requestedStep && !nextStep) {
@@ -95,7 +104,9 @@ export default function SignupPage(props) {
           const step = requestedStep || nextStep;
           const newQuery = omit(
             { ...props.query, ...pick(router.query, ['next', 'session', 'active', 'host']), ...query },
-            ['step'],
+            // `session` identifies one specific OTP challenge: it is meaningless on the email step
+            // and must not outlive the challenge that created it (dead session, or "Go Back").
+            step === SignupSteps.EMAIL_INPUT ? ['step', 'session'] : ['step'],
           );
           if (
             nextActionFlow &&
@@ -121,6 +132,14 @@ export default function SignupPage(props) {
 
   const me = data?.me;
   React.useLayoutEffect(() => {
+    // Drop our own-navigation marker once the route has settled. This runs *before* the restore
+    // check below on purpose: the pass that still sees the pending navigation stays suppressed,
+    // while every later pass (back/forward, a link to a verification URL) restores again.
+    if (previousAsPath.current !== router.asPath) {
+      previousAsPath.current = router.asPath;
+      isNavigatingToStep.current = false;
+    }
+
     if (router.query.step === 'organization' || router.query.organization === 'true') {
       setNextActionFlow(NEXT_ACTION_FLOWS.ORGANIZATION);
     } else if (router.query.step === 'collective' || router.query.collective === 'true') {
@@ -141,13 +160,17 @@ export default function SignupPage(props) {
     } else if (
       !me &&
       !loading &&
+      !isNavigatingToStep.current &&
       step === SignupSteps.EMAIL_INPUT &&
       router.query?.email &&
       router.query?.step === 'verify'
     ) {
+      // Restore the step after a direct load of the verify URL. Skipped while we are the ones
+      // navigating: `router.query` is still the query of the step we just left, so acting on it
+      // here would undo the navigation and put the user back on a challenge that is over.
       nextStep(SignupSteps.VERIFY_OTP);
     }
-  }, [me, router, step, steps, nextActionFlow, loading, nextStep]);
+  }, [me, router, router.asPath, step, steps, nextActionFlow, loading, nextStep]);
 
   const progress = React.useMemo(() => (steps.indexOf(step) + 1) / steps.length, [step, steps]);
 

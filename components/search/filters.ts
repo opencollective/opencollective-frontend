@@ -13,6 +13,20 @@ export enum SearchEntity {
   DASHBOARD_TOOL = 'DASHBOARD_TOOL',
 }
 
+/** Entities with results in `search.results` */
+export type SearchResultEntity = Exclude<SearchEntity, SearchEntity.ALL | SearchEntity.DASHBOARD_TOOL>;
+
+/** GraphQL field of each entity in `search.results` */
+export const SEARCH_ENTITY_RESULT_FIELDS = {
+  [SearchEntity.ACCOUNTS]: 'accounts',
+  [SearchEntity.EXPENSES]: 'expenses',
+  [SearchEntity.TRANSACTIONS]: 'transactions',
+  [SearchEntity.ORDERS]: 'orders',
+  [SearchEntity.UPDATES]: 'updates',
+  [SearchEntity.COMMENTS]: 'comments',
+  [SearchEntity.HOST_APPLICATIONS]: 'hostApplications',
+} as const satisfies Record<SearchResultEntity, string>;
+
 export const entityFilterOptions = {
   [SearchEntity.ACCOUNTS]: {
     value: SearchEntity.ACCOUNTS,

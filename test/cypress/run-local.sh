@@ -63,8 +63,8 @@ if [[ ! -f "$FRONTEND_DIR/.next/BUILD_ID" ]]; then
   exit 1
 fi
 
-if [[ ! -f "$API_DIR/dist/e2e.js" ]]; then
-  echo "API is not built. Run: (cd $API_DIR && npm run build)" >&2
+if [[ ! -f "$API_DIR/dist/e2e/index.js" && ! -f "$API_DIR/dist/e2e.js" ]]; then
+  echo "API is not built. Run: (cd $API_DIR && npm run build:e2e)" >&2
   exit 1
 fi
 
