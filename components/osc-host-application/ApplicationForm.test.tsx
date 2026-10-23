@@ -48,6 +48,8 @@ jest.mock('../../lib/ecosystems', () => ({
 
 import { fetchEcosystemsRepositoryInfo } from '../../lib/ecosystems';
 
+const mockFetchEcosystemsRepositoryInfo = fetchEcosystemsRepositoryInfo as jest.Mock;
+
 import ApplicationForm from './ApplicationForm';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -170,6 +172,8 @@ describe('ApplicationForm - applicationData.hasLegalEntity', () => {
 
 // ─── ecosyste.ms repository info ──────────────────────────────────────────────
 
+const RECENT_PUSHED_AT = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
 const ECOSYSTEMS_REPO_ENTRY = {
   packages: [
     {
@@ -193,7 +197,7 @@ const ECOSYSTEMS_REPO_ENTRY = {
     topics: ['opencollective', 'react'],
     archived: false,
     created_at: '2016-12-12T04:36:39.000Z',
-    pushed_at: '2026-10-11T11:24:07.000Z',
+    pushed_at: RECENT_PUSHED_AT,
     commit_stats: { total_commits: 120, total_committers: 8, last_synced_commit: 'abc123' },
   },
   contributors: { total_committers: 8 },
@@ -219,7 +223,7 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     mockMutate.mockResolvedValue({ data: { createCollective: null } });
-    fetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
+    mockFetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
   });
 
   afterEach(() => {
@@ -253,7 +257,7 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
     changeRepositoryUrl('https://github.com/foo/bar');
 
     // The lookup is pending (debounce + request): the field shows a spinner and the form cannot be submitted
-    const loadingIndicator = () => document.querySelector('[data-cy="ccf-form-repository-url-loading"]');
+    const loadingIndicator = () => document.querySelector<HTMLElement>('[data-cy="ccf-form-repository-url-loading"]');
     const submitButton = () => screen.getByRole('button', { name: /submit application/i });
     expect(loadingIndicator()).toBeInTheDocument();
     expect(submitButton()).toBeDisabled();
@@ -295,7 +299,7 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
       ownerKind: 'organization',
       archived: false,
       createdAt: '2016-12-12T04:36:39.000Z',
-      lastCommitAt: '2026-10-11T11:24:07.000Z',
+      lastCommitAt: RECENT_PUSHED_AT,
       lastCommitSha: 'abc123',
       commitStats: { totalCommits: 120, totalCommitters: 8 },
       packages: [
@@ -315,7 +319,7 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
   it('omits the snapshot when the repository info could not be fetched', async () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
     try {
-      fetchEcosystemsRepositoryInfo.mockRejectedValue(new Error('failed to fetch'));
+      mockFetchEcosystemsRepositoryInfo.mockRejectedValue(new Error('failed to fetch'));
       renderForm();
       fillRequiredFields();
       changeRepositoryUrl('https://github.com/foo/bar');
@@ -356,7 +360,7 @@ describe('ApplicationForm - automatic field population from the repository info'
     jest.clearAllMocks();
     jest.useFakeTimers();
     mockMutate.mockResolvedValue({ data: { createCollective: null } });
-    fetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
+    mockFetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
   });
 
   afterEach(() => {
@@ -389,7 +393,7 @@ describe('ApplicationForm - automatic field population from the repository info'
   });
 
   it('keeps the existing tags when the fetched repository has no license nor topics', async () => {
-    fetchEcosystemsRepositoryInfo.mockResolvedValue({
+    mockFetchEcosystemsRepositoryInfo.mockResolvedValue({
       ...ECOSYSTEMS_REPO_ENTRY,
       repository: { ...ECOSYSTEMS_REPO_ENTRY.repository, license: null, topics: [] },
     });
@@ -406,7 +410,7 @@ describe('ApplicationForm - automatic field population from the repository info'
   });
 
   it('does not match a repository license that is not a known SPDX id', async () => {
-    fetchEcosystemsRepositoryInfo.mockResolvedValue({
+    mockFetchEcosystemsRepositoryInfo.mockResolvedValue({
       ...ECOSYSTEMS_REPO_ENTRY,
       repository: { ...ECOSYSTEMS_REPO_ENTRY.repository, license: 'some-custom-license' },
     });
@@ -464,21 +468,23 @@ const weakRepositoryEntry = (overrides = {}) => ({
   packages: [],
   repository: {
     ...ECOSYSTEMS_REPO_ENTRY.repository,
-    commitStats: { total_commits: 3, total_committers: 1, last_synced_commit: 'abc123' },
+    commit_stats: { total_commits: 3, total_committers: 1, last_synced_commit: 'abc123' },
     forks_count: 0,
   },
+  contributors: { ...ECOSYSTEMS_REPO_ENTRY.contributors, total_committers: 1 },
   ...overrides,
 });
 
-const rulesPanel = () => document.querySelector('[data-cy="ccf-form-rules"]');
-const fieldRules = field => document.querySelector(`[data-cy="ccf-form-rules-${field}"]`);
+const rulesPanel = () => document.querySelector<HTMLElement>('[data-cy="ccf-form-rules"]') as HTMLElement;
+const fieldRules = (field: string) =>
+  document.querySelector<HTMLElement>(`[data-cy="ccf-form-rules-${field}"]`) as HTMLElement;
 const submitButton = () => screen.getByRole('button', { name: /submit application/i });
 
 describe('ApplicationForm - application rules', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockMutate.mockResolvedValue({ data: { createCollective: null } });
-    fetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
+    mockFetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
   });
 
   it('shows warnings next to the fields they relate to, without blocking the submission', async () => {
@@ -498,7 +504,7 @@ describe('ApplicationForm - application rules', () => {
   it('does not block when the repository cannot be found', async () => {
     jest.useFakeTimers();
     try {
-      fetchEcosystemsRepositoryInfo.mockResolvedValue({ ...ECOSYSTEMS_REPO_ENTRY, repository: null });
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue({ ...ECOSYSTEMS_REPO_ENTRY, repository: null });
       renderForm();
       fillRequiredFields();
       changeRepositoryUrl('https://github.com/foo/bar');
@@ -519,7 +525,9 @@ describe('ApplicationForm - application rules', () => {
   it('blocks the submission on a hard error', async () => {
     jest.useFakeTimers();
     try {
-      fetchEcosystemsRepositoryInfo.mockResolvedValue(weakRepositoryEntry({ owner: { login: 'foo', kind: 'user' } }));
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue(
+        weakRepositoryEntry({ owner: { login: 'foo', kind: 'user' } }),
+      );
       renderForm();
       fillRequiredFields();
       changeRepositoryUrl('https://github.com/foo/bar');
@@ -539,7 +547,7 @@ describe('ApplicationForm - application rules', () => {
   it('blocks a project with an error (no manual-review bypass)', async () => {
     jest.useFakeTimers();
     try {
-      fetchEcosystemsRepositoryInfo.mockResolvedValue(
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue(
         weakRepositoryEntry({ owner: { login: 'foo', kind: 'organization' } }),
       );
       renderForm();
@@ -581,7 +589,7 @@ describe('ApplicationForm - application rules', () => {
   it('mitigates the no-community error when a second admin is invited and the message is substantial', async () => {
     jest.useFakeTimers();
     try {
-      fetchEcosystemsRepositoryInfo.mockResolvedValue(
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue(
         weakRepositoryEntry({ owner: { login: 'foo', kind: 'organization' } }),
       );
       renderForm({
@@ -632,7 +640,7 @@ describe('ApplicationForm - Your Team', () => {
     renderForm({ initialValues: initialValuesWithInvites });
     fillRequiredFields();
 
-    const team = document.querySelector('[data-cy="profile-card"]');
+    const team = document.querySelector<HTMLElement>('[data-cy="profile-card"]') as HTMLElement;
     expect(team.querySelectorAll('[data-cy="admin-badge"]')).toHaveLength(2);
     expect(within(team).getByText('Thomas Anderson')).toBeInTheDocument();
     expect(within(team).getByText('Amazing New User')).toBeInTheDocument();
@@ -647,7 +655,7 @@ describe('ApplicationForm - Your Team', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /remove amazing new user/i }));
 
-    const team = document.querySelector('[data-cy="profile-card"]');
+    const team = document.querySelector<HTMLElement>('[data-cy="profile-card"]') as HTMLElement;
     expect(within(team).queryByText('Amazing New User')).not.toBeInTheDocument();
 
     submitForm();
@@ -699,7 +707,7 @@ describe('ApplicationForm - suggested admins', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockMutate.mockResolvedValue({ data: { createCollective: null } });
-    fetchEcosystemsRepositoryInfo.mockResolvedValue({
+    mockFetchEcosystemsRepositoryInfo.mockResolvedValue({
       ...ECOSYSTEMS_REPO_ENTRY,
       contributors: {
         ...ECOSYSTEMS_REPO_ENTRY.contributors,
@@ -722,7 +730,7 @@ describe('ApplicationForm - suggested admins', () => {
       changeRepositoryUrl('https://github.com/foo/bar');
       await flushRepositoryInfoDebounce();
 
-      const suggestions = document.querySelector('[data-cy="suggested-admins"]');
+      const suggestions = document.querySelector<HTMLElement>('[data-cy="suggested-admins"]') as HTMLElement;
       expect(suggestions).toBeInTheDocument();
       expect(within(suggestions).getByText('Jane Doe')).toBeInTheDocument();
       expect(within(suggestions).getByText('(jane@example.com)')).toBeInTheDocument();
@@ -733,7 +741,7 @@ describe('ApplicationForm - suggested admins', () => {
 
       fireEvent.click(within(suggestions).getByRole('button', { name: /jane doe/i }));
 
-      const team = document.querySelector('[data-cy="profile-card"]');
+      const team = document.querySelector<HTMLElement>('[data-cy="profile-card"]') as HTMLElement;
       expect(within(team).getByText('Jane Doe')).toBeInTheDocument();
       expect(within(team).getByText('(jane@example.com)')).toBeInTheDocument();
       expect(within(suggestions).queryByText('Jane Doe')).not.toBeInTheDocument();
@@ -755,7 +763,7 @@ describe('ApplicationForm - rule notes as the field hint', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockMutate.mockResolvedValue({ data: { createCollective: null } });
-    fetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
+    mockFetchEcosystemsRepositoryInfo.mockResolvedValue(ECOSYSTEMS_REPO_ENTRY);
   });
 
   it('falls back to the default hint while no rule applies to the repository URL', () => {
@@ -768,7 +776,7 @@ describe('ApplicationForm - rule notes as the field hint', () => {
   it('replaces the default hint with the rule notes once a rule applies', async () => {
     jest.useFakeTimers();
     try {
-      fetchEcosystemsRepositoryInfo.mockResolvedValue({ ...ECOSYSTEMS_REPO_ENTRY, repository: null });
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue({ ...ECOSYSTEMS_REPO_ENTRY, repository: null });
       renderForm();
       fillRequiredFields();
       changeRepositoryUrl('https://github.com/foo/bar');
@@ -785,7 +793,7 @@ describe('ApplicationForm - rule notes as the field hint', () => {
   it('shows the small-community warning as a hint on the message field', async () => {
     jest.useFakeTimers();
     try {
-      fetchEcosystemsRepositoryInfo.mockResolvedValue({
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue({
         ...ECOSYSTEMS_REPO_ENTRY,
         packages: [],
         repository: {
@@ -810,7 +818,7 @@ describe('ApplicationForm - rule notes as the field hint', () => {
   it('shows the early-stage warning as a hint on the message field', async () => {
     jest.useFakeTimers();
     try {
-      fetchEcosystemsRepositoryInfo.mockResolvedValue({
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue({
         ...ECOSYSTEMS_REPO_ENTRY,
         packages: [],
         repository: {
@@ -836,7 +844,7 @@ describe('ApplicationForm - rule notes as the field hint', () => {
   it('shows the personal-account-convert warning without a confirmation checkbox', async () => {
     jest.useFakeTimers();
     try {
-      fetchEcosystemsRepositoryInfo.mockResolvedValue({
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue({
         ...ECOSYSTEMS_REPO_ENTRY,
         packages: [],
         owner: { login: 'foo', kind: 'user' },

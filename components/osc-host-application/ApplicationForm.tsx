@@ -805,18 +805,6 @@ const ApplicationForm = ({
                                 {ruleNotes('licenseSpdxId')}
                               </div>
                             </div>
-                            {(errorFlags.length > 0 || !submissionGate.canSubmit) && (
-                              <div className="flex flex-col gap-2" data-cy="ccf-form-rules">
-                                {errorFlags.slice(0, 1).map(flag => (
-                                  <Alert key={flag.id} variant="destructive">
-                                    <XCircle className="size-4" />
-                                    <AlertDescription>
-                                      <FormattedMessage {...RULE_MESSAGES[flag.id]} />
-                                    </AlertDescription>
-                                  </Alert>
-                                ))}
-                              </div>
-                            )}
 
                             <FormField
                               name="applicationData.extraLicenseInfo"
@@ -1104,6 +1092,19 @@ const ApplicationForm = ({
                         </div>
                       </div>
                     </div>
+
+                    {errorFlags.length > 0 && (
+                      <div className="mx-auto flex w-full max-w-[993px] flex-col gap-2" data-cy="ccf-form-rules">
+                        {errorFlags.slice(0, 1).map(flag => (
+                          <Alert key={flag.id} variant="destructive">
+                            <XCircle className="size-4" />
+                            <AlertDescription>
+                              <FormattedMessage {...RULE_MESSAGES[flag.id]} />
+                            </AlertDescription>
+                          </Alert>
+                        ))}
+                      </div>
+                    )}
 
                     <div className="mb-12 flex justify-center">
                       <div className="grid w-full max-w-[672px] flex-1 grid-cols-1 gap-8 px-12 sm:grid-cols-2">

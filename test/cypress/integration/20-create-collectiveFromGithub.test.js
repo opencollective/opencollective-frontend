@@ -1,5 +1,9 @@
 describe('Create collective from Github', () => {
   it('Should submit create github page', () => {
+    cy.intercept('GET', '/api/ecosystems/repository*', {
+      statusCode: 404,
+      body: { error: { message: 'Not found' } },
+    });
     cy.intercept('GET', '/api/github-repositories*', { fixture: 'github-repos.json' });
     cy.login({ email: 'testuser@opencollective.com', redirect: '/opensource/apply/pick-repo?token=foofoo' });
     cy.contains('[data-cy=connect-github-header]', 'Pick a repository');

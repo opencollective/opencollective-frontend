@@ -109,7 +109,7 @@ export default function DrawerHeader({
                 {shouldPutPrimaryInMoreActions &&
                   primary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
 
-                {shouldPutPrimaryInMoreActions && primary.length > 0 && secondary.length > 0 && (
+                {shouldPutPrimaryInMoreActions && primary.length > 0 && secondary?.length > 0 && (
                   <DropdownMenuSeparator />
                 )}
 

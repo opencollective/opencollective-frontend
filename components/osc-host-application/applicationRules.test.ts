@@ -25,6 +25,8 @@ import {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+const RECENT_DATE = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
 const repository = (overrides: Partial<EcosystemsRepositorySnapshot> = {}): EcosystemsRepositorySnapshot => ({
   fullName: 'foo/bar',
   owner: 'foo',
@@ -37,7 +39,7 @@ const repository = (overrides: Partial<EcosystemsRepositorySnapshot> = {}): Ecos
   topics: ['opencollective'],
   archived: false,
   createdAt: '2020-01-01T00:00:00.000Z',
-  lastCommitAt: '2026-10-01T00:00:00.000Z',
+  lastCommitAt: RECENT_DATE,
   lastCommitSha: 'abc123',
   commitStats: { totalCommits: 120, totalCommitters: 8 },
   packages: [
