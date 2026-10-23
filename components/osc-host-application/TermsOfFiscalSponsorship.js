@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { XCircle } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -6,14 +7,10 @@ import { addAuthTokenToHeader } from '../../lib/api';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
-import Container from '../Container';
-import { Box, Flex, Grid } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
-import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
-import StyledCheckbox from '../StyledCheckbox';
-import { H1, P } from '../Text';
+import { Alert, AlertDescription } from '../ui/Alert';
+import { Button } from '../ui/Button';
+import { Checkbox } from '../ui/Checkbox';
 
 import ApplicationDescription from './ApplicationDescription';
 
@@ -74,83 +71,84 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
     }
   }, [LoggedInUser, redirectToGithub, callRedirectToGithub, collectiveSlug]);
 
+  const handleVerifyGithub = () => {
+    if (!checked) {
+      setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
+    } else if (!LoggedInUser) {
+      router.push({
+        pathname: '/signin',
+        query: { next: `${router.asPath}?redirectToGithub=true` },
+      });
+    } else {
+      callRedirectToGithub(collectiveSlug);
+    }
+  };
+
   return (
-    <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
-      <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
-        <Box width={'160px'} height={'160px'} mb="24px">
+    <div className="mt-6 flex flex-col items-center justify-center sm:mt-12">
+      <div className="flex flex-col items-center justify-center sm:flex-row">
+        <div className="mb-6 h-40 w-40">
           <NextIllustration
             alt="Open Source Collective logotype"
             src="/static/images/osc-logo.png"
             width={160}
             height={160}
           />
-        </Box>
-        <Box textAlign={['center', 'left']} width={['288px', '488px']} mb={4} ml={[null, '24px']}>
-          <H1
-            fontSize="32px"
-            lineHeight="40px"
-            letterSpacing="-0.008em"
-            color="black.900"
-            textAlign={['center', 'left']}
-            mb="14px"
-          >
+        </div>
+        <div className="mb-4 w-72 text-center sm:ml-6 sm:w-[488px] sm:text-left">
+          <h1 className="mb-3.5 text-[32px] leading-10 font-semibold tracking-tight text-foreground">
             <FormattedMessage id="HostApplication.header" defaultMessage="Apply with your Collective" />
-          </H1>
-          <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
+          </h1>
+          <p className="text-base leading-6 font-medium text-muted-foreground">
             <FormattedMessage
               id="collective.subtitle.opensource"
               defaultMessage="Open source projects are invited to join the Open Source Collective Fiscal Host."
             />
-          </P>
-        </Box>
-      </Flex>
-      <Box width={['288px', '672px']}>
-        <ApplicationDescription />
-        <Container display="flex" alignSelf="flex-start" alignItems="center" mb={4} mt={4}>
-          <Box mr={3}>
-            <StyledCheckbox
-              name="TOSAgreement"
-              checked={checked}
-              onChange={({ checked }) => onChecked(checked)}
-              label={
-                <P ml={1} fontSize="12px" lineHeight="18px" fontWeight="400">
-                  <FormattedMessage
-                    id="OCFHostApplication.tosCheckBoxLabel"
-                    defaultMessage="I agree with the <TOSLink>terms of fiscal sponsorship</TOSLink>."
-                    values={{
-                      TOSLink: getI18nLink({
-                        href: FISCAL_SPONSOR_TERMS,
-                        openInNewTabNoFollow: true,
-                        onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
-                        color: 'purple.500',
-                      }),
-                    }}
-                  />
-                </P>
-              }
-            />
-          </Box>
-        </Container>
-      </Box>
-      <Box width={['288px', '672px']} mb="100px">
-        <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={'32px'} mb={4}>
-          <StyledButton
-            textAlign="center"
-            buttonSize="large"
-            buttonStyle="purple"
+          </p>
+        </div>
+      </div>
+
+      <div className="w-full max-w-[672px]">
+        <div className="mt-3 flex flex-col gap-4 rounded-lg border border-border p-4 sm:mt-0 sm:p-8">
+          <ApplicationDescription />
+
+          <label className="flex cursor-pointer items-start gap-2 text-sm leading-normal">
+            <Checkbox checked={checked} onCheckedChange={value => onChecked(value === true)} />
+            <span>
+              <FormattedMessage
+                id="OCFHostApplication.tosCheckBoxLabel"
+                defaultMessage="I agree with the <TOSLink>terms of fiscal sponsorship</TOSLink>."
+                values={{
+                  TOSLink: chunks => (
+                    <Link
+                      href={FISCAL_SPONSOR_TERMS}
+                      openInNewTab
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                }}
+              />
+            </span>
+          </label>
+        </div>
+
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <XCircle className="size-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="mt-8 mb-12 grid grid-cols-1 gap-8 sm:grid-cols-2">
+          <Button
+            type="button"
+            size="lg"
+            className="w-full"
             loading={isRedirecting}
-            onClick={() => {
-              if (!checked) {
-                setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
-              } else if (!LoggedInUser) {
-                router.push({
-                  pathname: '/signin',
-                  query: { next: `${router.asPath}?redirectToGithub=true` },
-                });
-              } else {
-                callRedirectToGithub(collectiveSlug);
-              }
-            }}
+            disabled={!checked}
+            onClick={handleVerifyGithub}
           >
             {!LoggedInUser ? (
               <FormattedMessage
@@ -160,36 +158,29 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
             ) : (
               <FormattedMessage id="createcollective.opensource.VerifyGithub" defaultMessage="Verify using GitHub" />
             )}
-          </StyledButton>
-          <Link
-            href={{
-              pathname: `/opensource/apply/form`,
-              query: { ...(collectiveSlug && { collectiveSlug }) },
-            }}
-            onClick={e => {
-              if (!checked) {
-                e.preventDefault();
-                setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
-              }
-            }}
-          >
-            <StyledButton textAlign="center" buttonSize="large" buttonStyle="purpleSecondary">
+          </Button>
+          <Button asChild variant="outline" size="lg" className="w-full">
+            <Link
+              href={{
+                pathname: `/opensource/apply/form`,
+                query: { ...(collectiveSlug && { collectiveSlug }) },
+              }}
+              onClick={e => {
+                if (!checked) {
+                  e.preventDefault();
+                  setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
+                }
+              }}
+            >
               <FormattedMessage
                 id="createcollective.opensource.ManualVerification"
                 defaultMessage="Request manual verification"
               />
-            </StyledButton>
-          </Link>
-        </Grid>
-        {error && (
-          <Flex alignItems="center" justifyContent="center">
-            <MessageBox type="error" withIcon mb={[1, 3]}>
-              {error}
-            </MessageBox>
-          </Flex>
-        )}
-      </Box>
-    </Flex>
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 

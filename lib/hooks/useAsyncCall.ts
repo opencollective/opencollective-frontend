@@ -21,29 +21,57 @@ export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
   const { toast } = useToast();
   const intl = useIntl();
 
-  const callWith =
-    (...args) =>
-    async () => {
-      setLoading(true);
-      setError(undefined);
-      setData(undefined);
+  // Keep the latest `fn`/options in refs so `call`/`callWith` can keep a stable identity across
+  // renders (callers may depend on them, e.g. in effect dependency arrays). Update them after
+  // commit so an interrupted render cannot leak uncommitted values into a call.
+  const fnRef = React.useRef(fn);
+  const toastRef = React.useRef(toast);
+  const intlRef = React.useRef(intl);
+  const useErrorToastRef = React.useRef(useErrorToast);
+  const requestIdRef = React.useRef(0);
 
-      try {
-        const response = await fn(...args);
-        setData(response);
-      } catch (e) {
-        setError(e);
-        // eslint-disable-next-line no-console
-        console.error(e);
-        if (useErrorToast) {
-          toast({ variant: 'error', message: formatErrorMessage(intl, getErrorFromGraphqlException(e)) });
+  React.useLayoutEffect(() => {
+    fnRef.current = fn;
+    toastRef.current = toast;
+    intlRef.current = intl;
+    useErrorToastRef.current = useErrorToast;
+  });
+
+  const callWith = React.useCallback(
+    (...args: Parameters<T>) =>
+      async () => {
+        const requestId = ++requestIdRef.current;
+        setLoading(true);
+        setError(undefined);
+        setData(undefined);
+
+        try {
+          const response = await fnRef.current(...args);
+          if (requestId === requestIdRef.current) {
+            setData(response);
+          }
+        } catch (e) {
+          if (requestId === requestIdRef.current) {
+            setError(e);
+            // eslint-disable-next-line no-console
+            console.error(e);
+            if (useErrorToastRef.current) {
+              toastRef.current({
+                variant: 'error',
+                message: formatErrorMessage(intlRef.current, getErrorFromGraphqlException(e)),
+              });
+            }
+          }
+        } finally {
+          if (requestId === requestIdRef.current) {
+            setLoading(false);
+          }
         }
-      } finally {
-        setLoading(false);
-      }
-    };
+      },
+    [],
+  );
 
-  const call = (...args) => callWith(...args)();
+  const call = React.useCallback((...args: Parameters<T>) => callWith(...args)(), [callWith]);
 
   return { loading, call, callWith, data, error };
 };

@@ -41,6 +41,7 @@ const oscHostApplicationPageQuery = gql`
     account(slug: "opensource") {
       id
       slug
+      settings
       policies {
         id
         COLLECTIVE_MINIMUM_ADMINS {
@@ -94,6 +95,7 @@ const formValues = {
     extraLicenseInfo: '',
     amountOfMembers: '',
     linksToPreviousEvents: '',
+    hasLegalEntity: false,
   },
   termsOfServiceOC: false,
   inviteMembers: [],
@@ -107,6 +109,16 @@ const formatNameFromSlug = repoName => {
 const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedInUser }) => {
   const [checkedTermsOfFiscalSponsorship, setCheckedTermsOfFiscalSponsorship] = useState(false);
   const [initialValues, setInitialValues] = useState(formValues);
+
+  const resetApplicationFormValues = () => {
+    setInitialValues({
+      ...formValues,
+      user: { ...formValues.user },
+      collective: { ...formValues.collective, tags: [] },
+      applicationData: { ...formValues.applicationData },
+      inviteMembers: [],
+    });
+  };
 
   const intl = useIntl();
   const router = useRouter();
@@ -151,7 +163,10 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   }, [collectiveSlug, collective]);
 
   return (
-    <Page title="Open Source Collective application">
+    <Page
+      title="Open Source Collective application"
+      primaryColor={hostData?.account?.settings?.collectivePage?.primaryColor}
+    >
       {step === 'intro' && (
         <TermsOfFiscalSponsorship
           checked={checkedTermsOfFiscalSponsorship}
@@ -175,18 +190,17 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
                 typeOfProject: handle ? 'CODE' : null,
                 repositoryUrl: handle ? `https://github.com/${handle}` : '',
                 licenseSpdxId,
-                useGithubValidation: true,
+                useGithubValidation: Boolean(handle),
               },
             });
           }}
-          router={router}
           nextDisabled={!initialValues.applicationData.repositoryUrl}
         />
       )}
       {step === 'form' && (
         <ApplicationForm
           initialValues={initialValues}
-          setInitialValues={setInitialValues}
+          onBack={resetApplicationFormValues}
           loadingLoggedInUser={loadingLoggedInUser}
           LoggedInUser={LoggedInUser}
           collective={collective}
