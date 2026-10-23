@@ -129,6 +129,9 @@ const STATIC_PARAMS_EMBED = Object.keys(EmbedContributionFlowUrlParametersConfig
   key => EmbedContributionFlowUrlParametersConfig[key].static,
 );
 
+// Embed display options, to keep when the contributor leaves the flow and comes back (e.g. Stripe redirects)
+export const EMBED_DISPLAY_PARAMS = ['hideFAQ', 'hideHeader', 'hideSteps', 'backgroundColor', 'useTheme'];
+
 /**
  * Returns an un-sanitized version of the URL query parameters
  */
