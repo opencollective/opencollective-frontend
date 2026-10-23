@@ -84,7 +84,8 @@ export function UserPicker({
   const trimmedSearch = search.trim();
   const normalizedSearch = trimmedSearch.toLowerCase();
   const isEmail = Boolean(isValidEmail(trimmedSearch));
-  const searchTerm = isEmail ? '' : debouncedSearch;
+  const trimmedDebouncedSearch = debouncedSearch.trim();
+  const searchTerm = isEmail ? '' : trimmedDebouncedSearch;
 
   const { data, loading } = useQuery<UserPickerSearchData, UserPickerSearchVariables>(userPickerSearchQuery, {
     variables: { searchTerm, limit: 10 },
@@ -92,7 +93,7 @@ export function UserPicker({
     fetchPolicy: 'cache-first',
   });
 
-  const isSearchSettled = isEmail || (Boolean(trimmedSearch) && debouncedSearch === trimmedSearch && !loading);
+  const isSearchSettled = isEmail || (Boolean(trimmedSearch) && trimmedDebouncedSearch === trimmedSearch && !loading);
   const isSearching = Boolean(trimmedSearch) && !isEmail && !isSearchSettled;
   const showEmailInvite = isEmail && !excludedEmails.includes(normalizedSearch);
   const users = isSearchSettled

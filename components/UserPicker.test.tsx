@@ -55,6 +55,19 @@ describe('UserPicker', () => {
     expect(onSelect).toHaveBeenCalledWith({ memberAccount: user });
   });
 
+  it('trims surrounding whitespace when resolving the search', async () => {
+    jest.useFakeTimers();
+    renderPicker();
+    openPicker();
+    typeSearch('  ada  ');
+    await act(async () => {
+      jest.advanceTimersByTime(300);
+    });
+
+    expect(screen.getByRole('option', { name: /ada lovelace/i })).toBeInTheDocument();
+    expect(screen.queryByText(/searching/i)).not.toBeInTheDocument();
+  });
+
   it('returns an email invite when pressing Enter and no user is found', async () => {
     jest.useFakeTimers();
     (useQuery as jest.Mock).mockImplementation((query, options) =>

@@ -209,6 +209,7 @@ describe('lib/ecosystems', () => {
 
       expect(fetchStub).toHaveBeenCalledWith(
         '/api/ecosystems/repository?url=https%3A%2F%2Fgithub.com%2Ffoo%2Fbar%3Fx%3D1%26y%3D2',
+        expect.objectContaining({ signal: expect.anything() }),
       );
       expect(result).toEqual(REPO_ENTRY);
     });
