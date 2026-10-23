@@ -1,20 +1,9 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { validateTranslation } from '../../lib/i18n/translation-validation';
 
-const LANG_DIR = path.resolve(__dirname, '../../lang');
+import { loadEnglishMessages, loadLocaleMessages, writeLocaleMessages } from './translation-stats.js';
 
 function normalizeLocale(arg: string): string {
   return arg.replace(/\.json$/i, '');
-}
-
-function loadJson(filePath: string): Record<string, string> {
-  const raw = fs.readFileSync(filePath, 'utf8');
-  return JSON.parse(raw) as Record<string, string>;
-}
-
-function writeLocaleFile(filePath: string, data: Record<string, string>): void {
-  // Preserve key order from the parsed file (insertion order) to minimize diffs.
-  fs.writeFileSync(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
 }
 
 function main(): void {
@@ -29,15 +18,26 @@ function main(): void {
   const id = args[1];
   const translation = args.slice(2).join(' ');
 
-  const localePath = path.join(LANG_DIR, `${locale}.json`);
-  if (!fs.existsSync(localePath)) {
-    console.error(`Locale file not found: ${localePath}`);
+  const data = loadLocaleMessages(locale);
+  if (!data) {
+    console.error(`Locale file not found: lang/${locale}.json`);
     process.exit(1);
   }
 
-  const data = loadJson(localePath);
+  const english = loadEnglishMessages()[id];
+  if (english === undefined) {
+    console.error(`Unknown message id: ${id}`);
+    process.exit(1);
+  }
+
+  const errors = validateTranslation(english, translation);
+  if (errors.length) {
+    console.error(`Invalid translation for ${id}: ${errors.join('; ')}`);
+    process.exit(1);
+  }
+
   data[id] = translation;
-  writeLocaleFile(localePath, data);
+  writeLocaleMessages(locale, data);
 }
 
 main();

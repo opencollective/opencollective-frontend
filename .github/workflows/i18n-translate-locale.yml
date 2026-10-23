@@ -1,0 +1,297 @@
+name: i18n Translate Locale
+
+# Translates one locale with Claude. Called by `i18n-translate.yml`.
+#
+# Security: the `agent` job only gets read access and hands its changes over as data: a patch of
+# `lang/<locale>.json` and the ids to add to IGNORED. The `publish` job never runs code from the agent:
+# it checks the patch, writes IGNORED entries and progress with the repository scripts, re-validates
+# translations, and only then uses its write token to push.
+#
+# Secrets: ANTHROPIC_API_KEY (required), SLACK_WEBHOOK_URL (optional), OC_AGENT_APP_PRIVATE_KEY with
+# the OC_AGENT_APP_ID variable (optional: pull requests opened with GITHUB_TOKEN do not trigger CI).
+
+on:
+  workflow_call:
+    inputs:
+      locale:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  LOCALE: ${{ inputs.locale }}
+  BRANCH: i18n/${{ inputs.locale }}
+  MAX_STRINGS: 300
+  LOCALE_FILE: lang/${{ inputs.locale }}.json
+
+jobs:
+  agent:
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      changed: ${{ steps.patch.outputs.changed }}
+    steps:
+      - name: Set paths
+        run: |
+          echo "DATA_DIR=$RUNNER_TEMP/i18n" >> "$GITHUB_ENV"
+          echo "OUT_DIR=$RUNNER_TEMP/out" >> "$GITHUB_ENV"
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - name: Resolve language
+        id: language
+        run: |
+          case "$LOCALE" in
+            fr) language=French ;;
+            de) language=German ;;
+            es) language=Spanish ;;
+            pt-BR) language='Brazilian Portuguese' ;;
+            *) echo "::error::Unsupported locale: $LOCALE"; exit 1 ;;
+          esac
+          echo "language=$language" >> "$GITHUB_OUTPUT"
+
+      - name: Prefetch context
+        id: prefetch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$DATA_DIR" "$OUT_DIR"
+
+          # Carry over translations from the previous pull request if it is still open, so a
+          # pending review is not thrown away when the branch is rebuilt from main.
+          previous_pr=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$previous_pr" ]; then
+            git fetch --depth=1 origin "$BRANCH"
+            git show "FETCH_HEAD:$LOCALE_FILE" > "$DATA_DIR/previous.json"
+            npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --carry-over "$DATA_DIR/previous.json" || true
+            git show "FETCH_HEAD:scripts/i18n/translation-stats.ts" > "$DATA_DIR/previous-translation-stats.ts"
+            npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --diff-ignored \
+              scripts/i18n/translation-stats.ts "$DATA_DIR/previous-translation-stats.ts" > "$DATA_DIR/previous-ignored.json"
+            npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --ignore "$DATA_DIR/previous-ignored.json" || true
+            gh pr diff "$previous_pr" > "$DATA_DIR/previous-pr.diff"
+          fi
+
+          npx tsx scripts/i18n/show-untranslated.ts "$LOCALE" > "$DATA_DIR/untranslated-all.txt"
+          wc -l < "$DATA_DIR/untranslated-all.txt" | tr -d ' ' > "$DATA_DIR/untranslated-total.txt"
+          head -n "$MAX_STRINGS" "$DATA_DIR/untranslated-all.txt" > "$DATA_DIR/untranslated.txt"
+          npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --check 2> "$DATA_DIR/invalid.txt" > /dev/null || true
+          # Human fixes often name the language rather than the locale (or none), so match on the file.
+          gh pr list --state merged --search 'i18n in:title sort:updated-desc' --limit 50 \
+            --json number,title,url,mergedAt,author,files \
+            --jq "[.[] | select(any(.files[]; .path == \"$LOCALE_FILE\"))
+              | {number, title, url, mergedAt, author: .author.login}] | .[:15]" > "$DATA_DIR/recent-i18n-prs.json"
+
+          untranslated=$(wc -l < "$DATA_DIR/untranslated.txt" | tr -d ' ')
+          invalid=$(grep -c ': ' "$DATA_DIR/invalid.txt" || true)
+          echo "Untranslated: $untranslated (total $(cat "$DATA_DIR/untranslated-total.txt")), invalid: $invalid"
+          echo "todo=$((untranslated + invalid))" >> "$GITHUB_OUTPUT"
+
+      - name: Render prompt
+        id: prompt
+        if: steps.prefetch.outputs.todo != '0'
+        env:
+          LANGUAGE: ${{ steps.language.outputs.language }}
+        run: |
+          {
+            echo 'prompt<<PROMPT_EOF'
+            # shellcheck disable=SC2016 # envsubst takes the variable names literally
+            envsubst '${LOCALE} ${LANGUAGE} ${DATA_DIR} ${MAX_STRINGS}' < .github/prompts/i18n-translate.md
+            echo 'PROMPT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Translate with Claude
+        id: claude
+        if: steps.prefetch.outputs.todo != '0'
+        uses: anthropics/claude-code-action@6c690188da61cf16ee7debb28383ba67f02abb4c # v1.0.242
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
+          prompt: ${{ steps.prompt.outputs.prompt }}
+          claude_args: >-
+            --model claude-sonnet-5-5
+            --max-turns 150
+            --add-dir ${{ runner.temp }}/i18n
+            --allowedTools "Read,Write,Edit,Grep,Glob,Bash(npx tsx scripts/i18n/apply-translations.ts:*),Bash(npx tsx scripts/i18n/show-untranslated.ts:*),Bash(npm run langs:update-progress),Bash(rg:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(git diff:*)"
+            --json-schema '{"type":"object","properties":{"pr_title":{"type":"string"},"pr_body":{"type":"string"},"slack_summary":{"type":"string"}},"required":["pr_title","pr_body","slack_summary"]}'
+
+      - name: Save patch
+        id: patch
+        env:
+          RESULT: ${{ steps.claude.outputs.structured_output }}
+        run: |
+          set -euo pipefail
+          if [ -n "${RESULT:-}" ]; then printf '%s' "$RESULT" > "$OUT_DIR/result.json"; else echo '{}' > "$OUT_DIR/result.json"; fi
+          # Hand over translations and IGNORED ids as data only; `publish` regenerates the rest.
+          git show HEAD:scripts/i18n/translation-stats.ts > "$RUNNER_TEMP/translation-stats.base.ts"
+          npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --diff-ignored \
+            "$RUNNER_TEMP/translation-stats.base.ts" scripts/i18n/translation-stats.ts > "$OUT_DIR/ignored.json"
+          git status --porcelain -- . ":!$LOCALE_FILE" ':!scripts/i18n/translation-stats.ts' ':!lib/constants/locales.js' |
+            while read -r line; do echo "::warning::Ignoring change outside the allowlist: $line"; done
+          git diff --binary --no-renames -- "$LOCALE_FILE" > "$OUT_DIR/changes.patch"
+          git diff --stat -- "$LOCALE_FILE"
+          echo "IGNORED additions: $(jq length "$OUT_DIR/ignored.json")"
+          if [ -s "$OUT_DIR/changes.patch" ] || [ "$(jq length "$OUT_DIR/ignored.json")" != 0 ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload agent output
+        uses: actions/upload-artifact@v7
+        with:
+          name: i18n-${{ inputs.locale }}
+          path: ${{ runner.temp }}/out
+          retention-days: 7
+
+  publish:
+    needs: agent
+    if: needs.agent.outputs.changed == 'true'
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      pr_url: ${{ steps.pr.outputs.url }}
+    steps:
+      - name: Create GitHub App token
+        id: app-token
+        if: vars.OC_AGENT_APP_ID != ''
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.OC_AGENT_APP_ID }}
+          private-key: ${{ secrets.OC_AGENT_APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - name: Download agent output
+        uses: actions/download-artifact@v8
+        with:
+          name: i18n-${{ inputs.locale }}
+          path: ${{ runner.temp }}/out
+
+      - name: Apply and validate changes
+        run: |
+          set -euo pipefail
+          patch="$RUNNER_TEMP/out/changes.patch"
+          ignored="$RUNNER_TEMP/out/ignored.json"
+          if [ -s "$patch" ]; then
+            # --numstat only lists rename/copy destinations, so require plain deletes and additions.
+            if grep -Eq '^(rename|copy) from ' "$patch"; then
+              echo "::error::Patch contains renames or copies"
+              exit 1
+            fi
+            for file in $(git apply --numstat "$patch" | cut -f3); do
+              if [ "$file" != "$LOCALE_FILE" ]; then
+                echo "::error::Patch changes a file other than $LOCALE_FILE: $file"
+                exit 1
+              fi
+            done
+            git apply "$patch"
+          fi
+          jq -e 'type == "object" and all(.[]; type == "string")' "$ignored" > /dev/null
+          npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --ignore "$ignored"
+
+          git show "HEAD:$LOCALE_FILE" > "$RUNNER_TEMP/base.json"
+          npx tsx scripts/i18n/apply-translations.ts "$LOCALE" --check --base "$RUNNER_TEMP/base.json"
+          npx tsx scripts/i18n/show-untranslated.ts "$LOCALE" | wc -l | xargs echo "Remaining untranslated:"
+          npm run langs:update-progress
+          npx eslint scripts/i18n/translation-stats.ts
+          npx prettier --check "$LOCALE_FILE" scripts/i18n/translation-stats.ts lib/constants/locales.js
+
+      - name: Push branch and open pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          result="$RUNNER_TEMP/out/result.json"
+          title=$(jq -r '.pr_title // empty' "$result" | head -n 1 | cut -c1-150)
+          title="[i18n-$LOCALE] ${title:-Update translations}"
+          body=$(jq -r '.pr_body // empty' "$result")
+          {
+            printf '%s' "${body:-Rebased translations from the previous run on main.}"
+            printf '\n\n---\nGenerated by the [i18n Translate workflow](%s). Re-runs update this pull request.\n' "$RUN_URL"
+          } > "$RUNNER_TEMP/pr-body.md"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898283+github-actions[bot]@users.noreply.github.com'
+          git add -- "$LOCALE_FILE" scripts/i18n/translation-stats.ts lib/constants/locales.js
+          git commit -q -m "$title"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/$BRANCH"
+
+          url=$(gh pr list --head "$BRANCH" --state open --json url --jq '.[0].url // empty')
+          if [ -n "$url" ]; then
+            # Without new agent output (only carried-over translations), keep the existing description.
+            if [ -n "$body" ]; then
+              gh pr edit "$url" --title "$title" --body-file "$RUNNER_TEMP/pr-body.md"
+            fi
+          else
+            url=$(gh pr create --base main --head "$BRANCH" --title "$title" --body-file "$RUNNER_TEMP/pr-body.md")
+            gh pr edit "$url" --add-reviewer znarf || echo "::warning::Could not request a review from znarf"
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+  notify:
+    needs: [agent, publish]
+    if: always()
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    steps:
+      - name: Download agent output
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: i18n-${{ inputs.locale }}
+          path: ${{ runner.temp }}/out
+
+      - name: Post to Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          AGENT_RESULT: ${{ needs.agent.result }}
+          PUBLISH_RESULT: ${{ needs.publish.result }}
+          PR_URL: ${{ needs.publish.outputs.pr_url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
+            echo "SLACK_WEBHOOK_URL is not set; skipping Slack post"
+            exit 0
+          fi
+          summary=$(jq -r '.slack_summary // empty' "$RUNNER_TEMP/out/result.json" 2>/dev/null || true)
+          if [ "$AGENT_RESULT" != success ] || [ "$PUBLISH_RESULT" = failure ]; then
+            message=":warning: i18n $LOCALE failed (agent: $AGENT_RESULT, publish: $PUBLISH_RESULT). ${summary}"
+          else
+            message="i18n $LOCALE: ${summary:-Nothing left to translate.}"
+          fi
+          [ -n "${PR_URL:-}" ] && message="$message
+          Pull request: $PR_URL"
+          message="$message
+          Run: $RUN_URL"
+          jq -n --arg text "$message" '{text: $text}' |
+            curl -sS -f -X POST -H 'Content-type: application/json' --data @- "$SLACK_WEBHOOK_URL"

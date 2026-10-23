@@ -30,14 +30,20 @@ description: Batches translation of locale JSON using show-untranslated and set-
 3. **Per string**:
    - Read the line: `{id}: {english}`.
    - If meaning, audience, or UI role is unclear, **find context** before translating (see below).
-   - If the string **should stay English** in this locale (same word in both languages, standard loanword, product name, etc.), **do not** run `set-translation`. Add the **message id** to `IGNORED['<locale>']` in `scripts/i18n/translation-stats.ts` so it stops appearing in the report. Keep a short inline comment per entry (e.g. why it is not translated). Ignore matching is by **id**, not by English value.
+   - If the string **should stay English** in this locale (same word in both languages, standard loanword, product name, etc.), **do not** run `set-translation`. Add the **message id** to `IGNORED['<locale>']` in `scripts/i18n/translation-stats.ts` so it stops appearing in the report, with a short reason (e.g. why it is not translated). Ignore matching is by **id**, not by English value. To add several at once, write a `{ "<id>": "<reason>" }` JSON file and run `npx tsx scripts/i18n/apply-translations.ts <locale> --ignore ignored.json`.
    - Otherwise produce the target-language string that matches instructions and preserves placeholders/markup, then apply:
 
    ```bash
    npx tsx scripts/i18n/set-translation.ts <locale> <id> "Translation text"
    ```
 
-   Quote the translation so the shell does not split words.
+   Quote the translation so the shell does not split words. For many strings, write a `{ "<id>": "translation" }` JSON file and apply it in one call instead:
+
+   ```bash
+   npx tsx scripts/i18n/apply-translations.ts <locale> translations.json
+   ```
+
+   Both scripts reject translations that change `{placeholders}` or `<tags>`, break ICU syntax, or add invisible characters (zero-width spaces, soft hyphens, bidi controls). Fix the reported ids and apply again.
 
 4. **Repeat** step 2 until show-untranslated returns nothing (or the user stops).
 
@@ -79,10 +85,11 @@ Use when the English line alone is ambiguous (button vs heading, legal vs casual
 
 ## Scripts reference
 
-| Script / npm script                 | Role                                                                                                                         |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `scripts/i18n/show-untranslated.ts` | Lists `{id}: english` where locale value still equals English, minus per-locale `IGNORED` message ids. Optional `--limit N`. |
-| `scripts/i18n/set-translation.ts`   | Writes one key: `set-translation.ts <locale> <id> "text"`                                                                    |
-| `npm run langs:update-progress`     | Recomputes per-locale completion % and writes `lib/constants/locales.js`. Run once when done.                                |
+| Script / npm script                  | Role                                                                                                                         |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/i18n/show-untranslated.ts`  | Lists `{id}: english` where locale value still equals English, minus per-locale `IGNORED` message ids. Optional `--limit N`. |
+| `scripts/i18n/set-translation.ts`    | Writes one key: `set-translation.ts <locale> <id> "text"`                                                                    |
+| `scripts/i18n/apply-translations.ts` | Writes a JSON batch: `apply-translations.ts <locale> <file.json>`. `--check` lists invalid existing translations.            |
+| `npm run langs:update-progress`      | Recomputes per-locale completion % and writes `lib/constants/locales.js`. Run once when done.                                |
 
-Show-untranslated and set-translation are invoked with `npx tsx` from the repository root.
+These scripts are invoked with `npx tsx` from the repository root.

@@ -1,0 +1,36 @@
+name: i18n Translate
+
+# Weekly pass over frontend locale strings that still match English. Each locale runs
+# `i18n-translate-locale.yml` and opens (or updates) a reviewable pull request on `i18n/<locale>`.
+
+on:
+  schedule:
+    - cron: '0 6 * * 0' # Sunday 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      locale:
+        description: Locale to translate
+        type: choice
+        options: [all, fr, de, es, pt-BR]
+        default: all
+
+permissions:
+  contents: read
+
+jobs:
+  translate:
+    name: ${{ matrix.locale }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        locale: ${{ fromJSON(inputs.locale && inputs.locale != 'all' && format('["{0}"]', inputs.locale) || '["fr","de","es","pt-BR"]') }}
+    concurrency:
+      group: i18n-translate-${{ matrix.locale }}
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/i18n-translate-locale.yml
+    with:
+      locale: ${{ matrix.locale }}
+    secrets: inherit
