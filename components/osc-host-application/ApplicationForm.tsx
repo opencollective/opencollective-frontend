@@ -551,6 +551,19 @@ const ApplicationForm = ({
 
                 return (
                   <Form data-cy="ccf-form" className="flex flex-col gap-4">
+                    {errorFlags.length > 0 && (
+                      <div className="mx-auto flex w-full max-w-[993px] flex-col gap-2" data-cy="ccf-form-rules">
+                        {errorFlags.slice(0, 1).map(flag => (
+                          <Alert key={flag.id} variant="destructive">
+                            <XCircle className="size-4" />
+                            <AlertDescription>
+                              <FormattedMessage {...RULE_MESSAGES[flag.id]} />
+                            </AlertDescription>
+                          </Alert>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="mt-3 flex flex-col gap-8 rounded-lg border border-border p-4 sm:mt-0 sm:p-8">
                       <div className="flex flex-col gap-2">
                         <FormSectionTitle className="mb-0">
@@ -1100,20 +1113,6 @@ const ApplicationForm = ({
                         </div>
                       </div>
                     </div>
-
-                    {errorFlags.length > 0 && (
-                      <div className="mx-auto flex w-full max-w-[993px] flex-col gap-2" data-cy="ccf-form-rules">
-                        {errorFlags.slice(0, 1).map(flag => (
-                          <Alert key={flag.id} variant="destructive">
-                            <XCircle className="size-4" />
-                            <AlertDescription>
-                              <FormattedMessage {...RULE_MESSAGES[flag.id]} />
-                            </AlertDescription>
-                          </Alert>
-                        ))}
-                      </div>
-                    )}
-
                     <div className="mb-12 flex justify-center">
                       <div className="grid w-full max-w-[672px] flex-1 grid-cols-1 gap-8 px-12 sm:grid-cols-2">
                         <Button
