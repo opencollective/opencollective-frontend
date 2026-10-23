@@ -1,27 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
 import { isHiddenAccount } from '@/lib/collective';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
-import { Box } from '../components/Grid';
-import OrdersWithData from '../components/orders/OrdersWithData';
+import Link from '../components/Link';
+import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
 import Custom404 from './404';
 
 class OrdersPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, filter, value } }) {
-    return { slug: collectiveSlug, filter, value };
+  static getInitialProps({ query: { collectiveSlug } }) {
+    return { slug: collectiveSlug };
   }
 
   static propTypes = {
     slug: PropTypes.string, // for addCollectiveNavbarData
-    filter: PropTypes.string,
-    value: PropTypes.string,
     data: PropTypes.shape({
       account: PropTypes.object,
       loading: PropTypes.bool,
@@ -49,9 +48,16 @@ class OrdersPage extends React.Component {
             />
           </Container>
         )}
-        <Box py={4}>
-          <OrdersWithData accountSlug={slug} />
-        </Box>
+        <Container py={[4, 5, 6]} px={2} maxWidth={500} mx="auto">
+          <MessageBox type="info">
+            <FormattedMessage
+              defaultMessage="This page does not exists anymore. You can see all the contributions by changing the filters on the <TransactionsLink>transactions page</TransactionsLink>."
+              values={{
+                TransactionsLink: msg => <Link href={`/${slug}/transactions`}>{msg}</Link>,
+              }}
+            />
+          </MessageBox>
+        </Container>
       </Page>
     );
   }
