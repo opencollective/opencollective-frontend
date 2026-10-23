@@ -110,6 +110,16 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   const [checkedTermsOfFiscalSponsorship, setCheckedTermsOfFiscalSponsorship] = useState(false);
   const [initialValues, setInitialValues] = useState(formValues);
 
+  const resetApplicationFormValues = () => {
+    setInitialValues({
+      ...formValues,
+      user: { ...formValues.user },
+      collective: { ...formValues.collective, tags: [] },
+      applicationData: { ...formValues.applicationData },
+      inviteMembers: [],
+    });
+  };
+
   const intl = useIntl();
   const router = useRouter();
   const { toast } = useToast();
@@ -190,7 +200,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
       {step === 'form' && (
         <ApplicationForm
           initialValues={initialValues}
-          setInitialValues={setInitialValues}
+          onBack={resetApplicationFormValues}
           loadingLoggedInUser={loadingLoggedInUser}
           LoggedInUser={LoggedInUser}
           collective={collective}

@@ -83,7 +83,6 @@ const renderForm = (props = {}) =>
     withRequiredProviders(
       <ApplicationForm
         initialValues={initialValues}
-        setInitialValues={jest.fn()}
         loadingLoggedInUser={false}
         LoggedInUser={null}
         collective={null}
@@ -134,6 +133,17 @@ describe('ApplicationForm - applicationData.hasLegalEntity', () => {
     expect(screen.getByRole('button', { name: /submit application/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /visit our docs/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /terms of service/i })).toBeInTheDocument();
+  });
+
+  it('calls onBack to reset the form values before navigating back', () => {
+    const backSpy = jest.spyOn(window.history, 'back').mockImplementation(() => {});
+    const onBack = jest.fn();
+    renderForm({ onBack });
+
+    fireEvent.click(screen.getByRole('button', { name: /^back$/i }));
+
+    expect(onBack).toHaveBeenCalledTimes(1);
+    backSpy.mockRestore();
   });
 
   it('toggles the code section with the expand button', () => {
@@ -390,6 +400,29 @@ describe('ApplicationForm - automatic field population from the repository info'
     // The license is always derived from the repository, the tags are merged with the existing ones
     expect(applicationData.licenseSpdxId).toBe('MIT');
     expect(collective.tags).toEqual(['manual-tag', 'opencollective', 'react']);
+  });
+
+  it('replaces the tags when fetching information for a different repository', async () => {
+    mockFetchEcosystemsRepositoryInfo.mockImplementation((url: string) =>
+      Promise.resolve({
+        ...ECOSYSTEMS_REPO_ENTRY,
+        repository: {
+          ...ECOSYSTEMS_REPO_ENTRY.repository,
+          topics: url.includes('repo-b') ? ['topic-b'] : ['topic-a'],
+        },
+      }),
+    );
+
+    renderForm();
+    fillRequiredFields();
+
+    changeRepositoryUrl('https://github.com/foo/repo-a');
+    await flushRepositoryInfoDebounce();
+    changeRepositoryUrl('https://github.com/foo/repo-b');
+    await flushRepositoryInfoDebounce();
+
+    const { collective } = await submitAndReadVariables();
+    expect(collective.tags).toEqual(['topic-b']);
   });
 
   it('keeps the existing tags when the fetched repository has no license nor topics', async () => {

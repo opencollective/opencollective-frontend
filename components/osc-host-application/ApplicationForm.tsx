@@ -173,7 +173,7 @@ const ApplicationForm = ({
   LoggedInUser,
   loadingLoggedInUser,
   initialValues,
-  setInitialValues,
+  onBack = null,
   loadingCollective,
   canApplyWithCollective,
   router,
@@ -203,6 +203,8 @@ const ApplicationForm = ({
   );
   // Last URL a fetch was started for (to attribute fetch errors to the current URL)
   const lastFetchUrlRef = useRef(null);
+  // URL of the last repository info applied to the form (to reset tags when the repository changes)
+  const previousRepositoryUrlRef = useRef(null);
 
   // Application rules state (see `applicationRules.ts`)
   const [confirmedRuleIds, setConfirmedRuleIds] = useState([]);
@@ -268,10 +270,16 @@ const ApplicationForm = ({
       return;
     }
 
+    const isDifferentRepository =
+      previousRepositoryUrlRef.current !== null && previousRepositoryUrlRef.current !== repositoryInfo.url;
+    previousRepositoryUrlRef.current = repositoryInfo.url;
+
     formik.setFieldValue('applicationData.licenseSpdxId', toSpdxLicenseId(repository.license));
     if (!canApplyWithCollective) {
-      // The tags field only exists when applying with a new collective
-      const existingTags = formik.values.collective?.tags || [];
+      // The tags field only exists when applying with a new collective. When the repository
+      // changes, drop the tags from the previous repository (and any manual tags) and use the
+      // new repository's topics instead.
+      const existingTags = isDifferentRepository ? [] : formik.values.collective?.tags || [];
       const repositoryTags = toRepositoryTags(repository.topics).filter(tag => !existingTags.includes(tag));
       formik.setFieldValue('collective.tags', [...existingTags, ...repositoryTags]);
     }
@@ -1113,7 +1121,7 @@ const ApplicationForm = ({
                           variant="outline"
                           size="lg"
                           onClick={() => {
-                            setInitialValues({ ...initialValues, ...values });
+                            onBack?.();
                             if (typeof window !== 'undefined') {
                               window.history.back();
                             }
