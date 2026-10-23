@@ -131,7 +131,9 @@ export type EcosystemsRepositorySnapshot = {
 };
 
 export async function fetchEcosystemsRepositoryInfo(repositoryUrl: string): Promise<EcosystemsRepoSummary> {
-  const response = await fetch(`/api/ecosystems/repository?url=${encodeURIComponent(repositoryUrl)}`);
+  const response = await fetch(`/api/ecosystems/repository?url=${encodeURIComponent(repositoryUrl)}`, {
+    signal: AbortSignal.timeout(10_000),
+  });
   const json = await response.json().catch(() => null);
   if (!response.ok) {
     throw new Error(json?.error?.message || `Failed to fetch the repository information (${response.status})`);

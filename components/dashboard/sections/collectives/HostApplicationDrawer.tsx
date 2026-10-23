@@ -408,9 +408,16 @@ export default function HostApplicationDrawer({
                             !hasEnoughAdmins && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <span className="inline-flex">
+                                  <button
+                                    type="button"
+                                    aria-label={intl.formatMessage({
+                                      id: 'HostApplication.drawer.pendingAdmins',
+                                      defaultMessage: 'Admin invitations are still pending',
+                                    })}
+                                    className="inline-flex rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
+                                  >
                                     <AlertTriangle size={12} className="text-red-600" />
-                                  </span>
+                                  </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <FormattedMessage

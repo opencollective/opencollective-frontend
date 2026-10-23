@@ -373,10 +373,12 @@ const ApplicationForm = ({
     }
   };
 
-  if (error) {
-    // Scroll the user to the top in order to see the error message
-    window.scrollTo(0, 0);
-  }
+  useEffect(() => {
+    if (error) {
+      // Scroll the user to the top in order to see the error message
+      window.scrollTo(0, 0);
+    }
+  }, [error]);
 
   // Turn licenses into an array and sort them on label/name
   const spdxLicenseList = Object.keys(spdxLicenses)
@@ -527,7 +529,7 @@ const ApplicationForm = ({
                   ]);
 
                 const handleSlugChange = e => {
-                  if (!touched.slug) {
+                  if (!(touched.collective as { slug?: boolean })?.slug) {
                     setFieldValue('collective.slug', suggestSlug(e.target.value));
                   }
                 };

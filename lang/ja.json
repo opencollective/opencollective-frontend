@@ -2342,6 +2342,7 @@
   "HostApplication.customData.typeOfProject": "Type of project",
   "HostApplication.drawer.copyId": "Copy application ID",
   "HostApplication.drawer.details": "Application details",
+  "HostApplication.drawer.pendingAdmins": "Admin invitations are still pending",
   "HostApplication.drawer.title": "Host application",
   "HostApplication.Expired": "Expired",
   "HostApplication.form.aboutYourCommunity": "About your Community {optional}",

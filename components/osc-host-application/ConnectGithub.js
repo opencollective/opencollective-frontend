@@ -103,7 +103,11 @@ const ConnectGithub = ({ setGithubInfo, nextDisabled }) => {
               id="kwIdJS"
               values={{
                 ApplyLink: chunks => (
-                  <Link href={nextLinkPath} className="text-primary underline-offset-4 hover:underline">
+                  <Link
+                    href={nextLinkPath}
+                    onClick={() => setGithubInfo({})}
+                    className="text-primary underline-offset-4 hover:underline"
+                  >
                     {chunks}
                   </Link>
                 ),
