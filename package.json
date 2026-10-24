@@ -271,7 +271,7 @@
     "npm-run-all2": "^9.0.0",
     "nyc": "^18.0.0",
     "pdf-parse": "^2.4.5",
-    "@playwright/test": "1.64.0",
+    "@playwright/test": "1.64.1",
     "postcss": "8.5.30",
     "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.0",
