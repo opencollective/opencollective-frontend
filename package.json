@@ -272,7 +272,7 @@
     "nyc": "^18.0.0",
     "pdf-parse": "^2.4.5",
     "@playwright/test": "1.64.0",
-    "postcss": "8.5.30",
+    "postcss": "8.5.31",
     "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "prop-types": "^15.8.1",
