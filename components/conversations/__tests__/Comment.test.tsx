@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
+import { CommentType } from '../../../lib/graphql/types/v2/graphql';
 import { withRequiredProviders } from '../../../test/providers';
 
 import HTMLContent from '../../HTMLContent';
@@ -9,7 +10,7 @@ import Comment from '../Comment';
 jest.mock(
   '../../InlineEditField',
   () =>
-    ({ children }) =>
+    ({ children }: { children: (state: { isEditing: boolean }) => React.ReactNode }) =>
       children({ isEditing: false }),
 );
 jest.mock('../../RichTextEditor', () => () => null);
@@ -24,7 +25,16 @@ const html =
 
 describe('comment image links', () => {
   it('opens a linked image separately while keeping ordinary comment links unchanged', () => {
-    render(withRequiredProviders(<Comment comment={{ id: 'comment-id', createdAt: '2026-10-23', html }} />));
+    render(
+      withRequiredProviders(
+        <Comment
+          comment={{ id: 'comment-id', createdAt: '2026-10-23', html, type: CommentType.COMMENT }}
+          reactions={[]}
+          onDelete={jest.fn()}
+          onReplyClick={jest.fn()}
+        />,
+      ),
+    );
 
     const imageLink = screen.getByRole('link', { name: 'Receipt' });
     expect(imageLink).toHaveAttribute('href', 'https://example.org/receipt.png');
