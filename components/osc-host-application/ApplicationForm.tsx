@@ -171,8 +171,9 @@ const RuleNotes = ({ field, notes, confirmedRuleIds, onToggleConfirmation }) => 
 
 /**
  * Blocking application rule errors displayed above the form. Scrolls the page back to the top
- * when they appear (and when the set of errors changes), so the applicant sees why submission is
- * disabled even if they clicked the button from the bottom of the form.
+ * when the panel appears (or its content changes), so the applicant sees why submission is
+ * disabled. Errors anchored to a field (e.g. `message`) are rendered by that field instead and
+ * never reach this panel.
  */
 const RuleErrors = ({ flags }) => {
   const flagIds = flags.map(flag => flag.id).join(',');
@@ -507,8 +508,11 @@ const ApplicationForm = ({
                 // The repository lookup can still raise blocking rules: block the submission while it is pending
                 const canSubmit = submissionGate.canSubmit && !isRepositoryInfoLoading;
                 rulesRef.current = { flags: ruleFlags, gate: { ...submissionGate, canSubmit } };
-                // Errors gate the submission and stay in the panel above the submit button
+                // Errors gate the submission: field-anchored errors render on their field, the
+                // remaining ones stay in the panel above the submit button
                 const errorFlags = ruleFlags.filter(flag => flag.severity === 'error');
+                const messageError = errorFlags.find(flag => flag.field === 'message');
+                const panelErrorFlags = errorFlags.filter(flag => flag.field !== 'message');
                 const toggleRuleConfirmation = (ruleId, checked) =>
                   setConfirmedRuleIds(ids => (checked === true ? [...ids, ruleId] : ids.filter(id => id !== ruleId)));
                 const ruleNotes = (field, fallback = null) => {
@@ -590,7 +594,7 @@ const ApplicationForm = ({
 
                 return (
                   <Form data-cy="ccf-form" className="flex flex-col gap-4">
-                    <RuleErrors flags={errorFlags} />
+                    <RuleErrors flags={panelErrorFlags} />
 
                     <div className="mt-3 flex flex-col gap-8 rounded-lg border border-border p-4 sm:mt-0 sm:p-8">
                       <div className="flex flex-col gap-2">
@@ -1069,6 +1073,7 @@ const ApplicationForm = ({
                             required={true}
                             label={intl.formatMessage(i18nLabels.tellUsMoreLabel)}
                             hint={ruleNotes('message', <FormattedMessage {...i18nLabels.tellUsMoreHelpText} />)}
+                            error={messageError ? intl.formatMessage(RULE_MESSAGES[messageError.id]) : undefined}
                           >
                             {({ field }) => (
                               <Textarea
@@ -1157,16 +1162,29 @@ const ApplicationForm = ({
                           <ArrowLeft size={16} />
                           <FormattedMessage id="Back" defaultMessage="Back" />
                         </Button>
-                        <Button
-                          type="submit"
-                          size="lg"
-                          loading={submitting}
-                          disabled={!canSubmit}
-                          data-cy="ccf-form-submit"
+                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- catches clicks on the disabled submit button so the error panel can be scrolled into view */}
+                        <div
+                          className="flex"
+                          data-cy="ccf-form-submit-wrapper"
+                          onClick={() => {
+                            // The button is disabled while blocked: scroll up so the applicant sees why
+                            if (!canSubmit) {
+                              window.scrollTo(0, 0);
+                            }
+                          }}
                         >
-                          <FormattedMessage id="actions.submitApplication" defaultMessage="Submit application" />
-                          <ArrowRight size={16} />
-                        </Button>
+                          <Button
+                            type="submit"
+                            size="lg"
+                            className="w-full"
+                            loading={submitting}
+                            disabled={!canSubmit}
+                            data-cy="ccf-form-submit"
+                          >
+                            <FormattedMessage id="actions.submitApplication" defaultMessage="Submit application" />
+                            <ArrowRight size={16} />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </Form>

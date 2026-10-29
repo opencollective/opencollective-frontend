@@ -643,6 +643,54 @@ describe('ApplicationForm - application rules', () => {
     }
   });
 
+  it('shows the empty-application error on the message field instead of the error panel', () => {
+    renderForm();
+    fillRequiredFields();
+
+    // Clearing the description leaves a short message: the application has no usable text
+    fireEvent.change(screen.getByLabelText(/what does your collective do/i), { target: { value: '' } });
+
+    expect(screen.getByText(/don't have enough information/i)).toBeInTheDocument();
+    expect(rulesPanel()).toBeNull();
+    expect(submitButton()).toBeDisabled();
+  });
+
+  it('does not scroll to the top while typing the application message', () => {
+    const scrollTo = jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    try {
+      renderForm();
+      fillRequiredFields();
+
+      // Field-anchored errors never reach the panel, so typing cannot trigger the panel scroll
+      expect(rulesPanel()).toBeNull();
+      expect(scrollTo).not.toHaveBeenCalled();
+    } finally {
+      scrollTo.mockRestore();
+    }
+  });
+
+  it('scrolls to the top when clicking the blocked submit button', async () => {
+    const scrollTo = jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    jest.useFakeTimers();
+    try {
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue(
+        weakRepositoryEntry({ owner: { login: 'foo', kind: 'organization' } }),
+      );
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // The button is disabled while blocked, so the click lands on its wrapper
+      scrollTo.mockClear();
+      fireEvent.click(document.querySelector('[data-cy="ccf-form-submit-wrapper"]'));
+      expect(scrollTo).toHaveBeenCalledWith(0, 0);
+    } finally {
+      jest.useRealTimers();
+      scrollTo.mockRestore();
+    }
+  });
+
   it('requires the copyright confirmation for copyright-sensitive projects', async () => {
     renderForm();
     fillRequiredFields();
