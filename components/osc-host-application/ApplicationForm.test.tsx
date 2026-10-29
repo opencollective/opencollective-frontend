@@ -711,6 +711,43 @@ describe('ApplicationForm - application rules', () => {
     }
   });
 
+  it('scrolls to the confirmation note when a warning requires confirmation', () => {
+    const scrollTo = jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    try {
+      renderForm();
+      fillRequiredFields();
+      fireEvent.change(screen.getByLabelText(/collective name/i), { target: { value: 'Prysm - M3U IPTV player' } });
+
+      const confirmation = fieldRules('message');
+      const scrollIntoView = jest.fn();
+      confirmation.scrollIntoView = scrollIntoView;
+
+      fireEvent.click(document.querySelector('[data-cy="ccf-form-submit-wrapper"]'));
+
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
+      expect(scrollTo).not.toHaveBeenCalled();
+    } finally {
+      scrollTo.mockRestore();
+    }
+  });
+
+  it('does not scroll when only the repository lookup blocks the submission', () => {
+    const scrollTo = jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    jest.useFakeTimers();
+    try {
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar'); // Lookup pending
+
+      fireEvent.click(document.querySelector('[data-cy="ccf-form-submit-wrapper"]'));
+
+      expect(scrollTo).not.toHaveBeenCalled();
+    } finally {
+      jest.useRealTimers();
+      scrollTo.mockRestore();
+    }
+  });
+
   it('requires the copyright confirmation for copyright-sensitive projects', async () => {
     renderForm();
     fillRequiredFields();

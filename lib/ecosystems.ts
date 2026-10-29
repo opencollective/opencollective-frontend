@@ -137,7 +137,10 @@ export async function fetchEcosystemsRepositoryInfo(repositoryUrl: string): Prom
   const json = await response.json().catch(() => null);
   if (!response.ok) {
     throw new Error(json?.error?.message || `Failed to fetch the repository information (${response.status})`);
+  } else if (!json || typeof json !== 'object') {
+    throw new Error('Failed to parse the repository information');
   }
+
   return json;
 }
 

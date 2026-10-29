@@ -206,9 +206,21 @@ const RuleErrors = ({ flags }) => {
  * Scrolls the applicant to the blocking error: the top panel when it holds non-field errors,
  * otherwise the field that carries the only blocking error (e.g. the application message).
  */
-const scrollToBlockingError = flags => {
+const scrollToBlockingError = (flags, { needsConfirmation = [] } = {}) => {
   const blockingFlags = flags.filter(flag => flag.severity === 'error');
-  const onlyMessageErrors = blockingFlags.length > 0 && blockingFlags.every(flag => flag.field === 'message');
+  if (blockingFlags.length === 0) {
+    // Warnings requiring an explicit confirmation (e.g. copyright) are the block: show them
+    const confirmationFlag = flags.find(flag => needsConfirmation.includes(flag.id));
+    if (confirmationFlag) {
+      document
+        .querySelector(`[data-cy="ccf-form-rules-${confirmationFlag.field}"]`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    // Only the repository lookup loading state blocks in that case: there is nothing to scroll to
+    return;
+  }
+
+  const onlyMessageErrors = blockingFlags.every(flag => flag.field === 'message');
   if (onlyMessageErrors) {
     document.querySelector('[data-cy="ccf-form-message"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   } else {
@@ -363,7 +375,7 @@ const ApplicationForm = ({
     // Never submit while the application rules block it (e.g. when submitted with the Enter key)
     const { flags: ruleFlags, gate: submissionGate } = rulesRef.current;
     if (!submissionGate.canSubmit) {
-      scrollToBlockingError(ruleFlags);
+      scrollToBlockingError(ruleFlags, submissionGate);
       return;
     }
 
@@ -1184,7 +1196,7 @@ const ApplicationForm = ({
                           onClick={() => {
                             // The button is disabled while blocked: scroll up so the applicant sees why
                             if (!canSubmit) {
-                              scrollToBlockingError(ruleFlags);
+                              scrollToBlockingError(ruleFlags, submissionGate);
                             }
                           }}
                         >

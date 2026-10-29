@@ -233,5 +233,17 @@ describe('lib/ecosystems', () => {
 
       await expect(fetchEcosystemsRepositoryInfo('https://github.com/foo/bar')).rejects.toThrow('Rate limit exceeded');
     });
+
+    it('throws when a successful response cannot be parsed', async () => {
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.reject(new Error('invalid json')) });
+      await expect(fetchEcosystemsRepositoryInfo('https://github.com/foo/bar')).rejects.toThrow(
+        /Failed to parse the repository information/,
+      );
+
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(null) });
+      await expect(fetchEcosystemsRepositoryInfo('https://github.com/foo/bar')).rejects.toThrow(
+        /Failed to parse the repository information/,
+      );
+    });
   });
 });
