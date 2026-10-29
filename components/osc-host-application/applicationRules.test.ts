@@ -81,6 +81,22 @@ describe('applicationRules - metrics', () => {
     expect(
       getContributors(
         repository({
+          commitStats: null,
+          packages: [{ ...repository().packages[0], maintainers: [] }],
+        }),
+      ),
+    ).toBeNull(); // Empty maintainers can mean missing metadata, not a confirmed zero
+    expect(
+      getContributors(
+        repository({
+          commitStats: { totalCommits: 1, totalCommitters: 0 },
+          packages: [],
+        }),
+      ),
+    ).toBe(0); // A reported zero is a confirmed zero
+    expect(
+      getContributors(
+        repository({
           commitStats: { totalCommits: 1, totalCommitters: 2 },
           packages: [
             {
