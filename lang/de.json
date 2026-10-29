@@ -3783,6 +3783,7 @@
   "SecurityChecksModal.subtitle": "Für diese Ausgabe wurden mehrere Sicherheitsprüfungen markiert. Bitte prüfe sie und fahre mit Vorsicht fort.",
   "SecurityChecksModal.title": "Sicherheitsprüfungen",
   "SecurityScope.All": "Alle Bereiche",
+  "SecurityScope.LegalDocument": "Legal Document",
   "SecurityScope.Payee": "Zahlungsempfänger",
   "seeRawValues": "Alle anzeigen",
   "sEJpMg": "Um deinen Beitrag von {amountAndInterval} an {collective} fortzusetzen, wähle eine vorhandene Zahlungsmethode oder füge eine neue hinzu.",

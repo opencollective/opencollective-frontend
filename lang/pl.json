@@ -3783,6 +3783,7 @@
   "SecurityChecksModal.subtitle": "Dla tego wydatku zaznaczono wiele kontroli bezpieczeństwa. Proszę przejrzeć i zachować ostrożność.",
   "SecurityChecksModal.title": "Kontrola Bezpieczeństwa",
   "SecurityScope.All": "Wszystkie zakresy",
+  "SecurityScope.LegalDocument": "Legal Document",
   "SecurityScope.Payee": "Odbiorca",
   "seeRawValues": "See all",
   "sEJpMg": "To resume your {amountAndInterval} contribution to {collective}, pick an existing payment method or add a new one.",

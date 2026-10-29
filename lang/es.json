@@ -3783,6 +3783,7 @@
   "SecurityChecksModal.subtitle": "Se han marcado múltiples Controles de Seguridad para este Gasto. Por favor, revisa y procede con cautela.",
   "SecurityChecksModal.title": "Controles de Seguridad",
   "SecurityScope.All": "Todos los Ámbitos",
+  "SecurityScope.LegalDocument": "Legal Document",
   "SecurityScope.Payee": "Beneficiario",
   "seeRawValues": "Ver todo",
   "sEJpMg": "Para reanudar tu colaboración de {amountAndInterval} con {collective}, elige un método de pago existente o añade uno nuevo.",
