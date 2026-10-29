@@ -354,9 +354,21 @@ const containsKeyword = (text: string, keywords: string[]): boolean => {
 /**
  * Evaluates the application against all rules. Returns the flags to display - empty
  * when the application raises no issue.
+ *
+ * Hosts can let applicants submit even when a rule would normally block (`blockOnErrors: false`):
+ * blocking rules are then omitted entirely, so the applicant is not shown an error they cannot act on.
  */
-export function evaluateApplication(facts: ApplicationFacts): RuleFlag[] {
+export function evaluateApplication(
+  facts: ApplicationFacts,
+  { blockOnErrors = true }: { blockOnErrors?: boolean } = {},
+): RuleFlag[] {
   const flags: RuleFlag[] = [];
+  // Push a blocking rule only when the host wants the form to hard-block
+  const pushError = (id: RuleId) => {
+    if (blockOnErrors) {
+      flags.push({ id, severity: 'error' });
+    }
+  };
   const url = (facts.repositoryUrl || '').trim();
   const name = facts.name || '';
   const message = facts.message || '';
@@ -391,7 +403,7 @@ export function evaluateApplication(facts: ApplicationFacts): RuleFlag[] {
   // Application text (only once the applicant engaged with it, to avoid scolding an empty form)
   if (facts.applicationTextEngaged) {
     if (!description && message.trim().length < RULES_CONFIG.MESSAGE_EMPTY_LENGTH) {
-      flags.push({ id: 'empty-application', severity: 'error' });
+      pushError('empty-application');
     } else if (message.trim().length < RULES_CONFIG.MESSAGE_THIN_LENGTH) {
       flags.push({ id: 'thin-application', severity: 'warning' });
     }
@@ -405,15 +417,17 @@ export function evaluateApplication(facts: ApplicationFacts): RuleFlag[] {
   const communityMitigated = teamSize >= 2 && message.trim().length >= RULES_CONFIG.MESSAGE_SUBSTANTIAL_LENGTH;
 
   if (noCommunity && onPersonalAccount && weak && !communityMitigated) {
-    flags.push({ id: 'early-stage-personal-account', severity: 'error' });
+    pushError('early-stage-personal-account');
   } else {
     if (noCommunity) {
-      flags.push(
-        communityMitigated ? { id: 'no-community', severity: 'warning' } : { id: 'no-community', severity: 'error' },
-      );
+      if (communityMitigated) {
+        flags.push({ id: 'no-community', severity: 'warning' });
+      } else {
+        pushError('no-community');
+      }
     }
     if (onPersonalAccount && weak) {
-      flags.push({ id: 'personal-account', severity: 'error' });
+      pushError('personal-account');
     } else if (onPersonalAccount) {
       flags.push({ id: 'personal-account-convert', severity: 'warning' });
     }
@@ -423,7 +437,7 @@ export function evaluateApplication(facts: ApplicationFacts): RuleFlag[] {
   }
 
   if (ageInMonths !== null && ageInMonths < RULES_CONFIG.EARLY_STAGE_MONTHS && weak) {
-    flags.push({ id: 'early-stage', severity: 'error' });
+    pushError('early-stage');
   } else if (ageInMonths !== null && ageInMonths < RULES_CONFIG.EARLY_STAGE_MONTHS) {
     flags.push({ id: 'early-stage', severity: 'warning' });
   }
@@ -437,7 +451,7 @@ export function evaluateApplication(facts: ApplicationFacts): RuleFlag[] {
     const inactiveForMonths = (Date.now() - lastCommitAt) / (30 * 24 * 60 * 60 * 1000);
     const stronglyUsed = usage !== null && usage >= RULES_CONFIG.STRONG_USAGE;
     if (!isNaN(inactiveForMonths) && inactiveForMonths > RULES_CONFIG.INACTIVE_MONTHS && !stronglyUsed) {
-      flags.push({ id: 'inactive', severity: 'error' });
+      pushError('inactive');
     }
   }
 
@@ -455,7 +469,7 @@ export function evaluateApplication(facts: ApplicationFacts): RuleFlag[] {
   }
 
   if (repository?.archived) {
-    flags.push({ id: 'archived', severity: 'error' });
+    pushError('archived');
   }
 
   if (repository?.isFork) {

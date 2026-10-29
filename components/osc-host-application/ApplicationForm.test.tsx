@@ -600,6 +600,29 @@ describe('ApplicationForm - application rules', () => {
     }
   });
 
+  it('omits errors when the host disabled blocking', async () => {
+    jest.useFakeTimers();
+    try {
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue(
+        weakRepositoryEntry({ owner: { login: 'foo', kind: 'organization' } }),
+      );
+      renderForm({ host: { settings: { hostApplication: { blockOnErrors: false } } } });
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      // The no-community error is not shown at all: the applicant can submit
+      expect(fieldRules('repositoryUrl')).toBeNull();
+      expect(rulesPanel()).toBeNull();
+      expect(submitButton()).toBeEnabled();
+
+      submitForm();
+      await waitFor(() => expect(mockMutate).toHaveBeenCalledTimes(1));
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('requires the copyright confirmation for copyright-sensitive projects', async () => {
     renderForm();
     fillRequiredFields();

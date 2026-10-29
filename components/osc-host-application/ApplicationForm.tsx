@@ -184,6 +184,8 @@ const ApplicationForm = ({
 }) => {
   const intl = useIntl();
   const removeLabel = intl.formatMessage({ id: 'Remove', defaultMessage: 'Remove' });
+  // Hosts can choose to omit blocking rules instead of blocking the submission (default: block)
+  const blockOnErrors = host?.settings?.hostApplication?.blockOnErrors !== false;
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
 
   const [codeSectionExpanded, setCodeSectionExpanded] = useState(false);
@@ -449,23 +451,26 @@ const ApplicationForm = ({
                 formikRef.current = formik;
 
                 // Application rules: warnings and blocking errors, from the form values + repository info
-                const ruleFlags = evaluateApplication({
-                  typeOfProject: values.applicationData.typeOfProject,
-                  repositoryUrl: values.applicationData.repositoryUrl,
-                  name: values.collective?.name,
-                  message: values.message,
-                  description: values.collective?.description,
-                  teamSize: 1 + (values.inviteMembers?.length || 0),
-                  applicationTextEngaged: Boolean(
-                    (values.message || '').trim() ||
-                    (values.collective?.description || '').trim() ||
-                    touched.message ||
-                    touched.description ||
-                    formik.submitCount > 0,
-                  ),
-                  repositoryInfoState,
-                  repository: repositorySnapshot,
-                });
+                const ruleFlags = evaluateApplication(
+                  {
+                    typeOfProject: values.applicationData.typeOfProject,
+                    repositoryUrl: values.applicationData.repositoryUrl,
+                    name: values.collective?.name,
+                    message: values.message,
+                    description: values.collective?.description,
+                    teamSize: 1 + (values.inviteMembers?.length || 0),
+                    applicationTextEngaged: Boolean(
+                      (values.message || '').trim() ||
+                      (values.collective?.description || '').trim() ||
+                      touched.message ||
+                      touched.description ||
+                      formik.submitCount > 0,
+                    ),
+                    repositoryInfoState,
+                    repository: repositorySnapshot,
+                  },
+                  { blockOnErrors },
+                );
                 const submissionGate = getSubmissionGate(ruleFlags, { confirmedRuleIds });
                 // The repository lookup can still raise blocking rules: block the submission while it is pending
                 const canSubmit = submissionGate.canSubmit && !isRepositoryInfoLoading;

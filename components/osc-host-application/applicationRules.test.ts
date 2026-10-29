@@ -437,3 +437,24 @@ describe('applicationRules - getSubmissionGate', () => {
     expect(getSubmissionGate([])).toMatchObject({ canSubmit: true });
   });
 });
+
+// ─── Host opt-out ───────────────────────────────────────────────────────────
+
+describe('applicationRules - blockOnErrors host setting', () => {
+  it('omits blocking rules when the host opted out', () => {
+    const archived = facts({ repository: repository({ archived: true }) });
+
+    const blocking = evaluateApplication(archived);
+    expect(flagById(blocking, 'archived')?.severity).toBe('error');
+    expect(getSubmissionGate(blocking)).toMatchObject({ canSubmit: false, hardBlocks: ['archived'] });
+
+    const relaxed = evaluateApplication(archived, { blockOnErrors: false });
+    expect(ids(relaxed)).not.toContain('archived');
+    expect(getSubmissionGate(relaxed)).toMatchObject({ canSubmit: true, hardBlocks: [] });
+  });
+
+  it('still requires the copyright confirmation when the host opted out', () => {
+    const flags = evaluateApplication(facts({ name: 'Prysm - M3U IPTV player' }), { blockOnErrors: false });
+    expect(getSubmissionGate(flags)).toMatchObject({ canSubmit: false, needsConfirmation: ['copyright'] });
+  });
+});
