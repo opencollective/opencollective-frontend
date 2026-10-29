@@ -1,64 +1,30 @@
-import React, { Fragment } from 'react';
-import { Github } from '@styled-icons/fa-brands/Github';
-import { Star } from '@styled-icons/fa-solid/Star';
+import React from 'react';
+import { Star } from 'lucide-react';
+import { FormattedMessage } from 'react-intl';
 
-import Container from '../Container';
-import { Box, Flex } from '../Grid';
-import { P, Span } from '../Text';
-
-const RepositoryEntry = ({ radio, value }) => {
+const RepositoryEntry = ({ value }) => {
   const { type } = value.owner;
-  const repositoryTypeName = type === 'User' ? 'Personal Repo' : 'Organization Repo';
 
   return (
-    <Fragment>
-      <Container display="flex" justifyContent="space-between" alignItems="start">
-        <Flex alignItems="center" flexGrow="1">
-          <Span mr={4}>{radio}</Span>
-          <Span mr={3} color="black.300">
-            <Github size={40} />
-          </Span>
-          <Flex flexDirection="column" flex="1">
-            <P fontWeight={500} fontSize="0.85rem">
-              {value.full_name}
-            </P>
-            <Flex justifyContent="space-between" flexGrow="1">
-              <P
-                textTransform="uppercase"
-                fontWeight={600}
-                color="black.500"
-                fontSize="0.65rem"
-                mt={2}
-                letterSpacing="0.4px"
-              >
-                {repositoryTypeName}
-              </P>
-              <Box display={['block', null, 'none']} ml={3} mr={1}>
-                <Flex gap={4} color="black.600" mt={1} alignItems="center">
-                  <P fontWeight={600} fontSize="0.75rem" lineHeight="0.85rem">
-                    {value.stargazers_count}
-                  </P>
-                  <Star size={12} />
-                </Flex>
-              </Box>
-            </Flex>
-          </Flex>
-        </Flex>
-        <Box display={['none', null, 'block']}>
-          <Flex gap={4} color="black.600" mt={1}>
-            <P fontWeight={600} fontSize="0.75rem" lineHeight="0.85rem">
-              {value.stargazers_count}
-            </P>
-            <Star size={12} />
-          </Flex>
-        </Box>
-      </Container>
-      {value.description && (
-        <P color="black.700" fontSize="0.75rem" lineHeight="1.15rem" fontWeight="400" width={1} ml={4} mt={3} px={2}>
-          {value.description}
-        </P>
-      )}
-    </Fragment>
+    <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium text-foreground">{value.full_name}</p>
+          <p className="text-[0.65rem] font-semibold tracking-wide text-muted-foreground uppercase">
+            {type === 'User' ? (
+              <FormattedMessage id="GithubRepositories.personalRepo" defaultMessage="Personal Repo" />
+            ) : (
+              <FormattedMessage id="GithubRepositories.organizationRepo" defaultMessage="Organization Repo" />
+            )}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground">
+          <span>{value.stargazers_count}</span>
+          <Star className="size-3.5" />
+        </div>
+      </div>
+      {value.description && <p className="text-xs leading-5 text-muted-foreground">{value.description}</p>}
+    </div>
   );
 };
 

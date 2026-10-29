@@ -124,7 +124,7 @@ export function FormField({
               </Label>
             )}
             {children ? children({ form, meta, field: fieldAttributes }) : <Input {...fieldAttributes} />}
-            {hint && <p className={cn('text-sm text-muted-foreground', hintClassName)}>{hint}</p>}
+            {hint && <div className={cn('text-sm text-muted-foreground', hintClassName)}>{hint}</div>}
             {hasError && showError && (
               <p className={cn('text-sm text-red-600', errorClassName)}>
                 {isOCError(error)
