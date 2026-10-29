@@ -3783,6 +3783,7 @@
   "SecurityChecksModal.subtitle": "Várias verificações de segurança foram sinalizadas para esta despesa. Revise e prossiga com cautela.",
   "SecurityChecksModal.title": "Verificações de segurança",
   "SecurityScope.All": "Todos os escopos",
+  "SecurityScope.LegalDocument": "Legal Document",
   "SecurityScope.Payee": "Recebedor",
   "seeRawValues": "Ver tudo",
   "sEJpMg": "Para retomar sua contribuição de {amountAndInterval} para {collective}, escolha um método de pagamento existente ou adicione um novo.",

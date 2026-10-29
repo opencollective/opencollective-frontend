@@ -3783,6 +3783,7 @@
   "SecurityChecksModal.subtitle": "Flera säkerhetskontroller har flaggats för denna kostnad. Vänligen granska och fortsätt med försiktighet.",
   "SecurityChecksModal.title": "Säkerhetskontroller",
   "SecurityScope.All": "Alla omfattningar",
+  "SecurityScope.LegalDocument": "Legal Document",
   "SecurityScope.Payee": "Betalningsmottagare",
   "seeRawValues": "Visa alla",
   "sEJpMg": "To resume your {amountAndInterval} contribution to {collective}, pick an existing payment method or add a new one.",

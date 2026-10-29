@@ -3783,6 +3783,7 @@
   "SecurityChecksModal.subtitle": "Plusieurs alertes de sécurité ont été activées pour cette dépense. Veuillez vérifier et procéder avec prudence.",
   "SecurityChecksModal.title": "Contrôles de sécurité",
   "SecurityScope.All": "Tous les scopes",
+  "SecurityScope.LegalDocument": "Legal Document",
   "SecurityScope.Payee": "Bénéficiaire",
   "seeRawValues": "Tout voir",
   "sEJpMg": "Pour reprendre votre contribution de {amountAndInterval} à {collective}, choisissez un moyen de paiement existant ou ajoutez-en un nouveau.",

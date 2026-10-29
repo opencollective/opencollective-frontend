@@ -3783,6 +3783,7 @@
   "SecurityChecksModal.subtitle": "Multiple Security Checks have been flagged for this Expense. Please review and proceed with caution.",
   "SecurityChecksModal.title": "Security Checks",
   "SecurityScope.All": "All Scopes",
+  "SecurityScope.LegalDocument": "Legal Document",
   "SecurityScope.Payee": "Payee",
   "seeRawValues": "See all",
   "sEJpMg": "To resume your {amountAndInterval} contribution to {collective}, pick an existing payment method or add a new one.",
