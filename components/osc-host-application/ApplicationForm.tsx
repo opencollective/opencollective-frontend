@@ -202,6 +202,20 @@ const RuleErrors = ({ flags }) => {
   );
 };
 
+/**
+ * Scrolls the applicant to the blocking error: the top panel when it holds non-field errors,
+ * otherwise the field that carries the only blocking error (e.g. the application message).
+ */
+const scrollToBlockingError = flags => {
+  const blockingFlags = flags.filter(flag => flag.severity === 'error');
+  const onlyMessageErrors = blockingFlags.length > 0 && blockingFlags.every(flag => flag.field === 'message');
+  if (onlyMessageErrors) {
+    document.querySelector('[data-cy="ccf-form-message"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    window.scrollTo(0, 0);
+  }
+};
+
 const ApplicationForm = ({
   LoggedInUser,
   loadingLoggedInUser,
@@ -349,6 +363,7 @@ const ApplicationForm = ({
     // Never submit while the application rules block it (e.g. when submitted with the Enter key)
     const { flags: ruleFlags, gate: submissionGate } = rulesRef.current;
     if (!submissionGate.canSubmit) {
+      scrollToBlockingError(ruleFlags);
       return;
     }
 
@@ -1169,7 +1184,7 @@ const ApplicationForm = ({
                           onClick={() => {
                             // The button is disabled while blocked: scroll up so the applicant sees why
                             if (!canSubmit) {
-                              window.scrollTo(0, 0);
+                              scrollToBlockingError(ruleFlags);
                             }
                           }}
                         >

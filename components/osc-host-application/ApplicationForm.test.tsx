@@ -691,6 +691,26 @@ describe('ApplicationForm - application rules', () => {
     }
   });
 
+  it('scrolls to the message field when it carries the only blocking error', () => {
+    const scrollTo = jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    try {
+      renderForm();
+      fillRequiredFields();
+      fireEvent.change(screen.getByLabelText(/what does your collective do/i), { target: { value: '' } });
+
+      const message = screen.getByLabelText(/tell us a little about your project/i);
+      const scrollIntoView = jest.fn();
+      message.scrollIntoView = scrollIntoView;
+
+      fireEvent.click(document.querySelector('[data-cy="ccf-form-submit-wrapper"]'));
+
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
+      expect(scrollTo).not.toHaveBeenCalled();
+    } finally {
+      scrollTo.mockRestore();
+    }
+  });
+
   it('requires the copyright confirmation for copyright-sensitive projects', async () => {
     renderForm();
     fillRequiredFields();

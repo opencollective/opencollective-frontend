@@ -160,6 +160,16 @@ describe('lib/ecosystems', () => {
       );
     });
 
+    it('falls back to the contributors commit count when the repository has no commit stats', () => {
+      const snapshot = toRepositorySnapshot({
+        ...REPO_ENTRY,
+        repository: null,
+        contributors: { total_committers: 3, total_commits: 42 },
+      });
+
+      expect(snapshot.commitStats).toEqual({ totalCommits: 42, totalCommitters: 3 });
+    });
+
     it('supports entries without repository or packages', () => {
       const snapshot = toRepositorySnapshot({
         packages: [],

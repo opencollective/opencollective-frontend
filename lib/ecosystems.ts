@@ -216,7 +216,7 @@ export function toRepositorySnapshot(
     lastCommitSha: repository?.commit_stats?.last_synced_commit ?? null,
     commitStats: hasCommitStats
       ? {
-          totalCommits: repository?.commit_stats?.total_commits ?? 0,
+          totalCommits: repository?.commit_stats?.total_commits ?? entry.contributors?.total_commits ?? 0,
           totalCommitters: totalCommitters ?? 0,
           ...(typeof botCommitters === 'number' && { botCommitters }),
         }
