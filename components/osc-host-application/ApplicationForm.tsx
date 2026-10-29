@@ -169,6 +169,38 @@ const RuleNotes = ({ field, notes, confirmedRuleIds, onToggleConfirmation }) => 
   );
 };
 
+/**
+ * Blocking application rule errors displayed above the form. Scrolls the page back to the top
+ * when they appear (and when the set of errors changes), so the applicant sees why submission is
+ * disabled even if they clicked the button from the bottom of the form.
+ */
+const RuleErrors = ({ flags }) => {
+  const flagIds = flags.map(flag => flag.id).join(',');
+
+  useEffect(() => {
+    if (flagIds) {
+      window.scrollTo(0, 0);
+    }
+  }, [flagIds]);
+
+  if (flags.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mx-auto flex w-full max-w-[993px] flex-col gap-2" data-cy="ccf-form-rules">
+      {flags.slice(0, 1).map(flag => (
+        <Alert key={flag.id} variant="destructive">
+          <XCircle className="size-4" />
+          <AlertDescription>
+            <FormattedMessage {...RULE_MESSAGES[flag.id]} />
+          </AlertDescription>
+        </Alert>
+      ))}
+    </div>
+  );
+};
+
 const ApplicationForm = ({
   LoggedInUser,
   loadingLoggedInUser,
@@ -558,18 +590,7 @@ const ApplicationForm = ({
 
                 return (
                   <Form data-cy="ccf-form" className="flex flex-col gap-4">
-                    {errorFlags.length > 0 && (
-                      <div className="mx-auto flex w-full max-w-[993px] flex-col gap-2" data-cy="ccf-form-rules">
-                        {errorFlags.slice(0, 1).map(flag => (
-                          <Alert key={flag.id} variant="destructive">
-                            <XCircle className="size-4" />
-                            <AlertDescription>
-                              <FormattedMessage {...RULE_MESSAGES[flag.id]} />
-                            </AlertDescription>
-                          </Alert>
-                        ))}
-                      </div>
-                    )}
+                    <RuleErrors flags={errorFlags} />
 
                     <div className="mt-3 flex flex-col gap-8 rounded-lg border border-border p-4 sm:mt-0 sm:p-8">
                       <div className="flex flex-col gap-2">

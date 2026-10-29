@@ -623,6 +623,26 @@ describe('ApplicationForm - application rules', () => {
     }
   });
 
+  it('scrolls to the top when rule errors are displayed', async () => {
+    const scrollTo = jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    jest.useFakeTimers();
+    try {
+      mockFetchEcosystemsRepositoryInfo.mockResolvedValue(
+        weakRepositoryEntry({ owner: { login: 'foo', kind: 'organization' } }),
+      );
+      renderForm();
+      fillRequiredFields();
+      changeRepositoryUrl('https://github.com/foo/bar');
+      await flushRepositoryInfoDebounce();
+
+      expect(rulesPanel()).toBeInTheDocument();
+      expect(scrollTo).toHaveBeenCalledWith(0, 0);
+    } finally {
+      jest.useRealTimers();
+      scrollTo.mockRestore();
+    }
+  });
+
   it('requires the copyright confirmation for copyright-sensitive projects', async () => {
     renderForm();
     fillRequiredFields();
