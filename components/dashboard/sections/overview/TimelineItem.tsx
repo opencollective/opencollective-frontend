@@ -10,6 +10,7 @@ import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import { AvatarWithLink } from '../../../AvatarWithLink';
 import DateTime from '../../../DateTime';
+import { FiscalHostNoteBadge } from '../../../FiscalHostNoteBadge';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import StyledLink from '../../../StyledLink';
@@ -31,8 +32,25 @@ const ActivityContent = ({
   contentKey,
 }: {
   activity: TimelineActivity;
-  contentKey?: 'conversation' | 'update';
+  contentKey?: 'conversation' | 'update' | 'fiscalHostNote';
 }) => {
+  if (contentKey === 'fiscalHostNote') {
+    const note = activity?.data?.note as string | undefined;
+    if (!note) {
+      return null;
+    }
+
+    const noteType = (activity?.data?.noteType as 'WARNING' | 'INFO' | 'POSITIVE') || 'INFO';
+    return (
+      <div className="mt-4 space-y-2 rounded-xl bg-slate-50 p-4">
+        <div className="flex items-center gap-2 text-sm font-medium">
+          <FiscalHostNoteBadge note={{ type: noteType, note }} />
+          <FormattedMessage defaultMessage="Fiscal host note" id="FiscalHostNote.Title" />
+        </div>
+        <HTMLContent fontSize="14px" lineHeight="20px" content={note} />
+      </div>
+    );
+  }
   if (!contentKey) {
     return null;
   }

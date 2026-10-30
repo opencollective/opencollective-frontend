@@ -96,15 +96,15 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
       return (
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center">
-            <Avatar collective={account} className="mr-4" radius={48} />
+          <div className="flex items-center gap-2">
+            <Avatar collective={account} radius={48} />
             {account.isFrozen && (
-              <Badge type="info" size="xs" className="mr-2">
+              <Badge type="info" size="xs" className="ml-2">
                 <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
               </Badge>
             )}
             {admins.length === 0 && invitedAdmins.length > 0 && (
-              <Badge size="xs" className="mr-2 whitespace-nowrap">
+              <Badge size="xs" className="whitespace-nowrap">
                 <FormattedMessage defaultMessage="Invited" id="NmK6zP" />
               </Badge>
             )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { pick } from 'lodash-es';
-import { Archive, ArrowLeft, Pencil } from 'lucide-react';
+import { Archive, ArrowLeft, Flag, Pencil } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -11,7 +11,7 @@ import { i18nGraphqlException } from '@/lib/errors';
 import { gql } from '@/lib/graphql/helpers';
 import {
   type AccountReferenceInput,
-  type AccountType,
+  AccountType,
   type CommunityAccountDetailQuery,
   type CommunityAccountDetailQueryVariables,
   LegalDocumentType,
@@ -21,7 +21,9 @@ import formatCollectiveType from '@/lib/i18n/collective-type';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
+import { FiscalHostNoteModal } from '@/components/FiscalHostNoteModal';
 import { KYCTabPeopleDashboard } from '@/components/kyc/dashboard/KYCTabPeopleDashboard';
+import { useModal } from '@/components/ModalContext';
 import StyledModal from '@/components/StyledModal';
 import Tabs from '@/components/Tabs';
 import { Badge } from '@/components/ui/Badge';
@@ -118,6 +120,7 @@ export function AccountDetails(props: AccountDetailsProps) {
   );
 
   const { toast } = useToast();
+  const { showModal } = useModal();
   const [openExpenseId, setOpenExpenseId] = React.useState(null);
   const [openContributionId, setOpenContributionId] = React.useState(null);
   const [editVendor, setEditVendor] = React.useState<VendorFieldsFragment>(null);
@@ -135,6 +138,7 @@ export function AccountDetails(props: AccountDetailsProps) {
       variables: {
         accountId: props.account.id,
         hostSlug: dashboardAccount.slug,
+        includeFiscalHostNote: true,
       },
       fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     },
@@ -143,6 +147,18 @@ export function AccountDetails(props: AccountDetailsProps) {
   const account = query.data?.account;
   const host = query.data?.host;
   const isHostedAccount = HOSTED_ACCOUNT_TYPES.includes(account?.type);
+  const canFlagAccount = Boolean(
+    account &&
+    [
+      AccountType.INDIVIDUAL,
+      AccountType.ORGANIZATION,
+      AccountType.VENDOR,
+      AccountType.COLLECTIVE,
+      AccountType.FUND,
+      AccountType.PROJECT,
+      AccountType.EVENT,
+    ].includes(account.type),
+  );
   const isLoading = query.loading || !query.data;
   const refetch = () => query.refetch();
   const taxForms = host?.hostedLegalDocuments;
@@ -435,7 +451,7 @@ export function AccountDetails(props: AccountDetailsProps) {
       </button>
       <DashboardHeader
         title={
-          <div className="flex items-center gap-3 overflow-hidden">
+          <div className="flex items-center gap-3">
             {isLoading ? (
               <React.Fragment>
                 <Skeleton className="aspect-square size-9" />
@@ -443,7 +459,7 @@ export function AccountDetails(props: AccountDetailsProps) {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <Avatar collective={account} size={60} />
+                <Avatar collective={account} radius={60} />
                 <div className="flex flex-col overflow-hidden">
                   <div className="text-ellipsis">{account?.name || account?.slug}</div>
                   <div className="flex flex-wrap items-center gap-1">
@@ -501,6 +517,27 @@ export function AccountDetails(props: AccountDetailsProps) {
         }
         actions={
           <React.Fragment>
+            {canFlagAccount && (
+              <Button
+                variant="outline"
+                size="sm"
+                data-cy="flag-account-btn"
+                onClick={() =>
+                  showModal(FiscalHostNoteModal, {
+                    host: { slug: dashboardAccount.slug },
+                    account: {
+                      id: account.id,
+                      name: account.name,
+                      fiscalHostNote: account.fiscalHostNote,
+                    },
+                    refetchQueries: ['CommunityAccountDetail', 'PeopleHostDashboard', 'DashboardVendors'],
+                  })
+                }
+              >
+                <Flag size={16} className="mr-1" />
+                <FormattedMessage defaultMessage="Flag account" id="FiscalHostNote.FlagAccount" />
+              </Button>
+            )}
             {!account?.isPrivate && (
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/${account?.slug}`}>

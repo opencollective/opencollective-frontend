@@ -83,9 +83,9 @@ const getColumns = ({ intl, hasKYCFeature }) => {
       const account = row.original;
       const legalName = account.legalName !== account.name && account.legalName;
       return (
-        <div className="flex items-center overflow-hidden text-nowrap">
-          <Avatar size={24} collective={account} mr={2} />
-          <span className="truncate">{account.name || account.slug}</span>
+        <div className="flex items-center text-nowrap">
+          <Avatar size={24} collective={account} />
+          <span className="ml-2 truncate">{account.name || account.slug}</span>
 
           {legalName && <span className="ml-1 truncate text-muted-foreground">{`(${legalName})`}</span>}
         </div>

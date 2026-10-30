@@ -71,6 +71,16 @@ export const hostApplicationFieldsFragment = gql`
             imageUrl
             ...AccountHoverCardFields
             emails
+            fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+              type
+              note
+              updatedAt
+              updatedBy {
+                id
+                name
+                slug
+              }
+            }
           }
         }
       }
@@ -128,6 +138,7 @@ export const hostApplicationsMetadataQuery = gql`
 export const hostApplicationsQuery = gql`
   query HostApplications(
     $hostSlug: String!
+    $includeFiscalHostNote: Boolean! = false
     $limit: Int
     $offset: Int
     $orderBy: ChronologicalOrderInput
@@ -162,6 +173,8 @@ export const hostApplicationsQuery = gql`
 
 export const processApplicationMutation = gql`
   mutation ProcessHostApplication(
+    $hostSlug: String
+    $includeFiscalHostNote: Boolean! = false
     $host: AccountReferenceInput
     $account: AccountReferenceInput
     $hostApplication: HostApplicationReferenceInput
@@ -345,6 +358,16 @@ export const hostedCollectiveFieldsFragment = gql`
           id
           ...AccountHoverCardFields
           emails
+          fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
         }
       }
     }
@@ -388,6 +411,7 @@ export const hostedCollectivesMetadataQuery = gql`
 export const hostedCollectivesQuery = gql`
   query HostedCollectives(
     $hostSlug: String!
+    $includeFiscalHostNote: Boolean! = false
     $limit: Int!
     $offset: Int!
     $sort: OrderByInput
@@ -454,6 +478,16 @@ export const hostedCollectivesQuery = gql`
         nodes {
           id
           unhostedAt(host: { slug: $hostSlug })
+          fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
           ...HostedCollectiveFields
         }
       }
@@ -464,9 +498,19 @@ export const hostedCollectivesQuery = gql`
 `;
 
 export const hostedCollectiveDetailQuery = gql`
-  query HostedCollectiveDetail($id: String!) {
+  query HostedCollectiveDetail($id: String!, $hostSlug: String, $includeFiscalHostNote: Boolean! = false) {
     account(id: $id) {
       id
+      fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+        type
+        note
+        updatedAt
+        updatedBy {
+          id
+          name
+          slug
+        }
+      }
       ...HostedCollectiveFields
       transactions(limit: 10, offset: 0, kind: [ADDED_FUNDS, CONTRIBUTION, EXPENSE]) {
         nodes {
@@ -538,6 +582,8 @@ export const hostedCollectiveDetailQuery = gql`
 
 export const allCollectivesQuery = gql`
   query AllCollectives(
+    $hostSlug: String
+    $includeFiscalHostNote: Boolean! = false
     $limit: Int!
     $offset: Int!
     $sort: OrderByInput
