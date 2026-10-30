@@ -131,6 +131,7 @@ type HostApplicationDrawerProps = {
   open: boolean;
   onClose: () => void;
   applicationId: string;
+  hostSlug?: string;
   editCollectiveMutation?: (collective: { id: number; HostCollectiveId?: number }) => Promise<void>;
 };
 
@@ -138,6 +139,7 @@ export default function HostApplicationDrawer({
   open,
   onClose,
   applicationId,
+  hostSlug,
   editCollectiveMutation,
 }: HostApplicationDrawerProps) {
   const { LoggedInUser } = useLoggedInUser();
@@ -178,7 +180,13 @@ export default function HostApplicationDrawer({
 
   const applicationQuery = useQuery<HostApplicationThreadQuery, HostApplicationThreadQueryVariables>(
     gql`
-      query HostApplicationThread($hostApplication: HostApplicationReferenceInput!, $offset: Int!, $limit: Int!) {
+      query HostApplicationThread(
+        $hostApplication: HostApplicationReferenceInput!
+        $offset: Int!
+        $limit: Int!
+        $hostSlug: String
+        $includeFiscalHostNote: Boolean! = false
+      ) {
         hostApplication(hostApplication: $hostApplication) {
           ...HostApplicationFields
           threadComments: comments(limit: $limit, offset: $offset, orderBy: { field: CREATED_AT, direction: ASC }) {
@@ -201,6 +209,8 @@ export default function HostApplicationDrawer({
         hostApplication: {
           id: applicationId,
         },
+        hostSlug,
+        includeFiscalHostNote: Boolean(hostSlug),
         offset: threadOffset,
         limit: 100,
       },

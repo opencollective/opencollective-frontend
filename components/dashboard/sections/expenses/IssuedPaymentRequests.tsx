@@ -314,8 +314,11 @@ const IssuedPaymentRequests = ({ accountSlug, subpath }: DashboardSectionProps) 
         fromAccount: { slug: accountSlug },
         includeChildrenExpenses: true,
       };
+  const noteHostSlug = account?.hasHosting ? account.slug : account?.host?.slug;
   const variables = {
     ...accountVariables,
+    hostSlug: noteHostSlug,
+    includeFiscalHostNote: Boolean(noteHostSlug),
     fetchGrantHistory: false,
     ...queryFilter.variables,
   };

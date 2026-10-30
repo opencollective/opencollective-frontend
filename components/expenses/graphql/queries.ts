@@ -9,13 +9,54 @@ import {
 } from './fragments';
 
 export const expensePageQuery = gql`
-  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
+  query ExpensePage(
+    $legacyExpenseId: Int!
+    $draftKey: String
+    $offset: Int
+    $totalPaidExpensesDateFrom: DateTime
+    $hostSlug: String
+    $includeFiscalHostNote: Boolean! = false
+  ) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       id
       ...ExpensePageExpenseFields
+      account {
+        fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
+          }
+        }
+      }
+      createdByAccount {
+        fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
+          }
+        }
+      }
       payee {
         id
         ...ExpensePayeeFields
+        fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
+          }
+        }
         stats {
           id
           totalPaidExpenses(dateFrom: $totalPaidExpensesDateFrom) {

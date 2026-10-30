@@ -199,6 +199,8 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
   const { data, loading, refetch, error } = useQuery(accountExpensesQuery, {
     variables: {
       account: { slug: accountSlug },
+      hostSlug,
+      includeFiscalHostNote: Boolean(hostSlug),
       fetchHostForExpenses: false, // Already fetched at the root level
       hasAmountInCreatedByAccountCurrency: false,
       fetchGrantHistory: false,

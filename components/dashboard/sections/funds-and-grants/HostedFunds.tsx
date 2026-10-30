@@ -204,7 +204,7 @@ function HostedFundsList({ accountSlug: hostSlug, subpath }: DashboardSectionPro
   });
 
   const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
-    variables: { hostSlug, ...queryFilter.variables },
+    variables: { hostSlug, includeFiscalHostNote: true, ...queryFilter.variables },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     skip: isUpgradeRequired,

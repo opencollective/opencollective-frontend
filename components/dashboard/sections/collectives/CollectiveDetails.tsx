@@ -495,7 +495,11 @@ const CollectiveDetails = ({
     loading: loadingCollectiveInfo,
     refetch,
   } = useQuery(hostedCollectiveDetailQuery, {
-    variables: { id: collectiveId || c?.id },
+    variables: {
+      id: collectiveId || c?.id,
+      hostSlug: account?.slug,
+      includeFiscalHostNote: Boolean(account?.slug),
+    },
 
     fetchPolicy: 'cache-and-network',
   });

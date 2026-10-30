@@ -1213,6 +1213,16 @@ interface Account {
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
 
   """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
+
+  """
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
@@ -4086,6 +4096,16 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
 
   """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
+
+  """
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
@@ -6022,6 +6042,8 @@ enum ActivityType {
   DEACTIVATED_MONEY_MANAGEMENT
   ACTIVATED_HOSTING
   DEACTIVATED_HOSTING
+  FISCAL_HOST_NOTE_SET
+  FISCAL_HOST_NOTE_REMOVED
   AGREEMENT_CREATED
   AGREEMENT_EDITED
   AGREEMENT_DELETED
@@ -8045,6 +8067,40 @@ type TransactionsAmountGroup {
   isRefund: Boolean
   isHost: Boolean
   expenseType: ExpenseType
+}
+
+"""
+A host-private note about an account, set by a fiscal host admin
+"""
+type FiscalHostNote {
+  """
+  The gravity of the note
+  """
+  type: FiscalHostNoteType!
+
+  """
+  The note content, as sanitized HTML
+  """
+  note: String!
+
+  """
+  When the note was last updated
+  """
+  updatedAt: DateTime
+
+  """
+  The user who last updated the note
+  """
+  updatedBy: Account
+}
+
+"""
+The gravity of a fiscal host note about an account
+"""
+enum FiscalHostNoteType {
+  WARNING
+  INFO
+  POSITIVE
 }
 
 type CommunityStats {
@@ -11680,6 +11736,16 @@ type Bot implements Account {
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
 
   """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
+
+  """
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
@@ -12747,6 +12813,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
 
   """
   Various stats about how this account is connected to the rest of the community
@@ -14408,6 +14484,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
 
   """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
+
+  """
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
@@ -15772,6 +15858,16 @@ type Individual implements Account {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
 
   """
   Various stats about how this account is connected to the rest of the community
@@ -17166,6 +17262,16 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
 
   """
   Various stats about how this account is connected to the rest of the community
@@ -18641,6 +18747,16 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
 
   """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
+
+  """
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
@@ -19817,6 +19933,16 @@ type Vendor implements Account & AccountWithContributions {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
 
   """
   Various stats about how this account is connected to the rest of the community
@@ -22961,6 +23087,8 @@ enum ActivityAndClassesType {
   DEACTIVATED_MONEY_MANAGEMENT
   ACTIVATED_HOSTING
   DEACTIVATED_HOSTING
+  FISCAL_HOST_NOTE_SET
+  FISCAL_HOST_NOTE_REMOVED
   AGREEMENT_CREATED
   AGREEMENT_EDITED
   AGREEMENT_DELETED
@@ -24193,6 +24321,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
 
   """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
+
+  """
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
@@ -25417,6 +25555,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  A host-private note about this account, only visible to admins of the given fiscal host
+  """
+  fiscalHostNote(
+    """
+    The fiscal host the note belongs to
+    """
+    host: AccountReferenceInput!
+  ): FiscalHostNote
 
   """
   Various stats about how this account is connected to the rest of the community
@@ -28767,6 +28915,16 @@ type Mutation {
   ): Agreement!
 
   """
+  Add or update a host-private note about an account. Scope: "host".
+  """
+  setFiscalHostNote(input: SetFiscalHostNoteInput!): FiscalHostNote!
+
+  """
+  Remove a host-private note about an account. Scope: "host".
+  """
+  removeFiscalHostNote(input: RemoveFiscalHostNoteInput!): Boolean!
+
+  """
   Create a new vendor for given host
   """
   createVendor(
@@ -31591,6 +31749,40 @@ input AgreementReferenceInput {
   The internal id of the agreement (ie: 580)
   """
   legacyId: Int @deprecated(reason: "2026-02-25: use id")
+}
+
+input SetFiscalHostNoteInput {
+  """
+  The fiscal host the note belongs to
+  """
+  host: AccountReferenceInput!
+
+  """
+  The account the note is about
+  """
+  account: AccountReferenceInput!
+
+  """
+  The gravity of the note
+  """
+  type: FiscalHostNoteType!
+
+  """
+  The note content, as rich text with links
+  """
+  note: String!
+}
+
+input RemoveFiscalHostNoteInput {
+  """
+  The fiscal host the note belongs to
+  """
+  host: AccountReferenceInput!
+
+  """
+  The account the note is about
+  """
+  account: AccountReferenceInput!
 }
 
 input VendorCreateInput {

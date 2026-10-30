@@ -35,7 +35,7 @@ describe('getVisibleErrors', () => {
 describe('search results cache', () => {
   const searchCacheTestQuery = gql`
     query SearchCacheTest($offset: Int) {
-      search {
+      search(searchTerm: "test") {
         results {
           expenses(offset: $offset) {
             collection {
