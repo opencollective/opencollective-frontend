@@ -262,7 +262,7 @@ const CommentActions = ({
           <Container padding={2} borderRadius={8} border="1px solid #e1e4e6">
             <CommentMetadata comment={comment} />
             <Container mt={3} maxHeight={150} overflowY="auto">
-              <HTMLContent content={comment.html} fontSize="12px" data-cy="comment-body" />
+              <HTMLContent content={comment.html} fontSize="12px" data-cy="comment-body" openImageLinksInNewTab />
             </Container>
           </Container>
           {deleteError && (
