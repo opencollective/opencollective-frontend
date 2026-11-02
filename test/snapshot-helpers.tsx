@@ -15,7 +15,10 @@ import { withRequiredProviders } from './providers';
  *    - IntlProvider: { locale }
  *    - ThemeProvider: { theme }
  */
-export const snapshot = (component, providersParams = {}) => {
+export const snapshot = (
+  component: React.ReactNode,
+  providersParams: Parameters<typeof withRequiredProviders>[1] = {},
+) => {
   const componentWithProviders = withRequiredProviders(component, providersParams);
   const { container } = render(componentWithProviders);
   return expect(container).toMatchSnapshot();
@@ -24,14 +27,14 @@ export const snapshot = (component, providersParams = {}) => {
 /**
  * Same as `snapshot` but removes all `className` from the tree
  */
-export const snapshotWithoutClassNames = (component, providersParams = {}) => {
+export const snapshotWithoutClassNames = (
+  component: React.ReactNode,
+  providersParams: Parameters<typeof withRequiredProviders>[1] = {},
+) => {
   const componentWithProviders = withRequiredProviders(component, providersParams);
   const { container } = render(componentWithProviders);
 
-  /**
-   * @param {HTMLElement} node
-   */
-  const removeClassName = node => {
+  const removeClassName = (node: Element) => {
     if (node.hasAttribute('class')) {
       node.removeAttribute('class');
     }
@@ -51,7 +54,7 @@ export const snapshotWithoutClassNames = (component, providersParams = {}) => {
  * @deprecated Use `snapshot`
  * Same as `snapshot` but wraps component in a IntlProvider
  */
-export const snapshotI18n = (component, locale = 'en') => {
+export const snapshotI18n = (component: React.ReactNode, locale = 'en') => {
   const { container } = render(<IntlProvider locale={locale}>{component}</IntlProvider>);
   return expect(container).toMatchSnapshot();
 };

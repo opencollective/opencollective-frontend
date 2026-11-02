@@ -1,6 +1,6 @@
 /** See https://stripe.com/docs/testing#cards */
 
-const generateValidCard = code => ({
+const generateValidCard = (code: string) => ({
   creditCardNumber: code,
   expirationDate: '1250',
   cvcCode: '123',
