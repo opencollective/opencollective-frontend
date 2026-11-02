@@ -1,11 +1,9 @@
 import * as fs from 'fs';
 
-import lodash from 'lodash-es';
+import { difference, has, invertBy, mapValues, orderBy } from 'lodash-es';
 import { sync as mkdirpSync } from 'mkdirp';
 
 import locales from '../../lib/constants/locales';
-
-const { difference, has, invertBy, mapValues, orderBy } = lodash;
 
 const MESSAGES_FILE = './dist/messages/messages.json';
 const LANG_DIR = './lang/';
@@ -41,7 +39,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
  * A message will be ignored if part of `DUPLICATED_IGNORED_MESSAGES` or if it ends with "ed" (past tense)
  * since it's likely to be a verb that will have different feminine/masculine forms in other languages.
  */
-const shouldIgnoreDuplicateMessage = message => {
+const shouldIgnoreDuplicateMessage = (message: string): boolean => {
   const lowerCaseMessage = message.toLowerCase();
   return lowerCaseMessage.endsWith('ed') || DUPLICATED_IGNORED_MESSAGES.has(lowerCaseMessage);
 };
@@ -52,20 +50,24 @@ const shouldIgnoreDuplicateMessage = message => {
 // is a flat collection of `id: message` pairs for the app's default locale.
 const messagesFile = fs.readFileSync(MESSAGES_FILE, 'utf8');
 const jsonMessages = JSON.parse(messagesFile);
-const defaultMessages = mapValues(jsonMessages, message => message.defaultMessage);
+const defaultMessages: Record<string, string> = mapValues(jsonMessages, message => message.defaultMessage);
 
 /**
  * Store new keys in translation file without overwriting the existing ones.
  */
-const translatedMessages = (locale, defaultMessages, updatedKeys) => {
+const translatedMessages = (
+  locale: string,
+  defaultMessages: Record<string, string>,
+  updatedKeys: string[],
+): Record<string, string> => {
   const filename = `${LANG_DIR}${locale}.json`;
   const file = fs.readFileSync(filename, 'utf8');
   const json = JSON.parse(file);
 
   // Do translate
   const updatedMessages = Object.keys(defaultMessages)
-    .map(id => [id, defaultMessages[id]])
-    .reduce((collection, [id, defaultMessage]) => {
+    .map((id): [string, string] => [id, defaultMessages[id]])
+    .reduce<Record<string, string>>((collection, [id, defaultMessage]) => {
       if (updatedKeys.includes(id)) {
         // If default message was updated, override the translation
         collection[id] = defaultMessage;
@@ -88,14 +90,14 @@ const translatedMessages = (locale, defaultMessages, updatedKeys) => {
 /**
  * Sort translation object's keys alphabetically
  */
-const sortKeys = i18nKeys => {
+const sortKeys = (i18nKeys: string[]): string[] => {
   return orderBy(i18nKeys, [key => key.toLowerCase()]);
 };
 
 /**
  * Get the diff between two translations objects.
  */
-const getDiff = (base, newDefaults) => {
+const getDiff = (base: Record<string, string>, newDefaults: Record<string, string>) => {
   const sortedOldKeys = sortKeys(Object.keys(base));
   const sortedNewKeys = sortKeys(Object.keys(newDefaults));
   return {
@@ -110,21 +112,21 @@ const getDiff = (base, newDefaults) => {
 /**
  * Convert to JSON and ensure that the keys are sorted properly.
  */
-const convertToJSON = obj => {
+const convertToJSON = (obj: Record<string, string>): string => {
   return `${JSON.stringify(obj, sortKeys(Object.keys(obj)), 2)}\n`;
 };
 
 /**
  * Update the keys for locale and save the file
  */
-const translate = (locale, defaultMessages, updatedKeys) => {
+const translate = (locale: string, defaultMessages: Record<string, string>, updatedKeys: string[]): void => {
   const translations = convertToJSON(translatedMessages(locale, defaultMessages, updatedKeys));
   fs.writeFileSync(`${LANG_DIR}${locale}.json`, translations);
 };
 
-const getDuplicateMessages = messages => {
-  const groupedMessages = invertBy(messages);
-  const duplicates = [];
+const getDuplicateMessages = (messages: Record<string, string>): { ids: string[]; message: string }[] => {
+  const groupedMessages: Record<string, string[]> = invertBy(messages);
+  const duplicates: { ids: string[]; message: string }[] = [];
   Object.entries(groupedMessages).forEach(([message, ids]) => {
     if (ids.length > 1 && !shouldIgnoreDuplicateMessage(message)) {
       duplicates.push({ ids: ids, message });

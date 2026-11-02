@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const { randomBytes } = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
@@ -16,7 +16,9 @@ if (fs.existsSync(extraEnvPath)) {
 dotenv.config();
 debug.enable(process.env.DEBUG);
 
-const defaults = {
+type EnvDefaultValue = string | number | boolean | null;
+
+const defaults: Record<string, EnvDefaultValue> = {
   PORT: 3000,
   NODE_ENV: 'development',
   HOSTNAME: 'localhost',
@@ -43,7 +45,7 @@ const defaults = {
   WISE_PLATFORM_COLLECTIVE_SLUG: 'opencollective-host',
   OC_APPLICATION: 'frontend',
   OC_ENV: process.env.NODE_ENV || 'development',
-  OC_SECRET: crypto.randomBytes(16).toString('hex'),
+  OC_SECRET: randomBytes(16).toString('hex'),
   WISE_ENVIRONMENT: 'sandbox',
   API_PROXY: true,
   SENTRY_TRACES_SAMPLE_RATE: null,
@@ -74,6 +76,7 @@ if (['e2e'].includes(process.env.OC_ENV)) {
 
 for (const key in defaults) {
   if (process.env[key] === undefined) {
-    process.env[key] = defaults[key];
+    // Node stringifies `process.env` values on assignment, but its typings only accept strings.
+    process.env[key] = defaults[key] as string;
   }
 }

@@ -1,8 +1,13 @@
+type Rewrite = {
+  source: string;
+  destination: string;
+};
+
 const createOrderPage = '/contribution-flow';
 const contributionFlowSteps = '/details|profile|payment|summary|success';
 const isNewPricing = process.env.NEW_PRICING === 'true' || process.env.NEW_PRICING === '1';
 
-exports.REWRITES = [
+const REWRITES: Rewrite[] = [
   {
     source: '/id/:id*',
     destination: '/api/id/:id*',
@@ -447,3 +452,5 @@ exports.REWRITES = [
     destination: '/terms-of-fiscal-sponsorship',
   },
 ];
+
+exports.REWRITES = REWRITES;

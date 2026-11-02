@@ -5,8 +5,8 @@
 import * as Sentry from '@sentry/nextjs';
 
 import { SENTRY_APPLICATION_KEY } from './sentry.constants';
-import defaultConfig from './sentry.default.config.js';
-import { isExtensionOrInjectedScriptError } from './sentry-filters.js';
+import defaultConfig from './sentry.default.config';
+import { isExtensionOrInjectedScriptError } from './sentry-filters';
 
 const shouldUseThirdPartyErrorFilter = process.env.NODE_ENV === 'production';
 

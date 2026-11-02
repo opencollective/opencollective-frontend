@@ -4,10 +4,10 @@
 
 import * as Sentry from '@sentry/nextjs';
 
-import defaultConfig from './sentry.default.config.js';
+import defaultConfig from './sentry.default.config';
 
 // ts-unused-exports:disable-next-line
-export async function register() {
+export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME === 'nodejs' || process.env.NEXT_RUNTIME === 'edge') {
     Sentry.init({
       ...defaultConfig,

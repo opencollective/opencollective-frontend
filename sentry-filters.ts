@@ -1,4 +1,4 @@
-/** @typedef {import('@sentry/core').Event} SentryEvent */
+import type { Event, StackFrame } from '@sentry/browser';
 
 /** URL patterns for browser extensions, user scripts, and other injected code. */
 export const THIRD_PARTY_SCRIPT_URL_PATTERNS = [
@@ -19,10 +19,8 @@ export const THIRD_PARTY_SCRIPT_URL_PATTERNS = [
 
 /**
  * Returns true when a stack frame filename matches a known extension or injected-script URL.
- *
- * @param {string | undefined} url
  */
-export function isThirdPartyScriptUrl(url) {
+export function isThirdPartyScriptUrl(url: string | undefined): boolean {
   if (!url) {
     return false;
   }
@@ -30,20 +28,15 @@ export function isThirdPartyScriptUrl(url) {
   return THIRD_PARTY_SCRIPT_URL_PATTERNS.some(pattern => pattern.test(url));
 }
 
-/**
- * @param {SentryEvent} event
- */
-function getStackFrames(event) {
+function getStackFrames(event: Event): StackFrame[] {
   const exception = event?.exception?.values?.[0];
   return exception?.stacktrace?.frames?.filter(frame => frame.filename) ?? [];
 }
 
 /**
  * Returns true when a stack frame belongs to our application bundles.
- *
- * @param {import('@sentry/core').StackFrame} frame
  */
-function isApplicationFrame(frame) {
+function isApplicationFrame(frame: StackFrame): boolean {
   if (!frame.filename) {
     return false;
   }
@@ -62,10 +55,8 @@ function isApplicationFrame(frame) {
 /**
  * Fallback filter for browser extensions and injected scripts when build-time
  * module metadata is unavailable (e.g. local development).
- *
- * @param {SentryEvent} event
  */
-export function isExtensionOrInjectedScriptError(event) {
+export function isExtensionOrInjectedScriptError(event: Event): boolean {
   const frames = getStackFrames(event);
   if (frames.length === 0) {
     return false;

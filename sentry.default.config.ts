@@ -1,15 +1,14 @@
+import type { BrowserOptions } from '@sentry/browser';
 import * as Sentry from '@sentry/nextjs';
 
-import { THIRD_PARTY_SCRIPT_URL_PATTERNS } from './sentry-filters.js';
+import { THIRD_PARTY_SCRIPT_URL_PATTERNS } from './sentry-filters';
 
 // Default scope
-/** @type {(import('@sentry/browser').Scope} */
 const scope = Sentry.getCurrentScope();
 scope.setTag('nodejs', process.version);
 scope.setTag('runtimeEngine', typeof window !== 'undefined' ? 'browser' : 'server');
 
-/** @type {import('@sentry/browser/types/client').BrowserClientOptions} */
-export default {
+const defaultConfig: BrowserOptions = {
   dsn: process.env.SENTRY_DSN,
   environment: process.env.OC_ENV,
   attachStacktrace: true,
@@ -31,3 +30,5 @@ export default {
   tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE ? parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) : 0.01,
   release: process.env.HEROKU_SLUG_COMMIT?.slice(0, 7),
 };
+
+export default defaultConfig;

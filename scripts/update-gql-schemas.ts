@@ -6,14 +6,14 @@ import { getIntrospectionQuery } from 'graphql/utilities/getIntrospectionQuery';
 import { printSchema } from 'graphql/utilities/printSchema';
 import fetch from 'node-fetch';
 
+type RemoteSchemaResult = { status: 'ok'; schema: string } | { status: 'err'; message: string };
+type WriteFileResult = { status: 'ok'; path: string } | { status: 'err'; message: string };
+
 /**
  *
  * Fetch remote schema and turn it into string
- *
- * @param endpoint
- * @param options
  */
-async function getRemoteSchema(endpoint) {
+async function getRemoteSchema(endpoint: string): Promise<RemoteSchemaResult> {
   try {
     const introspectionQuery = getIntrospectionQuery({ inputValueDeprecation: true, schemaDescription: true });
     const { data, errors } = await fetch(endpoint, {
@@ -39,11 +39,8 @@ async function getRemoteSchema(endpoint) {
 /**
  *
  * Prints schema to file.
- *
- * @param dist
- * @param schema
  */
-function printToFile(schema, filePath) {
+function printToFile(schema: string, filePath: string): WriteFileResult {
   try {
     const output = path.resolve(process.cwd(), filePath);
     fs.writeFileSync(output, schema);
@@ -54,7 +51,7 @@ function printToFile(schema, filePath) {
   }
 }
 
-async function main(endpoint, filePath) {
+async function main(endpoint: string, filePath: string): Promise<void> {
   /* Fetch schema */
   const schema = await getRemoteSchema(endpoint);
 

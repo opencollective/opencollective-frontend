@@ -7,7 +7,15 @@
 import jsdoc from 'jsdoc-api';
 import { partition, repeat } from 'lodash-es';
 
-const main = async () => {
+type DocumentationRow = {
+  name: string;
+  type: string;
+  description: string;
+  default: string;
+  example: string;
+};
+
+const main = async (): Promise<void> => {
   const data = await jsdoc.explain({
     files: './components/contribution-flow/query-parameters.js',
   });
@@ -20,7 +28,7 @@ const main = async () => {
   };
 
   // Parse info
-  let rows = [];
+  let rows: DocumentationRow[] = [];
   for (const doc of data) {
     /* remove undocumented and non-members */
     if (doc.undocumented || doc.kind !== 'member' || !CONFIGS.includes(doc.memberof) || doc.access === 'private') {
