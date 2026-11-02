@@ -4,7 +4,8 @@ describe('UrlQueryHelper', () => {
   const queryHelper = new UrlQueryHelper({
     amount: { type: 'amount' },
     anotherAmount: { type: 'amount' },
-    description: { type: 'string' },
+    // `string` is not part of `FieldsConfig` but is handled as a passthrough at runtime.
+    description: { type: 'string' as never },
     interval: { type: 'interval' },
     quantity: { type: 'integer' },
     isTest: { type: 'boolean' },

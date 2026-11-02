@@ -27,14 +27,16 @@ const collective = {
   name: 'Test Collective',
   currency: 'USD',
   settings: {},
-};
+} as never;
 
 const getForm = () => ({
   setValues: jest.fn(),
   values: {
     type: ExpenseType.RECEIPT,
     currency: 'USD',
-    items: [{ description: 'Test item', amountV2: { valueInCents: 500, currency: 'USD' } }],
+    items: [{ description: 'Test item', amountV2: { valueInCents: 500, currency: 'USD' } }] as {
+      [key: string]: unknown;
+    }[],
     attachedFiles: [],
     payoutMethod: null,
     payee: null,
@@ -46,7 +48,7 @@ describe('OCR functions', () => {
   describe('updateExpenseFormWithUploadResult', () => {
     it('should update the form values with the upload result', () => {
       const form = getForm();
-      const result = updateExpenseFormWithUploadResult(collective, form, [uploadResult]);
+      const result = updateExpenseFormWithUploadResult(collective, form as never, [uploadResult] as never);
       expect(result).toBe(true);
       expect(form.setValues).toHaveBeenCalledWith({
         ...form.values,
@@ -77,7 +79,7 @@ describe('OCR functions', () => {
         { description: 'Test item 3', amount: null },
         { description: 'Test item 4', amount: { valueInCents: 500, currency: 'USD' } },
       ];
-      const result = filterParsableItems(items);
+      const result = filterParsableItems(items as never);
       expect(result).toEqual([items[3]]);
     });
   });
@@ -99,7 +101,7 @@ describe('OCR functions', () => {
         },
       ];
 
-      expect(compareItemOCRValues(form.values.items[0])).toEqual({
+      expect(compareItemOCRValues(form.values.items[0] as never)).toEqual({
         amountV2: {
           hasMismatch: false,
           ocrValue: { valueInCents: 1000, currency: 'USD' },
@@ -127,7 +129,7 @@ describe('OCR functions', () => {
         },
       ];
 
-      expect(compareItemOCRValues(form.values.items[0])).toEqual({
+      expect(compareItemOCRValues(form.values.items[0] as never)).toEqual({
         amountV2: {
           hasMismatch: true,
           ocrValue: { valueInCents: 1000, currency: 'USD' },
@@ -155,7 +157,7 @@ describe('OCR functions', () => {
         },
       ];
 
-      expect(compareItemOCRValues(form.values.items[0])).toEqual({
+      expect(compareItemOCRValues(form.values.items[0] as never)).toEqual({
         amountV2: {
           hasMismatch: true,
           ocrValue: { valueInCents: 1000, currency: 'USD' },

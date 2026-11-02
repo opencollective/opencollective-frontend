@@ -1,10 +1,11 @@
 import * as utils from '../currency-utils';
+import { Currency } from '../graphql/types/v2/graphql';
 
 describe('currency utils lib', () => {
   test('getCurrencySymbol', () => {
-    expect(utils.getCurrencySymbol('USD')).toEqual('$');
-    expect(utils.getCurrencySymbol('EUR')).toEqual('€');
-    expect(utils.getCurrencySymbol('JPY')).toEqual('¥');
+    expect(utils.getCurrencySymbol(Currency.USD)).toEqual('$');
+    expect(utils.getCurrencySymbol(Currency.EUR)).toEqual('€');
+    expect(utils.getCurrencySymbol(Currency.JPY)).toEqual('¥');
   });
 
   describe('roundCentsAmount', () => {

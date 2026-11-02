@@ -57,11 +57,13 @@ describe('isRelativeHref', () => {
 
 describe('getCollectivePageRoute', () => {
   it('returns no route for a vendor without a public profile', () => {
-    expect(getCollectivePageRoute({ type: 'VENDOR', slug: 'acme', hasPublicProfile: false })).toBe('');
+    const vendorWithoutPublicProfile = { type: 'VENDOR', slug: 'acme', hasPublicProfile: false };
+    expect(getCollectivePageRoute(vendorWithoutPublicProfile)).toBe('');
   });
 
   it('returns a route for a vendor with a public profile', () => {
-    expect(getCollectivePageRoute({ type: 'VENDOR', slug: 'acme', hasPublicProfile: true })).toBe('/acme');
+    const vendorWithPublicProfile = { type: 'VENDOR', slug: 'acme', hasPublicProfile: true };
+    expect(getCollectivePageRoute(vendorWithPublicProfile)).toBe('/acme');
   });
 
   it('defaults a vendor to hidden (no route) when public-profile fields are missing', () => {
@@ -69,21 +71,23 @@ describe('getCollectivePageRoute', () => {
   });
 
   it('returns a route for a vendor whose PUBLIC_PROFILE feature is ACTIVE (fallback)', () => {
-    expect(getCollectivePageRoute({ type: 'VENDOR', slug: 'acme', features: { PUBLIC_PROFILE: 'ACTIVE' } })).toBe(
-      '/acme',
-    );
+    const vendorWithActiveFeature = { type: 'VENDOR', slug: 'acme', features: { PUBLIC_PROFILE: 'ACTIVE' } };
+    expect(getCollectivePageRoute(vendorWithActiveFeature)).toBe('/acme');
   });
 
   it('returns no route for a vendor whose PUBLIC_PROFILE feature is not active (fallback)', () => {
-    expect(getCollectivePageRoute({ type: 'VENDOR', slug: 'acme', features: { PUBLIC_PROFILE: 'DISABLED' } })).toBe('');
+    const vendorWithDisabledFeature = { type: 'VENDOR', slug: 'acme', features: { PUBLIC_PROFILE: 'DISABLED' } };
+    expect(getCollectivePageRoute(vendorWithDisabledFeature)).toBe('');
   });
 
   it('returns no route for a private standard account', () => {
-    expect(getCollectivePageRoute({ type: 'ORGANIZATION', slug: 'acme', isPrivate: true })).toBe('');
+    const privateAccount = { type: 'ORGANIZATION', slug: 'acme', isPrivate: true };
+    expect(getCollectivePageRoute(privateAccount)).toBe('');
   });
 
   it('returns a route for a standard account with a public profile', () => {
-    expect(getCollectivePageRoute({ type: 'ORGANIZATION', slug: 'acme', hasPublicProfile: true })).toBe('/acme');
+    const standardAccountWithPublicProfile = { type: 'ORGANIZATION', slug: 'acme', hasPublicProfile: true };
+    expect(getCollectivePageRoute(standardAccountWithPublicProfile)).toBe('/acme');
   });
 });
 

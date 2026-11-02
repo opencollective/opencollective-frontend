@@ -69,9 +69,9 @@ describe('lib/errors', () => {
   describe('', () => {
     it('returns null if not an OCError', () => {
       expect(formatErrorMessage()).toBe(null);
-      expect(formatErrorMessage('')).toBe(null);
-      expect(formatErrorMessage(false)).toBe(null);
-      expect(formatErrorMessage(new Error())).toBe(null);
+      expect(formatErrorMessage('' as never)).toBe(null);
+      expect(formatErrorMessage(false as never)).toBe(null);
+      expect(formatErrorMessage(new Error() as never)).toBe(null);
     });
 
     it('Has fallback messages', () => {

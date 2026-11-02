@@ -133,7 +133,7 @@ describe('Collective sections', () => {
     });
 
     it('Returns an empty array for unknown types', () => {
-      expect(addDefaultSections()).toEqual([]);
+      expect(addDefaultSections(undefined, undefined)).toEqual([]);
     });
   });
 
@@ -147,9 +147,15 @@ describe('Collective sections', () => {
         const event = { type: 'EVENT', isActive: true, features };
         const pastDate = '2000-01-01';
         const futureDate = new Date(new Date().getFullYear() + 1, 1).toUTCString();
-        expectSectionsToContain(getFilteredSectionsForCollective({ ...event, endsAt: pastDate }), []);
-        expectSectionsToContain(getFilteredSectionsForCollective({ ...event, endsAt: pastDate }, true), []);
-        expectSectionsToContain(getFilteredSectionsForCollective({ ...event, endsAt: futureDate }), ['contribute']);
+        expectSectionsToContain(
+          getFilteredSectionsForCollective({ ...event, endsAt: pastDate }, undefined, undefined),
+          [],
+        );
+        expectSectionsToContain(getFilteredSectionsForCollective({ ...event, endsAt: pastDate }, true, undefined), []);
+        expectSectionsToContain(
+          getFilteredSectionsForCollective({ ...event, endsAt: futureDate }, undefined, undefined),
+          ['contribute'],
+        );
       });
     });
     describe('For collective', () => {
@@ -164,13 +170,19 @@ describe('Collective sections', () => {
 
       it('Filters for non-admins', () => {
         const collective = { type: 'COLLECTIVE', features };
-        expectSectionsToContain(getFilteredSectionsForCollective({ ...collective, isActive: true }), ['contribute']);
-        expectSectionsToContain(getFilteredSectionsForCollective({ ...collective, longDescription: 'Hi' }), ['about']);
+        expectSectionsToContain(
+          getFilteredSectionsForCollective({ ...collective, isActive: true }, undefined, undefined),
+          ['contribute'],
+        );
+        expectSectionsToContain(
+          getFilteredSectionsForCollective({ ...collective, longDescription: 'Hi' }, undefined, undefined),
+          ['about'],
+        );
       });
 
       it('Filters for admins', () => {
         const collective = { type: 'COLLECTIVE', features };
-        expectSectionsToMatch(getFilteredSectionsForCollective(collective, true), [
+        expectSectionsToMatch(getFilteredSectionsForCollective(collective, true, undefined), [
           'contribute',
           'contributors',
           'top-financial-contributors',

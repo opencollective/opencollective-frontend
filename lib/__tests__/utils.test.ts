@@ -9,7 +9,7 @@ describe('utils lib', () => {
     expect(utils.capitalize(undefined)).toEqual('');
     expect(utils.capitalize(null)).toEqual('');
     const arr = [undefined];
-    expect(utils.capitalize(arr)).toEqual('');
+    expect(utils.capitalize(arr as never)).toEqual('');
   });
 
   describe('isValidRelativeUrl', () => {
