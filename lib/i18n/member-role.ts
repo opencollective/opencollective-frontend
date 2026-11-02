@@ -1,8 +1,8 @@
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
 import roles from '../constants/roles';
 
-const RolesTranslations = defineMessages({
+const RolesTranslations: Record<string, MessageDescriptor> = defineMessages({
   [roles.HOST]: {
     id: 'Member.Role.HOST',
     defaultMessage: 'Host',
@@ -51,7 +51,7 @@ const RolesTranslations = defineMessages({
  * @param {func} `formatMessage` - see `injectIntl` or `useIntl`
  * @param {string} `role` - see `roles`
  */
-const formatMemberRole = (intl, role) => {
+const formatMemberRole = (intl: IntlShape, role: string): string => {
   const i18nMsg = RolesTranslations[role];
   return i18nMsg ? intl.formatMessage(i18nMsg) : role;
 };

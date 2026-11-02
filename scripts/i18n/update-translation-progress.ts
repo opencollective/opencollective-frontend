@@ -5,7 +5,7 @@ import { cloneDeep } from 'lodash-es';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import locales from '../../lib/constants/locales.js';
+import locales from '../../lib/constants/locales';
 
 import { getLocaleTranslationStats } from './translation-stats.js';
 
@@ -29,7 +29,7 @@ function main() {
     newLocales[localeCode].completion = `${stats.completionPercent}%`;
   }
 
-  const filePath = path.join(__dirname, '../../lib/constants/locales.js');
+  const filePath = path.join(__dirname, '../../lib/constants/locales.ts');
   const fileContent = fs.readFileSync(filePath, 'utf8');
   const contentStart = fileContent.indexOf('export default');
   if (contentStart === -1) {

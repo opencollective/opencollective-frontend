@@ -1,8 +1,8 @@
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
 import { WebhookEvents } from '../constants/notificationEvents';
 
-const TypesI18n = defineMessages({
+const TypesI18n: Record<string, MessageDescriptor> = defineMessages({
   [WebhookEvents.ALL]: {
     id: 'WebhookEvents.All',
     defaultMessage: 'All',
@@ -99,7 +99,7 @@ const TypesI18n = defineMessages({
  * @param {object} `intl` - see `injectIntl`
  * @param {string} `type`
  */
-export const i18nWebhookEventType = (intl, type) => {
+export const i18nWebhookEventType = (intl: IntlShape, type: string): string => {
   const i18nMsg = TypesI18n[type];
   return i18nMsg ? intl.formatMessage(i18nMsg) : type;
 };

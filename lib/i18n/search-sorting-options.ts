@@ -1,6 +1,6 @@
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
-const MESSAGES = defineMessages({
+const MESSAGES: Record<string, MessageDescriptor> = defineMessages({
   ACTIVITY: {
     defaultMessage: 'Activity',
     id: 'ZmlNQ3',
@@ -23,7 +23,7 @@ const MESSAGES = defineMessages({
   },
 });
 
-const i18nSearchSortingOptions = (intl, sortOption) => {
+const i18nSearchSortingOptions = (intl: IntlShape, sortOption: string): string => {
   const i18nMsg = MESSAGES[sortOption];
   return i18nMsg ? intl.formatMessage(i18nMsg) : sortOption;
 };

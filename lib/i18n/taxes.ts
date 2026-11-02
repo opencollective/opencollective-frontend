@@ -1,6 +1,6 @@
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
-const typeMsg = defineMessages({
+const typeMsg: Record<string, MessageDescriptor> = defineMessages({
   VAT: {
     id: 'tax.vat',
     defaultMessage: 'Value-added tax',
@@ -11,7 +11,7 @@ const typeMsg = defineMessages({
   },
 });
 
-const typeMsgShort = defineMessages({
+const typeMsgShort: Record<string, MessageDescriptor> = defineMessages({
   VAT: {
     id: 'tax.vatShort',
     defaultMessage: 'VAT',
@@ -22,7 +22,7 @@ const typeMsgShort = defineMessages({
   },
 });
 
-const descriptionMsg = defineMessages({
+const descriptionMsg: Record<string, MessageDescriptor> = defineMessages({
   VAT: {
     id: 'tax.vat.description',
     defaultMessage: 'This tier type is subject to VAT in Europe.',
@@ -33,7 +33,7 @@ const descriptionMsg = defineMessages({
   },
 });
 
-export const i18nTaxType = (intl, taxType, version = 'full') => {
+export const i18nTaxType = (intl: IntlShape, taxType: string, version = 'full'): string => {
   const msgLong = typeMsg[taxType];
   const msgShort = typeMsgShort[taxType];
   if (!msgLong || !msgShort) {
@@ -47,6 +47,7 @@ export const i18nTaxType = (intl, taxType, version = 'full') => {
   }
 };
 
-export const i18nTaxDescription = (intl, taxType) => {
-  return descriptionMsg[taxType] ? intl.formatMessage(descriptionMsg[taxType]) : null;
+export const i18nTaxDescription = (intl: IntlShape, taxType: string): string | null => {
+  const msg = descriptionMsg[taxType];
+  return msg ? intl.formatMessage(msg) : null;
 };

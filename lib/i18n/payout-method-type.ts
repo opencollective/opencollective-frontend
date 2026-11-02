@@ -1,8 +1,8 @@
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
 import { PayoutMethodType } from '../constants/payout-method';
 
-const TypesI18n = defineMessages({
+const TypesI18n: Record<string, MessageDescriptor> = defineMessages({
   ALL: {
     id: 'PayoutMethod.Type.All',
     defaultMessage: 'All methods',
@@ -28,7 +28,11 @@ const TypesI18n = defineMessages({
  * @param {string} `type`
  * @returns {string} The translated payout method type
  */
-const i18nPayoutMethodType = (intl, type, { aliasBankAccountToTransferWise } = {}) => {
+const i18nPayoutMethodType = (
+  intl: IntlShape,
+  type: string,
+  { aliasBankAccountToTransferWise }: { aliasBankAccountToTransferWise?: boolean } = {},
+): string => {
   if (!type) {
     return intl.formatMessage(TypesI18n[PayoutMethodType.OTHER]);
   } else if (type === PayoutMethodType.PAYPAL) {

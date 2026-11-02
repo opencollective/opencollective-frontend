@@ -1,8 +1,8 @@
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../constants/host-fee-structure';
 
-const TypesI18n = defineMessages({
+const TypesI18n: Record<string, MessageDescriptor> = defineMessages({
   ALL: {
     id: 'HostFee.AllTypes',
     defaultMessage: 'All',
@@ -27,7 +27,7 @@ const TypesI18n = defineMessages({
  * @param {object} `intl` - see `injectIntl`
  * @param {string} `type`
  */
-export const formatHostFeeStructure = (intl, type) => {
+export const formatHostFeeStructure = (intl: IntlShape, type: string): string => {
   const i18nMsg = TypesI18n[type];
   return i18nMsg ? intl.formatMessage(i18nMsg) : type;
 };

@@ -1,10 +1,10 @@
 import React from 'react';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, type IntlShape, type MessageDescriptor } from 'react-intl';
 
 import ExpenseTypes from '../constants/expenseTypes';
 import { ExpenseStatus } from '../graphql/types/v2/graphql';
 
-const i18nTypes = defineMessages({
+const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
   ALL: {
     id: 'AllExpenses',
     defaultMessage: 'All expenses',
@@ -39,7 +39,7 @@ const i18nTypes = defineMessages({
   },
 });
 
-const i18nStatus = defineMessages({
+const i18nStatus: Record<string, MessageDescriptor> = defineMessages({
   ALL: {
     id: 'Expenses.AllShort',
     defaultMessage: 'All',
@@ -125,7 +125,7 @@ const i18nStatus = defineMessages({
 /**
  * Translate the type of an expense
  */
-export const i18nExpenseType = (intl, type, id) => {
+export const i18nExpenseType = (intl: IntlShape, type: string, id?: number): string => {
   let formattedType = i18nTypes[type] ? intl.formatMessage(i18nTypes[type]) : type;
   if (id) {
     formattedType = `${formattedType} #${id}`;
@@ -136,7 +136,7 @@ export const i18nExpenseType = (intl, type, id) => {
 /**
  * Translate the status of an expense
  */
-export const i18nExpenseStatus = (intl, status) => {
+export const i18nExpenseStatus = (intl: IntlShape, status: string): string => {
   return i18nStatus[status] ? intl.formatMessage(i18nStatus[status]) : status;
 };
 

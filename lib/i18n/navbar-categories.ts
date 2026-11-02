@@ -1,8 +1,8 @@
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
 import { NAVBAR_CATEGORIES } from '../../components/collective-navbar/constants';
 
-const I18N_CATEGORIES = defineMessages({
+const I18N_CATEGORIES: Record<string, MessageDescriptor> = defineMessages({
   [NAVBAR_CATEGORIES.ABOUT]: {
     id: 'collective.about.title',
     defaultMessage: 'About',
@@ -25,7 +25,7 @@ const I18N_CATEGORIES = defineMessages({
   },
 });
 
-const i18nNavbarCategory = (intl, category) => {
+const i18nNavbarCategory = (intl: IntlShape, category: string): string => {
   return I18N_CATEGORIES[category] ? intl.formatMessage(I18N_CATEGORIES[category]) : category;
 };
 

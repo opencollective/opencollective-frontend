@@ -1,6 +1,6 @@
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
-const i18nTypes = defineMessages({
+const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
   ADAPTIVE: { id: 'PaymentMethod.PayPal.type.Adaptive', defaultMessage: 'Adaptive' },
   ALL: { id: 'PaymentMethods.All', defaultMessage: 'All' },
   BACS_DEBIT: { id: 'Stripe.PaymentMethod.Label.bacs_debit', defaultMessage: 'Bacs Direct Debit' },
@@ -21,7 +21,7 @@ const i18nTypes = defineMessages({
   US_BANK_ACCOUNT: { id: 'ACH Debit', defaultMessage: 'ACH Debit' },
   VIRTUAL_CARD: { id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' },
   SWISH: { id: 'Stripe.PaymentMethod.Label.swish', defaultMessage: 'Swish' },
-  [null]: { id: 'PaymentMethods.None', defaultMessage: 'No payment method' },
+  ['null']: { id: 'PaymentMethods.None', defaultMessage: 'No payment method' },
   // For now, no need to support:
   // - ALIPAY -> "Alipay" doesn't need translation
 });
@@ -31,6 +31,7 @@ const i18nTypes = defineMessages({
  *
  * Ex: i18nPaymentMethodType(intl, 'giftcard') === 'Gift card'
  */
-export const i18nPaymentMethodType = (intl, type) => {
-  return i18nTypes[type] ? intl.formatMessage(i18nTypes[type]) : type;
+export const i18nPaymentMethodType = (intl: IntlShape, type: string | null): string | null => {
+  const key = type === null ? 'null' : type;
+  return i18nTypes[key] ? intl.formatMessage(i18nTypes[key]) : type;
 };

@@ -1,9 +1,9 @@
 import React from 'react';
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
 import { TransactionKind, TransactionTypes } from '../constants/transactions';
 
-const i18nTypes = defineMessages({
+const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
   ALL: {
     id: 'AllTransactions',
     defaultMessage: 'All transactions',
@@ -18,7 +18,7 @@ const i18nTypes = defineMessages({
   },
 });
 
-const i18nKind = defineMessages({
+const i18nKind: Record<string, MessageDescriptor> = defineMessages({
   ALL: {
     id: 'SectionTransactions.All',
     defaultMessage: 'All',
@@ -89,7 +89,7 @@ const i18nKind = defineMessages({
   },
 });
 
-const i18nKindDefinition = defineMessages({
+const i18nKindDefinition: Record<string, MessageDescriptor> = defineMessages({
   [TransactionKind.ADDED_FUNDS]: {
     id: 'Transaction.kind.ADDED_FUNDS.definition',
     defaultMessage: 'Off platform contributions',
@@ -128,7 +128,7 @@ const i18nKindDefinition = defineMessages({
   // TransactionKind.PLATFORM_TIP_DEBT
 });
 
-const KindDefinitionParams = {
+const KindDefinitionParams: Record<string, { LearnMoreLink: (chunks: React.ReactNode) => React.ReactNode }> = {
   [TransactionKind.HOST_FEE]: {
     LearnMoreLink: chunks => (
       <a
@@ -146,7 +146,7 @@ const KindDefinitionParams = {
 /**
  * Translate the type of an transaction
  */
-export const i18nTransactionType = (intl, type, id) => {
+export const i18nTransactionType = (intl: IntlShape, type: string, id?: number): string => {
   let formattedType = i18nTypes[type] ? intl.formatMessage(i18nTypes[type]) : type;
   if (id) {
     formattedType = `${formattedType} #${id}`;
@@ -157,13 +157,13 @@ export const i18nTransactionType = (intl, type, id) => {
 /**
  * Translate the type of an transaction
  */
-export const i18nTransactionKind = (intl, type) => {
+export const i18nTransactionKind = (intl: IntlShape, type: string): string => {
   return i18nKind[type] ? intl.formatMessage(i18nKind[type]) : type;
 };
 
 /**
  * The definition (help text) of a transaction kind, returns null if no definition exists
  */
-export const i18nTransactionKindDefinition = (intl, type) => {
+export const i18nTransactionKindDefinition = (intl: IntlShape, type: string): React.ReactNode => {
   return i18nKindDefinition[type] ? intl.formatMessage(i18nKindDefinition[type], KindDefinitionParams[type]) : null;
 };

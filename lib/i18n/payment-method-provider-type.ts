@@ -1,10 +1,10 @@
 // TODO(paymentMethodType): migrate to service+type
-import { defineMessages } from 'react-intl';
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
 
 import { GQLV2_PAYMENT_METHOD_LEGACY_TYPES } from '../constants/payment-methods';
 import { TransactionKind } from '../constants/transactions';
 
-const i18nTypes = defineMessages({
+const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
   [GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CREDIT_CARD]: {
     id: 'CreditCard',
     defaultMessage: 'Credit Card',
@@ -48,7 +48,7 @@ const i18nTypes = defineMessages({
  * Similar to ``, but specialized for the GQLV2's `PaymentMethodType`
  * from `paymentMethod.providerType`
  */
-export const i18nPaymentMethodProviderType = (intl, providerType) => {
+export const i18nPaymentMethodProviderType = (intl: IntlShape, providerType: string): string => {
   if (providerType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL) {
     return 'PayPal';
   } else if (i18nTypes[providerType]) {
