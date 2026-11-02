@@ -331,12 +331,12 @@
   },
   "allowScripts": {
     "@tailwindcss/oxide@4.3.3": true,
-    "cypress@16.1.1": true,
+    "cypress@16.2.1": true,
     "esbuild@0.28.2": true,
     "sharp@0.35.5": true,
     "@sentry/cli@2.58.6": true,
     "canvas@3.2.3": true,
     "husky@4.3.8": true,
-    "unrs-resolver@1.12.2": true
+    "unrs-resolver@1.13.0": true
   }
 }
