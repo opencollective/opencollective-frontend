@@ -188,7 +188,7 @@ class ContributionFlowSuccess extends React.Component<
     if (isStripeRedirect) {
       const stripe = await getStripe(null, this.props.router.query.stripeAccount);
       const paymentIntentResult = await stripe.retrievePaymentIntent(
-        this.props.router.query.payment_intent_client_secret,
+        this.props.router.query.payment_intent_client_secret as string,
       );
       this.setState({
         paymentIntentResult,

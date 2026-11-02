@@ -159,7 +159,7 @@ export const singular = str => {
   return str.replace(/ies$/, 'y').replace(/s$/, '');
 };
 
-export const capitalize = str => {
+export const capitalize = (str: string = undefined): string => {
   if (typeof str !== 'string') {
     return '';
   }
