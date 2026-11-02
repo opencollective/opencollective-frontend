@@ -29,6 +29,9 @@ function contributeNewSEPADebit({ name } = {}) {
   cy.wait(3000);
 }
 
+// Stripe test mode settles SEPA debits asynchronously, and since 2026-11-02 it takes ~15 minutes even for the
+// "immediate success" IBAN (pi_3UXGjABYycQg1OMf1BcenBp5: processing at 08:36, succeeded at 08:52 UTC). An order
+// stays PROCESSING until the payment_intent.succeeded webhook, so the tests accept PROCESSING (or PAID if it settled).
 const testConfig = {
   retries: {
     runMode: 2,
@@ -61,10 +64,10 @@ describe('Contribute Flow: Stripe Payment Element', () => {
         cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
 
         cy.getOrderIdFromContributionSuccessPage().then(contributionId => {
-          cy.waitOrderStatus(contributionId, 'PAID');
+          cy.waitOrderStatus(contributionId, /^(PROCESSING|PAID)$/);
           cy.visit(`/${col.slug}/orders`);
           cy.contains('Financial contribution to TestCollective');
-          cy.contains('Paid');
+          cy.contains(/Processing|Paid/);
         });
       });
     });
@@ -81,7 +84,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
       cy.getOrderIdFromContributionSuccessPage().then(contributionId => {
-        cy.waitOrderStatus(contributionId, 'PAID');
+        cy.waitOrderStatus(contributionId, /^(PROCESSING|PAID)$/);
         cy.get('@collective').then(col => {
           cy.visit(`/${col.slug}/donate`);
         });
