@@ -23,7 +23,7 @@ type RejectedFile = {
 
 type ImageUploaderOptions = {
   isMulti?: boolean;
-  mockImageGenerator?: (index: number) => unknown;
+  mockImageGenerator?: (index: number) => string | boolean;
   onSuccess?: (files: unknown, rejectedFiles?: unknown) => void;
   onReject?: (files: unknown, rejectedFiles?: unknown) => void;
   kind?: string;
@@ -66,15 +66,12 @@ export const useImageUploader = ({
         const results = await allSettled(
           filesToUpload.map((file, index) =>
             uploadImageWithXHR(file, kind, {
-              // `uploadImageWithXHR` types `mockImage` as boolean but also accepts a mock URL (see lib/api.ts).
-              mockImage: (mockImageGenerator && mockImageGenerator(index)) as boolean,
+              mockImage: mockImageGenerator && mockImageGenerator(index),
               onProgress: progress => {
                 const newProgressList = [...uploadProgressList];
                 newProgressList.splice(index, 0, progress);
                 setUploadProgressList(newProgressList);
               },
-              onSuccess: undefined,
-              onFailure: undefined,
             }),
           ),
         );
