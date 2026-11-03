@@ -64,6 +64,18 @@ const openPaypalPopup = (authorizeUrl: string): Window | null => {
 };
 
 /**
+ * Browsers only allow popups shortly after a user interaction (transient activation). When we know it
+ * has expired (e.g. the user spent time in the 2FA prompt), we skip `window.open` to avoid triggering
+ * the browser's "popup blocked" notice. Safari doesn't use this signal for popups, so callers must
+ * still handle `window.open` returning null.
+ */
+const mayOpenPopupWithoutClick = (): boolean => {
+  return typeof navigator === 'undefined' || !navigator.userActivation || navigator.userActivation.isActive;
+};
+
+type OverlayState = 'popupOpen' | 'popupBlocked' | null;
+
+/**
  * Renders a "Connect PayPal" button that opens the "Log in with PayPal" flow
  * in a mini-browser popup (no fullPage param). On approval, the popup posts
  * the auth code back to this window; we then exchange it via GraphQL.
@@ -93,10 +105,11 @@ const PaypalConnectButton = ({
   const intl = useIntl();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isPopupOpen, setIsPopupOpen] = React.useState(false);
+  const [overlayState, setOverlayState] = React.useState<OverlayState>(null);
   const hadSuccess = React.useRef(false);
   const popupRef = React.useRef<Window | null>(null);
   const cancelRef = React.useRef<(() => void) | null>(null);
+  const openPopupFromClickRef = React.useRef<(() => void) | null>(null);
 
   const [getPaypalOAuthUrl] = useMutation<PaypalOAuthUrlMutation, PaypalOAuthUrlMutationVariables>(
     getPaypalOAuthUrlMutation,
@@ -106,25 +119,22 @@ const PaypalConnectButton = ({
     ConnectPaypalPayoutMethodMutationVariables
   >(connectPaypalPayoutMethodMutation);
 
+  const showPopupBlockedToast = () => {
+    toast({
+      variant: 'error',
+      message: intl.formatMessage(
+        { defaultMessage: 'Failed to open {service}. Please allow popups for this site.', id: 'l5AoL3' },
+        { service: 'PayPal' },
+      ),
+    });
+  };
+
   const handleConnect = async () => {
     setIsLoading(true);
-    let popup: Window | null = null;
     try {
       hadSuccess.current = false;
-      // Open the popup synchronously, while the click's user activation is still valid, so browsers don't block it.
-      // It is navigated to the authorize URL once we get it from the API.
-      popup = openPaypalPopup('about:blank');
-      if (!popup) {
-        toast({
-          variant: 'error',
-          message: intl.formatMessage(
-            { defaultMessage: 'Failed to open {service}. Please allow popups for this site.', id: 'l5AoL3' },
-            { service: 'PayPal' },
-          ),
-        });
-        return;
-      }
-
+      // Fetch the URL before opening any window: this request may trigger a 2FA prompt, which must not be
+      // hidden behind the PayPal popup. See https://github.com/opencollective/opencollective/issues/9050
       const oauthResult = await getPaypalOAuthUrl({
         variables: {
           account: { id: accountId },
@@ -136,17 +146,19 @@ const PaypalConnectButton = ({
         throw new Error('PayPal Connect is not available at the moment.');
       }
 
-      popup.location.href = authorizeUrl;
-      popupRef.current = popup;
-      setIsPopupOpen(true);
-
       const { code, state } = await new Promise<{ code: string; state: string }>((resolve, reject) => {
+        let closedPoll: ReturnType<typeof setInterval> | null = null;
+
         const cleanup = () => {
           cancelRef.current = null;
-          setIsPopupOpen(false);
-          popupRef.current = null;
+          openPopupFromClickRef.current = null;
+          setOverlayState(null);
           window.removeEventListener('message', onMessage);
-          clearInterval(closedPoll);
+          if (closedPoll) {
+            clearInterval(closedPoll);
+          }
+          const popup = popupRef.current;
+          popupRef.current = null;
           if (popup && !popup.closed) {
             popup.close();
           }
@@ -173,18 +185,41 @@ const PaypalConnectButton = ({
           }
         };
 
-        const closedPoll = setInterval(() => {
-          if (popup?.closed) {
-            cleanup();
-            setTimeout(() => {
-              if (!hadSuccess.current) {
-                reject(new Error('PayPal login was cancelled'));
-              }
-            });
+        const watchPopup = (popup: Window) => {
+          popupRef.current = popup;
+          setOverlayState('popupOpen');
+          closedPoll = setInterval(() => {
+            if (popup.closed) {
+              cleanup();
+              setTimeout(() => {
+                if (!hadSuccess.current) {
+                  reject(new Error('PayPal login was cancelled'));
+                }
+              });
+            }
+          }, 500);
+        };
+
+        // Must be called from a click handler, so that the browser lets the popup through
+        openPopupFromClickRef.current = () => {
+          const popup = openPaypalPopup(authorizeUrl);
+          if (popup) {
+            watchPopup(popup);
+          } else {
+            showPopupBlockedToast();
           }
-        }, 500);
+        };
 
         window.addEventListener('message', onMessage);
+
+        // Try to open the popup right away. If the browser blocks it (the click that started the flow is too old,
+        // e.g. after a 2FA prompt), the overlay asks the user to click again to open it.
+        const popup = mayOpenPopupWithoutClick() ? openPaypalPopup(authorizeUrl) : null;
+        if (popup) {
+          watchPopup(popup);
+        } else {
+          setOverlayState('popupBlocked');
+        }
       });
 
       const connectResult = await connectPaypalPayoutMethod({
@@ -209,9 +244,6 @@ const PaypalConnectButton = ({
         payoutMethodId: payload.payoutMethod.id,
       });
     } catch (err) {
-      if (popup && !popup.closed) {
-        popup.close();
-      }
       const graphQLErrors = (err as { graphQLErrors?: unknown[] })?.graphQLErrors;
       if (err instanceof Error && !graphQLErrors?.length) {
         onError(err);
@@ -220,7 +252,7 @@ const PaypalConnectButton = ({
       }
     } finally {
       setIsLoading(false);
-      setIsPopupOpen(false);
+      setOverlayState(null);
     }
   };
 
@@ -235,7 +267,7 @@ const PaypalConnectButton = ({
         <PayPalIcon size={16} />
         <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'PayPal' }} />
       </Button>
-      <DialogPrimitive.Root open={isPopupOpen}>
+      <DialogPrimitive.Root open={overlayState !== null}>
         <DialogPrimitive.Portal>
           <DialogPrimitive.Overlay className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0">
             <DialogPrimitive.Content
@@ -255,14 +287,28 @@ const PaypalConnectButton = ({
                 <span className="text-2xl font-bold tracking-tight text-[#003087]">PayPal</span>
               </DialogPrimitive.Title>
               <DialogPrimitive.Description className="text-sm leading-relaxed text-slate-700">
-                <FormattedMessage
-                  defaultMessage="Don't see the PayPal login window?{br}We'll help you re-launch it."
-                  id="mpBY7Q"
-                  values={{ br: <br /> }}
-                />
+                {overlayState === 'popupBlocked' ? (
+                  <FormattedMessage
+                    defaultMessage="Continue to {service} to connect your account."
+                    id="BvpUE5"
+                    values={{ service: 'PayPal' }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Don't see the PayPal login window?{br}We'll help you re-launch it."
+                    id="mpBY7Q"
+                    values={{ br: <br /> }}
+                  />
+                )}
               </DialogPrimitive.Description>
               <button
-                onClick={() => popupRef.current?.focus()}
+                onClick={() => {
+                  if (popupRef.current && !popupRef.current.closed) {
+                    popupRef.current.focus();
+                  } else {
+                    openPopupFromClickRef.current?.();
+                  }
+                }}
                 className="text-sm font-semibold text-[#0070ba] underline underline-offset-2 hover:text-[#003087] focus:outline-none"
               >
                 <FormattedMessage defaultMessage="Click to Continue" id="PaypalConnectButton.popupOverlay.cta" />
