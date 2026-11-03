@@ -20,9 +20,9 @@ module.exports = {
         'components/MembersWithData.js',
         'components/SignInOrJoinFree.js',
         'components/tier-page/graphql/queries.js',
-        'lib/graphql/v1/fragments.js',
-        'lib/graphql/v1/mutations.js',
-        'lib/graphql/v1/queries.js',
+        'lib/graphql/v1/fragments.ts',
+        'lib/graphql/v1/mutations.ts',
+        'lib/graphql/v1/queries.ts',
         'pages/contribute.js',
         'pages/updatePaymentMethod.js',
         // The following documents use gql and gqlV1 at the same time, gqlV1 will not be linted

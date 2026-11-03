@@ -2,13 +2,17 @@ import fs from 'fs';
 import path from 'path';
 
 import { template } from 'lodash-es';
+import type { NextApiRequest } from 'next';
+
+// `res` is the Express response object provided by the custom server (`server/index.ts`); express has
+// no types in this project, so it stays untyped until the server layer is migrated.
 
 const COLLECTIVE_SLUG_REGEX = /^[a-z0-9-]{1,128}$/i;
 const VERB_ALLOWLIST = /^(contribute|donate)$/;
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res) {
   const content = fs.readFileSync(path.join(process.cwd(), 'server/templates/button.js'), 'utf8');
   const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
 

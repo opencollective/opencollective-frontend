@@ -7,10 +7,20 @@
  * (security regression from the GitHub OAuth token-leakage fix).
  */
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import handler from '../github-repositories';
 
-const makeReq = (headers = {}, query = {}) => ({ headers, query });
-const makeRes = () => {
+type MockResponse = {
+  setHeader: jest.Mock;
+  status: jest.Mock;
+  json: jest.Mock;
+  _headers: Record<string, string>;
+};
+
+const makeReq = (headers: Record<string, string> = {}, query: Record<string, string> = {}) =>
+  ({ headers, query }) as unknown as NextApiRequest;
+const makeRes = (): MockResponse => {
   const headers = {};
   return {
     setHeader: jest.fn((key, val) => {
@@ -23,7 +33,7 @@ const makeRes = () => {
 };
 
 describe('/api/github-repositories proxy', () => {
-  let fetchMock;
+  let fetchMock: jest.Mock;
 
   beforeEach(() => {
     process.env.API_URL = 'http://api.test';
@@ -33,18 +43,18 @@ describe('/api/github-repositories proxy', () => {
       status: 200,
       json: jest.fn().mockResolvedValue([{ id: 1, name: 'test-repo' }]),
     });
-    global.fetch = fetchMock;
+    global.fetch = fetchMock as unknown as typeof fetch;
   });
 
   afterEach(() => {
-    delete global.fetch;
+    delete (global as { fetch?: typeof fetch }).fetch;
   });
 
   it('forwards the Authorization header to the API', async () => {
     const req = makeReq({ authorization: 'Bearer connected-account-jwt' });
     const res = makeRes();
 
-    await handler(req, res);
+    await handler(req, res as unknown as NextApiResponse);
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [, options] = fetchMock.mock.calls[0];
@@ -55,7 +65,7 @@ describe('/api/github-repositories proxy', () => {
     const req = makeReq({}, { access_token: 'victim-session-jwt' });
     const res = makeRes();
 
-    await handler(req, res);
+    await handler(req, res as unknown as NextApiResponse);
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [calledUrl] = fetchMock.mock.calls[0];
@@ -66,7 +76,7 @@ describe('/api/github-repositories proxy', () => {
     const req = makeReq({ authorization: 'Bearer some-token' });
     const res = makeRes();
 
-    await handler(req, res);
+    await handler(req, res as unknown as NextApiResponse);
 
     const [calledUrl] = fetchMock.mock.calls[0];
     expect(new URL(calledUrl.toString()).searchParams.get('api_key')).toBe('test-api-key');
@@ -79,7 +89,7 @@ describe('/api/github-repositories proxy', () => {
     const req = makeReq({ authorization: 'Bearer some-token' });
     const res = makeRes();
 
-    await handler(req, res);
+    await handler(req, res as unknown as NextApiResponse);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(repos);

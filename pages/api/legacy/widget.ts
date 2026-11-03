@@ -2,7 +2,11 @@ import fs from 'fs';
 import path from 'path';
 
 import { isEmpty, isPlainObject, mapValues, pickBy, template } from 'lodash-es';
+import type { NextApiRequest } from 'next';
 import { z } from 'zod';
+
+// `res` is the Express response object provided by the custom server (`server/index.ts`); express has
+// no types in this project, so it stays untyped until the server layer is migrated.
 
 const WIDGET_ALLOWLIST = /^(widget|events|collectives|banner)$/;
 const SAFE_SELECTOR_REGEX = /^[a-zA-Z0-9#_.-]{1,50}$/;
@@ -30,7 +34,7 @@ const styleSchema = z.record(z.string(), z.any()).transform(raw =>
   ),
 );
 
-function sanitizeStyle(raw) {
+function sanitizeStyle(raw: unknown): string {
   if (typeof raw !== 'string') {
     return '{}';
   }
@@ -48,7 +52,7 @@ function sanitizeStyle(raw) {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res) {
   const content = fs.readFileSync(path.join(process.cwd(), 'server/templates/widget.js'), 'utf8');
   const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
 
