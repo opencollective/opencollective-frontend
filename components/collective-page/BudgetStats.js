@@ -185,8 +185,8 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                   extraTooltipContent={
                     <Box mt={2}>
                       <FormattedMessage
-                        defaultMessage="Including fees: {amount}"
-                        id="OTlvYM"
+                        defaultMessage="Fees: {amount}"
+                        id="jXNKGP"
                         values={{
                           amount: formatCurrency(
                             stats.totalAmountRaised.valueInCents - stats.totalNetAmountRaised.valueInCents,
