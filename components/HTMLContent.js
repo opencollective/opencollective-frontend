@@ -36,6 +36,10 @@ export const isEmptyHTMLValue = value => {
 /** Returns '' for empty rich-text scaffold HTML (e.g. Trix/React-Quill), otherwise the original value. */
 export const normalizeRichTextContent = value => (isEmptyHTMLValue(value) ? '' : value);
 
+// Both browser DOM nodes and interweave-ssr's parsed nodes expose childNodes.
+const hasImage = node =>
+  Array.from(node.childNodes || []).some(child => child.nodeName.toLowerCase() === 'img' || hasImage(child));
+
 const InlineDisplayBox = styled.div.withConfig({
   shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
 })`
@@ -73,6 +77,7 @@ const HTMLContent = styled(
     collapsePadding = 1,
     hideViewMoreLink = false,
     openLinksInNewTab = false,
+    openImageLinksInNewTab = false,
     readMoreMessage,
     ...props
   }) => {
@@ -121,7 +126,7 @@ const HTMLContent = styled(
                 }
               } else if (node.tagName.toLowerCase() === 'a') {
                 // Open links in new tab
-                if (openLinksInNewTab) {
+                if (openLinksInNewTab || (openImageLinksInNewTab && hasImage(node))) {
                   node.setAttribute('target', '_blank');
                   node.setAttribute('rel', 'noopener noreferrer');
                 }

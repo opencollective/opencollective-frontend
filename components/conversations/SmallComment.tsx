@@ -77,6 +77,7 @@ export default function SmallComment(props: CommentProps) {
                       collapsePadding={22}
                       content={comment.html}
                       data-cy="comment-body"
+                      openImageLinksInNewTab
                       readMoreMessage={<FormattedMessage defaultMessage="Read more" id="ContributeCard.ReadMore" />}
                     />
                   ) : (

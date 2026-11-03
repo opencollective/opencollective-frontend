@@ -73,7 +73,7 @@ const Comment = ({
         >
           {({ isEditing, setValue, setUploading }) =>
             !isEditing ? (
-              <HTMLContent content={comment.html} fontSize="13px" data-cy="comment-body" />
+              <HTMLContent content={comment.html} fontSize="13px" data-cy="comment-body" openImageLinksInNewTab />
             ) : (
               <RichTextEditor
                 kind="COMMENT"
