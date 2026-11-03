@@ -34,7 +34,11 @@ export const updatesSectionQuery = gql`
   query UpdatesSection($slug: String!, $onlyPublishedUpdates: Boolean) {
     account(slug: $slug) {
       id
-      updates(limit: 3, onlyPublishedUpdates: $onlyPublishedUpdates) {
+      updates(
+        limit: 3
+        onlyPublishedUpdates: $onlyPublishedUpdates
+        orderBy: { field: PUBLISHED_AT, direction: DESC }
+      ) {
         nodes {
           id
           slug
