@@ -9,7 +9,6 @@ import { styled } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { i18nGraphqlException } from '../../lib/errors';
-import { gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -23,6 +22,7 @@ import { P, Span } from '../Text';
 import { useToast } from '../ui/useToast';
 import { withUser } from '../UserProvider';
 
+import { cancelRecurringContributionMutation } from './graphql/queries';
 import UpdateOrderPopUp, { UpdatePlatformTipPopUp } from './UpdateOrderPopUp';
 import UpdatePaymentMethodPopUp from './UpdatePaymentMethodPopUp';
 
@@ -70,16 +70,6 @@ const i18nReasons = defineMessages({
   UPDATING_ORDER: { id: 'subscription.cancel.reason2', defaultMessage: 'Changing payment method or amount' },
   OTHER: { id: 'subscription.cancel.other', defaultMessage: 'Other' },
 });
-
-// GraphQL
-const cancelRecurringContributionMutation = gql`
-  mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!, $reasonCode: String!) {
-    cancelOrder(order: $order, reason: $reason, reasonCode: $reasonCode) {
-      id
-      status
-    }
-  }
-`;
 
 const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account, LoggedInUser }) => {
   const { toast } = useToast();

@@ -49,8 +49,8 @@ import {
 import CollapseSection from './CollapseSection';
 import ProjectTypeSelect from './ProjectTypeSelect';
 
-const createCollectiveMutation = gql`
-  mutation CreateCollective(
+const oscCreateCollectiveMutation = gql`
+  mutation OscCreateCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
     $user: IndividualCreateInput
@@ -77,8 +77,8 @@ const createCollectiveMutation = gql`
   }
 `;
 
-const applyToHostMutation = gql`
-  mutation ApplyToHost(
+const oscApplyToHostMutation = gql`
+  mutation OscApplyToHost(
     $collective: AccountReferenceInput!
     $host: AccountReferenceInput!
     $message: String
@@ -106,7 +106,7 @@ const applyToHostMutation = gql`
 `;
 
 const useApplicationMutation = canApplyWithCollective =>
-  useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation);
+  useMutation(canApplyWithCollective ? oscApplyToHostMutation : oscCreateCollectiveMutation);
 
 const REPOSITORY_INFO_DEBOUNCE_MS = 800;
 

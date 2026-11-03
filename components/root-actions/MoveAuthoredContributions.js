@@ -66,8 +66,12 @@ const ordersQuery = gql`
   ${moveOrdersFieldsFragment}
 `;
 
-const moveOrdersMutation = gql`
-  mutation MoveOrders($orders: [OrderReferenceInput!]!, $fromAccount: AccountReferenceInput!, $makeIncognito: Boolean) {
+const moveAuthoredContributionsMutation = gql`
+  mutation MoveAuthoredContributions(
+    $orders: [OrderReferenceInput!]!
+    $fromAccount: AccountReferenceInput!
+    $makeIncognito: Boolean
+  ) {
     moveOrders(orders: $orders, fromAccount: $fromAccount, makeIncognito: $makeIncognito) {
       id
       ...MoveOrdersFields
@@ -165,7 +169,7 @@ const MoveAuthoredContributions = () => {
   // GraphQL
   const { data, loading, error: ordersQueryError } = useQuery(ordersQuery, getOrdersQueryOptions(fromAccount));
   const allOptions = React.useMemo(() => getOrdersOptionsFromData(intl, data), [intl, data]);
-  const [submitMoveContributions] = useMutation(moveOrdersMutation);
+  const [submitMoveContributions] = useMutation(moveAuthoredContributionsMutation);
   const moveContributions = async () => {
     try {
       // Prepare variables
