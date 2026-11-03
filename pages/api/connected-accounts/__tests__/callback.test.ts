@@ -5,18 +5,27 @@
  * and - crucially - does NOT forward access_token (security regression).
  */
 
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import handler from '../[service]/callback';
 
 jest.mock('../../../../lib/constants/oauth', () => ({
   oauthServiceAllowlist: new Set(['github', 'stripe', 'transferwise', 'paypal']),
 }));
 
-const makeReq = (service, query = {}) => ({
-  query: { service, ...query },
-  headers: { accept: 'text/html', 'user-agent': 'test' },
-});
+type MockResponse = {
+  status: jest.Mock;
+  send: jest.Mock;
+  redirect: jest.Mock;
+};
 
-const makeRes = () => {
+const makeReq = (service: string, query: Record<string, string> = {}) =>
+  ({
+    query: { service, ...query },
+    headers: { accept: 'text/html', 'user-agent': 'test' },
+  }) as unknown as NextApiRequest;
+
+const makeRes = (): MockResponse => {
   const res = {
     status: jest.fn().mockReturnThis(),
     send: jest.fn().mockReturnThis(),
@@ -26,25 +35,25 @@ const makeRes = () => {
 };
 
 describe('connected-accounts callback proxy', () => {
-  let fetchSpy;
+  let fetchSpy: jest.Mock;
 
   beforeEach(() => {
     process.env.API_URL = 'http://api.test';
     process.env.API_KEY = 'test-api-key';
 
     fetchSpy = jest.fn().mockResolvedValue({ url: 'http://frontend.test/redirect-target' });
-    global.fetch = fetchSpy;
+    global.fetch = fetchSpy as unknown as typeof fetch;
   });
 
   afterEach(() => {
-    delete global.fetch;
+    delete (global as { fetch?: typeof fetch }).fetch;
   });
 
   it('rejects unknown services with 404', async () => {
     const req = makeReq('unknown-service');
     const res = makeRes();
 
-    await handler(req, res);
+    await handler(req, res as unknown as NextApiResponse);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(fetchSpy).not.toHaveBeenCalled();
@@ -59,7 +68,7 @@ describe('connected-accounts callback proxy', () => {
     });
     const res = makeRes();
 
-    await handler(req, res);
+    await handler(req, res as unknown as NextApiResponse);
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const [calledUrl] = fetchSpy.mock.calls[0];
@@ -80,7 +89,7 @@ describe('connected-accounts callback proxy', () => {
     });
     const res = makeRes();
 
-    await handler(req, res);
+    await handler(req, res as unknown as NextApiResponse);
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const [calledUrl] = fetchSpy.mock.calls[0];
@@ -97,7 +106,7 @@ describe('connected-accounts callback proxy', () => {
     const req = makeReq('github', { code: 'abc', state: 'uuid-123' });
     const res = makeRes();
 
-    await handler(req, res);
+    await handler(req, res as unknown as NextApiResponse);
 
     expect(res.redirect).toHaveBeenCalledWith(expectedRedirect);
   });
@@ -106,7 +115,7 @@ describe('connected-accounts callback proxy', () => {
     const req = makeReq('stripe', { code: 'stripe-code', state: 'stripe-state' });
     const res = makeRes();
 
-    await handler(req, res);
+    await handler(req, res as unknown as NextApiResponse);
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const [calledUrl] = fetchSpy.mock.calls[0];
