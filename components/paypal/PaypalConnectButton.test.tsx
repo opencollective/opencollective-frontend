@@ -466,6 +466,28 @@ describe('PaypalConnectButton', () => {
       });
     });
 
+    it('keeps the flow alive when the popup is re-opened before the closed-popup check runs', async () => {
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+      const onError = jest.fn();
+      const newPopup = { closed: false, close: jest.fn(), focus: jest.fn(), location: { href: '' } };
+
+      renderButton({ onError });
+      await user.click(screen.getByRole('button', { name: /connect paypal/i }));
+      await waitFor(() => screen.getByText(/don't see the paypal login window/i));
+
+      // The user closes the popup and clicks "Click to Continue" before the next 500ms check
+      mockPopup.closed = true;
+      jest.spyOn(window, 'open').mockReturnValue(newPopup as unknown as Window);
+      await user.click(screen.getByRole('button', { name: /click to continue/i }));
+      expect(window.open).toHaveBeenCalledWith(DEFAULT_AUTHORIZE_URL, 'paypalConnect', expect.any(String));
+
+      act(() => jest.advanceTimersByTime(2000));
+
+      expect(newPopup.close).not.toHaveBeenCalled();
+      expect(onError).not.toHaveBeenCalled();
+      expect(screen.getByText(/don't see the paypal login window/i)).toBeInTheDocument();
+    });
+
     it('does NOT call onError if popup closes after a successful auth', async () => {
       jest.useRealTimers();
       const user = userEvent.setup();

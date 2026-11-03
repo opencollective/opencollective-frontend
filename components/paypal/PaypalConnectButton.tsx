@@ -188,6 +188,10 @@ const PaypalConnectButton = ({
         const watchPopup = (popup: Window) => {
           popupRef.current = popup;
           setOverlayState('popupOpen');
+          // The user may re-open the popup (overlay CTA) before the previous one's poll noticed it was closed
+          if (closedPoll) {
+            clearInterval(closedPoll);
+          }
           closedPoll = setInterval(() => {
             if (popup.closed) {
               cleanup();
