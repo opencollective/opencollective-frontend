@@ -6,8 +6,8 @@ import { loadScriptAsync } from '../utils';
 const stripeInstances: Record<string, Stripe> = {};
 
 const getStripe = async (token?: string, stripeAccount?: string | string[]): Promise<Stripe> => {
-  // Next.js query params can be arrays; `Stripe` only accepts a string account id.
-  const stripeAccountId = stripeAccount as string;
+  // Next.js query params can be repeated (`string[]`); Stripe only accepts a single account id.
+  const stripeAccountId = Array.isArray(stripeAccount) ? stripeAccount[0] : stripeAccount;
   const instanceId = stripeAccountId || 'default';
   if (!stripeInstances[instanceId]) {
     const stripeKey = token || getEnvVar('STRIPE_KEY');

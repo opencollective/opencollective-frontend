@@ -183,21 +183,24 @@ class ContributionFlowSuccess extends React.Component<
   async componentDidMount() {
     this.trackSuccess();
 
-    const isStripeRedirect = this.props.router.query.payment_intent_client_secret;
+    // Next.js can return a `string[]` when a query param is repeated.
+    const queryClientSecret = this.props.router.query.payment_intent_client_secret;
+    const paymentIntentClientSecret = Array.isArray(queryClientSecret) ? queryClientSecret[0] : queryClientSecret;
 
-    if (isStripeRedirect) {
-      const stripe = await getStripe(null, this.props.router.query.stripeAccount);
-      const paymentIntentResult = await stripe.retrievePaymentIntent(
-        this.props.router.query.payment_intent_client_secret as string,
-      );
-      this.setState({
-        paymentIntentResult,
-      });
+    if (paymentIntentClientSecret) {
+      try {
+        const stripe = await getStripe(null, this.props.router.query.stripeAccount);
+        const paymentIntentResult = await stripe.retrievePaymentIntent(paymentIntentClientSecret);
+        this.setState({
+          paymentIntentResult,
+        });
+      } finally {
+        // Never leave the page loading when the payment intent cannot be retrieved.
+        this.setState({ loaded: true });
+      }
+    } else {
+      this.setState({ loaded: true });
     }
-
-    this.setState({
-      loaded: true,
-    });
   }
 
   componentDidUpdate() {
