@@ -114,9 +114,7 @@ const IGNORED: Record<string, readonly string[]> = {
     'Contact.Message', // "Message" - identique
     'Contributions', // "Contributions" - identique
     'contributions.id', // "#" - identique
-    'ContributionType.Ticket', // "Ticket" - identique (billet)
     'conversations', // "Conversations" - identique
-    'Email', // "Email" - identique
     'expense.incurredAt', // "Date" - identique
     'expense.notes', // "Notes" - identique
     'Expense.type', // "Type" - identique
@@ -149,7 +147,6 @@ const IGNORED: Record<string, readonly string[]> = {
     'Q0lxqm', // "CVV/CVC" - identique
     'r+dgiv', // "Taxes" - identique
     'section.budget.title', // "Budget" - identique
-    'section.tickets.title', // "Tickets" - identique
     'Stripe.PaymentMethod.Label.bancontact', // "Bancontact" - nom de marque
     'Stripe.PaymentMethod.Label.link', // "Link" - nom de marque
     'Stripe.PaymentMethod.Label.swish', // "Swish" - nom de marque
@@ -168,6 +165,11 @@ const IGNORED: Record<string, readonly string[]> = {
     'tZEZGT', // "{n, plural, one {1 contribution} other {{n} contributions}}" - identique
     '/TlAIY', // "Visible" - même terme en français
     'Interactions', // "Interactions" - identique
+    'HostApplication.customData.ecosystems.commits', // "Commits" - terme Git conservé
+    'HostApplication.customData.ecosystems.fork', // "Fork" - terme GitHub conservé
+    'HostApplication.customData.ecosystems.forks', // "Forks" - terme GitHub conservé
+    'HostApplication.customData.ecosystems.packages', // "Packages" - terme courant conservé
+    'search.cappedCount', // "{count}+" - notation numérique identique
   ],
   de: [
     'AccountingCategory.code', // "Code" - identisch

@@ -103,7 +103,7 @@ export const contributionFlowAccountFieldsFragment = gql`
 `;
 
 const orderSuccessHostFragment = gql`
-  fragment OrderSuccessHostFragment on Host {
+  fragment OrderSuccessHost on Host {
     id
     slug
     settings
@@ -111,7 +111,7 @@ const orderSuccessHostFragment = gql`
 `;
 
 export const orderSuccessFragment = gql`
-  fragment OrderSuccessFragment on Order {
+  fragment OrderSuccess on Order {
     id
     legacyId
     status
@@ -147,11 +147,6 @@ export const orderSuccessFragment = gql`
       legacyId
       name
       slug
-      type
-      amountType
-      amount {
-        valueInCents
-      }
     }
     membership {
       id
@@ -184,9 +179,6 @@ export const orderSuccessFragment = gql`
         id
         contributorsCount
       }
-      ... on AccountWithContributions {
-        platformContributionAvailable
-      }
       ... on AccountWithParent {
         parent {
           id
@@ -200,13 +192,13 @@ export const orderSuccessFragment = gql`
       ... on AccountWithHost {
         host {
           id
-          ...OrderSuccessHostFragment
+          ...OrderSuccessHost
         }
       }
       ... on Organization {
         host {
           id
-          ...OrderSuccessHostFragment
+          ...OrderSuccessHost
         }
       }
     }
@@ -215,11 +207,11 @@ export const orderSuccessFragment = gql`
 `;
 
 export const orderResponseFragment = gql`
-  fragment OrderResponseFragment on OrderWithPayment {
+  fragment OrderResponse on OrderWithPayment {
     guestToken
     order {
       id
-      ...OrderSuccessFragment
+      ...OrderSuccess
     }
     stripeError {
       message

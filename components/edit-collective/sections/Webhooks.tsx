@@ -460,7 +460,7 @@ const addEditCollectiveWebhooksData = graphql<Props, GraphQLV1Collective, { coll
   },
 );
 
-const editEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation, {
+const addEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation, {
   options: {
     context: API_V1_CONTEXT,
   },
@@ -485,6 +485,6 @@ const editEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutatio
   }),
 });
 
-const addGraphql = compose(addEditCollectiveWebhooksData, editEditCollectiveWebhooksMutation);
+const addGraphql = compose(addEditCollectiveWebhooksData, addEditCollectiveWebhooksMutation);
 
 export default injectIntl(addGraphql(Webhooks));

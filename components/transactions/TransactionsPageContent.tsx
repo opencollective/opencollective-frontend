@@ -180,6 +180,9 @@ export const transactionsPageQuery = gql`
           slug
         }
       }
+      ... on Organization {
+        hasMoneyManagement
+      }
       processingOrders: orders(filter: OUTGOING, includeIncognito: true, status: [PENDING, PROCESSING]) {
         totalCount
         nodes {
@@ -231,7 +234,7 @@ export const transactionsPageQuery = gql`
       payoutMethod: $payoutMethod
       includeEditedReversedTransactions: $includeEditedReversedTransactions
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
       kinds
       paymentMethodTypes
       totalCount

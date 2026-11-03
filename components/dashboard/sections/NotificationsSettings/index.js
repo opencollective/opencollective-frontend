@@ -19,7 +19,7 @@ import { Button } from '../../../ui/Button';
 import { Switch } from '../../../ui/Switch';
 
 import CollectiveSettings from './CollectiveSettings';
-import { accountActivitySubscriptionsFragment } from './fragments';
+import { accountActivitySubscriptionsFieldsFragment } from './fragments';
 import GroupView from './GroupView';
 
 const GROUP_VIEWS = {
@@ -74,7 +74,7 @@ const userActivitySubscriptionsQuery = gql`
       }
     }
   }
-  ${accountActivitySubscriptionsFragment}
+  ${accountActivitySubscriptionsFieldsFragment}
 `;
 
 const setNewsletterOptInMutation = gql`

@@ -61,7 +61,7 @@ const cancelMemberInvitationMutation = gql`
   }
 `;
 
-const editAccountHostFee = gql`
+const editAccountHostFeeMutation = gql`
   mutation EditAccountFee($account: AccountReferenceInput!, $hostFeePercent: Float!, $isCustomFee: Boolean!) {
     editAccountFeeStructure(account: $account, hostFeePercent: $hostFeePercent, isCustomFee: $isCustomFee) {
       id
@@ -106,7 +106,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
     hostFeesStructure: collective.hostFeesStructure,
     hostFeePercent: collective.hostFeePercent || host.hostFeePercent,
   });
-  const [submitEditSettings, { loading }] = useMutation(editAccountHostFee);
+  const [submitEditSettings, { loading }] = useMutation(editAccountHostFeeMutation);
   const handleFeeStructureChange = async ({ hostFeesStructure, hostFeePercent }) => {
     const previousState = cloneDeep(feeStructure);
     const isCustomFee = hostFeesStructure === HOST_FEE_STRUCTURE.CUSTOM_FEE;

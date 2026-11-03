@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 export default class Body extends React.Component {
   static propTypes = {
     children: PropTypes.node,
+    style: PropTypes.object,
   };
 
   render() {

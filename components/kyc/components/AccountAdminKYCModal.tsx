@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { gql } from '@/lib/graphql/helpers';
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/graphql';
 
-import { AccountHoverCard, accountHoverCardFields } from '@/components/AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import Avatar from '@/components/Avatar';
 import type { BaseModalProps } from '@/components/ModalContext';
 import { Button } from '@/components/ui/Button';
@@ -37,7 +37,7 @@ const accountAdminKycQuery = gql`
     }
   }
 
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 type AccountAdminKYCModalProps = {

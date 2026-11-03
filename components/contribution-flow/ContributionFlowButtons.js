@@ -37,7 +37,6 @@ class ContributionFlowButtons extends React.Component {
     stepDetails: PropTypes.object,
     stepSummary: PropTypes.object,
     showPlatformTip: PropTypes.bool,
-    isOscTipExperiment: PropTypes.bool,
     hostSlug: PropTypes.string,
   };
 
@@ -59,7 +58,6 @@ class ContributionFlowButtons extends React.Component {
             ? 'new'
             : 'old',
           [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(this.props.showPlatformTip),
-          [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: Boolean(this.props.isOscTipExperiment),
           [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: this.props.hostSlug,
         },
       });

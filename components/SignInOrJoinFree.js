@@ -152,7 +152,6 @@ class SignInOrJoinFree extends React.Component {
         websiteUrl: getWebsiteUrl(),
         sendLink,
         resetPassword,
-        createProfile: false,
       });
 
       // test*@opencollective.com.

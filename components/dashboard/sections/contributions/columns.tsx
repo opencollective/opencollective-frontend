@@ -286,7 +286,7 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
       const createdAt = order.createdAt;
       return (
         <React.Fragment>
-          {expectedAt && <DateTime value={expectedAt} dateStyle="medium" timeStyle={undefined} />}
+          {expectedAt && <DateTime value={expectedAt} dateStyle="medium" timeStyle={undefined} timeZone="UTC" />}
           {createdAt && (
             <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
               <FormattedMessage

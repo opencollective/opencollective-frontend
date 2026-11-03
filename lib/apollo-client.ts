@@ -292,6 +292,10 @@ function createInMemoryCache() {
           },
         },
       },
+      // A result's score depends on the search: never normalize it by the result's ID
+      SearchResultScore: {
+        keyFields: false,
+      },
       // Add this for search results pagination
       SearchResults: {
         fields: {
@@ -308,10 +312,15 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                // A next page that failed (e.g. a search too broad for PostgreSQL) keeps the results already loaded
+                if (!incoming) {
+                  return existing;
+                }
                 // Infinite scroll mode: append new results to existing ones
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -333,9 +342,13 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -356,9 +369,13 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -379,9 +396,13 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -402,9 +423,13 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -425,9 +450,13 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -448,9 +477,13 @@ function createInMemoryCache() {
               const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
 
               if (isInfiniteScroll) {
+                if (!incoming) {
+                  return existing; // A next page that failed keeps the results already loaded
+                }
                 return {
                   ...incoming,
                   highlights: { ...existing.highlights, ...incoming.highlights },
+                  scores: [...(existing.scores || []), ...(incoming.scores || [])],
                   collection: {
                     ...incoming.collection,
                     nodes: [...existing.collection.nodes, ...incoming.collection.nodes],

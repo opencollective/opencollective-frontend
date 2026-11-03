@@ -707,7 +707,13 @@ const EditExpenseType = ({ expense, onSubmit }) => {
                     )}
                   </React.Fragment>
                 ) : stepProps.id === 'details' ? (
-                  <EditTypeDetailsStep expenseForm={expenseForm} />
+                  <React.Fragment>
+                    {expenseForm.initialLoading ? (
+                      <Skeleton className="h-20 w-full" />
+                    ) : (
+                      <EditTypeDetailsStep expenseForm={expenseForm} />
+                    )}
+                  </React.Fragment>
                 ) : null}
               </Step>
             );

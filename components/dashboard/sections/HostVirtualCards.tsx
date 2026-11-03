@@ -15,7 +15,7 @@ import { i18nHasMissingReceipts } from '../../../lib/i18n/receipts-filter';
 import { sortSelectOptions } from '../../../lib/utils';
 import { VirtualCardStatusI18n } from '../../../lib/virtual-cards/constants';
 
-import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import { getI18nLink } from '../../I18nFormatters';
@@ -51,7 +51,7 @@ const hostedVirtualCardAccountsQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 const hostVirtualCardsMetadataQuery = gql`
@@ -148,7 +148,7 @@ const hostVirtualCardsQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 const schema = z.object({

@@ -41,7 +41,7 @@ const editStripeAccountQuery = gql`
 `;
 
 const getStripeOAuthUrlMutation = gql`
-  mutation GetStripeOAuthUrl($account: AccountReferenceInput!, $redirect: String) {
+  mutation StripeOAuthUrl($account: AccountReferenceInput!, $redirect: String) {
     getStripeOAuthUrl(account: $account, redirect: $redirect)
   }
 `;

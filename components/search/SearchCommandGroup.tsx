@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '@/lib/hooks/useQueryFilter';
-import { i18nSearchEntity } from '@/lib/i18n/search';
+import { i18nSearchCount, i18nSearchEntity } from '@/lib/i18n/search';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
@@ -22,33 +22,36 @@ import type { SearchEntityNodeMap } from './types';
 interface SeeMoreItemsCommandItemProps {
   onSelect: () => void;
   totalCount: number;
+  isTotalCountCapped?: boolean;
   limit: number;
   label: string;
 }
 
-const SeeMoreItemsCommandItem = React.memo<SeeMoreItemsCommandItemProps>(({ onSelect, totalCount, limit, label }) => {
-  const intl = useIntl();
-  if (totalCount > limit) {
-    return (
-      <SearchCommandItem onSelect={onSelect} className="items-center justify-start">
-        <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
-          <SearchIcon />
-        </div>
-        <span>
-          <FormattedMessage
-            defaultMessage="See {count} more {label}"
-            id="SearchResults.SeeMore"
-            values={{
-              count: Number(totalCount - limit).toLocaleString(intl.locale),
-              label: label.toLowerCase(),
-            }}
-          />
-        </span>
-      </SearchCommandItem>
-    );
-  }
-  return null;
-});
+const SeeMoreItemsCommandItem = React.memo<SeeMoreItemsCommandItemProps>(
+  ({ onSelect, totalCount, isTotalCountCapped, limit, label }) => {
+    const intl = useIntl();
+    if (totalCount > limit) {
+      return (
+        <SearchCommandItem onSelect={onSelect} className="items-center justify-start">
+          <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
+            <SearchIcon />
+          </div>
+          <span>
+            <FormattedMessage
+              defaultMessage="See {count} more {label}"
+              id="SearchResults.SeeMore"
+              values={{
+                count: i18nSearchCount(intl, totalCount - limit, isTotalCountCapped),
+                label: label.toLowerCase(),
+              }}
+            />
+          </span>
+        </SearchCommandItem>
+      );
+    }
+    return null;
+  },
+);
 
 type SearchCommandGroupEntity = keyof SearchEntityNodeMap;
 
@@ -89,6 +92,8 @@ const SearchResultItem = React.memo(SearchResultItemInner);
 
 type SearchCommandGroupProps<E extends SearchCommandGroupEntity = SearchCommandGroupEntity> = {
   totalCount?: number;
+  /** `totalCount` is a lower bound: there are more matches */
+  isTotalCountCapped?: boolean;
   nodes?: SearchEntityNodeMap[E][];
   renderNode: (node: SearchEntityNodeMap[E]) => React.ReactNode;
   input: string;
@@ -100,6 +105,7 @@ type SearchCommandGroupProps<E extends SearchCommandGroupEntity = SearchCommandG
 
 export function SearchCommandGroup<E extends SearchCommandGroupEntity>({
   totalCount,
+  isTotalCountCapped,
   nodes,
   renderNode,
   input,
@@ -149,6 +155,7 @@ export function SearchCommandGroup<E extends SearchCommandGroupEntity>({
           onSelect={handleSeeMoreSelect}
           key={`more-${String(entity)}`}
           totalCount={totalCount}
+          isTotalCountCapped={isTotalCountCapped}
           limit={queryFilter.variables.limit}
           label={i18nSearchEntity(intl, entity)}
         />

@@ -9,10 +9,10 @@ import { ContributionFrequency, OrderStatus, PaymentMethodService } from '../../
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
 import { useHasBalanceCategoriesPreview } from '../accounting/BalanceAccountingCategoryPicker';
 import { OrderBalanceAccountingCategoryPill } from '../accounting/BalanceAccountingCategoryPill';
-import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
 import { CopyIDDropdown } from '../CopyId';
 import DateTime from '../DateTime';
@@ -298,8 +298,8 @@ const contributionDrawerQuery = gql`
       id
     }
   }
-  ${accountHoverCardFields}
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountHoverCardFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 const EXTERNAL_PAYMENT_METHOD_SERVICES = [PaymentMethodService.STRIPE, PaymentMethodService.PAYPAL];

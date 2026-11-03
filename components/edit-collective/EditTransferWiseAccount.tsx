@@ -52,7 +52,7 @@ const editTransferWiseAccountQuery = gql`
 `;
 
 const getTransferwiseOAuthUrlMutation = gql`
-  mutation GetTransferwiseOAuthUrl($account: AccountReferenceInput!, $redirect: String) {
+  mutation TransferwiseOAuthUrl($account: AccountReferenceInput!, $redirect: String) {
     getTransferwiseOAuthUrl(account: $account, redirect: $redirect)
   }
 `;

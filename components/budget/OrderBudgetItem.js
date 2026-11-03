@@ -246,6 +246,7 @@ const OrderBudgetItem = ({
                         value={order.pendingContributionData.expectedAt}
                         dateStyle={'medium'}
                         timeStyle={undefined}
+                        timeZone="UTC"
                       />
                     </Span>
                   )}

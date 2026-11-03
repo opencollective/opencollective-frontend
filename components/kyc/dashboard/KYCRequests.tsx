@@ -9,7 +9,7 @@ import type { KycRequestsDashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import { KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { EmptyResults } from '@/components/dashboard/EmptyResults';
 import ComboSelectFilter from '@/components/dashboard/filters/ComboSelectFilter';
@@ -19,7 +19,7 @@ import type { DashboardSectionProps } from '@/components/dashboard/types';
 import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
-import { kycVerificationCollectionFields } from '../graphql';
+import { kycVerificationCollectionFieldsFragment } from '../graphql';
 import { i18nKYCVerificationStatus } from '../intl';
 import { SubmitKYCVerificationButton } from '../request/SubmitKYCVerificationButton';
 
@@ -79,8 +79,8 @@ export function KYCRequests(props: DashboardSectionProps) {
           }
         }
       }
-      ${kycVerificationCollectionFields}
-      ${accountHoverCardFields}
+      ${kycVerificationCollectionFieldsFragment}
+      ${accountHoverCardFieldsFragment}
     `,
     {
       variables: {

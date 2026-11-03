@@ -19,7 +19,7 @@ import ActivityDetailsDrawer from './ActivityDetailsDrawer';
 import ActivityFilters from './ActivityFilters';
 import { isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
-export const activityLogQuery = gql`
+const activityLogQuery = gql`
   query AccountActivityLog(
     $accountSlug: String!
     $limit: Int

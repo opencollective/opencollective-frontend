@@ -25,7 +25,7 @@ import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 import { useToast } from '../ui/useToast';
 
-import { managedOrderFragment, paymentMethodFragment } from './graphql/queries';
+import { managedOrderFieldsFragment, updatePaymentMethodFragment } from './graphql/queries';
 import AddPaymentMethod from './AddPaymentMethod';
 
 const PaymentMethodBox = styled(Flex)`
@@ -49,15 +49,15 @@ const paymentMethodsQuery = gql`
       id
       paymentMethods(type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]) {
         id
-        ...UpdatePaymentMethodFragment
+        ...UpdatePaymentMethod
       }
     }
     order(order: { id: $orderId }) {
       ...ManagedOrderFields
     }
   }
-  ${managedOrderFragment}
-  ${paymentMethodFragment}
+  ${managedOrderFieldsFragment}
+  ${updatePaymentMethodFragment}
 `;
 
 const updatePaymentMethodMutation = gql`
@@ -70,11 +70,11 @@ const updatePaymentMethodMutation = gql`
       ...ManagedOrderFields
     }
   }
-  ${managedOrderFragment}
+  ${managedOrderFieldsFragment}
 `;
 
 const paymentMethodResponseFragment = gql`
-  fragment paymentMethodResponseFragment on CreditCardWithStripeError {
+  fragment PaymentMethodResponse on CreditCardWithStripeError {
     paymentMethod {
       id
     }
@@ -92,7 +92,7 @@ export const addCreditCardMutation = gql`
     $account: AccountReferenceInput!
   ) {
     addCreditCard(creditCardInfo: $creditCardInfo, name: $name, account: $account) {
-      ...paymentMethodResponseFragment
+      ...PaymentMethodResponse
     }
   }
   ${paymentMethodResponseFragment}
@@ -101,7 +101,7 @@ export const addCreditCardMutation = gql`
 export const confirmCreditCardMutation = gql`
   mutation ConfirmCreditCardRecurringContributions($paymentMethod: PaymentMethodReferenceInput!) {
     confirmCreditCard(paymentMethod: $paymentMethod) {
-      ...paymentMethodResponseFragment
+      ...PaymentMethodResponse
     }
   }
   ${paymentMethodResponseFragment}

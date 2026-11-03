@@ -92,6 +92,20 @@ export default defineConfig([
           message: 'describe.only should only be used for debugging purposes and is not allowed in production code',
         },
       ],
+      // JavaScript naming rules for GraphQL documents and HOCs from RFC 011
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'VariableDeclarator[init.type="TaggedTemplateExpression"][init.tag.name=/^gql(V1)?$/][id.name!=/^[a-z][a-zA-Z0-9]*(Query|Mutation|Fragment)$/]',
+          message: 'GraphQL document variables are camelCase and end with Query, Mutation or Fragment (RFC 011).',
+        },
+        {
+          selector:
+            'VariableDeclarator[init.callee.name="graphql"][id.name!=/^add[A-Z][a-zA-Z0-9]*(Query|Mutation|Fragment|Data)$/]',
+          message: 'graphql() HOCs are named add*Query, add*Data, add*Mutation or add*Fragment (RFC 011).',
+        },
+      ],
       'react/jsx-fragments': ['error', 'element'],
       'react/react-in-jsx-scope': ['error'],
       'react/sort-comp': ['error'],
@@ -175,14 +189,21 @@ export default defineConfig([
       '@graphql-eslint/no-deprecated': 'warn',
       '@graphql-eslint/fields-on-correct-type': 'error',
       '@graphql-eslint/no-duplicate-fields': 'error',
+      // GraphQL naming rules from RFC 011 (https://github.com/opencollective/opencollective/blob/main/rfcs/011-graphql.md)
+      '@graphql-eslint/no-anonymous-operations': 'error',
       '@graphql-eslint/naming-convention': [
         'error',
         {
           VariableDefinition: 'camelCase',
           OperationDefinition: {
             style: 'PascalCase',
-            forbiddenPrefixes: ['get', 'fetch'],
+            // Prefixes are case-sensitive
+            forbiddenPrefixes: ['get', 'Get', 'fetch', 'Fetch'],
             forbiddenSuffixes: ['Query', 'Mutation', 'Fragment'],
+          },
+          FragmentDefinition: {
+            style: 'PascalCase',
+            forbiddenSuffixes: ['Fragment'],
           },
         },
       ],

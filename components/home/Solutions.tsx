@@ -124,11 +124,16 @@ const Solutions = () => {
               </div>
             </div>
 
-            <Button asChild variant="marketing" className="h-12 w-full rounded-full text-base" size="lg">
+            <Button
+              asChild
+              variant="marketing"
+              className="h-auto min-h-12 w-full rounded-full py-3 text-center text-base"
+              size="lg"
+            >
               <Link href="/organizations">
                 <div className="flex items-center justify-center gap-2">
                   <FormattedMessage {...messages['home.solutions.legallyIncorporated.button']} />
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} className="shrink-0" />
                 </div>
               </Link>
             </Button>
@@ -184,10 +189,15 @@ const Solutions = () => {
               </div>
             </div>
 
-            <Button asChild variant="marketing" className="h-12 w-full rounded-full text-base" size="lg">
+            <Button
+              asChild
+              variant="marketing"
+              className="h-auto min-h-12 w-full rounded-full py-3 text-center text-base"
+              size="lg"
+            >
               <Link href="/collectives" className="flex items-center justify-center gap-2">
                 <FormattedMessage {...messages['home.solutions.unincorporated.button']} />
-                <ArrowRight size={16} />
+                <ArrowRight size={16} className="shrink-0" />
               </Link>
             </Button>
           </div>

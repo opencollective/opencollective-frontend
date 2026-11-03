@@ -28,7 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
 
-import { kycVerificationFields } from '../graphql';
+import { kycVerificationFieldsFragment } from '../graphql';
 import { KYCRequestModal } from '../request/KYCRequestModal';
 import { CreateManualKYCRequestModal } from '../request/manual/CreateManualKYCRequestModal';
 
@@ -105,7 +105,7 @@ const accountKycStatusQuery = gql`
     }
   }
 
-  ${kycVerificationFields}
+  ${kycVerificationFieldsFragment}
 `;
 
 export function AccountKYCStatusBadge(props: AccountKYCStatusBadgeProps) {

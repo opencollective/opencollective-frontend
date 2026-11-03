@@ -17,8 +17,8 @@ import { createError, ERROR } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
 import type {
   ExpenseHostFieldsFragment,
-  ExpensesListAdminFieldsFragmentFragment,
-  ExpensesListFieldsFragmentFragment,
+  ExpensesListAdminFieldsFragment,
+  ExpensesListFieldsFragment,
 } from '../../lib/graphql/types/v2/graphql';
 import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
@@ -418,7 +418,7 @@ const getHandleSubmit = (intl, currency, onSubmit, payoutMethodType) => async va
 
 /** Expense fields needed by PayExpenseModal - combines list and admin fragments */
 type PayExpenseModalExpense = Pick<
-  ExpensesListFieldsFragmentFragment,
+  ExpensesListFieldsFragment,
   | 'id'
   | 'legacyId'
   | 'currency'
@@ -429,8 +429,8 @@ type PayExpenseModalExpense = Pick<
   | 'payoutMethod'
   | 'amountInHostCurrency'
 > &
-  Pick<ExpensesListAdminFieldsFragmentFragment, 'taxes'> & {
-    account: Pick<ExpensesListFieldsFragmentFragment['account'], 'name' | 'slug'>;
+  Pick<ExpensesListAdminFieldsFragment, 'taxes'> & {
+    account: Pick<ExpensesListFieldsFragment['account'], 'name' | 'slug'>;
   };
 
 /** Host fields needed by PayExpenseModal */
@@ -440,7 +440,7 @@ type PayExpenseModalHost = Pick<
 >;
 
 /** Collective fields needed by PayExpenseModal */
-type PayExpenseModalCollective = Pick<ExpensesListFieldsFragmentFragment['account'], 'currency'>;
+type PayExpenseModalCollective = Pick<ExpensesListFieldsFragment['account'], 'currency'>;
 
 type PayExpenseModalProps = {
   canPayWithAutomaticPayment: boolean;

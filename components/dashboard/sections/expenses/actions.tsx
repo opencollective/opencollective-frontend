@@ -24,8 +24,8 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { gql } from '../../../../lib/graphql/helpers';
 import type {
   ExpenseHostFieldsFragment,
-  ExpensesListAdminFieldsFragmentFragment,
-  ExpensesListFieldsFragmentFragment,
+  ExpensesListAdminFieldsFragment,
+  ExpensesListFieldsFragment,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
@@ -94,8 +94,8 @@ const SubmitExpenseFlow = React.lazy(() =>
  * Type for expense data used in actions. Combines ExpensesListFieldsFragment and
  * ExpensesListAdminFieldsFragment with optional additional fields that may be present
  */
-type ExpenseQueryNode = ExpensesListFieldsFragmentFragment &
-  ExpensesListAdminFieldsFragmentFragment & {
+type ExpenseQueryNode = ExpensesListFieldsFragment &
+  ExpensesListAdminFieldsFragment & {
     host?: ExpenseHostFieldsFragment | null;
   };
 

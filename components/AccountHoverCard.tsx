@@ -32,7 +32,7 @@ const AccountKYCStatusBadge = React.lazy(() =>
   import('./kyc/components/AccountKYCStatusBadge').then(mod => ({ default: mod.AccountKYCStatusBadge })),
 );
 
-export const accountHoverCardFields = gql`
+export const accountHoverCardFieldsFragment = gql`
   fragment AccountHoverCardFields on Account {
     id
     publicId

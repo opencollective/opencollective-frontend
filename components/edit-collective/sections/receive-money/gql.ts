@@ -1,7 +1,7 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
 const manualPaymentProviderFragment = gql`
-  fragment ManualPaymentProviderFragment on ManualPaymentProvider {
+  fragment ManualPaymentProviderFields on ManualPaymentProvider {
     id
     type
     name
@@ -45,7 +45,7 @@ export const editCollectiveBankTransferHostQuery = gql`
         type
       }
       manualPaymentProviders {
-        ...ManualPaymentProviderFragment
+        ...ManualPaymentProviderFields
       }
     }
   }
@@ -58,7 +58,7 @@ export const createManualPaymentProviderMutation = gql`
     $manualPaymentProvider: ManualPaymentProviderCreateInput!
   ) {
     createManualPaymentProvider(host: $host, manualPaymentProvider: $manualPaymentProvider) {
-      ...ManualPaymentProviderFragment
+      ...ManualPaymentProviderFields
     }
   }
   ${manualPaymentProviderFragment}
@@ -70,7 +70,7 @@ export const updateManualPaymentProviderMutation = gql`
     $input: ManualPaymentProviderUpdateInput!
   ) {
     updateManualPaymentProvider(manualPaymentProvider: $manualPaymentProvider, input: $input) {
-      ...ManualPaymentProviderFragment
+      ...ManualPaymentProviderFields
     }
   }
   ${manualPaymentProviderFragment}
@@ -79,7 +79,7 @@ export const updateManualPaymentProviderMutation = gql`
 export const deleteManualPaymentProviderMutation = gql`
   mutation DeleteManualPaymentProvider($manualPaymentProvider: ManualPaymentProviderReferenceInput!) {
     deleteManualPaymentProvider(manualPaymentProvider: $manualPaymentProvider) {
-      ...ManualPaymentProviderFragment
+      ...ManualPaymentProviderFields
     }
   }
   ${manualPaymentProviderFragment}
@@ -92,7 +92,7 @@ export const reorderManualPaymentProvidersMutation = gql`
     $providers: [ManualPaymentProviderReferenceInput!]!
   ) {
     reorderManualPaymentProviders(host: $host, type: $type, providers: $providers) {
-      ...ManualPaymentProviderFragment
+      ...ManualPaymentProviderFields
     }
   }
   ${manualPaymentProviderFragment}

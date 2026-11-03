@@ -1,6 +1,6 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-export const accountActivitySubscriptionsFragment = gql`
+export const accountActivitySubscriptionsFieldsFragment = gql`
   fragment AccountActivitySubscriptionsFields on Account {
     id
     name

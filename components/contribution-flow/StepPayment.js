@@ -24,7 +24,6 @@ const StepPayment = ({
   onNewCardFormReady,
   disabledPaymentMethodTypes,
   showPlatformTip,
-  isOscTipExperiment,
 }) => {
   const { LoggedInUser } = useLoggedInUser();
 
@@ -33,7 +32,6 @@ const StepPayment = ({
       props: {
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: stepDetails?.isNewPlatformTip ? 'new' : 'old',
         [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_ENABLED]: Boolean(showPlatformTip),
-        [AnalyticsProperty.CONTRIBUTION_IS_OSC_TIP_EXPERIMENT]: Boolean(isOscTipExperiment),
         [AnalyticsProperty.CONTRIBUTION_HOST_SLUG]: collective?.host?.slug,
       },
     });

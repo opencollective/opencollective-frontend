@@ -41,7 +41,7 @@ import { useToast } from '../ui/useToast';
 
 import { getUseVendorPolicyLabel } from './common';
 import type { VendorFieldsFragment } from './queries';
-import { createVendorMutation, vendorFieldFragment } from './queries';
+import { createVendorMutation, vendorFieldsFragment } from './queries';
 
 const FIELD_LABEL_PROPS = { fontSize: 14, fontWeight: 700 };
 
@@ -52,7 +52,7 @@ const editVendorMutation = gql`
       ...VendorFields
     }
   }
-  ${vendorFieldFragment}
+  ${vendorFieldsFragment}
 `;
 
 const EDITABLE_FIELDS = [

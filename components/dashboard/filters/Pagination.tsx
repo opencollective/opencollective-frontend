@@ -22,12 +22,18 @@ import {
 } from '../../ui/Pagination';
 import { Select, SelectContent, SelectItem } from '../../ui/Select';
 
-type PaginationProps =
+type PaginationProps = (
   | { total: number; hasMore?: never; queryFilter: any; className?: string }
-  | { total?: never; hasMore: boolean; queryFilter: any; className?: string };
+  | { total?: never; hasMore: boolean; queryFilter: any; className?: string }
+) & {
+  /** Maximum number of items per page that can be selected */
+  maxLimit?: number;
+};
 
-function SelectLimit({ limit, setLimit, defaultLimit }) {
-  const options = uniq([20, 40, 60, 80, 100, limit, defaultLimit].filter(Boolean)).sort((a, b) => a - b);
+function SelectLimit({ limit, setLimit, defaultLimit, maxLimit }) {
+  const options = uniq([20, 40, 60, 80, 100, limit, defaultLimit].filter(Boolean))
+    .filter(option => !maxLimit || option <= maxLimit)
+    .sort((a, b) => a - b);
 
   return (
     <Select value={String(limit)} onValueChange={v => setLimit(v)}>
@@ -51,7 +57,7 @@ function SelectLimit({ limit, setLimit, defaultLimit }) {
   );
 }
 
-export function Pagination({ total, hasMore, queryFilter, className = '' }: PaginationProps) {
+export function Pagination({ total, hasMore, queryFilter, className = '', maxLimit }: PaginationProps) {
   const { LoggedInUser } = useLoggedInUser();
   const { offset, limit } = queryFilter.values;
   const defaultLimit = queryFilter.defaultSchemaValues.limit;
@@ -175,7 +181,12 @@ export function Pagination({ total, hasMore, queryFilter, className = '' }: Pagi
     <div className={cn('flex items-center justify-between gap-1', className)}>
       <UIPagination className="flex-1 items-center justify-between sm:flex">
         <div className="hidden lg:block">
-          <SelectLimit limit={limit} defaultLimit={defaultLimit} setLimit={l => queryFilter.setFilter('limit', l)} />
+          <SelectLimit
+            limit={limit}
+            defaultLimit={defaultLimit}
+            maxLimit={maxLimit}
+            setLimit={l => queryFilter.setFilter('limit', l)}
+          />
         </div>
 
         {hasTotal && (

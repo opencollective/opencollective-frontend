@@ -87,12 +87,11 @@ jobs:
 
     services:
       redis:
-        image: redis@sha256:2c2dff791878316e3b083188be0d578423b24813cdda5de0e80ea4f7b3e6bfd6
+        image: valkey/valkey:9.1
         ports:
           - 6379:6379
-        options: --entrypoint redis-server
       postgres:
-        image: postgres:16.15@sha256:65b16a8b326e0cfbdf33fa7e783f2a0cb352a61448616ccccfd616ef42aa0f65
+        image: postgres:16.15
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -249,9 +248,13 @@ jobs:
             next_root="${next_root}/frontend-next"
           fi
           mkdir -p .next
-          rsync -a "${next_root}/" .next/
+          rsync -a --exclude _generated-public/ "${next_root}/" .next/
           test -f .next/BUILD_ID
           test -f .next/routes-manifest.json
+          # Put back the files the build generated in public/ (see "Stage Next.js build" in ci.yml), so this
+          # checkout serves what production serves from its build directory
+          rsync -a "${next_root}/_generated-public/" public/
+          test -f public/static/scripts/pdf.worker.min.mjs
 
           stack_root=/tmp/e2e-service-dists
           if [ ! -d "${stack_root}/opencollective-api/dist" ] && [ -d "${stack_root}/e2e-service-dists/opencollective-api/dist" ]; then
@@ -261,7 +264,7 @@ jobs:
           cp -a "${stack_root}/opencollective-api/dist" opencollective-api/dist
           cp -a "${stack_root}/opencollective-images/dist" opencollective-images/dist
           cp -a "${stack_root}/opencollective-pdf/dist" opencollective-pdf/dist
-          test -f opencollective-api/dist/e2e.js
+          test -f opencollective-api/dist/e2e/index.js || test -f opencollective-api/dist/e2e.js
           test -e opencollective-images/dist/server
           test -f opencollective-pdf/dist/server/index.js
 

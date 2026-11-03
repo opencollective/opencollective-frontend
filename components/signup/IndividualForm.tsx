@@ -4,6 +4,7 @@ import type { FormikProps } from 'formik';
 import { Form } from 'formik';
 import { omit, pick } from 'lodash-es';
 import { useRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -29,22 +30,57 @@ import { useToast } from '../ui/useToast';
 import type { SignupStepProps } from './common';
 import { SignupSteps } from './common';
 
-const emailVerificationFormSchema = z.union([
-  z.object({
-    email: z.string().email().min(5).max(128),
-    captcha: isCaptchaEnabled()
-      ? z.object({ token: z.string().nonempty(), provider: z.string().nonempty() })
-      : z.undefined(),
-  }),
-  z.object({
-    email: z.string().email().min(5).max(128),
-    otp: z.string().min(6).max(6).toUpperCase(),
-  }),
-]);
+const emailFieldSchema = z.string().email().min(5).max(128);
+const otpFieldSchema = z.string().min(6).max(6).toUpperCase();
+const captchaFieldSchema = z.object({ token: z.string().nonempty(), provider: z.string().nonempty() });
 
-type EmailVerificationFormValuesSchema = z.infer<typeof emailVerificationFormSchema>;
+/**
+ * Both steps share one Formik form that never remounts, so validation has to follow the step: a
+ * value left over from the other step must never satisfy it. As a union this let a stale `otp`
+ * through on the email step (skipping the captcha), and a stale `captcha` through on the code step
+ * (with no code at all).
+ */
+const schemaForStep = (step: SignupSteps) =>
+  z
+    .object({
+      email: emailFieldSchema,
+      otp: otpFieldSchema.optional(),
+      captcha: (isCaptchaEnabled() ? captchaFieldSchema : z.undefined()).optional(),
+    })
+    .superRefine((values, ctx) => {
+      if (step === SignupSteps.VERIFY_OTP) {
+        if (!values.otp) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['otp'], message: 'Required' });
+        }
+      } else if (isCaptchaEnabled() && !values.captcha) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['captcha'], message: 'Required' });
+      }
+    });
+
+type EmailVerificationFormValuesSchema = z.infer<ReturnType<typeof schemaForStep>>;
 
 const OTP_RESEND_INTERVAL = 30; // seconds
+
+/**
+ * `NOT_FOUND` from the OTP endpoints means the challenge is over: it expired, it was invalidated by
+ * too many wrong codes, or the account has already been verified. There is nothing left to retry,
+ * so tell the caller and send them back to the email step to start again. This is deliberately
+ * distinct from `INVALID_OTP`, which means "wrong code, but you can retry the same session".
+ */
+const showSessionExpiredAndRestart = (
+  toast: ReturnType<typeof useToast>['toast'],
+  intl: IntlShape,
+  nextStep: SignupStepProps['nextStep'],
+) => {
+  toast({
+    variant: 'error',
+    message: intl.formatMessage({
+      defaultMessage: 'This verification link is no longer valid. Please start again.',
+      id: 'signup.otp.sessionExpired',
+    }),
+  });
+  nextStep(SignupSteps.EMAIL_INPUT);
+};
 
 const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
   const [start, setStart] = React.useState<number>(new Date().getTime());
@@ -123,6 +159,8 @@ export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: Signu
           const token = response.token;
           await login(token);
           nextStep();
+        } else if (response.error?.type === 'NOT_FOUND') {
+          showSessionExpiredAndRestart(toast, intl, nextStep);
         } else {
           toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
         }
@@ -145,18 +183,17 @@ export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: Signu
             id: 'signup.otp.resendSuccess',
           }),
         });
+      } else if (response.error?.type === 'NOT_FOUND') {
+        showSessionExpiredAndRestart(toast, intl, nextStep);
       } else {
         toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
-        if (response.error.type === 'OTP_REQUEST_NOT_FOUND') {
-          nextStep(SignupSteps.EMAIL_INPUT);
-        }
       }
     }
   }, [intl, nextStep, toast, router.query.session]);
 
   return (
     <FormikZod<EmailVerificationFormValuesSchema>
-      schema={emailVerificationFormSchema}
+      schema={schemaForStep(step)}
       onSubmit={onSubmit}
       initialValues={{ email: router.query?.email as string }}
       innerRef={formikRef}

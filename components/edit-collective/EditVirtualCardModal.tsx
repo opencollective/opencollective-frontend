@@ -130,7 +130,7 @@ export const virtualCardsAssignedToCollectiveQuery = gql`
   }
 `;
 
-const VirtualCardPoliciesQuery = gql`
+const virtualCardPoliciesQuery = gql`
   query VirtualCardPolicies($slug: String) {
     account(slug: $slug) {
       id
@@ -186,7 +186,7 @@ export default function EditVirtualCardModal({
 }: EditVirtualCardModalProps) {
   const { toast } = useToast();
 
-  const { data: policyData, loading: isLoadingPolicy } = useQuery(VirtualCardPoliciesQuery, {
+  const { data: policyData, loading: isLoadingPolicy } = useQuery(virtualCardPoliciesQuery, {
     variables: {
       slug: host.slug,
     },

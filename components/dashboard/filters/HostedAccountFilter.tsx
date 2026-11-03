@@ -12,7 +12,7 @@ import type {
 } from '../../../lib/graphql/types/v2/graphql';
 import { isMulti } from '@/lib/filters/schemas';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
 
 import { accountFilterQuery } from './AccountFilter';
@@ -27,7 +27,7 @@ const hostedAccountFilterSearchQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const AccountRenderer = (props: {

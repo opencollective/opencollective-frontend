@@ -175,6 +175,7 @@ export const searchHostApplicationFieldsFragment = gql`
 export const searchCommandQuery = gql`
   query SearchCommand(
     $searchTerm: String!
+    $backend: SearchBackend
     $host: AccountReferenceInput
     $account: AccountReferenceInput
     $limit: Int!
@@ -189,10 +190,23 @@ export const searchCommandQuery = gql`
     $includeHostApplications: Boolean!
     $offset: Int
   ) {
-    search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account, useTopHits: $useTopHits) {
+    search(
+      searchTerm: $searchTerm
+      backend: $backend
+      defaultLimit: $limit
+      host: $host
+      account: $account
+      useTopHits: $useTopHits
+    ) {
       results {
         accounts(limit: $limit, offset: $offset) @include(if: $includeAccounts) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -203,6 +217,12 @@ export const searchCommandQuery = gql`
         }
         comments(limit: $limit, offset: $offset) @include(if: $includeComments) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -213,6 +233,12 @@ export const searchCommandQuery = gql`
         }
         expenses(limit: $limit, offset: $offset) @include(if: $includeExpenses) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -224,6 +250,12 @@ export const searchCommandQuery = gql`
         }
         orders(limit: $limit, offset: $offset) @include(if: $includeOrders) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -234,6 +266,12 @@ export const searchCommandQuery = gql`
         }
         transactions(limit: $limit, offset: $offset) @include(if: $includeTransactions) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -245,6 +283,12 @@ export const searchCommandQuery = gql`
 
         updates(limit: $limit, offset: $offset) @include(if: $includeUpdates) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -255,6 +299,12 @@ export const searchCommandQuery = gql`
         }
         hostApplications(limit: $limit, offset: $offset) @include(if: $includeHostApplications) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -277,6 +327,7 @@ export const searchCommandQuery = gql`
 export const searchPageQuery = gql`
   query SearchPage(
     $searchTerm: String!
+    $backend: SearchBackend
     $host: AccountReferenceInput
     $account: AccountReferenceInput
     $defaultLimit: Int!
@@ -300,6 +351,7 @@ export const searchPageQuery = gql`
   ) {
     search(
       searchTerm: $searchTerm
+      backend: $backend
       defaultLimit: $defaultLimit
       host: $host
       account: $account
@@ -308,6 +360,12 @@ export const searchPageQuery = gql`
       results {
         accounts(limit: $accountsLimit, offset: $offset) @include(if: $includeAccounts) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -318,6 +376,12 @@ export const searchPageQuery = gql`
         }
         comments(limit: $commentsLimit, offset: $offset) @include(if: $includeComments) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -328,6 +392,12 @@ export const searchPageQuery = gql`
         }
         expenses(limit: $expensesLimit, offset: $offset) @include(if: $includeExpenses) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -339,6 +409,12 @@ export const searchPageQuery = gql`
         }
         orders(limit: $ordersLimit, offset: $offset) @include(if: $includeOrders) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -349,6 +425,12 @@ export const searchPageQuery = gql`
         }
         transactions(limit: $transactionsLimit, offset: $offset) @include(if: $includeTransactions) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -360,6 +442,12 @@ export const searchPageQuery = gql`
 
         updates(limit: $updatesLimit, offset: $offset) @include(if: $includeUpdates) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit
@@ -370,6 +458,12 @@ export const searchPageQuery = gql`
         }
         hostApplications(limit: $hostApplicationsLimit, offset: $offset) @include(if: $includeHostApplications) {
           highlights
+          totalCountIsCapped
+          maxScore
+          scores {
+            id
+            score
+          }
           collection {
             totalCount
             limit

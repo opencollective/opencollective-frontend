@@ -19,7 +19,7 @@ import type {
   TransactionsImportStats,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { updateTransactionsImportRows } from './lib/graphql';
+import { updateTransactionsImportRowsMutation } from './lib/graphql';
 import { getMatchInfo } from './lib/match';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { ExpenseStatusFilter, OrderStatus, TransactionsImportRowAction } from '@/lib/graphql/types/v2/graphql';
@@ -33,7 +33,7 @@ import Image from '@/components/Image';
 import OrderStatusTag from '@/components/orders/OrderStatusTag';
 import { DataList, DataListItem } from '@/components/ui/DataList';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
@@ -165,7 +165,7 @@ const findExpenseMatchForOffPlatformCreditQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 const findOrderMatchForOffPlatformCreditQuery = gql`
@@ -233,7 +233,7 @@ const findOrderMatchForOffPlatformCreditQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
   ${confirmContributionFieldsFragment}
 `;
 
@@ -404,7 +404,7 @@ export const MatchCreditDialog = ({
   const intl = useIntl();
   const [activeViewId, setActiveViewId] = React.useState(TabType.EXPECTED_FUNDS);
   const matchInfo = getMatchInfo(row, selectedExpense, selectedContribution);
-  const [updateRows] = useMutation(updateTransactionsImportRows);
+  const [updateRows] = useMutation(updateTransactionsImportRowsMutation);
   const queryFilter = useMatchCreditDialogQueryFilter(activeViewId, row, host, accounts);
   const [isConfirming, setIsConfirming] = React.useState(false);
 

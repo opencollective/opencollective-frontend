@@ -47,6 +47,8 @@ type OrderTimelineItem = {
   icon: React.ReactNode;
   date: string | Date;
   expected?: boolean;
+  /** Set for values that represent a calendar day rather than an instant: rendered date-only, in UTC */
+  dateOnly?: boolean;
   details?: React.ReactNode;
   type?: 'error' | 'warning' | 'success' | 'info';
   collapsable?: boolean;
@@ -375,6 +377,7 @@ function ContributionTimeline(props: OrderTimelineProps) {
       title: <FormattedMessage defaultMessage="Expected date for funds received" id="2f9kCJ" />,
       icon: <Calendar size={16} />,
       date: props.order.pendingContributionData.expectedAt as string,
+      dateOnly: true,
       expected: true,
       type: 'info',
     });
@@ -452,7 +455,11 @@ function ContributionTimeline(props: OrderTimelineProps) {
                 <div>
                   <div>{t.title}</div>
                   <div className="text-xs leading-5 text-[#75777A]">
-                    <DateTime value={t.date} timeStyle="short" />
+                    {t.dateOnly ? (
+                      <DateTime value={t.date} dateStyle="medium" timeStyle={undefined} timeZone="UTC" />
+                    ) : (
+                      <DateTime value={t.date} timeStyle="short" />
+                    )}
                   </div>
                   {t.details && <div className="mt-2">{t.details}</div>}
                 </div>

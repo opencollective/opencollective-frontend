@@ -8,7 +8,7 @@ import { isMulti } from '@/lib/filters/schemas';
 import { gql } from '@/lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, ExpectedFundsFilter, HostContext } from '@/lib/graphql/types/v2/graphql';
 
-import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import type { FilterValues as OrderFilterValues } from '../sections/contributions/filters';
 
 import ComboSelectFilter from './ComboSelectFilter';
@@ -37,7 +37,7 @@ const createdByFilterSearchQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export type OrderCreatedByFilterMeta = {

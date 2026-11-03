@@ -12,12 +12,12 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import { Pagination } from '@/components/dashboard/filters/Pagination';
 import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
-import { kycVerificationCollectionFields } from '../graphql';
+import { kycVerificationCollectionFieldsFragment } from '../graphql';
 import { SubmitKYCVerificationButton } from '../request/SubmitKYCVerificationButton';
 
 import { KYCVerificationRequestsTable } from './KYCVerificationRequestsTable';
@@ -62,8 +62,8 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
           }
         }
       }
-      ${kycVerificationCollectionFields}
-      ${accountHoverCardFields}
+      ${kycVerificationCollectionFieldsFragment}
+      ${accountHoverCardFieldsFragment}
     `,
     {
       variables: {

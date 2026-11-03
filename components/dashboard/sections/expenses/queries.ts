@@ -1,8 +1,8 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import {
-  expenseHostFields,
+  expenseHostFieldsFragment,
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
 } from '../../../expenses/graphql/fragments';
@@ -68,7 +68,7 @@ export const accountExpensesQuery = gql`
       limit
       nodes {
         id
-        ...ExpensesListFieldsFragment
+        ...ExpensesListFields
         amountInCreatedByAccountCurrency: amountV2(currencySource: CREATED_BY_ACCOUNT)
           @include(if: $hasAmountInCreatedByAccountCurrency) {
           value
@@ -105,7 +105,7 @@ export const accountExpensesQuery = gql`
   }
 
   ${expensesListFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 export const accountExpensesMetadataQuery = gql`
@@ -154,7 +154,7 @@ export const accountExpensesMetadataQuery = gql`
       }
     }
   }
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 export const hostDashboardExpensesQuery = gql`
@@ -218,8 +218,8 @@ export const hostDashboardExpensesQuery = gql`
       limit
       nodes {
         id
-        ...ExpensesListFieldsFragment
-        ...ExpensesListAdminFieldsFragment
+        ...ExpensesListFields
+        ...ExpensesListAdminFields
 
         payee {
           grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, host: { slug: $hostSlug })
@@ -242,7 +242,7 @@ export const hostDashboardExpensesQuery = gql`
   }
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 export const hostDashboardMetadataQuery = gql`
@@ -335,7 +335,7 @@ export const paymentRequestsMetadataQuery = gql`
       totalCount
     }
   }
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 /**
@@ -489,8 +489,8 @@ export const paidDisbursementsQuery = gql`
       limit
       nodes {
         id
-        ...ExpensesListFieldsFragment
-        ...ExpensesListAdminFieldsFragment
+        ...ExpensesListFields
+        ...ExpensesListAdminFields
         paidAt
         paidBy {
           id
@@ -509,8 +509,8 @@ export const paidDisbursementsQuery = gql`
   }
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
-  ${accountHoverCardFields}
-  ${expenseHostFields}
+  ${accountHoverCardFieldsFragment}
+  ${expenseHostFieldsFragment}
 `;
 
 export const dashboardExpensesQuery = gql`
@@ -576,8 +576,8 @@ export const dashboardExpensesQuery = gql`
       limit
       nodes {
         id
-        ...ExpensesListFieldsFragment
-        ...ExpensesListAdminFieldsFragment
+        ...ExpensesListFields
+        ...ExpensesListAdminFields
 
         payee {
           grantHistory: expenses(
@@ -611,5 +611,5 @@ export const expenseHostQuery = gql`
       ...ExpenseHostFields
     }
   }
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
