@@ -52,7 +52,7 @@ safe-outputs:
     allowed-files:
       - lang/${{ github.aw.import-inputs.locale }}.json
       - scripts/i18n/translation-stats.ts
-      - lib/constants/locales.js
+      - lib/constants/locales.ts
   jobs:
     post-slack-summary:
       description: Post an i18n run summary to Slack
@@ -141,7 +141,7 @@ Required effects when the prefetch file has at least one line:
 
 No-op: if the prefetch file is empty, or the run produces no file changes, call `noop` with a short reason and still call `post_slack_summary` (no PR). Do not create an empty pull request.
 
-Do not merge the pull request. Do not edit files outside `lang/${{ github.aw.import-inputs.locale }}.json`, `scripts/i18n/translation-stats.ts`, and `lib/constants/locales.js`. Use `gh` for GitHub reads. Use configured safe outputs for all writes.
+Do not merge the pull request. Do not edit files outside `lang/${{ github.aw.import-inputs.locale }}.json`, `scripts/i18n/translation-stats.ts`, and `lib/constants/locales.ts`. Use `gh` for GitHub reads. Use configured safe outputs for all writes.
 
 ## Safe Outputs
 

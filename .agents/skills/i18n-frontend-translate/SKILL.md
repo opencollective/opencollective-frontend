@@ -44,7 +44,7 @@ description: Batches translation of locale JSON using show-untranslated and set-
 
 5. **Sanity check**: Optionally re-run show-untranslated for that locale; remaining lines should be actual translation work, or items intentionally listed under `IGNORED`.
 
-6. **Update progress**: After finishing (or when the user stops), refresh locale completion percentages in `lib/constants/locales.js`:
+6. **Update progress**: After finishing (or when the user stops), refresh locale completion percentages in `lib/constants/locales.ts`:
 
    ```bash
    npm run langs:update-progress
@@ -92,6 +92,6 @@ Read the guide before translating or reviewing that locale. When a guide and exi
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `scripts/i18n/show-untranslated.ts` | Lists `{id}: english` where locale value still equals English, minus per-locale `IGNORED` message ids. Optional `--limit N`. |
 | `scripts/i18n/set-translation.ts`   | Writes one key: `set-translation.ts <locale> <id> "text"`                                                                    |
-| `npm run langs:update-progress`     | Recomputes per-locale completion % and writes `lib/constants/locales.js`. Run once when done.                                |
+| `npm run langs:update-progress`     | Recomputes per-locale completion % and writes `lib/constants/locales.ts`. Run once when done.                                |
 
 Show-untranslated and set-translation are invoked with `npx tsx` from the repository root.
