@@ -30,12 +30,12 @@ type RelatedTransaction = {
 };
 
 type RenderDetailsStringParams = {
-  amount?: Amount;
-  platformFee?: Amount;
+  amount: Amount;
+  platformFee: Amount;
   hostFee?: Amount;
   paymentProcessorFee?: Amount;
-  netAmount?: Amount;
-  taxAmount?: Amount;
+  netAmount: Amount;
+  taxAmount: Amount;
   taxInfo?: { id?: string; rate?: number; type?: string; percentage?: number };
   isCredit?: boolean;
   hasOrder?: boolean;
