@@ -170,12 +170,14 @@ class ContributionFlowSuccess extends React.Component<
   },
   {
     paymentIntentResult: PaymentIntentResult | null;
+    paymentIntentError: string | null;
     loaded: boolean;
     successTracked: boolean;
   }
 > {
   state = {
     paymentIntentResult: null,
+    paymentIntentError: null,
     loaded: false,
     successTracked: false,
   };
@@ -194,8 +196,14 @@ class ContributionFlowSuccess extends React.Component<
         this.setState({
           paymentIntentResult,
         });
+      } catch (error) {
+        // The payment intent could not be verified: never fall through to the success view.
+        this.setState({
+          paymentIntentError:
+            (error instanceof Error && error.message) ||
+            this.props.intl.formatMessage({ id: 'UZEPLR', defaultMessage: 'An unknown error has occurred' }),
+        });
       } finally {
-        // Never leave the page loading when the payment intent cannot be retrieved.
         this.setState({ loaded: true });
       }
     } else {
@@ -204,6 +212,10 @@ class ContributionFlowSuccess extends React.Component<
   }
 
   componentDidUpdate() {
+    if (this.state?.paymentIntentError) {
+      // Never follow the success redirect when the payment intent could not be verified.
+      return;
+    }
     const {
       router: { query: queryParams },
       data: { order },
@@ -422,6 +434,17 @@ class ContributionFlowSuccess extends React.Component<
         <div className="flex justify-center py-5 sm:py-6">
           <MessageBox type="warning" withIcon>
             <FormattedMessage id="Order.NotFound" defaultMessage="This contribution doesn't exist" />
+          </MessageBox>
+        </div>
+      );
+    }
+
+    // The payment intent could not be verified: do not pretend the contribution succeeded.
+    if (!loading && this.state?.paymentIntentError) {
+      return (
+        <div className="flex justify-center py-5 sm:py-6">
+          <MessageBox type="warning" withIcon>
+            {this.state.paymentIntentError}
           </MessageBox>
         </div>
       );
