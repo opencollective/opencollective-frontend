@@ -63,6 +63,8 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
   }
 
   const isFund = collective.type === CollectiveType.FUND;
+  // Fund donors expect to see what they gave, so Funds show contributions before fees and count fees as disbursed
+  const totalRaised = isFund ? stats.totalAmountRaised : stats.totalNetAmountRaised;
   const isIndividual = !collective.isHost && isIndividualAccount(collective);
   const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
 
@@ -124,6 +126,27 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
               <ShowChart size="12px" />
               {collective.isHost ? (
                 <DefinedTerm term={Terms.TOTAL_INCOME} textTransform="uppercase" color="black.700" />
+              ) : isFund ? (
+                <DefinedTerm
+                  term={Terms.FUND_TOTAL_RAISED}
+                  textTransform="uppercase"
+                  color="black.700"
+                  extraTooltipContent={
+                    <Box mt={2}>
+                      <FormattedMessage
+                        defaultMessage="Net amount after fees: {amount}"
+                        id="68CCN/"
+                        values={{
+                          amount: formatCurrency(
+                            stats.totalNetAmountRaised.valueInCents || 0,
+                            stats.totalNetAmountRaised.currency,
+                            { locale },
+                          ),
+                        }}
+                      />
+                    </Box>
+                  }
+                />
               ) : (
                 <DefinedTerm
                   term={Terms.TOTAL_RAISED}
@@ -149,20 +172,37 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                 />
               )}
             </StatTitle>
-            <StatAmount
-              amount={stats.totalNetAmountRaised.valueInCents}
-              currency={stats.totalNetAmountRaised.currency}
-            />
+            <StatAmount amount={totalRaised.valueInCents} currency={totalRaised.currency} />
           </StatContainer>
           <StatContainer borderTop={borderTop}>
             <StatTitle>
               <Expand size="12px" />
-              <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total disbursed" />
+              {isFund ? (
+                <DefinedTerm
+                  term={Terms.FUND_TOTAL_DISBURSED}
+                  textTransform="uppercase"
+                  color="black.700"
+                  extraTooltipContent={
+                    <Box mt={2}>
+                      <FormattedMessage
+                        defaultMessage="Including fees: {amount}"
+                        id="OTlvYM"
+                        values={{
+                          amount: formatCurrency(
+                            stats.totalAmountRaised.valueInCents - stats.totalNetAmountRaised.valueInCents,
+                            collective.currency,
+                            { locale },
+                          ),
+                        }}
+                      />
+                    </Box>
+                  }
+                />
+              ) : (
+                <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total disbursed" />
+              )}
             </StatTitle>
-            <StatAmount
-              amount={stats.totalNetAmountRaised.valueInCents - stats.balance.valueInCents}
-              currency={collective.currency}
-            />
+            <StatAmount amount={totalRaised.valueInCents - stats.balance.valueInCents} currency={collective.currency} />
           </StatContainer>
           {!isFund && stats.totalAmountReceived && stats.yearlyBudget && stats.activeRecurringContributions && (
             <StatContainer data-cy="budgetSection-estimated-budget" borderTop={borderTop}>
