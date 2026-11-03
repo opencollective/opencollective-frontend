@@ -108,20 +108,12 @@ const PaypalConnectButton = ({
 
   const handleConnect = async () => {
     setIsLoading(true);
+    let popup: Window | null = null;
     try {
       hadSuccess.current = false;
-      const oauthResult = await getPaypalOAuthUrl({
-        variables: {
-          account: { id: accountId },
-          currency: currency as Currency,
-        },
-      });
-      const authorizeUrl = oauthResult.data?.getPaypalOAuthUrl;
-      if (!authorizeUrl) {
-        throw new Error('PayPal Connect is not available at the moment.');
-      }
-
-      const popup = openPaypalPopup(authorizeUrl);
+      // Open the popup synchronously, while the click's user activation is still valid, so browsers don't block it.
+      // It is navigated to the authorize URL once we get it from the API.
+      popup = openPaypalPopup('about:blank');
       if (!popup) {
         toast({
           variant: 'error',
@@ -133,6 +125,18 @@ const PaypalConnectButton = ({
         return;
       }
 
+      const oauthResult = await getPaypalOAuthUrl({
+        variables: {
+          account: { id: accountId },
+          currency: currency as Currency,
+        },
+      });
+      const authorizeUrl = oauthResult.data?.getPaypalOAuthUrl;
+      if (!authorizeUrl) {
+        throw new Error('PayPal Connect is not available at the moment.');
+      }
+
+      popup.location.href = authorizeUrl;
       popupRef.current = popup;
       setIsPopupOpen(true);
 
@@ -205,6 +209,9 @@ const PaypalConnectButton = ({
         payoutMethodId: payload.payoutMethod.id,
       });
     } catch (err) {
+      if (popup && !popup.closed) {
+        popup.close();
+      }
       const graphQLErrors = (err as { graphQLErrors?: unknown[] })?.graphQLErrors;
       if (err instanceof Error && !graphQLErrors?.length) {
         onError(err);
