@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "Celková konsolidovaná suma vrátane projektov a podujatí: {amount}",
   "budgetSection-balance-definition": "Aktuálny zostatok na účte. Nezahŕňa Projekty a Podujatia.",
   "budgetSection-disbursed": "Vyplatené prostriedky spolu",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "Celkový príjem",
   "budgetSection-raised": "Celková vyzbieraná suma",
   "budgetSection-raised-definition": "Celková čistá suma, ktorá je k dispozícii na výdavky po odpočítaní poplatkov.",

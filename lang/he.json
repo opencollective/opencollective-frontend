@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "מאזן סופי כולל פרויקטים ואירועים: {amount}",
   "budgetSection-balance-definition": "המאזן הנוכחי של החשבון. לא כולל פרויקטים ואירועים.",
   "budgetSection-disbursed": "סה\"כ הוצאות",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "סה\"כ הוצאות",
   "budgetSection-raised": "גויסו בסך הכול",
   "budgetSection-raised-definition": "סה\"כ מאזן לשימוש לאחר עמלות ותקורה.",

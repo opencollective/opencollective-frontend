@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "Всього консолідовано, включно з проєктами та подіями: {amount}",
   "budgetSection-balance-definition": "Поточний баланс рахунку. Без урахування проєктів та подій.",
   "budgetSection-disbursed": "Всього оплачено",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "Усього надходжень",
   "budgetSection-raised": "Всього зібрано",
   "budgetSection-raised-definition": "Загальна сума нетто, яку можна витратити після сплати комісій.",

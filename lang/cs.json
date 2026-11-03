@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "Celkem včetně projektů a akcí: {amount}",
   "budgetSection-balance-definition": "Aktuální zůstatek účtu. Nezahrnuje projekty a události.",
   "budgetSection-disbursed": "Celkem vyplaceno",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "Celkový příjem",
   "budgetSection-raised": "Celkem vybráno",
   "budgetSection-raised-definition": "Celková částka, kterou lze utratit, po poplatcích.",

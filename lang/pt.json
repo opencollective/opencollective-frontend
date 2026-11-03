@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "Total consolidated including Projects and Events: {amount}",
   "budgetSection-balance-definition": "The current balance of the account. Not including Projects and Events.",
   "budgetSection-disbursed": "Total desembolsado",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "Total income",
   "budgetSection-raised": "Total raised",
   "budgetSection-raised-definition": "Total net amount available to spend after fees.",

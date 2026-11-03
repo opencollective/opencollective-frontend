@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "Gesamtkonsolidierung inklusive Projekte und Events: {amount}",
   "budgetSection-balance-definition": "Das aktuelle Guthaben. Nicht inklusive Projekte und Events.",
   "budgetSection-disbursed": "Insgesamt ausgezahlt",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "Gesamteinkommen",
   "budgetSection-raised": "Summe erhoben",
   "budgetSection-raised-definition": "Gesamtnettobetrag, der nach Gebühren auszugeben ist.",

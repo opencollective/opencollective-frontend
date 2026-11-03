@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "Totale consolidato inclusi progetti ed eventi: {amount}",
   "budgetSection-balance-definition": "Il saldo corrente del conto. Non inclusi progetti ed eventi.",
   "budgetSection-disbursed": "Totale pagato",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "Totale Entrate",
   "budgetSection-raised": "Totale raccolto",
   "budgetSection-raised-definition": "Importo netto totale disponibile al netto delle commissioni.",

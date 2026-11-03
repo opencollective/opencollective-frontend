@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "Łącznie skonsolidowane, w tym projekty i wydarzenia: {amount}",
   "budgetSection-balance-definition": "Aktualny stan konta. Nie obejmuje projektów i wydarzeń.",
   "budgetSection-disbursed": "Ogółem wypłacone",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "Całkowity dochód",
   "budgetSection-raised": "Łącznie zebrano",
   "budgetSection-raised-definition": "Całkowita kwota netto dostępna do wydania po uwzględnieniu opłat.",

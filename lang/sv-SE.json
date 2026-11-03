@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "Totalt konsoliderat inklusive Projekt och Events: {amount}",
   "budgetSection-balance-definition": "Nuvarande saldo på kontot. Inkluderar inte projekt och evenemang.",
   "budgetSection-disbursed": "Totalt utbetalt",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "Total inkomst",
   "budgetSection-raised": "Totalt insamlat",
   "budgetSection-raised-definition": "Total nettobelopp för att spendera, efter avgifter.",

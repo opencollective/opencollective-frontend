@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "プロジェクトとイベントの収支を含む総額: {amount}",
   "budgetSection-balance-definition": "このアカウントの現在の残高です。プロジェクトおよびイベントの収支は含まれていません。",
   "budgetSection-disbursed": "総支払金額",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "総収入",
   "budgetSection-raised": "総調達金額",
   "budgetSection-raised-definition": "Total net amount available to spend after fees.",

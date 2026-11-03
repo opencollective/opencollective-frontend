@@ -751,6 +751,8 @@
   "budgetSection-balance-consolidated": "Total consolidated including Projects and Events: {amount}",
   "budgetSection-balance-definition": "The current balance of the account. Not including Projects and Events.",
   "budgetSection-disbursed": "총 지출액",
+  "budgetSection-fund-disbursed-definition": "Total amount distributed by this fund, including fees.",
+  "budgetSection-fund-raised-definition": "Total amount contributed to this fund, before fees.",
   "budgetSection-income": "총 수입",
   "budgetSection-raised": "총 모금액",
   "budgetSection-raised-definition": "Total net amount available to spend after fees.",
