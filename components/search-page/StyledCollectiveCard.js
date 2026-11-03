@@ -152,7 +152,7 @@ const StyledCollectiveCard = ({
   const intl = useIntl();
   const collectiveCountry = collective.location?.country || collective.parent?.location?.country;
   const countryString = collectiveCountry
-    ? `${getFlagEmoji(collectiveCountry)} ${getCountryDisplayName(intl.locale, collectiveCountry)}`
+    ? `${getFlagEmoji(collectiveCountry)} ${getCountryDisplayName(intl, collectiveCountry)}`
     : null;
 
   return (
