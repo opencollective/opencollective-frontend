@@ -187,8 +187,8 @@ const withLoggedInUser = <P extends WithLoggedInUserProps = WithLoggedInUserProp
 };
 
 type WithLoggedInUserInjectedProps = {
-  getLoggedInUser: (options?: GetLoggedInUserOptions) => Promise<LoggedInUser>;
-  getLoggedInUserFromCache: () => LoggedInUser;
+  getLoggedInUser: (options?: GetLoggedInUserOptions) => Promise<LoggedInUser | null>;
+  getLoggedInUserFromCache: () => LoggedInUser | null;
 };
 
 export default withLoggedInUser;

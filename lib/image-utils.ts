@@ -31,7 +31,7 @@ export function generateDownloadUrlForFileUrl(fileUrl: string): string {
   }
 }
 
-function resizeImage(imageUrl: string, { width, height, query, baseUrl }: ImageOptions): string {
+function resizeImage(imageUrl: string, { width, height, query, baseUrl }: ImageOptions): string | null {
   if (!imageUrl) {
     return null;
   }
@@ -74,7 +74,7 @@ function isValidImageUrl(src: string): boolean {
   return Boolean(src && (src.substr(0, 1) === '/' || src.substr(0, 4).toLowerCase() === 'http'));
 }
 
-export function imagePreview(src: string, defaultImage: string, options: ImageOptions = { width: 640 }): string {
+export function imagePreview(src: string, defaultImage: string, options: ImageOptions = { width: 640 }): string | null {
   if (typeof options.width === 'string') {
     options.width = Number(options.width.replace(/rem/, '')) * 10;
   }

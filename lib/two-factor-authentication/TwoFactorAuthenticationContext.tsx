@@ -2,6 +2,9 @@ import React from 'react';
 
 type TwoFactorAuthCode = { type: string; code: string };
 
+/** The prompt returns nothing when it is already open (e.g. React strict-mode double mounts). */
+type TwoFactorAuthResult = TwoFactorAuthCode | undefined;
+
 type TwoFactorAuthenticationOptions = {
   webauthn?: { challenge: string; [key: string]: unknown };
 };
@@ -35,7 +38,7 @@ class TwoFactorAuthPrompt {
     supportedMethods,
     authenticationOptions,
     allowRecovery,
-  }: TwoFactorAuthPromptOptions = {}): Promise<TwoFactorAuthCode> => {
+  }: TwoFactorAuthPromptOptions = {}): Promise<TwoFactorAuthResult> => {
     if (this.isOpen) {
       return;
     }
@@ -80,7 +83,7 @@ class TwoFactorAuthPrompt {
 }
 
 type TwoFactorAuthPromptApi = {
-  open: (options?: TwoFactorAuthPromptOptions) => Promise<TwoFactorAuthCode>;
+  open: (options?: TwoFactorAuthPromptOptions) => Promise<TwoFactorAuthResult>;
   resolveAuth: (args: TwoFactorAuthCode) => void;
   rejectAuth: (args: unknown) => void;
   isOpen: boolean;
