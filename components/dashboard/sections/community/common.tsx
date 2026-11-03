@@ -25,9 +25,10 @@ import type {
   DashboardVendorsQuery,
   KycStatusFieldsFragment,
   PeopleHostDashboardQuery,
+  TransactionKind,
   VendorFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
-import { AccountType, KycProvider, TransactionKind } from '@/lib/graphql/types/v2/graphql';
+import { AccountType, KycProvider } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';

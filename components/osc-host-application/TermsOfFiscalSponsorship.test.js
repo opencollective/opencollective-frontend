@@ -23,13 +23,6 @@ jest.mock('../../lib/hooks/useLoggedInUser', () => jest.fn(() => ({ LoggedInUser
 
 jest.mock('../collectives/HomeNextIllustration', () => () => <img alt="mock" />);
 jest.mock('./ApplicationDescription', () => () => <div data-testid="app-description" />);
-jest.mock('../I18nFormatters', () => ({
-  getI18nLink: () =>
-    function LinkMock({ children }) {
-      // eslint-disable-next-line jsx-a11y/anchor-is-valid
-      return <a>{children}</a>;
-    },
-}));
 
 // ─── Imports (after mocks) ────────────────────────────────────────────────────
 
@@ -62,6 +55,26 @@ describe('TermsOfFiscalSponsorship - redirectToGithub', () => {
 
   afterEach(() => {
     delete global.fetch;
+  });
+
+  it('renders the fiscal sponsorship checkbox, terms link and manual verification link', () => {
+    const onChecked = jest.fn();
+    renderComponent({ checked: false, onChecked });
+
+    expect(screen.getByRole('checkbox')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /terms of fiscal sponsorship/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /request manual verification/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('checkbox'));
+    expect(onChecked).toHaveBeenCalledWith(true);
+  });
+
+  it('requires accepting the fiscal sponsorship terms before continuing', () => {
+    renderComponent({ checked: false });
+
+    fireEvent.click(screen.getByRole('link', { name: /request manual verification/i }));
+
+    expect(screen.getByText(/please accept the terms of fiscal sponsorship/i)).toBeInTheDocument();
   });
 
   it('calls fetch with Authorization header when clicking the GitHub verify button', async () => {

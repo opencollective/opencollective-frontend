@@ -384,6 +384,11 @@ interface Account {
     Specific account to query the membership of.
     """
     account: AccountReferenceInput
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
     orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
@@ -10418,6 +10423,7 @@ enum SecurityCheckScope {
   USER
   COLLECTIVE
   PAYEE
+  LEGAL_DOCUMENT
   PAYOUT_METHOD
   ATTACHMENTS
 }
@@ -25959,7 +25965,7 @@ enum SearchBackend {
   OPENSEARCH
 
   """
-  [Preview] PostgreSQL: exact totals and numbered pages (up to 50 results per page and offset 5000), search terms up to 200 characters and 12 words. Not all entities are supported yet: requesting an unsupported one returns an error.
+  [Preview] PostgreSQL: exact totals and numbered pages (up to 50 results per page and offset 5000), search terms up to 200 characters and 12 words.
   """
   POSTGRES
 }
@@ -27669,6 +27675,11 @@ type Mutation {
     If true, the orders will be moved to the incognito account of "fromAccount"
     """
     makeIncognito: Boolean
+
+    """
+    Bypass the tier amount validation when moving orders to a tier that does not match their amount (root only, for data repair)
+    """
+    force: Boolean
   ): [Order]!
 
   """

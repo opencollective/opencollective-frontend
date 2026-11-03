@@ -31,7 +31,9 @@ import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import { useDrawerActionsContainer } from '../../../Drawer';
+import { editAccountSettingsMutation } from '../../../edit-collective/mutations';
 import InviteMemberModal from '../../../edit-collective/sections/team/InviteMemberModal';
+import { cancelMemberInvitationMutation } from '../../../edit-collective/sections/team/queries';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
@@ -54,12 +56,6 @@ import { ActivityUser } from '../ActivityLog/ActivityUser';
 import type { HostedCollectivesDataTableMeta } from './common';
 import { cols, MoreActionsMenu } from './common';
 import { hostedCollectiveDetailQuery } from './queries';
-
-const cancelMemberInvitationMutation = gql`
-  mutation CancelMemberInvitation($invitation: MemberInvitationReferenceInput!) {
-    cancelMemberInvitation(invitation: $invitation)
-  }
-`;
 
 const editAccountHostFeeMutation = gql`
   mutation EditAccountFee($account: AccountReferenceInput!, $hostFeePercent: Float!, $isCustomFee: Boolean!) {
@@ -231,15 +227,6 @@ const AdminsCanSeePayoutMethodsSwitch = ({ collective }: Partial<CollectiveDetai
     />
   );
 };
-
-const editAccountSettingsMutation = gql`
-  mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
-    editAccountSetting(account: $account, key: $key, value: $value) {
-      id
-      settings
-    }
-  }
-`;
 
 const DISPLAYED_EXPENSE_TYPES = [EXPENSE_TYPE.INVOICE, EXPENSE_TYPE.RECEIPT, EXPENSE_TYPE.GRANT];
 

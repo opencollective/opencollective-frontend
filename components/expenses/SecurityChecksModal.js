@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
-import { compact, find, first, uniq, upperCase } from 'lodash-es';
+import { compact, find, first, uniq } from 'lodash-es';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -34,6 +34,7 @@ const Scope = {
   USER: 'USER',
   COLLECTIVE: 'COLLECTIVE',
   PAYEE: 'PAYEE',
+  LEGAL_DOCUMENT: 'LEGAL_DOCUMENT',
   PAYOUT_METHOD: 'PAYOUT_METHOD',
   ATTACHMENTS: 'ATTACHMENTS',
 };
@@ -41,7 +42,39 @@ const Scope = {
 export const expenseRequiresSecurityConfirmation = expense =>
   expense?.securityChecks?.filter(check => check.level === 'HIGH').length > 0;
 
+const I18nScopes = defineMessages({
+  ALL: {
+    id: 'SecurityScope.All',
+    defaultMessage: 'All Scopes',
+  },
+  [Scope.PAYEE]: {
+    id: 'SecurityScope.Payee',
+    defaultMessage: 'Payee',
+  },
+  [Scope.LEGAL_DOCUMENT]: {
+    id: 'SecurityScope.LegalDocument',
+    defaultMessage: 'Legal Document',
+  },
+  [Scope.USER]: {
+    id: 'Tags.USER',
+    defaultMessage: 'User',
+  },
+  [Scope.COLLECTIVE]: {
+    id: 'Collective',
+    defaultMessage: 'Collective',
+  },
+  [Scope.PAYOUT_METHOD]: {
+    id: 'PayoutMethod',
+    defaultMessage: 'Payout Method',
+  },
+  [Scope.ATTACHMENTS]: {
+    id: 'Expense.Attachments',
+    defaultMessage: 'Attachments',
+  },
+});
+
 const SecurityCheck = check => {
+  const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
 
   return (
@@ -56,7 +89,7 @@ const SecurityCheck = check => {
             p="2px 6px"
             mb={2}
           >
-            {upperCase(check.scope)}
+            {I18nScopes[check.scope] ? intl.formatMessage(I18nScopes[check.scope]) : check.scope}
           </StyledTag>
         </Box>
         <P fontWeight="500" fontSize="14px" lineHeight="20px">
@@ -93,32 +126,6 @@ const SecurityCheck = check => {
   );
 };
 
-const I18nScopes = defineMessages({
-  ALL: {
-    id: 'SecurityScope.All',
-    defaultMessage: 'All Scopes',
-  },
-  [Scope.PAYEE]: {
-    id: 'SecurityScope.Payee',
-    defaultMessage: 'Payee',
-  },
-  [Scope.USER]: {
-    id: 'Tags.USER',
-    defaultMessage: 'User',
-  },
-  [Scope.COLLECTIVE]: {
-    id: 'Collective',
-    defaultMessage: 'Collective',
-  },
-  [Scope.PAYOUT_METHOD]: {
-    id: 'PayoutMethod',
-    defaultMessage: 'Payout Method',
-  },
-  [Scope.ATTACHMENTS]: {
-    id: 'Expense.Attachments',
-    defaultMessage: 'Attachments',
-  },
-});
 const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => {
   const intl = useIntl();
   const [scope, setScope] = React.useState();

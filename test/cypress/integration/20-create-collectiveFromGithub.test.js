@@ -1,5 +1,9 @@
 describe('Create collective from Github', () => {
   it('Should submit create github page', () => {
+    cy.intercept('GET', '/api/ecosystems/repository*', {
+      statusCode: 404,
+      body: { error: { message: 'Not found' } },
+    });
     cy.intercept('GET', '/api/github-repositories*', { fixture: 'github-repos.json' });
     cy.login({ email: 'testuser@opencollective.com', redirect: '/opensource/apply/pick-repo?token=foofoo' });
     cy.contains('[data-cy=connect-github-header]', 'Pick a repository');
@@ -9,7 +13,7 @@ describe('Create collective from Github', () => {
     cy.get('[data-cy=ccf-form-message]').type('We need to gather some money');
     cy.get('[data-cy=ccf-form-submit]').click();
     cy.contains('[data-cy=ccf-form]', 'This must be checked');
-    cy.get('[data-cy=checkbox-termsOfServiceOC]').find('[data-cy=custom-checkbox]').click();
+    cy.get('[data-cy=checkbox-termsOfServiceOC]').click();
     cy.get('[data-cy=ccf-form-submit]').click();
     cy.url().should('include', '/adblockpluschrome/onboarding');
   });
