@@ -2,91 +2,87 @@ import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-in
 
 import { Sections } from '../components/collective-page/_constants';
 
-// TODO: `Sections.FINANCIAL_OVERVIEW` and `Sections.EXPENSES` are not defined in
-// `components/collective-page/_constants`: both lookups resolve to `undefined` at runtime, so the
-// second message overrides the first under the `undefined` key. Preserved until fixed in a
-// separate commit.
-const sections: Record<string, string> = Sections;
-
 const I18N_SECTIONS: Record<string, MessageDescriptor> = defineMessages({
-  [sections.TOP_FINANCIAL_CONTRIBUTORS]: {
+  [Sections.TOP_FINANCIAL_CONTRIBUTORS]: {
     id: 'SectionContribute.TopContributors',
     defaultMessage: 'Top financial contributors',
   },
-  [sections.CONNECTED_COLLECTIVES]: {
+  [Sections.CONNECTED_COLLECTIVES]: {
     id: 'ConnectedCollectives',
     defaultMessage: 'Connected Collectives',
   },
-  [sections.OUR_TEAM]: {
+  [Sections.OUR_TEAM]: {
     id: 'OurTeam',
     defaultMessage: 'Our team',
   },
-  [sections.GOALS]: {
+  [Sections.GOALS]: {
     id: 'Goals',
     defaultMessage: 'Goals',
   },
-  [sections.UPDATES]: {
+  [Sections.UPDATES]: {
     id: 'updates',
     defaultMessage: 'Updates',
   },
-  [sections.CONVERSATIONS]: {
+  [Sections.CONVERSATIONS]: {
     id: 'conversations',
     defaultMessage: 'Conversations',
   },
-  [sections.TICKETS]: {
+  [Sections.TICKETS]: {
     id: 'section.tickets.title',
     defaultMessage: 'Tickets',
   },
-  [sections.LOCATION]: {
+  [Sections.LOCATION]: {
     id: 'SectionLocation.Title',
     defaultMessage: 'Location',
   },
   // CONTRIBUTE/CONTRIBUTIONS
-  [sections.CONTRIBUTE]: {
+  [Sections.CONTRIBUTE]: {
     id: 'Contribute',
     defaultMessage: 'Contribute',
   },
-  [sections.CONTRIBUTIONS]: {
+  [Sections.CONTRIBUTIONS]: {
     id: 'Contributions',
     defaultMessage: 'Contributions',
   },
   // EVENTS/PROJECTS
-  [sections.EVENTS]: {
+  [Sections.EVENTS]: {
     id: 'Events',
     defaultMessage: 'Events',
   },
-  [sections.PROJECTS]: {
+  [Sections.PROJECTS]: {
     id: 'Projects',
     defaultMessage: 'Projects',
   },
   // BUDGET/TRANSACTIONS
-  [sections.TRANSACTIONS]: {
+  [Sections.TRANSACTIONS]: {
     id: 'menu.transactions',
     defaultMessage: 'Transactions',
   },
-  [sections.BUDGET]: {
+  [Sections.BUDGET]: {
     id: 'section.budget.title',
     defaultMessage: 'Budget',
   },
-  [sections.FINANCIAL_OVERVIEW]: {
+  // These two sections are no longer part of the collective page navbar: keep their labels keyed by
+  // their legacy section names so the translations stay reachable.
+  ['financial-overview']: {
     id: 'section.financialOverview.title',
     defaultMessage: 'Financial Overview',
   },
-  [sections.EXPENSES]: {
+  ['expenses']: {
     id: 'Expenses',
     defaultMessage: 'Expenses',
   },
   // CONTRIBUTORS/PARTICIPANTS
-  [sections.CONTRIBUTORS]: {
+  [Sections.CONTRIBUTORS]: {
     id: 'Contributors',
     defaultMessage: 'Contributors',
   },
-  [sections.PARTICIPANTS]: {
+  [Sections.PARTICIPANTS]: {
     id: 'CollectivePage.NavBar.Participants',
     defaultMessage: 'Participants',
   },
   // ABOUT
-  [sections.ABOUT]: {
+  [Sections.ABOUT]: {
     id: 'collective.about.title',
     defaultMessage: 'About',
   },

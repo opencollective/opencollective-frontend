@@ -1,4 +1,5 @@
 import { cloneDeep, isEmpty, unset } from 'lodash-es';
+import { createIntl } from 'react-intl';
 
 import {
   addDefaultSections,
@@ -7,6 +8,7 @@ import {
   getSectionsNames,
 } from '../collective-sections';
 import { CollectiveType } from '../constants/collectives';
+import i18nCollectivePageSection from '../i18n-collective-page-section';
 
 const expectSectionsToContain = (sections, expectedSectionsNames) => {
   expectedSectionsNames.forEach(section => {
@@ -194,5 +196,22 @@ describe('Collective sections', () => {
         ]);
       });
     });
+  });
+});
+
+describe('i18nCollectivePageSection', () => {
+  const intl = createIntl({ locale: 'en' });
+
+  it('returns the label of a known section', () => {
+    expect(i18nCollectivePageSection(intl, 'budget')).toBe('Budget');
+  });
+
+  it('returns the legacy section labels that are not part of the navbar', () => {
+    expect(i18nCollectivePageSection(intl, 'financial-overview')).toBe('Financial Overview');
+    expect(i18nCollectivePageSection(intl, 'expenses')).toBe('Expenses');
+  });
+
+  it('returns unknown sections unchanged', () => {
+    expect(i18nCollectivePageSection(intl, 'unknown-section')).toBe('unknown-section');
   });
 });
