@@ -127,26 +127,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
               {collective.isHost ? (
                 <DefinedTerm term={Terms.TOTAL_INCOME} textTransform="uppercase" color="black.700" />
               ) : isFund ? (
-                <DefinedTerm
-                  term={Terms.FUND_TOTAL_RAISED}
-                  textTransform="uppercase"
-                  color="black.700"
-                  extraTooltipContent={
-                    <Box mt={2}>
-                      <FormattedMessage
-                        defaultMessage="Net amount after fees: {amount}"
-                        id="68CCN/"
-                        values={{
-                          amount: formatCurrency(
-                            stats.totalNetAmountRaised.valueInCents || 0,
-                            stats.totalNetAmountRaised.currency,
-                            { locale },
-                          ),
-                        }}
-                      />
-                    </Box>
-                  }
-                />
+                <DefinedTerm term={Terms.FUND_TOTAL_RAISED} textTransform="uppercase" color="black.700" />
               ) : (
                 <DefinedTerm
                   term={Terms.TOTAL_RAISED}
@@ -178,26 +159,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
             <StatTitle>
               <Expand size="12px" />
               {isFund ? (
-                <DefinedTerm
-                  term={Terms.FUND_TOTAL_DISBURSED}
-                  textTransform="uppercase"
-                  color="black.700"
-                  extraTooltipContent={
-                    <Box mt={2}>
-                      <FormattedMessage
-                        defaultMessage="Fees: {amount}"
-                        id="jXNKGP"
-                        values={{
-                          amount: formatCurrency(
-                            stats.totalAmountRaised.valueInCents - stats.totalNetAmountRaised.valueInCents,
-                            collective.currency,
-                            { locale },
-                          ),
-                        }}
-                      />
-                    </Box>
-                  }
-                />
+                <DefinedTerm term={Terms.FUND_TOTAL_DISBURSED} textTransform="uppercase" color="black.700" />
               ) : (
                 <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total disbursed" />
               )}
