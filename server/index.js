@@ -1,4 +1,4 @@
-require('../env');
+require('../env.ts');
 
 const { EventEmitter } = require('node:events');
 const http = require('node:http');

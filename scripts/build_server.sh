@@ -4,7 +4,7 @@ SRC=./
 DIST=./dist
 
 echo "> Copying server"
-cp env.js $DIST
+cp env.ts $DIST
 cp -R server $DIST
 
 echo "> Copying lang"

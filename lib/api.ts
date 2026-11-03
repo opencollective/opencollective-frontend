@@ -126,14 +126,24 @@ export const canUseMockImageUpload = () => {
   }
 };
 
+type ImageUploadOptions = {
+  /** function called with upload progress as a number [0-100] */
+  onProgress?: (progress: number) => void;
+  onSuccess?: (url: string) => void;
+  onFailure?: (error: unknown) => void;
+  /** A mock image URL (or `true` for the default one) to return in test environments */
+  mockImage?: boolean | string;
+};
+
 /**
  * Similar to `upload` but uses XHR, which gives us the ability
  * to watch for upload progress (not yet supported by fetch).
- *
- * @param `onProgress` - function called with upload progress as a number [0-100]
- * @param mockImage - An image to return in test environments
  */
-export function uploadImageWithXHR(file, kind, { onProgress, onSuccess, onFailure, mockImage = false }) {
+export function uploadImageWithXHR(
+  file: File,
+  kind: string,
+  { onProgress, onSuccess, onFailure, mockImage = false }: ImageUploadOptions,
+) {
   // Mock for development
   if (mockImage && canUseMockImageUpload()) {
     const mockImageUrl = mockImage === true ? 'https://d.pr/free/i/OlQVIb+' : mockImage;

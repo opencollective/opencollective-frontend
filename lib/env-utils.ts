@@ -1,0 +1,5 @@
+import { get } from 'lodash-es';
+
+/** Retrieve variables set in the environment */
+export const getEnvVar = (v: string): string =>
+  process.browser ? get(window, ['__NEXT_DATA__', 'env', v]) : get(process, ['env', v]);

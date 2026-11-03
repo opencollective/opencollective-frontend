@@ -1,0 +1,59 @@
+// TODO(paymentMethodType): migrate to service+type
+import { defineMessages, type IntlShape, type MessageDescriptor } from 'react-intl';
+
+import { GQLV2_PAYMENT_METHOD_LEGACY_TYPES } from '../constants/payment-methods';
+import { TransactionKind } from '../constants/transactions';
+
+const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
+  [GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CREDIT_CARD]: {
+    id: 'CreditCard',
+    defaultMessage: 'Credit Card',
+  },
+  [GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER]: {
+    id: 'Manual',
+    defaultMessage: 'Manual (Bank Transfer)',
+  },
+  [GQLV2_PAYMENT_METHOD_LEGACY_TYPES.GIFT_CARD]: {
+    id: 'GiftCard',
+    defaultMessage: 'Gift Card',
+  },
+  [GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PREPAID_BUDGET]: {
+    id: 'Prepaid',
+    defaultMessage: 'Prepaid Card',
+  },
+  [GQLV2_PAYMENT_METHOD_LEGACY_TYPES.ACCOUNT_BALANCE]: {
+    id: 'ServiceBalance',
+    defaultMessage: '{service} balance',
+  },
+  [GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CRYPTO]: {
+    id: 'Crypto',
+    defaultMessage: 'Crypto',
+  },
+  [TransactionKind.ADDED_FUNDS]: {
+    id: 'Transaction.kind.ADDED_FUNDS',
+    defaultMessage: 'Added funds',
+  },
+  // PENDING Contributions
+  CHECK: {
+    id: 'PaymentMethod.Check',
+    defaultMessage: 'Check',
+  },
+  UNKNOWN: {
+    id: 'Unknown',
+    defaultMessage: 'Unknown',
+  },
+});
+
+/**
+ * Similar to ``, but specialized for the GQLV2's `PaymentMethodType`
+ * from `paymentMethod.providerType`
+ */
+export const i18nPaymentMethodProviderType = (intl: IntlShape, providerType: string): string => {
+  if (providerType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL) {
+    return 'PayPal';
+  } else if (i18nTypes[providerType]) {
+    return intl.formatMessage(i18nTypes[providerType], { service: 'Open Collective' });
+  } else {
+    return providerType;
+  }
+};

@@ -232,7 +232,7 @@ export default defineConfig([
 
   // Server/config files
   {
-    files: ['server/*.js', '**/*.config.js', '**/env.js'],
+    files: ['server/*.js', '**/*.config.js', '**/env.{js,ts}'],
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
 
