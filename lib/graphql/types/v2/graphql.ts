@@ -9423,6 +9423,8 @@ export type Mutation = {
   confirmOrder: OrderWithPayment;
   /** Connect a GoCardless account */
   connectGoCardlessAccount: GoCardlessConnectAccountResponse;
+  /** Complete the PayPal OAuth flow and create or update a verified PayPal payout method. Scope: "expenses". */
+  connectPaypalPayoutMethod: PaypalConnectPayoutMethodResponse;
   /** Connect a Plaid account */
   connectPlaidAccount: PlaidConnectAccountResponse;
   /** Complete the Stripe OAuth flow and connect the account to the host. Scope: "connectedAccounts". */
@@ -9575,6 +9577,8 @@ export type Mutation = {
   generateGoCardlessLink: GoCardlessLink;
   /** Generate a Plaid Link token */
   generatePlaidLinkToken: PlaidLinkTokenCreateResponse;
+  /** Get the PayPal OAuth URL to initiate the "Log in with PayPal" payout method flow. Scope: "expenses". */
+  getPaypalOAuthUrl: Scalars['URL']['output'];
   /** Get the Stripe OAuth URL to initiate the account connection flow for a host. Scope: "connectedAccounts". */
   getStripeOAuthUrl: Scalars['URL']['output'];
   /** Get the Wise (TransferWise) OAuth URL to initiate the account connection flow for a host. Scope: "connectedAccounts". */
@@ -9859,6 +9863,17 @@ export type MutationConnectGoCardlessAccountArgs = {
   requisitionId: Scalars['String']['input'];
   sourceName?: InputMaybe<Scalars['String']['input']>;
   transactionImport?: InputMaybe<TransactionsImportReferenceInput>;
+};
+
+
+/** This is the root mutation */
+export type MutationConnectPaypalPayoutMethodArgs = {
+  account: AccountReferenceInput;
+  code: Scalars['NonEmptyString']['input'];
+  currency: Currency;
+  name?: InputMaybe<Scalars['String']['input']>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
+  state: Scalars['NonEmptyString']['input'];
 };
 
 
@@ -10461,6 +10476,13 @@ export type MutationGeneratePlaidLinkTokenArgs = {
   host: AccountReferenceInput;
   locale?: InputMaybe<Scalars['Locale']['input']>;
   transactionImport?: InputMaybe<TransactionsImportReferenceInput>;
+};
+
+
+/** This is the root mutation */
+export type MutationGetPaypalOAuthUrlArgs = {
+  account: AccountReferenceInput;
+  currency?: InputMaybe<Currency>;
 };
 
 
@@ -12485,6 +12507,14 @@ export enum PayoutMethodType {
   PAYPAL = 'PAYPAL',
   STRIPE = 'STRIPE'
 }
+
+export type PaypalConnectPayoutMethodResponse = {
+  __typename?: 'PaypalConnectPayoutMethodResponse';
+  /** The connected account that was created for this PayPal login */
+  connectedAccount: ConnectedAccount;
+  /** The payout method that was created or updated */
+  payoutMethod: PayoutMethod;
+};
 
 export type PaypalPaymentInput = {
   data?: InputMaybe<Scalars['JSON']['input']>;
