@@ -6,12 +6,17 @@ import { IntlProvider } from 'react-intl';
 import { type DefaultTheme, ThemeProvider } from 'styled-components';
 
 import { initClient } from '../lib/apollo-client';
-import { getLocaleMessages } from '../lib/i18n/request';
 import theme from '../lib/theme';
 
 import { TooltipProvider } from '../components/ui/Tooltip';
 
 const apolloClient = initClient();
+
+/**
+ * `getLocaleMessages` is async (webpack dynamic import); tests need the messages synchronously.
+ * `jest.requireActual` loads the same JSON file through jest's resolver.
+ */
+const getTestLocaleMessages = (locale: string): Record<string, string> => jest.requireActual(`../lang/${locale}.json`);
 
 type ProvidersParams = {
   IntlProvider?: { locale?: string };
@@ -32,12 +37,7 @@ export const withRequiredProviders = (component: React.ReactNode, providersParam
   const client: ApolloClient<object> = get(providersParams, 'ApolloProvider.client', apolloClient);
   const themeArg: DefaultTheme = get(providersParams, 'ThemeProvider.theme', theme);
   return (
-    <IntlProvider
-      locale={locale}
-      // TODO: `getLocaleMessages` is async (dynamic import); passing its promise as messages is a
-      // latent bug for non-English locales. Preserved as-is until fixed in a separate commit.
-      messages={locale === 'en' ? undefined : (getLocaleMessages(locale) as never)}
-    >
+    <IntlProvider locale={locale} messages={locale === 'en' ? undefined : getTestLocaleMessages(locale)}>
       <ApolloProvider client={client}>
         <TooltipProvider delayDuration={0} skipDelayDuration={0}>
           <ThemeProvider theme={themeArg}>{component}</ThemeProvider>
