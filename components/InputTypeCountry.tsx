@@ -117,17 +117,21 @@ class InputTypeCountry extends Component<InputTypeCountryProps> {
 
   render() {
     const { defaultValue, value, intl, onChange, locale, name, inputId, ...props } = this.props;
-    // `getOptions` only takes the locale; the `defaultValue` argument it used to receive was ignored
+    const selectLocale = locale || intl.locale;
+    // react-select ignores `defaultValue` when `value` is also passed, so only set one of them
+    const valueProps = isUndefined(value)
+      ? { defaultValue: defaultValue ? this.getSelectedOption(selectLocale, defaultValue) : undefined }
+      : { value: this.getSelectedOption(selectLocale, value) };
+
     return (
       <StyledSelect
         name={name}
         inputId={inputId}
         minWidth={150}
-        options={this.getOptions(locale || intl.locale)}
+        options={this.getOptions(selectLocale)}
         filterOption={this.filterOptions}
         onChange={({ value }) => onChange(value)}
-        value={!isUndefined(value) ? this.getSelectedOption(locale || intl.locale, value) : undefined}
-        defaultValue={defaultValue ? this.getSelectedOption(locale || intl.locale, defaultValue) : undefined}
+        {...valueProps}
         placeholder={<FormattedMessage id="InputTypeCountry.placeholder" defaultMessage="Please select your country" />}
         data-cy="country-select"
         {...props}

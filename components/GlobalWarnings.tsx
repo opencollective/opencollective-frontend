@@ -36,9 +36,6 @@ type GlobalWarningsProps = {
 
 const GlobalWarnings = ({ collective }: GlobalWarningsProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  // TODO(finding): `isLimited` is selected by the V1 user query but is not defined on the
-  // `LoggedInUser` model, so this warning has never rendered. Preserved with a typed lookup.
-  const isLimited = (LoggedInUser as { isLimited?: boolean } | null)?.isLimited;
 
   if (collective?.isFrozen) {
     const isLoggedInUserHostAdmin = Boolean(LoggedInUser?.isHostAdmin(collective));
@@ -61,7 +58,7 @@ const GlobalWarnings = ({ collective }: GlobalWarningsProps) => {
         )}
       </GlobalWarningContainer>
     );
-  } else if (LoggedInUser && isLimited) {
+  } else if (LoggedInUser?.isLimited) {
     // Limited user accounts
     return (
       <GlobalWarningContainer>

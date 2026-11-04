@@ -135,8 +135,7 @@ class SendMoneyToCollectiveBtn extends React.Component<SendMoneyToCollectiveBtnP
                       id="SendMoneyToCollective.btn"
                       defaultMessage="Send {amount} to {collective}"
                       values={{
-                        // TODO: the `locale` string was passed where `formatCurrency` expects options, so it was ignored
-                        amount: formatCurrency(amount, currency),
+                        amount: formatCurrency(amount, currency, { locale: this.props.intl.locale }),
                         collective: toCollective.name,
                       }}
                     />

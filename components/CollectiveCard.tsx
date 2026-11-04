@@ -186,10 +186,8 @@ class CollectiveCard extends React.Component<CollectiveCardProps> {
     };
 
     const membershipDates = memberships.map(m => m.createdAt);
-    // TODO: `createdAt` is an ISO string, so `b - a` is always NaN and the sort is a no-op.
-    // Preserved with the same numeric coercion (see PLAN.md).
     membershipDates.sort((a, b) => {
-      return Number(b) - Number(a);
+      return new Date(a).getTime() - new Date(b).getTime();
     });
 
     const oldestMembershipDate = membershipDates.length ? membershipDates[0] : null;
