@@ -1,7 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Field, Form, Formik } from 'formik';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -62,18 +63,24 @@ const messages = defineMessages({
   },
 });
 
-class CreateProjectForm extends React.Component {
-  static propTypes = {
-    error: PropTypes.string,
-    parent: PropTypes.object,
-    loading: PropTypes.bool,
-    onSubmit: PropTypes.func,
-    intl: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    github: PropTypes.object,
-    router: PropTypes.object.isRequired,
-  };
+type CreateProjectFormValues = {
+  name: string;
+  description: string;
+  slug: string;
+};
 
+type CreateProjectFormProps = {
+  error?: string;
+  parent?: Record<string, unknown>;
+  loading?: boolean;
+  onSubmit?: (values: CreateProjectFormValues) => void;
+  intl?: IntlShape;
+  onChange?: (values: CreateProjectFormValues) => void;
+  github?: Record<string, unknown>;
+  router: Router;
+};
+
+class CreateProjectForm extends React.Component<CreateProjectFormProps> {
   render() {
     const { intl, error, loading, parent } = this.props;
 
@@ -83,8 +90,8 @@ class CreateProjectForm extends React.Component {
       slug: '',
     };
 
-    const validate = values => {
-      const errors = {};
+    const validate = (values: CreateProjectFormValues) => {
+      const errors: Record<string, string> = {};
 
       if (values.name.length > 50) {
         errors.name = intl.formatMessage(messages.errorName);
@@ -101,7 +108,7 @@ class CreateProjectForm extends React.Component {
       return errors;
     };
 
-    const submit = values => {
+    const submit = (values: CreateProjectFormValues) => {
       const { description, name, slug } = values;
       this.props.onSubmit({ name, description, slug });
     };
@@ -110,7 +117,9 @@ class CreateProjectForm extends React.Component {
       <Flex flexDirection="column" m={[3, 0]}>
         <Container mb={4}>
           {/** Container here is important to make sure navbar doesn't stay fixed at the top (sticky must be at the same DOM nesting level to work) */}
-          <CollectiveNavbar collective={parent} onlyInfos={true} />
+          <CollectiveNavbar
+            {...({ collective: parent, onlyInfos: true } as React.ComponentProps<typeof CollectiveNavbar>)}
+          />
         </Container>
         <Flex flexDirection="column" my={[2, 4]}>
           <Box mb={[2, 3]}>
@@ -135,7 +144,7 @@ class CreateProjectForm extends React.Component {
         <Flex alignItems="center" justifyContent="center">
           <ContainerWithImage
             mb={[1, 5]}
-            width={[320, 512, 576]}
+            {...({ width: [320, 512, 576] } as Record<string, unknown>)}
             border={['none', '1px solid #E6E8EB']}
             borderRadius={['none', '8px']}
             px={[1, 4]}
@@ -218,7 +227,7 @@ class CreateProjectForm extends React.Component {
                         buttonStyle="primary"
                         type="submit"
                         loading={loading}
-                        onSubmit={handleSubmit}
+                        {...({ onSubmit: handleSubmit } as Record<string, unknown>)}
                         data-cy="ccf-form-submit"
                       >
                         <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
@@ -230,10 +239,11 @@ class CreateProjectForm extends React.Component {
             </Formik>
             <Flex justifyContent="center" mb={4} display={['flex', 'none']}>
               <NextIllustration
-                display={['block', 'none']}
+                {...({ display: ['block', 'none'] } as Record<string, unknown>)}
                 src="/static/images/create-collective/mobileForm.png"
                 width={320}
                 height={200}
+                alt={undefined}
               />
             </Flex>
           </ContainerWithImage>
@@ -243,4 +253,5 @@ class CreateProjectForm extends React.Component {
   }
 }
 
-export default injectIntl(withRouter(CreateProjectForm));
+// `injectIntl` only types the injected `intl` prop; the class' own props are kept as-is
+export default injectIntl(withRouter(CreateProjectForm) as React.ComponentType<{ intl?: IntlShape }>);

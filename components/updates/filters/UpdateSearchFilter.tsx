@@ -28,7 +28,13 @@ const messages = defineMessages({
   },
 });
 
-const UpdateSearchFilter = ({ searchTerm, onChange }) => {
+type UpdateSearchFilterProps = {
+  /** Current search term, if any */
+  searchTerm?: string;
+  onChange: (searchTerm: string) => void;
+};
+
+const UpdateSearchFilter = ({ searchTerm, onChange }: UpdateSearchFilterProps) => {
   const { formatMessage } = useIntl();
   return (
     <Container>

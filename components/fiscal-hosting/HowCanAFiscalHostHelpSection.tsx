@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { themeGet } from '@styled-system/theme-get';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -10,7 +11,7 @@ import { SectionTitle } from '../marketing/Text';
 import StyledCarousel from '../StyledCarousel';
 import { H4, P, Span } from '../Text';
 
-const SelectFeatureButton = styled.button`
+const SelectFeatureButton = styled.button<{ active?: boolean; width?: number }>`
   width: 100%;
   cursor: pointer;
   color: #1869f5;
@@ -161,7 +162,13 @@ const messages = defineMessages({
   },
 });
 
-const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
+type FeatureTitleProps = {
+  id: string;
+  intl: IntlShape;
+  activeFeature: string;
+} & Omit<React.ComponentProps<typeof Container>, 'children'>;
+
+const FeatureTitle = ({ id, intl, activeFeature, ...props }: FeatureTitleProps) => {
   const iconUrl =
     activeFeature === id
       ? `/static/images/fiscal-hosting/${id}-icon-pink.png`
@@ -171,11 +178,11 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
     <Container alignItems="center" justifyContent={['center', 'space-between']} width={1} {...props}>
       <Container display="flex" alignItems="center">
         <Box width={[null, '48px']} height={[null, '48px']} mr={[3, 2]}>
-          <NextIllustration width={50} height={50} src={iconUrl} alt={`${id} icon`} preload="true" />
+          <NextIllustration width={50} height={50} src={iconUrl} alt={`${id} icon`} preload />
         </Box>
         <Span
           color={['black.800', 'black.900']}
-          active={id === activeFeature}
+          {...({ active: id === activeFeature } as React.ComponentProps<typeof Span>)}
           fontWeight="500"
           textAlign={['center', 'left']}
           fontSize={['20px', '16px', null, null, '18px']}
@@ -189,13 +196,19 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
   );
 };
 
-const FeatureDescription = ({ intl, id, ...props }) => (
+type FeatureDescriptionProps = {
+  intl: IntlShape;
+  id: string;
+  learnMoreLink?: string;
+} & Omit<React.ComponentProps<typeof Box>, 'children'>;
+
+const FeatureDescription = ({ intl, id, ...props }: FeatureDescriptionProps) => (
   <Box {...props}>
     <P
       fontSize={['16px', null, null, null, '18px']}
-      lineHeight={['24px', null, null, null, '27px']}
-      color={['black.600', 'black.700']}
-      letterSpacing={['-0.04px', '-0.16px']}
+      {...({ lineHeight: ['24px', null, null, null, '27px'] } as Record<string, unknown>)}
+      {...({ color: ['black.600', 'black.700'] } as Record<string, unknown>)}
+      {...({ letterSpacing: ['-0.04px', '-0.16px'] } as Record<string, unknown>)}
       textAlign={['center', 'left']}
     >
       {intl.formatMessage(messages[`fiscalHosting.feature.${id}.description`])}{' '}
@@ -203,21 +216,32 @@ const FeatureDescription = ({ intl, id, ...props }) => (
   </Box>
 );
 
-const Feature = ({ id, learnMoreLink, intl }) => (
+type FeatureProps = {
+  id: string;
+  learnMoreLink?: string;
+  intl: IntlShape;
+};
+
+const Feature = ({ id, learnMoreLink, intl }: FeatureProps) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
     <FeatureTitle intl={intl} id={id} activeFeature={id} display={['flex', 'none']} />
-    <Container mb={[2, 3, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
+    <Container
+      mb={[2, 3, 5]}
+      ml={[null, null, 4]}
+      {...({ width: [null, null, '400px', null, '624px'] } as Record<string, unknown>)}
+      textAlign="left"
+    >
       <H4 display={['none', 'block']} letterSpacing="-0.4px" fontWeight="bold" color="black.800" my={3}>
         {intl.formatMessage(messages[`fiscalHosting.feature.${id}`])}
       </H4>
       <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', 'block']} />
     </Container>
-    <Container mt={['14px', 0]} width={[null, '392px', '466px', null, '756px']}>
+    <Container mt={['14px', 0]} {...({ width: [null, '392px', '466px', null, '756px'] } as Record<string, unknown>)}>
       <NextIllustration
         loading="eager"
         width={756}
         height={502}
-        preload="true"
+        preload
         src={`/static/images/fiscal-hosting/${id}-screenshot.png`}
         alt={intl.formatMessage(messages[`fiscalHosting.feature.${id}`])}
       />
@@ -254,7 +278,7 @@ const HowToUseOpenCollective = () => {
             </FeatureList>
           ))}
         </FeatureListWrapper>
-        <StyledCarousel display={[null, 'none']} width={1}>
+        <StyledCarousel {...({ display: [null, 'none'], width: 1 } as Record<string, unknown>)}>
           {features.map(feature => (
             <Fragment key={feature.id}>
               <Feature id={feature.id} learnMoreLink={feature.learnMoreLink} intl={intl} />

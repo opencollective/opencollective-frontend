@@ -18,7 +18,10 @@ const HowOCWorks = () => {
         width={['288px', '676px', '413px', null, '555px']}
         display={[null, null, 'none']}
       >
-        <MainTitle textAlign={['center', null, 'left']} whiteSpace={[null, null, 'pre-line']}>
+        <MainTitle
+          textAlign={['center', null, 'left']}
+          {...({ whiteSpace: [null, null, 'pre-line'] } as Record<string, unknown>)}
+        >
           <FormattedMessage id="OC.howItWorks" defaultMessage="How Open Collective works" />
         </MainTitle>
       </Box>
@@ -37,7 +40,10 @@ const HowOCWorks = () => {
           width={['288px', '344px', '413px', null, '555px']}
           display={['none', null, 'block']}
         >
-          <MainTitle textAlign={['center', null, 'left']} whiteSpace={[null, null, 'pre-line']}>
+          <MainTitle
+            textAlign={['center', null, 'left']}
+            {...({ whiteSpace: [null, null, 'pre-line'] } as Record<string, unknown>)}
+          >
             <FormattedMessage id="OC.howItWorks" defaultMessage="How Open Collective works" />
           </MainTitle>
         </Box>

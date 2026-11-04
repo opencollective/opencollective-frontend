@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
+import type LoggedInUser from '../../lib/LoggedInUser';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { Box, Flex } from '../Grid';
@@ -18,16 +19,37 @@ import { withUser } from '../UserProvider';
 
 import Form from './Form';
 
-class CreateProject extends Component {
-  static propTypes = {
-    parent: PropTypes.object,
-    LoggedInUser: PropTypes.object, // from withUser
-    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
-    createProject: PropTypes.func.isRequired, // addCreateProjectMutation
-    router: PropTypes.object,
-  };
+type CreateProjectProject = {
+  slug?: string;
+  name?: string;
+  description?: string;
+};
 
-  constructor(props) {
+type CreateProjectProps = {
+  parent?: {
+    slug?: string;
+    name?: string;
+    isFrozen?: boolean;
+    host?: { slug: string; type?: string; parentCollective?: { slug?: string }; parent?: { slug?: string } };
+  };
+  /** from withUser */
+  LoggedInUser?: LoggedInUser;
+  /** from withUser */
+  refetchLoggedInUser?: () => Promise<unknown>;
+  /** addCreateProjectMutation */
+  createProject?: (options: {
+    variables: { project: CreateProjectProject; parent: { slug?: string } };
+  }) => Promise<{ data?: { createProject?: { slug?: string } } }>;
+  router: Router;
+};
+
+type CreateProjectState = {
+  error?: string;
+  creating: boolean;
+};
+
+class CreateProject extends Component<CreateProjectProps, CreateProjectState> {
+  constructor(props: CreateProjectProps) {
     super(props);
 
     this.state = { error: null, creating: false };
@@ -35,7 +57,7 @@ class CreateProject extends Component {
     this.createProject = this.createProject.bind(this);
   }
 
-  async createProject(project) {
+  async createProject(project: CreateProjectProject) {
     // set state to loading
     this.setState({ creating: true });
 
@@ -120,7 +142,12 @@ const createProjectMutation = gql`
   }
 `;
 
-const addCreateProjectMutation = graphql(createProjectMutation, {
+const addCreateProjectMutation = graphql<
+  Omit<CreateProjectProps, 'router' | 'LoggedInUser' | 'refetchLoggedInUser'>,
+  Record<string, unknown>,
+  Record<string, unknown>,
+  { createProject?: CreateProjectProps['createProject'] }
+>(createProjectMutation, {
   name: 'createProject',
 });
 

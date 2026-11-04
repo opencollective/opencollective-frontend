@@ -1,4 +1,5 @@
 import React from 'react';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -144,4 +145,5 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
   );
 };
 
-export default injectIntl(SearchCollectiveCard);
+// `injectIntl` only types the injected `intl` prop; the component's own props are kept as-is
+export default injectIntl(SearchCollectiveCard as React.ComponentType<{ intl?: IntlShape }>);

@@ -38,7 +38,7 @@ const MoreAboutFiscalHosting = () => {
       </Box>
       <Flex flexDirection={['column', null, 'row']}>
         <Link href="/fiscal-hosting">
-          <Wrapper color="black.900" mb={[3, null, 0]} width={['288px', '400px']}>
+          <Wrapper color="black.900" mb={[3, null, 0]} {...({ width: ['288px', '400px'] } as Record<string, unknown>)}>
             <Box width={[null, '266px']}>
               <H3
                 fontSize={['24px', '32px']}
@@ -58,7 +58,11 @@ const MoreAboutFiscalHosting = () => {
           </Wrapper>
         </Link>
         <Link href="/become-a-host">
-          <Wrapper color="black.900" ml={[null, null, 3]} width={['288px', '400px']}>
+          <Wrapper
+            color="black.900"
+            ml={[null, null, 3]}
+            {...({ width: ['288px', '400px'] } as Record<string, unknown>)}
+          >
             <Box width={[null, '266px']}>
               <H3
                 fontSize={['24px', '32px']}

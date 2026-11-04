@@ -5,10 +5,22 @@ import { Box, Flex } from '../Grid';
 import UpdateOrderByFilter from './filters/UpdateOrderByFilter';
 import UpdateSearchFilter from './filters/UpdateSearchFilter';
 
-const UpdateFilters = ({ values, onChange }) => {
-  const getFilterProps = name => ({
+type UpdateFiltersProps = {
+  values?: Record<string, unknown>;
+  onChange: (values: Record<string, unknown>) => void;
+};
+
+const UpdateFilters = ({ values, onChange }: UpdateFiltersProps) => {
+  // Both filters receive the same props; each one only consumes the relevant ones (see PLAN.md)
+  const getFilterProps = (
+    name: string,
+  ): {
+    inputId: string;
+    value: string;
+    onChange: (value: string) => void;
+  } => ({
     inputId: `updates-filter-${name}`,
-    value: values?.[name],
+    value: values?.[name] as string,
     onChange: value => {
       onChange({ ...values, [name]: value === 'ALL' ? null : value });
     },

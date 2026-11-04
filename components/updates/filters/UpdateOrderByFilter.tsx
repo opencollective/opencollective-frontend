@@ -26,7 +26,12 @@ const labels = defineMessages({
   },
 });
 
-const UpdateOrderByFilter = ({ value, onChange, ...props }) => {
+type UpdateOrderByFilterProps = {
+  value?: string;
+  onChange: (value: string) => void;
+};
+
+const UpdateOrderByFilter = ({ value, onChange, ...props }: UpdateOrderByFilterProps) => {
   const intl = useIntl();
   const getOption = value => ({ label: intl.formatMessage(labels[value]), value });
   const options = [getOption('most-recent'), getOption('oldest')];

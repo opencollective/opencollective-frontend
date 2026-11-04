@@ -33,8 +33,10 @@ const MoreFeatures = () => (
     </Container>
     <Flex
       mx={3}
-      gridGap={['48px', '72px 40px', '72px 112px', null, '124px 112px']}
-      placeSelf="center"
+      {...({
+        gridGap: ['48px', '72px 40px', '72px 112px', null, '124px 112px'],
+        placeSelf: 'center',
+      } as Record<string, unknown>)}
       justifyContent="center"
       flexWrap="wrap"
       alignItems={['center', null, null, 'flex-start']}

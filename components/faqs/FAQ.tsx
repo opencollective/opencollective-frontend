@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
@@ -58,7 +57,7 @@ export const Entry = styled.details`
   }
 `;
 
-const CollapseBtn = styled.div`
+const CollapseBtn = styled.div<{ size?: number | string; ml?: number }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -82,15 +81,17 @@ const CollapseBtn = styled.div`
 `;
 
 /** Entry title */
-export const Title = styled(({ children, ...props }) => (
-  <summary {...props}>
-    <div>{children}</div>
-    <CollapseBtn size={18} ml={3}>
-      <ChevronUp size="1em" data-item="chevron-up" style={{ marginTop: -1 }} />
-      <ChevronDown size="1em" data-item="chevron-down" />
-    </CollapseBtn>
-  </summary>
-))`
+export const Title = styled(
+  ({ children, ...props }: { children?: React.ReactNode } & React.ComponentProps<'summary'>) => (
+    <summary {...props}>
+      <div>{children}</div>
+      <CollapseBtn size={18} ml={3}>
+        <ChevronUp size="1em" data-item="chevron-up" style={{ marginTop: -1 }} />
+        <ChevronDown size="1em" data-item="chevron-down" />
+      </CollapseBtn>
+    </summary>
+  ),
+)`
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -109,8 +110,13 @@ export const Separator = styled.hr`
   width: 100%;
 `;
 
+type EntryContainerProps = {
+  withBorderLeft?: boolean;
+  withNewButtons?: boolean;
+};
+
 /** A simple wrapper to group entries */
-const EntryContainer = styled.div`
+const EntryContainer = styled.div<EntryContainerProps>`
   ${Entry} {
     ${props =>
       props.withNewButtons
@@ -156,24 +162,22 @@ const EntryContainer = styled.div`
   }
 `;
 
+type FAQProps = {
+  children?: React.ReactNode;
+  /** The title to display above entries. Set to null to disable it. */
+  title?: string;
+  /** Props for styling the title */
+  titleProps?: Record<string, unknown>;
+  /** If true, a border will be displayed on the left  */
+  withBorderLeft?: boolean;
+  /** If true, will display a button with a chevron instead of the `+` sign  */
+  withNewButtons?: boolean;
+} & Omit<React.ComponentProps<typeof Container>, 'children'>;
+
 /**
  * A small FAQ with expendable contents.
  */
-export default class FAQ extends Component {
-  static propTypes = {
-    children: PropTypes.node,
-    /** The title to display above entries. Set to null to disable it. */
-    title: PropTypes.string,
-    /** Props for styling the title */
-    titleProps: PropTypes.object,
-    /** If true, a border will be displayed on the left  */
-    withBorderLeft: PropTypes.bool,
-    /** If true, will display a button with a chevron instead of the `+` sign  */
-    withNewButtons: PropTypes.bool,
-    /** All properties from `Box` */
-    ...Box.propTypes,
-  };
-
+export default class FAQ extends Component<FAQProps> {
   render() {
     const { title, children, withBorderLeft, withNewButtons, titleProps, ...props } = this.props;
     return (

@@ -122,7 +122,13 @@ const getBackground = collective => {
   return backgroundImage ? `url(${backgroundImage}) 0 0 / cover no-repeat, ${primaryColor}` : primaryColor;
 };
 
-const CollectiveContainer = ({ useLink, collective, children }) => {
+type CollectiveContainerProps = {
+  useLink?: boolean;
+  collective: StyledCollectiveCardProps['collective'];
+  children: React.ReactNode;
+};
+
+const CollectiveContainer = ({ useLink, collective, children }: CollectiveContainerProps) => {
   if (useLink) {
     return (
       <LinkCollective className="max-w-[85%]" collective={collective}>
@@ -133,6 +139,27 @@ const CollectiveContainer = ({ useLink, collective, children }) => {
     return children;
   }
 };
+
+type StyledCollectiveCardProps = {
+  collective: {
+    name?: string;
+    type?: string;
+    website?: string;
+    backgroundImageUrl?: string;
+    parentCollective?: { backgroundImageUrl?: string };
+    parent?: { location?: { country?: string }; backgroundImageUrl?: string };
+    location?: { country?: string };
+    settings?: Record<string, unknown>;
+    tags?: string[];
+  };
+  /** Custom tag, rendered as-is when provided */
+  tag?: React.ReactNode;
+  bodyHeight?: number;
+  children?: React.ReactNode;
+  borderRadius?: number;
+  showWebsite?: boolean;
+  useLink?: boolean;
+} & Omit<React.ComponentProps<typeof StyledCard>, 'children'>;
 
 /**
  * A card to show a collective that supports including a custom body.
@@ -148,7 +175,7 @@ const StyledCollectiveCard = ({
   showWebsite,
   useLink = true,
   ...props
-}) => {
+}: StyledCollectiveCardProps) => {
   const intl = useIntl();
   const collectiveCountry = collective.location?.country || collective.parent?.location?.country;
   const countryString = collectiveCountry
@@ -182,7 +209,8 @@ const StyledCollectiveCard = ({
                   {collective.name}
                 </P>
               </CollectiveContainer>
-              <AccountTrustBadge account={collective} />
+              {/* The card receives a partial collective; the badge reads the fields it needs */}
+              <AccountTrustBadge account={collective as React.ComponentProps<typeof AccountTrustBadge>['account']} />
             </div>
             {showWebsite && collective.website && (
               <P fontSize="11px" fontWeight="400" title={collective.website} truncateOverflow mt={1}>
@@ -208,7 +236,7 @@ const StyledCollectiveCard = ({
             <div className="flex flex-wrap gap-2">
               {collective.tags &&
                 collective.tags
-                  .filter(tag => !IGNORED_TAGS.includes(tag))
+                  .filter(tag => !(IGNORED_TAGS as readonly string[]).includes(tag))
                   .slice(0, 4)
                   .map(tag => (
                     <StyledTag key={tag} variant="rounded-right">
