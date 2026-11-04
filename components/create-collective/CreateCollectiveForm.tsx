@@ -260,7 +260,7 @@ class CreateCollectiveForm extends React.Component<CreateCollectiveFormProps> {
             >
               <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
                 {formik => {
-                  const { values, handleSubmit, touched, setFieldValue } = formik;
+                  const { values, touched, setFieldValue } = formik;
 
                   const handleSlugChange = e => {
                     if (!touched.slug) {
@@ -544,7 +544,6 @@ class CreateCollectiveForm extends React.Component<CreateCollectiveFormProps> {
                           buttonStyle="primary"
                           type="submit"
                           loading={loading}
-                          {...({ onSubmit: handleSubmit } as Record<string, unknown>)}
                           data-cy="ccf-form-submit"
                         >
                           <FormattedMessage id="collective.create" defaultMessage="Create Collective" />

@@ -163,7 +163,7 @@ class CreateFundForm extends React.Component<CreateFundFormProps> {
           >
             <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
               {formik => {
-                const { values, handleSubmit, errors, touched, setFieldValue } = formik;
+                const { values, errors, touched, setFieldValue } = formik;
 
                 const handleSlugChange = e => {
                   if (!touched.slug) {
@@ -276,7 +276,6 @@ class CreateFundForm extends React.Component<CreateFundFormProps> {
                         buttonStyle="primary"
                         type="submit"
                         loading={loading}
-                        {...({ onSubmit: handleSubmit } as Record<string, unknown>)}
                         data-cy="ccf-form-submit"
                       >
                         <FormattedMessage id="createFund.button" defaultMessage="Create Fund" />

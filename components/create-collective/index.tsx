@@ -169,8 +169,6 @@ class CreateCollective extends Component<CreateCollectiveProps, CreateCollective
       <CreateCollectiveForm
         host={host}
         onSubmit={this.createCollective}
-        // TODO: `handleChange` is not defined on this component (always `undefined`, see PLAN.md findings)
-        onChange={undefined}
         loading={this.state.creating}
         error={error}
         popularTags={popularTags}
