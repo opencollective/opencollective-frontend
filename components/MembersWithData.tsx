@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { DataValue } from '@apollo/client/react/hoc';
 import { graphql } from '@apollo/client/react/hoc';
 import { clsx } from 'clsx';
 import { uniqBy } from 'lodash-es';
@@ -7,6 +7,8 @@ import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import type { Currency } from '../lib/graphql/types/v2/graphql';
+import type LoggedInUser from '../lib/LoggedInUser';
 
 import Container from './Container';
 import Error from './Error';
@@ -25,21 +27,79 @@ const MembersContainer = styled.div`
   }
 `;
 
-class MembersWithData extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    tier: PropTypes.object,
-    limit: PropTypes.number,
-    onChange: PropTypes.func,
-    LoggedInUser: PropTypes.object,
-    fetchMore: PropTypes.func.isRequired,
-    className: PropTypes.string,
-    data: PropTypes.object,
-    memberRole: PropTypes.string,
-    type: PropTypes.string,
+/** Hand-written shape for the V1 members query (V1 is not covered by codegen, see #4054) */
+type MemberNode = {
+  id?: string;
+  role?: string;
+  createdAt?: string;
+  collective?: { id?: number | string; name?: string };
+  stats?: { totalDonations?: number };
+  tier?: { id?: string; name?: string };
+  member?: {
+    id?: string;
+    type?: string;
+    name?: string;
+    company?: string;
+    description?: string;
+    slug?: string;
+    website?: string;
+    imageUrl?: string;
+    backgroundImage?: string;
+    isIncognito?: boolean;
   };
+};
 
-  constructor(props) {
+type MembersQueryVariables = {
+  collectiveSlug: string;
+  role?: string;
+  type?: string;
+  limit?: number;
+  offset?: number;
+  orderBy?: string;
+};
+
+type MembersQueryData = {
+  allMembers?: MemberNode[];
+  error?: { message?: string };
+  fetchMore: (options: {
+    variables: { offset: number; limit: number };
+    updateQuery: (
+      previousResult: MembersQueryData,
+      options: { fetchMoreResult?: MembersQueryData },
+    ) => MembersQueryData;
+  }) => Promise<unknown>;
+};
+
+type OwnProps = {
+  collective?: {
+    id?: number | string;
+    slug: string;
+    name?: string;
+    type?: string;
+    currency?: Currency;
+  };
+  tier?: { name?: string };
+  limit?: number;
+  onChange?: (info: { height: number }) => void;
+  LoggedInUser?: LoggedInUser;
+  className?: string;
+  memberRole?: string;
+  type?: string;
+  orderBy?: string;
+};
+
+type Props = OwnProps & {
+  data?: DataValue<MembersQueryData, MembersQueryVariables>;
+  fetchMore?: () => Promise<unknown>;
+};
+
+type State = {
+  role?: string;
+  loading: boolean;
+};
+
+class MembersWithData extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       role: null,
@@ -51,9 +111,13 @@ class MembersWithData extends React.Component {
     this.onChange();
   }
 
+  node: HTMLDivElement;
+
   onChange = () => {
     const { onChange } = this.props;
-    onChange && this.node && onChange({ height: this.node.offsetHeight });
+    if (onChange && this.node) {
+      onChange({ height: this.node.offsetHeight });
+    }
   };
 
   fetchMore = e => {
@@ -85,7 +149,7 @@ class MembersWithData extends React.Component {
       if (b.stats.totalDonations !== a.stats.totalDonations) {
         return b.stats.totalDonations - a.stats.totalDonations;
       } else if (a.createdAt !== b.createdAt) {
-        return new Date(a.createdAt) - new Date(b.createdAt);
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       } else {
         return a.collective.name.localeCompare(b.collective.name);
       }
@@ -102,7 +166,11 @@ class MembersWithData extends React.Component {
     }
     const limit = this.props.limit || MEMBERS_PER_PAGE * 2;
     return (
-      <MembersContainer ref={node => (this.node = node)}>
+      <MembersContainer
+        ref={node => {
+          this.node = node;
+        }}
+      >
         <Container
           className="cardsList"
           display="flex"
@@ -177,7 +245,7 @@ const membersQuery = gqlV1 /* GraphQL */ `
   }
 `;
 
-const addMembersData = graphql(membersQuery, {
+const addMembersData = graphql<OwnProps, MembersQueryData, MembersQueryVariables>(membersQuery, {
   options: props => ({
     context: API_V1_CONTEXT,
     variables: {

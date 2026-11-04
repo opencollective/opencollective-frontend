@@ -1,6 +1,8 @@
 import React from 'react';
 import { Search, X } from 'lucide-react';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { styled } from 'styled-components';
 import { borderColor, borderRadius, height, typography } from 'styled-system';
 
@@ -13,7 +15,13 @@ import StyledInput from './StyledInput';
 import StyledRoundButton from './StyledRoundButton';
 import { Span } from './Text';
 
-const SearchInputContainer = styled(Flex)`
+type SearchInputContainerProps = {
+  borderRadius?: string;
+  borderColor?: string;
+  height?: string;
+};
+
+const SearchInputContainer = styled(Flex)<SearchInputContainerProps>`
   border: 1px solid;
   ${borderColor};
   ${borderRadius};
@@ -57,8 +65,43 @@ const ClearFilterButton = styled.button`
   padding: 4px;
 `;
 
-class SearchForm extends React.Component {
-  constructor(props) {
+type SearchFormProps = {
+  onSubmit?: React.FormEventHandler<HTMLFormElement>;
+  placeholder?: string;
+  width?: number | string;
+  autoFocus?: boolean;
+  defaultValue?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  borderRadius?: string;
+  borderColor?: string;
+  height?: string;
+  disabled?: boolean;
+  onFocus?: () => void;
+  autoComplete?: string;
+  fontStyle?: string;
+  letterSpacing?: string;
+  fontSize?: string;
+  lineHeight?: string;
+  fontWeight?: string;
+  className?: string;
+  onClearFilter?: () => void;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  /** Padding on the wrapper, defaults to 1 */
+  py?: number;
+  showSearchButton?: boolean;
+  searchButtonStyles?: React.CSSProperties;
+  closeSearchModal?: () => void;
+  router: Router;
+};
+
+type SearchFormState = {
+  isLoading: boolean;
+};
+
+class SearchForm extends React.Component<SearchFormProps, SearchFormState> {
+  constructor(props: SearchFormProps) {
     super(props);
     this.state = { isLoading: false };
   }
@@ -128,7 +171,8 @@ class SearchForm extends React.Component {
             aria-label="Open Collective search input"
             defaultValue={defaultValue}
             value={value}
-            onChange={onChange && (e => onChange(e.target.value))}
+            // `as={StyledInput}` is not reflected in the inferred event target type
+            onChange={onChange && (e => onChange((e.target as HTMLInputElement).value))}
             disabled={disabled}
             onFocus={onFocus}
             autoComplete={autoComplete}

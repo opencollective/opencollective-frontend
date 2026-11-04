@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { ArrowForward } from '@styled-icons/material/ArrowForward';
 import styled, { css } from 'styled-components';
@@ -11,7 +10,13 @@ import Container from './Container';
 import { Flex } from './Grid';
 import StyledRoundButton from './StyledRoundButton';
 
-const RefContainer = styled.div`
+type RefContainerProps = {
+  hideScrollbar?: boolean;
+  /** Forwarded to the custom `container` component, which uses it to disable scroll snapping */
+  disableScrollSnapping?: boolean;
+};
+
+const RefContainer = styled.div<RefContainerProps>`
   display: flex;
   overflow-x: auto;
   scroll-behavior: smooth;
@@ -28,7 +33,7 @@ const RefContainer = styled.div`
     `}
 `;
 
-const ControlsContainer = styled(Flex)`
+const ControlsContainer = styled(Flex)<{ controlsTopPosition?: number }>`
   z-index: 10;
   position: absolute;
   top: ${props => (props.controlsTopPosition ? `${props.controlsTopPosition}%` : '50%')};
@@ -37,7 +42,7 @@ const ControlsContainer = styled(Flex)`
   width: 100%;
 `;
 
-const ArrowContainer = styled(StyledRoundButton)`
+const ArrowContainer = styled(StyledRoundButton)<{ isVisible?: boolean }>`
   transition: opacity 0.25s ease-in, visibility 0.25s;
   visibility: ${props => (props.isVisible ? 'visible' : 'hidden')};
   opacity: ${props => (props.isVisible ? '1' : '0')};
@@ -49,29 +54,34 @@ const ArrowContainer = styled(StyledRoundButton)`
   }
 `;
 
+type HorizontalScrollerProps = {
+  /* Children component */
+  children: React.ReactNode;
+  /** Container component where the list (children) will be inserted */
+  container?: React.ElementType;
+  /** Passed to `container` */
+  containerProps?: React.ComponentProps<typeof RefContainer>;
+  /** Callback to get the scrolled distance when we click on prev/next controllers */
+  getScrollDistance?: (offsetWidth: number) => number;
+  /** @ignore from withViewport */
+  width?: number;
+  /** Set the top position of the arrows. Defaults 50% */
+  controlsTopPosition?: number;
+};
+
+type HorizontalScrollerState = {
+  canGoPrev: boolean;
+  canGoNext: boolean;
+};
+
 /**
  * Helper to display a list of horizontally scrollable items, with two little
  * carets to navigate easily.
  */
-class HorizontalScroller extends React.PureComponent {
-  static propTypes = {
-    /* Children component */
-    children: PropTypes.node.isRequired,
-    /** Container component where the list (children) will be inserted */
-    container: PropTypes.elementType,
-    /** Passed to `container` */
-    containerProps: PropTypes.object,
-    /** Callback to get the scrolled distance when we click on prev/next controllers */
-    getScrollDistance: PropTypes.func,
-    /** @ignore from withViewport */
-    width: PropTypes.number,
-    /** Set the top position of the arrows. Defaults 50% */
-    controlsTopPosition: PropTypes.number,
-  };
-
-  constructor(props) {
+class HorizontalScroller extends React.PureComponent<HorizontalScrollerProps, HorizontalScrollerState> {
+  constructor(props: HorizontalScrollerProps) {
     super(props);
-    this.ref = React.createRef();
+    this.ref = React.createRef<HTMLDivElement>();
     this.state = { canGoPrev: false, canGoNext: false };
   }
 
@@ -91,6 +101,8 @@ class HorizontalScroller extends React.PureComponent {
       this.ref.current.removeEventListener('scroll', this.updateScrollInfo);
     }
   }
+
+  ref: React.RefObject<HTMLDivElement>;
 
   updateScrollInfo = debounceScroll(() => {
     if (!this.ref.current) {

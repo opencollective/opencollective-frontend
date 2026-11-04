@@ -1,35 +1,62 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { findLastIndex } from 'lodash-es';
+
+type Step = {
+  /** The step name, **must be unique**. */
+  name: string;
+  /** A function triggered when leaving the step. Return false to abort. */
+  validate?: (action?: string) => boolean | Promise<boolean>;
+  /** A boolean indicating if the step has been completed */
+  isCompleted?: boolean;
+};
+
+/** A step as it can be passed around: `index` is missing for raw (unbuilt) steps */
+type AnyStep = Step & { index?: number };
+
+type BuiltStep = Step & {
+  index: number;
+  isLastStep: boolean;
+  isVisited: boolean;
+};
+
+type StepsProps = {
+  /** The steps list */
+  steps: Step[];
+  /** The current step name. The step must be present in `steps` */
+  currentStepName: string;
+  /** Called to change step */
+  onStepChange: (step: AnyStep) => void;
+  /** Called when the last step is submitted */
+  onComplete: () => void;
+  /** A function that gets passed everything needed to show the current step */
+  children: (props: {
+    currentStep: BuiltStep;
+    prevStep: BuiltStep;
+    nextStep: BuiltStep;
+    lastValidStep: BuiltStep;
+    isValidating: boolean;
+    lastVisitedStep: BuiltStep;
+    steps: BuiltStep[];
+    goNext: () => Promise<boolean | void>;
+    goBack?: () => boolean;
+    goToStep: (step: AnyStep, opts?: { ignoreValidation?: boolean; action?: string }) => Promise<boolean>;
+    isValidStep: boolean;
+  }) => React.ReactNode;
+  /** If false on initial mount, the check for steps completion (and thus the redirect) will be delayed until the flag becomes true */
+  delayCompletionCheck: boolean;
+};
+
+type StepsState = {
+  /** A set of visited steps */
+  visited: Set<string>;
+  /** True if an async `validate` is currently running */
+  isValidating: boolean;
+};
 
 /**
  * A stepper component to manage state and validations for multi-steps processes.
  */
-export default class Steps extends React.Component {
-  static propTypes = {
-    /** The steps list */
-    steps: PropTypes.arrayOf(
-      PropTypes.shape({
-        /** The step name, **must be unique**. */
-        name: PropTypes.string.isRequired,
-        /** A function triggered when leaving the step. Return false to abort. */
-        validate: PropTypes.func,
-        /** A boolean indicating if the step has been completed */
-        isCompleted: PropTypes.bool,
-      }),
-    ).isRequired,
-    /** The current step name. The step must be present in `steps` */
-    currentStepName: PropTypes.string.isRequired,
-    /** Called to change step */
-    onStepChange: PropTypes.func.isRequired,
-    /** Called when the last step is submitted */
-    onComplete: PropTypes.func.isRequired,
-    /** A function that gets passed everything needed to show the current step */
-    children: PropTypes.func.isRequired,
-    /** If false on initial mount, the check for steps completion (and thus the redirect) will be delayed until the flag becomes true */
-    delayCompletionCheck: PropTypes.bool.isRequired,
-  };
-
+export default class Steps extends React.Component<StepsProps, StepsState> {
   state = {
     /** A set of visited steps */
     visited: new Set([]),
@@ -43,7 +70,7 @@ export default class Steps extends React.Component {
     }
   }
 
-  componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps: StepsProps) {
     if (!this.props.delayCompletionCheck) {
       if (oldProps.delayCompletionCheck || oldProps.currentStepName !== this.props.currentStepName) {
         this.redirectIfStepIsInvalid();
@@ -62,18 +89,18 @@ export default class Steps extends React.Component {
     }
   };
 
-  onInvalidStep = (step, lastValidStep) => {
+  onInvalidStep = (step: BuiltStep, lastValidStep: BuiltStep) => {
     const firstStep = this.getStepByIndex(0);
     const targetStep = lastValidStep ? this.props.steps[lastValidStep.index + 1] : firstStep;
     return this.goToStep(targetStep, { ignoreValidation: true });
   };
 
-  markStepAsVisited = step => {
+  markStepAsVisited = (step: Step) => {
     this.setState(state => ({ visited: state.visited.add(step.name) }));
   };
 
   /** Build a step to be passed to children */
-  buildStep = (baseStep, index) => {
+  buildStep = (baseStep: Step, index: number): BuiltStep => {
     return {
       ...baseStep,
       index: index,
@@ -97,7 +124,7 @@ export default class Steps extends React.Component {
     return this.buildStep(steps[lastValidStepIdx], lastValidStepIdx);
   }
 
-  getLastVisitedStep(lastVisitedStep) {
+  getLastVisitedStep(lastVisitedStep: BuiltStep) {
     const lastVisitedStepIdx = findLastIndex(
       this.props.steps,
       s => this.state.visited.has(s.name),
@@ -108,17 +135,17 @@ export default class Steps extends React.Component {
     return this.buildStep(this.props.steps[returnedStepIdx], returnedStepIdx);
   }
 
-  getStepByIndex(stepIdx) {
+  getStepByIndex(stepIdx: number): BuiltStep {
     return stepIdx === -1 || stepIdx >= this.props.steps.length
       ? null
       : this.buildStep(this.props.steps[stepIdx], stepIdx);
   }
 
-  getStepByName(stepName) {
+  getStepByName(stepName: string): BuiltStep {
     return this.getStepByIndex(this.props.steps.findIndex(s => s.name === stepName));
   }
 
-  validateCurrentStep = async (action = null) => {
+  validateCurrentStep = async (action: string = null) => {
     const currentStep = this.getStepByName(this.props.currentStepName);
     if (!currentStep) {
       return false;
@@ -168,7 +195,8 @@ export default class Steps extends React.Component {
    * Go to given step. Will be blocked if current step is not validated, unless
    * if `opts.ignoreValidation` is true.
    */
-  goToStep = async (step, opts = {}) => {
+  // `index` is optional: `onInvalidStep` passes a raw step (not built), which is preserved as-is (see PLAN.md)
+  goToStep = async (step: AnyStep, opts: { ignoreValidation?: boolean; action?: string } = {}) => {
     const currentStep = this.getStepByName(this.props.currentStepName);
     let ignoreValidation = opts.ignoreValidation;
     if (step.index < currentStep?.index) {

@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
 import Head from 'next/head';
+import type { IntlShape } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
 import { getCollectiveImage } from '../lib/image-utils';
@@ -18,30 +18,59 @@ const messages = defineMessages({
   },
 });
 
-class Header extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    canonicalURL: PropTypes.string,
-    description: PropTypes.string,
-    image: PropTypes.string,
-    twitterHandle: PropTypes.string,
-    css: PropTypes.string,
-    className: PropTypes.string,
-    title: PropTypes.string,
-    metaTitle: PropTypes.string,
-    showSearch: PropTypes.bool,
-    showProfileAndChangelogMenu: PropTypes.bool,
-    showMenuItems: PropTypes.bool,
-    withTopBar: PropTypes.bool,
-    updatesRss: PropTypes.bool,
-    /** If true, a no-robots meta will be added to the page */
-    noRobots: PropTypes.bool,
-    /** @ignore from injectIntl */
-    intl: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    loading: PropTypes.bool,
-  };
+type HeaderCollective = {
+  id?: number | string;
+  type?: string;
+  slug: string;
+  name?: string;
+  description?: string;
+  longDescription?: string;
+  imageUrl?: string;
+  image?: string;
+  backgroundImage?: string;
+  twitterHandle?: string;
+  isIncognito?: boolean;
+  currency?: string;
+  stats?: { balance?: number };
+  parentCollective?: { twitterHandle?: string };
+};
 
+type HeaderProps = {
+  collective?: HeaderCollective;
+  canonicalURL?: string;
+  description?: string;
+  image?: string;
+  twitterHandle?: string;
+  css?: string;
+  className?: string;
+  title?: string;
+  metaTitle?: string;
+  showSearch?: boolean;
+  showProfileAndChangelogMenu?: boolean;
+  showMenuItems?: boolean;
+  withTopBar?: boolean;
+  updatesRss?: boolean;
+  /** If true, a no-robots meta will be added to the page */
+  noRobots?: boolean;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  LoggedInUser?: Record<string, unknown>;
+  loading?: boolean;
+};
+
+type MetaTag = {
+  property?: string;
+  name?: string;
+  content?: string;
+  rel?: string;
+  type?: string;
+  title?: string;
+  href?: string;
+  /** Not a valid `<meta>` attribute, kept for markup parity (see PLAN.md) */
+  size?: string;
+};
+
+class Header extends React.Component<HeaderProps> {
   static defaultProps = {
     withTopBar: true,
   };
@@ -79,7 +108,7 @@ class Header extends React.Component {
     const metaTitle = this.props.metaTitle || (title ? `${title} - Open Collective` : 'Open Collective');
     const defaultImage = `https://opencollective.com/static/images/opencollective-og.png`;
 
-    const metas = [
+    const metas: MetaTag[] = [
       { property: 'twitter:site', content: '@opencollect' },
       { property: 'twitter:creator', content: this.getTwitterHandle() },
       { property: 'fb:app_id', content: '266835577107099' },
@@ -116,27 +145,47 @@ class Header extends React.Component {
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
           {/** Disable IE compatibility mode. See https://developer.paypal.com/docs/checkout/integrate/#2-add-the-paypal-javascript-sdk-to-your-web-page */}
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-          <meta property="og:logo" content="/static/images/opencollectiveicon240x240" size="240x240" />
-          <meta property="og:logo" content="/static/images/opencollectiveicon48x48" size="48x48" />
-          <meta property="og:logo" content="/static/images/opencollectivelogo480x80" size="480x80" />
-          <meta property="og:logo" content="/static/images/opencollectivelogo480x80@2x" size="960x160" />
+          {/* `size` is not a valid `<meta>` attribute; rendered as-is for markup parity (see PLAN.md) */}
+          <meta
+            property="og:logo"
+            content="/static/images/opencollectiveicon240x240"
+            {...({ size: '240x240' } as React.ComponentProps<'meta'>)}
+          />
+          <meta
+            property="og:logo"
+            content="/static/images/opencollectiveicon48x48"
+            {...({ size: '48x48' } as React.ComponentProps<'meta'>)}
+          />
+          <meta
+            property="og:logo"
+            content="/static/images/opencollectivelogo480x80"
+            {...({ size: '480x80' } as React.ComponentProps<'meta'>)}
+          />
+          <meta
+            property="og:logo"
+            content="/static/images/opencollectivelogo480x80@2x"
+            {...({ size: '960x160' } as React.ComponentProps<'meta'>)}
+          />
           {css && <link rel="stylesheet" href={css} />}
           <title>{this.getTitle()}</title>
           {this.getMetas().map((props, idx) => (
-            // We use index in this `key` because their can be multiple meta for the same property (eg. og:image)
+            // We use index in this `key` because their can be multiple meta for the same property (eg. og:image).
+            // `size` is not part of `<meta>`'s props but is rendered as-is (see PLAN.md).
             // eslint-disable-next-line react/no-array-index-key
-            <meta key={`${props.property || props.name}-${idx}`} {...props} />
+            <meta key={`${props.property || props.name}-${idx}`} {...(props as Record<string, unknown>)} />
           ))}
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
         <div id="top" />
         {withTopBar && (
+          // `account` and `loading` are not consumed by `TopBar`; both are kept for behaviour parity (see PLAN.md)
           <TopBar
-            account={this.props.collective}
+            {...({ account: this.props.collective, loading: this.props.loading } as React.ComponentProps<
+              typeof TopBar
+            >)}
             showSearch={this.props.showSearch}
             showMenuItems={this.props.showMenuItems}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
-            loading={this.props.loading}
           />
         )}
         <GlobalWarnings collective={this.props.collective} />
@@ -145,4 +194,5 @@ class Header extends React.Component {
   }
 }
 
-export default injectIntl(Header);
+// `injectIntl` only types the injected `intl` prop; the class' own props are kept as-is
+export default injectIntl(Header as React.ComponentType<{ intl?: IntlShape }>);

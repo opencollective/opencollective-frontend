@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import type { DocumentNode } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { get, pick } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -39,6 +40,9 @@ const FormButton = styled(StyledButton)`
   animation: ${fadeIn} 0.3s;
 `;
 
+/** `values` is the untyped record being edited; the edited field is handled as a string draft */
+const getFieldDraft = (values: Record<string, unknown>, field: string): string => get(values, field) as string;
+
 const messages = defineMessages({
   warnDiscardChanges: {
     id: 'warning.discardUnsavedChanges',
@@ -46,51 +50,69 @@ const messages = defineMessages({
   },
 });
 
+type InlineEditFieldRenderProps = {
+  value?: React.ReactNode;
+  isEditing: boolean;
+  maxLength?: number;
+  enableEditor: () => void;
+  disableEditor: (noWarning?: boolean | React.MouseEvent) => void;
+  setValue: (draft: string) => void;
+  setUploading?: (uploading: boolean) => void;
+};
+
+type InlineEditFieldProps = {
+  /** Field name */
+  field: string;
+  /** Object that holds the values */
+  values: Record<string, unknown>;
+  /** The GraphQL mutation used to update this value */
+  mutation: DocumentNode;
+  /** Passed to Apollo */
+  mutationOptions?: Record<string, unknown>;
+  /** Can user edit the description */
+  canEdit?: boolean;
+  /** Unused by this component, accepted for consumers that still pass it (see PLAN.md) */
+  canDelete?: boolean;
+  /** Use this to control the component state */
+  isEditing?: boolean;
+  /** Add a confirm if trying to leave the form with unsaved changes */
+  warnIfUnsavedChanges?: boolean;
+  required?: boolean;
+  /** Max field length */
+  maxLength?: number;
+  /** Gets passed the item, the new value and must return the mutation variables */
+  prepareVariables?: (values: Record<string, unknown>, draft: string) => Record<string, unknown>;
+  /** For cases when component is controlled */
+  disableEditor?: (noWarning?: boolean) => void;
+  /** Set to false to disable edit icon even if user is allowed to edit */
+  showEditIcon?: boolean;
+  /** If given, this function will be used to render the field */
+  children?: (props: InlineEditFieldRenderProps) => React.ReactNode;
+  /**
+   * A text that will be rendered if user can edit and there's no value available.
+   * Highly recommended if field is nullable.
+   */
+  placeholder?: React.ReactNode;
+  /** To set the min width of Cancel/Save buttons */
+  buttonsMinWidth?: number | string;
+  /** Editing the top value. */
+  topEdit?: number;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+};
+
+type InlineEditFieldState = {
+  isEditing: boolean;
+  draft: string;
+  uploading: boolean;
+};
+
 /**
  * A field that can be edited inline. Relies directly on GraphQL to handle errors and
  * loading states properly. By default this component will use `TextAreaAutosize`
  * but you can override this behaviour by passing a custom `children` prop.
  */
-class InlineEditField extends Component {
-  static propTypes = {
-    /** Field name */
-    field: PropTypes.string.isRequired,
-    /** Object that holds the values */
-    values: PropTypes.object.isRequired,
-    /** The GraphQL mutation used to update this value */
-    mutation: PropTypes.object.isRequired,
-    /** Passed to Apollo */
-    mutationOptions: PropTypes.object,
-    /** Can user edit the description */
-    canEdit: PropTypes.bool,
-    /** Use this to control the component state */
-    isEditing: PropTypes.bool,
-    /** Add a confirm if trying to leave the form with unsaved changes */
-    warnIfUnsavedChanges: PropTypes.bool,
-    required: PropTypes.bool,
-    /** Max field length */
-    maxLength: PropTypes.number,
-    /** Gets passed the item, the new value and must return the mutation variables */
-    prepareVariables: PropTypes.func,
-    /** For cases when component is controlled */
-    disableEditor: PropTypes.func,
-    /** Set to false to disable edit icon even if user is allowed to edit */
-    showEditIcon: PropTypes.bool,
-    /** If given, this function will be used to render the field */
-    children: PropTypes.func,
-    /**
-     * A text that will be rendered if user can edit and there's no value available.
-     * Highly recommended if field is nullable.
-     */
-    placeholder: PropTypes.node,
-    /** To set the min width of Cancel/Save buttons */
-    buttonsMinWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** Editing the top value. */
-    topEdit: PropTypes.number,
-    /** @ignore from injectIntl */
-    intl: PropTypes.object.isRequired,
-  };
-
+class InlineEditField extends Component<InlineEditFieldProps, InlineEditFieldState> {
   static defaultProps = {
     showEditIcon: true,
     buttonsMinWidth: 225,
@@ -99,10 +121,10 @@ class InlineEditField extends Component {
 
   state = { isEditing: false, draft: '', uploading: false };
 
-  componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps: InlineEditFieldProps) {
     if (oldProps.isEditing !== this.props.isEditing) {
       if (this.props.isEditing) {
-        this.setState({ isEditing: true, draft: get(this.props.values, this.props.field) });
+        this.setState({ isEditing: true, draft: getFieldDraft(this.props.values, this.props.field) });
       } else {
         this.setState({ isEditing: false });
       }
@@ -110,13 +132,14 @@ class InlineEditField extends Component {
   }
 
   enableEditor = () => {
-    this.setState({ isEditing: true, draft: get(this.props.values, this.props.field) });
+    this.setState({ isEditing: true, draft: getFieldDraft(this.props.values, this.props.field) });
   };
 
-  disableEditor = noWarning => {
+  // Also registered as an `onClick` handler, which passes the event here (truthy); preserved as-is
+  disableEditor = (noWarning?: boolean | React.MouseEvent) => {
     const { warnIfUnsavedChanges, intl, values, field } = this.props;
     if (!noWarning && warnIfUnsavedChanges) {
-      const isDirty = get(values, field) !== this.state.draft;
+      const isDirty = getFieldDraft(values, field) !== this.state.draft;
       if (isDirty && !confirm(intl.formatMessage(messages.warnDiscardChanges))) {
         return;
       }
@@ -129,11 +152,17 @@ class InlineEditField extends Component {
     }
   };
 
-  setDraft = draft => {
+  setDraft = (draft: string) => {
     this.setState({ draft });
   };
 
-  renderContent(field, canEdit, value, placeholder, children) {
+  renderContent(
+    field: string,
+    canEdit: boolean,
+    value: React.ReactNode,
+    placeholder: React.ReactNode,
+    children: (props: InlineEditFieldRenderProps) => React.ReactNode,
+  ) {
     if (children) {
       return children({
         value,
@@ -169,7 +198,7 @@ class InlineEditField extends Component {
     } = this.props;
     const { draft, isEditing } = this.state;
     const { buttonsMinWidth } = this.props;
-    const value = get(values, field);
+    const value = getFieldDraft(values, field);
     const touched = draft !== value;
     const isValid = !this.props.required ? touched : touched && Boolean(draft);
 
@@ -210,10 +239,12 @@ class InlineEditField extends Component {
                     px={0}
                     py={0}
                     border="0"
-                    letterSpacing="inherit"
+                    {...({
+                      letterSpacing: 'inherit',
+                      fontWeight: 'inherit',
+                      lineHeight: 'inherit',
+                    } as React.ComponentProps<typeof StyledTextarea>)}
                     fontSize="inherit"
-                    fontWeight="inherit"
-                    lineHeight="inherit"
                     maxLength={this.props.maxLength}
                     data-cy={`InlineEditField-Textarea-${field}`}
                     withOutline
@@ -265,4 +296,5 @@ class InlineEditField extends Component {
   }
 }
 
-export default injectIntl(InlineEditField);
+// `injectIntl` only types the injected `intl` prop; the class' own props (and `defaultProps`) are kept as-is
+export default injectIntl(InlineEditField as React.ComponentType<{ intl?: IntlShape }>);

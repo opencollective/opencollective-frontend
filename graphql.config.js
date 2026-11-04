@@ -17,7 +17,7 @@ module.exports = {
         'components/edit-collective/sections/Webhooks.tsx',
         'components/EditPublicMessagePopup.tsx',
         'components/MembershipsWithData.tsx',
-        'components/MembersWithData.js',
+        'components/MembersWithData.tsx',
         'components/SignInOrJoinFree.js',
         'components/tier-page/graphql/queries.js',
         'lib/graphql/v1/fragments.ts',

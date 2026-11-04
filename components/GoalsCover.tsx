@@ -1,11 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { debounce, get, maxBy, sortBy, truncate } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import { formatCurrency } from '../lib/currency-utils';
+import type { Currency } from '../lib/graphql/types/v2/graphql';
 import injectIntl from '@/lib/injectIntl';
 
 import Container from './Container';
@@ -15,7 +16,24 @@ const getProgressColor = theme => theme.colors.primary[600];
 const getEmptyProgressColor = () => '#e2e2e2';
 const MAX_TITLE_LENGTH = 32;
 
-const GoalContainer = styled.div`
+type Goal = {
+  slug: string;
+  type?: string;
+  key?: string;
+  title?: string;
+  description?: string;
+  amount?: number;
+  precision?: number;
+  position?: string;
+  level?: number;
+  isReached?: boolean;
+  hidden?: boolean;
+  animateProgress?: boolean;
+  isOverlapping?: boolean;
+  progress?: number;
+};
+
+const GoalContainer = styled.div<{ goal: Goal; index: number }>`
   position: absolute;
   top: 0;
   left: 0;
@@ -142,14 +160,33 @@ const BarContainer = styled.div`
   }
 `;
 
-class GoalsCover extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-    interpolation: PropTypes.oneOf(['linear', 'logarithm', 'auto']),
-    intl: PropTypes.object.isRequired,
+type GoalsCoverProps = {
+  collective: {
+    id?: number | string;
+    slug?: string;
+    name?: string;
+    currency?: Currency;
+    stats?: { balance?: number; yearlyBudget?: number; backers?: { all?: number } };
+    settings?: {
+      goals?: Array<Partial<Goal> & { key?: string }>;
+      goalsInterpolation?: string;
+    };
   };
+  interpolation?: 'linear' | 'logarithm' | 'auto';
+  intl?: IntlShape;
+};
 
-  constructor(props) {
+type GoalsCoverState = {
+  goals?: Goal[];
+  maxAmount?: number;
+  maxLevelAbove?: number;
+  hasCustomGoals?: boolean;
+  // The resize listener passes the event object here (see `updateGoals`)
+  firstMount?: boolean | Event;
+};
+
+class GoalsCover extends React.Component<GoalsCoverProps, GoalsCoverState> {
+  constructor(props: GoalsCoverProps) {
     super(props);
     this.renderGoal = this.renderGoal.bind(this);
     this.updateGoals = debounce(this.updateGoals.bind(this), 100, { maxWait: 200 });
@@ -177,7 +214,7 @@ class GoalsCover extends React.Component {
     window.addEventListener('resize', this.updateGoals);
   }
 
-  componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps: GoalsCoverProps) {
     if (this.state.firstMount || this.props.collective !== oldProps.collective) {
       this.updateGoals();
     }
@@ -187,7 +224,12 @@ class GoalsCover extends React.Component {
     window.removeEventListener('resize', this.updateGoals);
   }
 
-  updateGoals(firstMount = false) {
+  labelsRefs: Record<string, React.RefObject<HTMLDivElement>>;
+
+  messages: Record<string, { id: string; defaultMessage: string }>;
+
+  // Registered as a resize listener, which passes the event as `firstMount` (truthy); preserved as-is
+  updateGoals(firstMount: boolean | Event = false) {
     this.setState({ ...this.populateGoals(), firstMount });
   }
 
@@ -212,7 +254,7 @@ class GoalsCover extends React.Component {
   }
 
   /** Create goal object with correct defaults and store a ref for React */
-  createGoal(slug, params) {
+  createGoal(slug: string, params: Partial<Goal>): Goal {
     this.labelsRefs[slug] = this.labelsRefs[slug] || React.createRef();
     return {
       precision: 0,
@@ -299,7 +341,7 @@ class GoalsCover extends React.Component {
    *
    * Also adds a unique slug to goals.
    */
-  getCustomGoals(maxCustomGoalsToShow) {
+  getCustomGoals(maxCustomGoalsToShow: number): Goal[] {
     const settingsGoals = get(this.props.collective, 'settings.goals', []);
     const sortedGoals = sortBy(settingsGoals, 'amount');
     const goals = sortedGoals.map((goal, idx) => this.createGoal(`goal-${idx}-${goal.key || uuid()}`, goal));
@@ -322,7 +364,7 @@ class GoalsCover extends React.Component {
    * If a ref exists for this goal, get its real with. Otherwise estimate
    * it based on its title (for initial rendering and server-side rendering)
    */
-  getGoalLabelWidthInPx(goal) {
+  getGoalLabelWidthInPx(goal: Goal) {
     const ref = this.labelsRefs[goal.slug];
     if (ref && ref.current) {
       return ref.current.offsetWidth + 15; // Add a bigger hit box
@@ -336,19 +378,19 @@ class GoalsCover extends React.Component {
   }
 
   /** Given a percent size, returns its value in pixels */
-  percentageToPx(availWidth, percentage) {
+  percentageToPx(availWidth: number, percentage: number) {
     const progressBarPercentageWidth = availWidth > 420 ? 0.8 : 0.95;
     const progressBarWidthInPx = availWidth * progressBarPercentageWidth;
     return percentage * progressBarWidthInPx;
   }
 
   /** Given a pixels size, returns its value as a percentage of availWidth */
-  pxToPercentage(availWidth, widthInPx) {
+  pxToPercentage(availWidth: number, widthInPx: number) {
     return widthInPx / availWidth;
   }
 
   /** Returns the overlap size if any, 0 otherwise */
-  goalsOverlapInPx(availWidth, maxAmount, prevGoal, goal) {
+  goalsOverlapInPx(availWidth: number, maxAmount: number, prevGoal: Goal, goal: Goal) {
     if (!prevGoal) {
       return 0;
     }
@@ -377,7 +419,7 @@ class GoalsCover extends React.Component {
    *
    * @returns {goal, overlap}
    */
-  overlapWithPrev(availWidth, maxAmount, prevGoals, goal) {
+  overlapWithPrev(availWidth: number, maxAmount: number, prevGoals: Goal[], goal: Goal) {
     for (let i = prevGoals.length - 1; i >= 0; i--) {
       const prevGoal = prevGoals[i];
       if (goal.position === prevGoal.position && goal.level === prevGoal.level) {
@@ -391,7 +433,7 @@ class GoalsCover extends React.Component {
   }
 
   /** @returns {Object} {goals, hasCustomGoals, maxAmount, maxLevelAbove} */
-  populateGoals(isServerSide, isInitialRender) {
+  populateGoals(isServerSide?: boolean, isInitialRender?: boolean) {
     // Show only one custom goal on mobile
     let maxLevelAbove = 0;
     let availWidth = 700;
@@ -472,7 +514,7 @@ class GoalsCover extends React.Component {
     return { goals, maxAmount, maxLevelAbove, hasCustomGoals: customGoals.length > 0 };
   }
 
-  getDivTitle(title, description) {
+  getDivTitle(title: string, description: string) {
     if (title && description) {
       return `${title}\n\n${description}`;
     } else {
@@ -480,7 +522,7 @@ class GoalsCover extends React.Component {
     }
   }
 
-  renderGoal(goal, index) {
+  renderGoal(goal: Goal, index: number) {
     const { collective, intl } = this.props;
     const slug = goal.slug;
     const amount = formatCurrency(goal.amount || 0, collective.currency, {
@@ -539,4 +581,5 @@ class GoalsCover extends React.Component {
   }
 }
 
-export default injectIntl(GoalsCover);
+// `injectIntl` only types the injected `intl` prop; the class' own props are kept as-is
+export default injectIntl(GoalsCover as React.ComponentType<{ intl?: IntlShape }>);

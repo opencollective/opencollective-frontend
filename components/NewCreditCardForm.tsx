@@ -1,6 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
+import type { StripeCardElementChangeEvent } from '@stripe/stripe-js';
+import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { isUndefined } from 'lodash-es';
 import { HelpCircle } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
@@ -27,19 +28,36 @@ const StyledCardElement = styled(CardElement)`
   border-radius: 3px;
 `;
 
-class NewCreditCardFormWithoutStripe extends React.Component {
-  static propTypes = {
-    error: PropTypes.string,
-    hasSaveCheckBox: PropTypes.bool,
-    hidePostalCode: PropTypes.bool,
-    onChange: PropTypes.func,
-    onReady: PropTypes.func,
-    stripe: PropTypes.object,
-    stripeElements: PropTypes.object,
-    useLegacyCallback: PropTypes.bool,
-    defaultIsSaved: PropTypes.bool,
-  };
+type CreditCardValue = {
+  isSavedForLater?: boolean;
+  service?: string;
+  type?: string;
+  stripeData?: StripeCardElementChangeEvent;
+};
 
+type NewCreditCardFormProps = {
+  error?: string;
+  hasSaveCheckBox?: boolean;
+  hidePostalCode?: boolean;
+  /** Called with either the Stripe change event (legacy) or the card value */
+  onChange?: (value: unknown) => void;
+  onReady?: (result: { stripe: Stripe; stripeElements: StripeElements }) => void;
+  stripe?: Stripe;
+  stripeElements?: StripeElements;
+  useLegacyCallback?: boolean;
+  defaultIsSaved?: boolean;
+  /** Not consumed by this component, accepted for consumers that still pass it (see PLAN.md) */
+  name?: string;
+  /** Not consumed by this component, accepted for consumers that still pass it (see PLAN.md) */
+  profileType?: string;
+};
+
+type NewCreditCardFormState = {
+  value: CreditCardValue;
+  showAllErrors: boolean;
+};
+
+class NewCreditCardFormWithoutStripe extends React.Component<NewCreditCardFormProps, NewCreditCardFormState> {
   static defaultProps = {
     hasSaveCheckBox: true,
     hidePostalCode: false,
@@ -54,13 +72,13 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     }
   }
 
-  componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps: NewCreditCardFormProps) {
     if (this.props.onReady && !oldProps.stripe && this.props.stripe) {
       this.props.onReady({ stripe: this.props.stripe, stripeElements: this.props.stripeElements });
     }
   }
 
-  onCheckboxChange = e => {
+  onCheckboxChange = (e: { checked: boolean }) => {
     if (this.props.useLegacyCallback) {
       this.props.onChange(e);
     } else {
@@ -71,7 +89,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     }
   };
 
-  onCardChange = e => {
+  onCardChange = (e: StripeCardElementChangeEvent) => {
     const { useLegacyCallback, onChange, defaultIsSaved } = this.props;
     this.setState({ showAllErrors: false });
     if (useLegacyCallback) {
@@ -160,7 +178,10 @@ class NewCreditCardFormWithoutStripe extends React.Component {
   }
 }
 
-const NewCreditCardForm = ({ useLegacyCallback = true, ...props }) => (
+const NewCreditCardForm = ({
+  useLegacyCallback = true,
+  ...props
+}: Omit<NewCreditCardFormProps, 'stripe' | 'stripeElements'>) => (
   <ElementsConsumer>
     {({ stripe, elements }) => (
       <NewCreditCardFormWithoutStripe
@@ -172,9 +193,5 @@ const NewCreditCardForm = ({ useLegacyCallback = true, ...props }) => (
     )}
   </ElementsConsumer>
 );
-
-NewCreditCardForm.propTypes = {
-  useLegacyCallback: PropTypes.bool,
-};
 
 export default NewCreditCardForm;
