@@ -33,7 +33,7 @@ const ProjectTypeOption = ({ name, value, label, description, isChecked, onChang
         onChange={onChange}
         className="mr-1 self-center"
       />
-      <Image src={iconSrc} width={48} height={48} className="mr-3 self-center" alt={undefined} />
+      <Image src={iconSrc} width={48} height={48} className="mr-3 self-center" alt="" />
       <div>
         <p className="mb-2 text-base font-bold">{label}</p>
         <p className="text-xs leading-normal font-normal text-muted-foreground">{description}</p>

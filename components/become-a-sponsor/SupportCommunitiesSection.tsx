@@ -31,7 +31,7 @@ const SupportCommunities = () => (
           src="/static/images/become-a-sponsor/supportCommunities-illustration.png"
           width={576}
           height={405}
-          alt={undefined}
+          alt="Communities and their supporters"
         />
       </Box>
       <Box width={['304px', '306px', '437px', null, '536px']}>
@@ -59,7 +59,7 @@ const SupportCommunities = () => (
         src="/static/images/become-a-sponsor/supportCommunities-illustration.png"
         width={576}
         height={405}
-        alt={undefined}
+        alt="Communities and their supporters"
       />
     </Box>
   </Flex>

@@ -231,7 +231,7 @@ export const ApplicationApproveScreen = ({
             <Check size={18} className="text-white" />
           </div>
           <Container flex="0 0 96px">
-            <Image src="/static/images/oc-oauth-connect-logo.png" height={96} width={96} alt={undefined} />
+            <Image src="/static/images/oc-oauth-connect-logo.png" height={96} width={96} alt="Open Collective" />
           </Container>
         </TopAvatarsContainer>
         <Box pt={56}>
@@ -300,7 +300,7 @@ export const ApplicationApproveScreen = ({
                       {SCOPES_INFO[scope].icon}
                     </div>
                   ) : (
-                    <Image src="/static/images/stars-exchange-rounded.png" width={32} height={32} alt={undefined} />
+                    <Image src="/static/images/stars-exchange-rounded.png" width={32} height={32} alt="" />
                   )}
                   <P fontSize="16px" color="black.700" ml={3}>
                     {SCOPES_INFO[scope].label}

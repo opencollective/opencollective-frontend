@@ -558,7 +558,7 @@ class CreateCollectiveForm extends React.Component<CreateCollectiveFormProps> {
                   src="/static/images/create-collective/mobileForm.png"
                   width={320}
                   height={200}
-                  alt={undefined}
+                  alt=""
                 />
               </Container>
             </ContainerWithImage>

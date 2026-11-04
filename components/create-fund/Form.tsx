@@ -291,7 +291,7 @@ class CreateFundForm extends React.Component<CreateFundFormProps> {
                 src="/static/images/create-collective/mobileForm.png"
                 width={320}
                 height={200}
-                alt={undefined}
+                alt=""
               />
             </Flex>
           </ContainerWithImage>
