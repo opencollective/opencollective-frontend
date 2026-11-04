@@ -143,6 +143,7 @@ type Props = {
   disabled?: boolean;
   isLoading?: boolean;
   loading?: boolean;
+  required?: boolean;
   label?: React.ReactNode;
   size?: number | string;
   inputId?: string;
@@ -186,8 +187,20 @@ class StyledCheckbox extends React.Component<Props, State> {
   }
 
   render() {
-    const { name, checked, label, disabled, size, inputId, width, alignItems, isLoading, fontSize, ...props } =
-      this.props;
+    const {
+      name,
+      checked,
+      label,
+      disabled,
+      size,
+      inputId,
+      width,
+      alignItems,
+      isLoading,
+      fontSize,
+      required,
+      ...props
+    } = this.props;
     const realChecked = checked === undefined ? this.state.checked : checked;
     return (
       <CheckboxContainer
@@ -218,6 +231,7 @@ class StyledCheckbox extends React.Component<Props, State> {
           type="checkbox"
           checked={realChecked}
           disabled={disabled}
+          required={required}
           readOnly
           tabIndex={-1} // Prevents the checkbox from being focused, since we're using the container as the focusable element
         />

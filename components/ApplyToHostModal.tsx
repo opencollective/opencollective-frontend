@@ -191,9 +191,8 @@ type ConfirmButtonsProps = {
 const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, isOSCHost }: ConfirmButtonsProps) => {
   return (
     <Flex justifyContent="flex-end" width="100%">
-      {/* `buttonType` is not a StyledButton prop (it was forwarded to the DOM); kept for behaviour parity */}
       <StyledButton
-        {...({ buttonType: 'button' } as React.ComponentProps<typeof StyledButton>)}
+        type="button"
         onClick={onBack || onClose}
         disabled={isSubmitting}
         buttonStyle="standard"
@@ -580,9 +579,9 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                               <StyledInputFormikField name="areTosChecked">
                                 {({ form, field }) => (
                                   <Flex flexDirection="column" mx={1} mt={18}>
-                                    {/* `required` is not a StyledCheckbox prop (it reaches the wrapper div); kept for behaviour parity */}
                                     <StyledCheckbox
                                       name="tos"
+                                      required
                                       label={
                                         <FormattedMessage
                                           id="Host.TOSCheckbox"
@@ -597,7 +596,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                           }}
                                         />
                                       }
-                                      {...({ required: true } as React.ComponentProps<typeof StyledCheckbox>)}
                                       checked={field.value}
                                       onChange={({ checked }) => form.setFieldValue('areTosChecked', checked)}
                                       error={field.error}
@@ -611,8 +609,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
 
                         {error && (
                           <MessageBox type="error" withIcon my={[1, 3]}>
-                            {/* TODO: `error` is an ApolloError object, which React cannot render - preserved as-is (see PLAN.md) */}
-                            {error as never}
+                            {i18nGraphqlException(intl, error)}
                           </MessageBox>
                         )}
                       </React.Fragment>
