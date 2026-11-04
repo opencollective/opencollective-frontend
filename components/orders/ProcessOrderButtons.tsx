@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
+import type { ConfirmContributionFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 
 import ConfirmationModal from '../ConfirmationModal';
 import ContributionConfirmationModal from '../ContributionConfirmationModal';
@@ -37,11 +38,17 @@ export const hasProcessButtons = permissions => {
   );
 };
 
+type ProcessOrderButtonsProps = {
+  order: ConfirmContributionFieldsFragment;
+  permissions: { canMarkAsPaid?: boolean; canMarkAsExpired?: boolean };
+  onSuccess?: () => void;
+};
+
 /**
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
  */
-const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
+const ProcessOrderButtons = ({ order, permissions, onSuccess }: ProcessOrderButtonsProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [selectedAction, setSelectedAction] = React.useState(null);

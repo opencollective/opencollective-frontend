@@ -257,7 +257,7 @@ const OrderBudgetItem = ({
         </Flex>
         {order?.permissions && (
           <ButtonsContainer>
-            <ProcessOrderButtons order={order} permissions={order.permissions} onSuccess={undefined} />
+            <ProcessOrderButtons order={order} permissions={order.permissions} />
           </ButtonsContainer>
         )}
       </Flex>
