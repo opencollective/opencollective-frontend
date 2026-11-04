@@ -161,7 +161,7 @@ const ACTIVITY_LIMIT = 25;
 
 const getQueryVariables = (accountSlug, router) => {
   const routerQuery = omit(router.query, ['slug', 'section']);
-  const offset = parseInt(routerQuery.offset) || 0;
+  const offset = parseInt(routerQuery.offset as string) || 0;
   const { period, type, account, limit } = routerQuery;
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
 
@@ -193,12 +193,12 @@ const getQueryVariables = (accountSlug, router) => {
 };
 
 const getChangesThatRequireUpdate = (account, queryParams) => {
-  const changes = {};
+  const changes: { type?: string | null } = {};
   if (!account) {
     return changes;
   }
 
-  if (!isSupportedActivityTypeFilter(account, queryParams.type)) {
+  if (!isSupportedActivityTypeFilter(account, queryParams.type as string)) {
     changes.type = null;
   }
   return changes;
@@ -208,7 +208,7 @@ const ActivityLog = ({ accountSlug }) => {
   const router = useRouter();
   const [selectedActivity, setSelectedActivity] = React.useState(null);
   const routerQuery = useMemo(() => omit(router.query, ['slug', 'section']), [router.query]);
-  const offset = parseInt(routerQuery.offset) || 0;
+  const offset = parseInt(routerQuery.offset as string) || 0;
   const queryVariables = getQueryVariables(accountSlug, router);
   const { data, loading, error } = useQuery(activityLogQuery, {
     variables: queryVariables,

@@ -7,13 +7,24 @@ import { styled } from 'styled-components';
 import { Flex } from '../../../Grid';
 import StyledTag from '../../../StyledTag';
 
-const diffValues = (prevValue, newValue) => {
+type ValueDiffPart = { added?: boolean; removed?: boolean; value?: React.ReactNode };
+type ValueDiff = { type: string; diff: ValueDiffPart[] };
+
+type FieldDiff = {
+  action: 'remove' | 'add' | 'update';
+  key: string;
+  newValue?: React.ReactNode;
+  prevValue?: React.ReactNode;
+  changes?: ValueDiff;
+};
+
+const diffValues = (prevValue, newValue): ValueDiff => {
   if (typeof prevValue === 'string' || typeof newValue === 'string') {
-    return { type: 'string', diff: diffChars(prevValue ?? '', newValue ?? '') };
+    return { type: 'string', diff: diffChars(prevValue ?? '', newValue ?? '') as ValueDiffPart[] };
   } else if (Array.isArray(prevValue) || Array.isArray(newValue)) {
-    return { type: 'array', diff: diffArrays(prevValue ?? [], newValue ?? []) };
+    return { type: 'array', diff: diffArrays(prevValue ?? [], newValue ?? []) as ValueDiffPart[] };
   } else if (typeof prevValue === 'object' || typeof newValue === 'object') {
-    return { type: 'object', diff: diffJson(prevValue ?? {}, newValue ?? {}) };
+    return { type: 'object', diff: diffJson(prevValue ?? {}, newValue ?? {}) as ValueDiffPart[] };
   } else {
     return {
       type: 'default',
@@ -25,15 +36,15 @@ const diffValues = (prevValue, newValue) => {
   }
 };
 
-const deepCompare = (prev, next) => {
+const deepCompare = (prev, next): FieldDiff[] => {
   const removedKeys = Object.keys(prev).filter(key => !has(next, key));
   const addedKeys = Object.keys(next).filter(key => !has(prev, key));
   const changedValues = pickBy(next, (value, key) => !addedKeys.includes(key) && prev[key] !== value);
   return [
-    ...removedKeys.map(key => ({ action: 'remove', key, prevValue: JSON.stringify(prev[key]) })),
-    ...addedKeys.map(key => ({ action: 'add', key, newValue: JSON.stringify(next[key]) })),
+    ...removedKeys.map(key => ({ action: 'remove' as const, key, prevValue: JSON.stringify(prev[key]) })),
+    ...addedKeys.map(key => ({ action: 'add' as const, key, newValue: JSON.stringify(next[key]) })),
     ...Object.keys(changedValues).map(key => ({
-      action: 'update',
+      action: 'update' as const,
       key,
       newValue: next[key],
       prevValue: prev[key],
@@ -154,8 +165,16 @@ export const CollectiveEditedDetails = ({ activity }) => {
                 </InlineDiffContainer>
               ) : (
                 <Flex flexDirection="column" gridGap="8px">
-                  {!isEmpty(prevValue) && <RemovedValue p={1}>{JSON.stringify(prevValue, null, 2)}</RemovedValue>}
-                  {!isEmpty(newValue) && <AddedValue p={1}>{JSON.stringify(newValue, null, 2)}</AddedValue>}
+                  {!isEmpty(prevValue) && (
+                    <RemovedValue {...({ p: 1 } as Record<string, unknown>)}>
+                      {JSON.stringify(prevValue, null, 2)}
+                    </RemovedValue>
+                  )}
+                  {!isEmpty(newValue) && (
+                    <AddedValue {...({ p: 1 } as Record<string, unknown>)}>
+                      {JSON.stringify(newValue, null, 2)}
+                    </AddedValue>
+                  )}
                 </Flex>
               )}
             </div>

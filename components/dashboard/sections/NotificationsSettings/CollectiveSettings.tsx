@@ -15,7 +15,7 @@ import { Button } from '../../../ui/Button';
 
 import ActivitySwitch from './ActivitySwitch';
 
-const CollectiveSettings = ({ account, advancedSettings, big, roleLabel, ...boxProps }) => {
+const CollectiveSettings = ({ account, advancedSettings, big = undefined, roleLabel = undefined, ...boxProps }) => {
   const intl = useIntl();
   const [displayAdvancedSettings, setDisplayAdvancedSettings] = React.useState(false);
 

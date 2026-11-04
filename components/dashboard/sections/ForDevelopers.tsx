@@ -1,4 +1,5 @@
 import React from 'react';
+import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 
 import { isIndividualAccount } from '../../../lib/collective';
@@ -10,7 +11,12 @@ import PersonalTokenSettings from '../../personal-token/PersonalTokenSettings';
 import PersonalTokensList from '../../personal-token/PersonalTokensList';
 
 const ForDevelopers = ({ account }) => {
-  const router = useRouter() || {};
+  const fallbackRouter: Pick<NextRouter, 'query' | 'asPath' | 'push'> = {
+    query: {},
+    asPath: '',
+    push: () => Promise.resolve(true),
+  };
+  const router = useRouter() || fallbackRouter;
   const query = router.query;
   const [subSection, id] = query.subpath || [];
   if (subSection === 'oauth' && id) {
@@ -22,13 +28,13 @@ const ForDevelopers = ({ account }) => {
       <React.Fragment>
         <OAuthApplicationsList
           account={account}
-          offset={query.offset ? parseInt(query.offset) : 0}
+          offset={query.offset ? parseInt(query.offset as string) : 0}
           onApplicationCreated={(app, account) => router.push(getOauthAppSettingsRoute(account, app))}
         />
         {isIndividualAccount(account) && (
           <PersonalTokensList
             account={account}
-            offset={query.offset ? parseInt(query.offset) : 0}
+            offset={query.offset ? parseInt(query.offset as string) : 0}
             onPersonalTokenCreated={(app, account) => router.push(getPersonalTokenSettingsRoute(account, app))}
           />
         )}

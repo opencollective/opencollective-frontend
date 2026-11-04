@@ -25,7 +25,7 @@ const FilterLabel = styled.label`
 `;
 
 const ActivityFilters = ({ filters, onChange, account }) => {
-  const getFilterProps = (name, valueModifier) => {
+  const getFilterProps = (name: string, valueModifier?: (value: unknown) => unknown) => {
     return {
       inputId: `activity-filter-${name}`,
       value: filters?.[name],

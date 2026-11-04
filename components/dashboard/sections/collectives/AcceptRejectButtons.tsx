@@ -66,7 +66,7 @@ const AcceptRejectButtons = ({
             })
           ) : (
             <Button
-              minWidth={100}
+              {...({ minWidth: 100 } as Record<string, unknown>)}
               variant="outline"
               disabled={disabled || blockActions || isLoading}
               loading={isLoading && action === 'APPROVE'}
@@ -91,7 +91,7 @@ const AcceptRejectButtons = ({
             })
           ) : (
             <Button
-              minWidth={100}
+              {...({ minWidth: 100 } as Record<string, unknown>)}
               variant="outlineDestructive"
               onClick={() => setShowRejectModal(true)}
               disabled={blockActions || isLoading}
@@ -106,7 +106,7 @@ const AcceptRejectButtons = ({
       )}
       {isCollectiveAdmin && editCollectiveMutation && (
         <Button
-          minWidth={100}
+          {...({ minWidth: 100 } as Record<string, unknown>)}
           variant="outlineDestructive"
           onClick={() => setIsConfirmingWithdraw(true)}
           disabled={isLoading}

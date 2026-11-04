@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -20,9 +21,14 @@ import { P } from '../../Text';
 import { ALL_SECTIONS } from '../constants';
 
 const AuthorizedAppsSection = () => {
-  const router = useRouter() || {};
+  const fallbackRouter: Pick<NextRouter, 'query' | 'asPath' | 'push'> = {
+    query: {},
+    asPath: '',
+    push: () => Promise.resolve(true),
+  };
+  const router = useRouter() || fallbackRouter;
   const query = router.query;
-  const variables = { limit: 10, offset: query.offset ? parseInt(query.offset) : 0 };
+  const variables = { limit: 10, offset: query.offset ? parseInt(query.offset as string) : 0 };
   const { data, loading, error, refetch } = useQuery(authorizedAppsQuery, { variables });
   const { LoggedInUser } = useLoggedInUser();
   const authorizations = data?.loggedInAccount?.oAuthAuthorizations;

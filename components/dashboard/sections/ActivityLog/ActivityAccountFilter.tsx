@@ -9,8 +9,15 @@ import { getSelectFilterStyles } from '../../../StyledSelectFilter';
 
 const SELECT_STYLES = getSelectFilterStyles();
 
-const getCustomOptions = (intl, account) => {
-  const options = [
+type AccountFilterOption = {
+  id?: string;
+  value?: { slug: string };
+  isCustomOption: boolean;
+  label: string;
+};
+
+const getCustomOptions = (intl, account): AccountFilterOption[] => {
+  const options: AccountFilterOption[] = [
     {
       value: account,
       isCustomOption: true,

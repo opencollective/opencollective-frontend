@@ -5,6 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { gql } from '../../../../lib/graphql/helpers';
+import type { Currency } from '../../../../lib/graphql/types/v2/graphql';
 
 import { getPortabilitySummary, leaveHostQuery } from '@/components/edit-collective/LeaveHostModal';
 
@@ -47,7 +48,22 @@ const unhostAccountMutation = gql`
   }
 `;
 
-const UnhostAccountModal = ({ collective, host, ...props }) => {
+type UnhostAccount = {
+  id?: number | string;
+  name?: string;
+  slug?: string;
+  currency?: Currency;
+  stats?: { balance?: { valueInCents?: number; currency?: Currency } };
+};
+
+type UnhostAccountModalProps = {
+  collective: UnhostAccount;
+  host: { legacyId?: number; name?: string };
+  onClose: () => void;
+  onSuccess?: () => void;
+};
+
+const UnhostAccountModal = ({ collective, host, ...props }: UnhostAccountModalProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [message, setMessage] = useState('');
@@ -123,7 +139,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
                       <StyledLink
                         color="black.800"
                         href="https://documentation.opencollective.com/expenses-and-getting-paid/submitting-expenses"
-                        textDecoration="underline"
+                        {...({ textDecoration: 'underline' } as Record<string, unknown>)}
                         openInNewTab
                       >
                         {value}
