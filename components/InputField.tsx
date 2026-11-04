@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get, isNil } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
@@ -20,18 +19,35 @@ import StyledInputLocation from './StyledInputLocation';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
 
-const Label = ({ label, isPrivate }) => (
+type LabelProps = {
+  label: React.ReactNode;
+  isPrivate?: boolean;
+};
+
+const Label = ({ label, isPrivate }: LabelProps) => (
   <label className="text-sm font-bold">
     {label}&nbsp;{isPrivate && <PrivateInfoIcon />}
   </label>
 );
 
-Label.propTypes = {
-  label: PropTypes.node,
-  isPrivate: PropTypes.bool,
-};
+/** `capitalize` ignores non-strings (returns an empty string) - kept as a typed helper */
+const capitalizeLabel = (label: React.ReactNode): string => (typeof label === 'string' ? capitalize(label) : '');
 
-function FieldGroup({ label, help, pre, post, after, button, className, isPrivate, ...props }) {
+type FieldGroupProps = {
+  label?: React.ReactNode;
+  help?: string;
+  pre?: string;
+  post?: string;
+  after?: string;
+  button?: React.ReactNode;
+  className?: string;
+  isPrivate?: boolean;
+  name?: string;
+  /** Rendering hint: `error` shows the error state */
+  validationState?: string;
+} & Record<string, unknown>;
+
+function FieldGroup({ label, help, pre, post, after, button, className, isPrivate, ...props }: FieldGroupProps) {
   const validationState = props.validationState === 'error' ? 'error' : null;
   delete props.validationState;
 
@@ -56,7 +72,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
               e.target.blur();
             }}
             {...inputProps}
-            key={inputProps.key}
+            key={inputProps.key as React.Key}
           />
           {after && <div className="after">{after}</div>}
           {button && <StyledButton>{button}</StyledButton>}
@@ -82,7 +98,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
               e.target.blur();
             }}
             {...inputProps}
-            key={inputProps.key}
+            key={inputProps.key as React.Key}
           />
           {button && <StyledButton>{button}</StyledButton>}
         </Box>
@@ -91,20 +107,6 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
     );
   }
 }
-
-FieldGroup.propTypes = {
-  key: PropTypes.string,
-  name: PropTypes.string,
-  label: PropTypes.string,
-  help: PropTypes.string,
-  pre: PropTypes.string,
-  post: PropTypes.string,
-  after: PropTypes.string,
-  button: PropTypes.node,
-  className: PropTypes.string,
-  isPrivate: PropTypes.bool,
-  validationState: PropTypes.string,
-};
 
 const InputFieldContainer = styled.div`
   label {
@@ -123,65 +125,70 @@ const HelpBlock = styled(Box)`
   font-size: 0.75rem;
 `;
 
+type InputFieldValue = string | number | boolean | unknown[] | Record<string, unknown>;
+
+type InputFieldProps = {
+  name: string;
+  label?: React.ReactNode;
+  description?: string;
+  isPrivate?: boolean;
+  value?: InputFieldValue;
+  defaultValue?: InputFieldValue;
+  validate?: (value: InputFieldValue) => boolean;
+  options?: Array<Record<string, unknown>> | Record<string, unknown>;
+  context?: Record<string, unknown>;
+  placeholder?: string;
+  pre?: string;
+  post?: string;
+  button?: React.ReactNode;
+  className?: string;
+  type?: string;
+  onChange: (value: InputFieldValue) => void;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+  overflow?: string;
+  required?: boolean;
+  style?: React.CSSProperties;
+  multiple?: boolean;
+  closeOnSelect?: boolean;
+  charCount?: number;
+  maxLength?: number;
+  step?: number | string;
+  disabled?: boolean;
+  min?: number;
+  max?: number;
+  focus?: boolean;
+  help?: string;
+  error?: string;
+  formModified?: boolean;
+  /** Rendered by the `component` type */
+  component?: React.ComponentType<Record<string, unknown>>;
+};
+
+type InputFieldState = {
+  value: InputFieldValue;
+  validationState: string;
+};
+
 /**
  * @deprecated InputField is deprecated and should be avoided for new developments.
  * Please use the newer equivalents: `StyledInput`, `InputAmount`, etc.
  */
-class InputField extends React.Component {
-  static propTypes = {
-    name: PropTypes.string.isRequired,
-    label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    description: PropTypes.string,
-    isPrivate: PropTypes.bool,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object, PropTypes.array]),
-    defaultValue: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-      PropTypes.object,
-      PropTypes.bool,
-      PropTypes.array,
-    ]),
-    validate: PropTypes.func,
-    options: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
-    context: PropTypes.object,
-    placeholder: PropTypes.string,
-    pre: PropTypes.string,
-    post: PropTypes.string,
-    button: PropTypes.node,
-    className: PropTypes.string,
-    type: PropTypes.string,
-    onChange: PropTypes.func.isRequired,
-    onKeyDown: PropTypes.func,
-    overflow: PropTypes.string,
-    required: PropTypes.bool,
-    style: PropTypes.object,
-    multiple: PropTypes.bool,
-    closeOnSelect: PropTypes.bool,
-    charCount: PropTypes.number,
-    maxLength: PropTypes.number,
-    step: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    disabled: PropTypes.bool,
-    min: PropTypes.number,
-    max: PropTypes.number,
-    focus: PropTypes.bool,
-    help: PropTypes.string,
-    error: PropTypes.string,
-    formModified: PropTypes.bool,
-  };
-
-  constructor(props) {
+class InputField extends React.Component<InputFieldProps, InputFieldState> {
+  constructor(props: InputFieldProps) {
     super(props);
     this.state = { value: props.value, validationState: null };
     this.handleChange = this.handleChange.bind(this);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: InputFieldProps) {
     if (this.props.value !== prevProps.value) {
       this.setState({ value: this.props.value });
     }
   }
 
-  validate(value) {
+  input: React.ReactNode;
+
+  validate(value: InputFieldValue) {
     if (!value) {
       return !this.props.required;
     }
@@ -191,14 +198,15 @@ class InputField extends React.Component {
     }
     switch (this.props.type) {
       case 'email':
-        return value.match(
+        // Only text-like values reach this branch
+        return (value as string).match(
           /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         );
     }
     return true;
   }
 
-  roundCurrencyValue(value) {
+  roundCurrencyValue(value: number) {
     if (value === null) {
       return null;
     } else if (get(this.props.options, 'step') === 1) {
@@ -208,13 +216,13 @@ class InputField extends React.Component {
     return value;
   }
 
-  handleChange(value) {
+  handleChange(value: InputFieldValue) {
     const { type, step } = this.props;
     if (type === 'number') {
-      const parsed = step && parseFloat(step) !== 1 ? parseFloat(value) : parseInt(value);
+      const parsed = step && parseFloat(String(step)) !== 1 ? parseFloat(String(value)) : parseInt(String(value));
       value = isNaN(parsed) ? null : parsed;
     } else if (type === 'currency') {
-      value = this.roundCurrencyValue(value);
+      value = this.roundCurrencyValue(value as number);
     }
 
     if (this.validate(value)) {
@@ -234,12 +242,14 @@ class InputField extends React.Component {
     switch (this.props.type) {
       case 'textarea': {
         value = value || this.props.defaultValue || '';
+        // Textareas always receive text
+        const textValue = value as string;
         let after;
         if (field.charCount) {
           if (field.maxLength) {
-            after = `${field.maxLength - value.length} characters left`;
+            after = `${field.maxLength - textValue.length} characters left`;
           } else {
-            after = `${value.length} characters`;
+            after = `${textValue.length} characters`;
           }
         }
         this.input = (
@@ -247,7 +257,7 @@ class InputField extends React.Component {
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 <Box width={[1, 2 / 12]}>
-                  <Label label={capitalize(field.label)} />
+                  <Label label={capitalizeLabel(field.label)} />
                 </Box>
                 <Box width={[1, 10 / 12]}>
                   <StyledTextarea
@@ -255,7 +265,7 @@ class InputField extends React.Component {
                     className={field.className}
                     onChange={event => this.handleChange(event.target.value)}
                     placeholder={this.props.placeholder}
-                    value={this.state.value || this.props.defaultValue || ''}
+                    value={(this.state.value || this.props.defaultValue || '') as string}
                     maxLength={field.maxLength}
                   />
                   {after && <div className="after">{after}</div>}
@@ -267,7 +277,7 @@ class InputField extends React.Component {
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
                   <Box width={1}>
-                    <Label label={capitalize(field.label)} />
+                    <Label label={capitalizeLabel(field.label)} />
                   </Box>
                 )}
                 <Box width={1}>
@@ -276,7 +286,7 @@ class InputField extends React.Component {
                     className={field.className}
                     onChange={event => this.handleChange(event.target.value)}
                     placeholder={this.props.placeholder}
-                    value={this.state.value || this.props.defaultValue || ''}
+                    value={(this.state.value || this.props.defaultValue || '') as string}
                     maxLength={field.maxLength}
                   />
                   {after && <div className="after">{after}</div>}
@@ -295,10 +305,13 @@ class InputField extends React.Component {
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 <Box width={[1, 2 / 12]}>
-                  <Label label={capitalize(field.label)} />
+                  <Label label={capitalizeLabel(field.label)} />
                 </Box>
                 <Box width={[1, 2 / 12]}>
-                  <EditTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                  <EditTags
+                    {...({ ...field } as React.ComponentProps<typeof EditTags>)}
+                    onChange={entries => field.onChange(entries.map(e => e.value))}
+                  />
                 </Box>
               </Flex>
             )}
@@ -306,12 +319,15 @@ class InputField extends React.Component {
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
                   <Box width={1}>
-                    <Label label={capitalize(field.label)} />
+                    <Label label={capitalizeLabel(field.label)} />
                   </Box>
                 )}
                 {field.description && <HelpBlock p={1}>{field.description}</HelpBlock>}
                 <Box width={1}>
-                  <EditTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                  <EditTags
+                    {...({ ...field } as React.ComponentProps<typeof EditTags>)}
+                    onChange={entries => field.onChange(entries.map(e => e.value))}
+                  />
                 </Box>
               </Flex>
             )}
@@ -325,10 +341,13 @@ class InputField extends React.Component {
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 <Box width={[1, 2 / 12]}>
-                  <Label label={capitalize(field.label)} />
+                  <Label label={capitalizeLabel(field.label)} />
                 </Box>
                 <Box width={[1, 2 / 12]}>
-                  <CollectiveTagsInput {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                  <CollectiveTagsInput
+                    {...({ ...field } as React.ComponentProps<typeof CollectiveTagsInput>)}
+                    onChange={entries => field.onChange(entries.map(e => e.value))}
+                  />
                 </Box>
               </Flex>
             )}
@@ -336,12 +355,15 @@ class InputField extends React.Component {
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
                   <Box width={1}>
-                    <Label label={capitalize(field.label)} />
+                    <Label label={capitalizeLabel(field.label)} />
                   </Box>
                 )}
                 {field.description && <HelpBlock p={1}>{field.description}</HelpBlock>}
                 <Box width={1}>
-                  <CollectiveTagsInput {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                  <CollectiveTagsInput
+                    {...({ ...field } as React.ComponentProps<typeof CollectiveTagsInput>)}
+                    onChange={entries => field.onChange(entries.map(e => e.value))}
+                  />
                 </Box>
               </Flex>
             )}
@@ -355,7 +377,7 @@ class InputField extends React.Component {
             {horizontal && (
               <Flex flexWrap="wrap" p={1}>
                 <Box width={[1, 2 / 12]}>
-                  <Label label={capitalize(field.label)} />
+                  <Label label={capitalizeLabel(field.label)} />
                 </Box>
                 <Box width={[1, 10 / 12]}>
                   <field.component onChange={this.handleChange} {...field} {...field.options} />
@@ -366,7 +388,7 @@ class InputField extends React.Component {
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
                   <Box width={1}>
-                    <Label label={capitalize(field.label)} />
+                    <Label label={capitalizeLabel(field.label)} />
                   </Box>
                 )}
                 <Box width={1}>
@@ -384,7 +406,7 @@ class InputField extends React.Component {
           <Flex flexWrap="wrap" p={1}>
             {field.label && (
               <Box width={1}>
-                <Label label={capitalize(field.label)} />
+                <Label label={capitalizeLabel(field.label)} />
               </Box>
             )}
             <Box width={1}>
@@ -405,13 +427,15 @@ class InputField extends React.Component {
           <Flex flexWrap="wrap" p={1}>
             {field.label && (
               <Box width={1}>
-                <Label label={capitalize(field.label)} isPrivate={field.isPrivate} />
+                <Label label={capitalizeLabel(field.label)} isPrivate={field.isPrivate} />
               </Box>
             )}
             <Box width={1}>
               <StyledInputLocation
-                location={this.state.value || field.defaultValue}
-                onChange={event => this.handleChange(event)}
+                {...({
+                  location: this.state.value || field.defaultValue,
+                  onChange: event => this.handleChange(event),
+                } as React.ComponentProps<typeof StyledInputLocation>)}
               />
               {field.description && <HelpBlock>{field.description}</HelpBlock>}
             </Box>
@@ -425,7 +449,9 @@ class InputField extends React.Component {
               <FormattedMessage defaultMessage="Social Links" id="3bLmoU" />
             </Box>
             <SocialLinksFormField
-              value={this.state.value || field.defaultValue}
+              value={
+                (this.state.value || field.defaultValue) as React.ComponentProps<typeof SocialLinksFormField>['value']
+              }
               onChange={event => this.handleChange(event)}
               touched={field.formModified}
             />
@@ -447,7 +473,7 @@ class InputField extends React.Component {
             disabled={field.disabled}
             step={get(field, 'options.step') || '0.01'}
             min={(field.min || 0) / 100}
-            label={typeof field.label === 'string' ? `${capitalize(field.label)}` : field.label}
+            label={typeof field.label === 'string' ? `${capitalizeLabel(field.label)}` : field.label}
             help={field.description}
             placeholder={field.placeholder}
             className={`currency ${field.className}`}
@@ -458,23 +484,25 @@ class InputField extends React.Component {
         break;
 
       case 'select': {
-        if (!field.options || field.options.length === 0) {
+        // `options` may also be an object, but the select branch always works with arrays
+        const selectOptions = field.options as Array<Record<string, unknown>>;
+        if (!selectOptions || selectOptions.length === 0) {
           // eslint-disable-next-line no-console
           console.warn('>>> InputField: options.length needs to be >= 1', field.options);
           return null;
         }
 
         const firstOptionValue =
-          field.options[0].value !== undefined ? field.options[0].value : Object.keys(field.options[0])[0];
+          selectOptions[0].value !== undefined ? selectOptions[0].value : Object.keys(selectOptions[0])[0];
 
         let defaultValue;
         if (field.defaultValue) {
           let defaultOption;
-          if (field.options[0].value !== undefined) {
-            defaultOption = field.options.find(option => option.value === field.defaultValue);
+          if (selectOptions[0].value !== undefined) {
+            defaultOption = selectOptions.find(option => option.value === field.defaultValue);
             defaultValue = defaultOption;
           } else {
-            defaultOption = field.options.find(option => Object.keys(option)[0] === field.defaultValue);
+            defaultOption = selectOptions.find(option => Object.keys(option)[0] === field.defaultValue);
             defaultValue = {
               key: Object.keys(defaultOption)[0],
               value: Object.keys(defaultOption)[0],
@@ -482,17 +510,17 @@ class InputField extends React.Component {
             };
           }
         } else {
-          if (field.options[0].value !== undefined) {
+          if (selectOptions[0].value !== undefined) {
             defaultValue = {
-              key: field.options[0].value,
-              value: field.options[0].value,
-              label: field.options[0].label,
+              key: selectOptions[0].value,
+              value: selectOptions[0].value,
+              label: selectOptions[0].label,
             };
           } else {
             defaultValue = {
-              key: Object.keys(field.options[0])[0],
-              value: Object.keys(field.options[0])[0],
-              label: Object.values(field.options[0])[0],
+              key: Object.keys(selectOptions[0])[0],
+              value: Object.keys(selectOptions[0])[0],
+              label: Object.values(selectOptions[0])[0],
             };
           }
         }
@@ -502,22 +530,22 @@ class InputField extends React.Component {
             inputId={`input-field-${field.name}`}
             name={field.name}
             data-cy={field.name}
-            type="select"
+            {...({ type: 'select' } as React.ComponentProps<typeof StyledSelect>)}
             key={`${field.name}-${firstOptionValue}`} // make sure we instantiate a new component if first value changes
             placeholder={field.placeholder}
             className={field.className}
             defaultValue={defaultValue}
             disabled={field.disabled}
-            isSearchable={field.options?.length > 15}
+            isSearchable={selectOptions?.length > 15}
             options={
-              field.options &&
-              field.options.map(option => {
+              selectOptions &&
+              selectOptions.map(option => {
                 const value = option.value !== undefined ? option.value : Object.keys(option)[0];
-                const label = option.label || option[value];
+                const label = option.label || option[value as string];
                 return { key: value, value: value, label: label };
               })
             }
-            onChange={option => {
+            onChange={(option: { value?: InputFieldValue }) => {
               this.handleChange(option.value);
             }}
           />
@@ -529,7 +557,7 @@ class InputField extends React.Component {
               <div>
                 <Flex flexWrap="wrap" p={1}>
                   <Box width={[1, 2 / 12]}>
-                    <Label label={capitalize(field.label)} />
+                    <Label label={capitalizeLabel(field.label)} />
                   </Box>
                   <Box width={[1, 10 / 12]}>{StyledSelectComponent}</Box>
                 </Flex>
@@ -547,7 +575,7 @@ class InputField extends React.Component {
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
                   <Box width={1}>
-                    <Label label={capitalize(field.label)} />
+                    <Label label={capitalizeLabel(field.label)} />
                   </Box>
                 )}
                 <Box width={1}>
@@ -568,12 +596,12 @@ class InputField extends React.Component {
               <div>
                 <Flex flexWrap="wrap" p={1}>
                   <Box width={[1, 2 / 12]}>
-                    <Label label={capitalize(field.label)} />
+                    <Label label={capitalizeLabel(field.label)} />
                   </Box>
                   <Box width={[1, 10 / 12]}>
                     <StyledCheckbox
                       name="input-checkbox"
-                      defaultChecked={field.defaultValue}
+                      defaultChecked={Boolean(field.defaultValue)}
                       onChange={event => this.handleChange(event.target.checked)}
                       label={field.description}
                     />
@@ -594,7 +622,7 @@ class InputField extends React.Component {
                 <Box width={1}>
                   <StyledCheckbox
                     name="input-checkbox"
-                    defaultChecked={field.defaultValue}
+                    defaultChecked={Boolean(field.defaultValue)}
                     onChange={event => this.handleChange(event.target.checked)}
                     label={field.description}
                   />
@@ -613,13 +641,13 @@ class InputField extends React.Component {
               <Flex flexWrap="wrap" p={1}>
                 {field.label && (
                   <Box width={[1, 2 / 12]}>
-                    <Label label={capitalize(field.label)} />
+                    <Label label={capitalizeLabel(field.label)} />
                   </Box>
                 )}
                 <Box width={[1, 10 / 12]}>
                   <Switch
                     name={field.name}
-                    defaultChecked={field.defaultValue}
+                    defaultChecked={Boolean(field.defaultValue)}
                     onCheckedChange={checked => this.handleChange(checked)}
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
@@ -628,11 +656,11 @@ class InputField extends React.Component {
             )}
             {!horizontal && (
               <React.Fragment>
-                {field.label && <Label label={capitalize(field.label)} />}
+                {field.label && <Label label={capitalizeLabel(field.label)} />}
                 <div className="switch">
                   <Switch
                     name={field.name}
-                    defaultChecked={field.defaultValue}
+                    defaultChecked={Boolean(field.defaultValue)}
                     onCheckedChange={checked => this.handleChange(checked)}
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
@@ -655,7 +683,7 @@ class InputField extends React.Component {
             name={field.name}
             maxLength={field.maxLength}
             disabled={field.disabled}
-            label={field.label && `${capitalize(field.label)}`}
+            label={field.label && `${capitalizeLabel(field.label)}`}
             help={field.description}
             autoFocus={field.focus}
             placeholder={field.placeholder}

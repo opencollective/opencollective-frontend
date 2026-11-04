@@ -18,7 +18,7 @@ module.exports = {
         'components/EditPublicMessagePopup.tsx',
         'components/MembershipsWithData.tsx',
         'components/MembersWithData.tsx',
-        'components/SignInOrJoinFree.js',
+        'components/SignInOrJoinFree.tsx',
         'components/tier-page/graphql/queries.js',
         'lib/graphql/v1/fragments.ts',
         'lib/graphql/v1/mutations.ts',

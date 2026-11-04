@@ -1,8 +1,9 @@
 import React, { Fragment } from 'react';
-import { PropTypes } from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash-es';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
@@ -40,60 +41,86 @@ export const SignInOverlayBackground = styled(Container)`
   box-shadow: 0px 9px 14px 1px #dedede;
 `;
 
+type SignInOrJoinFreeForm = 'signin' | 'create-account';
+
+type OAuthDetails = {
+  isOAuth?: boolean;
+  oAuthAppName?: string;
+  oAuthAppImage?: string;
+};
+
+type SignInOrJoinFreeProps = {
+  /** Redirect URL */
+  redirect?: string;
+  /** To pre-fill the "email" field */
+  defaultEmail?: string;
+  /** Provide this to automatically sign in the given email */
+  email?: string;
+  /** createUserQuery binding */
+  createUser?: (options: { variables: Record<string, unknown> }) => Promise<unknown>;
+  /** Whether user can signup from there */
+  disableSignup?: boolean;
+  /** Use this prop to use this as a controlled component */
+  form?: SignInOrJoinFreeForm;
+  /** Set the initial view for the component */
+  defaultForm?: SignInOrJoinFreeForm;
+  /** If provided, component will use links instead of buttons to make the switch */
+  routes?: {
+    signin?: string;
+    join?: string;
+  };
+  /** Label for signIn, defaults to "Continue with your email" */
+  signInLabel?: React.ReactNode;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  router: Router;
+  hideFooter?: boolean;
+  isOAuth?: boolean;
+  showSubHeading?: boolean;
+  showOCLogo?: boolean;
+  oAuthApplication?: {
+    name?: string;
+    account?: {
+      imageUrl?: string;
+    };
+  };
+  /* From UserProvider / withUser */
+  login?: (token: string) => Promise<unknown>;
+  /** whether the input needs to be auto-focused */
+  autoFocus?: boolean;
+  /** whether to update the page title when the sign in form is active */
+  noSignInTitle?: boolean;
+  whitelabelProvider?: {
+    name?: string;
+    squareLogo?: {
+      url?: string;
+    };
+  };
+};
+
+type SignInOrJoinFreeState = {
+  form: SignInOrJoinFreeForm;
+  error?: string;
+  submitting: boolean;
+  unknownEmailError: boolean;
+  email: string;
+  emailAlreadyExists: boolean;
+  isOAuth?: boolean;
+  oAuthAppName?: string;
+  oAuthAppImage?: string;
+  passwordRequired?: boolean;
+  password?: string;
+  name?: string;
+  newsletterOptIn?: boolean;
+  tosOptIn?: boolean;
+};
+
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
  * also has the API methods binded, so you can use it directly.
  */
-class SignInOrJoinFree extends React.Component {
-  static propTypes = {
-    /** Redirect URL */
-    redirect: PropTypes.string,
-    /** To pre-fill the "email" field */
-    defaultEmail: PropTypes.string,
-    /** Provide this to automatically sign in the given email */
-    email: PropTypes.string,
-    /** createUserQuery binding */
-    createUser: PropTypes.func,
-    /** Whether user can signup from there */
-    disableSignup: PropTypes.bool,
-    /** Use this prop to use this as a controlled component */
-    form: PropTypes.oneOf(['signin', 'create-account']),
-    /** Set the initial view for the component */
-    defaultForm: PropTypes.oneOf(['signin', 'create-account']),
-    /** If provided, component will use links instead of buttons to make the switch */
-    routes: PropTypes.shape({
-      signin: PropTypes.string,
-      join: PropTypes.string,
-    }),
-    /** Label for signIn, defaults to "Continue with your email" */
-    signInLabel: PropTypes.node,
-    intl: PropTypes.object,
-    router: PropTypes.object,
-    hideFooter: PropTypes.bool,
-    isOAuth: PropTypes.bool,
-    showSubHeading: PropTypes.bool,
-    showOCLogo: PropTypes.bool,
-    oAuthApplication: PropTypes.shape({
-      name: PropTypes.string,
-      account: PropTypes.shape({
-        imageUrl: PropTypes.string,
-      }),
-    }),
-    /* From UserProvider / withUser */
-    login: PropTypes.func,
-    /** whether the input needs to be auto-focused */
-    autoFocus: PropTypes.bool,
-    /** whether to update the page title when the sign in form is active */
-    noSignInTitle: PropTypes.bool,
-    whitelabelProvider: PropTypes.shape({
-      name: PropTypes.string,
-      squareLogo: PropTypes.shape({
-        url: PropTypes.string,
-      }),
-    }),
-  };
-
-  constructor(props) {
+class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJoinFreeState> {
+  constructor(props: SignInOrJoinFreeProps) {
     super(props);
     this.state = {
       form: this.props.defaultForm || 'signin',
@@ -115,7 +142,7 @@ class SignInOrJoinFree extends React.Component {
     }
   }
 
-  switchForm = (form, oAuthDetails = {}) => {
+  switchForm = (form: SignInOrJoinFreeForm, oAuthDetails: OAuthDetails = {}) => {
     // Update local state
     this.setState({
       form,
@@ -137,7 +164,11 @@ class SignInOrJoinFree extends React.Component {
     return encodeURIComponent(redirectUrl || currentPath || '/');
   }
 
-  signIn = async (email, password = null, { sendLink = false, resetPassword = false } = {}) => {
+  signIn = async (
+    email: string,
+    password: string = null,
+    { sendLink = false, resetPassword = false }: { sendLink?: boolean; resetPassword?: boolean } = {},
+  ) => {
     if (this.state.submitting) {
       return false;
     }
@@ -207,13 +238,24 @@ class SignInOrJoinFree extends React.Component {
     }
   };
 
-  createProfile = async data => {
+  createProfile = async (data: {
+    email?: string;
+    name?: string;
+    legalName?: string;
+    newsletterOptIn?: boolean;
+    captcha?: { token?: string; provider?: string };
+    orgName?: string;
+    orgLegalName?: string;
+    githubHandle?: string;
+    twitterHandle?: string;
+    website?: string;
+  }) => {
     if (this.state.submitting) {
       return false;
     }
     const user = pick(data, ['email', 'name', 'legalName', 'newsletterOptIn']);
     const organizationData = pick(data, ['orgName', 'orgLegalName', 'githubHandle', 'twitterHandle', 'website']);
-    const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
+    const organization: Record<string, unknown> = Object.keys(organizationData).length > 0 ? organizationData : null;
     if (organization) {
       organization.name = organization.orgName;
       organization.legalName = organization.orgLegalName;
@@ -304,7 +346,8 @@ class SignInOrJoinFree extends React.Component {
                     onEmailChange={email =>
                       this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })
                     }
-                    onFieldChange={(name, value) => this.setState({ [name]: value })}
+                    // Computed key: `CreateProfile` reports the field name to update
+                    onFieldChange={(name, value) => this.setState({ [name]: value } as SignInOrJoinFreeState)}
                     onSubmit={this.createProfile}
                     onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                     submitting={submitting}
@@ -372,6 +415,11 @@ const signupMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const addSignupMutation = graphql(signupMutation, { name: 'createUser', options: { context: API_V1_CONTEXT } });
+const addSignupMutation = graphql<
+  Omit<SignInOrJoinFreeProps, 'router'>,
+  Record<string, unknown>,
+  Record<string, unknown>,
+  { createUser?: (options: { variables: Record<string, unknown> }) => Promise<unknown> }
+>(signupMutation, { name: 'createUser', options: { context: API_V1_CONTEXT } });
 
 export default withUser(injectIntl(addSignupMutation(withRouter(SignInOrJoinFree))));

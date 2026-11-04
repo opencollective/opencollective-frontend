@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { FormattedMessage } from 'react-intl';
 
@@ -16,73 +15,84 @@ import StyledLink from './StyledLink';
 import StyledLinkButton from './StyledLinkButton';
 import { Span } from './Text';
 
+type SignInFormOptions = {
+  sendLink?: boolean;
+  resetPassword?: boolean;
+};
+
+type SignInProps = {
+  /** handles the email input submission, a.k.a Sign In */
+  onSubmit: (options?: SignInFormOptions) => void;
+  /** handles the redirect from sign-in, a.k.a Join Free. Accepts URLs (string) or custom action func */
+  onSecondaryAction: (() => void) | string;
+  /** When set to true, will show a spinner in Sign In button and will disable all actions */
+  loading?: boolean;
+  /** Whether user can click on "Join Free" */
+  showSecondaryAction?: boolean;
+  /** Set this to true to display the unknown email message */
+  unknownEmail?: boolean;
+  /** Set this to true to display the password field */
+  passwordRequired?: boolean;
+  /** Label, defaults to "Continue with your email" */
+  label?: React.ReactNode;
+  /** Set the value of email input */
+  email: string;
+  /** Set the value of password input */
+  password?: string;
+  /** handles changes in the email input */
+  onEmailChange: (email: string) => void;
+  /** handles changes in the password input */
+  onPasswordChange: (password: string) => void;
+  /** Oauth Sign In **/
+  isOAuth?: boolean;
+  /** Oauth App Name **/
+  oAuthAppName?: string;
+  /** Oauth App Image **/
+  oAuthAppImage?: string;
+  /** Show/hide subheading **/
+  showSubHeading?: boolean;
+  /** Show/hide Open Collective Logo **/
+  showOCLogo?: boolean;
+  /** whether the input needs to be auto-focused */
+  autoFocus?: boolean;
+  /** whether to show the title or not */
+  noSignInTitle?: boolean;
+  whitelabelProvider?: {
+    name?: string;
+    squareLogo?: {
+      url?: string;
+    };
+  };
+};
+
+type SignInState = {
+  error?: string;
+  showError: boolean;
+  unknownEmail?: boolean;
+};
+
 /**
  * Component for handing user sign-in or redirecting to sign-up.
  */
-export default class SignIn extends React.Component {
-  static propTypes = {
-    /** handles the email input submission, a.k.a Sign In */
-    onSubmit: PropTypes.func.isRequired,
-    /** handles the redirect from sign-in, a.k.a Join Free. Accepts URLs (string) or custom action func */
-    onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
-    /** When set to true, will show a spinner in Sign In button and will disable all actions */
-    loading: PropTypes.bool,
-    /** Whether user can click on "Join Free" */
-    showSecondaryAction: PropTypes.bool,
-    /** Set this to true to display the unknown email message */
-    unknownEmail: PropTypes.bool,
-    /** Set this to true to display the password field */
-    passwordRequired: PropTypes.bool,
-    /** Label, defaults to "Continue with your email" */
-    label: PropTypes.node,
-    /** Set the value of email input */
-    email: PropTypes.string.isRequired,
-    /** Set the value of password input */
-    password: PropTypes.string,
-    /** handles changes in the email input */
-    onEmailChange: PropTypes.func.isRequired,
-    /** handles changes in the password input */
-    onPasswordChange: PropTypes.func.isRequired,
-    /** Oauth Sign In **/
-    isOAuth: PropTypes.bool,
-    /** Oauth App Name **/
-    oAuthAppName: PropTypes.string,
-    /** Oauth App Image **/
-    oAuthAppImage: PropTypes.string,
-    /** Show/hide subheading **/
-    showSubHeading: PropTypes.bool,
-    /** Show/hide Open Collective Logo **/
-    showOCLogo: PropTypes.bool,
-    /** whether the input needs to be auto-focused */
-    autoFocus: PropTypes.bool,
-    /** whether to show the title or not */
-    noSignInTitle: PropTypes.bool,
-    whitelabelProvider: PropTypes.shape({
-      name: PropTypes.string,
-      squareLogo: PropTypes.shape({
-        url: PropTypes.string,
-      }),
-    }),
-  };
-
+export default class SignIn extends React.Component<SignInProps, SignInState> {
   static defaultProps = {
     showSubHeading: true,
     showOCLogo: true,
     autoFocus: true,
   };
 
-  constructor(props) {
+  constructor(props: SignInProps) {
     super(props);
     this.state = { error: null, showError: false };
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: SignInProps) {
     if (prevProps.unknownEmail !== this.props.unknownEmail) {
       this.setState({ unknownEmail: this.props.unknownEmail });
     }
   }
 
-  renderSecondaryAction(message) {
+  renderSecondaryAction(message: React.ReactNode) {
     const { loading, onSecondaryAction } = this.props;
     return typeof onSecondaryAction === 'string' ? (
       <StyledLink
@@ -108,7 +118,7 @@ export default class SignIn extends React.Component {
     );
   }
 
-  getSignInPageHeading(unknownEmail) {
+  getSignInPageHeading(unknownEmail: boolean) {
     if (this.props.isOAuth && unknownEmail) {
       return <FormattedMessage defaultMessage="Sign in to your Open Collective account" id="sAWx+H" />;
     } else if (this.props.isOAuth || this.props.whitelabelProvider) {
@@ -118,7 +128,7 @@ export default class SignIn extends React.Component {
     }
   }
 
-  getSignInPageSubHeading(oAuthAppName) {
+  getSignInPageSubHeading(oAuthAppName: string) {
     if (this.props.isOAuth) {
       return (
         <FormattedMessage defaultMessage="and connect with {oAuthAppName}" id="boQlk1" values={{ oAuthAppName }} />
@@ -162,10 +172,11 @@ export default class SignIn extends React.Component {
             <React.Fragment>
               <div className="mb-10 flex justify-center">
                 <Box minWidth={104}>
-                  <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} />
+                  {/* `alt` is required by `next/image` types but was never provided; kept as-is (see PLAN.md) */}
+                  <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} alt={undefined} />
                 </Box>
                 <Box ml={24} mr={24} mt={32} minWidth={40}>
-                  <Image src="/static/images/oauth-flow-connect.png" height={40} width={40} />
+                  <Image src="/static/images/oauth-flow-connect.png" height={40} width={40} alt={undefined} />
                 </Box>
                 <Box minWidth={104}>
                   <img src={this.props.oAuthAppImage} alt="" height={104} width={104} style={{ borderRadius: 10 }} />
@@ -175,7 +186,7 @@ export default class SignIn extends React.Component {
           ) : (
             this.props.showOCLogo && (
               <div className="flex items-center justify-center gap-4">
-                <Image src="/static/images/oc-logo-watercolor-256.png" height={128} width={128} />
+                <Image src="/static/images/oc-logo-watercolor-256.png" height={128} width={128} alt={undefined} />
                 {whitelabelProvider?.squareLogo && (
                   <React.Fragment>
                     <Image
@@ -183,6 +194,7 @@ export default class SignIn extends React.Component {
                       height={64}
                       width={64}
                       className="mt-5 -rotate-[20deg]"
+                      alt={undefined}
                     />
                     <img src={whitelabelProvider.squareLogo.url} alt="" height={128} width={128} />
                   </React.Fragment>
@@ -224,7 +236,7 @@ export default class SignIn extends React.Component {
               >
                 <StyledInputField
                   style={{ display: this.props.passwordRequired ? 'none' : 'block' }}
-                  labelFontWeight={600}
+                  labelFontWeight="600"
                   labelFontSize="13px"
                   alignItems="left"
                   width="100%"
@@ -249,14 +261,15 @@ export default class SignIn extends React.Component {
                       if (e.key === ' ') {
                         e.preventDefault();
                       } else if (e.key === 'Enter') {
-                        onEmailChange(e.target.value);
-                        this.setState({ error: e.target.validationMessage, showError: true });
+                        // React 19 types `target` as `EventTarget` outside `ChangeEvent`
+                        onEmailChange((e.target as HTMLInputElement).value);
+                        this.setState({ error: (e.target as HTMLInputElement).validationMessage, showError: true });
                       }
                     }}
                     onBlur={() => this.setState({ showError: true })}
                     onInvalid={event => {
                       event.preventDefault();
-                      this.setState({ error: event.target.validationMessage });
+                      this.setState({ error: (event.target as HTMLInputElement).validationMessage });
                     }}
                     placeholder="e.g., yourname@yourhost.com"
                     autoFocus={this.props.autoFocus}
@@ -268,7 +281,7 @@ export default class SignIn extends React.Component {
                 </StyledInputField>
                 <StyledInputField
                   style={{ display: this.props.passwordRequired ? 'block' : 'none' }}
-                  labelFontWeight={600}
+                  labelFontWeight="600"
                   labelFontSize="13px"
                   alignItems="left"
                   width="100%"
@@ -278,7 +291,7 @@ export default class SignIn extends React.Component {
                 >
                   <PasswordInput
                     key={this.props.passwordRequired ? 'required' : 'initial'}
-                    fontSize="14px"
+                    {...({ fontSize: '14px' } as React.ComponentProps<typeof PasswordInput>)}
                     id="password"
                     name="password"
                     autoComplete="current-password"
@@ -297,14 +310,15 @@ export default class SignIn extends React.Component {
                       if (e.key === ' ') {
                         e.preventDefault();
                       } else if (e.key === 'Enter') {
-                        onPasswordChange(e.target.value);
-                        this.setState({ error: e.target.validationMessage, showError: true });
+                        // React 19 types `target` as `EventTarget` outside `ChangeEvent`
+                        onPasswordChange((e.target as HTMLInputElement).value);
+                        this.setState({ error: (e.target as HTMLInputElement).validationMessage, showError: true });
                       }
                     }}
                     onBlur={() => this.setState({ showError: true })}
                     onInvalid={event => {
                       event.preventDefault();
-                      this.setState({ error: event.target.validationMessage });
+                      this.setState({ error: (event.target as HTMLInputElement).validationMessage });
                     }}
                   />
                 </StyledInputField>

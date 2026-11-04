@@ -2,7 +2,9 @@ import React from 'react';
 import { PopoverPortal } from '@radix-ui/react-popover';
 import { groupBy, intersection, isEqual, last, sortBy, truncate } from 'lodash-es';
 import memoizeOne from 'memoize-one';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
+import type { SelectInstance } from 'react-select';
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
@@ -16,6 +18,7 @@ import CollectiveTypePicker from './CollectiveTypePicker';
 import Container from './Container';
 import CreateCollectiveMiniForm from './CreateCollectiveMiniForm';
 import { Flex } from './Grid';
+import type { StyledSelectProps } from './StyledSelect';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
 
@@ -60,7 +63,10 @@ const CollectiveLabelTextContainer = styled.div`
  * Default label builder used to render a collective. For sections titles and custom options,
  * this will just return the default label.
  */
-export const DefaultCollectiveLabel = ({ value: collective }, context) => {
+export const DefaultCollectiveLabel = (
+  { value: collective }: { value?: Collective | null },
+  context?: { selectValue?: CollectiveOption[] },
+) => {
   const selected = (context?.selectValue ?? []).some(o => o.value.slug === collective.slug);
   return !collective ? (
     <Span fontSize="12px" lineHeight="18px" color="black.500">
@@ -69,7 +75,11 @@ export const DefaultCollectiveLabel = ({ value: collective }, context) => {
   ) : (
     <Flex alignItems="center">
       <Avatar collective={collective} radius={16} />
-      <CollectiveLabelTextContainer role="option" value={collective.slug} aria-selected={selected}>
+      <CollectiveLabelTextContainer
+        role="option"
+        {...({ value: collective.slug } as React.ComponentProps<typeof CollectiveLabelTextContainer>)}
+        aria-selected={selected}
+      >
         <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
           {truncate(collective.name, { length: 40 })}
         </Span>
@@ -123,30 +133,136 @@ const getCollectivesFromOptions = options => {
 
 const isCollectiveInList = (collective, collectives) => collectives.some(c => isSameCollective(collective, c));
 
+type Collective = {
+  id?: number | string;
+  legacyId?: number;
+  slug?: string;
+  name?: string;
+  type?: string;
+  email?: string;
+  imageUrl?: string;
+  isIncognito?: boolean;
+};
+
+type CollectiveOption = {
+  label?: React.ReactNode;
+  value?: Collective | null;
+  options?: CollectiveOption[];
+  isDisabled?: boolean;
+  types?: string[];
+  isNew?: boolean;
+  __background__?: string;
+  [FLAG_COLLECTIVE_PICKER_COLLECTIVE]?: boolean;
+  [FLAG_NEW_COLLECTIVE]?: boolean;
+  [FLAG_INVITE_NEW]?: boolean;
+};
+
+type BuildOption = (collective: Collective) => CollectiveOption;
+
+type CollectivePickerProps = Omit<
+  StyledSelectProps,
+  | 'onChange'
+  | 'onInputChange'
+  | 'value'
+  | 'options'
+  | 'defaultValue'
+  | 'formatOptionLabel'
+  | 'isDisabled'
+  | 'menuIsOpen'
+  | 'isSearchable'
+> & {
+  inputId?: string;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  collectives?: Collective[];
+  creatable?: boolean | string[];
+  customOptions?: CollectiveOption[];
+  customOptionsPosition?: string;
+  formatOptionLabel?: (option: CollectiveOption, context?: unknown, intl?: IntlShape) => React.ReactNode;
+  getDefaultOptions?: (buildOption: BuildOption, allOptions: CollectiveOption[]) => unknown;
+  getOptions?: (buildOption: BuildOption) => unknown;
+  groupByType?: boolean;
+  onChange?: (option: CollectiveOption, actionMeta?: unknown) => void;
+  onInputChange?: (searchText: string) => void;
+  onCreateClick?: (type: string) => void;
+  onSelectNewCollectiveOption?: (args: {
+    searchText: string;
+    onCreatedCollective: (collective: Collective) => void;
+  }) => void;
+  onInvite?: (invite: boolean) => void;
+  sortFunc?: (collectives: Collective[]) => Collective[];
+  types?: string[];
+  isDisabled?: boolean;
+  menuIsOpen?: boolean;
+  minWidth?: number | string;
+  maxWidth?: number | string;
+  width?: number | string;
+  addLoggedInUserAsAdmin?: boolean;
+  renderNewCollectiveOption?: (args: {
+    searchText: string;
+    onCreatedCollective: (collective: Collective) => void;
+  }) => React.ReactNode;
+  isSearchable?: boolean;
+  expenseType?: string;
+  useBeneficiaryForVendor?: boolean;
+  loading?: boolean;
+  isLoading?: boolean;
+  isMulti?: boolean;
+  collective?: Collective | Collective[] | null;
+  excludeAdminFields?: boolean;
+  createCollectiveOptionalFields?: string[];
+  invitable?: boolean;
+  HostCollectiveId?: number;
+  vendorVisibleToAccountIds?: number[];
+};
+
+type CollectivePickerState = {
+  createFormCollectiveType: string;
+  displayInviteMenu: boolean;
+  menuIsOpen: boolean;
+  createdCollectives: Collective[];
+  searchText: string;
+  showCreatedCollective?: boolean;
+  createdCollective?: Collective;
+};
+
 /**
  * An overset og `StyledSelect` specialized to display, filter and pick a collective from a given list.
  * Accepts all the props from [StyledSelect](#!/StyledSelect).
  *
  * If you want the collectives to be automatically loaded from the API, check `CollectivePickerAsync`.
  */
-class CollectivePicker extends React.PureComponent {
-  constructor(props) {
+class CollectivePicker extends React.PureComponent<CollectivePickerProps, CollectivePickerState> {
+  static defaultProps = {
+    groupByType: true,
+    getDefaultOptions: () => undefined,
+    getOptions: () => undefined,
+    formatOptionLabel: DefaultCollectiveLabel,
+    sortFunc: collectives => sortBy(collectives, 'name'),
+  };
+
+  constructor(props: CollectivePickerProps) {
     super(props);
     this.containerRef = React.createRef();
     this.selectRef = React.createRef();
-    this.state = {
-      createFormCollectiveType: null,
-      displayInviteMenu: null,
-      menuIsOpen: props.menuIsOpen,
-      createdCollectives: [],
-      searchText: '',
-    };
   }
+
+  state: CollectivePickerState = {
+    createFormCollectiveType: null,
+    displayInviteMenu: null,
+    menuIsOpen: null,
+    createdCollectives: [],
+    searchText: '',
+  };
+
+  containerRef: React.RefObject<HTMLDivElement>;
+
+  selectRef: React.RefObject<SelectInstance<unknown, boolean>>;
 
   /**
    * Function to generate a single select option
    */
-  buildCollectiveOption(collective) {
+  buildCollectiveOption(collective: Collective): CollectiveOption {
     if (collective === null) {
       return null;
     } else {
@@ -298,7 +414,7 @@ class CollectivePicker extends React.PureComponent {
     }
   };
 
-  getMenuIsOpen(menuIsOpenFromProps) {
+  getMenuIsOpen(menuIsOpenFromProps: boolean) {
     if (this.state.createFormCollectiveType || this.props.isDisabled) {
       return false;
     } else if (typeof menuIsOpenFromProps !== 'undefined') {
@@ -312,7 +428,10 @@ class CollectivePicker extends React.PureComponent {
 
   closeMenu = () => this.setState({ menuIsOpen: false });
 
-  getDefaultOption = (getDefaultOptionsFromProps, allOptions) => {
+  getDefaultOption = (
+    getDefaultOptionsFromProps: CollectivePickerProps['getDefaultOptions'],
+    allOptions: CollectiveOption[],
+  ) => {
     if (this.state.createdCollective) {
       return this.buildCollectiveOption(this.state.createdCollective);
     } else if (getDefaultOptionsFromProps) {
@@ -324,7 +443,8 @@ class CollectivePicker extends React.PureComponent {
     if (this.props.collective !== undefined) {
       return this.props.isMulti && Array.isArray(this.props.collective)
         ? this.props.collective.map(this.buildCollectiveOption)
-        : this.buildCollectiveOption(this.props.collective);
+        : // `isMulti` is not a discriminated prop: the single-collective branch is asserted here
+          this.buildCollectiveOption(this.props.collective as Collective);
     } else if (this.state.showCreatedCollective) {
       return this.buildCollectiveOption(last(this.state.createdCollectives));
     } else {
@@ -332,7 +452,7 @@ class CollectivePicker extends React.PureComponent {
     }
   };
 
-  onNewCollectiveOptionCreated = collective => {
+  onNewCollectiveOptionCreated = (collective: Collective) => {
     this.onInputChange('');
     this.selectRef.current.blur();
     const { onChange } = this.props;
@@ -388,7 +508,7 @@ class CollectivePicker extends React.PureComponent {
     const prefillValue = isEmail(searchText) ? { email: searchText } : { name: searchText };
 
     return (
-      <Popover open={createFormCollectiveType}>
+      <Popover open={Boolean(createFormCollectiveType)}>
         <PopoverAnchor asChild>
           <Container position="relative" minWidth={minWidth} maxWidth={maxWidth} width={width} ref={this.containerRef}>
             <StyledSelect
@@ -404,7 +524,7 @@ class CollectivePicker extends React.PureComponent {
               onChange={this.onChange}
               noOptionsMessage={searchText ? undefined : () => null}
               isSearchable={isSearchable ?? true}
-              formatOptionLabel={(option, context) => {
+              formatOptionLabel={(option: CollectiveOption, context) => {
                 if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
                   return formatOptionLabel(option, context, intl);
                 } else if (option[FLAG_NEW_COLLECTIVE]) {
@@ -416,7 +536,11 @@ class CollectivePicker extends React.PureComponent {
                   ) : (
                     <CollectiveTypePicker
                       onChange={this.setCreateFormCollectiveType}
-                      types={option.types || (typeof creatable === 'object' ? creatable : types)}
+                      types={
+                        (option.types || (typeof creatable === 'object' ? creatable : types)) as React.ComponentProps<
+                          typeof CollectiveTypePicker
+                        >['types']
+                      }
                       useBeneficiaryForVendor={useBeneficiaryForVendor}
                     />
                   );
@@ -489,12 +613,5 @@ class CollectivePicker extends React.PureComponent {
   }
 }
 
-CollectivePicker.defaultProps = {
-  groupByType: true,
-  getDefaultOptions: () => undefined,
-  getOptions: () => undefined,
-  formatOptionLabel: DefaultCollectiveLabel,
-  sortFunc: collectives => sortBy(collectives, 'name'),
-};
-
-export default injectIntl(CollectivePicker);
+// `injectIntl` only types the injected `intl` prop; the class' own props (and `defaultProps`) are kept as-is
+export default injectIntl(CollectivePicker as React.ComponentType<{ intl?: IntlShape }>);
