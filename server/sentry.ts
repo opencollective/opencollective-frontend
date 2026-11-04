@@ -1,8 +1,25 @@
-// NOTE: This require will be replaced with `@sentry/browser`
+// NOTE: This import will be replaced with `@sentry/browser`
 // client side thanks to the webpack config in next.config.js
-const Sentry = require('@sentry/nextjs');
+import type { Scope } from '@sentry/browser';
+import * as Sentry from '@sentry/nextjs';
 
-const updateScopeWithNextContext = (scope, ctx) => {
+type NextContext = {
+  req?: {
+    url?: string;
+    method?: string;
+    headers?: unknown;
+    params?: unknown;
+    query?: unknown;
+  };
+  res?: { statusCode?: number };
+  errorInfo?: Record<string, unknown>;
+  query?: unknown;
+  pathname?: string;
+};
+
+type ErrorWithStatusCode = Error & { statusCode?: number };
+
+const updateScopeWithNextContext = (scope: Scope, ctx?: NextContext): void => {
   if (ctx) {
     const { req, res, errorInfo, query, pathname } = ctx;
 
@@ -28,10 +45,7 @@ const updateScopeWithNextContext = (scope, ctx) => {
   }
 };
 
-const updateScopeWithWindowContext = (
-  /** @type {(import('@sentry/browser').Scope} */
-  scope,
-) => {
+const updateScopeWithWindowContext = (scope: Scope): void => {
   if (typeof window !== 'undefined') {
     scope.setTag('ssr', false);
     scope.setExtra('url', window.location?.href);
@@ -41,8 +55,7 @@ const updateScopeWithWindowContext = (
 /**
  * Helper to extract Sentry tags from an error
  */
-const captureException = (err, ctx) => {
-  /** @type {(import('@sentry/browser').Scope} */
+const captureException = (err: ErrorWithStatusCode, ctx?: NextContext): string | undefined => {
   const scope = Sentry.getCurrentScope();
   if (err.message) {
     // De-duplication currently doesn't work correctly for SSR / browser errors
@@ -65,8 +78,11 @@ const captureException = (err, ctx) => {
   }
 };
 
-const captureMessage = (message, opts, ctx) => {
-  /** @type {import('@sentry/browser').Scope} */
+const captureMessage = (
+  message: string,
+  opts?: Parameters<typeof Sentry.captureMessage>[1],
+  ctx?: NextContext,
+): string | undefined => {
   const scope = Sentry.getCurrentScope();
   updateScopeWithWindowContext(scope);
   updateScopeWithNextContext(scope, ctx);
@@ -79,4 +95,7 @@ const captureMessage = (message, opts, ctx) => {
   }
 };
 
-module.exports = { Sentry, captureException, captureMessage };
+const sentryLib = { Sentry, captureException, captureMessage };
+
+export default sentryLib;
+export { Sentry, captureMessage };

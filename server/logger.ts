@@ -1,6 +1,6 @@
-const winston = require('winston');
+import winston from 'winston';
 
-function getLogLevel() {
+function getLogLevel(): string {
   if (process.env.LOG_LEVEL) {
     return process.env.LOG_LEVEL;
   } else if (['test', 'e2e', 'ci'].includes(process.env.OC_ENV)) {
@@ -20,4 +20,4 @@ const winstonConsole = new winston.transports.Console({
 logger.add(winstonConsole);
 logger.exceptions.handle(winstonConsole);
 
-module.exports = logger;
+export default logger;

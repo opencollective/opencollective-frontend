@@ -1,7 +1,7 @@
-const expressLimiter = require('./express-limiter');
-const logger = require('./logger');
-const { parseToBooleanDefaultFalse } = require('./utils');
-const { createRedisClient } = require('./redis');
+import expressLimiter from './express-limiter.ts';
+import logger from './logger.ts';
+import { createRedisClient } from './redis.ts';
+import { parseToBooleanDefaultFalse } from './utils.ts';
 
 const enabled = parseToBooleanDefaultFalse(process.env.RATE_LIMITING_ENABLED);
 const simulate = parseToBooleanDefaultFalse(process.env.RATE_LIMITING_SIMULATE);
@@ -63,4 +63,4 @@ const load = async app => {
   app.use(expressLimiter(redisClient)(expressLimiterOptions));
 };
 
-module.exports = load;
+export default load;

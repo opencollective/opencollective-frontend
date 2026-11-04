@@ -1,30 +1,30 @@
-const path = require('path');
-const fs = require('fs');
+import express from 'express';
+import proxy from 'express-http-proxy';
+import trim from 'lodash-es/trim.js';
+import fs from 'node:fs';
+import path from 'node:path';
 
-const express = require('express');
-const proxy = require('express-http-proxy');
-const trim = require('lodash-es/trim').default;
+import downloadFileHandler from './download-file.ts';
 
-const downloadFileHandler = require('./download-file');
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
-const maxAge = (maxAge = 60) => {
+const maxAge = (maxAge: number = 60) => {
   return (req, res, next) => {
     res.set('Cache-Control', `public, max-age=${maxAge}`);
     next();
   };
 };
 
-module.exports = expressApp => {
+export default expressApp => {
   const app = expressApp;
 
   // Support older assets from website
-  app.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
+  app.use('/public/images', express.static(path.join(import.meta.dirname, '../public/static/images')));
 
   app.get('/static/*path', maxAge(86400));
 
   // Load the favicon file into memory
-  const faviconPath = path.join(__dirname, '../public/static/images/favicon.ico.png');
+  const faviconPath = path.join(import.meta.dirname, '../public/static/images/favicon.ico.png');
   const favicon = fs.readFileSync(faviconPath);
   app.get('/favicon.:ext', maxAge(300000), (req, res) => {
     res.type('image/png');

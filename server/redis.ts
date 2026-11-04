@@ -1,17 +1,17 @@
-const { createClient } = require('redis');
+import { createClient, type RedisClientOptions } from 'redis';
 
-const logger = require('./logger');
+import logger from './logger.ts';
 
-let redisClient;
+let redisClient: ReturnType<typeof createClient> | null;
 
-async function createRedisClient() {
+async function createRedisClient(): Promise<ReturnType<typeof createClient> | null> {
   if (!redisClient) {
     const url = process.env.REDIS_URL;
     if (!url) {
       return;
     }
 
-    const redisOptions = { url };
+    const redisOptions: RedisClientOptions = { url };
     if (redisOptions.url.includes('rediss://')) {
       redisOptions.socket = { tls: true, rejectUnauthorized: false };
     }
@@ -34,6 +34,4 @@ async function createRedisClient() {
   return redisClient;
 }
 
-module.exports = {
-  createRedisClient,
-};
+export { createRedisClient };

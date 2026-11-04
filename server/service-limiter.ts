@@ -1,6 +1,6 @@
-const debug = require('debug');
+import debug from 'debug';
 
-const logger = require('./logger');
+import logger from './logger.ts';
 
 const nonEssentialRobots = ['Ahrefs', 'Bluechip Backlinks', 'PetalBot', 'Semrush', 'Shenma', 'SpiderFoot', 'WebMeUp'];
 
@@ -10,7 +10,7 @@ const debugServiceLevel = debug('serviceLevel');
 
 let serviceLevel = 0;
 
-function increaseServiceLevel(newLevel) {
+function increaseServiceLevel(newLevel: number): void {
   debugServiceLevel(`Increasing service level to ${newLevel}`);
   if (newLevel > serviceLevel) {
     serviceLevel = newLevel;
@@ -23,7 +23,7 @@ const onServiceLimited = (req, res) => {
   res.status(503).send(message);
 };
 
-async function serviceLimiterMiddleware(req, res, next) {
+async function serviceLimiterMiddleware(req, res, next): Promise<void> {
   if (!req.identity && req.hyperwatch) {
     req.identity = await req.hyperwatch.getIdentity();
   }
@@ -42,7 +42,4 @@ async function serviceLimiterMiddleware(req, res, next) {
   next();
 }
 
-module.exports = {
-  serviceLimiterMiddleware,
-  increaseServiceLevel,
-};
+export { serviceLimiterMiddleware, increaseServiceLevel };
