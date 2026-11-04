@@ -133,7 +133,6 @@ const TransactionDetails = ({ displayActions, transaction }) => {
               paymentProcessorFee,
               netAmount,
               isCredit,
-              // TODO: `renderDetailsString` does not accept `isRefunded` (see PLAN.md findings)
               hasOrder,
               toAccount,
               fromAccount,
