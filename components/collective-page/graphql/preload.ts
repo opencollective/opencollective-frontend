@@ -25,7 +25,7 @@ type PreloadCollective = {
 };
 
 export const preloadCollectivePageGraphqlQueries = async (
-  client: ApolloClient<unknown>,
+  client: Pick<ApolloClient<unknown>, 'query'>,
   collective?: PreloadCollective,
 ): Promise<void> => {
   if (collective) {

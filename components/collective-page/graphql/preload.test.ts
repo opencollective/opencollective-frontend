@@ -12,8 +12,10 @@ describe('preloadCollectivePageGraphqlQueries', () => {
   it('preloads all queries used by the V2 budget section', async () => {
     const collective = { slug: 'babel', type: 'COLLECTIVE' };
     const client = { query: jest.fn().mockResolvedValue({}) };
-    getFilteredSectionsForCollective.mockReturnValue([{ name: 'BUDGET', sections: [{ name: 'budget', version: 2 }] }]);
-    getSectionsNames.mockReturnValue(['budget']);
+    jest
+      .mocked(getFilteredSectionsForCollective)
+      .mockReturnValue([{ name: 'BUDGET', sections: [{ name: 'budget', version: 2 }] }] as never);
+    jest.mocked(getSectionsNames).mockReturnValue(['budget']);
 
     await preloadCollectivePageGraphqlQueries(client, collective);
 
