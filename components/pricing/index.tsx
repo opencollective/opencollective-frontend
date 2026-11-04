@@ -250,16 +250,7 @@ const Pricing = () => {
               <FormattedMessage id="Amount.Free" defaultMessage="Free" />
             </H4>
             <ListWrapper as="ul">
-              <ListItem
-                {...({
-                  fontSize: '15px',
-                  lineHeight: '22px',
-                  fontWeight: '500',
-                  color: 'black.900',
-                  my: '8px',
-                  listStyle: 'circle',
-                } as Record<string, unknown>)}
-              >
+              <ListItem>
                 <FormattedMessage
                   id="pricing.collectiveCard.unlimited"
                   defaultMessage="Unlimited access to all features"
@@ -351,16 +342,7 @@ const Pricing = () => {
               <FormattedMessage id="pricing.fiscalHost.weSucceed" defaultMessage="We succeed if you succeed" />
             </H4>
             <ListWrapper as="ul">
-              <ListItem
-                {...({
-                  fontSize: '15px',
-                  lineHeight: '22px',
-                  fontWeight: '500',
-                  color: 'black.900',
-                  my: '8px',
-                  listStyle: 'circle',
-                } as Record<string, unknown>)}
-              >
+              <ListItem>
                 <FormattedMessage
                   id="pricing.fiscalHost.unlimited"
                   defaultMessage="Host unlimited Collectives and access all features"
