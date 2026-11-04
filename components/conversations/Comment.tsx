@@ -94,8 +94,7 @@ const Comment = ({
         {(reactions || canReply) && (
           <Flex mt={3} flexWrap="wrap" data-cy="comment-reactions">
             {reactions && <CommentReactions reactions={reactions} />}
-            {/* `reactions` is not a prop of `EmojiReactionPicker` (dead prop, see PLAN.md findings) */}
-            {canReply && <EmojiReactionPicker comment={comment} {...({ reactions } as Record<string, unknown>)} />}
+            {canReply && <EmojiReactionPicker comment={comment} />}
           </Flex>
         )}
       </Box>

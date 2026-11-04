@@ -80,7 +80,7 @@ const AdminActionButtons = ({
           copyLinkToClipboard();
         }}
       >
-        <ShareIcon size="1em" {...({ mr: 2 } as Record<string, unknown>)} />
+        <ShareIcon size="1em" />
         <FormattedMessage tagName="span" id="Share" defaultMessage="Share" />
       </CommentBtn>
       {canEdit && (
@@ -91,7 +91,7 @@ const AdminActionButtons = ({
             onEdit();
           }}
         >
-          <Edit size="1em" {...({ mr: 2 } as Record<string, unknown>)} />
+          <Edit size="1em" />
           <FormattedMessage tagName="span" id="Edit" defaultMessage="Edit" />
         </CommentBtn>
       )}
@@ -104,7 +104,7 @@ const AdminActionButtons = ({
           }}
           color="red.600"
         >
-          <X size="1em" {...({ mr: 2 } as Record<string, unknown>)} />
+          <X size="1em" />
           <FormattedMessage tagName="span" id="actions.delete" defaultMessage="Delete" />
         </CommentBtn>
       )}
@@ -217,9 +217,7 @@ const CommentActions = ({
             </Flex>
           )}
           <Flex flexDirection="column" alignItems="flex-start">
-            {/* `comment`/`isConversationRoot` are not used by `AdminActionButtons` (dead props) */}
             <AdminActionButtons
-              {...({ comment, isConversationRoot } as Record<string, unknown>)}
               openDeleteConfirmation={() => setDeleting(true)}
               onEdit={onEditClick}
               canEdit={canEdit}
