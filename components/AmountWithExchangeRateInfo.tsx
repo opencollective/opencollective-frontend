@@ -123,12 +123,7 @@ const AmountWithExchangeRateInfo = ({
       content={() => formatFxRateInfo(intl, exchangeRate, { warning, error })}
     >
       {/* `noWrap` is not a valid `flex-wrap` value (browsers ignore it); preserved for behaviour parity - see PLAN.md */}
-      <Flex
-        flexWrap={'noWrap' as React.ComponentProps<typeof Flex>['flexWrap']}
-        alignItems="center"
-        flexDirection={invertIconPosition ? 'row-reverse' : 'row'}
-        gap="4px"
-      >
+      <Flex flexWrap="nowrap" alignItems="center" flexDirection={invertIconPosition ? 'row-reverse' : 'row'} gap="4px">
         <div className={cn('flex flex-row gap-1 whitespace-nowrap', amountWrapperClassName)}>
           <FormattedMoneyAmount
             amount={valueInCents ?? Math.round(value * 100)}

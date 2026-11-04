@@ -130,8 +130,7 @@ class ExportImages extends React.Component<ExportImagesProps, ExportImagesState>
             name="tiers"
             type="select"
             options={tierOptions}
-            // `InputField`'s select reports the option key as a string; it is used as an index (see PLAN.md)
-            onChange={tierIndex => this.setState({ tierIndex: tierIndex as number })}
+            onChange={tierIndex => this.setState({ tierIndex: Number(tierIndex) })}
           />
         </div>
         {tier && (
