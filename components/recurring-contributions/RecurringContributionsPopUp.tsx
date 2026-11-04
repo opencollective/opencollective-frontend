@@ -298,12 +298,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
 
       {updateOrderMenu && (
         <MenuSection data-cy="recurring-contribution-order-menu">
-          {/* `setMenuState` is not a prop of `UpdateOrderPopUp` (dead prop, see PLAN.md findings) */}
-          <UpdateOrderPopUp
-            {...({ setMenuState } as Record<string, unknown>)}
-            contribution={contribution}
-            onCloseEdit={onCloseEdit}
-          />
+          <UpdateOrderPopUp contribution={contribution} onCloseEdit={onCloseEdit} />
         </MenuSection>
       )}
 

@@ -99,7 +99,6 @@ const RecurringContributionsContainer = ({
     }
   }, [displayedRecurringContributions]);
 
-  // No dependency array (the labels are recomputed on every render, as before)
   const filterOptions = React.useMemo(
     () => [
       { value: FILTERS.ACTIVE, label: intl.formatMessage(I18nFilters[FILTERS.ACTIVE]) },
@@ -107,7 +106,7 @@ const RecurringContributionsContainer = ({
       { value: FILTERS.YEARLY, label: intl.formatMessage(I18nFilters[FILTERS.YEARLY]) },
       { value: FILTERS.CANCELLED, label: intl.formatMessage(I18nFilters[FILTERS.CANCELLED]) },
     ],
-    undefined,
+    [intl],
   );
 
   if (isLoading) {
