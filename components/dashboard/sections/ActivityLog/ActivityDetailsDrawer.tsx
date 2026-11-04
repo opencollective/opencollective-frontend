@@ -15,8 +15,6 @@ import ActivityDetails, { activityHasDetails } from './ActivityDetails';
 import { ActivityUser } from './ActivityUser';
 
 type ActivityDrawerProps = {
-  /** Unused: the drawer opens based on the `activity` prop */
-  open?: boolean;
   activity?: Activity | null;
   onClose: () => void;
 };
