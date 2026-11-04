@@ -186,7 +186,7 @@
     "prettier:write": "npm run prettier -- --write",
     "script": "tsx $@",
     "start": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON dist/server/index.ts",
-    "start:ci": "nyc --silent --exclude \".next/**\" node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts",
+    "start:ci": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts",
     "start:e2e": "cross-env TZ=UTC NODE_ENV=production OC_ENV=e2e node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts",
     "styled-components-migration-progress": "tsx scripts/styled-components-migration-progress.ts",
     "test": "cross-env NODE_ENV=test TZ=UTC sh -c 'if [ $# -eq 0 ]; then jest components lib pages; else jest \"$@\"; fi' --",
