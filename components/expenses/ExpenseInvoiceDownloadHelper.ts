@@ -45,7 +45,7 @@ const downloadExpenseInvoice = async (collective, expense, { setLoading, isLoadi
   }
 };
 
-const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, disablePreview }) => {
+const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError }) => {
   const [isLoading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
   const { toast } = useToast();
@@ -62,7 +62,6 @@ const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, disable
       return downloadExpenseInvoice(collective, expense, {
         setLoading,
         isLoading,
-        disablePreview,
         onError: error => {
           setError(error);
           if (onError) {
@@ -79,8 +78,8 @@ const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, disable
 /**
  * An helper to build components that download expense's invoice. Does not check the permissions.
  */
-const ExpenseInvoiceDownloadHelper = ({ children, expense, collective, onError, disablePreview }) => {
-  const state = useExpenseInvoiceDownloadHelper({ expense, collective, onError, disablePreview });
+const ExpenseInvoiceDownloadHelper = ({ children, expense, collective, onError }) => {
+  const state = useExpenseInvoiceDownloadHelper({ expense, collective, onError });
   return children(state);
 };
 

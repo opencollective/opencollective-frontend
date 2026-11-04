@@ -14,7 +14,7 @@ import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledTag from '../StyledTag';
 
-import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
+import ConfirmProcessExpenseModal, { type ConfirmProcessExpenseModalType } from './ConfirmProcessExpenseModal';
 import { getExpenseStatusMsgType } from './ExpenseStatusTag';
 import ProcessExpenseButtons, { ButtonLabel } from './ProcessExpenseButtons';
 
@@ -78,9 +78,9 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const wrapperRef = React.useRef(undefined);
   const [showPopup, setShowPopup] = React.useState(false);
   const [isClosable, setClosable] = React.useState(true);
-  const [processModal, setProcessModal] = React.useState(false);
+  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType>();
   const hideProcessExpenseButtons = expense?.status === ExpenseStatus.APPROVED;
-  const buttonProps = { px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' };
+  const buttonProps: Record<string, unknown> = { px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' };
   const status = expense.onHold ? 'ON_HOLD' : expense.status;
 
   const onClick = () => {

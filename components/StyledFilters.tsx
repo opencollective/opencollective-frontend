@@ -64,6 +64,8 @@ type StyledFiltersProps = {
   /** Forwarded to the flex container */
   px?: SpaceProps['px'];
   /** Forwarded to the flex container */
+  p?: SpaceProps['p'];
+  /** Forwarded to the flex container */
   justifyContent?: FlexProps['justifyContent'];
 } & (
   | {

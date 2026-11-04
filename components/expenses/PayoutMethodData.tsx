@@ -12,22 +12,23 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { Badge } from '../ui/Badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
-const renderObject = object =>
-  Object.entries(object).reduce((acc, [key, value]) => {
+const renderObject = (object: Record<string, unknown>) =>
+  Object.entries(object).reduce<React.ReactNode[]>((acc, [key, value]) => {
     if (typeof value === 'object') {
-      return [...acc, ...renderObject(value)];
+      return [...acc, ...renderObject(value as Record<string, unknown>)];
     }
     return [
       ...acc,
       <p className="text-sm leading-5 text-ellipsis" key={key}>
-        <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: startCase(key) }} /> {value}
+        <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: startCase(key) }} />{' '}
+        {value as React.ReactNode}
       </p>,
     ];
   }, []);
 
 const PRIVATE_DATA_PLACEHOLDER = '********';
 
-const getPmData = (payoutMethod, field, isLoading) => {
+const getPmData = (payoutMethod, field, isLoading = undefined) => {
   if (isLoading) {
     return <LoadingPlaceholder height={15} />;
   } else {

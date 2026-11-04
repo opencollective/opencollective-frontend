@@ -41,7 +41,7 @@ const CurrencyPicker = React.memo(
     ...props
   }: {
     /** A list of currencies presented in the currency picker */
-    availableCurrencies: string[];
+    availableCurrencies?: readonly string[];
     onChange: (selectedCurrency: string) => void;
     value?: string;
     inputId?: string;

@@ -127,7 +127,7 @@ const PayExpenseButton = ({
           onClose={() => showModal(false)}
           error={error}
           canPayWithAutomaticPayment={canPayWithAutomaticPayment}
-          onSubmit={async values => {
+          onSubmit={async (values: { action: string } & Record<string, unknown>) => {
             const { action, ...data } = values;
             const success = await onSubmit(action, data);
             if (success) {

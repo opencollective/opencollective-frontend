@@ -32,7 +32,7 @@ import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
 import { useToast } from '../ui/useToast';
 
-import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
+import ConfirmProcessExpenseModal, { type ConfirmProcessExpenseModalType } from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 
@@ -41,7 +41,7 @@ const SubmitExpenseFlow = React.lazy(() =>
   import('../submit-expense/SubmitExpenseFlow').then(module => ({ default: module.SubmitExpenseFlow })),
 );
 
-const Action = styled.button`
+const Action = styled.button<{ buttonStyle?: string; loading?: boolean }>`
   ${margin}
   padding: 16px;
   cursor: pointer;
@@ -105,18 +105,18 @@ export const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
  */
 const ExpenseMoreActionsButton = ({
   expense,
-  onError,
-  isDisabled,
+  onError = undefined,
+  isDisabled = undefined,
   linkAction = 'copy',
-  onModalToggle,
+  onModalToggle = undefined,
   onDelete,
-  onExpenseUpdate,
+  onExpenseUpdate = undefined,
   isViewingExpenseInHostContext = false,
   enableKeyboardShortcuts,
   onCloneModalOpenChange,
   ...props
 }) => {
-  const [processModal, setProcessModal] = React.useState(null);
+  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType>();
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);

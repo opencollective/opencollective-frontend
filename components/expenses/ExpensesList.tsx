@@ -18,7 +18,7 @@ import { P } from '../Text';
 import { SubmittedExpenseListItem } from './list/SubmittedExpenseListItem';
 import ExpenseDrawer from './ExpenseDrawer';
 
-const ExpenseContainer = styled.div`
+const ExpenseContainer = styled.div<{ isFirst?: boolean }>`
   ${props =>
     !props.isFirst &&
     css`
@@ -69,6 +69,7 @@ const ExpensesList = ({
   nbPlaceholders = 10,
   isInverted = false,
   view = 'public',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onDelete = undefined,
   onProcess = undefined,
   expenseFieldForTotalAmount = 'amountInAccountCurrency',
@@ -88,7 +89,7 @@ const ExpensesList = ({
   }, [openExpenseLegacyId, expenses]);
   const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
 
-  const [selectedExpenseIndex, setSelectedExpenseIndex] = React.useState();
+  const [selectedExpenseIndex, setSelectedExpenseIndex] = React.useState<number>();
   const navigateIndex = dif => event => {
     if (hasKeyboardShortcutsEnabled && !openExpenseLegacyId) {
       event.preventDefault();
@@ -123,7 +124,7 @@ const ExpensesList = ({
     const selectedExpense = expenses?.[selectedExpenseIndex];
     if (selectedExpense) {
       const expenseElement = document.getElementById(`expense-${selectedExpense?.legacyId}`);
-      expenseElement?.scrollIntoViewIfNeeded?.();
+      (expenseElement as HTMLElement & { scrollIntoViewIfNeeded?: () => void })?.scrollIntoViewIfNeeded?.();
     }
   }, [selectedExpenseIndex, expenses]);
 
@@ -172,7 +173,6 @@ const ExpensesList = ({
                   host={host || expense.host}
                   showProcessActions
                   view={view}
-                  onDelete={onDelete}
                   onProcess={onProcess}
                   selected={!openExpenseLegacyId && selectedExpenseIndex === idx}
                   expandExpense={(e, attachmentUrl) => {

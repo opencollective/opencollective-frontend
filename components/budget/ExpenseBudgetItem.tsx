@@ -105,7 +105,7 @@ const ExpenseBudgetItem = ({
   host = undefined,
   isInverted = false,
   showAmountSign = false,
-  expense,
+  expense = undefined,
   showProcessActions = false,
   view = 'public',
   onProcess = undefined,

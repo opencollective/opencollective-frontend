@@ -155,7 +155,6 @@ const ExpenseSummary = ({
               onClose?.();
             }}
             enableKeyboardShortcuts={enableKeyboardShortcuts}
-            displayMarkAsIncomplete
           />
         </Flex>
       )}
@@ -645,7 +644,16 @@ const ExpenseSummary = ({
       </Flex>
 
       {expense?.privateMessage && (
-        <Box mb={3} p={3} borderRadius="8px" backgroundColor="#f9fafb" border="1px solid" borderColor="black.200">
+        <Box
+          mb={3}
+          p={3}
+          {...({
+            borderRadius: '8px',
+            backgroundColor: '#f9fafb',
+            border: '1px solid',
+            borderColor: 'black.200',
+          } as Record<string, unknown>)}
+        >
           <Flex alignItems="center" mb={2} justifyContent="space-between">
             <Flex alignItems="center" gap={6}>
               <Span fontSize="13px" fontWeight="500" color="black.700" lineHeight="16px" textTransform="uppercase">

@@ -66,7 +66,7 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
               />
             </P>
             <LinkCollective collective={host}>
-              <P color="black.600" fontSize="11px" fontWeight="bold" truncateOverflow maxWidth={135}>
+              <P color="black.600" fontSize="11px" fontWeight="bold" truncateOverflow>
                 {collective?.isActive ? (
                   host.name
                 ) : (

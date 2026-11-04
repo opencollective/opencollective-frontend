@@ -117,14 +117,14 @@ const i18nFieldLabels = defineMessages({
 const Field = ({
   input,
   getFieldName,
-  disabled,
+  disabled = false,
   loading,
-  refetch,
+  refetch = undefined,
   formik,
-  labelClassName,
-  hintClassName,
-  errorClassName,
-  fieldClassName,
+  labelClassName = null,
+  hintClassName = null,
+  errorClassName = null,
+  fieldClassName = null,
 }) => {
   const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
@@ -247,7 +247,8 @@ export const FieldGroup = ({
   errorClassName = null,
   fieldClassName = null,
   ...props
-}) => {
+}: { field: { group: Array<{ key: string }> } } & Omit<React.ComponentProps<typeof Field>, 'input'> &
+  Record<string, unknown>) => {
   return (
     <div className="flex-1">
       {field.group.map(input => (
@@ -608,6 +609,8 @@ const PayoutBankInformationForm = ({
 
   const availableCurrencies = React.useMemo(() => (currencies || []).map(c => c.value).filter(Boolean), [currencies]);
 
+  const items = (formik?.values as { items?: Array<{ amountV2?: { valueInCents?: number }; amount?: number }> })?.items;
+
   const validateCurrencyMinimumAmount = React.useCallback(() => {
     // Skip if currency is fixed (2) (3)
     // or if `availableCurrencies` is not set (but we're not supposed to be there anyway)
@@ -616,8 +619,8 @@ const PayoutBankInformationForm = ({
     }
 
     // Only validate minimum amount if the form has items
-    if (formik?.values?.items?.length > 0) {
-      const invoiceTotalAmount = formik.values.items.reduce(
+    if (items?.length > 0) {
+      const invoiceTotalAmount = items.reduce(
         (amount, attachment) => amount + (attachment.amountV2?.valueInCents || attachment.amount || 0),
         0,
       );
@@ -637,7 +640,7 @@ const PayoutBankInformationForm = ({
         );
       }
     }
-  }, [availableCurrencies, fixedCurrency, formatMessage, formik.values.items, selectedCurrency, wiseHost?.currency]);
+  }, [availableCurrencies, fixedCurrency, formatMessage, items, selectedCurrency, wiseHost?.currency]);
 
   // Display spinner if loading
   if (loading) {

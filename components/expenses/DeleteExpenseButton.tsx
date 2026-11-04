@@ -7,7 +7,7 @@ import { Button } from '../ui/Button';
 
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 
-const DeleteExpenseButton = ({ expense, onDelete, buttonProps, isDisabled, onModalToggle }) => {
+const DeleteExpenseButton = ({ expense, onDelete, buttonProps, isDisabled = undefined, onModalToggle }) => {
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const showDeleteConfirm = isOpen => {
     setDeleteConfirm(isOpen);

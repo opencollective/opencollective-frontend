@@ -185,10 +185,10 @@ const ExpenseSummaryAdditionalInformation = ({
             <Container mt={3}>
               <StyledLink
                 as={Link}
-                fontWeight="700"
-                color="black.700"
-                textDecoration="underline"
-                fontSize="14px"
+                {...({ fontWeight: '700', color: 'black.700', textDecoration: 'underline', fontSize: '14px' } as Record<
+                  string,
+                  unknown
+                >)}
                 href={`${getDashboardRoute(host, 'host-agreements')}?account=${collective.slug}`}
               >
                 <FormattedMessage

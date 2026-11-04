@@ -6,7 +6,7 @@ import StyledLink from '../StyledLink';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
 
-const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
+const CreateExpenseFAQ = ({ defaultOpen = undefined, ...props }) => (
   <FAQ {...props}>
     <Entry open={defaultOpen}>
       <Title>

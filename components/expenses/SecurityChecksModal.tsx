@@ -126,9 +126,9 @@ const SecurityCheck = check => {
   );
 };
 
-const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => {
+const SecurityChecksModal = ({ expense, onClose, onConfirm = undefined, ...modalProps }) => {
   const intl = useIntl();
-  const [scope, setScope] = React.useState();
+  const [scope, setScope] = React.useState<string>();
 
   return (
     <StyledModal onClose={onClose} data-cy="security-check-modal" {...modalProps}>
@@ -152,9 +152,9 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
       <ModalBody mb={0} mt="24px">
         <StyledFilters
           p={0}
-          filters={['ALL', ...uniq(expense.securityChecks?.map(check => check.scope))]}
+          filters={['ALL', ...uniq(expense.securityChecks?.map(check => check.scope))] as string[]}
           getLabel={key => intl.formatMessage(I18nScopes[key])}
-          onChange={filter => (filter === 'ALL' ? setScope() : setScope(filter))}
+          onChange={filter => (filter === 'ALL' ? setScope(undefined) : setScope(filter))}
           selected={scope}
         />
         <StyledCard mt={3}>

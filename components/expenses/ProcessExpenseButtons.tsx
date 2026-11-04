@@ -32,7 +32,7 @@ import { useToast } from '../ui/useToast';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import ApproveExpenseModal from './ApproveExpenseModal';
-import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
+import ConfirmProcessExpenseModal, { type ConfirmProcessExpenseModalType } from './ConfirmProcessExpenseModal';
 import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
@@ -133,17 +133,18 @@ const ProcessExpenseButtons = ({
   collective,
   host,
   permissions,
-  buttonProps = DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
-  onSuccess,
+  buttonProps = DEFAULT_PROCESS_EXPENSE_BTN_PROPS as Record<string, unknown>,
+  onSuccess = undefined,
+  enableKeyboardShortcuts = false,
   onModalToggle = undefined,
   onDelete = undefined,
   isMoreActions = undefined,
   displaySecurityChecks = true,
   isViewingExpenseInHostContext = false,
   disabled = undefined,
-  enableKeyboardShortcuts,
 }) => {
-  const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
+  const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] =
+    React.useState<ConfirmProcessExpenseModalType>();
   const [showApproveExpenseModal, setShowApproveExpenseModal] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState(null);
   const [processExpense, { loading, error }] = useMutation(processExpenseButtonsMutation);
@@ -199,7 +200,7 @@ const ProcessExpenseButtons = ({
     return () => onModalToggle?.(false);
   }, [confirmProcessExpenseAction, onModalToggle]);
 
-  const triggerAction = async (action, paymentParams) => {
+  const triggerAction = async (action, paymentParams = undefined) => {
     // Prevent submitting the action if another one is being submitted at the same time
     if (loading) {
       return;
@@ -242,7 +243,7 @@ const ProcessExpenseButtons = ({
     return true;
   };
 
-  const getButtonProps = action => {
+  const getButtonProps = (action = undefined) => {
     const isSelectedAction = selectedAction === action;
     return {
       ...buttonProps,
@@ -416,7 +417,9 @@ const ProcessExpenseButtons = ({
           expense={expense}
           host={host}
           account={collective}
-          onConfirm={() => triggerAction('APPROVE')}
+          onConfirm={async () => {
+            await triggerAction('APPROVE');
+          }}
           onClose={() => {
             setShowApproveExpenseModal(false);
             onModalToggle?.(false);
