@@ -79,10 +79,10 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
   };
 
   return (
-    <PublicMessageContainer width={[1, '400px']} flexShrink={1} height={112} mt={2}>
+    <PublicMessageContainer width="100%" maxWidth="400px" height="112px" mt={2}>
       <Formik initialValues={initialValues} onSubmit={submitPublicMessage}>
         {formik => {
-          const { values, handleSubmit, isSubmitting, dirty } = formik;
+          const { values, isSubmitting, dirty } = formik;
 
           return (
             <Form>
@@ -124,13 +124,7 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
                   </Flex>
                 </Flex>
                 <Flex alignItems="center" justifyContent="flex-end">
-                  <StyledButton
-                    buttonSize="tiny"
-                    loading={isSubmitting}
-                    type="submit"
-                    onSubmit={handleSubmit}
-                    disabled={isSubmitted}
-                  >
+                  <StyledButton buttonSize="tiny" loading={isSubmitting} type="submit" disabled={isSubmitted}>
                     {isSubmitted && dirty ? (
                       <FormattedMessage id="saved" defaultMessage="Saved" />
                     ) : (

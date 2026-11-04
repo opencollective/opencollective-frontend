@@ -6,7 +6,7 @@ import Container from '../Container';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 
-const CollectiveTitleContainer = ({ collective, useLink, children, linkColor }) => {
+const CollectiveTitleContainer = ({ collective, useLink, children, linkColor = undefined }) => {
   if (useLink) {
     return (
       <StyledLink as={Link} href={getCollectivePageRoute(collective)} color={linkColor}>

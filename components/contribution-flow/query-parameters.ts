@@ -169,5 +169,9 @@ export const stepsDataToUrlParamsData = (
   return data;
 };
 
-export const ContributionFlowUrlQueryHelper = new UrlQueryHelper(ContributionFlowUrlParametersConfig);
-export const EmbedContributionFlowUrlQueryHelper = new UrlQueryHelper(EmbedContributionFlowUrlParametersConfig);
+export const ContributionFlowUrlQueryHelper = new UrlQueryHelper(
+  ContributionFlowUrlParametersConfig as ConstructorParameters<typeof UrlQueryHelper>[0],
+);
+export const EmbedContributionFlowUrlQueryHelper = new UrlQueryHelper(
+  EmbedContributionFlowUrlParametersConfig as ConstructorParameters<typeof UrlQueryHelper>[0],
+);

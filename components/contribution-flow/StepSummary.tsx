@@ -145,7 +145,7 @@ const VATInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
                     error={formState.error}
                     onBlur={e => {
                       const rawNumber = e.target.value;
-                      let error = false;
+                      let error: string | false = false;
                       let validationResult = checkVATNumberFormat(rawNumber);
                       if (!validationResult.isValid) {
                         // Try again with the country code
@@ -279,7 +279,7 @@ const StepSummary = ({
   }
 
   // Helper to prepare onChange data
-  const dispatchChange = (newValues, hasFormParam) => {
+  const dispatchChange = (newValues, hasFormParam = undefined) => {
     if (onChange) {
       const newTaxInfo = { ...taxInfo, ...newValues };
       const percent = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, newTaxInfo);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { find, get, pick, sortBy, uniqBy } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective';
@@ -36,35 +37,68 @@ export const canUseIncognitoForContribution = tier => {
   return !tier || tier.type !== 'TICKET';
 };
 
+type ContributionPaymentMethod = {
+  id?: string;
+  service?: string;
+  type?: string;
+  data?: { stripeAccount?: string };
+  account?: unknown;
+  [key: string]: unknown;
+};
+
 export const generatePaymentMethodOptions = (
-  intl,
-  paymentMethods,
-  stepProfile,
-  stepDetails,
-  stepSummary,
-  collective,
-  isEmbed,
-  disabledPaymentMethodTypes,
-  paymentIntent,
+  intl: IntlShape,
+  paymentMethods: ContributionPaymentMethod[],
+  stepProfile: { host?: { id?: number }; id?: number | string; type?: string },
+  stepDetails: object,
+  stepSummary: object,
+  collective: {
+    id?: number | string;
+    host?: {
+      id?: number;
+      supportedPaymentMethods?: string[];
+      manualPaymentProviders?: unknown[];
+    };
+  },
+  isEmbed: boolean,
+  disabledPaymentMethodTypes: string[],
+  paymentIntent?: {
+    payment_method_types?: string[];
+    stripeAccount?: string;
+  },
 ) => {
-  const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
+  const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []) as string[];
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER); // TODO: Replace by "Manual" type
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYPAL);
   const hostHasStripe = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD);
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const interval = get(stepDetails, 'interval', null);
 
-  const paymentMethodsOptions = paymentMethods.map(pm => ({
+  type PaymentMethodOption = {
+    id?: string;
+    key: string;
+    title: React.ReactNode;
+    subtitle?: React.ReactNode;
+    icon?: React.ReactNode;
+    disabled?: boolean;
+    paymentMethod?: ContributionPaymentMethod & {
+      sourcePaymentMethod?: ContributionPaymentMethod;
+      limitedToHosts?: Array<{ id?: number }>;
+      providerType?: string;
+    };
+  };
+
+  const paymentMethodsOptions: PaymentMethodOption[] = paymentMethods.map(pm => ({
     id: pm.id,
     key: `pm-${pm.id}`,
-    title: getPaymentMethodName(pm),
-    subtitle: getPaymentMethodMetadata(pm, totalAmount),
-    icon: getPaymentMethodIcon(pm, pm.account),
-    disabled: isPaymentMethodDisabled(pm, totalAmount),
+    title: getPaymentMethodName(pm as never),
+    subtitle: getPaymentMethodMetadata(pm as never, totalAmount),
+    icon: getPaymentMethodIcon(pm as never, pm.account),
+    disabled: isPaymentMethodDisabled(pm as never, totalAmount),
     paymentMethod: pm,
   }));
 
-  let uniquePMs = uniqBy(paymentMethodsOptions, 'id');
+  let uniquePMs: PaymentMethodOption[] = uniqBy(paymentMethodsOptions, 'id');
 
   uniquePMs = uniquePMs.filter(
     ({ paymentMethod }) =>
@@ -149,7 +183,9 @@ export const generatePaymentMethodOptions = (
   ];
 
   // adding payment methods
-  if (!balanceOnlyCollectiveTypes.includes(stepProfile.type)) {
+  if (
+    !balanceOnlyCollectiveTypes.includes(stepProfile.type as Parameters<typeof balanceOnlyCollectiveTypes.includes>[0])
+  ) {
     if (paymentIntent) {
       let availableMethodLabels = paymentIntent.payment_method_types.map(method =>
         getStripePaymentMethodLabel(intl, method),
@@ -173,7 +209,7 @@ export const generatePaymentMethodOptions = (
         icon: <CreditCard color="#c9ced4" size={'1.5em'} />,
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.STRIPE,
-          type: PAYMENT_METHOD_TYPE.STRIPE_ELEMENTS,
+          type: (PAYMENT_METHOD_TYPE as Record<string, string>).STRIPE_ELEMENTS,
         },
       });
     }
@@ -223,16 +259,22 @@ export const generatePaymentMethodOptions = (
     }
 
     // Manual payment providers
-    const manualPaymentProviders = get(collective, 'host.manualPaymentProviders', []);
+    const manualPaymentProviders = get(collective, 'host.manualPaymentProviders', []) as Array<{
+      id?: string;
+      name?: string;
+      [key: string]: unknown;
+    }>;
     if (
       hostHasManual &&
       Array.isArray(manualPaymentProviders) &&
       manualPaymentProviders.length > 0 &&
-      stepDetails.interval === INTERVALS.oneTime &&
+      stepDetails['interval'] === INTERVALS.oneTime &&
       !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)
     ) {
       manualPaymentProviders.forEach(provider => {
-        const Icon = getManualPaymentProviderIconComponent(provider);
+        const Icon = getManualPaymentProviderIconComponent(
+          provider as Parameters<typeof getManualPaymentProviderIconComponent>[0],
+        );
         uniquePMs.push({
           key: `custom-${provider.id}`,
           title: provider.name,

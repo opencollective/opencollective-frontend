@@ -1,5 +1,6 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
+import type { MessageDescriptor } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -67,7 +68,7 @@ const contentMessages = defineMessages({
   },
 });
 
-const CTAContainer = styled(Container)`
+const CTAContainer = styled(Container)<{ $isPrimary?: boolean; hoverable?: boolean }>`
   display: flex;
   justify-content: space-between;
   border: 1px solid ${themeGet('colors.black.400')};
@@ -109,8 +110,9 @@ const SuccessCTAWrapper = ({ type, email, account, ...props }) => {
           as={Link}
           display="block"
           data-cy="join-opencollective-link"
-          href={{ pathname: '/signup', query: { email } }}
+          href={{ pathname: '/signup', query: { email } } as never}
           color="black.800"
+          children={props.children}
           {...props}
         />
       );
@@ -121,7 +123,7 @@ const SuccessCTAWrapper = ({ type, email, account, ...props }) => {
           display="block"
           color="black.800"
           data-cy="success-signin-link"
-          href={{ pathname: '/signin', query: { email } }}
+          href={{ pathname: '/signin', query: { email } } as never}
           {...props}
         />
       );
@@ -149,13 +151,13 @@ const SuccessCTA = ({ type, email, account, isPrimary }) => {
             my={3}
           >
             <H3 mb={3} color="black.800">
-              {formatMessage(headerMessages[type], {
+              {formatMessage(headerMessages[type] as MessageDescriptor, {
                 accountName: account.name,
                 nbsp: <React.Fragment>&nbsp;</React.Fragment>,
               })}
             </H3>
             <P fontSize="14px" lineHeight="24px" fontWeight={300} color="black.700">
-              {formatMessage(contentMessages[type], { accountName: account.name })}
+              {formatMessage(contentMessages[type] as MessageDescriptor, { accountName: account.name })}
             </P>
             {isNewsletter && (
               <Box mt={2}>

@@ -22,7 +22,7 @@ const DEFAULT_LOCATION = {
  * and fallbacks on the raw address if not.
  */
 const StyledInputLocation = ({
-  name,
+  name = undefined,
   location,
   autoDetectCountry = false,
   labelFontSize = undefined,

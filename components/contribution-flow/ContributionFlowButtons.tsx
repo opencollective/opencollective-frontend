@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -21,25 +20,24 @@ const ButtonWithTextCentered = styled(StyledButton)`
   }
 `;
 
-class ContributionFlowButtons extends React.Component {
-  static propTypes = {
-    goNext: PropTypes.func,
-    goBack: PropTypes.func,
-    step: PropTypes.shape({ name: PropTypes.string }),
-    prevStep: PropTypes.shape({ name: PropTypes.string }),
-    nextStep: PropTypes.shape({ name: PropTypes.string }),
-    isValidating: PropTypes.bool,
-    /** If provided, the PayPal button will be displayed in place of the regular submit */
-    paypalButtonProps: PropTypes.object,
-    currency: PropTypes.string,
-    disabled: PropTypes.bool,
-    tier: PropTypes.shape({ type: PropTypes.string }),
-    stepDetails: PropTypes.object,
-    stepSummary: PropTypes.object,
-    showPlatformTip: PropTypes.bool,
-    hostSlug: PropTypes.string,
-  };
+type ContributionFlowButtonsProps = {
+  goNext?: () => Promise<unknown>;
+  goBack?: () => unknown;
+  step?: { name: string };
+  prevStep?: { name: string };
+  nextStep?: { name: string };
+  isValidating?: boolean;
+  paypalButtonProps?: Record<string, unknown>;
+  currency?: string;
+  disabled?: boolean;
+  tier?: Record<string, unknown>;
+  stepDetails?: Record<string, unknown>;
+  stepSummary?: Record<string, unknown>;
+  showPlatformTip?: boolean;
+  hostSlug?: string;
+};
 
+class ContributionFlowButtons extends React.Component<ContributionFlowButtonsProps> {
   state = { isLoadingNext: false };
 
   goNext = async e => {
@@ -121,14 +119,20 @@ class ContributionFlowButtons extends React.Component {
                 <FormattedMessage
                   id="contribute.ticket"
                   defaultMessage="Get {quantity, select, 1 {ticket} other {tickets}}"
-                  values={{ quantity: stepDetails.quantity || 1 }}
+                  values={{ quantity: (stepDetails.quantity as number) || 1 }}
                 />
               ) : totalAmount ? (
                 <FormattedMessage
                   id="contribute.amount"
                   defaultMessage="Contribute {amount}"
                   values={{
-                    amount: <Currency value={totalAmount} currency={currency} precision="auto" />,
+                    amount: (
+                      <Currency
+                        value={totalAmount}
+                        currency={currency as Parameters<typeof Currency>[0]['currency']}
+                        precision="auto"
+                      />
+                    ),
                   }}
                 />
               ) : (

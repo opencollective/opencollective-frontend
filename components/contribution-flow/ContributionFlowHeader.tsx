@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { truncate } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import injectIntl from '@/lib/injectIntl';
@@ -13,27 +13,20 @@ import { withUser } from '../UserProvider';
 
 import CollectiveTitleContainer from './CollectiveTitleContainer';
 
-class NewContributionFlowHeader extends React.Component {
-  static propTypes = {
-    collective: PropTypes.shape({
-      slug: PropTypes.string,
-      currency: PropTypes.string,
-      name: PropTypes.string,
-      contributors: PropTypes.shape({
-        totalCount: PropTypes.number,
-        nodes: PropTypes.arrayOf(
-          PropTypes.shape({
-            id: PropTypes.string,
-            name: PropTypes.string,
-          }),
-        ),
-      }),
-    }).isRequired,
-    LoggedInUser: PropTypes.object,
-    intl: PropTypes.object,
-    isEmbed: PropTypes.bool,
+type NewContributionFlowHeaderProps = {
+  collective?: {
+    slug?: string;
+    currency?: string;
+    name?: string;
+    contributors?: { totalCount?: number; nodes?: Array<{ id?: string; name?: string }> };
+    [key: string]: unknown;
   };
+  LoggedInUser?: Record<string, unknown>;
+  intl?: IntlShape;
+  isEmbed?: boolean;
+};
 
+class NewContributionFlowHeader extends React.Component<NewContributionFlowHeaderProps> {
   render() {
     const { collective, isEmbed } = this.props;
     const contributors = collective.contributors?.nodes;
@@ -71,7 +64,7 @@ class NewContributionFlowHeader extends React.Component {
               <Flex alignItems="center">
                 {contributors.map(contributor => (
                   <Box key={contributor.id} mx={1}>
-                    <ContributorAvatar contributor={contributor} radius={24} />
+                    <ContributorAvatar contributor={contributor as never} radius={24} />
                   </Box>
                 ))}
                 {collective.contributors.totalCount > contributors.length && (

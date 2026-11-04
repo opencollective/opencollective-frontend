@@ -126,7 +126,7 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, router, showPlat
         >
           {({ item, isSelected }) => (
             <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
-              {i18nInterval(intl, item)}
+              {i18nInterval(intl, item as string)}
             </Span>
           )}
         </StyledButtonSet>

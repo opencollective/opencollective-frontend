@@ -108,7 +108,7 @@ const ContributionFlowStepsProgress = ({
             {step.label || step.name}
           </StepLabel>
           <Container fontSize="13px" lineHeight="20px" textAlign="center" wordBreak="break-word">
-            {step.isVisited && (
+            {(step as typeof step & { isVisited?: boolean }).isVisited && (
               <StepInfo
                 step={step}
                 stepProfile={stepProfile}

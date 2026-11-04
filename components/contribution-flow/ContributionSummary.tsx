@@ -3,6 +3,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { get } from 'lodash-es';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
+import type { ColorProps, TypographyProps } from 'styled-system';
 import { color, flex, typography } from 'styled-system';
 
 import INTERVALS from '../../lib/constants/intervals';
@@ -20,7 +21,7 @@ import { Span } from '../Text';
 
 import { getTotalAmount } from './utils';
 
-const AmountLine = styled.div.attrs({
+const AmountLine = styled.div.attrs<{ 'data-cy'?: string } & ColorProps & TypographyProps>({
   'data-cy': 'ContributionSummary-AmountLine',
 })`
   display: flex;
@@ -50,11 +51,26 @@ const Amount = styled(Span)`
   text-align: right;
 `;
 
-const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment, currency, tier, renderTax }) => {
+const ContributionSummary = ({
+  collective,
+  stepDetails,
+  stepSummary,
+  stepPayment,
+  currency,
+  tier,
+  renderTax = undefined,
+}) => {
   const intl = useIntl();
   const amount = stepDetails.amount;
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
-  const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
+  type PaymentMethodFeeInfo = {
+    fee?: number;
+    feePercent?: number;
+    isExact?: boolean;
+    name?: string;
+    aboutURL?: string;
+  };
+  const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency) as PaymentMethodFeeInfo;
   const platformTip = get(stepDetails, 'platformTip', 0);
   const showQuantity = stepDetails.quantity > 1 || ['TICKET', 'PRODUCT'].includes(tier?.type);
   const contributionName = tier?.name ? `${collective.name} - "${tier.name}"` : collective.name;
@@ -140,7 +156,6 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               {!pmFeeInfo.isExact && (
                 <Box display="inline-block" mr={1} verticalAlign="text-bottom">
                   <StyledTooltip
-                    verticalAlign="top"
                     content={
                       <Span>
                         <FormattedMessage
@@ -182,7 +197,6 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               {!pmFeeInfo.isExact && (
                 <Box display="inline-block" mr={1} verticalAlign="text-bottom">
                   <StyledTooltip
-                    verticalAlign="top"
                     content={
                       <FormattedMessage
                         defaultMessage="Net Amount = Total charge - Payment processor fee - Platform tip"
@@ -209,7 +223,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               values={{
                 date: (
                   <FormattedDate
-                    value={getNextChargeDate(new Date(), stepDetails.interval)}
+                    value={getNextChargeDate(new Date(), stepDetails.interval, undefined)}
                     day="numeric"
                     month="long"
                     year="numeric"
@@ -233,7 +247,6 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               />
               <Box display="inline-block" ml={1} verticalAlign="text-bottom">
                 <StyledTooltip
-                  verticalAlign="top"
                   content={
                     <FormattedMessage
                       id="ContributionSummary.NextCharge"
@@ -241,7 +254,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                       values={{
                         date: (
                           <FormattedDate
-                            value={getNextChargeDate(new Date(), stepDetails.interval)}
+                            value={getNextChargeDate(new Date(), stepDetails.interval, undefined)}
                             day="numeric"
                             month="long"
                             year="numeric"

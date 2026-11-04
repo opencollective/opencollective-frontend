@@ -1,11 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
 import { get, intersection, isEmpty, isEqual, isNil, omitBy, pick } from 'lodash-es';
 import memoizeOne from 'memoize-one';
+import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape, MessageValue } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -25,6 +26,7 @@ import { Experiment, isExperimentEnabled } from '../../lib/experiments/experimen
 import { gql } from '../../lib/graphql/helpers';
 import { AccountType } from '../../lib/graphql/types/v2/graphql';
 import { setGuestToken } from '../../lib/guest-accounts';
+import type LoggedInUser from '../../lib/LoggedInUser';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
@@ -111,42 +113,139 @@ const OTHER_MESSAGES = defineMessages({
   },
 });
 
-class ContributionFlow extends React.Component {
-  static propTypes = {
-    collective: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      currency: PropTypes.string.isRequired,
-      platformContributionAvailable: PropTypes.bool,
-      host: PropTypes.shape({
-        slug: PropTypes.string,
-        legacyId: PropTypes.number,
-      }),
-      parent: PropTypes.shape({
-        slug: PropTypes.string,
-      }),
-    }).isRequired,
-    contributorProfiles: PropTypes.arrayOf(PropTypes.object),
-    host: PropTypes.object.isRequired,
-    tier: PropTypes.object,
-    intl: PropTypes.object,
-    createOrder: PropTypes.func.isRequired,
-    confirmOrder: PropTypes.func.isRequired,
-    loadingLoggedInUser: PropTypes.bool,
-    isEmbed: PropTypes.bool,
-    error: PropTypes.string,
-    /** @ignore from withUser */
-    refetchLoggedInUser: PropTypes.func,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-    createIncognitoProfile: PropTypes.func.isRequired, // from mutation
-    router: PropTypes.object,
-    onStepChange: PropTypes.func,
-    onSuccess: PropTypes.func,
+const WARNING_MESSAGES = defineMessages<{
+  tipAmountContributionWarning: {
+    contributionAmount: MessageValue;
+    accountName: MessageValue;
+    tipAmount: MessageValue;
+    newLine: MessageValue;
   };
+}>({
+  tipAmountContributionWarning: OTHER_MESSAGES.tipAmountContributionWarning,
+});
 
-  constructor(props) {
+import type { Stripe, StripeElements } from '@stripe/stripe-js';
+
+type ContributionFlowProps = {
+  collective: {
+    slug: string;
+    name: string;
+    type: string;
+    currency: string;
+    platformContributionAvailable?: boolean;
+    host?: { slug?: string; legacyId?: number };
+    parent?: { slug?: string };
+    [key: string]: unknown;
+  };
+  contributorProfiles?: Array<{
+    account: { isIncognito?: boolean; type?: string; slug?: string; [key: string]: unknown };
+  }>;
+  host: Record<string, unknown>;
+  tier?: {
+    id?: number | string;
+    amount?: { currency?: string; valueInCents?: number };
+    interval?: string;
+    availableQuantity?: number;
+    [key: string]: unknown;
+  };
+  intl?: IntlShape;
+  createOrder?: (options: unknown) => Promise<{ data?: Record<string, unknown>; [key: string]: unknown }>;
+  confirmOrder?: (options: unknown) => Promise<{ data?: Record<string, unknown>; [key: string]: unknown }>;
+  loadingLoggedInUser?: boolean;
+  isEmbed?: boolean;
+  error?: string;
+  refetchLoggedInUser?: () => Promise<unknown>;
+  LoggedInUser?: LoggedInUser;
+  createIncognitoProfile?: (options?: unknown) => Promise<{
+    data?: { createIncognitoProfile?: Record<string, unknown> };
+  }>;
+  router: NextRouter;
+  onStepChange?: (step: string) => void;
+  onSuccess?: (order: unknown) => void;
+  /** Injected by the graphql HOCs */
+  data?: unknown;
+  mutate?: unknown;
+  result?: unknown;
+};
+
+type ContributionFlowPaymentMethod = {
+  id?: string;
+  service?: string;
+  type?: string;
+  name?: string;
+  isSavedForLater?: boolean;
+  stripePaymentIntentId?: string;
+  stripeData?: { complete?: boolean; stripePaymentMethodId?: string };
+  data?: { stripePaymentMethodId?: string; [key: string]: unknown };
+  paypalInfo?: { subscriptionId?: string; [key: string]: unknown };
+  [key: string]: unknown;
+};
+
+type ContributionFlowStepPayment = {
+  key?: string;
+  isKeyOnly?: boolean;
+  isCompleted?: boolean;
+  stripeData?: { stripe?: Stripe; paymentIntentClientSecret?: string; elements?: StripeElements };
+  chargeAttempt?: number;
+  paymentMethod?: ContributionFlowPaymentMethod;
+};
+
+type ContributionFlowStepProfile = {
+  id?: string | number;
+  isGuest?: boolean;
+  email?: string;
+  name?: string;
+  legalName?: string;
+  contributorRejectedCategories?: string[];
+  [key: string]: unknown;
+};
+
+type ContributionFlowState = {
+  error: unknown;
+  stripe: Stripe;
+  stripeElements: StripeElements;
+  isSubmitted: boolean;
+  isSubmitting: boolean;
+  isInitializing: boolean;
+  isNavigating: boolean;
+  showSignIn: boolean;
+  createdOrder: Record<string, unknown>;
+  forceSummaryStep: boolean;
+  stepProfile: ContributionFlowStepProfile;
+  stepPayment: ContributionFlowStepPayment;
+  stepSummary: Record<string, unknown>;
+  step: string;
+  stepDetails: {
+    quantity: number;
+    interval: string;
+    amount: number;
+    platformTip: number;
+    platformTipOption: string;
+    isNewPlatformTip: boolean;
+    currency: string;
+    customData?: unknown;
+    tags?: unknown;
+    redirect?: string;
+    shouldRedirectParent?: boolean;
+    hideSteps?: boolean;
+    legalName?: string;
+  };
+};
+
+type ContributionFlowUrlParams = {
+  amount?: number;
+  quantity?: number;
+  paymentMethod?: string;
+  interval?: string;
+  contributeAs?: string;
+  email?: string;
+  name?: string;
+  tags?: unknown;
+  [key: string]: unknown;
+};
+
+class ContributionFlow extends React.Component<ContributionFlowProps, ContributionFlowState> {
+  constructor(props: ContributionFlowProps) {
     super(props);
     this.mainContainerRef = React.createRef();
     this.formRef = React.createRef();
@@ -174,6 +273,7 @@ class ContributionFlow extends React.Component {
         isKeyOnly: true, // For the step payment to recognize if it needs to load the payment method
       },
       stepSummary: null,
+      step: undefined,
       stepDetails: {
         quantity,
         interval: isSupportedInterval(collective, tier, LoggedInUser, queryParams.interval)
@@ -200,7 +300,7 @@ class ContributionFlow extends React.Component {
     if (step !== 'success' && step !== 'details') {
       track(AnalyticsEvent.CONTRIBUTION_STARTED, {
         props: {
-          [AnalyticsProperty.CONTRIBUTION_STEP]: this.getCurrentStepName(),
+          [AnalyticsProperty.CONTRIBUTION_STEP]: this.getCurrentStepName() as string,
           [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_VARIANT]: this.state.stepDetails.isNewPlatformTip
             ? 'new'
             : 'old',
@@ -255,6 +355,9 @@ class ContributionFlow extends React.Component {
     }
   }
 
+  mainContainerRef = React.createRef<HTMLDivElement>();
+  formRef = React.createRef<HTMLFormElement>();
+
   updateRouteFromState = async () => {
     if (this.state.isNavigating) {
       return;
@@ -287,9 +390,10 @@ class ContributionFlow extends React.Component {
     }
   };
 
-  _getQueryParams = memoizeOne(query => {
-    return this.getQueryHelper().decode(query);
-  });
+  _getQueryParams = memoizeOne(
+    (query: Record<string, unknown>): ContributionFlowUrlParams =>
+      this.getQueryHelper().decode(query) as ContributionFlowUrlParams,
+  );
 
   getQueryParams = () => {
     return this._getQueryParams(this.props.router.query);
@@ -325,13 +429,23 @@ class ContributionFlow extends React.Component {
 
     try {
       const totalAmount = getTotalAmount(stepDetails, stepSummary);
-      const skipTaxes = !totalAmount || isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
+      const skipTaxes =
+        !totalAmount ||
+        isEmpty(
+          this.getApplicableTaxes(
+            collective as Parameters<typeof getApplicableTaxes>[0],
+            host,
+            tier?.type as Parameters<typeof getApplicableTaxes>[2],
+          ),
+        );
       const response = await this.props.createOrder({
         variables: {
           order: {
             quantity: stepDetails.quantity,
             amount: { valueInCents: stepDetails.amount },
-            frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
+            frequency: getGQLV2FrequencyFromInterval(
+              stepDetails.interval as Parameters<typeof getGQLV2FrequencyFromInterval>[0],
+            ),
             guestInfo,
             fromAccount,
             fromAccountInfo: {
@@ -364,7 +478,10 @@ class ContributionFlow extends React.Component {
         },
       });
 
-      return this.handleOrderResponse(response.data.createOrder, stepProfile.email);
+      return this.handleOrderResponse(
+        response.data.createOrder as Parameters<typeof this.handleOrderResponse>[0],
+        stepProfile.email as string,
+      );
     } catch (e) {
       this.handleError();
       this.showError(getErrorFromGraphqlException(e));
@@ -394,13 +511,13 @@ class ContributionFlow extends React.Component {
 
       const returnUrl = new URL(`${baseRoute}/donate/success`);
       returnUrl.searchParams.set('OrderId', order.id);
-      returnUrl.searchParams.set('stripeAccount', stripeData?.stripe?.stripeAccount);
+      returnUrl.searchParams.set('stripeAccount', (stripeData?.stripe as { stripeAccount?: string })?.stripeAccount);
 
       const queryParams = this.getQueryParams();
       if (queryParams.redirect) {
-        returnUrl.searchParams.set('redirect', queryParams.redirect);
+        returnUrl.searchParams.set('redirect', String(queryParams.redirect));
         if (queryParams.shouldRedirectParent) {
-          returnUrl.searchParams.set('shouldRedirectParent', queryParams.shouldRedirectParent);
+          returnUrl.searchParams.set('shouldRedirectParent', String(queryParams.shouldRedirectParent));
         }
       }
 
@@ -408,7 +525,7 @@ class ContributionFlow extends React.Component {
         await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {
           returnUrl: returnUrl.href,
           elements: stripeData?.elements,
-          type: stepPayment.paymentMethod?.type,
+          type: stepPayment.paymentMethod?.type as Parameters<typeof confirmPayment>[2]['type'],
           paymentMethodId: stepPayment.paymentMethod?.data?.stripePaymentMethodId,
         });
         this.setState({ isSubmitted: true, isSubmitting: false });
@@ -427,7 +544,7 @@ class ContributionFlow extends React.Component {
     }
   };
 
-  handleError = message => {
+  handleError = (message = undefined) => {
     track(AnalyticsEvent.CONTRIBUTION_ERROR);
     this.setState({ isSubmitting: false, error: message });
   };
@@ -451,7 +568,10 @@ class ContributionFlow extends React.Component {
         this.setState({ isSubmitting: true, error: null });
         try {
           const response = await this.props.confirmOrder({ variables: { order: { id: order.id }, guestToken } });
-          return this.handleOrderResponse(response.data.confirmOrder, email);
+          return this.handleOrderResponse(
+            response.data.confirmOrder as Parameters<typeof this.handleOrderResponse>[0],
+            email as string,
+          );
         } catch (e) {
           this.handleError(e.message);
         }
@@ -466,7 +586,7 @@ class ContributionFlow extends React.Component {
     this.props.onSuccess?.(order);
     if (isValidExternalRedirect(queryParams.redirect)) {
       followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
-        shouldRedirectParent: queryParams.shouldRedirectParent,
+        shouldRedirectParent: Boolean(queryParams.shouldRedirectParent),
       });
     } else {
       const email = this.state.stepProfile?.email;
@@ -520,7 +640,11 @@ class ContributionFlow extends React.Component {
       return null;
     }
 
-    const paymentMethod = pick(stepPayment.paymentMethod, ['service', 'type', 'manualPaymentProvider']);
+    const paymentMethod = pick(stepPayment.paymentMethod, [
+      'service',
+      'type',
+      'manualPaymentProvider',
+    ]) as ContributionFlowPaymentMethod;
 
     // Payment Method already registered
     if (stepPayment.paymentMethod.id) {
@@ -530,7 +654,7 @@ class ContributionFlow extends React.Component {
     } else if (stepPayment.key === NEW_CREDIT_CARD_KEY) {
       const cardElement = stripeElements.getElement(CardElement);
       const { token } = await stripe.createToken(cardElement);
-      const pm = stripeTokenToPaymentMethod(token);
+      const pm = stripeTokenToPaymentMethod(token as Parameters<typeof stripeTokenToPaymentMethod>[0]);
 
       paymentMethod.name = pm.name;
       paymentMethod.isSavedForLater = stepPayment.paymentMethod.isSavedForLater;
@@ -623,9 +747,9 @@ class ContributionFlow extends React.Component {
     return true;
   };
 
-  getContributorRejectedCategories = account => {
-    const rejectedCategories = get(this.props.collective, 'settings.moderation.rejectedCategories', []);
-    const contributorCategories = get(account, 'categories', []);
+  getContributorRejectedCategories = (account: Record<string, unknown>): string[] => {
+    const rejectedCategories = get(this.props.collective, 'settings.moderation.rejectedCategories', []) as string[];
+    const contributorCategories = get(account, 'categories', []) as string[];
 
     if (rejectedCategories.length === 0 || contributorCategories.length === 0) {
       return [];
@@ -656,7 +780,10 @@ class ContributionFlow extends React.Component {
   };
 
   /** Navigate to another step, ensuring all route params are preserved */
-  pushStepRoute = async (stepName, { query: newQueryParams, replace = false } = {}) => {
+  pushStepRoute = async (
+    stepName: string,
+    { query: newQueryParams, replace = false }: { query?: Record<string, unknown>; replace?: boolean } = {},
+  ) => {
     // Reset errors if any
     this.setState({ error: null, isNavigating: true });
 
@@ -747,7 +874,7 @@ class ContributionFlow extends React.Component {
   };
 
   getCurrentStepName = () => {
-    return this.props.router.query.step || STEPS.DETAILS;
+    return (this.props.router.query.step as string) || STEPS.DETAILS;
   };
 
   /** Returns the steps list */
@@ -784,11 +911,17 @@ class ContributionFlow extends React.Component {
             stepDetails.platformTip / (stepDetails.amount * stepDetails.quantity) >= 0.5
           ) {
             return confirm(
-              intl.formatMessage(OTHER_MESSAGES.tipAmountContributionWarning, {
-                contributionAmount: formatCurrency(getTotalAmount(stepDetails, stepSummary), currency, {
+              intl.formatMessage(WARNING_MESSAGES.tipAmountContributionWarning, {
+                contributionAmount: formatCurrency(
+                  getTotalAmount(stepDetails, stepSummary),
+                  currency as Parameters<typeof formatCurrency>[1],
+                  {
+                    locale: intl.locale,
+                  },
+                ),
+                tipAmount: formatCurrency(stepDetails.platformTip, currency as Parameters<typeof formatCurrency>[1], {
                   locale: intl.locale,
                 }),
-                tipAmount: formatCurrency(stepDetails.platformTip, currency, { locale: intl.locale }),
                 accountName: collective.name,
                 newLine: '\n',
               }),
@@ -809,12 +942,18 @@ class ContributionFlow extends React.Component {
     // Show the summary step only if the order has tax
     if (
       !noPaymentRequired &&
-      (this.getApplicableTaxes(collective, host, tier?.type).length || this.state.forceSummaryStep)
+      (this.getApplicableTaxes(
+        collective as Parameters<typeof getApplicableTaxes>[0],
+        host,
+        tier?.type as Parameters<typeof getApplicableTaxes>[2],
+      ).length ||
+        this.state.forceSummaryStep)
     ) {
       steps.push({
         name: 'summary',
         label: intl.formatMessage(STEP_LABELS.summary),
-        isCompleted: get(stepSummary, 'isReady', false),
+        isCompleted: Boolean(get(stepSummary, 'isReady', false)),
+        validate: () => true,
       });
     }
 
@@ -824,7 +963,7 @@ class ContributionFlow extends React.Component {
         name: 'payment',
         label: intl.formatMessage(STEP_LABELS.payment),
         isCompleted: !stepProfile?.contributorRejectedCategories && stepPayment?.isCompleted,
-        validate: action => {
+        validate: async action => {
           if (action === 'prev') {
             return true;
           } else if (stepPayment?.isKeyOnly) {
@@ -899,7 +1038,7 @@ class ContributionFlow extends React.Component {
     const currentStepName = this.getCurrentStepName();
 
     if (currentStepName === STEPS.SUCCESS) {
-      return <ContributionFlowSuccess collective={collective} />;
+      return <ContributionFlowSuccess {...({ collective } as Record<string, unknown>)} />;
     }
 
     return (
@@ -1003,7 +1142,11 @@ class ContributionFlow extends React.Component {
                     step={currentStep}
                     showPlatformTip={this.canHavePlatformTips()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
-                    taxes={this.getApplicableTaxes(collective, host, tier?.type)}
+                    taxes={this.getApplicableTaxes(
+                      collective as Parameters<typeof getApplicableTaxes>[0],
+                      host,
+                      tier?.type as Parameters<typeof getApplicableTaxes>[2],
+                    )}
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
                     isSubmitting={isValidating || isLoading}
@@ -1073,7 +1216,12 @@ class ContributionFlow extends React.Component {
   }
 }
 
-const addCreateIncognitoProfileMutation = graphql(
+const addCreateIncognitoProfileMutation = graphql<
+  Omit<ContributionFlowProps, 'router'>,
+  { createIncognitoProfile?: Record<string, unknown> },
+  Record<string, unknown>,
+  { createIncognitoProfile?: ContributionFlowProps['createIncognitoProfile'] }
+>(
   gql`
     mutation CreateIncognitoProfile {
       createIncognitoProfile {
@@ -1090,7 +1238,12 @@ const addCreateIncognitoProfileMutation = graphql(
   },
 );
 
-const addCreateOrderMutation = graphql(
+const addCreateOrderMutation = graphql<
+  Omit<ContributionFlowProps, 'router'>,
+  { createOrder?: Record<string, unknown> },
+  Record<string, unknown>,
+  { createOrder?: ContributionFlowProps['createOrder'] }
+>(
   gql`
     mutation CreateOrder($order: OrderCreateInput!) {
       createOrder(order: $order) {
@@ -1104,7 +1257,12 @@ const addCreateOrderMutation = graphql(
   },
 );
 
-const addConfirmOrderMutation = graphql(
+const addConfirmOrderMutation = graphql<
+  Omit<ContributionFlowProps, 'router'>,
+  { confirmOrder?: Record<string, unknown> },
+  Record<string, unknown>,
+  { confirmOrder?: ContributionFlowProps['confirmOrder'] }
+>(
   gql`
     mutation ConfirmOrder($order: OrderReferenceInput!, $guestToken: String) {
       confirmOrder(order: $order, guestToken: $guestToken) {
