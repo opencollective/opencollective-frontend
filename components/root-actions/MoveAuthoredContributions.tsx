@@ -80,7 +80,19 @@ const moveAuthoredContributionsMutation = gql`
   ${moveOrdersFieldsFragment}
 `;
 
-const getOrdersOptionsFromData = (intl, data) => {
+type OrderOption = {
+  value: {
+    id?: number | string;
+    legacyId?: number;
+    description?: string;
+    createdAt?: string;
+    amount?: { valueInCents?: number; currency?: string };
+    fromAccount?: Record<string, unknown>;
+    toAccount?: { slug?: string };
+  };
+};
+
+const getOrdersOptionsFromData = (intl, data): OrderOption[] => {
   if (!data?.orders) {
     return [];
   }
@@ -148,7 +160,7 @@ const getOrdersQueryOptions = selectedProfile => {
     skip: !selectedProfile,
 
     variables: selectedProfile ? { account: { legacyId: selectedProfile.id } } : null,
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'network-only' as const,
   };
 };
 
@@ -160,7 +172,7 @@ const MoveAuthoredContributions = () => {
   const [newFromAccount, setNewFromAccount] = React.useState(null);
   const [hasConfirmationModal, setHasConfirmationModal] = React.useState(false);
   const [hasConfirmed, setHasConfirmed] = React.useState(false);
-  const [selectedOrdersOptions, setSelectedOrderOptions] = React.useState([]);
+  const [selectedOrdersOptions, setSelectedOrderOptions] = React.useState<ReadonlyArray<OrderOption>>([]);
   const isValid = Boolean(fromAccount && newFromAccount && selectedOrdersOptions.length);
   const callToAction = getCallToAction(selectedOrdersOptions, newFromAccount);
   const toAccountCustomOptions = React.useMemo(() => getToAccountCustomOptions(fromAccount), [fromAccount]);
@@ -174,7 +186,11 @@ const MoveAuthoredContributions = () => {
     try {
       // Prepare variables
       const ordersInputs = selectedOrdersOptions.map(({ value }) => ({ id: value.id }));
-      const mutationVariables = { orders: ordersInputs };
+      const mutationVariables: {
+        orders: Array<{ id?: number | string }>;
+        fromAccount?: { legacyId?: number };
+        makeIncognito?: boolean;
+      } = { orders: ordersInputs };
       if (newFromAccount.useIncognitoProfile) {
         mutationVariables.fromAccount = { legacyId: fromAccount.id };
         mutationVariables.makeIncognito = true;
@@ -244,8 +260,8 @@ const MoveAuthoredContributions = () => {
           isClearable
           isMulti
           closeMenuOnSelect={false}
-          disabled={!fromAccount}
-          truncationThreshold={5}
+          {...({ disabled: !fromAccount } as Record<string, unknown>)}
+          {...({ truncationThreshold: 5 } as Record<string, unknown>)}
           formatOptionLabel={option => formatOrderOption(option, intl)}
         />
       </Box>

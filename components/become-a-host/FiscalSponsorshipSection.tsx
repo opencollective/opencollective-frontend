@@ -18,7 +18,10 @@ const FiscalSponsorship = () => {
         width={['288px', '601px', '438px', null, '555px']}
         display={[null, null, 'none']}
       >
-        <MainTitle textAlign={['center', null, 'left']} whiteSpace={[null, null, 'pre-line']}>
+        <MainTitle
+          textAlign={['center', null, 'left']}
+          {...({ whiteSpace: [null, null, 'pre-line'] } as Record<string, unknown>)}
+        >
           <FormattedMessage id="becomeAHost.title" defaultMessage="Fiscal sponsorship has never been easier" />
         </MainTitle>
       </Box>
@@ -37,7 +40,10 @@ const FiscalSponsorship = () => {
           width={['288px', '306px', '438px', null, '555px']}
           display={['none', null, 'block']}
         >
-          <MainTitle textAlign={['center', null, 'left']} whiteSpace={[null, null, 'pre-line']}>
+          <MainTitle
+            textAlign={['center', null, 'left']}
+            {...({ whiteSpace: [null, null, 'pre-line'] } as Record<string, unknown>)}
+          >
             <FormattedMessage id="becomeAHost.title" defaultMessage="Fiscal sponsorship has never been easier" />
           </MainTitle>
         </Box>

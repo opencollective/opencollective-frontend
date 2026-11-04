@@ -1,4 +1,5 @@
 import React from 'react';
+import type { MessageValue } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
@@ -18,7 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import RecurringContributionsPopUp from './RecurringContributionsPopUp';
 
-const messages = defineMessages({
+const messages = defineMessages<{ manage: Record<string, never>; tag: { status: MessageValue } }>({
   manage: {
     id: 'Edit',
     defaultMessage: 'Edit',

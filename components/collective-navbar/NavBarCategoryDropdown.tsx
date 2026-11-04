@@ -14,7 +14,7 @@ import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
-const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
+const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })<{ $isSelected?: boolean }>`
   display: block;
   width: 100%;
 
@@ -169,7 +169,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
   const displayedLinks = links.filter(link => !link.hide);
 
   return (
-    <CategoryDropdown trigger="hover" tabIndex="-1">
+    <CategoryDropdown trigger="hover" tabIndex={-1}>
       <NavBarScrollContainer category={category} useAnchor={useAnchor}>
         <CategoryContainer
           mr={[0, null, 3]}
@@ -177,8 +177,10 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
           {...getLinkProps(useAnchor, collective, category)}
           onClick={e => {
             // Remove focus to make sure dropdown gets closed
-            if (document.activeElement?.contains(e.target)) {
-              document.activeElement.blur();
+            // (`activeElement` is an `Element` in the DOM types; only focusable elements have `blur`)
+            const activeElement = document.activeElement as HTMLElement;
+            if (activeElement?.contains(e.target as Node)) {
+              activeElement.blur();
             }
           }}
         >

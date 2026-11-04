@@ -10,7 +10,7 @@ const DebitCreditItem = styled.div`
 `;
 
 /** A colored gradient to show the type of the transaction */
-const DebitCreditGradient = styled.div`
+const DebitCreditGradient = styled.div<{ isCredit?: boolean }>`
   position: absolute;
   right: -1px;
   height: 70%;

@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
 import { get, trim } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -79,17 +79,51 @@ const messages = defineMessages({
 
 const LABEL_STYLES = { fontWeight: 500, fontSize: '14px', lineHeight: '17px' };
 
-class CreateCollectiveForm extends React.Component {
-  static propTypes = {
-    error: PropTypes.string,
-    host: PropTypes.object,
-    loading: PropTypes.bool,
-    onSubmit: PropTypes.func,
-    intl: PropTypes.object.isRequired,
-    loggedInUser: PropTypes.object,
-    popularTags: PropTypes.arrayOf(PropTypes.string),
-  };
+type CreateCollectiveFormHost = {
+  name?: string;
+  slug?: string;
+  createdAt?: string;
+  currency?: string;
+  hostFeePercent?: number;
+  platformContributionAvailable?: boolean;
+  termsUrl?: string;
+  settings?: { applyMessage?: string };
+  policies?: { COLLECTIVE_MINIMUM_ADMINS?: { numberOfAdmins?: number; enabled?: boolean } };
+};
 
+type CreateCollectiveAdminInvite = {
+  role?: string;
+  memberAccount: { id: number | string; name?: string; imageUrl?: string; slug?: string };
+};
+
+type CreateCollectiveFormValues = {
+  name: string;
+  description: string;
+  slug: string;
+  tags: string[];
+  location: unknown;
+  message: string;
+  tos: boolean;
+  hostTos: boolean;
+  inviteMembers: CreateCollectiveAdminInvite[];
+};
+
+type CreateCollectiveFormProps = {
+  error?: string;
+  host?: CreateCollectiveFormHost;
+  loading?: boolean;
+  onSubmit?: (values: {
+    collective: Pick<CreateCollectiveFormValues, 'name' | 'description' | 'slug' | 'tags' | 'location'>;
+    message: string;
+    inviteMembers: CreateCollectiveAdminInvite[];
+  }) => void;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  loggedInUser?: { collective: CreateCollectiveAdminInvite['memberAccount'] };
+  popularTags?: string[];
+};
+
+class CreateCollectiveForm extends React.Component<CreateCollectiveFormProps> {
   hasHostTerms() {
     if (!this.props.host) {
       return false;
@@ -114,8 +148,8 @@ class CreateCollectiveForm extends React.Component {
       inviteMembers: [],
     };
 
-    const validate = values => {
-      const errors = requireFields(values, ['name', 'slug', 'description']);
+    const validate = (values: CreateCollectiveFormValues) => {
+      const errors: Record<string, unknown> = requireFields(values, ['name', 'slug', 'description']);
 
       if (values.slug !== trim(values.slug, '-')) {
         errors.slug = intl.formatMessage(messages.errorSlugHyphen);
@@ -134,7 +168,7 @@ class CreateCollectiveForm extends React.Component {
       return errors;
     };
 
-    const submit = values => {
+    const submit = (values: CreateCollectiveFormValues) => {
       const { description, name, slug, message, tags, location, inviteMembers } = values;
       return this.props.onSubmit({ collective: { name, description, slug, tags, location }, message, inviteMembers });
     };
@@ -510,7 +544,7 @@ class CreateCollectiveForm extends React.Component {
                           buttonStyle="primary"
                           type="submit"
                           loading={loading}
-                          onSubmit={handleSubmit}
+                          {...({ onSubmit: handleSubmit } as Record<string, unknown>)}
                           data-cy="ccf-form-submit"
                         >
                           <FormattedMessage id="collective.create" defaultMessage="Create Collective" />
@@ -521,7 +555,12 @@ class CreateCollectiveForm extends React.Component {
                 }}
               </Formik>
               <Container justifyContent="center" mb={4} display={['flex', 'none']}>
-                <NextIllustration src="/static/images/create-collective/mobileForm.png" width={320} height={200} />
+                <NextIllustration
+                  src="/static/images/create-collective/mobileForm.png"
+                  width={320}
+                  height={200}
+                  alt={undefined}
+                />
               </Container>
             </ContainerWithImage>
           </Flex>

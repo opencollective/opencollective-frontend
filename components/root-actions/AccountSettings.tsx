@@ -34,13 +34,25 @@ const editAccountFlagsMutation = gql`
   }
 `;
 
+type AccountOption = {
+  length?: number;
+  value?: {
+    id?: number | string;
+    slug?: string;
+    isHost?: boolean;
+    isArchived?: boolean;
+    isTrustedHost?: boolean;
+    isTwoFactorAuthEnabled?: boolean;
+  };
+};
+
 const AccountSettings = () => {
   const { toast } = useToast();
   const intl = useIntl();
-  const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
-  const [archivedFlag, setArchivedFlag] = React.useState();
-  const [trustedHostFlag, setTrustedHostFlag] = React.useState();
-  const [twoFactorEnabledFlag, setTwoFactorEnabledFlag] = React.useState();
+  const [selectedAccountOption, setSelectedAccountOption] = React.useState<AccountOption>([]);
+  const [archivedFlag, setArchivedFlag] = React.useState<boolean | undefined>();
+  const [trustedHostFlag, setTrustedHostFlag] = React.useState<boolean | undefined>();
+  const [twoFactorEnabledFlag, setTwoFactorEnabledFlag] = React.useState<boolean | undefined>();
   const [enableSave, setEnableSave] = React.useState(false);
   const [editAccountFlags, { loading }] = useMutation(editAccountFlagsMutation);
 

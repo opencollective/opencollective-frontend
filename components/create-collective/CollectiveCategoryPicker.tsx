@@ -67,7 +67,7 @@ const CollectiveCategoryPicker = () => {
         </H1>
       </Box>
       <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']} mb={[5, 6]}>
-        <Container alignItems="center" width={[null, 280, 312]} mb={[4, 0]}>
+        <Container alignItems="center" {...({ width: [null, 280, 312] } as Record<string, unknown>)} mb={[4, 0]}>
           <Flex flexDirection="column" justifyContent="center" alignItems="center">
             <Image
               src="/static/images/create-collective/openSourceIllustration.png"
@@ -87,7 +87,7 @@ const CollectiveCategoryPicker = () => {
           borderLeft={['none', '1px solid #E6E8EB']}
           borderTop={['1px solid #E6E8EB', 'none']}
           alignItems="center"
-          width={[null, 280, 312]}
+          {...({ width: [null, 280, 312] } as Record<string, unknown>)}
         >
           <Flex flexDirection="column" justifyContent="center" alignItems="center">
             <Image

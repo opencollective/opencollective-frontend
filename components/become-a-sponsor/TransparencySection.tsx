@@ -98,7 +98,7 @@ const Transparency = () => (
           <H3
             fontSize={['20px', null, null, null, '24px']}
             lineHeight={['28px', null, '32px', null, '40px']}
-            letterSpacing={['-0.008em', null, '-0.6px']}
+            {...({ letterSpacing: ['-0.008em', null, '-0.6px'] } as Record<string, unknown>)}
             color="primary.900"
             mb={2}
           >
@@ -108,9 +108,9 @@ const Transparency = () => (
             <P
               fontSize={['15px', '16px', '18px']}
               lineHeight={['22px', '24px', '32px']}
-              color={['black.700', 'black.600']}
+              {...({ color: ['black.700', 'black.600'] } as Record<string, unknown>)}
               fontWeight="400"
-              letterSpacing={[null, null, '-0.16px', null, '-0.2px']}
+              {...({ letterSpacing: [null, null, '-0.16px', null, '-0.2px'] } as Record<string, unknown>)}
               textAlign="left"
             >
               <FormattedMessage
@@ -134,7 +134,7 @@ const Transparency = () => (
           <H3
             fontSize={['20px', null, null, null, '24px']}
             lineHeight={['28px', null, '32px', null, '40px']}
-            letterSpacing={['-0.008em', null, '-0.6px']}
+            {...({ letterSpacing: ['-0.008em', null, '-0.6px'] } as Record<string, unknown>)}
             color="primary.900"
             mb={2}
           >
@@ -144,9 +144,9 @@ const Transparency = () => (
             <P
               fontSize={['15px', '16px', '18px']}
               lineHeight={['22px', '24px', '32px']}
-              color={['black.700', 'black.600']}
+              {...({ color: ['black.700', 'black.600'] } as Record<string, unknown>)}
               fontWeight="400"
-              letterSpacing={[null, null, '-0.16px', null, '-0.2px']}
+              {...({ letterSpacing: [null, null, '-0.16px', null, '-0.2px'] } as Record<string, unknown>)}
               textAlign="left"
             >
               <FormattedMessage
@@ -170,7 +170,7 @@ const Transparency = () => (
           <H3
             fontSize={['20px', null, null, null, '24px']}
             lineHeight={['28px', null, '32px', null, '40px']}
-            letterSpacing={['-0.008em', null, '-0.6px']}
+            {...({ letterSpacing: ['-0.008em', null, '-0.6px'] } as Record<string, unknown>)}
             color="primary.900"
             mb={2}
           >
@@ -180,9 +180,9 @@ const Transparency = () => (
             <P
               fontSize={['15px', '16px', '18px']}
               lineHeight={['22px', '24px', '32px']}
-              color={['black.700', 'black.600']}
+              {...({ color: ['black.700', 'black.600'] } as Record<string, unknown>)}
               fontWeight="400"
-              letterSpacing={[null, null, '-0.16px', null, '-0.2px']}
+              {...({ letterSpacing: [null, null, '-0.16px', null, '-0.2px'] } as Record<string, unknown>)}
               textAlign="left"
             >
               <FormattedMessage

@@ -77,7 +77,7 @@ const NavBarContainerGlobalStyle = createGlobalStyle`
   }
 `;
 
-const NavbarContentContainer = styled(Container)`
+const NavbarContentContainer = styled(Container)<{ isExpanded?: boolean }>`
   background: white;
   display: flex;
   justify-content: space-between;
@@ -184,7 +184,7 @@ const CollectiveName = styled(LinkCollective).attrs({
   }
 `;
 
-const CategoriesContainer = styled(Container)`
+const CategoriesContainer = styled(Container)<{ isExpanded?: boolean }>`
   background-color: #ffffff;
   max-height: calc(100vh - 70px);
   flex-shrink: 2;
@@ -335,7 +335,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser, onOpenSubmitExpe
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
         <Link href={getContributeRoute(collective)}>
-          <ActionButton tabIndex="-1">
+          <ActionButton tabIndex={-1}>
             <Planet size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
@@ -354,7 +354,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser, onOpenSubmitExpe
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
         <Link href={`${getCollectivePageRoute(collective)}/grants/new`}>
-          <ActionButton tabIndex="-1">
+          <ActionButton tabIndex={-1}>
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
               <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
@@ -375,7 +375,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser, onOpenSubmitExpe
           {btnProps => {
             const button = (
               <ActionButton
-                tabIndex="-1"
+                tabIndex={-1}
                 {...(btnProps.onClick ? { onClick: btnProps.onClick } : {})}
                 data-cy="submit-expense-button"
               >
@@ -396,7 +396,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser, onOpenSubmitExpe
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
         <Link href={getDashboardRoute(collective, 'outgoing-contributions')}>
-          <ActionButton tabIndex="-1">
+          <ActionButton tabIndex={-1}>
             <Stack size="1em" />
             <Span ml={2}>
               <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
@@ -467,10 +467,12 @@ const CollectiveNavbar = ({
   const { LoggedInUser } = useLoggedInUser();
   isAdmin = isAdmin || LoggedInUser?.isAdminOfCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
-  const { data, dataLoading } = useQuery(accountPermissionsQuery, {
+  const { data } = useQuery(accountPermissionsQuery, {
     variables: { slug: collective?.slug },
     skip: !collective?.slug || !LoggedInUser,
   });
+  // TODO: `dataLoading` does not exist on the Apollo query result (see PLAN.md findings); it was always `undefined`
+  const dataLoading = undefined;
 
   const [isSubmitExpenseModalOpen, _setIsSubmitExpenseModalOpen] = React.useState(false);
   const setIsSubmitExpenseModalOpen = open => {

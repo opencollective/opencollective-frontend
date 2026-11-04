@@ -115,7 +115,12 @@ const ForCollectiveCard = () => {
   const intl = useIntl();
 
   return (
-    <Card padding={['24px', null, '32px']} width={['288px', '636px']} borderRadius="8px" border="1px solid #DCDEE0">
+    <Card
+      padding={['24px', null, '32px']}
+      {...({ width: ['288px', '636px'] } as Record<string, unknown>)}
+      borderRadius="8px"
+      border="1px solid #DCDEE0"
+    >
       <Flex justifyContent="center" alignItems="center" mb={['32px', '35px']}>
         <Box width="72px" height="72px" mr="16px">
           <NextIllustration
@@ -238,7 +243,7 @@ const ForCollectiveCard = () => {
             <Link href="/signup/collective">
               <StyledButton
                 buttonStyle="primary"
-                width={['224px', '226px', null, '237px', '160px']}
+                {...({ width: ['224px', '226px', null, '237px', '160px'] } as Record<string, unknown>)}
                 py="8px"
                 my="8px"
                 px={[null, null, '16px']}
@@ -255,7 +260,7 @@ const ForCollectiveCard = () => {
                 px="16px"
                 my="8px"
                 whiteSpace="nowrap"
-                width={['224px', '226px', null, '237px', '139px']}
+                {...({ width: ['224px', '226px', null, '237px', '139px'] } as Record<string, unknown>)}
               >
                 <FormattedMessage id="join.findAFiscalHost" defaultMessage="Find a Fiscal Host" />
               </StyledButton>

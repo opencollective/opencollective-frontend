@@ -107,7 +107,31 @@ export const confirmCreditCardMutation = gql`
   ${paymentMethodResponseFragment}
 `;
 
-const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod) => {
+type UpdatePaymentMethodPM = {
+  id?: number | string;
+  name?: string;
+  data?: unknown;
+  service?: string;
+  type?: string;
+  balance?: { valueInCents?: number };
+  account?: { id?: number | string };
+  paypalInfo?: { subscriptionId?: string };
+  value?: { id?: number | string };
+};
+
+type RecurringContribution = {
+  id: number | string;
+  status?: string;
+  amount: { valueInCents?: number };
+  paymentMethod?: { id?: number | string };
+};
+
+const sortAndFilterPaymentMethods = (
+  paymentMethods: UpdatePaymentMethodPM[] | null,
+  contribution: RecurringContribution,
+  addedPaymentMethod?: UpdatePaymentMethodPM,
+  existingPaymentMethod?: UpdatePaymentMethodPM,
+) => {
   if (!paymentMethods) {
     return null;
   }
@@ -162,20 +186,24 @@ const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentM
   }));
 };
 
-export const useUpdatePaymentMethod = contribution => {
+export const useUpdatePaymentMethod = (contribution: RecurringContribution) => {
   const { toast } = useToast();
   const [submitUpdatePaymentMethod, { loading }] = useMutation(updatePaymentMethodMutation);
 
   return {
     isSubmitting: loading,
-    updatePaymentMethod: async paymentMethod => {
+    updatePaymentMethod: async (paymentMethod: UpdatePaymentMethodPM) => {
       const hasUpdate =
         contribution.status === 'PAUSED' ||
         !contribution.paymentMethod ||
         paymentMethod.id !== contribution.paymentMethod.id;
       try {
         if (hasUpdate) {
-          const variables = { order: { id: contribution.id } };
+          const variables: {
+            order: { id: number | string };
+            paypalSubscriptionId?: string;
+            paymentMethod?: { id: number | string };
+          } = { order: { id: contribution.id } };
           if (paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL) {
             variables.paypalSubscriptionId = paymentMethod.paypalInfo.subscriptionId;
           } else {
@@ -290,10 +318,9 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
   // data handling
   const paymentMethods = get(data, 'account.paymentMethods', null);
   const existingPaymentMethod = get(data, 'order.paymentMethod', null);
-  const filterPaymentMethodsParams = [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod];
   const paymentOptions = React.useMemo(
-    () => sortAndFilterPaymentMethods(...filterPaymentMethodsParams),
-    filterPaymentMethodsParams,
+    () => sortAndFilterPaymentMethods(paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod),
+    [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod],
   );
 
   useEffect(() => {

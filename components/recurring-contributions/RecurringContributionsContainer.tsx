@@ -20,7 +20,7 @@ const FILTERS = {
   MONTHLY: 'MONTHLY',
   YEARLY: 'YEARLY',
   CANCELLED: 'CANCELLED',
-};
+} as const;
 
 const I18nFilters = defineMessages({
   [FILTERS.ACTIVE]: {
@@ -99,12 +99,16 @@ const RecurringContributionsContainer = ({
     }
   }, [displayedRecurringContributions]);
 
-  const filterOptions = React.useMemo(() => [
-    { value: FILTERS.ACTIVE, label: intl.formatMessage(I18nFilters[FILTERS.ACTIVE]) },
-    { value: FILTERS.MONTHLY, label: intl.formatMessage(I18nFilters[FILTERS.MONTHLY]) },
-    { value: FILTERS.YEARLY, label: intl.formatMessage(I18nFilters[FILTERS.YEARLY]) },
-    { value: FILTERS.CANCELLED, label: intl.formatMessage(I18nFilters[FILTERS.CANCELLED]) },
-  ]);
+  // No dependency array (the labels are recomputed on every render, as before)
+  const filterOptions = React.useMemo(
+    () => [
+      { value: FILTERS.ACTIVE, label: intl.formatMessage(I18nFilters[FILTERS.ACTIVE]) },
+      { value: FILTERS.MONTHLY, label: intl.formatMessage(I18nFilters[FILTERS.MONTHLY]) },
+      { value: FILTERS.YEARLY, label: intl.formatMessage(I18nFilters[FILTERS.YEARLY]) },
+      { value: FILTERS.CANCELLED, label: intl.formatMessage(I18nFilters[FILTERS.CANCELLED]) },
+    ],
+    undefined,
+  );
 
   if (isLoading) {
     return <LoadingPlaceholder height="400px" mt={3} />;

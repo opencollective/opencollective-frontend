@@ -37,7 +37,7 @@ const DetailColumnHeader = styled.div`
   margin-bottom: 2px;
 `;
 
-const ButtonsContainer = styled.div.attrs({ 'data-cy': 'order-actions' })`
+const ButtonsContainer = styled.div.attrs<{ 'data-cy'?: string }>({ 'data-cy': 'order-actions' })`
   display: flex;
   flex-wrap: wrap;
   margin-top: 8px;
@@ -103,7 +103,7 @@ const OrderBudgetItem = ({
                     <H3
                       fontWeight="500"
                       lineHeight="1.5em"
-                      textDecoration="none"
+                      {...({ textDecoration: 'none' } as Record<string, unknown>)}
                       color="black.900"
                       fontSize={fontSize}
                       data-cy="contribution-title"
@@ -257,7 +257,7 @@ const OrderBudgetItem = ({
         </Flex>
         {order?.permissions && (
           <ButtonsContainer>
-            <ProcessOrderButtons order={order} permissions={order.permissions} />
+            <ProcessOrderButtons order={order} permissions={order.permissions} onSuccess={undefined} />
           </ButtonsContainer>
         )}
       </Flex>

@@ -29,7 +29,7 @@ import { Span } from '../Text';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
 
-const MenuItem = styled('li')`
+const MenuItem = styled('li')<{ isHiddenOnMobile?: boolean; py?: number }>`
   display: flex;
   align-items: center;
 
@@ -168,13 +168,30 @@ const StyledChevronDown = styled(ChevronDown)`
 
 const ITEM_PADDING = '11px 14px';
 
+type CollectiveNavbarActionsMenuProps = {
+  collective: { slug: string; host?: { slug?: string } };
+  callsToAction?: {
+    hasSubmitExpense?: boolean;
+    hasRequestGrant?: boolean;
+    hasManageSubscriptions?: boolean;
+    hasContribute?: boolean;
+    addFunds?: boolean;
+    hasContact?: boolean;
+    hasApply?: boolean;
+    [key: string]: boolean;
+  };
+  hiddenActionForNonMobile?: string;
+  LoggedInUser?: object;
+  onOpenSubmitExpenseModalClick?: () => void;
+};
+
 const CollectiveNavbarActionsMenu = ({
   collective,
   callsToAction = {},
   hiddenActionForNonMobile,
   LoggedInUser,
   onOpenSubmitExpenseModalClick = () => {},
-}) => {
+}: CollectiveNavbarActionsMenuProps) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];

@@ -170,7 +170,7 @@ const MergeAccountsForm = () => {
               name="has-confirmed-risk"
               checked={hasConfirmedRisk}
               onChange={({ checked }) => setHasConfirmedRisk(checked)}
-              mt={2}
+              {...({ mt: 2 } as Record<string, unknown>)}
               label={
                 <Span>
                   I understand that payment methods and other profile data will be merged, and that this action cannot

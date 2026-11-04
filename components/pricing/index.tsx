@@ -167,7 +167,7 @@ const Pricing = () => {
           display="flex"
           flexDirection="column"
           alignItems="center"
-          width={['288px', '636px', '956px', null, '992px']}
+          {...({ width: ['288px', '636px', '956px', null, '992px'] } as Record<string, unknown>)}
         >
           <MainTitle mb="14px">
             <FormattedMessage id="pricing.title" defaultMessage="Our Pricing Structure" />
@@ -251,12 +251,14 @@ const Pricing = () => {
             </H4>
             <ListWrapper as="ul">
               <ListItem
-                fontSize="15px"
-                lineHeight="22px"
-                fontWeight="500"
-                color="black.900"
-                my="8px"
-                listStyle="circle"
+                {...({
+                  fontSize: '15px',
+                  lineHeight: '22px',
+                  fontWeight: '500',
+                  color: 'black.900',
+                  my: '8px',
+                  listStyle: 'circle',
+                } as Record<string, unknown>)}
               >
                 <FormattedMessage
                   id="pricing.collectiveCard.unlimited"
@@ -278,7 +280,7 @@ const Pricing = () => {
             <Link href="/signup/collective">
               <StyledButton
                 buttonStyle="primary"
-                width={['224px', null, '160px']}
+                {...({ width: ['224px', null, '160px'] } as Record<string, unknown>)}
                 py="8px"
                 px={[null, null, 3]}
                 my="8px"
@@ -289,7 +291,7 @@ const Pricing = () => {
               </StyledButton>
             </Link>
             <Link href="#collective">
-              <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
+              <StyledButton {...({ width: ['224px', null, '139px'] } as Record<string, unknown>)} py="8px" my="8px">
                 <FormattedMessage defaultMessage="Learn more" id="TdTXXf" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
             </Link>
@@ -350,12 +352,14 @@ const Pricing = () => {
             </H4>
             <ListWrapper as="ul">
               <ListItem
-                fontSize="15px"
-                lineHeight="22px"
-                fontWeight="500"
-                color="black.900"
-                my="8px"
-                listStyle="circle"
+                {...({
+                  fontSize: '15px',
+                  lineHeight: '22px',
+                  fontWeight: '500',
+                  color: 'black.900',
+                  my: '8px',
+                  listStyle: 'circle',
+                } as Record<string, unknown>)}
               >
                 <FormattedMessage
                   id="pricing.fiscalHost.unlimited"
@@ -377,7 +381,7 @@ const Pricing = () => {
             <Link href="/signup/organization?active=true">
               <StyledButton
                 buttonStyle="primary"
-                width={['224px', null, '160px']}
+                {...({ width: ['224px', null, '160px'] } as Record<string, unknown>)}
                 py="8px"
                 px={[null, null, 3]}
                 my="8px"
@@ -388,7 +392,7 @@ const Pricing = () => {
               </StyledButton>
             </Link>
             <Link href="#fiscalHost">
-              <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
+              <StyledButton {...({ width: ['224px', null, '139px'] } as Record<string, unknown>)} py="8px" my="8px">
                 <FormattedMessage defaultMessage="Learn more" id="TdTXXf" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
             </Link>
@@ -411,7 +415,7 @@ const Pricing = () => {
           justifyContent="center"
           borderBottom={['1px solid rgba(49, 50, 51, 0.1)', null, null, 'none']}
           ref={tabRef}
-          width={[1, null, null, 'fit-content']}
+          {...({ width: [1, null, null, 'fit-content'] } as Record<string, unknown>)}
           background="white"
         >
           <Tabs activeTab={activeTab} />
@@ -446,7 +450,7 @@ const Pricing = () => {
             alignItems="center"
             justifyContent="center"
             mb={['72px', null, null, '120px']}
-            width={['288px', '636px', '700px', '832px', '862px']}
+            {...({ width: ['288px', '636px', '700px', '832px', '862px'] } as Record<string, unknown>)}
             marginLeft="auto"
             marginRight="auto"
           >

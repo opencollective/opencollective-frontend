@@ -17,7 +17,7 @@ const SupportCommunities = () => (
         <H2
           fontSize={['24px', null, null, null, '30px']}
           lineHeight={['32px', null, null, null, '48px']}
-          letterSpacing={['-1.2px', '-1.6px']}
+          {...({ letterSpacing: ['-1.2px', '-1.6px'] } as Record<string, unknown>)}
           color="primary.900"
           mb={['24px', 3]}
         >
@@ -27,17 +27,18 @@ const SupportCommunities = () => (
           />
         </H2>
         <NextIllustration
-          display={[null, 'none']}
+          {...({ display: [null, 'none'] } as Record<string, unknown>)}
           src="/static/images/become-a-sponsor/supportCommunities-illustration.png"
           width={576}
           height={405}
+          alt={undefined}
         />
       </Box>
       <Box width={['304px', '306px', '437px', null, '536px']}>
         <P
           fontSize={['14px', '16px', null, null, '18px']}
           lineHeight={['23px', '24px', null, null, '28px']}
-          letterSpacing={['-0.12px', 'normal', null, null, '-0.16px']}
+          {...({ letterSpacing: ['-0.12px', 'normal', null, null, '-0.16px'] } as Record<string, unknown>)}
           color="black.800"
           fontWeight="500"
         >
@@ -49,15 +50,16 @@ const SupportCommunities = () => (
       </Box>
     </Flex>
     <Box
-      display={['none', 'block']}
+      {...({ display: ['none', 'block'] } as Record<string, unknown>)}
       width={['324px', null, '478px', null, '576px']}
       height={['220px', null, '355px', null, '405px']}
     >
       <NextIllustration
-        display={[null, 'block']}
+        {...({ display: [null, 'block'] } as Record<string, unknown>)}
         src="/static/images/become-a-sponsor/supportCommunities-illustration.png"
         width={576}
         height={405}
+        alt={undefined}
       />
     </Box>
   </Flex>

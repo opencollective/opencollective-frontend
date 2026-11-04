@@ -4,6 +4,7 @@ import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
 import { get, includes, truncate } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
+import type { SpaceProps } from 'styled-system';
 import { space } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -59,7 +60,7 @@ const DetailColumnHeader = styled.div`
   color: #c4c7cc;
 `;
 
-const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
+const ButtonsContainer = styled.div.attrs<{ 'data-cy'?: string }>({ 'data-cy': 'expense-actions' })`
   display: flex;
   flex-wrap: wrap;
   margin-top: 8px;
@@ -76,7 +77,7 @@ const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
   }
 `;
 
-const ExpenseContainer = styled.div`
+const ExpenseContainer = styled.div<{ useDrawer?: boolean; selected?: boolean } & SpaceProps>`
   outline: none;
   display: block;
   width: 100%;
@@ -86,11 +87,7 @@ const ExpenseContainer = styled.div`
 
   transition: background 0.1s;
 
-  ${props =>
-    props.useDrawer &&
-    css`
-      ${props => props.selected && `background: #E5F3FF;`}
-    `}
+  ${props => props.useDrawer && props.selected && `background: #E5F3FF;`}
 
   ${props =>
     !props.selected &&
@@ -222,7 +219,7 @@ const ExpenseBudgetItem = ({
                             <H3
                               fontWeight="500"
                               lineHeight="1.5em"
-                              textDecoration="none"
+                              {...({ textDecoration: 'none' } as Record<string, unknown>)}
                               color="black.900"
                               fontSize={fontSize}
                               overflowWrap="anywhere"
@@ -450,7 +447,7 @@ const ExpenseBudgetItem = ({
                     <StyledButton
                       color="black.700"
                       fontSize="11px"
-                      cursor="pointer"
+                      {...({ cursor: 'pointer' } as Record<string, unknown>)}
                       buttonSize="tiny"
                       onClick={
                         useDrawer
@@ -484,7 +481,7 @@ const ExpenseBudgetItem = ({
                     <StyledButton
                       color="black.700"
                       fontSize="11px"
-                      cursor="pointer"
+                      {...({ cursor: 'pointer' } as Record<string, unknown>)}
                       buttonSize="tiny"
                       onClick={
                         useDrawer

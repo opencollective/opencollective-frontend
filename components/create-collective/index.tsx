@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
+import { compose } from '../../lib/utils';
 import injectIntl from '@/lib/injectIntl';
 
 import { Box, Flex } from '../Grid';
@@ -18,27 +20,52 @@ import { withUser } from '../UserProvider';
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
 import CreateCollectiveForm from './CreateCollectiveForm';
 
-class CreateCollective extends Component {
-  static propTypes = {
-    host: PropTypes.object,
-    intl: PropTypes.object,
-    LoggedInUser: PropTypes.object, // from withUser
-    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
-    router: PropTypes.object.isRequired, // from withRouter
-    createCollective: PropTypes.func.isRequired, // addCreateCollectiveMutation
-    data: PropTypes.shape({
-      // from addTagStatsQuery
-      tagStats: PropTypes.shape({
-        nodes: PropTypes.arrayOf(
-          PropTypes.shape({
-            tag: PropTypes.string,
-          }),
-        ),
-      }),
-    }),
-  };
+type CreateCollectiveHost = {
+  slug: string;
+  name?: string;
+  isOpenToApplications?: boolean;
+};
 
-  constructor(props) {
+type CreateCollectiveValues = {
+  name: string;
+  description: string;
+  slug: string;
+  tags?: string[];
+  location?: unknown;
+  message?: string;
+  inviteMembers?: Array<{ memberAccount: { id: number | string } }>;
+};
+
+type CreateCollectiveProps = {
+  host?: CreateCollectiveHost;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  /** from withUser */
+  LoggedInUser?: Record<string, unknown>;
+  /** from withUser */
+  refetchLoggedInUser?: () => Promise<unknown>;
+  /** from withRouter */
+  router: Router;
+  /** addCreateCollectiveMutation */
+  createCollective?: (options: {
+    variables: {
+      collective: CreateCollectiveValues;
+      host: { slug: string } | null;
+      message?: string;
+      inviteMembers?: Array<{ memberAccount: { legacyId: number | string } }>;
+    };
+  }) => Promise<{ data: { createCollective: { slug: string; legacyId: number } } }>;
+  /** from addTagStatsQuery */
+  data?: { tagStats?: { nodes?: Array<{ tag: string }> } };
+};
+
+type CreateCollectiveState = {
+  error: string | null;
+  creating: boolean;
+};
+
+class CreateCollective extends Component<CreateCollectiveProps, CreateCollectiveState> {
+  constructor(props: CreateCollectiveProps) {
     super(props);
 
     this.state = {
@@ -49,14 +76,21 @@ class CreateCollective extends Component {
     this.createCollective = this.createCollective.bind(this);
   }
 
-  async createCollective({ collective, message, inviteMembers }) {
+  async createCollective({
+    collective,
+    message,
+    inviteMembers,
+  }: {
+    collective: CreateCollectiveValues;
+    message?: string;
+    inviteMembers?: Array<{ memberAccount: { id: number | string } }>;
+  }) {
     // set state to loading
     this.setState({ creating: true });
 
     // prepare object
-    collective.tags = collective.tags
-      ? [...collective.tags, this.props.router.query.category]
-      : [this.props.router.query.category];
+    const category = this.props.router.query.category as string;
+    collective.tags = collective.tags ? [...collective.tags, category] : [category];
 
     // try mutation
     try {
@@ -91,7 +125,7 @@ class CreateCollective extends Component {
     const { LoggedInUser, host, router, data } = this.props;
     const { error } = this.state;
     const { category } = router.query;
-    const tags = data?.tagStats?.nodes?.filter(node => !IGNORED_TAGS.includes(node.tag));
+    const tags = data?.tagStats?.nodes?.filter(node => !(IGNORED_TAGS as readonly string[]).includes(node.tag));
     const popularTags = tags?.map(value => value.tag);
 
     if (host && !host.isOpenToApplications) {
@@ -135,7 +169,8 @@ class CreateCollective extends Component {
       <CreateCollectiveForm
         host={host}
         onSubmit={this.createCollective}
-        onChange={this.handleChange}
+        // TODO: `handleChange` is not defined on this component (always `undefined`, see PLAN.md findings)
+        onChange={undefined}
         loading={this.state.creating}
         error={error}
         popularTags={popularTags}
@@ -181,7 +216,7 @@ const addCreateCollectiveMutation = graphql(createCollectiveMutation, {
 });
 
 const addTagStatsQuery = graphql(createCollectiveTagStatsQuery, {
-  options: props => {
+  options: (props: { host?: CreateCollectiveHost }) => {
     return {
       variables: {
         host: props.host ? { slug: props.host.slug } : undefined,
@@ -190,4 +225,6 @@ const addTagStatsQuery = graphql(createCollectiveTagStatsQuery, {
   },
 });
 
-export default withRouter(withUser(addCreateCollectiveMutation(addTagStatsQuery(injectIntl(CreateCollective)))));
+const addGraphql = compose(addCreateCollectiveMutation, addTagStatsQuery);
+
+export default withRouter(withUser(addGraphql(injectIntl(CreateCollective))));

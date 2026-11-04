@@ -23,10 +23,18 @@ const editAccountTypeMutation = gql`
   }
 `;
 
+type AccountOption = {
+  length?: number;
+  value?: {
+    id?: number | string;
+    slug?: string;
+  };
+};
+
 const AccountType = () => {
   const { toast } = useToast();
   const intl = useIntl();
-  const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
+  const [selectedAccountOption, setSelectedAccountOption] = React.useState<AccountOption>([]);
   const [editAccountType, { loading }] = useMutation(editAccountTypeMutation);
   const [isConfirmationModelOpen, setIsConfirmationModelOpen] = React.useState(false);
 

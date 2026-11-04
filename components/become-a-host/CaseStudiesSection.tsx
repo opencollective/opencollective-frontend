@@ -87,8 +87,8 @@ const CaseStudy = ({ bgImage, name, id, logo, learnMorePath }) => {
       my={[null, 3, null, null, 4]}
     >
       <Container
-        width={[1, '205px', '306px', null, '360px']}
-        height={['210px', '218px', null, null, '256px']}
+        {...({ width: [1, '205px', '306px', null, '360px'] } as Record<string, unknown>)}
+        {...({ height: ['210px', '218px', null, null, '256px'] } as Record<string, unknown>)}
         background={[
           `url("/static/images/become-a-host/${bgImage}.png") no-repeat`,
           `url("/static/images/become-a-host/${bgImage}-sm.png") no-repeat`,
@@ -106,7 +106,7 @@ const CaseStudy = ({ bgImage, name, id, logo, learnMorePath }) => {
         flexDirection="column"
         alignItems="flex-start"
         mt={['12px', 3, '24px']}
-        width={[1, '206px', '306px', null, '360px']}
+        {...({ width: [1, '206px', '306px', null, '360px'] } as Record<string, unknown>)}
       >
         <CollectiveNameLink
           href={learnMorePath}
@@ -156,7 +156,9 @@ const CaseStudies = () => {
         </SectionDescription>
       </Box>
 
-      <StyledCarousel width="288px" options={caseStudies} display={[null, 'none']}>
+      <StyledCarousel
+        {...({ width: '288px', display: [null, 'none'], options: caseStudies } as Record<string, unknown>)}
+      >
         {caseStudies.map(caseStudy => (
           <CaseStudy key={caseStudy.id} {...caseStudy} />
         ))}

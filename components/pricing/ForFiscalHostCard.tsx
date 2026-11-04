@@ -19,7 +19,7 @@ const ListWrapper = styled(Box)`
   padding-left: 0;
 `;
 
-const ListItem = styled.li`
+const ListItem = styled.li<{ uncheck?: boolean }>`
   font-size: 13px;
   line-height: 16px;
   color: ${props => (props.uncheck ? themeGet('colors.black.500') : themeGet('colors.black.900'))};
@@ -165,7 +165,12 @@ const ForFiscalHosts = () => {
   const intl = useIntl();
 
   return (
-    <Card padding={['24px', null, '32px']} width={['288px', '636px']} borderRadius="8px" border="1px solid #DCDEE0">
+    <Card
+      padding={['24px', null, '32px']}
+      {...({ width: ['288px', '636px'] } as Record<string, unknown>)}
+      borderRadius="8px"
+      border="1px solid #DCDEE0"
+    >
       <Flex justifyContent="center" alignItems="center" mb="32px">
         <Box width="72px" height="72px" mr="16px">
           <NextIllustration

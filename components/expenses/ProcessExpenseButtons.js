@@ -135,12 +135,12 @@ const ProcessExpenseButtons = ({
   permissions,
   buttonProps = DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
   onSuccess,
-  onModalToggle,
-  onDelete,
-  isMoreActions,
+  onModalToggle = undefined,
+  onDelete = undefined,
+  isMoreActions = undefined,
   displaySecurityChecks = true,
   isViewingExpenseInHostContext = false,
-  disabled,
+  disabled = undefined,
   enableKeyboardShortcuts,
 }) => {
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();

@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
+import type { Currency } from '../../lib/graphql/types/v2/graphql';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -75,7 +76,35 @@ const accountTiersQuery = gql`
   }
 `;
 
-const getCallToAction = (selectedOrdersOptions, newTier) => {
+type MoveAccount = {
+  id?: number | string;
+  slug?: string;
+  name?: string;
+};
+
+type MoveTier = {
+  id?: number | string;
+  legacyId?: number;
+  slug?: string;
+  name?: string;
+};
+
+type TierOption = { value: MoveTier | 'custom'; label: string };
+
+type OrderOption = {
+  value: {
+    id?: number | string;
+    legacyId?: number;
+    description?: string;
+    createdAt?: string;
+    amount?: { valueInCents?: number; currency?: Currency };
+    receiverAccount?: Record<string, unknown>;
+    toAccount?: { slug?: string };
+    tier?: { slug?: string; legacyId?: number; name?: string };
+  };
+};
+
+const getCallToAction = (selectedOrdersOptions: ReadonlyArray<OrderOption>, newTier: MoveTier | 'custom' | null) => {
   const base = `Move ${selectedOrdersOptions.length} contributions`;
   if (newTier === 'custom') {
     return `${base} to the "custom contribution" tier`;
@@ -84,11 +113,11 @@ const getCallToAction = (selectedOrdersOptions, newTier) => {
   }
 };
 
-const getTierOption = tier => {
+const getTierOption = (tier: MoveTier): TierOption => {
   return { value: tier, label: `#${tier.legacyId} - ${tier.name}` };
 };
 
-const getTiersOptions = (tiers, accountSettings) => {
+const getTiersOptions = (tiers: MoveTier[], accountSettings): TierOption[] => {
   if (!tiers) {
     return [];
   }
@@ -105,10 +134,10 @@ const MoveReceivedContributions = () => {
   // Local state and hooks
   const intl = useIntl();
   const { toast } = useToast();
-  const [receiverAccount, setReceiverAccount] = React.useState(null);
+  const [receiverAccount, setReceiverAccount] = React.useState<MoveAccount>(null);
   const [hasConfirmationModal, setHasConfirmationModal] = React.useState(false);
-  const [selectedOrdersOptions, setSelectedOrderOptions] = React.useState([]);
-  const [newTier, setNewTier] = React.useState(false);
+  const [selectedOrdersOptions, setSelectedOrderOptions] = React.useState<ReadonlyArray<OrderOption>>([]);
+  const [newTier, setNewTier] = React.useState<MoveTier | 'custom' | null>(null);
   const isValid = Boolean(receiverAccount && selectedOrdersOptions.length && newTier);
   const callToAction = getCallToAction(selectedOrdersOptions, newTier);
 
@@ -126,7 +155,10 @@ const MoveReceivedContributions = () => {
     try {
       // Prepare variables
       const ordersInputs = selectedOrdersOptions.map(({ value }) => ({ id: value.id }));
-      const mutationVariables = {
+      const mutationVariables: {
+        orders: Array<{ id?: number | string }>;
+        tier: { isCustom: true } | { id?: number | string };
+      } = {
         orders: ordersInputs,
         tier: newTier === 'custom' ? { isCustom: true } : { id: newTier.id },
       };
@@ -187,7 +219,7 @@ const MoveReceivedContributions = () => {
             isLoading={tiersLoading}
             onChange={({ value }) => setNewTier(value)}
             options={tiersOptions}
-            value={!newTier ? null : getTierOption(newTier)}
+            value={!newTier ? null : getTierOption(newTier as MoveTier)}
           />
         )}
       </StyledInputField>

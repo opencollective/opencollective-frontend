@@ -49,8 +49,8 @@ const WhatAreTheBenefits = () => {
           mr={[null, null, '40px', null, '103px']}
         >
           <Box
-            width={['132px', null, null, null, '208px']}
-            height={['132px', null, null, null, '208px']}
+            {...({ width: ['132px', null, null, null, '208px'] } as Record<string, unknown>)}
+            {...({ height: ['132px', null, null, null, '208px'] } as Record<string, unknown>)}
             mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
@@ -87,8 +87,8 @@ const WhatAreTheBenefits = () => {
           mr={[null, null, '40px', null, '103px']}
         >
           <Box
-            width={['132px', null, null, null, '208px']}
-            height={['132px', null, null, null, '208px']}
+            {...({ width: ['132px', null, null, null, '208px'] } as Record<string, unknown>)}
+            {...({ height: ['132px', null, null, null, '208px'] } as Record<string, unknown>)}
             mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
@@ -124,8 +124,8 @@ const WhatAreTheBenefits = () => {
           mb={4}
         >
           <Box
-            width={['132px', null, null, null, '208px']}
-            height={['132px', null, null, null, '208px']}
+            {...({ width: ['132px', null, null, null, '208px'] } as Record<string, unknown>)}
+            {...({ height: ['132px', null, null, null, '208px'] } as Record<string, unknown>)}
             mb={[2, null, '17px', null, '51px']}
             mr={[null, 4, 0]}
           >
@@ -164,11 +164,11 @@ const WhatAreTheBenefits = () => {
           mr={[null, null, null, null, '178px']}
         >
           <Container
-            width={['83px', '79px', '115px', null, '147px']}
-            height={['68px', '65px', '94px', null, '120px']}
+            {...({ width: ['83px', '79px', '115px', null, '147px'] } as Record<string, unknown>)}
+            {...({ height: ['68px', '65px', '94px', null, '120px'] } as Record<string, unknown>)}
             position="absolute"
-            top={[null, 0, '265px', null, '290px']}
-            left={['0', '215px', '330px', null, '350px']}
+            {...({ top: [null, 0, '265px', null, '290px'] } as Record<string, unknown>)}
+            {...({ left: ['0', '215px', '330px', null, '350px'] } as Record<string, unknown>)}
           >
             <NextIllustration
               src="/static/images/become-a-host/keepTrackBird.png"
@@ -189,32 +189,32 @@ const WhatAreTheBenefits = () => {
           <Box
             mb={['24px', 0]}
             overflow="auto"
-            maxWidth={['304px', '324px', '478px', null, '558px']}
-            maxHeight={['229px', '281px', '355px', null, '420px']}
+            {...({ maxWidth: ['304px', '324px', '478px', null, '558px'] } as Record<string, unknown>)}
+            {...({ maxHeight: ['229px', '281px', '355px', null, '420px'] } as Record<string, unknown>)}
           >
             <ScreenShotWrapper
               alt="Keep track of all budgets Illustration"
               src="/static/images/become-a-host/keepTrackOfBudget-xs.png"
-              display={[null, 'none']}
+              {...({ display: [null, 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="Keep track of all budgets Illustration"
               src="/static/images/become-a-host/keepTrackOfBudget-sm.png"
-              display={['none', 'block', 'none']}
+              {...({ display: ['none', 'block', 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="Keep track of all budgets Illustration"
               src="/static/images/become-a-host/keepTrackOfBudget-md.png"
-              display={['none', null, 'block', null, 'none']}
+              {...({ display: ['none', null, 'block', null, 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="Keep track of all budgets Illustration"
               src="/static/images/become-a-host/keepTrackOfBudget-lg.png"
-              display={['none', null, null, null, 'block']}
+              {...({ display: ['none', null, null, null, 'block'] } as Record<string, unknown>)}
             />
           </Box>
           <Box
-            width={['304px', '288px', '437px', null, '408px']}
+            {...({ width: ['304px', '288px', '437px', null, '408px'] } as Record<string, unknown>)}
             mr={[null, '24px', '41px', null, '134px']}
             textAlign={['center', 'left']}
           >
@@ -223,7 +223,7 @@ const WhatAreTheBenefits = () => {
               lineHeight={['32px', null, null, null, '40px']}
               letterSpacing="-0.008em"
               color="primary.900"
-              display={['none', 'block']}
+              {...({ display: ['none', 'block'] } as Record<string, unknown>)}
               mb={3}
             >
               <FormattedMessage
@@ -253,11 +253,11 @@ const WhatAreTheBenefits = () => {
           position="relative"
         >
           <Container
-            width={['71px', '85px', '115px', null, '126px']}
-            height={['44px', '52px', '71px', null, '78px']}
+            {...({ width: ['71px', '85px', '115px', null, '126px'] } as Record<string, unknown>)}
+            {...({ height: ['44px', '52px', '71px', null, '78px'] } as Record<string, unknown>)}
             position="absolute"
-            right={['0', null, '124px', null, '28px']}
-            top={[null, null, '65px']}
+            {...({ right: ['0', null, '124px', null, '28px'] } as Record<string, unknown>)}
+            {...({ top: [null, null, '65px'] } as Record<string, unknown>)}
           >
             <NextIllustration
               src="/static/images/become-a-host/easyExpenseBird.png"
@@ -278,32 +278,32 @@ const WhatAreTheBenefits = () => {
           <Box
             mb={['24px', 0]}
             overflow="auto"
-            maxWidth={['304px', '324px', '478px', null, '558px']}
-            maxHeight={['229px', '281px', '355px', null, '420px']}
+            {...({ maxWidth: ['304px', '324px', '478px', null, '558px'] } as Record<string, unknown>)}
+            {...({ maxHeight: ['229px', '281px', '355px', null, '420px'] } as Record<string, unknown>)}
           >
             <ScreenShotWrapper
               alt="Easy expense management Illustration"
               src="/static/images/become-a-host/easyExpense-xs.png"
-              display={[null, 'none']}
+              {...({ display: [null, 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="Easy expense management Illustration"
               src="/static/images/become-a-host/easyExpense-sm.png"
-              display={['none', 'block', 'none']}
+              {...({ display: ['none', 'block', 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="Easy expense management Illustration"
               src="/static/images/become-a-host/easyExpense-md.png"
-              display={['none', null, 'block', null, 'none']}
+              {...({ display: ['none', null, 'block', null, 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="Easy expense management Illustration"
               src="/static/images/become-a-host/easyExpense-lg.png"
-              display={['none', null, null, null, 'block']}
+              {...({ display: ['none', null, null, null, 'block'] } as Record<string, unknown>)}
             />
           </Box>
           <Box
-            width={['304px', '288px', '437px', null, '408px']}
+            {...({ width: ['304px', '288px', '437px', null, '408px'] } as Record<string, unknown>)}
             ml={[null, '24px', '41px', null, '96px']}
             textAlign={['center', 'left']}
           >
@@ -312,7 +312,7 @@ const WhatAreTheBenefits = () => {
               lineHeight={['32px', null, null, null, '40px']}
               letterSpacing="-0.008em"
               color="primary.900"
-              display={['none', 'block']}
+              {...({ display: ['none', 'block'] } as Record<string, unknown>)}
               mb={3}
             >
               <FormattedMessage
@@ -343,11 +343,11 @@ const WhatAreTheBenefits = () => {
           mr={[null, null, null, null, '178px']}
         >
           <Container
-            width={['88px', '105px', '122px', null, '156px']}
-            height={['44px', '52px', '61px', null, '78px']}
+            {...({ width: ['88px', '105px', '122px', null, '156px'] } as Record<string, unknown>)}
+            {...({ height: ['44px', '52px', '61px', null, '78px'] } as Record<string, unknown>)}
             position="absolute"
-            left={['0', '150px', '200px']}
-            top={[null, '-10px', '35px']}
+            {...({ left: ['0', '150px', '200px'] } as Record<string, unknown>)}
+            {...({ top: [null, '-10px', '35px'] } as Record<string, unknown>)}
           >
             <NextIllustration
               src="/static/images/become-a-host/combineFundingBird.png"
@@ -368,32 +368,32 @@ const WhatAreTheBenefits = () => {
           <Box
             mb={['24px', 0]}
             overflow="auto"
-            maxWidth={['304px', '324px', '478px', null, '558px']}
-            maxHeight={['229px', '281px', '355px', null, '420px']}
+            {...({ maxWidth: ['304px', '324px', '478px', null, '558px'] } as Record<string, unknown>)}
+            {...({ maxHeight: ['229px', '281px', '355px', null, '420px'] } as Record<string, unknown>)}
           >
             <ScreenShotWrapper
               alt="Combine Funding sources Illustration"
               src="/static/images/become-a-host/combineFunding-xs.png"
-              display={[null, 'none']}
+              {...({ display: [null, 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="Combine Funding sources Illustration"
               src="/static/images/become-a-host/combineFunding-sm.png"
-              display={['none', 'block', 'none']}
+              {...({ display: ['none', 'block', 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="Combine Funding sources Illustration"
               src="/static/images/become-a-host/combineFunding-md.png"
-              display={['none', null, 'block', null, 'none']}
+              {...({ display: ['none', null, 'block', null, 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="Combine Funding sources Illustration"
               src="/static/images/become-a-host/combineFunding-lg.png"
-              display={['none', null, null, null, 'block']}
+              {...({ display: ['none', null, null, null, 'block'] } as Record<string, unknown>)}
             />
           </Box>
           <Box
-            width={['304px', '288px', '437px', null, '408px']}
+            {...({ width: ['304px', '288px', '437px', null, '408px'] } as Record<string, unknown>)}
             mr={[null, '24px', '41px', null, '134px']}
             textAlign={['center', 'left']}
           >
@@ -402,7 +402,7 @@ const WhatAreTheBenefits = () => {
               lineHeight={['32px', null, null, null, '40px']}
               letterSpacing="-0.008em"
               color="primary.900"
-              display={['none', 'block']}
+              {...({ display: ['none', 'block'] } as Record<string, unknown>)}
               mb={3}
             >
               <FormattedMessage
@@ -432,10 +432,10 @@ const WhatAreTheBenefits = () => {
           position="relative"
         >
           <Container
-            width={['77px', '91px', '106px', null, '136px']}
-            height={['31px', '37px', '43px', null, '55px']}
+            {...({ width: ['77px', '91px', '106px', null, '136px'] } as Record<string, unknown>)}
+            {...({ height: ['31px', '37px', '43px', null, '55px'] } as Record<string, unknown>)}
             position="absolute"
-            left={['49px', '380px', '550px', null, '660px']}
+            {...({ left: ['49px', '380px', '550px', null, '660px'] } as Record<string, unknown>)}
             bottom="0"
           >
             <NextIllustration
@@ -446,10 +446,10 @@ const WhatAreTheBenefits = () => {
             />
           </Container>
           <Container
-            width={['78px', '93px', '108px', null, '138px']}
-            height={['38px', '47px', '53px', null, '68px']}
+            {...({ width: ['78px', '93px', '108px', null, '138px'] } as Record<string, unknown>)}
+            {...({ height: ['38px', '47px', '53px', null, '68px'] } as Record<string, unknown>)}
             position="absolute"
-            right={['42px', 0, '98px', null, 0]}
+            {...({ right: ['42px', 0, '98px', null, 0] } as Record<string, unknown>)}
             bottom="0"
           >
             <NextIllustration
@@ -467,32 +467,32 @@ const WhatAreTheBenefits = () => {
           <Box
             mb={['24px', 0]}
             overflow="auto"
-            maxWidth={['304px', '324px', '478px', null, '558px']}
-            maxHeight={['229px', '281px', '355px', null, '420px']}
+            {...({ maxWidth: ['304px', '324px', '478px', null, '558px'] } as Record<string, unknown>)}
+            {...({ maxHeight: ['229px', '281px', '355px', null, '420px'] } as Record<string, unknown>)}
           >
             <ScreenShotWrapper
               alt="In-depth Reports Illustration"
               src="/static/images/become-a-host/indepth-report-xs.png"
-              display={[null, 'none']}
+              {...({ display: [null, 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="In-depth Reports Illustration"
               src="/static/images/become-a-host/indepth-report-sm.png"
-              display={['none', 'block', 'none']}
+              {...({ display: ['none', 'block', 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="In-depth Reports Illustration"
               src="/static/images/become-a-host/indepth-report-md.png"
-              display={['none', null, 'block', null, 'none']}
+              {...({ display: ['none', null, 'block', null, 'none'] } as Record<string, unknown>)}
             />
             <ScreenShotWrapper
               alt="In-depth Reports Illustration"
               src="/static/images/become-a-host/indepth-report-lg.png"
-              display={['none', null, null, null, 'block']}
+              {...({ display: ['none', null, null, null, 'block'] } as Record<string, unknown>)}
             />
           </Box>
           <Box
-            width={['304px', '288px', '437px', null, '408px']}
+            {...({ width: ['304px', '288px', '437px', null, '408px'] } as Record<string, unknown>)}
             ml={[null, '24px', '41px', null, '96px']}
             textAlign={['center', 'left']}
             mb={['50px', null, 0]}
@@ -502,7 +502,7 @@ const WhatAreTheBenefits = () => {
               lineHeight={['32px', null, null, null, '40px']}
               letterSpacing="-0.008em"
               color="primary.900"
-              display={['none', 'block']}
+              {...({ display: ['none', 'block'] } as Record<string, unknown>)}
               mb={3}
             >
               <FormattedMessage id="becomeAHost.benefit.inDepthReports" defaultMessage="In-depth reports" />

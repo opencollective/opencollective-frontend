@@ -87,7 +87,7 @@ const searchQuery = gql`
   }
 `;
 
-const CardContainer = styled.div`
+const CardContainer = styled.div<{ $isSelected?: boolean }>`
   border-radius: 16px;
   cursor: crosshair;
   transition:

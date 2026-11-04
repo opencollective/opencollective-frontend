@@ -6,7 +6,7 @@ import { styled } from 'styled-components';
 import Container from '../Container';
 import Link from '../Link';
 
-const Tab = styled.button`
+const Tab = styled.button<{ active?: boolean }>`
   font-size: 15px;
   line-height: 22px;
   color: ${themeGet('colors.black.800')};
@@ -38,7 +38,7 @@ const Tabs = ({ activeTab }) => (
     px={['16px', null, null, 0]}
     py={['15px', null, null, 0]}
     pt={[null, null, null, 3]}
-    width={[null, '636px', null, '113px']}
+    {...({ width: [null, '636px', null, '113px'] } as Record<string, unknown>)}
     background="white"
     justifyContent={['center', 'flex-start']}
     alignItems={['center', null, null, 'flex-start']}
