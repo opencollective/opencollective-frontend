@@ -299,8 +299,7 @@ class TierPage extends Component<TierPageProps> {
             </Container>
 
             {/** ---- Contribute desktop ---- */}
-            {/* `position` is applied by `Hide`'s styled-system functions but missing from its props type */}
-            <Hide {...({ position: 'relative' } as Record<string, unknown>)} xs sm md flex="0 1 416px" pt={112}>
+            <Hide position="relative" xs sm md flex="0 1 416px" pt={112}>
               <Container width="100%" position="sticky" top={80} pb={32}>
                 <Container
                   width={1}
@@ -441,9 +440,7 @@ class TierPage extends Component<TierPageProps> {
           </Flex>
         </Flex>
         {contributors && contributors.length > 0 && (
-          // `collectiveName` is not a prop of `TierContributors` (dead prop, see PLAN.md findings)
           <TierContributors
-            {...({ collectiveName: collective.name } as Record<string, unknown>)}
             contributors={contributors}
             contributorsStats={contributorsStats}
             currency={tier.currency || collective.currency}
@@ -507,9 +504,7 @@ class TierPage extends Component<TierPageProps> {
                     defaultMessage="{amountWithInterval} raised"
                     values={{
                       amountWithInterval: (
-                        // `color` is not a prop of `FormattedMoneyAmount` (dead prop, see PLAN.md findings)
                         <FormattedMoneyAmount
-                          {...({ color: 'black.700' } as Record<string, unknown>)}
                           amount={amountRaised}
                           currency={tier.currency}
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
