@@ -251,12 +251,9 @@ const OrdersWithData = ({
               &nbsp;+
             </StyledButton>
             {showCreatePendingOrderModal && (
-              // This modal requires `open`/`setOpen`; `OrdersWithData` never passed them, so it never opens
-              // (see PLAN.md findings). `open={false}` matches the previous `undefined`; the unused `onClose`
-              // prop is dropped.
               <CreatePendingOrderModal
-                open={false}
-                setOpen={() => undefined}
+                open={showCreatePendingOrderModal}
+                setOpen={setShowCreatePendingOrderModal}
                 hostSlug={data.account.slug}
                 onSuccess={() => refetch()}
               />
