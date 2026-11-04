@@ -82,4 +82,4 @@ function expressLimiter(redisClient) {
   };
 }
 
-module.exports = expressLimiter;
+export default expressLimiter;

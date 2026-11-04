@@ -1,9 +1,9 @@
-const hyperwatch = require('@hyperwatch/hyperwatch');
-const expressBasicAuth = require('express-basic-auth');
+import hyperwatch from '@hyperwatch/hyperwatch';
+import expressBasicAuth from 'express-basic-auth';
 
-const logger = require('./logger');
-const redisProvider = require('./redis-provider');
-const { parseToBooleanDefaultFalse } = require('./utils');
+import logger from './logger.ts';
+import redisProvider from './redis-provider.ts';
+import { parseToBooleanDefaultFalse } from './utils.ts';
 
 const {
   HYPERWATCH_ENABLED: enabled,
@@ -63,7 +63,12 @@ const load = async (app, { server, fallback }) => {
   const expressInput = input.express.create({ name: 'Hyperwatch Express Middleware' });
 
   app.use((req, res, next) => {
-    req.ip = req.ip || '::1'; // Fix "Invalid message: data.request should have required property 'address'"
+    // `req.ip` is a getter-only property on Express's request prototype, so plain
+    // assignment throws in strict mode (ESM). Shadow it with a fallback instead.
+    // Fix "Invalid message: data.request should have required property 'address'"
+    if (!req.ip) {
+      Object.defineProperty(req, 'ip', { value: '::1', configurable: true, enumerable: true, writable: true });
+    }
     next();
   });
 
@@ -112,4 +117,4 @@ const load = async (app, { server, fallback }) => {
   return Boolean(secret);
 };
 
-module.exports = load;
+export default load;

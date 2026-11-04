@@ -1,9 +1,10 @@
-const fetch = require('node-fetch');
-const { pipeline } = require('stream');
-const { promisify } = require('util');
+import { pipeline } from 'node:stream';
+import { promisify } from 'node:util';
+import fetch from 'node-fetch';
+
 const streamPipeline = promisify(pipeline);
 
-const isValidS3ImageUrl = (parsedURL, isProd) => {
+const isValidS3ImageUrl = (parsedURL: URL, isProd: boolean): boolean => {
   const expectedS3Hostnames = [
     `opencollective-${isProd ? 'production' : 'staging'}.s3-us-west-1.amazonaws.com`,
     `opencollective-${isProd ? 'production' : 'staging'}.s3.us-west-1.amazonaws.com`,
@@ -12,7 +13,7 @@ const isValidS3ImageUrl = (parsedURL, isProd) => {
   return expectedS3Hostnames.includes(parsedURL.hostname) && /\/\w+/.test(parsedURL.pathname);
 };
 
-const isValidRESTApiUrl = (parsedURL, isProd) => {
+const isValidRESTApiUrl = (parsedURL: URL, isProd: boolean): boolean => {
   const expectedRestApiHostname = `rest${isProd ? '' : '-staging'}.opencollective.com`;
   return parsedURL.hostname === expectedRestApiHostname && /\/v2\/[^/]+\/transactions\.csv/.test(parsedURL.pathname);
 };
@@ -20,7 +21,7 @@ const isValidRESTApiUrl = (parsedURL, isProd) => {
 /* Helper to enable downloading files that are on S3 since Chrome and Firefox does 
    not allow cross-origin downloads when using the download attribute on an anchor tag, 
    see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download. */
-async function downloadFileHandler(req, res) {
+async function downloadFileHandler(req, res): Promise<void> {
   const { url } = req.query;
   if (!url) {
     return res.status(400).json({ error: 'Missing url parameter' });
@@ -28,7 +29,7 @@ async function downloadFileHandler(req, res) {
 
   const hostname = req.get('original-hostname') || req.hostname;
   const isProd = hostname === 'opencollective.com';
-  let parsedURL;
+  let parsedURL: URL;
   try {
     parsedURL = new URL(url);
   } catch {
@@ -65,4 +66,4 @@ async function downloadFileHandler(req, res) {
   await streamPipeline(response.body, res);
 }
 
-module.exports = downloadFileHandler;
+export default downloadFileHandler;

@@ -1,5 +1,5 @@
-const logger = require('./logger');
-const { createRedisClient } = require('./redis');
+import logger from './logger.ts';
+import { createRedisClient } from './redis.ts';
 
 const redisProvider = async () => {
   const redisClient = await createRedisClient();
@@ -10,7 +10,7 @@ const redisProvider = async () => {
   return {
     clear: async () => redisClient?.flushAll(),
     delete: async key => redisClient?.del(key),
-    get: async (key, { unserialize = JSON.parse } = {}) => {
+    get: async (key, { unserialize = JSON.parse }: { unserialize?: (value: string | Buffer) => unknown } = {}) => {
       const value = await redisClient?.get(key);
       if (value) {
         try {
@@ -39,4 +39,4 @@ const redisProvider = async () => {
   };
 };
 
-module.exports = redisProvider;
+export default redisProvider;

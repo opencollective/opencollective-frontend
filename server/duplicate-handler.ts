@@ -1,6 +1,8 @@
-const debug = require('debug')('duplicateHandler');
+import createDebug from 'debug';
 
-function duplicateHandler({ skip, timeout } = {}) {
+const debug = createDebug('duplicateHandler');
+
+function duplicateHandler({ skip, timeout }: { skip?: (req) => boolean; timeout?: number | string } = {}) {
   timeout = Number(timeout) || 30;
 
   const requests = new Map();
@@ -42,9 +44,9 @@ function duplicateHandler({ skip, timeout } = {}) {
           // Copy original methods
           originResMethods[method] = origin.res[method];
 
-          origin.res[method] = function () {
+          origin.res[method] = function (...args) {
             // Apply on the origin method
-            originResMethods[method].apply(origin.res, arguments);
+            originResMethods[method].call(origin.res, ...args);
 
             // Apply on duplicates method
             const request = requests.get(id);
@@ -56,7 +58,7 @@ function duplicateHandler({ skip, timeout } = {}) {
                   duplicate.res.statusMessage = origin.res.statusMessage;
                 }
 
-                duplicate.res[method].apply(duplicate.res, arguments);
+                duplicate.res[method].call(duplicate.res, ...args);
               }
             }
           };
@@ -90,4 +92,4 @@ function duplicateHandler({ skip, timeout } = {}) {
   };
 }
 
-module.exports = duplicateHandler;
+export default duplicateHandler;

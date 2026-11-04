@@ -1,23 +1,23 @@
-require('../env.ts');
+import '../env.ts';
 
-const { EventEmitter } = require('node:events');
-const http = require('node:http');
-const next = require('next');
-const express = require('express');
-const helmet = require('helmet');
-const cookieParser = require('cookie-parser');
-const cloudflareIps = require('./cloudflare-ips.json');
-const isEmpty = require('lodash-es/isEmpty').default;
-const throng = require('throng');
+import cookieParser from 'cookie-parser';
+import express from 'express';
+import helmet from 'helmet';
+import isEmpty from 'lodash-es/isEmpty.js';
+import next from 'next';
+import { EventEmitter } from 'node:events';
+import http from 'node:http';
+import throng from 'throng';
 
-const logger = require('./logger');
-const loggerMiddleware = require('./logger-middleware');
-const routes = require('./routes');
-const hyperwatch = require('./hyperwatch');
-const rateLimiter = require('./rate-limiter');
-const duplicateHandler = require('./duplicate-handler');
-const { serviceLimiterMiddleware, increaseServiceLevel } = require('./service-limiter');
-const { parseToBooleanDefaultFalse } = require('./utils');
+import cloudflareIps from './cloudflare-ips.json' with { type: 'json' };
+import duplicateHandler from './duplicate-handler.ts';
+import hyperwatch from './hyperwatch.ts';
+import logger from './logger.ts';
+import loggerMiddleware from './logger-middleware.ts';
+import rateLimiter from './rate-limiter.ts';
+import routes from './routes.ts';
+import { increaseServiceLevel, serviceLimiterMiddleware } from './service-limiter.ts';
+import { parseToBooleanDefaultFalse } from './utils.ts';
 
 const app = express();
 const server = http.createServer(app);
@@ -30,12 +30,16 @@ const hostname = process.env.HOSTNAME;
 // Next.js 16 defaults to Turbopack; keep webpack for our custom next.config.js plugins.
 // Next.js gets its own channel for WebSocket upgrades (e.g. hot reload), so it
 // never closes the Hyperwatch stream (workaround for Next.js 16.3)
-const nextUpgrades = new EventEmitter();
+// Next only needs an event emitter here; its type expects the http.Server instance.
+const nextUpgrades = new EventEmitter() as Parameters<typeof next>[0]['httpServer'];
 const forwardUpgradeToNext = (req, socket, head) => nextUpgrades.emit('upgrade', req, socket, head);
-const nextApp = next({ dev, hostname, port, webpack: true, httpServer: nextUpgrades });
+const nextApp = next({ dev, hostname, port: port ? Number(port) : undefined, webpack: true, httpServer: nextUpgrades });
 const nextRequestHandler = nextApp.getRequestHandler();
+// TODO(finding): Next 16's `getRequestHandler()` takes no arguments and returns the handler,
+// so this call never responds to the request. Preserved behaviour-identically (see PLAN.md).
+const nextHmrRequestHandler: (req, res) => void = nextApp.getRequestHandler.bind(nextApp);
 
-const workers = process.env.WEB_CONCURRENCY || 1;
+const workers = Number(process.env.WEB_CONCURRENCY) || 1;
 
 const desiredServiceLevel = Number(process.env.SERVICE_LEVEL) || 100;
 
@@ -46,7 +50,7 @@ const start = id =>
     );
 
     app.all('/_next/webpack-hmr', (req, res) => {
-      nextApp.getRequestHandler(req, res);
+      nextHmrRequestHandler(req, res);
     });
 
     // Not much documentation on this,
