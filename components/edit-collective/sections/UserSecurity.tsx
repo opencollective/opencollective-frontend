@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
@@ -22,28 +21,32 @@ import { Button } from '../../ui/Button';
 import { toast } from '../../ui/useToast';
 import { withUser } from '../../UserProvider';
 
-class UserSecurity extends React.Component {
-  static propTypes = {
-    /** From graphql query */
-    setPassword: PropTypes.func.isRequired,
-    /** From withUser */
-    LoggedInUser: PropTypes.shape({
-      isRoot: PropTypes.bool.isRequired,
-      hasPassword: PropTypes.bool.isRequired,
-      hasRole: PropTypes.func.isRequired,
-      email: PropTypes.string.isRequired,
-    }),
-    login: PropTypes.func.isRequired,
-    refetchLoggedInUser: PropTypes.func.isRequired,
-    data: PropTypes.shape({
-      individual: PropTypes.object,
-      loading: PropTypes.bool,
-    }),
-    /** From parent component */
-    slug: PropTypes.string,
+type UserSecurityProps = {
+  setPassword?: (options: unknown) => Promise<{ data: { setPassword: { token?: string } } }>;
+  LoggedInUser?: {
+    isRoot?: boolean;
+    hasPassword?: boolean;
+    hasRole?: (role: string) => boolean;
+    email?: string;
   };
+  login?: (token: string) => Promise<unknown>;
+  refetchLoggedInUser?: () => Promise<unknown>;
+  data?: { individual?: unknown; loading?: boolean };
+  slug?: string;
+};
 
-  constructor(props) {
+type UserSecurityState = {
+  error: unknown;
+  passwordLoading: boolean;
+  passwordError: React.ReactNode;
+  currentPassword: string;
+  password: string;
+  passwordKey: number;
+  passwordScore: number;
+};
+
+class UserSecurity extends React.Component<UserSecurityProps, UserSecurityState> {
+  constructor(props: UserSecurityProps) {
     super(props);
     this.state = {
       error: null,
@@ -67,6 +70,8 @@ class UserSecurity extends React.Component {
       section.scrollIntoView();
     }
   }
+
+  hasTriggeredScroll: boolean;
 
   async setPassword() {
     const { password, passwordKey, currentPassword, passwordScore } = this.state;
@@ -301,7 +306,7 @@ const addGraphql = compose(
     name: 'setPassword',
   }),
   graphql(accountHasTwoFactorAuthQuery, {
-    options: props => ({
+    options: (props: UserSecurityProps) => ({
       variables: {
         slug: props.slug,
       },

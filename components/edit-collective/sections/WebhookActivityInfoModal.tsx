@@ -171,10 +171,10 @@ const CodeContainer = styled.pre`
   overflow: auto;
 `;
 
-const WebhookActivityInfoModal = ({ activity, ...props }) => {
+const WebhookActivityInfoModal = ({ activity, onClose = undefined, ...props }) => {
   const intl = useIntl();
   return (
-    <StyledModal {...props}>
+    <StyledModal onClose={onClose} {...props}>
       <ModalHeader>
         <FormattedMessage
           defaultMessage='Details for the "{event}" webhook event'

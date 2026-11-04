@@ -103,8 +103,8 @@ const EditPayPalAccount = props => {
       });
       await refetch();
     },
-    validate(values) {
-      const errors = {};
+    validate(values: Record<string, string>) {
+      const errors: Record<string, string> = {};
       if (!values.token) {
         errors.token = 'Required';
       }

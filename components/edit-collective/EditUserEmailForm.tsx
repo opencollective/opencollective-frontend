@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { isNil } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
@@ -16,24 +15,27 @@ import { Button } from '../ui/Button';
 
 import SettingsSectionTitle from './sections/SettingsSectionTitle';
 
-class EditUserEmailForm extends React.Component {
-  static propTypes = {
-    // From withData: A function to call to update user
-    updateUserEmail: PropTypes.func.isRequired,
-
-    // from withUser
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      LoggedInUser: PropTypes.shape({
-        email: PropTypes.string.isRequired,
-        emailWaitingForValidation: PropTypes.string,
-      }),
-      updateUserEmail: PropTypes.shape({
-        emailWaitingForValidation: PropTypes.string,
-      }),
-    }).isRequired,
+type EditUserEmailFormProps = {
+  updateUserEmail?: (options: { variables: { email: string } }) => Promise<{
+    data?: { updateUserEmail: { emailWaitingForValidation?: string } };
+  }>;
+  data?: {
+    loading?: boolean;
+    LoggedInUser?: { email?: string; emailWaitingForValidation?: string };
+    updateUserEmail?: { emailWaitingForValidation?: string };
   };
+};
 
+type EditUserEmailFormState = {
+  step: string;
+  newEmail: string;
+  error: React.ReactNode;
+  isSubmitting: boolean;
+  isResendingConfirmation: boolean;
+  isTouched: boolean;
+};
+
+class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUserEmailFormState> {
   state = {
     step: 'initial',
     newEmail: null,
@@ -47,7 +49,7 @@ class EditUserEmailForm extends React.Component {
     this.loadInitialState();
   }
 
-  componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps: EditUserEmailFormProps) {
     if (oldProps.data.LoggedInUser !== this.props.data.LoggedInUser) {
       this.loadInitialState();
     }
@@ -68,7 +70,7 @@ class EditUserEmailForm extends React.Component {
   render() {
     const { data, updateUserEmail } = this.props;
     const { loading, LoggedInUser = { email: '' } } = data;
-    const { step, newEmail, error, isSubmitting, isResendingConfirmation, isTouched } = this.state;
+    const { step, newEmail, error, isTouched } = this.state;
     const isValid = newEmail && isEmail(newEmail);
     const isDone = step === 'already-sent' || step === 'success';
 
@@ -98,7 +100,6 @@ class EditUserEmailForm extends React.Component {
             />
             <Button
               disabled={!isTouched || !newEmail || !isValid || isDone}
-              loading={isSubmitting}
               variant="outline"
               onClick={async () => {
                 this.setState({ isSubmitting: true });
@@ -120,9 +121,7 @@ class EditUserEmailForm extends React.Component {
             </Button>
             {step === 'success' && (
               <Button
-                minWidth={180}
-                disabled={step === 'already-sent'}
-                loading={isResendingConfirmation}
+                disabled={(step as string) === 'already-sent'}
                 onClick={async () => {
                   this.setState({ isResendingConfirmation: true });
                   try {
@@ -171,7 +170,12 @@ const loggedInUserEmailQuery = gqlV1 /* GraphQL */ `
   }
 `;
 
-const addLoggedInUserEmailData = graphql(loggedInUserEmailQuery, {
+const addLoggedInUserEmailData = graphql<
+  EditUserEmailFormProps,
+  { LoggedInUser?: { id?: string; email?: string; emailWaitingForValidation?: string } },
+  Record<string, unknown>,
+  { data?: EditUserEmailFormProps['data'] }
+>(loggedInUserEmailQuery, {
   options: {
     fetchPolicy: 'network-only',
     context: API_V1_CONTEXT,
@@ -188,7 +192,12 @@ const updateUserEmailMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const addUpdateUserEmailMutation = graphql(updateUserEmailMutation, {
+const addUpdateUserEmailMutation = graphql<
+  EditUserEmailFormProps,
+  { updateUserEmail?: { id?: string; email?: string; emailWaitingForValidation?: string } },
+  { email: string },
+  { updateUserEmail?: EditUserEmailFormProps['updateUserEmail'] }
+>(updateUserEmailMutation, {
   name: 'updateUserEmail',
   options: {
     context: API_V1_CONTEXT,

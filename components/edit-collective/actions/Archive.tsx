@@ -209,7 +209,6 @@ const ArchiveCollective = ({ collective }) => {
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </Button>
               <Button
-                buttonStyle="primary"
                 data-cy="action"
                 onClick={() => {
                   if (modal.type === 'Unarchive') {

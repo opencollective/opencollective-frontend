@@ -286,7 +286,7 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
     <React.Fragment>
       <Dialog onOpenChange={show => !show && cancelHandler()} open={true}>
         <DialogPortal>
-          <DialogContent onClose={cancelHandler}>
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>
                 {isInvitation ? (

@@ -116,7 +116,7 @@ const InviteMemberModal = props => {
   return (
     <Dialog onOpenChange={show => !show && cancelHandler()} open={true}>
       <DialogPortal>
-        <DialogContent onClose={cancelHandler}>
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
               <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />

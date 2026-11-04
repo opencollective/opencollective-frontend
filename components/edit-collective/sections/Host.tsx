@@ -1,12 +1,13 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import type { GraphQLV1Collective } from '../../../lib/custom_typings/GraphQLV1';
 import injectIntl from '@/lib/injectIntl';
 
 import { Separator } from '@/components/ui/Separator';
@@ -42,16 +43,36 @@ const EditCollectiveHostSection = styled.div`
   }
 `;
 
-class Host extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object.isRequired,
-    editCollectiveMutation: PropTypes.func.isRequired,
-    router: PropTypes.object.isRequired, // from withRouter
-    intl: PropTypes.object.isRequired, // from injectIntl
-  };
+type HostCollective = {
+  id: number;
+  slug: string;
+  name: string;
+  legalName: string;
+  imageUrl: string;
+  policies: Record<string, unknown>;
+  type?: string;
+  currency?: string;
+  isActive?: boolean;
+  host?: { id?: number; slug?: string; legalName?: string };
+  stats?: { balance?: number };
+  [key: string]: unknown;
+};
 
-  constructor(props) {
+type HostProps = {
+  collective: HostCollective;
+  LoggedInUser: object;
+  editCollectiveMutation: (collective: { id: number; HostCollectiveId?: number }) => Promise<void>;
+  router: { push: (options: unknown) => void };
+  intl?: IntlShape;
+};
+
+type HostState = {
+  collective: HostCollective;
+  isSubmitting: boolean;
+};
+
+class Host extends React.Component<HostProps, HostState> {
+  constructor(props: HostProps) {
     super(props);
     this.changeHost = this.changeHost.bind(this);
     this.updateSelectedOption = this.updateSelectedOption.bind(this);
@@ -106,20 +127,28 @@ class Host extends React.Component {
     );
   }
 
-  getAdministratedHosts = memoizeOne(LoggedInUser => {
-    return (
-      LoggedInUser?.memberOf
-        ?.filter(membership => membership.role === 'ADMIN' && membership.collective.hasHosting)
-        .map(membership => membership.collective)
-        .filter(Boolean) || []
-    );
-  });
+  getAdministratedHosts = memoizeOne(
+    (LoggedInUser: {
+      memberOf?: Array<{ role: string; collective: { hasHosting?: boolean; [key: string]: unknown } }>;
+    }) => {
+      return (
+        LoggedInUser?.memberOf
+          ?.filter(membership => membership.role === 'ADMIN' && membership.collective.hasHosting)
+          .map(membership => membership.collective)
+          .filter(Boolean) || []
+      );
+    },
+  );
 
   render() {
-    const { LoggedInUser, collective, router, intl, editCollectiveMutation } = this.props;
+    const { LoggedInUser: rawLoggedInUser, collective, router, intl, editCollectiveMutation } = this.props;
+    const LoggedInUser = rawLoggedInUser as {
+      isHostAdmin?: (collective: unknown) => boolean;
+      memberOf?: Array<{ role: string; collective: { hasHosting?: boolean; [key: string]: unknown } }>;
+    };
     const { locale } = intl;
 
-    const selectedOption = get(router, 'query.selectedOption', 'noHost');
+    const selectedOption = get(router, 'query.selectedOption', 'noHost') as string;
 
     const showLegalNameInfoBox = LoggedInUser?.isHostAdmin(collective) && !collective.host?.legalName;
     const administratedHosts = this.getAdministratedHosts(LoggedInUser);
@@ -143,7 +172,11 @@ class Host extends React.Component {
                   id="editCollective.selfHost.balance"
                   defaultMessage="Current balance: {balance}."
                   values={{
-                    balance: formatCurrency(collective.stats.balance, collective.currency, { locale }),
+                    balance: formatCurrency(
+                      collective.stats.balance,
+                      collective.currency as Parameters<typeof formatCurrency>[1],
+                      { locale },
+                    ),
                     type: collective.type,
                   }}
                 />{' '}
@@ -161,7 +194,7 @@ class Host extends React.Component {
           {collective.stats.balance === 0 && (
             <Fragment>
               <p>
-                <Button onClick={() => this.changeHost()} minWidth={200} loading={this.state.isSubmitting}>
+                <Button onClick={() => this.changeHost()}>
                   <FormattedMessage id="editCollective.selfHost.removeBtn" defaultMessage="Reset Fiscal Host" />
                 </Button>
               </p>
@@ -287,8 +320,7 @@ class Host extends React.Component {
                 </StyledLink>
                 {selectedOption === 'ownHost' && (
                   <SelectOwnFiscalHost
-                    administratedHosts={administratedHosts}
-                    collective={collective}
+                    administratedHosts={administratedHosts as GraphQLV1Collective[]}
                     onSubmit={hostCollective => this.changeHost(hostCollective)}
                   />
                 )}

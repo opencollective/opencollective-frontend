@@ -38,6 +38,15 @@ const initialValues = {
   spendingLimitAmount: undefined,
 };
 
+type RequestFormValues = {
+  agreement: boolean;
+  notes?: string;
+  purpose?: string;
+  spendingLimitAmount?: { valueInCents?: number; currency?: string };
+  spendingLimitInterval: VirtualCardLimitInterval;
+  collective: { id?: number | string; slug?: string; [key: string]: unknown };
+};
+
 const requestVirtualCardMutation = gql`
   mutation RequestVirtualCard(
     $notes: String
@@ -71,7 +80,7 @@ const RequestVirtualCardModal = props => {
 
   const { toast } = useToast();
   const [requestNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(requestVirtualCardMutation);
-  const formik = useFormik({
+  const formik = useFormik<RequestFormValues>({
     initialValues: {
       ...initialValues,
       spendingLimitInterval: defaultSpendingLimitInterval,
@@ -97,8 +106,8 @@ const RequestVirtualCardModal = props => {
       });
       props.onClose?.();
     },
-    validate(values) {
-      const errors = {};
+    validate(values: RequestFormValues) {
+      const errors: Record<string, string> = {};
       if (!values.agreement) {
         errors.agreement = 'Required';
       }
@@ -217,7 +226,10 @@ const RequestVirtualCardModal = props => {
                   {...inputProps}
                   inputId="spendingLimitInterval"
                   data-cy="spendingLimitInterval"
-                  error={formik.touched.limitAmount && Boolean(formik.errors.limitAmount)}
+                  error={
+                    (formik.touched as Record<string, boolean>).limitAmount &&
+                    Boolean((formik.errors as Record<string, string>).limitAmount)
+                  }
                   onBlur={() => formik.setFieldTouched('spendingLimitInterval', true)}
                   onChange={({ value }) => formik.setFieldValue('spendingLimitInterval', value)}
                   disabled={isCreating}
@@ -256,7 +268,7 @@ const RequestVirtualCardModal = props => {
             <Box pt={2}>
               <ExclamationCircle color="#E03F6A" size={16} />
               <Span ml={1} color="black.700" fontSize="14px">
-                {formik.errors.spendingLimitAmount}
+                {formik.errors.spendingLimitAmount as React.ReactNode}
               </Span>
             </Box>
           )}
@@ -275,7 +287,7 @@ const RequestVirtualCardModal = props => {
               required
               checked={formik.values.agreement}
               onChange={({ checked }) => formik.setFieldValue('agreement', checked)}
-              error={formik.touched.agreement && formik.errors.agreement}
+              error={Boolean(formik.touched.agreement && formik.errors.agreement)}
             />
           </Box>
           <Box mt={3}>
@@ -290,7 +302,7 @@ const RequestVirtualCardModal = props => {
           )}
         </ModalBody>
         <ModalFooter isFullWidth>
-          <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
+          <Container display="flex" justifyContent={['center', 'flex-end']}>
             <StyledButton
               my={1}
               minWidth={140}

@@ -1,9 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
+import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import type { formatCurrency } from '../../lib/currency-utils';
+import type { GraphQLV1Collective } from '../../lib/custom_typings/GraphQLV1';
+import type { AccountType, CollectiveFeatureStatus, ConnectedAccount } from '../../lib/graphql/types/v2/graphql';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
 import ActivityLog from '../dashboard/sections/ActivityLog';
@@ -41,16 +44,34 @@ import EditUserEmailForm from './EditUserEmailForm';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 
-class EditCollectiveForm extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    section: PropTypes.string,
-    onSubmit: PropTypes.func,
-    LoggedInUser: PropTypes.object.isRequired,
-    router: PropTypes.object, // from withRouter
+type EditCollectiveFormProps = {
+  collective?: {
+    id: number;
+    slug: string;
+    name: string;
+    legalName: string;
+    imageUrl: string;
+    policies: GraphQLV1Collective['policies'];
+    type: GraphQLV1Collective['type'];
+    currency?: string;
+    isPrivate: boolean;
+    isHost?: boolean;
+    settings?: Record<string, unknown>;
+    features?: Record<string, CollectiveFeatureStatus>;
+    connectedAccounts?: Array<{ service: string }>;
+    [key: string]: unknown;
   };
+  account?: { id: string; slug: string };
+  section?: string;
+  host?: unknown;
+  status?: string;
+  onSubmit?: (collective: { id: number; HostCollectiveId?: number }) => Promise<void>;
+  LoggedInUser: object;
+  router: NextRouter;
+};
 
-  constructor(props) {
+class EditCollectiveForm extends React.Component<EditCollectiveFormProps> {
+  constructor(props: EditCollectiveFormProps) {
     super(props);
   }
 
@@ -59,7 +80,7 @@ class EditCollectiveForm extends React.Component {
 
     switch (section) {
       case ALL_SECTIONS.INFO:
-        return <Info collective={collective} account={this.props.account} />;
+        return <Info account={this.props.account} />;
 
       case ALL_SECTIONS.COLLECTIVE_GOALS:
         return <CollectiveGoals collective={collective} currency={collective.currency} />;
@@ -76,7 +97,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case ALL_SECTIONS.PAYMENT_METHODS:
-        return <PaymentInformation account={collective} />;
+        return <PaymentInformation account={{ ...collective, type: collective.type as AccountType }} />;
 
       case ALL_SECTIONS.TIERS:
         return <Tiers collective={collective} />;
@@ -100,10 +121,8 @@ class EditCollectiveForm extends React.Component {
         return (
           <div>
             {collective.type === USER && <EditUserEmailForm />}
-            {collective.type === ORGANIZATION && (
-              <FiscalHosting collective={collective} account={this.props.account} LoggedInUser={LoggedInUser} />
-            )}
-            {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && (
+            {collective.type === ORGANIZATION && <FiscalHosting collective={collective} account={this.props.account} />}
+            {[COLLECTIVE, FUND, PROJECT, EVENT].some(type => type === collective.type) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
             <Archive collective={collective} />
@@ -120,10 +139,21 @@ class EditCollectiveForm extends React.Component {
       // Fiscal Hosts
 
       case ALL_SECTIONS.FISCAL_HOSTING:
-        return <FiscalHost collective={collective} account={this.props.account} />;
+        return <FiscalHost account={this.props.account} />;
 
       case ALL_SECTIONS.RECEIVING_MONEY:
-        return <ReceivingMoney collective={collective} />;
+        return (
+          <ReceivingMoney
+            collective={{
+              ...collective,
+              type: collective.type as AccountType,
+              isHost: Boolean(collective.isHost),
+              currency: collective.currency as Parameters<typeof formatCurrency>[1],
+              features: collective.features as Record<string, CollectiveFeatureStatus>,
+              connectedAccounts: collective.connectedAccounts as Array<{ service: ConnectedAccount['service'] }>,
+            }}
+          />
+        );
 
       case ALL_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;

@@ -147,8 +147,6 @@ const HostVirtualCards = props => {
                 name="application"
                 className="horizontal"
                 type="switch"
-                id={inputProps.id}
-                inputName={inputProps.name}
                 onChange={handleSettingsUpdate(inputProps.name)}
                 defaultValue={get(props.collective, `settings.${inputProps.name}`)}
               />
@@ -174,8 +172,6 @@ const HostVirtualCards = props => {
                 name="application"
                 className="horizontal"
                 type="switch"
-                id={inputProps.id}
-                inputName={inputProps.name}
                 onChange={handleSettingsUpdate(inputProps.name)}
                 defaultValue={get(props.collective, `settings.${inputProps.name}`)}
               />
@@ -198,8 +194,6 @@ const HostVirtualCards = props => {
                 name="application"
                 className="horizontal"
                 type="switch"
-                id={inputProps.id}
-                inputName={inputProps.name}
                 onChange={handleSettingsUpdate(inputProps.name)}
                 defaultValue={get(props.collective, `settings.${inputProps.name}`)}
               />
@@ -228,8 +222,6 @@ const HostVirtualCards = props => {
                 name="application"
                 className="horizontal"
                 type="switch"
-                id={inputProps.id}
-                inputName={inputProps.name}
                 onChange={handleSettingsUpdate(inputProps.name)}
                 defaultValue={get(props.collective, `settings.${inputProps.name}`)}
               />
@@ -256,7 +248,6 @@ const HostVirtualCards = props => {
               >
                 {inputProps => (
                   <StyledInput
-                    id={inputProps.id}
                     name={inputProps.name}
                     type="number"
                     defaultValue={get(props.collective, `settings.${inputProps.name}`)}
@@ -319,7 +310,7 @@ const HostVirtualCards = props => {
             </Box>
           }
         >
-          {inputProps => (
+          {() => (
             <RichTextEditor
               withBorders
               showCount
@@ -327,8 +318,6 @@ const HostVirtualCards = props => {
               version="simplified"
               editorMinHeight="12.5rem"
               editorMaxHeight={500}
-              id={inputProps.id}
-              inputName={inputProps.name}
               onChange={e => setVirtualCardPolicy(e.target.value)}
               defaultValue={virtualCardPolicy}
               placeholder={formatMessage(messages['policy.placeholder'])}

@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
 
-const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
+const EditCollectivePageFAQ = ({ defaultOpen = undefined, ...props }) => (
   <FAQ {...props}>
     <Entry open={defaultOpen}>
       <Title>

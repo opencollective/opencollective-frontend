@@ -2,6 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { cloneDeep, filter, get, isEmpty, isNil, set, size } from 'lodash-es';
+import type { MessageValue } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '../../../lib/collective';
@@ -39,7 +40,6 @@ import { useToast } from '../../ui/useToast';
 
 import { collectiveSettingsEditQuery } from './EditCollectivePage';
 import SettingsSectionTitle from './SettingsSectionTitle';
-
 const EXPENSE_POLICY_MAX_LENGTH = 16000; // max in database is ~15,500
 const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
@@ -194,10 +194,54 @@ const messages = defineMessages({
   },
 });
 
+const valueMessages = defineMessages<{
+  contributionPolicyError: { maxLength: MessageValue };
+  expensePolicyError: { maxLength: MessageValue };
+  requiredAdmins: { admins: MessageValue };
+}>({
+  contributionPolicyError: messages['contributionPolicy.error'],
+  expensePolicyError: messages['expensePolicy.error'],
+  requiredAdmins: messages['requiredAdmins.numberOfAdmins'],
+});
+
+type ExpensePolicies = {
+  invoicePolicy?: string;
+  receiptPolicy?: string;
+  titlePolicy?: string;
+  grantPolicy?: string;
+};
+
+type PoliciesMap = {
+  EXPENSE_POLICIES?: ExpensePolicies;
+  EXPENSE_AUTHOR_CANNOT_APPROVE?: {
+    enabled?: boolean;
+    amountInCents?: number;
+    appliesToHostedCollectives?: boolean;
+    appliesToSingleAdminCollectives?: boolean;
+  };
+  CONTRIBUTOR_INFO_THRESHOLDS?: { legalName?: boolean; address?: boolean };
+  TAX_FORM_THRESHOLDS?: { US?: number; NON_US?: number; includePayPalExpenses?: boolean };
+  COLLECTIVE_MINIMUM_ADMINS?: { numberOfAdmins?: number; applies?: string; freeze?: boolean };
+  EXPENSE_CATEGORIZATION?: {
+    requiredForExpenseSubmitters?: boolean;
+    requiredForCollectiveAdmins?: boolean;
+  };
+  COLLECTIVE_ADMINS_CAN_REFUND?: boolean;
+  USE_VENDOR_POLICY?: string;
+};
+
+type PoliciesFormValues = {
+  contributionPolicy: string;
+  disablePublicExpenseSubmission: boolean;
+  expenseTypes: Record<string, boolean>;
+  policies: PoliciesMap;
+  expensePolicy?: string;
+};
+
 const Policies = ({ collective }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const [selected, setSelected] = React.useState([]);
+  const [selected, setSelected] = React.useState<Array<{ value: unknown; label: unknown }>>([]);
   const { toast } = useToast();
   const hasMoneyManagement = hasAccountMoneyManagement(collective);
   const hasHosting = collective.hasHosting;
@@ -210,8 +254,7 @@ const Policies = ({ collective }) => {
   const { loading, data } = useQuery(collectiveSettingsEditQuery, {
     variables: { slug: collective.slug },
   });
-  const [updateCategories, { loading: isSubmittingCategories, error: categoriesError }] =
-    useMutation(updateFilterCategoriesMutation);
+  const [updateCategories, { error: categoriesError }] = useMutation(updateFilterCategoriesMutation);
   const [updateCollective, { loading: isSubmittingSettings, error: settingsError }] = useMutation(
     editCollectivePolicyMutation,
     { context: API_V1_CONTEXT },
@@ -237,7 +280,7 @@ const Policies = ({ collective }) => {
   }, [MODERATION_CATEGORIES]);
 
   // Form
-  const formik = useFormik({
+  const formik = useFormik<PoliciesFormValues>({
     initialValues: {
       contributionPolicy: collectiveContributionPolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
@@ -293,18 +336,20 @@ const Policies = ({ collective }) => {
         });
       }
     },
-    validate(values) {
-      const errors = {};
+    validate(values: PoliciesFormValues) {
+      const errors: Record<string, string> = {};
       const contributionPolicyText = stripHTML(values.contributionPolicy);
       const expensePolicyText = stripHTML(values.expensePolicy);
 
       if (contributionPolicyText.length > CONTRIBUTION_POLICY_MAX_LENGTH) {
-        errors.contributionPolicy = formatMessage(messages['contributionPolicy.error'], {
+        errors.contributionPolicy = formatMessage(valueMessages.contributionPolicyError, {
           maxLength: CONTRIBUTION_POLICY_MAX_LENGTH,
         });
       }
       if (expensePolicyText.length > EXPENSE_POLICY_MAX_LENGTH) {
-        errors.expensePolicy = formatMessage(messages['expensePolicy.error'], { maxLength: EXPENSE_POLICY_MAX_LENGTH });
+        errors.expensePolicy = formatMessage(valueMessages.expensePolicyError, {
+          maxLength: EXPENSE_POLICY_MAX_LENGTH,
+        });
       }
       return errors;
     },
@@ -330,7 +375,7 @@ const Policies = ({ collective }) => {
 
   const numberOfAdminsOptions = [0, 2, 3, 4, 5].map(n => ({
     value: n,
-    label: formatMessage(messages['requiredAdmins.numberOfAdmins'], { admins: n }),
+    label: formatMessage(valueMessages.requiredAdmins, { admins: n }),
   }));
   const minAdminsApplies = [
     { value: 'NEW_COLLECTIVES', label: <FormattedMessage defaultMessage="New Collectives Only" id="SeQW9/" /> },
@@ -397,7 +442,7 @@ const Policies = ({ collective }) => {
                   maxWidth={600}
                   options={selectOptions}
                   value={selected}
-                  onChange={selectedOptions => setSelected(selectedOptions)}
+                  onChange={selectedOptions => setSelected([...selectedOptions])}
                   isMulti
                 />
               </Container>
@@ -544,7 +589,7 @@ const Policies = ({ collective }) => {
             </Container>
           )}
 
-          <SettingsSectionTitle id="expenses">{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>
+          <SettingsSectionTitle>{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>
 
           <StyledInputField
             name="policies.EXPENSE_POLICIES.invoicePolicy"
@@ -574,7 +619,6 @@ const Policies = ({ collective }) => {
                   placeholder={formatMessage(messages['invoiceExpensePolicy.placeholder'])}
                   defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.invoicePolicy || ''}
                   fontSize="14px"
-                  maxHeight={600}
                 />
               )
             }
@@ -614,7 +658,6 @@ const Policies = ({ collective }) => {
                   placeholder={formatMessage(messages['receiptExpensePolicy.placeholder'])}
                   defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy || ''}
                   fontSize="14px"
-                  maxHeight={600}
                 />
               )
             }
@@ -654,7 +697,6 @@ const Policies = ({ collective }) => {
                   placeholder={formatMessage(messages['grantExpensePolicy.placeholder'])}
                   defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.grantPolicy || ''}
                   fontSize="14px"
-                  maxHeight={600}
                 />
               )
             }
@@ -694,7 +736,6 @@ const Policies = ({ collective }) => {
                   placeholder={formatMessage(messages['titleExpensePolicy.placeholder'])}
                   defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.titlePolicy || ''}
                   fontSize="14px"
-                  maxHeight={600}
                 />
               )
             }
@@ -1332,13 +1373,7 @@ const Policies = ({ collective }) => {
         )}
 
         <div className="mt-10 flex w-full justify-stretch">
-          <Button
-            data-cy="submit-policy-btn"
-            className="w-full"
-            loading={isSubmittingSettings || isSubmittingCategories}
-            type="submit"
-            onSubmit={formik.handleSubmit}
-          >
+          <Button data-cy="submit-policy-btn" className="w-full" type="submit">
             <FormattedMessage id="save" defaultMessage="Save" />
           </Button>
         </div>

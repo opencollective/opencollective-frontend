@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get, sortBy, startCase } from 'lodash-es';
 import { Plus, Trash } from 'lucide-react';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -31,31 +31,56 @@ import SettingsSubtitle from '../SettingsSubtitle';
 const BORDER = '1px solid #efefef';
 const getInterpolationOption = value => ({ label: startCase(value), value });
 const INTERPOLATION_OPTIONS = ['auto', 'logarithm', 'linear'].map(getInterpolationOption);
-class CollectiveGoals extends React.Component {
-  static propTypes = {
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      slug: PropTypes.string.isRequired,
-      settings: PropTypes.object,
-    }).isRequired,
-    currency: PropTypes.string.isRequired,
-    intl: PropTypes.object.isRequired,
-    editCollectiveSettings: PropTypes.func.isRequired,
-    title: PropTypes.string,
-  };
+type Goal = {
+  key: string;
+  type?: string;
+  title?: string;
+  description?: string;
+  amount?: number;
+};
 
-  constructor(props) {
+type CollectiveGoalsProps = {
+  collective: { id: number; slug: string; settings?: Record<string, unknown>; features?: Record<string, string> };
+  currency: string;
+  intl?: IntlShape;
+  editCollectiveSettings?: (options: unknown) => Promise<unknown>;
+  title?: string;
+};
+
+type CollectiveGoalsState = {
+  collectivePage: Record<string, unknown>;
+  isTouched: boolean;
+  error: React.ReactNode;
+  submitting: boolean;
+  submitted: boolean;
+  isSubmitting?: boolean;
+  goalsInterpolation: string;
+  goals: Goal[];
+};
+
+type GoalField = {
+  name: string;
+  label: string;
+  type?: string;
+  options?: Array<{ value: string; label: string }>;
+  placeholder?: string;
+  maxLength?: number;
+  pre?: string;
+};
+
+class CollectiveGoals extends React.Component<CollectiveGoalsProps, CollectiveGoalsState> {
+  constructor(props: CollectiveGoalsProps) {
     super(props);
     const { intl, collective } = props;
 
     this.state = {
-      collectivePage: get(collective.settings, 'collectivePage', {}),
+      collectivePage: get(collective.settings, 'collectivePage', {}) as Record<string, unknown>,
       isTouched: false,
       error: null,
       submitting: false,
       submitted: false,
-      goalsInterpolation: get(collective.settings, 'goalsInterpolation', 'auto'),
-      goals: sortBy(get(collective.settings, 'goals', []), 'amount').map(goal => ({
+      goalsInterpolation: get(collective.settings, 'goalsInterpolation', 'auto') as string,
+      goals: sortBy(get(collective.settings, 'goals', []) as Goal[], 'amount').map(goal => ({
         ...goal,
         key: goal.key || uuid(),
       })),
@@ -108,6 +133,10 @@ class CollectiveGoals extends React.Component {
       },
     ];
   }
+
+  defaultType: string;
+  messages: Record<string, { id: string; defaultMessage: string }>;
+  fields: GoalField[];
 
   editGoal = (index, fieldName, value) => {
     if (value === 'onetime') {
@@ -187,7 +216,7 @@ class CollectiveGoals extends React.Component {
   renderGoal = (goal, index) => {
     const { intl } = this.props;
 
-    const defaultValues = {
+    const defaultValues: Record<string, string | number | undefined> = {
       ...goal,
       type: goal.type || this.defaultType,
     };
@@ -229,7 +258,7 @@ class CollectiveGoals extends React.Component {
                 type={this.fields[2].type}
                 placeholder={this.fields[2].placeholder}
                 onChange={event => this.editGoal(index, this.fields[2].name, event.target.value * 100)}
-                value={defaultValues[this.fields[2].name] / 100 || ''}
+                value={(defaultValues[this.fields[2].name] as number) / 100 || ''}
               />
             </StyledInputField>
           </Box>
@@ -238,7 +267,7 @@ class CollectiveGoals extends React.Component {
               <StyledTextarea
                 placeholder={this.fields[3].placeholder}
                 onChange={event => this.editGoal(index, this.fields[3].name, event.target.value)}
-                value={defaultValues[this.fields[3].name] || ''}
+                value={(defaultValues[this.fields[3].name] as string) || ''}
                 width="100%"
               />
             </StyledInputField>
@@ -256,7 +285,7 @@ class CollectiveGoals extends React.Component {
 
   render() {
     const { intl, collective } = this.props;
-    const { goals, goalsInterpolation, collectivePage, isSubmitting, submitted, isTouched, error } = this.state;
+    const { goals, goalsInterpolation, collectivePage, submitted, isTouched, error } = this.state;
 
     if (collective.features[FEATURES.COLLECTIVE_GOALS] === 'UNSUPPORTED') {
       return <FeatureNotSupported />;
@@ -306,7 +335,7 @@ class CollectiveGoals extends React.Component {
         )}
 
         <div className="flex flex-col gap-2 sm:justify-stretch">
-          <Button onClick={this.handleSubmit} loading={isSubmitting} disabled={submitted || !isTouched} minWidth={200}>
+          <Button onClick={this.handleSubmit} disabled={submitted || !isTouched}>
             {submitted ? (
               <FormattedMessage id="saved" defaultMessage="Saved" />
             ) : (
@@ -324,7 +353,12 @@ class CollectiveGoals extends React.Component {
   }
 }
 
-const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation, {
+const addEditCollectiveSettingsMutation = graphql<
+  CollectiveGoalsProps,
+  { editAccountSetting: { id: string; settings: Record<string, unknown> } },
+  Record<string, unknown>,
+  { editCollectiveSettings?: (options: unknown) => Promise<unknown> }
+>(editCollectiveSettingsMutation, {
   name: 'editCollectiveSettings',
   options: {
     context: API_V1_CONTEXT,

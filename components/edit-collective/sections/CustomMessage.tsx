@@ -129,12 +129,7 @@ const CustomMessage = ({ collective }) => {
         </MessageBox>
       )}
       <div className="mt-4 flex">
-        <Button
-          className="w-full"
-          disabled={loading || !isModified}
-          width="157px"
-          onClick={() => handleSubmit(customMessage)}
-        >
+        <Button className="w-full" disabled={loading || !isModified} onClick={() => handleSubmit(customMessage)}>
           <FormattedMessage id="save" defaultMessage="Save" />
         </Button>
       </div>

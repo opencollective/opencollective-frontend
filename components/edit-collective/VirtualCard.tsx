@@ -4,6 +4,7 @@ import { Copy } from '@styled-icons/feather/Copy';
 import { EllipsisVertical } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
+import type { SpaceProps } from 'styled-system';
 import { margin } from 'styled-system';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -66,7 +67,7 @@ export const CardContainer = styled(Flex)`
   }
 `;
 
-const Action = styled.button`
+const Action = styled.button<{ color?: string } & SpaceProps>`
   ${margin}
   cursor: pointer;
   line-height: 16px;
@@ -88,7 +89,7 @@ const Action = styled.button`
   }
 `;
 
-export const StateLabel = styled(Box)`
+export const StateLabel = styled(Box)<{ isActive?: boolean }>`
   align-self: center;
   padding: 2px 6px;
   border-radius: 4px;
@@ -189,7 +190,11 @@ export const ActionsButton = props => {
             <DropdownMenuItem
               onClick={e => {
                 e.preventDefault();
-                confirmOnPauseCard && isActive ? setShowConfirmationModal(true) : handlePauseUnpause();
+                if (confirmOnPauseCard && isActive) {
+                  setShowConfirmationModal(true);
+                } else {
+                  handlePauseUnpause();
+                }
               }}
               disabled={isLoading || isCanceled}
             >
@@ -198,7 +203,7 @@ export const ActionsButton = props => {
               ) : (
                 <FormattedMessage id="VirtualCards.ResumeCard" defaultMessage="Resume Card" />
               )}
-              {isLoading && <Spinner ml={2} size="0.9em" mb="2px" />}
+              {isLoading && <Spinner size="0.9em" />}
             </DropdownMenuItem>
           )}
           {canDeleteVirtualCard && (
@@ -389,7 +394,7 @@ export function CardDetails({ virtualCard }) {
             {virtualCard.privateData.cvv}
 
             <Action color="black" ml={2} onClick={handleCopy(virtualCard.privateData.cvv)}>
-              <Box position="relative" display="inline-block">
+              <Box display="inline-block">
                 <Copy size="18px" />
               </Box>
             </Action>
@@ -480,9 +485,8 @@ const VirtualCard = props => {
         color="black.900"
         minHeight="48px"
         px="24px"
-        justifyContent={'space-between'}
+        justifyContent="space-between"
         alignItems="center"
-        shrink={0}
       >
         {(props.canEditVirtualCard || props.canPauseOrResumeVirtualCard || props.canDeleteVirtualCard) && (
           <ActionsButton

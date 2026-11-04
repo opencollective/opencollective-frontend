@@ -83,7 +83,7 @@ const MemberForm = props => {
   };
 
   const validate = values => {
-    const errors = {};
+    const errors: Record<string, string> = {};
     if (showSince && !dayjs(values.since).isValid()) {
       errors.since = intl.formatMessage(memberFormMessages.inValidDateError);
     } else if (!fixedRole && (!values.role || !supportedRoles.includes(values.role))) {

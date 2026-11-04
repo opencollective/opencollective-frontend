@@ -37,6 +37,16 @@ const initialValues = {
   cardName: undefined,
 };
 
+type AssignFormValues = {
+  cardNumber?: string;
+  collective?: { id?: number | string; slug?: string; [key: string]: unknown };
+  expiryDate?: string;
+  cvv?: string;
+  assignee?: { id?: number | string; [key: string]: unknown };
+  provider: string;
+  cardName?: string;
+};
+
 const assignNewVirtualCardMutation = gql`
   mutation AssignNewVirtualCard(
     $virtualCard: VirtualCardInput!
@@ -66,7 +76,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
       ...initialValues,
       collective,
     },
-    async onSubmit(values) {
+    async onSubmit(values: AssignFormValues) {
       const { collective, assignee, provider, cardName } = values;
       const privateData = {
         cardNumber: values.cardNumber.replace(/\s+/g, ''),
@@ -106,8 +116,8 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
       onSuccess?.();
       handleClose();
     },
-    validate(values) {
-      const errors = {};
+    validate(values: AssignFormValues) {
+      const errors: Record<string, string> = {};
       if (!values.cardNumber) {
         errors.cardNumber = 'Required';
       } else if (values.cardNumber.length < 16 + 6) {
@@ -153,11 +163,11 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
   }, [formik.values.collective]);
 
   const handleClose = () => {
-    formik.resetForm(initialValues);
+    formik.resetForm();
     formik.setErrors({});
     onClose?.();
   };
-  const handleCollectivePick = async option => {
+  const handleCollectivePick = async (option: { value: { slug?: string } }) => {
     formik.setFieldValue('collective', option.value);
     formik.setFieldValue('assignee', null);
   };
@@ -273,7 +283,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
                   isSearchable={false}
                   disabled={true}
                   value={{ key: 'STRIPE', value: 'STRIPE', label: 'Stripe' }}
-                  onChange={option => formik.setFieldValue('provider', option.value)}
+                  onChange={(option: { value: string }) => formik.setFieldValue('provider', option.value)}
                 />
               )}
             </StyledInputField>
@@ -338,7 +348,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
                   ]}
                   render={(ref, props) => (
                     <StyledInputGroup
-                      prepend={<CreditCard height="18px" style={{ marginTop: '-1px' }} />}
+                      prepend={<CreditCard size="18px" style={{ marginTop: '-1px' }} />}
                       prependProps={{ bg: 'transparent', ml: 2 }}
                       innerRef={ref}
                       {...props}
@@ -395,7 +405,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
           </Box>
         </ModalBody>
         <ModalFooter isFullWidth>
-          <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
+          <Container display="flex" justifyContent={['center', 'flex-end']}>
             <StyledButton
               my={1}
               minWidth={140}

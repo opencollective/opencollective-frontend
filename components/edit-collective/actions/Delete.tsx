@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
+import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -26,7 +27,13 @@ const deleteAccountMutation = gql`
 
 const { PROJECT, EVENT } = CollectiveType;
 
-const DeleteCollective = ({ collective, ...props }) => {
+type DeleteCollectiveProps = {
+  collective: { id: number; name: string; slug: string; type: string; [key: string]: unknown };
+  router: NextRouter;
+  refetchLoggedInUser?: () => Promise<unknown>;
+};
+
+const DeleteCollective = ({ collective, ...props }: DeleteCollectiveProps) => {
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
   const [deleteAccount] = useMutation(deleteAccountMutation);
@@ -67,7 +74,7 @@ const DeleteCollective = ({ collective, ...props }) => {
         />
       </p>
       {error && <MessageBox type="error">{error}</MessageBox>}
-      {!collective.isDeletable && ![EVENT, PROJECT].includes(collective.type) ? (
+      {!collective.isDeletable && ![EVENT, PROJECT].some(type => type === collective.type) ? (
         <MessageBox type="warning">
           <FormattedMessage
             id="collective.delete.isNotDeletable-message"
@@ -83,7 +90,7 @@ const DeleteCollective = ({ collective, ...props }) => {
             values={{ type: collective.type }}
           />
         </MessageBox>
-      ) : !collective.isDeletable && [EVENT, PROJECT].includes(collective.type) ? (
+      ) : !collective.isDeletable && [EVENT, PROJECT].some(type => type === collective.type) ? (
         <MessageBox type="warning">
           <FormattedMessage
             id="collective.event.delete.isNotDeletable-message"

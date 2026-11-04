@@ -99,7 +99,7 @@ export const collectiveSettingsEditQuery = gql`
   }
 `;
 
-const ItemContainer = styled.div`
+const ItemContainer = styled.div<{ isDragging?: boolean; isDragOverlay?: boolean; isSubSection?: boolean }>`
   ${props =>
     props.isDragging &&
     css`
@@ -134,10 +134,22 @@ const CollectiveSectionEntry = ({
   onSectionToggle,
   collectiveType,
   isSubSection,
-  hasData,
-  showMissingDataWarning,
+  hasData = undefined,
+  showMissingDataWarning = undefined,
   showDragIcon,
   dragHandleProps,
+}: {
+  isEnabled: boolean;
+  version?: number;
+  restrictedTo?: string[];
+  section: string;
+  onSectionToggle: (section: string, options: unknown) => void;
+  collectiveType?: string;
+  isSubSection?: boolean;
+  hasData?: boolean;
+  showMissingDataWarning?: boolean;
+  showDragIcon?: boolean;
+  dragHandleProps?: Record<string, unknown>;
 }) => {
   const intl = useIntl();
 
@@ -310,7 +322,29 @@ const MenuCategory = ({ item, collective, onSectionToggle, setSubSections, dragH
   );
 };
 
-const Item = React.forwardRef(
+type SectionNode = {
+  name: string;
+  type?: string;
+  isEnabled?: boolean;
+  version?: number;
+  restrictedTo?: string[];
+  sections?: SectionNode[];
+};
+
+type ItemProps = {
+  dragHandleProps?: Record<string, unknown>;
+  isDragging?: boolean;
+  isDragOverlay?: boolean;
+  style?: React.CSSProperties;
+  setSubSections?: (sections: SectionNode[]) => void;
+  onSectionToggle?: (section: string, options: unknown) => void;
+  collective?: { type: string; slug: string; [key: string]: unknown };
+  item?: SectionNode;
+  isSubSection?: boolean;
+  showDragIcon?: boolean;
+};
+
+const Item = React.forwardRef<HTMLDivElement, ItemProps>(
   (
     {
       dragHandleProps,
@@ -364,7 +398,7 @@ Item.displayName = 'Item';
 
 const MemoizedItem = memo(Item);
 
-const DraggableItem = props => {
+const DraggableItem = (props: { id: string } & ItemProps) => {
   const { attributes, listeners, isDragging, setNodeRef, transform, transition } = useSortable({ id: props.id });
 
   const style = {
@@ -383,7 +417,7 @@ const DraggableItem = props => {
   );
 };
 
-const EditCollectivePage = ({ collective }) => {
+const EditCollectivePage = ({ collective }: { collective: { slug: string; type: string; [key: string]: unknown } }) => {
   const intl = useIntl();
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState([]);
@@ -462,7 +496,6 @@ const EditCollectivePage = ({ collective }) => {
                           item={item}
                           collective={collective}
                           onSectionToggle={onSectionToggle}
-                          fontWeight="bold"
                           showDragIcon
                           setSubSections={subSections => {
                             const newSections = cloneDeep(sections);
@@ -509,9 +542,7 @@ const EditCollectivePage = ({ collective }) => {
                 value: {
                   ...data?.account?.settings.collectivePage,
                   sections,
-                  showGoals: flatten(sections, item => item.sections || item).some(
-                    ({ name, isEnabled }) => name === Sections.GOALS && isEnabled,
-                  ),
+                  showGoals: flatten(sections).some(({ name, isEnabled }) => name === Sections.GOALS && isEnabled),
                 },
               },
             });

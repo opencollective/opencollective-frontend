@@ -66,11 +66,7 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
               <Button variant="outline" onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </Button>
-              <Button
-                buttonStyle="primary"
-                data-cy="action"
-                onClick={() => setModal({ ...modal, show: false, isApproved: true })}
-              >
+              <Button data-cy="action" onClick={() => setModal({ ...modal, show: false, isApproved: true })}>
                 <FormattedMessage id="confirm" defaultMessage="Confirm" />
               </Button>
             </div>
