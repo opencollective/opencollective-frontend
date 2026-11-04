@@ -66,8 +66,6 @@ type MetaTag = {
   type?: string;
   title?: string;
   href?: string;
-  /** Not a valid `<meta>` attribute, kept for markup parity (see PLAN.md) */
-  size?: string;
 };
 
 class Header extends React.Component<HeaderProps> {
@@ -145,44 +143,22 @@ class Header extends React.Component<HeaderProps> {
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
           {/** Disable IE compatibility mode. See https://developer.paypal.com/docs/checkout/integrate/#2-add-the-paypal-javascript-sdk-to-your-web-page */}
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-          {/* `size` is not a valid `<meta>` attribute; rendered as-is for markup parity (see PLAN.md) */}
-          <meta
-            property="og:logo"
-            content="/static/images/opencollectiveicon240x240"
-            {...({ size: '240x240' } as React.ComponentProps<'meta'>)}
-          />
-          <meta
-            property="og:logo"
-            content="/static/images/opencollectiveicon48x48"
-            {...({ size: '48x48' } as React.ComponentProps<'meta'>)}
-          />
-          <meta
-            property="og:logo"
-            content="/static/images/opencollectivelogo480x80"
-            {...({ size: '480x80' } as React.ComponentProps<'meta'>)}
-          />
-          <meta
-            property="og:logo"
-            content="/static/images/opencollectivelogo480x80@2x"
-            {...({ size: '960x160' } as React.ComponentProps<'meta'>)}
-          />
+          <meta property="og:logo" content="/static/images/opencollectiveicon240x240" />
+          <meta property="og:logo" content="/static/images/opencollectiveicon48x48" />
+          <meta property="og:logo" content="/static/images/opencollectivelogo480x80" />
+          <meta property="og:logo" content="/static/images/opencollectivelogo480x80@2x" />
           {css && <link rel="stylesheet" href={css} />}
           <title>{this.getTitle()}</title>
           {this.getMetas().map((props, idx) => (
             // We use index in this `key` because their can be multiple meta for the same property (eg. og:image).
-            // `size` is not part of `<meta>`'s props but is rendered as-is (see PLAN.md).
             // eslint-disable-next-line react/no-array-index-key
-            <meta key={`${props.property || props.name}-${idx}`} {...(props as Record<string, unknown>)} />
+            <meta key={`${props.property || props.name}-${idx}`} {...props} />
           ))}
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
         <div id="top" />
         {withTopBar && (
-          // `account` and `loading` are not consumed by `TopBar`; both are kept for behaviour parity (see PLAN.md)
           <TopBar
-            {...({ account: this.props.collective, loading: this.props.loading } as React.ComponentProps<
-              typeof TopBar
-            >)}
             showSearch={this.props.showSearch}
             showMenuItems={this.props.showMenuItems}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}

@@ -181,7 +181,7 @@ const CreateProfile = ({
             <Flex justifyContent="center" mb={40}>
               <Box minWidth={104}>
                 {/* `alt` is required by `next/image` types but was never provided; kept as-is (see PLAN.md) */}
-                <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} alt={undefined} />
+                <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} alt="Open Collective" />
               </Box>
               <Box ml={24} mr={24} mt={32} minWidth={40}>
                 <Image src="/static/images/oauth-flow-connect.png" alt="OAuth Connect" height={40} width={40} />
@@ -192,7 +192,7 @@ const CreateProfile = ({
             </Flex>
           </React.Fragment>
         ) : (
-          <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} alt={undefined} />
+          <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} alt="Open Collective" />
         )}
         <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
           {isOAuth ? (

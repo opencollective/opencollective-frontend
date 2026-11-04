@@ -291,7 +291,6 @@ export default class SignIn extends React.Component<SignInProps, SignInState> {
                 >
                   <PasswordInput
                     key={this.props.passwordRequired ? 'required' : 'initial'}
-                    {...({ fontSize: '14px' } as React.ComponentProps<typeof PasswordInput>)}
                     id="password"
                     name="password"
                     autoComplete="current-password"

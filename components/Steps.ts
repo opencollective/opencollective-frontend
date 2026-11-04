@@ -1,6 +1,8 @@
 import React from 'react';
 import { findLastIndex } from 'lodash-es';
 
+type AnyStep = Step & { index?: number };
+
 type Step = {
   /** The step name, **must be unique**. */
   name: string;
@@ -11,8 +13,6 @@ type Step = {
 };
 
 /** A step as it can be passed around: `index` is missing for raw (unbuilt) steps */
-type AnyStep = Step & { index?: number };
-
 type BuiltStep = Step & {
   index: number;
   isLastStep: boolean;
@@ -91,7 +91,7 @@ export default class Steps extends React.Component<StepsProps, StepsState> {
 
   onInvalidStep = (step: BuiltStep, lastValidStep: BuiltStep) => {
     const firstStep = this.getStepByIndex(0);
-    const targetStep = lastValidStep ? this.props.steps[lastValidStep.index + 1] : firstStep;
+    const targetStep = lastValidStep ? this.getStepByIndex(lastValidStep.index + 1) : firstStep;
     return this.goToStep(targetStep, { ignoreValidation: true });
   };
 
@@ -195,8 +195,7 @@ export default class Steps extends React.Component<StepsProps, StepsState> {
    * Go to given step. Will be blocked if current step is not validated, unless
    * if `opts.ignoreValidation` is true.
    */
-  // `index` is optional: `onInvalidStep` passes a raw step (not built), which is preserved as-is (see PLAN.md)
-  goToStep = async (step: AnyStep, opts: { ignoreValidation?: boolean; action?: string } = {}) => {
+  goToStep = async (step: BuiltStep, opts: { ignoreValidation?: boolean; action?: string } = {}) => {
     const currentStep = this.getStepByName(this.props.currentStepName);
     let ignoreValidation = opts.ignoreValidation;
     if (step.index < currentStep?.index) {
