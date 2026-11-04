@@ -52,7 +52,8 @@ type RichTextEditorProps = RichTextEditorContainerProps & {
   /** A name for the input */
   inputName?: string;
   /** Change this prop to force a re-render of the component */
-  reset?: boolean;
+  /** Any value that changes between renders resets the editor (the comment id is used as a sentinel) */
+  reset?: boolean | number | string;
   /** If true, max text length will be displayed at the bottom right */
   showCount?: boolean;
   /** Max length of the text */

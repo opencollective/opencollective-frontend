@@ -1,0 +1,330 @@
+import React from 'react';
+import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
+import { Planet } from '@styled-icons/boxicons-regular/Planet';
+import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
+import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
+import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
+import { AttachMoney } from '@styled-icons/material/AttachMoney';
+import { Stack } from '@styled-icons/remix-line/Stack';
+import { pickBy } from 'lodash-es';
+import { FormattedMessage } from 'react-intl';
+import styled, { css } from 'styled-components';
+
+import { getContributeRoute } from '../../lib/collective';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+
+import ActionButton from '../ActionButton';
+import AddFundsBtn from '../AddFundsBtn';
+import ApplyToHostBtn from '../ApplyToHostBtn';
+import ContactCollectiveBtn from '../ContactCollectiveBtn';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import Link from '../Link';
+import StyledButton from '../StyledButton';
+import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
+import StyledHr from '../StyledHr';
+import StyledLink from '../StyledLink';
+import { SubmitExpenseLink } from '../SubmitExpenseBtn';
+import { Span } from '../Text';
+
+import { NAVBAR_ACTION_TYPE } from './menu';
+
+const MenuItem = styled('li')<{ isHiddenOnMobile?: boolean }>`
+  display: flex;
+  align-items: center;
+
+  &,
+  a,
+  button {
+    width: 100%;
+    text-align: left;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: -0.4px;
+    outline: none;
+
+    @media (max-width: 39.938em) {
+      font-size: 14px;
+    }
+
+    &:not(:hover) {
+      color: #313233;
+    }
+
+    &:hover:not(:disabled) {
+      background: white;
+      color: ${props => props.theme.colors.black[800]};
+      &:not(:active) {
+        background: white;
+        text-decoration: underline;
+      }
+    }
+
+    &:focus {
+      box-shadow: none;
+      outline: none;
+      background: white;
+      text-shadow: 0px 0px 1px black; /** Using text-shadow rather than font-weight to prevent size changes */
+    }
+
+    &:disabled {
+      color: #8c8c8c;
+    }
+  }
+
+  a,
+  button {
+    &:not(:active) {
+      margin-right: 24px;
+    }
+
+    &:active {
+      outline: 1px solid #e8e9eb;
+      margin-left: 12px;
+      margin-right: 12px;
+      background: white;
+    }
+  }
+
+  svg {
+    margin-right: 8px;
+    fill: ${props => props.theme.colors.primary[600]};
+    color: ${props => props.theme.colors.primary[600]};
+  }
+
+  ${props =>
+    props.isHiddenOnMobile &&
+    css`
+      @media screen and (min-width: 40em) {
+        display: none;
+      }
+    `}
+`;
+
+const ActionsDropdown = styled(Dropdown)`
+  ${DropdownContent} {
+    padding: 8px 0;
+  }
+
+  @media screen and (min-width: 40em) and (max-width: 88em) {
+    ${DropdownContent} {
+      right: 50px;
+    }
+  }
+
+  @media (max-width: 39.938em) {
+    ${DropdownArrow} {
+      display: none !important;
+    }
+    ${DropdownContent} {
+      display: block;
+      position: relative;
+      box-shadow: none;
+      border: none;
+      padding-top: 0;
+      text-transform: uppercase;
+      button {
+        text-transform: uppercase;
+      }
+
+      svg {
+        margin-right: 16px;
+      }
+    }
+  }
+
+  ${props =>
+    props.$isHiddenOnNonMobile &&
+    css`
+      @media screen and (min-width: 39.938em) {
+        display: none;
+      }
+    `}
+`;
+
+const StyledActionButton = styled(ActionButton).attrs({ isSecondary: true })`
+  svg {
+    stroke-width: 2;
+  }
+
+  span {
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  @media (max-width: 39.938em) {
+    cursor: none;
+    pointer-events: none;
+  }
+`;
+
+const StyledChevronDown = styled(ChevronDown)`
+  @media (max-width: 39.938em) {
+    display: none;
+  }
+`;
+
+const ITEM_PADDING = '11px 14px';
+
+type CollectiveNavbarActionsMenuProps = {
+  collective: { slug: string; host?: { slug?: string } };
+  callsToAction?: {
+    hasSubmitExpense?: boolean;
+    hasRequestGrant?: boolean;
+    hasManageSubscriptions?: boolean;
+    hasContribute?: boolean;
+    addFunds?: boolean;
+    hasContact?: boolean;
+    hasApply?: boolean;
+    [key: string]: boolean;
+  };
+  hiddenActionForNonMobile?: string;
+  LoggedInUser?: object;
+  onOpenSubmitExpenseModalClick?: () => void;
+};
+
+const CollectiveNavbarActionsMenu = ({
+  collective,
+  callsToAction = {},
+  hiddenActionForNonMobile,
+  LoggedInUser,
+  onOpenSubmitExpenseModalClick = () => {},
+}: CollectiveNavbarActionsMenuProps) => {
+  const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
+  const isEmpty = enabledCTAs.length < 1;
+  const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
+
+  // Do not render the menu if there are no available CTAs
+  if (isEmpty) {
+    return null;
+  }
+
+  return (
+    <Container
+      display={hasOnlyOneHiddenCTA ? ['flex', 'none'] : 'flex'}
+      alignItems="center"
+      order={[-1, 0]}
+      borderTop={['1px solid #e1e1e1', 'none']}
+      ml={1}
+    >
+      <Box px={1}>
+        <ActionsDropdown trigger="click" $isHiddenOnNonMobile={enabledCTAs.length <= 2}>
+          {({ triggerProps, dropdownProps }) => (
+            <React.Fragment>
+              <Flex alignItems="center">
+                <Box display={['block', 'none']} width={'32px'} ml={2}>
+                  <StyledHr borderStyle="solid" borderColor="primary.600" />
+                </Box>
+                <StyledActionButton my={2} {...triggerProps}>
+                  <Span>
+                    <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
+                  </Span>
+                  <StyledChevronDown size="14px" />
+                </StyledActionButton>
+              </Flex>
+              <div {...dropdownProps}>
+                <DropdownArrow />
+                <DropdownContent>
+                  <Box as="ul" p={0} m={0} minWidth={184}>
+                    {callsToAction.hasSubmitExpense && (
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
+                        <SubmitExpenseLink
+                          collective={collective}
+                          LoggedInUser={LoggedInUser}
+                          onOpenSubmitExpenseModalClick={onOpenSubmitExpenseModalClick}
+                          linkComponent={StyledLink}
+                        >
+                          <Container p={ITEM_PADDING}>
+                            <Receipt size="20px" />
+                            <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                          </Container>
+                        </SubmitExpenseLink>
+                      </MenuItem>
+                    )}
+                    {callsToAction.hasRequestGrant && (
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
+                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/grants/new`}>
+                          <Container p={ITEM_PADDING}>
+                            <MoneyCheckAlt size="20px" />
+                            <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
+                          </Container>
+                        </StyledLink>
+                      </MenuItem>
+                    )}
+                    {callsToAction.hasManageSubscriptions && (
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
+                        <StyledLink as={Link} href={getDashboardRoute(collective, 'outgoing-contributions')}>
+                          <Container p={ITEM_PADDING}>
+                            <Stack size="20px" />
+                            <span>
+                              <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                            </span>
+                          </Container>
+                        </StyledLink>
+                      </MenuItem>
+                    )}
+                    {callsToAction.hasContribute && (
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTRIBUTE}>
+                        <StyledLink as={Link} href={getContributeRoute(collective)}>
+                          <Container p={ITEM_PADDING}>
+                            <Planet size="20px" />
+                            <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
+                          </Container>
+                        </StyledLink>
+                      </MenuItem>
+                    )}
+                    {callsToAction.addFunds && (
+                      <AddFundsBtn collective={collective}>
+                        {btnProps => (
+                          <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
+                            <StyledButton
+                              borderRadius={0}
+                              p="10px 14px"
+                              isBorderless
+                              {...btnProps}
+                              data-cy="add-funds-btn"
+                            >
+                              <AttachMoney size="20px" />
+                              <Span>
+                                <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+                              </Span>
+                            </StyledButton>
+                          </MenuItem>
+                        )}
+                      </AddFundsBtn>
+                    )}
+                    {callsToAction.hasContact && (
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
+                        <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
+                          {btnProps => (
+                            <StyledButton {...btnProps} borderRadius={0} p="10px 14px" isBorderless>
+                              <Envelope size="20px" />
+                              <FormattedMessage id="Contact" defaultMessage="Contact" />
+                            </StyledButton>
+                          )}
+                        </ContactCollectiveBtn>
+                      </MenuItem>
+                    )}
+                    {callsToAction.hasApply && (
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
+                        <ApplyToHostBtn
+                          hostSlug={collective.slug}
+                          isHidden={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}
+                          buttonProps={{ isBorderless: true, p: '10px 14px' }}
+                        />
+                      </MenuItem>
+                    )}
+                  </Box>
+                </DropdownContent>
+              </div>
+            </React.Fragment>
+          )}
+        </ActionsDropdown>
+      </Box>
+    </Container>
+  );
+};
+
+export default CollectiveNavbarActionsMenu;

@@ -50,6 +50,8 @@ type NewCreditCardFormProps = {
   name?: string;
   /** Not consumed by this component, accepted for consumers that still pass it (see PLAN.md) */
   profileType?: string;
+  /** Not consumed by this component, accepted for consumers that still pass it (see PLAN.md) */
+  isCompact?: boolean;
 };
 
 type NewCreditCardFormState = {

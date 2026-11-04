@@ -78,7 +78,7 @@ const formatOptionLabel = option => {
 /**
  * Fetches expenses based on user search input.
  */
-const ExpensesPickerAsync = ({ inputId, noCache, account, status, ...props }) => {
+const ExpensesPickerAsync = ({ inputId, noCache = false, account = undefined, status = undefined, ...props }) => {
   const fetchPolicy: 'network-only' | undefined = noCache ? 'network-only' : undefined;
   const variables = { account: getAccountInput(account), status };
   const queryParameters = { fetchPolicy, variables };

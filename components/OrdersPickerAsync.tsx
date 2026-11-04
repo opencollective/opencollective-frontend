@@ -107,7 +107,14 @@ const formatOptionLabel = option => {
 /**
  * A specialization of `CollectivePicker` that fetches the data based on user search.
  */
-const OrdersPickerAsync = ({ inputId, noCache, account, filter, includeIncognito, ...props }) => {
+const OrdersPickerAsync = ({
+  inputId,
+  noCache = false,
+  account = undefined,
+  filter = undefined,
+  includeIncognito = undefined,
+  ...props
+}) => {
   const fetchPolicy: 'network-only' | undefined = noCache ? 'network-only' : undefined;
   const variables = { includeIncognito, filter, account: getAccountInput(account) };
   const queryParameters = { fetchPolicy, variables };
