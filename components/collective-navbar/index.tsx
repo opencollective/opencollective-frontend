@@ -467,12 +467,10 @@ const CollectiveNavbar = ({
   const { LoggedInUser } = useLoggedInUser();
   isAdmin = isAdmin || LoggedInUser?.isAdminOfCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
-  const { data } = useQuery(accountPermissionsQuery, {
+  const { data, loading: dataLoading } = useQuery(accountPermissionsQuery, {
     variables: { slug: collective?.slug },
     skip: !collective?.slug || !LoggedInUser,
   });
-  // TODO: `dataLoading` does not exist on the Apollo query result (see PLAN.md findings); it was always `undefined`
-  const dataLoading = undefined;
 
   const [isSubmitExpenseModalOpen, _setIsSubmitExpenseModalOpen] = React.useState(false);
   const setIsSubmitExpenseModalOpen = open => {

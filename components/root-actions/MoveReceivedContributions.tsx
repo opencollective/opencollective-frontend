@@ -219,7 +219,7 @@ const MoveReceivedContributions = () => {
             isLoading={tiersLoading}
             onChange={({ value }) => setNewTier(value)}
             options={tiersOptions}
-            value={!newTier ? null : getTierOption(newTier as MoveTier)}
+            value={!newTier || newTier === 'custom' ? null : getTierOption(newTier)}
           />
         )}
       </StyledInputField>

@@ -260,8 +260,8 @@ const MoveAuthoredContributions = () => {
           isClearable
           isMulti
           closeMenuOnSelect={false}
-          {...({ disabled: !fromAccount } as Record<string, unknown>)}
-          {...({ truncationThreshold: 5 } as Record<string, unknown>)}
+          isDisabled={!fromAccount}
+          truncationThreshold={5}
           formatOptionLabel={option => formatOrderOption(option, intl)}
         />
       </Box>

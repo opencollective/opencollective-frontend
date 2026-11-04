@@ -351,6 +351,8 @@ export type StyledSelectProps = LayoutProps &
     error?: boolean;
     inputId?: string;
     useSearchIcon?: boolean;
+    /** Maximum number of selected values displayed before truncating */
+    truncationThreshold?: number;
   };
 
 export type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;

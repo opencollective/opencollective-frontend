@@ -29,7 +29,7 @@ import { Span } from '../Text';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
 
-const MenuItem = styled('li')<{ isHiddenOnMobile?: boolean; py?: number }>`
+const MenuItem = styled('li')<{ isHiddenOnMobile?: boolean }>`
   display: flex;
   align-items: center;
 
@@ -40,7 +40,7 @@ const MenuItem = styled('li')<{ isHiddenOnMobile?: boolean; py?: number }>`
     text-align: left;
     font-style: normal;
     font-weight: 500;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 16px;
     letter-spacing: -0.4px;
     outline: none;
@@ -244,7 +244,7 @@ const CollectiveNavbarActionsMenu = ({
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
-                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
                         <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/grants/new`}>
                           <Container p={ITEM_PADDING}>
                             <MoneyCheckAlt size="20px" />
@@ -266,7 +266,7 @@ const CollectiveNavbarActionsMenu = ({
                       </MenuItem>
                     )}
                     {callsToAction.hasContribute && (
-                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTRIBUTE}>
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTRIBUTE}>
                         <StyledLink as={Link} href={getContributeRoute(collective)}>
                           <Container p={ITEM_PADDING}>
                             <Planet size="20px" />
@@ -278,10 +278,10 @@ const CollectiveNavbarActionsMenu = ({
                     {callsToAction.addFunds && (
                       <AddFundsBtn collective={collective}>
                         {btnProps => (
-                          <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
+                          <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
                             <StyledButton
                               borderRadius={0}
-                              p={ITEM_PADDING}
+                              p="10px 14px"
                               isBorderless
                               {...btnProps}
                               data-cy="add-funds-btn"
@@ -296,10 +296,10 @@ const CollectiveNavbarActionsMenu = ({
                       </AddFundsBtn>
                     )}
                     {callsToAction.hasContact && (
-                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
                         <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
                           {btnProps => (
-                            <StyledButton {...btnProps} borderRadius={0} p={ITEM_PADDING} isBorderless>
+                            <StyledButton {...btnProps} borderRadius={0} p="10px 14px" isBorderless>
                               <Envelope size="20px" />
                               <FormattedMessage id="Contact" defaultMessage="Contact" />
                             </StyledButton>
@@ -308,11 +308,11 @@ const CollectiveNavbarActionsMenu = ({
                       </MenuItem>
                     )}
                     {callsToAction.hasApply && (
-                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
+                      <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}>
                         <ApplyToHostBtn
                           hostSlug={collective.slug}
                           isHidden={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.APPLY}
-                          buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
+                          buttonProps={{ isBorderless: true, p: '10px 14px' }}
                         />
                       </MenuItem>
                     )}
