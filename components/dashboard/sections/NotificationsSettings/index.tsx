@@ -395,7 +395,7 @@ const NotificationsSettings = ({ accountSlug, subpath }) => {
                 <Switch
                   name={`newsletter-switch`}
                   checked={data?.account?.newsletterOptIn}
-                  {...({ isDisabled: setNewsletterOptInLoading } as Record<string, unknown>)}
+                  disabled={setNewsletterOptInLoading}
                   onCheckedChange={checked => setNewsletterOptIn({ variables: { newsletterOptIn: checked } })}
                 />
               </Flex>
